@@ -51,7 +51,8 @@ export class NexaClient {
     #binaryTail: Promise<undefined> = Promise.resolve(undefined);
     readonly #pending: PendingRequests;
     readonly #options: ClientOptions;
-    readonly #attachments: Set<(attachment: ReceivedAttachment) => void> = new Set();
+    readonly #attachments: Set<(attachment: ReceivedAttachment) => void | Promise<void>> =
+        new Set();
     readonly #events: Set<(event: GatewayEvent) => void> = new Set();
     readonly #closeListeners: Set<(error: Error) => void> = new Set();
     readonly #gaps: Set<(gap: SequenceGap) => void> = new Set();
@@ -267,7 +268,9 @@ export class NexaClient {
     }
 
     /** Receives raw file bytes for ask and stream calls; subscribe before starting a turn. */
-    public onAttachment(listener: (attachment: ReceivedAttachment) => void): () => void {
+    public onAttachment(
+        listener: (attachment: ReceivedAttachment) => void | Promise<void>,
+    ): () => void {
         this.#attachments.add(listener);
         return (): void => {
             this.#attachments.delete(listener);
@@ -465,11 +468,7 @@ export class NexaClient {
                 complete,
                 BinaryChunks.MAX_TRANSFER_BYTES,
             );
-            for (const listener of this.#attachments) {
-                this.#notify((): void => {
-                    listener(attachment);
-                });
-            }
+            void this.#deliverAttachment(attachment);
             return;
         }
         if (
@@ -537,6 +536,31 @@ export class NexaClient {
             });
         }
     }
+    async #deliverAttachment(attachment: ReceivedAttachment): Promise<void> {
+        let received: boolean = this.#attachments.size > 0;
+        try {
+            await Promise.all(
+                [...this.#attachments].map(async (listener): Promise<void> => {
+                    await listener(attachment);
+                }),
+            );
+        } catch (error: unknown) {
+            received = false;
+            this.#notify((): void => {
+                throw error;
+            });
+        }
+        if (this.#hello?.features.methods.includes(Method.MediaAcknowledge)) {
+            try {
+                await this.call(Method.MediaAcknowledge, { id: attachment.id, received });
+            } catch (error: unknown) {
+                this.#notify((): void => {
+                    throw error;
+                });
+            }
+        }
+    }
+
     #notify(listener: () => void): void {
         try {
             listener();

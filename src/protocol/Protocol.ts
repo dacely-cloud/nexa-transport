@@ -1318,6 +1318,14 @@ export interface GatewayMethodslogs_tailShape {
     readonly result: ReadonlyArray<LogRecord>;
 }
 
+/** GatewayMethodsmedia_acknowledge wire fields. */
+export interface GatewayMethodsmedia_acknowledgeShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: MediaAcknowledgeParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: OkResult;
+}
+
 /** GatewayMethodssessions_delete wire fields. */
 export interface GatewayMethodssessions_deleteShape {
     /** params as defined by the Nexa gateway. */
@@ -1572,6 +1580,8 @@ export interface GatewayMethodsShape {
     readonly 'jobs.remove': GatewayMethodsjobs_removeShape;
     /** logs.tail as defined by the Nexa gateway. */
     readonly 'logs.tail': GatewayMethodslogs_tailShape;
+    /** media.acknowledge as defined by the Nexa gateway. */
+    readonly 'media.acknowledge': GatewayMethodsmedia_acknowledgeShape;
     /** sessions.delete as defined by the Nexa gateway. */
     readonly 'sessions.delete': GatewayMethodssessions_deleteShape;
     /** sessions.get as defined by the Nexa gateway. */
@@ -2018,6 +2028,17 @@ export interface LogTailParamsShape {
 
 /** LogTailParams from the Nexa wire protocol. */
 export type LogTailParams = LogTailParamsShape;
+
+/** MediaAcknowledgeParams wire fields. */
+export interface MediaAcknowledgeParamsShape {
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** received as defined by the Nexa gateway. */
+    readonly received: boolean;
+}
+
+/** MediaAcknowledgeParams from the Nexa wire protocol. */
+export type MediaAcknowledgeParams = MediaAcknowledgeParamsShape;
 
 /** Allowed values for MemoryLendermode. */
 export const MemoryLendermodeValues = { Value0: 'all', Value1: 'partial' } as const;
@@ -3765,6 +3786,8 @@ export enum Method {
     JobsRemove = 'jobs.remove',
     /** Calls logs.tail. */
     LogsTail = 'logs.tail',
+    /** Calls media.acknowledge. */
+    MediaAcknowledge = 'media.acknowledge',
     /** Calls sessions.delete. */
     SessionsDelete = 'sessions.delete',
     /** Calls sessions.get. */

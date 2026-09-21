@@ -32,6 +32,7 @@ All 54 protocol methods. `connect` is managed by `NexaClient.connect`; the remai
 - [jobs.list](#jobs-list)
 - [jobs.remove](#jobs-remove)
 - [logs.tail](#logs-tail)
+- [media.acknowledge](#media-acknowledge)
 - [sessions.delete](#sessions-delete)
 - [sessions.get](#sessions-get)
 - [sessions.list](#sessions-list)
@@ -675,6 +676,30 @@ Parameters: [LogTailParams](protocol.md#logtailparams).
 | `since` | No       | `number`                                    | Only lines newer than this timestamp, so a poller does not re-read what it has. |
 
 Result: Array of [LogRecord](protocol.md#logrecord).
+
+## media.acknowledge
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.MediaAcknowledge> = {
+    id: 'YOUR_ID',
+    received: false,
+};
+const result: ResultOf<typeof Method.MediaAcknowledge> = await client.call(
+    Method.MediaAcknowledge,
+    params,
+);
+```
+
+Parameters: [MediaAcknowledgeParams](protocol.md#mediaacknowledgeparams).
+
+| Field      | Required | Type      | Description |
+| ---------- | -------- | --------- | ----------- |
+| `id`       | Yes      | `string`  |             |
+| `received` | Yes      | `boolean` |             |
+
+Result: [OkResult](protocol.md#okresult).
 
 ## sessions.delete
 

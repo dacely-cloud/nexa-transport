@@ -1632,8 +1632,6 @@ export const schema: Schema = {
             type: 'object',
         },
         GatewayMethods: {
-            description:
-                'Every method, with its params and its result. The single source of truth for both ends.',
             properties: {
                 'accounts.create': {
                     properties: {
@@ -2065,6 +2063,18 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'media.acknowledge': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/MediaAcknowledgeParams',
+                        },
+                        result: {
+                            $ref: '#/definitions/OkResult',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'sessions.delete': {
                     properties: {
                         params: {
@@ -2419,6 +2429,7 @@ export const schema: Schema = {
                 'jobs.list',
                 'jobs.remove',
                 'logs.tail',
+                'media.acknowledge',
                 'sessions.delete',
                 'sessions.get',
                 'sessions.list',
@@ -3062,6 +3073,20 @@ export const schema: Schema = {
                     type: 'number',
                 },
             },
+            type: 'object',
+        },
+        MediaAcknowledgeParams: {
+            description:
+                'Client attachment handler outcome; receipt does not assert that a human viewed it.',
+            properties: {
+                id: {
+                    type: 'string',
+                },
+                received: {
+                    type: 'boolean',
+                },
+            },
+            required: ['id', 'received'],
             type: 'object',
         },
         MemoryLender: {
