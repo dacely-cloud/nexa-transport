@@ -502,13 +502,16 @@ async function refresh(): Promise<void> {
 client.onAttachment((file): void => {
     console.log(file.filename, file.data);
 });
-for (const file of session.files) {
+// Render session.files as attachment cards using metadata only.
+// Call this function from the attachment's Download/Open button.
+async function downloadSavedFile(attachmentId: string): Promise<void> {
     await client.call(Method.SessionsDownload, {
         id: sessionKey,
-        attachmentId: file.id,
+        attachmentId,
     });
 }
-client.close();
 ```
+
+`resumeSession()` and `Method.SessionsFiles` return saved-file metadata only; they do not download attachment contents or call `onAttachment`. Render filenames, MIME types and sizes from `session.files`. Keep ZIPs, PDFs and other documents metadata-only until the user clicks Download/Open, then call `downloadSavedFile(file.id)`. Do not loop over all saved files and download them on resume. Your UI may explicitly request image/video previews, preferably only for visible items; automatic preview downloads are not performed by the SDK.
 
 Downloads use the same raw, chunked binary transport and `onAttachment` callback as live files. Session ownership is checked for both listing and downloading. The gateway saves files before attempting live delivery. Deleting a session removes its saved files. Reconnect restores subscriptions but does not replay missed events; refresh saved history and tasks to reconcile your UI. A snapshot may overlap live events, so reconcile by session/task identity instead of appending the same state twice.

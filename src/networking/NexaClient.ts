@@ -297,7 +297,7 @@ export class NexaClient {
         }
         return result;
     }
-    /** Restores an owned session without starting or repeating a turn. Subscribe before reading to observe later updates. */
+    /** Restores messages, active tasks and file metadata without downloading saved attachments or repeating a turn. */
     public async resumeSession(sessionId: string): Promise<SessionSnapshot> {
         await this.call(Method.SessionsSubscribe, { sessionId });
         const [messages, tasks, files]: [
