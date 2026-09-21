@@ -1,182 +1,342 @@
+<div align="center">
+
 # nexa-transport
 
-A fully typed Nexa gateway client for browsers and Node.js 22+. Built with Vite and TypeScript 7; checked with Oxc's type-aware rules. No runtime dependencies or Node imports in the browser code.
+### Nexa in your application.
 
-The package speaks **Nexa's websocket gateway protocol v1**. It covers all 54 gateway RPCs, event streaming, tool execution/progress/results, approvals, multi-turn sessions, image/video/document attachments, native NCAP artifacts and rich output, and voice. Nexa executes tools on its server; this library transports requests and results.
+Typed WebSocket client for browsers and Node.js.
 
-## Install
+Chat, tools, media, artifacts, and voice through the Nexa gateway.
 
-Before publication, install the built tarball:
+[![types](https://img.shields.io/badge/types-included-2563ff.svg?labelColor=0e1520)](#api)
+[![node](https://img.shields.io/badge/Node.js-22%2B-22e3ab.svg?labelColor=0e1520)](#installation)
+[![protocol](https://img.shields.io/badge/protocol-Nexa_v1-7c3aed.svg?labelColor=0e1520)](#gateway-compatibility)
+[![license](https://img.shields.io/badge/license-Apache--2.0-8b9ab4.svg?labelColor=0e1520)](./LICENSE)
 
-```sh
-npm install /root/nexa-transport/nexa-transport-0.1.0.tgz
+</div>
+
+---
+
+<details>
+<summary><b>Contents</b></summary>
+
+- [Installation](#installation)
+- [Quick start](#quick-start)
+- [Conversations](#conversations)
+- [Streaming](#streaming)
+- [Media and artifacts](#media-and-artifacts)
+- [Events and approvals](#events-and-approvals)
+- [Authentication](#authentication)
+- [API](#api)
+- [Configuration](#configuration)
+- [Gateway compatibility](#gateway-compatibility)
+- [Development](#development)
+
+</details>
+
+## Features
+
+|                    |                                                            |
+| ------------------ | ---------------------------------------------------------- |
+| **Typed RPC**      | Method enums with method-specific parameters and results.  |
+| **Conversations**  | Create, resume, list, and retrieve chat history.           |
+| **Streaming**      | Text, reasoning, tool progress, and terminal results.      |
+| **Media**          | Images, videos, ordered frames, and documents.             |
+| **Rich output**    | Tool results, artifacts, NCAP events, and binary payloads. |
+| **Voice**          | PCM audio transport, transcripts, and call lifecycle.      |
+| **Access control** | API keys, device pairing, scopes, and tool approvals.      |
+| **Portable**       | Browser and Node.js support with no runtime dependencies.  |
+
+## Installation
+
+Requires Node.js 22+ or a modern browser. Distributed as ESM with TypeScript declarations.
+
+Build a package from source:
+
+```bash
+git clone git@github.com:dacely-cloud/nexa-transport.git
+cd nexa-transport
+npm ci
+npm pack
 ```
 
-Once published: `npm install nexa-transport`.
+Install the resulting archive in your application:
 
-## Connect and chat
+```bash
+npm install /path/to/nexa-transport-0.1.0.tgz
+```
+
+## Quick start
 
 ```ts
 import { NexaClient } from 'nexa-transport';
 import { Method } from 'nexa-transport/protocol';
 
 const client = await NexaClient.connect({
-    url: 'wss://your-nexa.example/',
-    apiKey: userProvidedNexaKey,
+    url: 'wss://nexa.example.com',
+    apiKey: 'YOUR_API_KEY',
 });
 
 try {
-    const turn = client.stream({ message: 'Explain this project' });
-    for await (const event of turn) {
-        switch (event.type) {
-            case 'text':
-                appendText(event.text);
-                break;
-            case 'reasoning':
-                appendReasoning(event.text);
-                break;
-            case 'tool-start':
-                showTool(event.call);
-                break;
-            case 'tool-progress':
-                updateTool(event.call, event.update);
-                break;
-            case 'tool-finish':
-                finishTool(event.outcome);
-                break;
-            case 'native':
-                renderNative(event);
-                break;
-        }
-    }
-    const answer = await turn.result;
-    await client.call(Method.AgentAsk, {
-        message: 'Now explain the tests',
-        conversationId: answer.sessionKey,
+    const answer = await client.call(Method.AgentAsk, {
+        message: 'Explain this project',
     });
+
+    console.log(answer.text);
 } finally {
     client.close();
 }
 ```
 
-`sessionKey` is the server's namespaced conversation identity. Preserve it for follow-up turns; do not reconstruct it from usernames or use the provider's `conversationId` in its place. `sessions.list`, `sessions.get`, and `sessions.messages` retrieve saved conversations and their full content blocks.
+The examples below use an authenticated `client`. `client.call()` accepts `Method` enum members; raw method strings are rejected by TypeScript.
 
-The complete, typechecked integration examples are in `examples/Chat.ts` and `examples/Node.ts`. The UI callback names above illustrate application-owned rendering.
+## Conversations
 
-## Media, tools, artifacts, and documents
+Send a message without `conversationId` to create a conversation. Use the returned `sessionKey` for subsequent turns.
+
+```ts
+const first = await client.call(Method.AgentAsk, {
+    message: 'Help me build a website',
+});
+
+const next = await client.call(Method.AgentAsk, {
+    conversationId: first.sessionKey,
+    message: 'Use TypeScript',
+});
+```
+
+List saved conversations, retrieve their messages, and resume using the selected session's `id`:
+
+```ts
+const sessions = await client.call(Method.SessionsList, { limit: 50 });
+const session = sessions[0];
+
+if (session !== undefined) {
+    const messages = await client.call(Method.SessionsMessages, { id: session.id });
+    console.log(messages);
+
+    await client.call(Method.AgentAsk, {
+        conversationId: session.id,
+        message: 'Continue where we left off',
+    });
+}
+```
+
+Nexa retains conversation history server-side. Save the `sessionKey` to resume after reconnecting. The result's `conversationId` belongs to the model provider; use `sessionKey` for gateway requests.
+
+## Streaming
+
+```ts
+const turn = client.stream({ message: 'Review this project' });
+
+for await (const event of turn) {
+    switch (event.type) {
+        case 'text':
+            console.log(event.text);
+            break;
+        case 'tool-start':
+            console.log(event.call);
+            break;
+        case 'tool-progress':
+            console.log(event.update);
+            break;
+        case 'tool-finish':
+            console.log(event.outcome);
+            break;
+    }
+}
+
+const result = await turn.result;
+```
+
+Pass `conversationId` to continue an existing session. `turn.result` resolves with the final answer and session key.
+
+Cancel with `await turn.cancel()`, an `AbortSignal`, or by breaking out of the iterator. Cancellation targets the server's run ID. Disconnecting rejects outstanding requests and ends active streams.
+
+```ts
+const controller = new AbortController();
+const turn = client.stream({ message: 'Analyze the workspace' }, { signal: controller.signal });
+
+controller.abort();
+```
+
+## Media and artifacts
+
+Attachments accept inline base64 or HTTP(S) URLs using Nexa content blocks.
+
+```ts
+await client.call(Method.AgentAsk, {
+    message: 'Compare the image and document',
+    attachments: [
+        {
+            type: 'image',
+            source: { kind: 'url', url: 'https://example.com/photo.png' },
+        },
+        {
+            type: 'document',
+            source: { kind: 'url', url: 'https://example.com/report.pdf' },
+        },
+    ],
+});
+```
+
+`NexaMedia` converts browser `File` and `Blob` objects into attachments:
+
+| Helper                               | Content                        |
+| ------------------------------------ | ------------------------------ |
+| `NexaMedia.image(blob, title?)`      | Image                          |
+| `NexaMedia.video(blob, title?)`      | Video container                |
+| `NexaMedia.videoFrame(blob, title?)` | Ordered video frame            |
+| `NexaMedia.document(blob, title?)`   | Document                       |
+| `NexaMedia.nativeEvent(event)`       | Validated NCAP payload         |
+| `NexaMedia.bytes(data)`              | Binary payload as `Uint8Array` |
+| `NexaMedia.base64(bytes)`            | Base64 encoding                |
+| `NexaMedia.fromBase64(text)`         | Base64 decoding                |
+
+Read native artifacts and video output from the event stream:
 
 ```ts
 import { NexaMedia } from 'nexa-transport/media';
 
-const turn = client.stream({
-    message: 'Compare this image with the document',
-    attachments: [
-        await NexaMedia.image(imageFile, imageFile.name),
-        await NexaMedia.document(pdfFile, pdfFile.name),
-        { type: 'video', source: { kind: 'url', url: videoUrl } },
-    ],
-});
+const turn = client.stream({ message: 'Create a report' });
+
 for await (const event of turn) {
     const native = NexaMedia.nativeEvent(event);
-    if (native?.artifact) showArtifact(native.artifact);
-    if (native?.video?.phase === 'chunk') saveVideoChunk(NexaMedia.bytes(native.video.data));
-    if (event.type === 'tool-progress' && event.update.attachment) {
-        const preview = event.update.attachment;
-        showPreview(new Blob([NexaMedia.bytes(preview.data)], { type: preview.mimeType }));
+
+    if (native?.artifact !== undefined) {
+        console.log(native.artifact);
+    }
+
+    if (native?.video?.phase === 'chunk') {
+        const bytes = NexaMedia.bytes(native.video.data);
+        console.log(bytes);
     }
 }
+
 await turn.result;
 ```
 
-Attachments use Nexa's existing `text`, `image`, `video`, `video-frame`, and `document` blocks. Inline base64 and HTTP(S) URL sources are supported. `NexaMedia.videoFrame` creates ordered frames; `video` creates a container attachment. Blob helpers enforce a 12 MiB per-item ceiling; the negotiated frame limit also applies to the entire request. Tool progress attachments, tool result content blocks, display metadata, delivery receipts, and native artifacts are retained. `NexaMedia.bytes` handles both indexed JSON byte objects and arrays emitted by gateway versions.
+Tool results preserve content blocks, display metadata, and delivery receipts. Native events include rich blocks, graphs, tasks, research, artifacts, video, and voice. Available media capabilities depend on the connected provider. Server-local artifact paths require a separate authorized file-delivery integration.
 
-Native events include rich blocks, project graphs, backlog, sub-agents, findings, research, skills, artifacts, video generation, and voice. Media/model capabilities still depend on the connected Nexa provider. A server-local artifact path is metadata, not a public download URL; the SDK does not bypass filesystem authorization or invent a download endpoint.
-
-## Events, approvals, and session mirrors
+## Events and approvals
 
 ```ts
 import { EventName } from 'nexa-transport/events';
-import { Method } from 'nexa-transport/protocol';
 
-const stopApproval = client.on(EventName.ApprovalRequested, (approval) => {
-    showApproval(approval);
+const unsubscribe = client.on(EventName.ApprovalRequested, (approval) => {
+    console.log(approval.approvalId, approval.tool, approval.summary);
 });
-await client.call(Method.ApprovalsResolve, { approvalId, approved: true });
 
-const stopMirror = client.on(EventName.TurnEvent, ({ sessionId, event }) => {
-    renderSessionEvent(sessionId, event);
-});
-await client.call(Method.SessionsSubscribe, { sessionId });
-// Later:
-await client.call(Method.SessionsUnsubscribe, { sessionId });
-stopApproval();
-stopMirror();
+const pending = await client.call(Method.ApprovalsList, {});
+console.log(pending);
+
+unsubscribe();
 ```
 
-`on` validates and types every catalogued event payload. `onEvent` also exposes new event names and retains their complete JSON. Originating-stream events and mirrored events share the gateway event feed: use the local `TurnStream` for local rendering and filter session mirrors to avoid rendering your own output twice. `onSequenceGap` reports bigint sequence ranges: re-fetch affected session state. `onClose` reports connection termination. Listener exceptions go to the optional `onListenerError` callback and cannot break transport cleanup.
+Use `Method.ApprovalsResolve` with `{ approvalId, approved }` to submit the user's decision.
 
-## Authentication and hosting
+| Subscription                     | Purpose                         |
+| -------------------------------- | ------------------------------- |
+| `client.on(EventName, listener)` | Typed, validated event payloads |
+| `client.onEvent(listener)`       | All server events               |
+| `client.onSequenceGap(listener)` | Missing event detection         |
+| `client.onClose(listener)`       | Connection termination          |
 
-`apiKey` is Nexa's configured shared token, or a paired-device token accompanied by `deviceId`. There is no separate username/password login endpoint. `connect()` resolves only after the websocket upgrade, nonce challenge, and protocol negotiation succeed. Inspect `client.hello.auth.scopes` and `client.hello.features` for permissions and available server services.
+Each subscription returns a function that removes its listener. Use `Method.SessionsSubscribe` and `Method.SessionsUnsubscribe` with `{ sessionId }` to observe a session. Session events also include locally started turns; filter by stream ID when rendering both feeds.
 
-```ts
-const client = await NexaClient.connect({
-    url: 'wss://your-nexa.example/',
-    deviceId: installationId,
-    deviceName: 'Nervalab browser',
-    pairingCode: operatorProvidedCode,
-});
-const deviceToken = client.hello.auth.token;
-// Reconnect with { deviceId: installationId, apiKey: deviceToken }.
+## Authentication
+
+Connect with an API key, or supply `deviceId` alongside a paired-device token. For initial pairing, use `deviceId`, `deviceName`, and `pairingCode`. A newly issued credential is returned in `client.hello.auth.token`.
+
+`client.hello.auth` contains the authenticated identity and scopes. `client.hello.features` lists supported methods, events, and capabilities.
+
+Browser authentication uses query parameters on the WebSocket upgrade. Use WSS, exclude credentials from application bundles, and redact connection queries in proxy logs. The SDK does not persist credentials. For a separately hosted frontend, add its exact origin to the gateway's `allowedOrigins` configuration.
+
+## API
+
+| Method family                                        | Operations                                          |
+| ---------------------------------------------------- | --------------------------------------------------- |
+| `Method.Agent*`                                      | Run turns, stream, list agents, define agents       |
+| `Method.Sessions*`                                   | List, get, messages, delete, subscribe, unsubscribe |
+| `Method.Tasks*`                                      | List, get, cancel                                   |
+| `Method.Approvals*`                                  | List, resolve                                       |
+| `Method.Jobs*`                                       | List, add, remove                                   |
+| `Method.Credit*`                                     | Budgets, set budget, remove budget, summary         |
+| `Method.Channels*`                                   | List, status, dead letters                          |
+| `Method.Workspaces*`                                 | List, describe, create, destroy                     |
+| `Method.Devices*`                                    | List, approve, reject, revoke                       |
+| `Method.Accounts*`                                   | List, create, remove, usage                         |
+| `Method.Teams*`, `Method.Shares*`                    | List, create, set member, remove                    |
+| `Method.Config*`, `Method.LogsTail`, `Method.Health` | Configuration, logs, health                         |
+| `Method.Voice*`                                      | Start, audio, stop                                  |
+
+For voice, `Method.VoiceStart` returns the call ID, sample rate, and frame size. Send base64 PCM16 through `Method.VoiceAudio`, receive audio and transcripts through `EventName.VoiceAudio` and `EventName.VoiceEvent`, and finish with `Method.VoiceStop`.
+
+| Import                          | Exports                                |
+| ------------------------------- | -------------------------------------- |
+| `nexa-transport`                | `NexaClient`                           |
+| `nexa-transport/protocol`       | `Method`, request and response types   |
+| `nexa-transport/events`         | `EventName`, event types               |
+| `nexa-transport/media`          | `NexaMedia`                            |
+| `nexa-transport/errors`         | `TransportError`, `TransportErrorCode` |
+| `nexa-transport/options`        | Connection and call option types       |
+| `nexa-transport/stream`         | `TurnStream` type                      |
+| `nexa-transport/stream-options` | `StreamOptions` type                   |
+
+## Configuration
+
+| Option               | Default          |
+| -------------------- | ---------------- |
+| `connectTimeoutMs`   | 15 seconds       |
+| `requestTimeoutMs`   | 60 seconds       |
+| `maxPendingRequests` | 64               |
+| `maxMessageBytes`    | 16 MiB           |
+| `turnTimeoutMs`      | 1 hour           |
+| `maxBufferedEvents`  | 256 per stream   |
+| `maxBufferedBytes`   | 8 MiB per stream |
+
+Connection options are passed to `NexaClient.connect()`. Per-call `signal` and `timeoutMs` are passed as the third argument to `client.call()`. Stream options are passed as the second argument to `client.stream()`.
+
+Blob helpers accept up to 12 MiB per attachment; the complete request must also fit the gateway's payload limit. Streams exceeding their buffer limits are cancelled.
+
+RPC cancellation stops local waiting; a server-side mutation may already have executed. Requests are not retried automatically. Reconnect with `NexaClient.connect()`, restore subscriptions, and reload session state. `TransportError.remote` preserves server error codes, retry information, and details.
+
+## Gateway compatibility
+
+Uses Nexa gateway protocol v1. Media requires `hello.features.attachments`. Browser pairing requires query-based device metadata and issued credentials in `hello.auth.token`.
+
+The [gateway patch](./server-patches/nexa-gateway-v1.patch) adds these capabilities to the corresponding Nexa revision. Check compatibility before applying it:
+
+```bash
+git apply --check /path/to/nexa-gateway-v1.patch
+git apply /path/to/nexa-gateway-v1.patch
 ```
 
-The SDK uses the gateway's query-token authentication because browsers cannot set websocket authorization headers. Use WSS in production, redact websocket query strings from proxy logs, and have each user supply their own credential or pair a scoped device. Never place a shared deployment admin token in the website bundle. Credentials are not written to browser storage by this package. Browser upgrade failures cannot expose HTTP status/body; the SDK reports a connection error without including the credential-bearing URL.
+## Development
 
-For a Nervalab deployment on a different origin, configure Nexa's `allowedOrigins` with the exact website origin. The reverse proxy must support websocket upgrades, retain the query parameters, and permit long-running connections. Origin checks remain enforced by Nexa.
+TypeScript 7, Vite, Oxlint with type-aware rules, Prettier, and Vitest.
 
-**Server compatibility:** this workspace includes additive changes in `/root/nexa`: attachment validation/forwarding and mirrored attachments; browser device-id/name/scope query metadata; newly issued device tokens in `hello.auth.token`. Deploy these gateway changes for browser pairing and inbound media. The package includes `server-patches/nexa-gateway-v1.patch` for the corresponding Nexa source revision; review and apply it with `git apply --check` before `git apply`. These changes are already applied in this workspace. Older protocol-v1 gateways remain usable for text and control APIs. Media requests require the advertised `hello.features.attachments` capability; the SDK refuses them when it is absent, preventing silent media loss.
-
-## RPC coverage and voice
-
-`Method` is a TypeScript string enum. `client.call` requires an enum member and rejects raw string literals at compile time. For example, `client.call(Method.SessionsList, { limit: 50 })` lists previous conversations without raw method strings. All 54 members are generated from the gateway contract.
-
-`client.call(method, params)` gives method-specific parameter and result types for all current methods:
-
-- Agent ask/stream, agent list/define.
-- Sessions list/get/messages/delete/subscribe/unsubscribe.
-- Tasks list/get/cancel and approvals list/resolve.
-- Jobs list/add/remove; credit budgets/setBudget/removeBudget/summary.
-- Channels list/status/deadLetters.list.
-- Workspaces list/describe/create/destroy.
-- Devices list/approve/reject/revoke.
-- Accounts list/create/remove/usage; teams and shares list/create/setMember/remove.
-- Config get/set/unset; logs tail; health.
-- Voice start/audio/stop, with typed voice audio and transcript/status events.
-
-Start a voice call with `voice.start`; use its advertised sample rate and frame size. Send PCM16 bytes with `voice.audio` using `NexaMedia.base64(bytes)`. Subscribe to `voice.audio` and `voice.event`, decode received PCM with `NexaMedia.fromBase64`, and finish with `voice.stop`. Microphone capture, resampling, playback, rendering, and user consent belong to the website.
-
-Import protocol types from `nexa-transport/protocol`, event names/types from `nexa-transport/events`, and errors from `nexa-transport/errors`. Protocol numeric fields retain Nexa's JSON number representation; event sequence counters use bigint. Free-form tool arguments and native extension fields use recursive `JsonValue`, never `any`.
-
-## Cancellation, failures, and limits
-
-Pass an `AbortSignal` to `connect`, `call`, or `stream`. `turn.cancel()` and breaking from its async iterator cancel the server run using the acknowledged **runId**. `turn.result` settles independently of event consumption. On disconnect all pending requests and active streams settle. Local cancellation of a generic RPC stops waiting; the remote mutation may already have executed.
-
-Defaults: 15-second connect deadline, 60-second RPC deadline, one-hour turn deadline, 64 pending RPCs, 16 MiB frame limit, and 256 unread events / 8 MiB per stream. Configure these through `ClientOptions`, `CallOptions`, and `StreamOptions`. Slow consumers are failed and their run cancelled rather than allowing unbounded buffering. A timed-out stream acknowledgement closes the connection to release a run whose id is unknown.
-
-No mutation is retried automatically. Reconnect explicitly with `NexaClient.connect`, then re-subscribe and re-fetch session state. A connection error before authentication may represent an invalid key, rejected origin, unreachable server, or protocol failure. Remote RPC errors preserve the server code, retryability, retry delay, and details in `TransportError.remote`.
-
-## Development and release
-
-```sh
+```bash
 npm ci
 npm run check
-npm run test:gateway  # requires sibling /root/nexa and Google Chrome
-npm pack
-npm run test:package
 ```
 
-`npm run check` runs TypeScript 7, type-aware Oxc with warnings treated as failures, Prettier using Nexa’s copied configuration, protocol/lifecycle tests, and the Vite library/declaration build. `npm run test:gateway` runs the real Nexa gateway in Node and Chrome with a deterministic agent; it does not require paid model credentials.
+| Command                | Purpose                                           |
+| ---------------------- | ------------------------------------------------- |
+| `npm run build`        | Build ESM bundles and declarations                |
+| `npm run typecheck`    | Check TypeScript contracts                        |
+| `npm run lint`         | Run type-aware Oxc checks                         |
+| `npm run format`       | Format source and documentation                   |
+| `npm test`             | Run library tests                                 |
+| `npm run test:gateway` | Run Nexa gateway and Chrome integration tests     |
+| `npm run generate`     | Regenerate protocol types and schemas             |
+| `npm pack`             | Build and package a release                       |
+| `npm run test:package` | Verify the packed package in an isolated consumer |
 
-`npm run generate` snapshots the sibling Nexa TypeScript contracts into standalone public types and runtime schemas. The published package has no dependency on the Nexa source tree. Review regenerated contract changes and run gateway tests before a release. The runtime schema interpreter is fully typed and uses no eval, supporting strict browser CSPs.
+Protocol generation requires a sibling `nexa` checkout. Gateway tests additionally require the transport integration fixtures in that checkout and Google Chrome. Package verification requires a generated tarball.
 
-The package is prepared for public npm publication. Publishing requires an authorized npm account and `npm publish`; generating a tarball does not publish it.
+See [Chat.ts](./examples/Chat.ts) and [Node.ts](./examples/Node.ts) for application examples.
+
+---
+
+<div align="center"><sub><a href="./LICENSE">Apache-2.0</a> · <a href="https://github.com/dacely-cloud">Dacely Cloud</a></sub></div>
