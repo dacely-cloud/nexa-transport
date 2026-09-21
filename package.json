@@ -52,14 +52,15 @@
         "typecheck": "tsc --noEmit",
         "lint": "oxlint --type-aware --type-check --deny-warnings src test examples",
         "test": "vitest run",
-        "check": "npm run typecheck && npm run lint && npm run format:check && npm test && npm run build",
+        "check": "npm run typecheck && npm run docs:check && npm run lint && npm run format:check && npm test && npm run build",
         "prepack": "npm run check",
         "generate": "node script/generate.mjs",
         "test:gateway": "cd ../nexa && npx vitest run test/gateway/TransportAttachments.test.ts test/gateway/TransportBrowser.test.ts test/gateway/TransportRich.test.ts",
         "format": "prettier --write \"src/**/*.{ts,tsx}\" \"test/**/*.ts\" \"examples/**/*.ts\" \"script/*.{mjs,ts,json}\" \"*.{ts,json,md}\" \"docs/**/*.md\"",
         "format:check": "prettier --check \"src/**/*.{ts,tsx}\" \"test/**/*.ts\" \"examples/**/*.ts\" \"script/*.{mjs,ts,json}\" \"*.{ts,json,md}\" \"docs/**/*.md\"",
         "test:package": "node script/pack-smoke.mjs",
-        "docs": "node script/document.mjs && prettier --write \"docs/**/*.md\""
+        "docs": "node script/document.mjs && prettier --write \"docs/**/*.md\"",
+        "docs:check": "node script/check-docs.mjs"
     },
     "devDependencies": {
         "@types/node": "^26.5.1",

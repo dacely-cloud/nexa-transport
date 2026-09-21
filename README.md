@@ -76,16 +76,18 @@ npm install /path/to/nexa-transport-0.1.0.tgz
 ## Quick start
 
 ```ts
+import type { ResultOf } from 'nexa-transport/protocol';
+
 import { NexaClient } from 'nexa-transport';
 import { Method } from 'nexa-transport/protocol';
 
-const client = await NexaClient.connect({
+const client: NexaClient = await NexaClient.connect({
     url: 'wss://nexa.example.com',
     apiKey: 'YOUR_API_KEY',
 });
 
 try {
-    const answer = await client.call(Method.AgentAsk, {
+    const answer: ResultOf<typeof Method.AgentAsk> = await client.call(Method.AgentAsk, {
         message: 'Explain this project',
     });
 
@@ -95,6 +97,8 @@ try {
 }
 ```
 
+With a personal API key, omit `userId` from chat and stream requests; Nexa uses the authenticated user automatically. Display names are not user IDs.
+
 The examples below use an authenticated `client`. `client.call()` accepts `Method` enum members; raw method strings are rejected by TypeScript.
 
 ## Conversations
@@ -102,11 +106,13 @@ The examples below use an authenticated `client`. `client.call()` accepts `Metho
 Send a message without `conversationId` to create a conversation. Use the returned `sessionKey` for subsequent turns.
 
 ```ts
-const first = await client.call(Method.AgentAsk, {
+import type { ResultOf } from 'nexa-transport/protocol';
+
+const first: ResultOf<typeof Method.AgentAsk> = await client.call(Method.AgentAsk, {
     message: 'Help me build a website',
 });
 
-const next = await client.call(Method.AgentAsk, {
+const next: ResultOf<typeof Method.AgentAsk> = await client.call(Method.AgentAsk, {
     conversationId: first.sessionKey,
     message: 'Use TypeScript',
 });
@@ -115,11 +121,18 @@ const next = await client.call(Method.AgentAsk, {
 List saved conversations, retrieve their messages, and resume using the selected session's `id`:
 
 ```ts
-const sessions = await client.call(Method.SessionsList, { limit: 50 });
-const session = sessions[0];
+import type { ResultOf, Session } from 'nexa-transport/protocol';
+
+const sessions: ResultOf<typeof Method.SessionsList> = await client.call(Method.SessionsList, {
+    limit: 50,
+});
+const session: Session | undefined = sessions[0];
 
 if (session !== undefined) {
-    const messages = await client.call(Method.SessionsMessages, { id: session.id });
+    const messages: ResultOf<typeof Method.SessionsMessages> = await client.call(
+        Method.SessionsMessages,
+        { id: session.id },
+    );
     console.log(messages);
 
     await client.call(Method.AgentAsk, {
@@ -134,7 +147,10 @@ Nexa retains conversation history server-side. Save the `sessionKey` to resume a
 ## Streaming
 
 ```ts
-const turn = client.stream({ message: 'Review this project' });
+import type { AskResult } from 'nexa-transport/protocol';
+import type { TurnStream } from 'nexa-transport/stream';
+
+const turn: TurnStream = client.stream({ message: 'Review this project' });
 
 for await (const event of turn) {
     switch (event.type) {
@@ -153,7 +169,7 @@ for await (const event of turn) {
     }
 }
 
-const result = await turn.result;
+const result: AskResult = await turn.result;
 ```
 
 Pass `conversationId` to continue an existing session. `turn.result` resolves with the final answer and session key.
@@ -161,8 +177,13 @@ Pass `conversationId` to continue an existing session. `turn.result` resolves wi
 Cancel with `await turn.cancel()`, an `AbortSignal`, or by breaking out of the iterator. Cancellation targets the server's run ID. Disconnecting rejects outstanding requests and ends active streams.
 
 ```ts
-const controller = new AbortController();
-const turn = client.stream({ message: 'Analyze the workspace' }, { signal: controller.signal });
+import type { TurnStream } from 'nexa-transport/stream';
+
+const controller: AbortController = new AbortController();
+const turn: TurnStream = client.stream(
+    { message: 'Analyze the workspace' },
+    { signal: controller.signal },
+);
 
 controller.abort();
 ```
@@ -203,19 +224,22 @@ await client.call(Method.AgentAsk, {
 Read native artifacts and video output from the event stream:
 
 ```ts
+import type { NcapDelta } from 'nexa-transport/protocol';
+import type { TurnStream } from 'nexa-transport/stream';
+
 import { NexaMedia } from 'nexa-transport/media';
 
-const turn = client.stream({ message: 'Create a report' });
+const turn: TurnStream = client.stream({ message: 'Create a report' });
 
 for await (const event of turn) {
-    const native = NexaMedia.nativeEvent(event);
+    const native: NcapDelta | null = NexaMedia.nativeEvent(event);
 
     if (native?.artifact !== undefined) {
         console.log(native.artifact);
     }
 
     if (native?.video?.phase === 'chunk') {
-        const bytes = NexaMedia.bytes(native.video.data);
+        const bytes: Uint8Array<ArrayBuffer> = NexaMedia.bytes(native.video.data);
         console.log(bytes);
     }
 }
@@ -228,13 +252,18 @@ Tool results preserve content blocks, display metadata, and delivery receipts. N
 ## Events and approvals
 
 ```ts
+import type { ResultOf, ApprovalRequestedData } from 'nexa-transport/protocol';
+
 import { EventName } from 'nexa-transport/events';
 
-const unsubscribe = client.on(EventName.ApprovalRequested, (approval) => {
-    console.log(approval.approvalId, approval.tool, approval.summary);
-});
+const unsubscribe: () => void = client.on(
+    EventName.ApprovalRequested,
+    (approval: ApprovalRequestedData): void => {
+        console.log(approval.approvalId, approval.tool, approval.summary);
+    },
+);
 
-const pending = await client.call(Method.ApprovalsList, {});
+const pending: ResultOf<typeof Method.ApprovalsList> = await client.call(Method.ApprovalsList, {});
 console.log(pending);
 
 unsubscribe();
