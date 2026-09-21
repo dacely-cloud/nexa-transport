@@ -48,6 +48,7 @@
     },
     "scripts": {
         "build": "vite build && tsc -p tsconfig.build.json",
+        "prepare": "npm run build",
         "typecheck": "tsc --noEmit",
         "lint": "oxlint --type-aware --type-check --deny-warnings src test examples",
         "test": "vitest run",
