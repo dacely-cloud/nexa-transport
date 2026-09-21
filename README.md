@@ -34,6 +34,13 @@ Chat, tools, media, artifacts, and voice through the Nexa gateway.
 
 </details>
 
+## Documentation
+
+- [Complete usage guide](./docs/guide.md): conversations, running work, tools, skills, audio, images, GIFs, video, generation, documents, artifacts, and ZIP workflows.
+- [Client API](./docs/client.md): every client method, helper, option, event, and error.
+- [RPC reference](./docs/methods.md): all 54 methods with call templates, parameters, and results.
+- [Protocol types](./docs/protocol.md): every payload field and union variant.
+
 ## Features
 
 |                    |                                                            |
