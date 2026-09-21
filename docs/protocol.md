@@ -713,6 +713,8 @@ Configurable bounds on gateway-owned work and memory.
 | `logs.tail`                 | Yes      | Object (fields below) |             |
 | `media.acknowledge`         | Yes      | Object (fields below) |             |
 | `sessions.delete`           | Yes      | Object (fields below) |             |
+| `sessions.download`         | Yes      | Object (fields below) |             |
+| `sessions.files`            | Yes      | Object (fields below) |             |
 | `sessions.get`              | Yes      | Object (fields below) |             |
 | `sessions.list`             | Yes      | Object (fields below) |             |
 | `sessions.messages`         | Yes      | Object (fields below) |             |
@@ -989,6 +991,20 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | -------------------------------- | ----------- |
 | `params` | Yes      | [IdParams](protocol.md#idparams) |             |
 | `result` | Yes      | [OkResult](protocol.md#okresult) |             |
+
+**sessions.download**
+
+| Field    | Required | Type                                               | Description |
+| -------- | -------- | -------------------------------------------------- | ----------- |
+| `params` | Yes      | [SessionFileParams](protocol.md#sessionfileparams) |             |
+| `result` | Yes      | [OkResult](protocol.md#okresult)                   |             |
+
+**sessions.files**
+
+| Field    | Required | Type                                                            | Description |
+| -------- | -------- | --------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [IdParams](protocol.md#idparams)                                |             |
+| `result` | Yes      | Array of [DeliveredAttachment](protocol.md#deliveredattachment) |             |
 
 **sessions.get**
 
@@ -1921,6 +1937,15 @@ Type: `"destructive"` / `"execute"` / `"read"` / `"write"`.
 What a caller may do.
 
 Type: `"admin"` / `"read"` / `"write"`.
+
+## SessionFileParams
+
+Identifies a saved file within an owned session.
+
+| Field          | Required | Type     | Description |
+| -------------- | -------- | -------- | ----------- |
+| `attachmentId` | Yes      | `string` |             |
+| `id`           | Yes      | `string` |             |
 
 ## SessionListParams
 

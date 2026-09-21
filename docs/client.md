@@ -119,3 +119,11 @@ Local validation and media helpers can also throw native errors such as `TypeErr
 `nexa-transport/protocol` exports `Method`, `GatewayMethods`, `MethodName`, `ParamsOf<M>`, `ResultOf<M>`, and the generated protocol interfaces, aliases, and value objects. `Method` is the runtime enum used for RPC dispatch. Other generated value objects describe wire-level unions and are not additional RPCs.
 
 The SDK validates the bundled protocol version, retains extensible JSON payloads, and exposes the server's negotiated capabilities in `hello`. Updating these generated types requires regenerating the contract against a compatible Nexa checkout and testing both endpoints.
+
+## Reconnection and session recovery
+
+Established connections reconnect automatically with jittered exponential delays from 250–500 ms up to 15–30 seconds. Initial connection failures reject directly. Set `ClientOptions.reconnect` to `false` to opt out. Protocol and application-handshake refusals stop retries; browsers may report failed HTTP upgrades only as generic network failures. `close()` cancels retries permanently. Issued pairing credentials replace the single-use code for subsequent connections.
+
+`connected` becomes false during interruption. `reconnecting` indicates scheduled or active retries. `onClose(listener)` reports each interruption; `onReconnect(listener)` runs after authentication and session subscription restoration. Both return unsubscribe functions. Existing event and attachment listeners survive reconnect. In-flight calls and streams reject, and no mutation is automatically repeated.
+
+`resumeSession(sessionId)` subscribes to the owned session and returns a typed `SessionSnapshot` containing `messages`, active `tasks`, and saved `files`. Use it after reconnect or a page reload, with the session key saved by your application. Download a saved file through `Method.SessionsDownload`; bytes arrive through `onAttachment`.

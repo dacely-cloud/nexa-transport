@@ -34,7 +34,9 @@ export interface ClientOptions {
     readonly maxMessageBytes?: number;
     /** Maximum concurrent pending RPCs; default 64. */
     readonly maxPendingRequests?: number;
-    /** Cancels the connection attempt. */
+    /** Reconnect after established connections drop, with jittered exponential backoff up to 30 seconds. Default true. Initial connection failures still reject. */
+    readonly reconnect?: boolean;
+    /** Cancels the initial connection attempt. */
     readonly signal?: AbortSignal;
 }
 

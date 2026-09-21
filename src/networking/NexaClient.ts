@@ -44,9 +44,22 @@ export interface ReceivedAudio {
     readonly sampleRate: number;
     readonly data: Uint8Array<ArrayBuffer>;
 }
+/** Saved history, live tasks and downloadable files for a subscribed session. */
+export interface SessionSnapshot {
+    readonly messages: ResultOf<Method.SessionsMessages>;
+    readonly tasks: ResultOf<Method.TasksList>;
+    readonly files: ResultOf<Method.SessionsFiles>;
+}
 /** Authenticated Nexa gateway connection shared by browsers and Node.js. */
 export class NexaClient {
-    readonly #socket: WebSocket;
+    #socket: WebSocket;
+    readonly #url: URL;
+    #disposed: boolean = false;
+    #ready: boolean = false;
+    #retryTimer: ReturnType<typeof setTimeout> | undefined;
+    #attempt: number = 0;
+    readonly #subscriptions: Set<string> = new Set();
+    readonly #reconnectListeners: Set<() => void> = new Set();
     readonly #binaryChunks: BinaryChunks = new BinaryChunks();
     #binaryTail: Promise<undefined> = Promise.resolve(undefined);
     readonly #pending: PendingRequests;
@@ -97,9 +110,17 @@ export class NexaClient {
         if (options.scopes !== undefined) {
             url.searchParams.set('scopes', options.scopes.join(','));
         }
-        this.#socket = new WebSocket(url);
-        this.#socket.binaryType = 'arraybuffer';
-        this.#socket.addEventListener('message', (event: MessageEvent<unknown>): void => {
+        this.#url = url;
+        this.#socket = this.#openSocket();
+    }
+
+    #openSocket(): WebSocket {
+        const socket: WebSocket = new WebSocket(this.#url);
+        socket.binaryType = 'arraybuffer';
+        socket.addEventListener('message', (event: MessageEvent<unknown>): void => {
+            if (socket !== this.#socket) {
+                return;
+            }
             try {
                 this.#receive(event.data);
             } catch {
@@ -108,7 +129,10 @@ export class NexaClient {
                 );
             }
         });
-        this.#socket.addEventListener('close', (event: CloseEvent): void => {
+        socket.addEventListener('close', (event: CloseEvent): void => {
+            if (socket !== this.#socket) {
+                return;
+            }
             this.#fail(
                 new TransportError(
                     TransportErrorCode.Closed,
@@ -118,7 +142,10 @@ export class NexaClient {
                 ),
             );
         });
-        this.#socket.addEventListener('error', (): void => {
+        socket.addEventListener('error', (): void => {
+            if (socket !== this.#socket) {
+                return;
+            }
             // An established WebSocket emits close after error; preserve its actual close details.
             if (this.#hello !== null) {
                 return;
@@ -130,6 +157,7 @@ export class NexaClient {
                 ),
             );
         });
+        return socket;
     }
 
     /** Opens, authenticates, and negotiates protocol v1 before returning. */
@@ -151,61 +179,84 @@ export class NexaClient {
             throw new TransportError(TransportErrorCode.Aborted, 'Connection aborted');
         }
         const client: NexaClient = new NexaClient(options);
+        try {
+            await client.#handshake(options.signal);
+            return client;
+        } catch (error: unknown) {
+            client.close();
+            throw error;
+        }
+    }
+
+    async #handshake(signal?: AbortSignal): Promise<void> {
         const abort: () => void = (): void => {
-            client.#fail(new TransportError(TransportErrorCode.Aborted, 'Connection aborted'));
+            this.#fail(new TransportError(TransportErrorCode.Aborted, 'Connection aborted'));
         };
         const timer: ReturnType<typeof setTimeout> = setTimeout((): void => {
-            client.#fail(
+            this.#fail(
                 new TransportError(TransportErrorCode.Timeout, 'Gateway handshake timed out'),
             );
-        }, options.connectTimeoutMs ?? 15_000);
-        options.signal?.addEventListener('abort', abort, { once: true });
+        }, this.#options.connectTimeoutMs ?? 15_000);
+        signal?.addEventListener('abort', abort, { once: true });
         try {
             await new Promise<void>((resolve): void => {
-                client.#wake = resolve;
+                this.#wake = resolve;
             });
-            if (client.#failure !== undefined) {
-                throw client.#failure;
+            if (this.#failure !== undefined) {
+                throw this.#failure;
             }
             if (
-                client.#challenge === null ||
-                client.#challenge.minProtocol > 1 ||
-                client.#challenge.protocol < 1
+                this.#challenge === null ||
+                this.#challenge.minProtocol > 1 ||
+                this.#challenge.protocol < 1
             ) {
                 throw new TransportError(
                     TransportErrorCode.Protocol,
                     'Gateway does not support protocol v1',
                 );
             }
-            client.#hello = await client.#call(
+            this.#hello = await this.#call(
                 Method.Connect,
                 {
-                    nonce: client.#challenge.nonce,
+                    nonce: this.#challenge.nonce,
                     minProtocol: 1,
                     maxProtocol: 1,
                     client: {
-                        id: options.client?.id ?? 'nexa-transport',
-                        version: options.client?.version ?? '0.1.0',
-                        platform: options.client?.platform ?? 'javascript',
+                        id: this.#options.client?.id ?? 'nexa-transport',
+                        version: this.#options.client?.version ?? '0.1.0',
+                        platform: this.#options.client?.platform ?? 'javascript',
                         mode: 'ui',
                     },
                 },
                 {},
             );
-            if (client.#hello.protocol !== 1) {
+            if (this.#hello.protocol !== 1) {
                 throw new TransportError(
                     TransportErrorCode.Protocol,
                     'Unexpected negotiated protocol',
                 );
             }
-            return client;
+            if (this.#hello.auth.token !== undefined) {
+                this.#url.searchParams.set('token', this.#hello.auth.token);
+                this.#url.searchParams.delete('pair');
+            }
+            for (const sessionId of this.#subscriptions) {
+                await this.#call(Method.SessionsSubscribe, { sessionId }, {});
+            }
+            if (this.#closed || this.#disposed) {
+                throw (
+                    this.#failure ?? new TransportError(TransportErrorCode.Closed, 'Client closed')
+                );
+            }
+            this.#ready = true;
+            this.#attempt = 0;
         } catch (error: unknown) {
-            client.close();
+            this.#fail(error instanceof Error ? error : new Error(String(error)));
             throw error;
         } finally {
             clearTimeout(timer);
-            options.signal?.removeEventListener('abort', abort);
-            client.#wake = undefined;
+            signal?.removeEventListener('abort', abort);
+            this.#wake = undefined;
         }
     }
 
@@ -218,7 +269,7 @@ export class NexaClient {
     }
     /** Whether this connection can accept new calls. */
     public get connected(): boolean {
-        return !this.#closed && this.#hello !== null;
+        return !this.#closed && this.#ready;
     }
     /** Calls any Nexa RPC with validated parameters and result. Mutations are never replayed. */
     public async call<M extends Exclude<Method, Method.Connect>>(
@@ -235,7 +286,36 @@ export class NexaClient {
                 'Gateway does not advertise this method',
             );
         }
-        return await this.#call(method, params, options);
+        const result: ResultOf<M> = await this.#call(method, params, options);
+        if ('sessionId' in params && typeof params.sessionId === 'string') {
+            if (method === Method.SessionsSubscribe) {
+                this.#subscriptions.add(params.sessionId);
+            }
+            if (method === Method.SessionsUnsubscribe) {
+                this.#subscriptions.delete(params.sessionId);
+            }
+        }
+        return result;
+    }
+    /** Restores an owned session without starting or repeating a turn. Subscribe before reading to observe later updates. */
+    public async resumeSession(sessionId: string): Promise<SessionSnapshot> {
+        await this.call(Method.SessionsSubscribe, { sessionId });
+        const [messages, tasks, files]: [
+            ResultOf<Method.SessionsMessages>,
+            ResultOf<Method.TasksList>,
+            ResultOf<Method.SessionsFiles>,
+        ] = await Promise.all([
+            this.call(Method.SessionsMessages, { id: sessionId }),
+            this.call(Method.TasksList, {}),
+            this.call(Method.SessionsFiles, { id: sessionId }),
+        ]);
+        return {
+            messages,
+            tasks: tasks.filter(
+                (task: ResultOf<Method.TasksList>[number]): boolean => task.sessionId === sessionId,
+            ),
+            files,
+        };
     }
     /** Subscribes to a catalogued event with a fully validated payload. */
     public on<E extends keyof EventMap>(
@@ -340,9 +420,23 @@ export class NexaClient {
             this.#closeListeners.delete(listener);
         };
     }
-    /** Closes the socket and rejects every pending request. Idempotent. */
+    /** Observes a restored connection after session subscriptions have been restored. Refresh history and tasks here. */
+    public onReconnect(listener: () => void): () => void {
+        this.#reconnectListeners.add(listener);
+        return (): void => {
+            this.#reconnectListeners.delete(listener);
+        };
+    }
+    /** Whether a lost connection is waiting for or performing another handshake. */
+    public get reconnecting(): boolean {
+        return !this.#disposed && this.#attempt > 0;
+    }
+    /** Closes permanently, cancelling reconnect and rejecting pending requests. Idempotent. */
     public close(): void {
+        this.#disposed = true;
+        clearTimeout(this.#retryTimer);
         this.#fail(new TransportError(TransportErrorCode.Closed, 'Client closed'));
+        this.#clearListeners();
     }
 
     async #call<M extends Method>(
@@ -404,6 +498,7 @@ export class NexaClient {
         return raw as ResultOf<M>;
     }
     async #sendPayload(payload: string | Uint8Array<ArrayBuffer>, id: string): Promise<void> {
+        const socket: WebSocket = this.#socket;
         const previous: Promise<undefined> = this.#binaryTail;
         const gate: PromiseWithResolvers<undefined> = Promise.withResolvers<undefined>();
         if (typeof payload !== 'string') {
@@ -442,7 +537,7 @@ export class NexaClient {
                 id,
                 error instanceof Error ? error : new Error('Could not send request'),
             );
-            if (typeof payload !== 'string') {
+            if (typeof payload !== 'string' && socket === this.#socket) {
                 this.#fail(
                     new TransportError(TransportErrorCode.Connection, 'Binary upload interrupted'),
                 );
@@ -548,6 +643,7 @@ export class NexaClient {
         }
     }
     async #deliverAttachment(attachment: ReceivedAttachment): Promise<void> {
+        const socket: WebSocket = this.#socket;
         let received: boolean = this.#attachments.size > 0;
         try {
             await Promise.all(
@@ -561,7 +657,11 @@ export class NexaClient {
                 throw error;
             });
         }
-        if (this.#hello?.features.methods.includes(Method.MediaAcknowledge)) {
+        if (
+            socket === this.#socket &&
+            this.connected &&
+            this.#hello?.features.methods.includes(Method.MediaAcknowledge)
+        ) {
             try {
                 await this.call(Method.MediaAcknowledge, { id: attachment.id, received });
             } catch (error: unknown) {
@@ -589,6 +689,8 @@ export class NexaClient {
         if (this.#closed) {
             return;
         }
+        const wasReady: boolean = this.#ready;
+        this.#ready = false;
         this.#closed = true;
         this.#failure = error;
         this.#pending.close(error);
@@ -598,12 +700,61 @@ export class NexaClient {
                 listener(error);
             });
         }
+        this.#binaryChunks.clear();
+        this.#socket.close();
+        if (wasReady) {
+            this.#scheduleReconnect(error);
+        }
+    }
+    #clearListeners(): void {
         this.#closeListeners.clear();
         this.#events.clear();
         this.#attachments.clear();
-        this.#binaryChunks.clear();
         this.#gaps.clear();
-        this.#socket.close();
+        this.#reconnectListeners.clear();
+    }
+    #scheduleReconnect(error: Error): void {
+        if (
+            this.#disposed ||
+            this.#options.reconnect === false ||
+            (error instanceof TransportError &&
+                (error.code === TransportErrorCode.Protocol ||
+                    error.code === TransportErrorCode.Remote ||
+                    error.code === TransportErrorCode.Aborted ||
+                    error.code === TransportErrorCode.Limit ||
+                    error.closeDetails?.code === 1008))
+        ) {
+            this.#disposed = true;
+            this.#clearListeners();
+            return;
+        }
+        this.#attempt += 1;
+        const delay: number = Math.min(30_000, 500 * 2 ** Math.min(this.#attempt - 1, 6));
+        this.#retryTimer = setTimeout(
+            (): void => {
+                void this.#reconnect();
+            },
+            delay * (0.5 + Math.random() * 0.5),
+        );
+    }
+    async #reconnect(): Promise<void> {
+        if (this.#disposed) {
+            return;
+        }
+        this.#closed = false;
+        this.#failure = undefined;
+        this.#hello = null;
+        this.#challenge = null;
+        this.#sequence = 0n;
+        try {
+            this.#socket = this.#openSocket();
+            await this.#handshake();
+            for (const listener of this.#reconnectListeners) {
+                this.#notify(listener);
+            }
+        } catch (error: unknown) {
+            this.#scheduleReconnect(error instanceof Error ? error : new Error(String(error)));
+        }
     }
 }
 /** Narrows only at the external JSON boundary. */

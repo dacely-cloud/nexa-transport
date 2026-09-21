@@ -113,7 +113,7 @@ if (selected !== undefined) {
 
 `SessionsMessages` can contain text, reasoning, tool calls/results, and media blocks. `SessionsList` exposes saved metadata such as title, timestamps, participants, usage, and optional recovery/open-turn state. An open flag describes saved state; use task queries/events to inspect current activity. `SessionsDelete({ id })` deletes the selected session and requires write authority. Queries and deletion are subject to user ownership rules.
 
-After reconnecting, create a new `NexaClient`, reload history, and supply the same session key. The SDK does not reconnect or restore subscriptions automatically.
+After an established connection drops, the SDK reconnects with jittered exponential backoff and restores successful session subscriptions. Register `onReconnect` to refresh history and running tasks. In-flight calls and streams reject; mutations are never replayed. Set `reconnect: false` to disable this. `close()` permanently stops retries. After a full page reload, create a client and call `resumeSession` with your saved session key.
 
 ## Streaming and running work
 
@@ -282,7 +282,7 @@ console.log(delivery.attachments);
 stopFiles();
 ```
 
-`attachments` in the final result and `attachment` stream events contain metadata, not another copy of the bytes. Match their `id` with the callback's `id`; `streamId` identifies streaming deliveries. The SDK does not retain delivered bytes after notifying listeners. Files can be up to **100 MiB each**. Transfers use **256 KiB binary chunks**, with backpressure, ordering checks, and cleanup after disconnect or 30 seconds without progress. The SDK reassembles a file before calling `onAttachment`. At most 64 files can be delivered per turn. Uploads may contain multiple attachments with at most 100 MiB of combined bytes per request; larger batches should use separate requests. Delivery receipts require a successful client attachment handler. Register `onAttachment` before requesting files. Handlers may return a promise; resolve it after adding the file to your UI or saving it, and throw or reject on failure. The SDK sends `Method.MediaAcknowledge` automatically. Missing handlers, rejected handlers, disconnects, and a 15-second acknowledgment timeout produce a tool error visible to the model. Receipt does not prove a human viewed the file. Clients using older library versions must update to send acknowledgments.
+`attachments` in the final result and `attachment` stream events contain metadata, not another copy of the bytes. Match their `id` with the callback's `id`; `streamId` identifies streaming deliveries. The SDK does not retain delivered bytes after notifying listeners. Files can be up to **100 MiB each**. Transfers use **256 KiB binary chunks**, with backpressure, ordering checks, and cleanup after disconnect or 30 seconds without progress. The SDK reassembles a file before calling `onAttachment`. At most 64 files can be delivered per turn. Uploads may contain multiple attachments with at most 100 MiB of combined bytes per request; larger batches should use separate requests. Delivery receipts require a successful client attachment handler. Register `onAttachment` before requesting files. Handlers may return a promise; resolve it after adding the file to your UI or saving it, and throw or reject on failure. The SDK sends `Method.MediaAcknowledge` automatically. Missing handlers, rejected handlers, and a 15-second acknowledgment timeout produce a tool error visible to the model. When a client disconnects, the gateway continues the accepted turn and saves its files to the owned session for later download; offline storage does not claim live receipt. Receipt does not prove a human viewed the file. Clients using older library versions must update to send acknowledgments.
 
 Other deliverables may appear as native artifact events, tool-result content, document/media blocks, or links in the final answer. Preserve all of these channels when building an artifact viewer. `NcapArtifactDelta` contains `item`, `title`, and an `artifact` string; that string is not guaranteed to be a URL or file bytes.
 
@@ -402,7 +402,7 @@ stopMessages();
 
 Subscriptions require gateway authorization; the current personal-key allowlist does not include these two RPCs. Subscribe with an appropriate device/operator credential, or refresh authorized history with `SessionsMessages`. Locally started streams already deliver their events; avoid displaying duplicates when combining stream and subscription feeds.
 
-Use `client.onSequenceGap(({ expected, received }) => ...)` to detect missing events and refresh affected state. The library does not replay gaps. Use `onClose()` to release resources and offer reconnect. Use `onListenerError` in connection options to report exceptions thrown by application listeners.
+Use `client.onSequenceGap(({ expected, received }) => ...)` to detect missing events and refresh affected state. The library does not replay gaps. Use `onClose()` to report interruptions and release live audio resources, and `onReconnect()` to refresh session state. Event and attachment listeners remain registered across automatic reconnects. Use `onListenerError` in connection options to report exceptions thrown by application listeners.
 
 Native events preserve the NCAP fields for content, reasoning, status, usage, tools, block phases, artifacts, video, voice, agents, agent-tool requests, backlog, graph, expert, findings, research, preflight, reflections, skills, and steering. Some describe server internals or progress; not every provider emits them. See [NcapDelta](protocol.md#ncapdelta) for each field and union variant.
 
@@ -462,7 +462,7 @@ Transport error categories are `closed`, `timeout`, `aborted`, `protocol`, `limi
 
 On gateways advertising `binaryMedia`, upload payloads travel as raw chunks, so a 100 MiB file does not require a 100 MiB WebSocket message. JSON metadata and each wire frame remain bounded. Older gateways use the base64 JSON representation and its smaller frame limits. Server limits in `hello` may be stricter. Raise a per-call `timeoutMs` for a long `AgentAsk`, or use streaming and consume events promptly. A stream exceeding its buffer limits is cancelled. `close()` is idempotent, closes the socket, and rejects pending operations.
 
-No automatic retry is performed. Retrying a timed-out mutating call can duplicate work. Reconcile the session/task state first. The SDK does not persist credentials, schedule reconnections, retry mutations, play media, transcode codecs, or render artifacts for you.
+No automatic retry is performed. Retrying a timed-out mutating call can duplicate work. Reconcile the session/task state first. The SDK does not persist credentials, retry mutations, play media, transcode codecs, or render artifacts for you.
 
 ## Complete reference
 
@@ -472,3 +472,43 @@ No automatic retry is performed. Retrying a timed-out mutating call can duplicat
 - [Typed source examples](../examples)
 
 The method/type pages are generated from the package's bundled contract with `npm run docs`. After updating the server protocol, run `npm run generate` before regenerating documentation, and run the normal package checks. `npm run docs:check` compiles all TypeScript code blocks against the SDK and checks variable annotations. Snippets share the connection setup above; file and microphone inputs are supplied by the application. Stream loop bindings are inferred from the explicitly typed `TurnStream` because TypeScript forbids type annotations on `for...of` bindings.
+
+## Recover after a reload or disconnect
+
+Keep the session key in your application's storage, scoped to the authenticated user. Supply a stable `conversationId` when starting a turn so the conversation can be found even if the connection drops before acceptance. Accepted streaming work continues after the page closes, while Nexa stays running. Use explicit cancellation to stop it. A server shutdown still cancels running turns; this is not restart recovery.
+
+```typescript
+import { NexaClient, type SessionSnapshot } from 'nexa-transport';
+import { Method } from 'nexa-transport/protocol';
+
+const client: NexaClient = await NexaClient.connect({
+    url: 'wss://nexa.example.com',
+    apiKey: 'YOUR_API_KEY',
+});
+const sessionKey: string = 'user:ralph::saved-conversation';
+const session: SessionSnapshot = await client.resumeSession(sessionKey);
+console.log(session.messages, session.tasks, session.files);
+client.onReconnect((): void => {
+    void refresh();
+});
+async function refresh(): Promise<void> {
+    try {
+        const snapshot: SessionSnapshot = await client.resumeSession(sessionKey);
+        console.log(snapshot);
+    } catch (error: unknown) {
+        console.error(error);
+    }
+}
+client.onAttachment((file): void => {
+    console.log(file.filename, file.data);
+});
+for (const file of session.files) {
+    await client.call(Method.SessionsDownload, {
+        id: sessionKey,
+        attachmentId: file.id,
+    });
+}
+client.close();
+```
+
+Downloads use the same raw, chunked binary transport and `onAttachment` callback as live files. Session ownership is checked for both listing and downloading. The gateway saves files before attempting live delivery. Deleting a session removes its saved files. Reconnect restores subscriptions but does not replay missed events; refresh saved history and tasks to reconcile your UI. A snapshot may overlap live events, so reconcile by session/task identity instead of appending the same state twice.
