@@ -34,6 +34,8 @@ export interface ClientOptions {
     readonly maxMessageBytes?: number;
     /** Maximum concurrent pending RPCs; default 64. */
     readonly maxPendingRequests?: number;
+    /** Maximum active streaming turns, including acknowledged turns; default 64. */
+    readonly maxActiveStreams?: number;
     /** Reconnect after established connections drop, with jittered exponential backoff up to 30 seconds. Default true. Initial connection failures still reject. */
     readonly reconnect?: boolean;
     /** Cancels the initial connection attempt. */

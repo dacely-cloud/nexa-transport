@@ -1,3 +1,4 @@
+import { materializeError, rethrow } from './ErrorStack.js';
 import { BinaryChunks } from '../media/BinaryChunks.js';
 import { NexaMedia } from '../media/NexaMedia.js';
 import { BinaryEnvelope } from '../media/BinaryEnvelope.js';
@@ -53,6 +54,7 @@ export interface SessionSnapshot {
 /** Authenticated Nexa gateway connection shared by browsers and Node.js. */
 export class NexaClient {
     #socket: WebSocket;
+    #detachSocket: (() => void) | undefined;
     readonly #url: URL;
     #disposed: boolean = false;
     #ready: boolean = false;
@@ -61,7 +63,11 @@ export class NexaClient {
     readonly #subscriptions: Set<string> = new Set();
     readonly #reconnectListeners: Set<() => void> = new Set();
     readonly #binaryChunks: BinaryChunks = new BinaryChunks();
-    #binaryTail: Promise<undefined> = Promise.resolve(undefined);
+    readonly #uploads: Map<string, Uint8Array<ArrayBuffer>> = new Map();
+    #uploadBytes: number = 0;
+    #sending: boolean = false;
+    #deliveryBytes: number = 0;
+    #deliveries: number = 0;
     readonly #pending: PendingRequests;
     readonly #options: ClientOptions;
     readonly #attachments: Set<(attachment: ReceivedAttachment) => void | Promise<void>> =
@@ -80,7 +86,8 @@ export class NexaClient {
 
     /** Opens a socket; use connect to obtain an authenticated client. */
     private constructor(options: ClientOptions) {
-        this.#options = options;
+        const { signal: _signal, ...settings } = options;
+        this.#options = settings;
         this.#pending = new PendingRequests(options.maxPendingRequests ?? 64);
         const url: URL = new URL(options.url);
         if (url.protocol === 'https:') {
@@ -90,11 +97,13 @@ export class NexaClient {
             url.protocol = 'ws:';
         }
         if (!['ws:', 'wss:'].includes(url.protocol) || url.username || url.password || url.hash) {
-            throw new TypeError('Expected a ws(s) endpoint without userinfo or fragment');
+            throw materializeError(
+                new TypeError('Expected a ws(s) endpoint without userinfo or fragment'),
+            );
         }
         if (options.apiKey !== undefined) {
             if (options.apiKey.length === 0) {
-                throw new TypeError('apiKey cannot be empty');
+                throw materializeError(new TypeError('apiKey cannot be empty'));
             }
             url.searchParams.set('token', options.apiKey);
         }
@@ -117,19 +126,21 @@ export class NexaClient {
     #openSocket(): WebSocket {
         const socket: WebSocket = new WebSocket(this.#url);
         socket.binaryType = 'arraybuffer';
-        socket.addEventListener('message', (event: MessageEvent<unknown>): void => {
+        const message = (event: MessageEvent<unknown>): void => {
             if (socket !== this.#socket) {
                 return;
             }
             try {
                 this.#receive(event.data);
-            } catch {
+            } catch (error: unknown) {
                 this.#fail(
-                    new TransportError(TransportErrorCode.Protocol, 'Invalid gateway frame'),
+                    error instanceof TransportError
+                        ? error
+                        : new TransportError(TransportErrorCode.Protocol, 'Invalid gateway frame'),
                 );
             }
-        });
-        socket.addEventListener('close', (event: CloseEvent): void => {
+        };
+        const close = (event: CloseEvent): void => {
             if (socket !== this.#socket) {
                 return;
             }
@@ -141,8 +152,8 @@ export class NexaClient {
                     { code: event.code, reason: event.reason, wasClean: event.wasClean },
                 ),
             );
-        });
-        socket.addEventListener('error', (): void => {
+        };
+        const error = (): void => {
             if (socket !== this.#socket) {
                 return;
             }
@@ -156,7 +167,15 @@ export class NexaClient {
                     'Gateway connection failed; check credentials, origin policy, and endpoint',
                 ),
             );
-        });
+        };
+        socket.addEventListener('message', message);
+        socket.addEventListener('close', close);
+        socket.addEventListener('error', error);
+        this.#detachSocket = (): void => {
+            socket.removeEventListener('message', message);
+            socket.removeEventListener('close', close);
+            socket.removeEventListener('error', error);
+        };
         return socket;
     }
 
@@ -167,12 +186,15 @@ export class NexaClient {
             options.requestTimeoutMs,
             options.maxMessageBytes,
             options.maxPendingRequests,
+            options.maxActiveStreams,
         ]) {
             if (
                 value !== undefined &&
                 (!Number.isSafeInteger(value) || value <= 0 || value > 2_147_483_647)
             ) {
-                throw new RangeError('Connection limits must be positive bounded integers');
+                throw materializeError(
+                    new RangeError('Connection limits must be positive bounded integers'),
+                );
             }
         }
         if (options.signal?.aborted === true) {
@@ -286,13 +308,27 @@ export class NexaClient {
                 'Gateway does not advertise this method',
             );
         }
-        const result: ResultOf<M> = await this.#call(method, params, options);
-        if ('sessionId' in params && typeof params.sessionId === 'string') {
+        const pending: Promise<ResultOf<M>> = this.#call(method, params, options).catch(rethrow);
+        if (
+            (method === Method.SessionsSubscribe || method === Method.SessionsUnsubscribe) &&
+            'sessionId' in params &&
+            typeof params.sessionId === 'string'
+        ) {
+            return this.#updateSubscription(pending, method, params.sessionId);
+        }
+        return pending;
+    }
+    async #updateSubscription<M extends Method>(
+        pending: Promise<ResultOf<M>>,
+        method: M,
+        sessionId: string,
+    ): Promise<ResultOf<M>> {
+        const result: ResultOf<M> = await pending;
+        if (!this.#disposed) {
             if (method === Method.SessionsSubscribe) {
-                this.#subscriptions.add(params.sessionId);
-            }
-            if (method === Method.SessionsUnsubscribe) {
-                this.#subscriptions.delete(params.sessionId);
+                this.#subscriptions.add(sessionId);
+            } else {
+                this.#subscriptions.delete(sessionId);
             }
         }
         return result;
@@ -362,24 +398,15 @@ export class NexaClient {
     public onAttachment(
         listener: (attachment: ReceivedAttachment) => void | Promise<void>,
     ): () => void {
-        this.#attachments.add(listener);
-        return (): void => {
-            this.#attachments.delete(listener);
-        };
+        return this.#disposed ? (): void => {} : subscribe(this.#attachments, listener);
     }
     /** Observes all events, including session mirrors and native tool progress. */
     public onEvent(listener: (event: GatewayEvent) => void): () => void {
-        this.#events.add(listener);
-        return (): void => {
-            this.#events.delete(listener);
-        };
+        return this.#disposed ? (): void => {} : subscribe(this.#events, listener);
     }
     /** Observes lost events so a UI can refresh its session state. */
     public onSequenceGap(listener: (gap: SequenceGap) => void): () => void {
-        this.#gaps.add(listener);
-        return (): void => {
-            this.#gaps.delete(listener);
-        };
+        return this.#disposed ? (): void => {} : subscribe(this.#gaps, listener);
     }
     /** Starts a bounded event stream, exposing tools, media, and native NCAP payloads. */
     public stream(params: StreamParams, options: StreamOptions = {}): TurnStream {
@@ -388,7 +415,10 @@ export class NexaClient {
         }
         const streamId: string = params.streamId ?? crypto.randomUUID();
         if (this.#streamIds.has(streamId)) {
-            throw new TypeError('Stream id is already active');
+            throw materializeError(new TypeError('Stream id is already active'));
+        }
+        if (this.#streamIds.size >= (this.#options.maxActiveStreams ?? 64)) {
+            throw new TransportError(TransportErrorCode.Limit, 'Too many active streams');
         }
         this.#streamIds.add(streamId);
         try {
@@ -397,7 +427,7 @@ export class NexaClient {
             return turn;
         } catch (error: unknown) {
             this.#streamIds.delete(streamId);
-            throw error;
+            rethrow(error);
         }
     }
     async #releaseStream(turn: TurnStream): Promise<void> {
@@ -415,17 +445,11 @@ export class NexaClient {
             listener(this.#failure);
             return (): void => {};
         }
-        this.#closeListeners.add(listener);
-        return (): void => {
-            this.#closeListeners.delete(listener);
-        };
+        return subscribe(this.#closeListeners, listener);
     }
     /** Observes a restored connection after session subscriptions have been restored. Refresh history and tasks here. */
     public onReconnect(listener: () => void): () => void {
-        this.#reconnectListeners.add(listener);
-        return (): void => {
-            this.#reconnectListeners.delete(listener);
-        };
+        return this.#disposed ? (): void => {} : subscribe(this.#reconnectListeners, listener);
     }
     /** Whether a lost connection is waiting for or performing another handshake. */
     public get reconnecting(): boolean {
@@ -445,7 +469,7 @@ export class NexaClient {
         options: CallOptions,
     ): Promise<ResultOf<M>> {
         if (!Object.hasOwn(methodValidators, method) || !methodValidators[method].params(params)) {
-            throw new TypeError('Invalid RPC parameters');
+            throw materializeError(new TypeError('Invalid RPC parameters'));
         }
         if (
             (method === Method.AgentAsk || method === Method.AgentStream) &&
@@ -461,33 +485,59 @@ export class NexaClient {
         }
         const timeout: number = options.timeoutMs ?? this.#options.requestTimeoutMs ?? 60_000;
         if (!Number.isSafeInteger(timeout) || timeout <= 0 || timeout > 2_147_483_647) {
-            throw new RangeError('Invalid request timeout');
+            throw materializeError(new RangeError('Invalid request timeout'));
         }
         const id: string = String(++this.#nextId);
-        const text: string = JSON.stringify({ v: 1, id, method, params });
-        const binary: Uint8Array<ArrayBuffer> | null =
-            this.#hello?.features.binaryMedia === true ? BinaryEnvelope.encode(text) : null;
-        const payload: string | Uint8Array<ArrayBuffer> = binary ?? text;
-        const payloadBytes: number = binary?.byteLength ?? new TextEncoder().encode(text).length;
-        const maxBytes: number = Math.min(
-            this.#options.maxMessageBytes ?? 16 * 1024 * 1024,
-            this.#hello?.policy.maxPayloadBytes ?? 64 * 1024,
-        );
-        if (binary === null && payloadBytes > maxBytes) {
-            throw new TransportError(
-                TransportErrorCode.Limit,
-                'Request exceeds gateway payload limit',
-            );
+        const pending: Promise<JsonValue> = this.#pending.create(id, options, timeout, (): void => {
+            const queued: Uint8Array<ArrayBuffer> | undefined = this.#uploads.get(id);
+            if (queued !== undefined) {
+                this.#uploadBytes -= queued.byteLength;
+                this.#uploads.delete(id);
+            }
+        });
+        // Rejected or already aborted requests must not allocate or queue upload payloads.
+        if (this.#pending.has(id)) {
+            try {
+                const text: string = JSON.stringify({ v: 1, id, method, params });
+                const binary: Uint8Array<ArrayBuffer> | null =
+                    this.#hello?.features.binaryMedia === true ? BinaryEnvelope.encode(text) : null;
+                const payload: string | Uint8Array<ArrayBuffer> = binary ?? text;
+                const payloadBytes: number =
+                    binary?.byteLength ?? new TextEncoder().encode(text).length;
+                const maxBytes: number = Math.min(
+                    this.#options.maxMessageBytes ?? 16 * 1024 * 1024,
+                    this.#hello?.policy.maxPayloadBytes ?? 64 * 1024,
+                );
+                if (binary === null && payloadBytes > maxBytes) {
+                    throw new TransportError(
+                        TransportErrorCode.Limit,
+                        'Request exceeds gateway payload limit',
+                    );
+                }
+                if (
+                    binary === null &&
+                    this.#socket.bufferedAmount + payloadBytes >
+                        (this.#hello?.policy.maxBufferedBytes ?? 16 * 1024 * 1024)
+                ) {
+                    throw new TransportError(
+                        TransportErrorCode.Limit,
+                        'Websocket outbound buffer is full',
+                    );
+                }
+                this.#sendPayload(payload, id);
+            } catch (error: unknown) {
+                this.#pending.reject(
+                    id,
+                    error instanceof Error ? error : new Error('Could not encode request'),
+                );
+            }
         }
-        if (
-            binary === null &&
-            this.#socket.bufferedAmount + payloadBytes >
-                (this.#hello?.policy.maxBufferedBytes ?? 16 * 1024 * 1024)
-        ) {
-            throw new TransportError(TransportErrorCode.Limit, 'Websocket outbound buffer is full');
-        }
-        const pending: Promise<JsonValue> = this.#pending.create(id, options, timeout);
-        void this.#sendPayload(payload, id);
+        return NexaClient.#result(pending, method);
+    }
+    static async #result<M extends Method>(
+        pending: Promise<JsonValue>,
+        method: M,
+    ): Promise<ResultOf<M>> {
         const raw: JsonValue = await pending;
         if (!methodValidators[method].result(raw)) {
             throw new TransportError(
@@ -497,21 +547,45 @@ export class NexaClient {
         }
         return raw as ResultOf<M>;
     }
-    async #sendPayload(payload: string | Uint8Array<ArrayBuffer>, id: string): Promise<void> {
-        const socket: WebSocket = this.#socket;
-        const previous: Promise<undefined> = this.#binaryTail;
-        const gate: PromiseWithResolvers<undefined> = Promise.withResolvers<undefined>();
-        if (typeof payload !== 'string') {
-            this.#binaryTail = gate.promise;
+    #sendPayload(payload: string | Uint8Array<ArrayBuffer>, id: string): void {
+        if (!this.#pending.has(id)) {
+            return;
         }
+        if (typeof payload === 'string') {
+            this.#socket.send(payload);
+            return;
+        }
+        if (this.#uploadBytes + payload.byteLength > BinaryChunks.MAX_TRANSFER_BYTES) {
+            throw new TransportError(
+                TransportErrorCode.Limit,
+                'Binary upload memory budget is full',
+            );
+        }
+        this.#uploadBytes += payload.byteLength;
+        this.#uploads.set(id, payload);
+        if (!this.#sending) {
+            void this.#drainUploads();
+        }
+    }
+    async #drainUploads(): Promise<void> {
+        this.#sending = true;
         try {
-            if (typeof payload === 'string') {
-                if (this.#pending.has(id)) {
-                    this.#socket.send(payload);
+            for (const [id, payload] of this.#uploads) {
+                this.#uploads.delete(id);
+                try {
+                    await this.#sendBinary(payload, id);
+                } finally {
+                    this.#uploadBytes -= payload.byteLength;
                 }
-                return;
             }
-            await previous;
+        } finally {
+            this.#sending = false;
+        }
+    }
+    async #sendBinary(payload: Uint8Array<ArrayBuffer>, id: string): Promise<void> {
+        const socket: WebSocket = this.#socket;
+        let started: boolean = false;
+        try {
             const chunkBytes: number = Math.min(
                 BinaryChunks.CHUNK_BYTES,
                 (this.#hello?.policy.maxPayloadBytes ?? 65536) - 28,
@@ -519,31 +593,30 @@ export class NexaClient {
                 (this.#options.maxMessageBytes ?? 16 * 1024 * 1024) - 28,
             );
             for (const chunk of BinaryChunks.split(payload, chunkBytes)) {
-                while (this.#socket.bufferedAmount > chunkBytes) {
-                    if (this.#closed || !this.#pending.has(id)) {
-                        throw new Error('Binary upload was interrupted');
+                while (socket.bufferedAmount > chunkBytes) {
+                    if (socket !== this.#socket || this.#closed || !this.#pending.has(id)) {
+                        throw materializeError(new Error('Binary upload was interrupted'));
                     }
                     await new Promise<void>((resolve): void => {
                         setTimeout(resolve, 5);
                     });
                 }
-                if (this.#closed || !this.#pending.has(id)) {
-                    throw new Error('Binary upload was interrupted');
+                if (socket !== this.#socket || this.#closed || !this.#pending.has(id)) {
+                    throw materializeError(new Error('Binary upload was interrupted'));
                 }
-                this.#socket.send(chunk);
+                socket.send(chunk);
+                started = true;
             }
         } catch (error: unknown) {
             this.#pending.reject(
                 id,
                 error instanceof Error ? error : new Error('Could not send request'),
             );
-            if (typeof payload !== 'string' && socket === this.#socket) {
+            if (started && socket === this.#socket) {
                 this.#fail(
                     new TransportError(TransportErrorCode.Connection, 'Binary upload interrupted'),
                 );
             }
-        } finally {
-            gate.resolve(undefined);
         }
     }
 
@@ -553,19 +626,21 @@ export class NexaClient {
         }
         if (raw instanceof ArrayBuffer) {
             if (raw.byteLength > (this.#options.maxMessageBytes ?? 16 * 1024 * 1024)) {
-                throw new RangeError('Binary frame exceeds limit');
+                throw materializeError(new RangeError('Binary frame exceeds limit'));
             }
             if (this.#hello === null) {
-                throw new Error('Binary media arrived before authentication');
+                throw materializeError(new Error('Binary media arrived before authentication'));
             }
             const complete: ArrayBuffer | null = this.#binaryChunks.accept(raw);
             if (complete === null) {
                 return;
             }
             if (complete.byteLength >= 8 && new DataView(complete).getUint32(0) === 0x4e584246) {
-                this.#receive(
-                    JSON.stringify(
-                        BinaryEnvelope.decode(complete, BinaryChunks.MAX_TRANSFER_BYTES),
+                this.#receiveFrame(
+                    BinaryEnvelope.decode(
+                        complete,
+                        BinaryChunks.MAX_TRANSFER_BYTES,
+                        this.#options.maxMessageBytes ?? 16 * 1024 * 1024,
                     ),
                 );
                 return;
@@ -574,7 +649,19 @@ export class NexaClient {
                 complete,
                 BinaryChunks.MAX_TRANSFER_BYTES,
             );
-            void this.#deliverAttachment(attachment);
+            const bytes: number = attachment.data.buffer.byteLength;
+            if (
+                this.#deliveries >= 64 ||
+                this.#deliveryBytes + bytes > BinaryChunks.MAX_TRANSFER_BYTES
+            ) {
+                throw new TransportError(
+                    TransportErrorCode.Limit,
+                    'Attachment consumers fell behind',
+                );
+            }
+            this.#deliveries += 1;
+            this.#deliveryBytes += bytes;
+            this.#deliverAttachment(attachment);
             return;
         }
         if (
@@ -582,21 +669,23 @@ export class NexaClient {
             new TextEncoder().encode(raw).length >
                 (this.#options.maxMessageBytes ?? 16 * 1024 * 1024)
         ) {
-            throw new Error('Invalid frame size or encoding');
+            throw materializeError(new Error('Invalid frame size or encoding'));
         }
-        const frame: unknown = JSON.parse(raw);
+        this.#receiveFrame(JSON.parse(raw));
+    }
+    #receiveFrame(frame: unknown): void {
         if (!isRecord(frame)) {
-            throw new Error('Expected frame object');
+            throw materializeError(new Error('Expected frame object'));
         }
         if (typeof frame['id'] === 'string' && typeof frame['ok'] === 'boolean') {
             if (frame['ok']) {
                 if (!isJson(frame['result'])) {
-                    throw new Error('Expected JSON result');
+                    throw materializeError(new Error('Expected JSON result'));
                 }
                 this.#pending.resolve(frame['id'], frame['result']);
             } else {
                 if (!validators.error(frame['error'])) {
-                    throw new Error('Expected wire error');
+                    throw materializeError(new Error('Expected wire error'));
                 }
                 const remote: WireError = frame['error'];
                 this.#pending.reject(
@@ -613,11 +702,11 @@ export class NexaClient {
             frame['seq'] < 1 ||
             !isJson(frame['data'])
         ) {
-            throw new Error('Invalid event envelope');
+            throw materializeError(new Error('Invalid event envelope'));
         }
         const seq: bigint = BigInt(frame['seq']);
         if (seq <= this.#sequence) {
-            throw new Error('Non-monotonic event sequence');
+            throw materializeError(new Error('Non-monotonic event sequence'));
         }
         if (seq !== this.#sequence + 1n) {
             for (const listener of this.#gaps) {
@@ -629,7 +718,7 @@ export class NexaClient {
         this.#sequence = seq;
         if (frame['event'] === 'connect.challenge') {
             if (this.#challenge !== null || !validators.challenge(frame['data'])) {
-                throw new Error('Invalid challenge');
+                throw materializeError(new Error('Invalid challenge'));
             }
             this.#challenge = frame['data'];
             this.#wake?.();
@@ -642,33 +731,60 @@ export class NexaClient {
             });
         }
     }
-    async #deliverAttachment(attachment: ReceivedAttachment): Promise<void> {
-        const socket: WebSocket = this.#socket;
-        let received: boolean = this.#attachments.size > 0;
+    #deliverAttachment(attachment: ReceivedAttachment): void {
+        const pending: Promise<void>[] = [...this.#attachments].map((listener): Promise<void> => {
+            try {
+                return Promise.resolve(listener(attachment));
+            } catch (error: unknown) {
+                return Promise.reject(
+                    error instanceof Error ? error : new Error('Attachment listener failed'),
+                );
+            }
+        });
+        // User promises can outlive a connection. They must not root its client or file buffer.
+        void NexaClient.#finishAttachment(
+            new WeakRef(this),
+            new WeakRef(this.#socket),
+            attachment.id,
+            attachment.data.buffer.byteLength,
+            pending,
+        );
+    }
+    static async #finishAttachment(
+        owner: WeakRef<NexaClient>,
+        socket: WeakRef<WebSocket>,
+        id: string,
+        bytes: number,
+        pending: Promise<void>[],
+    ): Promise<void> {
+        const outcomes: PromiseSettledResult<void>[] = await Promise.allSettled(pending);
+        const client: NexaClient | undefined = owner.deref();
+        if (client === undefined) {
+            return;
+        }
         try {
-            await Promise.all(
-                [...this.#attachments].map(async (listener): Promise<void> => {
-                    await listener(attachment);
-                }),
-            );
+            if (socket.deref() !== client.#socket || !client.connected) {
+                return;
+            }
+            let received: boolean = outcomes.length > 0;
+            for (const outcome of outcomes) {
+                if (outcome.status === 'rejected') {
+                    received = false;
+                    client.#notify((): void => {
+                        throw outcome.reason;
+                    });
+                }
+            }
+            if (client.#hello?.features.methods.includes(Method.MediaAcknowledge)) {
+                await client.call(Method.MediaAcknowledge, { id, received });
+            }
         } catch (error: unknown) {
-            received = false;
-            this.#notify((): void => {
+            client.#notify((): void => {
                 throw error;
             });
-        }
-        if (
-            socket === this.#socket &&
-            this.connected &&
-            this.#hello?.features.methods.includes(Method.MediaAcknowledge)
-        ) {
-            try {
-                await this.call(Method.MediaAcknowledge, { id: attachment.id, received });
-            } catch (error: unknown) {
-                this.#notify((): void => {
-                    throw error;
-                });
-            }
+        } finally {
+            client.#deliveries -= 1;
+            client.#deliveryBytes -= bytes;
         }
     }
 
@@ -692,7 +808,7 @@ export class NexaClient {
         const wasReady: boolean = this.#ready;
         this.#ready = false;
         this.#closed = true;
-        this.#failure = error;
+        this.#failure = materializeError(error);
         this.#pending.close(error);
         this.#wake?.();
         for (const listener of this.#closeListeners) {
@@ -701,12 +817,16 @@ export class NexaClient {
             });
         }
         this.#binaryChunks.clear();
+        this.#detachSocket?.();
+        this.#detachSocket = undefined;
         this.#socket.close();
         if (wasReady) {
             this.#scheduleReconnect(error);
         }
     }
     #clearListeners(): void {
+        this.#subscriptions.clear();
+        this.#streamIds.clear();
         this.#closeListeners.clear();
         this.#events.clear();
         this.#attachments.clear();
@@ -773,4 +893,17 @@ function isJson(value: unknown): value is JsonValue {
         return value.every(isJson);
     }
     return isRecord(value) && Object.values(value).every(isJson);
+}
+
+/** Cleanup handles never outlive the registry's ownership of callbacks. */
+function subscribe<T extends object>(listeners: Set<T>, listener: T): () => void {
+    listeners.add(listener);
+    const registry: WeakRef<Set<T>> = new WeakRef(listeners);
+    const callback: WeakRef<T> = new WeakRef(listener);
+    return (): void => {
+        const entry: T | undefined = callback.deref();
+        if (entry !== undefined) {
+            registry.deref()?.delete(entry);
+        }
+    };
 }

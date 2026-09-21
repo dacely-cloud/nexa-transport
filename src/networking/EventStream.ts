@@ -53,6 +53,17 @@ export class EventStream<T> implements AsyncIterableIterator<T> {
         }
         this.#waiter = undefined;
     }
+    /** Releases unread events when the consumer explicitly stops, including after completion. */
+    public return(): Promise<IteratorResult<T, undefined>> {
+        this.discard();
+        this.end();
+        return Promise.resolve({ done: true, value: undefined });
+    }
+    /** Drops buffered values without changing the terminal result. */
+    public discard(): void {
+        this.#values.length = 0;
+        this.#bytes = 0;
+    }
     /** Returns the next event. Concurrent reads are deliberately rejected. */
     public next(): Promise<IteratorResult<T, undefined>> {
         if (this.#error !== undefined) {

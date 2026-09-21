@@ -1,3 +1,4 @@
+import { materializeError } from './ErrorStack.js';
 import type { CallOptions } from '../interface/ClientOptions.js';
 import type { JsonValue } from '../protocol/Protocol.js';
 import { TransportError, TransportErrorCode } from './TransportError.js';
@@ -13,7 +14,12 @@ export class PendingRequests {
     /** Sets a hard concurrency bound. */
     public constructor(public readonly limit: number) {}
     /** Registers before send, including timeout and abort cleanup. */
-    public create(id: string, options: CallOptions, timeout: number): Promise<JsonValue> {
+    public create(
+        id: string,
+        options: CallOptions,
+        timeout: number,
+        onSettled?: () => void,
+    ): Promise<JsonValue> {
         if (this.#pending.size >= this.limit) {
             return Promise.reject(
                 new TransportError(TransportErrorCode.Limit, 'Too many pending requests'),
@@ -35,6 +41,7 @@ export class PendingRequests {
                 cleanup: (): void => {
                     clearTimeout(timer);
                     options.signal?.removeEventListener('abort', abort);
+                    onSettled?.();
                 },
             });
             options.signal?.addEventListener('abort', abort, { once: true });
@@ -55,7 +62,9 @@ export class PendingRequests {
     /** Fails one request exactly once. */
     public reject(id: string, error: Error): void {
         const pending: PendingRequest | undefined = this.#take(id);
-        pending?.reject(error);
+        if (pending !== undefined) {
+            pending.reject(materializeError(error));
+        }
     }
     /** Settles all outstanding requests. */
     public close(error: Error): void {

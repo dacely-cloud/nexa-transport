@@ -68,7 +68,7 @@ export class NexaMedia {
         if (!Array.isArray(value) && !isJsonRecord(value)) {
             throw new TypeError('Expected binary JSON');
         }
-        const length: number = Object.keys(value).length;
+        const length: number = Array.isArray(value) ? value.length : Object.keys(value).length;
         if (length > 16 * 1024 * 1024) {
             throw new RangeError('Binary payload exceeds 16 MiB');
         }
