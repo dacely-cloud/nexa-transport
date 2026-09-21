@@ -1,0 +1,390 @@
+diff --git a/src/gateway/Auth.ts b/src/gateway/Auth.ts
+index 32f3f4cb..fbcac5b7 100644
+--- a/src/gateway/Auth.ts
++++ b/src/gateway/Auth.ts
+@@ -874,7 +874,9 @@ export class Authenticator {
+         // refusal below is not counted either: it means a legitimate client asked for too much, and
+         // counting it would lock an operator out over a misconfigured viewer.
+         this.#forgive(request);
+-        const requested = parseScopes(header(request, 'x-nexa-scopes'));
++        const requested = parseScopes(
++            header(request, 'x-nexa-scopes') ?? request.query?.get('scopes') ?? undefined,
++        );
+         const granted = expandScopes(this.#scopes);
+         for (const scope of requested) {
+             if (!satisfies(granted, scope)) {
+@@ -917,7 +919,8 @@ export class Authenticator {
+                 message: 'this gateway is not accepting pairing codes',
+             });
+         }
+-        const deviceId = header(request, 'x-nexa-device-id');
++        const deviceId =
++            header(request, 'x-nexa-device-id') ?? request.query?.get('deviceId') ?? undefined;
+         if (deviceId === undefined || deviceId.length === 0) {
+             // The credential is BOUND to the device id, and revocation is by device id. Minting one
+             // for a caller that named no device would produce a token nothing can ever revoke.
+@@ -929,7 +932,10 @@ export class Authenticator {
+         }
+         const redeemed = await this.#codes.redeem(code, {
+             deviceId,
+-            deviceName: header(request, 'x-nexa-device-name') ?? deviceId,
++            deviceName:
++                header(request, 'x-nexa-device-name') ??
++                request.query?.get('deviceName') ??
++                deviceId,
+             remoteAddress: request.remoteAddress,
+         });
+         return redeemed.ok ? ok(this.#issue(redeemed.value, 'device')) : redeemed;
+@@ -938,7 +944,8 @@ export class Authenticator {
+     /** The approved device this request claims to be, or null when it claims none. */
+     async #knownDevice(request: AuthRequest): Promise<DeviceRecord | null> {
+         const store = this.#pairing;
+-        const deviceId = header(request, 'x-nexa-device-id');
++        const deviceId =
++            header(request, 'x-nexa-device-id') ?? request.query?.get('deviceId') ?? undefined;
+         if (store === null || deviceId === undefined || deviceId.length === 0) {
+             return null;
+         }
+@@ -959,7 +966,9 @@ export class Authenticator {
+             });
+         }
+         const granted = expandScopes(known.scopes);
+-        const requested = parseScopes(header(request, 'x-nexa-scopes'));
++        const requested = parseScopes(
++            header(request, 'x-nexa-scopes') ?? request.query?.get('scopes') ?? undefined,
++        );
+         for (const scope of requested) {
+             if (!satisfies(granted, scope)) {
+                 // Never silently narrowed either: a client that believes it has write and does not
+@@ -995,7 +1004,8 @@ export class Authenticator {
+                 message: 'pairing is not configured',
+             });
+         }
+-        const deviceId = header(request, 'x-nexa-device-id');
++        const deviceId =
++            header(request, 'x-nexa-device-id') ?? request.query?.get('deviceId') ?? undefined;
+         if (deviceId === undefined || deviceId.length === 0) {
+             return err({
+                 code: AuthFailureCode.Required,
+@@ -1003,8 +1013,11 @@ export class Authenticator {
+                 message: 'a device id is required',
+             });
+         }
+-        const requested = parseScopes(header(request, 'x-nexa-scopes'));
+-        const name = header(request, 'x-nexa-device-name') ?? deviceId;
++        const requested = parseScopes(
++            header(request, 'x-nexa-scopes') ?? request.query?.get('scopes') ?? undefined,
++        );
++        const name =
++            header(request, 'x-nexa-device-name') ?? request.query?.get('deviceName') ?? deviceId;
+         if (this.#autoApproveLoopback && isLoopbackHost(request.remoteAddress)) {
+             return ok(
+                 this.#issue(await this.#autoApprove(store, deviceId, name, requested), 'device'),
+diff --git a/src/gateway/Protocol.ts b/src/gateway/Protocol.ts
+index 855735ff..264d80ee 100644
+--- a/src/gateway/Protocol.ts
++++ b/src/gateway/Protocol.ts
+@@ -1,6 +1,7 @@
+ // SPDX-License-Identifier: Apache-2.0
+ 
+ import type { AgentDefinition, Session, TurnEvent } from '../agent/Types';
++import { parseAttachments, type InboundAttachment } from './Attachments';
+ import type { GatewayLimits } from './Capacity';
+ import type { DeadLetter } from '../channels/DeadLetter';
+ import { ErrorCode, NexaError } from '../core/Errors';
+@@ -231,26 +232,33 @@ export interface ConnectParams {
+  * its method list, its event list, its own scopes and the server's limits off the wire cannot be
+  * wrong about any of them, and raising a limit or adding a method does not require a client release.
+  */
++/** Methods, events, and additive capabilities supported by this gateway. */
++export interface GatewayFeatures {
++    /** User media attachments are validated and forwarded to the agent. */
++    readonly attachments?: true;
++    readonly methods: readonly string[];
++    readonly events: readonly string[];
++    /**
++     * The scope each method requires.
++     *
++     * Sent because the alternative is every client shipping its own copy of the server's
++     * authorization table, which then drifts: a UI that greys out the wrong button is a support
++     * ticket, and one that offers a button the server refuses is worse.
++     */
++    readonly methodScopes: Readonly<Record<string, Scope>>;
++}
++
+ export interface HelloOk {
+     readonly type: 'hello-ok';
+     readonly protocol: number;
+     readonly minProtocol: number;
+     readonly server: { readonly version: string; readonly connId: string };
+-    readonly features: {
+-        readonly methods: readonly string[];
+-        readonly events: readonly string[];
+-        /**
+-         * The scope each method requires.
+-         *
+-         * Sent because the alternative is every client shipping its own copy of the server's
+-         * authorization table, which then drifts: a UI that greys out the wrong button is a support
+-         * ticket, and one that offers a button the server refuses is worse.
+-         */
+-        readonly methodScopes: Readonly<Record<string, Scope>>;
+-    };
++    readonly features: GatewayFeatures;
+     readonly auth: {
+         readonly principalId: string;
+         readonly method: 'none' | 'token' | 'device';
++        /** Newly issued device credential, delivered to browser clients unable to read upgrade headers. */
++        readonly token?: string;
+         readonly scopes: readonly Scope[];
+     };
+     readonly policy: {
+@@ -319,6 +327,8 @@ export interface TurnEndData {
+ 
+ /** The payload of a {@link GATEWAY_EVENTS.SessionMessage} event. */
+ export interface SessionMessageData {
++    /** Attachments sent with this message, preserved for session viewers. */
++    readonly attachments?: readonly InboundAttachment[];
+     readonly sessionId: string;
+     readonly role: 'user' | 'assistant';
+     readonly text: string;
+@@ -359,6 +369,8 @@ export interface ApprovalResolvedData {
+ 
+ /** What one turn is asked for. */
+ export interface AskParams {
++    /** User-authored image, video, document, and text blocks, in display order. */
++    readonly attachments?: readonly InboundAttachment[];
+     readonly message: string;
+     readonly agentId?: string;
+     /** Continues an existing conversation. */
+@@ -1124,6 +1136,9 @@ export function parseAskParams(raw: unknown): AskParams {
+     const record = asRecord(raw, 'params');
+     return {
+         message: requireString(record, 'message'),
++        ...(record['attachments'] === undefined
++            ? {}
++            : { attachments: parseAttachments(record['attachments']) }),
+         ...optional(record, 'agentId'),
+         ...optional(record, 'conversationId'),
+         ...optional(record, 'userId'),
+diff --git a/src/gateway/Server.ts b/src/gateway/Server.ts
+index af5c12da..34037966 100644
+--- a/src/gateway/Server.ts
++++ b/src/gateway/Server.ts
+@@ -1,5 +1,6 @@
+ // SPDX-License-Identifier: Apache-2.0
+ 
++import type { InboundAttachment } from './Attachments';
+ import { randomUUID } from 'node:crypto';
+ import type { GatewayHttpRequest, GatewayHttpResponse } from './GatewayHttp';
+ import type { GatewaySocket } from './GatewaySocket';
+@@ -102,6 +103,7 @@ import {
+     type DeviceRequestInfo,
+     type GatewayEvent,
+     type HelloOk,
++    type GatewayFeatures,
+     type RequestEnvelope,
+     type ResponseEnvelope,
+     type SessionMessageData,
+@@ -143,6 +145,8 @@ import {
+ 
+ /** How a turn is requested of the agent. Structurally satisfied by `Nexa`. */
+ export interface AgentCallOptions {
++    /** Validated user media forwarded to Nexa without flattening to text. */
++    readonly attachments?: readonly InboundAttachment[];
+     readonly agentId?: string;
+     readonly principal?: Partial<ToolPrincipal>;
+     readonly conversationId?: string;
+@@ -493,6 +497,7 @@ class GatewayConnection {
+         authMethod: AuthOutcome['method'],
+         challenge: string,
+         deviceId: string | null,
++        public readonly issuedDeviceToken?: string,
+     ) {
+         this.socket = socket;
+         this.scopes = scopes;
+@@ -1061,6 +1066,7 @@ export class GatewayServer {
+             outcome.method,
+             nonce,
+             outcome.deviceId,
++            outcome.issuedDeviceToken,
+         );
+         // The wire log names frames by connection, and WHO a connection is only exists from here
+         // on: the transport tap sees bytes, this line is what lets a reader attribute them.
+@@ -1389,6 +1395,9 @@ export class GatewayServer {
+             auth: {
+                 principalId: connection.principalId,
+                 method: connection.authMethod,
++                ...(connection.issuedDeviceToken === undefined
++                    ? {}
++                    : { token: connection.issuedDeviceToken }),
+                 scopes: [...connection.scopes],
+             },
+             // The values this process will actually enforce, read from the same fields the
+@@ -1581,6 +1590,9 @@ export class GatewayServer {
+                             sessionId: mirrored,
+                             role: 'user',
+                             text: ask.message,
++                            ...(ask.attachments === undefined
++                                ? {}
++                                : { attachments: ask.attachments }),
+                             principalId: connection.principalId,
+                             at: this.#now(),
+                         } satisfies SessionMessageData,
+@@ -2114,6 +2126,9 @@ export class GatewayServer {
+             256 +
+             2 *
+                 (params.message.length +
++                    (params.attachments === undefined
++                        ? 0
++                        : JSON.stringify(params.attachments).length) +
+                     (params.agentId?.length ?? 0) +
+                     (params.conversationId?.length ?? 0) +
+                     (params.userId?.length ?? 0) +
+@@ -2148,6 +2163,9 @@ export class GatewayServer {
+                     sessionId: mirrorSessionId,
+                     role: 'user',
+                     text: params.message,
++                    ...(params.attachments === undefined
++                        ? {}
++                        : { attachments: params.attachments }),
+                     principalId: connection.principalId,
+                     streamId,
+                     at: this.#now(),
+@@ -2490,6 +2508,7 @@ export class GatewayServer {
+     ): AgentCallOptions {
+         const userId = turnUserId(connection, params.userId);
+         return {
++            ...(params.attachments === undefined ? {} : { attachments: params.attachments }),
+             ...(params.agentId === undefined ? {} : { agentId: params.agentId }),
+             ...(params.conversationId === undefined
+                 ? {}
+@@ -2620,13 +2639,10 @@ export class GatewayServer {
+      * being absent, which is why this filters one prefix rather than deriving the whole table from
+      * `#deps`.
+      */
+-    #advertisedFeatures(): {
+-        readonly methods: readonly string[];
+-        readonly events: readonly string[];
+-        readonly methodScopes: Readonly<Record<string, Scope>>;
+-    } {
++    #advertisedFeatures(): GatewayFeatures {
+         if (this.#deps.accounts !== undefined) {
+             return {
++                attachments: true,
+                 methods: GATEWAY_METHODS,
+                 events: [...GATEWAY_EVENT_NAMES],
+                 methodScopes: EFFECTIVE_METHOD_SCOPES,
+@@ -2634,6 +2650,7 @@ export class GatewayServer {
+         }
+         const served = GATEWAY_METHODS.filter((name) => !isAccountsMethod(name));
+         return {
++            attachments: true,
+             methods: served,
+             events: [...GATEWAY_EVENT_NAMES],
+             methodScopes: Object.fromEntries(
+diff --git a/src/gateway/Attachments.ts b/src/gateway/Attachments.ts
+new file mode 100644
+index 00000000..264dfb13
+--- /dev/null
++++ b/src/gateway/Attachments.ts
+@@ -0,0 +1,100 @@
++// SPDX-License-Identifier: Apache-2.0
++
++import { ErrorCode, NexaError } from '../core/Errors';
++import type { BinarySource, ContentBlock } from '../providers/Types';
++
++/** User-authored attachment kinds accepted by the agent's public boundary. */
++export const AttachmentType = {
++    Text: 'text',
++    Image: 'image',
++    Video: 'video',
++    VideoFrame: 'video-frame',
++    Document: 'document',
++} as const;
++
++/** A user attachment cannot inject tool results or provider reasoning into history. */
++export type InboundAttachment = Extract<
++    ContentBlock,
++    { readonly type: (typeof AttachmentType)[keyof typeof AttachmentType] }
++>;
++
++/** Validates bounded attachment lists without altering binary bytes or ordering. */
++export function parseAttachments(raw: unknown): readonly InboundAttachment[] {
++    if (!Array.isArray(raw) || raw.length > 64) {
++        throw invalidAttachment('attachments must be an array of at most 64 blocks');
++    }
++    return raw.map((block: unknown): InboundAttachment => {
++        if (typeof block !== 'object' || block === null || !('type' in block)) {
++            throw invalidAttachment('attachment must have a type');
++        }
++        if (
++            block.type === AttachmentType.Text &&
++            'text' in block &&
++            typeof block.text === 'string'
++        ) {
++            return { type: AttachmentType.Text, text: block.text };
++        }
++        if (
++            block.type !== AttachmentType.Image &&
++            block.type !== AttachmentType.Video &&
++            block.type !== AttachmentType.VideoFrame &&
++            block.type !== AttachmentType.Document
++        ) {
++            throw invalidAttachment('unsupported inbound attachment type');
++        }
++        if (!('source' in block)) {
++            throw invalidAttachment('binary attachment must have a source');
++        }
++        const source: BinarySource = parseSource(block.source);
++        if ('title' in block && typeof block.title !== 'string') {
++            throw invalidAttachment('attachment title must be a string');
++        }
++        return {
++            type: block.type,
++            source,
++            ...('title' in block && typeof block.title === 'string' ? { title: block.title } : {}),
++        };
++    });
++}
++
++/** Validates the provider-neutral binary source at the websocket trust boundary. */
++function parseSource(raw: unknown): BinarySource {
++    if (typeof raw !== 'object' || raw === null || !('kind' in raw)) {
++        throw invalidAttachment('attachment source must have a kind');
++    }
++    if (raw.kind === 'url' && 'url' in raw && typeof raw.url === 'string') {
++        let url: URL;
++        try {
++            url = new URL(raw.url);
++        } catch {
++            throw invalidAttachment('attachment URL must be absolute HTTP or HTTPS');
++        }
++        if (
++            (url.protocol !== 'https:' && url.protocol !== 'http:') ||
++            url.username ||
++            url.password
++        ) {
++            throw invalidAttachment('attachment URL must be HTTP or HTTPS without credentials');
++        }
++        return { kind: 'url', url: raw.url };
++    }
++    if (
++        raw.kind === 'base64' &&
++        'mediaType' in raw &&
++        typeof raw.mediaType === 'string' &&
++        raw.mediaType.length > 0 &&
++        'data' in raw &&
++        typeof raw.data === 'string' &&
++        raw.data.length > 0 &&
++        raw.data.length % 4 === 0 &&
++        /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(raw.data)
++    ) {
++        return { kind: 'base64', mediaType: raw.mediaType, data: raw.data };
++    }
++    throw invalidAttachment('attachment source must contain a URL or valid base64 and mediaType');
++}
++
++/** Returns the gateway's standard invalid-request error. */
++function invalidAttachment(message: string): NexaError {
++    return new NexaError(ErrorCode.InvalidRequest, message, { source: 'gateway' });
++}
