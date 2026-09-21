@@ -27,3 +27,5 @@ Register `client.onAttachment()` before asking for media. It receives `ReceivedA
 Use `client.sendAudio(callId, pcm)` and `client.onAudio()` for raw PCM16 byte arrays. The existing enum-based `Method.VoiceAudio` call remains supported and is packed into binary frames automatically.
 
 These are transport limits. Provider decoding limits, accepted document formats, installed tools, user permissions, and voice configuration still determine what Nexa can do with uploaded content.
+
+After reassembly, the client responds with `media.acknowledge` and `{ id, received }`. The acknowledgment is scoped to the receiving connection. `received: true` means the attachment handler completed successfully; it does not assert that a human viewed the file. Missing or failed handlers send `received: false`. The server waits up to 15 seconds after queuing the final chunk; absent acknowledgment leaves delivery unconfirmed and returns an error to the model. The SDK performs this exchange automatically and awaits asynchronous attachment handlers.

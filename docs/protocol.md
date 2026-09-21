@@ -679,8 +679,6 @@ Configurable bounds on gateway-owned work and memory.
 
 ## GatewayMethods
 
-Every method, with its params and its result. The single source of truth for both ends.
-
 | Field                       | Required | Type                  | Description |
 | --------------------------- | -------- | --------------------- | ----------- |
 | `accounts.create`           | Yes      | Object (fields below) |             |
@@ -713,6 +711,7 @@ Every method, with its params and its result. The single source of truth for bot
 | `jobs.list`                 | Yes      | Object (fields below) |             |
 | `jobs.remove`               | Yes      | Object (fields below) |             |
 | `logs.tail`                 | Yes      | Object (fields below) |             |
+| `media.acknowledge`         | Yes      | Object (fields below) |             |
 | `sessions.delete`           | Yes      | Object (fields below) |             |
 | `sessions.get`              | Yes      | Object (fields below) |             |
 | `sessions.list`             | Yes      | Object (fields below) |             |
@@ -976,6 +975,13 @@ Every method, with its params and its result. The single source of truth for bot
 | -------- | -------- | ------------------------------------------- | ----------- |
 | `params` | Yes      | [LogTailParams](protocol.md#logtailparams)  |             |
 | `result` | Yes      | Array of [LogRecord](protocol.md#logrecord) |             |
+
+**media.acknowledge**
+
+| Field    | Required | Type                                                         | Description |
+| -------- | -------- | ------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [MediaAcknowledgeParams](protocol.md#mediaacknowledgeparams) |             |
+| `result` | Yes      | [OkResult](protocol.md#okresult)                             |             |
 
 **sessions.delete**
 
@@ -1441,6 +1447,15 @@ A window over the recent log.
 | `limit` | No       | `number`                                    | How many lines back to read. Absent reads everything the buffer still holds.    |
 | `scope` | No       | `string`                                    | Only lines from this subsystem, e.g. `gateway`.                                 |
 | `since` | No       | `number`                                    | Only lines newer than this timestamp, so a poller does not re-read what it has. |
+
+## MediaAcknowledgeParams
+
+Client attachment handler outcome; receipt does not assert that a human viewed it.
+
+| Field      | Required | Type      | Description |
+| ---------- | -------- | --------- | ----------- |
+| `id`       | Yes      | `string`  |             |
+| `received` | Yes      | `boolean` |             |
 
 ## MemoryLender
 
