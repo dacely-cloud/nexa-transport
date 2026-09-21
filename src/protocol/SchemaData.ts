@@ -2087,6 +2087,33 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'sessions.download': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/SessionFileParams',
+                        },
+                        result: {
+                            $ref: '#/definitions/OkResult',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'sessions.files': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/IdParams',
+                        },
+                        result: {
+                            items: {
+                                $ref: '#/definitions/DeliveredAttachment',
+                            },
+                            type: 'array',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'sessions.get': {
                     properties: {
                         params: {
@@ -2431,6 +2458,8 @@ export const schema: Schema = {
                 'logs.tail',
                 'media.acknowledge',
                 'sessions.delete',
+                'sessions.download',
+                'sessions.files',
                 'sessions.get',
                 'sessions.list',
                 'sessions.messages',
@@ -4240,6 +4269,19 @@ export const schema: Schema = {
             description: 'What a caller may do.',
             enum: ['admin', 'read', 'write'],
             type: 'string',
+        },
+        SessionFileParams: {
+            description: 'Identifies a saved file within an owned session.',
+            properties: {
+                attachmentId: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+            },
+            required: ['attachmentId', 'id'],
+            type: 'object',
         },
         SessionListParams: {
             description: 'A filter over sessions.',

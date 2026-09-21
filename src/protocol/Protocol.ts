@@ -1334,6 +1334,22 @@ export interface GatewayMethodssessions_deleteShape {
     readonly result: OkResult;
 }
 
+/** GatewayMethodssessions_download wire fields. */
+export interface GatewayMethodssessions_downloadShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: SessionFileParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: OkResult;
+}
+
+/** GatewayMethodssessions_files wire fields. */
+export interface GatewayMethodssessions_filesShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: IdParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ReadonlyArray<DeliveredAttachment>;
+}
+
 /** GatewayMethodssessions_get wire fields. */
 export interface GatewayMethodssessions_getShape {
     /** params as defined by the Nexa gateway. */
@@ -1584,6 +1600,10 @@ export interface GatewayMethodsShape {
     readonly 'media.acknowledge': GatewayMethodsmedia_acknowledgeShape;
     /** sessions.delete as defined by the Nexa gateway. */
     readonly 'sessions.delete': GatewayMethodssessions_deleteShape;
+    /** sessions.download as defined by the Nexa gateway. */
+    readonly 'sessions.download': GatewayMethodssessions_downloadShape;
+    /** sessions.files as defined by the Nexa gateway. */
+    readonly 'sessions.files': GatewayMethodssessions_filesShape;
     /** sessions.get as defined by the Nexa gateway. */
     readonly 'sessions.get': GatewayMethodssessions_getShape;
     /** sessions.list as defined by the Nexa gateway. */
@@ -2731,6 +2751,17 @@ export const ScopeValues = { Value0: 'admin', Value1: 'read', Value2: 'write' } 
 /** Scope from the Nexa wire protocol. */
 export type Scope = (typeof ScopeValues)[keyof typeof ScopeValues];
 
+/** SessionFileParams wire fields. */
+export interface SessionFileParamsShape {
+    /** attachmentId as defined by the Nexa gateway. */
+    readonly attachmentId: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+}
+
+/** SessionFileParams from the Nexa wire protocol. */
+export type SessionFileParams = SessionFileParamsShape;
+
 /** SessionListParams wire fields. */
 export interface SessionListParamsShape {
     /** agentId as defined by the Nexa gateway. */
@@ -3790,6 +3821,10 @@ export enum Method {
     MediaAcknowledge = 'media.acknowledge',
     /** Calls sessions.delete. */
     SessionsDelete = 'sessions.delete',
+    /** Calls sessions.download. */
+    SessionsDownload = 'sessions.download',
+    /** Calls sessions.files. */
+    SessionsFiles = 'sessions.files',
     /** Calls sessions.get. */
     SessionsGet = 'sessions.get',
     /** Calls sessions.list. */

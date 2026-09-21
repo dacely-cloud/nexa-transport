@@ -204,3 +204,62 @@ describe('Nexa websocket lifetimes', (): void => {
         ).rejects.not.toThrow('SECRET');
     });
 });
+
+it('reconnects, restores subscriptions and never repeats an interrupted mutation', async (): Promise<void> => {
+    const connected: NexaClient = await connect();
+    if (gateway === undefined) {
+        throw new Error('Missing peer');
+    }
+    let failNext: boolean = true;
+    gateway.handler = (socket: WebSocket, request: Request): void => {
+        if (request.method === 'agent.ask' && failNext) {
+            failNext = false;
+            socket.close(1001, 'temporary disconnect');
+            return;
+        }
+        socket.send(
+            JSON.stringify({
+                id: request.id,
+                ok: true,
+                result: request.method === 'sessions.subscribe' ? { ok: true } : result,
+            }),
+        );
+    };
+    await connected.call(Method.SessionsSubscribe, { sessionId: 'test::main' });
+    const restored: Promise<void> = new Promise((resolve): void => {
+        connected.onReconnect(resolve);
+    });
+    await expect(connected.call(Method.AgentAsk, { message: 'Run once' })).rejects.toThrow(
+        'temporary disconnect',
+    );
+    await restored;
+    expect(connected.connected).toBe(true);
+    expect(
+        gateway.requests.filter(
+            (request: Request): boolean => request.method === 'sessions.subscribe',
+        ),
+    ).toHaveLength(2);
+    expect(
+        gateway.requests.filter((request: Request): boolean => request.method === 'agent.ask'),
+    ).toHaveLength(1);
+    expect(await connected.call(Method.AgentAsk, { message: 'New request' })).toEqual(result);
+});
+
+it('manual close cancels a scheduled reconnect', async (): Promise<void> => {
+    const connected: NexaClient = await connect();
+    if (gateway === undefined) {
+        throw new Error('Missing peer');
+    }
+    gateway.handler = (socket: WebSocket): void => {
+        socket.close(1001, 'temporary disconnect');
+    };
+    await expect(connected.call(Method.AgentAsk, { message: 'Run once' })).rejects.toThrow();
+    connected.close();
+    await new Promise<void>((resolve): void => {
+        setTimeout(resolve, 600);
+    });
+    expect(
+        gateway.requests.filter((request: Request): boolean => request.method === 'connect'),
+    ).toHaveLength(1);
+    expect(connected.reconnecting).toBe(false);
+});

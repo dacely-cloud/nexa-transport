@@ -34,6 +34,8 @@ All 54 protocol methods. `connect` is managed by `NexaClient.connect`; the remai
 - [logs.tail](#logs-tail)
 - [media.acknowledge](#media-acknowledge)
 - [sessions.delete](#sessions-delete)
+- [sessions.download](#sessions-download)
+- [sessions.files](#sessions-files)
 - [sessions.get](#sessions-get)
 - [sessions.list](#sessions-list)
 - [sessions.messages](#sessions-messages)
@@ -722,6 +724,52 @@ Parameters: [IdParams](protocol.md#idparams).
 | `id`  | Yes      | `string` |             |
 
 Result: [OkResult](protocol.md#okresult).
+
+## sessions.download
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.SessionsDownload> = {
+    attachmentId: 'YOUR_ATTACHMENTID',
+    id: 'YOUR_ID',
+};
+const result: ResultOf<typeof Method.SessionsDownload> = await client.call(
+    Method.SessionsDownload,
+    params,
+);
+```
+
+Parameters: [SessionFileParams](protocol.md#sessionfileparams).
+
+| Field          | Required | Type     | Description |
+| -------------- | -------- | -------- | ----------- |
+| `attachmentId` | Yes      | `string` |             |
+| `id`           | Yes      | `string` |             |
+
+Result: [OkResult](protocol.md#okresult).
+
+## sessions.files
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.SessionsFiles> = {
+    id: 'YOUR_ID',
+};
+const result: ResultOf<typeof Method.SessionsFiles> = await client.call(
+    Method.SessionsFiles,
+    params,
+);
+```
+
+Parameters: [IdParams](protocol.md#idparams).
+
+| Field | Required | Type     | Description |
+| ----- | -------- | -------- | ----------- |
+| `id`  | Yes      | `string` |             |
+
+Result: Array of [DeliveredAttachment](protocol.md#deliveredattachment).
 
 ## sessions.get
 
