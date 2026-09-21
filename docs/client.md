@@ -100,7 +100,7 @@ For exact payload fields see [protocol types](protocol.md), especially `TurnEven
 
 ## Errors
 
-Import `TransportError` and `TransportErrorCode` from `nexa-transport/errors`. `TransportError` extends `Error` with a `code` and optional `remote: WireError`.
+Import `TransportError` and `TransportErrorCode` from `nexa-transport/errors`. `TransportError` extends `Error` with a `code`, optional `remote: WireError`, and optional `closeDetails: WebSocketCloseDetails`. For WebSocket disconnects, `closeDetails` preserves the numeric close code, reason, and `wasClean` flag; the error message includes the code and reason. Code 1006 means no normal close handshake was received, not a confirmed authentication failure.
 
 | Code constant | Value        | Meaning                                   |
 | ------------- | ------------ | ----------------------------------------- |

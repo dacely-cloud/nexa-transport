@@ -108,10 +108,21 @@ export class NexaClient {
                 );
             }
         });
-        this.#socket.addEventListener('close', (): void => {
-            this.#fail(new TransportError(TransportErrorCode.Closed, 'Gateway connection closed'));
+        this.#socket.addEventListener('close', (event: CloseEvent): void => {
+            this.#fail(
+                new TransportError(
+                    TransportErrorCode.Closed,
+                    `Gateway connection closed (${event.code}): ${event.reason || 'no close reason received'}`,
+                    undefined,
+                    { code: event.code, reason: event.reason, wasClean: event.wasClean },
+                ),
+            );
         });
         this.#socket.addEventListener('error', (): void => {
+            // An established WebSocket emits close after error; preserve its actual close details.
+            if (this.#hello !== null) {
+                return;
+            }
             this.#fail(
                 new TransportError(
                     TransportErrorCode.Connection,
