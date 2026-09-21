@@ -1,14 +1,13 @@
 import { isEventData, type EventMap } from '../protocol/Events.js';
 import type { StreamOptions } from '../interface/StreamOptions.js';
 import { Method } from '../protocol/Protocol.js';
-import type { AskResult, StreamParams } from '../protocol/Protocol.js';
+import type { StreamParams } from '../protocol/Protocol.js';
 import { TurnStream } from './TurnStream.js';
-import type { AskOptions, CallOptions, ClientOptions } from '../interface/ClientOptions.js';
+import type { CallOptions, ClientOptions } from '../interface/ClientOptions.js';
 import type {
     ConnectChallengeData,
     HelloOk,
     JsonValue,
-    MethodName,
     ParamsOf,
     ResultOf,
     WireError,
@@ -194,20 +193,8 @@ export class NexaClient {
     public get connected(): boolean {
         return !this.#closed && this.#hello !== null;
     }
-    /** Sends a message, optionally continuing a saved conversation or attaching media. */
-    public async ask(message: string, options: AskOptions = {}): Promise<AskResult> {
-        const { signal, timeoutMs, ...params }: AskOptions = options;
-        return await this.call(
-            Method.AgentAsk,
-            { ...params, message },
-            {
-                ...(signal === undefined ? {} : { signal }),
-                ...(timeoutMs === undefined ? {} : { timeoutMs }),
-            },
-        );
-    }
     /** Calls any Nexa RPC with validated parameters and result. Mutations are never replayed. */
-    public async call<M extends Exclude<MethodName, typeof Method.Connect>>(
+    public async call<M extends Exclude<Method, Method.Connect>>(
         method: M,
         params: ParamsOf<M>,
         options: CallOptions = {},
@@ -302,7 +289,7 @@ export class NexaClient {
         this.#fail(new TransportError(TransportErrorCode.Closed, 'Client closed'));
     }
 
-    async #call<M extends MethodName>(
+    async #call<M extends Method>(
         method: M,
         params: ParamsOf<M>,
         options: CallOptions,

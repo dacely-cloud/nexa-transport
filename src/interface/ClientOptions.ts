@@ -1,4 +1,3 @@
-import type { AskParams } from '../protocol/Protocol.js';
 /** Metadata sent in the Nexa connect handshake. */
 export interface ClientIdentity {
     /** Stable application or installation identifier. */
@@ -46,6 +45,3 @@ export interface CallOptions {
     /** Deadline in milliseconds. */
     readonly timeoutMs?: number;
 }
-
-/** Conversation, media, and cancellation options for a direct ask. */
-export interface AskOptions extends Omit<AskParams, 'message'>, CallOptions {}

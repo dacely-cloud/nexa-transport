@@ -21,7 +21,7 @@ async function connect(): Promise<NexaClient> {
     return client;
 }
 describe('Nexa websocket lifetimes', (): void => {
-    it('asks directly with conversation and media options using the typed method enum', async (): Promise<void> => {
+    it('calls the enum method with typed conversation and media parameters', async (): Promise<void> => {
         const connected: NexaClient = await connect();
         if (gateway === undefined) {
             throw new Error('No peer');
@@ -29,9 +29,9 @@ describe('Nexa websocket lifetimes', (): void => {
         gateway.handler = (socket: WebSocket, request: Request): void => {
             socket.send(JSON.stringify({ id: request.id, ok: true, result }));
         };
-        const answer: AskResult = await connected.ask('Continue', {
+        const answer: AskResult = await connected.call(Method.AgentAsk, {
+            message: 'Continue',
             conversationId: 'test::main',
-            timeoutMs: 500,
             attachments: [{ type: 'text', text: 'Context' }],
         });
         expect(answer.sessionKey).toBe('test::main');
@@ -95,7 +95,7 @@ describe('Nexa websocket lifetimes', (): void => {
         gateway.handler = (socket: WebSocket, request: Request): void => {
             socket.send(JSON.stringify({ id: request.id, ok: true, result: { text: 123 } }));
         };
-        await expect(connected.call('agent.ask', { message: 'hello' })).rejects.toMatchObject({
+        await expect(connected.call(Method.AgentAsk, { message: 'hello' })).rejects.toMatchObject({
             code: TransportErrorCode.Protocol,
         });
     });
@@ -107,17 +107,17 @@ describe('Nexa websocket lifetimes', (): void => {
         gateway.handler = (socket: WebSocket): void => {
             socket.close();
         };
-        await expect(connected.call('health', {})).rejects.toMatchObject({
+        await expect(connected.call(Method.Health, {})).rejects.toMatchObject({
             code: TransportErrorCode.Closed,
         });
     });
     it('enforces deadlines and observes cancellation before sending', async (): Promise<void> => {
         const connected: NexaClient = await connect();
-        await expect(connected.call('health', {}, { timeoutMs: 10 })).rejects.toMatchObject({
+        await expect(connected.call(Method.Health, {}, { timeoutMs: 10 })).rejects.toMatchObject({
             code: TransportErrorCode.Timeout,
         });
         await expect(
-            connected.call('health', {}, { signal: AbortSignal.abort() }),
+            connected.call(Method.Health, {}, { signal: AbortSignal.abort() }),
         ).rejects.toMatchObject({ code: TransportErrorCode.Aborted });
         expect(
             gateway?.requests.filter((request: Request): boolean => request.method === 'health'),

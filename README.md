@@ -50,7 +50,8 @@ try {
         }
     }
     const answer = await turn.result;
-    await client.ask('Now explain the tests', {
+    await client.call(Method.AgentAsk, {
+        message: 'Now explain the tests',
         conversationId: answer.sessionKey,
     });
 } finally {
@@ -137,9 +138,7 @@ For a Nervalab deployment on a different origin, configure Nexa's `allowedOrigin
 
 ## RPC coverage and voice
 
-`client.ask(message, options)` sends a chat message directly. Use `conversationId` in options to resume a session, alongside optional attachments, signal, and timeoutMs.
-
-`Method` is the runtime method enum (`as const` with a derived type), following Nexa’s enum conventions. For example, `client.call(Method.SessionsList, { limit: 50 })` lists previous conversations without raw method strings. All 54 members are generated from the gateway contract.
+`Method` is a TypeScript string enum. `client.call` requires an enum member and rejects raw string literals at compile time. For example, `client.call(Method.SessionsList, { limit: 50 })` lists previous conversations without raw method strings. All 54 members are generated from the gateway contract.
 
 `client.call(method, params)` gives method-specific parameter and result types for all current methods:
 
