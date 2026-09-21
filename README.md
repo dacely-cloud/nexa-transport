@@ -39,6 +39,7 @@ Chat, tools, media, artifacts, and voice through the Nexa gateway.
 - [Complete usage guide](./docs/guide.md): conversations, running work, tools, skills, audio, images, GIFs, video, generation, documents, artifacts, and ZIP workflows.
 - [Client API](./docs/client.md): every client method, helper, option, event, and error.
 - [RPC reference](./docs/methods.md): all 54 methods with call templates, parameters, and results.
+- [Binary media protocol](./docs/binary-media.md): raw bytes, chunking, limits, and file delivery.
 - [Protocol types](./docs/protocol.md): every payload field and union variant.
 
 ## Features
@@ -221,6 +222,19 @@ await client.call(Method.AgentAsk, {
 | `NexaMedia.base64(bytes)`            | Base64 encoding                |
 | `NexaMedia.fromBase64(text)`         | Base64 decoding                |
 
+Receive delivered images, audio, videos, documents, and archives as raw bytes:
+
+```ts
+import type { ReceivedAttachment } from 'nexa-transport';
+
+const stopFiles: () => void = client.onAttachment((file: ReceivedAttachment): void => {
+    const blob: Blob = new Blob([file.data], { type: file.mimeType });
+    console.log(file.filename, blob);
+});
+```
+
+With `hello.features.binaryMedia`, files up to 100 MiB use 256 KiB binary chunks. Inline uploads and live PCM audio also use binary WebSocket frames. Use `sendAudio(callId, bytes)` and `onAudio(listener)` for live audio. Register listeners before starting work; result attachment IDs match the received files.
+
 Read native artifacts and video output from the event stream:
 
 ```ts
@@ -333,20 +347,15 @@ For voice, `Method.VoiceStart` returns the call ID, sample rate, and frame size.
 
 Connection options are passed to `NexaClient.connect()`. Per-call `signal` and `timeoutMs` are passed as the third argument to `client.call()`. Stream options are passed as the second argument to `client.stream()`.
 
-Blob helpers accept up to 12 MiB per attachment; the complete request must also fit the gateway's payload limit. Streams exceeding their buffer limits are cancelled.
+Blob helpers accept up to 100 MiB per attachment, with a combined upload limit of 100 MiB per request. Binary transfers use chunks of up to 256 KiB within the gateway's frame limits. Streams exceeding their buffer limits are cancelled.
 
 RPC cancellation stops local waiting; a server-side mutation may already have executed. Requests are not retried automatically. Reconnect with `NexaClient.connect()`, restore subscriptions, and reload session state. `TransportError.remote` preserves server error codes, retry information, and details.
 
 ## Gateway compatibility
 
-Uses Nexa gateway protocol v1. Media requires `hello.features.attachments`. Browser pairing requires query-based device metadata and issued credentials in `hello.auth.token`.
+Uses Nexa gateway protocol v1. The Nexa engine includes media delivery, chunked binary transfers, and browser pairing by default. No gateway patch is required.
 
-The [gateway patch](./server-patches/nexa-gateway-v1.patch) adds these capabilities to the corresponding Nexa revision. Check compatibility before applying it:
-
-```bash
-git apply --check /path/to/nexa-gateway-v1.patch
-git apply /path/to/nexa-gateway-v1.patch
-```
+The gateway advertises attachment support through `hello.features.attachments` and binary transfers through `hello.features.binaryMedia`. Browser pairing uses query-based device metadata and returns issued credentials in `hello.auth.token`. Use a current Nexa engine with this library to enable these capabilities.
 
 ## Development
 

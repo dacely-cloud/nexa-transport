@@ -274,6 +274,8 @@ export type AskParams = AskParamsShape;
 
 /** AskResult wire fields. */
 export interface AskResultShape {
+    /** attachments as defined by the Nexa gateway. */
+    readonly attachments?: ReadonlyArray<DeliveredAttachment>;
     /** conversationId as defined by the Nexa gateway. */
     readonly conversationId: null | string;
     /** finishReason as defined by the Nexa gateway. */
@@ -763,6 +765,25 @@ export const DeadLetterStageValues = {
 /** DeadLetterStage from the Nexa wire protocol. */
 export type DeadLetterStage = (typeof DeadLetterStageValues)[keyof typeof DeadLetterStageValues];
 
+/** DeliveredAttachment wire fields. */
+export interface DeliveredAttachmentShape {
+    /** asFile as defined by the Nexa gateway. */
+    readonly asFile?: boolean;
+    /** byteLength as defined by the Nexa gateway. */
+    readonly byteLength: number;
+    /** description as defined by the Nexa gateway. */
+    readonly description?: string;
+    /** filename as defined by the Nexa gateway. */
+    readonly filename: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** mimeType as defined by the Nexa gateway. */
+    readonly mimeType: string;
+}
+
+/** DeliveredAttachment from the Nexa wire protocol. */
+export type DeliveredAttachment = DeliveredAttachmentShape;
+
 /** DeliveryDestination wire fields. */
 export interface DeliveryDestinationShape {
     /** channel as defined by the Nexa gateway. */
@@ -981,6 +1002,8 @@ export type Session = SessionShape;
 export interface GatewayFeaturesShape {
     /** attachments as defined by the Nexa gateway. */
     readonly attachments?: true;
+    /** binaryMedia as defined by the Nexa gateway. */
+    readonly binaryMedia?: true;
     /** events as defined by the Nexa gateway. */
     readonly events: ReadonlyArray<string>;
     /** methodScopes as defined by the Nexa gateway. */
@@ -1791,8 +1814,8 @@ export interface JobShape {
 /** Job from the Nexa wire protocol. */
 export type Job = JobShape;
 
-/** JobActionVariant0 wire fields. */
-export interface JobActionVariant0Shape {
+/** JobActionVariant1 wire fields. */
+export interface JobActionVariant1Shape {
     /** agentId as defined by the Nexa gateway. */
     readonly agentId: string;
     /** deliverTo as defined by the Nexa gateway. */
@@ -1805,16 +1828,16 @@ export interface JobActionVariant0Shape {
     readonly silentWhenEmpty?: boolean;
 }
 
-/** Allowed values for JobActionVariant1elevation. */
-export const JobActionVariant1elevationValues = {
+/** Allowed values for JobActionVariant2elevation. */
+export const JobActionVariant2elevationValues = {
     Value0: 'ask',
     Value1: 'full',
     Value2: 'off',
     Value3: 'on',
 } as const;
 
-/** JobActionVariant1 wire fields. */
-export interface JobActionVariant1Shape {
+/** JobActionVariant2 wire fields. */
+export interface JobActionVariant2Shape {
     /** allowSelfLifecycle as defined by the Nexa gateway. */
     readonly allowSelfLifecycle?: boolean;
     /** command as defined by the Nexa gateway. */
@@ -1822,15 +1845,15 @@ export interface JobActionVariant1Shape {
     /** cwd as defined by the Nexa gateway. */
     readonly cwd?: string;
     /** elevation as defined by the Nexa gateway. */
-    readonly elevation?: (typeof JobActionVariant1elevationValues)[keyof typeof JobActionVariant1elevationValues];
+    readonly elevation?: (typeof JobActionVariant2elevationValues)[keyof typeof JobActionVariant2elevationValues];
     /** kind as defined by the Nexa gateway. */
     readonly kind: 'shell';
     /** timeoutMs as defined by the Nexa gateway. */
     readonly timeoutMs?: number;
 }
 
-/** JobActionVariant2 wire fields. */
-export interface JobActionVariant2Shape {
+/** JobActionVariant3 wire fields. */
+export interface JobActionVariant3Shape {
     /** input as defined by the Nexa gateway. */
     readonly input: JsonValue;
     /** kind as defined by the Nexa gateway. */
@@ -1839,8 +1862,8 @@ export interface JobActionVariant2Shape {
     readonly tool: string;
 }
 
-/** JobActionVariant3 wire fields. */
-export interface JobActionVariant3Shape {
+/** JobActionVariant4 wire fields. */
+export interface JobActionVariant4Shape {
     /** event as defined by the Nexa gateway. */
     readonly event: string;
     /** kind as defined by the Nexa gateway. */
@@ -1849,19 +1872,20 @@ export interface JobActionVariant3Shape {
     readonly payload?: JsonValue;
 }
 
-/** JobActionVariant4 wire fields. */
-export interface JobActionVariant4Shape {
+/** JobActionVariant5 wire fields. */
+export interface JobActionVariant5Shape {
     /** kind as defined by the Nexa gateway. */
     readonly kind: 'maintenance';
 }
 
 /** JobAction from the Nexa wire protocol. */
 export type JobAction =
-    | JobActionVariant0Shape
+    | ReminderAction
     | JobActionVariant1Shape
     | JobActionVariant2Shape
     | JobActionVariant3Shape
-    | JobActionVariant4Shape;
+    | JobActionVariant4Shape
+    | JobActionVariant5Shape;
 
 /** JobAddParams wire fields. */
 export interface JobAddParamsShape {
@@ -2652,6 +2676,23 @@ export type Recordstringstringnumberboolean = Readonly<Record<string, string | n
 /** Recordstringunknown from the Nexa wire protocol. */
 export type Recordstringunknown = Readonly<Record<string, JsonValue>>;
 
+/** ReminderAction wire fields. */
+export interface ReminderActionShape {
+    /** channelId as defined by the Nexa gateway. */
+    readonly channelId: string;
+    /** conversationId as defined by the Nexa gateway. */
+    readonly conversationId: string;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: 'reminder';
+    /** text as defined by the Nexa gateway. */
+    readonly text: string;
+    /** threadId as defined by the Nexa gateway. */
+    readonly threadId?: string;
+}
+
+/** ReminderAction from the Nexa wire protocol. */
+export type ReminderAction = ReminderActionShape;
+
 /** Allowed values for RiskLevel. */
 export const RiskLevelValues = {
     Value0: 'destructive',
@@ -3296,26 +3337,26 @@ export type WireError = WireErrorShape;
 
 /** WireTurnEventVariant0 wire fields. */
 export interface WireTurnEventVariant0Shape {
+    /** attachment as defined by the Nexa gateway. */
+    readonly attachment: DeliveredAttachment;
+    /** type as defined by the Nexa gateway. */
+    readonly type: 'attachment';
+}
+
+/** WireTurnEventVariant1 wire fields. */
+export interface WireTurnEventVariant1Shape {
     /** turnId as defined by the Nexa gateway. */
     readonly turnId: string;
     /** type as defined by the Nexa gateway. */
     readonly type: 'turn-start';
 }
 
-/** WireTurnEventVariant1 wire fields. */
-export interface WireTurnEventVariant1Shape {
+/** WireTurnEventVariant2 wire fields. */
+export interface WireTurnEventVariant2Shape {
     /** iteration as defined by the Nexa gateway. */
     readonly iteration: number;
     /** type as defined by the Nexa gateway. */
     readonly type: 'iteration-start';
-}
-
-/** WireTurnEventVariant2 wire fields. */
-export interface WireTurnEventVariant2Shape {
-    /** text as defined by the Nexa gateway. */
-    readonly text: string;
-    /** type as defined by the Nexa gateway. */
-    readonly type: 'text';
 }
 
 /** WireTurnEventVariant3 wire fields. */
@@ -3323,19 +3364,27 @@ export interface WireTurnEventVariant3Shape {
     /** text as defined by the Nexa gateway. */
     readonly text: string;
     /** type as defined by the Nexa gateway. */
-    readonly type: 'reasoning';
+    readonly type: 'text';
 }
 
 /** WireTurnEventVariant4 wire fields. */
 export interface WireTurnEventVariant4Shape {
+    /** text as defined by the Nexa gateway. */
+    readonly text: string;
+    /** type as defined by the Nexa gateway. */
+    readonly type: 'reasoning';
+}
+
+/** WireTurnEventVariant5 wire fields. */
+export interface WireTurnEventVariant5Shape {
     /** call as defined by the Nexa gateway. */
     readonly call: ToolCall;
     /** type as defined by the Nexa gateway. */
     readonly type: 'tool-start';
 }
 
-/** WireTurnEventVariant5 wire fields. */
-export interface WireTurnEventVariant5Shape {
+/** WireTurnEventVariant6 wire fields. */
+export interface WireTurnEventVariant6Shape {
     /** call as defined by the Nexa gateway. */
     readonly call: ToolCall;
     /** type as defined by the Nexa gateway. */
@@ -3344,16 +3393,16 @@ export interface WireTurnEventVariant5Shape {
     readonly update: ToolProgress;
 }
 
-/** WireTurnEventVariant6 wire fields. */
-export interface WireTurnEventVariant6Shape {
+/** WireTurnEventVariant7 wire fields. */
+export interface WireTurnEventVariant7Shape {
     /** outcome as defined by the Nexa gateway. */
     readonly outcome: ToolOutcome;
     /** type as defined by the Nexa gateway. */
     readonly type: 'tool-finish';
 }
 
-/** WireTurnEventVariant7 wire fields. */
-export interface WireTurnEventVariant7Shape {
+/** WireTurnEventVariant8 wire fields. */
+export interface WireTurnEventVariant8Shape {
     /** summary as defined by the Nexa gateway. */
     readonly summary: string;
     /** tool as defined by the Nexa gateway. */
@@ -3362,8 +3411,8 @@ export interface WireTurnEventVariant7Shape {
     readonly type: 'approval-required';
 }
 
-/** WireTurnEventVariant8 wire fields. */
-export interface WireTurnEventVariant8Shape {
+/** WireTurnEventVariant9 wire fields. */
+export interface WireTurnEventVariant9Shape {
     /** droppedMessages as defined by the Nexa gateway. */
     readonly droppedMessages: number;
     /** summary as defined by the Nexa gateway. */
@@ -3372,16 +3421,16 @@ export interface WireTurnEventVariant8Shape {
     readonly type: 'compacted';
 }
 
-/** WireTurnEventVariant9 wire fields. */
-export interface WireTurnEventVariant9Shape {
+/** WireTurnEventVariant10 wire fields. */
+export interface WireTurnEventVariant10Shape {
     /** type as defined by the Nexa gateway. */
     readonly type: 'usage';
     /** usage as defined by the Nexa gateway. */
     readonly usage: TokenUsage;
 }
 
-/** WireTurnEventVariant10 wire fields. */
-export interface WireTurnEventVariant10Shape {
+/** WireTurnEventVariant11 wire fields. */
+export interface WireTurnEventVariant11Shape {
     /** data as defined by the Nexa gateway. */
     readonly data: JsonValue;
     /** source as defined by the Nexa gateway. */
@@ -3390,8 +3439,8 @@ export interface WireTurnEventVariant10Shape {
     readonly type: 'native';
 }
 
-/** WireTurnEventVariant11 wire fields. */
-export interface WireTurnEventVariant11Shape {
+/** WireTurnEventVariant12 wire fields. */
+export interface WireTurnEventVariant12Shape {
     /** detail as defined by the Nexa gateway. */
     readonly detail?: string;
     /** status as defined by the Nexa gateway. */
@@ -3400,8 +3449,8 @@ export interface WireTurnEventVariant11Shape {
     readonly type: 'status';
 }
 
-/** WireTurnEventVariant12 wire fields. */
-export interface WireTurnEventVariant12Shape {
+/** WireTurnEventVariant13 wire fields. */
+export interface WireTurnEventVariant13Shape {
     /** iterations as defined by the Nexa gateway. */
     readonly iterations: number;
     /** reason as defined by the Nexa gateway. */
@@ -3414,8 +3463,8 @@ export interface WireTurnEventVariant12Shape {
     readonly usage: TokenUsage;
 }
 
-/** WireTurnEventVariant13 wire fields. */
-export interface WireTurnEventVariant13Shape {
+/** WireTurnEventVariant14 wire fields. */
+export interface WireTurnEventVariant14Shape {
     /** error as defined by the Nexa gateway. */
     readonly error: WireError;
     /** retryable as defined by the Nexa gateway. */
@@ -3439,7 +3488,8 @@ export type WireTurnEvent =
     | WireTurnEventVariant10Shape
     | WireTurnEventVariant11Shape
     | WireTurnEventVariant12Shape
-    | WireTurnEventVariant13Shape;
+    | WireTurnEventVariant13Shape
+    | WireTurnEventVariant14Shape;
 
 /** Allowed values for Workspacestate. */
 export const WorkspacestateValues = {

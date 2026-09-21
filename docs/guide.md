@@ -63,7 +63,7 @@ if (deviceToken !== undefined) {
 }
 ```
 
-Pairing requires gateway support and an operator-issued code. Shared operator tokens and device credentials have different authority from personal keys. `hello.features.methods` describes the gateway catalog; it does not guarantee your key may call every listed method. Scope checks and per-user policy both apply. Personal keys currently cover chat, health, agent listing, and permitted session/task/workspace methods; voice, subscriptions, and administrative calls may require a device or operator credential.
+Pairing requires gateway support and an operator-issued code. Shared operator tokens and device credentials have different authority from personal keys. `hello.features.methods` describes the gateway catalog; it does not guarantee your key may call every listed method. Scope checks and per-user policy both apply. Personal keys currently cover chat, health, agent listing, and permitted session/task/workspace methods; subscriptions and administrative calls may require a device or operator credential. Personal keys can use live voice when it is configured on the server.
 
 Connection options also include `scopes`, `client: { id, version, platform }`, `signal`, `onListenerError`, and resource limits. `scopes` requests a subset of authority; it cannot grant additional privileges. See [client options](client.md).
 
@@ -173,7 +173,7 @@ Task IDs, stream IDs, and session IDs are distinct. A task record is not guarant
 
 ## Images, GIFs, video, and documents
 
-Check `client.hello.features.attachments` before relying on attachments. Supported inbound block types are `image`, `video`, `video-frame`, and `document`. Each accepts a base64 source or a URL source. There is no arbitrary filesystem upload RPC.
+Check `client.hello.features.attachments` before relying on attachments. Supported inbound block types are `image`, `video`, `video-frame`, and `document`. Each accepts an inline source or a URL source. When `hello.features.binaryMedia` is true, the SDK sends inline image, video, frame, and document bytes in binary WebSocket frames. Existing base64-shaped protocol objects remain compatible; their payload strings are removed from the JSON header and transported as raw bytes. There is no arbitrary filesystem upload RPC.
 
 Browser `File` objects are `Blob` objects and work directly:
 
@@ -265,7 +265,26 @@ Native video events have a `phase` discriminator. Inspect the [NcapDelta video f
 
 ## Artifacts, files, and ZIP archives
 
-Deliverables may appear as native artifact events, tool-result content, document/media blocks, or links in the final answer. Preserve all of these channels when building an artifact viewer. `NcapArtifactDelta` contains `item`, `title`, and an `artifact` string; that string is not guaranteed to be a URL or file bytes.
+The gateway registers the same `send_media` tool used by chat channels. Subscribe to `client.onAttachment()` before asking for a file. The callback supplies raw `Uint8Array` bytes for images, audio, video, documents, and archives:
+
+```ts
+import type { ReceivedAttachment } from 'nexa-transport';
+import type { ResultOf } from 'nexa-transport/protocol';
+
+const stopFiles: () => void = client.onAttachment((file: ReceivedAttachment): void => {
+    const blob: Blob = new Blob([file.data], { type: file.mimeType });
+    console.log(file.id, file.filename, blob);
+});
+const delivery: ResultOf<typeof Method.AgentAsk> = await client.call(Method.AgentAsk, {
+    message: 'Create a report and send the PDF.',
+});
+console.log(delivery.attachments);
+stopFiles();
+```
+
+`attachments` in the final result and `attachment` stream events contain metadata, not another copy of the bytes. Match their `id` with the callback's `id`; `streamId` identifies streaming deliveries. The SDK does not retain delivered bytes after notifying listeners. Files can be up to **100 MiB each**. Transfers use **256 KiB binary chunks**, with backpressure, ordering checks, and cleanup after disconnect or 30 seconds without progress. The SDK reassembles a file before calling `onAttachment`. At most 64 files can be delivered per turn. Uploads may contain multiple attachments with at most 100 MiB of combined bytes per request; larger batches should use separate requests. Delivery receipts acknowledge acceptance by the gateway transport, not rendering or saving by the browser.
+
+Other deliverables may appear as native artifact events, tool-result content, document/media blocks, or links in the final answer. Preserve all of these channels when building an artifact viewer. `NcapArtifactDelta` contains `item`, `title`, and an `artifact` string; that string is not guaranteed to be a URL or file bytes.
 
 ```ts
 import type { NcapDelta, NcapArtifactDelta } from 'nexa-transport/protocol';
@@ -283,20 +302,21 @@ If Nexa supplies an HTTP(S) download URL, download it using your application's H
 
 For ZIP creation, ask the agent to archive the requested deliverables and return the archive. Its toolchain must support that operation. ZIP inputs are not a dedicated gateway attachment type: do not assume `document(application/zip)` will extract an archive. Provide an accessible archive URL in your request or arrange an authorized workspace upload through your application, then ask Nexa to inspect it. Whether it can fetch, extract, or serve the archive is a server capability.
 
-For large generated files, prefer server-provided download references over JSON/base64 payloads. Render untrusted artifact text as text unless your application intentionally sanitizes and supports its markup.
+For large generated files, prefer server-provided download references over unbounded inline payloads. Render untrusted artifact text as text unless your application intentionally sanitizes and supports its markup.
 
 ## Audio and live voice
 
-The voice RPCs transport raw **mono PCM16** in base64 fields. They do not accept MP3, WAV containers, Opus, or microphone `MediaRecorder` blobs directly. Capture/decode, resampling, frame buffering, and playback belong to the application.
+The voice RPCs transport raw **mono PCM16** in binary WebSocket frames when binary media is supported. Use `sendAudio()` and `onAudio()` for typed byte arrays. The lower-level `Method.VoiceAudio` and `EventName.VoiceAudio` interfaces retain their base64 field shape for compatibility; the SDK packs and restores those fields at the wire boundary. They do not accept MP3, WAV containers, Opus, or microphone `MediaRecorder` blobs directly. Capture/decode, resampling, frame buffering, and playback belong to the application.
 
 Register listeners before opening a call:
 
 ```ts
 import type { ResultOf } from 'nexa-transport/protocol';
-import type { VoiceAudio, VoiceEvent } from 'nexa-transport/events';
+import type { VoiceEvent } from 'nexa-transport/events';
+import type { ReceivedAudio } from 'nexa-transport';
 
-const stopAudio: () => void = client.on(EventName.VoiceAudio, (frame: VoiceAudio): void => {
-    const pcm: Uint8Array<ArrayBuffer> = NexaMedia.fromBase64(frame.pcm);
+const stopAudio: () => void = client.onAudio((frame: ReceivedAudio): void => {
+    const pcm: Uint8Array<ArrayBuffer> = frame.data;
     // Queue PCM16 for playback at frame.sampleRate; route by frame.callId.
 });
 const stopVoiceEvents: () => void = client.on(EventName.VoiceEvent, (event: VoiceEvent): void => {
@@ -309,10 +329,7 @@ const voice: ResultOf<typeof Method.VoiceStart> = await client.call(Method.Voice
 try {
     // microphonePcm is one mono PCM16 frame at voice.sampleRate.
     // Buffer/split your capture stream into voice.frameBytes-byte frames.
-    await client.call(Method.VoiceAudio, {
-        callId: voice.callId,
-        pcm: NexaMedia.base64(microphonePcm),
-    });
+    await client.sendAudio(voice.callId, microphonePcm);
 } finally {
     await client.call(Method.VoiceStop, { callId: voice.callId });
     stopAudio();
@@ -324,7 +341,7 @@ Here `microphonePcm` is a `Uint8Array<ArrayBuffer>` produced by your audio captu
 
 Native NCAP `voice` output is a separate binary event field, decoded by `nativeEvent()`. Do not assume those bytes have the same framing as `voice.audio`; use the producing provider's format contract.
 
-There is no `NexaMedia.audio()` attachment helper or generic inbound audio-file block in this gateway contract. Audio-file transcription, speech synthesis, music generation, and audio downloads require a server tool/workflow; request those through normal agent messages and consume delivered artifacts. Live voice additionally requires server voice configuration and an authorized credential.
+There is no `NexaMedia.audio()` attachment helper or generic inbound audio-file block in this gateway contract. Audio-file transcription, speech synthesis, music generation, and audio downloads require a server tool/workflow; request those through normal agent messages and consume delivered artifacts. Live voice additionally requires server voice configuration and an authorized credential, including a personal API key.
 
 ## Tools, skills, and approvals
 
@@ -431,19 +448,19 @@ try {
 
 Transport error categories are `closed`, `timeout`, `aborted`, `protocol`, `limit`, `connection`, and `remote`. Remote errors preserve the server's code, details, and retry metadata. Bad local arguments can also throw `TypeError` or `RangeError`. RPC parameters, responses, and known events are runtime-validated. Unsupported or incompatible payloads fail explicitly.
 
-| Limit                       | Default               |
-| --------------------------- | --------------------- |
-| Connection deadline         | 15 seconds            |
-| RPC deadline                | 60 seconds            |
-| Pending requests            | 64                    |
-| WebSocket JSON message size | 16 MiB                |
-| Stream duration             | 1 hour                |
-| Unread stream events        | 256                   |
-| Unread stream JSON bytes    | 8 MiB                 |
-| Inline Blob helper size     | 1 byte through 12 MiB |
-| Decoded binary JSON         | At most 16 MiB        |
+| Limit                       | Default                |
+| --------------------------- | ---------------------- |
+| Connection deadline         | 15 seconds             |
+| RPC deadline                | 60 seconds             |
+| Pending requests            | 64                     |
+| WebSocket JSON message size | 16 MiB                 |
+| Stream duration             | 1 hour                 |
+| Unread stream events        | 256                    |
+| Unread stream JSON bytes    | 8 MiB                  |
+| Inline Blob helper size     | 1 byte through 100 MiB |
+| Decoded binary JSON         | At most 16 MiB         |
 
-Base64 adds size overhead; multiple individually valid attachments can exceed the message limit. Server limits in `hello` may be stricter. Raise a per-call `timeoutMs` for a long `AgentAsk`, or use streaming and consume events promptly. A stream exceeding its buffer limits is cancelled. `close()` is idempotent, closes the socket, and rejects pending operations.
+On gateways advertising `binaryMedia`, upload payloads travel as raw chunks, so a 100 MiB file does not require a 100 MiB WebSocket message. JSON metadata and each wire frame remain bounded. Older gateways use the base64 JSON representation and its smaller frame limits. Server limits in `hello` may be stricter. Raise a per-call `timeoutMs` for a long `AgentAsk`, or use streaming and consume events promptly. A stream exceeding its buffer limits is cancelled. `close()` is idempotent, closes the socket, and rejects pending operations.
 
 No automatic retry is performed. Retrying a timed-out mutating call can duplicate work. Reconcile the session/task state first. The SDK does not persist credentials, schedule reconnections, retry mutations, play media, transcode codecs, or render artifacts for you.
 
