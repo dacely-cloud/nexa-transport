@@ -128,6 +128,17 @@ for (const [name, def] of Object.entries(schema.definitions)) {
 declarations.push(
     '/** Supported RPC names. */\nexport type MethodName = keyof GatewayMethods;\n/** Parameters for a particular RPC. */\nexport type ParamsOf<M extends MethodName> = GatewayMethods[M]["params"];\n/** Result for a particular RPC. */\nexport type ResultOf<M extends MethodName> = GatewayMethods[M]["result"];',
 );
+/** Runtime enum constants share the server method catalog as their source of truth. */
+const methodEntries = Object.keys(schema.definitions.GatewayMethods.properties).map((method) => {
+    const key = method
+        .split('.')
+        .map((part) => part[0].toUpperCase() + part.slice(1))
+        .join('');
+    return `    /** Calls ${method}. */\n    ${key}: ${JSON.stringify(method)},`;
+});
+declarations.push(
+    `/** Nexa RPC method enum, generated from the complete gateway catalog. */\nexport const Method = {\n${methodEntries.join('\n')}\n} as const satisfies Readonly<Record<string, MethodName>>;\n/** A value from the Nexa RPC method enum. */\nexport type Method = (typeof Method)[keyof typeof Method];`,
+);
 mkdirSync('src/protocol', { recursive: true });
 writeFileSync(
     'src/protocol/Protocol.ts',

@@ -1,8 +1,9 @@
 import { isEventData, type EventMap } from '../protocol/Events.js';
 import type { StreamOptions } from '../interface/StreamOptions.js';
-import type { StreamParams } from '../protocol/Protocol.js';
+import { Method } from '../protocol/Protocol.js';
+import type { AskResult, StreamParams } from '../protocol/Protocol.js';
 import { TurnStream } from './TurnStream.js';
-import type { CallOptions, ClientOptions } from '../interface/ClientOptions.js';
+import type { AskOptions, CallOptions, ClientOptions } from '../interface/ClientOptions.js';
 import type {
     ConnectChallengeData,
     HelloOk,
@@ -151,7 +152,7 @@ export class NexaClient {
                 );
             }
             client.#hello = await client.#call(
-                'connect',
+                Method.Connect,
                 {
                     nonce: client.#challenge.nonce,
                     minProtocol: 1,
@@ -193,8 +194,20 @@ export class NexaClient {
     public get connected(): boolean {
         return !this.#closed && this.#hello !== null;
     }
+    /** Sends a message, optionally continuing a saved conversation or attaching media. */
+    public async ask(message: string, options: AskOptions = {}): Promise<AskResult> {
+        const { signal, timeoutMs, ...params }: AskOptions = options;
+        return await this.call(
+            Method.AgentAsk,
+            { ...params, message },
+            {
+                ...(signal === undefined ? {} : { signal }),
+                ...(timeoutMs === undefined ? {} : { timeoutMs }),
+            },
+        );
+    }
     /** Calls any Nexa RPC with validated parameters and result. Mutations are never replayed. */
-    public async call<M extends Exclude<MethodName, 'connect'>>(
+    public async call<M extends Exclude<MethodName, typeof Method.Connect>>(
         method: M,
         params: ParamsOf<M>,
         options: CallOptions = {},
@@ -298,7 +311,7 @@ export class NexaClient {
             throw new TypeError('Invalid RPC parameters');
         }
         if (
-            (method === 'agent.ask' || method === 'agent.stream') &&
+            (method === Method.AgentAsk || method === Method.AgentStream) &&
             'attachments' in params &&
             Array.isArray(params.attachments) &&
             params.attachments.length > 0 &&
