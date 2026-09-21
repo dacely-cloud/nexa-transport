@@ -1,4 +1,9 @@
-import { Method, type AskResult } from '../src/protocol/Protocol.js';
+import {
+    Method,
+    WorkerState,
+    type WorkerStatus,
+    type AskResult,
+} from '../src/protocol/Protocol.js';
 import { afterEach, describe, expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
 import { NexaClient } from '../src/networking/NexaClient.js';
@@ -45,6 +50,70 @@ describe('Nexa websocket lifetimes', (): void => {
         });
         expect(gateway.requests.at(-1)?.params).not.toHaveProperty('timeoutMs');
         expect(await connected.call(Method.AgentAsk, { message: 'New chat' })).toEqual(result);
+    });
+    it('preserves individually identified worker status events through websocket validation', async (): Promise<void> => {
+        const connected: NexaClient = await connect();
+        if (gateway === undefined) {
+            throw new Error('No peer');
+        }
+        const worker: WorkerStatus = {
+            id: 'worker-1',
+            parentId: 'root',
+            rootId: 'root',
+            agentId: 'default',
+            goal: 'review',
+            depth: 1,
+            state: WorkerState.Working,
+            activity: 'reading files',
+            startedAt: '1000',
+            lastActivityAt: '1200',
+        };
+        gateway.handler = (socket: WebSocket, request: Request): void => {
+            socket.send(
+                JSON.stringify({
+                    id: request.id,
+                    ok: true,
+                    result: { streamId: request.params['streamId'], runId: 'run' },
+                }),
+            );
+            for (const [index, state] of [WorkerState.Working, WorkerState.Done].entries()) {
+                socket.send(
+                    JSON.stringify({
+                        event: 'turn.event',
+                        seq: index + 2,
+                        data: {
+                            streamId: request.params['streamId'],
+                            event: { type: 'agents-status', workers: [{ ...worker, state }] },
+                        },
+                    }),
+                );
+            }
+            socket.send(
+                JSON.stringify({
+                    event: 'turn.end',
+                    seq: 4,
+                    data: { streamId: request.params['streamId'], ok: true, result },
+                }),
+            );
+        };
+        const updates: WorkerStatus[] = [];
+        const turn: TurnStream = connected.stream({ message: 'review' });
+        for await (const event of turn) {
+            if (event.type === 'agents-status') {
+                updates.push(...event.workers);
+            }
+        }
+        expect(updates.map((entry: WorkerStatus): string => entry.state)).toEqual([
+            WorkerState.Working,
+            WorkerState.Done,
+        ]);
+        expect(
+            updates.every(
+                (entry: WorkerStatus): boolean =>
+                    entry.id === worker.id && entry.parentId === worker.parentId,
+            ),
+        ).toBe(true);
+        expect(await turn.result).toEqual(result);
     });
     it('captures events arriving immediately after acceptance and returns a result', async (): Promise<void> => {
         const connected: NexaClient = await connect();

@@ -2352,47 +2352,54 @@ A turn event as it travels.
 
 Variant 1: Object (fields below)
 
+| Field     | Required | Type                                              | Description |
+| --------- | -------- | ------------------------------------------------- | ----------- |
+| `type`    | Yes      | `"agents-status"`                                 |             |
+| `workers` | Yes      | Array of [WorkerStatus](protocol.md#workerstatus) |             |
+
+Variant 2: Object (fields below)
+
 | Field        | Required | Type                                                   | Description |
 | ------------ | -------- | ------------------------------------------------------ | ----------- |
 | `attachment` | Yes      | [DeliveredAttachment](protocol.md#deliveredattachment) |             |
 | `type`       | Yes      | `"attachment"`                                         |             |
 
-Variant 2: Object (fields below)
+Variant 3: Object (fields below)
 
 | Field    | Required | Type           | Description |
 | -------- | -------- | -------------- | ----------- |
 | `turnId` | Yes      | `string`       |             |
 | `type`   | Yes      | `"turn-start"` |             |
 
-Variant 3: Object (fields below)
+Variant 4: Object (fields below)
 
 | Field       | Required | Type                | Description |
 | ----------- | -------- | ------------------- | ----------- |
 | `iteration` | Yes      | `number`            |             |
 | `type`      | Yes      | `"iteration-start"` |             |
 
-Variant 4: Object (fields below)
+Variant 5: Object (fields below)
 
 | Field  | Required | Type     | Description |
 | ------ | -------- | -------- | ----------- |
 | `text` | Yes      | `string` |             |
 | `type` | Yes      | `"text"` |             |
 
-Variant 5: Object (fields below)
+Variant 6: Object (fields below)
 
 | Field  | Required | Type          | Description |
 | ------ | -------- | ------------- | ----------- |
 | `text` | Yes      | `string`      |             |
 | `type` | Yes      | `"reasoning"` |             |
 
-Variant 6: Object (fields below)
+Variant 7: Object (fields below)
 
 | Field  | Required | Type                             | Description |
 | ------ | -------- | -------------------------------- | ----------- |
 | `call` | Yes      | [ToolCall](protocol.md#toolcall) |             |
 | `type` | Yes      | `"tool-start"`                   |             |
 
-Variant 7: Object (fields below)
+Variant 8: Object (fields below)
 
 | Field    | Required | Type                                     | Description |
 | -------- | -------- | ---------------------------------------- | ----------- |
@@ -2400,14 +2407,14 @@ Variant 7: Object (fields below)
 | `type`   | Yes      | `"tool-progress"`                        |             |
 | `update` | Yes      | [ToolProgress](protocol.md#toolprogress) |             |
 
-Variant 8: Object (fields below)
+Variant 9: Object (fields below)
 
 | Field     | Required | Type                                   | Description |
 | --------- | -------- | -------------------------------------- | ----------- |
 | `outcome` | Yes      | [ToolOutcome](protocol.md#tooloutcome) |             |
 | `type`    | Yes      | `"tool-finish"`                        |             |
 
-Variant 9: Object (fields below)
+Variant 10: Object (fields below)
 
 | Field     | Required | Type                  | Description |
 | --------- | -------- | --------------------- | ----------- |
@@ -2415,7 +2422,7 @@ Variant 9: Object (fields below)
 | `tool`    | Yes      | `string`              |             |
 | `type`    | Yes      | `"approval-required"` |             |
 
-Variant 10: Object (fields below)
+Variant 11: Object (fields below)
 
 | Field             | Required | Type          | Description |
 | ----------------- | -------- | ------------- | ----------- |
@@ -2423,14 +2430,14 @@ Variant 10: Object (fields below)
 | `summary`         | Yes      | `string`      |             |
 | `type`            | Yes      | `"compacted"` |             |
 
-Variant 11: Object (fields below)
+Variant 12: Object (fields below)
 
 | Field   | Required | Type                                 | Description |
 | ------- | -------- | ------------------------------------ | ----------- |
 | `type`  | Yes      | `"usage"`                            |             |
 | `usage` | Yes      | [TokenUsage](protocol.md#tokenusage) |             |
 
-Variant 12: Object (fields below)
+Variant 13: Object (fields below)
 
 | Field    | Required | Type                               | Description |
 | -------- | -------- | ---------------------------------- | ----------- |
@@ -2438,7 +2445,7 @@ Variant 12: Object (fields below)
 | `source` | Yes      | `string`                           |             |
 | `type`   | Yes      | `"native"`                         |             |
 
-Variant 13: Object (fields below)
+Variant 14: Object (fields below)
 
 | Field    | Required | Type       | Description |
 | -------- | -------- | ---------- | ----------- |
@@ -2446,7 +2453,7 @@ Variant 13: Object (fields below)
 | `status` | Yes      | `string`   |             |
 | `type`   | Yes      | `"status"` |             |
 
-Variant 14: Object (fields below)
+Variant 15: Object (fields below)
 
 | Field        | Required | Type                                     | Description |
 | ------------ | -------- | ---------------------------------------- | ----------- |
@@ -2456,13 +2463,36 @@ Variant 14: Object (fields below)
 | `type`       | Yes      | `"turn-finish"`                          |             |
 | `usage`      | Yes      | [TokenUsage](protocol.md#tokenusage)     |             |
 
-Variant 15: Object (fields below)
+Variant 16: Object (fields below)
 
 | Field       | Required | Type                               | Description |
 | ----------- | -------- | ---------------------------------- | ----------- |
 | `error`     | Yes      | [WireError](protocol.md#wireerror) |             |
 | `retryable` | Yes      | `boolean`                          |             |
 | `type`      | Yes      | `"error"`                          |             |
+
+## WorkerState
+
+Lifecycle states for Nexa's delegated workers.
+
+Type: `"aborted"` / `"done"` / `"failed"` / `"queued"` / `"refused"` / `"stopping"` / `"working"`.
+
+## WorkerStatus
+
+One worker, identified independently of its shared persona. Times are decimal epoch milliseconds.
+
+| Field            | Required | Type                                   | Description |
+| ---------------- | -------- | -------------------------------------- | ----------- |
+| `activity`       | Yes      | `string`                               |             |
+| `agentId`        | Yes      | `string`                               |             |
+| `depth`          | Yes      | `number`                               |             |
+| `goal`           | Yes      | `string`                               |             |
+| `id`             | Yes      | `string`                               |             |
+| `lastActivityAt` | Yes      | `string`                               |             |
+| `parentId`       | Yes      | `string`                               |             |
+| `rootId`         | Yes      | `string`                               |             |
+| `startedAt`      | Yes      | `string`                               |             |
+| `state`          | Yes      | [WorkerState](protocol.md#workerstate) |             |
 
 ## Workspace
 
