@@ -25,7 +25,7 @@ import { Method } from 'nexa-transport/protocol';
 import { EventName } from 'nexa-transport/events';
 import { NexaMedia } from 'nexa-transport/media';
 
-const client = await NexaClient.connect({
+const client: NexaClient = await NexaClient.connect({
     url: 'wss://your-gateway.example',
     apiKey: 'YOUR_PERSONAL_API_KEY',
 });
@@ -36,25 +36,25 @@ console.log(client.hello.auth.scopes);
 console.log(client.hello.features);
 ```
 
-The personal key identifies its user. Passing `userId` in a request does not grant permission to impersonate another user. The SDK sends the credential through the WebSocket upgrade query so it works in browsers. Use WSS outside trusted local development; configure exact permitted frontend origins on the gateway. The SDK does not store credentials. Do not put real keys in published frontend bundles or logged URLs.
+With a personal API key, omit `userId` from `client.call(Method.AgentAsk, ...)` and `client.stream(...)`. The gateway automatically uses the key’s user. `client.hello.auth.principalId` is the internal identity, for example `user:ralph`; `Ralph` is a display name for your UI. Sending `userId: 'Ralph'` fails because it does not match the authenticated principal. Do not derive identity from a display name. The SDK sends the credential through the WebSocket upgrade query so it works in browsers. Use WSS outside trusted local development; configure permitted frontend origins on the gateway, or use `--allow-origin '*'` to accept any origin while retaining authentication. The SDK does not store credentials. Do not put real keys in published frontend bundles or logged URLs.
 
 A local Nexa operator can retrieve an automatically assigned key with `nexa api-keys get user:<id>`. New enabled users receive a default key; boot provisions one for enabled users without an active key when identity and per-user workspaces are enabled. `/apikey` commands provide personal key management on supported chat surfaces. Revocation is enforced by the server, including existing connections.
 
 For device pairing:
 
 ```ts
-const paired = await NexaClient.connect({
+const paired: NexaClient = await NexaClient.connect({
     url: 'wss://your-gateway.example',
     deviceId: 'stable-installation-id',
     deviceName: 'My application',
     pairingCode: 'CODE_FROM_OPERATOR',
 });
-const deviceToken = paired.hello.auth.token;
+const deviceToken: string | undefined = paired.hello.auth.token;
 // Store an issued deviceToken in your application's credential store.
 paired.close();
 
 if (deviceToken !== undefined) {
-    const reconnected = await NexaClient.connect({
+    const reconnected: NexaClient = await NexaClient.connect({
         url: 'wss://your-gateway.example',
         deviceId: 'stable-installation-id',
         apiKey: deviceToken,
@@ -72,12 +72,14 @@ Connection options also include `scopes`, `client: { id, version, platform }`, `
 Omit `conversationId` to start a new conversation:
 
 ```ts
-const first = await client.call(Method.AgentAsk, {
+import type { ResultOf } from 'nexa-transport/protocol';
+
+const first: ResultOf<typeof Method.AgentAsk> = await client.call(Method.AgentAsk, {
     message: 'Explain how this library works.',
 });
-const sessionKey = first.sessionKey;
+const sessionKey: string = first.sessionKey;
 
-const second = await client.call(Method.AgentAsk, {
+const second: ResultOf<typeof Method.AgentAsk> = await client.call(Method.AgentAsk, {
     conversationId: sessionKey,
     message: 'Show a short example.',
 });
@@ -87,11 +89,20 @@ console.log(second.text);
 Save `sessionKey` in your application. Nexa's provider-level `conversationId` is a different identifier; gateway conversation requests use the session key. A result also contains `turnId`, `finishReason`, `reasoning`, `iterations`, and token `usage`.
 
 ```ts
-const sessions = await client.call(Method.SessionsList, { limit: 50 });
-const selected = sessions[0];
+import type { ResultOf, Session } from 'nexa-transport/protocol';
+
+const sessions: ResultOf<typeof Method.SessionsList> = await client.call(Method.SessionsList, {
+    limit: 50,
+});
+const selected: Session | undefined = sessions[0];
 if (selected !== undefined) {
-    const details = await client.call(Method.SessionsGet, { id: selected.id });
-    const messages = await client.call(Method.SessionsMessages, { id: selected.id });
+    const details: ResultOf<typeof Method.SessionsGet> = await client.call(Method.SessionsGet, {
+        id: selected.id,
+    });
+    const messages: ResultOf<typeof Method.SessionsMessages> = await client.call(
+        Method.SessionsMessages,
+        { id: selected.id },
+    );
     // Render messages by role and content-block type, not as text-only records.
     await client.call(Method.AgentAsk, {
         conversationId: selected.id,
@@ -107,7 +118,10 @@ After reconnecting, create a new `NexaClient`, reload history, and supply the sa
 ## Streaming and running work
 
 ```ts
-const turn = client.stream({
+import type { NcapDelta, AskResult } from 'nexa-transport/protocol';
+import type { TurnStream } from 'nexa-transport/stream';
+
+const turn: TurnStream = client.stream({
     conversationId: sessionKey,
     message: 'Inspect the project and explain the next steps.',
 });
@@ -127,13 +141,13 @@ for await (const event of turn) {
             console.log(event.outcome);
             break;
         case 'native': {
-            const native = NexaMedia.nativeEvent(event);
+            const native: NcapDelta | null = NexaMedia.nativeEvent(event);
             if (native?.artifact !== undefined) console.log(native.artifact);
             break;
         }
     }
 }
-const result = await turn.result;
+const result: AskResult = await turn.result;
 ```
 
 The iterator includes turn/iteration lifecycle, status, reasoning, usage, tools, native events, and finish events. Use the discriminator and [WireTurnEvent variants](protocol.md#wireturnevent) to render all supported cases. `turn.streamId` identifies the local stream; `turn.result` resolves only with its terminal answer. Starting a stream returns immediately; a pending model turn is not itself a connection failure.
@@ -141,10 +155,14 @@ The iterator includes turn/iteration lifecycle, status, reasoning, usage, tools,
 For a work UI, show the last status/tool progress while waiting for text, keep the cancellation control available, and distinguish terminal completion, failure, and interruption. Native agent/backlog/graph events can describe delegated work independently of the visible answer.
 
 ```ts
-const tasks = await client.call(Method.TasksList, {});
-const task = tasks[0];
+import type { ResultOf, TaskRecord } from 'nexa-transport/protocol';
+
+const tasks: ResultOf<typeof Method.TasksList> = await client.call(Method.TasksList, {});
+const task: TaskRecord | undefined = tasks[0];
 if (task !== undefined) {
-    const current = await client.call(Method.TasksGet, { id: task.runId });
+    const current: ResultOf<typeof Method.TasksGet> = await client.call(Method.TasksGet, {
+        id: task.runId,
+    });
     console.log(current);
     // To explicitly cancel that task:
     // await client.call(Method.TasksCancel, { id: task.runId });
@@ -160,15 +178,23 @@ Check `client.hello.features.attachments` before relying on attachments. Support
 Browser `File` objects are `Blob` objects and work directly:
 
 ```ts
-const image = await NexaMedia.image(new Blob([imageBytes], { type: 'image/png' }), 'Front view');
-const pdf = await NexaMedia.document(new Blob([pdfBytes], { type: 'application/pdf' }), 'Report');
-const reply = await client.call(Method.AgentAsk, {
+import type { ResultOf, InboundAttachment } from 'nexa-transport/protocol';
+
+const image: InboundAttachment = await NexaMedia.image(
+    new Blob([imageBytes], { type: 'image/png' }),
+    'Front view',
+);
+const pdf: InboundAttachment = await NexaMedia.document(
+    new Blob([pdfBytes], { type: 'application/pdf' }),
+    'Report',
+);
+const reply: ResultOf<typeof Method.AgentAsk> = await client.call(Method.AgentAsk, {
     message: 'Compare the diagram with this report.',
     attachments: [image, pdf],
 });
 ```
 
-Here `imageBytes` and `pdfBytes` come from your file picker or application. In Node.js, read the file using `node:fs/promises` and put the resulting bytes in a `Blob` with its actual MIME type. The library itself has no filesystem dependency.
+Here `imageBytes` and `pdfBytes` are `Uint8Array<ArrayBuffer>` values from your file picker or application. In Node.js, read the file using `node:fs/promises` and put the resulting bytes in a `Blob` with its actual MIME type. The library itself has no filesystem dependency.
 
 A URL source delegates retrieval to Nexa:
 
@@ -184,6 +210,8 @@ await client.call(Method.AgentAsk, {
 });
 ```
 
+An attachment title is a display label, not a media ID. Server media tools require the actual returned `media_` identifier followed by 64 hexadecimal characters. A filename such as `report.pdf` cannot be passed as `mediaId`. Send the document bytes or URL in `attachments`; a filename in the message alone does not upload a document.
+
 The URL must be accessible to the server. Browser cookies and application authorization headers are not forwarded by this source shape. Server URL-access policy and provider format support still apply.
 
 | Content              | Encoding                                                | What the SDK guarantees                                                                       |
@@ -195,13 +223,19 @@ The URL must be accessible to the server. Browser cookies and application author
 | PDF/document         | `NexaMedia.document(blob)`                              | Transports a document source; extraction and supported formats depend on Nexa/provider        |
 
 ```ts
-const clip = await NexaMedia.video(videoFile, 'Clip');
-const frames = await Promise.all(frameFiles.map((file) => NexaMedia.videoFrame(file)));
+import type { InboundAttachment } from 'nexa-transport/protocol';
+
+const clip: InboundAttachment = await NexaMedia.video(videoFile, 'Clip');
+const frames: InboundAttachment[] = await Promise.all(
+    frameFiles.map((file: Blob): Promise<InboundAttachment> => NexaMedia.videoFrame(file)),
+);
 await client.call(Method.AgentAsk, {
     message: 'Compare the original clip with these ordered frames.',
     attachments: [clip, ...frames],
 });
 ```
+
+`videoFile` is a browser `File`; `frameFiles` is a `readonly File[]` supplied by your application.
 
 The SDK does not expose frame timestamps or an FPS option in `videoFrame`. Supply temporal context in the message if necessary. A GIF requiring motion analysis can be decoded by your application into ordered frames or converted into a supported video before attachment.
 
@@ -210,16 +244,19 @@ The SDK does not expose frame timestamps or an FPS option in `videoFrame`. Suppl
 Generation is an agent task. There is no `generateImage()` or `generateVideo()` SDK endpoint. Ask Nexa through `AgentAsk` or `stream`; the configured server tools/providers perform generation and delivery.
 
 ```ts
-const generation = client.stream({
+import type { NcapDelta, AskResult } from 'nexa-transport/protocol';
+import type { TurnStream } from 'nexa-transport/stream';
+
+const generation: TurnStream = client.stream({
     message: 'Generate a PNG illustration of a small observatory at night and return the artifact.',
 });
 for await (const event of generation) {
     if (event.type === 'tool-finish') console.log(event.outcome);
-    const native = NexaMedia.nativeEvent(event);
+    const native: NcapDelta | null = NexaMedia.nativeEvent(event);
     if (native?.artifact !== undefined) console.log(native.artifact);
     if (native?.video !== undefined) console.log(native.video);
 }
-const generated = await generation.result;
+const generated: AskResult = await generation.result;
 ```
 
 For video, request the duration, format, and visual content in the message. For image editing or image-to-video, include an image attachment. For GIF output, request a GIF and use the returned artifact/file if the server can produce it. Prompting does not guarantee an installed generator, a particular model, a codec, or a downloadable URL. Report tool errors and the terminal response in your application.
@@ -231,9 +268,11 @@ Native video events have a `phase` discriminator. Inspect the [NcapDelta video f
 Deliverables may appear as native artifact events, tool-result content, document/media blocks, or links in the final answer. Preserve all of these channels when building an artifact viewer. `NcapArtifactDelta` contains `item`, `title`, and an `artifact` string; that string is not guaranteed to be a URL or file bytes.
 
 ```ts
-const native = NexaMedia.nativeEvent(event);
+import type { NcapDelta, NcapArtifactDelta } from 'nexa-transport/protocol';
+
+const native: NcapDelta | null = NexaMedia.nativeEvent(event);
 if (native?.artifact !== undefined) {
-    const { item, title, artifact } = native.artifact;
+    const { item, title, artifact }: NcapArtifactDelta = native.artifact;
     // Store this metadata in your application's artifact list.
 }
 ```
@@ -253,14 +292,19 @@ The voice RPCs transport raw **mono PCM16** in base64 fields. They do not accept
 Register listeners before opening a call:
 
 ```ts
-const stopAudio = client.on(EventName.VoiceAudio, (frame) => {
-    const pcm = NexaMedia.fromBase64(frame.pcm);
+import type { ResultOf } from 'nexa-transport/protocol';
+import type { VoiceAudio, VoiceEvent } from 'nexa-transport/events';
+
+const stopAudio: () => void = client.on(EventName.VoiceAudio, (frame: VoiceAudio): void => {
+    const pcm: Uint8Array<ArrayBuffer> = NexaMedia.fromBase64(frame.pcm);
     // Queue PCM16 for playback at frame.sampleRate; route by frame.callId.
 });
-const stopVoiceEvents = client.on(EventName.VoiceEvent, (event) => {
+const stopVoiceEvents: () => void = client.on(EventName.VoiceEvent, (event: VoiceEvent): void => {
     console.log(event.callId, event);
 });
-const voice = await client.call(Method.VoiceStart, { conversationId: sessionKey });
+const voice: ResultOf<typeof Method.VoiceStart> = await client.call(Method.VoiceStart, {
+    conversationId: sessionKey,
+});
 
 try {
     // microphonePcm is one mono PCM16 frame at voice.sampleRate.
@@ -276,7 +320,7 @@ try {
 }
 ```
 
-Here `microphonePcm` is produced by your audio capture code. Use the returned `sampleRate` and `frameBytes`; do not hardcode either. Keep capture backpressure bounded and release microphone tracks/audio resources on stop or disconnect. Voice-event variants include transcripts and call state; their exact fields are in [VoiceCallEvent](protocol.md#voicecallevent).
+Here `microphonePcm` is a `Uint8Array<ArrayBuffer>` produced by your audio capture code. Use the returned `sampleRate` and `frameBytes`; do not hardcode either. Keep capture backpressure bounded and release microphone tracks/audio resources on stop or disconnect. Voice-event variants include transcripts and call state; their exact fields are in [VoiceCallEvent](protocol.md#voicecallevent).
 
 Native NCAP `voice` output is a separate binary event field, decoded by `nativeEvent()`. Do not assume those bytes have the same framing as `voice.audio`; use the producing provider's format contract.
 
@@ -289,10 +333,15 @@ The transport does not execute tools on the client or send a local tool catalog.
 Approval events are notifications, not authority to approve:
 
 ```ts
-const unsubscribe = client.on(EventName.ApprovalRequested, (request) => {
-    console.log(request);
-});
-const pending = await client.call(Method.ApprovalsList, {});
+import type { ResultOf, ApprovalRequestedData } from 'nexa-transport/protocol';
+
+const unsubscribe: () => void = client.on(
+    EventName.ApprovalRequested,
+    (request: ApprovalRequestedData): void => {
+        console.log(request);
+    },
+);
+const pending: ResultOf<typeof Method.ApprovalsList> = await client.call(Method.ApprovalsList, {});
 // After an authorized operator explicitly decides:
 await client.call(Method.ApprovalsResolve, {
     approvalId: 'SELECTED_APPROVAL_ID',
@@ -320,9 +369,14 @@ Approval listing/resolution requires operator-level access in the current gatewa
 | `Shutdown`                              | Server shutdown notification                      |
 
 ```ts
-const stopMessages = client.on(EventName.SessionMessage, (message) => {
-    console.log(message.sessionId, message.role, message.text);
-});
+import type { SessionMessageData } from 'nexa-transport/protocol';
+
+const stopMessages: () => void = client.on(
+    EventName.SessionMessage,
+    (message: SessionMessageData): void => {
+        console.log(message.sessionId, message.role, message.text);
+    },
+);
 await client.call(Method.SessionsSubscribe, { sessionId: sessionKey });
 // Later:
 await client.call(Method.SessionsUnsubscribe, { sessionId: sessionKey });
@@ -400,4 +454,4 @@ No automatic retry is performed. Retrying a timed-out mutating call can duplicat
 - [All protocol type fields and variants](protocol.md)
 - [Typed source examples](../examples)
 
-The method/type pages are generated from the package's bundled contract with `npm run docs`. After updating the server protocol, run `npm run generate` before regenerating documentation, and run the normal package checks.
+The method/type pages are generated from the package's bundled contract with `npm run docs`. After updating the server protocol, run `npm run generate` before regenerating documentation, and run the normal package checks. `npm run docs:check` compiles all TypeScript code blocks against the SDK and checks variable annotations. Snippets share the connection setup above; file and microphone inputs are supplied by the application. Stream loop bindings are inferred from the explicitly typed `TurnStream` because TypeScript forbids type annotations on `for...of` bindings.

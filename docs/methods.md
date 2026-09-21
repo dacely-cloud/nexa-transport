@@ -60,9 +60,15 @@ All 54 protocol methods. `connect` is managed by `NexaClient.connect`; the remai
 ## accounts.create
 
 ```ts
-await client.call(Method.AccountsCreate, {
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.AccountsCreate> = {
     displayName: 'YOUR_DISPLAYNAME',
-});
+};
+const result: ResultOf<typeof Method.AccountsCreate> = await client.call(
+    Method.AccountsCreate,
+    params,
+);
 ```
 
 Parameters: [AccountCreateParams](protocol.md#accountcreateparams).
@@ -79,7 +85,10 @@ Result: [AccountSummary](protocol.md#accountsummary).
 ## accounts.list
 
 ```ts
-await client.call(Method.AccountsList, {});
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.AccountsList> = {};
+const result: ResultOf<typeof Method.AccountsList> = await client.call(Method.AccountsList, params);
 ```
 
 Parameters: [Recordstringnever](protocol.md#recordstringnever).
@@ -91,9 +100,15 @@ Result: Array of [AccountSummary](protocol.md#accountsummary).
 ## accounts.remove
 
 ```ts
-await client.call(Method.AccountsRemove, {
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.AccountsRemove> = {
     principalId: 'YOUR_PRINCIPALID',
-});
+};
+const result: ResultOf<typeof Method.AccountsRemove> = await client.call(
+    Method.AccountsRemove,
+    params,
+);
 ```
 
 Parameters: [AccountRemoveParams](protocol.md#accountremoveparams).
@@ -108,7 +123,13 @@ Result: [OkResult](protocol.md#okresult).
 ## accounts.usage
 
 ```ts
-await client.call(Method.AccountsUsage, {});
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.AccountsUsage> = {};
+const result: ResultOf<typeof Method.AccountsUsage> = await client.call(
+    Method.AccountsUsage,
+    params,
+);
 ```
 
 Parameters: [AccountsUsageParams](protocol.md#accountsusageparams).
@@ -124,10 +145,15 @@ Result: [AccountsUsageResult](protocol.md#accountsusageresult).
 ## agent.ask
 
 ```ts
-await client.call(Method.AgentAsk, {
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.AgentAsk> = {
     message: 'Your request',
-});
+};
+const result: ResultOf<typeof Method.AgentAsk> = await client.call(Method.AgentAsk, params);
 ```
+
+With a personal API key, omit `userId`; the gateway uses the authenticated identity. A display name such as `Ralph` is not the internal principal `user:ralph`. See [connection and identity](guide.md#connection-and-identity).
 
 Parameters: [AskParams](protocol.md#askparams).
 
@@ -145,10 +171,15 @@ Result: [AskResult](protocol.md#askresult).
 ## agent.stream
 
 ```ts
-await client.call(Method.AgentStream, {
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.AgentStream> = {
     message: 'Your request',
-});
+};
+const result: ResultOf<typeof Method.AgentStream> = await client.call(Method.AgentStream, params);
 ```
+
+With a personal API key, omit `userId`; the gateway uses the authenticated identity. A display name such as `Ralph` is not the internal principal `user:ralph`. See [connection and identity](guide.md#connection-and-identity).
 
 Parameters: [StreamParams](protocol.md#streamparams).
 
@@ -167,14 +198,17 @@ Result: [StreamAccepted](protocol.md#streamaccepted).
 ## agents.define
 
 ```ts
-await client.call(Method.AgentsDefine, {
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.AgentsDefine> = {
     agent: {
         id: 'YOUR_ID',
         model: 'YOUR_MODEL',
         name: 'YOUR_NAME',
         provider: 'YOUR_PROVIDER',
     },
-});
+};
+const result: ResultOf<typeof Method.AgentsDefine> = await client.call(Method.AgentsDefine, params);
 ```
 
 Parameters: [AgentDefineParams](protocol.md#agentdefineparams).
@@ -188,7 +222,10 @@ Result: [OkResult](protocol.md#okresult).
 ## agents.list
 
 ```ts
-await client.call(Method.AgentsList, {});
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.AgentsList> = {};
+const result: ResultOf<typeof Method.AgentsList> = await client.call(Method.AgentsList, params);
 ```
 
 Parameters: [Recordstringnever](protocol.md#recordstringnever).
@@ -200,7 +237,13 @@ Result: Array of [AgentDefinition](protocol.md#agentdefinition).
 ## approvals.list
 
 ```ts
-await client.call(Method.ApprovalsList, {});
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ApprovalsList> = {};
+const result: ResultOf<typeof Method.ApprovalsList> = await client.call(
+    Method.ApprovalsList,
+    params,
+);
 ```
 
 Parameters: [Recordstringnever](protocol.md#recordstringnever).
@@ -212,10 +255,16 @@ Result: Array of [PendingApproval](protocol.md#pendingapproval).
 ## approvals.resolve
 
 ```ts
-await client.call(Method.ApprovalsResolve, {
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ApprovalsResolve> = {
     approvalId: 'YOUR_APPROVALID',
     approved: false,
-});
+};
+const result: ResultOf<typeof Method.ApprovalsResolve> = await client.call(
+    Method.ApprovalsResolve,
+    params,
+);
 ```
 
 Parameters: [ApprovalResolveParams](protocol.md#approvalresolveparams).
@@ -231,7 +280,13 @@ Result: [OkResult](protocol.md#okresult).
 ## channels.deadLetters.list
 
 ```ts
-await client.call(Method.ChannelsDeadLettersList, {});
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ChannelsDeadLettersList> = {};
+const result: ResultOf<typeof Method.ChannelsDeadLettersList> = await client.call(
+    Method.ChannelsDeadLettersList,
+    params,
+);
 ```
 
 Parameters: [Recordstringnever](protocol.md#recordstringnever).
@@ -243,7 +298,10 @@ Result: Array of [DeadLetter](protocol.md#deadletter).
 ## channels.list
 
 ```ts
-await client.call(Method.ChannelsList, {});
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ChannelsList> = {};
+const result: ResultOf<typeof Method.ChannelsList> = await client.call(Method.ChannelsList, params);
 ```
 
 Parameters: [Recordstringnever](protocol.md#recordstringnever).
@@ -255,9 +313,15 @@ Result: Array of [ChannelInfo](protocol.md#channelinfo).
 ## channels.status
 
 ```ts
-await client.call(Method.ChannelsStatus, {
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ChannelsStatus> = {
     id: 'YOUR_ID',
-});
+};
+const result: ResultOf<typeof Method.ChannelsStatus> = await client.call(
+    Method.ChannelsStatus,
+    params,
+);
 ```
 
 Parameters: [IdParams](protocol.md#idparams).
@@ -271,7 +335,10 @@ Result: [ChannelStatusResult](protocol.md#channelstatusresult).
 ## config.get
 
 ```ts
-await client.call(Method.ConfigGet, {});
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ConfigGet> = {};
+const result: ResultOf<typeof Method.ConfigGet> = await client.call(Method.ConfigGet, params);
 ```
 
 Parameters: [Recordstringnever](protocol.md#recordstringnever).
@@ -283,10 +350,13 @@ Result: [ConfigResult](protocol.md#configresult).
 ## config.set
 
 ```ts
-await client.call(Method.ConfigSet, {
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ConfigSet> = {
     key: 'YOUR_KEY',
     value: 'YOUR_VALUE',
-});
+};
+const result: ResultOf<typeof Method.ConfigSet> = await client.call(Method.ConfigSet, params);
 ```
 
 Parameters: [ConfigWriteParams](protocol.md#configwriteparams).
@@ -301,9 +371,12 @@ Result: [ConfigWriteResult](protocol.md#configwriteresult).
 ## config.unset
 
 ```ts
-await client.call(Method.ConfigUnset, {
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ConfigUnset> = {
     key: 'YOUR_KEY',
-});
+};
+const result: ResultOf<typeof Method.ConfigUnset> = await client.call(Method.ConfigUnset, params);
 ```
 
 Parameters: Object (fields below).
@@ -332,7 +405,13 @@ Result: [HelloOk](protocol.md#hellook).
 ## credit.budgets
 
 ```ts
-await client.call(Method.CreditBudgets, {});
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.CreditBudgets> = {};
+const result: ResultOf<typeof Method.CreditBudgets> = await client.call(
+    Method.CreditBudgets,
+    params,
+);
 ```
 
 Parameters: [Recordstringnever](protocol.md#recordstringnever).
@@ -344,9 +423,15 @@ Result: Array of [Budget](protocol.md#budget).
 ## credit.removeBudget
 
 ```ts
-await client.call(Method.CreditRemoveBudget, {
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.CreditRemoveBudget> = {
     id: 'YOUR_ID',
-});
+};
+const result: ResultOf<typeof Method.CreditRemoveBudget> = await client.call(
+    Method.CreditRemoveBudget,
+    params,
+);
 ```
 
 Parameters: Object (fields below).
@@ -360,13 +445,19 @@ Result: Object (fields below).
 ## credit.setBudget
 
 ```ts
-await client.call(Method.CreditSetBudget, {
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.CreditSetBudget> = {
     enforcement: 'block',
     limitMicrocents: 1,
     period: 'daily',
     scope: 'agent',
     scopeId: 'YOUR_SCOPEID',
-});
+};
+const result: ResultOf<typeof Method.CreditSetBudget> = await client.call(
+    Method.CreditSetBudget,
+    params,
+);
 ```
 
 Parameters: Object (fields below).
@@ -385,7 +476,13 @@ Result: [Budget](protocol.md#budget).
 ## credit.summary
 
 ```ts
-await client.call(Method.CreditSummary, {});
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.CreditSummary> = {};
+const result: ResultOf<typeof Method.CreditSummary> = await client.call(
+    Method.CreditSummary,
+    params,
+);
 ```
 
 Parameters: [CreditSummaryParams](protocol.md#creditsummaryparams).
@@ -402,9 +499,15 @@ Result: [CreditSummary](protocol.md#creditsummary).
 ## devices.approve
 
 ```ts
-await client.call(Method.DevicesApprove, {
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DevicesApprove> = {
     requestId: 'YOUR_REQUESTID',
-});
+};
+const result: ResultOf<typeof Method.DevicesApprove> = await client.call(
+    Method.DevicesApprove,
+    params,
+);
 ```
 
 Parameters: [DeviceApproveParams](protocol.md#deviceapproveparams).
@@ -419,7 +522,10 @@ Result: [DeviceApproveResult](protocol.md#deviceapproveresult).
 ## devices.list
 
 ```ts
-await client.call(Method.DevicesList, {});
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DevicesList> = {};
+const result: ResultOf<typeof Method.DevicesList> = await client.call(Method.DevicesList, params);
 ```
 
 Parameters: [Recordstringnever](protocol.md#recordstringnever).
@@ -431,9 +537,15 @@ Result: [DeviceListResult](protocol.md#devicelistresult).
 ## devices.reject
 
 ```ts
-await client.call(Method.DevicesReject, {
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DevicesReject> = {
     id: 'YOUR_ID',
-});
+};
+const result: ResultOf<typeof Method.DevicesReject> = await client.call(
+    Method.DevicesReject,
+    params,
+);
 ```
 
 Parameters: [IdParams](protocol.md#idparams).
@@ -447,9 +559,15 @@ Result: [OkResult](protocol.md#okresult).
 ## devices.revoke
 
 ```ts
-await client.call(Method.DevicesRevoke, {
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DevicesRevoke> = {
     deviceId: 'YOUR_DEVICEID',
-});
+};
+const result: ResultOf<typeof Method.DevicesRevoke> = await client.call(
+    Method.DevicesRevoke,
+    params,
+);
 ```
 
 Parameters: [DeviceRefParams](protocol.md#devicerefparams).
@@ -463,7 +581,10 @@ Result: [OkResult](protocol.md#okresult).
 ## health
 
 ```ts
-await client.call(Method.Health, {});
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.Health> = {};
+const result: ResultOf<typeof Method.Health> = await client.call(Method.Health, params);
 ```
 
 Parameters: [Recordstringnever](protocol.md#recordstringnever).
@@ -475,9 +596,12 @@ Result: [HealthResult](protocol.md#healthresult).
 ## jobs.add
 
 ```ts
-await client.call(Method.JobsAdd, {
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.JobsAdd> = {
     name: 'YOUR_NAME',
-});
+};
+const result: ResultOf<typeof Method.JobsAdd> = await client.call(Method.JobsAdd, params);
 ```
 
 Parameters: [JobAddParams](protocol.md#jobaddparams).
@@ -501,7 +625,10 @@ Result: [IdParams](protocol.md#idparams).
 ## jobs.list
 
 ```ts
-await client.call(Method.JobsList, {});
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.JobsList> = {};
+const result: ResultOf<typeof Method.JobsList> = await client.call(Method.JobsList, params);
 ```
 
 Parameters: [Recordstringnever](protocol.md#recordstringnever).
@@ -513,9 +640,12 @@ Result: Array of [Job](protocol.md#job).
 ## jobs.remove
 
 ```ts
-await client.call(Method.JobsRemove, {
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.JobsRemove> = {
     id: 'YOUR_ID',
-});
+};
+const result: ResultOf<typeof Method.JobsRemove> = await client.call(Method.JobsRemove, params);
 ```
 
 Parameters: [IdParams](protocol.md#idparams).
@@ -529,7 +659,10 @@ Result: [OkResult](protocol.md#okresult).
 ## logs.tail
 
 ```ts
-await client.call(Method.LogsTail, {});
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.LogsTail> = {};
+const result: ResultOf<typeof Method.LogsTail> = await client.call(Method.LogsTail, params);
 ```
 
 Parameters: [LogTailParams](protocol.md#logtailparams).
@@ -546,9 +679,15 @@ Result: Array of [LogRecord](protocol.md#logrecord).
 ## sessions.delete
 
 ```ts
-await client.call(Method.SessionsDelete, {
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.SessionsDelete> = {
     id: 'YOUR_ID',
-});
+};
+const result: ResultOf<typeof Method.SessionsDelete> = await client.call(
+    Method.SessionsDelete,
+    params,
+);
 ```
 
 Parameters: [IdParams](protocol.md#idparams).
@@ -562,9 +701,12 @@ Result: [OkResult](protocol.md#okresult).
 ## sessions.get
 
 ```ts
-await client.call(Method.SessionsGet, {
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.SessionsGet> = {
     id: 'YOUR_ID',
-});
+};
+const result: ResultOf<typeof Method.SessionsGet> = await client.call(Method.SessionsGet, params);
 ```
 
 Parameters: [IdParams](protocol.md#idparams).
@@ -578,7 +720,10 @@ Result: [Session](protocol.md#session) / `null`.
 ## sessions.list
 
 ```ts
-await client.call(Method.SessionsList, {});
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.SessionsList> = {};
+const result: ResultOf<typeof Method.SessionsList> = await client.call(Method.SessionsList, params);
 ```
 
 Parameters: [SessionListParams](protocol.md#sessionlistparams).
@@ -594,9 +739,15 @@ Result: Array of [Session](protocol.md#session).
 ## sessions.messages
 
 ```ts
-await client.call(Method.SessionsMessages, {
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.SessionsMessages> = {
     id: 'YOUR_ID',
-});
+};
+const result: ResultOf<typeof Method.SessionsMessages> = await client.call(
+    Method.SessionsMessages,
+    params,
+);
 ```
 
 Parameters: [IdParams](protocol.md#idparams).
@@ -610,9 +761,15 @@ Result: Array of [ModelMessage](protocol.md#modelmessage).
 ## sessions.subscribe
 
 ```ts
-await client.call(Method.SessionsSubscribe, {
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.SessionsSubscribe> = {
     sessionId: 'YOUR_SESSIONID',
-});
+};
+const result: ResultOf<typeof Method.SessionsSubscribe> = await client.call(
+    Method.SessionsSubscribe,
+    params,
+);
 ```
 
 Parameters: [SessionRef](protocol.md#sessionref).
@@ -626,9 +783,15 @@ Result: [OkResult](protocol.md#okresult).
 ## sessions.unsubscribe
 
 ```ts
-await client.call(Method.SessionsUnsubscribe, {
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.SessionsUnsubscribe> = {
     sessionId: 'YOUR_SESSIONID',
-});
+};
+const result: ResultOf<typeof Method.SessionsUnsubscribe> = await client.call(
+    Method.SessionsUnsubscribe,
+    params,
+);
 ```
 
 Parameters: [SessionRef](protocol.md#sessionref).
@@ -642,9 +805,12 @@ Result: [OkResult](protocol.md#okresult).
 ## shares.create
 
 ```ts
-await client.call(Method.SharesCreate, {
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.SharesCreate> = {
     name: 'YOUR_NAME',
-});
+};
+const result: ResultOf<typeof Method.SharesCreate> = await client.call(Method.SharesCreate, params);
 ```
 
 Parameters: [ShareCreateParams](protocol.md#sharecreateparams).
@@ -661,7 +827,10 @@ Result: [ShareSummary](protocol.md#sharesummary).
 ## shares.list
 
 ```ts
-await client.call(Method.SharesList, {});
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.SharesList> = {};
+const result: ResultOf<typeof Method.SharesList> = await client.call(Method.SharesList, params);
 ```
 
 Parameters: [Recordstringnever](protocol.md#recordstringnever).
@@ -673,9 +842,12 @@ Result: Array of [ShareSummary](protocol.md#sharesummary).
 ## shares.remove
 
 ```ts
-await client.call(Method.SharesRemove, {
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.SharesRemove> = {
     id: 'YOUR_ID',
-});
+};
+const result: ResultOf<typeof Method.SharesRemove> = await client.call(Method.SharesRemove, params);
 ```
 
 Parameters: [IdParams](protocol.md#idparams).
@@ -689,12 +861,18 @@ Result: [OkResult](protocol.md#okresult).
 ## shares.setMember
 
 ```ts
-await client.call(Method.SharesSetMember, {
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.SharesSetMember> = {
     id: 'YOUR_ID',
     mode: 'YOUR_MODE',
     shareId: 'YOUR_SHAREID',
     subject: 'YOUR_SUBJECT',
-});
+};
+const result: ResultOf<typeof Method.SharesSetMember> = await client.call(
+    Method.SharesSetMember,
+    params,
+);
 ```
 
 Parameters: [ShareMemberParams](protocol.md#sharememberparams).
@@ -711,9 +889,12 @@ Result: [ShareSummary](protocol.md#sharesummary).
 ## tasks.cancel
 
 ```ts
-await client.call(Method.TasksCancel, {
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.TasksCancel> = {
     id: 'YOUR_ID',
-});
+};
+const result: ResultOf<typeof Method.TasksCancel> = await client.call(Method.TasksCancel, params);
 ```
 
 Parameters: [IdParams](protocol.md#idparams).
@@ -727,9 +908,12 @@ Result: [OkResult](protocol.md#okresult).
 ## tasks.get
 
 ```ts
-await client.call(Method.TasksGet, {
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.TasksGet> = {
     id: 'YOUR_ID',
-});
+};
+const result: ResultOf<typeof Method.TasksGet> = await client.call(Method.TasksGet, params);
 ```
 
 Parameters: [IdParams](protocol.md#idparams).
@@ -743,7 +927,10 @@ Result: [TaskRecord](protocol.md#taskrecord) / `null`.
 ## tasks.list
 
 ```ts
-await client.call(Method.TasksList, {});
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.TasksList> = {};
+const result: ResultOf<typeof Method.TasksList> = await client.call(Method.TasksList, params);
 ```
 
 Parameters: [Recordstringnever](protocol.md#recordstringnever).
@@ -755,9 +942,12 @@ Result: Array of [TaskRecord](protocol.md#taskrecord).
 ## teams.create
 
 ```ts
-await client.call(Method.TeamsCreate, {
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.TeamsCreate> = {
     name: 'YOUR_NAME',
-});
+};
+const result: ResultOf<typeof Method.TeamsCreate> = await client.call(Method.TeamsCreate, params);
 ```
 
 Parameters: [TeamCreateParams](protocol.md#teamcreateparams).
@@ -773,7 +963,10 @@ Result: [TeamSummary](protocol.md#teamsummary).
 ## teams.list
 
 ```ts
-await client.call(Method.TeamsList, {});
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.TeamsList> = {};
+const result: ResultOf<typeof Method.TeamsList> = await client.call(Method.TeamsList, params);
 ```
 
 Parameters: [Recordstringnever](protocol.md#recordstringnever).
@@ -785,9 +978,12 @@ Result: Array of [TeamSummary](protocol.md#teamsummary).
 ## teams.remove
 
 ```ts
-await client.call(Method.TeamsRemove, {
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.TeamsRemove> = {
     id: 'YOUR_ID',
-});
+};
+const result: ResultOf<typeof Method.TeamsRemove> = await client.call(Method.TeamsRemove, params);
 ```
 
 Parameters: [IdParams](protocol.md#idparams).
@@ -801,11 +997,17 @@ Result: [OkResult](protocol.md#okresult).
 ## teams.setMember
 
 ```ts
-await client.call(Method.TeamsSetMember, {
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.TeamsSetMember> = {
     member: false,
     principalId: 'YOUR_PRINCIPALID',
     teamId: 'YOUR_TEAMID',
-});
+};
+const result: ResultOf<typeof Method.TeamsSetMember> = await client.call(
+    Method.TeamsSetMember,
+    params,
+);
 ```
 
 Parameters: [TeamMemberParams](protocol.md#teammemberparams).
@@ -821,10 +1023,13 @@ Result: [TeamSummary](protocol.md#teamsummary).
 ## voice.audio
 
 ```ts
-await client.call(Method.VoiceAudio, {
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.VoiceAudio> = {
     callId: 'YOUR_CALLID',
     pcm: 'YOUR_PCM',
-});
+};
+const result: ResultOf<typeof Method.VoiceAudio> = await client.call(Method.VoiceAudio, params);
 ```
 
 Parameters: [VoiceAudioParams](protocol.md#voiceaudioparams).
@@ -839,7 +1044,10 @@ Result: [OkResult](protocol.md#okresult).
 ## voice.start
 
 ```ts
-await client.call(Method.VoiceStart, {});
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.VoiceStart> = {};
+const result: ResultOf<typeof Method.VoiceStart> = await client.call(Method.VoiceStart, params);
 ```
 
 Parameters: [VoiceStartParams](protocol.md#voicestartparams).
@@ -853,9 +1061,12 @@ Result: [VoiceStarted](protocol.md#voicestarted).
 ## voice.stop
 
 ```ts
-await client.call(Method.VoiceStop, {
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.VoiceStop> = {
     callId: 'YOUR_CALLID',
-});
+};
+const result: ResultOf<typeof Method.VoiceStop> = await client.call(Method.VoiceStop, params);
 ```
 
 Parameters: [VoiceStopParams](protocol.md#voicestopparams).
@@ -869,9 +1080,15 @@ Result: [OkResult](protocol.md#okresult).
 ## workspaces.create
 
 ```ts
-await client.call(Method.WorkspacesCreate, {
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkspacesCreate> = {
     name: 'YOUR_NAME',
-});
+};
+const result: ResultOf<typeof Method.WorkspacesCreate> = await client.call(
+    Method.WorkspacesCreate,
+    params,
+);
 ```
 
 Parameters: [WorkspaceCreateParams](protocol.md#workspacecreateparams).
@@ -887,9 +1104,15 @@ Result: [Workspace](protocol.md#workspace).
 ## workspaces.describe
 
 ```ts
-await client.call(Method.WorkspacesDescribe, {
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkspacesDescribe> = {
     id: 'YOUR_ID',
-});
+};
+const result: ResultOf<typeof Method.WorkspacesDescribe> = await client.call(
+    Method.WorkspacesDescribe,
+    params,
+);
 ```
 
 Parameters: [IdParams](protocol.md#idparams).
@@ -903,9 +1126,15 @@ Result: [WorkspaceDescription](protocol.md#workspacedescription).
 ## workspaces.destroy
 
 ```ts
-await client.call(Method.WorkspacesDestroy, {
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkspacesDestroy> = {
     id: 'YOUR_ID',
-});
+};
+const result: ResultOf<typeof Method.WorkspacesDestroy> = await client.call(
+    Method.WorkspacesDestroy,
+    params,
+);
 ```
 
 Parameters: [WorkspaceDestroyParams](protocol.md#workspacedestroyparams).
@@ -920,7 +1149,13 @@ Result: [OkResult](protocol.md#okresult).
 ## workspaces.list
 
 ```ts
-await client.call(Method.WorkspacesList, {});
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkspacesList> = {};
+const result: ResultOf<typeof Method.WorkspacesList> = await client.call(
+    Method.WorkspacesList,
+    params,
+);
 ```
 
 Parameters: [Recordstringnever](protocol.md#recordstringnever).

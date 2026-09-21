@@ -105,8 +105,13 @@ for (const [name, entry] of Object.entries(methods)) {
     else
         reference +=
             '```ts\n' +
-            `await client.call(Method.${enumName(name)}, ${JSON.stringify(sample(params), null, 4)});\n` +
+            "import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';\n\n" +
+            `const params: ParamsOf<typeof Method.${enumName(name)}> = ${JSON.stringify(sample(params), null, 4)};\n` +
+            `const result: ResultOf<typeof Method.${enumName(name)}> = await client.call(Method.${enumName(name)}, params);\n` +
             '```\n\n';
+    if (name === 'agent.ask' || name === 'agent.stream')
+        reference +=
+            'With a personal API key, omit `userId`; the gateway uses the authenticated identity. A display name such as `Ralph` is not the internal principal `user:ralph`. See [connection and identity](guide.md#connection-and-identity).\n\n';
     reference += `Parameters: ${type(params)}.\n\n${fields(params)}\nResult: ${type(result)}.\n\n`;
 }
 writeFileSync('docs/methods.md', reference);
