@@ -3654,115 +3654,113 @@ export type ParamsOf<M extends MethodName> = GatewayMethods[M]['params'];
 export type ResultOf<M extends MethodName> = GatewayMethods[M]['result'];
 
 /** Nexa RPC method enum, generated from the complete gateway catalog. */
-export const Method = {
+export enum Method {
     /** Calls accounts.create. */
-    AccountsCreate: 'accounts.create',
+    AccountsCreate = 'accounts.create',
     /** Calls accounts.list. */
-    AccountsList: 'accounts.list',
+    AccountsList = 'accounts.list',
     /** Calls accounts.remove. */
-    AccountsRemove: 'accounts.remove',
+    AccountsRemove = 'accounts.remove',
     /** Calls accounts.usage. */
-    AccountsUsage: 'accounts.usage',
+    AccountsUsage = 'accounts.usage',
     /** Calls agent.ask. */
-    AgentAsk: 'agent.ask',
+    AgentAsk = 'agent.ask',
     /** Calls agent.stream. */
-    AgentStream: 'agent.stream',
+    AgentStream = 'agent.stream',
     /** Calls agents.define. */
-    AgentsDefine: 'agents.define',
+    AgentsDefine = 'agents.define',
     /** Calls agents.list. */
-    AgentsList: 'agents.list',
+    AgentsList = 'agents.list',
     /** Calls approvals.list. */
-    ApprovalsList: 'approvals.list',
+    ApprovalsList = 'approvals.list',
     /** Calls approvals.resolve. */
-    ApprovalsResolve: 'approvals.resolve',
+    ApprovalsResolve = 'approvals.resolve',
     /** Calls channels.deadLetters.list. */
-    ChannelsDeadLettersList: 'channels.deadLetters.list',
+    ChannelsDeadLettersList = 'channels.deadLetters.list',
     /** Calls channels.list. */
-    ChannelsList: 'channels.list',
+    ChannelsList = 'channels.list',
     /** Calls channels.status. */
-    ChannelsStatus: 'channels.status',
+    ChannelsStatus = 'channels.status',
     /** Calls config.get. */
-    ConfigGet: 'config.get',
+    ConfigGet = 'config.get',
     /** Calls config.set. */
-    ConfigSet: 'config.set',
+    ConfigSet = 'config.set',
     /** Calls config.unset. */
-    ConfigUnset: 'config.unset',
+    ConfigUnset = 'config.unset',
     /** Calls connect. */
-    Connect: 'connect',
+    Connect = 'connect',
     /** Calls credit.budgets. */
-    CreditBudgets: 'credit.budgets',
+    CreditBudgets = 'credit.budgets',
     /** Calls credit.removeBudget. */
-    CreditRemoveBudget: 'credit.removeBudget',
+    CreditRemoveBudget = 'credit.removeBudget',
     /** Calls credit.setBudget. */
-    CreditSetBudget: 'credit.setBudget',
+    CreditSetBudget = 'credit.setBudget',
     /** Calls credit.summary. */
-    CreditSummary: 'credit.summary',
+    CreditSummary = 'credit.summary',
     /** Calls devices.approve. */
-    DevicesApprove: 'devices.approve',
+    DevicesApprove = 'devices.approve',
     /** Calls devices.list. */
-    DevicesList: 'devices.list',
+    DevicesList = 'devices.list',
     /** Calls devices.reject. */
-    DevicesReject: 'devices.reject',
+    DevicesReject = 'devices.reject',
     /** Calls devices.revoke. */
-    DevicesRevoke: 'devices.revoke',
+    DevicesRevoke = 'devices.revoke',
     /** Calls health. */
-    Health: 'health',
+    Health = 'health',
     /** Calls jobs.add. */
-    JobsAdd: 'jobs.add',
+    JobsAdd = 'jobs.add',
     /** Calls jobs.list. */
-    JobsList: 'jobs.list',
+    JobsList = 'jobs.list',
     /** Calls jobs.remove. */
-    JobsRemove: 'jobs.remove',
+    JobsRemove = 'jobs.remove',
     /** Calls logs.tail. */
-    LogsTail: 'logs.tail',
+    LogsTail = 'logs.tail',
     /** Calls sessions.delete. */
-    SessionsDelete: 'sessions.delete',
+    SessionsDelete = 'sessions.delete',
     /** Calls sessions.get. */
-    SessionsGet: 'sessions.get',
+    SessionsGet = 'sessions.get',
     /** Calls sessions.list. */
-    SessionsList: 'sessions.list',
+    SessionsList = 'sessions.list',
     /** Calls sessions.messages. */
-    SessionsMessages: 'sessions.messages',
+    SessionsMessages = 'sessions.messages',
     /** Calls sessions.subscribe. */
-    SessionsSubscribe: 'sessions.subscribe',
+    SessionsSubscribe = 'sessions.subscribe',
     /** Calls sessions.unsubscribe. */
-    SessionsUnsubscribe: 'sessions.unsubscribe',
+    SessionsUnsubscribe = 'sessions.unsubscribe',
     /** Calls shares.create. */
-    SharesCreate: 'shares.create',
+    SharesCreate = 'shares.create',
     /** Calls shares.list. */
-    SharesList: 'shares.list',
+    SharesList = 'shares.list',
     /** Calls shares.remove. */
-    SharesRemove: 'shares.remove',
+    SharesRemove = 'shares.remove',
     /** Calls shares.setMember. */
-    SharesSetMember: 'shares.setMember',
+    SharesSetMember = 'shares.setMember',
     /** Calls tasks.cancel. */
-    TasksCancel: 'tasks.cancel',
+    TasksCancel = 'tasks.cancel',
     /** Calls tasks.get. */
-    TasksGet: 'tasks.get',
+    TasksGet = 'tasks.get',
     /** Calls tasks.list. */
-    TasksList: 'tasks.list',
+    TasksList = 'tasks.list',
     /** Calls teams.create. */
-    TeamsCreate: 'teams.create',
+    TeamsCreate = 'teams.create',
     /** Calls teams.list. */
-    TeamsList: 'teams.list',
+    TeamsList = 'teams.list',
     /** Calls teams.remove. */
-    TeamsRemove: 'teams.remove',
+    TeamsRemove = 'teams.remove',
     /** Calls teams.setMember. */
-    TeamsSetMember: 'teams.setMember',
+    TeamsSetMember = 'teams.setMember',
     /** Calls voice.audio. */
-    VoiceAudio: 'voice.audio',
+    VoiceAudio = 'voice.audio',
     /** Calls voice.start. */
-    VoiceStart: 'voice.start',
+    VoiceStart = 'voice.start',
     /** Calls voice.stop. */
-    VoiceStop: 'voice.stop',
+    VoiceStop = 'voice.stop',
     /** Calls workspaces.create. */
-    WorkspacesCreate: 'workspaces.create',
+    WorkspacesCreate = 'workspaces.create',
     /** Calls workspaces.describe. */
-    WorkspacesDescribe: 'workspaces.describe',
+    WorkspacesDescribe = 'workspaces.describe',
     /** Calls workspaces.destroy. */
-    WorkspacesDestroy: 'workspaces.destroy',
+    WorkspacesDestroy = 'workspaces.destroy',
     /** Calls workspaces.list. */
-    WorkspacesList: 'workspaces.list',
-} as const satisfies Readonly<Record<string, MethodName>>;
-/** A value from the Nexa RPC method enum. */
-export type Method = (typeof Method)[keyof typeof Method];
+    WorkspacesList = 'workspaces.list',
+}

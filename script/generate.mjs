@@ -134,10 +134,10 @@ const methodEntries = Object.keys(schema.definitions.GatewayMethods.properties).
         .split('.')
         .map((part) => part[0].toUpperCase() + part.slice(1))
         .join('');
-    return `    /** Calls ${method}. */\n    ${key}: ${JSON.stringify(method)},`;
+    return `    /** Calls ${method}. */\n    ${key} = ${JSON.stringify(method)},`;
 });
 declarations.push(
-    `/** Nexa RPC method enum, generated from the complete gateway catalog. */\nexport const Method = {\n${methodEntries.join('\n')}\n} as const satisfies Readonly<Record<string, MethodName>>;\n/** A value from the Nexa RPC method enum. */\nexport type Method = (typeof Method)[keyof typeof Method];`,
+    `/** Nexa RPC method enum, generated from the complete gateway catalog. */\nexport enum Method {\n${methodEntries.join('\n')}\n}`,
 );
 mkdirSync('src/protocol', { recursive: true });
 writeFileSync(
