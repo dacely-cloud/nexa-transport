@@ -18,6 +18,7 @@ Once published: `npm install nexa-transport`.
 
 ```ts
 import { NexaClient } from 'nexa-transport';
+import { Method } from 'nexa-transport/protocol';
 
 const client = await NexaClient.connect({
     url: 'wss://your-nexa.example/',
@@ -49,8 +50,7 @@ try {
         }
     }
     const answer = await turn.result;
-    await client.call('agent.ask', {
-        message: 'Now explain the tests',
+    await client.ask('Now explain the tests', {
         conversationId: answer.sessionKey,
     });
 } finally {
@@ -94,17 +94,20 @@ Native events include rich blocks, project graphs, backlog, sub-agents, findings
 ## Events, approvals, and session mirrors
 
 ```ts
-const stopApproval = client.on('approval.requested', (approval) => {
+import { EventName } from 'nexa-transport/events';
+import { Method } from 'nexa-transport/protocol';
+
+const stopApproval = client.on(EventName.ApprovalRequested, (approval) => {
     showApproval(approval);
 });
-await client.call('approvals.resolve', { approvalId, approved: true });
+await client.call(Method.ApprovalsResolve, { approvalId, approved: true });
 
-const stopMirror = client.on('turn.event', ({ sessionId, event }) => {
+const stopMirror = client.on(EventName.TurnEvent, ({ sessionId, event }) => {
     renderSessionEvent(sessionId, event);
 });
-await client.call('sessions.subscribe', { sessionId });
+await client.call(Method.SessionsSubscribe, { sessionId });
 // Later:
-await client.call('sessions.unsubscribe', { sessionId });
+await client.call(Method.SessionsUnsubscribe, { sessionId });
 stopApproval();
 stopMirror();
 ```
@@ -133,6 +136,10 @@ For a Nervalab deployment on a different origin, configure Nexa's `allowedOrigin
 **Server compatibility:** this workspace includes additive changes in `/root/nexa`: attachment validation/forwarding and mirrored attachments; browser device-id/name/scope query metadata; newly issued device tokens in `hello.auth.token`. Deploy these gateway changes for browser pairing and inbound media. The package includes `server-patches/nexa-gateway-v1.patch` for the corresponding Nexa source revision; review and apply it with `git apply --check` before `git apply`. These changes are already applied in this workspace. Older protocol-v1 gateways remain usable for text and control APIs. Media requests require the advertised `hello.features.attachments` capability; the SDK refuses them when it is absent, preventing silent media loss.
 
 ## RPC coverage and voice
+
+`client.ask(message, options)` sends a chat message directly. Use `conversationId` in options to resume a session, alongside optional attachments, signal, and timeoutMs.
+
+`Method` is the runtime method enum (`as const` with a derived type), following Nexa’s enum conventions. For example, `client.call(Method.SessionsList, { limit: 50 })` lists previous conversations without raw method strings. All 54 members are generated from the gateway contract.
 
 `client.call(method, params)` gives method-specific parameter and result types for all current methods:
 

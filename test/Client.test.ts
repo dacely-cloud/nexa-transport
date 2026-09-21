@@ -1,3 +1,4 @@
+import { Method, type AskResult } from '../src/protocol/Protocol.js';
 import { afterEach, describe, expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
 import { NexaClient } from '../src/networking/NexaClient.js';
@@ -20,6 +21,31 @@ async function connect(): Promise<NexaClient> {
     return client;
 }
 describe('Nexa websocket lifetimes', (): void => {
+    it('asks directly with conversation and media options using the typed method enum', async (): Promise<void> => {
+        const connected: NexaClient = await connect();
+        if (gateway === undefined) {
+            throw new Error('No peer');
+        }
+        gateway.handler = (socket: WebSocket, request: Request): void => {
+            socket.send(JSON.stringify({ id: request.id, ok: true, result }));
+        };
+        const answer: AskResult = await connected.ask('Continue', {
+            conversationId: 'test::main',
+            timeoutMs: 500,
+            attachments: [{ type: 'text', text: 'Context' }],
+        });
+        expect(answer.sessionKey).toBe('test::main');
+        expect(gateway.requests.at(-1)).toMatchObject({
+            method: Method.AgentAsk,
+            params: {
+                message: 'Continue',
+                conversationId: 'test::main',
+                attachments: [{ type: 'text', text: 'Context' }],
+            },
+        });
+        expect(gateway.requests.at(-1)?.params).not.toHaveProperty('timeoutMs');
+        expect(await connected.call(Method.AgentAsk, { message: 'New chat' })).toEqual(result);
+    });
     it('captures events arriving immediately after acceptance and returns a result', async (): Promise<void> => {
         const connected: NexaClient = await connect();
         if (gateway === undefined) {

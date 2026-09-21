@@ -1,3 +1,4 @@
+import { Method } from '../protocol/Protocol.js';
 import type { StreamOptions } from '../interface/StreamOptions.js';
 import type {
     AskResult,
@@ -68,7 +69,7 @@ export class TurnStream implements AsyncIterable<WireTurnEvent> {
             void this.#cancel(new TransportError(TransportErrorCode.Timeout, 'Turn timed out'));
         }, duration);
         this.#accepted = client.call(
-            'agent.stream',
+            Method.AgentStream,
             { ...params, streamId: this.streamId },
             options.timeoutMs === undefined ? {} : { timeoutMs: options.timeoutMs },
         );
@@ -125,7 +126,7 @@ export class TurnStream implements AsyncIterable<WireTurnEvent> {
         try {
             const accepted: StreamAccepted = await this.#accepted;
             if (this.#client.connected) {
-                await this.#client.call('tasks.cancel', { id: accepted.runId });
+                await this.#client.call(Method.TasksCancel, { id: accepted.runId });
             }
         } catch {
             /** A failed start or disconnected socket already has no locally owned run. */
