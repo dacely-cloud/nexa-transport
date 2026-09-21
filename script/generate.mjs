@@ -82,9 +82,9 @@ function type(node, hint) {
         );
     if (node.const !== undefined) return JSON.stringify(node.const);
     if (node.enum) {
-        const name = nameFor(`${hint}Values`);
+        const name = nameFor(hint === 'WorkerState' ? hint : `${hint}Values`);
         declarations.push(
-            `/** Allowed values for ${hint}. */\nexport const ${name} = ${JSON.stringify(Object.fromEntries(node.enum.map((v, i) => [`Value${i}`, v])))} as const;`,
+            `/** Allowed values for ${hint}. */\nexport const ${name} = ${JSON.stringify(Object.fromEntries(node.enum.map((v, i) => [hint === 'WorkerState' ? v[0].toUpperCase() + v.slice(1) : `Value${i}`, v])))} as const;`,
         );
         return `(typeof ${name})[keyof typeof ${name}]`;
     }

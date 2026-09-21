@@ -515,3 +515,32 @@ async function downloadSavedFile(attachmentId: string): Promise<void> {
 `resumeSession()` and `Method.SessionsFiles` return saved-file metadata only; they do not download attachment contents or call `onAttachment`. Render filenames, MIME types and sizes from `session.files`. Keep ZIPs, PDFs and other documents metadata-only until the user clicks Download/Open, then call `downloadSavedFile(file.id)`. Do not loop over all saved files and download them on resume. Your UI may explicitly request image/video previews, preferably only for visible items; automatic preview downloads are not performed by the SDK.
 
 Downloads use the same raw, chunked binary transport and `onAttachment` callback as live files. Session ownership is checked for both listing and downloading. The gateway saves files before attempting live delivery. Deleting a session removes its saved files. Reconnect restores subscriptions but does not replay missed events; refresh saved history and tasks to reconcile your UI. A snapshot may overlap live events, so reconcile by session/task identity instead of appending the same state twice.
+
+## Individual worker status
+
+Nexa streams `agents-status` updates for its delegated workers, independently of parent text and tool completion. Use each worker's `id` as the UI key; multiple workers can share an `agentId` (persona). `parentId` and `rootId` describe the delegation tree. Updates include `goal`, `depth`, `state`, `activity`, `startedAt`, and `lastActivityAt`. Times are decimal epoch-millisecond strings.
+
+```ts
+import { WorkerState, type WorkerStatus, type AskResult } from 'nexa-transport/protocol';
+import type { TurnStream } from 'nexa-transport/stream';
+
+const workers: Map<string, WorkerStatus> = new Map<string, WorkerStatus>();
+const turn: TurnStream = client.stream({
+    message: 'Delegate independent research and review tasks, then combine the findings.',
+    conversationId: 'YOUR_SESSION_KEY',
+});
+for await (const event of turn) {
+    if (event.type !== 'agents-status') continue;
+    for (const worker of event.workers) {
+        workers.set(worker.id, worker);
+        console.log(worker.id, worker.goal, worker.state, worker.activity);
+        if (worker.state === WorkerState.Failed) console.error('Worker failed:', worker.id);
+    }
+}
+const result: AskResult = await turn.result;
+console.log(result.text);
+```
+
+States are `WorkerState.Queued`, `Working`, `Stopping`, `Done`, `Failed`, `Aborted`, and `Refused`. Upsert updates rather than replacing the whole UI list: completed workers can disappear from later snapshots after their reports are collected. Fast updates may be coalesced to the latest status per worker. A quiet worker is not automatically marked failed.
+
+This requires an engine version that emits `agents-status`. It is live progress, not a durable worker-history API. Existing session subscriptions receive these turn events too; workers still tracked by the engine are included when a new turn starts. For provider-native NCAP agents, continue using `NexaMedia.nativeEvent(event)?.agent`, keyed by its `item`; those are a separate provider-managed lifecycle.

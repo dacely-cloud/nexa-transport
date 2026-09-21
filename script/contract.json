@@ -5008,6 +5008,22 @@
             "anyOf": [
                 {
                     "properties": {
+                        "type": {
+                            "const": "agents-status",
+                            "type": "string"
+                        },
+                        "workers": {
+                            "items": {
+                                "$ref": "#/definitions/WorkerStatus"
+                            },
+                            "type": "array"
+                        }
+                    },
+                    "required": ["type", "workers"],
+                    "type": "object"
+                },
+                {
+                    "properties": {
                         "attachment": {
                             "$ref": "#/definitions/DeliveredAttachment"
                         },
@@ -5230,6 +5246,59 @@
                 }
             ],
             "description": "A turn event as it travels.\n\nIdentical to {@link TurnEvent} except for the error variant: `Error` does not survive\n`JSON.stringify` — it serializes to `{}` — so a failing turn would arrive as an empty object and\na client would report \"something went wrong\" with nothing else, forever."
+        },
+        "WorkerState": {
+            "description": "Lifecycle states for Nexa's delegated workers.",
+            "enum": ["aborted", "done", "failed", "queued", "refused", "stopping", "working"],
+            "type": "string"
+        },
+        "WorkerStatus": {
+            "description": "One worker, identified independently of its shared persona. Times are decimal epoch milliseconds.",
+            "properties": {
+                "activity": {
+                    "type": "string"
+                },
+                "agentId": {
+                    "type": "string"
+                },
+                "depth": {
+                    "type": "number"
+                },
+                "goal": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "lastActivityAt": {
+                    "type": "string"
+                },
+                "parentId": {
+                    "type": "string"
+                },
+                "rootId": {
+                    "type": "string"
+                },
+                "startedAt": {
+                    "type": "string"
+                },
+                "state": {
+                    "$ref": "#/definitions/WorkerState"
+                }
+            },
+            "required": [
+                "activity",
+                "agentId",
+                "depth",
+                "goal",
+                "id",
+                "lastActivityAt",
+                "parentId",
+                "rootId",
+                "startedAt",
+                "state"
+            ],
+            "type": "object"
         },
         "Workspace": {
             "description": "An isolated place an agent works.",
