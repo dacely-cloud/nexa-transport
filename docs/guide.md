@@ -241,7 +241,7 @@ The SDK does not expose frame timestamps or an FPS option in `videoFrame`. Suppl
 
 ## Image and video generation
 
-Generation is an agent task. There is no `generateImage()` or `generateVideo()` SDK endpoint. Ask Nexa through `AgentAsk` or `stream`; the configured server tools/providers perform generation and delivery.
+Generation is an agent task. There is no `generateImage()` or `generateVideo()` SDK endpoint. Ask Nexa through `AgentAsk` or `stream`; the configured server tools/providers perform generation and delivery. For multiple distinct images, request separate files with one scene per image. Nexa provides `generate_images`, a batch tool with 1–8 independently prompted entries, one generated file per entry, progress updates, and per-item outcomes. Successful files survive a partial batch failure. Only the first output may have an inline model preview; all successful files remain available for delivery through `onAttachment` and later session downloads.
 
 ```ts
 import type { NcapDelta, AskResult } from 'nexa-transport/protocol';
