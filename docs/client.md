@@ -17,6 +17,10 @@ Import `NexaClient` from `nexa-transport`, `Method` and protocol types from `nex
 | `client.onClose(listener)`                   | Reports the connection-ending error; returns unsubscribe. A listener registered after failure is called immediately.                                         |
 | `client.close()`                             | Idempotent close; rejects pending requests and terminates active stream consumers.                                                                           |
 
+`client.onAttachment(listener)` delivers `ReceivedAttachment` records with `Uint8Array<ArrayBuffer>` data, filename, MIME type, delivery ID, and optional stream/session IDs. Subscribe before starting a request; the returned function unsubscribes. Binary files are separate from JSON events and are not retained by the client.
+
+`client.onAudio(listener)` delivers `ReceivedAudio` records with `callId`, `sampleRate`, and raw PCM16 `data`. `client.sendAudio(callId, data, options?)` sends a PCM16 byte array and returns the typed `VoiceAudio` RPC result. Both received types are exported from `nexa-transport`.
+
 There is no `client.ask()` convenience method. Use `client.call(Method.AgentAsk, ...)`.
 
 ### ClientOptions
@@ -77,7 +81,7 @@ Breaking out of the iterator cancels unfinished work. Consume the iterator and a
 | `base64(bytes)`            | `Uint8Array`                                           | Base64 string.                                                                                                          |
 | `fromBase64(value)`        | Base64 string                                          | `Uint8Array<ArrayBuffer>`.                                                                                              |
 
-Blob encoders require a non-empty MIME type and a size from 1 byte through 12 MiB. They encode bytes without validating codecs, extracting archive contents, or transcoding. Browser `File` objects work because they extend `Blob`.
+Blob encoders require a non-empty MIME type and a size from 1 byte through 100 MiB. They encode bytes without validating codecs, extracting archive contents, or transcoding. Browser `File` objects work because they extend `Blob`.
 
 ## Events
 

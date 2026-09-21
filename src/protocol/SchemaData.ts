@@ -436,6 +436,14 @@ export const schema: Schema = {
         AskResult: {
             description: 'What a finished turn produced.',
             properties: {
+                attachments: {
+                    description:
+                        'Delivered files; IDs match attachment events so clients can deduplicate.',
+                    items: {
+                        $ref: '#/definitions/DeliveredAttachment',
+                    },
+                    type: 'array',
+                },
                 conversationId: {
                     type: ['null', 'string'],
                 },
@@ -1165,6 +1173,34 @@ export const schema: Schema = {
             enum: ['deliver', 'gate', 'route', 'turn'],
             type: 'string',
         },
+        DeliveredAttachment: {
+            description: 'A file delivered to an application through the gateway.',
+            properties: {
+                asFile: {
+                    type: 'boolean',
+                },
+                byteLength: {
+                    description: 'Size of the accompanying binary WebSocket payload.',
+                    type: 'number',
+                },
+                description: {
+                    type: 'string',
+                },
+                filename: {
+                    type: 'string',
+                },
+                id: {
+                    description:
+                        'Stable delivery identifier shared by the event and terminal result.',
+                    type: 'string',
+                },
+                mimeType: {
+                    type: 'string',
+                },
+            },
+            required: ['byteLength', 'filename', 'id', 'mimeType'],
+            type: 'object',
+        },
         DeliveryDestination: {
             description:
                 'A destination excludes response tokens and distinguishes threaded conversations.',
@@ -1499,6 +1535,12 @@ export const schema: Schema = {
                 attachments: {
                     const: true,
                     description: 'User media attachments are validated and forwarded to the agent.',
+                    type: 'boolean',
+                },
+                binaryMedia: {
+                    const: true,
+                    description:
+                        'NXMD frames carry outbound file bytes; JSON results contain matching metadata.',
                     type: 'boolean',
                 },
                 events: {
@@ -2709,6 +2751,9 @@ export const schema: Schema = {
         },
         JobAction: {
             anyOf: [
+                {
+                    $ref: '#/definitions/ReminderAction',
+                },
                 {
                     properties: {
                         agentId: {
@@ -4137,6 +4182,30 @@ export const schema: Schema = {
                 $ref: '#/definitions/JsonValue',
             },
         },
+        ReminderAction: {
+            description:
+                'A durable message to the conversation that requested it; no model execution.',
+            properties: {
+                channelId: {
+                    type: 'string',
+                },
+                conversationId: {
+                    type: 'string',
+                },
+                kind: {
+                    const: 'reminder',
+                    type: 'string',
+                },
+                text: {
+                    type: 'string',
+                },
+                threadId: {
+                    type: 'string',
+                },
+            },
+            required: ['channelId', 'conversationId', 'kind', 'text'],
+            type: 'object',
+        },
         RiskLevel: {
             description: 'How dangerous an action is.',
             enum: ['destructive', 'execute', 'read', 'write'],
@@ -5050,6 +5119,19 @@ export const schema: Schema = {
         },
         WireTurnEvent: {
             anyOf: [
+                {
+                    properties: {
+                        attachment: {
+                            $ref: '#/definitions/DeliveredAttachment',
+                        },
+                        type: {
+                            const: 'attachment',
+                            type: 'string',
+                        },
+                    },
+                    required: ['attachment', 'type'],
+                    type: 'object',
+                },
                 {
                     properties: {
                         turnId: {

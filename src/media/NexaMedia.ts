@@ -95,11 +95,15 @@ export class NexaMedia {
     /** Decodes a base64 protocol field into bytes for playback or saving. */
     public static fromBase64(value: string): Uint8Array<ArrayBuffer> {
         const binary: string = atob(value);
-        return Uint8Array.from(binary, (character: string): number => character.charCodeAt(0));
+        const bytes: Uint8Array<ArrayBuffer> = new Uint8Array(binary.length);
+        for (let index: number = 0; index < binary.length; index += 1) {
+            bytes[index] = binary.charCodeAt(index);
+        }
+        return bytes;
     }
     static async #source(blob: Blob): Promise<BinarySource> {
-        if (blob.size === 0 || blob.size > 12 * 1024 * 1024) {
-            throw new RangeError('Inline media must be between 1 byte and 12 MiB');
+        if (blob.size === 0 || blob.size > 100 * 1024 * 1024) {
+            throw new RangeError('Inline media must be between 1 byte and 100 MiB');
         }
         if (blob.type.length === 0) {
             throw new TypeError('Media Blob needs a MIME type');

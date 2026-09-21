@@ -1,4 +1,9 @@
-import { isEventData, type EventMap } from '../protocol/Events.js';
+import { BinaryChunks } from '../media/BinaryChunks.js';
+import { NexaMedia } from '../media/NexaMedia.js';
+import { BinaryEnvelope } from '../media/BinaryEnvelope.js';
+import { BinaryMedia, type ReceivedAttachment } from '../media/BinaryMedia.js';
+export type { ReceivedAttachment } from '../media/BinaryMedia.js';
+import { EventName, isEventData, type VoiceAudio, type EventMap } from '../protocol/Events.js';
 import type { StreamOptions } from '../interface/StreamOptions.js';
 import { Method } from '../protocol/Protocol.js';
 import type { StreamParams } from '../protocol/Protocol.js';
@@ -33,11 +38,20 @@ export interface SequenceGap {
     /** Actual event received. */
     readonly received: bigint;
 }
+/** A live mono PCM16 frame decoded from the binary transport. */
+export interface ReceivedAudio {
+    readonly callId: string;
+    readonly sampleRate: number;
+    readonly data: Uint8Array<ArrayBuffer>;
+}
 /** Authenticated Nexa gateway connection shared by browsers and Node.js. */
 export class NexaClient {
     readonly #socket: WebSocket;
+    readonly #binaryChunks: BinaryChunks = new BinaryChunks();
+    #binaryTail: Promise<undefined> = Promise.resolve(undefined);
     readonly #pending: PendingRequests;
     readonly #options: ClientOptions;
+    readonly #attachments: Set<(attachment: ReceivedAttachment) => void> = new Set();
     readonly #events: Set<(event: GatewayEvent) => void> = new Set();
     readonly #closeListeners: Set<(error: Error) => void> = new Set();
     readonly #gaps: Set<(gap: SequenceGap) => void> = new Set();
@@ -83,6 +97,7 @@ export class NexaClient {
             url.searchParams.set('scopes', options.scopes.join(','));
         }
         this.#socket = new WebSocket(url);
+        this.#socket.binaryType = 'arraybuffer';
         this.#socket.addEventListener('message', (event: MessageEvent<unknown>): void => {
             try {
                 this.#receive(event.data);
@@ -231,6 +246,33 @@ export class NexaClient {
             listener(frame.data);
         });
     }
+    /** Receives live PCM16 bytes with the call's sample rate. */
+    public onAudio(listener: (frame: ReceivedAudio) => void): () => void {
+        return this.on(EventName.VoiceAudio, (frame: VoiceAudio): void => {
+            listener({
+                callId: frame.callId,
+                sampleRate: frame.sampleRate,
+                data: NexaMedia.fromBase64(frame.pcm),
+            });
+        });
+    }
+
+    /** Sends a mono PCM16 frame using negotiated binary transport. */
+    public sendAudio(
+        callId: string,
+        data: Uint8Array,
+        options: CallOptions = {},
+    ): Promise<ResultOf<typeof Method.VoiceAudio>> {
+        return this.call(Method.VoiceAudio, { callId, pcm: NexaMedia.base64(data) }, options);
+    }
+
+    /** Receives raw file bytes for ask and stream calls; subscribe before starting a turn. */
+    public onAttachment(listener: (attachment: ReceivedAttachment) => void): () => void {
+        this.#attachments.add(listener);
+        return (): void => {
+            this.#attachments.delete(listener);
+        };
+    }
     /** Observes all events, including session mirrors and native tool progress. */
     public onEvent(listener: (event: GatewayEvent) => void): () => void {
         this.#events.add(listener);
@@ -315,33 +357,29 @@ export class NexaClient {
         }
         const id: string = String(++this.#nextId);
         const text: string = JSON.stringify({ v: 1, id, method, params });
+        const binary: Uint8Array<ArrayBuffer> | null =
+            this.#hello?.features.binaryMedia === true ? BinaryEnvelope.encode(text) : null;
+        const payload: string | Uint8Array<ArrayBuffer> = binary ?? text;
+        const payloadBytes: number = binary?.byteLength ?? new TextEncoder().encode(text).length;
         const maxBytes: number = Math.min(
             this.#options.maxMessageBytes ?? 16 * 1024 * 1024,
             this.#hello?.policy.maxPayloadBytes ?? 64 * 1024,
         );
-        if (new TextEncoder().encode(text).length > maxBytes) {
+        if (binary === null && payloadBytes > maxBytes) {
             throw new TransportError(
                 TransportErrorCode.Limit,
                 'Request exceeds gateway payload limit',
             );
         }
         if (
-            this.#socket.bufferedAmount + new TextEncoder().encode(text).length >
-            (this.#hello?.policy.maxBufferedBytes ?? 16 * 1024 * 1024)
+            binary === null &&
+            this.#socket.bufferedAmount + payloadBytes >
+                (this.#hello?.policy.maxBufferedBytes ?? 16 * 1024 * 1024)
         ) {
             throw new TransportError(TransportErrorCode.Limit, 'Websocket outbound buffer is full');
         }
         const pending: Promise<JsonValue> = this.#pending.create(id, options, timeout);
-        if (this.#pending.has(id)) {
-            try {
-                this.#socket.send(text);
-            } catch {
-                this.#pending.reject(
-                    id,
-                    new TransportError(TransportErrorCode.Connection, 'Could not send request'),
-                );
-            }
-        }
+        void this.#sendPayload(payload, id);
         const raw: JsonValue = await pending;
         if (!methodValidators[method].result(raw)) {
             throw new TransportError(
@@ -351,8 +389,87 @@ export class NexaClient {
         }
         return raw as ResultOf<M>;
     }
+    async #sendPayload(payload: string | Uint8Array<ArrayBuffer>, id: string): Promise<void> {
+        const previous: Promise<undefined> = this.#binaryTail;
+        const gate: PromiseWithResolvers<undefined> = Promise.withResolvers<undefined>();
+        if (typeof payload !== 'string') {
+            this.#binaryTail = gate.promise;
+        }
+        try {
+            if (typeof payload === 'string') {
+                if (this.#pending.has(id)) {
+                    this.#socket.send(payload);
+                }
+                return;
+            }
+            await previous;
+            const chunkBytes: number = Math.min(
+                BinaryChunks.CHUNK_BYTES,
+                (this.#hello?.policy.maxPayloadBytes ?? 65536) - 28,
+                Math.floor((this.#hello?.policy.maxBufferedBytes ?? 65536) / 2),
+                (this.#options.maxMessageBytes ?? 16 * 1024 * 1024) - 28,
+            );
+            for (const chunk of BinaryChunks.split(payload, chunkBytes)) {
+                while (this.#socket.bufferedAmount > chunkBytes) {
+                    if (this.#closed || !this.#pending.has(id)) {
+                        throw new Error('Binary upload was interrupted');
+                    }
+                    await new Promise<void>((resolve): void => {
+                        setTimeout(resolve, 5);
+                    });
+                }
+                if (this.#closed || !this.#pending.has(id)) {
+                    throw new Error('Binary upload was interrupted');
+                }
+                this.#socket.send(chunk);
+            }
+        } catch (error: unknown) {
+            this.#pending.reject(
+                id,
+                error instanceof Error ? error : new Error('Could not send request'),
+            );
+            if (typeof payload !== 'string') {
+                this.#fail(
+                    new TransportError(TransportErrorCode.Connection, 'Binary upload interrupted'),
+                );
+            }
+        } finally {
+            gate.resolve(undefined);
+        }
+    }
+
     #receive(raw: unknown): void {
         if (this.#closed) {
+            return;
+        }
+        if (raw instanceof ArrayBuffer) {
+            if (raw.byteLength > (this.#options.maxMessageBytes ?? 16 * 1024 * 1024)) {
+                throw new RangeError('Binary frame exceeds limit');
+            }
+            if (this.#hello === null) {
+                throw new Error('Binary media arrived before authentication');
+            }
+            const complete: ArrayBuffer | null = this.#binaryChunks.accept(raw);
+            if (complete === null) {
+                return;
+            }
+            if (complete.byteLength >= 8 && new DataView(complete).getUint32(0) === 0x4e584246) {
+                this.#receive(
+                    JSON.stringify(
+                        BinaryEnvelope.decode(complete, BinaryChunks.MAX_TRANSFER_BYTES),
+                    ),
+                );
+                return;
+            }
+            const attachment: ReceivedAttachment = BinaryMedia.decode(
+                complete,
+                BinaryChunks.MAX_TRANSFER_BYTES,
+            );
+            for (const listener of this.#attachments) {
+                this.#notify((): void => {
+                    listener(attachment);
+                });
+            }
             return;
         }
         if (
@@ -448,6 +565,8 @@ export class NexaClient {
         }
         this.#closeListeners.clear();
         this.#events.clear();
+        this.#attachments.clear();
+        this.#binaryChunks.clear();
         this.#gaps.clear();
         this.#socket.close();
     }

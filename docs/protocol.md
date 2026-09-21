@@ -186,16 +186,17 @@ What one turn is asked for.
 
 What a finished turn produced.
 
-| Field            | Required | Type                                     | Description                                                                         |
-| ---------------- | -------- | ---------------------------------------- | ----------------------------------------------------------------------------------- |
-| `conversationId` | Yes      | `null,string`                            |                                                                                     |
-| `finishReason`   | Yes      | [FinishReason](protocol.md#finishreason) |                                                                                     |
-| `iterations`     | Yes      | `number`                                 |                                                                                     |
-| `reasoning`      | Yes      | `string`                                 |                                                                                     |
-| `sessionKey`     | Yes      | `string`                                 | The session id this turn was filed under — `sessions.get`'s id, not the provider's. |
-| `text`           | Yes      | `string`                                 |                                                                                     |
-| `turnId`         | Yes      | `string`                                 |                                                                                     |
-| `usage`          | Yes      | [TokenUsage](protocol.md#tokenusage)     |                                                                                     |
+| Field            | Required | Type                                                            | Description                                                                         |
+| ---------------- | -------- | --------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `attachments`    | No       | Array of [DeliveredAttachment](protocol.md#deliveredattachment) | Delivered files; IDs match attachment events so clients can deduplicate.            |
+| `conversationId` | Yes      | `null,string`                                                   |                                                                                     |
+| `finishReason`   | Yes      | [FinishReason](protocol.md#finishreason)                        |                                                                                     |
+| `iterations`     | Yes      | `number`                                                        |                                                                                     |
+| `reasoning`      | Yes      | `string`                                                        |                                                                                     |
+| `sessionKey`     | Yes      | `string`                                                        | The session id this turn was filed under — `sessions.get`'s id, not the provider's. |
+| `text`           | Yes      | `string`                                                        |                                                                                     |
+| `turnId`         | Yes      | `string`                                                        |                                                                                     |
+| `usage`          | Yes      | [TokenUsage](protocol.md#tokenusage)                            |                                                                                     |
 
 ## BinarySource
 
@@ -502,6 +503,19 @@ How far a message got before it failed.
 
 Type: `"deliver"` / `"gate"` / `"route"` / `"turn"`.
 
+## DeliveredAttachment
+
+A file delivered to an application through the gateway.
+
+| Field         | Required | Type      | Description                                                         |
+| ------------- | -------- | --------- | ------------------------------------------------------------------- |
+| `asFile`      | No       | `boolean` |                                                                     |
+| `byteLength`  | Yes      | `number`  | Size of the accompanying binary WebSocket payload.                  |
+| `description` | No       | `string`  |                                                                     |
+| `filename`    | Yes      | `string`  |                                                                     |
+| `id`          | Yes      | `string`  | Stable delivery identifier shared by the event and terminal result. |
+| `mimeType`    | Yes      | `string`  |                                                                     |
+
 ## DeliveryDestination
 
 A destination excludes response tokens and distinguishes threaded conversations.
@@ -637,12 +651,13 @@ Collapses the required/optional intersection into one object type.
 
 Methods, events, and additive capabilities supported by this gateway.
 
-| Field          | Required | Type                                               | Description                                                      |
-| -------------- | -------- | -------------------------------------------------- | ---------------------------------------------------------------- |
-| `attachments`  | No       | `true`                                             | User media attachments are validated and forwarded to the agent. |
-| `events`       | Yes      | Array of `string`                                  |                                                                  |
-| `methodScopes` | Yes      | [RecordstringScope](protocol.md#recordstringscope) | The scope each method requires.                                  |
-| `methods`      | Yes      | Array of `string`                                  |                                                                  |
+| Field          | Required | Type                                               | Description                                                                    |
+| -------------- | -------- | -------------------------------------------------- | ------------------------------------------------------------------------------ |
+| `attachments`  | No       | `true`                                             | User media attachments are validated and forwarded to the agent.               |
+| `binaryMedia`  | No       | `true`                                             | NXMD frames carry outbound file bytes; JSON results contain matching metadata. |
+| `events`       | Yes      | Array of `string`                                  |                                                                                |
+| `methodScopes` | Yes      | [RecordstringScope](protocol.md#recordstringscope) | The scope each method requires.                                                |
+| `methods`      | Yes      | Array of `string`                                  |                                                                                |
 
 ## GatewayLimits
 
@@ -1264,7 +1279,17 @@ A scheduled job as it is stored.
 
 What a job does when it fires.
 
-Variant 1: Object (fields below)
+Variant 1: [ReminderAction](protocol.md#reminderaction)
+
+| Field            | Required | Type         | Description |
+| ---------------- | -------- | ------------ | ----------- |
+| `channelId`      | Yes      | `string`     |             |
+| `conversationId` | Yes      | `string`     |             |
+| `kind`           | Yes      | `"reminder"` |             |
+| `text`           | Yes      | `string`     |             |
+| `threadId`       | No       | `string`     |             |
+
+Variant 2: Object (fields below)
 
 | Field             | Required | Type           | Description                                                               |
 | ----------------- | -------- | -------------- | ------------------------------------------------------------------------- |
@@ -1274,7 +1299,7 @@ Variant 1: Object (fields below)
 | `prompt`          | Yes      | `string`       |                                                                           |
 | `silentWhenEmpty` | No       | `boolean`      | Suppress delivery when the turn produced nothing worth sending.           |
 
-Variant 2: Object (fields below)
+Variant 3: Object (fields below)
 
 | Field                | Required | Type                                  | Description                                                    |
 | -------------------- | -------- | ------------------------------------- | -------------------------------------------------------------- |
@@ -1285,7 +1310,7 @@ Variant 2: Object (fields below)
 | `kind`               | Yes      | `"shell"`                             | Run a shell command. Its stdout becomes the run's output.      |
 | `timeoutMs`          | No       | `number`                              |                                                                |
 
-Variant 3: Object (fields below)
+Variant 4: Object (fields below)
 
 | Field   | Required | Type                               | Description                                                 |
 | ------- | -------- | ---------------------------------- | ----------------------------------------------------------- |
@@ -1293,7 +1318,7 @@ Variant 3: Object (fields below)
 | `kind`  | Yes      | `"tool"`                           | Call a registered tool directly, with no model in the loop. |
 | `tool`  | Yes      | `string`                           |                                                             |
 
-Variant 4: Object (fields below)
+Variant 5: Object (fields below)
 
 | Field     | Required | Type                               | Description                                  |
 | --------- | -------- | ---------------------------------- | -------------------------------------------- |
@@ -1301,7 +1326,7 @@ Variant 4: Object (fields below)
 | `kind`    | Yes      | `"event"`                          | Emit an event other subsystems subscribe to. |
 | `payload` | No       | [JsonValue](protocol.md#jsonvalue) |                                              |
 
-Variant 5: Object (fields below)
+Variant 6: Object (fields below)
 
 | Field  | Required | Type            | Description                                                               |
 | ------ | -------- | --------------- | ------------------------------------------------------------------------- |
@@ -1858,6 +1883,18 @@ Type: Dictionary.
 
 Type: Dictionary.
 
+## ReminderAction
+
+A durable message to the conversation that requested it; no model execution.
+
+| Field            | Required | Type         | Description |
+| ---------------- | -------- | ------------ | ----------- |
+| `channelId`      | Yes      | `string`     |             |
+| `conversationId` | Yes      | `string`     |             |
+| `kind`           | Yes      | `"reminder"` |             |
+| `text`           | Yes      | `string`     |             |
+| `threadId`       | No       | `string`     |             |
+
 ## RiskLevel
 
 How dangerous an action is.
@@ -2275,40 +2312,47 @@ A turn event as it travels.
 
 Variant 1: Object (fields below)
 
+| Field        | Required | Type                                                   | Description |
+| ------------ | -------- | ------------------------------------------------------ | ----------- |
+| `attachment` | Yes      | [DeliveredAttachment](protocol.md#deliveredattachment) |             |
+| `type`       | Yes      | `"attachment"`                                         |             |
+
+Variant 2: Object (fields below)
+
 | Field    | Required | Type           | Description |
 | -------- | -------- | -------------- | ----------- |
 | `turnId` | Yes      | `string`       |             |
 | `type`   | Yes      | `"turn-start"` |             |
 
-Variant 2: Object (fields below)
+Variant 3: Object (fields below)
 
 | Field       | Required | Type                | Description |
 | ----------- | -------- | ------------------- | ----------- |
 | `iteration` | Yes      | `number`            |             |
 | `type`      | Yes      | `"iteration-start"` |             |
 
-Variant 3: Object (fields below)
+Variant 4: Object (fields below)
 
 | Field  | Required | Type     | Description |
 | ------ | -------- | -------- | ----------- |
 | `text` | Yes      | `string` |             |
 | `type` | Yes      | `"text"` |             |
 
-Variant 4: Object (fields below)
+Variant 5: Object (fields below)
 
 | Field  | Required | Type          | Description |
 | ------ | -------- | ------------- | ----------- |
 | `text` | Yes      | `string`      |             |
 | `type` | Yes      | `"reasoning"` |             |
 
-Variant 5: Object (fields below)
+Variant 6: Object (fields below)
 
 | Field  | Required | Type                             | Description |
 | ------ | -------- | -------------------------------- | ----------- |
 | `call` | Yes      | [ToolCall](protocol.md#toolcall) |             |
 | `type` | Yes      | `"tool-start"`                   |             |
 
-Variant 6: Object (fields below)
+Variant 7: Object (fields below)
 
 | Field    | Required | Type                                     | Description |
 | -------- | -------- | ---------------------------------------- | ----------- |
@@ -2316,14 +2360,14 @@ Variant 6: Object (fields below)
 | `type`   | Yes      | `"tool-progress"`                        |             |
 | `update` | Yes      | [ToolProgress](protocol.md#toolprogress) |             |
 
-Variant 7: Object (fields below)
+Variant 8: Object (fields below)
 
 | Field     | Required | Type                                   | Description |
 | --------- | -------- | -------------------------------------- | ----------- |
 | `outcome` | Yes      | [ToolOutcome](protocol.md#tooloutcome) |             |
 | `type`    | Yes      | `"tool-finish"`                        |             |
 
-Variant 8: Object (fields below)
+Variant 9: Object (fields below)
 
 | Field     | Required | Type                  | Description |
 | --------- | -------- | --------------------- | ----------- |
@@ -2331,7 +2375,7 @@ Variant 8: Object (fields below)
 | `tool`    | Yes      | `string`              |             |
 | `type`    | Yes      | `"approval-required"` |             |
 
-Variant 9: Object (fields below)
+Variant 10: Object (fields below)
 
 | Field             | Required | Type          | Description |
 | ----------------- | -------- | ------------- | ----------- |
@@ -2339,14 +2383,14 @@ Variant 9: Object (fields below)
 | `summary`         | Yes      | `string`      |             |
 | `type`            | Yes      | `"compacted"` |             |
 
-Variant 10: Object (fields below)
+Variant 11: Object (fields below)
 
 | Field   | Required | Type                                 | Description |
 | ------- | -------- | ------------------------------------ | ----------- |
 | `type`  | Yes      | `"usage"`                            |             |
 | `usage` | Yes      | [TokenUsage](protocol.md#tokenusage) |             |
 
-Variant 11: Object (fields below)
+Variant 12: Object (fields below)
 
 | Field    | Required | Type                               | Description |
 | -------- | -------- | ---------------------------------- | ----------- |
@@ -2354,7 +2398,7 @@ Variant 11: Object (fields below)
 | `source` | Yes      | `string`                           |             |
 | `type`   | Yes      | `"native"`                         |             |
 
-Variant 12: Object (fields below)
+Variant 13: Object (fields below)
 
 | Field    | Required | Type       | Description |
 | -------- | -------- | ---------- | ----------- |
@@ -2362,7 +2406,7 @@ Variant 12: Object (fields below)
 | `status` | Yes      | `string`   |             |
 | `type`   | Yes      | `"status"` |             |
 
-Variant 13: Object (fields below)
+Variant 14: Object (fields below)
 
 | Field        | Required | Type                                     | Description |
 | ------------ | -------- | ---------------------------------------- | ----------- |
@@ -2372,7 +2416,7 @@ Variant 13: Object (fields below)
 | `type`       | Yes      | `"turn-finish"`                          |             |
 | `usage`      | Yes      | [TokenUsage](protocol.md#tokenusage)     |             |
 
-Variant 14: Object (fields below)
+Variant 15: Object (fields below)
 
 | Field       | Required | Type                               | Description |
 | ----------- | -------- | ---------------------------------- | ----------- |
