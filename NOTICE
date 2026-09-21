@@ -1,0 +1,6 @@
+nexa-transport
+
+Protocol contracts are derived from the Apache-2.0-licensed Nexa project
+(https://github.com/dacely-cloud/nexa). The generated snapshot contains Nexa
+gateway v1 method, event, content, tool, and NCAP data definitions, adapted for
+standalone JSON validation and portable browser/Node.js consumption.
