@@ -37,6 +37,7 @@ Chat, tools, media, artifacts, and voice through the Nexa gateway.
 ## Documentation
 
 - [Complete usage guide](./docs/guide.md): conversations, running work, tools, skills, audio, images, GIFs, video, generation, documents, artifacts, and ZIP workflows.
+- [Memory testing and ownership](./docs/memory.md): cleanup guarantees, regression tests, and browser stress tests.
 - [Client API](./docs/client.md): every client method, helper, option, event, and error.
 - [RPC reference](./docs/methods.md): all 54 methods with call templates, parameters, and results.
 - [Binary media protocol](./docs/binary-media.md): raw bytes, chunking, limits, and file delivery.
@@ -340,6 +341,7 @@ For voice, `Method.VoiceStart` returns the call ID, sample rate, and frame size.
 | `connectTimeoutMs`   | 15 seconds       |
 | `requestTimeoutMs`   | 60 seconds       |
 | `maxPendingRequests` | 64               |
+| `maxActiveStreams`   | 64               |
 | `maxMessageBytes`    | 16 MiB           |
 | `turnTimeoutMs`      | 1 hour           |
 | `maxBufferedEvents`  | 256 per stream   |
@@ -347,7 +349,7 @@ For voice, `Method.VoiceStart` returns the call ID, sample rate, and frame size.
 
 Connection options are passed to `NexaClient.connect()`. Per-call `signal` and `timeoutMs` are passed as the third argument to `client.call()`. Stream options are passed as the second argument to `client.stream()`.
 
-Blob helpers accept up to 100 MiB per attachment, with a combined upload limit of 100 MiB per request. Binary transfers use chunks of up to 256 KiB within the gateway's frame limits. Streams exceeding their buffer limits are cancelled.
+Blob helpers accept up to 100 MiB per attachment, with a combined upload limit of 100 MiB per request. Binary transfers use chunks of up to 256 KiB within the gateway's frame limits. Streams exceeding their buffer limits are cancelled. Active and queued binary uploads share a 101 MiB budget per client; excess uploads are rejected with a limit error. Queued uploads are released on cancellation, timeout, or disconnect. Outstanding attachment callbacks and acknowledgements are limited to 64 deliveries and 101 MiB per client; exceeding either limit closes the connection.
 
 RPC cancellation stops local waiting; a server-side mutation may already have executed. Requests are not retried automatically. Reconnect with `NexaClient.connect()`, restore subscriptions, and reload session state. `TransportError.remote` preserves server error codes, retry information, and details.
 
@@ -366,17 +368,19 @@ npm ci
 npm run check
 ```
 
-| Command                | Purpose                                           |
-| ---------------------- | ------------------------------------------------- |
-| `npm run build`        | Build ESM bundles and declarations                |
-| `npm run typecheck`    | Check TypeScript contracts                        |
-| `npm run lint`         | Run type-aware Oxc checks                         |
-| `npm run format`       | Format source and documentation                   |
-| `npm test`             | Run library tests                                 |
-| `npm run test:gateway` | Run Nexa gateway and Chrome integration tests     |
-| `npm run generate`     | Regenerate protocol types and schemas             |
-| `npm pack`             | Build and package a release                       |
-| `npm run test:package` | Verify the packed package in an isolated consumer |
+| Command                       | Purpose                                                   |
+| ----------------------------- | --------------------------------------------------------- |
+| `npm run build`               | Build ESM bundles and declarations                        |
+| `npm run typecheck`           | Check TypeScript contracts                                |
+| `npm run lint`                | Run type-aware Oxc checks                                 |
+| `npm run format`              | Format source and documentation                           |
+| `npm test`                    | Run library tests                                         |
+| `npm run test:memory`         | Build and run forced-GC retention and memory stress tests |
+| `npm run test:memory:browser` | Run the two-tab Chrome memory stress test                 |
+| `npm run test:gateway`        | Run Nexa gateway and Chrome integration tests             |
+| `npm run generate`            | Regenerate protocol types and schemas                     |
+| `npm pack`                    | Build and package a release                               |
+| `npm run test:package`        | Verify the packed package in an isolated consumer         |
 
 Protocol generation requires a sibling `nexa` checkout. Gateway tests additionally require the transport integration fixtures in that checkout and Google Chrome. Package verification requires a generated tarball.
 

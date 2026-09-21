@@ -1,6 +1,8 @@
 import { WebSocketServer, WebSocket } from 'ws';
 import type { AddressInfo } from 'node:net';
 import type { AskResult, HelloOk, JsonValue } from '../src/protocol/Protocol.js';
+import { BinaryChunks } from '../src/media/BinaryChunks.js';
+import { BinaryEnvelope } from '../src/media/BinaryEnvelope.js';
 import { methodValidators } from '../src/protocol/MethodValidators.js';
 /** Minimal protocol-v1 hello fixture independent of the client implementation. */
 export const hello: HelloOk = {
@@ -48,7 +50,7 @@ export class TestGateway {
     /** Handler used after the connect handshake. */
     public handler: (socket: WebSocket, request: Request) => void = (): void => {};
     /** Opens an ephemeral loopback port. */
-    public constructor() {
+    public constructor(greeting: HelloOk = hello) {
         this.#server = new WebSocketServer({ host: '127.0.0.1', port: 0 });
         this.#server.on('connection', (socket: WebSocket): void => {
             socket.send(
@@ -58,8 +60,19 @@ export class TestGateway {
                     data: { nonce: 'challenge', ts: 1, protocol: 1, minProtocol: 1 },
                 }),
             );
-            socket.on('message', (raw: Buffer): void => {
-                const request: unknown = JSON.parse(raw.toString());
+            const chunks: BinaryChunks = new BinaryChunks();
+            socket.on('close', (): void => chunks.clear());
+            socket.on('message', (raw: Buffer, binary: boolean): void => {
+                const complete: ArrayBuffer | null = binary
+                    ? chunks.accept(Uint8Array.from(raw).buffer)
+                    : null;
+                if (binary && complete === null) {
+                    return;
+                }
+                const request: unknown =
+                    complete === null
+                        ? JSON.parse(raw.toString())
+                        : BinaryEnvelope.decode(complete, BinaryChunks.MAX_TRANSFER_BYTES);
                 if (!isRequest(request)) {
                     throw new Error('Invalid test request');
                 }
@@ -69,7 +82,7 @@ export class TestGateway {
                         socket.close();
                         return;
                     }
-                    socket.send(JSON.stringify({ id: request.id, ok: true, result: hello }));
+                    socket.send(JSON.stringify({ id: request.id, ok: true, result: greeting }));
                 } else {
                     this.handler(socket, request);
                 }

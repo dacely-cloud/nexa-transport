@@ -41,6 +41,7 @@ Import `ClientOptions` and `CallOptions` as types from `nexa-transport/options`.
 | `requestTimeoutMs`   | `number`                 | Default RPC deadline; 60,000 ms.                                                                             |
 | `maxMessageBytes`    | `number`                 | JSON frame limit; 16 MiB.                                                                                    |
 | `maxPendingRequests` | `number`                 | In-flight RPC ceiling; 64.                                                                                   |
+| `maxActiveStreams`   | `number`                 | Active streaming-turn ceiling, including acknowledged turns; 64.                                             |
 | `signal`             | `AbortSignal`            | Cancels connection establishment. Use call/stream signals for subsequent operations.                         |
 
 `CallOptions` has `timeoutMs` and `signal`. Pass it as the third argument of `call`. It controls local waiting, not transactional rollback on the server.
@@ -127,3 +128,11 @@ Established connections reconnect automatically with jittered exponential delays
 `connected` becomes false during interruption. `reconnecting` indicates scheduled or active retries. `onClose(listener)` reports each interruption; `onReconnect(listener)` runs after authentication and session subscription restoration. Both return unsubscribe functions. Existing event and attachment listeners survive reconnect. In-flight calls and streams reject, and no mutation is automatically repeated.
 
 `resumeSession(sessionId)` subscribes to the owned session and returns a typed `SessionSnapshot` containing `messages`, active `tasks`, and saved `files`. Use it after reconnect or a page reload, with the session key saved by your application. The `files` array contains metadata only: resuming never downloads saved attachment bytes. Render file cards from that metadata and call `Method.SessionsDownload` only when the user requests a file; bytes then arrive through `onAttachment`. Keep ZIPs, PDFs and other documents lazy. Image/video previews may be requested explicitly by the UI.
+
+### Memory ownership
+
+Consume a turn's events as they arrive. Breaking out of iteration drops unread events and cancels a running turn; `await turn.cancel()` also drops buffered events after a turn has completed. Normal completion preserves unread events until they are consumed, explicitly cancelled, or the turn becomes unreachable. Use `client.call(Method.AgentAsk, ...)` when only the final result is needed.
+
+Pending RPCs and active streaming turns have separate limits. Binary uploads share a 101 MiB budget per client; rejected requests are not encoded or queued, and queued payloads are removed when their requests settle. This budget covers retained encoded payloads, not temporary encoding allocations or application-owned media.
+
+Attachment handlers may run concurrently. Outstanding deliveries, including acknowledgements, are limited to 64 and 101 MiB per client. Exceeding either limit closes the connection with a limit error. Finish handlers promptly and release application-owned file data when no longer needed. Call listener unsubscribe functions when removing a view and `client.close()` when disposing its client. Each browser tab owns its own client and memory budgets.

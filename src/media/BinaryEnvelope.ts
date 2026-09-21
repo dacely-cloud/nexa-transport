@@ -22,7 +22,7 @@ export class BinaryEnvelope {
         }
         const parts: BinaryPart[] = [];
         const payloads: Uint8Array[] = [];
-        BinaryEnvelope.#extract(raw, [], parts, payloads, 0);
+        BinaryEnvelope.#extract(raw, [], parts, payloads, 0, { remaining: 100 * 1024 * 1024 });
         if (parts.length === 0) {
             return null;
         }
@@ -49,7 +49,11 @@ export class BinaryEnvelope {
         return frame;
     }
 
-    public static decode(buffer: ArrayBuffer, maxBytes: number): JsonValue {
+    public static decode(
+        buffer: ArrayBuffer,
+        maxBytes: number,
+        maxJsonBytes: number = maxBytes,
+    ): JsonValue {
         if (buffer.byteLength < 8 || buffer.byteLength > maxBytes) {
             throw new RangeError('Invalid binary envelope size');
         }
@@ -74,6 +78,10 @@ export class BinaryEnvelope {
             throw new TypeError('Invalid binary envelope metadata');
         }
         const json: JsonValue = header['json'];
+        let jsonBytes: number = new TextEncoder().encode(JSON.stringify(json)).length;
+        if (jsonBytes > maxJsonBytes) {
+            throw new RangeError('Decoded binary JSON exceeds limit');
+        }
         let offset: number = 8 + length;
         for (const part of header['parts']) {
             if (!BinaryEnvelope.#part(part) || part.length > buffer.byteLength - offset) {
@@ -104,6 +112,18 @@ export class BinaryEnvelope {
                 if (index === part.path.length - 1) {
                     if ((Array.isArray(target) ? target[Number(key)] : target[key]) !== null) {
                         throw new TypeError('Binary field must reference an unused placeholder');
+                    }
+                    // Check expansion before allocating a number array or base64 string.
+                    let replacementBytes: number = 2 + Math.ceil(bytes.length / 3) * 4;
+                    if (part.encoding === BinaryEncoding.Array) {
+                        replacementBytes = 2 + Math.max(0, bytes.length - 1);
+                        for (const byte of bytes) {
+                            replacementBytes += byte < 10 ? 1 : byte < 100 ? 2 : 3;
+                        }
+                    }
+                    jsonBytes += replacementBytes - 4; // Replaces the JSON null placeholder.
+                    if (jsonBytes > maxJsonBytes) {
+                        throw new RangeError('Decoded binary JSON exceeds limit');
                     }
                     const replacement: JsonValue =
                         part.encoding === BinaryEncoding.Array
@@ -137,6 +157,7 @@ export class BinaryEnvelope {
         parts: BinaryPart[],
         payloads: Uint8Array[],
         depth: number,
+        budget: { remaining: number },
     ): void {
         if (depth > 24) {
             throw new RangeError('Binary JSON nesting limit exceeded');
@@ -146,15 +167,19 @@ export class BinaryEnvelope {
         }
         for (const [key, child] of Object.entries(value)) {
             const base64: boolean =
-                typeof child === 'string' &&
-                /^[A-Za-z0-9+/]*={0,2}$/.test(child) &&
-                child.length % 4 === 0 &&
                 (key === 'pcm' ||
-                    (key === 'data' && !Array.isArray(value) && value['kind'] === 'base64'));
+                    (key === 'data' && !Array.isArray(value) && value['kind'] === 'base64')) &&
+                typeof child === 'string' &&
+                child.length % 4 === 0 &&
+                /^[A-Za-z0-9+/]*={0,2}$/.test(child);
             const rawArray: boolean =
                 key === 'voice' || (key === 'data' && path.at(-1) === 'video');
             let bytes: Uint8Array | null = null;
             if (base64 && typeof child === 'string') {
+                const length: number =
+                    (child.length / 4) * 3 -
+                    (child.endsWith('==') ? 2 : child.endsWith('=') ? 1 : 0);
+                BinaryEnvelope.#reservePart(length, parts.length, budget);
                 const decoded: string = atob(child);
                 bytes = new Uint8Array(decoded.length);
                 for (let index: number = 0; index < decoded.length; index += 1) {
@@ -171,13 +196,11 @@ export class BinaryEnvelope {
                             entry <= 255,
                     )
                 ) {
+                    BinaryEnvelope.#reservePart(values.length, parts.length, budget);
                     bytes = Uint8Array.from(values);
                 }
             }
             if (bytes !== null) {
-                if (parts.length >= 128) {
-                    throw new RangeError('Too many binary fields');
-                }
                 parts.push({
                     path: [...path, key],
                     length: bytes.byteLength,
@@ -190,9 +213,19 @@ export class BinaryEnvelope {
                     value[key] = null;
                 }
             } else {
-                BinaryEnvelope.#extract(child, [...path, key], parts, payloads, depth + 1);
+                BinaryEnvelope.#extract(child, [...path, key], parts, payloads, depth + 1, budget);
             }
         }
+    }
+
+    static #reservePart(length: number, count: number, budget: { remaining: number }): void {
+        if (count >= 128) {
+            throw new RangeError('Too many binary fields');
+        }
+        if (length > budget.remaining) {
+            throw new RangeError('Binary envelope exceeds limits');
+        }
+        budget.remaining -= length;
     }
 
     static #base64(bytes: Uint8Array): string {

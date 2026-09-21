@@ -1,3 +1,4 @@
+import { materializeError } from './ErrorStack.js';
 import type { WireError } from '../protocol/Protocol.js';
 /** Machine-readable transport failures. */
 export const TransportErrorCode = {
@@ -28,5 +29,6 @@ export class TransportError extends Error {
     ) {
         super(message);
         this.name = 'TransportError';
+        materializeError(this);
     }
 }

@@ -14,13 +14,13 @@ import { TransportError, TransportErrorCode } from './TransportError.js';
 /** A turn's events, terminal result, and server-side cancellation handle. */
 export class TurnStream implements AsyncIterable<WireTurnEvent> {
     readonly #events: EventStream<WireTurnEvent>;
-    readonly #client: NexaClient;
+    #client: NexaClient | undefined;
     readonly #accepted: Promise<StreamAccepted>;
     readonly #completion: PromiseWithResolvers<AskResult> = Promise.withResolvers<AskResult>();
-    readonly #unlisten: () => void;
-    readonly #unclose: () => void;
-    readonly #timer: ReturnType<typeof setTimeout>;
-    readonly #options: StreamOptions;
+    #unlisten: (() => void) | undefined;
+    #unclose: (() => void) | undefined;
+    #timer: ReturnType<typeof setTimeout> | undefined;
+    #signal: AbortSignal | undefined;
     readonly #abort: () => void;
     #ended: boolean = false;
     /** Client-chosen id, registered before any RPC can emit events. */
@@ -52,7 +52,7 @@ export class TurnStream implements AsyncIterable<WireTurnEvent> {
             );
         }
         this.#client = client;
-        this.#options = options;
+        this.#signal = options.signal;
         this.streamId = params.streamId ?? crypto.randomUUID();
         this.#events = new EventStream(limit, bytes);
         this.result = this.#completion.promise;
@@ -79,6 +79,7 @@ export class TurnStream implements AsyncIterable<WireTurnEvent> {
     }
     /** Stops the server run using its runId, never the client streamId. */
     public async cancel(): Promise<void> {
+        this.#events.discard();
         await this.#cancel(new TransportError(TransportErrorCode.Aborted, 'Turn cancelled'));
     }
     /** Consuming partially and breaking cancels the remaining server run. */
@@ -94,6 +95,7 @@ export class TurnStream implements AsyncIterable<WireTurnEvent> {
         }
     }
     async #observeStart(): Promise<void> {
+        const client: NexaClient | undefined = this.#client;
         try {
             const accepted: StreamAccepted = await this.#accepted;
             if (accepted.streamId !== this.streamId) {
@@ -107,7 +109,7 @@ export class TurnStream implements AsyncIterable<WireTurnEvent> {
         } catch (error: unknown) {
             this.#end(asError(error));
             if (error instanceof TransportError && error.code === TransportErrorCode.Timeout) {
-                this.#client.close();
+                client?.close();
             }
         }
     }
@@ -122,11 +124,12 @@ export class TurnStream implements AsyncIterable<WireTurnEvent> {
         if (this.#ended) {
             return;
         }
+        const client: NexaClient | undefined = this.#client;
         this.#end(error);
         try {
             const accepted: StreamAccepted = await this.#accepted;
-            if (this.#client.connected) {
-                await this.#client.call(Method.TasksCancel, { id: accepted.runId });
+            if (client?.connected === true) {
+                await client.call(Method.TasksCancel, { id: accepted.runId });
             }
         } catch {
             /** A failed start or disconnected socket already has no locally owned run. */
@@ -174,10 +177,15 @@ export class TurnStream implements AsyncIterable<WireTurnEvent> {
             return;
         }
         this.#ended = true;
-        this.#unlisten();
-        this.#unclose();
+        this.#unlisten?.();
+        this.#unclose?.();
+        this.#unlisten = undefined;
+        this.#unclose = undefined;
+        this.#client = undefined;
         clearTimeout(this.#timer);
-        this.#options.signal?.removeEventListener('abort', this.#abort);
+        this.#timer = undefined;
+        this.#signal?.removeEventListener('abort', this.#abort);
+        this.#signal = undefined;
         if (error !== undefined) {
             this.#completion.reject(error);
         }

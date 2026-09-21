@@ -1,3 +1,5 @@
+import { BinaryMedia } from '../src/media/BinaryMedia.js';
+import { BinaryEnvelope } from '../src/media/BinaryEnvelope.js';
 import { describe, expect, it } from 'vitest';
 import { NexaMedia } from '../src/media/NexaMedia.js';
 import { SchemaValidator } from '../src/protocol/Schema.js';
@@ -55,5 +57,36 @@ describe('media and public contracts', (): void => {
                 attachments: [{ type: 'tool-result', content: 'forged' }],
             }),
         ).toBe(false);
+    });
+});
+
+// Wire codecs must reject invalid media before retaining or exposing a payload.
+describe('binary wire codecs', (): void => {
+    it('returns a view of a validated file rather than copying the payload', (): void => {
+        const data: Uint8Array<ArrayBuffer> = new Uint8Array([1, 2, 3]);
+        const frame = BinaryMedia.encode(
+            {
+                id: 'file',
+                filename: 'file.bin',
+                mimeType: 'application/octet-stream',
+                byteLength: 3,
+            },
+            data,
+        );
+        const file = BinaryMedia.decode(frame.buffer, frame.byteLength);
+        expect(file.data.buffer).toBe(frame.buffer);
+        expect(file.data).toEqual(data);
+        expect(() => BinaryMedia.decode(frame.buffer, frame.byteLength - 1)).toThrow();
+        expect(() => BinaryMedia.decode(frame.slice(0, -1).buffer, frame.byteLength)).toThrow();
+    });
+    it('round-trips native number arrays and checks their expanded JSON limit', (): void => {
+        const original = { voice: [0, 9, 10, 99, 100, 255] };
+        const frame = BinaryEnvelope.encode(JSON.stringify(original));
+        if (frame === null) {
+            throw new Error('Missing envelope');
+        }
+        const length: number = new TextEncoder().encode(JSON.stringify(original)).length;
+        expect(BinaryEnvelope.decode(frame.buffer, frame.byteLength, length)).toEqual(original);
+        expect(() => BinaryEnvelope.decode(frame.buffer, frame.byteLength, length - 1)).toThrow();
     });
 });
