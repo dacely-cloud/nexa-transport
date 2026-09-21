@@ -99,16 +99,18 @@ describe('Nexa websocket lifetimes', (): void => {
             code: TransportErrorCode.Protocol,
         });
     });
-    it('settles in-flight calls on disconnect', async (): Promise<void> => {
+    it('settles in-flight calls with the server close diagnostics', async (): Promise<void> => {
         const connected: NexaClient = await connect();
         if (gateway === undefined) {
             throw new Error('No peer');
         }
         gateway.handler = (socket: WebSocket): void => {
-            socket.close();
+            socket.close(1001, 'no pong');
         };
         await expect(connected.call(Method.Health, {})).rejects.toMatchObject({
             code: TransportErrorCode.Closed,
+            message: 'Gateway connection closed (1001): no pong',
+            closeDetails: { code: 1001, reason: 'no pong', wasClean: true },
         });
     });
     it('enforces deadlines and observes cancellation before sending', async (): Promise<void> => {

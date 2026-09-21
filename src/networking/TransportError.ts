@@ -11,6 +11,12 @@ export const TransportErrorCode = {
 } as const;
 /** Transport failure category. */
 export type TransportErrorCode = (typeof TransportErrorCode)[keyof typeof TransportErrorCode];
+/** WebSocket close details, preserved for diagnostics and reconnect decisions. */
+export interface WebSocketCloseDetails {
+    readonly code: number;
+    readonly reason: string;
+    readonly wasClean: boolean;
+}
 /** A transport failure or a typed gateway error, without credential-bearing URLs. */
 export class TransportError extends Error {
     /** Creates a failure with optional server diagnostics. */
@@ -18,6 +24,7 @@ export class TransportError extends Error {
         public readonly code: TransportErrorCode,
         message: string,
         public readonly remote?: WireError,
+        public readonly closeDetails?: WebSocketCloseDetails,
     ) {
         super(message);
         this.name = 'TransportError';
