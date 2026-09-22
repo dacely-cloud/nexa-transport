@@ -1,3 +1,5 @@
+import type { ReceivedAttachment } from './BinaryMedia.js';
+export { MeshoptDecoder } from 'meshoptimizer/decoder';
 import type {
     BinarySource,
     InboundAttachment,
@@ -8,6 +10,56 @@ import type {
 import { native } from '../protocol/Validators.js';
 /** Creates protocol media blocks and decodes rich native payloads without platform imports. */
 export class NexaMedia {
+    /** Creates a 3D upload using the gateway's file carrier; bytes determine the stored asset kind. */
+    public static async model3d(blob: Blob, title?: string): Promise<InboundAttachment> {
+        if (blob.size === 0 || blob.size > 100 * 1024 * 1024) {
+            throw new RangeError('3D media must be between 1 byte and 100 MiB');
+        }
+        const bytes = new Uint8Array(await blob.arrayBuffer());
+        const format = NexaMedia.geometryFormat({ data: bytes, mimeType: blob.type });
+        if (format === null) {
+            throw new TypeError('Expected a GLB or PLY asset');
+        }
+        return NexaMedia.document(
+            new Blob([bytes], {
+                type: format === 'glb' ? 'model/gltf-binary' : 'application/x-ply',
+            }),
+            title,
+        );
+    }
+    /** Identifies received 3D files by both their MIME type and binary header. */
+    public static geometryFormat(
+        file: Pick<ReceivedAttachment, 'data' | 'mimeType'>,
+    ): 'glb' | 'ply' | null {
+        const bytes = file.data;
+        const header = new TextDecoder().decode(bytes.subarray(0, 128));
+        if (
+            file.mimeType === 'model/gltf-binary' &&
+            bytes.length >= 12 &&
+            header.startsWith('glTF')
+        ) {
+            const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+            if (view.getUint32(4, true) !== 2 || view.getUint32(8, true) !== bytes.length) {
+                throw new TypeError('Invalid GLB version or length');
+            }
+            return 'glb';
+        }
+        if (
+            file.mimeType === 'application/x-ply' &&
+            /^ply\r?\nformat (ascii|binary_little_endian|binary_big_endian) 1\.0\r?\n/.test(header)
+        ) {
+            return 'ply';
+        }
+        return null;
+    }
+    /** Creates a browser-renderable/downloadable Blob; callers own and revoke any object URLs. */
+    public static geometryBlob(file: Pick<ReceivedAttachment, 'data' | 'mimeType'>): Blob {
+        if (NexaMedia.geometryFormat(file) === null) {
+            throw new TypeError('Expected GLB or PLY media');
+        }
+        return new Blob([file.data], { type: file.mimeType });
+    }
+
     /** Encodes an image Blob as an inline Nexa attachment. */
     public static async image(blob: Blob, title?: string): Promise<InboundAttachment> {
         return {
@@ -56,6 +108,15 @@ export class NexaMedia {
             data['video'] = {
                 ...data['video'],
                 data: Array.from(NexaMedia.bytes(data['video']['data'])),
+            };
+        }
+        if (
+            isJsonRecord(data['geometry']) &&
+            (data['geometry']['phase'] === 'chunk' || data['geometry']['phase'] === 'preview')
+        ) {
+            data['geometry'] = {
+                ...data['geometry'],
+                data: Array.from(NexaMedia.bytes(data['geometry']['data'])),
             };
         }
         if (!native(data)) {
