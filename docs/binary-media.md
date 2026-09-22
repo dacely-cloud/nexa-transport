@@ -29,3 +29,23 @@ Use `client.sendAudio(callId, pcm)` and `client.onAudio()` for raw PCM16 byte ar
 These are transport limits. Provider decoding limits, accepted document formats, installed tools, user permissions, and voice configuration still determine what Nexa can do with uploaded content.
 
 After reassembly, the client responds with `media.acknowledge` and `{ id, received }`. The acknowledgment is scoped to the receiving connection. `received: true` means the attachment handler completed successfully; it does not assert that a human viewed the file. Missing or failed handlers send `received: false`. The server waits up to 15 seconds after queuing the final chunk; absent acknowledgment leaves delivery unconfirmed and returns an error to the model. The SDK performs this exchange automatically and awaits asynchronous attachment handlers.
+
+## Generated 3D models
+
+TRELLIS results arrive through `onAttachment` as GLB (`model/gltf-binary`) and
+optional Gaussian PLY (`application/x-ply`). Nexa also delivers PNG views through
+the same attachment callback. Use `NexaMedia.geometryFormat(file)` to identify a
+validated GLB/PLY header and `NexaMedia.geometryBlob(file)` to create a Blob for
+saving or viewing. Upload models with `await NexaMedia.model3d(blob, filename)`.
+The existing 100 MiB transport limit applies to each file.
+
+Nexa optimizes GLB with lossless `EXT_meshopt_compression`. This SDK exports
+`MeshoptDecoder` from `nexa-transport/media`. Pass it to a compatible glTF loader
+(for example `loader.setMeshoptDecoder(MeshoptDecoder)`) before loading a model.
+Callers own rendering, camera controls and Blob URL lifetimes; revoke object URLs
+when the viewer is disposed. Gaussian PLY needs a Gaussian splat renderer, not an
+ordinary triangle-mesh PLY loader. PNG previews work without any 3D renderer.
+
+`NexaMedia.nativeEvent` preserves typed geometry acceptance, progress, preview,
+chunk and completion events, including binary byte normalization. Generated
+asset files use binary attachment delivery; they are not embedded in chat text.

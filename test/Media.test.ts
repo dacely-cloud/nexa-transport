@@ -90,3 +90,53 @@ describe('binary wire codecs', (): void => {
         expect(() => BinaryEnvelope.decode(frame.buffer, frame.byteLength, length - 1)).toThrow();
     });
 });
+
+it('transports 3D assets and normalizes native geometry bytes', async (): Promise<void> => {
+    const bytes: Uint8Array<ArrayBuffer> = new Uint8Array(12);
+    bytes.set([103, 108, 84, 70]);
+    const view: DataView = new DataView(bytes.buffer);
+    view.setUint32(4, 2, true);
+    view.setUint32(8, 12, true);
+    const upload = await NexaMedia.model3d(
+        new Blob([bytes], { type: 'model/gltf-binary' }),
+        'chair.glb',
+    );
+    expect(
+        methodValidators['agent.ask'].params({
+            message: 'Inspect this model',
+            attachments: [upload],
+        }),
+    ).toBe(true);
+    const received = BinaryMedia.decode(
+        BinaryMedia.encode(
+            { id: 'model', filename: 'chair.glb', mimeType: 'model/gltf-binary', byteLength: 12 },
+            bytes,
+        ).buffer,
+        1024,
+    );
+    expect(NexaMedia.geometryFormat(received)).toBe('glb');
+    expect(new Uint8Array(await NexaMedia.geometryBlob(received).arrayBuffer())).toEqual(bytes);
+    expect(
+        NexaMedia.nativeEvent({
+            type: 'native',
+            source: 'ncap',
+            data: {
+                content: '',
+                reasoning: '',
+                geometry: {
+                    phase: 'chunk',
+                    assetId: 0,
+                    revision: 0,
+                    format: 'glb',
+                    offset: 0,
+                    totalBytes: 2,
+                    data: { '0': 0, '1': 255 },
+                },
+            },
+        })?.geometry,
+    ).toMatchObject({ data: [0, 255] });
+    view.setUint32(8, 200, true);
+    await expect(
+        NexaMedia.model3d(new Blob([bytes], { type: 'model/gltf-binary' })),
+    ).rejects.toThrow('length');
+});

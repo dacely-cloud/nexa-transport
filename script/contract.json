@@ -2430,6 +2430,11 @@
             ],
             "type": "object"
         },
+        "GeometryFormat": {
+            "description": "Supported serialized 3D asset formats; radiance fields remain unspecified.",
+            "enum": ["gaussian_ply", "glb"],
+            "type": "string"
+        },
         "HealthResult": {
             "description": "Liveness and identity.",
             "properties": {
@@ -3386,9 +3391,162 @@
                     "$ref": "#/definitions/NcapFindingDelta",
                     "description": "One DEDUPED finding from a closed fan-out, with its words."
                 },
+                "geometry": {
+                    "anyOf": [
+                        {
+                            "properties": {
+                                "model": {
+                                    "type": "string"
+                                },
+                                "phase": {
+                                    "const": "accepted",
+                                    "type": "string"
+                                },
+                                "seed": {
+                                    "type": "number"
+                                }
+                            },
+                            "required": ["model", "phase", "seed"],
+                            "type": "object"
+                        },
+                        {
+                            "properties": {
+                                "completed": {
+                                    "type": "number"
+                                },
+                                "phase": {
+                                    "const": "progress",
+                                    "type": "string"
+                                },
+                                "stage": {
+                                    "type": "number"
+                                },
+                                "total": {
+                                    "type": "number"
+                                }
+                            },
+                            "required": ["completed", "phase", "stage", "total"],
+                            "type": "object"
+                        },
+                        {
+                            "properties": {
+                                "assetId": {
+                                    "type": "number"
+                                },
+                                "data": {
+                                    "items": {
+                                        "type": "number"
+                                    },
+                                    "type": "array"
+                                },
+                                "format": {
+                                    "$ref": "#/definitions/GeometryFormat"
+                                },
+                                "offset": {
+                                    "type": "number"
+                                },
+                                "phase": {
+                                    "enum": ["chunk", "preview"],
+                                    "type": "string"
+                                },
+                                "revision": {
+                                    "type": "number"
+                                },
+                                "totalBytes": {
+                                    "type": "number"
+                                }
+                            },
+                            "required": [
+                                "assetId",
+                                "data",
+                                "format",
+                                "offset",
+                                "phase",
+                                "revision",
+                                "totalBytes"
+                            ],
+                            "type": "object"
+                        },
+                        {
+                            "properties": {
+                                "assetId": {
+                                    "type": "number"
+                                },
+                                "phase": {
+                                    "const": "end",
+                                    "type": "string"
+                                },
+                                "totalBytes": {
+                                    "type": "number"
+                                }
+                            },
+                            "required": ["assetId", "phase", "totalBytes"],
+                            "type": "object"
+                        }
+                    ],
+                    "description": "Native 3D generation event; binary asset data stays outside model text."
+                },
                 "graph": {
                     "$ref": "#/definitions/NcapGraphDelta",
                     "description": "A live project-graph event for the knowledge-graph view."
+                },
+                "image": {
+                    "anyOf": [
+                        {
+                            "properties": {
+                                "data": {
+                                    "items": {
+                                        "type": "number"
+                                    },
+                                    "type": "array"
+                                },
+                                "index": {
+                                    "type": "number"
+                                },
+                                "offset": {
+                                    "type": "number"
+                                },
+                                "phase": {
+                                    "const": "chunk",
+                                    "type": "string"
+                                }
+                            },
+                            "required": ["data", "index", "offset", "phase"],
+                            "type": "object"
+                        },
+                        {
+                            "properties": {
+                                "height": {
+                                    "type": "number"
+                                },
+                                "index": {
+                                    "type": "number"
+                                },
+                                "phase": {
+                                    "const": "end",
+                                    "type": "string"
+                                },
+                                "totalBytes": {
+                                    "type": "number"
+                                },
+                                "transparent": {
+                                    "type": "boolean"
+                                },
+                                "width": {
+                                    "type": "number"
+                                }
+                            },
+                            "required": [
+                                "height",
+                                "index",
+                                "phase",
+                                "totalBytes",
+                                "transparent",
+                                "width"
+                            ],
+                            "type": "object"
+                        }
+                    ]
                 },
                 "preflight": {
                     "description": "The full pre-flight reflection for the panel shown before the answer streams.",

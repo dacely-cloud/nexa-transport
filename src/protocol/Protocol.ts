@@ -1655,6 +1655,12 @@ export interface GatewayMethodsShape {
 /** GatewayMethods from the Nexa wire protocol. */
 export type GatewayMethods = GatewayMethodsShape;
 
+/** Allowed values for GeometryFormat. */
+export const GeometryFormatValues = { Value0: 'gaussian_ply', Value1: 'glb' } as const;
+
+/** GeometryFormat from the Nexa wire protocol. */
+export type GeometryFormat = (typeof GeometryFormatValues)[keyof typeof GeometryFormatValues];
+
 /** HealthResult wire fields. */
 export interface HealthResultShape {
     /** connections as defined by the Nexa gateway. */
@@ -2262,6 +2268,87 @@ export interface NcapDeltaexpertShape {
     readonly why: string;
 }
 
+/** NcapDeltageometryVariant0 wire fields. */
+export interface NcapDeltageometryVariant0Shape {
+    /** model as defined by the Nexa gateway. */
+    readonly model: string;
+    /** phase as defined by the Nexa gateway. */
+    readonly phase: 'accepted';
+    /** seed as defined by the Nexa gateway. */
+    readonly seed: number;
+}
+
+/** NcapDeltageometryVariant1 wire fields. */
+export interface NcapDeltageometryVariant1Shape {
+    /** completed as defined by the Nexa gateway. */
+    readonly completed: number;
+    /** phase as defined by the Nexa gateway. */
+    readonly phase: 'progress';
+    /** stage as defined by the Nexa gateway. */
+    readonly stage: number;
+    /** total as defined by the Nexa gateway. */
+    readonly total: number;
+}
+
+/** Allowed values for NcapDeltageometryVariant2phase. */
+export const NcapDeltageometryVariant2phaseValues = { Value0: 'chunk', Value1: 'preview' } as const;
+
+/** NcapDeltageometryVariant2 wire fields. */
+export interface NcapDeltageometryVariant2Shape {
+    /** assetId as defined by the Nexa gateway. */
+    readonly assetId: number;
+    /** data as defined by the Nexa gateway. */
+    readonly data: ReadonlyArray<number>;
+    /** format as defined by the Nexa gateway. */
+    readonly format: GeometryFormat;
+    /** offset as defined by the Nexa gateway. */
+    readonly offset: number;
+    /** phase as defined by the Nexa gateway. */
+    readonly phase: (typeof NcapDeltageometryVariant2phaseValues)[keyof typeof NcapDeltageometryVariant2phaseValues];
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: number;
+    /** totalBytes as defined by the Nexa gateway. */
+    readonly totalBytes: number;
+}
+
+/** NcapDeltageometryVariant3 wire fields. */
+export interface NcapDeltageometryVariant3Shape {
+    /** assetId as defined by the Nexa gateway. */
+    readonly assetId: number;
+    /** phase as defined by the Nexa gateway. */
+    readonly phase: 'end';
+    /** totalBytes as defined by the Nexa gateway. */
+    readonly totalBytes: number;
+}
+
+/** NcapDeltaimageVariant0 wire fields. */
+export interface NcapDeltaimageVariant0Shape {
+    /** data as defined by the Nexa gateway. */
+    readonly data: ReadonlyArray<number>;
+    /** index as defined by the Nexa gateway. */
+    readonly index: number;
+    /** offset as defined by the Nexa gateway. */
+    readonly offset: number;
+    /** phase as defined by the Nexa gateway. */
+    readonly phase: 'chunk';
+}
+
+/** NcapDeltaimageVariant1 wire fields. */
+export interface NcapDeltaimageVariant1Shape {
+    /** height as defined by the Nexa gateway. */
+    readonly height: number;
+    /** index as defined by the Nexa gateway. */
+    readonly index: number;
+    /** phase as defined by the Nexa gateway. */
+    readonly phase: 'end';
+    /** totalBytes as defined by the Nexa gateway. */
+    readonly totalBytes: number;
+    /** transparent as defined by the Nexa gateway. */
+    readonly transparent: boolean;
+    /** width as defined by the Nexa gateway. */
+    readonly width: number;
+}
+
 /** NcapDeltapreflightitemsItem wire fields. */
 export interface NcapDeltapreflightitemsItemShape {
     /** label as defined by the Nexa gateway. */
@@ -2374,8 +2461,16 @@ export interface NcapDeltaShape {
     readonly expert?: NcapDeltaexpertShape;
     /** finding as defined by the Nexa gateway. */
     readonly finding?: NcapFindingDelta;
+    /** geometry as defined by the Nexa gateway. */
+    readonly geometry?:
+        | NcapDeltageometryVariant0Shape
+        | NcapDeltageometryVariant1Shape
+        | NcapDeltageometryVariant2Shape
+        | NcapDeltageometryVariant3Shape;
     /** graph as defined by the Nexa gateway. */
     readonly graph?: NcapGraphDelta;
+    /** image as defined by the Nexa gateway. */
+    readonly image?: NcapDeltaimageVariant0Shape | NcapDeltaimageVariant1Shape;
     /** preflight as defined by the Nexa gateway. */
     readonly preflight?: NcapDeltapreflightShape;
     /** reasoning as defined by the Nexa gateway. */
