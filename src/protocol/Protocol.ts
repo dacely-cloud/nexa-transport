@@ -3428,7 +3428,14 @@ export interface VoiceCallEventVariant3Shape {
 }
 
 /** VoiceCallEvent from the Nexa wire protocol. */
+/** Replaceable recognition hypothesis; finalized text arrives as heard. */
+export interface VoiceInterimEvent {
+    readonly kind: 'interim';
+    readonly text: string;
+}
+
 export type VoiceCallEvent =
+    | VoiceInterimEvent
     | VoiceCallEventVariant0Shape
     | VoiceCallEventVariant1Shape
     | VoiceCallEventVariant2Shape

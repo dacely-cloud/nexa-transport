@@ -4,7 +4,13 @@ import { NexaMedia } from '../media/NexaMedia.js';
 import { BinaryEnvelope } from '../media/BinaryEnvelope.js';
 import { BinaryMedia, type ReceivedAttachment } from '../media/BinaryMedia.js';
 export type { ReceivedAttachment } from '../media/BinaryMedia.js';
-import { EventName, isEventData, type VoiceAudio, type EventMap } from '../protocol/Events.js';
+import {
+    EventName,
+    isEventData,
+    type VoiceAudio,
+    type VoiceEvent,
+    type EventMap,
+} from '../protocol/Events.js';
 import type { StreamOptions } from '../interface/StreamOptions.js';
 import { Method } from '../protocol/Protocol.js';
 import type { StreamParams } from '../protocol/Protocol.js';
@@ -44,6 +50,13 @@ export interface ReceivedAudio {
     readonly callId: string;
     readonly sampleRate: number;
     readonly data: Uint8Array<ArrayBuffer>;
+}
+/** A replacement hypothesis or settled caller utterance, scoped to its call. */
+export interface ReceivedTranscript {
+    readonly callId: string;
+    readonly text: string;
+    /** False replaces the current hypothesis; true appends a settled utterance. */
+    readonly final: boolean;
 }
 /** Saved history, live tasks and downloadable files for a subscribed session. */
 export interface SessionSnapshot {
@@ -383,6 +396,31 @@ export class NexaClient {
                 data: NexaMedia.fromBase64(frame.pcm),
             });
         });
+    }
+
+    /** Receives live ASR revisions and settled utterances. Subscribe before startVoice. */
+    public onTranscript(listener: (event: ReceivedTranscript) => void): () => void {
+        return this.on(EventName.VoiceEvent, (event: VoiceEvent): void => {
+            if (event.kind === 'interim' || event.kind === 'heard') {
+                listener({ callId: event.callId, text: event.text, final: event.kind === 'heard' });
+            }
+        });
+    }
+
+    /** Opens the server voice path, including its configured Nerva streaming transcriber. */
+    public startVoice(
+        params: ParamsOf<typeof Method.VoiceStart> = {},
+        options: CallOptions = {},
+    ): Promise<ResultOf<typeof Method.VoiceStart>> {
+        return this.call(Method.VoiceStart, params, options);
+    }
+
+    /** Releases the microphone, transcription stream, and speech session. */
+    public stopVoice(
+        callId: string,
+        options: CallOptions = {},
+    ): Promise<ResultOf<typeof Method.VoiceStop>> {
+        return this.call(Method.VoiceStop, { callId }, options);
     }
 
     /** Sends a mono PCM16 frame using negotiated binary transport. */

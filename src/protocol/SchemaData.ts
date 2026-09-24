@@ -5281,6 +5281,19 @@ export const schema: Schema = {
                     required: ['kind', 'message'],
                     type: 'object',
                 },
+                {
+                    type: 'object',
+                    properties: {
+                        kind: {
+                            type: 'string',
+                            const: 'interim',
+                        },
+                        text: {
+                            type: 'string',
+                        },
+                    },
+                    required: ['kind', 'text'],
+                },
             ],
         },
         VoiceStartParams: {
