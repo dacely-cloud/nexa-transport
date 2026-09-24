@@ -1,3 +1,5 @@
+export { NexaGeometry } from './NexaGeometry.js';
+export type { GeometryOptions, ImageGeometryOptions } from './NexaGeometry.js';
 import type { ReceivedAttachment } from './BinaryMedia.js';
 export { MeshoptDecoder } from 'meshoptimizer/decoder';
 import type {

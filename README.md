@@ -389,3 +389,51 @@ See [Chat.ts](./examples/Chat.ts) and [Node.ts](./examples/Node.ts) for applicat
 ---
 
 <div align="center"><sub><a href="./LICENSE">Apache-2.0</a> · <a href="https://github.com/dacely-cloud">Dacely Cloud</a></sub></div>
+
+### Text and image to 3D
+
+The gateway uses Nexa's `generate_3d` tool, with Nerva configured for the desired
+text/image backend and Blender installed for previews. These helpers build
+**agent-mediated** turns; they do not invoke the model directly or bypass tool
+approval. Generation availability and errors are reported by the agent.
+
+```ts
+import { NexaGeometry, NexaMedia } from 'nexa-transport/media';
+import type { TurnStream } from 'nexa-transport/stream';
+
+const unsubscribe: () => void = client.onAttachment((file) => {
+    if (NexaMedia.geometryFormat(file) !== null) {
+        const model: Blob = NexaMedia.geometryBlob(file);
+        // Save the Blob or hand it to your GLB viewer.
+    }
+});
+const turn: TurnStream = client.stream(NexaGeometry.text('A wooden treasure chest', { seed: 42 }));
+for await (const event of turn) {
+    // Render text, tool progress, and media events using the normal stream UI.
+}
+await turn.result;
+
+// Or load a reference PNG (a browser File also works):
+const reference: Blob = await (await fetch('/reference.png')).blob();
+const imageTurn: TurnStream = client.stream(
+    await NexaGeometry.image(reference, {
+        resolution: 1024,
+        seed: 42,
+    }),
+);
+for await (const event of imageTurn) {
+    // Keep an attachment subscription active to receive the model and previews.
+}
+await imageTurn.result;
+unsubscribe();
+```
+
+Subscribe to attachments before starting each turn. References are bounded to
+16 MiB; the backend validates PNG/JPEG pixels and the 4096-pixel dimension limit.
+Text generation selects the configured text model; image generation selects
+TRELLIS.2. If only TRELLIS.2 is configured, text first generates a reference image.
+Leave steps unspecified for backend defaults. Images support 512/1024 resolution.
+Outputs include a GLB and PNG previews; Gaussian PLY support depends on the model.
+Nexa's optimized GLBs require Meshopt decoding: `MeshoptDecoder` is exported from
+`nexa-transport/media` for viewer integration. Rigging and Roblox Studio import
+are separate operations. See `examples/Geometry.ts` for subscription cleanup.
