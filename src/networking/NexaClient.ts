@@ -1,3 +1,7 @@
+import { DataUploadClient } from './DataUploadClient.js';
+import type { DataUploadOptions } from '../interface/DataUploadOptions.js';
+export type { DataUploadOptions } from '../interface/DataUploadOptions.js';
+import type { DataFile } from '../protocol/Protocol.js';
 import { materializeError, rethrow } from './ErrorStack.js';
 import { BinaryChunks } from '../media/BinaryChunks.js';
 import { NexaMedia } from '../media/NexaMedia.js';
@@ -446,6 +450,15 @@ export class NexaClient {
     public onSequenceGap(listener: (gap: SequenceGap) => void): () => void {
         return this.#disposed ? (): void => {} : subscribe(this.#gaps, listener);
     }
+    /** Uploads a large File/Blob to disk; pass its returned path to the agent for analysis. */
+    public uploadData(
+        source: Blob,
+        filename: string,
+        options: DataUploadOptions = {},
+    ): Promise<DataFile> {
+        return DataUploadClient.upload(this, source, filename, options);
+    }
+
     /** Starts a bounded event stream, exposing tools, media, and native NCAP payloads. */
     public stream(params: StreamParams, options: StreamOptions = {}): TurnStream {
         if (!this.connected) {

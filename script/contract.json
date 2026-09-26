@@ -1062,6 +1062,93 @@
             },
             "type": "object"
         },
+        "DataFile": {
+            "description": "A complete source file the agent can process directly in its workspace.",
+            "properties": {
+                "byteLength": {
+                    "type": "string"
+                },
+                "filename": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                }
+            },
+            "required": ["byteLength", "filename", "id", "path"],
+            "type": "object"
+        },
+        "DataUpload": {
+            "description": "A disk-backed upload; byte counts use decimal strings on the wire.",
+            "properties": {
+                "byteLength": {
+                    "type": "string"
+                },
+                "filename": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                }
+            },
+            "required": ["byteLength", "filename", "id"],
+            "type": "object"
+        },
+        "DataUploadChunkParams": {
+            "description": "One bounded base64 chunk with an exact byte offset.",
+            "properties": {
+                "data": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "offset": {
+                    "type": "string"
+                }
+            },
+            "required": ["data", "id", "offset"],
+            "type": "object"
+        },
+        "DataUploadIdParams": {
+            "description": "Addresses an upload owned by the authenticated principal.",
+            "properties": {
+                "id": {
+                    "type": "string"
+                }
+            },
+            "required": ["id"],
+            "type": "object"
+        },
+        "DataUploadPosition": {
+            "description": "The durable position acknowledged after one bounded upload chunk.",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "offset": {
+                    "type": "string"
+                }
+            },
+            "required": ["id", "offset"],
+            "type": "object"
+        },
+        "DataUploadStartParams": {
+            "description": "Starts an upload without embedding source bytes in an agent request.",
+            "properties": {
+                "byteLength": {
+                    "type": "string"
+                },
+                "filename": {
+                    "type": "string"
+                }
+            },
+            "required": ["byteLength", "filename"],
+            "type": "object"
+        },
         "DeadLetter": {
             "description": "One recorded failure.",
             "properties": {
@@ -1480,6 +1567,179 @@
             ],
             "type": "object"
         },
+        "FunnelCohort": {
+            "description": "Exact cohort dimensions; games are already separated by owner/project in storage.",
+            "properties": {
+                "configRevision": {
+                    "type": "string"
+                },
+                "device": {
+                    "type": "string"
+                },
+                "experimentId": {
+                    "type": "string"
+                },
+                "observedConfig": {
+                    "type": "string"
+                },
+                "observedPerformance": {
+                    "type": "string"
+                },
+                "placeId": {
+                    "type": "string"
+                },
+                "placeVersion": {
+                    "type": "string"
+                },
+                "variant": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "configRevision",
+                "device",
+                "experimentId",
+                "placeId",
+                "placeVersion",
+                "variant"
+            ],
+            "type": "object"
+        },
+        "FunnelGroup": {
+            "description": "Bounded attempt counts, not unique users; each stage count is cumulative from the first step.",
+            "properties": {
+                "attempts": {
+                    "type": "number"
+                },
+                "cohort": {
+                    "$ref": "#/definitions/FunnelCohort"
+                },
+                "conversion": {
+                    "type": "number"
+                },
+                "reached": {
+                    "items": {
+                        "type": "number"
+                    },
+                    "type": "array"
+                },
+                "sessions": {
+                    "type": "number"
+                }
+            },
+            "required": ["attempts", "cohort", "conversion", "reached", "sessions"],
+            "type": "object"
+        },
+        "FunnelQuery": {
+            "description": "First-step cohort window and maximum allowed time to complete a funnel. Decimal milliseconds.",
+            "properties": {
+                "appliedConfigKey": {
+                    "type": "string"
+                },
+                "completionWindowMs": {
+                    "type": "string"
+                },
+                "configLookbackMs": {
+                    "type": "string"
+                },
+                "fromMs": {
+                    "type": "string"
+                },
+                "performanceFpsThreshold": {
+                    "type": "number"
+                },
+                "performanceLookbackMs": {
+                    "type": "string"
+                },
+                "steps": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "toMs": {
+                    "type": "string"
+                }
+            },
+            "required": ["completionWindowMs", "fromMs", "steps", "toMs"],
+            "type": "object"
+        },
+        "FunnelReport": {
+            "description": "Evidence returned to the model; raw player/session identifiers are not included.",
+            "properties": {
+                "caveats": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "collection": {
+                    "$ref": "#/definitions/TelemetryHealth",
+                    "description": "Owner-visible collection evidence, not a guarantee that the game emitted every required event."
+                },
+                "duplicateEvents": {
+                    "type": "number"
+                },
+                "generatedAtMs": {
+                    "type": "string"
+                },
+                "groups": {
+                    "items": {
+                        "$ref": "#/definitions/FunnelGroup"
+                    },
+                    "type": "array"
+                },
+                "ignoredClientEvents": {
+                    "type": "number"
+                },
+                "latestMatchingEventMs": {
+                    "type": ["null", "string"]
+                },
+                "missingAttemptEvents": {
+                    "type": "number"
+                },
+                "missingStartAttempts": {
+                    "type": "number"
+                },
+                "mixedCohortAttempts": {
+                    "type": "number"
+                },
+                "observedUntilMs": {
+                    "type": "string"
+                },
+                "pendingAttempts": {
+                    "type": "number"
+                },
+                "query": {
+                    "$ref": "#/definitions/FunnelQuery"
+                },
+                "repeatedStartEvents": {
+                    "type": "number"
+                },
+                "unattributedConfigAttempts": {
+                    "type": "number"
+                },
+                "unmeasuredPerformanceAttempts": {
+                    "type": "number"
+                }
+            },
+            "required": [
+                "caveats",
+                "duplicateEvents",
+                "generatedAtMs",
+                "groups",
+                "ignoredClientEvents",
+                "latestMatchingEventMs",
+                "missingAttemptEvents",
+                "missingStartAttempts",
+                "mixedCohortAttempts",
+                "observedUntilMs",
+                "pendingAttempts",
+                "query",
+                "repeatedStartEvents"
+            ],
+            "type": "object"
+        },
         "GatewayFeatures": {
             "description": "Methods, events, and additive capabilities supported by this gateway.",
             "properties": {
@@ -1894,6 +2154,54 @@
                     "required": ["params", "result"],
                     "type": "object"
                 },
+                "data.upload.cancel": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/DataUploadIdParams"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/OkResult"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "data.upload.chunk": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/DataUploadChunkParams"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/DataUploadPosition"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "data.upload.finish": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/DataUploadIdParams"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/DataFile"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "data.upload.start": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/DataUploadStartParams"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/DataUpload"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
                 "devices.approve": {
                     "properties": {
                         "params": {
@@ -2015,6 +2323,81 @@
                         },
                         "result": {
                             "$ref": "#/definitions/OkResult"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "roblox.credentials.remove": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/Record%3Cstring%2Cnever%3E"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/RobloxCredentialStatus"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "roblox.credentials.set": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/RobloxCredentialSetParams"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/RobloxCredentialStatus"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "roblox.credentials.status": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/Record%3Cstring%2Cnever%3E"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/RobloxCredentialStatus"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "roblox.telemetry.funnel": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/TelemetryFunnelParams"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/FunnelReport"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "roblox.telemetry.performance": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/TelemetryPerformanceParams"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/PerformanceReport"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "roblox.telemetry.projects": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/Record%3Cstring%2Cnever%3E"
+                        },
+                        "result": {
+                            "items": {
+                                "$ref": "#/definitions/TelemetryProject"
+                            },
+                            "type": "array"
                         }
                     },
                     "required": ["params", "result"],
@@ -2391,6 +2774,10 @@
                 "credit.removeBudget",
                 "credit.setBudget",
                 "credit.summary",
+                "data.upload.cancel",
+                "data.upload.chunk",
+                "data.upload.finish",
+                "data.upload.start",
                 "devices.approve",
                 "devices.list",
                 "devices.reject",
@@ -2401,6 +2788,12 @@
                 "jobs.remove",
                 "logs.tail",
                 "media.acknowledge",
+                "roblox.credentials.remove",
+                "roblox.credentials.set",
+                "roblox.credentials.status",
+                "roblox.telemetry.funnel",
+                "roblox.telemetry.performance",
+                "roblox.telemetry.projects",
                 "sessions.delete",
                 "sessions.download",
                 "sessions.files",
@@ -2729,6 +3122,9 @@
         },
         "JobAction": {
             "anyOf": [
+                {
+                    "$ref": "#/definitions/TelemetryMonitorAction"
+                },
                 {
                     "$ref": "#/definitions/ReminderAction"
                 },
@@ -3178,6 +3574,22 @@
             "required": ["artifact", "item", "title"],
             "type": "object"
         },
+        "NcapAsrTranscript": {
+            "description": "Native ASR result over exact mono 16 kHz input.",
+            "properties": {
+                "audioSamples": {
+                    "type": "number"
+                },
+                "language": {
+                    "type": "string"
+                },
+                "text": {
+                    "type": "string"
+                }
+            },
+            "required": ["audioSamples", "language", "text"],
+            "type": "object"
+        },
         "NcapBlockDelta": {
             "description": "A rich block the server decoded from the model stream, streamed in three phases.",
             "properties": {
@@ -3232,6 +3644,10 @@
                 "artifact": {
                     "$ref": "#/definitions/NcapArtifactDelta",
                     "description": "One item's DELIVERABLE, as that item closes."
+                },
+                "asr": {
+                    "$ref": "#/definitions/NcapAsrTranscript",
+                    "description": "Native transcription, separate from assistant content."
                 },
                 "backlog": {
                     "anyOf": [
@@ -3608,6 +4024,9 @@
                 "research": {
                     "$ref": "#/definitions/NcapResearchDelta",
                     "description": "One step of working an UNSOLVED problem."
+                },
+                "segmentation": {
+                    "$ref": "#/definitions/SegmentationFrame"
                 },
                 "skill": {
                     "$ref": "#/definitions/NcapSkillDelta",
@@ -4201,6 +4620,145 @@
             ],
             "type": "object"
         },
+        "PerformanceCohort": {
+            "description": "Input capability reports are not hardware or operating-system identification.",
+            "properties": {
+                "gamepadEnabled": {
+                    "type": "boolean"
+                },
+                "keyboardEnabled": {
+                    "type": "boolean"
+                },
+                "placeId": {
+                    "type": "string"
+                },
+                "placeVersion": {
+                    "type": "string"
+                },
+                "touchEnabled": {
+                    "type": "boolean"
+                }
+            },
+            "required": [
+                "gamepadEnabled",
+                "keyboardEnabled",
+                "placeId",
+                "placeVersion",
+                "touchEnabled"
+            ],
+            "type": "object"
+        },
+        "PerformanceGroup": {
+            "description": "Aggregate metrics expose no player/session identifiers. Counts are decimal strings.",
+            "properties": {
+                "cohort": {
+                    "$ref": "#/definitions/PerformanceCohort"
+                },
+                "frames": {
+                    "type": "string"
+                },
+                "maximumFrameMs": {
+                    "type": "number"
+                },
+                "meanSessionFps": {
+                    "type": "number"
+                },
+                "sampledDurationMs": {
+                    "type": "number"
+                },
+                "samples": {
+                    "type": "number"
+                },
+                "sessions": {
+                    "type": "number"
+                },
+                "slowFrameFraction": {
+                    "type": "number"
+                },
+                "slowFrames": {
+                    "type": "string"
+                },
+                "timeWeightedFps": {
+                    "type": "number"
+                }
+            },
+            "required": [
+                "cohort",
+                "frames",
+                "maximumFrameMs",
+                "meanSessionFps",
+                "sampledDurationMs",
+                "samples",
+                "sessions",
+                "slowFrameFraction",
+                "slowFrames",
+                "timeWeightedFps"
+            ],
+            "type": "object"
+        },
+        "PerformanceQuery": {
+            "description": "End-exclusive server-observed report timestamps; sample windows can begin before fromMs.",
+            "properties": {
+                "fromMs": {
+                    "type": "string"
+                },
+                "toMs": {
+                    "type": "string"
+                }
+            },
+            "required": ["fromMs", "toMs"],
+            "type": "object"
+        },
+        "PerformanceReport": {
+            "description": "Complete bounded selection with quality counts and collection diagnostics.",
+            "properties": {
+                "caveats": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "collection": {
+                    "$ref": "#/definitions/TelemetryHealth",
+                    "description": "Owner-visible collection evidence, not a guarantee that the game emitted every required event."
+                },
+                "duplicateSamples": {
+                    "type": "number"
+                },
+                "generatedAtMs": {
+                    "type": "string"
+                },
+                "groups": {
+                    "items": {
+                        "$ref": "#/definitions/PerformanceGroup"
+                    },
+                    "type": "array"
+                },
+                "ignoredSourceSamples": {
+                    "type": "number"
+                },
+                "invalidSamples": {
+                    "type": "number"
+                },
+                "latestSampleMs": {
+                    "type": ["null", "string"]
+                },
+                "query": {
+                    "$ref": "#/definitions/PerformanceQuery"
+                }
+            },
+            "required": [
+                "caveats",
+                "duplicateSamples",
+                "generatedAtMs",
+                "groups",
+                "ignoredSourceSamples",
+                "invalidSamples",
+                "latestSampleMs",
+                "query"
+            ],
+            "type": "object"
+        },
         "ReasoningOptions": {
             "description": "Reasoning configuration for a request.",
             "properties": {
@@ -4292,10 +4850,48 @@
             "enum": ["destructive", "execute", "read", "write"],
             "type": "string"
         },
+        "RobloxCredentialSetParams": {
+            "properties": {
+                "apiKey": {
+                    "type": "string"
+                }
+            },
+            "required": ["apiKey"],
+            "type": "object"
+        },
+        "RobloxCredentialStatus": {
+            "description": "Presence only: neither saved key material nor claims about Roblox permissions.",
+            "properties": {
+                "connected": {
+                    "type": "boolean"
+                },
+                "validated": {
+                    "const": false,
+                    "type": "boolean"
+                }
+            },
+            "required": ["connected", "validated"],
+            "type": "object"
+        },
         "Scope": {
             "description": "What a caller may do.",
             "enum": ["admin", "read", "write"],
             "type": "string"
+        },
+        "SegmentationFrame": {
+            "properties": {
+                "payload": {
+                    "items": {
+                        "type": "number"
+                    },
+                    "type": "array"
+                },
+                "type": {
+                    "type": "number"
+                }
+            },
+            "required": ["payload", "type"],
+            "type": "object"
         },
         "SessionFileParams": {
             "description": "Identifies a saved file within an owned session.",
@@ -4639,6 +5235,233 @@
             "required": ["createdAt", "id", "members", "name"],
             "type": "object"
         },
+        "TelemetryFunnelParams": {
+            "description": "Wire queries never carry an owner: the authenticated gateway supplies it.",
+            "properties": {
+                "appliedConfigKey": {
+                    "type": "string"
+                },
+                "completionWindowMs": {
+                    "type": "string"
+                },
+                "configLookbackMs": {
+                    "type": "string"
+                },
+                "fromMs": {
+                    "type": "string"
+                },
+                "performanceFpsThreshold": {
+                    "type": "number"
+                },
+                "performanceLookbackMs": {
+                    "type": "string"
+                },
+                "projectId": {
+                    "type": "string"
+                },
+                "steps": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "toMs": {
+                    "type": "string"
+                }
+            },
+            "required": ["completionWindowMs", "fromMs", "projectId", "steps", "toMs"],
+            "type": "object"
+        },
+        "TelemetryHealth": {
+            "description": "Owner-visible collection evidence, not a guarantee that the game emitted every required event.",
+            "properties": {
+                "caveats": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "ingestionEnabled": {
+                    "type": "boolean"
+                },
+                "lastCapacityRejectionMs": {
+                    "type": ["null", "string"]
+                },
+                "lastSuccessfulBatchMs": {
+                    "type": ["null", "string"]
+                },
+                "latestEventMs": {
+                    "type": ["null", "string"]
+                },
+                "maxEvents": {
+                    "type": "number"
+                },
+                "maxPayloadBytes": {
+                    "type": "string"
+                },
+                "projectId": {
+                    "type": "string"
+                },
+                "retainedFromMs": {
+                    "type": "string"
+                },
+                "retentionDays": {
+                    "type": "number"
+                },
+                "storedEvents": {
+                    "type": "number"
+                },
+                "storedPayloadBytes": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "caveats",
+                "ingestionEnabled",
+                "lastCapacityRejectionMs",
+                "lastSuccessfulBatchMs",
+                "latestEventMs",
+                "maxEvents",
+                "maxPayloadBytes",
+                "projectId",
+                "retainedFromMs",
+                "retentionDays",
+                "storedEvents",
+                "storedPayloadBytes"
+            ],
+            "type": "object"
+        },
+        "TelemetryMonitorAction": {
+            "description": "Scheduler stores the rule; identity is only in Job.owner, never supplied by this action.",
+            "properties": {
+                "destination": {
+                    "$ref": "#/definitions/TelemetryNotificationDestination",
+                    "description": "Host-captured private channel destination; never accepted from model arguments."
+                },
+                "investigate": {
+                    "type": "boolean"
+                },
+                "kind": {
+                    "const": "roblox-monitor",
+                    "type": "string"
+                },
+                "rule": {
+                    "$ref": "#/definitions/TelemetryMonitorRule"
+                }
+            },
+            "required": ["kind", "rule"],
+            "type": "object"
+        },
+        "TelemetryMonitorRule": {
+            "description": "A deterministic observed-conversion threshold, not an automatic causal experiment decision.",
+            "properties": {
+                "appliedConfigKey": {
+                    "type": "string"
+                },
+                "completionWindowMs": {
+                    "type": "number"
+                },
+                "configLookbackMs": {
+                    "type": "string"
+                },
+                "conversionBelow": {
+                    "type": "number"
+                },
+                "cooldownMs": {
+                    "type": "number"
+                },
+                "lookbackMs": {
+                    "type": "number"
+                },
+                "minimumAttempts": {
+                    "type": "number"
+                },
+                "minimumSessions": {
+                    "type": "number"
+                },
+                "performanceFpsThreshold": {
+                    "type": "number"
+                },
+                "performanceLookbackMs": {
+                    "type": "string"
+                },
+                "projectId": {
+                    "type": "string"
+                },
+                "settleDelayMs": {
+                    "type": "number"
+                },
+                "steps": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": [
+                "completionWindowMs",
+                "conversionBelow",
+                "cooldownMs",
+                "lookbackMs",
+                "minimumAttempts",
+                "minimumSessions",
+                "projectId",
+                "settleDelayMs",
+                "steps"
+            ],
+            "type": "object"
+        },
+        "TelemetryNotificationDestination": {
+            "description": "Host-captured private channel destination; never accepted from model arguments.",
+            "properties": {
+                "channelId": {
+                    "type": "string"
+                },
+                "conversationId": {
+                    "type": "string"
+                },
+                "threadId": {
+                    "type": "string"
+                }
+            },
+            "required": ["channelId", "conversationId"],
+            "type": "object"
+        },
+        "TelemetryPerformanceParams": {
+            "description": "Complete bounded client performance query for one owned project.",
+            "properties": {
+                "fromMs": {
+                    "type": "string"
+                },
+                "projectId": {
+                    "type": "string"
+                },
+                "toMs": {
+                    "type": "string"
+                }
+            },
+            "required": ["fromMs", "projectId", "toMs"],
+            "type": "object"
+        },
+        "TelemetryProject": {
+            "description": "Project identity returned to authenticated owners; contains no ingestion secret.",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "universeId": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "string"
+                }
+            },
+            "required": ["id", "name", "universeId", "userId"],
+            "type": "object"
+        },
         "TokenUsage": {
             "description": "Token accounting for a turn.",
             "properties": {
@@ -4884,6 +5707,13 @@
                     "$ref": "#/definitions/DeliveryReceipt",
                     "description": "Exact submitted artifact and acknowledged destination, produced by the delivery adapter."
                 },
+                "deliveryReceipts": {
+                    "description": "One authoritative receipt per file in a multi-attachment delivery.",
+                    "items": {
+                        "$ref": "#/definitions/DeliveryReceipt"
+                    },
+                    "type": "array"
+                },
                 "display": {
                     "anyOf": [
                         {
@@ -5051,6 +5881,9 @@
         "VoiceCallEvent": {
             "anyOf": [
                 {
+                    "$ref": "#/definitions/VoiceInterimEvent"
+                },
+                {
                     "properties": {
                         "kind": {
                             "const": "heard",
@@ -5101,21 +5934,22 @@
                     },
                     "required": ["kind", "message"],
                     "type": "object"
-                },
-                {
-                    "type": "object",
-                    "properties": {
-                        "kind": {
-                            "type": "string",
-                            "const": "interim"
-                        },
-                        "text": {
-                            "type": "string"
-                        }
-                    },
-                    "required": ["kind", "text"]
                 }
             ]
+        },
+        "VoiceInterimEvent": {
+            "description": "Replaceable ASR hypothesis for the current utterance.",
+            "properties": {
+                "kind": {
+                    "const": "interim",
+                    "type": "string"
+                },
+                "text": {
+                    "type": "string"
+                }
+            },
+            "required": ["kind", "text"],
+            "type": "object"
         },
         "VoiceStartParams": {
             "description": "Opens a spoken call. The conversation is the agent's, so a call can continue a typed thread.",

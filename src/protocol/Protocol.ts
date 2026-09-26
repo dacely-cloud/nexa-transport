@@ -719,6 +719,78 @@ export interface CreditSummaryParamsShape {
 /** CreditSummaryParams from the Nexa wire protocol. */
 export type CreditSummaryParams = CreditSummaryParamsShape;
 
+/** DataFile wire fields. */
+export interface DataFileShape {
+    /** byteLength as defined by the Nexa gateway. */
+    readonly byteLength: string;
+    /** filename as defined by the Nexa gateway. */
+    readonly filename: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** path as defined by the Nexa gateway. */
+    readonly path: string;
+}
+
+/** DataFile from the Nexa wire protocol. */
+export type DataFile = DataFileShape;
+
+/** DataUpload wire fields. */
+export interface DataUploadShape {
+    /** byteLength as defined by the Nexa gateway. */
+    readonly byteLength: string;
+    /** filename as defined by the Nexa gateway. */
+    readonly filename: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+}
+
+/** DataUpload from the Nexa wire protocol. */
+export type DataUpload = DataUploadShape;
+
+/** DataUploadChunkParams wire fields. */
+export interface DataUploadChunkParamsShape {
+    /** data as defined by the Nexa gateway. */
+    readonly data: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** offset as defined by the Nexa gateway. */
+    readonly offset: string;
+}
+
+/** DataUploadChunkParams from the Nexa wire protocol. */
+export type DataUploadChunkParams = DataUploadChunkParamsShape;
+
+/** DataUploadIdParams wire fields. */
+export interface DataUploadIdParamsShape {
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+}
+
+/** DataUploadIdParams from the Nexa wire protocol. */
+export type DataUploadIdParams = DataUploadIdParamsShape;
+
+/** DataUploadPosition wire fields. */
+export interface DataUploadPositionShape {
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** offset as defined by the Nexa gateway. */
+    readonly offset: string;
+}
+
+/** DataUploadPosition from the Nexa wire protocol. */
+export type DataUploadPosition = DataUploadPositionShape;
+
+/** DataUploadStartParams wire fields. */
+export interface DataUploadStartParamsShape {
+    /** byteLength as defined by the Nexa gateway. */
+    readonly byteLength: string;
+    /** filename as defined by the Nexa gateway. */
+    readonly filename: string;
+}
+
+/** DataUploadStartParams from the Nexa wire protocol. */
+export type DataUploadStartParams = DataUploadStartParamsShape;
+
 /** DeadLetter wire fields. */
 export interface DeadLetterShape {
     /** agentId as defined by the Nexa gateway. */
@@ -998,6 +1070,108 @@ export interface SessionShape {
 /** Session from the Nexa wire protocol. */
 export type Session = SessionShape;
 
+/** FunnelCohort wire fields. */
+export interface FunnelCohortShape {
+    /** configRevision as defined by the Nexa gateway. */
+    readonly configRevision: string;
+    /** device as defined by the Nexa gateway. */
+    readonly device: string;
+    /** experimentId as defined by the Nexa gateway. */
+    readonly experimentId: string;
+    /** observedConfig as defined by the Nexa gateway. */
+    readonly observedConfig?: string;
+    /** observedPerformance as defined by the Nexa gateway. */
+    readonly observedPerformance?: string;
+    /** placeId as defined by the Nexa gateway. */
+    readonly placeId: string;
+    /** placeVersion as defined by the Nexa gateway. */
+    readonly placeVersion: string;
+    /** variant as defined by the Nexa gateway. */
+    readonly variant: string;
+}
+
+/** FunnelCohort from the Nexa wire protocol. */
+export type FunnelCohort = FunnelCohortShape;
+
+/** FunnelGroup wire fields. */
+export interface FunnelGroupShape {
+    /** attempts as defined by the Nexa gateway. */
+    readonly attempts: number;
+    /** cohort as defined by the Nexa gateway. */
+    readonly cohort: FunnelCohort;
+    /** conversion as defined by the Nexa gateway. */
+    readonly conversion: number;
+    /** reached as defined by the Nexa gateway. */
+    readonly reached: ReadonlyArray<number>;
+    /** sessions as defined by the Nexa gateway. */
+    readonly sessions: number;
+}
+
+/** FunnelGroup from the Nexa wire protocol. */
+export type FunnelGroup = FunnelGroupShape;
+
+/** FunnelQuery wire fields. */
+export interface FunnelQueryShape {
+    /** appliedConfigKey as defined by the Nexa gateway. */
+    readonly appliedConfigKey?: string;
+    /** completionWindowMs as defined by the Nexa gateway. */
+    readonly completionWindowMs: string;
+    /** configLookbackMs as defined by the Nexa gateway. */
+    readonly configLookbackMs?: string;
+    /** fromMs as defined by the Nexa gateway. */
+    readonly fromMs: string;
+    /** performanceFpsThreshold as defined by the Nexa gateway. */
+    readonly performanceFpsThreshold?: number;
+    /** performanceLookbackMs as defined by the Nexa gateway. */
+    readonly performanceLookbackMs?: string;
+    /** steps as defined by the Nexa gateway. */
+    readonly steps: ReadonlyArray<string>;
+    /** toMs as defined by the Nexa gateway. */
+    readonly toMs: string;
+}
+
+/** FunnelQuery from the Nexa wire protocol. */
+export type FunnelQuery = FunnelQueryShape;
+
+/** FunnelReport wire fields. */
+export interface FunnelReportShape {
+    /** caveats as defined by the Nexa gateway. */
+    readonly caveats: ReadonlyArray<string>;
+    /** collection as defined by the Nexa gateway. */
+    readonly collection?: TelemetryHealth;
+    /** duplicateEvents as defined by the Nexa gateway. */
+    readonly duplicateEvents: number;
+    /** generatedAtMs as defined by the Nexa gateway. */
+    readonly generatedAtMs: string;
+    /** groups as defined by the Nexa gateway. */
+    readonly groups: ReadonlyArray<FunnelGroup>;
+    /** ignoredClientEvents as defined by the Nexa gateway. */
+    readonly ignoredClientEvents: number;
+    /** latestMatchingEventMs as defined by the Nexa gateway. */
+    readonly latestMatchingEventMs: null | string;
+    /** missingAttemptEvents as defined by the Nexa gateway. */
+    readonly missingAttemptEvents: number;
+    /** missingStartAttempts as defined by the Nexa gateway. */
+    readonly missingStartAttempts: number;
+    /** mixedCohortAttempts as defined by the Nexa gateway. */
+    readonly mixedCohortAttempts: number;
+    /** observedUntilMs as defined by the Nexa gateway. */
+    readonly observedUntilMs: string;
+    /** pendingAttempts as defined by the Nexa gateway. */
+    readonly pendingAttempts: number;
+    /** query as defined by the Nexa gateway. */
+    readonly query: FunnelQuery;
+    /** repeatedStartEvents as defined by the Nexa gateway. */
+    readonly repeatedStartEvents: number;
+    /** unattributedConfigAttempts as defined by the Nexa gateway. */
+    readonly unattributedConfigAttempts?: number;
+    /** unmeasuredPerformanceAttempts as defined by the Nexa gateway. */
+    readonly unmeasuredPerformanceAttempts?: number;
+}
+
+/** FunnelReport from the Nexa wire protocol. */
+export type FunnelReport = FunnelReportShape;
+
 /** GatewayFeatures wire fields. */
 export interface GatewayFeaturesShape {
     /** attachments as defined by the Nexa gateway. */
@@ -1246,6 +1420,38 @@ export interface GatewayMethodscredit_summaryShape {
     readonly result: CreditSummary;
 }
 
+/** GatewayMethodsdata_upload_cancel wire fields. */
+export interface GatewayMethodsdata_upload_cancelShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DataUploadIdParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: OkResult;
+}
+
+/** GatewayMethodsdata_upload_chunk wire fields. */
+export interface GatewayMethodsdata_upload_chunkShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DataUploadChunkParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DataUploadPosition;
+}
+
+/** GatewayMethodsdata_upload_finish wire fields. */
+export interface GatewayMethodsdata_upload_finishShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DataUploadIdParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DataFile;
+}
+
+/** GatewayMethodsdata_upload_start wire fields. */
+export interface GatewayMethodsdata_upload_startShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DataUploadStartParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DataUpload;
+}
+
 /** GatewayMethodsdevices_approve wire fields. */
 export interface GatewayMethodsdevices_approveShape {
     /** params as defined by the Nexa gateway. */
@@ -1324,6 +1530,54 @@ export interface GatewayMethodsmedia_acknowledgeShape {
     readonly params: MediaAcknowledgeParams;
     /** result as defined by the Nexa gateway. */
     readonly result: OkResult;
+}
+
+/** GatewayMethodsroblox_credentials_remove wire fields. */
+export interface GatewayMethodsroblox_credentials_removeShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: Recordstringnever;
+    /** result as defined by the Nexa gateway. */
+    readonly result: RobloxCredentialStatus;
+}
+
+/** GatewayMethodsroblox_credentials_set wire fields. */
+export interface GatewayMethodsroblox_credentials_setShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: RobloxCredentialSetParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: RobloxCredentialStatus;
+}
+
+/** GatewayMethodsroblox_credentials_status wire fields. */
+export interface GatewayMethodsroblox_credentials_statusShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: Recordstringnever;
+    /** result as defined by the Nexa gateway. */
+    readonly result: RobloxCredentialStatus;
+}
+
+/** GatewayMethodsroblox_telemetry_funnel wire fields. */
+export interface GatewayMethodsroblox_telemetry_funnelShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: TelemetryFunnelParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: FunnelReport;
+}
+
+/** GatewayMethodsroblox_telemetry_performance wire fields. */
+export interface GatewayMethodsroblox_telemetry_performanceShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: TelemetryPerformanceParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: PerformanceReport;
+}
+
+/** GatewayMethodsroblox_telemetry_projects wire fields. */
+export interface GatewayMethodsroblox_telemetry_projectsShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: Recordstringnever;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ReadonlyArray<TelemetryProject>;
 }
 
 /** GatewayMethodssessions_delete wire fields. */
@@ -1578,6 +1832,14 @@ export interface GatewayMethodsShape {
     readonly 'credit.setBudget': GatewayMethodscredit_setBudgetShape;
     /** credit.summary as defined by the Nexa gateway. */
     readonly 'credit.summary': GatewayMethodscredit_summaryShape;
+    /** data.upload.cancel as defined by the Nexa gateway. */
+    readonly 'data.upload.cancel': GatewayMethodsdata_upload_cancelShape;
+    /** data.upload.chunk as defined by the Nexa gateway. */
+    readonly 'data.upload.chunk': GatewayMethodsdata_upload_chunkShape;
+    /** data.upload.finish as defined by the Nexa gateway. */
+    readonly 'data.upload.finish': GatewayMethodsdata_upload_finishShape;
+    /** data.upload.start as defined by the Nexa gateway. */
+    readonly 'data.upload.start': GatewayMethodsdata_upload_startShape;
     /** devices.approve as defined by the Nexa gateway. */
     readonly 'devices.approve': GatewayMethodsdevices_approveShape;
     /** devices.list as defined by the Nexa gateway. */
@@ -1598,6 +1860,18 @@ export interface GatewayMethodsShape {
     readonly 'logs.tail': GatewayMethodslogs_tailShape;
     /** media.acknowledge as defined by the Nexa gateway. */
     readonly 'media.acknowledge': GatewayMethodsmedia_acknowledgeShape;
+    /** roblox.credentials.remove as defined by the Nexa gateway. */
+    readonly 'roblox.credentials.remove': GatewayMethodsroblox_credentials_removeShape;
+    /** roblox.credentials.set as defined by the Nexa gateway. */
+    readonly 'roblox.credentials.set': GatewayMethodsroblox_credentials_setShape;
+    /** roblox.credentials.status as defined by the Nexa gateway. */
+    readonly 'roblox.credentials.status': GatewayMethodsroblox_credentials_statusShape;
+    /** roblox.telemetry.funnel as defined by the Nexa gateway. */
+    readonly 'roblox.telemetry.funnel': GatewayMethodsroblox_telemetry_funnelShape;
+    /** roblox.telemetry.performance as defined by the Nexa gateway. */
+    readonly 'roblox.telemetry.performance': GatewayMethodsroblox_telemetry_performanceShape;
+    /** roblox.telemetry.projects as defined by the Nexa gateway. */
+    readonly 'roblox.telemetry.projects': GatewayMethodsroblox_telemetry_projectsShape;
     /** sessions.delete as defined by the Nexa gateway. */
     readonly 'sessions.delete': GatewayMethodssessions_deleteShape;
     /** sessions.download as defined by the Nexa gateway. */
@@ -1850,8 +2124,8 @@ export interface JobShape {
 /** Job from the Nexa wire protocol. */
 export type Job = JobShape;
 
-/** JobActionVariant1 wire fields. */
-export interface JobActionVariant1Shape {
+/** JobActionVariant2 wire fields. */
+export interface JobActionVariant2Shape {
     /** agentId as defined by the Nexa gateway. */
     readonly agentId: string;
     /** deliverTo as defined by the Nexa gateway. */
@@ -1864,16 +2138,16 @@ export interface JobActionVariant1Shape {
     readonly silentWhenEmpty?: boolean;
 }
 
-/** Allowed values for JobActionVariant2elevation. */
-export const JobActionVariant2elevationValues = {
+/** Allowed values for JobActionVariant3elevation. */
+export const JobActionVariant3elevationValues = {
     Value0: 'ask',
     Value1: 'full',
     Value2: 'off',
     Value3: 'on',
 } as const;
 
-/** JobActionVariant2 wire fields. */
-export interface JobActionVariant2Shape {
+/** JobActionVariant3 wire fields. */
+export interface JobActionVariant3Shape {
     /** allowSelfLifecycle as defined by the Nexa gateway. */
     readonly allowSelfLifecycle?: boolean;
     /** command as defined by the Nexa gateway. */
@@ -1881,15 +2155,15 @@ export interface JobActionVariant2Shape {
     /** cwd as defined by the Nexa gateway. */
     readonly cwd?: string;
     /** elevation as defined by the Nexa gateway. */
-    readonly elevation?: (typeof JobActionVariant2elevationValues)[keyof typeof JobActionVariant2elevationValues];
+    readonly elevation?: (typeof JobActionVariant3elevationValues)[keyof typeof JobActionVariant3elevationValues];
     /** kind as defined by the Nexa gateway. */
     readonly kind: 'shell';
     /** timeoutMs as defined by the Nexa gateway. */
     readonly timeoutMs?: number;
 }
 
-/** JobActionVariant3 wire fields. */
-export interface JobActionVariant3Shape {
+/** JobActionVariant4 wire fields. */
+export interface JobActionVariant4Shape {
     /** input as defined by the Nexa gateway. */
     readonly input: JsonValue;
     /** kind as defined by the Nexa gateway. */
@@ -1898,8 +2172,8 @@ export interface JobActionVariant3Shape {
     readonly tool: string;
 }
 
-/** JobActionVariant4 wire fields. */
-export interface JobActionVariant4Shape {
+/** JobActionVariant5 wire fields. */
+export interface JobActionVariant5Shape {
     /** event as defined by the Nexa gateway. */
     readonly event: string;
     /** kind as defined by the Nexa gateway. */
@@ -1908,20 +2182,21 @@ export interface JobActionVariant4Shape {
     readonly payload?: JsonValue;
 }
 
-/** JobActionVariant5 wire fields. */
-export interface JobActionVariant5Shape {
+/** JobActionVariant6 wire fields. */
+export interface JobActionVariant6Shape {
     /** kind as defined by the Nexa gateway. */
     readonly kind: 'maintenance';
 }
 
 /** JobAction from the Nexa wire protocol. */
 export type JobAction =
+    | TelemetryMonitorAction
     | ReminderAction
-    | JobActionVariant1Shape
     | JobActionVariant2Shape
     | JobActionVariant3Shape
     | JobActionVariant4Shape
-    | JobActionVariant5Shape;
+    | JobActionVariant5Shape
+    | JobActionVariant6Shape;
 
 /** JobAddParams wire fields. */
 export interface JobAddParamsShape {
@@ -2165,6 +2440,19 @@ export interface NcapArtifactDeltaShape {
 
 /** NcapArtifactDelta from the Nexa wire protocol. */
 export type NcapArtifactDelta = NcapArtifactDeltaShape;
+
+/** NcapAsrTranscript wire fields. */
+export interface NcapAsrTranscriptShape {
+    /** audioSamples as defined by the Nexa gateway. */
+    readonly audioSamples: number;
+    /** language as defined by the Nexa gateway. */
+    readonly language: string;
+    /** text as defined by the Nexa gateway. */
+    readonly text: string;
+}
+
+/** NcapAsrTranscript from the Nexa wire protocol. */
+export type NcapAsrTranscript = NcapAsrTranscriptShape;
 
 /** Allowed values for NcapBlockDeltaphase. */
 export const NcapBlockDeltaphaseValues = {
@@ -2445,6 +2733,8 @@ export interface NcapDeltaShape {
     readonly agentTool?: NcapAgentToolDelta;
     /** artifact as defined by the Nexa gateway. */
     readonly artifact?: NcapArtifactDelta;
+    /** asr as defined by the Nexa gateway. */
+    readonly asr?: NcapAsrTranscript;
     /** backlog as defined by the Nexa gateway. */
     readonly backlog?:
         | NcapDeltabacklogVariant0Shape
@@ -2479,6 +2769,8 @@ export interface NcapDeltaShape {
     readonly reflection?: NcapDeltareflectionShape;
     /** research as defined by the Nexa gateway. */
     readonly research?: NcapResearchDelta;
+    /** segmentation as defined by the Nexa gateway. */
+    readonly segmentation?: SegmentationFrame;
     /** skill as defined by the Nexa gateway. */
     readonly skill?: NcapSkillDelta;
     /** status as defined by the Nexa gateway. */
@@ -2770,6 +3062,86 @@ export interface PendingApprovalShape {
 /** PendingApproval from the Nexa wire protocol. */
 export type PendingApproval = PendingApprovalShape;
 
+/** PerformanceCohort wire fields. */
+export interface PerformanceCohortShape {
+    /** gamepadEnabled as defined by the Nexa gateway. */
+    readonly gamepadEnabled: boolean;
+    /** keyboardEnabled as defined by the Nexa gateway. */
+    readonly keyboardEnabled: boolean;
+    /** placeId as defined by the Nexa gateway. */
+    readonly placeId: string;
+    /** placeVersion as defined by the Nexa gateway. */
+    readonly placeVersion: string;
+    /** touchEnabled as defined by the Nexa gateway. */
+    readonly touchEnabled: boolean;
+}
+
+/** PerformanceCohort from the Nexa wire protocol. */
+export type PerformanceCohort = PerformanceCohortShape;
+
+/** PerformanceGroup wire fields. */
+export interface PerformanceGroupShape {
+    /** cohort as defined by the Nexa gateway. */
+    readonly cohort: PerformanceCohort;
+    /** frames as defined by the Nexa gateway. */
+    readonly frames: string;
+    /** maximumFrameMs as defined by the Nexa gateway. */
+    readonly maximumFrameMs: number;
+    /** meanSessionFps as defined by the Nexa gateway. */
+    readonly meanSessionFps: number;
+    /** sampledDurationMs as defined by the Nexa gateway. */
+    readonly sampledDurationMs: number;
+    /** samples as defined by the Nexa gateway. */
+    readonly samples: number;
+    /** sessions as defined by the Nexa gateway. */
+    readonly sessions: number;
+    /** slowFrameFraction as defined by the Nexa gateway. */
+    readonly slowFrameFraction: number;
+    /** slowFrames as defined by the Nexa gateway. */
+    readonly slowFrames: string;
+    /** timeWeightedFps as defined by the Nexa gateway. */
+    readonly timeWeightedFps: number;
+}
+
+/** PerformanceGroup from the Nexa wire protocol. */
+export type PerformanceGroup = PerformanceGroupShape;
+
+/** PerformanceQuery wire fields. */
+export interface PerformanceQueryShape {
+    /** fromMs as defined by the Nexa gateway. */
+    readonly fromMs: string;
+    /** toMs as defined by the Nexa gateway. */
+    readonly toMs: string;
+}
+
+/** PerformanceQuery from the Nexa wire protocol. */
+export type PerformanceQuery = PerformanceQueryShape;
+
+/** PerformanceReport wire fields. */
+export interface PerformanceReportShape {
+    /** caveats as defined by the Nexa gateway. */
+    readonly caveats: ReadonlyArray<string>;
+    /** collection as defined by the Nexa gateway. */
+    readonly collection?: TelemetryHealth;
+    /** duplicateSamples as defined by the Nexa gateway. */
+    readonly duplicateSamples: number;
+    /** generatedAtMs as defined by the Nexa gateway. */
+    readonly generatedAtMs: string;
+    /** groups as defined by the Nexa gateway. */
+    readonly groups: ReadonlyArray<PerformanceGroup>;
+    /** ignoredSourceSamples as defined by the Nexa gateway. */
+    readonly ignoredSourceSamples: number;
+    /** invalidSamples as defined by the Nexa gateway. */
+    readonly invalidSamples: number;
+    /** latestSampleMs as defined by the Nexa gateway. */
+    readonly latestSampleMs: null | string;
+    /** query as defined by the Nexa gateway. */
+    readonly query: PerformanceQuery;
+}
+
+/** PerformanceReport from the Nexa wire protocol. */
+export type PerformanceReport = PerformanceReportShape;
+
 /** Allowed values for ReasoningOptionseffort. */
 export const ReasoningOptionseffortValues = {
     Value0: 'high',
@@ -2840,11 +3212,42 @@ export const RiskLevelValues = {
 /** RiskLevel from the Nexa wire protocol. */
 export type RiskLevel = (typeof RiskLevelValues)[keyof typeof RiskLevelValues];
 
+/** RobloxCredentialSetParams wire fields. */
+export interface RobloxCredentialSetParamsShape {
+    /** apiKey as defined by the Nexa gateway. */
+    readonly apiKey: string;
+}
+
+/** RobloxCredentialSetParams from the Nexa wire protocol. */
+export type RobloxCredentialSetParams = RobloxCredentialSetParamsShape;
+
+/** RobloxCredentialStatus wire fields. */
+export interface RobloxCredentialStatusShape {
+    /** connected as defined by the Nexa gateway. */
+    readonly connected: boolean;
+    /** validated as defined by the Nexa gateway. */
+    readonly validated: false;
+}
+
+/** RobloxCredentialStatus from the Nexa wire protocol. */
+export type RobloxCredentialStatus = RobloxCredentialStatusShape;
+
 /** Allowed values for Scope. */
 export const ScopeValues = { Value0: 'admin', Value1: 'read', Value2: 'write' } as const;
 
 /** Scope from the Nexa wire protocol. */
 export type Scope = (typeof ScopeValues)[keyof typeof ScopeValues];
+
+/** SegmentationFrame wire fields. */
+export interface SegmentationFrameShape {
+    /** payload as defined by the Nexa gateway. */
+    readonly payload: ReadonlyArray<number>;
+    /** type as defined by the Nexa gateway. */
+    readonly type: number;
+}
+
+/** SegmentationFrame from the Nexa wire protocol. */
+export type SegmentationFrame = SegmentationFrameShape;
 
 /** SessionFileParams wire fields. */
 export interface SessionFileParamsShape {
@@ -3108,6 +3511,151 @@ export interface TeamSummaryShape {
 /** TeamSummary from the Nexa wire protocol. */
 export type TeamSummary = TeamSummaryShape;
 
+/** TelemetryFunnelParams wire fields. */
+export interface TelemetryFunnelParamsShape {
+    /** appliedConfigKey as defined by the Nexa gateway. */
+    readonly appliedConfigKey?: string;
+    /** completionWindowMs as defined by the Nexa gateway. */
+    readonly completionWindowMs: string;
+    /** configLookbackMs as defined by the Nexa gateway. */
+    readonly configLookbackMs?: string;
+    /** fromMs as defined by the Nexa gateway. */
+    readonly fromMs: string;
+    /** performanceFpsThreshold as defined by the Nexa gateway. */
+    readonly performanceFpsThreshold?: number;
+    /** performanceLookbackMs as defined by the Nexa gateway. */
+    readonly performanceLookbackMs?: string;
+    /** projectId as defined by the Nexa gateway. */
+    readonly projectId: string;
+    /** steps as defined by the Nexa gateway. */
+    readonly steps: ReadonlyArray<string>;
+    /** toMs as defined by the Nexa gateway. */
+    readonly toMs: string;
+}
+
+/** TelemetryFunnelParams from the Nexa wire protocol. */
+export type TelemetryFunnelParams = TelemetryFunnelParamsShape;
+
+/** TelemetryHealth wire fields. */
+export interface TelemetryHealthShape {
+    /** caveats as defined by the Nexa gateway. */
+    readonly caveats: ReadonlyArray<string>;
+    /** ingestionEnabled as defined by the Nexa gateway. */
+    readonly ingestionEnabled: boolean;
+    /** lastCapacityRejectionMs as defined by the Nexa gateway. */
+    readonly lastCapacityRejectionMs: null | string;
+    /** lastSuccessfulBatchMs as defined by the Nexa gateway. */
+    readonly lastSuccessfulBatchMs: null | string;
+    /** latestEventMs as defined by the Nexa gateway. */
+    readonly latestEventMs: null | string;
+    /** maxEvents as defined by the Nexa gateway. */
+    readonly maxEvents: number;
+    /** maxPayloadBytes as defined by the Nexa gateway. */
+    readonly maxPayloadBytes: string;
+    /** projectId as defined by the Nexa gateway. */
+    readonly projectId: string;
+    /** retainedFromMs as defined by the Nexa gateway. */
+    readonly retainedFromMs: string;
+    /** retentionDays as defined by the Nexa gateway. */
+    readonly retentionDays: number;
+    /** storedEvents as defined by the Nexa gateway. */
+    readonly storedEvents: number;
+    /** storedPayloadBytes as defined by the Nexa gateway. */
+    readonly storedPayloadBytes: string;
+}
+
+/** TelemetryHealth from the Nexa wire protocol. */
+export type TelemetryHealth = TelemetryHealthShape;
+
+/** TelemetryMonitorAction wire fields. */
+export interface TelemetryMonitorActionShape {
+    /** destination as defined by the Nexa gateway. */
+    readonly destination?: TelemetryNotificationDestination;
+    /** investigate as defined by the Nexa gateway. */
+    readonly investigate?: boolean;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: 'roblox-monitor';
+    /** rule as defined by the Nexa gateway. */
+    readonly rule: TelemetryMonitorRule;
+}
+
+/** TelemetryMonitorAction from the Nexa wire protocol. */
+export type TelemetryMonitorAction = TelemetryMonitorActionShape;
+
+/** TelemetryMonitorRule wire fields. */
+export interface TelemetryMonitorRuleShape {
+    /** appliedConfigKey as defined by the Nexa gateway. */
+    readonly appliedConfigKey?: string;
+    /** completionWindowMs as defined by the Nexa gateway. */
+    readonly completionWindowMs: number;
+    /** configLookbackMs as defined by the Nexa gateway. */
+    readonly configLookbackMs?: string;
+    /** conversionBelow as defined by the Nexa gateway. */
+    readonly conversionBelow: number;
+    /** cooldownMs as defined by the Nexa gateway. */
+    readonly cooldownMs: number;
+    /** lookbackMs as defined by the Nexa gateway. */
+    readonly lookbackMs: number;
+    /** minimumAttempts as defined by the Nexa gateway. */
+    readonly minimumAttempts: number;
+    /** minimumSessions as defined by the Nexa gateway. */
+    readonly minimumSessions: number;
+    /** performanceFpsThreshold as defined by the Nexa gateway. */
+    readonly performanceFpsThreshold?: number;
+    /** performanceLookbackMs as defined by the Nexa gateway. */
+    readonly performanceLookbackMs?: string;
+    /** projectId as defined by the Nexa gateway. */
+    readonly projectId: string;
+    /** settleDelayMs as defined by the Nexa gateway. */
+    readonly settleDelayMs: number;
+    /** steps as defined by the Nexa gateway. */
+    readonly steps: ReadonlyArray<string>;
+}
+
+/** TelemetryMonitorRule from the Nexa wire protocol. */
+export type TelemetryMonitorRule = TelemetryMonitorRuleShape;
+
+/** TelemetryNotificationDestination wire fields. */
+export interface TelemetryNotificationDestinationShape {
+    /** channelId as defined by the Nexa gateway. */
+    readonly channelId: string;
+    /** conversationId as defined by the Nexa gateway. */
+    readonly conversationId: string;
+    /** threadId as defined by the Nexa gateway. */
+    readonly threadId?: string;
+}
+
+/** TelemetryNotificationDestination from the Nexa wire protocol. */
+export type TelemetryNotificationDestination = TelemetryNotificationDestinationShape;
+
+/** TelemetryPerformanceParams wire fields. */
+export interface TelemetryPerformanceParamsShape {
+    /** fromMs as defined by the Nexa gateway. */
+    readonly fromMs: string;
+    /** projectId as defined by the Nexa gateway. */
+    readonly projectId: string;
+    /** toMs as defined by the Nexa gateway. */
+    readonly toMs: string;
+}
+
+/** TelemetryPerformanceParams from the Nexa wire protocol. */
+export type TelemetryPerformanceParams = TelemetryPerformanceParamsShape;
+
+/** TelemetryProject wire fields. */
+export interface TelemetryProjectShape {
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** name as defined by the Nexa gateway. */
+    readonly name: string;
+    /** universeId as defined by the Nexa gateway. */
+    readonly universeId: string;
+    /** userId as defined by the Nexa gateway. */
+    readonly userId: string;
+}
+
+/** TelemetryProject from the Nexa wire protocol. */
+export type TelemetryProject = TelemetryProjectShape;
+
 /** TokenUsage wire fields. */
 export interface TokenUsageShape {
     /** cacheWriteLongTokens as defined by the Nexa gateway. */
@@ -3278,6 +3826,8 @@ export interface ToolResultShape {
     readonly deliveredText?: string;
     /** deliveryReceipt as defined by the Nexa gateway. */
     readonly deliveryReceipt?: DeliveryReceipt;
+    /** deliveryReceipts as defined by the Nexa gateway. */
+    readonly deliveryReceipts?: ReadonlyArray<DeliveryReceipt>;
     /** display as defined by the Nexa gateway. */
     readonly display?:
         | ReadonlyArray<JsonValue>
@@ -3395,18 +3945,10 @@ export interface VoiceAudioParamsShape {
 /** VoiceAudioParams from the Nexa wire protocol. */
 export type VoiceAudioParams = VoiceAudioParamsShape;
 
-/** VoiceCallEventVariant0 wire fields. */
-export interface VoiceCallEventVariant0Shape {
-    /** kind as defined by the Nexa gateway. */
-    readonly kind: 'heard';
-    /** text as defined by the Nexa gateway. */
-    readonly text: string;
-}
-
 /** VoiceCallEventVariant1 wire fields. */
 export interface VoiceCallEventVariant1Shape {
     /** kind as defined by the Nexa gateway. */
-    readonly kind: 'said';
+    readonly kind: 'heard';
     /** text as defined by the Nexa gateway. */
     readonly text: string;
 }
@@ -3414,7 +3956,7 @@ export interface VoiceCallEventVariant1Shape {
 /** VoiceCallEventVariant2 wire fields. */
 export interface VoiceCallEventVariant2Shape {
     /** kind as defined by the Nexa gateway. */
-    readonly kind: 'status';
+    readonly kind: 'said';
     /** text as defined by the Nexa gateway. */
     readonly text: string;
 }
@@ -3422,24 +3964,37 @@ export interface VoiceCallEventVariant2Shape {
 /** VoiceCallEventVariant3 wire fields. */
 export interface VoiceCallEventVariant3Shape {
     /** kind as defined by the Nexa gateway. */
+    readonly kind: 'status';
+    /** text as defined by the Nexa gateway. */
+    readonly text: string;
+}
+
+/** VoiceCallEventVariant4 wire fields. */
+export interface VoiceCallEventVariant4Shape {
+    /** kind as defined by the Nexa gateway. */
     readonly kind: 'error';
     /** message as defined by the Nexa gateway. */
     readonly message: string;
 }
 
 /** VoiceCallEvent from the Nexa wire protocol. */
-/** Replaceable recognition hypothesis; finalized text arrives as heard. */
-export interface VoiceInterimEvent {
+export type VoiceCallEvent =
+    | VoiceInterimEvent
+    | VoiceCallEventVariant1Shape
+    | VoiceCallEventVariant2Shape
+    | VoiceCallEventVariant3Shape
+    | VoiceCallEventVariant4Shape;
+
+/** VoiceInterimEvent wire fields. */
+export interface VoiceInterimEventShape {
+    /** kind as defined by the Nexa gateway. */
     readonly kind: 'interim';
+    /** text as defined by the Nexa gateway. */
     readonly text: string;
 }
 
-export type VoiceCallEvent =
-    | VoiceInterimEvent
-    | VoiceCallEventVariant0Shape
-    | VoiceCallEventVariant1Shape
-    | VoiceCallEventVariant2Shape
-    | VoiceCallEventVariant3Shape;
+/** VoiceInterimEvent from the Nexa wire protocol. */
+export type VoiceInterimEvent = VoiceInterimEventShape;
 
 /** VoiceStartParams wire fields. */
 export interface VoiceStartParamsShape {
@@ -3951,6 +4506,14 @@ export enum Method {
     CreditSetBudget = 'credit.setBudget',
     /** Calls credit.summary. */
     CreditSummary = 'credit.summary',
+    /** Calls data.upload.cancel. */
+    DataUploadCancel = 'data.upload.cancel',
+    /** Calls data.upload.chunk. */
+    DataUploadChunk = 'data.upload.chunk',
+    /** Calls data.upload.finish. */
+    DataUploadFinish = 'data.upload.finish',
+    /** Calls data.upload.start. */
+    DataUploadStart = 'data.upload.start',
     /** Calls devices.approve. */
     DevicesApprove = 'devices.approve',
     /** Calls devices.list. */
@@ -3971,6 +4534,18 @@ export enum Method {
     LogsTail = 'logs.tail',
     /** Calls media.acknowledge. */
     MediaAcknowledge = 'media.acknowledge',
+    /** Calls roblox.credentials.remove. */
+    RobloxCredentialsRemove = 'roblox.credentials.remove',
+    /** Calls roblox.credentials.set. */
+    RobloxCredentialsSet = 'roblox.credentials.set',
+    /** Calls roblox.credentials.status. */
+    RobloxCredentialsStatus = 'roblox.credentials.status',
+    /** Calls roblox.telemetry.funnel. */
+    RobloxTelemetryFunnel = 'roblox.telemetry.funnel',
+    /** Calls roblox.telemetry.performance. */
+    RobloxTelemetryPerformance = 'roblox.telemetry.performance',
+    /** Calls roblox.telemetry.projects. */
+    RobloxTelemetryProjects = 'roblox.telemetry.projects',
     /** Calls sessions.delete. */
     SessionsDelete = 'sessions.delete',
     /** Calls sessions.download. */

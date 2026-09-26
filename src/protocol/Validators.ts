@@ -345,502 +345,642 @@ export function result20(value: unknown): boolean {
 /** Validates params21. */
 export function params21(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/devices.approve/properties/params',
+        '#/definitions/GatewayMethods/properties/data.upload.cancel/properties/params',
         value,
     );
 }
 /** Validates result21. */
 export function result21(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/devices.approve/properties/result',
+        '#/definitions/GatewayMethods/properties/data.upload.cancel/properties/result',
         value,
     );
 }
 /** Validates params22. */
 export function params22(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/devices.list/properties/params',
+        '#/definitions/GatewayMethods/properties/data.upload.chunk/properties/params',
         value,
     );
 }
 /** Validates result22. */
 export function result22(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/devices.list/properties/result',
+        '#/definitions/GatewayMethods/properties/data.upload.chunk/properties/result',
         value,
     );
 }
 /** Validates params23. */
 export function params23(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/devices.reject/properties/params',
+        '#/definitions/GatewayMethods/properties/data.upload.finish/properties/params',
         value,
     );
 }
 /** Validates result23. */
 export function result23(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/devices.reject/properties/result',
+        '#/definitions/GatewayMethods/properties/data.upload.finish/properties/result',
         value,
     );
 }
 /** Validates params24. */
 export function params24(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/devices.revoke/properties/params',
+        '#/definitions/GatewayMethods/properties/data.upload.start/properties/params',
         value,
     );
 }
 /** Validates result24. */
 export function result24(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/devices.revoke/properties/result',
+        '#/definitions/GatewayMethods/properties/data.upload.start/properties/result',
         value,
     );
 }
 /** Validates params25. */
 export function params25(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/health/properties/params',
+        '#/definitions/GatewayMethods/properties/devices.approve/properties/params',
         value,
     );
 }
 /** Validates result25. */
 export function result25(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/health/properties/result',
+        '#/definitions/GatewayMethods/properties/devices.approve/properties/result',
         value,
     );
 }
 /** Validates params26. */
 export function params26(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/jobs.add/properties/params',
+        '#/definitions/GatewayMethods/properties/devices.list/properties/params',
         value,
     );
 }
 /** Validates result26. */
 export function result26(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/jobs.add/properties/result',
+        '#/definitions/GatewayMethods/properties/devices.list/properties/result',
         value,
     );
 }
 /** Validates params27. */
 export function params27(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/jobs.list/properties/params',
+        '#/definitions/GatewayMethods/properties/devices.reject/properties/params',
         value,
     );
 }
 /** Validates result27. */
 export function result27(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/jobs.list/properties/result',
+        '#/definitions/GatewayMethods/properties/devices.reject/properties/result',
         value,
     );
 }
 /** Validates params28. */
 export function params28(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/jobs.remove/properties/params',
+        '#/definitions/GatewayMethods/properties/devices.revoke/properties/params',
         value,
     );
 }
 /** Validates result28. */
 export function result28(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/jobs.remove/properties/result',
+        '#/definitions/GatewayMethods/properties/devices.revoke/properties/result',
         value,
     );
 }
 /** Validates params29. */
 export function params29(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/logs.tail/properties/params',
+        '#/definitions/GatewayMethods/properties/health/properties/params',
         value,
     );
 }
 /** Validates result29. */
 export function result29(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/logs.tail/properties/result',
+        '#/definitions/GatewayMethods/properties/health/properties/result',
         value,
     );
 }
 /** Validates params30. */
 export function params30(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/media.acknowledge/properties/params',
+        '#/definitions/GatewayMethods/properties/jobs.add/properties/params',
         value,
     );
 }
 /** Validates result30. */
 export function result30(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/media.acknowledge/properties/result',
+        '#/definitions/GatewayMethods/properties/jobs.add/properties/result',
         value,
     );
 }
 /** Validates params31. */
 export function params31(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/sessions.delete/properties/params',
+        '#/definitions/GatewayMethods/properties/jobs.list/properties/params',
         value,
     );
 }
 /** Validates result31. */
 export function result31(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/sessions.delete/properties/result',
+        '#/definitions/GatewayMethods/properties/jobs.list/properties/result',
         value,
     );
 }
 /** Validates params32. */
 export function params32(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/sessions.download/properties/params',
+        '#/definitions/GatewayMethods/properties/jobs.remove/properties/params',
         value,
     );
 }
 /** Validates result32. */
 export function result32(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/sessions.download/properties/result',
+        '#/definitions/GatewayMethods/properties/jobs.remove/properties/result',
         value,
     );
 }
 /** Validates params33. */
 export function params33(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/sessions.files/properties/params',
+        '#/definitions/GatewayMethods/properties/logs.tail/properties/params',
         value,
     );
 }
 /** Validates result33. */
 export function result33(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/sessions.files/properties/result',
+        '#/definitions/GatewayMethods/properties/logs.tail/properties/result',
         value,
     );
 }
 /** Validates params34. */
 export function params34(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/sessions.get/properties/params',
+        '#/definitions/GatewayMethods/properties/media.acknowledge/properties/params',
         value,
     );
 }
 /** Validates result34. */
 export function result34(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/sessions.get/properties/result',
+        '#/definitions/GatewayMethods/properties/media.acknowledge/properties/result',
         value,
     );
 }
 /** Validates params35. */
 export function params35(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/sessions.list/properties/params',
+        '#/definitions/GatewayMethods/properties/roblox.credentials.remove/properties/params',
         value,
     );
 }
 /** Validates result35. */
 export function result35(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/sessions.list/properties/result',
+        '#/definitions/GatewayMethods/properties/roblox.credentials.remove/properties/result',
         value,
     );
 }
 /** Validates params36. */
 export function params36(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/sessions.messages/properties/params',
+        '#/definitions/GatewayMethods/properties/roblox.credentials.set/properties/params',
         value,
     );
 }
 /** Validates result36. */
 export function result36(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/sessions.messages/properties/result',
+        '#/definitions/GatewayMethods/properties/roblox.credentials.set/properties/result',
         value,
     );
 }
 /** Validates params37. */
 export function params37(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/sessions.subscribe/properties/params',
+        '#/definitions/GatewayMethods/properties/roblox.credentials.status/properties/params',
         value,
     );
 }
 /** Validates result37. */
 export function result37(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/sessions.subscribe/properties/result',
+        '#/definitions/GatewayMethods/properties/roblox.credentials.status/properties/result',
         value,
     );
 }
 /** Validates params38. */
 export function params38(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/sessions.unsubscribe/properties/params',
+        '#/definitions/GatewayMethods/properties/roblox.telemetry.funnel/properties/params',
         value,
     );
 }
 /** Validates result38. */
 export function result38(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/sessions.unsubscribe/properties/result',
+        '#/definitions/GatewayMethods/properties/roblox.telemetry.funnel/properties/result',
         value,
     );
 }
 /** Validates params39. */
 export function params39(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/shares.create/properties/params',
+        '#/definitions/GatewayMethods/properties/roblox.telemetry.performance/properties/params',
         value,
     );
 }
 /** Validates result39. */
 export function result39(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/shares.create/properties/result',
+        '#/definitions/GatewayMethods/properties/roblox.telemetry.performance/properties/result',
         value,
     );
 }
 /** Validates params40. */
 export function params40(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/shares.list/properties/params',
+        '#/definitions/GatewayMethods/properties/roblox.telemetry.projects/properties/params',
         value,
     );
 }
 /** Validates result40. */
 export function result40(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/shares.list/properties/result',
+        '#/definitions/GatewayMethods/properties/roblox.telemetry.projects/properties/result',
         value,
     );
 }
 /** Validates params41. */
 export function params41(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/shares.remove/properties/params',
+        '#/definitions/GatewayMethods/properties/sessions.delete/properties/params',
         value,
     );
 }
 /** Validates result41. */
 export function result41(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/shares.remove/properties/result',
+        '#/definitions/GatewayMethods/properties/sessions.delete/properties/result',
         value,
     );
 }
 /** Validates params42. */
 export function params42(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/shares.setMember/properties/params',
+        '#/definitions/GatewayMethods/properties/sessions.download/properties/params',
         value,
     );
 }
 /** Validates result42. */
 export function result42(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/shares.setMember/properties/result',
+        '#/definitions/GatewayMethods/properties/sessions.download/properties/result',
         value,
     );
 }
 /** Validates params43. */
 export function params43(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/tasks.cancel/properties/params',
+        '#/definitions/GatewayMethods/properties/sessions.files/properties/params',
         value,
     );
 }
 /** Validates result43. */
 export function result43(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/tasks.cancel/properties/result',
+        '#/definitions/GatewayMethods/properties/sessions.files/properties/result',
         value,
     );
 }
 /** Validates params44. */
 export function params44(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/tasks.get/properties/params',
+        '#/definitions/GatewayMethods/properties/sessions.get/properties/params',
         value,
     );
 }
 /** Validates result44. */
 export function result44(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/tasks.get/properties/result',
+        '#/definitions/GatewayMethods/properties/sessions.get/properties/result',
         value,
     );
 }
 /** Validates params45. */
 export function params45(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/tasks.list/properties/params',
+        '#/definitions/GatewayMethods/properties/sessions.list/properties/params',
         value,
     );
 }
 /** Validates result45. */
 export function result45(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/tasks.list/properties/result',
+        '#/definitions/GatewayMethods/properties/sessions.list/properties/result',
         value,
     );
 }
 /** Validates params46. */
 export function params46(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/teams.create/properties/params',
+        '#/definitions/GatewayMethods/properties/sessions.messages/properties/params',
         value,
     );
 }
 /** Validates result46. */
 export function result46(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/teams.create/properties/result',
+        '#/definitions/GatewayMethods/properties/sessions.messages/properties/result',
         value,
     );
 }
 /** Validates params47. */
 export function params47(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/teams.list/properties/params',
+        '#/definitions/GatewayMethods/properties/sessions.subscribe/properties/params',
         value,
     );
 }
 /** Validates result47. */
 export function result47(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/teams.list/properties/result',
+        '#/definitions/GatewayMethods/properties/sessions.subscribe/properties/result',
         value,
     );
 }
 /** Validates params48. */
 export function params48(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/teams.remove/properties/params',
+        '#/definitions/GatewayMethods/properties/sessions.unsubscribe/properties/params',
         value,
     );
 }
 /** Validates result48. */
 export function result48(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/teams.remove/properties/result',
+        '#/definitions/GatewayMethods/properties/sessions.unsubscribe/properties/result',
         value,
     );
 }
 /** Validates params49. */
 export function params49(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/teams.setMember/properties/params',
+        '#/definitions/GatewayMethods/properties/shares.create/properties/params',
         value,
     );
 }
 /** Validates result49. */
 export function result49(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/teams.setMember/properties/result',
+        '#/definitions/GatewayMethods/properties/shares.create/properties/result',
         value,
     );
 }
 /** Validates params50. */
 export function params50(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/voice.audio/properties/params',
+        '#/definitions/GatewayMethods/properties/shares.list/properties/params',
         value,
     );
 }
 /** Validates result50. */
 export function result50(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/voice.audio/properties/result',
+        '#/definitions/GatewayMethods/properties/shares.list/properties/result',
         value,
     );
 }
 /** Validates params51. */
 export function params51(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/voice.start/properties/params',
+        '#/definitions/GatewayMethods/properties/shares.remove/properties/params',
         value,
     );
 }
 /** Validates result51. */
 export function result51(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/voice.start/properties/result',
+        '#/definitions/GatewayMethods/properties/shares.remove/properties/result',
         value,
     );
 }
 /** Validates params52. */
 export function params52(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/voice.stop/properties/params',
+        '#/definitions/GatewayMethods/properties/shares.setMember/properties/params',
         value,
     );
 }
 /** Validates result52. */
 export function result52(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/voice.stop/properties/result',
+        '#/definitions/GatewayMethods/properties/shares.setMember/properties/result',
         value,
     );
 }
 /** Validates params53. */
 export function params53(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/workspaces.create/properties/params',
+        '#/definitions/GatewayMethods/properties/tasks.cancel/properties/params',
         value,
     );
 }
 /** Validates result53. */
 export function result53(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/workspaces.create/properties/result',
+        '#/definitions/GatewayMethods/properties/tasks.cancel/properties/result',
         value,
     );
 }
 /** Validates params54. */
 export function params54(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/workspaces.describe/properties/params',
+        '#/definitions/GatewayMethods/properties/tasks.get/properties/params',
         value,
     );
 }
 /** Validates result54. */
 export function result54(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/workspaces.describe/properties/result',
+        '#/definitions/GatewayMethods/properties/tasks.get/properties/result',
         value,
     );
 }
 /** Validates params55. */
 export function params55(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/workspaces.destroy/properties/params',
+        '#/definitions/GatewayMethods/properties/tasks.list/properties/params',
         value,
     );
 }
 /** Validates result55. */
 export function result55(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/workspaces.destroy/properties/result',
+        '#/definitions/GatewayMethods/properties/tasks.list/properties/result',
         value,
     );
 }
 /** Validates params56. */
 export function params56(value: unknown): boolean {
     return validator.validate(
-        '#/definitions/GatewayMethods/properties/workspaces.list/properties/params',
+        '#/definitions/GatewayMethods/properties/teams.create/properties/params',
         value,
     );
 }
 /** Validates result56. */
 export function result56(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/teams.create/properties/result',
+        value,
+    );
+}
+/** Validates params57. */
+export function params57(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/teams.list/properties/params',
+        value,
+    );
+}
+/** Validates result57. */
+export function result57(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/teams.list/properties/result',
+        value,
+    );
+}
+/** Validates params58. */
+export function params58(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/teams.remove/properties/params',
+        value,
+    );
+}
+/** Validates result58. */
+export function result58(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/teams.remove/properties/result',
+        value,
+    );
+}
+/** Validates params59. */
+export function params59(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/teams.setMember/properties/params',
+        value,
+    );
+}
+/** Validates result59. */
+export function result59(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/teams.setMember/properties/result',
+        value,
+    );
+}
+/** Validates params60. */
+export function params60(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/voice.audio/properties/params',
+        value,
+    );
+}
+/** Validates result60. */
+export function result60(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/voice.audio/properties/result',
+        value,
+    );
+}
+/** Validates params61. */
+export function params61(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/voice.start/properties/params',
+        value,
+    );
+}
+/** Validates result61. */
+export function result61(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/voice.start/properties/result',
+        value,
+    );
+}
+/** Validates params62. */
+export function params62(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/voice.stop/properties/params',
+        value,
+    );
+}
+/** Validates result62. */
+export function result62(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/voice.stop/properties/result',
+        value,
+    );
+}
+/** Validates params63. */
+export function params63(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/workspaces.create/properties/params',
+        value,
+    );
+}
+/** Validates result63. */
+export function result63(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/workspaces.create/properties/result',
+        value,
+    );
+}
+/** Validates params64. */
+export function params64(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/workspaces.describe/properties/params',
+        value,
+    );
+}
+/** Validates result64. */
+export function result64(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/workspaces.describe/properties/result',
+        value,
+    );
+}
+/** Validates params65. */
+export function params65(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/workspaces.destroy/properties/params',
+        value,
+    );
+}
+/** Validates result65. */
+export function result65(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/workspaces.destroy/properties/result',
+        value,
+    );
+}
+/** Validates params66. */
+export function params66(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/workspaces.list/properties/params',
+        value,
+    );
+}
+/** Validates result66. */
+export function result66(value: unknown): boolean {
     return validator.validate(
         '#/definitions/GatewayMethods/properties/workspaces.list/properties/result',
         value,

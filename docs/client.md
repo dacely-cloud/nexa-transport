@@ -21,6 +21,8 @@ Import `NexaClient` from `nexa-transport`, `Method` and protocol types from `nex
 
 `client.onAudio(listener)` delivers `ReceivedAudio` records with `callId`, `sampleRate`, and raw PCM16 `data`. `client.sendAudio(callId, data, options?)` sends a PCM16 byte array and returns the typed `VoiceAudio` RPC result. Both received types are exported from `nexa-transport`.
 
+`client.uploadData(blob, filename, options?)` streams a file to the authenticated workspace and returns `DataFile` from `nexa-transport/protocol`. `DataUploadOptions`, exported from `nexa-transport`, accepts `signal` and `onProgress(uploadedBytes: bigint, totalBytes: bigint)`. The helper holds at most one 192 KiB source slice in flight and reports server-acknowledged progress. Pass the returned path to an agent request to start analysis; upload alone makes no model call.
+
 There is no `client.ask()` convenience method. Use `client.call(Method.AgentAsk, ...)`.
 
 ### ClientOptions

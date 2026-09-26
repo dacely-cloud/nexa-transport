@@ -437,3 +437,19 @@ Outputs include a GLB and PNG previews; Gaussian PLY support depends on the mode
 Nexa's optimized GLBs require Meshopt decoding: `MeshoptDecoder` is exported from
 `nexa-transport/media` for viewer integration. Rigging and Roblox Studio import
 are separate operations. See `examples/Geometry.ts` for subscription cleanup.
+
+### Large data uploads
+
+Use `uploadData` for large documents or datasets. It sends acknowledged 192 KiB slices to the user's workspace instead of creating a whole-file base64 attachment:
+
+```typescript
+const uploaded = await client.uploadData(file, file.name, {
+    signal: controller.signal,
+    onProgress: (bytes, total) => console.log(bytes, total),
+});
+const turn = client.stream({
+    message: `Analyze the entire dataset at ${JSON.stringify(uploaded.path)} using import_dataset and query_dataset.`,
+});
+```
+
+The server returns a path, filename and decimal-string byte count. Source bytes never enter the agent request. Progress counts acknowledged bytes as `bigint`. Cancellation requests cleanup of unfinished uploads. The server must advertise the `data.upload.*` methods and grant write scope. For Node files, use a file-backed Blob to keep memory bounded. `NexaMedia.document` is still intended for inline attachments; uploading a file does not itself analyze it.
