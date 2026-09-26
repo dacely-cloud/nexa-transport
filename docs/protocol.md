@@ -476,6 +476,63 @@ A spend query.
 | `scopeId` | No       | `string`                                                           |                                                     |
 | `to`      | No       | `number`                                                           |                                                     |
 
+## DataFile
+
+A complete source file the agent can process directly in its workspace.
+
+| Field        | Required | Type     | Description |
+| ------------ | -------- | -------- | ----------- |
+| `byteLength` | Yes      | `string` |             |
+| `filename`   | Yes      | `string` |             |
+| `id`         | Yes      | `string` |             |
+| `path`       | Yes      | `string` |             |
+
+## DataUpload
+
+A disk-backed upload; byte counts use decimal strings on the wire.
+
+| Field        | Required | Type     | Description |
+| ------------ | -------- | -------- | ----------- |
+| `byteLength` | Yes      | `string` |             |
+| `filename`   | Yes      | `string` |             |
+| `id`         | Yes      | `string` |             |
+
+## DataUploadChunkParams
+
+One bounded base64 chunk with an exact byte offset.
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `data`   | Yes      | `string` |             |
+| `id`     | Yes      | `string` |             |
+| `offset` | Yes      | `string` |             |
+
+## DataUploadIdParams
+
+Addresses an upload owned by the authenticated principal.
+
+| Field | Required | Type     | Description |
+| ----- | -------- | -------- | ----------- |
+| `id`  | Yes      | `string` |             |
+
+## DataUploadPosition
+
+The durable position acknowledged after one bounded upload chunk.
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `id`     | Yes      | `string` |             |
+| `offset` | Yes      | `string` |             |
+
+## DataUploadStartParams
+
+Starts an upload without embedding source bytes in an agent request.
+
+| Field        | Required | Type     | Description |
+| ------------ | -------- | -------- | ----------- |
+| `byteLength` | Yes      | `string` |             |
+| `filename`   | Yes      | `string` |             |
+
 ## DeadLetter
 
 One recorded failure.
@@ -647,6 +704,71 @@ Collapses the required/optional intersection into one object type.
 | `userId`          | No       | `string`                                               |             |
 | `workspaceId`     | No       | `string`                                               |             |
 
+## FunnelCohort
+
+Exact cohort dimensions; games are already separated by owner/project in storage.
+
+| Field                 | Required | Type     | Description |
+| --------------------- | -------- | -------- | ----------- |
+| `configRevision`      | Yes      | `string` |             |
+| `device`              | Yes      | `string` |             |
+| `experimentId`        | Yes      | `string` |             |
+| `observedConfig`      | No       | `string` |             |
+| `observedPerformance` | No       | `string` |             |
+| `placeId`             | Yes      | `string` |             |
+| `placeVersion`        | Yes      | `string` |             |
+| `variant`             | Yes      | `string` |             |
+
+## FunnelGroup
+
+Bounded attempt counts, not unique users; each stage count is cumulative from the first step.
+
+| Field        | Required | Type                                     | Description |
+| ------------ | -------- | ---------------------------------------- | ----------- |
+| `attempts`   | Yes      | `number`                                 |             |
+| `cohort`     | Yes      | [FunnelCohort](protocol.md#funnelcohort) |             |
+| `conversion` | Yes      | `number`                                 |             |
+| `reached`    | Yes      | Array of `number`                        |             |
+| `sessions`   | Yes      | `number`                                 |             |
+
+## FunnelQuery
+
+First-step cohort window and maximum allowed time to complete a funnel. Decimal milliseconds.
+
+| Field                     | Required | Type              | Description |
+| ------------------------- | -------- | ----------------- | ----------- |
+| `appliedConfigKey`        | No       | `string`          |             |
+| `completionWindowMs`      | Yes      | `string`          |             |
+| `configLookbackMs`        | No       | `string`          |             |
+| `fromMs`                  | Yes      | `string`          |             |
+| `performanceFpsThreshold` | No       | `number`          |             |
+| `performanceLookbackMs`   | No       | `string`          |             |
+| `steps`                   | Yes      | Array of `string` |             |
+| `toMs`                    | Yes      | `string`          |             |
+
+## FunnelReport
+
+Evidence returned to the model; raw player/session identifiers are not included.
+
+| Field                           | Required | Type                                            | Description                                                                                    |
+| ------------------------------- | -------- | ----------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `caveats`                       | Yes      | Array of `string`                               |                                                                                                |
+| `collection`                    | No       | [TelemetryHealth](protocol.md#telemetryhealth)  | Owner-visible collection evidence, not a guarantee that the game emitted every required event. |
+| `duplicateEvents`               | Yes      | `number`                                        |                                                                                                |
+| `generatedAtMs`                 | Yes      | `string`                                        |                                                                                                |
+| `groups`                        | Yes      | Array of [FunnelGroup](protocol.md#funnelgroup) |                                                                                                |
+| `ignoredClientEvents`           | Yes      | `number`                                        |                                                                                                |
+| `latestMatchingEventMs`         | Yes      | `null,string`                                   |                                                                                                |
+| `missingAttemptEvents`          | Yes      | `number`                                        |                                                                                                |
+| `missingStartAttempts`          | Yes      | `number`                                        |                                                                                                |
+| `mixedCohortAttempts`           | Yes      | `number`                                        |                                                                                                |
+| `observedUntilMs`               | Yes      | `string`                                        |                                                                                                |
+| `pendingAttempts`               | Yes      | `number`                                        |                                                                                                |
+| `query`                         | Yes      | [FunnelQuery](protocol.md#funnelquery)          |                                                                                                |
+| `repeatedStartEvents`           | Yes      | `number`                                        |                                                                                                |
+| `unattributedConfigAttempts`    | No       | `number`                                        |                                                                                                |
+| `unmeasuredPerformanceAttempts` | No       | `number`                                        |                                                                                                |
+
 ## GatewayFeatures
 
 Methods, events, and additive capabilities supported by this gateway.
@@ -679,65 +801,75 @@ Configurable bounds on gateway-owned work and memory.
 
 ## GatewayMethods
 
-| Field                       | Required | Type                  | Description |
-| --------------------------- | -------- | --------------------- | ----------- |
-| `accounts.create`           | Yes      | Object (fields below) |             |
-| `accounts.list`             | Yes      | Object (fields below) |             |
-| `accounts.remove`           | Yes      | Object (fields below) |             |
-| `accounts.usage`            | Yes      | Object (fields below) |             |
-| `agent.ask`                 | Yes      | Object (fields below) |             |
-| `agent.stream`              | Yes      | Object (fields below) |             |
-| `agents.define`             | Yes      | Object (fields below) |             |
-| `agents.list`               | Yes      | Object (fields below) |             |
-| `approvals.list`            | Yes      | Object (fields below) |             |
-| `approvals.resolve`         | Yes      | Object (fields below) |             |
-| `channels.deadLetters.list` | Yes      | Object (fields below) |             |
-| `channels.list`             | Yes      | Object (fields below) |             |
-| `channels.status`           | Yes      | Object (fields below) |             |
-| `config.get`                | Yes      | Object (fields below) |             |
-| `config.set`                | Yes      | Object (fields below) |             |
-| `config.unset`              | Yes      | Object (fields below) |             |
-| `connect`                   | Yes      | Object (fields below) |             |
-| `credit.budgets`            | Yes      | Object (fields below) |             |
-| `credit.removeBudget`       | Yes      | Object (fields below) |             |
-| `credit.setBudget`          | Yes      | Object (fields below) |             |
-| `credit.summary`            | Yes      | Object (fields below) |             |
-| `devices.approve`           | Yes      | Object (fields below) |             |
-| `devices.list`              | Yes      | Object (fields below) |             |
-| `devices.reject`            | Yes      | Object (fields below) |             |
-| `devices.revoke`            | Yes      | Object (fields below) |             |
-| `health`                    | Yes      | Object (fields below) |             |
-| `jobs.add`                  | Yes      | Object (fields below) |             |
-| `jobs.list`                 | Yes      | Object (fields below) |             |
-| `jobs.remove`               | Yes      | Object (fields below) |             |
-| `logs.tail`                 | Yes      | Object (fields below) |             |
-| `media.acknowledge`         | Yes      | Object (fields below) |             |
-| `sessions.delete`           | Yes      | Object (fields below) |             |
-| `sessions.download`         | Yes      | Object (fields below) |             |
-| `sessions.files`            | Yes      | Object (fields below) |             |
-| `sessions.get`              | Yes      | Object (fields below) |             |
-| `sessions.list`             | Yes      | Object (fields below) |             |
-| `sessions.messages`         | Yes      | Object (fields below) |             |
-| `sessions.subscribe`        | Yes      | Object (fields below) |             |
-| `sessions.unsubscribe`      | Yes      | Object (fields below) |             |
-| `shares.create`             | Yes      | Object (fields below) |             |
-| `shares.list`               | Yes      | Object (fields below) |             |
-| `shares.remove`             | Yes      | Object (fields below) |             |
-| `shares.setMember`          | Yes      | Object (fields below) |             |
-| `tasks.cancel`              | Yes      | Object (fields below) |             |
-| `tasks.get`                 | Yes      | Object (fields below) |             |
-| `tasks.list`                | Yes      | Object (fields below) |             |
-| `teams.create`              | Yes      | Object (fields below) |             |
-| `teams.list`                | Yes      | Object (fields below) |             |
-| `teams.remove`              | Yes      | Object (fields below) |             |
-| `teams.setMember`           | Yes      | Object (fields below) |             |
-| `voice.audio`               | Yes      | Object (fields below) |             |
-| `voice.start`               | Yes      | Object (fields below) |             |
-| `voice.stop`                | Yes      | Object (fields below) |             |
-| `workspaces.create`         | Yes      | Object (fields below) |             |
-| `workspaces.describe`       | Yes      | Object (fields below) |             |
-| `workspaces.destroy`        | Yes      | Object (fields below) |             |
-| `workspaces.list`           | Yes      | Object (fields below) |             |
+| Field                          | Required | Type                  | Description |
+| ------------------------------ | -------- | --------------------- | ----------- |
+| `accounts.create`              | Yes      | Object (fields below) |             |
+| `accounts.list`                | Yes      | Object (fields below) |             |
+| `accounts.remove`              | Yes      | Object (fields below) |             |
+| `accounts.usage`               | Yes      | Object (fields below) |             |
+| `agent.ask`                    | Yes      | Object (fields below) |             |
+| `agent.stream`                 | Yes      | Object (fields below) |             |
+| `agents.define`                | Yes      | Object (fields below) |             |
+| `agents.list`                  | Yes      | Object (fields below) |             |
+| `approvals.list`               | Yes      | Object (fields below) |             |
+| `approvals.resolve`            | Yes      | Object (fields below) |             |
+| `channels.deadLetters.list`    | Yes      | Object (fields below) |             |
+| `channels.list`                | Yes      | Object (fields below) |             |
+| `channels.status`              | Yes      | Object (fields below) |             |
+| `config.get`                   | Yes      | Object (fields below) |             |
+| `config.set`                   | Yes      | Object (fields below) |             |
+| `config.unset`                 | Yes      | Object (fields below) |             |
+| `connect`                      | Yes      | Object (fields below) |             |
+| `credit.budgets`               | Yes      | Object (fields below) |             |
+| `credit.removeBudget`          | Yes      | Object (fields below) |             |
+| `credit.setBudget`             | Yes      | Object (fields below) |             |
+| `credit.summary`               | Yes      | Object (fields below) |             |
+| `data.upload.cancel`           | Yes      | Object (fields below) |             |
+| `data.upload.chunk`            | Yes      | Object (fields below) |             |
+| `data.upload.finish`           | Yes      | Object (fields below) |             |
+| `data.upload.start`            | Yes      | Object (fields below) |             |
+| `devices.approve`              | Yes      | Object (fields below) |             |
+| `devices.list`                 | Yes      | Object (fields below) |             |
+| `devices.reject`               | Yes      | Object (fields below) |             |
+| `devices.revoke`               | Yes      | Object (fields below) |             |
+| `health`                       | Yes      | Object (fields below) |             |
+| `jobs.add`                     | Yes      | Object (fields below) |             |
+| `jobs.list`                    | Yes      | Object (fields below) |             |
+| `jobs.remove`                  | Yes      | Object (fields below) |             |
+| `logs.tail`                    | Yes      | Object (fields below) |             |
+| `media.acknowledge`            | Yes      | Object (fields below) |             |
+| `roblox.credentials.remove`    | Yes      | Object (fields below) |             |
+| `roblox.credentials.set`       | Yes      | Object (fields below) |             |
+| `roblox.credentials.status`    | Yes      | Object (fields below) |             |
+| `roblox.telemetry.funnel`      | Yes      | Object (fields below) |             |
+| `roblox.telemetry.performance` | Yes      | Object (fields below) |             |
+| `roblox.telemetry.projects`    | Yes      | Object (fields below) |             |
+| `sessions.delete`              | Yes      | Object (fields below) |             |
+| `sessions.download`            | Yes      | Object (fields below) |             |
+| `sessions.files`               | Yes      | Object (fields below) |             |
+| `sessions.get`                 | Yes      | Object (fields below) |             |
+| `sessions.list`                | Yes      | Object (fields below) |             |
+| `sessions.messages`            | Yes      | Object (fields below) |             |
+| `sessions.subscribe`           | Yes      | Object (fields below) |             |
+| `sessions.unsubscribe`         | Yes      | Object (fields below) |             |
+| `shares.create`                | Yes      | Object (fields below) |             |
+| `shares.list`                  | Yes      | Object (fields below) |             |
+| `shares.remove`                | Yes      | Object (fields below) |             |
+| `shares.setMember`             | Yes      | Object (fields below) |             |
+| `tasks.cancel`                 | Yes      | Object (fields below) |             |
+| `tasks.get`                    | Yes      | Object (fields below) |             |
+| `tasks.list`                   | Yes      | Object (fields below) |             |
+| `teams.create`                 | Yes      | Object (fields below) |             |
+| `teams.list`                   | Yes      | Object (fields below) |             |
+| `teams.remove`                 | Yes      | Object (fields below) |             |
+| `teams.setMember`              | Yes      | Object (fields below) |             |
+| `voice.audio`                  | Yes      | Object (fields below) |             |
+| `voice.start`                  | Yes      | Object (fields below) |             |
+| `voice.stop`                   | Yes      | Object (fields below) |             |
+| `workspaces.create`            | Yes      | Object (fields below) |             |
+| `workspaces.describe`          | Yes      | Object (fields below) |             |
+| `workspaces.destroy`           | Yes      | Object (fields below) |             |
+| `workspaces.list`              | Yes      | Object (fields below) |             |
 
 **accounts.create**
 
@@ -915,6 +1047,34 @@ Configurable bounds on gateway-owned work and memory.
 | `params` | Yes      | [CreditSummaryParams](protocol.md#creditsummaryparams) |             |
 | `result` | Yes      | [CreditSummary](protocol.md#creditsummary)             |             |
 
+**data.upload.cancel**
+
+| Field    | Required | Type                                                 | Description |
+| -------- | -------- | ---------------------------------------------------- | ----------- |
+| `params` | Yes      | [DataUploadIdParams](protocol.md#datauploadidparams) |             |
+| `result` | Yes      | [OkResult](protocol.md#okresult)                     |             |
+
+**data.upload.chunk**
+
+| Field    | Required | Type                                                       | Description |
+| -------- | -------- | ---------------------------------------------------------- | ----------- |
+| `params` | Yes      | [DataUploadChunkParams](protocol.md#datauploadchunkparams) |             |
+| `result` | Yes      | [DataUploadPosition](protocol.md#datauploadposition)       |             |
+
+**data.upload.finish**
+
+| Field    | Required | Type                                                 | Description |
+| -------- | -------- | ---------------------------------------------------- | ----------- |
+| `params` | Yes      | [DataUploadIdParams](protocol.md#datauploadidparams) |             |
+| `result` | Yes      | [DataFile](protocol.md#datafile)                     |             |
+
+**data.upload.start**
+
+| Field    | Required | Type                                                       | Description |
+| -------- | -------- | ---------------------------------------------------------- | ----------- |
+| `params` | Yes      | [DataUploadStartParams](protocol.md#datauploadstartparams) |             |
+| `result` | Yes      | [DataUpload](protocol.md#dataupload)                       |             |
+
 **devices.approve**
 
 | Field    | Required | Type                                                   | Description |
@@ -984,6 +1144,48 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ------------------------------------------------------------ | ----------- |
 | `params` | Yes      | [MediaAcknowledgeParams](protocol.md#mediaacknowledgeparams) |             |
 | `result` | Yes      | [OkResult](protocol.md#okresult)                             |             |
+
+**roblox.credentials.remove**
+
+| Field    | Required | Type                                                         | Description |
+| -------- | -------- | ------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [Recordstringnever](protocol.md#recordstringnever)           |             |
+| `result` | Yes      | [RobloxCredentialStatus](protocol.md#robloxcredentialstatus) |             |
+
+**roblox.credentials.set**
+
+| Field    | Required | Type                                                               | Description |
+| -------- | -------- | ------------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [RobloxCredentialSetParams](protocol.md#robloxcredentialsetparams) |             |
+| `result` | Yes      | [RobloxCredentialStatus](protocol.md#robloxcredentialstatus)       |             |
+
+**roblox.credentials.status**
+
+| Field    | Required | Type                                                         | Description |
+| -------- | -------- | ------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [Recordstringnever](protocol.md#recordstringnever)           |             |
+| `result` | Yes      | [RobloxCredentialStatus](protocol.md#robloxcredentialstatus) |             |
+
+**roblox.telemetry.funnel**
+
+| Field    | Required | Type                                                       | Description |
+| -------- | -------- | ---------------------------------------------------------- | ----------- |
+| `params` | Yes      | [TelemetryFunnelParams](protocol.md#telemetryfunnelparams) |             |
+| `result` | Yes      | [FunnelReport](protocol.md#funnelreport)                   |             |
+
+**roblox.telemetry.performance**
+
+| Field    | Required | Type                                                                 | Description |
+| -------- | -------- | -------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [TelemetryPerformanceParams](protocol.md#telemetryperformanceparams) |             |
+| `result` | Yes      | [PerformanceReport](protocol.md#performancereport)                   |             |
+
+**roblox.telemetry.projects**
+
+| Field    | Required | Type                                                      | Description |
+| -------- | -------- | --------------------------------------------------------- | ----------- |
+| `params` | Yes      | [Recordstringnever](protocol.md#recordstringnever)        |             |
+| `result` | Yes      | Array of [TelemetryProject](protocol.md#telemetryproject) |             |
 
 **sessions.delete**
 
@@ -1167,6 +1369,12 @@ Configurable bounds on gateway-owned work and memory.
 | `params` | Yes      | [Recordstringnever](protocol.md#recordstringnever) |             |
 | `result` | Yes      | Array of [Workspace](protocol.md#workspace)        |             |
 
+## GeometryFormat
+
+Supported serialized 3D asset formats; radiance fields remain unspecified.
+
+Type: `"gaussian_ply"` / `"glb"`.
+
 ## HealthResult
 
 Liveness and identity.
@@ -1301,7 +1509,16 @@ A scheduled job as it is stored.
 
 What a job does when it fires.
 
-Variant 1: [ReminderAction](protocol.md#reminderaction)
+Variant 1: [TelemetryMonitorAction](protocol.md#telemetrymonitoraction)
+
+| Field         | Required | Type                                                                             | Description                                                                     |
+| ------------- | -------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `destination` | No       | [TelemetryNotificationDestination](protocol.md#telemetrynotificationdestination) | Host-captured private channel destination; never accepted from model arguments. |
+| `investigate` | No       | `boolean`                                                                        |                                                                                 |
+| `kind`        | Yes      | `"roblox-monitor"`                                                               |                                                                                 |
+| `rule`        | Yes      | [TelemetryMonitorRule](protocol.md#telemetrymonitorrule)                         |                                                                                 |
+
+Variant 2: [ReminderAction](protocol.md#reminderaction)
 
 | Field            | Required | Type         | Description |
 | ---------------- | -------- | ------------ | ----------- |
@@ -1311,7 +1528,7 @@ Variant 1: [ReminderAction](protocol.md#reminderaction)
 | `text`           | Yes      | `string`     |             |
 | `threadId`       | No       | `string`     |             |
 
-Variant 2: Object (fields below)
+Variant 3: Object (fields below)
 
 | Field             | Required | Type           | Description                                                               |
 | ----------------- | -------- | -------------- | ------------------------------------------------------------------------- |
@@ -1321,7 +1538,7 @@ Variant 2: Object (fields below)
 | `prompt`          | Yes      | `string`       |                                                                           |
 | `silentWhenEmpty` | No       | `boolean`      | Suppress delivery when the turn produced nothing worth sending.           |
 
-Variant 3: Object (fields below)
+Variant 4: Object (fields below)
 
 | Field                | Required | Type                                  | Description                                                    |
 | -------------------- | -------- | ------------------------------------- | -------------------------------------------------------------- |
@@ -1332,7 +1549,7 @@ Variant 3: Object (fields below)
 | `kind`               | Yes      | `"shell"`                             | Run a shell command. Its stdout becomes the run's output.      |
 | `timeoutMs`          | No       | `number`                              |                                                                |
 
-Variant 4: Object (fields below)
+Variant 5: Object (fields below)
 
 | Field   | Required | Type                               | Description                                                 |
 | ------- | -------- | ---------------------------------- | ----------------------------------------------------------- |
@@ -1340,7 +1557,7 @@ Variant 4: Object (fields below)
 | `kind`  | Yes      | `"tool"`                           | Call a registered tool directly, with no model in the loop. |
 | `tool`  | Yes      | `string`                           |                                                             |
 
-Variant 5: Object (fields below)
+Variant 6: Object (fields below)
 
 | Field     | Required | Type                               | Description                                  |
 | --------- | -------- | ---------------------------------- | -------------------------------------------- |
@@ -1348,7 +1565,7 @@ Variant 5: Object (fields below)
 | `kind`    | Yes      | `"event"`                          | Emit an event other subsystems subscribe to. |
 | `payload` | No       | [JsonValue](protocol.md#jsonvalue) |                                              |
 
-Variant 6: Object (fields below)
+Variant 7: Object (fields below)
 
 | Field  | Required | Type            | Description                                                               |
 | ------ | -------- | --------------- | ------------------------------------------------------------------------- |
@@ -1540,6 +1757,16 @@ One item's DELIVERABLE, as it closes — the counterpart to a finding for work t
 | `item`     | Yes      | `number` |                                                                                     |
 | `title`    | Yes      | `string` | The item's own title. An artifact carries no location and no severity to anchor it. |
 
+## NcapAsrTranscript
+
+Native ASR result over exact mono 16 kHz input.
+
+| Field          | Required | Type     | Description |
+| -------------- | -------- | -------- | ----------- |
+| `audioSamples` | Yes      | `number` |             |
+| `language`     | Yes      | `string` |             |
+| `text`         | Yes      | `string` |             |
+
 ## NcapBlockDelta
 
 A rich block the server decoded from the model stream, streamed in three phases.
@@ -1564,17 +1791,21 @@ A single streamed delta from the engine.
 | `agentId`        | No       | `number`                                                                                      | The response's numeric `agent_id`. `0` for a plain turn; in a batch it is the sub-request's |
 | `agentTool`      | No       | [NcapAgentToolDelta](protocol.md#ncapagenttooldelta)                                          | A sub-agent asking for a tool to be run on its behalf.                                      |
 | `artifact`       | No       | [NcapArtifactDelta](protocol.md#ncapartifactdelta)                                            | One item's DELIVERABLE, as that item closes.                                                |
+| `asr`            | No       | [NcapAsrTranscript](protocol.md#ncapasrtranscript)                                            | Native transcription, separate from assistant content.                                      |
 | `backlog`        | No       | Object (fields below) / Object (fields below) / Object (fields below) / Object (fields below) | A live backlog the ENGINE built for this turn: the goal decomposed and fanned out.          |
 | `block`          | No       | [NcapBlockDelta](protocol.md#ncapblockdelta)                                                  | A live rich-block phase (begin/delta/end) decoded server-side.                              |
 | `content`        | Yes      | `string`                                                                                      | Answer content for this chunk (empty on a non-content chunk).                               |
 | `conversationId` | No       | `string`                                                                                      | The server-owned conversation id for this turn, surfaced early (from `AgentBegin`).         |
 | `expert`         | No       | Object (fields below)                                                                         | The EXPERT the server's pre-flight reflection chose to handle this turn.                    |
 | `finding`        | No       | [NcapFindingDelta](protocol.md#ncapfindingdelta)                                              | One DEDUPED finding from a closed fan-out, with its words.                                  |
+| `geometry`       | No       | Object (fields below) / Object (fields below) / Object (fields below) / Object (fields below) | Native 3D generation event; binary asset data stays outside model text.                     |
 | `graph`          | No       | [NcapGraphDelta](protocol.md#ncapgraphdelta)                                                  | A live project-graph event for the knowledge-graph view.                                    |
+| `image`          | No       | Object (fields below) / Object (fields below)                                                 |                                                                                             |
 | `preflight`      | No       | Object (fields below)                                                                         | The full pre-flight reflection for the panel shown before the answer streams.               |
 | `reasoning`      | Yes      | `string`                                                                                      | Reasoning / thinking-trace text for this chunk (empty on a non-reasoning chunk).            |
 | `reflection`     | No       | Object (fields below)                                                                         | The reflection stage's reasoning. Display-only: it never becomes part of the persisted      |
 | `research`       | No       | [NcapResearchDelta](protocol.md#ncapresearchdelta)                                            | One step of working an UNSOLVED problem.                                                    |
+| `segmentation`   | No       | [SegmentationFrame](protocol.md#segmentationframe)                                            |                                                                                             |
 | `skill`          | No       | [NcapSkillDelta](protocol.md#ncapskilldelta)                                                  | One skill the engine ingested.                                                              |
 | `status`         | No       | `string`                                                                                      | An out-of-band engine lifecycle status carried by a chunk with no text.                     |
 | `steer`          | No       | [NcapSteerDelta](protocol.md#ncapsteerdelta)                                                  | One SUPERVISION ROUND of a decomposed run.                                                  |
@@ -1634,6 +1865,63 @@ A single streamed delta from the engine.
 | `index` | Yes      | `number` |             |
 | `pass`  | Yes      | `number` |             |
 | `why`   | Yes      | `string` |             |
+
+**geometry — variant 1**
+
+| Field   | Required | Type         | Description |
+| ------- | -------- | ------------ | ----------- |
+| `model` | Yes      | `string`     |             |
+| `phase` | Yes      | `"accepted"` |             |
+| `seed`  | Yes      | `number`     |             |
+
+**geometry — variant 2**
+
+| Field       | Required | Type         | Description |
+| ----------- | -------- | ------------ | ----------- |
+| `completed` | Yes      | `number`     |             |
+| `phase`     | Yes      | `"progress"` |             |
+| `stage`     | Yes      | `number`     |             |
+| `total`     | Yes      | `number`     |             |
+
+**geometry — variant 3**
+
+| Field        | Required | Type                                         | Description |
+| ------------ | -------- | -------------------------------------------- | ----------- |
+| `assetId`    | Yes      | `number`                                     |             |
+| `data`       | Yes      | Array of `number`                            |             |
+| `format`     | Yes      | [GeometryFormat](protocol.md#geometryformat) |             |
+| `offset`     | Yes      | `number`                                     |             |
+| `phase`      | Yes      | `"chunk"` / `"preview"`                      |             |
+| `revision`   | Yes      | `number`                                     |             |
+| `totalBytes` | Yes      | `number`                                     |             |
+
+**geometry — variant 4**
+
+| Field        | Required | Type     | Description |
+| ------------ | -------- | -------- | ----------- |
+| `assetId`    | Yes      | `number` |             |
+| `phase`      | Yes      | `"end"`  |             |
+| `totalBytes` | Yes      | `number` |             |
+
+**image — variant 1**
+
+| Field    | Required | Type              | Description |
+| -------- | -------- | ----------------- | ----------- |
+| `data`   | Yes      | Array of `number` |             |
+| `index`  | Yes      | `number`          |             |
+| `offset` | Yes      | `number`          |             |
+| `phase`  | Yes      | `"chunk"`         |             |
+
+**image — variant 2**
+
+| Field         | Required | Type      | Description |
+| ------------- | -------- | --------- | ----------- |
+| `height`      | Yes      | `number`  |             |
+| `index`       | Yes      | `number`  |             |
+| `phase`       | Yes      | `"end"`   |             |
+| `totalBytes`  | Yes      | `number`  |             |
+| `transparent` | Yes      | `boolean` |             |
+| `width`       | Yes      | `number`  |             |
 
 **preflight**
 
@@ -1880,6 +2168,60 @@ One approval waiting for a human.
 | `summary`     | Yes      | `string`                           |                                                                            |
 | `tool`        | Yes      | `string`                           |                                                                            |
 
+## PerformanceCohort
+
+Input capability reports are not hardware or operating-system identification.
+
+| Field             | Required | Type      | Description |
+| ----------------- | -------- | --------- | ----------- |
+| `gamepadEnabled`  | Yes      | `boolean` |             |
+| `keyboardEnabled` | Yes      | `boolean` |             |
+| `placeId`         | Yes      | `string`  |             |
+| `placeVersion`    | Yes      | `string`  |             |
+| `touchEnabled`    | Yes      | `boolean` |             |
+
+## PerformanceGroup
+
+Aggregate metrics expose no player/session identifiers. Counts are decimal strings.
+
+| Field               | Required | Type                                               | Description |
+| ------------------- | -------- | -------------------------------------------------- | ----------- |
+| `cohort`            | Yes      | [PerformanceCohort](protocol.md#performancecohort) |             |
+| `frames`            | Yes      | `string`                                           |             |
+| `maximumFrameMs`    | Yes      | `number`                                           |             |
+| `meanSessionFps`    | Yes      | `number`                                           |             |
+| `sampledDurationMs` | Yes      | `number`                                           |             |
+| `samples`           | Yes      | `number`                                           |             |
+| `sessions`          | Yes      | `number`                                           |             |
+| `slowFrameFraction` | Yes      | `number`                                           |             |
+| `slowFrames`        | Yes      | `string`                                           |             |
+| `timeWeightedFps`   | Yes      | `number`                                           |             |
+
+## PerformanceQuery
+
+End-exclusive server-observed report timestamps; sample windows can begin before fromMs.
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `fromMs` | Yes      | `string` |             |
+| `toMs`   | Yes      | `string` |             |
+
+## PerformanceReport
+
+Complete bounded selection with quality counts and collection diagnostics.
+
+| Field                  | Required | Type                                                      | Description                                                                                    |
+| ---------------------- | -------- | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `caveats`              | Yes      | Array of `string`                                         |                                                                                                |
+| `collection`           | No       | [TelemetryHealth](protocol.md#telemetryhealth)            | Owner-visible collection evidence, not a guarantee that the game emitted every required event. |
+| `duplicateSamples`     | Yes      | `number`                                                  |                                                                                                |
+| `generatedAtMs`        | Yes      | `string`                                                  |                                                                                                |
+| `groups`               | Yes      | Array of [PerformanceGroup](protocol.md#performancegroup) |                                                                                                |
+| `ignoredSourceSamples` | Yes      | `number`                                                  |                                                                                                |
+| `invalidSamples`       | Yes      | `number`                                                  |                                                                                                |
+| `latestSampleMs`       | Yes      | `null,string`                                             |                                                                                                |
+| `query`                | Yes      | [PerformanceQuery](protocol.md#performancequery)          |                                                                                                |
+
 ## ReasoningOptions
 
 Reasoning configuration for a request.
@@ -1932,11 +2274,33 @@ How dangerous an action is.
 
 Type: `"destructive"` / `"execute"` / `"read"` / `"write"`.
 
+## RobloxCredentialSetParams
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `apiKey` | Yes      | `string` |             |
+
+## RobloxCredentialStatus
+
+Presence only: neither saved key material nor claims about Roblox permissions.
+
+| Field       | Required | Type      | Description |
+| ----------- | -------- | --------- | ----------- |
+| `connected` | Yes      | `boolean` |             |
+| `validated` | Yes      | `false`   |             |
+
 ## Scope
 
 What a caller may do.
 
 Type: `"admin"` / `"read"` / `"write"`.
+
+## SegmentationFrame
+
+| Field     | Required | Type              | Description |
+| --------- | -------- | ----------------- | ----------- |
+| `payload` | Yes      | Array of `number` |             |
+| `type`    | Yes      | `number`          |             |
 
 ## SessionFileParams
 
@@ -2112,6 +2476,103 @@ A team, as the UI lists it.
 | `members`     | Yes      | Array of `string` |             |
 | `name`        | Yes      | `string`          |             |
 
+## TelemetryFunnelParams
+
+Wire queries never carry an owner: the authenticated gateway supplies it.
+
+| Field                     | Required | Type              | Description |
+| ------------------------- | -------- | ----------------- | ----------- |
+| `appliedConfigKey`        | No       | `string`          |             |
+| `completionWindowMs`      | Yes      | `string`          |             |
+| `configLookbackMs`        | No       | `string`          |             |
+| `fromMs`                  | Yes      | `string`          |             |
+| `performanceFpsThreshold` | No       | `number`          |             |
+| `performanceLookbackMs`   | No       | `string`          |             |
+| `projectId`               | Yes      | `string`          |             |
+| `steps`                   | Yes      | Array of `string` |             |
+| `toMs`                    | Yes      | `string`          |             |
+
+## TelemetryHealth
+
+Owner-visible collection evidence, not a guarantee that the game emitted every required event.
+
+| Field                     | Required | Type              | Description |
+| ------------------------- | -------- | ----------------- | ----------- |
+| `caveats`                 | Yes      | Array of `string` |             |
+| `ingestionEnabled`        | Yes      | `boolean`         |             |
+| `lastCapacityRejectionMs` | Yes      | `null,string`     |             |
+| `lastSuccessfulBatchMs`   | Yes      | `null,string`     |             |
+| `latestEventMs`           | Yes      | `null,string`     |             |
+| `maxEvents`               | Yes      | `number`          |             |
+| `maxPayloadBytes`         | Yes      | `string`          |             |
+| `projectId`               | Yes      | `string`          |             |
+| `retainedFromMs`          | Yes      | `string`          |             |
+| `retentionDays`           | Yes      | `number`          |             |
+| `storedEvents`            | Yes      | `number`          |             |
+| `storedPayloadBytes`      | Yes      | `string`          |             |
+
+## TelemetryMonitorAction
+
+Scheduler stores the rule; identity is only in Job.owner, never supplied by this action.
+
+| Field         | Required | Type                                                                             | Description                                                                     |
+| ------------- | -------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `destination` | No       | [TelemetryNotificationDestination](protocol.md#telemetrynotificationdestination) | Host-captured private channel destination; never accepted from model arguments. |
+| `investigate` | No       | `boolean`                                                                        |                                                                                 |
+| `kind`        | Yes      | `"roblox-monitor"`                                                               |                                                                                 |
+| `rule`        | Yes      | [TelemetryMonitorRule](protocol.md#telemetrymonitorrule)                         |                                                                                 |
+
+## TelemetryMonitorRule
+
+A deterministic observed-conversion threshold, not an automatic causal experiment decision.
+
+| Field                     | Required | Type              | Description |
+| ------------------------- | -------- | ----------------- | ----------- |
+| `appliedConfigKey`        | No       | `string`          |             |
+| `completionWindowMs`      | Yes      | `number`          |             |
+| `configLookbackMs`        | No       | `string`          |             |
+| `conversionBelow`         | Yes      | `number`          |             |
+| `cooldownMs`              | Yes      | `number`          |             |
+| `lookbackMs`              | Yes      | `number`          |             |
+| `minimumAttempts`         | Yes      | `number`          |             |
+| `minimumSessions`         | Yes      | `number`          |             |
+| `performanceFpsThreshold` | No       | `number`          |             |
+| `performanceLookbackMs`   | No       | `string`          |             |
+| `projectId`               | Yes      | `string`          |             |
+| `settleDelayMs`           | Yes      | `number`          |             |
+| `steps`                   | Yes      | Array of `string` |             |
+
+## TelemetryNotificationDestination
+
+Host-captured private channel destination; never accepted from model arguments.
+
+| Field            | Required | Type     | Description |
+| ---------------- | -------- | -------- | ----------- |
+| `channelId`      | Yes      | `string` |             |
+| `conversationId` | Yes      | `string` |             |
+| `threadId`       | No       | `string` |             |
+
+## TelemetryPerformanceParams
+
+Complete bounded client performance query for one owned project.
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `fromMs`    | Yes      | `string` |             |
+| `projectId` | Yes      | `string` |             |
+| `toMs`      | Yes      | `string` |             |
+
+## TelemetryProject
+
+Project identity returned to authenticated owners; contains no ingestion secret.
+
+| Field        | Required | Type     | Description |
+| ------------ | -------- | -------- | ----------- |
+| `id`         | Yes      | `string` |             |
+| `name`       | Yes      | `string` |             |
+| `universeId` | Yes      | `string` |             |
+| `userId`     | Yes      | `string` |             |
+
 ## TokenUsage
 
 Token accounting for a turn.
@@ -2216,6 +2677,7 @@ What a tool returns.
 | `deliveredMedia`       | No       | `boolean`                                                                               | Host receipt: true only after the attachment channel send resolves.                          |
 | `deliveredText`        | No       | `string`                                                                                | Text this tool already delivered to the user outside the agent's eventual reply.             |
 | `deliveryReceipt`      | No       | [DeliveryReceipt](protocol.md#deliveryreceipt)                                          | Exact submitted artifact and acknowledged destination, produced by the delivery adapter.     |
+| `deliveryReceipts`     | No       | Array of [DeliveryReceipt](protocol.md#deliveryreceipt)                                 | One authoritative receipt per file in a multi-attachment delivery.                           |
 | `display`              | No       | Array of [JsonValue](protocol.md#jsonvalue) / Dictionary / `null,string,number,boolean` | Structured data for a UI that renders this tool specially (a diff view, a file tree).        |
 | `inspectedMediaSha256` | No       | Array of `string`                                                                       | Original image digests successfully inspected by a vision route.                             |
 | `label`                | No       | `string`                                                                                | A short human label for a UI, e.g. `read 412 lines from src/main.ts`.                        |
@@ -2284,33 +2746,49 @@ The payload of a {@link GATEWAY_EVENTS.TurnEvent} event.
 
 ## VoiceCallEvent
 
-Variant 1: Object (fields below)
+Variant 1: [VoiceInterimEvent](protocol.md#voiceinterimevent)
+
+| Field  | Required | Type        | Description |
+| ------ | -------- | ----------- | ----------- |
+| `kind` | Yes      | `"interim"` |             |
+| `text` | Yes      | `string`    |             |
+
+Variant 2: Object (fields below)
 
 | Field  | Required | Type      | Description |
 | ------ | -------- | --------- | ----------- |
 | `kind` | Yes      | `"heard"` |             |
 | `text` | Yes      | `string`  |             |
 
-Variant 2: Object (fields below)
+Variant 3: Object (fields below)
 
 | Field  | Required | Type     | Description |
 | ------ | -------- | -------- | ----------- |
 | `kind` | Yes      | `"said"` |             |
 | `text` | Yes      | `string` |             |
 
-Variant 3: Object (fields below)
+Variant 4: Object (fields below)
 
 | Field  | Required | Type       | Description |
 | ------ | -------- | ---------- | ----------- |
 | `kind` | Yes      | `"status"` |             |
 | `text` | Yes      | `string`   |             |
 
-Variant 4: Object (fields below)
+Variant 5: Object (fields below)
 
 | Field     | Required | Type      | Description |
 | --------- | -------- | --------- | ----------- |
 | `kind`    | Yes      | `"error"` |             |
 | `message` | Yes      | `string`  |             |
+
+## VoiceInterimEvent
+
+Replaceable ASR hypothesis for the current utterance.
+
+| Field  | Required | Type        | Description |
+| ------ | -------- | ----------- | ----------- |
+| `kind` | Yes      | `"interim"` |             |
+| `text` | Yes      | `string`    |             |
 
 ## VoiceStartParams
 

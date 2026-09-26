@@ -23,6 +23,10 @@ All 54 protocol methods. `connect` is managed by `NexaClient.connect`; the remai
 - [credit.removeBudget](#credit-removeBudget)
 - [credit.setBudget](#credit-setBudget)
 - [credit.summary](#credit-summary)
+- [data.upload.cancel](#data-upload-cancel)
+- [data.upload.chunk](#data-upload-chunk)
+- [data.upload.finish](#data-upload-finish)
+- [data.upload.start](#data-upload-start)
 - [devices.approve](#devices-approve)
 - [devices.list](#devices-list)
 - [devices.reject](#devices-reject)
@@ -33,6 +37,12 @@ All 54 protocol methods. `connect` is managed by `NexaClient.connect`; the remai
 - [jobs.remove](#jobs-remove)
 - [logs.tail](#logs-tail)
 - [media.acknowledge](#media-acknowledge)
+- [roblox.credentials.remove](#roblox-credentials-remove)
+- [roblox.credentials.set](#roblox-credentials-set)
+- [roblox.credentials.status](#roblox-credentials-status)
+- [roblox.telemetry.funnel](#roblox-telemetry-funnel)
+- [roblox.telemetry.performance](#roblox-telemetry-performance)
+- [roblox.telemetry.projects](#roblox-telemetry-projects)
 - [sessions.delete](#sessions-delete)
 - [sessions.download](#sessions-download)
 - [sessions.files](#sessions-files)
@@ -499,6 +509,100 @@ Parameters: [CreditSummaryParams](protocol.md#creditsummaryparams).
 
 Result: [CreditSummary](protocol.md#creditsummary).
 
+## data.upload.cancel
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DataUploadCancel> = {
+    id: 'YOUR_ID',
+};
+const result: ResultOf<typeof Method.DataUploadCancel> = await client.call(
+    Method.DataUploadCancel,
+    params,
+);
+```
+
+Parameters: [DataUploadIdParams](protocol.md#datauploadidparams).
+
+| Field | Required | Type     | Description |
+| ----- | -------- | -------- | ----------- |
+| `id`  | Yes      | `string` |             |
+
+Result: [OkResult](protocol.md#okresult).
+
+## data.upload.chunk
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DataUploadChunk> = {
+    data: 'YOUR_DATA',
+    id: 'YOUR_ID',
+    offset: 'YOUR_OFFSET',
+};
+const result: ResultOf<typeof Method.DataUploadChunk> = await client.call(
+    Method.DataUploadChunk,
+    params,
+);
+```
+
+Parameters: [DataUploadChunkParams](protocol.md#datauploadchunkparams).
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `data`   | Yes      | `string` |             |
+| `id`     | Yes      | `string` |             |
+| `offset` | Yes      | `string` |             |
+
+Result: [DataUploadPosition](protocol.md#datauploadposition).
+
+## data.upload.finish
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DataUploadFinish> = {
+    id: 'YOUR_ID',
+};
+const result: ResultOf<typeof Method.DataUploadFinish> = await client.call(
+    Method.DataUploadFinish,
+    params,
+);
+```
+
+Parameters: [DataUploadIdParams](protocol.md#datauploadidparams).
+
+| Field | Required | Type     | Description |
+| ----- | -------- | -------- | ----------- |
+| `id`  | Yes      | `string` |             |
+
+Result: [DataFile](protocol.md#datafile).
+
+## data.upload.start
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DataUploadStart> = {
+    byteLength: 'YOUR_BYTELENGTH',
+    filename: 'YOUR_FILENAME',
+};
+const result: ResultOf<typeof Method.DataUploadStart> = await client.call(
+    Method.DataUploadStart,
+    params,
+);
+```
+
+Parameters: [DataUploadStartParams](protocol.md#datauploadstartparams).
+
+| Field        | Required | Type     | Description |
+| ------------ | -------- | -------- | ----------- |
+| `byteLength` | Yes      | `string` |             |
+| `filename`   | Yes      | `string` |             |
+
+Result: [DataUpload](protocol.md#dataupload).
+
 ## devices.approve
 
 ```ts
@@ -702,6 +806,142 @@ Parameters: [MediaAcknowledgeParams](protocol.md#mediaacknowledgeparams).
 | `received` | Yes      | `boolean` |             |
 
 Result: [OkResult](protocol.md#okresult).
+
+## roblox.credentials.remove
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.RobloxCredentialsRemove> = {};
+const result: ResultOf<typeof Method.RobloxCredentialsRemove> = await client.call(
+    Method.RobloxCredentialsRemove,
+    params,
+);
+```
+
+Parameters: [Recordstringnever](protocol.md#recordstringnever).
+
+Type: Dictionary.
+
+Result: [RobloxCredentialStatus](protocol.md#robloxcredentialstatus).
+
+## roblox.credentials.set
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.RobloxCredentialsSet> = {
+    apiKey: 'YOUR_APIKEY',
+};
+const result: ResultOf<typeof Method.RobloxCredentialsSet> = await client.call(
+    Method.RobloxCredentialsSet,
+    params,
+);
+```
+
+Parameters: [RobloxCredentialSetParams](protocol.md#robloxcredentialsetparams).
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `apiKey` | Yes      | `string` |             |
+
+Result: [RobloxCredentialStatus](protocol.md#robloxcredentialstatus).
+
+## roblox.credentials.status
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.RobloxCredentialsStatus> = {};
+const result: ResultOf<typeof Method.RobloxCredentialsStatus> = await client.call(
+    Method.RobloxCredentialsStatus,
+    params,
+);
+```
+
+Parameters: [Recordstringnever](protocol.md#recordstringnever).
+
+Type: Dictionary.
+
+Result: [RobloxCredentialStatus](protocol.md#robloxcredentialstatus).
+
+## roblox.telemetry.funnel
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.RobloxTelemetryFunnel> = {
+    completionWindowMs: 'YOUR_COMPLETIONWINDOWMS',
+    fromMs: 'YOUR_FROMMS',
+    projectId: 'YOUR_PROJECTID',
+    steps: [],
+    toMs: 'YOUR_TOMS',
+};
+const result: ResultOf<typeof Method.RobloxTelemetryFunnel> = await client.call(
+    Method.RobloxTelemetryFunnel,
+    params,
+);
+```
+
+Parameters: [TelemetryFunnelParams](protocol.md#telemetryfunnelparams).
+
+| Field                     | Required | Type              | Description |
+| ------------------------- | -------- | ----------------- | ----------- |
+| `appliedConfigKey`        | No       | `string`          |             |
+| `completionWindowMs`      | Yes      | `string`          |             |
+| `configLookbackMs`        | No       | `string`          |             |
+| `fromMs`                  | Yes      | `string`          |             |
+| `performanceFpsThreshold` | No       | `number`          |             |
+| `performanceLookbackMs`   | No       | `string`          |             |
+| `projectId`               | Yes      | `string`          |             |
+| `steps`                   | Yes      | Array of `string` |             |
+| `toMs`                    | Yes      | `string`          |             |
+
+Result: [FunnelReport](protocol.md#funnelreport).
+
+## roblox.telemetry.performance
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.RobloxTelemetryPerformance> = {
+    fromMs: 'YOUR_FROMMS',
+    projectId: 'YOUR_PROJECTID',
+    toMs: 'YOUR_TOMS',
+};
+const result: ResultOf<typeof Method.RobloxTelemetryPerformance> = await client.call(
+    Method.RobloxTelemetryPerformance,
+    params,
+);
+```
+
+Parameters: [TelemetryPerformanceParams](protocol.md#telemetryperformanceparams).
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `fromMs`    | Yes      | `string` |             |
+| `projectId` | Yes      | `string` |             |
+| `toMs`      | Yes      | `string` |             |
+
+Result: [PerformanceReport](protocol.md#performancereport).
+
+## roblox.telemetry.projects
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.RobloxTelemetryProjects> = {};
+const result: ResultOf<typeof Method.RobloxTelemetryProjects> = await client.call(
+    Method.RobloxTelemetryProjects,
+    params,
+);
+```
+
+Parameters: [Recordstringnever](protocol.md#recordstringnever).
+
+Type: Dictionary.
+
+Result: Array of [TelemetryProject](protocol.md#telemetryproject).
 
 ## sessions.delete
 
