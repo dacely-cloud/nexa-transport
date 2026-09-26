@@ -1,3 +1,4 @@
+import type { InboundAttachment } from '../src/protocol/Protocol.js';
 import { BinaryMedia } from '../src/media/BinaryMedia.js';
 import { BinaryEnvelope } from '../src/media/BinaryEnvelope.js';
 import { describe, expect, it } from 'vitest';
@@ -139,4 +140,16 @@ it('transports 3D assets and normalizes native geometry bytes', async (): Promis
     await expect(
         NexaMedia.model3d(new Blob([bytes], { type: 'model/gltf-binary' })),
     ).rejects.toThrow('length');
+});
+
+it('preserves browser File names without requiring a separate title', async (): Promise<void> => {
+    const file: File = new File(['%PDF-1.7'], 'founders_alignment_governance_proposal (2).pdf', {
+        type: 'application/pdf',
+    });
+    const attachment: InboundAttachment = await NexaMedia.document(file);
+    expect(attachment).toMatchObject({ type: 'document', title: file.name });
+    expect(await NexaMedia.document(file, 'renamed.pdf')).toMatchObject({ title: 'renamed.pdf' });
+    expect(
+        await NexaMedia.document(new Blob(['%PDF-1.7'], { type: 'application/pdf' })),
+    ).not.toHaveProperty('title');
 });
