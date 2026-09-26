@@ -13,7 +13,10 @@ import { native } from '../protocol/Validators.js';
 /** Creates protocol media blocks and decodes rich native payloads without platform imports. */
 export class NexaMedia {
     /** Creates a 3D upload using the gateway's file carrier; bytes determine the stored asset kind. */
-    public static async model3d(blob: Blob, title?: string): Promise<InboundAttachment> {
+    public static async model3d(
+        blob: Blob,
+        title: string | undefined = NexaMedia.#filename(blob),
+    ): Promise<InboundAttachment> {
         if (blob.size === 0 || blob.size > 100 * 1024 * 1024) {
             throw new RangeError('3D media must be between 1 byte and 100 MiB');
         }
@@ -63,7 +66,10 @@ export class NexaMedia {
     }
 
     /** Encodes an image Blob as an inline Nexa attachment. */
-    public static async image(blob: Blob, title?: string): Promise<InboundAttachment> {
+    public static async image(
+        blob: Blob,
+        title: string | undefined = NexaMedia.#filename(blob),
+    ): Promise<InboundAttachment> {
         return {
             type: 'image',
             source: await NexaMedia.#source(blob),
@@ -71,15 +77,21 @@ export class NexaMedia {
         };
     }
     /** Encodes a video Blob as an inline Nexa attachment. */
-    public static async video(blob: Blob, title?: string): Promise<InboundAttachment> {
+    public static async video(
+        blob: Blob,
+        title: string | undefined = NexaMedia.#filename(blob),
+    ): Promise<InboundAttachment> {
         return {
             type: 'video',
             source: await NexaMedia.#source(blob),
             ...(title === undefined ? {} : { title }),
         };
     }
-    /** Encodes a document Blob as an inline Nexa attachment. */
-    public static async document(blob: Blob, title?: string): Promise<InboundAttachment> {
+    /** Encodes a document Blob as an inline attachment, preserving File.name unless title overrides it. */
+    public static async document(
+        blob: Blob,
+        title: string | undefined = NexaMedia.#filename(blob),
+    ): Promise<InboundAttachment> {
         return {
             type: 'document',
             source: await NexaMedia.#source(blob),
@@ -87,7 +99,10 @@ export class NexaMedia {
         };
     }
     /** Encodes one ordered frame; consecutive frames form one clip. */
-    public static async videoFrame(blob: Blob, title?: string): Promise<InboundAttachment> {
+    public static async videoFrame(
+        blob: Blob,
+        title: string | undefined = NexaMedia.#filename(blob),
+    ): Promise<InboundAttachment> {
         return {
             type: 'video-frame',
             source: await NexaMedia.#source(blob),
@@ -164,6 +179,11 @@ export class NexaMedia {
         }
         return bytes;
     }
+    /** Reads browser File metadata structurally, including Files supplied by another realm. */
+    static #filename(blob: Blob): string | undefined {
+        return 'name' in blob && typeof blob.name === 'string' ? blob.name : undefined;
+    }
+
     static async #source(blob: Blob): Promise<BinarySource> {
         if (blob.size === 0 || blob.size > 100 * 1024 * 1024) {
             throw new RangeError('Inline media must be between 1 byte and 100 MiB');
