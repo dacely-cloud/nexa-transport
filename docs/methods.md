@@ -23,6 +23,8 @@ All 54 protocol methods. `connect` is managed by `NexaClient.connect`; the remai
 - [credit.removeBudget](#credit-removeBudget)
 - [credit.setBudget](#credit-setBudget)
 - [credit.summary](#credit-summary)
+- [credit.wallet](#credit-wallet)
+- [credit.walletHistory](#credit-walletHistory)
 - [data.upload.cancel](#data-upload-cancel)
 - [data.upload.chunk](#data-upload-chunk)
 - [data.upload.finish](#data-upload-finish)
@@ -508,6 +510,44 @@ Parameters: [CreditSummaryParams](protocol.md#creditsummaryparams).
 | `to`      | No       | `number`                                                           |                                                     |
 
 Result: [CreditSummary](protocol.md#creditsummary).
+
+## credit.wallet
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.CreditWallet> = {};
+const result: ResultOf<typeof Method.CreditWallet> = await client.call(Method.CreditWallet, params);
+```
+
+Parameters: Object (fields below).
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `userId` | No       | `string` |             |
+
+Result: [WalletSnapshot](protocol.md#walletsnapshot) / `null`.
+
+## credit.walletHistory
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.CreditWalletHistory> = {};
+const result: ResultOf<typeof Method.CreditWalletHistory> = await client.call(
+    Method.CreditWalletHistory,
+    params,
+);
+```
+
+Parameters: Object (fields below).
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `before` | No       | `string` |             |
+| `userId` | No       | `string` |             |
+
+Result: [WalletHistoryPage](protocol.md#wallethistorypage).
 
 ## data.upload.cancel
 
