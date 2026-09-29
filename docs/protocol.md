@@ -284,6 +284,21 @@ A channel's live health, as its own adapter reports it.
 | `kind`    | Yes      | `string` |             |
 | `message` | Yes      | `string` |             |
 
+## CommandExecutionReceipt
+
+Host-produced command termination evidence, separate from model-visible output.
+
+| Field          | Required | Type          | Description |
+| -------------- | -------- | ------------- | ----------- |
+| `command`      | Yes      | `string`      |             |
+| `cwd`          | Yes      | `string`      |             |
+| `exitCode`     | Yes      | `null,number` |             |
+| `processId`    | Yes      | `null,string` |             |
+| `processToken` | Yes      | `null,string` |             |
+| `remote`       | Yes      | `boolean`     |             |
+| `running`      | Yes      | `boolean`     |             |
+| `signal`       | Yes      | `null,string` |             |
+
 ## ConfigResult
 
 The effective configuration, with secrets removed.
@@ -671,7 +686,7 @@ A device waiting for an operator, as it appears on the wire.
 
 A stable, machine-readable failure classification.
 
-Type: `"aborted"` / `"auth"` / `"budget-exhausted"` / `"config"` / `"context-overflow"` / `"denied"` / `"forbidden"` / `"internal"` / `"invalid-request"` / `"network"` / `"not-found"` / `"protocol"` / `"rate-limit"` / `"timeout"` / `"tool-execution"` / `"tool-input"` / `"upstream"`.
+Type: `"aborted"` / `"auth"` / `"budget-exhausted"` / `"config"` / `"context-overflow"` / `"delivery-unconfirmed"` / `"denied"` / `"forbidden"` / `"internal"` / `"invalid-request"` / `"network"` / `"not-found"` / `"protocol"` / `"rate-limit"` / `"timeout"` / `"tool-execution"` / `"tool-input"` / `"upstream"`.
 
 ## FinishReason
 
@@ -824,6 +839,8 @@ Configurable bounds on gateway-owned work and memory.
 | `credit.removeBudget`          | Yes      | Object (fields below) |             |
 | `credit.setBudget`             | Yes      | Object (fields below) |             |
 | `credit.summary`               | Yes      | Object (fields below) |             |
+| `credit.wallet`                | Yes      | Object (fields below) |             |
+| `credit.walletHistory`         | Yes      | Object (fields below) |             |
 | `data.upload.cancel`           | Yes      | Object (fields below) |             |
 | `data.upload.chunk`            | Yes      | Object (fields below) |             |
 | `data.upload.finish`           | Yes      | Object (fields below) |             |
@@ -1046,6 +1063,33 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ------------------------------------------------------ | ----------- |
 | `params` | Yes      | [CreditSummaryParams](protocol.md#creditsummaryparams) |             |
 | `result` | Yes      | [CreditSummary](protocol.md#creditsummary)             |             |
+
+**credit.wallet**
+
+| Field    | Required | Type                                                  | Description |
+| -------- | -------- | ----------------------------------------------------- | ----------- |
+| `params` | Yes      | Object (fields below)                                 |             |
+| `result` | Yes      | [WalletSnapshot](protocol.md#walletsnapshot) / `null` |             |
+
+**credit.wallet.params**
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `userId` | No       | `string` |             |
+
+**credit.walletHistory**
+
+| Field    | Required | Type                                               | Description |
+| -------- | -------- | -------------------------------------------------- | ----------- |
+| `params` | Yes      | Object (fields below)                              |             |
+| `result` | Yes      | [WalletHistoryPage](protocol.md#wallethistorypage) |             |
+
+**credit.walletHistory.params**
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `before` | No       | `string` |             |
+| `userId` | No       | `string` |             |
 
 **data.upload.cancel**
 
@@ -2622,6 +2666,7 @@ Who is making a tool call.
 | `channelPlatformUserId`        | No       | `string`                                             | Native channel account id, retained separately from the mapped Nexa principal id.      |
 | `channelThreadId`              | No       | `string`                                             | Native thread carrying the active request, when distinct from its parent channel.      |
 | `conversationId`               | No       | `string`                                             |                                                                                        |
+| `discordAppOnly`               | No       | `boolean`                                            | Authenticated personal Discord app invocation, without server-bot capabilities.        |
 | `machineId`                    | No       | `string`                                             | The machine this caller's work runs on, when their account names one.                  |
 | `maxRisk`                      | No       | `"destructive"` / `"execute"` / `"read"` / `"write"` | The highest risk this caller may reach, whatever the deployment ceiling allows.        |
 | `projectId`                    | No       | `string`                                             |                                                                                        |
@@ -2672,6 +2717,7 @@ What a tool returns.
 
 | Field                  | Required | Type                                                                                    | Description                                                                                  |
 | ---------------------- | -------- | --------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `commandExecution`     | No       | [CommandExecutionReceipt](protocol.md#commandexecutionreceipt)                          | Only the execution adapter supplies this evidence; stdout cannot forge it.                   |
 | `content`              | Yes      | Array of [ContentBlock](protocol.md#contentblock) / `string`                            | What the model sees. A string for the ordinary case; blocks when the result carries an image |
 | `continuation`         | No       | `string`                                                                                | The exact call that would show the next page of this result, written by the tool.            |
 | `deliveredMedia`       | No       | `boolean`                                                                               | Host receipt: true only after the attachment channel send resolves.                          |
@@ -2681,12 +2727,14 @@ What a tool returns.
 | `display`              | No       | Array of [JsonValue](protocol.md#jsonvalue) / Dictionary / `null,string,number,boolean` | Structured data for a UI that renders this tool specially (a diff view, a file tree).        |
 | `inspectedMediaSha256` | No       | Array of `string`                                                                       | Original image digests successfully inspected by a vision route.                             |
 | `label`                | No       | `string`                                                                                | A short human label for a UI, e.g. `read 412 lines from src/main.ts`.                        |
+| `processMissing`       | No       | `boolean`                                                                               | The native process table confirmed the requested handle is absent for this session.          |
 | `protocolPayload`      | No       | `boolean`                                                                               | Preserve the string byte-for-byte instead of applying the registry's display-oriented        |
 | `question`             | No       | [ToolQuestion](protocol.md#toolquestion)                                                | A question handed back to the conversation surface for native delivery.                      |
 | `source`               | No       | `"external-model"` / `"local"` / `"model"` / `"network"`                                | Where the content came from, for taint tracking.                                             |
 | `status`               | Yes      | [ToolStatus](protocol.md#toolstatus)                                                    |                                                                                              |
 | `terminate`            | No       | `boolean`                                                                               | Whether this result should END the turn rather than feed back into the model.                |
 | `truncation`           | No       | [TruncationRecord](protocol.md#truncationrecord)                                        | What the registry's backstop removed, when it removed anything.                              |
+| `verifiedCodePaths`    | No       | Array of `string`                                                                       | Absolute source paths accepted by a native engineering workflow, never model-supplied.       |
 
 ## ToolStatus
 
@@ -2811,6 +2859,46 @@ Opens a spoken call. The conversation is the agent's, so a call can continue a t
 | Field    | Required | Type     | Description |
 | -------- | -------- | -------- | ----------- |
 | `callId` | Yes      | `string` |             |
+
+## WalletHistoryEntry
+
+A durable payment or settled request, without exposing provider payment identifiers.
+
+| Field        | Required | Type                     | Description |
+| ------------ | -------- | ------------------------ | ----------- |
+| `amount`     | Yes      | `string`                 |             |
+| `kind`       | Yes      | `"purchase"` / `"usage"` |             |
+| `paid`       | Yes      | `string`                 |             |
+| `plan`       | Yes      | `string`                 |             |
+| `recordedAt` | Yes      | `number`                 |             |
+| `sequence`   | Yes      | `string`                 |             |
+
+## WalletHistoryPage
+
+Cursor pagination remains stable when new transactions arrive.
+
+| Field     | Required | Type                                                          | Description |
+| --------- | -------- | ------------------------------------------------------------- | ----------- |
+| `entries` | Yes      | Array of [WalletHistoryEntry](protocol.md#wallethistoryentry) |             |
+| `next`    | Yes      | `null,string`                                                 |             |
+| `userId`  | Yes      | `string`                                                      |             |
+
+## WalletSnapshot
+
+Exact USD microcent balances encoded as decimal strings for JSON clients.
+
+| Field              | Required | Type     | Description |
+| ------------------ | -------- | -------- | ----------- |
+| `asOf`             | Yes      | `number` |             |
+| `credits`          | Yes      | `string` |             |
+| `creditsAvailable` | Yes      | `string` |             |
+| `creditsHeld`      | Yes      | `string` |             |
+| `resetsAt`         | Yes      | `number` |             |
+| `userId`           | Yes      | `string` |             |
+| `weeklyAvailable`  | Yes      | `string` |             |
+| `weeklyHeld`       | Yes      | `string` |             |
+| `weeklyLimit`      | Yes      | `string` |             |
+| `weeklyUsed`       | Yes      | `string` |             |
 
 ## WireError
 
