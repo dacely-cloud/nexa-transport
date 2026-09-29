@@ -430,6 +430,29 @@ export interface ChannelStatusResultShape {
 /** ChannelStatusResult from the Nexa wire protocol. */
 export type ChannelStatusResult = ChannelStatusResultShape;
 
+/** CommandExecutionReceipt wire fields. */
+export interface CommandExecutionReceiptShape {
+    /** command as defined by the Nexa gateway. */
+    readonly command: string;
+    /** cwd as defined by the Nexa gateway. */
+    readonly cwd: string;
+    /** exitCode as defined by the Nexa gateway. */
+    readonly exitCode: null | number;
+    /** processId as defined by the Nexa gateway. */
+    readonly processId: null | string;
+    /** processToken as defined by the Nexa gateway. */
+    readonly processToken: null | string;
+    /** remote as defined by the Nexa gateway. */
+    readonly remote: boolean;
+    /** running as defined by the Nexa gateway. */
+    readonly running: boolean;
+    /** signal as defined by the Nexa gateway. */
+    readonly signal: null | string;
+}
+
+/** CommandExecutionReceipt from the Nexa wire protocol. */
+export type CommandExecutionReceipt = CommandExecutionReceiptShape;
+
 /** ConfigResult wire fields. */
 export interface ConfigResultShape {
     /** config as defined by the Nexa gateway. */
@@ -995,18 +1018,19 @@ export const ErrorCodeValues = {
     Value2: 'budget-exhausted',
     Value3: 'config',
     Value4: 'context-overflow',
-    Value5: 'denied',
-    Value6: 'forbidden',
-    Value7: 'internal',
-    Value8: 'invalid-request',
-    Value9: 'network',
-    Value10: 'not-found',
-    Value11: 'protocol',
-    Value12: 'rate-limit',
-    Value13: 'timeout',
-    Value14: 'tool-execution',
-    Value15: 'tool-input',
-    Value16: 'upstream',
+    Value5: 'delivery-unconfirmed',
+    Value6: 'denied',
+    Value7: 'forbidden',
+    Value8: 'internal',
+    Value9: 'invalid-request',
+    Value10: 'network',
+    Value11: 'not-found',
+    Value12: 'protocol',
+    Value13: 'rate-limit',
+    Value14: 'timeout',
+    Value15: 'tool-execution',
+    Value16: 'tool-input',
+    Value17: 'upstream',
 } as const;
 
 /** ErrorCode from the Nexa wire protocol. */
@@ -1418,6 +1442,36 @@ export interface GatewayMethodscredit_summaryShape {
     readonly params: CreditSummaryParams;
     /** result as defined by the Nexa gateway. */
     readonly result: CreditSummary;
+}
+
+/** GatewayMethodscredit_walletparams wire fields. */
+export interface GatewayMethodscredit_walletparamsShape {
+    /** userId as defined by the Nexa gateway. */
+    readonly userId?: string;
+}
+
+/** GatewayMethodscredit_wallet wire fields. */
+export interface GatewayMethodscredit_walletShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: GatewayMethodscredit_walletparamsShape;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WalletSnapshot | null;
+}
+
+/** GatewayMethodscredit_walletHistoryparams wire fields. */
+export interface GatewayMethodscredit_walletHistoryparamsShape {
+    /** before as defined by the Nexa gateway. */
+    readonly before?: string;
+    /** userId as defined by the Nexa gateway. */
+    readonly userId?: string;
+}
+
+/** GatewayMethodscredit_walletHistory wire fields. */
+export interface GatewayMethodscredit_walletHistoryShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: GatewayMethodscredit_walletHistoryparamsShape;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WalletHistoryPage;
 }
 
 /** GatewayMethodsdata_upload_cancel wire fields. */
@@ -1832,6 +1886,10 @@ export interface GatewayMethodsShape {
     readonly 'credit.setBudget': GatewayMethodscredit_setBudgetShape;
     /** credit.summary as defined by the Nexa gateway. */
     readonly 'credit.summary': GatewayMethodscredit_summaryShape;
+    /** credit.wallet as defined by the Nexa gateway. */
+    readonly 'credit.wallet': GatewayMethodscredit_walletShape;
+    /** credit.walletHistory as defined by the Nexa gateway. */
+    readonly 'credit.walletHistory': GatewayMethodscredit_walletHistoryShape;
     /** data.upload.cancel as defined by the Nexa gateway. */
     readonly 'data.upload.cancel': GatewayMethodsdata_upload_cancelShape;
     /** data.upload.chunk as defined by the Nexa gateway. */
@@ -3739,6 +3797,8 @@ export interface ToolPrincipalShape {
     readonly channelThreadId?: string;
     /** conversationId as defined by the Nexa gateway. */
     readonly conversationId?: string;
+    /** discordAppOnly as defined by the Nexa gateway. */
+    readonly discordAppOnly?: boolean;
     /** machineId as defined by the Nexa gateway. */
     readonly machineId?: string;
     /** maxRisk as defined by the Nexa gateway. */
@@ -3816,6 +3876,8 @@ export const ToolResultsourceValues = {
 
 /** ToolResult wire fields. */
 export interface ToolResultShape {
+    /** commandExecution as defined by the Nexa gateway. */
+    readonly commandExecution?: CommandExecutionReceipt;
     /** content as defined by the Nexa gateway. */
     readonly content: ReadonlyArray<ContentBlock> | string;
     /** continuation as defined by the Nexa gateway. */
@@ -3840,6 +3902,8 @@ export interface ToolResultShape {
     readonly inspectedMediaSha256?: ReadonlyArray<string>;
     /** label as defined by the Nexa gateway. */
     readonly label?: string;
+    /** processMissing as defined by the Nexa gateway. */
+    readonly processMissing?: boolean;
     /** protocolPayload as defined by the Nexa gateway. */
     readonly protocolPayload?: boolean;
     /** question as defined by the Nexa gateway. */
@@ -3852,6 +3916,8 @@ export interface ToolResultShape {
     readonly terminate?: boolean;
     /** truncation as defined by the Nexa gateway. */
     readonly truncation?: TruncationRecord;
+    /** verifiedCodePaths as defined by the Nexa gateway. */
+    readonly verifiedCodePaths?: ReadonlyArray<string>;
 }
 
 /** ToolResult from the Nexa wire protocol. */
@@ -4026,6 +4092,68 @@ export interface VoiceStopParamsShape {
 
 /** VoiceStopParams from the Nexa wire protocol. */
 export type VoiceStopParams = VoiceStopParamsShape;
+
+/** Allowed values for WalletHistoryEntrykind. */
+export const WalletHistoryEntrykindValues = { Value0: 'purchase', Value1: 'usage' } as const;
+
+/** WalletHistoryEntry wire fields. */
+export interface WalletHistoryEntryShape {
+    /** amount as defined by the Nexa gateway. */
+    readonly amount: string;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: (typeof WalletHistoryEntrykindValues)[keyof typeof WalletHistoryEntrykindValues];
+    /** paid as defined by the Nexa gateway. */
+    readonly paid: string;
+    /** plan as defined by the Nexa gateway. */
+    readonly plan: string;
+    /** recordedAt as defined by the Nexa gateway. */
+    readonly recordedAt: number;
+    /** sequence as defined by the Nexa gateway. */
+    readonly sequence: string;
+}
+
+/** WalletHistoryEntry from the Nexa wire protocol. */
+export type WalletHistoryEntry = WalletHistoryEntryShape;
+
+/** WalletHistoryPage wire fields. */
+export interface WalletHistoryPageShape {
+    /** entries as defined by the Nexa gateway. */
+    readonly entries: ReadonlyArray<WalletHistoryEntry>;
+    /** next as defined by the Nexa gateway. */
+    readonly next: null | string;
+    /** userId as defined by the Nexa gateway. */
+    readonly userId: string;
+}
+
+/** WalletHistoryPage from the Nexa wire protocol. */
+export type WalletHistoryPage = WalletHistoryPageShape;
+
+/** WalletSnapshot wire fields. */
+export interface WalletSnapshotShape {
+    /** asOf as defined by the Nexa gateway. */
+    readonly asOf: number;
+    /** credits as defined by the Nexa gateway. */
+    readonly credits: string;
+    /** creditsAvailable as defined by the Nexa gateway. */
+    readonly creditsAvailable: string;
+    /** creditsHeld as defined by the Nexa gateway. */
+    readonly creditsHeld: string;
+    /** resetsAt as defined by the Nexa gateway. */
+    readonly resetsAt: number;
+    /** userId as defined by the Nexa gateway. */
+    readonly userId: string;
+    /** weeklyAvailable as defined by the Nexa gateway. */
+    readonly weeklyAvailable: string;
+    /** weeklyHeld as defined by the Nexa gateway. */
+    readonly weeklyHeld: string;
+    /** weeklyLimit as defined by the Nexa gateway. */
+    readonly weeklyLimit: string;
+    /** weeklyUsed as defined by the Nexa gateway. */
+    readonly weeklyUsed: string;
+}
+
+/** WalletSnapshot from the Nexa wire protocol. */
+export type WalletSnapshot = WalletSnapshotShape;
 
 /** WireError wire fields. */
 export interface WireErrorShape {
@@ -4506,6 +4634,10 @@ export enum Method {
     CreditSetBudget = 'credit.setBudget',
     /** Calls credit.summary. */
     CreditSummary = 'credit.summary',
+    /** Calls credit.wallet. */
+    CreditWallet = 'credit.wallet',
+    /** Calls credit.walletHistory. */
+    CreditWalletHistory = 'credit.walletHistory',
     /** Calls data.upload.cancel. */
     DataUploadCancel = 'data.upload.cancel',
     /** Calls data.upload.chunk. */
