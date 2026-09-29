@@ -1412,6 +1412,44 @@ export interface GatewayMethodscredit_removeBudgetShape {
     readonly result: GatewayMethodscredit_removeBudgetresultShape;
 }
 
+/** GatewayMethodscredit_resetAllowance wire fields. */
+export interface GatewayMethodscredit_resetAllowanceShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ResetAllowanceParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ResetAllowanceResult;
+}
+
+/** GatewayMethodscredit_resetHistoryparams wire fields. */
+export interface GatewayMethodscredit_resetHistoryparamsShape {
+    /** before as defined by the Nexa gateway. */
+    readonly before?: string;
+    /** userId as defined by the Nexa gateway. */
+    readonly userId?: string;
+}
+
+/** GatewayMethodscredit_resetHistory wire fields. */
+export interface GatewayMethodscredit_resetHistoryShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: GatewayMethodscredit_resetHistoryparamsShape;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ResetHistoryPage;
+}
+
+/** GatewayMethodscredit_resetsparams wire fields. */
+export interface GatewayMethodscredit_resetsparamsShape {
+    /** userId as defined by the Nexa gateway. */
+    readonly userId?: string;
+}
+
+/** GatewayMethodscredit_resets wire fields. */
+export interface GatewayMethodscredit_resetsShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: GatewayMethodscredit_resetsparamsShape;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ResetSnapshot | null;
+}
+
 /** GatewayMethodscredit_setBudgetparams wire fields. */
 export interface GatewayMethodscredit_setBudgetparamsShape {
     /** enforcement as defined by the Nexa gateway. */
@@ -1882,6 +1920,12 @@ export interface GatewayMethodsShape {
     readonly 'credit.budgets': GatewayMethodscredit_budgetsShape;
     /** credit.removeBudget as defined by the Nexa gateway. */
     readonly 'credit.removeBudget': GatewayMethodscredit_removeBudgetShape;
+    /** credit.resetAllowance as defined by the Nexa gateway. */
+    readonly 'credit.resetAllowance': GatewayMethodscredit_resetAllowanceShape;
+    /** credit.resetHistory as defined by the Nexa gateway. */
+    readonly 'credit.resetHistory': GatewayMethodscredit_resetHistoryShape;
+    /** credit.resets as defined by the Nexa gateway. */
+    readonly 'credit.resets': GatewayMethodscredit_resetsShape;
     /** credit.setBudget as defined by the Nexa gateway. */
     readonly 'credit.setBudget': GatewayMethodscredit_setBudgetShape;
     /** credit.summary as defined by the Nexa gateway. */
@@ -3259,6 +3303,81 @@ export interface ReminderActionShape {
 /** ReminderAction from the Nexa wire protocol. */
 export type ReminderAction = ReminderActionShape;
 
+/** ResetAllowanceParams wire fields. */
+export interface ResetAllowanceParamsShape {
+    /** cycle as defined by the Nexa gateway. */
+    readonly cycle: string;
+    /** requestId as defined by the Nexa gateway. */
+    readonly requestId: string;
+    /** week as defined by the Nexa gateway. */
+    readonly week: string;
+}
+
+/** ResetAllowanceParams from the Nexa wire protocol. */
+export type ResetAllowanceParams = ResetAllowanceParamsShape;
+
+/** ResetAllowanceResult wire fields. */
+export interface ResetAllowanceResultShape {
+    /** receipt as defined by the Nexa gateway. */
+    readonly receipt: ResetHistoryEntry;
+    /** requestId as defined by the Nexa gateway. */
+    readonly requestId: string;
+    /** userId as defined by the Nexa gateway. */
+    readonly userId: string;
+}
+
+/** ResetAllowanceResult from the Nexa wire protocol. */
+export type ResetAllowanceResult = ResetAllowanceResultShape;
+
+/** ResetHistoryEntry wire fields. */
+export interface ResetHistoryEntryShape {
+    /** allowance as defined by the Nexa gateway. */
+    readonly allowance: string;
+    /** previousHeld as defined by the Nexa gateway. */
+    readonly previousHeld: string;
+    /** previousUsed as defined by the Nexa gateway. */
+    readonly previousUsed: string;
+    /** recordedAt as defined by the Nexa gateway. */
+    readonly recordedAt: number;
+    /** sequence as defined by the Nexa gateway. */
+    readonly sequence: string;
+    /** week as defined by the Nexa gateway. */
+    readonly week: string;
+}
+
+/** ResetHistoryEntry from the Nexa wire protocol. */
+export type ResetHistoryEntry = ResetHistoryEntryShape;
+
+/** ResetHistoryPage wire fields. */
+export interface ResetHistoryPageShape {
+    /** entries as defined by the Nexa gateway. */
+    readonly entries: ReadonlyArray<ResetHistoryEntry>;
+    /** next as defined by the Nexa gateway. */
+    readonly next: null | string;
+    /** userId as defined by the Nexa gateway. */
+    readonly userId: string;
+}
+
+/** ResetHistoryPage from the Nexa wire protocol. */
+export type ResetHistoryPage = ResetHistoryPageShape;
+
+/** ResetSnapshot wire fields. */
+export interface ResetSnapshotShape {
+    /** asOf as defined by the Nexa gateway. */
+    readonly asOf: number;
+    /** available as defined by the Nexa gateway. */
+    readonly available: string;
+    /** cycle as defined by the Nexa gateway. */
+    readonly cycle: string;
+    /** userId as defined by the Nexa gateway. */
+    readonly userId: string;
+    /** week as defined by the Nexa gateway. */
+    readonly week: string;
+}
+
+/** ResetSnapshot from the Nexa wire protocol. */
+export type ResetSnapshot = ResetSnapshotShape;
+
 /** Allowed values for RiskLevel. */
 export const RiskLevelValues = {
     Value0: 'destructive',
@@ -4630,6 +4749,12 @@ export enum Method {
     CreditBudgets = 'credit.budgets',
     /** Calls credit.removeBudget. */
     CreditRemoveBudget = 'credit.removeBudget',
+    /** Calls credit.resetAllowance. */
+    CreditResetAllowance = 'credit.resetAllowance',
+    /** Calls credit.resetHistory. */
+    CreditResetHistory = 'credit.resetHistory',
+    /** Calls credit.resets. */
+    CreditResets = 'credit.resets',
     /** Calls credit.setBudget. */
     CreditSetBudget = 'credit.setBudget',
     /** Calls credit.summary. */
