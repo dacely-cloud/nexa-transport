@@ -2144,6 +2144,62 @@
                     "required": ["params", "result"],
                     "type": "object"
                 },
+                "credit.resetAllowance": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/ResetAllowanceParams"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/ResetAllowanceResult"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "credit.resetHistory": {
+                    "properties": {
+                        "params": {
+                            "properties": {
+                                "before": {
+                                    "type": "string"
+                                },
+                                "userId": {
+                                    "type": "string"
+                                }
+                            },
+                            "type": "object"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/ResetHistoryPage"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "credit.resets": {
+                    "properties": {
+                        "params": {
+                            "properties": {
+                                "userId": {
+                                    "type": "string"
+                                }
+                            },
+                            "type": "object"
+                        },
+                        "result": {
+                            "anyOf": [
+                                {
+                                    "$ref": "#/definitions/ResetSnapshot"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ]
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
                 "credit.setBudget": {
                     "properties": {
                         "params": {
@@ -2857,6 +2913,9 @@
                 "connect",
                 "credit.budgets",
                 "credit.removeBudget",
+                "credit.resetAllowance",
+                "credit.resetHistory",
+                "credit.resets",
                 "credit.setBudget",
                 "credit.summary",
                 "credit.wallet",
@@ -4930,6 +4989,111 @@
                 }
             },
             "required": ["channelId", "conversationId", "kind", "text"],
+            "type": "object"
+        },
+        "ResetAllowanceParams": {
+            "description": "A confirmed reset always applies to the exact displayed allowance generation.",
+            "properties": {
+                "cycle": {
+                    "type": "string"
+                },
+                "requestId": {
+                    "type": "string"
+                },
+                "week": {
+                    "type": "string"
+                }
+            },
+            "required": ["cycle", "requestId", "week"],
+            "type": "object"
+        },
+        "ResetAllowanceResult": {
+            "description": "A successful mutation carries its immutable receipt, including on retries.",
+            "properties": {
+                "receipt": {
+                    "$ref": "#/definitions/ResetHistoryEntry"
+                },
+                "requestId": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "string"
+                }
+            },
+            "required": ["receipt", "requestId", "userId"],
+            "type": "object"
+        },
+        "ResetHistoryEntry": {
+            "description": "Owner-scoped reset evidence without operator grant/payment identifiers.",
+            "properties": {
+                "allowance": {
+                    "type": "string"
+                },
+                "previousHeld": {
+                    "type": "string"
+                },
+                "previousUsed": {
+                    "type": "string"
+                },
+                "recordedAt": {
+                    "type": "number"
+                },
+                "sequence": {
+                    "type": "string"
+                },
+                "week": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "allowance",
+                "previousHeld",
+                "previousUsed",
+                "recordedAt",
+                "sequence",
+                "week"
+            ],
+            "type": "object"
+        },
+        "ResetHistoryPage": {
+            "description": "Stable descending pagination.",
+            "properties": {
+                "entries": {
+                    "items": {
+                        "$ref": "#/definitions/ResetHistoryEntry"
+                    },
+                    "type": "array"
+                },
+                "next": {
+                    "type": ["null", "string"]
+                },
+                "userId": {
+                    "type": "string"
+                }
+            },
+            "required": ["entries", "next", "userId"],
+            "type": "object"
+        },
+        "ResetSnapshot": {
+            "description": "JSON-safe reset state; generation tokens prevent stale tabs consuming another entitlement.",
+            "properties": {
+                "asOf": {
+                    "type": "number"
+                },
+                "available": {
+                    "type": "string"
+                },
+                "cycle": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "string"
+                },
+                "week": {
+                    "type": "string"
+                }
+            },
+            "required": ["asOf", "available", "cycle", "userId", "week"],
             "type": "object"
         },
         "RiskLevel": {
