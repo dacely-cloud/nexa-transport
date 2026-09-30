@@ -1282,6 +1282,20 @@ export interface GatewayMethodsagent_askShape {
     readonly result: AskResult;
 }
 
+/** GatewayMethodsagent_steerresult wire fields. */
+export interface GatewayMethodsagent_steerresultShape {
+    /** accepted as defined by the Nexa gateway. */
+    readonly accepted: boolean;
+}
+
+/** GatewayMethodsagent_steer wire fields. */
+export interface GatewayMethodsagent_steerShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: SteerParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: GatewayMethodsagent_steerresultShape;
+}
+
 /** GatewayMethodsagent_stream wire fields. */
 export interface GatewayMethodsagent_streamShape {
     /** params as defined by the Nexa gateway. */
@@ -1892,6 +1906,8 @@ export interface GatewayMethodsShape {
     readonly 'accounts.usage': GatewayMethodsaccounts_usageShape;
     /** agent.ask as defined by the Nexa gateway. */
     readonly 'agent.ask': GatewayMethodsagent_askShape;
+    /** agent.steer as defined by the Nexa gateway. */
+    readonly 'agent.steer': GatewayMethodsagent_steerShape;
     /** agent.stream as defined by the Nexa gateway. */
     readonly 'agent.stream': GatewayMethodsagent_streamShape;
     /** agents.define as defined by the Nexa gateway. */
@@ -3542,6 +3558,17 @@ export interface ShareSummaryShape {
 /** ShareSummary from the Nexa wire protocol. */
 export type ShareSummary = ShareSummaryShape;
 
+/** SteerParams wire fields. */
+export interface SteerParamsShape {
+    /** message as defined by the Nexa gateway. */
+    readonly message: string;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+}
+
+/** SteerParams from the Nexa wire protocol. */
+export type SteerParams = SteerParamsShape;
+
 /** StreamAccepted wire fields. */
 export interface StreamAcceptedShape {
     /** runId as defined by the Nexa gateway. */
@@ -3924,6 +3951,8 @@ export interface ToolPrincipalShape {
     readonly maxRisk?: (typeof ToolPrincipalmaxRiskValues)[keyof typeof ToolPrincipalmaxRiskValues];
     /** projectId as defined by the Nexa gateway. */
     readonly projectId?: string;
+    /** sourceAccessDenied as defined by the Nexa gateway. */
+    readonly sourceAccessDenied?: boolean;
     /** userId as defined by the Nexa gateway. */
     readonly userId?: string;
 }
@@ -4721,6 +4750,8 @@ export enum Method {
     AccountsUsage = 'accounts.usage',
     /** Calls agent.ask. */
     AgentAsk = 'agent.ask',
+    /** Calls agent.steer. */
+    AgentSteer = 'agent.steer',
     /** Calls agent.stream. */
     AgentStream = 'agent.stream',
     /** Calls agents.define. */

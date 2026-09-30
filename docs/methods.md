@@ -7,6 +7,7 @@ All 54 protocol methods. `connect` is managed by `NexaClient.connect`; the remai
 - [accounts.remove](#accounts-remove)
 - [accounts.usage](#accounts-usage)
 - [agent.ask](#agent-ask)
+- [agent.steer](#agent-steer)
 - [agent.stream](#agent-stream)
 - [agents.define](#agents-define)
 - [agents.list](#agents-list)
@@ -21,6 +22,9 @@ All 54 protocol methods. `connect` is managed by `NexaClient.connect`; the remai
 - [connect](#connect)
 - [credit.budgets](#credit-budgets)
 - [credit.removeBudget](#credit-removeBudget)
+- [credit.resetAllowance](#credit-resetAllowance)
+- [credit.resetHistory](#credit-resetHistory)
+- [credit.resets](#credit-resets)
 - [credit.setBudget](#credit-setBudget)
 - [credit.summary](#credit-summary)
 - [credit.wallet](#credit-wallet)
@@ -182,6 +186,27 @@ Parameters: [AskParams](protocol.md#askparams).
 | `userId`         | No       | `string`                                                    | The principal the turn is billed and authorized as.                      |
 
 Result: [AskResult](protocol.md#askresult).
+
+## agent.steer
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.AgentSteer> = {
+    message: 'Your request',
+    runId: 'YOUR_RUNID',
+};
+const result: ResultOf<typeof Method.AgentSteer> = await client.call(Method.AgentSteer, params);
+```
+
+Parameters: [SteerParams](protocol.md#steerparams).
+
+| Field     | Required | Type     | Description |
+| --------- | -------- | -------- | ----------- |
+| `message` | Yes      | `string` |             |
+| `runId`   | Yes      | `string` |             |
+
+Result: Object (fields below).
 
 ## agent.stream
 
@@ -456,6 +481,70 @@ Parameters: Object (fields below).
 | `id`  | Yes      | `string` |             |
 
 Result: Object (fields below).
+
+## credit.resetAllowance
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.CreditResetAllowance> = {
+    cycle: 'YOUR_CYCLE',
+    requestId: 'YOUR_REQUESTID',
+    week: 'YOUR_WEEK',
+};
+const result: ResultOf<typeof Method.CreditResetAllowance> = await client.call(
+    Method.CreditResetAllowance,
+    params,
+);
+```
+
+Parameters: [ResetAllowanceParams](protocol.md#resetallowanceparams).
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `cycle`     | Yes      | `string` |             |
+| `requestId` | Yes      | `string` |             |
+| `week`      | Yes      | `string` |             |
+
+Result: [ResetAllowanceResult](protocol.md#resetallowanceresult).
+
+## credit.resetHistory
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.CreditResetHistory> = {};
+const result: ResultOf<typeof Method.CreditResetHistory> = await client.call(
+    Method.CreditResetHistory,
+    params,
+);
+```
+
+Parameters: Object (fields below).
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `before` | No       | `string` |             |
+| `userId` | No       | `string` |             |
+
+Result: [ResetHistoryPage](protocol.md#resethistorypage).
+
+## credit.resets
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.CreditResets> = {};
+const result: ResultOf<typeof Method.CreditResets> = await client.call(Method.CreditResets, params);
+```
+
+Parameters: Object (fields below).
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `userId` | No       | `string` |             |
+
+Result: [ResetSnapshot](protocol.md#resetsnapshot) / `null`.
 
 ## credit.setBudget
 

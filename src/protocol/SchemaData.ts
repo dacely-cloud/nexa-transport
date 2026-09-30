@@ -2003,6 +2003,24 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'agent.steer': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/SteerParams',
+                        },
+                        result: {
+                            properties: {
+                                accepted: {
+                                    type: 'boolean',
+                                },
+                            },
+                            required: ['accepted'],
+                            type: 'object',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'agent.stream': {
                     properties: {
                         params: {
@@ -2961,6 +2979,7 @@ export const schema: Schema = {
                 'accounts.remove',
                 'accounts.usage',
                 'agent.ask',
+                'agent.steer',
                 'agent.stream',
                 'agents.define',
                 'agents.list',
@@ -5445,6 +5464,19 @@ export const schema: Schema = {
             required: ['createdAt', 'id', 'members', 'name', 'path'],
             type: 'object',
         },
+        SteerParams: {
+            description: 'A correction for the server-minted active run, not a follow-up turn.',
+            properties: {
+                message: {
+                    type: 'string',
+                },
+                runId: {
+                    type: 'string',
+                },
+            },
+            required: ['message', 'runId'],
+            type: 'object',
+        },
         StreamAccepted: {
             description: 'The acknowledgement of a streaming run.',
             properties: {
@@ -6017,6 +6049,11 @@ export const schema: Schema = {
                 },
                 projectId: {
                     type: 'string',
+                },
+                sourceAccessDenied: {
+                    description:
+                        'Host-enforced source confinement for gateway callers, including the web UI.',
+                    type: 'boolean',
                 },
                 userId: {
                     type: 'string',

@@ -332,3 +332,37 @@ it('manual close cancels a scheduled reconnect', async (): Promise<void> => {
     ).toHaveLength(1);
     expect(connected.reconnecting).toBe(false);
 });
+
+it('steers the server run without starting another stream and rejects completed handles', async () => {
+    const connected = await connect();
+    if (gateway === undefined) throw new Error('No peer');
+    gateway.handler = (socket: WebSocket, request: Request): void => {
+        if (request.method === 'agent.stream') {
+            socket.send(
+                JSON.stringify({
+                    id: request.id,
+                    ok: true,
+                    result: { streamId: request.params['streamId'], runId: 'owned-run' },
+                }),
+            );
+        } else {
+            socket.send(
+                JSON.stringify({
+                    id: request.id,
+                    ok: true,
+                    result: request.method === 'agent.steer' ? { accepted: true } : { ok: true },
+                }),
+            );
+        }
+    };
+    const turn = connected.stream({ message: 'Start' });
+    expect(await turn.steer('Use blue')).toBe(true);
+    expect(gateway.requests.at(-1)).toMatchObject({
+        method: 'agent.steer',
+        params: { runId: 'owned-run', message: 'Use blue' },
+    });
+    expect(gateway.requests.filter((request) => request.method === 'agent.stream')).toHaveLength(1);
+    await expect(turn.steer(' ')).rejects.toThrow();
+    await turn.cancel();
+    expect(await turn.steer('Late')).toBe(false);
+});
