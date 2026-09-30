@@ -77,6 +77,20 @@ export class TurnStream implements AsyncIterable<WireTurnEvent> {
         void this.#observeResult();
         options.signal?.addEventListener('abort', this.#abort, { once: true });
     }
+    /** Adds a correction to this active run without starting or cancelling a turn. */
+    public async steer(message: string): Promise<boolean> {
+        if (!message.trim() || message.length > 16_384)
+            throw new RangeError('Invalid steering message');
+        if (this.#ended) return false;
+        const accepted: StreamAccepted = await this.#accepted;
+        if (this.#ended || this.#client === undefined) return false;
+        const result = await this.#client.call(Method.AgentSteer, {
+            runId: accepted.runId,
+            message,
+        });
+        return result.accepted;
+    }
+
     /** Stops the server run using its runId, never the client streamId. */
     public async cancel(): Promise<void> {
         this.#events.discard();

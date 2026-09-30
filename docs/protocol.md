@@ -823,6 +823,7 @@ Configurable bounds on gateway-owned work and memory.
 | `accounts.remove`              | Yes      | Object (fields below) |             |
 | `accounts.usage`               | Yes      | Object (fields below) |             |
 | `agent.ask`                    | Yes      | Object (fields below) |             |
+| `agent.steer`                  | Yes      | Object (fields below) |             |
 | `agent.stream`                 | Yes      | Object (fields below) |             |
 | `agents.define`                | Yes      | Object (fields below) |             |
 | `agents.list`                  | Yes      | Object (fields below) |             |
@@ -837,6 +838,9 @@ Configurable bounds on gateway-owned work and memory.
 | `connect`                      | Yes      | Object (fields below) |             |
 | `credit.budgets`               | Yes      | Object (fields below) |             |
 | `credit.removeBudget`          | Yes      | Object (fields below) |             |
+| `credit.resetAllowance`        | Yes      | Object (fields below) |             |
+| `credit.resetHistory`          | Yes      | Object (fields below) |             |
+| `credit.resets`                | Yes      | Object (fields below) |             |
 | `credit.setBudget`             | Yes      | Object (fields below) |             |
 | `credit.summary`               | Yes      | Object (fields below) |             |
 | `credit.wallet`                | Yes      | Object (fields below) |             |
@@ -922,6 +926,19 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ---------------------------------- | ----------- |
 | `params` | Yes      | [AskParams](protocol.md#askparams) |             |
 | `result` | Yes      | [AskResult](protocol.md#askresult) |             |
+
+**agent.steer**
+
+| Field    | Required | Type                                   | Description |
+| -------- | -------- | -------------------------------------- | ----------- |
+| `params` | Yes      | [SteerParams](protocol.md#steerparams) |             |
+| `result` | Yes      | Object (fields below)                  |             |
+
+**agent.steer.result**
+
+| Field      | Required | Type      | Description |
+| ---------- | -------- | --------- | ----------- |
+| `accepted` | Yes      | `boolean` |             |
 
 **agent.stream**
 
@@ -1038,6 +1055,40 @@ Configurable bounds on gateway-owned work and memory.
 | Field | Required | Type   | Description |
 | ----- | -------- | ------ | ----------- |
 | `ok`  | Yes      | `true` |             |
+
+**credit.resetAllowance**
+
+| Field    | Required | Type                                                     | Description |
+| -------- | -------- | -------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ResetAllowanceParams](protocol.md#resetallowanceparams) |             |
+| `result` | Yes      | [ResetAllowanceResult](protocol.md#resetallowanceresult) |             |
+
+**credit.resetHistory**
+
+| Field    | Required | Type                                             | Description |
+| -------- | -------- | ------------------------------------------------ | ----------- |
+| `params` | Yes      | Object (fields below)                            |             |
+| `result` | Yes      | [ResetHistoryPage](protocol.md#resethistorypage) |             |
+
+**credit.resetHistory.params**
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `before` | No       | `string` |             |
+| `userId` | No       | `string` |             |
+
+**credit.resets**
+
+| Field    | Required | Type                                                | Description |
+| -------- | -------- | --------------------------------------------------- | ----------- |
+| `params` | Yes      | Object (fields below)                               |             |
+| `result` | Yes      | [ResetSnapshot](protocol.md#resetsnapshot) / `null` |             |
+
+**credit.resets.params**
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `userId` | No       | `string` |             |
 
 **credit.setBudget**
 
@@ -2312,6 +2363,61 @@ A durable message to the conversation that requested it; no model execution.
 | `text`           | Yes      | `string`     |             |
 | `threadId`       | No       | `string`     |             |
 
+## ResetAllowanceParams
+
+A confirmed reset always applies to the exact displayed allowance generation.
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `cycle`     | Yes      | `string` |             |
+| `requestId` | Yes      | `string` |             |
+| `week`      | Yes      | `string` |             |
+
+## ResetAllowanceResult
+
+A successful mutation carries its immutable receipt, including on retries.
+
+| Field       | Required | Type                                               | Description |
+| ----------- | -------- | -------------------------------------------------- | ----------- |
+| `receipt`   | Yes      | [ResetHistoryEntry](protocol.md#resethistoryentry) |             |
+| `requestId` | Yes      | `string`                                           |             |
+| `userId`    | Yes      | `string`                                           |             |
+
+## ResetHistoryEntry
+
+Owner-scoped reset evidence without operator grant/payment identifiers.
+
+| Field          | Required | Type     | Description |
+| -------------- | -------- | -------- | ----------- |
+| `allowance`    | Yes      | `string` |             |
+| `previousHeld` | Yes      | `string` |             |
+| `previousUsed` | Yes      | `string` |             |
+| `recordedAt`   | Yes      | `number` |             |
+| `sequence`     | Yes      | `string` |             |
+| `week`         | Yes      | `string` |             |
+
+## ResetHistoryPage
+
+Stable descending pagination.
+
+| Field     | Required | Type                                                        | Description |
+| --------- | -------- | ----------------------------------------------------------- | ----------- |
+| `entries` | Yes      | Array of [ResetHistoryEntry](protocol.md#resethistoryentry) |             |
+| `next`    | Yes      | `null,string`                                               |             |
+| `userId`  | Yes      | `string`                                                    |             |
+
+## ResetSnapshot
+
+JSON-safe reset state; generation tokens prevent stale tabs consuming another entitlement.
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `asOf`      | Yes      | `number` |             |
+| `available` | Yes      | `string` |             |
+| `cycle`     | Yes      | `string` |             |
+| `userId`    | Yes      | `string` |             |
+| `week`      | Yes      | `string` |             |
+
 ## RiskLevel
 
 How dangerous an action is.
@@ -2427,6 +2533,15 @@ A shared folder, as the UI lists it.
 | `id`      | Yes      | `string` |             |
 | `mode`    | Yes      | `string` |             |
 | `subject` | Yes      | `string` |             |
+
+## SteerParams
+
+A correction for the server-minted active run, not a follow-up turn.
+
+| Field     | Required | Type     | Description |
+| --------- | -------- | -------- | ----------- |
+| `message` | Yes      | `string` |             |
+| `runId`   | Yes      | `string` |             |
 
 ## StreamAccepted
 
@@ -2670,6 +2785,7 @@ Who is making a tool call.
 | `machineId`                    | No       | `string`                                             | The machine this caller's work runs on, when their account names one.                  |
 | `maxRisk`                      | No       | `"destructive"` / `"execute"` / `"read"` / `"write"` | The highest risk this caller may reach, whatever the deployment ceiling allows.        |
 | `projectId`                    | No       | `string`                                             |                                                                                        |
+| `sourceAccessDenied`           | No       | `boolean`                                            | Host-enforced source confinement for gateway callers, including the web UI.            |
 | `userId`                       | No       | `string`                                             |                                                                                        |
 
 ## ToolProgress
