@@ -6,6 +6,7 @@ import type {
     SessionMessageData,
     TurnEndData,
     TurnEventData,
+    ToolSitesData,
     VoiceCallEvent,
 } from './Protocol.js';
 import * as validators from './Validators.js';
@@ -14,6 +15,7 @@ import type { Validator } from './Validators.js';
 export const EventName = {
     Challenge: 'connect.challenge',
     TurnEvent: 'turn.event',
+    ToolSites: 'tool.sites',
     TurnEnd: 'turn.end',
     SessionMessage: 'session.message',
     ApprovalRequested: 'approval.requested',
@@ -47,6 +49,7 @@ export interface Shutdown {
 export interface EventMap {
     readonly 'connect.challenge': ConnectChallengeData;
     readonly 'turn.event': TurnEventData;
+    readonly 'tool.sites': ToolSitesData;
     readonly 'turn.end': TurnEndData;
     readonly 'session.message': SessionMessageData;
     readonly 'approval.requested': ApprovalRequestedData;
@@ -60,6 +63,7 @@ export interface EventMap {
 const eventValidators: Readonly<Record<keyof EventMap, Validator>> = {
     'connect.challenge': validators.challenge,
     'turn.event': validators.turnEvent,
+    'tool.sites': validators.toolSites,
     'turn.end': validators.turnEnd,
     'session.message': validators.sessionMessage,
     'approval.requested': validators.approvalRequested,

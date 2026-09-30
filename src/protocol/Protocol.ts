@@ -3558,6 +3558,17 @@ export interface ShareSummaryShape {
 /** ShareSummary from the Nexa wire protocol. */
 export type ShareSummary = ShareSummaryShape;
 
+/** SitePreview wire fields. */
+export interface SitePreviewShape {
+    /** favicon as defined by the Nexa gateway. */
+    readonly favicon: string;
+    /** origin as defined by the Nexa gateway. */
+    readonly origin: string;
+}
+
+/** SitePreview from the Nexa wire protocol. */
+export type SitePreview = SitePreviewShape;
+
 /** SteerParams wire fields. */
 export interface SteerParamsShape {
     /** message as defined by the Nexa gateway. */
@@ -4070,6 +4081,21 @@ export interface ToolResultShape {
 
 /** ToolResult from the Nexa wire protocol. */
 export type ToolResult = ToolResultShape;
+
+/** ToolSitesData wire fields. */
+export interface ToolSitesDataShape {
+    /** callId as defined by the Nexa gateway. */
+    readonly callId: string;
+    /** sessionId as defined by the Nexa gateway. */
+    readonly sessionId?: string;
+    /** sites as defined by the Nexa gateway. */
+    readonly sites: ReadonlyArray<SitePreview>;
+    /** streamId as defined by the Nexa gateway. */
+    readonly streamId: string;
+}
+
+/** ToolSitesData from the Nexa wire protocol. */
+export type ToolSitesData = ToolSitesDataShape;
 
 /** Allowed values for ToolStatus. */
 export const ToolStatusValues = {

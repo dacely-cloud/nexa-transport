@@ -5464,6 +5464,20 @@ export const schema: Schema = {
             required: ['createdAt', 'id', 'members', 'name', 'path'],
             type: 'object',
         },
+        SitePreview: {
+            description:
+                'Only server-fetched raster bytes cross the gateway; clients never fetch the visited host.',
+            properties: {
+                favicon: {
+                    type: 'string',
+                },
+                origin: {
+                    type: 'string',
+                },
+            },
+            required: ['favicon', 'origin'],
+            type: 'object',
+        },
         SteerParams: {
             description: 'A correction for the server-minted active run, not a follow-up turn.',
             properties: {
@@ -6279,6 +6293,29 @@ export const schema: Schema = {
             required: ['content', 'status'],
             type: 'object',
         },
+        ToolSitesData: {
+            description:
+                'Asynchronous tool decoration; may arrive after turn.end and never blocks it.',
+            properties: {
+                callId: {
+                    type: 'string',
+                },
+                sessionId: {
+                    type: 'string',
+                },
+                sites: {
+                    items: {
+                        $ref: '#/definitions/SitePreview',
+                    },
+                    type: 'array',
+                },
+                streamId: {
+                    type: 'string',
+                },
+            },
+            required: ['callId', 'sites', 'streamId'],
+            type: 'object',
+        },
         ToolStatus: {
             description: "What a tool did, from the agent's point of view.",
             enum: ['aborted', 'denied', 'error', 'ok'],
@@ -6362,8 +6399,6 @@ export const schema: Schema = {
             type: 'object',
         },
         TurnEventData: {
-            description:
-                'The payload of a {@link GATEWAY_EVENTS.TurnEvent} event.\n\n`sessionId` is what makes fan-out usable rather than merely possible. A mirroring client watches\nseveral conversations at once, and a frame carrying only a `streamId` — an id chosen by the OTHER\nclient, which this one has never seen — cannot be filed against a conversation. Absent when the\nrun named no conversation, in which case the run belongs to its originator alone and is never\nfanned out.',
             properties: {
                 event: {
                     $ref: '#/definitions/WireTurnEvent',
@@ -7262,6 +7297,9 @@ export const schema: Schema = {
         sessionMessage: {
             $ref: '#/definitions/SessionMessageData',
         },
+        toolSites: {
+            $ref: '#/definitions/ToolSitesData',
+        },
         turnEnd: {
             $ref: '#/definitions/TurnEndData',
         },
@@ -7281,6 +7319,7 @@ export const schema: Schema = {
         'methods',
         'native',
         'sessionMessage',
+        'toolSites',
         'turnEnd',
         'turnEvent',
         'voice',

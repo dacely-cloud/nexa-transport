@@ -36,6 +36,10 @@ export function native(value: unknown): value is protocol.NcapDelta {
 export function sessionMessage(value: unknown): value is protocol.SessionMessageData {
     return validator.validate('#/definitions/SessionMessageData', value);
 }
+/** Validates toolSites. */
+export function toolSites(value: unknown): value is protocol.ToolSitesData {
+    return validator.validate('#/definitions/ToolSitesData', value);
+}
 /** Validates turnEnd. */
 export function turnEnd(value: unknown): value is protocol.TurnEndData {
     return validator.validate('#/definitions/TurnEndData', value);
