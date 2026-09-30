@@ -3,6 +3,7 @@ import type {
     GatewayMethods,
     ConnectChallengeData,
     TurnEventData,
+    ToolSitesData,
     TurnEndData,
     SessionMessageData,
     ApprovalRequestedData,
@@ -17,6 +18,7 @@ export interface Contract {
     readonly methods: GatewayMethods;
     readonly challenge: ConnectChallengeData;
     readonly turnEvent: TurnEventData;
+    readonly toolSites: ToolSitesData;
     readonly turnEnd: TurnEndData;
     readonly sessionMessage: SessionMessageData;
     readonly approvalRequested: ApprovalRequestedData;
