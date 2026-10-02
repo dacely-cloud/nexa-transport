@@ -153,3 +153,28 @@ it('preserves browser File names without requiring a separate title', async (): 
         await NexaMedia.document(new Blob(['%PDF-1.7'], { type: 'application/pdf' })),
     ).not.toHaveProperty('title');
 });
+
+it.each([
+    ['sales.csv', 'text/csv'],
+    ['sales.tsv', 'text/tab-separated-values'],
+    ['data.json', 'application/json'],
+    ['data.jsonl', 'application/x-ndjson'],
+    ['notes.docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
+    ['unknown.bin', 'application/octet-stream'],
+])(
+    'infers document MIME for browser files without a type: %s',
+    async (filename: string, mime: string): Promise<void> => {
+        const attachment: InboundAttachment = await NexaMedia.document(
+            new File(['source'], filename),
+        );
+        expect(attachment).toMatchObject({
+            type: 'document',
+            title: filename,
+            source: { mediaType: mime },
+        });
+        const explicit: InboundAttachment = await NexaMedia.document(
+            new File(['source'], filename, { type: 'text/plain' }),
+        );
+        expect(explicit).toMatchObject({ source: { mediaType: 'text/plain' } });
+    },
+);

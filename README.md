@@ -453,3 +453,5 @@ const turn = client.stream({
 ```
 
 The server returns a path, filename and decimal-string byte count. Source bytes never enter the agent request. Progress counts acknowledged bytes as `bigint`. Cancellation requests cleanup of unfinished uploads. The server must advertise the `data.upload.*` methods and grant write scope. For Node files, use a file-backed Blob to keep memory bounded. `NexaMedia.document` is still intended for inline attachments; uploading a file does not itself analyze it.
+
+For inline CSV, TSV, JSON, JSONL, PDF and Office files, use `NexaMedia.document(file)`. It preserves `File.name` and infers the MIME type from the filename when the browser leaves `File.type` empty. Nexa can import structured attachments directly by their media ID using `import_dataset`, then run full-data SQL with `query_dataset`. Word `.docx` text is available through `extract_document`.

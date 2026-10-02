@@ -1208,6 +1208,8 @@ export interface GatewayFeaturesShape {
     readonly methodScopes: RecordstringScope;
     /** methods as defined by the Nexa gateway. */
     readonly methods: ReadonlyArray<string>;
+    /** officeGame as defined by the Nexa gateway. */
+    readonly officeGame?: true;
 }
 
 /** GatewayFeatures from the Nexa wire protocol. */

@@ -1,3 +1,9 @@
+import {
+    OfficeProtocol,
+    OfficeGameOp,
+    type OfficeGamePacket,
+    type OfficePlayer,
+} from '../office/OfficeProtocol.js';
 import { DataUploadClient } from './DataUploadClient.js';
 import type { DataUploadOptions } from '../interface/DataUploadOptions.js';
 export type { DataUploadOptions } from '../interface/DataUploadOptions.js';
@@ -70,6 +76,7 @@ export interface SessionSnapshot {
 }
 /** Authenticated Nexa gateway connection shared by browsers and Node.js. */
 export class NexaClient {
+    readonly #officeListeners = new Set<(packet: OfficeGamePacket) => void>();
     #socket: WebSocket;
     #detachSocket: (() => void) | undefined;
     readonly #url: URL;
@@ -288,6 +295,9 @@ export class NexaClient {
                 );
             }
             this.#ready = true;
+            if (this.#officeListeners.size > 0) {
+                this.#sendOffice(OfficeProtocol.control(OfficeGameOp.Request));
+            }
             this.#attempt = 0;
         } catch (error: unknown) {
             this.#fail(error instanceof Error ? error : new Error(String(error)));
@@ -490,6 +500,42 @@ export class NexaClient {
             this.#streamIds.delete(turn.streamId);
         }
     }
+    /** Observe authoritative office state over this existing authenticated connection. */
+    public subscribeOffice(listener: (packet: OfficeGamePacket) => void): () => void {
+        if (this.#hello?.features.officeGame !== true) {
+            throw new Error('This NEXA server does not support live office state');
+        }
+        const release = subscribe(this.#officeListeners, listener);
+        const reference = new WeakRef(this);
+        this.#sendOffice(OfficeProtocol.control(OfficeGameOp.Request));
+        return () => {
+            release();
+            const owner = reference.deref();
+            if (owner !== undefined && owner.#officeListeners.size === 0) {
+                owner.#sendOffice(OfficeProtocol.control(OfficeGameOp.Leave));
+            }
+        };
+    }
+    /** Send bounded player input; agent state can only originate in the runtime. */
+    public moveOffice(player: OfficePlayer): void {
+        if (this.#officeListeners.size > 0) {
+            this.#sendOffice({ ...OfficeProtocol.control(OfficeGameOp.Player), player });
+        }
+    }
+    #sendOffice(packet: OfficeGamePacket): void {
+        if (!this.connected || this.#hello?.features.officeGame !== true) {
+            return;
+        }
+        const bytes = OfficeProtocol.encode(packet);
+        if (this.#socket.bufferedAmount > 256 * 1024) {
+            if (packet.op === OfficeGameOp.Player) {
+                return;
+            }
+            throw new Error('Office control blocked by socket backpressure');
+        }
+        this.#socket.send(bytes);
+    }
+
     /** Observes connection termination for resource owners and UI state. */
     public onClose(listener: (error: Error) => void): () => void {
         if (this.#failure !== undefined) {
@@ -686,6 +732,16 @@ export class NexaClient {
             if (complete === null) {
                 return;
             }
+            if (OfficeProtocol.isFrame(new Uint8Array(complete))) {
+                if (this.#hello.features.officeGame !== true) {
+                    throw new Error('Unnegotiated office frame');
+                }
+                const packet = OfficeProtocol.decode(new Uint8Array(complete));
+                for (const listener of this.#officeListeners) {
+                    this.#notify(() => listener(packet));
+                }
+                return;
+            }
             if (complete.byteLength >= 8 && new DataView(complete).getUint32(0) === 0x4e584246) {
                 this.#receiveFrame(
                     BinaryEnvelope.decode(
@@ -876,6 +932,7 @@ export class NexaClient {
         }
     }
     #clearListeners(): void {
+        this.#officeListeners.clear();
         this.#subscriptions.clear();
         this.#streamIds.clear();
         this.#closeListeners.clear();
