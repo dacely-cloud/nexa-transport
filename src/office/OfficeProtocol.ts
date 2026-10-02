@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 /** OfficeState in the fixed-schema office protocol. */
-export type OfficeState = 'working' | 'sleeping' | 'waiting' | 'failed' | 'unknown';
+export type OfficeState = 'working' | 'idle' | 'sleeping' | 'waiting' | 'failed' | 'unknown';
 /** OfficePhase in the fixed-schema office protocol. */
 export interface OfficePhase {
     readonly id: string;
@@ -87,7 +87,7 @@ export interface OfficeAssignment {
 }
 /** NGOP: fixed-field binary office packets multiplexed on the authenticated gateway socket. */
 /** OFFICE_GAME_VERSION in the fixed-schema office protocol. */
-export const OFFICE_GAME_VERSION = 1;
+export const OFFICE_GAME_VERSION = 2;
 /** OFFICE_GAME_LIMIT in the fixed-schema office protocol. */
 export const OFFICE_GAME_LIMIT = 4 * 1024 * 1024;
 /** OfficeGameOp in the fixed-schema office protocol. */
@@ -107,6 +107,8 @@ export interface OfficePlayer {
     readonly x: number;
     readonly z: number;
     readonly yaw: number;
+    /** Height above the floor during a jump, in world units. */
+    readonly jumpHeight?: number;
     readonly floor: number;
     readonly active: boolean;
 }
@@ -331,7 +333,7 @@ const agent = record<OfficeAgent>({
     id: string,
     agentId: string,
     name: string,
-    state: enumeration(['working', 'sleeping', 'waiting', 'failed', 'unknown']),
+    state: enumeration(['working', 'idle', 'sleeping', 'waiting', 'failed', 'unknown']),
     activity: string,
     goal: string,
     source: optional(string),
@@ -396,8 +398,11 @@ const agents = list(agent),
     ids = list(string);
 const player: Codec<OfficePlayer> = {
     write(w, value) {
+        const jumpHeight = value.jumpHeight ?? 0;
         if (
-            ![value.x, value.z, value.yaw].every(Number.isFinite) ||
+            ![jumpHeight, value.x, value.z, value.yaw].every(Number.isFinite) ||
+            jumpHeight < 0 ||
+            jumpHeight > 2 ||
             Math.abs(value.x) > 500 ||
             Math.abs(value.z) > 500 ||
             Math.abs(value.yaw) > Math.PI * 2 ||
@@ -408,9 +413,9 @@ const player: Codec<OfficePlayer> = {
         ) {
             throw new Error('Invalid player pose');
         }
-        w.reserve(14);
+        w.reserve(18);
         const view = new DataView(w.bytes.buffer);
-        for (const valuePart of [value.x, value.z, value.yaw]) {
+        for (const valuePart of [value.x, value.z, value.yaw, jumpHeight]) {
             view.setFloat32(w.offset, valuePart, true);
             w.offset += 4;
         }
@@ -421,12 +426,15 @@ const player: Codec<OfficePlayer> = {
     read(r) {
         const x = r.view.getFloat32(r.take(4), true),
             z = r.view.getFloat32(r.take(4), true),
-            yaw = r.view.getFloat32(r.take(4), true);
+            yaw = r.view.getFloat32(r.take(4), true),
+            jumpHeight = r.view.getFloat32(r.take(4), true);
         const floor = r.u8(),
             active = boolean.read(r),
             name = string.read(r);
         if (
-            ![x, z, yaw].every(Number.isFinite) ||
+            ![x, z, yaw, jumpHeight].every(Number.isFinite) ||
+            jumpHeight < 0 ||
+            jumpHeight > 2 ||
             Math.abs(x) > 500 ||
             Math.abs(z) > 500 ||
             Math.abs(yaw) > Math.PI * 2 ||
@@ -434,7 +442,7 @@ const player: Codec<OfficePlayer> = {
         ) {
             throw new Error('Invalid player pose');
         }
-        return { x, z, yaw, floor, active, name };
+        return { x, z, yaw, floor, active, name, ...(jumpHeight === 0 ? {} : { jumpHeight }) };
     },
 };
 function encodeOfficeGame(packet: OfficeGamePacket): Uint8Array<ArrayBuffer> {

@@ -2066,6 +2066,45 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'agents.personal.list': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/Record%3Cstring%2Cnever%3E',
+                        },
+                        result: {
+                            items: {
+                                $ref: '#/definitions/PersonalAgent',
+                            },
+                            type: 'array',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'agents.personal.remove': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/IdParams',
+                        },
+                        result: {
+                            $ref: '#/definitions/OkResult',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'agents.personal.save': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/PersonalAgentInput',
+                        },
+                        result: {
+                            $ref: '#/definitions/PersonalAgent',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'approvals.list': {
                     properties: {
                         params: {
@@ -2989,6 +3028,9 @@ export const schema: Schema = {
                 'agent.stream',
                 'agents.define',
                 'agents.list',
+                'agents.personal.list',
+                'agents.personal.remove',
+                'agents.personal.save',
                 'approvals.list',
                 'approvals.resolve',
                 'channels.deadLetters.list',
@@ -5069,6 +5111,39 @@ export const schema: Schema = {
                 'latestSampleMs',
                 'query',
             ],
+            type: 'object',
+        },
+        PersonalAgent: {
+            description:
+                "A user's own agent instructions; execution permissions always come from the deployment default.",
+            properties: {
+                id: {
+                    type: 'string',
+                },
+                instructions: {
+                    type: 'string',
+                },
+                name: {
+                    type: 'string',
+                },
+            },
+            required: ['id', 'instructions', 'name'],
+            type: 'object',
+        },
+        PersonalAgentInput: {
+            description: 'Create with an empty id, or update an existing owned agent.',
+            properties: {
+                id: {
+                    type: 'string',
+                },
+                instructions: {
+                    type: 'string',
+                },
+                name: {
+                    type: 'string',
+                },
+            },
+            required: ['id', 'instructions', 'name'],
             type: 'object',
         },
         ReasoningOptions: {
