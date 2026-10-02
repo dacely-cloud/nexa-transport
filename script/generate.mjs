@@ -224,3 +224,10 @@ writeFileSync(
     'src/media/BinaryChunks.ts',
     readFileSync('../nexa/src/media/BinaryChunks.ts', 'utf8'),
 );
+
+/** NGOP has one canonical codec; copy it without runtime server dependencies. */
+mkdirSync('src/office', { recursive: true });
+writeFileSync(
+    'src/office/OfficeProtocol.ts',
+    readFileSync('../nexa/src/office/OfficeProtocol.ts', 'utf8'),
+);

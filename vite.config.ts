@@ -8,6 +8,7 @@ const config: UserConfig = {
                 protocol: 'src/protocol/Protocol.ts',
                 media: 'src/media/NexaMedia.ts',
                 events: 'src/protocol/Events.ts',
+                office: 'src/office/OfficeProtocol.ts',
                 errors: 'src/networking/TransportError.ts',
             },
             formats: ['es'],

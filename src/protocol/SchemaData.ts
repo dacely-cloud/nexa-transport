@@ -1867,6 +1867,12 @@ export const schema: Schema = {
                     },
                     type: 'array',
                 },
+                officeGame: {
+                    const: true,
+                    description:
+                        'NGOP office state and player input share the authenticated gateway socket.',
+                    type: 'boolean',
+                },
             },
             required: ['events', 'methodScopes', 'methods'],
             type: 'object',

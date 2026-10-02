@@ -94,7 +94,7 @@ export class NexaMedia {
     ): Promise<InboundAttachment> {
         return {
             type: 'document',
-            source: await NexaMedia.#source(blob),
+            source: await NexaMedia.#source(blob, blob.type || NexaMedia.#documentMime(title)),
             ...(title === undefined ? {} : { title }),
         };
     }
@@ -184,16 +184,37 @@ export class NexaMedia {
         return 'name' in blob && typeof blob.name === 'string' ? blob.name : undefined;
     }
 
-    static async #source(blob: Blob): Promise<BinarySource> {
+    /** Browsers may omit File.type for structured data and office documents. */
+    static #documentMime(filename: string | undefined): string {
+        const extension: string = filename?.split('.').at(-1)?.toLowerCase() ?? '';
+        const formats: Readonly<Record<string, string>> = {
+            csv: 'text/csv',
+            tsv: 'text/tab-separated-values',
+            json: 'application/json',
+            jsonl: 'application/x-ndjson',
+            ndjson: 'application/x-ndjson',
+            txt: 'text/plain',
+            md: 'text/markdown',
+            xml: 'application/xml',
+            pdf: 'application/pdf',
+            doc: 'application/msword',
+            docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        };
+        return formats[extension] ?? 'application/octet-stream';
+    }
+
+    static async #source(blob: Blob, mediaType: string = blob.type): Promise<BinarySource> {
         if (blob.size === 0 || blob.size > 100 * 1024 * 1024) {
             throw new RangeError('Inline media must be between 1 byte and 100 MiB');
         }
-        if (blob.type.length === 0) {
+        if (mediaType.length === 0) {
             throw new TypeError('Media Blob needs a MIME type');
         }
         return {
             kind: 'base64',
-            mediaType: blob.type,
+            mediaType,
             data: NexaMedia.base64(new Uint8Array(await blob.arrayBuffer())),
         };
     }

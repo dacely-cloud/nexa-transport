@@ -44,6 +44,10 @@
         },
         "./stream-options": {
             "types": "./dist/interface/StreamOptions.d.ts"
+        },
+        "./office": {
+            "types": "./dist/office/OfficeProtocol.d.ts",
+            "import": "./dist/office.js"
         }
     },
     "scripts": {
