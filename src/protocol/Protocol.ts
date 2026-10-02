@@ -1322,6 +1322,30 @@ export interface GatewayMethodsagents_listShape {
     readonly result: ReadonlyArray<AgentDefinition>;
 }
 
+/** GatewayMethodsagents_personal_list wire fields. */
+export interface GatewayMethodsagents_personal_listShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: Recordstringnever;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ReadonlyArray<PersonalAgent>;
+}
+
+/** GatewayMethodsagents_personal_remove wire fields. */
+export interface GatewayMethodsagents_personal_removeShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: IdParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: OkResult;
+}
+
+/** GatewayMethodsagents_personal_save wire fields. */
+export interface GatewayMethodsagents_personal_saveShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: PersonalAgentInput;
+    /** result as defined by the Nexa gateway. */
+    readonly result: PersonalAgent;
+}
+
 /** GatewayMethodsapprovals_list wire fields. */
 export interface GatewayMethodsapprovals_listShape {
     /** params as defined by the Nexa gateway. */
@@ -1916,6 +1940,12 @@ export interface GatewayMethodsShape {
     readonly 'agents.define': GatewayMethodsagents_defineShape;
     /** agents.list as defined by the Nexa gateway. */
     readonly 'agents.list': GatewayMethodsagents_listShape;
+    /** agents.personal.list as defined by the Nexa gateway. */
+    readonly 'agents.personal.list': GatewayMethodsagents_personal_listShape;
+    /** agents.personal.remove as defined by the Nexa gateway. */
+    readonly 'agents.personal.remove': GatewayMethodsagents_personal_removeShape;
+    /** agents.personal.save as defined by the Nexa gateway. */
+    readonly 'agents.personal.save': GatewayMethodsagents_personal_saveShape;
     /** approvals.list as defined by the Nexa gateway. */
     readonly 'approvals.list': GatewayMethodsapprovals_listShape;
     /** approvals.resolve as defined by the Nexa gateway. */
@@ -3261,6 +3291,32 @@ export interface PerformanceReportShape {
 
 /** PerformanceReport from the Nexa wire protocol. */
 export type PerformanceReport = PerformanceReportShape;
+
+/** PersonalAgent wire fields. */
+export interface PersonalAgentShape {
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** instructions as defined by the Nexa gateway. */
+    readonly instructions: string;
+    /** name as defined by the Nexa gateway. */
+    readonly name: string;
+}
+
+/** PersonalAgent from the Nexa wire protocol. */
+export type PersonalAgent = PersonalAgentShape;
+
+/** PersonalAgentInput wire fields. */
+export interface PersonalAgentInputShape {
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** instructions as defined by the Nexa gateway. */
+    readonly instructions: string;
+    /** name as defined by the Nexa gateway. */
+    readonly name: string;
+}
+
+/** PersonalAgentInput from the Nexa wire protocol. */
+export type PersonalAgentInput = PersonalAgentInputShape;
 
 /** Allowed values for ReasoningOptionseffort. */
 export const ReasoningOptionseffortValues = {
@@ -4786,6 +4842,12 @@ export enum Method {
     AgentsDefine = 'agents.define',
     /** Calls agents.list. */
     AgentsList = 'agents.list',
+    /** Calls agents.personal.list. */
+    AgentsPersonalList = 'agents.personal.list',
+    /** Calls agents.personal.remove. */
+    AgentsPersonalRemove = 'agents.personal.remove',
+    /** Calls agents.personal.save. */
+    AgentsPersonalSave = 'agents.personal.save',
     /** Calls approvals.list. */
     ApprovalsList = 'approvals.list',
     /** Calls approvals.resolve. */
