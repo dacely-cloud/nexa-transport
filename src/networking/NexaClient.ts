@@ -1,4 +1,7 @@
 import { OfficeLayoutProtocol, type OfficeLayoutState } from '../office/OfficeProtocol.js';
+import { CompanyProtocol } from '../company/CompanyProtocol.js';
+import { CompanyOp, type CompanyCommand, type CompanyState } from '../company/CompanyTypes.js';
+import { CompanyChannel } from './CompanyChannel.js';
 import {
     OfficeProtocol,
     OfficeGameOp,
@@ -84,6 +87,21 @@ export interface CollaborationOffice {
 }
 /** Authenticated Nexa gateway connection shared by browsers and Node.js. */
 export class NexaClient {
+    readonly #company = new CompanyChannel();
+    /** Read private staffing and briefs, or submit one revision-checked idempotent company command. */
+    public company(
+        command: CompanyCommand = { op: CompanyOp.Read, id: crypto.randomUUID(), revision: 0n },
+    ): Promise<CompanyState> {
+        if (!this.connected || this.#hello?.features.officeCompany !== true) {
+            return Promise.reject(
+                new Error('Company management requires the updated NEXA gateway.'),
+            );
+        }
+        if (this.#socket.bufferedAmount > 256 * 1024) {
+            return Promise.reject(new Error('Office connection is busy.'));
+        }
+        return this.#company.request(command, (bytes) => this.#socket.send(bytes));
+    }
     readonly #layouts = new Map<
         number,
         {
@@ -808,6 +826,13 @@ export class NexaClient {
             if (complete === null) {
                 return;
             }
+            if (CompanyProtocol.isFrame(new Uint8Array(complete))) {
+                if (this.#hello.features.officeCompany !== true) {
+                    throw new Error('Unnegotiated company frame');
+                }
+                this.#company.receive(CompanyProtocol.decode(new Uint8Array(complete)));
+                return;
+            }
             if (OfficeLayoutProtocol.isFrame(new Uint8Array(complete))) {
                 const packet = OfficeLayoutProtocol.decode(new Uint8Array(complete));
                 if (packet.op !== 3 && packet.op !== 4) {
@@ -1010,6 +1035,7 @@ export class NexaClient {
         this.#closed = true;
         this.#failure = materializeError(error);
         this.#pending.close(error);
+        this.#company.close(error);
         for (const pending of this.#layouts.values()) {
             clearTimeout(pending.timer);
             pending.reject(error);

@@ -156,3 +156,11 @@ Attachment handlers may run concurrently. Outstanding deliveries, including ackn
 `client.officeLayout()` reads the signed-in owner's saved geometry when `hello.features.officeLayout` is true. `client.officeLayout({ revision, pieces })` saves a replacement layout using the revision returned by the read. Coordinates are half-metre units and rotation is a quarter turn; the codec allows up to 128 bounded pieces.
 
 The OLAY binary channel uses the existing authenticated Chat socket. The gateway derives ownership from that connection, requires write scope for edits, and rejects visitors. Successful edits appear in the public office geometry stream without including prompts or granting visitors any controls. A stale revision is rejected: reload the layout before retrying. Disconnects fail pending requests without replaying edits.
+
+## Company records
+
+`client.company()` reads the account's persistent employees, departments, and project briefs when `hello.features.officeCompany` is true. Pass a `CompanyCommand` from `nexa-transport/company-types` to rename the company, hire or update an employee, save a department, or create a staffed brief. Each mutation supplies the last read `revision` and a unique `id` such as `crypto.randomUUID()`.
+
+Keep that exact command until its outcome is known. If a request times out or the connection closes, retry the same ID and payload: the gateway's durable command log returns current state without repeating the change. Reusing an ID with different contents is rejected. An unrelated stale edit requires a fresh read and a new command ID after reconciling the changes.
+
+NCO2 uses the existing Chat socket and accepts no client-supplied account identity. Visitors cannot read or write company records. Employee configuration inherits the deployment's tool restrictions; an explicit tool list only narrows them. Creating a brief saves its objective and staffing; execution approval, budgets, and review belong to the subsequent project workflow.
