@@ -651,7 +651,10 @@ export class NexaClient {
         if (!this.connected || this.#hello?.features.officeGame !== true) {
             return;
         }
-        const bytes = OfficeProtocol.encode(packet);
+        const bytes = OfficeProtocol.encode(
+            packet,
+            this.#hello.features.officeGameVersion === 3 ? 3 : 2,
+        );
         if (this.#socket.bufferedAmount > 256 * 1024) {
             if (packet.op === OfficeGameOp.Player) {
                 return;

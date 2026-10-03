@@ -64,14 +64,14 @@ export interface OfficeProject {
     readonly steering?: { round: number; summary: string };
 }
 /** OfficeReactionReason in the fixed-schema office protocol. */
-export type OfficeReactionReason = 'error' | 'feedback' | 'self-correction';
+export type OfficeReactionReason = 'error' | 'feedback' | 'self-correction' | 'accepted';
 /** OfficeReaction in the fixed-schema office protocol. */
 export interface OfficeReaction {
     readonly id: string;
     readonly startedAt: bigint;
     readonly expiresAt: bigint;
     readonly reason: OfficeReactionReason;
-    readonly phrase: 'FUCK!' | 'WTF?!' | 'WHAT IS THIS SHIT?!';
+    readonly phrase: 'FUCK!' | 'WTF?!' | 'WHAT IS THIS SHIT?!' | 'WE DID IT!';
 }
 /** One runtime-reported Agile assignment. */
 /** OfficeAssignment in the fixed-schema office protocol. */
@@ -87,7 +87,7 @@ export interface OfficeAssignment {
 }
 /** NGOP: fixed-field binary office packets multiplexed on the authenticated gateway socket. */
 /** OFFICE_GAME_VERSION in the fixed-schema office protocol. */
-export const OFFICE_GAME_VERSION = 2;
+export const OFFICE_GAME_VERSION = 3;
 /** OFFICE_GAME_LIMIT in the fixed-schema office protocol. */
 export const OFFICE_GAME_LIMIT = 4 * 1024 * 1024;
 /** OfficeGameOp in the fixed-schema office protocol. */
@@ -119,6 +119,8 @@ export interface OfficeGameState {
 }
 /** OfficeGamePacket in the fixed-schema office protocol. */
 export interface OfficeGamePacket extends OfficeGameState {
+    /** Present for a v2 peer; absent means the current protocol. */
+    readonly version?: 2;
     readonly op: (typeof OfficeGameOp)[keyof typeof OfficeGameOp];
     readonly sequence: number;
     readonly peer: string;
@@ -326,8 +328,8 @@ const reaction = record<OfficeReaction>({
     id: string,
     startedAt: timestamp,
     expiresAt: timestamp,
-    reason: enumeration(['error', 'feedback', 'self-correction']),
-    phrase: enumeration(['FUCK!', 'WTF?!', 'WHAT IS THIS SHIT?!']),
+    reason: enumeration(['error', 'feedback', 'self-correction', 'accepted']),
+    phrase: enumeration(['FUCK!', 'WTF?!', 'WHAT IS THIS SHIT?!', 'WE DID IT!']),
 });
 const agent = record<OfficeAgent>({
     id: string,
@@ -445,7 +447,10 @@ const player: Codec<OfficePlayer> = {
         return { x, z, yaw, floor, active, name, ...(jumpHeight === 0 ? {} : { jumpHeight }) };
     },
 };
-function encodeOfficeGame(packet: OfficeGamePacket): Uint8Array<ArrayBuffer> {
+function encodeOfficeGame(packet: OfficeGamePacket, version: 2 | 3): Uint8Array<ArrayBuffer> {
+    if (version !== 2 && version !== 3) {
+        throw new Error('Unsupported office protocol');
+    }
     if (!Number.isInteger(packet.sequence) || packet.sequence < 0 || packet.sequence > 0xffffffff) {
         throw new Error('Invalid office sequence');
     }
@@ -465,7 +470,21 @@ function encodeOfficeGame(packet: OfficeGamePacket): Uint8Array<ArrayBuffer> {
         player.write(w, packet.player);
     }
     if (packet.op === OfficeGameOp.Snapshot || packet.op === OfficeGameOp.Delta) {
-        agents.write(w, packet.agents);
+        agents.write(
+            w,
+            version === 2
+                ? packet.agents.map((agent) => {
+                      if (
+                          agent.reaction?.reason !== 'accepted' &&
+                          agent.reaction?.phrase !== 'WE DID IT!'
+                      ) {
+                          return agent;
+                      }
+                      const { reaction: _reaction, ...visible } = agent;
+                      return visible;
+                  })
+                : packet.agents,
+        );
         projects.write(w, packet.projects);
         if (packet.op === OfficeGameOp.Delta) {
             ids.write(w, packet.removedAgents);
@@ -475,7 +494,7 @@ function encodeOfficeGame(packet: OfficeGamePacket): Uint8Array<ArrayBuffer> {
     const bytes = w.bytes.slice(0, w.offset),
         header = new DataView(bytes.buffer);
     header.setUint32(0, 0x504f474e, true); /** NGOP */
-    header.setUint8(4, OFFICE_GAME_VERSION);
+    header.setUint8(4, version);
     header.setUint8(5, packet.op);
     header.setUint32(8, packet.sequence, true);
     header.setUint32(12, bytes.length - 16, true);
@@ -489,7 +508,7 @@ function decodeOfficeGame(bytes: Uint8Array): OfficeGamePacket {
         h = r.view;
     if (
         h.getUint32(0, true) !== 0x504f474e ||
-        h.getUint8(4) !== OFFICE_GAME_VERSION ||
+        (h.getUint8(4) !== OFFICE_GAME_VERSION && h.getUint8(4) !== 2) ||
         h.getUint16(6, true) !== 0
     ) {
         throw new Error('Unsupported office protocol');
@@ -506,6 +525,7 @@ function decodeOfficeGame(bytes: Uint8Array): OfficeGamePacket {
         throw new Error('Invalid office peer');
     }
     const packet: { -readonly [K in keyof OfficeGamePacket]: OfficeGamePacket[K] } = {
+        ...(h.getUint8(4) === 2 ? { version: 2 as const } : {}),
         op,
         peer,
         sequence: h.getUint32(8, true),
@@ -520,6 +540,16 @@ function decodeOfficeGame(bytes: Uint8Array): OfficeGamePacket {
     }
     if (op === OfficeGameOp.Snapshot || op === OfficeGameOp.Delta) {
         packet.agents = agents.read(r);
+        if (
+            packet.version === 2 &&
+            packet.agents.some(
+                (agent) =>
+                    agent.reaction?.reason === 'accepted' ||
+                    agent.reaction?.phrase === 'WE DID IT!',
+            )
+        ) {
+            throw new Error('Celebrations require office protocol v3');
+        }
         packet.projects = projects.read(r);
         if (op === OfficeGameOp.Delta) {
             packet.removedAgents = ids.read(r);
@@ -543,8 +573,11 @@ export class OfficeProtocol {
         );
     }
     /** Encode one complete packet. */
-    public static encode(packet: OfficeGamePacket): Uint8Array<ArrayBuffer> {
-        return encodeOfficeGame(packet);
+    public static encode(
+        packet: OfficeGamePacket,
+        version: 2 | 3 = packet.version ?? OFFICE_GAME_VERSION,
+    ): Uint8Array<ArrayBuffer> {
+        return encodeOfficeGame(packet, version);
     }
     /** Decode and validate a complete packet. */
     public static decode(bytes: Uint8Array): OfficeGamePacket {

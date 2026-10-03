@@ -1896,6 +1896,11 @@ export const schema: Schema = {
                         'NGOP office state and player input share the authenticated gateway socket.',
                     type: 'boolean',
                 },
+                officeGameVersion: {
+                    const: 3,
+                    description: 'NGOP version supporting server-issued acceptance celebrations.',
+                    type: 'number',
+                },
             },
             required: ['events', 'methodScopes', 'methods'],
             type: 'object',
