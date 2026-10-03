@@ -1883,6 +1883,11 @@ export const schema: Schema = {
                     description: 'Ordered private project snapshots after an owner subscribes.',
                     type: 'boolean',
                 },
+                companyProjectRecovery: {
+                    const: true,
+                    description: 'Private spending and reviewed interruption recovery in NCPW v4.',
+                    type: 'boolean',
+                },
                 companyProjects: {
                     const: true,
                     description:
