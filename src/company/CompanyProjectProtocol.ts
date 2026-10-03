@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { BinaryReader, BinaryWriter } from './CompanyBinary';
-import { CompanyWorkCodec, type CompanyWork, type CompanyWorkCommand } from './CompanyWork';
+import { BinaryReader, BinaryWriter } from './CompanyBinary.js';
+import { CompanyWorkCodec, type CompanyWork, type CompanyWorkCommand } from './CompanyWork.js';
 
 /** Private project messages multiplexed over the authenticated Chat socket. */
 export const CompanyProjectOp = {

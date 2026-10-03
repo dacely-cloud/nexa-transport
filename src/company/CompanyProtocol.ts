@@ -1,7 +1,13 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { OfficeConstruction, type OfficePlacement } from '../office/OfficeProtocol';
+import {
+    OfficeConstruction,
+    OfficeDesks,
+    type OfficeDeskPoint,
+    type OfficeDeskPlacement,
+    type OfficePlacement,
+} from '../office/OfficeProtocol';
 
 /** Operations on the private company channel multiplexed with NGOP and Chat. */
 export const CompanyOp = {
@@ -32,6 +38,8 @@ export interface CompanyEmployee {
     readonly instructions: string;
     readonly departmentId: string;
     readonly desk: number;
+    /** Optional physical location; changing the desk address resets it. */
+    readonly deskPosition?: OfficeDeskPoint;
     readonly settings?: CompanyEmployeeSettings;
 }
 /** Shared owner-authored guidance and an optional ceiling on members' tools. */
@@ -88,7 +96,7 @@ export interface CompanyState {
 /** Request identity and optimistic revision are supplied on every command. */
 export interface CompanyRequest {
     /** Reply using the original wire layout for older clients. */
-    readonly version?: 1 | 2 | 3 | 4 | 5 | 6;
+    readonly version?: 1 | 2 | 3 | 4 | 5 | 6 | 7;
     readonly id: string;
     readonly revision: bigint;
 }
@@ -153,6 +161,8 @@ export interface CompanyTeamArea {
 }
 /** Save a complete bounded floor plan without altering work or employee identity. */
 export interface CompanyConstruction extends CompanyRequest {
+    /** Omitted preserves saved positions; an empty array restores automatic placement. */
+    readonly deskPositions?: readonly OfficeDeskPlacement[];
     /** Omitted preserves valid assignments; an empty list clears every assignment. */
     readonly teams?: readonly CompanyTeamArea[];
     readonly op: typeof CompanyOp.Construction;
@@ -177,14 +187,14 @@ export type CompanyCommand =
     | CompanyEditEmployee;
 /** Successful response, correlated with its command ID. */
 export interface CompanySnapshot {
-    readonly version?: 1 | 2 | 3 | 4 | 5 | 6;
+    readonly version?: 1 | 2 | 3 | 4 | 5 | 6 | 7;
     readonly op: typeof CompanyOp.Snapshot;
     readonly id: string;
     readonly state: CompanyState;
 }
 /** Rejected command; no private state is embedded in errors. */
 export interface CompanyError {
-    readonly version?: 1 | 2 | 3 | 4 | 5 | 6;
+    readonly version?: 1 | 2 | 3 | 4 | 5 | 6 | 7;
     readonly op: typeof CompanyOp.Error;
     readonly id: string;
     readonly message: string;
@@ -242,7 +252,7 @@ class Writer {
             write(value);
         }
     }
-    public finish(op: number, version: 1 | 2 | 3 | 4 | 5 | 6 | 7): Uint8Array<ArrayBuffer> {
+    public finish(op: number, version: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8): Uint8Array<ArrayBuffer> {
         const view: DataView = new DataView(this.#bytes.buffer);
         view.setUint32(0, 0x504d434e, true);
         view.setUint8(4, version);
@@ -309,7 +319,7 @@ export class CompanyProtocol {
     /** Encode a command or its response. */
     public static encode(
         packet: CompanyPacket,
-        version: 1 | 2 | 3 | 4 | 5 | 6 | 7 = packet.version ?? 7,
+        version: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 = packet.version ?? 8,
     ): Uint8Array<ArrayBuffer> {
         if (
             (version !== 1 &&
@@ -318,7 +328,8 @@ export class CompanyProtocol {
                 version !== 4 &&
                 version !== 5 &&
                 version !== 6 &&
-                version !== 7) ||
+                version !== 7 &&
+                version !== 8) ||
             (version === 1 && packet.op === CompanyOp.Employee)
         ) {
             throw new Error('Employee settings require NCMP v2');
@@ -338,6 +349,13 @@ export class CompanyProtocol {
         if (version < 7 && packet.op === CompanyOp.Procedure) {
             throw new Error('Reviewed procedures require NCMP v7');
         }
+        if (
+            version < 8 &&
+            packet.op === CompanyOp.Construction &&
+            packet.deskPositions !== undefined
+        ) {
+            throw new Error('Desk positions require NCMP v8');
+        }
         if (!/^[a-zA-Z0-9-]{1,64}$/.test(packet.id)) {
             throw new Error('Invalid company request ID');
         }
@@ -354,6 +372,12 @@ export class CompanyProtocol {
                 w.text(employee.instructions);
                 w.text(employee.departmentId);
                 w.uint(employee.desk);
+                if (version >= 8) {
+                    w.uint(employee.deskPosition ? 1 : 0);
+                    if (employee.deskPosition) {
+                        this.#writeDesk(w, { desk: employee.desk, ...employee.deskPosition });
+                    }
+                }
                 if (version >= 2) {
                     this.#writeSettings(
                         w,
@@ -410,6 +434,13 @@ export class CompanyProtocol {
                     this.#writeConstruction(w, packet.construction);
                     if (version >= 6) {
                         this.#writeTeams(w, packet.teams);
+                    }
+                    if (version >= 8) {
+                        w.uint(packet.deskPositions === undefined ? 0 : 1);
+                        if (packet.deskPositions !== undefined) {
+                            OfficeDesks.validate(packet.deskPositions);
+                            w.list(packet.deskPositions, (item) => this.#writeDesk(w, item));
+                        }
                     }
                     break;
                 case CompanyOp.DepartmentSettings:
@@ -470,7 +501,8 @@ export class CompanyProtocol {
                 bytes[4] !== 4 &&
                 bytes[4] !== 5 &&
                 bytes[4] !== 6 &&
-                bytes[4] !== 7) ||
+                bytes[4] !== 7 &&
+                bytes[4] !== 8) ||
             bytes[6] !== 0 ||
             bytes[7] !== 0
         ) {
@@ -494,6 +526,7 @@ export class CompanyProtocol {
                 instructions: r.text(),
                 departmentId: r.text(),
                 desk: r.uint(),
+                ...(version >= 8 ? this.#readDeskPoint(r) : {}),
                 ...(version >= 2 ? { settings: this.#readSettings(r) } : {}),
             }));
             const departments: readonly CompanyDepartment[] = r.list(() => ({
@@ -552,6 +585,7 @@ export class CompanyProtocol {
                         revision,
                         construction: this.#readConstruction(r),
                         ...(version >= 6 ? this.#readTeams(r) : {}),
+                        ...(version >= 8 ? this.#readDesks(r) : {}),
                     };
                     break;
                 case CompanyOp.DepartmentSettings:
@@ -627,7 +661,41 @@ export class CompanyProtocol {
             }
         }
         r.finish();
-        return version === 7 ? packet : { ...packet, version };
+        return version === 8 ? packet : { ...packet, version };
+    }
+    static #writeDesk(w: Writer, item: OfficeDeskPlacement): void {
+        OfficeDesks.validate([item]);
+        w.uint(item.desk);
+        w.uint(item.x + 128);
+        w.uint(item.z + 128);
+    }
+    static #readDesk(r: Reader): OfficeDeskPlacement {
+        const item = { desk: r.uint(), x: r.uint() - 128, z: r.uint() - 128 };
+        OfficeDesks.validate([item]);
+        return item;
+    }
+    static #readDeskPoint(r: Reader): Pick<CompanyEmployee, 'deskPosition'> {
+        const flag = r.uint();
+        if (flag > 1) {
+            throw new Error('Invalid desk position flag');
+        }
+        if (!flag) {
+            return {};
+        }
+        const item = this.#readDesk(r);
+        return { deskPosition: { x: item.x, z: item.z } };
+    }
+    static #readDesks(r: Reader): Pick<CompanyConstruction, 'deskPositions'> {
+        const flag = r.uint();
+        if (flag > 1) {
+            throw new Error('Invalid desk positions flag');
+        }
+        if (!flag) {
+            return {};
+        }
+        const deskPositions = r.list(() => this.#readDesk(r));
+        OfficeDesks.validate(deskPositions);
+        return { deskPositions };
     }
     static #writeProcedure(w: Writer, procedure: CompanyProcedureDetails): void {
         w.text(procedure.title);

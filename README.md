@@ -471,3 +471,14 @@ catalog and published-preview reads for their authorized office, with invitation
 on every request. Catalogs contain public copy and content identities, without private project IDs,
 file paths, prompts, or review records. Withdrawal blocks subsequent reads; already received copies
 cannot be recalled.
+
+### Physical office desk positions
+
+`hello.features.officeDeskPositions` enables NGOP v8 and NCMP v8 on the existing socket.
+A company `Construction` command may include `deskPositions: [{ desk: 0, x: -8, z: 3 }]`.
+Coordinates are half-metre grid units, bounded to ±128; desk addresses are 0–255 and must
+belong to this company. The list replaces saved positions atomically with construction;
+omitting it preserves positions, and `[]` restores automatic placement. Other employee
+settings and work records are unchanged. Snapshots expose `employee.deskPosition`; the
+public office projection includes only its numeric coordinates. Older peers retain their
+original layout and never silently drop a requested position change.

@@ -587,6 +587,13 @@ export class NexaClient {
         ) {
             return Promise.reject(new Error('Department areas are unavailable on this connection'));
         }
+        if (
+            command.op === CompanyOp.Construction &&
+            command.deskPositions !== undefined &&
+            this.#hello.features.officeDeskPositions !== true
+        ) {
+            return Promise.reject(new Error('Desk positions are unavailable on this connection'));
+        }
         if (command.op === CompanyOp.Procedure && this.#hello.features.companyProcedures !== true) {
             return Promise.reject(
                 new Error('Reviewed procedures are unavailable on this connection'),
@@ -594,19 +601,21 @@ export class NexaClient {
         }
         const bytes: Uint8Array<ArrayBuffer> = CompanyProtocol.encode(
             command,
-            this.#hello.features.companyProcedures === true
-                ? 7
-                : this.#hello.features.companyTeamAreas === true
-                  ? 6
-                  : this.#hello.features.companyFollowups === true
-                    ? 5
-                    : this.#hello.features.officeConstruction === true
-                      ? 4
-                      : this.#hello.features.companyDepartmentSettings === true
-                        ? 3
-                        : this.#hello.features.officeCompanyVersion === 2
-                          ? 2
-                          : 1,
+            this.#hello.features.officeDeskPositions === true
+                ? 8
+                : this.#hello.features.companyProcedures === true
+                  ? 7
+                  : this.#hello.features.companyTeamAreas === true
+                    ? 6
+                    : this.#hello.features.companyFollowups === true
+                      ? 5
+                      : this.#hello.features.officeConstruction === true
+                        ? 4
+                        : this.#hello.features.companyDepartmentSettings === true
+                          ? 3
+                          : this.#hello.features.officeCompanyVersion === 2
+                            ? 2
+                            : 1,
         );
         return this.#company.request(command, () => {
             if (!this.connected || this.#socket.bufferedAmount > 256 * 1024) {
@@ -839,17 +848,19 @@ export class NexaClient {
         }
         const bytes = OfficeProtocol.encode(
             packet,
-            this.#hello.features.officeAppearance === true
-                ? 7
-                : this.#hello.features.officeExecution === true
-                  ? 6
-                  : this.#hello.features.officeConstruction === true
-                    ? 5
-                    : this.#hello.features.officeDeskAssignments === true
-                      ? 4
-                      : this.#hello.features.officeGameVersion === 3
-                        ? 3
-                        : 2,
+            this.#hello.features.officeDeskPositions === true
+                ? 8
+                : this.#hello.features.officeAppearance === true
+                  ? 7
+                  : this.#hello.features.officeExecution === true
+                    ? 6
+                    : this.#hello.features.officeConstruction === true
+                      ? 5
+                      : this.#hello.features.officeDeskAssignments === true
+                        ? 4
+                        : this.#hello.features.officeGameVersion === 3
+                          ? 3
+                          : 2,
         );
         if (this.#socket.bufferedAmount > 256 * 1024) {
             if (packet.op === OfficeGameOp.Player) {

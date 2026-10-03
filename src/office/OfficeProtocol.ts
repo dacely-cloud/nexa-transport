@@ -42,6 +42,59 @@ export class OfficeConstruction {
         }
     }
 }
+/** Saved workstation coordinates on the half-metre grid, independent of execution state. */
+export interface OfficeDeskPoint {
+    readonly x: number;
+    readonly z: number;
+}
+/** A placement names a public desk address, never an employee or account identifier. */
+export interface OfficeDeskPlacement extends OfficeDeskPoint {
+    readonly desk: number;
+}
+/** Shared bounded validation for owner edits and visual packets. */
+export class OfficeDesks {
+    /** Validate coordinates before allocation; desk addresses use stable 48-desk floors. */
+    public static validate(items: readonly OfficeDeskPlacement[]): void {
+        if (items.length > 256) {
+            throw new Error('Too many desk positions.');
+        }
+        const used = new Set<number>();
+        for (const item of items) {
+            if (
+                !Number.isInteger(item.desk) ||
+                item.desk < 0 ||
+                item.desk > 255 ||
+                used.has(item.desk) ||
+                !Number.isInteger(item.x) ||
+                Math.abs(item.x) > 128 ||
+                !Number.isInteger(item.z) ||
+                Math.abs(item.z) > 128
+            ) {
+                throw new Error('Invalid desk position.');
+            }
+            used.add(item.desk);
+        }
+        for (let i = 0; i < items.length; i++) {
+            const a = items[i];
+            if (!a) {
+                continue;
+            }
+            for (const b of items.slice(i + 1)) {
+                if (
+                    Math.floor(a.desk / 48) === Math.floor(b.desk / 48) &&
+                    Math.abs(a.x - b.x) < 7 &&
+                    Math.abs(a.z - b.z) < 7
+                ) {
+                    throw new Error('Leave space between desks and their chairs.');
+                }
+            }
+        }
+    }
+    /** Definitions originate from owned company records, with no user-supplied metadata accepted. */
+    public static metadata(point: OfficeDeskPoint | undefined): Readonly<Record<string, string>> {
+        return point ? { officeDeskX: String(point.x), officeDeskZ: String(point.z) } : {};
+    }
+}
 /** OfficeState in the fixed-schema office protocol. */
 export type OfficeState = 'working' | 'idle' | 'sleeping' | 'waiting' | 'failed' | 'unknown';
 /** OfficePhase in the fixed-schema office protocol. */
@@ -83,6 +136,8 @@ export interface OfficeAgent {
     readonly rank?: 'lead' | 'member';
     /** Saved visual desk address, independent of temporary execution IDs. */
     readonly desk?: number;
+    /** Optional owner-positioned workstation on the half-metre grid. */
+    readonly deskPosition?: OfficeDeskPoint;
     /** Public cosmetic seed, independent of saved desk and temporary run identifiers. */
     readonly appearance?: number;
     readonly phases?: readonly OfficePhase[];
@@ -161,7 +216,7 @@ export interface OfficeAssignment {
 }
 /** NGOP: fixed-field binary office packets multiplexed on the authenticated gateway socket. */
 /** OFFICE_GAME_VERSION in the fixed-schema office protocol. */
-export const OFFICE_GAME_VERSION = 7;
+export const OFFICE_GAME_VERSION = 8;
 /** OFFICE_GAME_LIMIT in the fixed-schema office protocol. */
 export const OFFICE_GAME_LIMIT = 4 * 1024 * 1024;
 /** OfficeGameOp in the fixed-schema office protocol. */
@@ -195,7 +250,7 @@ export interface OfficeGameState {
 /** OfficeGamePacket in the fixed-schema office protocol. */
 export interface OfficeGamePacket extends OfficeGameState {
     /** Present for an older peer; absent means the current protocol. */
-    readonly version?: 2 | 3 | 4 | 5 | 6;
+    readonly version?: 2 | 3 | 4 | 5 | 6 | 7;
     readonly op: (typeof OfficeGameOp)[keyof typeof OfficeGameOp];
     readonly sequence: number;
     readonly peer: string;
@@ -406,7 +461,7 @@ const reaction = record<OfficeReaction>({
     reason: enumeration(['error', 'feedback', 'self-correction', 'accepted']),
     phrase: enumeration(['FUCK!', 'WTF?!', 'WHAT IS THIS SHIT?!', 'WE DID IT!']),
 });
-const agent = record<Omit<OfficeAgent, 'desk' | 'appearance'>>({
+const agent = record<Omit<OfficeAgent, 'desk' | 'appearance' | 'deskPosition'>>({
     id: string,
     agentId: string,
     name: string,
@@ -556,7 +611,7 @@ const appearance: Codec<number | undefined> = optional({
         return value;
     },
 });
-const dressedAgents = list<OfficeAgent>({
+const dressedAgent: Codec<OfficeAgent> = {
     write(w, value) {
         assignedAgent.write(w, value);
         appearance.write(w, value.appearance);
@@ -565,6 +620,31 @@ const dressedAgents = list<OfficeAgent>({
         const value = assignedAgent.read(r),
             seed = appearance.read(r);
         return seed === undefined ? value : { ...value, appearance: seed };
+    },
+};
+const dressedAgents = list(dressedAgent);
+const positionedAgents = list<OfficeAgent>({
+    write(w, value) {
+        dressedAgent.write(w, value);
+        w.u8(value.deskPosition ? 1 : 0);
+        if (value.deskPosition) {
+            OfficeDesks.validate([{ desk: value.desk ?? 0, ...value.deskPosition }]);
+            w.number(value.deskPosition.x);
+            w.number(value.deskPosition.z);
+        }
+    },
+    read(r) {
+        const value = dressedAgent.read(r),
+            flag = r.u8();
+        if (flag > 1) {
+            throw new Error('Invalid desk position flag');
+        }
+        if (!flag) {
+            return value;
+        }
+        const deskPosition = { x: r.number(), z: r.number() };
+        OfficeDesks.validate([{ desk: value.desk ?? 0, ...deskPosition }]);
+        return { ...value, deskPosition };
     },
 });
 const assignedAgents = list(assignedAgent);
@@ -622,7 +702,7 @@ const player: Codec<OfficePlayer> = {
 };
 function encodeOfficeGame(
     packet: OfficeGamePacket,
-    version: 2 | 3 | 4 | 5 | 6 | 7,
+    version: 2 | 3 | 4 | 5 | 6 | 7 | 8,
 ): Uint8Array<ArrayBuffer> {
     if (
         version !== 2 &&
@@ -630,7 +710,8 @@ function encodeOfficeGame(
         version !== 4 &&
         version !== 5 &&
         version !== 6 &&
-        version !== 7
+        version !== 7 &&
+        version !== 8
     ) {
         throw new Error('Unsupported office protocol');
     }
@@ -653,7 +734,14 @@ function encodeOfficeGame(
         player.write(w, packet.player);
     }
     if (packet.op === OfficeGameOp.Snapshot || packet.op === OfficeGameOp.Delta) {
-        (version >= 7 ? dressedAgents : version >= 4 ? assignedAgents : agents).write(
+        (version >= 8
+            ? positionedAgents
+            : version >= 7
+              ? dressedAgents
+              : version >= 4
+                ? assignedAgents
+                : agents
+        ).write(
             w,
             version === 2
                 ? packet.agents.map((agent) => {
@@ -705,6 +793,7 @@ function decodeOfficeGame(bytes: Uint8Array): OfficeGamePacket {
     if (
         h.getUint32(0, true) !== 0x504f474e ||
         (h.getUint8(4) !== OFFICE_GAME_VERSION &&
+            h.getUint8(4) !== 7 &&
             h.getUint8(4) !== 6 &&
             h.getUint8(4) !== 5 &&
             h.getUint8(4) !== 4 &&
@@ -726,7 +815,7 @@ function decodeOfficeGame(bytes: Uint8Array): OfficeGamePacket {
         throw new Error('Invalid office peer');
     }
     const packet: { -readonly [K in keyof OfficeGamePacket]: OfficeGamePacket[K] } = {
-        ...(h.getUint8(4) < 7 ? { version: h.getUint8(4) as 2 | 3 | 4 | 5 | 6 } : {}),
+        ...(h.getUint8(4) < 8 ? { version: h.getUint8(4) as 2 | 3 | 4 | 5 | 6 | 7 } : {}),
         op,
         peer,
         sequence: h.getUint32(8, true),
@@ -741,7 +830,13 @@ function decodeOfficeGame(bytes: Uint8Array): OfficeGamePacket {
     }
     if (op === OfficeGameOp.Snapshot || op === OfficeGameOp.Delta) {
         packet.agents = (
-            h.getUint8(4) >= 7 ? dressedAgents : h.getUint8(4) >= 4 ? assignedAgents : agents
+            h.getUint8(4) >= 8
+                ? positionedAgents
+                : h.getUint8(4) >= 7
+                  ? dressedAgents
+                  : h.getUint8(4) >= 4
+                    ? assignedAgents
+                    : agents
         ).read(r);
         if (
             packet.version === 2 &&
@@ -797,7 +892,7 @@ export class OfficeProtocol {
     /** Encode one complete packet. */
     public static encode(
         packet: OfficeGamePacket,
-        version: 2 | 3 | 4 | 5 | 6 | 7 = packet.version ?? OFFICE_GAME_VERSION,
+        version: 2 | 3 | 4 | 5 | 6 | 7 | 8 = packet.version ?? OFFICE_GAME_VERSION,
     ): Uint8Array<ArrayBuffer> {
         return encodeOfficeGame(packet, version);
     }

@@ -49,7 +49,7 @@ it('round trips bounded department settings and rejects them on older versions',
     }
 });
 
-it.each([1, 2, 3, 4, 5, 6, 7] as const)(
+it.each([1, 2, 3, 4, 5, 6, 7, 8] as const)(
     'negotiates NCMP v%i and rejects unsupported department changes locally',
     async (version) => {
         const server = new WebSocketServer({ host: '127.0.0.1', port: 0 });
@@ -100,6 +100,7 @@ it.each([1, 2, 3, 4, 5, 6, 7] as const)(
                                     ...(version >= 5 ? { companyFollowups: true } : {}),
                                     ...(version >= 6 ? { companyTeamAreas: true } : {}),
                                     ...(version >= 7 ? { companyProcedures: true } : {}),
+                                    ...(version >= 8 ? { officeDeskPositions: true } : {}),
                                 },
                             },
                         }),
@@ -148,6 +149,13 @@ it.each([1, 2, 3, 4, 5, 6, 7] as const)(
                 await client.company(construction);
                 expect(versions).toEqual([version, version, version]);
             }
+            const positioned = {
+                ...construction,
+                id: 'position',
+                deskPositions: [{ desk: 0, x: 8, z: 3 }],
+            };
+            if (version < 8)
+                {await expect(client.company(positioned)).rejects.toThrow('unavailable');}
             const followup = {
                 op: CompanyOp.Draft,
                 id: 'followup',
@@ -192,10 +200,14 @@ it.each([1, 2, 3, 4, 5, 6, 7] as const)(
                 expect(() => CompanyProtocol.encode(procedure, version)).toThrow('v7');
             } else {
                 await client.company(procedure);
-                expect(versions.at(-1)).toBe(7);
+                expect(versions.at(-1)).toBe(version);
                 expect(CompanyProtocol.decode(CompanyProtocol.encode(procedure))).toEqual(
                     procedure,
                 );
+            }
+            if (version >= 8) {
+                await client.company(positioned);
+                expect(versions.at(-1)).toBe(8);
             }
         } finally {
             client.close();
