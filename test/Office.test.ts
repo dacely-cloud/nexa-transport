@@ -1,4 +1,4 @@
-import { expect, it } from 'vitest';
+import { expect, it, vi } from 'vitest';
 import { WebSocketServer } from 'ws';
 import { NexaClient } from '../src/networking/NexaClient';
 import { OfficeGameOp, OfficeProtocol, type OfficeGamePacket } from '../src/office/OfficeProtocol';
@@ -71,6 +71,20 @@ it('multiplexes binary office input with RPC and restores the subscription after
         await expect.poll(() => input.at(-1)?.op).toBe(OfficeGameOp.Leave);
         expect(client.connected).toBe(true);
         expect(await client.call(Method.AgentsList, {})).toEqual([]);
+        const stopClosing = client.subscribeOffice(() => {});
+        const state = vi
+            .spyOn(WebSocket.prototype, 'readyState', 'get')
+            .mockReturnValue(WebSocket.CLOSING);
+        const send = vi.spyOn(WebSocket.prototype, 'send');
+        try {
+            expect(client.connected).toBe(false);
+            client.moveOffice({ name: 'Visitor', x: 1, z: 2, yaw: 0, floor: 0, active: true });
+            stopClosing();
+            expect(send).not.toHaveBeenCalled();
+        } finally {
+            send.mockRestore();
+            state.mockRestore();
+        }
     } finally {
         client.close();
         for (const socket of server.clients) {
