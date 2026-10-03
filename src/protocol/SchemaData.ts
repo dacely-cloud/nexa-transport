@@ -1959,6 +1959,11 @@ export const schema: Schema = {
                     description: 'Accepts NGOP v4 with saved visual desk assignments.',
                     type: 'boolean',
                 },
+                officeDeskPositions: {
+                    const: true,
+                    description: 'Saved physical workstation positions in NGOP v8 and NCMP v8.',
+                    type: 'boolean',
+                },
                 officeExecution: {
                     const: true,
                     description: 'Scheduler workload summaries in NGOP v6.',
