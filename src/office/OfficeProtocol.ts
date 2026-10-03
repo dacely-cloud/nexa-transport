@@ -917,3 +917,125 @@ export class OfficeProtocol {
         };
     }
 }
+
+/** Private layout commands use OLAY frames on the existing authenticated socket. */
+export interface OfficeLayoutState {
+    readonly revision: bigint;
+    readonly pieces: readonly OfficePlacement[];
+}
+/** Read=1, save=2, snapshot=3, error=4. No account ID is accepted from the client. */
+export interface OfficeLayoutPacket extends OfficeLayoutState {
+    readonly op: 1 | 2 | 3 | 4;
+    readonly id: number;
+    readonly message?: string;
+}
+/** Bounded binary geometry codec shared by gateway and browser. */
+export class OfficeLayoutProtocol {
+    /** Recognize the independent layout discriminator. */
+    public static isFrame(bytes: Uint8Array): boolean {
+        return (
+            bytes.length >= 4 &&
+            new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength).getUint32(0) ===
+                0x4f4c4159
+        );
+    }
+    /** Encode half-metre coordinates without JSON or private agent content. */
+    public static encode(packet: OfficeLayoutPacket): Uint8Array<ArrayBuffer> {
+        OfficeConstruction.validate(packet.pieces);
+        if (
+            !Number.isInteger(packet.id) ||
+            packet.id < 0 ||
+            packet.id > 0xffffffff ||
+            packet.revision < 0n ||
+            packet.revision > 0xffffffffffffffffn
+        ) {
+            throw new Error('Invalid layout identity');
+        }
+        const message = new TextEncoder().encode(packet.message ?? '');
+        if (
+            message.length > 512 ||
+            (packet.op !== 4 && message.length) ||
+            ((packet.op === 1 || packet.op === 4) && packet.pieces.length)
+        ) {
+            throw new Error('Invalid layout payload');
+        }
+        const bytes = new Uint8Array(20 + packet.pieces.length * 8 + message.length);
+        const view = new DataView(bytes.buffer);
+        view.setUint32(0, 0x4f4c4159);
+        view.setUint8(4, 1);
+        view.setUint8(5, packet.op);
+        view.setUint32(6, packet.id);
+        view.setBigUint64(10, packet.revision);
+        view.setUint16(18, packet.op === 4 ? message.length : packet.pieces.length);
+        const kinds = ['wall', 'window', 'door', 'plant', 'sofa', 'table', 'team'];
+        packet.pieces.forEach((piece, index) => {
+            const offset = 20 + index * 8;
+            view.setUint8(offset, piece.id);
+            view.setUint8(offset + 1, kinds.indexOf(piece.kind));
+            view.setUint8(offset + 2, piece.floor);
+            view.setUint8(offset + 3, piece.rotation);
+            view.setInt16(offset + 4, piece.x);
+            view.setInt16(offset + 6, piece.z);
+        });
+        if (packet.op === 4) {
+            bytes.set(message, 20);
+        }
+        return bytes;
+    }
+    /** Reject unknown versions, opcodes, trailing bytes and oversized input before allocation. */
+    public static decode(bytes: Uint8Array): OfficeLayoutPacket {
+        if (!this.isFrame(bytes) || bytes.length < 20 || bytes.length > 1044 || bytes[4] !== 1) {
+            throw new Error('Invalid layout frame');
+        }
+        const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+        const op = view.getUint8(5);
+        const count = view.getUint16(18);
+        if (op !== 1 && op !== 2 && op !== 3 && op !== 4) {
+            throw new Error('Invalid layout operation');
+        }
+        if (
+            (op === 1 && count !== 0) ||
+            count > (op === 4 ? 512 : 128) ||
+            bytes.length !== 20 + count * (op === 4 ? 1 : 8)
+        ) {
+            throw new Error('Invalid layout length');
+        }
+        const pieces: OfficePlacement[] = [];
+        const kinds: readonly OfficePlacement['kind'][] = [
+            'wall',
+            'window',
+            'door',
+            'plant',
+            'sofa',
+            'table',
+            'team',
+        ];
+        if (op !== 4) {
+            for (let index = 0; index < count; index++) {
+                const offset = 20 + index * 8;
+                const kind = kinds[view.getUint8(offset + 1)];
+                if (!kind) {
+                    throw new Error('Invalid layout asset');
+                }
+                pieces.push({
+                    id: view.getUint8(offset),
+                    kind,
+                    floor: view.getUint8(offset + 2),
+                    rotation: view.getUint8(offset + 3),
+                    x: view.getInt16(offset + 4),
+                    z: view.getInt16(offset + 6),
+                });
+            }
+        }
+        OfficeConstruction.validate(pieces);
+        return {
+            op,
+            id: view.getUint32(6),
+            revision: view.getBigUint64(10),
+            pieces,
+            ...(op === 4
+                ? { message: new TextDecoder('utf-8', { fatal: true }).decode(bytes.subarray(20)) }
+                : {}),
+        };
+    }
+}

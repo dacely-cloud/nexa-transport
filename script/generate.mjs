@@ -231,29 +231,3 @@ writeFileSync(
     'src/office/OfficeProtocol.ts',
     readFileSync('../nexa/src/office/OfficeProtocol.ts', 'utf8'),
 );
-
-/** NCMP shares the server's canonical fixed-schema codec. */
-mkdirSync('src/company', { recursive: true });
-writeFileSync(
-    'src/company/CompanyProtocol.ts',
-    readFileSync('../nexa/src/company/CompanyProtocol.ts', 'utf8'),
-);
-
-/** Private project contracts use the same portable codecs as durable runtime storage. */
-for (const name of [
-    'CompanyBinary',
-    'CompanyWork',
-    'CompanyMaintenanceTypes',
-    'CompanyProjectProtocol',
-    'CompanyShowroomProtocol',
-    'CompanyCollaborationTypes',
-    'CompanyCollaborationProtocol',
-]) {
-    writeFileSync(
-        `src/company/${name}.ts`,
-        readFileSync(`../nexa/src/company/${name}.ts`, 'utf8').replace(
-            /from '(\.\.?\/[^']+)'/g,
-            "from '$1.js'",
-        ),
-    );
-}

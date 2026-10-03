@@ -1,39 +1,4 @@
-import {
-    CompanyCollaborationProtocol,
-    CollaborationOp,
-    type CollaborationCall,
-    type CollaborationReply,
-    type CollaborationRequest,
-} from '../company/CompanyCollaborationProtocol.js';
-import { CollaborationRequests } from './CollaborationRequests.js';
-import {
-    CompanyShowroomProtocol,
-    type ShowroomRequest,
-    type ShowroomCatalog,
-    type ShowroomContent,
-} from '../company/CompanyShowroomProtocol.js';
-import { ShowroomRequests } from './ShowroomRequests.js';
-import {
-    CompanyProtocol,
-    CompanyOp,
-    type CompanyCommand,
-    type CompanyState,
-} from '../company/CompanyProtocol.js';
-import { CompanyRequests } from './CompanyRequests.js';
-import { CompanyProjectRequests } from './CompanyProjectRequests.js';
-import {
-    CompanyProjectOp,
-    CompanyProjectProtocol,
-    type CompanyProjectRequest,
-    type CompanyProjectSnapshot,
-    type CompanyProjectFile,
-    type CompanyAllowanceCommand,
-    type CompanyMaintenanceCommand,
-    type CompanyEmployeeHistory,
-    type CompanySpending,
-    type CompanyRecoveryCommand,
-} from '../company/CompanyProjectProtocol.js';
-import type { CompanyWorkCommand } from '../company/CompanyWork.js';
+import { OfficeLayoutProtocol, type OfficeLayoutState } from '../office/OfficeProtocol.js';
 import {
     OfficeProtocol,
     OfficeGameOp,
@@ -119,10 +84,46 @@ export interface CollaborationOffice {
 }
 /** Authenticated Nexa gateway connection shared by browsers and Node.js. */
 export class NexaClient {
-    readonly #collaboration = new CollaborationRequests();
-    readonly #showroom = new ShowroomRequests();
-    readonly #company = new CompanyRequests();
-    readonly #projects = new CompanyProjectRequests();
+    readonly #layouts = new Map<
+        number,
+        {
+            resolve: (state: OfficeLayoutState) => void;
+            reject: (error: Error) => void;
+            timer: ReturnType<typeof setTimeout>;
+        }
+    >();
+    #layoutId = 0;
+    /** Read or save owner-only geometry over the existing connection; writes use a revision precondition. */
+    public officeLayout(state?: OfficeLayoutState): Promise<OfficeLayoutState> {
+        if (!this.connected || this.#hello?.features.officeLayout !== true) {
+            return Promise.reject(new Error('Office building requires the updated NEXA gateway.'));
+        }
+        if (this.#layouts.size >= 8 || this.#socket.bufferedAmount > 256 * 1024) {
+            return Promise.reject(new Error('Office connection is busy.'));
+        }
+        const id = ++this.#layoutId;
+        const bytes = OfficeLayoutProtocol.encode({
+            op: state ? 2 : 1,
+            id,
+            revision: state?.revision ?? 0n,
+            pieces: state?.pieces ?? [],
+        });
+        return new Promise((resolve, reject) => {
+            const timer = setTimeout(() => {
+                this.#layouts.delete(id);
+                reject(new Error('Layout request timed out. Reload the layout before retrying.'));
+            }, 15000);
+            this.#layouts.set(id, { resolve, reject, timer });
+            try {
+                this.#socket.send(bytes);
+            } catch (error) {
+                clearTimeout(timer);
+                this.#layouts.delete(id);
+                reject(error instanceof Error ? error : new Error('Layout send failed'));
+            }
+        });
+    }
+
     readonly #officeListeners = new Set<(packet: OfficeGamePacket) => void>();
     #socket: WebSocket;
     #detachSocket: (() => void) | undefined;
@@ -547,471 +548,6 @@ export class NexaClient {
             this.#streamIds.delete(turn.streamId);
         }
     }
-    /** Manage explicit account invitations or read a scoped project on this same Chat connection. */
-    public collaboration(request: CollaborationCall): Promise<CollaborationReply> {
-        if (!this.connected || this.#hello?.features.companyCollaboration !== true) {
-            return Promise.reject(
-                new Error('Project collaboration is unavailable on this connection'),
-            );
-        }
-        return this.#collaboration.request(request, () => this.#sendCollaboration(request));
-    }
-
-    /** Read or change only the project named in an accepted invitation. No owner identity is supplied. */
-    public async collaborationProject(
-        grantId: string,
-        projectId: string,
-        command?: CompanyWorkCommand,
-    ): Promise<CompanyProjectSnapshot> {
-        const id = command?.id ?? crypto.randomUUID();
-        const response = await this.collaboration({
-            op: CollaborationOp.Project,
-            id,
-            grantId,
-            request: command
-                ? { op: CompanyProjectOp.Command, id, projectId, command }
-                : { op: CompanyProjectOp.Read, id, projectId },
-        });
-        if (
-            response.op !== CollaborationOp.ProjectResult ||
-            response.response.op !== CompanyProjectOp.Snapshot
-        ) {
-            throw new Error('Expected a collaboration project snapshot');
-        }
-        return response.response;
-    }
-
-    /** Download a captured file from an invited project; every chunk rechecks access. */
-    public async collaborationArtifact(
-        grantId: string,
-        projectId: string,
-        attemptId: string,
-        path: string,
-        offset = 0,
-    ): Promise<CompanyProjectFile> {
-        const id = crypto.randomUUID();
-        const response = await this.collaboration({
-            op: CollaborationOp.Project,
-            id,
-            grantId,
-            request: { op: CompanyProjectOp.Artifact, id, projectId, attemptId, path, offset },
-        });
-        if (
-            response.op !== CollaborationOp.ProjectResult ||
-            response.response.op !== CompanyProjectOp.File
-        ) {
-            throw new Error('Expected a collaboration file');
-        }
-        return response.response;
-    }
-
-    /** Receive ordered snapshots until this view closes, access ends, or the socket disconnects. */
-    public subscribeCollaborationProject(
-        grantId: string,
-        projectId: string,
-        listener: (snapshot: CompanyProjectSnapshot) => void,
-        onError: (error: Error) => void,
-    ): () => void {
-        const id = crypto.randomUUID();
-        return this.#collaboration.listen(
-            id,
-            grantId,
-            'project',
-            projectId,
-            (packet) => {
-                if (
-                    packet.op === CollaborationOp.ProjectResult &&
-                    packet.response.op === CompanyProjectOp.Snapshot
-                ) {
-                    this.#notify(() => listener(packet.response as CompanyProjectSnapshot));
-                }
-            },
-            (error) => this.#notify(() => onError(error)),
-            () =>
-                this.#sendCollaboration({
-                    op: CollaborationOp.Watch,
-                    id,
-                    grantId,
-                    channel: 'project',
-                }),
-            () => this.#leaveCollaboration(id),
-        );
-    }
-
-    /** Watch and walk in an invited owner's sanitized office without changing your Chat identity. */
-    public subscribeCollaborationOffice(
-        grantId: string,
-        listener: (packet: OfficeGamePacket) => void,
-        onError: (error: Error) => void,
-    ): CollaborationOffice {
-        const id = crypto.randomUUID();
-        const close = this.#collaboration.listen(
-            id,
-            grantId,
-            'office',
-            undefined,
-            (packet) => {
-                if (packet.op === CollaborationOp.Office) {
-                    this.#notify(() => listener(packet.frame));
-                }
-            },
-            (error) => this.#notify(() => onError(error)),
-            () =>
-                this.#sendCollaboration({
-                    op: CollaborationOp.Watch,
-                    id,
-                    grantId,
-                    channel: 'office',
-                }),
-            () => this.#leaveCollaboration(id),
-        );
-        return {
-            close,
-            move: (player) => {
-                if (
-                    !this.#collaboration.watching(id) ||
-                    !this.connected ||
-                    this.#socket.bufferedAmount > 256 * 1024
-                ) {
-                    return;
-                }
-                this.#sendCollaboration({ op: CollaborationOp.Move, id, grantId, player });
-            },
-        };
-    }
-    #sendCollaboration(request: CollaborationRequest): void {
-        if (
-            !this.connected ||
-            this.#hello?.features.companyCollaboration !== true ||
-            this.#socket.bufferedAmount > 256 * 1024
-        ) {
-            throw new Error('Collaboration connection is unavailable or busy');
-        }
-        this.#socket.send(CompanyCollaborationProtocol.encode(request));
-    }
-    #leaveCollaboration(id: string): void {
-        if (!this.connected) {
-            return;
-        }
-        try {
-            this.#sendCollaboration({ op: CollaborationOp.Leave, id });
-        } catch {
-            this.#fail(new Error('Could not release collaboration subscription'));
-        }
-    }
-    /** Read explicitly published previews or submit an owner publication over the current socket. */
-    public showroom(request: ShowroomRequest): Promise<ShowroomCatalog | ShowroomContent> {
-        if (!this.connected || this.#hello?.features.companyShowroom !== true) {
-            return Promise.reject(new Error('The showroom is unavailable on this connection'));
-        }
-        const bytes = CompanyShowroomProtocol.encode(request);
-        return this.#showroom.request(request, () => {
-            if (!this.connected || this.#socket.bufferedAmount > 256 * 1024) {
-                throw new Error('Showroom connection is busy or disconnected');
-            }
-            this.#socket.send(bytes);
-        });
-    }
-    /** Read or change your private company over the existing authenticated socket. */
-    public company(command: CompanyCommand): Promise<CompanyState> {
-        if (!this.connected || this.#hello?.features.officeCompany !== true) {
-            return Promise.reject(
-                new Error('Company management is unavailable on this connection'),
-            );
-        }
-        if (command.op === CompanyOp.Employee && this.#hello.features.officeCompanyVersion !== 2) {
-            return Promise.reject(
-                new Error('Employee settings are unavailable on this connection'),
-            );
-        }
-        if (
-            command.op === CompanyOp.DepartmentSettings &&
-            this.#hello.features.companyDepartmentSettings !== true
-        ) {
-            return Promise.reject(
-                new Error('Department settings are unavailable on this connection'),
-            );
-        }
-        if (
-            command.op === CompanyOp.Construction &&
-            this.#hello.features.officeConstruction !== true
-        ) {
-            return Promise.reject(
-                new Error('Office construction is unavailable on this connection'),
-            );
-        }
-        if (
-            command.op === CompanyOp.Draft &&
-            command.sourceProjectId &&
-            this.#hello.features.companyFollowups !== true
-        ) {
-            return Promise.reject(
-                new Error('Follow-up projects are unavailable on this connection'),
-            );
-        }
-        if (
-            command.op === CompanyOp.Construction &&
-            command.teams !== undefined &&
-            this.#hello.features.companyTeamAreas !== true
-        ) {
-            return Promise.reject(new Error('Department areas are unavailable on this connection'));
-        }
-        if (
-            command.op === CompanyOp.Construction &&
-            command.deskPositions !== undefined &&
-            this.#hello.features.officeDeskPositions !== true
-        ) {
-            return Promise.reject(new Error('Desk positions are unavailable on this connection'));
-        }
-        if (command.op === CompanyOp.Procedure && this.#hello.features.companyProcedures !== true) {
-            return Promise.reject(
-                new Error('Reviewed procedures are unavailable on this connection'),
-            );
-        }
-        const bytes: Uint8Array<ArrayBuffer> = CompanyProtocol.encode(
-            command,
-            this.#hello.features.officeDeskPositions === true
-                ? 8
-                : this.#hello.features.companyProcedures === true
-                  ? 7
-                  : this.#hello.features.companyTeamAreas === true
-                    ? 6
-                    : this.#hello.features.companyFollowups === true
-                      ? 5
-                      : this.#hello.features.officeConstruction === true
-                        ? 4
-                        : this.#hello.features.companyDepartmentSettings === true
-                          ? 3
-                          : this.#hello.features.officeCompanyVersion === 2
-                            ? 2
-                            : 1,
-        );
-        return this.#company.request(command, () => {
-            if (!this.connected || this.#socket.bufferedAmount > 256 * 1024) {
-                throw new Error('Company connection is busy or disconnected');
-            }
-            this.#socket.send(bytes);
-        });
-    }
-
-    /** Read project work or submit an owner decision using a stable command ID for safe retries. */
-    public async project(
-        projectId: string,
-        command?: CompanyWorkCommand,
-    ): Promise<CompanyProjectSnapshot> {
-        if (
-            command?.kind === 'assign' &&
-            this.#hello?.features.companyProjectAssignments !== true
-        ) {
-            throw new Error('Project reassignment is unavailable on this connection');
-        }
-        if (command?.kind === 'schedule' && this.#hello?.features.companyProjectControls !== true) {
-            throw new Error('Project management controls are unavailable on this connection');
-        }
-        const request: CompanyProjectRequest =
-            command === undefined
-                ? { op: CompanyProjectOp.Read, id: crypto.randomUUID(), projectId }
-                : { op: CompanyProjectOp.Command, id: command.id, projectId, command };
-        const response = await this.#projectRequest(request);
-        if (response.op !== CompanyProjectOp.Snapshot) {
-            throw new Error('Expected project snapshot');
-        }
-        return response;
-    }
-
-    /** Change approved spending and concurrency without replaying or restarting assignments. */
-    public async projectAllowance(
-        projectId: string,
-        command: CompanyAllowanceCommand,
-    ): Promise<CompanyProjectSnapshot> {
-        if (this.#hello?.features.companyProjectControls !== true) {
-            throw new Error('Project management controls are unavailable on this connection');
-        }
-        const response = await this.#projectRequest({
-            ...command,
-            op: CompanyProjectOp.Allowance,
-            projectId,
-        });
-        if (response.op !== CompanyProjectOp.Snapshot) {
-            throw new Error('Expected project snapshot');
-        }
-        return response;
-    }
-
-    /** Authorize repeating an accepted task plan within explicit recurring limits. */
-    public async projectMaintenance(
-        projectId: string,
-        command: CompanyMaintenanceCommand,
-    ): Promise<CompanyProjectSnapshot> {
-        if (this.#hello?.features.companyMaintenance !== true) {
-            throw new Error('Recurring maintenance is unavailable on this connection');
-        }
-        const response = await this.#projectRequest({
-            ...command,
-            op: CompanyProjectOp.Maintenance,
-            projectId,
-        });
-        if (response.op !== CompanyProjectOp.Snapshot) {
-            throw new Error('Expected project snapshot');
-        }
-        return response;
-    }
-
-    /** Receive an initial private snapshot and subsequent changes on this connection; release on dialog close. */
-    public subscribeProject(
-        projectId: string,
-        listener: (snapshot: CompanyProjectSnapshot) => void,
-        onError: (error: Error) => void,
-    ): () => void {
-        if (!this.connected || this.#hello?.features.companyProjectLive !== true) {
-            throw new Error('Live project updates are unavailable on this connection');
-        }
-        const id = crypto.randomUUID();
-        const send = (
-            op: typeof CompanyProjectOp.Subscribe | typeof CompanyProjectOp.Leave,
-        ): void => {
-            if (!this.connected) {
-                if (op === CompanyProjectOp.Leave) {
-                    return;
-                }
-                throw new Error('Project connection closed');
-            }
-            if (this.#socket.bufferedAmount > 256 * 1024) {
-                throw new Error('Project connection is busy');
-            }
-            this.#socket.send(
-                CompanyProjectProtocol.encode(
-                    { op, id, projectId },
-                    this.#hello?.features.companyMaintenance === true
-                        ? 5
-                        : this.#hello?.features.companyProjectRecovery === true
-                          ? 4
-                          : this.#hello?.features.companyProjectAssignments === true
-                            ? 3
-                            : this.#hello?.features.companyProjectControls === true
-                              ? 2
-                              : 1,
-                ),
-            );
-        };
-        return this.#projects.listen(
-            id,
-            projectId,
-            (snapshot) => this.#notify(() => listener(snapshot)),
-            (error) => this.#notify(() => onError(error)),
-            () => send(CompanyProjectOp.Subscribe),
-            () => {
-                try {
-                    send(CompanyProjectOp.Leave);
-                } catch {
-                    this.#fail(new Error('Could not release project subscription'));
-                }
-            },
-        );
-    }
-
-    /** Download one captured-file chunk. Continue at offset + bytes.length until total is reached. */
-    public async projectArtifact(
-        projectId: string,
-        attemptId: string,
-        path: string,
-        offset = 0,
-    ): Promise<CompanyProjectFile> {
-        const response = await this.#projectRequest({
-            op: CompanyProjectOp.Artifact,
-            id: crypto.randomUUID(),
-            projectId,
-            attemptId,
-            path,
-            offset,
-        });
-        if (response.op !== CompanyProjectOp.File) {
-            throw new Error('Expected project file');
-        }
-        return response;
-    }
-
-    /** Read measured employee project history on the existing owner connection. */
-    public async employeeHistory(employeeId: string): Promise<CompanyEmployeeHistory> {
-        if (this.#hello?.features.companyEmployeeHistory !== true) {
-            throw new Error('Employee history is unavailable on this NEXA host');
-        }
-        const response = await this.#projectRequest({
-            op: CompanyProjectOp.Employee,
-            id: crypto.randomUUID(),
-            employeeId,
-        });
-        if (response.op !== CompanyProjectOp.History) {
-            throw new Error('Expected employee history');
-        }
-        return response;
-    }
-
-    /** Read bounded private provider-request history, with a cursor for older entries. */
-    public async projectSpending(projectId: string, before = 0n): Promise<CompanySpending> {
-        if (this.#hello?.features.companyProjectRecovery !== true) {
-            throw new Error('Project spending history is unavailable');
-        }
-        const response = await this.#projectRequest({
-            op: CompanyProjectOp.Ledger,
-            id: crypto.randomUUID(),
-            projectId,
-            before,
-        });
-        if (response.op !== CompanyProjectOp.Spending) {
-            throw new Error('Expected project spending history');
-        }
-        return response;
-    }
-
-    /** Record checked interruption evidence; this never releases unknown spending or starts work. */
-    public async projectRecover(
-        projectId: string,
-        command: CompanyRecoveryCommand,
-    ): Promise<CompanySpending> {
-        if (this.#hello?.features.companyProjectRecovery !== true) {
-            throw new Error('Project recovery is unavailable');
-        }
-        const response = await this.#projectRequest({
-            ...command,
-            op: CompanyProjectOp.Recover,
-            projectId,
-        });
-        if (response.op !== CompanyProjectOp.Spending) {
-            throw new Error('Expected project recovery history');
-        }
-        return response;
-    }
-
-    #projectRequest(
-        request: CompanyProjectRequest,
-    ): Promise<
-        CompanyProjectSnapshot | CompanyProjectFile | CompanyEmployeeHistory | CompanySpending
-    > {
-        if (!this.connected || this.#hello?.features.companyProjects !== true) {
-            return Promise.reject(new Error('Project execution is unavailable on this connection'));
-        }
-        const bytes = CompanyProjectProtocol.encode(
-            request,
-            this.#hello.features.companyMaintenance === true
-                ? 5
-                : this.#hello.features.companyProjectRecovery === true
-                  ? 4
-                  : this.#hello.features.companyProjectAssignments === true ||
-                      this.#hello.features.companyEmployeeHistory === true
-                    ? 3
-                    : this.#hello.features.companyProjectControls === true
-                      ? 2
-                      : 1,
-        );
-        return this.#projects.request(request, () => {
-            if (!this.connected || this.#socket.bufferedAmount > 256 * 1024) {
-                throw new Error('Project connection is busy or disconnected');
-            }
-            this.#socket.send(bytes);
-        });
-    }
-
     /** Observe authoritative office state over this existing authenticated connection. */
     public subscribeOffice(listener: (packet: OfficeGamePacket) => void): () => void {
         if (this.#hello?.features.officeGame !== true) {
@@ -1272,34 +808,21 @@ export class NexaClient {
             if (complete === null) {
                 return;
             }
-            if (CompanyCollaborationProtocol.isFrame(new Uint8Array(complete))) {
-                if (this.#hello.features.companyCollaboration !== true) {
-                    throw new Error('Unnegotiated collaboration frame');
+            if (OfficeLayoutProtocol.isFrame(new Uint8Array(complete))) {
+                const packet = OfficeLayoutProtocol.decode(new Uint8Array(complete));
+                if (packet.op !== 3 && packet.op !== 4) {
+                    throw new Error('Unexpected layout command');
                 }
-                this.#collaboration.receive(
-                    CompanyCollaborationProtocol.decode(new Uint8Array(complete)),
-                );
-                return;
-            }
-            if (CompanyShowroomProtocol.isFrame(new Uint8Array(complete))) {
-                if (this.#hello.features.companyShowroom !== true) {
-                    throw new Error('Unnegotiated showroom frame');
+                const pending = this.#layouts.get(packet.id);
+                if (pending) {
+                    this.#layouts.delete(packet.id);
+                    clearTimeout(pending.timer);
+                    if (packet.op === 4) {
+                        pending.reject(new Error(packet.message));
+                    } else {
+                        pending.resolve({ revision: packet.revision, pieces: packet.pieces });
+                    }
                 }
-                this.#showroom.receive(CompanyShowroomProtocol.decode(new Uint8Array(complete)));
-                return;
-            }
-            if (CompanyProjectProtocol.isFrame(new Uint8Array(complete))) {
-                if (this.#hello.features.companyProjects !== true) {
-                    throw new Error('Unnegotiated project frame');
-                }
-                this.#projects.receive(CompanyProjectProtocol.decode(new Uint8Array(complete)));
-                return;
-            }
-            if (CompanyProtocol.isFrame(new Uint8Array(complete))) {
-                if (this.#hello.features.officeCompany !== true) {
-                    throw new Error('Unnegotiated company frame');
-                }
-                this.#company.receive(CompanyProtocol.decode(new Uint8Array(complete)));
                 return;
             }
             if (OfficeProtocol.isFrame(new Uint8Array(complete))) {
@@ -1487,10 +1010,11 @@ export class NexaClient {
         this.#closed = true;
         this.#failure = materializeError(error);
         this.#pending.close(error);
-        this.#collaboration.close(error);
-        this.#showroom.close(error);
-        this.#company.close(error);
-        this.#projects.close(error);
+        for (const pending of this.#layouts.values()) {
+            clearTimeout(pending.timer);
+            pending.reject(error);
+        }
+        this.#layouts.clear();
         this.#wake?.();
         for (const listener of this.#closeListeners) {
             this.#notify((): void => {
