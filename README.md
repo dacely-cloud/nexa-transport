@@ -455,3 +455,19 @@ const turn = client.stream({
 The server returns a path, filename and decimal-string byte count. Source bytes never enter the agent request. Progress counts acknowledged bytes as `bigint`. Cancellation requests cleanup of unfinished uploads. The server must advertise the `data.upload.*` methods and grant write scope. For Node files, use a file-backed Blob to keep memory bounded. `NexaMedia.document` is still intended for inline attachments; uploading a file does not itself analyze it.
 
 For inline CSV, TSV, JSON, JSONL, PDF and Office files, use `NexaMedia.document(file)`. It preserves `File.name` and infers the MIME type from the filename when the browser leaves `File.type` empty. Nexa can import structured attachments directly by their media ID using `import_dataset`, then run full-data SQL with `query_dataset`. Word `.docx` text is available through `extract_document`.
+
+### Public office showroom
+
+`client.showroom(request)` uses the existing binary socket when
+`client.hello.features.companyShowroom` is true. Import `ShowroomOp` and the request/response types
+from `nexa-transport/showroom`. `Read` returns the current catalog; `Preview` requests a published
+entry by its public ID. Verify the preview's SHA-256 and byte count against the selected catalog
+entry before rendering it in an isolated viewer.
+
+Only an authenticated owner with write scope can `Publish` an explicitly selected file from the
+current accepted delivery or `Withdraw` an entry. Retain mutation request IDs and catalog revisions
+for explicit retries; the SDK never replays publication automatically. Visitor tickets permit only
+catalog and published-preview reads for their authorized office, with invitation validity checked
+on every request. Catalogs contain public copy and content identities, without private project IDs,
+file paths, prompts, or review records. Withdrawal blocks subsequent reads; already received copies
+cannot be recalled.

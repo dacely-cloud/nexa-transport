@@ -1222,6 +1222,8 @@ export interface GatewayFeaturesShape {
     readonly companyProjectRecovery?: true;
     /** companyProjects as defined by the Nexa gateway. */
     readonly companyProjects?: true;
+    /** companyShowroom as defined by the Nexa gateway. */
+    readonly companyShowroom?: true;
     /** companyTeamAreas as defined by the Nexa gateway. */
     readonly companyTeamAreas?: true;
     /** events as defined by the Nexa gateway. */
