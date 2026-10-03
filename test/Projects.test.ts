@@ -91,6 +91,7 @@ it('does not accept a file response belonging to another project or offset', asy
         const pending: Promise<
             | CompanyProjectFile
             | import('../src/company/CompanyProjectProtocol.js').CompanyProjectSnapshot
+            | import('../src/company/CompanyProjectProtocol.js').CompanyEmployeeHistory
         > = requests.request({ ...packet, op: CompanyProjectOp.Artifact }, (): void => {});
         requests.receive({ ...packet, ...changes });
         await expect(pending).rejects.toThrow('Mismatched');
@@ -172,4 +173,49 @@ it('rejects excessive chunks and malformed wire data before allocating file cont
     const unknown = bytes.slice();
     unknown[5] = 127;
     expect(() => CompanyProjectProtocol.decode(unknown)).toThrow('Unknown');
+});
+
+it('keeps exact employee totals, bounds history, and correlates employee responses', async () => {
+    const packet = {
+        op: CompanyProjectOp.History,
+        id: 'history',
+        employeeId: 'ada',
+        asOf: 100n,
+        attempts: 2,
+        completed: 1,
+        blocked: 1,
+        running: 0,
+        reviews: 0,
+        repeats: 1,
+        accepted: 0,
+        inputTokens: (1n << 65n) + 1n,
+        outputTokens: 3n,
+        recent: [],
+    };
+    expect(CompanyProjectProtocol.decode(CompanyProjectProtocol.encode(packet))).toEqual(packet);
+    for (const version of [1, 2] as const) {
+        expect(() => CompanyProjectProtocol.encode(packet, version)).toThrow('v3');
+        expect(() =>
+            CompanyProjectProtocol.encode(
+                { op: CompanyProjectOp.Employee, id: 'history', employeeId: 'ada' },
+                version,
+            ),
+        ).toThrow('v3');
+    }
+    const invalid = CompanyProjectProtocol.encode(packet);
+    invalid[invalid.length - 1] = 21;
+    expect(() => CompanyProjectProtocol.decode(invalid)).toThrow('limits');
+    const requests = new CompanyProjectRequests();
+    const pending = requests.request(
+        { op: CompanyProjectOp.Employee, id: 'history', employeeId: 'grace' },
+        () => {},
+    );
+    requests.receive(packet);
+    await expect(pending).rejects.toThrow('Mismatched');
+    const own = requests.request(
+        { op: CompanyProjectOp.Employee, id: 'history', employeeId: 'ada' },
+        () => {},
+    );
+    requests.receive(packet);
+    expect(await own).toEqual(packet);
 });

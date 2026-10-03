@@ -7,11 +7,14 @@ import {
     type CompanyProjectPacket,
     type CompanyProjectSnapshot,
     type CompanyProjectFile,
+    type CompanyEmployeeHistory,
 } from '../company/CompanyProjectProtocol.js';
 
 interface PendingProject {
     readonly request: CompanyProjectRequest;
-    readonly resolve: (response: CompanyProjectSnapshot | CompanyProjectFile) => void;
+    readonly resolve: (
+        response: CompanyProjectSnapshot | CompanyProjectFile | CompanyEmployeeHistory,
+    ) => void;
     readonly reject: (error: Error) => void;
     readonly timer: ReturnType<typeof setTimeout>;
 }
@@ -72,7 +75,7 @@ export class CompanyProjectRequests {
     public request(
         request: CompanyProjectRequest,
         send: () => void,
-    ): Promise<CompanyProjectSnapshot | CompanyProjectFile> {
+    ): Promise<CompanyProjectSnapshot | CompanyProjectFile | CompanyEmployeeHistory> {
         if (this.#pending.size >= 16 || this.#pending.has(request.id)) {
             return Promise.reject(new Error('Project request already pending or capacity reached'));
         }
@@ -103,6 +106,7 @@ export class CompanyProjectRequests {
         if (
             packet.op !== CompanyProjectOp.Snapshot &&
             packet.op !== CompanyProjectOp.File &&
+            packet.op !== CompanyProjectOp.History &&
             packet.op !== CompanyProjectOp.Error
         ) {
             throw new Error('Unexpected project request from server');
@@ -132,14 +136,18 @@ export class CompanyProjectRequests {
         }
         const request = pending.request;
         const matches =
-            packet.op === CompanyProjectOp.Snapshot
-                ? request.op !== CompanyProjectOp.Artifact &&
-                  packet.work.projectId === request.projectId
-                : request.op === CompanyProjectOp.Artifact &&
-                  packet.projectId === request.projectId &&
-                  packet.attemptId === request.attemptId &&
-                  packet.path === request.path &&
-                  packet.offset === request.offset;
+            packet.op === CompanyProjectOp.History
+                ? request.op === CompanyProjectOp.Employee &&
+                  packet.employeeId === request.employeeId
+                : packet.op === CompanyProjectOp.Snapshot
+                  ? request.op !== CompanyProjectOp.Employee &&
+                    request.op !== CompanyProjectOp.Artifact &&
+                    packet.work.projectId === request.projectId
+                  : request.op === CompanyProjectOp.Artifact &&
+                    packet.projectId === request.projectId &&
+                    packet.attemptId === request.attemptId &&
+                    packet.path === request.path &&
+                    packet.offset === request.offset;
         if (!matches) {
             this.#reject(packet.id, new Error('Mismatched project response'));
             return;

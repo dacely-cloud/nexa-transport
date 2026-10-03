@@ -12,9 +12,11 @@ export const CompanyProjectOp = {
     Subscribe: 4,
     Leave: 5,
     Allowance: 6,
+    Employee: 7,
     Snapshot: 128,
     File: 129,
     Error: 130,
+    History: 131,
 } as const;
 /** Real usage and commitments, independently versioned from project work. */
 export interface CompanyProjectBudget {
@@ -43,6 +45,11 @@ export interface CompanyProjectWire {
 /** Requests never contain an owner; the gateway supplies the verified account. */
 export type CompanyProjectRequest = CompanyProjectWire &
     (
+        | {
+              readonly op: typeof CompanyProjectOp.Employee;
+              readonly id: string;
+              readonly employeeId: string;
+          }
         | ({
               readonly op: typeof CompanyProjectOp.Allowance;
               readonly projectId: string;
@@ -92,11 +99,46 @@ export interface CompanyProjectFile extends CompanyProjectWire {
     readonly offset: number;
     readonly bytes: Uint8Array;
 }
+/** Measured project history; counts describe records, not model intelligence. */
+export interface CompanyEmployeeHistory extends CompanyProjectWire {
+    readonly op: typeof CompanyProjectOp.History;
+    readonly id: string;
+    readonly employeeId: string;
+    readonly asOf: bigint;
+    readonly attempts: number;
+    readonly completed: number;
+    readonly blocked: number;
+    readonly running: number;
+    readonly reviews: number;
+    readonly repeats: number;
+    readonly accepted: number;
+    readonly inputTokens: bigint;
+    readonly outputTokens: bigint;
+    readonly recent: readonly CompanyEmployeeRecord[];
+}
+/** An immutable execution author and evidence from that exact attempt. */
+export interface CompanyEmployeeRecord {
+    readonly projectId: string;
+    readonly projectName: string;
+    readonly taskId: string;
+    readonly title: string;
+    readonly kind: 'plan' | 'work' | 'review' | 'unknown';
+    readonly attemptId: string;
+    readonly status: 'running' | 'done' | 'blocked';
+    readonly started: bigint;
+    readonly finished: bigint;
+    readonly summary: string;
+    readonly evidence: number;
+    readonly artifacts: number;
+    readonly repeat: boolean;
+    readonly accepted: boolean;
+}
 /** Private operation result. */
 export type CompanyProjectResponse = CompanyProjectWire &
     (
         | CompanyProjectSnapshot
         | CompanyProjectFile
+        | CompanyEmployeeHistory
         | {
               readonly op: typeof CompanyProjectOp.Error;
               readonly id: string;
@@ -140,6 +182,12 @@ export class CompanyProjectProtocol {
         ) {
             throw new Error('Project reassignment requires NCPW v3');
         }
+        if (
+            version < 3 &&
+            (packet.op === CompanyProjectOp.Employee || packet.op === CompanyProjectOp.History)
+        ) {
+            throw new Error('Employee history requires NCPW v3');
+        }
         this.#id(packet.id);
         const w = new BinaryWriter(1024);
         w.u32(0x5750434e).u8(version).u8(packet.op).u8(0).u8(0).str(packet.id);
@@ -159,6 +207,45 @@ export class CompanyProjectProtocol {
                 const schedule = packet.schedule ?? { paused: false, priority: 1 };
                 this.#schedule(schedule);
                 w.u8(schedule.paused ? 1 : 0).u8(schedule.priority);
+            }
+        } else if (packet.op === CompanyProjectOp.Employee) {
+            this.#employee(packet.employeeId);
+            w.str(packet.employeeId);
+        } else if (packet.op === CompanyProjectOp.History) {
+            this.#employee(packet.employeeId);
+            if (packet.recent.length > 20) {
+                throw new Error('Employee history exceeds limits');
+            }
+            w.str(packet.employeeId).u64(packet.asOf);
+            for (const count of [
+                packet.attempts,
+                packet.completed,
+                packet.blocked,
+                packet.running,
+                packet.reviews,
+                packet.repeats,
+                packet.accepted,
+            ]) {
+                w.u32(count);
+            }
+            this.#wide(w, packet.inputTokens);
+            this.#wide(w, packet.outputTokens);
+            w.u8(packet.recent.length);
+            for (const row of packet.recent) {
+                w.str(row.projectId)
+                    .str(row.projectName)
+                    .str(row.taskId)
+                    .str(row.title)
+                    .str(row.kind)
+                    .str(row.attemptId)
+                    .str(row.status)
+                    .u64(row.started)
+                    .u64(row.finished)
+                    .str(row.summary)
+                    .u32(row.evidence)
+                    .u32(row.artifacts)
+                    .u8(row.repeat ? 1 : 0)
+                    .u8(row.accepted ? 1 : 0);
             }
         } else if (packet.op === CompanyProjectOp.Error) {
             w.str(packet.message);
@@ -258,6 +345,88 @@ export class CompanyProjectProtocol {
                 this.#schedule(schedule);
                 packet = { ...packet, schedule };
             }
+        } else if (op === CompanyProjectOp.Employee && version === 3) {
+            const employeeId = r.str();
+            this.#employee(employeeId);
+            packet = { op, id, employeeId };
+        } else if (op === CompanyProjectOp.History && version === 3) {
+            const employeeId = r.str();
+            this.#employee(employeeId);
+            const asOf = r.u64(),
+                attempts = r.u32(),
+                completed = r.u32(),
+                blocked = r.u32(),
+                running = r.u32(),
+                reviews = r.u32(),
+                repeats = r.u32(),
+                accepted = r.u32();
+            const inputTokens = r.u64() | (r.u64() << 64n),
+                outputTokens = r.u64() | (r.u64() << 64n);
+            const count = r.u8();
+            if (count > 20) {
+                throw new Error('Employee history exceeds limits');
+            }
+            const recent: CompanyEmployeeRecord[] = [];
+            for (let i = 0; i < count; i++) {
+                const projectId = r.str(),
+                    projectName = r.str(),
+                    taskId = r.str(),
+                    title = r.str(),
+                    kind = r.str(),
+                    attemptId = r.str(),
+                    status = r.str();
+                if (
+                    (kind !== 'plan' &&
+                        kind !== 'work' &&
+                        kind !== 'review' &&
+                        kind !== 'unknown') ||
+                    (status !== 'running' && status !== 'done' && status !== 'blocked')
+                ) {
+                    throw new Error('Invalid employee history state');
+                }
+                const started = r.u64(),
+                    finished = r.u64(),
+                    summary = r.str(),
+                    evidence = r.u32(),
+                    artifacts = r.u32(),
+                    repeat = r.u8(),
+                    accepted = r.u8();
+                if (repeat > 1 || accepted > 1) {
+                    throw new Error('Invalid employee history flag');
+                }
+                recent.push({
+                    projectId,
+                    projectName,
+                    taskId,
+                    title,
+                    kind,
+                    attemptId,
+                    status,
+                    started,
+                    finished,
+                    summary,
+                    evidence,
+                    artifacts,
+                    repeat: repeat === 1,
+                    accepted: accepted === 1,
+                });
+            }
+            packet = {
+                op,
+                id,
+                employeeId,
+                asOf,
+                attempts,
+                completed,
+                blocked,
+                running,
+                reviews,
+                repeats,
+                accepted,
+                inputTokens,
+                outputTokens,
+                recent,
+            };
         } else if (op === CompanyProjectOp.Error) {
             packet = { op, id, message: r.str() };
         } else {
@@ -362,6 +531,17 @@ export class CompanyProjectProtocol {
             throw new Error('Trailing project packet data');
         }
         return version < 3 ? { ...packet, version: version as 1 | 2 } : packet;
+    }
+    static #employee(id: string): void {
+        if (!id || id.length > 128) {
+            throw new Error('Invalid employee identity');
+        }
+    }
+    static #wide(w: BinaryWriter, value: bigint): void {
+        if (value < 0n || value >= 1n << 128n) {
+            throw new Error('Invalid employee usage total');
+        }
+        w.u64(value & 0xffffffffffffffffn).u64(value >> 64n);
     }
     static #schedule(schedule: CompanyProjectSchedule): void {
         if (
