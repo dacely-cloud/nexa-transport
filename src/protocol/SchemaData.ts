@@ -1582,11 +1582,17 @@ export const schema: Schema = {
             ],
             type: 'string',
         },
-        'Flatten<{readonlytitle:string|null;readonlyid:string;readonlyagentId:string;readonlycreatedAt:number;readonlyupdatedAt:number;readonlyconversationId:string|null;readonlyparticipants:readonlystring[];readonlymessageCount:number;readonlyusage:TokenUsage;}&{readonlyprojectId?:string|undefined;readonlyuserId?:string|undefined;readonlyworkspaceId?:string|undefined;readonlyturnOpen?:boolean|undefined;readonlyresumePending?:boolean|undefined;readonlyresumeEligible?:boolean|undefined;readonlyresumePrincipal?:ToolPrincipal|undefined;readonlyresumeCwd?:string|undefined;readonlyresumeSurface?:ConversationSurface|undefined;}>':
+        'Flatten<{readonlytitle:string|null;readonlyid:string;readonlyagentId:string;readonlycreatedAt:number;readonlyupdatedAt:number;readonlyconversationId:string|null;readonlyparticipants:readonlystring[];readonlymessageCount:number;readonlyusage:TokenUsage;}&{readonlyactiveToolFamilies?:readonlystring[]|undefined;readonlyprojectId?:string|undefined;readonlyuserId?:string|undefined;readonlyworkspaceId?:string|undefined;readonlyturnOpen?:boolean|undefined;readonlyresumePending?:boolean|undefined;readonlyresumeEligible?:boolean|undefined;readonlyresumePrincipal?:ToolPrincipal|undefined;readonlyresumeCwd?:string|undefined;readonlyresumeSurface?:ConversationSurface|undefined;}>':
             {
                 description:
                     'Collapses the required/optional intersection into one object type.\n\nHomomorphic (`in keyof T` over a naked type parameter), so `readonly` and `?` are carried through\nrather than flattened away — without it every derived type would lose its modifiers and a caller\ncould assign to a field the store treats as immutable.',
                 properties: {
+                    activeToolFamilies: {
+                        items: {
+                            type: 'string',
+                        },
+                        type: 'array',
+                    },
                     agentId: {
                         type: 'string',
                     },
@@ -2593,6 +2599,32 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'office.ownerProof': {
+                    description:
+                        "Bind an invitation to the authenticated socket's office, using a short-lived signed proof.",
+                    properties: {
+                        params: {
+                            properties: {
+                                accountId: {
+                                    type: 'string',
+                                },
+                            },
+                            required: ['accountId'],
+                            type: 'object',
+                        },
+                        result: {
+                            properties: {
+                                proof: {
+                                    type: 'string',
+                                },
+                            },
+                            required: ['proof'],
+                            type: 'object',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'roblox.credentials.remove': {
                     properties: {
                         params: {
@@ -2715,7 +2747,7 @@ export const schema: Schema = {
                         result: {
                             anyOf: [
                                 {
-                                    $ref: '#/definitions/Flatten%3C%7Breadonlytitle%3Astring%7Cnull%3Breadonlyid%3Astring%3BreadonlyagentId%3Astring%3BreadonlycreatedAt%3Anumber%3BreadonlyupdatedAt%3Anumber%3BreadonlyconversationId%3Astring%7Cnull%3Breadonlyparticipants%3Areadonlystring%5B%5D%3BreadonlymessageCount%3Anumber%3Breadonlyusage%3ATokenUsage%3B%7D%26%7BreadonlyprojectId%3F%3Astring%7Cundefined%3BreadonlyuserId%3F%3Astring%7Cundefined%3BreadonlyworkspaceId%3F%3Astring%7Cundefined%3BreadonlyturnOpen%3F%3Aboolean%7Cundefined%3BreadonlyresumePending%3F%3Aboolean%7Cundefined%3BreadonlyresumeEligible%3F%3Aboolean%7Cundefined%3BreadonlyresumePrincipal%3F%3AToolPrincipal%7Cundefined%3BreadonlyresumeCwd%3F%3Astring%7Cundefined%3BreadonlyresumeSurface%3F%3AConversationSurface%7Cundefined%3B%7D%3E',
+                                    $ref: '#/definitions/Flatten%3C%7Breadonlytitle%3Astring%7Cnull%3Breadonlyid%3Astring%3BreadonlyagentId%3Astring%3BreadonlycreatedAt%3Anumber%3BreadonlyupdatedAt%3Anumber%3BreadonlyconversationId%3Astring%7Cnull%3Breadonlyparticipants%3Areadonlystring%5B%5D%3BreadonlymessageCount%3Anumber%3Breadonlyusage%3ATokenUsage%3B%7D%26%7BreadonlyactiveToolFamilies%3F%3Areadonlystring%5B%5D%7Cundefined%3BreadonlyprojectId%3F%3Astring%7Cundefined%3BreadonlyuserId%3F%3Astring%7Cundefined%3BreadonlyworkspaceId%3F%3Astring%7Cundefined%3BreadonlyturnOpen%3F%3Aboolean%7Cundefined%3BreadonlyresumePending%3F%3Aboolean%7Cundefined%3BreadonlyresumeEligible%3F%3Aboolean%7Cundefined%3BreadonlyresumePrincipal%3F%3AToolPrincipal%7Cundefined%3BreadonlyresumeCwd%3F%3Astring%7Cundefined%3BreadonlyresumeSurface%3F%3AConversationSurface%7Cundefined%3B%7D%3E',
                                     description:
                                         'Collapses the required/optional intersection into one object type.\n\nHomomorphic (`in keyof T` over a naked type parameter), so `readonly` and `?` are carried through\nrather than flattened away — without it every derived type would lose its modifiers and a caller\ncould assign to a field the store treats as immutable.',
                                 },
@@ -2735,7 +2767,7 @@ export const schema: Schema = {
                         },
                         result: {
                             items: {
-                                $ref: '#/definitions/Flatten%3C%7Breadonlytitle%3Astring%7Cnull%3Breadonlyid%3Astring%3BreadonlyagentId%3Astring%3BreadonlycreatedAt%3Anumber%3BreadonlyupdatedAt%3Anumber%3BreadonlyconversationId%3Astring%7Cnull%3Breadonlyparticipants%3Areadonlystring%5B%5D%3BreadonlymessageCount%3Anumber%3Breadonlyusage%3ATokenUsage%3B%7D%26%7BreadonlyprojectId%3F%3Astring%7Cundefined%3BreadonlyuserId%3F%3Astring%7Cundefined%3BreadonlyworkspaceId%3F%3Astring%7Cundefined%3BreadonlyturnOpen%3F%3Aboolean%7Cundefined%3BreadonlyresumePending%3F%3Aboolean%7Cundefined%3BreadonlyresumeEligible%3F%3Aboolean%7Cundefined%3BreadonlyresumePrincipal%3F%3AToolPrincipal%7Cundefined%3BreadonlyresumeCwd%3F%3Astring%7Cundefined%3BreadonlyresumeSurface%3F%3AConversationSurface%7Cundefined%3B%7D%3E',
+                                $ref: '#/definitions/Flatten%3C%7Breadonlytitle%3Astring%7Cnull%3Breadonlyid%3Astring%3BreadonlyagentId%3Astring%3BreadonlycreatedAt%3Anumber%3BreadonlyupdatedAt%3Anumber%3BreadonlyconversationId%3Astring%7Cnull%3Breadonlyparticipants%3Areadonlystring%5B%5D%3BreadonlymessageCount%3Anumber%3Breadonlyusage%3ATokenUsage%3B%7D%26%7BreadonlyactiveToolFamilies%3F%3Areadonlystring%5B%5D%7Cundefined%3BreadonlyprojectId%3F%3Astring%7Cundefined%3BreadonlyuserId%3F%3Astring%7Cundefined%3BreadonlyworkspaceId%3F%3Astring%7Cundefined%3BreadonlyturnOpen%3F%3Aboolean%7Cundefined%3BreadonlyresumePending%3F%3Aboolean%7Cundefined%3BreadonlyresumeEligible%3F%3Aboolean%7Cundefined%3BreadonlyresumePrincipal%3F%3AToolPrincipal%7Cundefined%3BreadonlyresumeCwd%3F%3Astring%7Cundefined%3BreadonlyresumeSurface%3F%3AConversationSurface%7Cundefined%3B%7D%3E',
                             },
                             type: 'array',
                         },
@@ -3063,6 +3095,7 @@ export const schema: Schema = {
                 'jobs.remove',
                 'logs.tail',
                 'media.acknowledge',
+                'office.ownerProof',
                 'roblox.credentials.remove',
                 'roblox.credentials.set',
                 'roblox.credentials.status',
