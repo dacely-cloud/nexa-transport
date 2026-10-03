@@ -45,6 +45,30 @@ it('round-trips management controls, retains exact money, and rejects unsupporte
     expect(() => CompanyProjectProtocol.encode(allowance, 1)).toThrow('v2');
 });
 
+it('negotiates reassignment without sending new commands to older hosts', () => {
+    const packet = {
+        op: CompanyProjectOp.Command,
+        id: 'assign',
+        projectId: 'project',
+        command: {
+            kind: 'assign' as const,
+            id: 'assign',
+            revision: 9n,
+            taskId: 'implementation',
+            employeeId: 'linus',
+        },
+    };
+    expect(CompanyProjectProtocol.decode(CompanyProjectProtocol.encode(packet))).toEqual(packet);
+    for (const version of [1, 2] as const) {
+        expect(() => CompanyProjectProtocol.encode(packet, version)).toThrow('v3');
+        const old = { op: CompanyProjectOp.Read, id: 'read', projectId: 'project' };
+        expect(CompanyProjectProtocol.decode(CompanyProjectProtocol.encode(old, version))).toEqual({
+            ...old,
+            version,
+        });
+    }
+});
+
 it('does not accept a file response belonging to another project or offset', async (): Promise<void> => {
     const requests: CompanyProjectRequests = new CompanyProjectRequests();
     const packet: CompanyProjectFile = {

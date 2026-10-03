@@ -38,7 +38,7 @@ export interface CompanyAllowanceCommand {
 }
 /** Retain the requested wire version for replies to older clients. */
 export interface CompanyProjectWire {
-    readonly version?: 1;
+    readonly version?: 1 | 2;
 }
 /** Requests never contain an owner; the gateway supplies the verified account. */
 export type CompanyProjectRequest = CompanyProjectWire &
@@ -77,6 +77,8 @@ export interface CompanyProjectSnapshot extends CompanyProjectWire {
     readonly work: CompanyWork;
     readonly budget: CompanyProjectBudget | null;
     readonly schedule?: CompanyProjectSchedule;
+    /** This host supports reassignment and immutable execution authors. */
+    readonly assignments?: true;
 }
 /** A bounded slice of a host-resolved captured delivery, never an arbitrary filesystem read. */
 export interface CompanyProjectFile extends CompanyProjectWire {
@@ -104,7 +106,7 @@ export type CompanyProjectResponse = CompanyProjectWire &
 /** Both directions of the bounded project protocol. */
 export type CompanyProjectPacket = CompanyProjectRequest | CompanyProjectResponse;
 
-/** NCPW v2 adds owner dispatch controls while retaining v1 snapshots for older clients. */
+/** NCPW v3 preserves execution authors and adds reassignment; older clients retain their wire layout. */
 export class CompanyProjectProtocol {
     /** One response carries at most 64 KiB of artifact bytes. */
     public static readonly chunkBytes = 65536;
@@ -119,9 +121,9 @@ export class CompanyProjectProtocol {
     /** Encode one request or result. */
     public static encode(
         packet: CompanyProjectPacket,
-        version: 1 | 2 = packet.version ?? 2,
+        version: 1 | 2 | 3 = packet.version ?? 3,
     ): Uint8Array<ArrayBuffer> {
-        if (version !== 1 && version !== 2) {
+        if (version !== 1 && version !== 2 && version !== 3) {
             throw new Error('Unsupported project packet');
         }
         if (
@@ -131,11 +133,18 @@ export class CompanyProjectProtocol {
         ) {
             throw new Error('Project controls require NCPW v2');
         }
+        if (
+            version < 3 &&
+            packet.op === CompanyProjectOp.Command &&
+            packet.command.kind === 'assign'
+        ) {
+            throw new Error('Project reassignment requires NCPW v3');
+        }
         this.#id(packet.id);
         const w = new BinaryWriter(1024);
         w.u32(0x5750434e).u8(version).u8(packet.op).u8(0).u8(0).str(packet.id);
         if (packet.op === CompanyProjectOp.Snapshot) {
-            const work = CompanyWorkCodec.encode(packet.work);
+            const work = CompanyWorkCodec.encode(packet.work, version === 3 ? 2 : 1);
             w.u32(work.length)
                 .bytes(work)
                 .u8(packet.budget === null ? 0 : 1);
@@ -146,7 +155,7 @@ export class CompanyProjectProtocol {
                     .u64(packet.budget.reserved)
                     .u32(packet.budget.concurrency);
             }
-            if (version === 2) {
+            if (version >= 2) {
                 const schedule = packet.schedule ?? { paused: false, priority: 1 };
                 this.#schedule(schedule);
                 w.u8(schedule.paused ? 1 : 0).u8(schedule.priority);
@@ -163,7 +172,9 @@ export class CompanyProjectProtocol {
                     throw new Error('Mismatched project command identity');
                 }
                 w.str(command.kind).u64(command.revision);
-                if (command.kind === 'schedule') {
+                if (command.kind === 'assign') {
+                    w.str(command.taskId).str(command.employeeId);
+                } else if (command.kind === 'schedule') {
                     this.#schedule(command);
                     w.u8(command.paused ? 1 : 0).u8(command.priority);
                 } else if (command.kind === 'plan' || command.kind === 'approve') {
@@ -200,7 +211,7 @@ export class CompanyProjectProtocol {
             throw new Error('Unsupported project packet');
         }
         const version = r.u8();
-        if (version !== 1 && version !== 2) {
+        if (version !== 1 && version !== 2 && version !== 3) {
             throw new Error('Unsupported project packet');
         }
         const op = r.u8();
@@ -230,8 +241,14 @@ export class CompanyProjectProtocol {
                           reserved: r.u64(),
                           concurrency: r.u32(),
                       };
-            packet = { op, id, work, budget };
-            if (version === 2) {
+            packet = {
+                op,
+                id,
+                work,
+                budget,
+                ...(version === 3 ? { assignments: true as const } : {}),
+            };
+            if (version >= 2) {
                 const paused = r.u8(),
                     priority = r.u8();
                 if (paused > 1) {
@@ -254,7 +271,7 @@ export class CompanyProjectProtocol {
                 op === CompanyProjectOp.Leave
             ) {
                 packet = { op, id, projectId };
-            } else if (op === CompanyProjectOp.Allowance && version === 2) {
+            } else if (op === CompanyProjectOp.Allowance && version >= 2) {
                 packet = {
                     op,
                     id,
@@ -267,7 +284,9 @@ export class CompanyProjectProtocol {
                 const kind = r.str();
                 const revision = r.u64();
                 let command: CompanyWorkCommand;
-                if (kind === 'schedule' && version === 2) {
+                if (kind === 'assign' && version === 3) {
+                    command = { kind, id, revision, taskId: r.str(), employeeId: r.str() };
+                } else if (kind === 'schedule' && version >= 2) {
                     const paused = r.u8(),
                         priority = r.u8();
                     if (paused > 1) {
@@ -342,7 +361,7 @@ export class CompanyProjectProtocol {
         if (r.remaining !== 0) {
             throw new Error('Trailing project packet data');
         }
-        return version === 1 ? { ...packet, version: 1 } : packet;
+        return version < 3 ? { ...packet, version: version as 1 | 2 } : packet;
     }
     static #schedule(schedule: CompanyProjectSchedule): void {
         if (

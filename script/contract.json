@@ -1800,6 +1800,11 @@
                     "description": "NXMD frames carry outbound file bytes; JSON results contain matching metadata.",
                     "type": "boolean"
                 },
+                "companyProjectAssignments": {
+                    "const": true,
+                    "description": "NCPW v3 supports reassignment and immutable execution authors.",
+                    "type": "boolean"
+                },
                 "companyProjectControls": {
                     "const": true,
                     "description": "NCPW v2 supports durable pause/priority controls and live allowance changes.",

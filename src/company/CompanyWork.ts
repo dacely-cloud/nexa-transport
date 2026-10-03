@@ -27,6 +27,8 @@ export interface CompanyArtifact {
 export interface CompanyWorkAttempt {
     readonly id: string;
     readonly taskId: string;
+    /** Employee who actually executed this attempt, independent of later reassignment. */
+    readonly employeeId: string;
     readonly holder: string;
     readonly expires: bigint;
     readonly started: bigint;
@@ -67,6 +69,13 @@ export interface CompanyProposal {
 
 /** Owner decisions are revision-checked and idempotent; none accepts a principal from the wire. */
 export type CompanyWorkCommand =
+    | {
+          readonly kind: 'assign';
+          readonly id: string;
+          readonly revision: bigint;
+          readonly taskId: string;
+          readonly employeeId: string;
+      }
     | {
           readonly kind: 'schedule';
           readonly id: string;
@@ -111,7 +120,10 @@ export class CompanyWorkCodec {
     static readonly #decoder = new TextDecoder('utf-8', { fatal: true });
     static readonly #encoder = new TextEncoder();
     /** Encode a complete private work snapshot; file contents remain in the artifact store. */
-    public static encode(work: CompanyWork): Uint8Array {
+    public static encode(work: CompanyWork, version: 1 | 2 = 2): Uint8Array {
+        if (version !== 1 && version !== 2) {
+            throw new Error('Unsupported company work snapshot');
+        }
         const w = new BinaryWriter(1024);
         const text = (value: string): void => {
             if (value.length > 16000 || CompanyWorkCodec.#encoder.encode(value).length > 65536) {
@@ -134,7 +146,7 @@ export class CompanyWorkCodec {
                 write(value);
             }
         };
-        w.u32(0x4b57434e).u8(1);
+        w.u32(0x4b57434e).u8(version);
         text(work.projectId);
         big(work.revision);
         text(work.phase);
@@ -171,6 +183,9 @@ export class CompanyWorkCodec {
         list(work.attempts, (attempt) => {
             text(attempt.id);
             text(attempt.taskId);
+            if (version === 2) {
+                text(attempt.employeeId);
+            }
             text(attempt.holder);
             big(attempt.expires);
             big(attempt.started);
@@ -236,7 +251,11 @@ export class CompanyWorkCodec {
             }
             return found;
         };
-        if (r.u32() !== 0x4b57434e || r.u8() !== 1) {
+        if (r.u32() !== 0x4b57434e) {
+            throw new Error('Unsupported company work snapshot');
+        }
+        const version = r.u8();
+        if (version !== 1 && version !== 2) {
             throw new Error('Unsupported company work snapshot');
         }
         const projectId = text();
@@ -277,6 +296,7 @@ export class CompanyWorkCodec {
         const attempts = list<CompanyWorkAttempt>(() => ({
             id: text(),
             taskId: text(),
+            employeeId: version === 2 ? text() : '',
             holder: text(),
             expires: big(),
             started: big(),
@@ -308,7 +328,14 @@ export class CompanyWorkCodec {
             feedback,
             decision,
             tasks,
-            attempts,
+            attempts:
+                version === 2
+                    ? attempts
+                    : attempts.map((attempt) => ({
+                          ...attempt,
+                          employeeId:
+                              tasks.find((task) => task.id === attempt.taskId)?.employeeId ?? '',
+                      })),
         };
     }
 }

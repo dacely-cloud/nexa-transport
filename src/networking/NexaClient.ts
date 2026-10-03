@@ -539,6 +539,12 @@ export class NexaClient {
         projectId: string,
         command?: CompanyWorkCommand,
     ): Promise<CompanyProjectSnapshot> {
+        if (
+            command?.kind === 'assign' &&
+            this.#hello?.features.companyProjectAssignments !== true
+        ) {
+            throw new Error('Project reassignment is unavailable on this connection');
+        }
         if (command?.kind === 'schedule' && this.#hello?.features.companyProjectControls !== true) {
             throw new Error('Project management controls are unavailable on this connection');
         }
@@ -597,7 +603,11 @@ export class NexaClient {
             this.#socket.send(
                 CompanyProjectProtocol.encode(
                     { op, id, projectId },
-                    this.#hello?.features.companyProjectControls === true ? 2 : 1,
+                    this.#hello?.features.companyProjectAssignments === true
+                        ? 3
+                        : this.#hello?.features.companyProjectControls === true
+                          ? 2
+                          : 1,
                 ),
             );
         };
@@ -646,7 +656,11 @@ export class NexaClient {
         }
         const bytes = CompanyProjectProtocol.encode(
             request,
-            this.#hello.features.companyProjectControls === true ? 2 : 1,
+            this.#hello.features.companyProjectAssignments === true
+                ? 3
+                : this.#hello.features.companyProjectControls === true
+                  ? 2
+                  : 1,
         );
         return this.#projects.request(request, () => {
             if (!this.connected || this.#socket.bufferedAmount > 256 * 1024) {
