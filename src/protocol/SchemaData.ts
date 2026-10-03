@@ -1856,6 +1856,12 @@ export const schema: Schema = {
                         'NXMD frames carry outbound file bytes; JSON results contain matching metadata.',
                     type: 'boolean',
                 },
+                companyProjectControls: {
+                    const: true,
+                    description:
+                        'NCPW v2 supports durable pause/priority controls and live allowance changes.',
+                    type: 'boolean',
+                },
                 companyProjectLive: {
                     const: true,
                     description: 'Ordered private project snapshots after an owner subscribes.',
