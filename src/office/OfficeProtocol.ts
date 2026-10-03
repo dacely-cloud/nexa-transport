@@ -1,6 +1,47 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+/** Public construction pieces use half-metre grid coordinates and quarter turns. */
+export interface OfficePlacement {
+    readonly id: number;
+    readonly kind: 'wall' | 'window' | 'door' | 'plant' | 'sofa' | 'table' | 'team';
+    readonly floor: number;
+    readonly x: number;
+    readonly z: number;
+    readonly rotation: number;
+}
+/** Shared limits for durable owner edits and public geometry decoding. */
+export class OfficeConstruction {
+    /** Reject unbounded coordinates, unknown assets, and ambiguous identities. */
+    public static validate(items: readonly OfficePlacement[]): void {
+        if (items.length > 128) {
+            throw new Error('An office can contain up to 128 construction pieces.');
+        }
+        const ids: Set<number> = new Set();
+        for (const item of items) {
+            if (
+                !Number.isInteger(item.id) ||
+                item.id < 0 ||
+                item.id > 255 ||
+                ids.has(item.id) ||
+                !['wall', 'window', 'door', 'plant', 'sofa', 'table', 'team'].includes(item.kind) ||
+                !Number.isInteger(item.floor) ||
+                item.floor < 0 ||
+                item.floor > 5 ||
+                !Number.isInteger(item.x) ||
+                Math.abs(item.x) > 128 ||
+                !Number.isInteger(item.z) ||
+                Math.abs(item.z) > 128 ||
+                !Number.isInteger(item.rotation) ||
+                item.rotation < 0 ||
+                item.rotation > 3
+            ) {
+                throw new Error('Invalid office construction piece.');
+            }
+            ids.add(item.id);
+        }
+    }
+}
 /** OfficeState in the fixed-schema office protocol. */
 export type OfficeState = 'working' | 'idle' | 'sleeping' | 'waiting' | 'failed' | 'unknown';
 /** OfficePhase in the fixed-schema office protocol. */
@@ -89,7 +130,7 @@ export interface OfficeAssignment {
 }
 /** NGOP: fixed-field binary office packets multiplexed on the authenticated gateway socket. */
 /** OFFICE_GAME_VERSION in the fixed-schema office protocol. */
-export const OFFICE_GAME_VERSION = 4;
+export const OFFICE_GAME_VERSION = 5;
 /** OFFICE_GAME_LIMIT in the fixed-schema office protocol. */
 export const OFFICE_GAME_LIMIT = 4 * 1024 * 1024;
 /** OfficeGameOp in the fixed-schema office protocol. */
@@ -116,13 +157,14 @@ export interface OfficePlayer {
 }
 /** OfficeGameState in the fixed-schema office protocol. */
 export interface OfficeGameState {
+    readonly construction?: readonly OfficePlacement[];
     readonly agents: readonly OfficeAgent[];
     readonly projects: readonly OfficeProject[];
 }
 /** OfficeGamePacket in the fixed-schema office protocol. */
 export interface OfficeGamePacket extends OfficeGameState {
     /** Present for an older peer; absent means the current protocol. */
-    readonly version?: 2 | 3;
+    readonly version?: 2 | 3 | 4;
     readonly op: (typeof OfficeGameOp)[keyof typeof OfficeGameOp];
     readonly sequence: number;
     readonly peer: string;
@@ -476,8 +518,11 @@ const player: Codec<OfficePlayer> = {
         return { x, z, yaw, floor, active, name, ...(jumpHeight === 0 ? {} : { jumpHeight }) };
     },
 };
-function encodeOfficeGame(packet: OfficeGamePacket, version: 2 | 3 | 4): Uint8Array<ArrayBuffer> {
-    if (version !== 2 && version !== 3 && version !== 4) {
+function encodeOfficeGame(
+    packet: OfficeGamePacket,
+    version: 2 | 3 | 4 | 5,
+): Uint8Array<ArrayBuffer> {
+    if (version !== 2 && version !== 3 && version !== 4 && version !== 5) {
         throw new Error('Unsupported office protocol');
     }
     if (!Number.isInteger(packet.sequence) || packet.sequence < 0 || packet.sequence > 0xffffffff) {
@@ -499,7 +544,7 @@ function encodeOfficeGame(packet: OfficeGamePacket, version: 2 | 3 | 4): Uint8Ar
         player.write(w, packet.player);
     }
     if (packet.op === OfficeGameOp.Snapshot || packet.op === OfficeGameOp.Delta) {
-        (version === 4 ? assignedAgents : agents).write(
+        (version >= 4 ? assignedAgents : agents).write(
             w,
             version === 2
                 ? packet.agents.map((agent) => {
@@ -515,6 +560,19 @@ function encodeOfficeGame(packet: OfficeGamePacket, version: 2 | 3 | 4): Uint8Ar
                 : packet.agents,
         );
         projects.write(w, packet.projects);
+        if (version >= 5 && packet.op === OfficeGameOp.Snapshot) {
+            const items = packet.construction ?? [];
+            OfficeConstruction.validate(items);
+            w.u32(items.length);
+            for (const item of items) {
+                w.u8(item.id);
+                string.write(w, item.kind);
+                w.u8(item.floor);
+                w.number(item.x);
+                w.number(item.z);
+                w.u8(item.rotation);
+            }
+        }
         if (packet.op === OfficeGameOp.Delta) {
             ids.write(w, packet.removedAgents);
             ids.write(w, packet.removedProjects);
@@ -537,7 +595,10 @@ function decodeOfficeGame(bytes: Uint8Array): OfficeGamePacket {
         h = r.view;
     if (
         h.getUint32(0, true) !== 0x504f474e ||
-        (h.getUint8(4) !== OFFICE_GAME_VERSION && h.getUint8(4) !== 3 && h.getUint8(4) !== 2) ||
+        (h.getUint8(4) !== OFFICE_GAME_VERSION &&
+            h.getUint8(4) !== 4 &&
+            h.getUint8(4) !== 3 &&
+            h.getUint8(4) !== 2) ||
         h.getUint16(6, true) !== 0
     ) {
         throw new Error('Unsupported office protocol');
@@ -554,7 +615,7 @@ function decodeOfficeGame(bytes: Uint8Array): OfficeGamePacket {
         throw new Error('Invalid office peer');
     }
     const packet: { -readonly [K in keyof OfficeGamePacket]: OfficeGamePacket[K] } = {
-        ...(h.getUint8(4) < 4 ? { version: h.getUint8(4) as 2 | 3 } : {}),
+        ...(h.getUint8(4) < 5 ? { version: h.getUint8(4) as 2 | 3 | 4 } : {}),
         op,
         peer,
         sequence: h.getUint32(8, true),
@@ -568,7 +629,7 @@ function decodeOfficeGame(bytes: Uint8Array): OfficeGamePacket {
         packet.player = player.read(r);
     }
     if (op === OfficeGameOp.Snapshot || op === OfficeGameOp.Delta) {
-        packet.agents = (packet.version === undefined ? assignedAgents : agents).read(r);
+        packet.agents = (h.getUint8(4) >= 4 ? assignedAgents : agents).read(r);
         if (
             packet.version === 2 &&
             packet.agents.some(
@@ -580,6 +641,25 @@ function decodeOfficeGame(bytes: Uint8Array): OfficeGamePacket {
             throw new Error('Celebrations require office protocol v3');
         }
         packet.projects = projects.read(r);
+        if (h.getUint8(4) >= 5 && op === OfficeGameOp.Snapshot) {
+            const count: number = r.u32();
+            if (count > 128) {
+                throw new Error('Too many construction pieces');
+            }
+            const items: OfficePlacement[] = [];
+            for (let i = 0; i < count; i++) {
+                items.push({
+                    id: r.u8(),
+                    kind: string.read(r) as OfficePlacement['kind'],
+                    floor: r.u8(),
+                    x: r.number(),
+                    z: r.number(),
+                    rotation: r.u8(),
+                });
+            }
+            OfficeConstruction.validate(items);
+            packet.construction = items;
+        }
         if (op === OfficeGameOp.Delta) {
             packet.removedAgents = ids.read(r);
             packet.removedProjects = ids.read(r);
@@ -604,7 +684,7 @@ export class OfficeProtocol {
     /** Encode one complete packet. */
     public static encode(
         packet: OfficeGamePacket,
-        version: 2 | 3 | 4 = packet.version ?? OFFICE_GAME_VERSION,
+        version: 2 | 3 | 4 | 5 = packet.version ?? OFFICE_GAME_VERSION,
     ): Uint8Array<ArrayBuffer> {
         return encodeOfficeGame(packet, version);
     }

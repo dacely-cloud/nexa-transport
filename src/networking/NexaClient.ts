@@ -540,13 +540,23 @@ export class NexaClient {
                 new Error('Department settings are unavailable on this connection'),
             );
         }
+        if (
+            command.op === CompanyOp.Construction &&
+            this.#hello.features.officeConstruction !== true
+        ) {
+            return Promise.reject(
+                new Error('Office construction is unavailable on this connection'),
+            );
+        }
         const bytes: Uint8Array<ArrayBuffer> = CompanyProtocol.encode(
             command,
-            this.#hello.features.companyDepartmentSettings === true
-                ? 3
-                : this.#hello.features.officeCompanyVersion === 2
-                  ? 2
-                  : 1,
+            this.#hello.features.officeConstruction === true
+                ? 4
+                : this.#hello.features.companyDepartmentSettings === true
+                  ? 3
+                  : this.#hello.features.officeCompanyVersion === 2
+                    ? 2
+                    : 1,
         );
         return this.#company.request(command, () => {
             if (!this.connected || this.#socket.bufferedAmount > 256 * 1024) {
@@ -737,11 +747,13 @@ export class NexaClient {
         }
         const bytes = OfficeProtocol.encode(
             packet,
-            this.#hello.features.officeDeskAssignments === true
-                ? 4
-                : this.#hello.features.officeGameVersion === 3
-                  ? 3
-                  : 2,
+            this.#hello.features.officeConstruction === true
+                ? 5
+                : this.#hello.features.officeDeskAssignments === true
+                  ? 4
+                  : this.#hello.features.officeGameVersion === 3
+                    ? 3
+                    : 2,
         );
         if (this.#socket.bufferedAmount > 256 * 1024) {
             if (packet.op === OfficeGameOp.Player) {

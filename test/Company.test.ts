@@ -49,7 +49,7 @@ it('round trips bounded department settings and rejects them on older versions',
     }
 });
 
-it.each([1, 2, 3] as const)(
+it.each([1, 2, 3, 4] as const)(
     'negotiates NCMP v%i and rejects unsupported department changes locally',
     async (version) => {
         const server = new WebSocketServer({ host: '127.0.0.1', port: 0 });
@@ -95,6 +95,7 @@ it.each([1, 2, 3] as const)(
                                     officeCompany: true,
                                     ...(version >= 2 ? { officeCompanyVersion: 2 } : {}),
                                     ...(version >= 3 ? { companyDepartmentSettings: true } : {}),
+                                    ...(version >= 4 ? { officeConstruction: true } : {}),
                                 },
                             },
                         }),
@@ -129,7 +130,19 @@ it.each([1, 2, 3] as const)(
                 expect(versions).toEqual([version]);
             } else {
                 await client.company(edit);
-                expect(versions).toEqual([3, 3]);
+                expect(versions).toEqual([version, version]);
+            }
+            const construction = {
+                op: CompanyOp.Construction,
+                id: 'build',
+                revision: 0n,
+                construction: [],
+            } as const;
+            if (version < 4) {
+                await expect(client.company(construction)).rejects.toThrow('unavailable');
+            } else {
+                await client.company(construction);
+                expect(versions).toEqual([4, 4, 4]);
             }
         } finally {
             client.close();

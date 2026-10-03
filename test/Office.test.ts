@@ -5,7 +5,7 @@ import { OfficeGameOp, OfficeProtocol, type OfficeGamePacket } from '../src/offi
 import { Method } from '../src/protocol/Protocol';
 import { hello } from './Support';
 
-it.each([2, 3, 4] as const)(
+it.each([2, 3, 4, 5] as const)(
     'multiplexes office v%i with RPC and restores negotiated subscriptions',
     async (version) => {
         const server = new WebSocketServer({ host: '127.0.0.1', port: 0 });
@@ -29,6 +29,16 @@ it.each([2, 3, 4] as const)(
                             OfficeProtocol.encode(
                                 {
                                     ...OfficeProtocol.control(OfficeGameOp.Snapshot),
+                                    construction: [
+                                        {
+                                            id: 4,
+                                            kind: 'window',
+                                            floor: 0,
+                                            x: 3,
+                                            z: 6,
+                                            rotation: 1,
+                                        },
+                                    ],
                                     agents: [
                                         {
                                             id: 'employee',
@@ -69,7 +79,8 @@ it.each([2, 3, 4] as const)(
                                               ...hello.features,
                                               officeGame: true,
                                               ...(version >= 3 ? { officeGameVersion: 3 } : {}),
-                                              ...(version === 4
+                                              ...(version >= 5 ? { officeConstruction: true } : {}),
+                                              ...(version >= 4
                                                   ? { officeDeskAssignments: true }
                                                   : {}),
                                           },
@@ -90,11 +101,12 @@ it.each([2, 3, 4] as const)(
             const snapshots: OfficeGamePacket[] = [];
             const stop = client.subscribeOffice((packet) => snapshots.push(packet));
             await expect.poll(() => snapshots.length).toBe(1);
-            expect(input[0]?.version ?? 4).toBe(version);
+            expect(input[0]?.version ?? 5).toBe(version);
             expect(snapshots[0]?.agents[0]?.reaction?.reason).toBe(
                 version >= 3 ? 'accepted' : undefined,
             );
-            expect(snapshots[0]?.agents[0]?.desk).toBe(version === 4 ? 71 : undefined);
+            expect(snapshots[0]?.agents[0]?.desk).toBe(version >= 4 ? 71 : undefined);
+            expect(snapshots[0]?.construction?.[0]?.kind).toBe(version >= 5 ? 'window' : undefined);
             expect(await client.call(Method.AgentsList, {})).toEqual([]);
             client.moveOffice({ name: 'Visitor', x: 1, z: 2, yaw: 0, floor: 0, active: true });
             await expect
@@ -110,6 +122,7 @@ it.each([2, 3, 4] as const)(
             stop();
             await expect.poll(() => input.at(-1)?.op).toBe(OfficeGameOp.Leave);
             expect(client.connected).toBe(true);
+            expect(snapshots[0]?.construction?.[0]?.kind).toBe(version >= 5 ? 'window' : undefined);
             expect(await client.call(Method.AgentsList, {})).toEqual([]);
             const stopClosing = client.subscribeOffice(() => {});
             const state = vi

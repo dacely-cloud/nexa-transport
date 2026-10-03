@@ -1917,6 +1917,11 @@ export const schema: Schema = {
                     description: 'NCMP v2 employee model and tool settings.',
                     type: 'number',
                 },
+                officeConstruction: {
+                    const: true,
+                    description: 'NCMP v4 owner construction and NGOP v5 public floor plans.',
+                    type: 'boolean',
+                },
                 officeDeskAssignments: {
                     const: true,
                     description: 'Accepts NGOP v4 with saved visual desk assignments.',

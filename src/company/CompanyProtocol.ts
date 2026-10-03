@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { OfficeConstruction, type OfficePlacement } from '../office/OfficeProtocol';
+
 /** Operations on the private company channel multiplexed with NGOP and Chat. */
 export const CompanyOp = {
     Read: 1,
@@ -11,6 +13,7 @@ export const CompanyOp = {
     Assign: 6,
     Employee: 7,
     DepartmentSettings: 8,
+    Construction: 9,
     Snapshot: 128,
     Error: 129,
 } as const;
@@ -51,6 +54,7 @@ export interface CompanyProject {
 }
 /** Private authoritative company state. Never delivered to office visitors. */
 export interface CompanyState {
+    readonly construction?: readonly OfficePlacement[];
     readonly name: string;
     readonly revision: bigint;
     readonly employees: readonly CompanyEmployee[];
@@ -60,7 +64,7 @@ export interface CompanyState {
 /** Request identity and optimistic revision are supplied on every command. */
 export interface CompanyRequest {
     /** Reply using the original wire layout for older clients. */
-    readonly version?: 1 | 2;
+    readonly version?: 1 | 2 | 3;
     readonly id: string;
     readonly revision: bigint;
 }
@@ -117,9 +121,15 @@ export interface CompanyEditEmployee extends CompanyRequest {
     readonly instructions: string;
     readonly settings: CompanyEmployeeSettings;
 }
+/** Save a complete bounded floor plan without altering work or employee identity. */
+export interface CompanyConstruction extends CompanyRequest {
+    readonly op: typeof CompanyOp.Construction;
+    readonly construction: readonly OfficePlacement[];
+}
 /** Commands carry no owner field; the gateway supplies the authenticated principal. */
 export type CompanyCommand =
     | CompanyRead
+    | CompanyConstruction
     | CompanyConfigure
     | CompanyHire
     | CompanyCreateDepartment
@@ -129,14 +139,14 @@ export type CompanyCommand =
     | CompanyEditEmployee;
 /** Successful response, correlated with its command ID. */
 export interface CompanySnapshot {
-    readonly version?: 1 | 2;
+    readonly version?: 1 | 2 | 3;
     readonly op: typeof CompanyOp.Snapshot;
     readonly id: string;
     readonly state: CompanyState;
 }
 /** Rejected command; no private state is embedded in errors. */
 export interface CompanyError {
-    readonly version?: 1 | 2;
+    readonly version?: 1 | 2 | 3;
     readonly op: typeof CompanyOp.Error;
     readonly id: string;
     readonly message: string;
@@ -194,7 +204,7 @@ class Writer {
             write(value);
         }
     }
-    public finish(op: number, version: 1 | 2 | 3): Uint8Array<ArrayBuffer> {
+    public finish(op: number, version: 1 | 2 | 3 | 4): Uint8Array<ArrayBuffer> {
         const view: DataView = new DataView(this.#bytes.buffer);
         view.setUint32(0, 0x504d434e, true);
         view.setUint8(4, version);
@@ -248,7 +258,7 @@ class Reader {
     }
 }
 
-/** NCMP v3 adds shared department settings, retaining v1/v2 reply layouts. */
+/** NCMP v4 adds saved construction, retaining earlier reply layouts. */
 export class CompanyProtocol {
     /** Identify a frame without parsing an unrelated Chat or game packet. */
     public static isFrame(bytes: Uint8Array): boolean {
@@ -261,16 +271,19 @@ export class CompanyProtocol {
     /** Encode a command or its response. */
     public static encode(
         packet: CompanyPacket,
-        version: 1 | 2 | 3 = packet.version ?? 3,
+        version: 1 | 2 | 3 | 4 = packet.version ?? 4,
     ): Uint8Array<ArrayBuffer> {
         if (
-            (version !== 1 && version !== 2 && version !== 3) ||
+            (version !== 1 && version !== 2 && version !== 3 && version !== 4) ||
             (version === 1 && packet.op === CompanyOp.Employee)
         ) {
             throw new Error('Employee settings require NCMP v2');
         }
         if (version < 3 && packet.op === CompanyOp.DepartmentSettings) {
             throw new Error('Department settings require NCMP v3');
+        }
+        if (version < 4 && packet.op === CompanyOp.Construction) {
+            throw new Error('Office construction requires NCMP v4');
         }
         if (!/^[a-zA-Z0-9-]{1,64}$/.test(packet.id)) {
             throw new Error('Invalid company request ID');
@@ -312,11 +325,17 @@ export class CompanyProtocol {
                 w.text(project.managerId);
                 w.list(project.team, (id) => w.text(id));
             });
+            if (version >= 4) {
+                this.#writeConstruction(w, state.construction ?? []);
+            }
         } else if (packet.op === CompanyOp.Error) {
             w.text(packet.message);
         } else {
             w.big(packet.revision);
             switch (packet.op) {
+                case CompanyOp.Construction:
+                    this.#writeConstruction(w, packet.construction);
+                    break;
                 case CompanyOp.DepartmentSettings:
                     w.text(packet.departmentId);
                     w.text(packet.name);
@@ -366,7 +385,7 @@ export class CompanyProtocol {
             bytes.length < 8 ||
             bytes.length > 4 * 1024 * 1024 ||
             !this.isFrame(bytes) ||
-            (bytes[4] !== 1 && bytes[4] !== 2 && bytes[4] !== 3) ||
+            (bytes[4] !== 1 && bytes[4] !== 2 && bytes[4] !== 3 && bytes[4] !== 4) ||
             bytes[6] !== 0 ||
             bytes[7] !== 0
         ) {
@@ -404,12 +423,29 @@ export class CompanyProtocol {
                 managerId: r.text(),
                 team: r.list(() => r.text()),
             }));
-            packet = { op, id, state: { revision, name, employees, departments, projects } };
+            packet = {
+                op,
+                id,
+                state: {
+                    revision,
+                    name,
+                    employees,
+                    departments,
+                    projects,
+                    ...(version >= 4 ? { construction: this.#readConstruction(r) } : {}),
+                },
+            };
         } else if (op === CompanyOp.Error) {
             packet = { op, id, message: r.text() };
         } else {
             const revision: bigint = r.big();
             switch (op) {
+                case CompanyOp.Construction:
+                    if (version < 4) {
+                        throw new Error('Office construction requires NCMP v4');
+                    }
+                    packet = { op, id, revision, construction: this.#readConstruction(r) };
+                    break;
                 case CompanyOp.DepartmentSettings:
                     if (version < 3) {
                         throw new Error('Department settings require NCMP v3');
@@ -482,7 +518,30 @@ export class CompanyProtocol {
             }
         }
         r.finish();
-        return version === 3 ? packet : { ...packet, version };
+        return version === 4 ? packet : { ...packet, version };
+    }
+    static #writeConstruction(w: Writer, items: readonly OfficePlacement[]): void {
+        OfficeConstruction.validate(items);
+        w.list(items, (item) => {
+            w.uint(item.id);
+            w.text(item.kind);
+            w.uint(item.floor);
+            w.uint(item.x + 128);
+            w.uint(item.z + 128);
+            w.uint(item.rotation);
+        });
+    }
+    static #readConstruction(r: Reader): readonly OfficePlacement[] {
+        const items: readonly OfficePlacement[] = r.list(() => ({
+            id: r.uint(),
+            kind: r.text() as OfficePlacement['kind'],
+            floor: r.uint(),
+            x: r.uint() - 128,
+            z: r.uint() - 128,
+            rotation: r.uint(),
+        }));
+        OfficeConstruction.validate(items);
+        return items;
     }
     static #writeDepartment(w: Writer, settings: CompanyDepartmentSettings): void {
         w.text(settings.instructions);
