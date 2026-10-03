@@ -1856,6 +1856,11 @@ export const schema: Schema = {
                         'NXMD frames carry outbound file bytes; JSON results contain matching metadata.',
                     type: 'boolean',
                 },
+                companyProjectLive: {
+                    const: true,
+                    description: 'Ordered private project snapshots after an owner subscribes.',
+                    type: 'boolean',
+                },
                 companyProjects: {
                     const: true,
                     description:

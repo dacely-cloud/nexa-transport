@@ -549,6 +549,46 @@ export class NexaClient {
         return response;
     }
 
+    /** Receive an initial private snapshot and subsequent changes on this connection; release on dialog close. */
+    public subscribeProject(
+        projectId: string,
+        listener: (snapshot: CompanyProjectSnapshot) => void,
+        onError: (error: Error) => void,
+    ): () => void {
+        if (!this.connected || this.#hello?.features.companyProjectLive !== true) {
+            throw new Error('Live project updates are unavailable on this connection');
+        }
+        const id = crypto.randomUUID();
+        const send = (
+            op: typeof CompanyProjectOp.Subscribe | typeof CompanyProjectOp.Leave,
+        ): void => {
+            if (!this.connected) {
+                if (op === CompanyProjectOp.Leave) {
+                    return;
+                }
+                throw new Error('Project connection closed');
+            }
+            if (this.#socket.bufferedAmount > 256 * 1024) {
+                throw new Error('Project connection is busy');
+            }
+            this.#socket.send(CompanyProjectProtocol.encode({ op, id, projectId }));
+        };
+        return this.#projects.listen(
+            id,
+            projectId,
+            (snapshot) => this.#notify(() => listener(snapshot)),
+            (error) => this.#notify(() => onError(error)),
+            () => send(CompanyProjectOp.Subscribe),
+            () => {
+                try {
+                    send(CompanyProjectOp.Leave);
+                } catch {
+                    this.#fail(new Error('Could not release project subscription'));
+                }
+            },
+        );
+    }
+
     /** Download one captured-file chunk. Continue at offset + bytes.length until total is reached. */
     public async projectArtifact(
         projectId: string,

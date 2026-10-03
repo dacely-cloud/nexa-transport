@@ -27,6 +27,8 @@ Import `NexaClient` from `nexa-transport`, `Method` and protocol types from `nex
 
 `client.projectArtifact(projectId, attemptId, path, offset?)` reads a captured delivery referenced in the owner's project history. Each response contains at most 64 KiB, with `offset`, `total`, and a SHA-256 `digest`. Continue from `offset + bytes.length` until `total` is reached; verify the assembled file against the digest before using it. The server resolves the file from the authenticated account's recorded attempt, never from an arbitrary filesystem path. Treat downloaded HTML as untrusted content when building previews. Protocol types are available from `nexa-transport/projects`; work and command types are available from `nexa-transport/company-work`.
 
+`client.subscribeProject(projectId, onSnapshot, onError)` requires `companyProjectLive`. It delivers an initial private snapshot followed by changed work or spending over the same socket. Call the returned release function when closing the project view. A disconnect ends the subscription and calls `onError`; reconnect with backoff and subscribe again to receive current authoritative state. At most eight project subscriptions may be open on one connection. Closing a subscription does not cancel approved work.
+
 There is no `client.ask()` convenience method. Use `client.call(Method.AgentAsk, ...)`.
 
 ### ClientOptions
