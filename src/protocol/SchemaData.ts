@@ -1911,6 +1911,11 @@ export const schema: Schema = {
                     },
                     type: 'array',
                 },
+                officeAppearance: {
+                    const: true,
+                    description: 'Stable employee cosmetics in NGOP v7.',
+                    type: 'boolean',
+                },
                 officeCompany: {
                     const: true,
                     description:
