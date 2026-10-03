@@ -12,6 +12,7 @@ const config: UserConfig = {
                 company: 'src/company/CompanyProtocol.ts',
                 projects: 'src/company/CompanyProjectProtocol.ts',
                 showroom: 'src/company/CompanyShowroomProtocol.ts',
+                collaboration: 'src/company/CompanyCollaborationProtocol.ts',
                 'company-work': 'src/company/CompanyWork.ts',
                 errors: 'src/networking/TransportError.ts',
             },

@@ -1856,6 +1856,12 @@ export const schema: Schema = {
                         'NXMD frames carry outbound file bytes; JSON results contain matching metadata.',
                     type: 'boolean',
                 },
+                companyCollaboration: {
+                    const: true,
+                    description:
+                        'Explicit project-scoped account invitations and collaboration over NCLB v1.',
+                    type: 'boolean',
+                },
                 companyDepartmentSettings: {
                     const: true,
                     description: 'NCMP v3 shared department guidance and tool ceilings.',

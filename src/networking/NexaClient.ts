@@ -1,4 +1,12 @@
 import {
+    CompanyCollaborationProtocol,
+    CollaborationOp,
+    type CollaborationCall,
+    type CollaborationReply,
+    type CollaborationRequest,
+} from '../company/CompanyCollaborationProtocol.js';
+import { CollaborationRequests } from './CollaborationRequests.js';
+import {
     CompanyShowroomProtocol,
     type ShowroomRequest,
     type ShowroomCatalog,
@@ -102,8 +110,16 @@ export interface SessionSnapshot {
     readonly tasks: ResultOf<Method.TasksList>;
     readonly files: ResultOf<Method.SessionsFiles>;
 }
+/** One scoped public office stream on your personal connection. */
+export interface CollaborationOffice {
+    /** Release presence and stop receiving this office. Safe to call more than once. */
+    readonly close: () => void;
+    /** Send movement while subscribed; identity and display name remain server-owned. */
+    readonly move: (player: OfficePlayer) => void;
+}
 /** Authenticated Nexa gateway connection shared by browsers and Node.js. */
 export class NexaClient {
+    readonly #collaboration = new CollaborationRequests();
     readonly #showroom = new ShowroomRequests();
     readonly #company = new CompanyRequests();
     readonly #projects = new CompanyProjectRequests();
@@ -529,6 +545,158 @@ export class NexaClient {
             /** Turn consumers receive errors through their iterator and result. */
         } finally {
             this.#streamIds.delete(turn.streamId);
+        }
+    }
+    /** Manage explicit account invitations or read a scoped project on this same Chat connection. */
+    public collaboration(request: CollaborationCall): Promise<CollaborationReply> {
+        if (!this.connected || this.#hello?.features.companyCollaboration !== true) {
+            return Promise.reject(
+                new Error('Project collaboration is unavailable on this connection'),
+            );
+        }
+        return this.#collaboration.request(request, () => this.#sendCollaboration(request));
+    }
+
+    /** Read or change only the project named in an accepted invitation. No owner identity is supplied. */
+    public async collaborationProject(
+        grantId: string,
+        projectId: string,
+        command?: CompanyWorkCommand,
+    ): Promise<CompanyProjectSnapshot> {
+        const id = command?.id ?? crypto.randomUUID();
+        const response = await this.collaboration({
+            op: CollaborationOp.Project,
+            id,
+            grantId,
+            request: command
+                ? { op: CompanyProjectOp.Command, id, projectId, command }
+                : { op: CompanyProjectOp.Read, id, projectId },
+        });
+        if (
+            response.op !== CollaborationOp.ProjectResult ||
+            response.response.op !== CompanyProjectOp.Snapshot
+        ) {
+            throw new Error('Expected a collaboration project snapshot');
+        }
+        return response.response;
+    }
+
+    /** Download a captured file from an invited project; every chunk rechecks access. */
+    public async collaborationArtifact(
+        grantId: string,
+        projectId: string,
+        attemptId: string,
+        path: string,
+        offset = 0,
+    ): Promise<CompanyProjectFile> {
+        const id = crypto.randomUUID();
+        const response = await this.collaboration({
+            op: CollaborationOp.Project,
+            id,
+            grantId,
+            request: { op: CompanyProjectOp.Artifact, id, projectId, attemptId, path, offset },
+        });
+        if (
+            response.op !== CollaborationOp.ProjectResult ||
+            response.response.op !== CompanyProjectOp.File
+        ) {
+            throw new Error('Expected a collaboration file');
+        }
+        return response.response;
+    }
+
+    /** Receive ordered snapshots until this view closes, access ends, or the socket disconnects. */
+    public subscribeCollaborationProject(
+        grantId: string,
+        projectId: string,
+        listener: (snapshot: CompanyProjectSnapshot) => void,
+        onError: (error: Error) => void,
+    ): () => void {
+        const id = crypto.randomUUID();
+        return this.#collaboration.listen(
+            id,
+            grantId,
+            'project',
+            projectId,
+            (packet) => {
+                if (
+                    packet.op === CollaborationOp.ProjectResult &&
+                    packet.response.op === CompanyProjectOp.Snapshot
+                ) {
+                    this.#notify(() => listener(packet.response as CompanyProjectSnapshot));
+                }
+            },
+            (error) => this.#notify(() => onError(error)),
+            () =>
+                this.#sendCollaboration({
+                    op: CollaborationOp.Watch,
+                    id,
+                    grantId,
+                    channel: 'project',
+                }),
+            () => this.#leaveCollaboration(id),
+        );
+    }
+
+    /** Watch and walk in an invited owner's sanitized office without changing your Chat identity. */
+    public subscribeCollaborationOffice(
+        grantId: string,
+        listener: (packet: OfficeGamePacket) => void,
+        onError: (error: Error) => void,
+    ): CollaborationOffice {
+        const id = crypto.randomUUID();
+        const close = this.#collaboration.listen(
+            id,
+            grantId,
+            'office',
+            undefined,
+            (packet) => {
+                if (packet.op === CollaborationOp.Office) {
+                    this.#notify(() => listener(packet.frame));
+                }
+            },
+            (error) => this.#notify(() => onError(error)),
+            () =>
+                this.#sendCollaboration({
+                    op: CollaborationOp.Watch,
+                    id,
+                    grantId,
+                    channel: 'office',
+                }),
+            () => this.#leaveCollaboration(id),
+        );
+        return {
+            close,
+            move: (player) => {
+                if (
+                    !this.#collaboration.watching(id) ||
+                    !this.connected ||
+                    this.#socket.bufferedAmount > 256 * 1024
+                ) {
+                    return;
+                }
+                this.#sendCollaboration({ op: CollaborationOp.Move, id, grantId, player });
+            },
+        };
+    }
+    #sendCollaboration(request: CollaborationRequest): void {
+        if (
+            !this.connected ||
+            this.#hello?.features.companyCollaboration !== true ||
+            this.#socket.bufferedAmount > 256 * 1024
+        ) {
+            throw new Error('Collaboration connection is unavailable or busy');
+        }
+        this.#socket.send(CompanyCollaborationProtocol.encode(request));
+    }
+    #leaveCollaboration(id: string): void {
+        if (!this.connected) {
+            return;
+        }
+        try {
+            this.#sendCollaboration({ op: CollaborationOp.Leave, id });
+        } catch {
+            this.#fail(new Error('Could not release collaboration subscription'));
         }
     }
     /** Read explicitly published previews or submit an owner publication over the current socket. */
@@ -1104,6 +1272,15 @@ export class NexaClient {
             if (complete === null) {
                 return;
             }
+            if (CompanyCollaborationProtocol.isFrame(new Uint8Array(complete))) {
+                if (this.#hello.features.companyCollaboration !== true) {
+                    throw new Error('Unnegotiated collaboration frame');
+                }
+                this.#collaboration.receive(
+                    CompanyCollaborationProtocol.decode(new Uint8Array(complete)),
+                );
+                return;
+            }
             if (CompanyShowroomProtocol.isFrame(new Uint8Array(complete))) {
                 if (this.#hello.features.companyShowroom !== true) {
                     throw new Error('Unnegotiated showroom frame');
@@ -1310,6 +1487,7 @@ export class NexaClient {
         this.#closed = true;
         this.#failure = materializeError(error);
         this.#pending.close(error);
+        this.#collaboration.close(error);
         this.#showroom.close(error);
         this.#company.close(error);
         this.#projects.close(error);
