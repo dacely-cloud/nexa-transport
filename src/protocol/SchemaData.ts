@@ -1867,6 +1867,12 @@ export const schema: Schema = {
                         'Owner-only employee evidence over the existing binary project channel.',
                     type: 'boolean',
                 },
+                companyFollowups: {
+                    const: true,
+                    description:
+                        'NCMP v5 supports separately approved follow-ups from accepted deliveries.',
+                    type: 'boolean',
+                },
                 companyProjectAssignments: {
                     const: true,
                     description: 'NCPW v3 supports reassignment and immutable execution authors.',
