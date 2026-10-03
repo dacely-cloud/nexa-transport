@@ -1,5 +1,6 @@
 import {
     CompanyProtocol,
+    CompanyOp,
     type CompanyCommand,
     type CompanyState,
 } from '../company/CompanyProtocol.js';
@@ -525,7 +526,15 @@ export class NexaClient {
                 new Error('Company management is unavailable on this connection'),
             );
         }
-        const bytes: Uint8Array<ArrayBuffer> = CompanyProtocol.encode(command);
+        if (command.op === CompanyOp.Employee && this.#hello.features.officeCompanyVersion !== 2) {
+            return Promise.reject(
+                new Error('Employee settings are unavailable on this connection'),
+            );
+        }
+        const bytes: Uint8Array<ArrayBuffer> = CompanyProtocol.encode(
+            command,
+            this.#hello.features.officeCompanyVersion === 2 ? 2 : 1,
+        );
         return this.#company.request(command, () => {
             if (!this.connected || this.#socket.bufferedAmount > 256 * 1024) {
                 throw new Error('Company connection is busy or disconnected');

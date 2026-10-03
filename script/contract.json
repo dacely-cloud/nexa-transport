@@ -1841,6 +1841,11 @@
                     "description": "NCMP private company controls on the existing authenticated socket.",
                     "type": "boolean"
                 },
+                "officeCompanyVersion": {
+                    "const": 2,
+                    "description": "NCMP v2 employee model and tool settings.",
+                    "type": "number"
+                },
                 "officeGame": {
                     "const": true,
                     "description": "NGOP office state and player input share the authenticated gateway socket.",

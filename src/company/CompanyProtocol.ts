@@ -9,9 +9,16 @@ export const CompanyOp = {
     Department: 4,
     Draft: 5,
     Assign: 6,
+    Employee: 7,
     Snapshot: 128,
     Error: 129,
 } as const;
+/** Optional employee overrides; null tools inherits the deployment ceiling, while [] permits none. */
+export interface CompanyEmployeeSettings {
+    readonly provider: string;
+    readonly model: string;
+    readonly tools: readonly string[] | null;
+}
 /** Stable company employee, independent of execution attempts. */
 export interface CompanyEmployee {
     readonly id: string;
@@ -20,6 +27,7 @@ export interface CompanyEmployee {
     readonly instructions: string;
     readonly departmentId: string;
     readonly desk: number;
+    readonly settings?: CompanyEmployeeSettings;
 }
 /** Organizational area owned by this company. */
 export interface CompanyDepartment {
@@ -44,6 +52,8 @@ export interface CompanyState {
 }
 /** Request identity and optimistic revision are supplied on every command. */
 export interface CompanyRequest {
+    /** Reply using the original wire layout for older clients. */
+    readonly version?: 1;
     readonly id: string;
     readonly revision: bigint;
 }
@@ -84,6 +94,15 @@ export interface CompanyAssign extends CompanyRequest {
     readonly departmentId: string;
     readonly desk: number;
 }
+/** Update a persistent employee without changing their ID, assignments, or desk. */
+export interface CompanyEditEmployee extends CompanyRequest {
+    readonly op: typeof CompanyOp.Employee;
+    readonly employeeId: string;
+    readonly name: string;
+    readonly role: string;
+    readonly instructions: string;
+    readonly settings: CompanyEmployeeSettings;
+}
 /** Commands carry no owner field; the gateway supplies the authenticated principal. */
 export type CompanyCommand =
     | CompanyRead
@@ -91,15 +110,18 @@ export type CompanyCommand =
     | CompanyHire
     | CompanyCreateDepartment
     | CompanyDraft
-    | CompanyAssign;
+    | CompanyAssign
+    | CompanyEditEmployee;
 /** Successful response, correlated with its command ID. */
 export interface CompanySnapshot {
+    readonly version?: 1;
     readonly op: typeof CompanyOp.Snapshot;
     readonly id: string;
     readonly state: CompanyState;
 }
 /** Rejected command; no private state is embedded in errors. */
 export interface CompanyError {
+    readonly version?: 1;
     readonly op: typeof CompanyOp.Error;
     readonly id: string;
     readonly message: string;
@@ -157,10 +179,10 @@ class Writer {
             write(value);
         }
     }
-    public finish(op: number): Uint8Array<ArrayBuffer> {
+    public finish(op: number, version: 1 | 2): Uint8Array<ArrayBuffer> {
         const view: DataView = new DataView(this.#bytes.buffer);
         view.setUint32(0, 0x504d434e, true);
-        view.setUint8(4, 1);
+        view.setUint8(4, version);
         view.setUint8(5, op);
         return this.#bytes.slice(0, this.#offset);
     }
@@ -211,7 +233,7 @@ class Reader {
     }
 }
 
-/** NCMP v1 uses a fixed schema, bounded UTF-8 fields, and unsigned 64-bit revisions. */
+/** NCMP v2 adds persistent employee settings while retaining the v1 wire layout. */
 export class CompanyProtocol {
     /** Identify a frame without parsing an unrelated Chat or game packet. */
     public static isFrame(bytes: Uint8Array): boolean {
@@ -222,7 +244,16 @@ export class CompanyProtocol {
         );
     }
     /** Encode a command or its response. */
-    public static encode(packet: CompanyPacket): Uint8Array<ArrayBuffer> {
+    public static encode(
+        packet: CompanyPacket,
+        version: 1 | 2 = packet.version ?? 2,
+    ): Uint8Array<ArrayBuffer> {
+        if (
+            (version !== 1 && version !== 2) ||
+            (version === 1 && packet.op === CompanyOp.Employee)
+        ) {
+            throw new Error('Employee settings require NCMP v2');
+        }
         if (!/^[a-zA-Z0-9-]{1,64}$/.test(packet.id)) {
             throw new Error('Invalid company request ID');
         }
@@ -239,6 +270,12 @@ export class CompanyProtocol {
                 w.text(employee.instructions);
                 w.text(employee.departmentId);
                 w.uint(employee.desk);
+                if (version === 2) {
+                    this.#writeSettings(
+                        w,
+                        employee.settings ?? { provider: '', model: '', tools: null },
+                    );
+                }
             });
             w.list(state.departments, (department) => {
                 w.text(department.id);
@@ -256,6 +293,13 @@ export class CompanyProtocol {
         } else {
             w.big(packet.revision);
             switch (packet.op) {
+                case CompanyOp.Employee:
+                    w.text(packet.employeeId);
+                    w.text(packet.name);
+                    w.text(packet.role);
+                    w.text(packet.instructions);
+                    this.#writeSettings(w, packet.settings);
+                    break;
                 case CompanyOp.Read:
                     break;
                 case CompanyOp.Configure:
@@ -285,7 +329,7 @@ export class CompanyProtocol {
                 }
             }
         }
-        return w.finish(packet.op);
+        return w.finish(packet.op, version);
     }
     /** Decode at the trust boundary; no JSON, dynamic field names, or executable values. */
     public static decode(bytes: Uint8Array): CompanyPacket {
@@ -293,12 +337,13 @@ export class CompanyProtocol {
             bytes.length < 8 ||
             bytes.length > 4 * 1024 * 1024 ||
             !this.isFrame(bytes) ||
-            bytes[4] !== 1 ||
+            (bytes[4] !== 1 && bytes[4] !== 2) ||
             bytes[6] !== 0 ||
             bytes[7] !== 0
         ) {
             throw new Error('Invalid company frame');
         }
+        const version = bytes[4];
         const r: Reader = new Reader(bytes);
         const id: string = r.text();
         if (!/^[a-zA-Z0-9-]{1,64}$/.test(id)) {
@@ -316,6 +361,7 @@ export class CompanyProtocol {
                 instructions: r.text(),
                 departmentId: r.text(),
                 desk: r.uint(),
+                ...(version === 2 ? { settings: this.#readSettings(r) } : {}),
             }));
             const departments: readonly CompanyDepartment[] = r.list(() => ({
                 id: r.text(),
@@ -334,6 +380,21 @@ export class CompanyProtocol {
         } else {
             const revision: bigint = r.big();
             switch (op) {
+                case CompanyOp.Employee:
+                    if (version !== 2) {
+                        throw new Error('Employee settings require NCMP v2');
+                    }
+                    packet = {
+                        op,
+                        id,
+                        revision,
+                        employeeId: r.text(),
+                        name: r.text(),
+                        role: r.text(),
+                        instructions: r.text(),
+                        settings: this.#readSettings(r),
+                    };
+                    break;
                 case CompanyOp.Read:
                     packet = { op, id, revision };
                     break;
@@ -378,6 +439,23 @@ export class CompanyProtocol {
             }
         }
         r.finish();
-        return packet;
+        return version === 1 ? { ...packet, version: 1 } : packet;
+    }
+    static #writeSettings(w: Writer, settings: CompanyEmployeeSettings): void {
+        w.text(settings.provider);
+        w.text(settings.model);
+        w.uint(settings.tools === null ? 0 : 1);
+        if (settings.tools !== null) {
+            w.list(settings.tools, (tool) => w.text(tool));
+        }
+    }
+    static #readSettings(r: Reader): CompanyEmployeeSettings {
+        const provider = r.text(),
+            model = r.text(),
+            tools = r.uint();
+        if (tools > 1) {
+            throw new Error('Invalid employee tool mode');
+        }
+        return { provider, model, tools: tools === 0 ? null : r.list(() => r.text()) };
     }
 }
