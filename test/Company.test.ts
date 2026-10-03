@@ -49,7 +49,7 @@ it('round trips bounded department settings and rejects them on older versions',
     }
 });
 
-it.each([1, 2, 3, 4, 5] as const)(
+it.each([1, 2, 3, 4, 5, 6] as const)(
     'negotiates NCMP v%i and rejects unsupported department changes locally',
     async (version) => {
         const server = new WebSocketServer({ host: '127.0.0.1', port: 0 });
@@ -97,6 +97,7 @@ it.each([1, 2, 3, 4, 5] as const)(
                                     ...(version >= 3 ? { companyDepartmentSettings: true } : {}),
                                     ...(version >= 4 ? { officeConstruction: true } : {}),
                                     ...(version >= 5 ? { companyFollowups: true } : {}),
+                                    ...(version >= 6 ? { companyTeamAreas: true } : {}),
                                 },
                             },
                         }),
@@ -160,7 +161,17 @@ it.each([1, 2, 3, 4, 5] as const)(
                 expect(() => CompanyProtocol.encode(followup, version)).toThrow('v5');
             } else {
                 await client.company(followup);
-                expect(versions).toEqual([5, 5, 5, 5]);
+                expect(versions).toEqual([version, version, version, version]);
+            }
+            const areas = {
+                ...construction,
+                teams: [{ departmentId: 'engineering', placementId: 0 }],
+            };
+            if (version < 6) {
+                await expect(client.company(areas)).rejects.toThrow('unavailable');
+            } else {
+                await client.company(areas);
+                expect(versions.at(-1)).toBe(6);
             }
         } finally {
             client.close();
@@ -212,5 +223,49 @@ it('round trips private accepted lineage without silently downgrading follow-up 
         expect(() => CompanyProtocol.encode(command, version)).toThrow('v5');
         const old = CompanyProtocol.decode(CompanyProtocol.encode(packet, version));
         expect(old.op === CompanyOp.Snapshot && old.state.projects[0]?.source).toBeUndefined();
+    }
+});
+
+it('round trips area zero and distinguishes preserved from cleared department assignments', () => {
+    for (const teams of [undefined, [], [{ departmentId: 'engineering', placementId: 0 }]]) {
+        const command = {
+            op: CompanyOp.Construction,
+            id: 'areas',
+            revision: 4n,
+            construction: [],
+            ...(teams === undefined ? {} : { teams }),
+        } as const;
+        expect(CompanyProtocol.decode(CompanyProtocol.encode(command))).toEqual(command);
+    }
+    const packet = {
+        op: CompanyOp.Snapshot,
+        id: 'areas',
+        state: {
+            name: 'Company',
+            revision: 1n,
+            employees: [],
+            projects: [],
+            construction: [],
+            departments: [
+                {
+                    id: 'engineering',
+                    name: 'Engineering',
+                    settings: { instructions: 'PRIVATE', tools: null },
+                    area: 0,
+                },
+            ],
+        },
+    } as const;
+    expect(CompanyProtocol.decode(CompanyProtocol.encode(packet))).toEqual(packet);
+    for (const placementId of [-1, 256, 0.5, NaN]) {
+        expect(() =>
+            CompanyProtocol.encode({
+                op: CompanyOp.Construction,
+                id: 'bad',
+                revision: 0n,
+                construction: [],
+                teams: [{ departmentId: 'engineering', placementId }],
+            }),
+        ).toThrow('area');
     }
 });

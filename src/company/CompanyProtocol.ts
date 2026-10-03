@@ -40,6 +40,8 @@ export interface CompanyDepartmentSettings {
 }
 /** Organizational area owned by this company. */
 export interface CompanyDepartment {
+    /** Saved team-area placement; private department identity is never sent to visitors. */
+    readonly area?: number;
     readonly id: string;
     readonly name: string;
     readonly settings?: CompanyDepartmentSettings;
@@ -70,7 +72,7 @@ export interface CompanyState {
 /** Request identity and optimistic revision are supplied on every command. */
 export interface CompanyRequest {
     /** Reply using the original wire layout for older clients. */
-    readonly version?: 1 | 2 | 3 | 4;
+    readonly version?: 1 | 2 | 3 | 4 | 5;
     readonly id: string;
     readonly revision: bigint;
 }
@@ -128,8 +130,15 @@ export interface CompanyEditEmployee extends CompanyRequest {
     readonly instructions: string;
     readonly settings: CompanyEmployeeSettings;
 }
+/** One department assigned to a saved team-area placement. */
+export interface CompanyTeamArea {
+    readonly departmentId: string;
+    readonly placementId: number;
+}
 /** Save a complete bounded floor plan without altering work or employee identity. */
 export interface CompanyConstruction extends CompanyRequest {
+    /** Omitted preserves valid assignments; an empty list clears every assignment. */
+    readonly teams?: readonly CompanyTeamArea[];
     readonly op: typeof CompanyOp.Construction;
     readonly construction: readonly OfficePlacement[];
 }
@@ -146,14 +155,14 @@ export type CompanyCommand =
     | CompanyEditEmployee;
 /** Successful response, correlated with its command ID. */
 export interface CompanySnapshot {
-    readonly version?: 1 | 2 | 3 | 4;
+    readonly version?: 1 | 2 | 3 | 4 | 5;
     readonly op: typeof CompanyOp.Snapshot;
     readonly id: string;
     readonly state: CompanyState;
 }
 /** Rejected command; no private state is embedded in errors. */
 export interface CompanyError {
-    readonly version?: 1 | 2 | 3 | 4;
+    readonly version?: 1 | 2 | 3 | 4 | 5;
     readonly op: typeof CompanyOp.Error;
     readonly id: string;
     readonly message: string;
@@ -211,7 +220,7 @@ class Writer {
             write(value);
         }
     }
-    public finish(op: number, version: 1 | 2 | 3 | 4 | 5): Uint8Array<ArrayBuffer> {
+    public finish(op: number, version: 1 | 2 | 3 | 4 | 5 | 6): Uint8Array<ArrayBuffer> {
         const view: DataView = new DataView(this.#bytes.buffer);
         view.setUint32(0, 0x504d434e, true);
         view.setUint8(4, version);
@@ -265,7 +274,7 @@ class Reader {
     }
 }
 
-/** NCMP v5 adds accepted delivery lineage, retaining earlier reply layouts. */
+/** NCMP v6 adds saved department areas, retaining earlier reply layouts. */
 export class CompanyProtocol {
     /** Identify a frame without parsing an unrelated Chat or game packet. */
     public static isFrame(bytes: Uint8Array): boolean {
@@ -278,10 +287,15 @@ export class CompanyProtocol {
     /** Encode a command or its response. */
     public static encode(
         packet: CompanyPacket,
-        version: 1 | 2 | 3 | 4 | 5 = packet.version ?? 5,
+        version: 1 | 2 | 3 | 4 | 5 | 6 = packet.version ?? 6,
     ): Uint8Array<ArrayBuffer> {
         if (
-            (version !== 1 && version !== 2 && version !== 3 && version !== 4 && version !== 5) ||
+            (version !== 1 &&
+                version !== 2 &&
+                version !== 3 &&
+                version !== 4 &&
+                version !== 5 &&
+                version !== 6) ||
             (version === 1 && packet.op === CompanyOp.Employee)
         ) {
             throw new Error('Employee settings require NCMP v2');
@@ -294,6 +308,9 @@ export class CompanyProtocol {
         }
         if (version < 5 && packet.op === CompanyOp.Draft && packet.sourceProjectId) {
             throw new Error('Follow-up projects require NCMP v5');
+        }
+        if (version < 6 && packet.op === CompanyOp.Construction && packet.teams !== undefined) {
+            throw new Error('Department areas require NCMP v6');
         }
         if (!/^[a-zA-Z0-9-]{1,64}$/.test(packet.id)) {
             throw new Error('Invalid company request ID');
@@ -327,6 +344,9 @@ export class CompanyProtocol {
                         department.settings ?? { instructions: '', tools: null },
                     );
                 }
+                if (version >= 6) {
+                    this.#writeArea(w, department.area);
+                }
             });
             w.list(state.projects, (project) => {
                 w.text(project.id);
@@ -336,7 +356,9 @@ export class CompanyProtocol {
                 w.list(project.team, (id) => w.text(id));
                 if (version >= 5) {
                     w.text(project.source?.projectId ?? '');
-                    if (project.source) {w.big(project.source.revision);}
+                    if (project.source) {
+                        w.big(project.source.revision);
+                    }
                 }
             });
             if (version >= 4) {
@@ -349,6 +371,9 @@ export class CompanyProtocol {
             switch (packet.op) {
                 case CompanyOp.Construction:
                     this.#writeConstruction(w, packet.construction);
+                    if (version >= 6) {
+                        this.#writeTeams(w, packet.teams);
+                    }
                     break;
                 case CompanyOp.DepartmentSettings:
                     w.text(packet.departmentId);
@@ -379,7 +404,9 @@ export class CompanyProtocol {
                     w.text(packet.brief);
                     w.text(packet.managerId);
                     w.list(packet.team, (id) => w.text(id));
-                    if (version >= 5) {w.text(packet.sourceProjectId ?? '');}
+                    if (version >= 5) {
+                        w.text(packet.sourceProjectId ?? '');
+                    }
                     break;
                 case CompanyOp.Assign:
                     w.text(packet.employeeId);
@@ -404,7 +431,8 @@ export class CompanyProtocol {
                 bytes[4] !== 2 &&
                 bytes[4] !== 3 &&
                 bytes[4] !== 4 &&
-                bytes[4] !== 5) ||
+                bytes[4] !== 5 &&
+                bytes[4] !== 6) ||
             bytes[6] !== 0 ||
             bytes[7] !== 0
         ) {
@@ -434,6 +462,7 @@ export class CompanyProtocol {
                 id: r.text(),
                 name: r.text(),
                 ...(version >= 3 ? { settings: this.#readDepartment(r) } : {}),
+                ...(version >= 6 ? this.#readArea(r) : {}),
             }));
             const projects: readonly CompanyProject[] = r.list(() => ({
                 id: r.text(),
@@ -464,7 +493,13 @@ export class CompanyProtocol {
                     if (version < 4) {
                         throw new Error('Office construction requires NCMP v4');
                     }
-                    packet = { op, id, revision, construction: this.#readConstruction(r) };
+                    packet = {
+                        op,
+                        id,
+                        revision,
+                        construction: this.#readConstruction(r),
+                        ...(version >= 6 ? this.#readTeams(r) : {}),
+                    };
                     break;
                 case CompanyOp.DepartmentSettings:
                     if (version < 3) {
@@ -539,7 +574,54 @@ export class CompanyProtocol {
             }
         }
         r.finish();
-        return version === 5 ? packet : { ...packet, version };
+        return version === 6 ? packet : { ...packet, version };
+    }
+    static #writeArea(w: Writer, area: number | undefined): void {
+        if (area !== undefined && (!Number.isInteger(area) || area < 0 || area > 255)) {
+            throw new Error('Invalid department area');
+        }
+        w.uint(area === undefined ? 0 : area + 1);
+    }
+    static #readArea(r: Reader): Pick<CompanyDepartment, 'area'> {
+        const area = r.uint();
+        if (area > 256) {
+            throw new Error('Invalid department area');
+        }
+        return area ? { area: area - 1 } : {};
+    }
+    static #writeTeams(w: Writer, teams: readonly CompanyTeamArea[] | undefined): void {
+        w.uint(teams === undefined ? 0 : 1);
+        if (teams === undefined) {
+            return;
+        }
+        if (teams.length > 16) {
+            throw new Error('Too many department areas');
+        }
+        w.list(teams, (team) => {
+            w.text(team.departmentId);
+            this.#writeArea(w, team.placementId);
+        });
+    }
+    static #readTeams(r: Reader): Pick<CompanyConstruction, 'teams'> {
+        const present = r.uint();
+        if (present === 0) {
+            return {};
+        }
+        if (present !== 1) {
+            throw new Error('Invalid department areas');
+        }
+        const teams = r.list(() => {
+            const departmentId = r.text();
+            const { area } = this.#readArea(r);
+            if (area === undefined) {
+                throw new Error('Missing department area');
+            }
+            return { departmentId, placementId: area };
+        });
+        if (teams.length > 16) {
+            throw new Error('Too many department areas');
+        }
+        return { teams };
     }
     static #readSourceId(r: Reader): Pick<CompanyDraft, 'sourceProjectId'> {
         const sourceProjectId = r.text();
