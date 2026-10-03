@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { BinaryReader, BinaryWriter } from './CompanyBinary.js';
-import { CompanyWorkCodec, type CompanyWork, type CompanyWorkCommand } from './CompanyWork.js';
+import { BinaryReader, BinaryWriter } from './CompanyBinary';
+import { CompanyWorkCodec, type CompanyWork, type CompanyWorkCommand } from './CompanyWork';
 
 /** Private project messages multiplexed over the authenticated Chat socket. */
 export const CompanyProjectOp = {
@@ -13,10 +13,13 @@ export const CompanyProjectOp = {
     Leave: 5,
     Allowance: 6,
     Employee: 7,
+    Ledger: 8,
+    Recover: 9,
     Snapshot: 128,
     File: 129,
     Error: 130,
     History: 131,
+    Spending: 132,
 } as const;
 /** Real usage and commitments, independently versioned from project work. */
 export interface CompanyProjectBudget {
@@ -40,11 +43,59 @@ export interface CompanyAllowanceCommand {
 }
 /** Retain the requested wire version for replies to older clients. */
 export interface CompanyProjectWire {
-    readonly version?: 1 | 2;
+    readonly version?: 1 | 2 | 3;
+}
+/** An owner records why an interrupted, financially settled assignment may be retried. */
+export interface CompanyRecoveryCommand {
+    readonly id: string;
+    readonly attemptId: string;
+    readonly revision: bigint;
+    readonly evidence: string;
+}
+/** Provider-request spending; unknown amounts remain reserved and cannot be edited by a browser. */
+export interface CompanySpendingRow {
+    readonly sequence: bigint;
+    readonly id: string;
+    readonly attemptId: string;
+    readonly maximum: bigint;
+    readonly amount: bigint | null;
+    readonly state: 'reserved' | 'dispatched' | 'settled' | 'cancelled';
+    readonly provider: string;
+    readonly model: string;
+    readonly receipt: string;
+}
+/** A bounded account-owned attempt and any recorded recovery decision. */
+export interface CompanyRecoveryRow {
+    readonly attemptId: string;
+    readonly employeeId: string;
+    readonly title: string;
+    readonly status: 'running' | 'succeeded' | 'failed' | 'interrupted';
+    readonly pending: boolean;
+    readonly evidence: string;
+    readonly at: bigint;
+}
+/** Cursor-based private spending history, independent of public office packets. */
+export interface CompanySpending extends CompanyProjectWire {
+    readonly op: typeof CompanyProjectOp.Spending;
+    readonly id: string;
+    readonly projectId: string;
+    readonly next: bigint;
+    readonly charges: readonly CompanySpendingRow[];
+    readonly attempts: readonly CompanyRecoveryRow[];
 }
 /** Requests never contain an owner; the gateway supplies the verified account. */
 export type CompanyProjectRequest = CompanyProjectWire &
     (
+        | {
+              readonly op: typeof CompanyProjectOp.Ledger;
+              readonly id: string;
+              readonly projectId: string;
+              readonly before: bigint;
+          }
+        | ({
+              readonly op: typeof CompanyProjectOp.Recover;
+              readonly projectId: string;
+          } & CompanyRecoveryCommand)
         | {
               readonly op: typeof CompanyProjectOp.Employee;
               readonly id: string;
@@ -139,6 +190,7 @@ export type CompanyProjectResponse = CompanyProjectWire &
         | CompanyProjectSnapshot
         | CompanyProjectFile
         | CompanyEmployeeHistory
+        | CompanySpending
         | {
               readonly op: typeof CompanyProjectOp.Error;
               readonly id: string;
@@ -148,7 +200,7 @@ export type CompanyProjectResponse = CompanyProjectWire &
 /** Both directions of the bounded project protocol. */
 export type CompanyProjectPacket = CompanyProjectRequest | CompanyProjectResponse;
 
-/** NCPW v3 preserves execution authors and adds reassignment; older clients retain their wire layout. */
+/** NCPW v4 adds private spending history and recorded recovery decisions. */
 export class CompanyProjectProtocol {
     /** One response carries at most 64 KiB of artifact bytes. */
     public static readonly chunkBytes = 65536;
@@ -163,9 +215,9 @@ export class CompanyProjectProtocol {
     /** Encode one request or result. */
     public static encode(
         packet: CompanyProjectPacket,
-        version: 1 | 2 | 3 = packet.version ?? 3,
+        version: 1 | 2 | 3 | 4 = packet.version ?? 4,
     ): Uint8Array<ArrayBuffer> {
-        if (version !== 1 && version !== 2 && version !== 3) {
+        if (version !== 1 && version !== 2 && version !== 3 && version !== 4) {
             throw new Error('Unsupported project packet');
         }
         if (
@@ -188,11 +240,19 @@ export class CompanyProjectProtocol {
         ) {
             throw new Error('Employee history requires NCPW v3');
         }
+        if (
+            version < 4 &&
+            [CompanyProjectOp.Ledger, CompanyProjectOp.Recover, CompanyProjectOp.Spending].some(
+                (op) => op === packet.op,
+            )
+        ) {
+            throw new Error('Project recovery requires NCPW v4');
+        }
         this.#id(packet.id);
         const w = new BinaryWriter(1024);
         w.u32(0x5750434e).u8(version).u8(packet.op).u8(0).u8(0).str(packet.id);
         if (packet.op === CompanyProjectOp.Snapshot) {
-            const work = CompanyWorkCodec.encode(packet.work, version === 3 ? 2 : 1);
+            const work = CompanyWorkCodec.encode(packet.work, version >= 3 ? 2 : 1);
             w.u32(work.length)
                 .bytes(work)
                 .u8(packet.budget === null ? 0 : 1);
@@ -207,6 +267,32 @@ export class CompanyProjectProtocol {
                 const schedule = packet.schedule ?? { paused: false, priority: 1 };
                 this.#schedule(schedule);
                 w.u8(schedule.paused ? 1 : 0).u8(schedule.priority);
+            }
+        } else if (packet.op === CompanyProjectOp.Spending) {
+            if (packet.charges.length > 50 || packet.attempts.length > 128) {
+                throw new Error('Spending history exceeds limits');
+            }
+            w.str(packet.projectId).u64(packet.next).u8(packet.charges.length);
+            for (const row of packet.charges) {
+                w.u64(row.sequence)
+                    .str(row.id)
+                    .str(row.attemptId)
+                    .u64(row.maximum)
+                    .u8(row.amount === null ? 0 : 1);
+                if (row.amount !== null) {
+                    w.u64(row.amount);
+                }
+                w.str(row.state).str(row.provider).str(row.model).str(row.receipt);
+            }
+            w.u8(packet.attempts.length);
+            for (const row of packet.attempts) {
+                w.str(row.attemptId)
+                    .str(row.employeeId)
+                    .str(row.title)
+                    .str(row.status)
+                    .u8(row.pending ? 1 : 0)
+                    .str(row.evidence)
+                    .u64(row.at);
             }
         } else if (packet.op === CompanyProjectOp.Employee) {
             this.#employee(packet.employeeId);
@@ -251,7 +337,12 @@ export class CompanyProjectProtocol {
             w.str(packet.message);
         } else {
             w.str(packet.projectId);
-            if (packet.op === CompanyProjectOp.Allowance) {
+            if (packet.op === CompanyProjectOp.Ledger) {
+                w.u64(packet.before);
+            } else if (packet.op === CompanyProjectOp.Recover) {
+                this.#recovery(packet);
+                w.str(packet.attemptId).u64(packet.revision).str(packet.evidence);
+            } else if (packet.op === CompanyProjectOp.Allowance) {
                 w.u64(packet.revision).u64(packet.limit).u32(packet.concurrency);
             } else if (packet.op === CompanyProjectOp.Command) {
                 const command = packet.command;
@@ -298,7 +389,7 @@ export class CompanyProjectProtocol {
             throw new Error('Unsupported project packet');
         }
         const version = r.u8();
-        if (version !== 1 && version !== 2 && version !== 3) {
+        if (version !== 1 && version !== 2 && version !== 3 && version !== 4) {
             throw new Error('Unsupported project packet');
         }
         const op = r.u8();
@@ -333,7 +424,7 @@ export class CompanyProjectProtocol {
                 id,
                 work,
                 budget,
-                ...(version === 3 ? { assignments: true as const } : {}),
+                ...(version >= 3 ? { assignments: true as const } : {}),
             };
             if (version >= 2) {
                 const paused = r.u8(),
@@ -345,11 +436,81 @@ export class CompanyProjectProtocol {
                 this.#schedule(schedule);
                 packet = { ...packet, schedule };
             }
-        } else if (op === CompanyProjectOp.Employee && version === 3) {
+        } else if (op === CompanyProjectOp.Spending && version >= 4) {
+            const projectId = r.str(),
+                next = r.u64(),
+                count = r.u8();
+            if (count > 50) {
+                throw new Error('Spending history exceeds limits');
+            }
+            const charges: CompanySpendingRow[] = [];
+            for (let i = 0; i < count; i++) {
+                const sequence = r.u64(),
+                    chargeId = r.str(),
+                    attemptId = r.str(),
+                    maximum = r.u64(),
+                    hasAmount = r.u8();
+                if (hasAmount > 1) {
+                    throw new Error('Invalid spending amount flag');
+                }
+                const amount = hasAmount === 1 ? r.u64() : null,
+                    state = r.str();
+                if (
+                    state !== 'reserved' &&
+                    state !== 'dispatched' &&
+                    state !== 'settled' &&
+                    state !== 'cancelled'
+                ) {
+                    throw new Error('Invalid spending state');
+                }
+                charges.push({
+                    sequence,
+                    id: chargeId,
+                    attemptId,
+                    maximum,
+                    amount,
+                    state,
+                    provider: r.str(),
+                    model: r.str(),
+                    receipt: r.str(),
+                });
+            }
+            const attemptCount = r.u8();
+            if (attemptCount > 128) {
+                throw new Error('Recovery history exceeds limits');
+            }
+            const attempts: CompanyRecoveryRow[] = [];
+            for (let i = 0; i < attemptCount; i++) {
+                const attemptId = r.str(),
+                    employeeId = r.str(),
+                    title = r.str(),
+                    status = r.str(),
+                    pending = r.u8();
+                if (
+                    pending > 1 ||
+                    (status !== 'running' &&
+                        status !== 'succeeded' &&
+                        status !== 'failed' &&
+                        status !== 'interrupted')
+                ) {
+                    throw new Error('Invalid recovery state');
+                }
+                attempts.push({
+                    attemptId,
+                    employeeId,
+                    title,
+                    status,
+                    pending: pending === 1,
+                    evidence: r.str(),
+                    at: r.u64(),
+                });
+            }
+            packet = { op, id, projectId, next, charges, attempts };
+        } else if (op === CompanyProjectOp.Employee && version >= 3) {
             const employeeId = r.str();
             this.#employee(employeeId);
             packet = { op, id, employeeId };
-        } else if (op === CompanyProjectOp.History && version === 3) {
+        } else if (op === CompanyProjectOp.History && version >= 3) {
             const employeeId = r.str();
             this.#employee(employeeId);
             const asOf = r.u64(),
@@ -440,6 +601,18 @@ export class CompanyProjectProtocol {
                 op === CompanyProjectOp.Leave
             ) {
                 packet = { op, id, projectId };
+            } else if (op === CompanyProjectOp.Ledger && version >= 4) {
+                packet = { op, id, projectId, before: r.u64() };
+            } else if (op === CompanyProjectOp.Recover && version >= 4) {
+                packet = {
+                    op,
+                    id,
+                    projectId,
+                    attemptId: r.str(),
+                    revision: r.u64(),
+                    evidence: r.str(),
+                };
+                this.#recovery(packet);
             } else if (op === CompanyProjectOp.Allowance && version >= 2) {
                 packet = {
                     op,
@@ -453,7 +626,7 @@ export class CompanyProjectProtocol {
                 const kind = r.str();
                 const revision = r.u64();
                 let command: CompanyWorkCommand;
-                if (kind === 'assign' && version === 3) {
+                if (kind === 'assign' && version >= 3) {
                     command = { kind, id, revision, taskId: r.str(), employeeId: r.str() };
                 } else if (kind === 'schedule' && version >= 2) {
                     const paused = r.u8(),
@@ -530,7 +703,13 @@ export class CompanyProjectProtocol {
         if (r.remaining !== 0) {
             throw new Error('Trailing project packet data');
         }
-        return version < 3 ? { ...packet, version: version as 1 | 2 } : packet;
+        return version < 4 ? { ...packet, version: version as 1 | 2 | 3 } : packet;
+    }
+    static #recovery(command: CompanyRecoveryCommand): void {
+        this.#id(command.attemptId);
+        if (!command.evidence.trim() || command.evidence.length > 16000) {
+            throw new Error('Recovery requires evidence of the checked outcome');
+        }
     }
     static #employee(id: string): void {
         if (!id || id.length > 128) {

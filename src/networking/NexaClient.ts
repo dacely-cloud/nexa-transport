@@ -14,6 +14,8 @@ import {
     type CompanyProjectFile,
     type CompanyAllowanceCommand,
     type CompanyEmployeeHistory,
+    type CompanySpending,
+    type CompanyRecoveryCommand,
 } from '../company/CompanyProjectProtocol.js';
 import type { CompanyWorkCommand } from '../company/CompanyWork.js';
 import {
@@ -635,11 +637,13 @@ export class NexaClient {
             this.#socket.send(
                 CompanyProjectProtocol.encode(
                     { op, id, projectId },
-                    this.#hello?.features.companyProjectAssignments === true
-                        ? 3
-                        : this.#hello?.features.companyProjectControls === true
-                          ? 2
-                          : 1,
+                    this.#hello?.features.companyProjectRecovery === true
+                        ? 4
+                        : this.#hello?.features.companyProjectAssignments === true
+                          ? 3
+                          : this.#hello?.features.companyProjectControls === true
+                            ? 2
+                            : 1,
                 ),
             );
         };
@@ -696,20 +700,60 @@ export class NexaClient {
         return response;
     }
 
+    /** Read bounded private provider-request history, with a cursor for older entries. */
+    public async projectSpending(projectId: string, before = 0n): Promise<CompanySpending> {
+        if (this.#hello?.features.companyProjectRecovery !== true) {
+            throw new Error('Project spending history is unavailable');
+        }
+        const response = await this.#projectRequest({
+            op: CompanyProjectOp.Ledger,
+            id: crypto.randomUUID(),
+            projectId,
+            before,
+        });
+        if (response.op !== CompanyProjectOp.Spending) {
+            throw new Error('Expected project spending history');
+        }
+        return response;
+    }
+
+    /** Record checked interruption evidence; this never releases unknown spending or starts work. */
+    public async projectRecover(
+        projectId: string,
+        command: CompanyRecoveryCommand,
+    ): Promise<CompanySpending> {
+        if (this.#hello?.features.companyProjectRecovery !== true) {
+            throw new Error('Project recovery is unavailable');
+        }
+        const response = await this.#projectRequest({
+            ...command,
+            op: CompanyProjectOp.Recover,
+            projectId,
+        });
+        if (response.op !== CompanyProjectOp.Spending) {
+            throw new Error('Expected project recovery history');
+        }
+        return response;
+    }
+
     #projectRequest(
         request: CompanyProjectRequest,
-    ): Promise<CompanyProjectSnapshot | CompanyProjectFile | CompanyEmployeeHistory> {
+    ): Promise<
+        CompanyProjectSnapshot | CompanyProjectFile | CompanyEmployeeHistory | CompanySpending
+    > {
         if (!this.connected || this.#hello?.features.companyProjects !== true) {
             return Promise.reject(new Error('Project execution is unavailable on this connection'));
         }
         const bytes = CompanyProjectProtocol.encode(
             request,
-            this.#hello.features.companyProjectAssignments === true ||
-                this.#hello.features.companyEmployeeHistory === true
-                ? 3
-                : this.#hello.features.companyProjectControls === true
-                  ? 2
-                  : 1,
+            this.#hello.features.companyProjectRecovery === true
+                ? 4
+                : this.#hello.features.companyProjectAssignments === true ||
+                    this.#hello.features.companyEmployeeHistory === true
+                  ? 3
+                  : this.#hello.features.companyProjectControls === true
+                    ? 2
+                    : 1,
         );
         return this.#projects.request(request, () => {
             if (!this.connected || this.#socket.bufferedAmount > 256 * 1024) {

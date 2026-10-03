@@ -92,6 +92,7 @@ it('does not accept a file response belonging to another project or offset', asy
             | CompanyProjectFile
             | import('../src/company/CompanyProjectProtocol.js').CompanyProjectSnapshot
             | import('../src/company/CompanyProjectProtocol.js').CompanyEmployeeHistory
+            | import('../src/company/CompanyProjectProtocol.js').CompanySpending
         > = requests.request({ ...packet, op: CompanyProjectOp.Artifact }, (): void => {});
         requests.receive({ ...packet, ...changes });
         await expect(pending).rejects.toThrow('Mismatched');
@@ -218,4 +219,75 @@ it('keeps exact employee totals, bounds history, and correlates employee respons
     );
     requests.receive(packet);
     expect(await own).toEqual(packet);
+});
+
+it('bounds private spending pages, preserves exact receipts and correlates recovery replies', async () => {
+    const ledger = {
+        op: CompanyProjectOp.Spending,
+        id: 'ledger',
+        projectId: 'alice-project',
+        next: 1n,
+        charges: [
+            {
+                sequence: 2n,
+                id: 'charge',
+                attemptId: 'attempt',
+                maximum: 9007199254740993n,
+                amount: null,
+                state: 'dispatched' as const,
+                provider: 'provider',
+                model: 'model',
+                receipt: 'provider-request',
+            },
+        ],
+        attempts: [
+            {
+                attemptId: 'attempt',
+                employeeId: 'ada',
+                title: '<img src=x onerror=alert(1)>',
+                status: 'interrupted' as const,
+                pending: true,
+                evidence: '',
+                at: 0n,
+            },
+        ],
+    };
+    expect(CompanyProjectProtocol.decode(CompanyProjectProtocol.encode(ledger))).toEqual(ledger);
+    for (const version of [1, 2, 3] as const) {
+        expect(() => CompanyProjectProtocol.encode(ledger, version)).toThrow('v4');
+    }
+    expect(() =>
+        CompanyProjectProtocol.encode({
+            ...ledger,
+            charges: Array.from({ length: 51 }).flatMap(() => ledger.charges),
+        }),
+    ).toThrow('limits');
+    const requests = new CompanyProjectRequests();
+    const request = {
+        op: CompanyProjectOp.Ledger,
+        id: 'ledger',
+        projectId: 'alice-project',
+        before: 0n,
+    };
+    const wrong = requests.request(request, () => {});
+    requests.receive({ ...ledger, projectId: 'bob-project' });
+    await expect(wrong).rejects.toThrow('Mismatched');
+    const right = requests.request(request, () => {});
+    requests.receive(ledger);
+    expect(await right).toEqual(ledger);
+    const recovery = {
+        op: CompanyProjectOp.Recover,
+        id: 'ledger',
+        projectId: 'alice-project',
+        attemptId: 'attempt',
+        revision: 4n,
+        evidence: 'Checked workspace and provider records.',
+    };
+    expect(CompanyProjectProtocol.decode(CompanyProjectProtocol.encode(recovery))).toEqual(
+        recovery,
+    );
+    expect(() => CompanyProjectProtocol.encode({ ...recovery, evidence: ' ' })).toThrow('evidence');
+    const recovered = requests.request(recovery, () => {});
+    requests.receive(ledger);
+    expect(await recovered).toEqual(ledger);
 });

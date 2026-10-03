@@ -1214,6 +1214,8 @@ export interface GatewayFeaturesShape {
     readonly companyProjectControls?: true;
     /** companyProjectLive as defined by the Nexa gateway. */
     readonly companyProjectLive?: true;
+    /** companyProjectRecovery as defined by the Nexa gateway. */
+    readonly companyProjectRecovery?: true;
     /** companyProjects as defined by the Nexa gateway. */
     readonly companyProjects?: true;
     /** events as defined by the Nexa gateway. */
