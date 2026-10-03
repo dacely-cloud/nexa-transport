@@ -243,6 +243,7 @@ writeFileSync(
 for (const name of [
     'CompanyBinary',
     'CompanyWork',
+    'CompanyMaintenanceTypes',
     'CompanyProjectProtocol',
     'CompanyShowroomProtocol',
 ]) {

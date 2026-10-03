@@ -9,6 +9,32 @@ import {
     type CompanyProjectFile,
 } from '../src/company/CompanyProjectProtocol.js';
 
+it('keeps maintenance money exact, rejects malformed limits, and requires the negotiated v5 channel', () => {
+    const request = {
+        op: CompanyProjectOp.Maintenance,
+        id: 'repeat',
+        projectId: 'project',
+        revision: 2n,
+        sourceRevision: 9n,
+        intervalMs: 86400000n,
+        maxRuns: 3,
+        limit: 9007199254740993n,
+        concurrency: 2,
+        maxIterations: 16,
+        paused: false,
+    };
+    const bytes = CompanyProjectProtocol.encode(request);
+    expect(bytes[4]).toBe(5);
+    expect(CompanyProjectProtocol.decode(bytes)).toEqual(request);
+    for (const version of [1, 2, 3, 4] as const) {
+        expect(() => CompanyProjectProtocol.encode(request, version)).toThrow('v5');
+    }
+    bytes[bytes.length - 1] = 2;
+    expect(() => CompanyProjectProtocol.decode(bytes)).toThrow('pause flag');
+    expect(() => CompanyProjectProtocol.encode({ ...request, maxRuns: 33 })).toThrow('limits');
+    expect(() => CompanyProjectProtocol.encode({ ...request, intervalMs: 1n })).toThrow('limits');
+});
+
 it('round-trips management controls, retains exact money, and rejects unsupported or malformed controls', () => {
     const schedule = {
         op: CompanyProjectOp.Command,

@@ -2,7 +2,18 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { BinaryReader, BinaryWriter } from './CompanyBinary.js';
+import {
+    CompanyMaintenanceCodec,
+    type CompanyMaintenanceCommand,
+    type CompanyMaintenancePolicy,
+} from './CompanyMaintenanceTypes.js';
 import { CompanyWorkCodec, type CompanyWork, type CompanyWorkCommand } from './CompanyWork.js';
+export type {
+    CompanyMaintenanceCommand,
+    CompanyMaintenancePolicy,
+    CompanyMaintenanceRun,
+    CompanyMaintenanceSettings,
+} from './CompanyMaintenanceTypes.js';
 
 /** Private project messages multiplexed over the authenticated Chat socket. */
 export const CompanyProjectOp = {
@@ -15,6 +26,7 @@ export const CompanyProjectOp = {
     Employee: 7,
     Ledger: 8,
     Recover: 9,
+    Maintenance: 10,
     Snapshot: 128,
     File: 129,
     Error: 130,
@@ -43,7 +55,7 @@ export interface CompanyAllowanceCommand {
 }
 /** Retain the requested wire version for replies to older clients. */
 export interface CompanyProjectWire {
-    readonly version?: 1 | 2 | 3;
+    readonly version?: 1 | 2 | 3 | 4;
 }
 /** An owner records why an interrupted, financially settled assignment may be retried. */
 export interface CompanyRecoveryCommand {
@@ -86,6 +98,10 @@ export interface CompanySpending extends CompanyProjectWire {
 /** Requests never contain an owner; the gateway supplies the verified account. */
 export type CompanyProjectRequest = CompanyProjectWire &
     (
+        | ({
+              readonly op: typeof CompanyProjectOp.Maintenance;
+              readonly projectId: string;
+          } & CompanyMaintenanceCommand)
         | {
               readonly op: typeof CompanyProjectOp.Ledger;
               readonly id: string;
@@ -137,6 +153,8 @@ export interface CompanyProjectSnapshot extends CompanyProjectWire {
     readonly schedule?: CompanyProjectSchedule;
     /** This host supports reassignment and immutable execution authors. */
     readonly assignments?: true;
+    /** Present on hosts that support owner-authorized recurring maintenance. */
+    readonly maintenance?: CompanyMaintenancePolicy | null;
 }
 /** A bounded slice of a host-resolved captured delivery, never an arbitrary filesystem read. */
 export interface CompanyProjectFile extends CompanyProjectWire {
@@ -200,7 +218,7 @@ export type CompanyProjectResponse = CompanyProjectWire &
 /** Both directions of the bounded project protocol. */
 export type CompanyProjectPacket = CompanyProjectRequest | CompanyProjectResponse;
 
-/** NCPW v4 adds private spending history and recorded recovery decisions. */
+/** NCPW v5 adds private owner-authorized recurring maintenance. */
 export class CompanyProjectProtocol {
     /** One response carries at most 64 KiB of artifact bytes. */
     public static readonly chunkBytes = 65536;
@@ -215,9 +233,9 @@ export class CompanyProjectProtocol {
     /** Encode one request or result. */
     public static encode(
         packet: CompanyProjectPacket,
-        version: 1 | 2 | 3 | 4 = packet.version ?? 4,
+        version: 1 | 2 | 3 | 4 | 5 = packet.version ?? 5,
     ): Uint8Array<ArrayBuffer> {
-        if (version !== 1 && version !== 2 && version !== 3 && version !== 4) {
+        if (version !== 1 && version !== 2 && version !== 3 && version !== 4 && version !== 5) {
             throw new Error('Unsupported project packet');
         }
         if (
@@ -249,6 +267,9 @@ export class CompanyProjectProtocol {
             throw new Error('Project recovery requires NCPW v4');
         }
         this.#id(packet.id);
+        if (packet.op === CompanyProjectOp.Maintenance && version < 5) {
+            throw new Error('Recurring maintenance requires NCPW v5');
+        }
         const w = new BinaryWriter(1024);
         w.u32(0x5750434e).u8(version).u8(packet.op).u8(0).u8(0).str(packet.id);
         if (packet.op === CompanyProjectOp.Snapshot) {
@@ -267,6 +288,12 @@ export class CompanyProjectProtocol {
                 const schedule = packet.schedule ?? { paused: false, priority: 1 };
                 this.#schedule(schedule);
                 w.u8(schedule.paused ? 1 : 0).u8(schedule.priority);
+            }
+            if (version >= 5) {
+                const maintenance = packet.maintenance
+                    ? CompanyMaintenanceCodec.encode(packet.maintenance)
+                    : new Uint8Array();
+                w.u32(maintenance.length).bytes(maintenance);
             }
         } else if (packet.op === CompanyProjectOp.Spending) {
             if (packet.charges.length > 50 || packet.attempts.length > 128) {
@@ -337,7 +364,10 @@ export class CompanyProjectProtocol {
             w.str(packet.message);
         } else {
             w.str(packet.projectId);
-            if (packet.op === CompanyProjectOp.Ledger) {
+            if (packet.op === CompanyProjectOp.Maintenance) {
+                w.u64(packet.revision);
+                CompanyMaintenanceCodec.settings(w, packet);
+            } else if (packet.op === CompanyProjectOp.Ledger) {
                 w.u64(packet.before);
             } else if (packet.op === CompanyProjectOp.Recover) {
                 this.#recovery(packet);
@@ -389,7 +419,7 @@ export class CompanyProjectProtocol {
             throw new Error('Unsupported project packet');
         }
         const version = r.u8();
-        if (version !== 1 && version !== 2 && version !== 3 && version !== 4) {
+        if (version !== 1 && version !== 2 && version !== 3 && version !== 4 && version !== 5) {
             throw new Error('Unsupported project packet');
         }
         const op = r.u8();
@@ -435,6 +465,17 @@ export class CompanyProjectProtocol {
                 const schedule = { paused: paused === 1, priority };
                 this.#schedule(schedule);
                 packet = { ...packet, schedule };
+            }
+            if (version >= 5) {
+                const length = r.u32();
+                if (length > 32768) {
+                    throw new Error('Maintenance policy exceeds limits');
+                }
+                packet = {
+                    ...packet,
+                    maintenance:
+                        length === 0 ? null : CompanyMaintenanceCodec.decode(r.bytes(length)),
+                };
             }
         } else if (op === CompanyProjectOp.Spending && version >= 4) {
             const projectId = r.str(),
@@ -601,6 +642,14 @@ export class CompanyProjectProtocol {
                 op === CompanyProjectOp.Leave
             ) {
                 packet = { op, id, projectId };
+            } else if (op === CompanyProjectOp.Maintenance && version >= 5) {
+                packet = {
+                    op,
+                    id,
+                    projectId,
+                    revision: r.u64(),
+                    ...CompanyMaintenanceCodec.readSettings(r),
+                };
             } else if (op === CompanyProjectOp.Ledger && version >= 4) {
                 packet = { op, id, projectId, before: r.u64() };
             } else if (op === CompanyProjectOp.Recover && version >= 4) {
@@ -703,7 +752,7 @@ export class CompanyProjectProtocol {
         if (r.remaining !== 0) {
             throw new Error('Trailing project packet data');
         }
-        return version < 4 ? { ...packet, version: version as 1 | 2 | 3 } : packet;
+        return version === 5 ? packet : { ...packet, version };
     }
     static #recovery(command: CompanyRecoveryCommand): void {
         this.#id(command.attemptId);

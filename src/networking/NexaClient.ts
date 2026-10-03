@@ -20,6 +20,7 @@ import {
     type CompanyProjectSnapshot,
     type CompanyProjectFile,
     type CompanyAllowanceCommand,
+    type CompanyMaintenanceCommand,
     type CompanyEmployeeHistory,
     type CompanySpending,
     type CompanyRecoveryCommand,
@@ -669,6 +670,25 @@ export class NexaClient {
         return response;
     }
 
+    /** Authorize repeating an accepted task plan within explicit recurring limits. */
+    public async projectMaintenance(
+        projectId: string,
+        command: CompanyMaintenanceCommand,
+    ): Promise<CompanyProjectSnapshot> {
+        if (this.#hello?.features.companyMaintenance !== true) {
+            throw new Error('Recurring maintenance is unavailable on this connection');
+        }
+        const response = await this.#projectRequest({
+            ...command,
+            op: CompanyProjectOp.Maintenance,
+            projectId,
+        });
+        if (response.op !== CompanyProjectOp.Snapshot) {
+            throw new Error('Expected project snapshot');
+        }
+        return response;
+    }
+
     /** Receive an initial private snapshot and subsequent changes on this connection; release on dialog close. */
     public subscribeProject(
         projectId: string,
@@ -694,13 +714,15 @@ export class NexaClient {
             this.#socket.send(
                 CompanyProjectProtocol.encode(
                     { op, id, projectId },
-                    this.#hello?.features.companyProjectRecovery === true
-                        ? 4
-                        : this.#hello?.features.companyProjectAssignments === true
-                          ? 3
-                          : this.#hello?.features.companyProjectControls === true
-                            ? 2
-                            : 1,
+                    this.#hello?.features.companyMaintenance === true
+                        ? 5
+                        : this.#hello?.features.companyProjectRecovery === true
+                          ? 4
+                          : this.#hello?.features.companyProjectAssignments === true
+                            ? 3
+                            : this.#hello?.features.companyProjectControls === true
+                              ? 2
+                              : 1,
                 ),
             );
         };
@@ -803,14 +825,16 @@ export class NexaClient {
         }
         const bytes = CompanyProjectProtocol.encode(
             request,
-            this.#hello.features.companyProjectRecovery === true
-                ? 4
-                : this.#hello.features.companyProjectAssignments === true ||
-                    this.#hello.features.companyEmployeeHistory === true
-                  ? 3
-                  : this.#hello.features.companyProjectControls === true
-                    ? 2
-                    : 1,
+            this.#hello.features.companyMaintenance === true
+                ? 5
+                : this.#hello.features.companyProjectRecovery === true
+                  ? 4
+                  : this.#hello.features.companyProjectAssignments === true ||
+                      this.#hello.features.companyEmployeeHistory === true
+                    ? 3
+                    : this.#hello.features.companyProjectControls === true
+                      ? 2
+                      : 1,
         );
         return this.#projects.request(request, () => {
             if (!this.connected || this.#socket.bufferedAmount > 256 * 1024) {

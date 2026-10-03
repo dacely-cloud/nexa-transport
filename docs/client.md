@@ -159,6 +159,14 @@ With `companyProjectRecovery`, `projectSpending(projectId, before?)` reads up to
 
 When `hello.features.companyFollowups` is true, NCMP v5 accepts a `CompanyOp.Draft` with `sourceProjectId` referencing an owned, accepted delivery. The saved project's `source` records the accepted revision. Creation is idempotent and does not execute work; planning needs a new allowance and implementation needs a new approval. NEXA seeds a separate workspace from integrity-checked captured files, preserving the original delivery and spending ledger. Earlier protocol versions omit lineage and reject follow-up commands instead of treating them as ordinary drafts.
 
+### Recurring maintenance
+
+With `companyMaintenance`, `projectMaintenance(projectId, command)` configures NCPW v5 recurring work on the existing socket. The command contains a stable `id`, current policy `revision` (zero initially), accepted work `sourceRevision`, `intervalMs` (one hour to 90 days), `maxRuns` (1–32 total cycles), per-cycle `limit` in microcents, `concurrency` (1–8), `maxIterations` (1–64), and `paused`. Retrying an uncertain command uses the same ID and values. Older hosts reject this operation locally.
+
+This explicitly authorizes repetition of the accepted task graph. Each cycle gets its own project, workspace, funding allowance, execution history, and independent review. The first uses the accepted source files; later cycles use the last accepted cycle. Unaccepted or blocked cycles prevent the next cycle. Pausing stops future reservations while an already reserved cycle can finish. Missed intervals never produce a catch-up batch. Updating limits affects only future reservations; separately raising a cycle’s allowance is another spending decision.
+
+Project snapshots include `maintenance` (null when unconfigured), with policy revision, next eligible time, preparation errors, and cycle project IDs, phases, and work revisions. Live subscriptions also report cycle transitions without changing the accepted source work. Read the company roster again before opening a newly created cycle. Visitors cannot configure or read private policies; they continue receiving sanitized office activity. Preparation errors require an explicit configuration retry; interrupted execution still uses normal spending reconciliation. Existing company project capacity applies.
+
 ### Reviewed procedures
 
 When `companyProcedures` is advertised, NCMP v7 adds `CompanyOp.Procedure` and the private `CompanyState.procedures` catalog. A procedure contains a title, instructions, an employee or department scope, and an owned accepted source `{ projectId, revision }`. Submit `procedureId: ''` and `status: 'draft'` to create it. Drafts are inactive. To approve, send the saved fields unchanged with its generated `procedureId`, the latest company revision, a fresh command ID, and `status: 'approved'`. The server supplies `approvedAt`.

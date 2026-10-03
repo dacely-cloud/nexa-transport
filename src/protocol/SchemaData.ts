@@ -1873,6 +1873,12 @@ export const schema: Schema = {
                         'NCMP v5 supports separately approved follow-ups from accepted deliveries.',
                     type: 'boolean',
                 },
+                companyMaintenance: {
+                    const: true,
+                    description:
+                        'Owner-authorized repetition of an accepted task plan over NCPW v5.',
+                    type: 'boolean',
+                },
                 companyProcedures: {
                     const: true,
                     description: 'Private reviewed guidance tied to accepted company deliveries.',

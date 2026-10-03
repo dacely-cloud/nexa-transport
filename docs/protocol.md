@@ -789,14 +789,34 @@ Evidence returned to the model; raw player/session identifiers are not included.
 
 Methods, events, and additive capabilities supported by this gateway.
 
-| Field          | Required | Type                                               | Description                                                                    |
-| -------------- | -------- | -------------------------------------------------- | ------------------------------------------------------------------------------ |
-| `attachments`  | No       | `true`                                             | User media attachments are validated and forwarded to the agent.               |
-| `binaryMedia`  | No       | `true`                                             | NXMD frames carry outbound file bytes; JSON results contain matching metadata. |
-| `events`       | Yes      | Array of `string`                                  |                                                                                |
-| `methodScopes` | Yes      | [RecordstringScope](protocol.md#recordstringscope) | The scope each method requires.                                                |
-| `methods`      | Yes      | Array of `string`                                  |                                                                                |
-| `officeGame`   | No       | `true`                                             | NGOP office state and player input share the authenticated gateway socket.     |
+| Field                       | Required | Type                                               | Description                                                                            |
+| --------------------------- | -------- | -------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `attachments`               | No       | `true`                                             | User media attachments are validated and forwarded to the agent.                       |
+| `binaryMedia`               | No       | `true`                                             | NXMD frames carry outbound file bytes; JSON results contain matching metadata.         |
+| `companyDepartmentSettings` | No       | `true`                                             | NCMP v3 shared department guidance and tool ceilings.                                  |
+| `companyEmployeeHistory`    | No       | `true`                                             | Owner-only employee evidence over the existing binary project channel.                 |
+| `companyFollowups`          | No       | `true`                                             | NCMP v5 supports separately approved follow-ups from accepted deliveries.              |
+| `companyMaintenance`        | No       | `true`                                             | Owner-authorized repetition of an accepted task plan over NCPW v5.                     |
+| `companyProcedures`         | No       | `true`                                             | Private reviewed guidance tied to accepted company deliveries.                         |
+| `companyProjectAssignments` | No       | `true`                                             | NCPW v3 supports reassignment and immutable execution authors.                         |
+| `companyProjectControls`    | No       | `true`                                             | NCPW v2 supports durable pause/priority controls and live allowance changes.           |
+| `companyProjectLive`        | No       | `true`                                             | Ordered private project snapshots after an owner subscribes.                           |
+| `companyProjectRecovery`    | No       | `true`                                             | Private spending and reviewed interruption recovery in NCPW v4.                        |
+| `companyProjects`           | No       | `true`                                             | Owner-only project decisions, usage, and captured files on the existing binary socket. |
+| `companyShowroom`           | No       | `true`                                             | Explicit public previews; visitors receive only publication data.                      |
+| `companyTeamAreas`          | No       | `true`                                             | NCMP v6 binds departments to saved construction areas.                                 |
+| `events`                    | Yes      | Array of `string`                                  |                                                                                        |
+| `methodScopes`              | Yes      | [RecordstringScope](protocol.md#recordstringscope) | The scope each method requires.                                                        |
+| `methods`                   | Yes      | Array of `string`                                  |                                                                                        |
+| `officeAppearance`          | No       | `true`                                             | Stable employee cosmetics in NGOP v7.                                                  |
+| `officeCompany`             | No       | `true`                                             | NCMP private company controls on the existing authenticated socket.                    |
+| `officeCompanyVersion`      | No       | `2`                                                | NCMP v2 employee model and tool settings.                                              |
+| `officeConstruction`        | No       | `true`                                             | NCMP v4 owner construction and NGOP v5 public floor plans.                             |
+| `officeDeskAssignments`     | No       | `true`                                             | Accepts NGOP v4 with saved visual desk assignments.                                    |
+| `officeDeskPositions`       | No       | `true`                                             | Saved physical workstation positions in NGOP v8 and NCMP v8.                           |
+| `officeExecution`           | No       | `true`                                             | Scheduler workload summaries in NGOP v6.                                               |
+| `officeGame`                | No       | `true`                                             | NGOP office state and player input share the authenticated gateway socket.             |
+| `officeGameVersion`         | No       | `3`                                                | NGOP version supporting server-issued acceptance celebrations.                         |
 
 ## GatewayLimits
 
@@ -1659,7 +1679,13 @@ Variant 1: [TelemetryMonitorAction](protocol.md#telemetrymonitoraction)
 | `kind`        | Yes      | `"roblox-monitor"`                                                               |                                                                                 |
 | `rule`        | Yes      | [TelemetryMonitorRule](protocol.md#telemetrymonitorrule)                         |                                                                                 |
 
-Variant 2: [ReminderAction](protocol.md#reminderaction)
+Variant 2: Object (fields below)
+
+| Field  | Required | Type                 | Description |
+| ------ | -------- | -------------------- | ----------- |
+| `kind` | Yes      | `"company-dispatch"` |             |
+
+Variant 3: [ReminderAction](protocol.md#reminderaction)
 
 | Field            | Required | Type         | Description |
 | ---------------- | -------- | ------------ | ----------- |
@@ -1669,7 +1695,7 @@ Variant 2: [ReminderAction](protocol.md#reminderaction)
 | `text`           | Yes      | `string`     |             |
 | `threadId`       | No       | `string`     |             |
 
-Variant 3: Object (fields below)
+Variant 4: Object (fields below)
 
 | Field             | Required | Type           | Description                                                               |
 | ----------------- | -------- | -------------- | ------------------------------------------------------------------------- |
@@ -1679,7 +1705,7 @@ Variant 3: Object (fields below)
 | `prompt`          | Yes      | `string`       |                                                                           |
 | `silentWhenEmpty` | No       | `boolean`      | Suppress delivery when the turn produced nothing worth sending.           |
 
-Variant 4: Object (fields below)
+Variant 5: Object (fields below)
 
 | Field                | Required | Type                                  | Description                                                    |
 | -------------------- | -------- | ------------------------------------- | -------------------------------------------------------------- |
@@ -1690,7 +1716,7 @@ Variant 4: Object (fields below)
 | `kind`               | Yes      | `"shell"`                             | Run a shell command. Its stdout becomes the run's output.      |
 | `timeoutMs`          | No       | `number`                              |                                                                |
 
-Variant 5: Object (fields below)
+Variant 6: Object (fields below)
 
 | Field   | Required | Type                               | Description                                                 |
 | ------- | -------- | ---------------------------------- | ----------------------------------------------------------- |
@@ -1698,7 +1724,7 @@ Variant 5: Object (fields below)
 | `kind`  | Yes      | `"tool"`                           | Call a registered tool directly, with no model in the loop. |
 | `tool`  | Yes      | `string`                           |                                                             |
 
-Variant 6: Object (fields below)
+Variant 7: Object (fields below)
 
 | Field     | Required | Type                               | Description                                  |
 | --------- | -------- | ---------------------------------- | -------------------------------------------- |
@@ -1706,7 +1732,7 @@ Variant 6: Object (fields below)
 | `kind`    | Yes      | `"event"`                          | Emit an event other subsystems subscribe to. |
 | `payload` | No       | [JsonValue](protocol.md#jsonvalue) |                                              |
 
-Variant 7: Object (fields below)
+Variant 8: Object (fields below)
 
 | Field  | Required | Type            | Description                                                               |
 | ------ | -------- | --------------- | ------------------------------------------------------------------------- |
@@ -2855,6 +2881,7 @@ Who is making a tool call.
 | `channelPlatformRoleIds`       | No       | Array of `string`                                    | Native Discord role ids used for tool-time authority verification.                     |
 | `channelPlatformUserId`        | No       | `string`                                             | Native channel account id, retained separately from the mapped Nexa principal id.      |
 | `channelThreadId`              | No       | `string`                                             | Native thread carrying the active request, when distinct from its parent channel.      |
+| `companyExecution`             | No       | `true`                                               | Host-issued company execution is always confined, never the local machine operator.    |
 | `conversationId`               | No       | `string`                                             |                                                                                        |
 | `discordAppOnly`               | No       | `boolean`                                            | Authenticated personal Discord app invocation, without server-bot capabilities.        |
 | `machineId`                    | No       | `string`                                             | The machine this caller's work runs on, when their account names one.                  |
