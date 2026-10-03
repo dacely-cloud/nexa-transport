@@ -1,4 +1,11 @@
 import {
+    CompanyShowroomProtocol,
+    type ShowroomRequest,
+    type ShowroomCatalog,
+    type ShowroomContent,
+} from '../company/CompanyShowroomProtocol.js';
+import { ShowroomRequests } from './ShowroomRequests.js';
+import {
     CompanyProtocol,
     CompanyOp,
     type CompanyCommand,
@@ -96,6 +103,7 @@ export interface SessionSnapshot {
 }
 /** Authenticated Nexa gateway connection shared by browsers and Node.js. */
 export class NexaClient {
+    readonly #showroom = new ShowroomRequests();
     readonly #company = new CompanyRequests();
     readonly #projects = new CompanyProjectRequests();
     readonly #officeListeners = new Set<(packet: OfficeGamePacket) => void>();
@@ -521,6 +529,19 @@ export class NexaClient {
         } finally {
             this.#streamIds.delete(turn.streamId);
         }
+    }
+    /** Read explicitly published previews or submit an owner publication over the current socket. */
+    public showroom(request: ShowroomRequest): Promise<ShowroomCatalog | ShowroomContent> {
+        if (!this.connected || this.#hello?.features.companyShowroom !== true) {
+            return Promise.reject(new Error('The showroom is unavailable on this connection'));
+        }
+        const bytes = CompanyShowroomProtocol.encode(request);
+        return this.#showroom.request(request, () => {
+            if (!this.connected || this.#socket.bufferedAmount > 256 * 1024) {
+                throw new Error('Showroom connection is busy or disconnected');
+            }
+            this.#socket.send(bytes);
+        });
     }
     /** Read or change your private company over the existing authenticated socket. */
     public company(command: CompanyCommand): Promise<CompanyState> {
@@ -1048,6 +1069,13 @@ export class NexaClient {
             if (complete === null) {
                 return;
             }
+            if (CompanyShowroomProtocol.isFrame(new Uint8Array(complete))) {
+                if (this.#hello.features.companyShowroom !== true) {
+                    throw new Error('Unnegotiated showroom frame');
+                }
+                this.#showroom.receive(CompanyShowroomProtocol.decode(new Uint8Array(complete)));
+                return;
+            }
             if (CompanyProjectProtocol.isFrame(new Uint8Array(complete))) {
                 if (this.#hello.features.companyProjects !== true) {
                     throw new Error('Unnegotiated project frame');
@@ -1247,6 +1275,7 @@ export class NexaClient {
         this.#closed = true;
         this.#failure = materializeError(error);
         this.#pending.close(error);
+        this.#showroom.close(error);
         this.#company.close(error);
         this.#projects.close(error);
         this.#wake?.();

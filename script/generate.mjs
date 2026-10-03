@@ -240,7 +240,17 @@ writeFileSync(
 );
 
 /** Private project contracts use the same portable codecs as durable runtime storage. */
-for (const name of ['CompanyBinary', 'CompanyWork', 'CompanyProjectProtocol']) {
-    writeFileSync(`src/company/${name}.ts`, readFileSync(`../nexa/src/company/${name}.ts`, 'utf8')
-        .replace(/from '(\.\/[^']+)'/g, "from '$1.js'"));
+for (const name of [
+    'CompanyBinary',
+    'CompanyWork',
+    'CompanyProjectProtocol',
+    'CompanyShowroomProtocol',
+]) {
+    writeFileSync(
+        `src/company/${name}.ts`,
+        readFileSync(`../nexa/src/company/${name}.ts`, 'utf8').replace(
+            /from '(\.\/[^']+)'/g,
+            "from '$1.js'",
+        ),
+    );
 }

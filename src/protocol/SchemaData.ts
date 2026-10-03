@@ -1905,6 +1905,12 @@ export const schema: Schema = {
                         'Owner-only project decisions, usage, and captured files on the existing binary socket.',
                     type: 'boolean',
                 },
+                companyShowroom: {
+                    const: true,
+                    description:
+                        'Explicit public previews; visitors receive only publication data.',
+                    type: 'boolean',
+                },
                 companyTeamAreas: {
                     const: true,
                     description: 'NCMP v6 binds departments to saved construction areas.',
