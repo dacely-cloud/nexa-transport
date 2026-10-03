@@ -1927,6 +1927,11 @@ export const schema: Schema = {
                     description: 'Accepts NGOP v4 with saved visual desk assignments.',
                     type: 'boolean',
                 },
+                officeExecution: {
+                    const: true,
+                    description: 'Scheduler workload summaries in NGOP v6.',
+                    type: 'boolean',
+                },
                 officeGame: {
                     const: true,
                     description:
