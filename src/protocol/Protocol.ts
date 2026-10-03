@@ -1053,6 +1053,8 @@ export type FinishReason = (typeof FinishReasonValues)[keyof typeof FinishReason
 
 /** Session wire fields. */
 export interface SessionShape {
+    /** activeToolFamilies as defined by the Nexa gateway. */
+    readonly activeToolFamilies?: ReadonlyArray<string>;
     /** agentId as defined by the Nexa gateway. */
     readonly agentId: string;
     /** conversationId as defined by the Nexa gateway. */
@@ -1664,6 +1666,26 @@ export interface GatewayMethodsmedia_acknowledgeShape {
     readonly result: OkResult;
 }
 
+/** GatewayMethodsoffice_ownerProofparams wire fields. */
+export interface GatewayMethodsoffice_ownerProofparamsShape {
+    /** accountId as defined by the Nexa gateway. */
+    readonly accountId: string;
+}
+
+/** GatewayMethodsoffice_ownerProofresult wire fields. */
+export interface GatewayMethodsoffice_ownerProofresultShape {
+    /** proof as defined by the Nexa gateway. */
+    readonly proof: string;
+}
+
+/** GatewayMethodsoffice_ownerProof wire fields. */
+export interface GatewayMethodsoffice_ownerProofShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: GatewayMethodsoffice_ownerProofparamsShape;
+    /** result as defined by the Nexa gateway. */
+    readonly result: GatewayMethodsoffice_ownerProofresultShape;
+}
+
 /** GatewayMethodsroblox_credentials_remove wire fields. */
 export interface GatewayMethodsroblox_credentials_removeShape {
     /** params as defined by the Nexa gateway. */
@@ -2010,6 +2032,8 @@ export interface GatewayMethodsShape {
     readonly 'logs.tail': GatewayMethodslogs_tailShape;
     /** media.acknowledge as defined by the Nexa gateway. */
     readonly 'media.acknowledge': GatewayMethodsmedia_acknowledgeShape;
+    /** office.ownerProof as defined by the Nexa gateway. */
+    readonly 'office.ownerProof': GatewayMethodsoffice_ownerProofShape;
     /** roblox.credentials.remove as defined by the Nexa gateway. */
     readonly 'roblox.credentials.remove': GatewayMethodsroblox_credentials_removeShape;
     /** roblox.credentials.set as defined by the Nexa gateway. */
@@ -4912,6 +4936,8 @@ export enum Method {
     LogsTail = 'logs.tail',
     /** Calls media.acknowledge. */
     MediaAcknowledge = 'media.acknowledge',
+    /** Calls office.ownerProof. */
+    OfficeOwnerProof = 'office.ownerProof',
     /** Calls roblox.credentials.remove. */
     RobloxCredentialsRemove = 'roblox.credentials.remove',
     /** Calls roblox.credentials.set. */

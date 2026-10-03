@@ -11,6 +11,9 @@ All 54 protocol methods. `connect` is managed by `NexaClient.connect`; the remai
 - [agent.stream](#agent-stream)
 - [agents.define](#agents-define)
 - [agents.list](#agents-list)
+- [agents.personal.list](#agents-personal-list)
+- [agents.personal.remove](#agents-personal-remove)
+- [agents.personal.save](#agents-personal-save)
 - [approvals.list](#approvals-list)
 - [approvals.resolve](#approvals-resolve)
 - [channels.deadLetters.list](#channels-deadLetters-list)
@@ -43,6 +46,7 @@ All 54 protocol methods. `connect` is managed by `NexaClient.connect`; the remai
 - [jobs.remove](#jobs-remove)
 - [logs.tail](#logs-tail)
 - [media.acknowledge](#media-acknowledge)
+- [office.ownerProof](#office-ownerProof)
 - [roblox.credentials.remove](#roblox-credentials-remove)
 - [roblox.credentials.set](#roblox-credentials-set)
 - [roblox.credentials.status](#roblox-credentials-status)
@@ -273,6 +277,72 @@ Parameters: [Recordstringnever](protocol.md#recordstringnever).
 Type: Dictionary.
 
 Result: Array of [AgentDefinition](protocol.md#agentdefinition).
+
+## agents.personal.list
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.AgentsPersonalList> = {};
+const result: ResultOf<typeof Method.AgentsPersonalList> = await client.call(
+    Method.AgentsPersonalList,
+    params,
+);
+```
+
+Parameters: [Recordstringnever](protocol.md#recordstringnever).
+
+Type: Dictionary.
+
+Result: Array of [PersonalAgent](protocol.md#personalagent).
+
+## agents.personal.remove
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.AgentsPersonalRemove> = {
+    id: 'YOUR_ID',
+};
+const result: ResultOf<typeof Method.AgentsPersonalRemove> = await client.call(
+    Method.AgentsPersonalRemove,
+    params,
+);
+```
+
+Parameters: [IdParams](protocol.md#idparams).
+
+| Field | Required | Type     | Description |
+| ----- | -------- | -------- | ----------- |
+| `id`  | Yes      | `string` |             |
+
+Result: [OkResult](protocol.md#okresult).
+
+## agents.personal.save
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.AgentsPersonalSave> = {
+    id: 'YOUR_ID',
+    instructions: 'YOUR_INSTRUCTIONS',
+    name: 'YOUR_NAME',
+};
+const result: ResultOf<typeof Method.AgentsPersonalSave> = await client.call(
+    Method.AgentsPersonalSave,
+    params,
+);
+```
+
+Parameters: [PersonalAgentInput](protocol.md#personalagentinput).
+
+| Field          | Required | Type     | Description |
+| -------------- | -------- | -------- | ----------- |
+| `id`           | Yes      | `string` |             |
+| `instructions` | Yes      | `string` |             |
+| `name`         | Yes      | `string` |             |
+
+Result: [PersonalAgent](protocol.md#personalagent).
 
 ## approvals.list
 
@@ -935,6 +1005,28 @@ Parameters: [MediaAcknowledgeParams](protocol.md#mediaacknowledgeparams).
 | `received` | Yes      | `boolean` |             |
 
 Result: [OkResult](protocol.md#okresult).
+
+## office.ownerProof
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.OfficeOwnerProof> = {
+    accountId: 'YOUR_ACCOUNTID',
+};
+const result: ResultOf<typeof Method.OfficeOwnerProof> = await client.call(
+    Method.OfficeOwnerProof,
+    params,
+);
+```
+
+Parameters: Object (fields below).
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `accountId` | Yes      | `string` |             |
+
+Result: Object (fields below).
 
 ## roblox.credentials.remove
 

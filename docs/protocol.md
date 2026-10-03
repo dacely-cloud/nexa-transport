@@ -698,26 +698,27 @@ Type: `"aborted"` / `"error"` / `"length"` / `"refusal"` / `"stop"` / `"stop-seq
 
 Collapses the required/optional intersection into one object type.
 
-| Field             | Required | Type                                                   | Description |
-| ----------------- | -------- | ------------------------------------------------------ | ----------- |
-| `agentId`         | Yes      | `string`                                               |             |
-| `conversationId`  | Yes      | `null,string`                                          |             |
-| `createdAt`       | Yes      | `number`                                               |             |
-| `id`              | Yes      | `string`                                               |             |
-| `messageCount`    | Yes      | `number`                                               |             |
-| `participants`    | Yes      | Array of `string`                                      |             |
-| `projectId`       | No       | `string`                                               |             |
-| `resumeCwd`       | No       | `string`                                               |             |
-| `resumeEligible`  | No       | `boolean`                                              |             |
-| `resumePending`   | No       | `boolean`                                              |             |
-| `resumePrincipal` | No       | [ToolPrincipal](protocol.md#toolprincipal)             |             |
-| `resumeSurface`   | No       | [ConversationSurface](protocol.md#conversationsurface) |             |
-| `title`           | Yes      | `null,string`                                          |             |
-| `turnOpen`        | No       | `boolean`                                              |             |
-| `updatedAt`       | Yes      | `number`                                               |             |
-| `usage`           | Yes      | [TokenUsage](protocol.md#tokenusage)                   |             |
-| `userId`          | No       | `string`                                               |             |
-| `workspaceId`     | No       | `string`                                               |             |
+| Field                | Required | Type                                                   | Description |
+| -------------------- | -------- | ------------------------------------------------------ | ----------- |
+| `activeToolFamilies` | No       | Array of `string`                                      |             |
+| `agentId`            | Yes      | `string`                                               |             |
+| `conversationId`     | Yes      | `null,string`                                          |             |
+| `createdAt`          | Yes      | `number`                                               |             |
+| `id`                 | Yes      | `string`                                               |             |
+| `messageCount`       | Yes      | `number`                                               |             |
+| `participants`       | Yes      | Array of `string`                                      |             |
+| `projectId`          | No       | `string`                                               |             |
+| `resumeCwd`          | No       | `string`                                               |             |
+| `resumeEligible`     | No       | `boolean`                                              |             |
+| `resumePending`      | No       | `boolean`                                              |             |
+| `resumePrincipal`    | No       | [ToolPrincipal](protocol.md#toolprincipal)             |             |
+| `resumeSurface`      | No       | [ConversationSurface](protocol.md#conversationsurface) |             |
+| `title`              | Yes      | `null,string`                                          |             |
+| `turnOpen`           | No       | `boolean`                                              |             |
+| `updatedAt`          | Yes      | `number`                                               |             |
+| `usage`              | Yes      | [TokenUsage](protocol.md#tokenusage)                   |             |
+| `userId`             | No       | `string`                                               |             |
+| `workspaceId`        | No       | `string`                                               |             |
 
 ## FunnelCohort
 
@@ -795,6 +796,7 @@ Methods, events, and additive capabilities supported by this gateway.
 | `events`       | Yes      | Array of `string`                                  |                                                                                |
 | `methodScopes` | Yes      | [RecordstringScope](protocol.md#recordstringscope) | The scope each method requires.                                                |
 | `methods`      | Yes      | Array of `string`                                  |                                                                                |
+| `officeGame`   | No       | `true`                                             | NGOP office state and player input share the authenticated gateway socket.     |
 
 ## GatewayLimits
 
@@ -816,81 +818,85 @@ Configurable bounds on gateway-owned work and memory.
 
 ## GatewayMethods
 
-| Field                          | Required | Type                  | Description |
-| ------------------------------ | -------- | --------------------- | ----------- |
-| `accounts.create`              | Yes      | Object (fields below) |             |
-| `accounts.list`                | Yes      | Object (fields below) |             |
-| `accounts.remove`              | Yes      | Object (fields below) |             |
-| `accounts.usage`               | Yes      | Object (fields below) |             |
-| `agent.ask`                    | Yes      | Object (fields below) |             |
-| `agent.steer`                  | Yes      | Object (fields below) |             |
-| `agent.stream`                 | Yes      | Object (fields below) |             |
-| `agents.define`                | Yes      | Object (fields below) |             |
-| `agents.list`                  | Yes      | Object (fields below) |             |
-| `approvals.list`               | Yes      | Object (fields below) |             |
-| `approvals.resolve`            | Yes      | Object (fields below) |             |
-| `channels.deadLetters.list`    | Yes      | Object (fields below) |             |
-| `channels.list`                | Yes      | Object (fields below) |             |
-| `channels.status`              | Yes      | Object (fields below) |             |
-| `config.get`                   | Yes      | Object (fields below) |             |
-| `config.set`                   | Yes      | Object (fields below) |             |
-| `config.unset`                 | Yes      | Object (fields below) |             |
-| `connect`                      | Yes      | Object (fields below) |             |
-| `credit.budgets`               | Yes      | Object (fields below) |             |
-| `credit.removeBudget`          | Yes      | Object (fields below) |             |
-| `credit.resetAllowance`        | Yes      | Object (fields below) |             |
-| `credit.resetHistory`          | Yes      | Object (fields below) |             |
-| `credit.resets`                | Yes      | Object (fields below) |             |
-| `credit.setBudget`             | Yes      | Object (fields below) |             |
-| `credit.summary`               | Yes      | Object (fields below) |             |
-| `credit.wallet`                | Yes      | Object (fields below) |             |
-| `credit.walletHistory`         | Yes      | Object (fields below) |             |
-| `data.upload.cancel`           | Yes      | Object (fields below) |             |
-| `data.upload.chunk`            | Yes      | Object (fields below) |             |
-| `data.upload.finish`           | Yes      | Object (fields below) |             |
-| `data.upload.start`            | Yes      | Object (fields below) |             |
-| `devices.approve`              | Yes      | Object (fields below) |             |
-| `devices.list`                 | Yes      | Object (fields below) |             |
-| `devices.reject`               | Yes      | Object (fields below) |             |
-| `devices.revoke`               | Yes      | Object (fields below) |             |
-| `health`                       | Yes      | Object (fields below) |             |
-| `jobs.add`                     | Yes      | Object (fields below) |             |
-| `jobs.list`                    | Yes      | Object (fields below) |             |
-| `jobs.remove`                  | Yes      | Object (fields below) |             |
-| `logs.tail`                    | Yes      | Object (fields below) |             |
-| `media.acknowledge`            | Yes      | Object (fields below) |             |
-| `roblox.credentials.remove`    | Yes      | Object (fields below) |             |
-| `roblox.credentials.set`       | Yes      | Object (fields below) |             |
-| `roblox.credentials.status`    | Yes      | Object (fields below) |             |
-| `roblox.telemetry.funnel`      | Yes      | Object (fields below) |             |
-| `roblox.telemetry.performance` | Yes      | Object (fields below) |             |
-| `roblox.telemetry.projects`    | Yes      | Object (fields below) |             |
-| `sessions.delete`              | Yes      | Object (fields below) |             |
-| `sessions.download`            | Yes      | Object (fields below) |             |
-| `sessions.files`               | Yes      | Object (fields below) |             |
-| `sessions.get`                 | Yes      | Object (fields below) |             |
-| `sessions.list`                | Yes      | Object (fields below) |             |
-| `sessions.messages`            | Yes      | Object (fields below) |             |
-| `sessions.subscribe`           | Yes      | Object (fields below) |             |
-| `sessions.unsubscribe`         | Yes      | Object (fields below) |             |
-| `shares.create`                | Yes      | Object (fields below) |             |
-| `shares.list`                  | Yes      | Object (fields below) |             |
-| `shares.remove`                | Yes      | Object (fields below) |             |
-| `shares.setMember`             | Yes      | Object (fields below) |             |
-| `tasks.cancel`                 | Yes      | Object (fields below) |             |
-| `tasks.get`                    | Yes      | Object (fields below) |             |
-| `tasks.list`                   | Yes      | Object (fields below) |             |
-| `teams.create`                 | Yes      | Object (fields below) |             |
-| `teams.list`                   | Yes      | Object (fields below) |             |
-| `teams.remove`                 | Yes      | Object (fields below) |             |
-| `teams.setMember`              | Yes      | Object (fields below) |             |
-| `voice.audio`                  | Yes      | Object (fields below) |             |
-| `voice.start`                  | Yes      | Object (fields below) |             |
-| `voice.stop`                   | Yes      | Object (fields below) |             |
-| `workspaces.create`            | Yes      | Object (fields below) |             |
-| `workspaces.describe`          | Yes      | Object (fields below) |             |
-| `workspaces.destroy`           | Yes      | Object (fields below) |             |
-| `workspaces.list`              | Yes      | Object (fields below) |             |
+| Field                          | Required | Type                  | Description                                                                                |
+| ------------------------------ | -------- | --------------------- | ------------------------------------------------------------------------------------------ |
+| `accounts.create`              | Yes      | Object (fields below) |                                                                                            |
+| `accounts.list`                | Yes      | Object (fields below) |                                                                                            |
+| `accounts.remove`              | Yes      | Object (fields below) |                                                                                            |
+| `accounts.usage`               | Yes      | Object (fields below) |                                                                                            |
+| `agent.ask`                    | Yes      | Object (fields below) |                                                                                            |
+| `agent.steer`                  | Yes      | Object (fields below) |                                                                                            |
+| `agent.stream`                 | Yes      | Object (fields below) |                                                                                            |
+| `agents.define`                | Yes      | Object (fields below) |                                                                                            |
+| `agents.list`                  | Yes      | Object (fields below) |                                                                                            |
+| `agents.personal.list`         | Yes      | Object (fields below) |                                                                                            |
+| `agents.personal.remove`       | Yes      | Object (fields below) |                                                                                            |
+| `agents.personal.save`         | Yes      | Object (fields below) |                                                                                            |
+| `approvals.list`               | Yes      | Object (fields below) |                                                                                            |
+| `approvals.resolve`            | Yes      | Object (fields below) |                                                                                            |
+| `channels.deadLetters.list`    | Yes      | Object (fields below) |                                                                                            |
+| `channels.list`                | Yes      | Object (fields below) |                                                                                            |
+| `channels.status`              | Yes      | Object (fields below) |                                                                                            |
+| `config.get`                   | Yes      | Object (fields below) |                                                                                            |
+| `config.set`                   | Yes      | Object (fields below) |                                                                                            |
+| `config.unset`                 | Yes      | Object (fields below) |                                                                                            |
+| `connect`                      | Yes      | Object (fields below) |                                                                                            |
+| `credit.budgets`               | Yes      | Object (fields below) |                                                                                            |
+| `credit.removeBudget`          | Yes      | Object (fields below) |                                                                                            |
+| `credit.resetAllowance`        | Yes      | Object (fields below) |                                                                                            |
+| `credit.resetHistory`          | Yes      | Object (fields below) |                                                                                            |
+| `credit.resets`                | Yes      | Object (fields below) |                                                                                            |
+| `credit.setBudget`             | Yes      | Object (fields below) |                                                                                            |
+| `credit.summary`               | Yes      | Object (fields below) |                                                                                            |
+| `credit.wallet`                | Yes      | Object (fields below) |                                                                                            |
+| `credit.walletHistory`         | Yes      | Object (fields below) |                                                                                            |
+| `data.upload.cancel`           | Yes      | Object (fields below) |                                                                                            |
+| `data.upload.chunk`            | Yes      | Object (fields below) |                                                                                            |
+| `data.upload.finish`           | Yes      | Object (fields below) |                                                                                            |
+| `data.upload.start`            | Yes      | Object (fields below) |                                                                                            |
+| `devices.approve`              | Yes      | Object (fields below) |                                                                                            |
+| `devices.list`                 | Yes      | Object (fields below) |                                                                                            |
+| `devices.reject`               | Yes      | Object (fields below) |                                                                                            |
+| `devices.revoke`               | Yes      | Object (fields below) |                                                                                            |
+| `health`                       | Yes      | Object (fields below) |                                                                                            |
+| `jobs.add`                     | Yes      | Object (fields below) |                                                                                            |
+| `jobs.list`                    | Yes      | Object (fields below) |                                                                                            |
+| `jobs.remove`                  | Yes      | Object (fields below) |                                                                                            |
+| `logs.tail`                    | Yes      | Object (fields below) |                                                                                            |
+| `media.acknowledge`            | Yes      | Object (fields below) |                                                                                            |
+| `office.ownerProof`            | Yes      | Object (fields below) | Bind an invitation to the authenticated socket's office, using a short-lived signed proof. |
+| `roblox.credentials.remove`    | Yes      | Object (fields below) |                                                                                            |
+| `roblox.credentials.set`       | Yes      | Object (fields below) |                                                                                            |
+| `roblox.credentials.status`    | Yes      | Object (fields below) |                                                                                            |
+| `roblox.telemetry.funnel`      | Yes      | Object (fields below) |                                                                                            |
+| `roblox.telemetry.performance` | Yes      | Object (fields below) |                                                                                            |
+| `roblox.telemetry.projects`    | Yes      | Object (fields below) |                                                                                            |
+| `sessions.delete`              | Yes      | Object (fields below) |                                                                                            |
+| `sessions.download`            | Yes      | Object (fields below) |                                                                                            |
+| `sessions.files`               | Yes      | Object (fields below) |                                                                                            |
+| `sessions.get`                 | Yes      | Object (fields below) |                                                                                            |
+| `sessions.list`                | Yes      | Object (fields below) |                                                                                            |
+| `sessions.messages`            | Yes      | Object (fields below) |                                                                                            |
+| `sessions.subscribe`           | Yes      | Object (fields below) |                                                                                            |
+| `sessions.unsubscribe`         | Yes      | Object (fields below) |                                                                                            |
+| `shares.create`                | Yes      | Object (fields below) |                                                                                            |
+| `shares.list`                  | Yes      | Object (fields below) |                                                                                            |
+| `shares.remove`                | Yes      | Object (fields below) |                                                                                            |
+| `shares.setMember`             | Yes      | Object (fields below) |                                                                                            |
+| `tasks.cancel`                 | Yes      | Object (fields below) |                                                                                            |
+| `tasks.get`                    | Yes      | Object (fields below) |                                                                                            |
+| `tasks.list`                   | Yes      | Object (fields below) |                                                                                            |
+| `teams.create`                 | Yes      | Object (fields below) |                                                                                            |
+| `teams.list`                   | Yes      | Object (fields below) |                                                                                            |
+| `teams.remove`                 | Yes      | Object (fields below) |                                                                                            |
+| `teams.setMember`              | Yes      | Object (fields below) |                                                                                            |
+| `voice.audio`                  | Yes      | Object (fields below) |                                                                                            |
+| `voice.start`                  | Yes      | Object (fields below) |                                                                                            |
+| `voice.stop`                   | Yes      | Object (fields below) |                                                                                            |
+| `workspaces.create`            | Yes      | Object (fields below) |                                                                                            |
+| `workspaces.describe`          | Yes      | Object (fields below) |                                                                                            |
+| `workspaces.destroy`           | Yes      | Object (fields below) |                                                                                            |
+| `workspaces.list`              | Yes      | Object (fields below) |                                                                                            |
 
 **accounts.create**
 
@@ -960,6 +966,27 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ------------------------------------------------------- | ----------- |
 | `params` | Yes      | [Recordstringnever](protocol.md#recordstringnever)      |             |
 | `result` | Yes      | Array of [AgentDefinition](protocol.md#agentdefinition) |             |
+
+**agents.personal.list**
+
+| Field    | Required | Type                                                | Description |
+| -------- | -------- | --------------------------------------------------- | ----------- |
+| `params` | Yes      | [Recordstringnever](protocol.md#recordstringnever)  |             |
+| `result` | Yes      | Array of [PersonalAgent](protocol.md#personalagent) |             |
+
+**agents.personal.remove**
+
+| Field    | Required | Type                             | Description |
+| -------- | -------- | -------------------------------- | ----------- |
+| `params` | Yes      | [IdParams](protocol.md#idparams) |             |
+| `result` | Yes      | [OkResult](protocol.md#okresult) |             |
+
+**agents.personal.save**
+
+| Field    | Required | Type                                                 | Description |
+| -------- | -------- | ---------------------------------------------------- | ----------- |
+| `params` | Yes      | [PersonalAgentInput](protocol.md#personalagentinput) |             |
+| `result` | Yes      | [PersonalAgent](protocol.md#personalagent)           |             |
 
 **approvals.list**
 
@@ -1239,6 +1266,25 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ------------------------------------------------------------ | ----------- |
 | `params` | Yes      | [MediaAcknowledgeParams](protocol.md#mediaacknowledgeparams) |             |
 | `result` | Yes      | [OkResult](protocol.md#okresult)                             |             |
+
+**office.ownerProof**
+
+| Field    | Required | Type                  | Description |
+| -------- | -------- | --------------------- | ----------- |
+| `params` | Yes      | Object (fields below) |             |
+| `result` | Yes      | Object (fields below) |             |
+
+**office.ownerProof.params**
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `accountId` | Yes      | `string` |             |
+
+**office.ownerProof.result**
+
+| Field   | Required | Type     | Description |
+| ------- | -------- | -------- | ----------- |
+| `proof` | Yes      | `string` |             |
 
 **roblox.credentials.remove**
 
@@ -2317,6 +2363,26 @@ Complete bounded selection with quality counts and collection diagnostics.
 | `latestSampleMs`       | Yes      | `null,string`                                             |                                                                                                |
 | `query`                | Yes      | [PerformanceQuery](protocol.md#performancequery)          |                                                                                                |
 
+## PersonalAgent
+
+A user's own agent instructions; execution permissions always come from the deployment default.
+
+| Field          | Required | Type     | Description |
+| -------------- | -------- | -------- | ----------- |
+| `id`           | Yes      | `string` |             |
+| `instructions` | Yes      | `string` |             |
+| `name`         | Yes      | `string` |             |
+
+## PersonalAgentInput
+
+Create with an empty id, or update an existing owned agent.
+
+| Field          | Required | Type     | Description |
+| -------------- | -------- | -------- | ----------- |
+| `id`           | Yes      | `string` |             |
+| `instructions` | Yes      | `string` |             |
+| `name`         | Yes      | `string` |             |
+
 ## ReasoningOptions
 
 Reasoning configuration for a request.
@@ -2533,6 +2599,15 @@ A shared folder, as the UI lists it.
 | `id`      | Yes      | `string` |             |
 | `mode`    | Yes      | `string` |             |
 | `subject` | Yes      | `string` |             |
+
+## SitePreview
+
+Only server-fetched raster bytes cross the gateway; clients never fetch the visited host.
+
+| Field     | Required | Type     | Description |
+| --------- | -------- | -------- | ----------- |
+| `favicon` | Yes      | `string` |             |
+| `origin`  | Yes      | `string` |             |
 
 ## SteerParams
 
@@ -2852,6 +2927,17 @@ What a tool returns.
 | `truncation`           | No       | [TruncationRecord](protocol.md#truncationrecord)                                        | What the registry's backstop removed, when it removed anything.                              |
 | `verifiedCodePaths`    | No       | Array of `string`                                                                       | Absolute source paths accepted by a native engineering workflow, never model-supplied.       |
 
+## ToolSitesData
+
+Asynchronous tool decoration; may arrive after turn.end and never blocks it.
+
+| Field       | Required | Type                                            | Description |
+| ----------- | -------- | ----------------------------------------------- | ----------- |
+| `callId`    | Yes      | `string`                                        |             |
+| `sessionId` | No       | `string`                                        |             |
+| `sites`     | Yes      | Array of [SitePreview](protocol.md#sitepreview) |             |
+| `streamId`  | Yes      | `string`                                        |             |
+
 ## ToolStatus
 
 What a tool did, from the agent's point of view.
@@ -2892,8 +2978,6 @@ The payload of a {@link GATEWAY_EVENTS.TurnEnd} event.
 | `streamId`  | Yes      | `string`                           |                                                                   |
 
 ## TurnEventData
-
-The payload of a {@link GATEWAY_EVENTS.TurnEvent} event.
 
 | Field       | Required | Type                                       | Description |
 | ----------- | -------- | ------------------------------------------ | ----------- |
