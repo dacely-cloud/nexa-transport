@@ -456,29 +456,6 @@ The server returns a path, filename and decimal-string byte count. Source bytes 
 
 For inline CSV, TSV, JSON, JSONL, PDF and Office files, use `NexaMedia.document(file)`. It preserves `File.name` and infers the MIME type from the filename when the browser leaves `File.type` empty. Nexa can import structured attachments directly by their media ID using `import_dataset`, then run full-data SQL with `query_dataset`. Word `.docx` text is available through `extract_document`.
 
-### Public office showroom
+### Office building
 
-`client.showroom(request)` uses the existing binary socket when
-`client.hello.features.companyShowroom` is true. Import `ShowroomOp` and the request/response types
-from `nexa-transport/showroom`. `Read` returns the current catalog; `Preview` requests a published
-entry by its public ID. Verify the preview's SHA-256 and byte count against the selected catalog
-entry before rendering it in an isolated viewer.
-
-Only an authenticated owner with write scope can `Publish` an explicitly selected file from the
-current accepted delivery or `Withdraw` an entry. Retain mutation request IDs and catalog revisions
-for explicit retries; the SDK never replays publication automatically. Visitor tickets permit only
-catalog and published-preview reads for their authorized office, with invitation validity checked
-on every request. Catalogs contain public copy and content identities, without private project IDs,
-file paths, prompts, or review records. Withdrawal blocks subsequent reads; already received copies
-cannot be recalled.
-
-### Physical office desk positions
-
-`hello.features.officeDeskPositions` enables NGOP v8 and NCMP v8 on the existing socket.
-A company `Construction` command may include `deskPositions: [{ desk: 0, x: -8, z: 3 }]`.
-Coordinates are half-metre grid units, bounded to ±128; desk addresses are 0–255 and must
-belong to this company. The list replaces saved positions atomically with construction;
-omitting it preserves positions, and `[]` restores automatic placement. Other employee
-settings and work records are unchanged. Snapshots expose `employee.deskPosition`; the
-public office projection includes only its numeric coordinates. Older peers retain their
-original layout and never silently drop a requested position change.
+Read your layout with `client.officeLayout()`, then save `{ revision, pieces }` with the same method. This requires `hello.features.officeLayout`. Layouts use bounded half-metre coordinates and quarter turns. The OLAY binary protocol shares the existing authenticated socket. Only the owner can save; visitors receive public geometry through `subscribeOffice`. Concurrent edits use revision checks and cannot silently overwrite each other.

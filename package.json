@@ -48,26 +48,6 @@
         "./office": {
             "types": "./dist/office/OfficeProtocol.d.ts",
             "import": "./dist/office.js"
-        },
-        "./projects": {
-            "types": "./dist/company/CompanyProjectProtocol.d.ts",
-            "import": "./dist/projects.js"
-        },
-        "./showroom": {
-            "types": "./dist/company/CompanyShowroomProtocol.d.ts",
-            "import": "./dist/showroom.js"
-        },
-        "./collaboration": {
-            "types": "./dist/company/CompanyCollaborationProtocol.d.ts",
-            "import": "./dist/collaboration.js"
-        },
-        "./company-work": {
-            "types": "./dist/company/CompanyWork.d.ts",
-            "import": "./dist/company-work.js"
-        },
-        "./company": {
-            "types": "./dist/company/CompanyProtocol.d.ts",
-            "import": "./dist/company.js"
         }
     },
     "scripts": {

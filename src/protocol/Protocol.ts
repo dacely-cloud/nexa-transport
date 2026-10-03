@@ -1204,32 +1204,6 @@ export interface GatewayFeaturesShape {
     readonly attachments?: true;
     /** binaryMedia as defined by the Nexa gateway. */
     readonly binaryMedia?: true;
-    /** companyCollaboration as defined by the Nexa gateway. */
-    readonly companyCollaboration?: true;
-    /** companyDepartmentSettings as defined by the Nexa gateway. */
-    readonly companyDepartmentSettings?: true;
-    /** companyEmployeeHistory as defined by the Nexa gateway. */
-    readonly companyEmployeeHistory?: true;
-    /** companyFollowups as defined by the Nexa gateway. */
-    readonly companyFollowups?: true;
-    /** companyMaintenance as defined by the Nexa gateway. */
-    readonly companyMaintenance?: true;
-    /** companyProcedures as defined by the Nexa gateway. */
-    readonly companyProcedures?: true;
-    /** companyProjectAssignments as defined by the Nexa gateway. */
-    readonly companyProjectAssignments?: true;
-    /** companyProjectControls as defined by the Nexa gateway. */
-    readonly companyProjectControls?: true;
-    /** companyProjectLive as defined by the Nexa gateway. */
-    readonly companyProjectLive?: true;
-    /** companyProjectRecovery as defined by the Nexa gateway. */
-    readonly companyProjectRecovery?: true;
-    /** companyProjects as defined by the Nexa gateway. */
-    readonly companyProjects?: true;
-    /** companyShowroom as defined by the Nexa gateway. */
-    readonly companyShowroom?: true;
-    /** companyTeamAreas as defined by the Nexa gateway. */
-    readonly companyTeamAreas?: true;
     /** events as defined by the Nexa gateway. */
     readonly events: ReadonlyArray<string>;
     /** methodScopes as defined by the Nexa gateway. */
@@ -1238,10 +1212,6 @@ export interface GatewayFeaturesShape {
     readonly methods: ReadonlyArray<string>;
     /** officeAppearance as defined by the Nexa gateway. */
     readonly officeAppearance?: true;
-    /** officeCompany as defined by the Nexa gateway. */
-    readonly officeCompany?: true;
-    /** officeCompanyVersion as defined by the Nexa gateway. */
-    readonly officeCompanyVersion?: 2;
     /** officeConstruction as defined by the Nexa gateway. */
     readonly officeConstruction?: true;
     /** officeDeskAssignments as defined by the Nexa gateway. */
@@ -1254,6 +1224,8 @@ export interface GatewayFeaturesShape {
     readonly officeGame?: true;
     /** officeGameVersion as defined by the Nexa gateway. */
     readonly officeGameVersion?: 3;
+    /** officeLayout as defined by the Nexa gateway. */
+    readonly officeLayout?: true;
 }
 
 /** GatewayFeatures from the Nexa wire protocol. */

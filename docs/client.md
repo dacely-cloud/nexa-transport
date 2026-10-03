@@ -151,61 +151,8 @@ Pending RPCs and active streaming turns have separate limits. Binary uploads sha
 
 Attachment handlers may run concurrently. Outstanding deliveries, including acknowledgements, are limited to 64 and 101 MiB per client. Exceeding either limit closes the connection with a limit error. Finish handlers promptly and release application-owned file data when no longer needed. Call listener unsubscribe functions when removing a view and `client.close()` when disposing its client. Each browser tab owns its own client and memory budgets.
 
-`officeExecution` enables NGOP v6 project workload summaries: running assignments, dependency-ready and waiting tasks, blocked tasks, current approved concurrency (`slots`), pause status, and a fixed project phase. These describe this owner’s scheduler, not physical CPU/GPU availability. Readiness does not bypass approval, pause, funding, or global dispatch limits. Visitors receive only these bounded status fields with their sanitized boards. Older peers retain NGOP v2–5 without execution summaries.
+## Office layout
 
-With `companyProjectRecovery`, `projectSpending(projectId, before?)` reads up to 50 provider-request charges and the project’s bounded attempt recovery records over NCPW v4. Pass `next` for older charges; zero means no older page. `projectRecover(projectId, command)` records checked external-outcome evidence only for a blocked, interrupted attempt whose spending is fully settled. It never changes provider costs, releases unresolved holds, or starts another assignment. Identical attempt/evidence retries preserve the original decision timestamp. Refresh the project, then make a separate planning, approval, or correction decision to resume. Visitors cannot use either operation.
+`client.officeLayout()` reads the signed-in owner's saved geometry when `hello.features.officeLayout` is true. `client.officeLayout({ revision, pieces })` saves a replacement layout using the revision returned by the read. Coordinates are half-metre units and rotation is a quarter turn; the codec allows up to 128 bounded pieces.
 
-`officeAppearance` negotiates NGOP v7. Each visible employee carries an optional 16-bit `appearance` seed derived from their permanent agent identity, independent of run IDs, display name, and desk. Use the received value for visitors, whose private identifiers are replaced. `OfficeAppearance.seed` provides the same deterministic fallback for local previews and configured employees. Older NGOP v2–6 peers keep their original layouts. Appearance is cosmetic and grants no authority.
-
-When `hello.features.companyFollowups` is true, NCMP v5 accepts a `CompanyOp.Draft` with `sourceProjectId` referencing an owned, accepted delivery. The saved project's `source` records the accepted revision. Creation is idempotent and does not execute work; planning needs a new allowance and implementation needs a new approval. NEXA seeds a separate workspace from integrity-checked captured files, preserving the original delivery and spending ledger. Earlier protocol versions omit lineage and reject follow-up commands instead of treating them as ordinary drafts.
-
-### Recurring maintenance
-
-With `companyMaintenance`, `projectMaintenance(projectId, command)` configures NCPW v5 recurring work on the existing socket. The command contains a stable `id`, current policy `revision` (zero initially), accepted work `sourceRevision`, `intervalMs` (one hour to 90 days), `maxRuns` (1–32 total cycles), per-cycle `limit` in microcents, `concurrency` (1–8), `maxIterations` (1–64), and `paused`. Retrying an uncertain command uses the same ID and values. Older hosts reject this operation locally.
-
-This explicitly authorizes repetition of the accepted task graph. Each cycle gets its own project, workspace, funding allowance, execution history, and independent review. The first uses the accepted source files; later cycles use the last accepted cycle. Unaccepted or blocked cycles prevent the next cycle. Pausing stops future reservations while an already reserved cycle can finish. Missed intervals never produce a catch-up batch. Updating limits affects only future reservations; separately raising a cycle’s allowance is another spending decision.
-
-Project snapshots include `maintenance` (null when unconfigured), with policy revision, next eligible time, preparation errors, and cycle project IDs, phases, and work revisions. Live subscriptions also report cycle transitions without changing the accepted source work. Read the company roster again before opening a newly created cycle. Visitors cannot configure or read private policies; they continue receiving sanitized office activity. Preparation errors require an explicit configuration retry; interrupted execution still uses normal spending reconciliation. Existing company project capacity applies.
-
-### Reviewed procedures
-
-When `companyProcedures` is advertised, NCMP v7 adds `CompanyOp.Procedure` and the private `CompanyState.procedures` catalog. A procedure contains a title, instructions, an employee or department scope, and an owned accepted source `{ projectId, revision }`. Submit `procedureId: ''` and `status: 'draft'` to create it. Drafts are inactive. To approve, send the saved fields unchanged with its generated `procedureId`, the latest company revision, a fresh command ID, and `status: 'approved'`. The server supplies `approvedAt`.
-
-Editing requires `status: 'draft'` and removes active approval. `status: 'retired'` stops future use while retaining the source and approval date. Retain command IDs on uncertain retries. Source acceptance and revision are rechecked server-side; private company operations remain unavailable to office visitors. Older clients omit procedure fields and reject procedure changes locally.
-
-Only approved procedures matching an employee or their current department join the instructions for future turns, including Chat and background execution. Running turns retain their starting instructions. Procedures cannot add tool permissions, change models, increase spending limits, or dispatch work. Limits are 32 records, 80 title characters, 4,000 instruction characters per record, and 32,000 approved instruction characters across the company. These are owner-reviewed methods with evidence, not a claim of improved model intelligence.
-
-### Scoped project collaboration
-
-`companyCollaboration` enables NCLB v1 on the existing personal Chat socket. Import
-`CollaborationOp` and its types from `nexa-transport/collaboration`. Visit tickets
-never grant this capability.
-
-The recipient calls `client.collaboration({ op: CollaborationOp.Code, id })` to
-create a 15-minute account code. The owner sends `Invite` with a stable request ID,
-owned `projectId`, recipient `code`, display `label`, `role` (`reviewer` or
-`coordinator`) and `durationMs` (one hour to 90 days). The named recipient must
-explicitly accept through `Decide` with `grantId`, current grant `revision` and
-`decision: 'accept'`. Decline and owner revocation use the same operation. Codes are
-consumed once and retries never renew or restore expired/revoked access.
-
-`List` with empty `projectId` returns your invitations; an owned project ID lists
-its collaborators. `Context` with `grantId` returns the invited project and roster,
-without employee instructions or unrelated projects. `collaborationProject(grantId,
-projectId, command?)` reads or changes that project. Reviewers may inspect captured
-files and accept a delivery; coordinators may also reassign queued tasks and change
-priority/pause dispatch. Planning, approvals, budget changes, corrections, employee
-configuration, maintenance and invitations remain owner-only. Acceptance can allow
-an already owner-authorized maintenance schedule to advance.
-
-`subscribeCollaborationProject(grantId, projectId, listener, onError)` returns an
-unsubscribe function. `collaborationArtifact(grantId, projectId, attemptId, path,
-offset)` reads one checked file chunk. `subscribeCollaborationOffice(grantId,
-listener, onError)` returns `{ close, move }` for the owner's sanitized office. Its
-frames include generic activity and presence, never private prompts or project
-identifiers. This does not change your Chat identity or authorize owner RPCs.
-
-Close subscriptions when their views close. On disconnect, pending operations fail;
-reopen streams after reconnect and retry uncertain mutations explicitly with the
-same ID and values. Private snapshots and artifact chunks recheck the grant before
-sending; idle subscriptions and office presence are revalidated every second.
+The OLAY binary channel uses the existing authenticated Chat socket. The gateway derives ownership from that connection, requires write scope for edits, and rejects visitors. Successful edits appear in the public office geometry stream without including prompts or granting visitors any controls. A stale revision is rejected: reload the layout before retrying. Disconnects fail pending requests without replaying edits.

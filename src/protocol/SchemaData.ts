@@ -1856,78 +1856,6 @@ export const schema: Schema = {
                         'NXMD frames carry outbound file bytes; JSON results contain matching metadata.',
                     type: 'boolean',
                 },
-                companyCollaboration: {
-                    const: true,
-                    description:
-                        'Explicit project-scoped account invitations and collaboration over NCLB v1.',
-                    type: 'boolean',
-                },
-                companyDepartmentSettings: {
-                    const: true,
-                    description: 'NCMP v3 shared department guidance and tool ceilings.',
-                    type: 'boolean',
-                },
-                companyEmployeeHistory: {
-                    const: true,
-                    description:
-                        'Owner-only employee evidence over the existing binary project channel.',
-                    type: 'boolean',
-                },
-                companyFollowups: {
-                    const: true,
-                    description:
-                        'NCMP v5 supports separately approved follow-ups from accepted deliveries.',
-                    type: 'boolean',
-                },
-                companyMaintenance: {
-                    const: true,
-                    description:
-                        'Owner-authorized repetition of an accepted task plan over NCPW v5.',
-                    type: 'boolean',
-                },
-                companyProcedures: {
-                    const: true,
-                    description: 'Private reviewed guidance tied to accepted company deliveries.',
-                    type: 'boolean',
-                },
-                companyProjectAssignments: {
-                    const: true,
-                    description: 'NCPW v3 supports reassignment and immutable execution authors.',
-                    type: 'boolean',
-                },
-                companyProjectControls: {
-                    const: true,
-                    description:
-                        'NCPW v2 supports durable pause/priority controls and live allowance changes.',
-                    type: 'boolean',
-                },
-                companyProjectLive: {
-                    const: true,
-                    description: 'Ordered private project snapshots after an owner subscribes.',
-                    type: 'boolean',
-                },
-                companyProjectRecovery: {
-                    const: true,
-                    description: 'Private spending and reviewed interruption recovery in NCPW v4.',
-                    type: 'boolean',
-                },
-                companyProjects: {
-                    const: true,
-                    description:
-                        'Owner-only project decisions, usage, and captured files on the existing binary socket.',
-                    type: 'boolean',
-                },
-                companyShowroom: {
-                    const: true,
-                    description:
-                        'Explicit public previews; visitors receive only publication data.',
-                    type: 'boolean',
-                },
-                companyTeamAreas: {
-                    const: true,
-                    description: 'NCMP v6 binds departments to saved construction areas.',
-                    type: 'boolean',
-                },
                 events: {
                     items: {
                         type: 'string',
@@ -1949,17 +1877,6 @@ export const schema: Schema = {
                     const: true,
                     description: 'Stable employee cosmetics in NGOP v7.',
                     type: 'boolean',
-                },
-                officeCompany: {
-                    const: true,
-                    description:
-                        'NCMP private company controls on the existing authenticated socket.',
-                    type: 'boolean',
-                },
-                officeCompanyVersion: {
-                    const: 2,
-                    description: 'NCMP v2 employee model and tool settings.',
-                    type: 'number',
                 },
                 officeConstruction: {
                     const: true,
@@ -1991,6 +1908,11 @@ export const schema: Schema = {
                     const: 3,
                     description: 'NGOP version supporting server-issued acceptance celebrations.',
                     type: 'number',
+                },
+                officeLayout: {
+                    const: true,
+                    description: 'Owner-only OLAY geometry commands.',
+                    type: 'boolean',
                 },
             },
             required: ['events', 'methodScopes', 'methods'],
