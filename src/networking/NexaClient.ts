@@ -318,7 +318,7 @@ export class NexaClient {
     }
     /** Whether this connection can accept new calls. */
     public get connected(): boolean {
-        return !this.#closed && this.#ready;
+        return !this.#closed && this.#ready && this.#socket.readyState === WebSocket.OPEN;
     }
     /** Calls any Nexa RPC with validated parameters and result. Mutations are never replayed. */
     public async call<M extends Exclude<Method, Method.Connect>>(
@@ -648,6 +648,9 @@ export class NexaClient {
         if (!this.#pending.has(id)) {
             return;
         }
+        if (this.#socket.readyState !== WebSocket.OPEN) {
+            throw new TransportError(TransportErrorCode.Closed, 'Gateway socket is closing');
+        }
         if (typeof payload === 'string') {
             this.#socket.send(payload);
             return;
@@ -691,14 +694,24 @@ export class NexaClient {
             );
             for (const chunk of BinaryChunks.split(payload, chunkBytes)) {
                 while (socket.bufferedAmount > chunkBytes) {
-                    if (socket !== this.#socket || this.#closed || !this.#pending.has(id)) {
+                    if (
+                        socket !== this.#socket ||
+                        socket.readyState !== WebSocket.OPEN ||
+                        this.#closed ||
+                        !this.#pending.has(id)
+                    ) {
                         throw materializeError(new Error('Binary upload was interrupted'));
                     }
                     await new Promise<void>((resolve): void => {
                         setTimeout(resolve, 5);
                     });
                 }
-                if (socket !== this.#socket || this.#closed || !this.#pending.has(id)) {
+                if (
+                    socket !== this.#socket ||
+                    socket.readyState !== WebSocket.OPEN ||
+                    this.#closed ||
+                    !this.#pending.has(id)
+                ) {
                     throw materializeError(new Error('Binary upload was interrupted'));
                 }
                 socket.send(chunk);
