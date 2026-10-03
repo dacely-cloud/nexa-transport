@@ -44,8 +44,14 @@ export interface CompanyDepartment {
     readonly name: string;
     readonly settings?: CompanyDepartmentSettings;
 }
+/** Immutable accepted project that supplies a follow-up's starting files. */
+export interface CompanyProjectSource {
+    readonly projectId: string;
+    readonly revision: bigint;
+}
 /** Persistent project brief ready for planning and execution. */
 export interface CompanyProject {
+    readonly source?: CompanyProjectSource;
     readonly id: string;
     readonly name: string;
     readonly brief: string;
@@ -64,7 +70,7 @@ export interface CompanyState {
 /** Request identity and optimistic revision are supplied on every command. */
 export interface CompanyRequest {
     /** Reply using the original wire layout for older clients. */
-    readonly version?: 1 | 2 | 3;
+    readonly version?: 1 | 2 | 3 | 4;
     readonly id: string;
     readonly revision: bigint;
 }
@@ -99,6 +105,7 @@ export interface CompanyEditDepartment extends CompanyRequest {
 }
 /** Save a project brief and its initial staffing. */
 export interface CompanyDraft extends CompanyRequest {
+    readonly sourceProjectId?: string;
     readonly op: typeof CompanyOp.Draft;
     readonly name: string;
     readonly brief: string;
@@ -139,14 +146,14 @@ export type CompanyCommand =
     | CompanyEditEmployee;
 /** Successful response, correlated with its command ID. */
 export interface CompanySnapshot {
-    readonly version?: 1 | 2 | 3;
+    readonly version?: 1 | 2 | 3 | 4;
     readonly op: typeof CompanyOp.Snapshot;
     readonly id: string;
     readonly state: CompanyState;
 }
 /** Rejected command; no private state is embedded in errors. */
 export interface CompanyError {
-    readonly version?: 1 | 2 | 3;
+    readonly version?: 1 | 2 | 3 | 4;
     readonly op: typeof CompanyOp.Error;
     readonly id: string;
     readonly message: string;
@@ -204,7 +211,7 @@ class Writer {
             write(value);
         }
     }
-    public finish(op: number, version: 1 | 2 | 3 | 4): Uint8Array<ArrayBuffer> {
+    public finish(op: number, version: 1 | 2 | 3 | 4 | 5): Uint8Array<ArrayBuffer> {
         const view: DataView = new DataView(this.#bytes.buffer);
         view.setUint32(0, 0x504d434e, true);
         view.setUint8(4, version);
@@ -258,7 +265,7 @@ class Reader {
     }
 }
 
-/** NCMP v4 adds saved construction, retaining earlier reply layouts. */
+/** NCMP v5 adds accepted delivery lineage, retaining earlier reply layouts. */
 export class CompanyProtocol {
     /** Identify a frame without parsing an unrelated Chat or game packet. */
     public static isFrame(bytes: Uint8Array): boolean {
@@ -271,10 +278,10 @@ export class CompanyProtocol {
     /** Encode a command or its response. */
     public static encode(
         packet: CompanyPacket,
-        version: 1 | 2 | 3 | 4 = packet.version ?? 4,
+        version: 1 | 2 | 3 | 4 | 5 = packet.version ?? 5,
     ): Uint8Array<ArrayBuffer> {
         if (
-            (version !== 1 && version !== 2 && version !== 3 && version !== 4) ||
+            (version !== 1 && version !== 2 && version !== 3 && version !== 4 && version !== 5) ||
             (version === 1 && packet.op === CompanyOp.Employee)
         ) {
             throw new Error('Employee settings require NCMP v2');
@@ -284,6 +291,9 @@ export class CompanyProtocol {
         }
         if (version < 4 && packet.op === CompanyOp.Construction) {
             throw new Error('Office construction requires NCMP v4');
+        }
+        if (version < 5 && packet.op === CompanyOp.Draft && packet.sourceProjectId) {
+            throw new Error('Follow-up projects require NCMP v5');
         }
         if (!/^[a-zA-Z0-9-]{1,64}$/.test(packet.id)) {
             throw new Error('Invalid company request ID');
@@ -324,6 +334,10 @@ export class CompanyProtocol {
                 w.text(project.brief);
                 w.text(project.managerId);
                 w.list(project.team, (id) => w.text(id));
+                if (version >= 5) {
+                    w.text(project.source?.projectId ?? '');
+                    if (project.source) {w.big(project.source.revision);}
+                }
             });
             if (version >= 4) {
                 this.#writeConstruction(w, state.construction ?? []);
@@ -365,6 +379,7 @@ export class CompanyProtocol {
                     w.text(packet.brief);
                     w.text(packet.managerId);
                     w.list(packet.team, (id) => w.text(id));
+                    if (version >= 5) {w.text(packet.sourceProjectId ?? '');}
                     break;
                 case CompanyOp.Assign:
                     w.text(packet.employeeId);
@@ -385,7 +400,11 @@ export class CompanyProtocol {
             bytes.length < 8 ||
             bytes.length > 4 * 1024 * 1024 ||
             !this.isFrame(bytes) ||
-            (bytes[4] !== 1 && bytes[4] !== 2 && bytes[4] !== 3 && bytes[4] !== 4) ||
+            (bytes[4] !== 1 &&
+                bytes[4] !== 2 &&
+                bytes[4] !== 3 &&
+                bytes[4] !== 4 &&
+                bytes[4] !== 5) ||
             bytes[6] !== 0 ||
             bytes[7] !== 0
         ) {
@@ -422,6 +441,7 @@ export class CompanyProtocol {
                 brief: r.text(),
                 managerId: r.text(),
                 team: r.list(() => r.text()),
+                ...(version >= 5 ? this.#readSource(r) : {}),
             }));
             packet = {
                 op,
@@ -501,6 +521,7 @@ export class CompanyProtocol {
                         brief: r.text(),
                         managerId: r.text(),
                         team: r.list(() => r.text()),
+                        ...(version >= 5 ? this.#readSourceId(r) : {}),
                     };
                     break;
                 case CompanyOp.Assign:
@@ -518,7 +539,15 @@ export class CompanyProtocol {
             }
         }
         r.finish();
-        return version === 4 ? packet : { ...packet, version };
+        return version === 5 ? packet : { ...packet, version };
+    }
+    static #readSourceId(r: Reader): Pick<CompanyDraft, 'sourceProjectId'> {
+        const sourceProjectId = r.text();
+        return sourceProjectId ? { sourceProjectId } : {};
+    }
+    static #readSource(r: Reader): Pick<CompanyProject, 'source'> {
+        const projectId = r.text();
+        return projectId ? { source: { projectId, revision: r.big() } } : {};
     }
     static #writeConstruction(w: Writer, items: readonly OfficePlacement[]): void {
         OfficeConstruction.validate(items);

@@ -49,7 +49,7 @@ it('round trips bounded department settings and rejects them on older versions',
     }
 });
 
-it.each([1, 2, 3, 4] as const)(
+it.each([1, 2, 3, 4, 5] as const)(
     'negotiates NCMP v%i and rejects unsupported department changes locally',
     async (version) => {
         const server = new WebSocketServer({ host: '127.0.0.1', port: 0 });
@@ -96,6 +96,7 @@ it.each([1, 2, 3, 4] as const)(
                                     ...(version >= 2 ? { officeCompanyVersion: 2 } : {}),
                                     ...(version >= 3 ? { companyDepartmentSettings: true } : {}),
                                     ...(version >= 4 ? { officeConstruction: true } : {}),
+                                    ...(version >= 5 ? { companyFollowups: true } : {}),
                                 },
                             },
                         }),
@@ -142,7 +143,24 @@ it.each([1, 2, 3, 4] as const)(
                 await expect(client.company(construction)).rejects.toThrow('unavailable');
             } else {
                 await client.company(construction);
-                expect(versions).toEqual([4, 4, 4]);
+                expect(versions).toEqual([version, version, version]);
+            }
+            const followup = {
+                op: CompanyOp.Draft,
+                id: 'followup',
+                revision: 0n,
+                sourceProjectId: 'source',
+                name: 'Maintenance',
+                brief: 'Improve the accepted product',
+                managerId: 'ada',
+                team: ['ada', 'grace'],
+            } as const;
+            if (version < 5) {
+                await expect(client.company(followup)).rejects.toThrow('unavailable');
+                expect(() => CompanyProtocol.encode(followup, version)).toThrow('v5');
+            } else {
+                await client.company(followup);
+                expect(versions).toEqual([5, 5, 5, 5]);
             }
         } finally {
             client.close();
@@ -155,3 +173,44 @@ it.each([1, 2, 3, 4] as const)(
         }
     },
 );
+
+it('round trips private accepted lineage without silently downgrading follow-up commands', () => {
+    const command = {
+        op: CompanyOp.Draft,
+        id: 'followup',
+        revision: 3n,
+        sourceProjectId: 'accepted-project',
+        name: 'Maintenance',
+        brief: 'Keep the original behavior.',
+        managerId: 'ada',
+        team: ['ada', 'grace'],
+    } as const;
+    expect(CompanyProtocol.decode(CompanyProtocol.encode(command))).toEqual(command);
+    const packet = {
+        op: CompanyOp.Snapshot,
+        id: 'snapshot',
+        state: {
+            name: 'Company',
+            revision: 4n,
+            employees: [],
+            departments: [],
+            construction: [],
+            projects: [
+                {
+                    id: 'child',
+                    name: command.name,
+                    brief: command.brief,
+                    managerId: command.managerId,
+                    team: command.team,
+                    source: { projectId: 'accepted-project', revision: 9007199254740993n },
+                },
+            ],
+        },
+    } as const;
+    expect(CompanyProtocol.decode(CompanyProtocol.encode(packet))).toEqual(packet);
+    for (const version of [1, 2, 3, 4] as const) {
+        expect(() => CompanyProtocol.encode(command, version)).toThrow('v5');
+        const old = CompanyProtocol.decode(CompanyProtocol.encode(packet, version));
+        expect(old.op === CompanyOp.Snapshot && old.state.projects[0]?.source).toBeUndefined();
+    }
+});
