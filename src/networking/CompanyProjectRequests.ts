@@ -18,6 +18,56 @@ interface PendingProject {
 /** Bounded owner requests; reconnect never automatically replays a spending decision. */
 export class CompanyProjectRequests {
     readonly #pending = new Map<string, PendingProject>();
+    readonly #watches = new Map<
+        string,
+        {
+            readonly project: string;
+            readonly listener: (snapshot: CompanyProjectSnapshot) => void;
+            readonly fail: (error: Error) => void;
+            readonly timer: ReturnType<typeof setTimeout>;
+        }
+    >();
+    /** Register a bounded live stream before sending its subscribe packet. */
+    public listen(
+        id: string,
+        project: string,
+        listener: (snapshot: CompanyProjectSnapshot) => void,
+        fail: (error: Error) => void,
+        send: () => void,
+        leave: () => void,
+    ): () => void {
+        if (this.#watches.size >= 8 || this.#watches.has(id)) {
+            throw new Error('Too many open projects');
+        }
+        const reject = (error: Error): void => {
+            const watch = this.#watches.get(id);
+            if (!watch) {
+                return;
+            }
+            this.#watches.delete(id);
+            clearTimeout(watch.timer);
+            fail(error);
+        };
+        const timer = setTimeout(() => {
+            reject(new Error('Project subscription timed out'));
+            leave();
+        }, 30000);
+        this.#watches.set(id, { project, listener, fail: reject, timer });
+        try {
+            send();
+        } catch (error: unknown) {
+            reject(error instanceof Error ? error : new Error('Project subscription failed'));
+        }
+        return () => {
+            const watch = this.#watches.get(id);
+            if (!watch) {
+                return;
+            }
+            this.#watches.delete(id);
+            clearTimeout(watch.timer);
+            leave();
+        };
+    }
     /** Register before sending, retaining the caller's stable mutation identity. */
     public request(
         request: CompanyProjectRequest,
@@ -57,6 +107,21 @@ export class CompanyProjectRequests {
         ) {
             throw new Error('Unexpected project request from server');
         }
+        const watch = this.#watches.get(packet.id);
+        if (watch !== undefined) {
+            if (packet.op === CompanyProjectOp.Error) {
+                watch.fail(new Error(packet.message));
+            } else if (
+                packet.op !== CompanyProjectOp.Snapshot ||
+                packet.work.projectId !== watch.project
+            ) {
+                watch.fail(new Error('Mismatched project update'));
+            } else {
+                clearTimeout(watch.timer);
+                watch.listener(packet);
+            }
+            return;
+        }
         const pending = this.#pending.get(packet.id);
         if (pending === undefined) {
             return;
@@ -85,6 +150,9 @@ export class CompanyProjectRequests {
     }
     /** Fail outstanding requests when their connection ends. */
     public close(error: Error): void {
+        for (const watch of this.#watches.values()) {
+            watch.fail(error);
+        }
         for (const id of this.#pending.keys()) {
             this.#reject(id, error);
         }

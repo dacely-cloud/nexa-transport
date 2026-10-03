@@ -9,6 +9,8 @@ export const CompanyProjectOp = {
     Read: 1,
     Command: 2,
     Artifact: 3,
+    Subscribe: 4,
+    Leave: 5,
     Snapshot: 128,
     File: 129,
     Error: 130,
@@ -23,7 +25,14 @@ export interface CompanyProjectBudget {
 }
 /** Requests never contain an owner; the gateway supplies the verified account. */
 export type CompanyProjectRequest =
-    | { readonly op: typeof CompanyProjectOp.Read; readonly id: string; readonly projectId: string }
+    | {
+          readonly op:
+              | typeof CompanyProjectOp.Read
+              | typeof CompanyProjectOp.Subscribe
+              | typeof CompanyProjectOp.Leave;
+          readonly id: string;
+          readonly projectId: string;
+      }
     | {
           readonly op: typeof CompanyProjectOp.Command;
           readonly id: string;
@@ -172,7 +181,11 @@ export class CompanyProjectProtocol {
             if (!projectId || projectId.length > 128) {
                 throw new Error('Invalid project identity');
             }
-            if (op === CompanyProjectOp.Read) {
+            if (
+                op === CompanyProjectOp.Read ||
+                op === CompanyProjectOp.Subscribe ||
+                op === CompanyProjectOp.Leave
+            ) {
                 packet = { op, id, projectId };
             } else if (op === CompanyProjectOp.Command) {
                 const kind = r.str();
