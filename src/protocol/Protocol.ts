@@ -1210,6 +1210,8 @@ export interface GatewayFeaturesShape {
     readonly companyEmployeeHistory?: true;
     /** companyFollowups as defined by the Nexa gateway. */
     readonly companyFollowups?: true;
+    /** companyProcedures as defined by the Nexa gateway. */
+    readonly companyProcedures?: true;
     /** companyProjectAssignments as defined by the Nexa gateway. */
     readonly companyProjectAssignments?: true;
     /** companyProjectControls as defined by the Nexa gateway. */

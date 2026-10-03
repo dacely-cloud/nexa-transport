@@ -1873,6 +1873,11 @@ export const schema: Schema = {
                         'NCMP v5 supports separately approved follow-ups from accepted deliveries.',
                     type: 'boolean',
                 },
+                companyProcedures: {
+                    const: true,
+                    description: 'Private reviewed guidance tied to accepted company deliveries.',
+                    type: 'boolean',
+                },
                 companyProjectAssignments: {
                     const: true,
                     description: 'NCPW v3 supports reassignment and immutable execution authors.',

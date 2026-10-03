@@ -49,7 +49,7 @@ it('round trips bounded department settings and rejects them on older versions',
     }
 });
 
-it.each([1, 2, 3, 4, 5, 6] as const)(
+it.each([1, 2, 3, 4, 5, 6, 7] as const)(
     'negotiates NCMP v%i and rejects unsupported department changes locally',
     async (version) => {
         const server = new WebSocketServer({ host: '127.0.0.1', port: 0 });
@@ -72,6 +72,7 @@ it.each([1, 2, 3, 4, 5, 6] as const)(
                                 op: CompanyOp.Snapshot,
                                 id: packet.id,
                                 state: {
+                                    procedures: [],
                                     name: 'Company',
                                     revision: 0n,
                                     employees: [],
@@ -98,6 +99,7 @@ it.each([1, 2, 3, 4, 5, 6] as const)(
                                     ...(version >= 4 ? { officeConstruction: true } : {}),
                                     ...(version >= 5 ? { companyFollowups: true } : {}),
                                     ...(version >= 6 ? { companyTeamAreas: true } : {}),
+                                    ...(version >= 7 ? { companyProcedures: true } : {}),
                                 },
                             },
                         }),
@@ -171,7 +173,29 @@ it.each([1, 2, 3, 4, 5, 6] as const)(
                 await expect(client.company(areas)).rejects.toThrow('unavailable');
             } else {
                 await client.company(areas);
-                expect(versions.at(-1)).toBe(6);
+                expect(versions.at(-1)).toBe(version);
+            }
+            const procedure = {
+                op: CompanyOp.Procedure,
+                id: 'procedure',
+                revision: 0n,
+                procedureId: '',
+                title: 'Verify keyboard access',
+                instructions: 'Test tab order and visible focus.',
+                scope: 'employee',
+                targetId: 'ada',
+                status: 'draft',
+                source: { projectId: 'source', revision: 9007199254740993n },
+            } as const;
+            if (version < 7) {
+                await expect(client.company(procedure)).rejects.toThrow('unavailable');
+                expect(() => CompanyProtocol.encode(procedure, version)).toThrow('v7');
+            } else {
+                await client.company(procedure);
+                expect(versions.at(-1)).toBe(7);
+                expect(CompanyProtocol.decode(CompanyProtocol.encode(procedure))).toEqual(
+                    procedure,
+                );
             }
         } finally {
             client.close();
@@ -201,6 +225,7 @@ it('round trips private accepted lineage without silently downgrading follow-up 
         op: CompanyOp.Snapshot,
         id: 'snapshot',
         state: {
+            procedures: [],
             name: 'Company',
             revision: 4n,
             employees: [],
@@ -241,6 +266,7 @@ it('round trips area zero and distinguishes preserved from cleared department as
         op: CompanyOp.Snapshot,
         id: 'areas',
         state: {
+            procedures: [],
             name: 'Company',
             revision: 1n,
             employees: [],
@@ -267,5 +293,40 @@ it('round trips area zero and distinguishes preserved from cleared department as
                 teams: [{ departmentId: 'engineering', placementId }],
             }),
         ).toThrow('area');
+    }
+});
+
+it('round trips private procedure evidence and approval timestamps without losing bigint precision', () => {
+    const source = { projectId: 'accepted-project', revision: 9007199254740993n };
+    for (const status of ['draft', 'approved', 'retired'] as const) {
+        const packet = {
+            op: CompanyOp.Snapshot,
+            id: 'procedures',
+            state: {
+                name: 'Company',
+                revision: 1n,
+                employees: [],
+                departments: [],
+                projects: [],
+                construction: [],
+                procedures: [
+                    {
+                        id: 'method',
+                        title: '<img src=x> 🚀',
+                        instructions: 'Private method',
+                        scope: 'department',
+                        targetId: 'engineering',
+                        source,
+                        status,
+                        approvedAt: 9007199254740995n,
+                    },
+                ],
+            },
+        } as const;
+        expect(CompanyProtocol.decode(CompanyProtocol.encode(packet))).toEqual(packet);
+        for (const version of [1, 2, 3, 4, 5, 6] as const) {
+            const legacy = CompanyProtocol.decode(CompanyProtocol.encode(packet, version));
+            expect(legacy.op === CompanyOp.Snapshot && legacy.state.procedures).toBeUndefined();
+        }
     }
 });

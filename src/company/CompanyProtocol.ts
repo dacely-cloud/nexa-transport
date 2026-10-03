@@ -14,6 +14,7 @@ export const CompanyOp = {
     Employee: 7,
     DepartmentSettings: 8,
     Construction: 9,
+    Procedure: 10,
     Snapshot: 128,
     Error: 129,
 } as const;
@@ -60,8 +61,23 @@ export interface CompanyProject {
     readonly managerId: string;
     readonly team: readonly string[];
 }
+/** Owner-reviewed reusable guidance tied to an immutable accepted delivery. */
+export interface CompanyProcedureDetails {
+    readonly title: string;
+    readonly instructions: string;
+    readonly scope: 'employee' | 'department';
+    readonly targetId: string;
+    readonly source: CompanyProjectSource;
+    readonly status: 'draft' | 'approved' | 'retired';
+}
+/** Approval activates only the saved wording; edits return the procedure to draft. */
+export interface CompanyProcedure extends CompanyProcedureDetails {
+    readonly id: string;
+    readonly approvedAt: bigint;
+}
 /** Private authoritative company state. Never delivered to office visitors. */
 export interface CompanyState {
+    readonly procedures?: readonly CompanyProcedure[];
     readonly construction?: readonly OfficePlacement[];
     readonly name: string;
     readonly revision: bigint;
@@ -72,7 +88,7 @@ export interface CompanyState {
 /** Request identity and optimistic revision are supplied on every command. */
 export interface CompanyRequest {
     /** Reply using the original wire layout for older clients. */
-    readonly version?: 1 | 2 | 3 | 4 | 5;
+    readonly version?: 1 | 2 | 3 | 4 | 5 | 6;
     readonly id: string;
     readonly revision: bigint;
 }
@@ -142,9 +158,15 @@ export interface CompanyConstruction extends CompanyRequest {
     readonly op: typeof CompanyOp.Construction;
     readonly construction: readonly OfficePlacement[];
 }
+/** Create a draft, revise it, approve saved wording, or retire a procedure. */
+export interface CompanyEditProcedure extends CompanyRequest, CompanyProcedureDetails {
+    readonly op: typeof CompanyOp.Procedure;
+    readonly procedureId: string;
+}
 /** Commands carry no owner field; the gateway supplies the authenticated principal. */
 export type CompanyCommand =
     | CompanyRead
+    | CompanyEditProcedure
     | CompanyConstruction
     | CompanyConfigure
     | CompanyHire
@@ -155,14 +177,14 @@ export type CompanyCommand =
     | CompanyEditEmployee;
 /** Successful response, correlated with its command ID. */
 export interface CompanySnapshot {
-    readonly version?: 1 | 2 | 3 | 4 | 5;
+    readonly version?: 1 | 2 | 3 | 4 | 5 | 6;
     readonly op: typeof CompanyOp.Snapshot;
     readonly id: string;
     readonly state: CompanyState;
 }
 /** Rejected command; no private state is embedded in errors. */
 export interface CompanyError {
-    readonly version?: 1 | 2 | 3 | 4 | 5;
+    readonly version?: 1 | 2 | 3 | 4 | 5 | 6;
     readonly op: typeof CompanyOp.Error;
     readonly id: string;
     readonly message: string;
@@ -220,7 +242,7 @@ class Writer {
             write(value);
         }
     }
-    public finish(op: number, version: 1 | 2 | 3 | 4 | 5 | 6): Uint8Array<ArrayBuffer> {
+    public finish(op: number, version: 1 | 2 | 3 | 4 | 5 | 6 | 7): Uint8Array<ArrayBuffer> {
         const view: DataView = new DataView(this.#bytes.buffer);
         view.setUint32(0, 0x504d434e, true);
         view.setUint8(4, version);
@@ -274,7 +296,7 @@ class Reader {
     }
 }
 
-/** NCMP v6 adds saved department areas, retaining earlier reply layouts. */
+/** NCMP v7 adds reviewed reusable procedures, retaining earlier reply layouts. */
 export class CompanyProtocol {
     /** Identify a frame without parsing an unrelated Chat or game packet. */
     public static isFrame(bytes: Uint8Array): boolean {
@@ -287,7 +309,7 @@ export class CompanyProtocol {
     /** Encode a command or its response. */
     public static encode(
         packet: CompanyPacket,
-        version: 1 | 2 | 3 | 4 | 5 | 6 = packet.version ?? 6,
+        version: 1 | 2 | 3 | 4 | 5 | 6 | 7 = packet.version ?? 7,
     ): Uint8Array<ArrayBuffer> {
         if (
             (version !== 1 &&
@@ -295,7 +317,8 @@ export class CompanyProtocol {
                 version !== 3 &&
                 version !== 4 &&
                 version !== 5 &&
-                version !== 6) ||
+                version !== 6 &&
+                version !== 7) ||
             (version === 1 && packet.op === CompanyOp.Employee)
         ) {
             throw new Error('Employee settings require NCMP v2');
@@ -311,6 +334,9 @@ export class CompanyProtocol {
         }
         if (version < 6 && packet.op === CompanyOp.Construction && packet.teams !== undefined) {
             throw new Error('Department areas require NCMP v6');
+        }
+        if (version < 7 && packet.op === CompanyOp.Procedure) {
+            throw new Error('Reviewed procedures require NCMP v7');
         }
         if (!/^[a-zA-Z0-9-]{1,64}$/.test(packet.id)) {
             throw new Error('Invalid company request ID');
@@ -364,11 +390,22 @@ export class CompanyProtocol {
             if (version >= 4) {
                 this.#writeConstruction(w, state.construction ?? []);
             }
+            if (version >= 7) {
+                w.list(state.procedures ?? [], (procedure) => {
+                    w.text(procedure.id);
+                    this.#writeProcedure(w, procedure);
+                    w.big(procedure.approvedAt);
+                });
+            }
         } else if (packet.op === CompanyOp.Error) {
             w.text(packet.message);
         } else {
             w.big(packet.revision);
             switch (packet.op) {
+                case CompanyOp.Procedure:
+                    w.text(packet.procedureId);
+                    this.#writeProcedure(w, packet);
+                    break;
                 case CompanyOp.Construction:
                     this.#writeConstruction(w, packet.construction);
                     if (version >= 6) {
@@ -432,7 +469,8 @@ export class CompanyProtocol {
                 bytes[4] !== 3 &&
                 bytes[4] !== 4 &&
                 bytes[4] !== 5 &&
-                bytes[4] !== 6) ||
+                bytes[4] !== 6 &&
+                bytes[4] !== 7) ||
             bytes[6] !== 0 ||
             bytes[7] !== 0
         ) {
@@ -482,6 +520,15 @@ export class CompanyProtocol {
                     departments,
                     projects,
                     ...(version >= 4 ? { construction: this.#readConstruction(r) } : {}),
+                    ...(version >= 7
+                        ? {
+                              procedures: r.list(() => ({
+                                  id: r.text(),
+                                  ...this.#readProcedure(r),
+                                  approvedAt: r.big(),
+                              })),
+                          }
+                        : {}),
                 },
             };
         } else if (op === CompanyOp.Error) {
@@ -489,6 +536,12 @@ export class CompanyProtocol {
         } else {
             const revision: bigint = r.big();
             switch (op) {
+                case CompanyOp.Procedure:
+                    if (version < 7) {
+                        throw new Error('Reviewed procedures require NCMP v7');
+                    }
+                    packet = { op, id, revision, procedureId: r.text(), ...this.#readProcedure(r) };
+                    break;
                 case CompanyOp.Construction:
                     if (version < 4) {
                         throw new Error('Office construction requires NCMP v4');
@@ -574,7 +627,33 @@ export class CompanyProtocol {
             }
         }
         r.finish();
-        return version === 6 ? packet : { ...packet, version };
+        return version === 7 ? packet : { ...packet, version };
+    }
+    static #writeProcedure(w: Writer, procedure: CompanyProcedureDetails): void {
+        w.text(procedure.title);
+        w.text(procedure.instructions);
+        const scope = ['employee', 'department'].indexOf(procedure.scope);
+        const status = ['draft', 'approved', 'retired'].indexOf(procedure.status);
+        if (scope < 0 || status < 0) {
+            throw new Error('Invalid procedure state');
+        }
+        w.uint(scope);
+        w.text(procedure.targetId);
+        w.text(procedure.source.projectId);
+        w.big(procedure.source.revision);
+        w.uint(status);
+    }
+    static #readProcedure(r: Reader): CompanyProcedureDetails {
+        const title = r.text(),
+            instructions = r.text();
+        const scope = (['employee', 'department'] as const)[r.uint()];
+        const targetId = r.text();
+        const source = { projectId: r.text(), revision: r.big() };
+        const status = (['draft', 'approved', 'retired'] as const)[r.uint()];
+        if (!scope || !status) {
+            throw new Error('Invalid procedure state');
+        }
+        return { title, instructions, scope, targetId, source, status };
     }
     static #writeArea(w: Writer, area: number | undefined): void {
         if (area !== undefined && (!Number.isInteger(area) || area < 0 || area > 255)) {
