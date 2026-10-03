@@ -5,7 +5,7 @@ import { OfficeGameOp, OfficeProtocol, type OfficeGamePacket } from '../src/offi
 import { Method } from '../src/protocol/Protocol';
 import { hello } from './Support';
 
-it.each([2, 3, 4, 5, 6] as const)(
+it.each([2, 3, 4, 5, 6, 7] as const)(
     'multiplexes office v%i with RPC and restores negotiated subscriptions',
     async (version) => {
         const server = new WebSocketServer({ host: '127.0.0.1', port: 0 });
@@ -67,6 +67,7 @@ it.each([2, 3, 4, 5, 6] as const)(
                                             activity: 'Accepted',
                                             goal: '',
                                             desk: 71,
+                                            appearance: 65535,
                                             reaction: {
                                                 id: 'acceptance',
                                                 startedAt: 1n,
@@ -98,6 +99,7 @@ it.each([2, 3, 4, 5, 6] as const)(
                                               ...hello.features,
                                               officeGame: true,
                                               ...(version >= 3 ? { officeGameVersion: 3 } : {}),
+                                              ...(version >= 7 ? { officeAppearance: true } : {}),
                                               ...(version >= 6 ? { officeExecution: true } : {}),
                                               ...(version >= 5 ? { officeConstruction: true } : {}),
                                               ...(version >= 4
@@ -121,11 +123,12 @@ it.each([2, 3, 4, 5, 6] as const)(
             const snapshots: OfficeGamePacket[] = [];
             const stop = client.subscribeOffice((packet) => snapshots.push(packet));
             await expect.poll(() => snapshots.length).toBe(1);
-            expect(input[0]?.version ?? 6).toBe(version);
+            expect(input[0]?.version ?? 7).toBe(version);
             expect(snapshots[0]?.agents[0]?.reaction?.reason).toBe(
                 version >= 3 ? 'accepted' : undefined,
             );
             expect(snapshots[0]?.agents[0]?.desk).toBe(version >= 4 ? 71 : undefined);
+            expect(snapshots[0]?.agents[0]?.appearance).toBe(version >= 7 ? 65535 : undefined);
             expect(snapshots[0]?.construction?.[0]?.kind).toBe(version >= 5 ? 'window' : undefined);
             expect(snapshots.at(-1)?.projects[0]?.execution?.slots).toBe(
                 version >= 6 ? 2 : undefined,

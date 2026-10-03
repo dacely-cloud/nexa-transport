@@ -1224,6 +1224,8 @@ export interface GatewayFeaturesShape {
     readonly methodScopes: RecordstringScope;
     /** methods as defined by the Nexa gateway. */
     readonly methods: ReadonlyArray<string>;
+    /** officeAppearance as defined by the Nexa gateway. */
+    readonly officeAppearance?: true;
     /** officeCompany as defined by the Nexa gateway. */
     readonly officeCompany?: true;
     /** officeCompanyVersion as defined by the Nexa gateway. */

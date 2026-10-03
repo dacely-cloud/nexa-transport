@@ -56,6 +56,17 @@ export interface OfficeTask {
     readonly title: string;
     readonly activity: string;
 }
+/** A stable, bounded cosmetic value; only the value is shared with visitors, never the identity text. */
+export class OfficeAppearance {
+    /** Derive permanent visual variation from an immutable employee identity, independent of tasks or desks. */
+    public static seed(identity: string): number {
+        let value = 2166136261;
+        for (let i = 0; i < identity.length; i++) {
+            value = Math.imul(value ^ identity.charCodeAt(i), 16777619) >>> 0;
+        }
+        return (value ^ (value >>> 16)) & 65535;
+    }
+}
 /** OfficeAgent in the fixed-schema office protocol. */
 export interface OfficeAgent {
     readonly id: string;
@@ -72,6 +83,8 @@ export interface OfficeAgent {
     readonly rank?: 'lead' | 'member';
     /** Saved visual desk address, independent of temporary execution IDs. */
     readonly desk?: number;
+    /** Public cosmetic seed, independent of saved desk and temporary run identifiers. */
+    readonly appearance?: number;
     readonly phases?: readonly OfficePhase[];
     readonly tasks?: readonly OfficeTask[];
     readonly discussionWith?: string;
@@ -148,7 +161,7 @@ export interface OfficeAssignment {
 }
 /** NGOP: fixed-field binary office packets multiplexed on the authenticated gateway socket. */
 /** OFFICE_GAME_VERSION in the fixed-schema office protocol. */
-export const OFFICE_GAME_VERSION = 6;
+export const OFFICE_GAME_VERSION = 7;
 /** OFFICE_GAME_LIMIT in the fixed-schema office protocol. */
 export const OFFICE_GAME_LIMIT = 4 * 1024 * 1024;
 /** OfficeGameOp in the fixed-schema office protocol. */
@@ -182,7 +195,7 @@ export interface OfficeGameState {
 /** OfficeGamePacket in the fixed-schema office protocol. */
 export interface OfficeGamePacket extends OfficeGameState {
     /** Present for an older peer; absent means the current protocol. */
-    readonly version?: 2 | 3 | 4 | 5;
+    readonly version?: 2 | 3 | 4 | 5 | 6;
     readonly op: (typeof OfficeGameOp)[keyof typeof OfficeGameOp];
     readonly sequence: number;
     readonly peer: string;
@@ -393,7 +406,7 @@ const reaction = record<OfficeReaction>({
     reason: enumeration(['error', 'feedback', 'self-correction', 'accepted']),
     phrase: enumeration(['FUCK!', 'WTF?!', 'WHAT IS THIS SHIT?!', 'WE DID IT!']),
 });
-const agent = record<Omit<OfficeAgent, 'desk'>>({
+const agent = record<Omit<OfficeAgent, 'desk' | 'appearance'>>({
     id: string,
     agentId: string,
     name: string,
@@ -528,6 +541,32 @@ const assignedAgent: Codec<OfficeAgent> = {
         return address === undefined ? value : { ...value, desk: address };
     },
 };
+const appearance: Codec<number | undefined> = optional({
+    write(w, value) {
+        if (!Number.isInteger(value) || value < 0 || value > 65535) {
+            throw new Error('Invalid office appearance');
+        }
+        w.u32(value);
+    },
+    read(r) {
+        const value = r.u32();
+        if (value > 65535) {
+            throw new Error('Invalid office appearance');
+        }
+        return value;
+    },
+});
+const dressedAgents = list<OfficeAgent>({
+    write(w, value) {
+        assignedAgent.write(w, value);
+        appearance.write(w, value.appearance);
+    },
+    read(r) {
+        const value = assignedAgent.read(r),
+            seed = appearance.read(r);
+        return seed === undefined ? value : { ...value, appearance: seed };
+    },
+});
 const assignedAgents = list(assignedAgent);
 const agents = list(agent),
     projects = list(project),
@@ -583,9 +622,16 @@ const player: Codec<OfficePlayer> = {
 };
 function encodeOfficeGame(
     packet: OfficeGamePacket,
-    version: 2 | 3 | 4 | 5 | 6,
+    version: 2 | 3 | 4 | 5 | 6 | 7,
 ): Uint8Array<ArrayBuffer> {
-    if (version !== 2 && version !== 3 && version !== 4 && version !== 5 && version !== 6) {
+    if (
+        version !== 2 &&
+        version !== 3 &&
+        version !== 4 &&
+        version !== 5 &&
+        version !== 6 &&
+        version !== 7
+    ) {
         throw new Error('Unsupported office protocol');
     }
     if (!Number.isInteger(packet.sequence) || packet.sequence < 0 || packet.sequence > 0xffffffff) {
@@ -607,7 +653,7 @@ function encodeOfficeGame(
         player.write(w, packet.player);
     }
     if (packet.op === OfficeGameOp.Snapshot || packet.op === OfficeGameOp.Delta) {
-        (version >= 4 ? assignedAgents : agents).write(
+        (version >= 7 ? dressedAgents : version >= 4 ? assignedAgents : agents).write(
             w,
             version === 2
                 ? packet.agents.map((agent) => {
@@ -659,6 +705,7 @@ function decodeOfficeGame(bytes: Uint8Array): OfficeGamePacket {
     if (
         h.getUint32(0, true) !== 0x504f474e ||
         (h.getUint8(4) !== OFFICE_GAME_VERSION &&
+            h.getUint8(4) !== 6 &&
             h.getUint8(4) !== 5 &&
             h.getUint8(4) !== 4 &&
             h.getUint8(4) !== 3 &&
@@ -679,7 +726,7 @@ function decodeOfficeGame(bytes: Uint8Array): OfficeGamePacket {
         throw new Error('Invalid office peer');
     }
     const packet: { -readonly [K in keyof OfficeGamePacket]: OfficeGamePacket[K] } = {
-        ...(h.getUint8(4) < 6 ? { version: h.getUint8(4) as 2 | 3 | 4 | 5 } : {}),
+        ...(h.getUint8(4) < 7 ? { version: h.getUint8(4) as 2 | 3 | 4 | 5 | 6 } : {}),
         op,
         peer,
         sequence: h.getUint32(8, true),
@@ -693,7 +740,9 @@ function decodeOfficeGame(bytes: Uint8Array): OfficeGamePacket {
         packet.player = player.read(r);
     }
     if (op === OfficeGameOp.Snapshot || op === OfficeGameOp.Delta) {
-        packet.agents = (h.getUint8(4) >= 4 ? assignedAgents : agents).read(r);
+        packet.agents = (
+            h.getUint8(4) >= 7 ? dressedAgents : h.getUint8(4) >= 4 ? assignedAgents : agents
+        ).read(r);
         if (
             packet.version === 2 &&
             packet.agents.some(
@@ -748,7 +797,7 @@ export class OfficeProtocol {
     /** Encode one complete packet. */
     public static encode(
         packet: OfficeGamePacket,
-        version: 2 | 3 | 4 | 5 | 6 = packet.version ?? OFFICE_GAME_VERSION,
+        version: 2 | 3 | 4 | 5 | 6 | 7 = packet.version ?? OFFICE_GAME_VERSION,
     ): Uint8Array<ArrayBuffer> {
         return encodeOfficeGame(packet, version);
     }
