@@ -231,3 +231,10 @@ writeFileSync(
     'src/office/OfficeProtocol.ts',
     readFileSync('../nexa/src/office/OfficeProtocol.ts', 'utf8'),
 );
+
+/** NCMP shares the server's canonical fixed-schema codec. */
+mkdirSync('src/company', { recursive: true });
+writeFileSync(
+    'src/company/CompanyProtocol.ts',
+    readFileSync('../nexa/src/company/CompanyProtocol.ts', 'utf8'),
+);

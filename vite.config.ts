@@ -9,6 +9,7 @@ const config: UserConfig = {
                 media: 'src/media/NexaMedia.ts',
                 events: 'src/protocol/Events.ts',
                 office: 'src/office/OfficeProtocol.ts',
+                company: 'src/company/CompanyProtocol.ts',
                 errors: 'src/networking/TransportError.ts',
             },
             formats: ['es'],

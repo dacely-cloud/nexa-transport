@@ -1873,6 +1873,12 @@ export const schema: Schema = {
                     },
                     type: 'array',
                 },
+                officeCompany: {
+                    const: true,
+                    description:
+                        'NCMP private company controls on the existing authenticated socket.',
+                    type: 'boolean',
+                },
                 officeGame: {
                     const: true,
                     description:
