@@ -1856,6 +1856,12 @@ export const schema: Schema = {
                         'NXMD frames carry outbound file bytes; JSON results contain matching metadata.',
                     type: 'boolean',
                 },
+                companyProjects: {
+                    const: true,
+                    description:
+                        'Owner-only project decisions, usage, and captured files on the existing binary socket.',
+                    type: 'boolean',
+                },
                 events: {
                     items: {
                         type: 'string',
@@ -3450,6 +3456,16 @@ export const schema: Schema = {
             anyOf: [
                 {
                     $ref: '#/definitions/TelemetryMonitorAction',
+                },
+                {
+                    properties: {
+                        kind: {
+                            const: 'company-dispatch',
+                            type: 'string',
+                        },
+                    },
+                    required: ['kind'],
+                    type: 'object',
                 },
                 {
                     $ref: '#/definitions/ReminderAction',
@@ -6161,6 +6177,12 @@ export const schema: Schema = {
                     description:
                         'Native thread carrying the active request, when distinct from its parent channel.',
                     type: 'string',
+                },
+                companyExecution: {
+                    const: true,
+                    description:
+                        'Host-issued company execution is always confined, never the local machine operator.',
+                    type: 'boolean',
                 },
                 conversationId: {
                     type: 'string',

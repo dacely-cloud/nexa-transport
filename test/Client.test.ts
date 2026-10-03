@@ -335,7 +335,9 @@ it('manual close cancels a scheduled reconnect', async (): Promise<void> => {
 
 it('steers the server run without starting another stream and rejects completed handles', async () => {
     const connected = await connect();
-    if (gateway === undefined) throw new Error('No peer');
+    if (gateway === undefined) {
+        throw new Error('No peer');
+    }
     gateway.handler = (socket: WebSocket, request: Request): void => {
         if (request.method === 'agent.stream') {
             socket.send(
