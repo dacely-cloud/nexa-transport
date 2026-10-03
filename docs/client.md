@@ -174,3 +174,38 @@ When `companyProcedures` is advertised, NCMP v7 adds `CompanyOp.Procedure` and t
 Editing requires `status: 'draft'` and removes active approval. `status: 'retired'` stops future use while retaining the source and approval date. Retain command IDs on uncertain retries. Source acceptance and revision are rechecked server-side; private company operations remain unavailable to office visitors. Older clients omit procedure fields and reject procedure changes locally.
 
 Only approved procedures matching an employee or their current department join the instructions for future turns, including Chat and background execution. Running turns retain their starting instructions. Procedures cannot add tool permissions, change models, increase spending limits, or dispatch work. Limits are 32 records, 80 title characters, 4,000 instruction characters per record, and 32,000 approved instruction characters across the company. These are owner-reviewed methods with evidence, not a claim of improved model intelligence.
+
+### Scoped project collaboration
+
+`companyCollaboration` enables NCLB v1 on the existing personal Chat socket. Import
+`CollaborationOp` and its types from `nexa-transport/collaboration`. Visit tickets
+never grant this capability.
+
+The recipient calls `client.collaboration({ op: CollaborationOp.Code, id })` to
+create a 15-minute account code. The owner sends `Invite` with a stable request ID,
+owned `projectId`, recipient `code`, display `label`, `role` (`reviewer` or
+`coordinator`) and `durationMs` (one hour to 90 days). The named recipient must
+explicitly accept through `Decide` with `grantId`, current grant `revision` and
+`decision: 'accept'`. Decline and owner revocation use the same operation. Codes are
+consumed once and retries never renew or restore expired/revoked access.
+
+`List` with empty `projectId` returns your invitations; an owned project ID lists
+its collaborators. `Context` with `grantId` returns the invited project and roster,
+without employee instructions or unrelated projects. `collaborationProject(grantId,
+projectId, command?)` reads or changes that project. Reviewers may inspect captured
+files and accept a delivery; coordinators may also reassign queued tasks and change
+priority/pause dispatch. Planning, approvals, budget changes, corrections, employee
+configuration, maintenance and invitations remain owner-only. Acceptance can allow
+an already owner-authorized maintenance schedule to advance.
+
+`subscribeCollaborationProject(grantId, projectId, listener, onError)` returns an
+unsubscribe function. `collaborationArtifact(grantId, projectId, attemptId, path,
+offset)` reads one checked file chunk. `subscribeCollaborationOffice(grantId,
+listener, onError)` returns `{ close, move }` for the owner's sanitized office. Its
+frames include generic activity and presence, never private prompts or project
+identifiers. This does not change your Chat identity or authorize owner RPCs.
+
+Close subscriptions when their views close. On disconnect, pending operations fail;
+reopen streams after reconnect and retry uncertain mutations explicitly with the
+same ID and values. Private snapshots and artifact chunks recheck the grant before
+sending; idle subscriptions and office presence are revalidated every second.

@@ -246,11 +246,13 @@ for (const name of [
     'CompanyMaintenanceTypes',
     'CompanyProjectProtocol',
     'CompanyShowroomProtocol',
+    'CompanyCollaborationTypes',
+    'CompanyCollaborationProtocol',
 ]) {
     writeFileSync(
         `src/company/${name}.ts`,
         readFileSync(`../nexa/src/company/${name}.ts`, 'utf8').replace(
-            /from '(\.\/[^']+)'/g,
+            /from '(\.\.?\/[^']+)'/g,
             "from '$1.js'",
         ),
     );
