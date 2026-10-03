@@ -1912,6 +1912,11 @@ export const schema: Schema = {
                     description: 'NCMP v2 employee model and tool settings.',
                     type: 'number',
                 },
+                officeDeskAssignments: {
+                    const: true,
+                    description: 'Accepts NGOP v4 with saved visual desk assignments.',
+                    type: 'boolean',
+                },
                 officeGame: {
                     const: true,
                     description:

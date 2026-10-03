@@ -1224,6 +1224,8 @@ export interface GatewayFeaturesShape {
     readonly officeCompany?: true;
     /** officeCompanyVersion as defined by the Nexa gateway. */
     readonly officeCompanyVersion?: 2;
+    /** officeDeskAssignments as defined by the Nexa gateway. */
+    readonly officeDeskAssignments?: true;
     /** officeGame as defined by the Nexa gateway. */
     readonly officeGame?: true;
     /** officeGameVersion as defined by the Nexa gateway. */
