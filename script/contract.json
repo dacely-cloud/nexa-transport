@@ -1821,6 +1821,11 @@
                     "description": "Stable employee cosmetics in NGOP v7.",
                     "type": "boolean"
                 },
+                "officeCompany": {
+                    "const": true,
+                    "description": "NCO2 persistent company staffing and project briefs.",
+                    "type": "boolean"
+                },
                 "officeConstruction": {
                     "const": true,
                     "description": "NCMP v4 owner construction and NGOP v5 public floor plans.",

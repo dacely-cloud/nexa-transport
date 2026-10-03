@@ -797,6 +797,7 @@ Methods, events, and additive capabilities supported by this gateway.
 | `methodScopes`          | Yes      | [RecordstringScope](protocol.md#recordstringscope) | The scope each method requires.                                                |
 | `methods`               | Yes      | Array of `string`                                  |                                                                                |
 | `officeAppearance`      | No       | `true`                                             | Stable employee cosmetics in NGOP v7.                                          |
+| `officeCompany`         | No       | `true`                                             | NCO2 persistent company staffing and project briefs.                           |
 | `officeConstruction`    | No       | `true`                                             | NCMP v4 owner construction and NGOP v5 public floor plans.                     |
 | `officeDeskAssignments` | No       | `true`                                             | Accepts NGOP v4 with saved visual desk assignments.                            |
 | `officeDeskPositions`   | No       | `true`                                             | Saved physical workstation positions in NGOP v8 and NCMP v8.                   |

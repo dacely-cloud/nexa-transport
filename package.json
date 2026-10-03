@@ -48,6 +48,14 @@
         "./office": {
             "types": "./dist/office/OfficeProtocol.d.ts",
             "import": "./dist/office.js"
+        },
+        "./company": {
+            "types": "./dist/company/CompanyProtocol.d.ts",
+            "import": "./dist/company.js"
+        },
+        "./company-types": {
+            "types": "./dist/company/CompanyTypes.d.ts",
+            "import": "./dist/company-types.js"
         }
     },
     "scripts": {
