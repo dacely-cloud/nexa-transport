@@ -1218,6 +1218,8 @@ export interface GatewayFeaturesShape {
     readonly officeCompany?: true;
     /** officeGame as defined by the Nexa gateway. */
     readonly officeGame?: true;
+    /** officeGameVersion as defined by the Nexa gateway. */
+    readonly officeGameVersion?: 3;
 }
 
 /** GatewayFeatures from the Nexa wire protocol. */
