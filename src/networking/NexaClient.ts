@@ -1,4 +1,10 @@
 import {
+    CompanyProtocol,
+    type CompanyCommand,
+    type CompanyState,
+} from '../company/CompanyProtocol.js';
+import { CompanyRequests } from './CompanyRequests.js';
+import {
     OfficeProtocol,
     OfficeGameOp,
     type OfficeGamePacket,
@@ -76,6 +82,7 @@ export interface SessionSnapshot {
 }
 /** Authenticated Nexa gateway connection shared by browsers and Node.js. */
 export class NexaClient {
+    readonly #company = new CompanyRequests();
     readonly #officeListeners = new Set<(packet: OfficeGamePacket) => void>();
     #socket: WebSocket;
     #detachSocket: (() => void) | undefined;
@@ -500,6 +507,22 @@ export class NexaClient {
             this.#streamIds.delete(turn.streamId);
         }
     }
+    /** Read or change your private company over the existing authenticated socket. */
+    public company(command: CompanyCommand): Promise<CompanyState> {
+        if (!this.connected || this.#hello?.features.officeCompany !== true) {
+            return Promise.reject(
+                new Error('Company management is unavailable on this connection'),
+            );
+        }
+        const bytes: Uint8Array<ArrayBuffer> = CompanyProtocol.encode(command);
+        return this.#company.request(command, () => {
+            if (!this.connected || this.#socket.bufferedAmount > 256 * 1024) {
+                throw new Error('Company connection is busy or disconnected');
+            }
+            this.#socket.send(bytes);
+        });
+    }
+
     /** Observe authoritative office state over this existing authenticated connection. */
     public subscribeOffice(listener: (packet: OfficeGamePacket) => void): () => void {
         if (this.#hello?.features.officeGame !== true) {
@@ -745,6 +768,13 @@ export class NexaClient {
             if (complete === null) {
                 return;
             }
+            if (CompanyProtocol.isFrame(new Uint8Array(complete))) {
+                if (this.#hello.features.officeCompany !== true) {
+                    throw new Error('Unnegotiated company frame');
+                }
+                this.#company.receive(CompanyProtocol.decode(new Uint8Array(complete)));
+                return;
+            }
             if (OfficeProtocol.isFrame(new Uint8Array(complete))) {
                 if (this.#hello.features.officeGame !== true) {
                     throw new Error('Unnegotiated office frame');
@@ -930,6 +960,7 @@ export class NexaClient {
         this.#closed = true;
         this.#failure = materializeError(error);
         this.#pending.close(error);
+        this.#company.close(error);
         this.#wake?.();
         for (const listener of this.#closeListeners) {
             this.#notify((): void => {
