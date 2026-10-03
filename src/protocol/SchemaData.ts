@@ -1856,6 +1856,12 @@ export const schema: Schema = {
                         'NXMD frames carry outbound file bytes; JSON results contain matching metadata.',
                     type: 'boolean',
                 },
+                companyEmployeeHistory: {
+                    const: true,
+                    description:
+                        'Owner-only employee evidence over the existing binary project channel.',
+                    type: 'boolean',
+                },
                 companyProjectAssignments: {
                     const: true,
                     description: 'NCPW v3 supports reassignment and immutable execution authors.',

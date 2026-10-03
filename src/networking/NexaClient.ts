@@ -13,6 +13,7 @@ import {
     type CompanyProjectSnapshot,
     type CompanyProjectFile,
     type CompanyAllowanceCommand,
+    type CompanyEmployeeHistory,
 } from '../company/CompanyProjectProtocol.js';
 import type { CompanyWorkCommand } from '../company/CompanyWork.js';
 import {
@@ -657,15 +658,32 @@ export class NexaClient {
         return response;
     }
 
+    /** Read measured employee project history on the existing owner connection. */
+    public async employeeHistory(employeeId: string): Promise<CompanyEmployeeHistory> {
+        if (this.#hello?.features.companyEmployeeHistory !== true) {
+            throw new Error('Employee history is unavailable on this NEXA host');
+        }
+        const response = await this.#projectRequest({
+            op: CompanyProjectOp.Employee,
+            id: crypto.randomUUID(),
+            employeeId,
+        });
+        if (response.op !== CompanyProjectOp.History) {
+            throw new Error('Expected employee history');
+        }
+        return response;
+    }
+
     #projectRequest(
         request: CompanyProjectRequest,
-    ): Promise<CompanyProjectSnapshot | CompanyProjectFile> {
+    ): Promise<CompanyProjectSnapshot | CompanyProjectFile | CompanyEmployeeHistory> {
         if (!this.connected || this.#hello?.features.companyProjects !== true) {
             return Promise.reject(new Error('Project execution is unavailable on this connection'));
         }
         const bytes = CompanyProjectProtocol.encode(
             request,
-            this.#hello.features.companyProjectAssignments === true
+            this.#hello.features.companyProjectAssignments === true ||
+                this.#hello.features.companyEmployeeHistory === true
                 ? 3
                 : this.#hello.features.companyProjectControls === true
                   ? 2
