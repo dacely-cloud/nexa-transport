@@ -9,6 +9,42 @@ import {
     type CompanyProjectFile,
 } from '../src/company/CompanyProjectProtocol.js';
 
+it('round-trips management controls, retains exact money, and rejects unsupported or malformed controls', () => {
+    const schedule = {
+        op: CompanyProjectOp.Command,
+        id: 'pause',
+        projectId: 'project',
+        command: {
+            kind: 'schedule' as const,
+            id: 'pause',
+            revision: 4n,
+            paused: true,
+            priority: 2,
+        },
+    };
+    const bytes = CompanyProjectProtocol.encode(schedule);
+    expect(CompanyProjectProtocol.decode(bytes)).toEqual(schedule);
+    expect(() => CompanyProjectProtocol.encode(schedule, 1)).toThrow('v2');
+    const badPause = bytes.slice();
+    badPause[badPause.length - 2] = 2;
+    expect(() => CompanyProjectProtocol.decode(badPause)).toThrow('pause');
+    const badPriority = bytes.slice();
+    badPriority[badPriority.length - 1] = 3;
+    expect(() => CompanyProjectProtocol.decode(badPriority)).toThrow('schedule');
+    const allowance = {
+        op: CompanyProjectOp.Allowance,
+        id: 'allowance',
+        projectId: 'project',
+        revision: 1n,
+        limit: 9007199254740993n,
+        concurrency: 8,
+    };
+    expect(CompanyProjectProtocol.decode(CompanyProjectProtocol.encode(allowance))).toEqual(
+        allowance,
+    );
+    expect(() => CompanyProjectProtocol.encode(allowance, 1)).toThrow('v2');
+});
+
 it('does not accept a file response belonging to another project or offset', async (): Promise<void> => {
     const requests: CompanyProjectRequests = new CompanyProjectRequests();
     const packet: CompanyProjectFile = {

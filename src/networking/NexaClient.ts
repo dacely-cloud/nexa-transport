@@ -11,6 +11,7 @@ import {
     type CompanyProjectRequest,
     type CompanyProjectSnapshot,
     type CompanyProjectFile,
+    type CompanyAllowanceCommand,
 } from '../company/CompanyProjectProtocol.js';
 import type { CompanyWorkCommand } from '../company/CompanyWork.js';
 import {
@@ -538,11 +539,33 @@ export class NexaClient {
         projectId: string,
         command?: CompanyWorkCommand,
     ): Promise<CompanyProjectSnapshot> {
+        if (command?.kind === 'schedule' && this.#hello?.features.companyProjectControls !== true) {
+            throw new Error('Project management controls are unavailable on this connection');
+        }
         const request: CompanyProjectRequest =
             command === undefined
                 ? { op: CompanyProjectOp.Read, id: crypto.randomUUID(), projectId }
                 : { op: CompanyProjectOp.Command, id: command.id, projectId, command };
         const response = await this.#projectRequest(request);
+        if (response.op !== CompanyProjectOp.Snapshot) {
+            throw new Error('Expected project snapshot');
+        }
+        return response;
+    }
+
+    /** Change approved spending and concurrency without replaying or restarting assignments. */
+    public async projectAllowance(
+        projectId: string,
+        command: CompanyAllowanceCommand,
+    ): Promise<CompanyProjectSnapshot> {
+        if (this.#hello?.features.companyProjectControls !== true) {
+            throw new Error('Project management controls are unavailable on this connection');
+        }
+        const response = await this.#projectRequest({
+            ...command,
+            op: CompanyProjectOp.Allowance,
+            projectId,
+        });
         if (response.op !== CompanyProjectOp.Snapshot) {
             throw new Error('Expected project snapshot');
         }
@@ -571,7 +594,12 @@ export class NexaClient {
             if (this.#socket.bufferedAmount > 256 * 1024) {
                 throw new Error('Project connection is busy');
             }
-            this.#socket.send(CompanyProjectProtocol.encode({ op, id, projectId }));
+            this.#socket.send(
+                CompanyProjectProtocol.encode(
+                    { op, id, projectId },
+                    this.#hello?.features.companyProjectControls === true ? 2 : 1,
+                ),
+            );
         };
         return this.#projects.listen(
             id,
@@ -616,7 +644,10 @@ export class NexaClient {
         if (!this.connected || this.#hello?.features.companyProjects !== true) {
             return Promise.reject(new Error('Project execution is unavailable on this connection'));
         }
-        const bytes = CompanyProjectProtocol.encode(request);
+        const bytes = CompanyProjectProtocol.encode(
+            request,
+            this.#hello.features.companyProjectControls === true ? 2 : 1,
+        );
         return this.#projects.request(request, () => {
             if (!this.connected || this.#socket.bufferedAmount > 256 * 1024) {
                 throw new Error('Project connection is busy or disconnected');

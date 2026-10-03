@@ -11,6 +11,7 @@ export const CompanyProjectOp = {
     Artifact: 3,
     Subscribe: 4,
     Leave: 5,
+    Allowance: 6,
     Snapshot: 128,
     File: 129,
     Error: 130,
@@ -23,39 +24,62 @@ export interface CompanyProjectBudget {
     readonly reserved: bigint;
     readonly concurrency: number;
 }
+/** Live owner dispatch controls. Pausing lets assignments already running finish. */
+export interface CompanyProjectSchedule {
+    readonly paused: boolean;
+    readonly priority: number;
+}
+/** An allowance change is deduplicated by its own stable ID and financial revision. */
+export interface CompanyAllowanceCommand {
+    readonly id: string;
+    readonly revision: bigint;
+    readonly limit: bigint;
+    readonly concurrency: number;
+}
+/** Retain the requested wire version for replies to older clients. */
+export interface CompanyProjectWire {
+    readonly version?: 1;
+}
 /** Requests never contain an owner; the gateway supplies the verified account. */
-export type CompanyProjectRequest =
-    | {
-          readonly op:
-              | typeof CompanyProjectOp.Read
-              | typeof CompanyProjectOp.Subscribe
-              | typeof CompanyProjectOp.Leave;
-          readonly id: string;
-          readonly projectId: string;
-      }
-    | {
-          readonly op: typeof CompanyProjectOp.Command;
-          readonly id: string;
-          readonly projectId: string;
-          readonly command: CompanyWorkCommand;
-      }
-    | {
-          readonly op: typeof CompanyProjectOp.Artifact;
-          readonly id: string;
-          readonly projectId: string;
-          readonly attemptId: string;
-          readonly path: string;
-          readonly offset: number;
-      };
+export type CompanyProjectRequest = CompanyProjectWire &
+    (
+        | ({
+              readonly op: typeof CompanyProjectOp.Allowance;
+              readonly projectId: string;
+          } & CompanyAllowanceCommand)
+        | {
+              readonly op:
+                  | typeof CompanyProjectOp.Read
+                  | typeof CompanyProjectOp.Subscribe
+                  | typeof CompanyProjectOp.Leave;
+              readonly id: string;
+              readonly projectId: string;
+          }
+        | {
+              readonly op: typeof CompanyProjectOp.Command;
+              readonly id: string;
+              readonly projectId: string;
+              readonly command: CompanyWorkCommand;
+          }
+        | {
+              readonly op: typeof CompanyProjectOp.Artifact;
+              readonly id: string;
+              readonly projectId: string;
+              readonly attemptId: string;
+              readonly path: string;
+              readonly offset: number;
+          }
+    );
 /** Complete owner-only work state with current spending. */
-export interface CompanyProjectSnapshot {
+export interface CompanyProjectSnapshot extends CompanyProjectWire {
     readonly op: typeof CompanyProjectOp.Snapshot;
     readonly id: string;
     readonly work: CompanyWork;
     readonly budget: CompanyProjectBudget | null;
+    readonly schedule?: CompanyProjectSchedule;
 }
 /** A bounded slice of a host-resolved captured delivery, never an arbitrary filesystem read. */
-export interface CompanyProjectFile {
+export interface CompanyProjectFile extends CompanyProjectWire {
     readonly op: typeof CompanyProjectOp.File;
     readonly id: string;
     readonly projectId: string;
@@ -67,14 +91,20 @@ export interface CompanyProjectFile {
     readonly bytes: Uint8Array;
 }
 /** Private operation result. */
-export type CompanyProjectResponse =
-    | CompanyProjectSnapshot
-    | CompanyProjectFile
-    | { readonly op: typeof CompanyProjectOp.Error; readonly id: string; readonly message: string };
+export type CompanyProjectResponse = CompanyProjectWire &
+    (
+        | CompanyProjectSnapshot
+        | CompanyProjectFile
+        | {
+              readonly op: typeof CompanyProjectOp.Error;
+              readonly id: string;
+              readonly message: string;
+          }
+    );
 /** Both directions of the bounded project protocol. */
 export type CompanyProjectPacket = CompanyProjectRequest | CompanyProjectResponse;
 
-/** NCPW v1 retains exact monetary integers and fixed schemas without JSON serialization. */
+/** NCPW v2 adds owner dispatch controls while retaining v1 snapshots for older clients. */
 export class CompanyProjectProtocol {
     /** One response carries at most 64 KiB of artifact bytes. */
     public static readonly chunkBytes = 65536;
@@ -87,10 +117,23 @@ export class CompanyProjectProtocol {
         );
     }
     /** Encode one request or result. */
-    public static encode(packet: CompanyProjectPacket): Uint8Array<ArrayBuffer> {
+    public static encode(
+        packet: CompanyProjectPacket,
+        version: 1 | 2 = packet.version ?? 2,
+    ): Uint8Array<ArrayBuffer> {
+        if (version !== 1 && version !== 2) {
+            throw new Error('Unsupported project packet');
+        }
+        if (
+            version === 1 &&
+            (packet.op === CompanyProjectOp.Allowance ||
+                (packet.op === CompanyProjectOp.Command && packet.command.kind === 'schedule'))
+        ) {
+            throw new Error('Project controls require NCPW v2');
+        }
         this.#id(packet.id);
         const w = new BinaryWriter(1024);
-        w.u32(0x5750434e).u8(1).u8(packet.op).u8(0).u8(0).str(packet.id);
+        w.u32(0x5750434e).u8(version).u8(packet.op).u8(0).u8(0).str(packet.id);
         if (packet.op === CompanyProjectOp.Snapshot) {
             const work = CompanyWorkCodec.encode(packet.work);
             w.u32(work.length)
@@ -103,17 +146,27 @@ export class CompanyProjectProtocol {
                     .u64(packet.budget.reserved)
                     .u32(packet.budget.concurrency);
             }
+            if (version === 2) {
+                const schedule = packet.schedule ?? { paused: false, priority: 1 };
+                this.#schedule(schedule);
+                w.u8(schedule.paused ? 1 : 0).u8(schedule.priority);
+            }
         } else if (packet.op === CompanyProjectOp.Error) {
             w.str(packet.message);
         } else {
             w.str(packet.projectId);
-            if (packet.op === CompanyProjectOp.Command) {
+            if (packet.op === CompanyProjectOp.Allowance) {
+                w.u64(packet.revision).u64(packet.limit).u32(packet.concurrency);
+            } else if (packet.op === CompanyProjectOp.Command) {
                 const command = packet.command;
                 if (command.id !== packet.id) {
                     throw new Error('Mismatched project command identity');
                 }
                 w.str(command.kind).u64(command.revision);
-                if (command.kind === 'plan' || command.kind === 'approve') {
+                if (command.kind === 'schedule') {
+                    this.#schedule(command);
+                    w.u8(command.paused ? 1 : 0).u8(command.priority);
+                } else if (command.kind === 'plan' || command.kind === 'approve') {
                     w.u64(command.limit)
                         .u64(command.allowanceRevision)
                         .u32(command.concurrency)
@@ -143,7 +196,11 @@ export class CompanyProjectProtocol {
     /** Validate before routing; unknown operations, invalid UTF-8, and trailing data are rejected. */
     public static decode(bytes: Uint8Array): CompanyProjectPacket {
         const r = new BinaryReader(bytes);
-        if (r.u32() !== 0x5750434e || r.u8() !== 1) {
+        if (r.u32() !== 0x5750434e) {
+            throw new Error('Unsupported project packet');
+        }
+        const version = r.u8();
+        if (version !== 1 && version !== 2) {
             throw new Error('Unsupported project packet');
         }
         const op = r.u8();
@@ -174,6 +231,16 @@ export class CompanyProjectProtocol {
                           concurrency: r.u32(),
                       };
             packet = { op, id, work, budget };
+            if (version === 2) {
+                const paused = r.u8(),
+                    priority = r.u8();
+                if (paused > 1) {
+                    throw new Error('Invalid project pause flag');
+                }
+                const schedule = { paused: paused === 1, priority };
+                this.#schedule(schedule);
+                packet = { ...packet, schedule };
+            }
         } else if (op === CompanyProjectOp.Error) {
             packet = { op, id, message: r.str() };
         } else {
@@ -187,11 +254,28 @@ export class CompanyProjectProtocol {
                 op === CompanyProjectOp.Leave
             ) {
                 packet = { op, id, projectId };
+            } else if (op === CompanyProjectOp.Allowance && version === 2) {
+                packet = {
+                    op,
+                    id,
+                    projectId,
+                    revision: r.u64(),
+                    limit: r.u64(),
+                    concurrency: r.u32(),
+                };
             } else if (op === CompanyProjectOp.Command) {
                 const kind = r.str();
                 const revision = r.u64();
                 let command: CompanyWorkCommand;
-                if (kind === 'plan' || kind === 'approve') {
+                if (kind === 'schedule' && version === 2) {
+                    const paused = r.u8(),
+                        priority = r.u8();
+                    if (paused > 1) {
+                        throw new Error('Invalid project pause flag');
+                    }
+                    command = { kind, id, revision, paused: paused === 1, priority };
+                    this.#schedule(command);
+                } else if (kind === 'plan' || kind === 'approve') {
                     const limit = r.u64(),
                         allowanceRevision = r.u64(),
                         concurrency = r.u32(),
@@ -258,7 +342,17 @@ export class CompanyProjectProtocol {
         if (r.remaining !== 0) {
             throw new Error('Trailing project packet data');
         }
-        return packet;
+        return version === 1 ? { ...packet, version: 1 } : packet;
+    }
+    static #schedule(schedule: CompanyProjectSchedule): void {
+        if (
+            typeof schedule.paused !== 'boolean' ||
+            !Number.isInteger(schedule.priority) ||
+            schedule.priority < 0 ||
+            schedule.priority > 2
+        ) {
+            throw new Error('Invalid project schedule');
+        }
     }
     static #id(id: string): void {
         if (!/^[a-zA-Z0-9-]{1,64}$/.test(id)) {

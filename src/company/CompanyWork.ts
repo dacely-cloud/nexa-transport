@@ -68,6 +68,13 @@ export interface CompanyProposal {
 /** Owner decisions are revision-checked and idempotent; none accepts a principal from the wire. */
 export type CompanyWorkCommand =
     | {
+          readonly kind: 'schedule';
+          readonly id: string;
+          readonly revision: bigint;
+          readonly paused: boolean;
+          readonly priority: number;
+      }
+    | {
           readonly kind: 'plan';
           readonly id: string;
           readonly revision: bigint;

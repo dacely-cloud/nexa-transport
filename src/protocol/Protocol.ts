@@ -1204,6 +1204,8 @@ export interface GatewayFeaturesShape {
     readonly attachments?: true;
     /** binaryMedia as defined by the Nexa gateway. */
     readonly binaryMedia?: true;
+    /** companyProjectControls as defined by the Nexa gateway. */
+    readonly companyProjectControls?: true;
     /** companyProjectLive as defined by the Nexa gateway. */
     readonly companyProjectLive?: true;
     /** companyProjects as defined by the Nexa gateway. */
