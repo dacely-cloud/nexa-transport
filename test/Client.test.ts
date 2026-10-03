@@ -26,6 +26,24 @@ async function connect(): Promise<NexaClient> {
     return client;
 }
 describe('Nexa websocket lifetimes', (): void => {
+    it('does not send recurring authorization to a host without maintenance support', async (): Promise<void> => {
+        const connected: NexaClient = await connect();
+        const before: number = gateway?.requests.length ?? 0;
+        await expect(
+            connected.projectMaintenance('project', {
+                id: 'repeat',
+                revision: 0n,
+                sourceRevision: 1n,
+                intervalMs: 3600000n,
+                maxRuns: 2,
+                limit: 100n,
+                concurrency: 1,
+                maxIterations: 8,
+                paused: false,
+            }),
+        ).rejects.toThrow('unavailable');
+        expect(gateway?.requests.length).toBe(before);
+    });
     it('calls the enum method with typed conversation and media parameters', async (): Promise<void> => {
         const connected: NexaClient = await connect();
         if (gateway === undefined) {
