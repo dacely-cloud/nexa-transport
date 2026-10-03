@@ -10,6 +10,7 @@ export const CompanyOp = {
     Draft: 5,
     Assign: 6,
     Employee: 7,
+    DepartmentSettings: 8,
     Snapshot: 128,
     Error: 129,
 } as const;
@@ -29,10 +30,16 @@ export interface CompanyEmployee {
     readonly desk: number;
     readonly settings?: CompanyEmployeeSettings;
 }
+/** Shared owner-authored guidance and an optional ceiling on members' tools. */
+export interface CompanyDepartmentSettings {
+    readonly instructions: string;
+    readonly tools: readonly string[] | null;
+}
 /** Organizational area owned by this company. */
 export interface CompanyDepartment {
     readonly id: string;
     readonly name: string;
+    readonly settings?: CompanyDepartmentSettings;
 }
 /** Persistent project brief ready for planning and execution. */
 export interface CompanyProject {
@@ -53,7 +60,7 @@ export interface CompanyState {
 /** Request identity and optimistic revision are supplied on every command. */
 export interface CompanyRequest {
     /** Reply using the original wire layout for older clients. */
-    readonly version?: 1;
+    readonly version?: 1 | 2;
     readonly id: string;
     readonly revision: bigint;
 }
@@ -78,6 +85,13 @@ export interface CompanyHire extends CompanyRequest {
 export interface CompanyCreateDepartment extends CompanyRequest {
     readonly op: typeof CompanyOp.Department;
     readonly name: string;
+}
+/** Update shared guidance and permissions without changing department membership. */
+export interface CompanyEditDepartment extends CompanyRequest {
+    readonly op: typeof CompanyOp.DepartmentSettings;
+    readonly departmentId: string;
+    readonly name: string;
+    readonly settings: CompanyDepartmentSettings;
 }
 /** Save a project brief and its initial staffing. */
 export interface CompanyDraft extends CompanyRequest {
@@ -109,19 +123,20 @@ export type CompanyCommand =
     | CompanyConfigure
     | CompanyHire
     | CompanyCreateDepartment
+    | CompanyEditDepartment
     | CompanyDraft
     | CompanyAssign
     | CompanyEditEmployee;
 /** Successful response, correlated with its command ID. */
 export interface CompanySnapshot {
-    readonly version?: 1;
+    readonly version?: 1 | 2;
     readonly op: typeof CompanyOp.Snapshot;
     readonly id: string;
     readonly state: CompanyState;
 }
 /** Rejected command; no private state is embedded in errors. */
 export interface CompanyError {
-    readonly version?: 1;
+    readonly version?: 1 | 2;
     readonly op: typeof CompanyOp.Error;
     readonly id: string;
     readonly message: string;
@@ -179,7 +194,7 @@ class Writer {
             write(value);
         }
     }
-    public finish(op: number, version: 1 | 2): Uint8Array<ArrayBuffer> {
+    public finish(op: number, version: 1 | 2 | 3): Uint8Array<ArrayBuffer> {
         const view: DataView = new DataView(this.#bytes.buffer);
         view.setUint32(0, 0x504d434e, true);
         view.setUint8(4, version);
@@ -233,7 +248,7 @@ class Reader {
     }
 }
 
-/** NCMP v2 adds persistent employee settings while retaining the v1 wire layout. */
+/** NCMP v3 adds shared department settings, retaining v1/v2 reply layouts. */
 export class CompanyProtocol {
     /** Identify a frame without parsing an unrelated Chat or game packet. */
     public static isFrame(bytes: Uint8Array): boolean {
@@ -246,13 +261,16 @@ export class CompanyProtocol {
     /** Encode a command or its response. */
     public static encode(
         packet: CompanyPacket,
-        version: 1 | 2 = packet.version ?? 2,
+        version: 1 | 2 | 3 = packet.version ?? 3,
     ): Uint8Array<ArrayBuffer> {
         if (
-            (version !== 1 && version !== 2) ||
+            (version !== 1 && version !== 2 && version !== 3) ||
             (version === 1 && packet.op === CompanyOp.Employee)
         ) {
             throw new Error('Employee settings require NCMP v2');
+        }
+        if (version < 3 && packet.op === CompanyOp.DepartmentSettings) {
+            throw new Error('Department settings require NCMP v3');
         }
         if (!/^[a-zA-Z0-9-]{1,64}$/.test(packet.id)) {
             throw new Error('Invalid company request ID');
@@ -270,7 +288,7 @@ export class CompanyProtocol {
                 w.text(employee.instructions);
                 w.text(employee.departmentId);
                 w.uint(employee.desk);
-                if (version === 2) {
+                if (version >= 2) {
                     this.#writeSettings(
                         w,
                         employee.settings ?? { provider: '', model: '', tools: null },
@@ -280,6 +298,12 @@ export class CompanyProtocol {
             w.list(state.departments, (department) => {
                 w.text(department.id);
                 w.text(department.name);
+                if (version >= 3) {
+                    this.#writeDepartment(
+                        w,
+                        department.settings ?? { instructions: '', tools: null },
+                    );
+                }
             });
             w.list(state.projects, (project) => {
                 w.text(project.id);
@@ -293,6 +317,11 @@ export class CompanyProtocol {
         } else {
             w.big(packet.revision);
             switch (packet.op) {
+                case CompanyOp.DepartmentSettings:
+                    w.text(packet.departmentId);
+                    w.text(packet.name);
+                    this.#writeDepartment(w, packet.settings);
+                    break;
                 case CompanyOp.Employee:
                     w.text(packet.employeeId);
                     w.text(packet.name);
@@ -337,7 +366,7 @@ export class CompanyProtocol {
             bytes.length < 8 ||
             bytes.length > 4 * 1024 * 1024 ||
             !this.isFrame(bytes) ||
-            (bytes[4] !== 1 && bytes[4] !== 2) ||
+            (bytes[4] !== 1 && bytes[4] !== 2 && bytes[4] !== 3) ||
             bytes[6] !== 0 ||
             bytes[7] !== 0
         ) {
@@ -361,11 +390,12 @@ export class CompanyProtocol {
                 instructions: r.text(),
                 departmentId: r.text(),
                 desk: r.uint(),
-                ...(version === 2 ? { settings: this.#readSettings(r) } : {}),
+                ...(version >= 2 ? { settings: this.#readSettings(r) } : {}),
             }));
             const departments: readonly CompanyDepartment[] = r.list(() => ({
                 id: r.text(),
                 name: r.text(),
+                ...(version >= 3 ? { settings: this.#readDepartment(r) } : {}),
             }));
             const projects: readonly CompanyProject[] = r.list(() => ({
                 id: r.text(),
@@ -380,8 +410,21 @@ export class CompanyProtocol {
         } else {
             const revision: bigint = r.big();
             switch (op) {
+                case CompanyOp.DepartmentSettings:
+                    if (version < 3) {
+                        throw new Error('Department settings require NCMP v3');
+                    }
+                    packet = {
+                        op,
+                        id,
+                        revision,
+                        departmentId: r.text(),
+                        name: r.text(),
+                        settings: this.#readDepartment(r),
+                    };
+                    break;
                 case CompanyOp.Employee:
-                    if (version !== 2) {
+                    if (version < 2) {
                         throw new Error('Employee settings require NCMP v2');
                     }
                     packet = {
@@ -439,23 +482,34 @@ export class CompanyProtocol {
             }
         }
         r.finish();
-        return version === 1 ? { ...packet, version: 1 } : packet;
+        return version === 3 ? packet : { ...packet, version };
+    }
+    static #writeDepartment(w: Writer, settings: CompanyDepartmentSettings): void {
+        w.text(settings.instructions);
+        this.#writeTools(w, settings.tools);
+    }
+    static #readDepartment(r: Reader): CompanyDepartmentSettings {
+        return { instructions: r.text(), tools: this.#readTools(r) };
+    }
+    static #writeTools(w: Writer, tools: readonly string[] | null): void {
+        w.uint(tools === null ? 0 : 1);
+        if (tools !== null) {
+            w.list(tools, (tool) => w.text(tool));
+        }
+    }
+    static #readTools(r: Reader): readonly string[] | null {
+        const mode: number = r.uint();
+        if (mode > 1) {
+            throw new Error('Invalid company tool mode');
+        }
+        return mode === 0 ? null : r.list(() => r.text());
     }
     static #writeSettings(w: Writer, settings: CompanyEmployeeSettings): void {
         w.text(settings.provider);
         w.text(settings.model);
-        w.uint(settings.tools === null ? 0 : 1);
-        if (settings.tools !== null) {
-            w.list(settings.tools, (tool) => w.text(tool));
-        }
+        this.#writeTools(w, settings.tools);
     }
     static #readSettings(r: Reader): CompanyEmployeeSettings {
-        const provider = r.text(),
-            model = r.text(),
-            tools = r.uint();
-        if (tools > 1) {
-            throw new Error('Invalid employee tool mode');
-        }
-        return { provider, model, tools: tools === 0 ? null : r.list(() => r.text()) };
+        return { provider: r.text(), model: r.text(), tools: this.#readTools(r) };
     }
 }

@@ -2,6 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { expect, it } from 'vitest';
+import { WebSocketServer } from 'ws';
+import { NexaClient } from '../src/networking/NexaClient.js';
+import { hello } from './Support.js';
 import { CompanyOp, CompanyProtocol } from '../src/company/CompanyProtocol.js';
 
 it('preserves empty and inherited employee permissions and gates settings on NCMP v2', () => {
@@ -25,3 +28,117 @@ it('preserves empty and inherited employee permissions and gates settings on NCM
         version: 1,
     });
 });
+
+it('round trips bounded department settings and rejects them on older versions', () => {
+    for (const tools of [null, [], ['read_file']]) {
+        const command = {
+            op: CompanyOp.DepartmentSettings,
+            id: 'shared',
+            revision: 9n,
+            departmentId: 'engineering',
+            name: 'Engineering',
+            settings: { instructions: '<script>literal text</script>', tools },
+        } as const;
+        expect(CompanyProtocol.decode(CompanyProtocol.encode(command))).toEqual(command);
+        for (const version of [1, 2] as const) {
+            expect(() => CompanyProtocol.encode(command, version)).toThrow('v3');
+            const malformed = CompanyProtocol.encode(command);
+            malformed[4] = version;
+            expect(() => CompanyProtocol.decode(malformed)).toThrow('v3');
+        }
+    }
+});
+
+it.each([1, 2, 3] as const)(
+    'negotiates NCMP v%i and rejects unsupported department changes locally',
+    async (version) => {
+        const server = new WebSocketServer({ host: '127.0.0.1', port: 0 });
+        const versions: number[] = [];
+        server.on('connection', (socket) => {
+            socket.send(
+                JSON.stringify({
+                    event: 'connect.challenge',
+                    seq: 1,
+                    data: { nonce: 'challenge', ts: 1, protocol: 1, minProtocol: 1 },
+                }),
+            );
+            socket.on('message', (raw: Buffer, binary: boolean) => {
+                if (binary) {
+                    const packet = CompanyProtocol.decode(raw);
+                    versions.push(raw[4] ?? 0);
+                    socket.send(
+                        CompanyProtocol.encode(
+                            {
+                                op: CompanyOp.Snapshot,
+                                id: packet.id,
+                                state: {
+                                    name: 'Company',
+                                    revision: 0n,
+                                    employees: [],
+                                    departments: [],
+                                    projects: [],
+                                },
+                            },
+                            version,
+                        ),
+                    );
+                } else {
+                    const request = JSON.parse(raw.toString()) as { readonly id: string };
+                    socket.send(
+                        JSON.stringify({
+                            id: request.id,
+                            ok: true,
+                            result: {
+                                ...hello,
+                                features: {
+                                    ...hello.features,
+                                    officeCompany: true,
+                                    ...(version >= 2 ? { officeCompanyVersion: 2 } : {}),
+                                    ...(version >= 3 ? { companyDepartmentSettings: true } : {}),
+                                },
+                            },
+                        }),
+                    );
+                }
+            });
+        });
+        await new Promise<void>((resolve) => server.once('listening', resolve));
+        const address = server.address();
+        if (address === null || typeof address === 'string') {
+            throw new Error('Expected address');
+        }
+        const client = await NexaClient.connect({
+            url: `ws://127.0.0.1:${address.port}`,
+            reconnect: false,
+        });
+        try {
+            expect(
+                (await client.company({ op: CompanyOp.Read, id: 'read', revision: 0n })).name,
+            ).toBe('Company');
+            expect(versions).toEqual([version]);
+            const edit = {
+                op: CompanyOp.DepartmentSettings,
+                id: 'edit',
+                revision: 0n,
+                departmentId: 'team',
+                name: 'Engineering',
+                settings: { instructions: 'Private guidance', tools: [] },
+            } as const;
+            if (version < 3) {
+                await expect(client.company(edit)).rejects.toThrow('unavailable');
+                expect(versions).toEqual([version]);
+            } else {
+                await client.company(edit);
+                expect(versions).toEqual([3, 3]);
+            }
+        } finally {
+            client.close();
+            for (const socket of server.clients) {
+                socket.terminate();
+            }
+            await new Promise<void>((resolve, reject) =>
+                server.close((error) => (error ? reject(error) : resolve())),
+            );
+        }
+    },
+);

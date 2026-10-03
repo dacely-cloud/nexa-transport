@@ -532,9 +532,21 @@ export class NexaClient {
                 new Error('Employee settings are unavailable on this connection'),
             );
         }
+        if (
+            command.op === CompanyOp.DepartmentSettings &&
+            this.#hello.features.companyDepartmentSettings !== true
+        ) {
+            return Promise.reject(
+                new Error('Department settings are unavailable on this connection'),
+            );
+        }
         const bytes: Uint8Array<ArrayBuffer> = CompanyProtocol.encode(
             command,
-            this.#hello.features.officeCompanyVersion === 2 ? 2 : 1,
+            this.#hello.features.companyDepartmentSettings === true
+                ? 3
+                : this.#hello.features.officeCompanyVersion === 2
+                  ? 2
+                  : 1,
         );
         return this.#company.request(command, () => {
             if (!this.connected || this.#socket.bufferedAmount > 256 * 1024) {
