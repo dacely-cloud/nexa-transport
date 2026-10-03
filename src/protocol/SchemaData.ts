@@ -1901,6 +1901,11 @@ export const schema: Schema = {
                         'NCMP private company controls on the existing authenticated socket.',
                     type: 'boolean',
                 },
+                officeCompanyVersion: {
+                    const: 2,
+                    description: 'NCMP v2 employee model and tool settings.',
+                    type: 'number',
+                },
                 officeGame: {
                     const: true,
                     description:

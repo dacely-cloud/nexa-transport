@@ -1220,6 +1220,8 @@ export interface GatewayFeaturesShape {
     readonly methods: ReadonlyArray<string>;
     /** officeCompany as defined by the Nexa gateway. */
     readonly officeCompany?: true;
+    /** officeCompanyVersion as defined by the Nexa gateway. */
+    readonly officeCompanyVersion?: 2;
     /** officeGame as defined by the Nexa gateway. */
     readonly officeGame?: true;
     /** officeGameVersion as defined by the Nexa gateway. */
