@@ -10,6 +10,8 @@ const config: UserConfig = {
                 events: 'src/protocol/Events.ts',
                 office: 'src/office/OfficeProtocol.ts',
                 company: 'src/company/CompanyProtocol.ts',
+                projects: 'src/company/CompanyProjectProtocol.ts',
+                'company-work': 'src/company/CompanyWork.ts',
                 errors: 'src/networking/TransportError.ts',
             },
             formats: ['es'],

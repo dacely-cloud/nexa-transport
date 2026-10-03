@@ -23,6 +23,10 @@ Import `NexaClient` from `nexa-transport`, `Method` and protocol types from `nex
 
 `client.uploadData(blob, filename, options?)` streams a file to the authenticated workspace and returns `DataFile` from `nexa-transport/protocol`. `DataUploadOptions`, exported from `nexa-transport`, accepts `signal` and `onProgress(uploadedBytes: bigint, totalBytes: bigint)`. The helper holds at most one 192 KiB source slice in flight and reports server-acknowledged progress. Pass the returned path to an agent request to start analysis; upload alone makes no model call.
 
+`client.project(projectId, command?)` reads a private project snapshot or submits an owner decision: plan, approve, request a correction, or accept a delivery. It returns durable work history and the current spending allowance. Money uses integer USD microcents (`100000000n` equals $1), and revisions use `bigint`. Retain the exact command, including its ID and revision, when retrying after a timeout or disconnect; the server deduplicates it. The client does not automatically replay spending decisions. Project commands and file requests require the negotiated `companyProjects` capability and travel as binary NCPW frames over the existing Chat socket.
+
+`client.projectArtifact(projectId, attemptId, path, offset?)` reads a captured delivery referenced in the owner's project history. Each response contains at most 64 KiB, with `offset`, `total`, and a SHA-256 `digest`. Continue from `offset + bytes.length` until `total` is reached; verify the assembled file against the digest before using it. The server resolves the file from the authenticated account's recorded attempt, never from an arbitrary filesystem path. Treat downloaded HTML as untrusted content when building previews. Protocol types are available from `nexa-transport/projects`; work and command types are available from `nexa-transport/company-work`.
+
 There is no `client.ask()` convenience method. Use `client.call(Method.AgentAsk, ...)`.
 
 ### ClientOptions

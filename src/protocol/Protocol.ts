@@ -1204,6 +1204,8 @@ export interface GatewayFeaturesShape {
     readonly attachments?: true;
     /** binaryMedia as defined by the Nexa gateway. */
     readonly binaryMedia?: true;
+    /** companyProjects as defined by the Nexa gateway. */
+    readonly companyProjects?: true;
     /** events as defined by the Nexa gateway. */
     readonly events: ReadonlyArray<string>;
     /** methodScopes as defined by the Nexa gateway. */
@@ -2300,8 +2302,14 @@ export interface JobShape {
 /** Job from the Nexa wire protocol. */
 export type Job = JobShape;
 
-/** JobActionVariant2 wire fields. */
-export interface JobActionVariant2Shape {
+/** JobActionVariant1 wire fields. */
+export interface JobActionVariant1Shape {
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: 'company-dispatch';
+}
+
+/** JobActionVariant3 wire fields. */
+export interface JobActionVariant3Shape {
     /** agentId as defined by the Nexa gateway. */
     readonly agentId: string;
     /** deliverTo as defined by the Nexa gateway. */
@@ -2314,16 +2322,16 @@ export interface JobActionVariant2Shape {
     readonly silentWhenEmpty?: boolean;
 }
 
-/** Allowed values for JobActionVariant3elevation. */
-export const JobActionVariant3elevationValues = {
+/** Allowed values for JobActionVariant4elevation. */
+export const JobActionVariant4elevationValues = {
     Value0: 'ask',
     Value1: 'full',
     Value2: 'off',
     Value3: 'on',
 } as const;
 
-/** JobActionVariant3 wire fields. */
-export interface JobActionVariant3Shape {
+/** JobActionVariant4 wire fields. */
+export interface JobActionVariant4Shape {
     /** allowSelfLifecycle as defined by the Nexa gateway. */
     readonly allowSelfLifecycle?: boolean;
     /** command as defined by the Nexa gateway. */
@@ -2331,15 +2339,15 @@ export interface JobActionVariant3Shape {
     /** cwd as defined by the Nexa gateway. */
     readonly cwd?: string;
     /** elevation as defined by the Nexa gateway. */
-    readonly elevation?: (typeof JobActionVariant3elevationValues)[keyof typeof JobActionVariant3elevationValues];
+    readonly elevation?: (typeof JobActionVariant4elevationValues)[keyof typeof JobActionVariant4elevationValues];
     /** kind as defined by the Nexa gateway. */
     readonly kind: 'shell';
     /** timeoutMs as defined by the Nexa gateway. */
     readonly timeoutMs?: number;
 }
 
-/** JobActionVariant4 wire fields. */
-export interface JobActionVariant4Shape {
+/** JobActionVariant5 wire fields. */
+export interface JobActionVariant5Shape {
     /** input as defined by the Nexa gateway. */
     readonly input: JsonValue;
     /** kind as defined by the Nexa gateway. */
@@ -2348,8 +2356,8 @@ export interface JobActionVariant4Shape {
     readonly tool: string;
 }
 
-/** JobActionVariant5 wire fields. */
-export interface JobActionVariant5Shape {
+/** JobActionVariant6 wire fields. */
+export interface JobActionVariant6Shape {
     /** event as defined by the Nexa gateway. */
     readonly event: string;
     /** kind as defined by the Nexa gateway. */
@@ -2358,8 +2366,8 @@ export interface JobActionVariant5Shape {
     readonly payload?: JsonValue;
 }
 
-/** JobActionVariant6 wire fields. */
-export interface JobActionVariant6Shape {
+/** JobActionVariant7 wire fields. */
+export interface JobActionVariant7Shape {
     /** kind as defined by the Nexa gateway. */
     readonly kind: 'maintenance';
 }
@@ -2367,12 +2375,13 @@ export interface JobActionVariant6Shape {
 /** JobAction from the Nexa wire protocol. */
 export type JobAction =
     | TelemetryMonitorAction
+    | JobActionVariant1Shape
     | ReminderAction
-    | JobActionVariant2Shape
     | JobActionVariant3Shape
     | JobActionVariant4Shape
     | JobActionVariant5Shape
-    | JobActionVariant6Shape;
+    | JobActionVariant6Shape
+    | JobActionVariant7Shape;
 
 /** JobAddParams wire fields. */
 export interface JobAddParamsShape {
@@ -4036,6 +4045,8 @@ export interface ToolPrincipalShape {
     readonly channelPlatformUserId?: string;
     /** channelThreadId as defined by the Nexa gateway. */
     readonly channelThreadId?: string;
+    /** companyExecution as defined by the Nexa gateway. */
+    readonly companyExecution?: true;
     /** conversationId as defined by the Nexa gateway. */
     readonly conversationId?: string;
     /** discordAppOnly as defined by the Nexa gateway. */

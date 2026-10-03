@@ -4,6 +4,15 @@ import {
     type CompanyState,
 } from '../company/CompanyProtocol.js';
 import { CompanyRequests } from './CompanyRequests.js';
+import { CompanyProjectRequests } from './CompanyProjectRequests.js';
+import {
+    CompanyProjectOp,
+    CompanyProjectProtocol,
+    type CompanyProjectRequest,
+    type CompanyProjectSnapshot,
+    type CompanyProjectFile,
+} from '../company/CompanyProjectProtocol.js';
+import type { CompanyWorkCommand } from '../company/CompanyWork.js';
 import {
     OfficeProtocol,
     OfficeGameOp,
@@ -83,6 +92,7 @@ export interface SessionSnapshot {
 /** Authenticated Nexa gateway connection shared by browsers and Node.js. */
 export class NexaClient {
     readonly #company = new CompanyRequests();
+    readonly #projects = new CompanyProjectRequests();
     readonly #officeListeners = new Set<(packet: OfficeGamePacket) => void>();
     #socket: WebSocket;
     #detachSocket: (() => void) | undefined;
@@ -523,6 +533,58 @@ export class NexaClient {
         });
     }
 
+    /** Read project work or submit an owner decision using a stable command ID for safe retries. */
+    public async project(
+        projectId: string,
+        command?: CompanyWorkCommand,
+    ): Promise<CompanyProjectSnapshot> {
+        const request: CompanyProjectRequest =
+            command === undefined
+                ? { op: CompanyProjectOp.Read, id: crypto.randomUUID(), projectId }
+                : { op: CompanyProjectOp.Command, id: command.id, projectId, command };
+        const response = await this.#projectRequest(request);
+        if (response.op !== CompanyProjectOp.Snapshot) {
+            throw new Error('Expected project snapshot');
+        }
+        return response;
+    }
+
+    /** Download one captured-file chunk. Continue at offset + bytes.length until total is reached. */
+    public async projectArtifact(
+        projectId: string,
+        attemptId: string,
+        path: string,
+        offset = 0,
+    ): Promise<CompanyProjectFile> {
+        const response = await this.#projectRequest({
+            op: CompanyProjectOp.Artifact,
+            id: crypto.randomUUID(),
+            projectId,
+            attemptId,
+            path,
+            offset,
+        });
+        if (response.op !== CompanyProjectOp.File) {
+            throw new Error('Expected project file');
+        }
+        return response;
+    }
+
+    #projectRequest(
+        request: CompanyProjectRequest,
+    ): Promise<CompanyProjectSnapshot | CompanyProjectFile> {
+        if (!this.connected || this.#hello?.features.companyProjects !== true) {
+            return Promise.reject(new Error('Project execution is unavailable on this connection'));
+        }
+        const bytes = CompanyProjectProtocol.encode(request);
+        return this.#projects.request(request, () => {
+            if (!this.connected || this.#socket.bufferedAmount > 256 * 1024) {
+                throw new Error('Project connection is busy or disconnected');
+            }
+            this.#socket.send(bytes);
+        });
+    }
+
     /** Observe authoritative office state over this existing authenticated connection. */
     public subscribeOffice(listener: (packet: OfficeGamePacket) => void): () => void {
         if (this.#hello?.features.officeGame !== true) {
@@ -768,6 +830,13 @@ export class NexaClient {
             if (complete === null) {
                 return;
             }
+            if (CompanyProjectProtocol.isFrame(new Uint8Array(complete))) {
+                if (this.#hello.features.companyProjects !== true) {
+                    throw new Error('Unnegotiated project frame');
+                }
+                this.#projects.receive(CompanyProjectProtocol.decode(new Uint8Array(complete)));
+                return;
+            }
             if (CompanyProtocol.isFrame(new Uint8Array(complete))) {
                 if (this.#hello.features.officeCompany !== true) {
                     throw new Error('Unnegotiated company frame');
@@ -961,6 +1030,7 @@ export class NexaClient {
         this.#failure = materializeError(error);
         this.#pending.close(error);
         this.#company.close(error);
+        this.#projects.close(error);
         this.#wake?.();
         for (const listener of this.#closeListeners) {
             this.#notify((): void => {
