@@ -49,6 +49,23 @@ export interface CompanyWorkAttempt {
     readonly evidence: readonly CompanyEvidence[];
     /** Owner acknowledgement after the host confirms that no provider liability remains unresolved. */
     readonly interruptionReview?: CompanyInterruptionReview;
+    /** Exact-call owner decisions; these never authorize a future invocation or another host attempt. */
+    readonly permissions?: readonly CompanyToolPermission[];
+}
+/** A private, durable request retains complete arguments and its execution fence. */
+export interface CompanyToolPermission {
+    readonly id: string;
+    readonly fingerprint: string;
+    readonly tool: string;
+    readonly summary: string;
+    readonly detail: string;
+    readonly arguments: string;
+    readonly risk: 'read' | 'write' | 'execute' | 'destructive';
+    readonly requested: bigint;
+    readonly expires: bigint;
+    readonly status: 'pending' | 'approved' | 'denied' | 'expired';
+    readonly decided: bigint;
+    readonly decisionId: string;
 }
 /** A recovery decision preserves execution receipts and never certifies a successful delivery. */
 export interface CompanyInterruptionReview {
@@ -145,6 +162,14 @@ export interface CompanyReviewInterruption extends CompanyWorkRequest {
     readonly attemptId: string;
     readonly evidence: string;
 }
+/** Decide one saved invocation; the host supplies its tool, arguments, risk, and execution holder. */
+export interface CompanyDecidePermission extends CompanyWorkRequest {
+    readonly kind: 'permission';
+    readonly attemptId: string;
+    readonly permissionId: string;
+    readonly fingerprint: string;
+    readonly approved: boolean;
+}
 /** Change queued assignments without interrupting a running tool call. */
 export interface CompanyAssign extends CompanyWorkRequest {
     readonly kind: 'assign';
@@ -180,6 +205,7 @@ export type CompanyWorkCommand =
     | CompanySchedule
     | CompanySetBaseline
     | CompanySetShowcase
+    | CompanyDecidePermission
     | CompanyReviewInterruption;
 /** Exact completed-run receipts passed by the host, never by an owner or visitor command. */
 export interface CompanyWorkResult {

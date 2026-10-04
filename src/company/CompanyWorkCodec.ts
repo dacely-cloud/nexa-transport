@@ -13,6 +13,7 @@ import type {
     CompanyShowcase,
     CompanyVerificationOutcome,
     CompanyInterruptionReview,
+    CompanyToolPermission,
 } from './CompanyWorkTypes.js';
 
 /** Versioned, bounded binary persistence; prompts and artifact contents are never public office data. */
@@ -30,21 +31,25 @@ export class CompanyWorkCodec {
         verification: boolean = true,
         showcase: boolean = true,
         recovery: boolean = true,
+        permissions: boolean = true,
     ): Uint8Array {
         const w: BinaryWriter = new BinaryWriter(1024);
         const version: number =
-            recovery && work.attempts.some((attempt) => attempt.interruptionReview !== undefined)
-                ? 5
-                : showcase && work.showcase
-                  ? 4
-                  : verification &&
-                      work.attempts.some((attempt) =>
-                          attempt.evidence.some((evidence) => evidence.outcome !== undefined),
-                      )
-                    ? 3
-                    : work.baseline
-                      ? 2
-                      : 1;
+            permissions && work.attempts.some((attempt) => (attempt.permissions?.length ?? 0) > 0)
+                ? 6
+                : recovery &&
+                    work.attempts.some((attempt) => attempt.interruptionReview !== undefined)
+                  ? 5
+                  : showcase && work.showcase
+                    ? 4
+                    : verification &&
+                        work.attempts.some((attempt) =>
+                            attempt.evidence.some((evidence) => evidence.outcome !== undefined),
+                        )
+                      ? 3
+                      : work.baseline
+                        ? 2
+                        : 1;
         w.u32(this.#magic).u8(version);
         w.str(work.projectId)
             .u64(work.revision)
@@ -106,6 +111,27 @@ export class CompanyWorkCodec {
                         .str(attempt.interruptionReview.evidence);
                 }
             }
+            if (version >= 6) {
+                const saved: readonly CompanyToolPermission[] = attempt.permissions ?? [];
+                if (saved.length > 32) {
+                    throw new Error('Too many saved tool permissions');
+                }
+                this.#writeList(w, saved, (permission: CompanyToolPermission): void => {
+                    this.validatePermission(permission);
+                    w.str(permission.id)
+                        .str(permission.fingerprint)
+                        .str(permission.tool)
+                        .str(permission.summary)
+                        .str(permission.detail)
+                        .str(permission.arguments)
+                        .str(permission.risk)
+                        .u64(permission.requested)
+                        .u64(permission.expires)
+                        .str(permission.status)
+                        .u64(permission.decided)
+                        .str(permission.decisionId);
+                });
+            }
         });
         if (version >= 3) {
             w.u8(work.baseline ? 1 : 0);
@@ -134,7 +160,12 @@ export class CompanyWorkCodec {
         const version: number = r.u8();
         if (
             magic !== this.#magic ||
-            (version !== 1 && version !== 2 && version !== 3 && version !== 4 && version !== 5)
+            (version !== 1 &&
+                version !== 2 &&
+                version !== 3 &&
+                version !== 4 &&
+                version !== 5 &&
+                version !== 6)
         ) {
             throw new Error('Unsupported company work record');
         }
@@ -275,25 +306,42 @@ export class CompanyWorkCodec {
                 if (reviewed > 1) {
                     throw new Error('Invalid interruption review presence');
                 }
-                if (reviewed === 0) {
-                    return attempt;
+                let completed: CompanyWorkAttempt = attempt;
+                if (reviewed === 1) {
+                    const review: CompanyInterruptionReview = {
+                        id: r.str(),
+                        at: r.u64(),
+                        evidence: r.str(),
+                    };
+                    if (
+                        status !== 'blocked' ||
+                        review.at !== finished ||
+                        review.at < started ||
+                        !/^[a-zA-Z0-9-]{1,64}$/.test(review.id) ||
+                        !review.evidence.trim() ||
+                        review.evidence.length > 8000
+                    ) {
+                        throw new Error('Invalid stored interruption review');
+                    }
+                    completed = { ...attempt, interruptionReview: review };
                 }
-                const review: CompanyInterruptionReview = {
-                    id: r.str(),
-                    at: r.u64(),
-                    evidence: r.str(),
-                };
-                if (
-                    status !== 'blocked' ||
-                    review.at !== finished ||
-                    review.at < started ||
-                    !/^[a-zA-Z0-9-]{1,64}$/.test(review.id) ||
-                    !review.evidence.trim() ||
-                    review.evidence.length > 8000
-                ) {
-                    throw new Error('Invalid stored interruption review');
+                if (version >= 6) {
+                    const permissions: readonly CompanyToolPermission[] = this.#readList(
+                        r,
+                        (): CompanyToolPermission => this.#readPermission(r),
+                    );
+                    if (
+                        permissions.length > 32 ||
+                        new Set(permissions.map((item) => item.id)).size !== permissions.length ||
+                        permissions.some((item) => item.requested < started)
+                    ) {
+                        throw new Error('Invalid saved attempt permissions');
+                    }
+                    if (permissions.length > 0) {
+                        completed = { ...completed, permissions };
+                    }
                 }
-                return { ...attempt, interruptionReview: review };
+                return completed;
             },
         );
         const present: number = version >= 3 ? r.u8() : version === 2 ? 1 : 0;
@@ -379,6 +427,12 @@ export class CompanyWorkCodec {
         const w: BinaryWriter = new BinaryWriter(256);
         w.str(command.kind).str(command.id).u64(command.revision);
         switch (command.kind) {
+            case 'permission':
+                w.str(command.attemptId)
+                    .str(command.permissionId)
+                    .str(command.fingerprint)
+                    .u8(command.approved ? 1 : 0);
+                break;
             case 'review-interruption':
                 w.str(command.attemptId).str(command.evidence);
                 break;
@@ -429,6 +483,30 @@ export class CompanyWorkCodec {
         }
         let command: CompanyWorkCommand;
         switch (kind) {
+            case 'permission': {
+                const attemptId: string = r.str();
+                const permissionId: string = r.str();
+                const fingerprint: string = r.str();
+                const approved: number = r.u8();
+                if (
+                    !/^[a-zA-Z0-9-]{1,80}$/.test(attemptId) ||
+                    !/^[a-zA-Z0-9-]{1,64}$/.test(permissionId) ||
+                    !/^[a-f0-9]{64}$/.test(fingerprint) ||
+                    approved > 1
+                ) {
+                    throw new Error('Invalid tool permission decision');
+                }
+                command = {
+                    kind,
+                    id,
+                    revision,
+                    attemptId,
+                    permissionId,
+                    fingerprint,
+                    approved: approved === 1,
+                };
+                break;
+            }
             case 'review-interruption': {
                 const attemptId: string = r.str();
                 const evidence: string = r.str();
@@ -508,6 +586,76 @@ export class CompanyWorkCodec {
             throw new Error('Trailing project decision data');
         }
         return command;
+    }
+    /** Validate both host-created records and decoded durable binary state. */
+    public static validatePermission(permission: CompanyToolPermission): void {
+        if (
+            !/^[a-zA-Z0-9-]{1,64}$/.test(permission.id) ||
+            !/^[a-f0-9]{64}$/.test(permission.fingerprint) ||
+            !permission.tool.trim() ||
+            permission.tool.length > 128 ||
+            !permission.summary.trim() ||
+            permission.summary.length > 2000 ||
+            permission.detail.length > 8000 ||
+            !permission.arguments.trim() ||
+            permission.arguments.length > 16000 ||
+            !['read', 'write', 'execute', 'destructive'].includes(permission.risk) ||
+            !['pending', 'approved', 'denied', 'expired'].includes(permission.status) ||
+            permission.requested < 0n ||
+            permission.expires <= permission.requested ||
+            permission.expires > 0xffffffffffffffffn ||
+            permission.decided < 0n ||
+            permission.decided > 0xffffffffffffffffn ||
+            (permission.status === 'pending' &&
+                (permission.decided !== 0n || permission.decisionId !== '')) ||
+            (permission.status !== 'pending' && permission.decided < permission.requested) ||
+            ((permission.status === 'approved' || permission.status === 'denied') &&
+                (permission.decided >= permission.expires ||
+                    !/^[a-zA-Z0-9-]{1,64}$/.test(permission.decisionId))) ||
+            (permission.status === 'expired' &&
+                (permission.decided < permission.expires || permission.decisionId !== ''))
+        ) {
+            throw new Error('Invalid saved tool permission');
+        }
+    }
+    static #readPermission(r: BinaryReader): CompanyToolPermission {
+        const id: string = r.str(),
+            fingerprint: string = r.str(),
+            tool: string = r.str(),
+            summary: string = r.str(),
+            detail: string = r.str(),
+            args: string = r.str(),
+            risk: string = r.str();
+        const requested: bigint = r.u64(),
+            expires: bigint = r.u64();
+        const status: string = r.str();
+        const decided: bigint = r.u64();
+        const decisionId: string = r.str();
+        if (
+            (risk !== 'read' && risk !== 'write' && risk !== 'execute' && risk !== 'destructive') ||
+            (status !== 'pending' &&
+                status !== 'approved' &&
+                status !== 'denied' &&
+                status !== 'expired')
+        ) {
+            throw new Error('Invalid tool permission status or risk');
+        }
+        const permission: CompanyToolPermission = {
+            id,
+            fingerprint,
+            tool,
+            summary,
+            detail,
+            arguments: args,
+            risk,
+            requested,
+            expires,
+            status,
+            decided,
+            decisionId,
+        };
+        this.validatePermission(permission);
+        return permission;
     }
     static #validateBaseline(base: CompanyBaseline, project: string): void {
         let total: bigint = 0n;

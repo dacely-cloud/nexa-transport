@@ -1982,6 +1982,12 @@ export const schema: Schema = {
                     description: 'NCP2 version 2 with accepted-product baselines for new projects.',
                     type: 'boolean',
                 },
+                officeProjectPermissions: {
+                    const: true,
+                    description:
+                        'Owner-only NCP2 v6 exact-call tool permissions tied to a live execution attempt.',
+                    type: 'boolean',
+                },
                 officeProjectRecovery: {
                     const: true,
                     description:

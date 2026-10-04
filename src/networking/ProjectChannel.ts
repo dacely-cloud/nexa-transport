@@ -22,10 +22,13 @@ interface ProjectWatch {
 export class ProjectChannel {
     readonly #pending: Map<string, PendingProject> = new Map();
     readonly #watches: Map<string, ProjectWatch> = new Map();
-    #version: 2 | 3 | 4 | 5 | undefined;
+    #version: 2 | 3 | 4 | 5 | 6 | undefined;
     #send: ((bytes: Uint8Array<ArrayBuffer>) => void) | undefined;
     /** Restore read subscriptions only. A lost mutation is never automatically replayed. */
-    public resume(send: (bytes: Uint8Array<ArrayBuffer>) => void, version?: 2 | 3 | 4 | 5): void {
+    public resume(
+        send: (bytes: Uint8Array<ArrayBuffer>) => void,
+        version?: 2 | 3 | 4 | 5 | 6,
+    ): void {
         this.#version = version;
         this.#send = send;
         for (const [id, watch] of this.#watches) {

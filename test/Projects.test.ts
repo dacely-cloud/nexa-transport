@@ -399,3 +399,44 @@ it('negotiates owner interruption reviews and resumes only reads after connectio
     release();
     channel.clear();
 });
+
+it('sends exact permission decisions only after negotiation and never replays them on reconnect', async () => {
+    const channel = new ProjectChannel();
+    const packets: ReturnType<typeof CompanyProjectProtocol.decode>[] = [];
+    const send = (bytes: Uint8Array): void => {
+        packets.push(CompanyProjectProtocol.decode(bytes));
+    };
+    const request: ProjectClientPacket = {
+        op: ProjectOp.Command,
+        id: 'owner-permission',
+        project: 'project',
+        command: {
+            kind: 'permission',
+            id: 'decide-exact-call',
+            revision: 8n,
+            attemptId: 'attempt',
+            permissionId: 'permission',
+            fingerprint: 'a'.repeat(64),
+            approved: true,
+        },
+    };
+    channel.resume(send, 5);
+    await expect(channel.state(request)).rejects.toThrow('version 6');
+    expect(packets).toEqual([]);
+    channel.resume(send, 6);
+    const release = channel.watch('project', vi.fn(), vi.fn());
+    const pending = channel.state(request);
+    const failed = expect(pending).rejects.toThrow('Connection interrupted');
+    expect(packets[1]).toMatchObject({
+        version: 6,
+        op: ProjectOp.Command,
+        command: request.command,
+    });
+    channel.disconnect(new Error('Connection interrupted'));
+    await failed;
+    channel.resume(send, 6);
+    expect(packets.filter((packet) => packet.op === ProjectOp.Command)).toHaveLength(1);
+    expect(packets.at(-1)).toMatchObject({ op: ProjectOp.Subscribe, version: 6 });
+    release();
+    channel.clear();
+});

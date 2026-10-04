@@ -35,6 +35,9 @@ export class CompanyProjectProtocol {
             case ProjectOp.Stopped:
                 break;
             case ProjectOp.Command: {
+                if (packet.command.kind === 'permission' && version < 6) {
+                    throw new Error('Tool permissions require project protocol version 6');
+                }
                 if (packet.command.kind === 'review-interruption' && version < 5) {
                     throw new Error('Interruption reviews require project protocol version 5');
                 }
@@ -46,7 +49,8 @@ export class CompanyProjectProtocol {
                     packet.version !== 2 &&
                     packet.version !== 3 &&
                     packet.version !== 4 &&
-                    packet.version !== 5
+                    packet.version !== 5 &&
+                    packet.version !== 6
                 ) {
                     throw new Error('Starting products require project protocol version 2');
                 }
@@ -64,7 +68,8 @@ export class CompanyProjectProtocol {
                     packet.version !== 2 &&
                     packet.version !== 3 &&
                     packet.version !== 4 &&
-                    packet.version !== 5
+                    packet.version !== 5 &&
+                    packet.version !== 6
                 ) {
                     throw new Error('Starting products require project protocol version 2');
                 }
@@ -73,6 +78,7 @@ export class CompanyProjectProtocol {
                     version >= 3,
                     version >= 4,
                     version >= 5,
+                    version >= 6,
                 );
                 w.u64(packet.sequence)
                     .u32(bytes.length)
@@ -105,7 +111,12 @@ export class CompanyProjectProtocol {
         const version: number = r.u8();
         if (
             magic !== this.#magic ||
-            (version !== 1 && version !== 2 && version !== 3 && version !== 4 && version !== 5)
+            (version !== 1 &&
+                version !== 2 &&
+                version !== 3 &&
+                version !== 4 &&
+                version !== 5 &&
+                version !== 6)
         ) {
             throw new Error('Unsupported project protocol');
         }
@@ -186,6 +197,16 @@ export class CompanyProjectProtocol {
             throw new Error('Trailing project packet data');
         }
         if (
+            version < 6 &&
+            ((packet.op === ProjectOp.Command && packet.command.kind === 'permission') ||
+                ((packet.op === ProjectOp.Snapshot || packet.op === ProjectOp.Update) &&
+                    packet.state.work.attempts.some(
+                        (attempt) => (attempt.permissions?.length ?? 0) > 0,
+                    )))
+        ) {
+            throw new Error('Tool permissions require project protocol version 6');
+        }
+        if (
             version < 5 &&
             ((packet.op === ProjectOp.Command && packet.command.kind === 'review-interruption') ||
                 ((packet.op === ProjectOp.Snapshot || packet.op === ProjectOp.Update) &&
@@ -220,7 +241,7 @@ export class CompanyProjectProtocol {
         ) {
             throw new Error('Public showroom controls require project protocol version 4');
         }
-        return version === 2 || version === 3 || version === 4 || version === 5
+        return version === 2 || version === 3 || version === 4 || version === 5 || version === 6
             ? { ...packet, version }
             : packet;
     }
