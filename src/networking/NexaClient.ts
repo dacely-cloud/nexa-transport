@@ -109,13 +109,15 @@ export class NexaClient {
     }
     /** A read cannot configure, provision or reconnect the owner's execution machine. */
     public executionHost(): Promise<CompanyHostState> {
-        if (!this.supportsExecutionHosts)
+        if (!this.supportsExecutionHosts) {
             return Promise.reject(
                 new Error('Workspace resources require the updated NEXA gateway.'),
             );
+        }
         return this.#hosts.request({ op: HostOp.Read, id: crypto.randomUUID() }, (bytes) => {
-            if (!this.connected || this.#socket.bufferedAmount > 256 * 1024)
+            if (!this.connected || this.#socket.bufferedAmount > 256 * 1024) {
                 throw new Error('Workspace resources connection is unavailable or busy.');
+            }
             this.#socket.send(bytes);
         });
     }
@@ -124,8 +126,9 @@ export class NexaClient {
         listener: (state: CompanyHostState) => void,
         onError: (error: Error) => void,
     ): () => void {
-        if (!this.supportsExecutionHosts)
+        if (!this.supportsExecutionHosts) {
             throw new Error('Workspace resources require the updated NEXA gateway.');
+        }
         return this.#hosts.watch(
             (state) => this.#notify(() => listener(state)),
             (error) => this.#notify(() => onError(error)),
@@ -567,8 +570,9 @@ export class NexaClient {
             this.#ready = true;
             if (this.supportsExecutionHosts) {
                 this.#hosts.resume((bytes) => {
-                    if (!this.connected || this.#socket.bufferedAmount > 256 * 1024)
+                    if (!this.connected || this.#socket.bufferedAmount > 256 * 1024) {
                         throw new Error('Workspace resources connection is unavailable or busy.');
+                    }
                     this.#socket.send(bytes);
                 });
             }
@@ -1097,8 +1101,9 @@ export class NexaClient {
                 return;
             }
             if (CompanyHostProtocol.isFrame(new Uint8Array(complete))) {
-                if (!this.supportsExecutionHosts)
+                if (!this.supportsExecutionHosts) {
                     throw new Error('Unnegotiated workspace resource frame');
+                }
                 this.#hosts.receive(CompanyHostProtocol.decode(new Uint8Array(complete)));
                 return;
             }
