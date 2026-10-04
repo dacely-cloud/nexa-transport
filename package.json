@@ -67,6 +67,9 @@
         },
         "./work-types": {
             "types": "./dist/company/CompanyWorkTypes.d.ts"
+        },
+        "./company-limits": {
+            "types": "./dist/company/CompanyLimitsTypes.d.ts"
         }
     },
     "scripts": {

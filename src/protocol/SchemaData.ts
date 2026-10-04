@@ -1883,6 +1883,12 @@ export const schema: Schema = {
                     description: 'NCO2 persistent company staffing and project briefs.',
                     type: 'boolean',
                 },
+                officeCompanyLimits: {
+                    const: true,
+                    description:
+                        'Private company-wide funding and capacity over the existing connection.',
+                    type: 'boolean',
+                },
                 officeCompanyUpdates: {
                     const: true,
                     description: 'Ordered private company subscriptions over the existing socket.',
