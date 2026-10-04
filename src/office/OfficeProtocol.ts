@@ -111,6 +111,18 @@ export interface OfficeTask {
 }
 /** Visual task state carried in the existing activity field, without private work text. */
 export type OfficeTaskStatus = 'active' | 'waiting' | 'done' | 'error';
+/** Server event ordering also applies after browser timestamps are converted to numbers. */
+export interface OfficeReactionStamp {
+    readonly id: string;
+    readonly startedAt: number | bigint;
+}
+/** Only employee roots share reactions; delegated workers retain their own events. */
+export interface OfficeReactionAgent<Reaction extends OfficeReactionStamp> extends Pick<
+    OfficeAgent,
+    'id' | 'agentId' | 'streamId' | 'workerId' | 'desk'
+> {
+    readonly reaction?: Reaction;
+}
 /** Shared activity selection keeps owner and visitor desks consistent across concurrent turns. */
 export class OfficeWork {
     /** Permanent desks and root turns represent employees; delegated workers keep their own avatars. */
@@ -150,6 +162,39 @@ export class OfficeWork {
             }
         }
         return roots;
+    }
+    /** A newer event supersedes an older one without resetting its server-issued timing. */
+    public static reaction<Reaction extends OfficeReactionStamp>(
+        previous: Reaction | undefined,
+        next: Reaction | undefined,
+    ): Reaction | undefined {
+        if (!next) {
+            return previous;
+        }
+        return !previous ||
+            next.startedAt > previous.startedAt ||
+            (next.startedAt === previous.startedAt && next.id < previous.id)
+            ? next
+            : previous;
+    }
+    /** Select each employee's latest event independently of the turn driving their work state. */
+    public static reactions<Reaction extends OfficeReactionStamp>(
+        agents: readonly OfficeReactionAgent<Reaction>[],
+    ): ReadonlyMap<string, Reaction> {
+        const reactions: Map<string, Reaction> = new Map();
+        for (const agent of agents) {
+            if (!OfficeWork.isRoot(agent) || !agent.reaction) {
+                continue;
+            }
+            const reaction: Reaction | undefined = OfficeWork.reaction(
+                reactions.get(agent.agentId),
+                agent.reaction,
+            );
+            if (reaction) {
+                reactions.set(agent.agentId, reaction);
+            }
+        }
+        return reactions;
     }
     /** Each monitor reflects its own turn, rather than borrowing another task's avatar state. */
     public static status(agent: Pick<OfficeAgent, 'state' | 'phaseStatus'>): OfficeTaskStatus {

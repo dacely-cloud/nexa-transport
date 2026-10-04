@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { OfficeWork, type OfficeAgent } from '../src/office/OfficeProtocol.js';
+import { OfficeWork, type OfficeAgent, type OfficeReaction } from '../src/office/OfficeProtocol.js';
 
 it('selects the active external employee turn independently of company waiting, old history, and packet order', () => {
     const active: OfficeAgent = {
@@ -52,4 +52,74 @@ it('selects the active external employee turn independently of company waiting, 
     const failed: OfficeAgent = { ...active, state: 'failed' };
     const recovered: OfficeAgent = { ...old, id: 'recovered', streamId: 'recovered' };
     expect(OfficeWork.roots([failed, recovered]).get('employee')).toBe(recovered);
+});
+
+it('orders employee reactions by server event time while keeping delegated workers and other employees separate', () => {
+    const failed: OfficeReaction = {
+        id: 'failed-project',
+        reason: 'error',
+        phrase: 'WTF?!',
+        startedAt: 1000n,
+        expiresAt: 16000n,
+    };
+    const accepted: OfficeReaction = {
+        ...failed,
+        id: 'accepted-project',
+        reason: 'accepted',
+        phrase: 'WE DID IT!',
+        startedAt: 2000n,
+        expiresAt: 17000n,
+    };
+    const root: OfficeAgent = {
+        id: 'company',
+        streamId: 'company',
+        agentId: 'employee',
+        name: 'Developer',
+        state: 'working',
+        activity: 'Working',
+        goal: '',
+        reaction: failed,
+    };
+    const external: OfficeAgent = {
+        ...root,
+        id: 'discord',
+        streamId: 'discord',
+        reaction: accepted,
+    };
+    const worker: OfficeAgent = {
+        ...root,
+        id: 'company:worker',
+        workerId: 'worker',
+        reaction: { ...failed, id: 'worker-event', startedAt: 3000n },
+    };
+    const other: OfficeAgent = { ...root, id: 'other', streamId: 'other', agentId: 'other' };
+    for (const input of [
+        [root, worker, external, other],
+        [other, external, worker, root],
+    ]) {
+        const reactions: ReadonlyMap<string, OfficeReaction> =
+            OfficeWork.reactions<OfficeReaction>(input);
+        expect(reactions.get('employee')).toBe(accepted);
+        expect(reactions.get('other')).toBe(failed);
+        expect(reactions.size).toBe(2);
+    }
+    expect(OfficeWork.reactions<OfficeReaction>([worker]).size).toBe(0);
+    expect(OfficeWork.reaction(failed, undefined)).toBe(failed);
+    expect(OfficeWork.reaction(undefined, accepted)).toBe(accepted);
+    expect(OfficeWork.reaction(undefined, undefined)).toBeUndefined();
+    const tie: OfficeReaction = { ...accepted, id: 'a-tie' };
+    expect(OfficeWork.reaction(accepted, tie)).toBe(tie);
+    expect(OfficeWork.reaction(tie, accepted)).toBe(tie);
+    const browserFailure = {
+        ...failed,
+        startedAt: Number(failed.startedAt),
+        expiresAt: Number(failed.expiresAt),
+    };
+    const browserAcceptance = {
+        ...accepted,
+        startedAt: Number(accepted.startedAt),
+        expiresAt: Number(accepted.expiresAt),
+    };
+    expect(OfficeWork.reaction(browserFailure, browserAcceptance)).toBe(browserAcceptance);
+    expect(OfficeWork.reaction(browserAcceptance, browserFailure)).toBe(browserAcceptance);
 });
