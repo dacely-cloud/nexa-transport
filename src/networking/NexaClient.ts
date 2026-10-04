@@ -541,11 +541,13 @@ export class NexaClient {
                         }
                         this.#socket.send(bytes);
                     },
-                    this.#hello.features.officeEmployeeCosts === true
-                        ? 3
-                        : this.#hello.features.officeVerification === true
-                          ? 2
-                          : undefined,
+                    this.#hello.features.officeEmployeeDevelopment === true
+                        ? 4
+                        : this.#hello.features.officeEmployeeCosts === true
+                          ? 3
+                          : this.#hello.features.officeVerification === true
+                            ? 2
+                            : undefined,
                 );
             }
             if (this.#hello.features.officeCompanyUpdates === true) {

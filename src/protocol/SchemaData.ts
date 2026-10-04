@@ -1932,6 +1932,12 @@ export const schema: Schema = {
                         'Private employee results include exact original-attempt ledger costs.',
                     type: 'boolean',
                 },
+                officeEmployeeDevelopment: {
+                    const: true,
+                    description:
+                        'NCE1 version 4 supplies evidence-based accepted delivery history on the private owner channel.',
+                    type: 'boolean',
+                },
                 officeEmployeeResults: {
                     const: true,
                     description:
