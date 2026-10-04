@@ -9,6 +9,60 @@ import {
 
 afterEach(() => vi.useRealTimers());
 
+it('negotiates exact private employee costs and downgrades reads after reconnect without replaying work', async () => {
+    const channel = new EmployeeChannels();
+    const sent: CompanyEmployeePacket[] = [];
+    const send = (bytes: Uint8Array<ArrayBuffer>) =>
+        sent.push(CompanyEmployeeProtocol.decode(bytes));
+    channel.resume(send, 3);
+    const read = channel.read('employee');
+    expect(sent[0]).toMatchObject({ version: 3, op: EmployeeOp.Read });
+    const results: CompanyEmployeeResults = {
+        revision: 1n,
+        employeeId: 'employee',
+        projects: [
+            {
+                projectId: 'project',
+                name: 'Product',
+                revision: 2n,
+                phase: 'blocked',
+                acceptedAt: 0n,
+                completed: 0,
+                blocked: 1,
+                interrupted: 0,
+                running: 0,
+                acceptedTasks: 0,
+                repeatedTasks: 0,
+                recordedChecks: 0,
+                inputTokens: 0n,
+                outputTokens: 0n,
+                cost: { spent: 9007199254740993n, reserved: 80n, charges: 2n, unresolved: 1n },
+            },
+        ],
+    };
+    const packet = CompanyEmployeeProtocol.decode(
+        CompanyEmployeeProtocol.encode({
+            version: 3,
+            op: EmployeeOp.Snapshot,
+            id: sent[0]?.id ?? '',
+            employeeId: 'employee',
+            sequence: 0n,
+            state: results,
+        }),
+    );
+    channel.receive(packet);
+    expect((await read).projects[0]?.cost?.spent).toBe(9007199254740993n);
+    const leave = channel.watch('employee', vi.fn(), vi.fn());
+    channel.close(new Error('Disconnected'));
+    channel.resume(send, 2);
+    expect(sent.at(-1)).toMatchObject({ op: EmployeeOp.Subscribe, version: 2 });
+    expect(
+        sent.every((entry) => entry.op === EmployeeOp.Read || entry.op === EmployeeOp.Subscribe),
+    ).toBe(true);
+    leave();
+    channel.clear();
+});
+
 it('negotiates verification reads and watches, then downgrades read subscriptions when reconnecting to an older gateway', async () => {
     const channel = new EmployeeChannels();
     const sent: CompanyEmployeePacket[] = [];

@@ -807,6 +807,7 @@ Methods, events, and additive capabilities supported by this gateway.
 | `officeDeskAssignments`     | No       | `true`                                             | Accepts NGOP v4 with saved visual desk assignments.                            |
 | `officeDeskPositions`       | No       | `true`                                             | Saved physical workstation positions in NGOP v8 and NCMP v8.                   |
 | `officeEmployeeResults`     | No       | `true`                                             | Read-only employee evidence on the existing private office connection.         |
+| `officeEmployeeCosts`       | No       | `true`                                             | Exact original-attempt employee ledger costs in private NCE1 v3 reports.       |
 | `officeVerification`        | No       | `true`                                             | Host verification outcomes in NCP2 v3 and NCE1 v2 private records.             |
 | `officeExecution`           | No       | `true`                                             | Scheduler workload summaries in NGOP v6.                                       |
 | `officeGame`                | No       | `true`                                             | NGOP office state and player input share the authenticated gateway socket.     |

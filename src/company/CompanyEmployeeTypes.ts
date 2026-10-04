@@ -33,6 +33,15 @@ export interface CompanyEmployeeProject {
     readonly outputTokens: bigint;
     /** Available only when host-classified outcomes exist; legacy receipts remain unclassified. */
     readonly verification?: CompanyEmployeeVerification;
+    /** Exact ledger amounts attributed to this employee's original execution attempts. */
+    readonly cost?: CompanyEmployeeCost;
+}
+/** Settled spending and outstanding maximum liability remain separate; counts include cancelled requests. */
+export interface CompanyEmployeeCost {
+    readonly spent: bigint;
+    readonly reserved: bigint;
+    readonly charges: bigint;
+    readonly unresolved: bigint;
 }
 /** Completed command exits and file reads are distinct evidence, including failures on blocked runs. */
 export interface CompanyEmployeeVerification {
@@ -52,7 +61,7 @@ export interface CompanyEmployeeResults {
 /** No employee report operation can execute work or change persistent records. */
 export interface CompanyEmployeeControl {
     /** Version 2 carries host verification counters; absent retains the original binary layout. */
-    readonly version?: 2;
+    readonly version?: 2 | 3;
     readonly op:
         typeof EmployeeOp.Read | typeof EmployeeOp.Subscribe | typeof EmployeeOp.Unsubscribe;
     readonly id: string;
@@ -62,7 +71,7 @@ export interface CompanyEmployeeControl {
 /** First snapshot and subsequent changes remain correlated to the selected employee. */
 export interface CompanyEmployeeSnapshot {
     /** Version 2 carries host verification counters. */
-    readonly version?: 2;
+    readonly version?: 2 | 3;
     readonly op: typeof EmployeeOp.Snapshot | typeof EmployeeOp.Update;
     readonly id: string;
     readonly employeeId: string;
@@ -73,7 +82,7 @@ export interface CompanyEmployeeSnapshot {
 /** A stopped or rejected subscription never includes private project records. */
 export interface CompanyEmployeeTerminal {
     /** Correlates the selected read protocol without including private records. */
-    readonly version?: 2;
+    readonly version?: 2 | 3;
     readonly op: typeof EmployeeOp.Stopped | typeof EmployeeOp.Error;
     readonly id: string;
     readonly employeeId: string;

@@ -22,10 +22,10 @@ interface EmployeeChannelEntry {
 export class EmployeeChannels {
     readonly #entries = new Map<string, EmployeeChannelEntry>();
     #references = 0;
-    #version: 2 | undefined;
+    #version: 2 | 3 | undefined;
     #send: ((bytes: Uint8Array<ArrayBuffer>) => void) | undefined;
     /** Restore read subscriptions after authentication, never infer or dispatch work. */
-    public resume(send: (bytes: Uint8Array<ArrayBuffer>) => void, version?: 2): void {
+    public resume(send: (bytes: Uint8Array<ArrayBuffer>) => void, version?: 2 | 3): void {
         this.#version = version;
         this.#send = send;
         for (const entry of this.#entries.values()) {

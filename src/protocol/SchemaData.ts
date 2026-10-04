@@ -1926,6 +1926,12 @@ export const schema: Schema = {
                     description: 'Saved physical workstation positions in NGOP v8 and NCMP v8.',
                     type: 'boolean',
                 },
+                officeEmployeeCosts: {
+                    const: true,
+                    description:
+                        'Private employee results include exact original-attempt ledger costs.',
+                    type: 'boolean',
+                },
                 officeEmployeeResults: {
                     const: true,
                     description:
