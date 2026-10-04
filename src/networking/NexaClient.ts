@@ -128,6 +128,10 @@ export class NexaClient {
     public get supportsProjectBaselines(): boolean {
         return this.connected && this.#hello?.features.officeProjectBaselines === true;
     }
+    /** Whether private company snapshots include department resource permissions. */
+    public get supportsDepartmentTools(): boolean {
+        return this.#hello?.features.officeDepartmentTools === true;
+    }
     /** Whether the connected owner gateway exposes real company limits. */
     public get supportsCompanyLimits(): boolean {
         return this.#hello?.features.officeCompanyLimits === true;
@@ -178,6 +182,11 @@ export class NexaClient {
     public company(
         command: CompanyCommand = { op: CompanyOp.Read, id: crypto.randomUUID(), revision: 0n },
     ): Promise<CompanyState> {
+        if (command.op === CompanyOp.DepartmentPolicy && !this.supportsDepartmentTools) {
+            return Promise.reject(
+                new Error('Department permissions require the updated NEXA gateway.'),
+            );
+        }
         if (!this.connected || this.#hello?.features.officeCompany !== true) {
             return Promise.reject(
                 new Error('Company management requires the updated NEXA gateway.'),
@@ -473,12 +482,17 @@ export class NexaClient {
             }
             this.#ready = true;
             if (this.#hello.features.officeCompanyUpdates === true) {
-                this.#company.resume((bytes): void => {
-                    if (!this.connected || this.#socket.bufferedAmount > 256 * 1024) {
-                        throw new Error('Company connection is unavailable or busy.');
-                    }
-                    this.#socket.send(bytes);
-                });
+                this.#company.resume(
+                    (bytes): void => {
+                        if (!this.connected || this.#socket.bufferedAmount > 256 * 1024) {
+                            throw new Error('Company connection is unavailable or busy.');
+                        }
+                        this.#socket.send(bytes);
+                    },
+                    this.supportsDepartmentTools
+                        ? CompanyFormats.departmentTools
+                        : CompanyFormats.staffing,
+                );
             }
             if (this.#hello.features.officeCompanyLimits === true) {
                 this.#companyLimits.resume((bytes): void => {
@@ -981,6 +995,9 @@ export class NexaClient {
                     this.#hello.features.officeCompanyLimits !== true
                 ) {
                     throw new Error('Unnegotiated budget frame');
+                }
+                if (packet.version === 2 && !this.supportsDepartmentTools) {
+                    throw new Error('Unnegotiated company policy frame');
                 }
                 this.#company.receive(packet);
                 this.#companyLimits.receive(packet);

@@ -103,3 +103,43 @@ it('bounds subscriptions, expires unanswered snapshots, and rejects regressing c
     expect(vi.getTimerCount()).toBe(0);
     channel.clear();
 });
+
+it('renegotiates department snapshots on reconnect without replaying a policy mutation', async () => {
+    const channel = new CompanyChannel(CompanyFormats.staffing);
+    const sent: Array<ReturnType<typeof CompanyProtocol.decode>> = [];
+    const send = (bytes: Uint8Array<ArrayBuffer>): void => {
+        sent.push(CompanyProtocol.decode(bytes));
+    };
+    const listener = vi.fn();
+    channel.resume(send, CompanyFormats.departmentTools);
+    const leave = channel.watch(listener, vi.fn());
+    const id = sent[0]?.id ?? '';
+    expect(sent[0]).toEqual({ op: CompanyOp.Subscribe, id, version: 2 });
+    const state = {
+        revision: 1n,
+        name: 'Studio',
+        employees: [],
+        departments: [{ id: 'team', name: 'Team', instructions: 'Private.', tools: ['read_file'] }],
+        projects: [],
+    };
+    channel.receive({ op: CompanyOp.LiveSnapshot, id, sequence: 0n, state, version: 2 });
+    expect(listener).toHaveBeenLastCalledWith(state);
+    const policy = {
+        op: CompanyOp.DepartmentPolicy,
+        id: 'policy',
+        revision: 1n,
+        departmentId: 'team',
+        name: 'Team',
+        instructions: 'Private.',
+        tools: [],
+    } as const;
+    const pending = channel.request(policy, send);
+    expect(sent.at(-1)).toEqual({ ...policy, version: 2 });
+    channel.close(new Error('Disconnected'));
+    await expect(pending).rejects.toThrow('Disconnected');
+    channel.resume(send, CompanyFormats.staffing);
+    expect(sent.at(-1)).toEqual({ op: CompanyOp.Subscribe, id });
+    expect(sent.filter((packet) => packet.op === CompanyOp.DepartmentPolicy)).toHaveLength(1);
+    leave();
+    channel.clear();
+});

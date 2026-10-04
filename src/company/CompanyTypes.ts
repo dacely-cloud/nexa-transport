@@ -16,6 +16,7 @@ export const CompanyOp = {
     SetLimits: 9,
     SubscribeLimits: 10,
     UnsubscribeLimits: 11,
+    DepartmentPolicy: 12,
     LimitsSnapshot: 133,
     LimitsUpdate: 134,
     LimitsStopped: 135,
@@ -43,6 +44,8 @@ export interface CompanyEmployee extends EmployeeDetails {
 }
 /** Shared instructions for a named team. */
 export interface CompanyDepartment {
+    /** Absent or null inherits deployment access; an empty list permits no action tools. */
+    readonly tools?: readonly string[] | null;
     readonly id: string;
     readonly name: string;
     readonly instructions: string;
@@ -67,8 +70,12 @@ export interface CompanyState {
     readonly departments: readonly CompanyDepartment[];
     readonly projects: readonly CompanyProject[];
 }
+/** Version two includes department resource policies in private company snapshots. */
+export interface CompanyWireVersion {
+    readonly version?: 2;
+}
 /** A durable command ID is reusable only with the identical command body. */
-export interface CompanyRequest {
+export interface CompanyRequest extends CompanyWireVersion {
     readonly id: string;
     readonly revision: bigint;
 }
@@ -93,13 +100,26 @@ export interface CompanyTeam extends CompanyRequest {
     readonly name: string;
     readonly instructions: string;
 }
+/** Save department instructions and its tool ceiling together in one reviewed change. */
+export interface CompanyDepartmentPolicy extends CompanyRequest {
+    readonly op: typeof CompanyOp.DepartmentPolicy;
+    readonly departmentId: string;
+    readonly name: string;
+    readonly instructions: string;
+    readonly tools: readonly string[] | null;
+}
 /** Create a project brief and its initial staffing without starting execution. */
 export interface CompanyBrief extends CompanyRequest, ProjectDetails {
     readonly op: typeof CompanyOp.Project;
 }
 /** Commands never accept an owner identity from the client. */
 export type CompanyCommand =
-    CompanyRead | CompanyConfigure | CompanyStaff | CompanyTeam | CompanyBrief;
+    | CompanyRead
+    | CompanyConfigure
+    | CompanyStaff
+    | CompanyTeam
+    | CompanyBrief
+    | CompanyDepartmentPolicy;
 /** Correlated authoritative state after a read or committed command. */
 export interface CompanySnapshot {
     readonly op: typeof CompanyOp.Snapshot;
@@ -144,7 +164,7 @@ export interface CompanyStopped {
     readonly id: string;
 }
 /** Binary company request and response union. */
-export type CompanyPacket =
+export type CompanyPacket = (
     | CompanyCommand
     | CompanySnapshot
     | CompanyFailure
@@ -152,4 +172,6 @@ export type CompanyPacket =
     | CompanyLiveSnapshot
     | CompanyUpdate
     | CompanyStopped
-    | CompanyLimitsPacket;
+    | CompanyLimitsPacket
+) &
+    CompanyWireVersion;

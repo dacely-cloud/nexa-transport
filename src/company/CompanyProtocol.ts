@@ -29,7 +29,9 @@ export class CompanyProtocol {
     /** Encode and validate both trusted persistence records and outgoing client requests. */
     public static encode(packet: CompanyPacket): Uint8Array<ArrayBuffer> {
         const w: BinaryWriter = new BinaryWriter(256);
-        w.u32(this.#magic).u8(1).u8(packet.op).str(packet.id);
+        const version: number =
+            packet.version ?? (packet.op === CompanyOp.DepartmentPolicy ? 2 : 1);
+        w.u32(this.#magic).u8(version).u8(packet.op).str(packet.id);
         if (packet.op === CompanyOp.LimitsSnapshot || packet.op === CompanyOp.LimitsUpdate) {
             w.u64(packet.sequence);
             this.#writeLimits(w, packet.state);
@@ -45,10 +47,10 @@ export class CompanyProtocol {
             }
             w.u64(packet.revision).u64(packet.limit).u8(packet.concurrency);
         } else if (packet.op === CompanyOp.Snapshot) {
-            this.#writeState(w, packet.state);
+            this.#writeState(w, packet.state, version);
         } else if (packet.op === CompanyOp.LiveSnapshot || packet.op === CompanyOp.Update) {
             w.u64(packet.sequence);
-            this.#writeState(w, packet.state);
+            this.#writeState(w, packet.state, version);
         } else if (
             packet.op === CompanyOp.Subscribe ||
             packet.op === CompanyOp.Unsubscribe ||
@@ -73,6 +75,10 @@ export class CompanyProtocol {
                     w.str(packet.employeeId);
                     this.#writeEmployee(w, packet);
                     break;
+                case CompanyOp.DepartmentPolicy:
+                    w.str(packet.departmentId).str(packet.name).str(packet.instructions);
+                    this.#writeTools(w, packet.tools);
+                    break;
                 case CompanyOp.Department:
                     w.str(packet.departmentId).str(packet.name).str(packet.instructions);
                     break;
@@ -88,7 +94,11 @@ export class CompanyProtocol {
     /** Reject unsupported operations, oversized arrays, malformed UTF-8 and trailing data. */
     public static decode(bytes: Uint8Array): CompanyPacket {
         const r: BinaryReader = new BinaryReader(bytes);
-        if (r.u32() !== this.#magic || r.u8() !== 1) {
+        if (r.u32() !== this.#magic) {
+            throw new Error('Unsupported company protocol');
+        }
+        const version: number = r.u8();
+        if (version !== 1 && version !== 2) {
             throw new Error('Unsupported company protocol');
         }
         const op: number = r.u8();
@@ -111,9 +121,9 @@ export class CompanyProtocol {
                 throw new Error('Invalid company capacity');
             }
         } else if (op === CompanyOp.Snapshot) {
-            packet = { op, id, state: this.#readState(r) };
+            packet = { op, id, state: this.#readState(r, version) };
         } else if (op === CompanyOp.LiveSnapshot || op === CompanyOp.Update) {
-            packet = { op, id, sequence: r.u64(), state: this.#readState(r) };
+            packet = { op, id, sequence: r.u64(), state: this.#readState(r, version) };
         } else if (
             op === CompanyOp.Subscribe ||
             op === CompanyOp.Unsubscribe ||
@@ -144,6 +154,22 @@ export class CompanyProtocol {
                         ...this.#readEmployee(r),
                     };
                     break;
+                case CompanyOp.DepartmentPolicy:
+                    if (version !== 2) {
+                        throw new Error(
+                            'Department permissions require company protocol version 2',
+                        );
+                    }
+                    packet = {
+                        op,
+                        id,
+                        revision,
+                        departmentId: this.#text(r, 64),
+                        name: this.#text(r, 80),
+                        instructions: this.#text(r, 16000),
+                        tools: this.#readTools(r),
+                    };
+                    break;
                 case CompanyOp.Department:
                     packet = {
                         op,
@@ -164,7 +190,7 @@ export class CompanyProtocol {
         if (r.remaining) {
             throw new Error('Trailing company data');
         }
-        return packet;
+        return version === 2 ? { ...packet, version: 2 } : packet;
     }
     static #writeLimits(w: BinaryWriter, state: CompanyLimits): void {
         if ((state.limit === null) !== (state.concurrency === null)) {
@@ -258,6 +284,26 @@ export class CompanyProtocol {
         }
         return values;
     }
+    static #writeTools(w: BinaryWriter, tools: readonly string[] | null): void {
+        w.u8(tools === null ? 0 : 1);
+        if (tools !== null) {
+            this.#strings(w, tools);
+        }
+    }
+    static #readTools(r: BinaryReader): readonly string[] | null {
+        const flag: number = r.u8();
+        if (flag > 1) {
+            throw new Error('Invalid company tool policy');
+        }
+        if (flag === 0) {
+            return null;
+        }
+        const tools: readonly string[] = this.#readStrings(r, 128);
+        if (tools.some((tool: string): boolean => !/^[a-zA-Z0-9_.:-]{1,128}$/u.test(tool))) {
+            throw new Error('Invalid company tool name');
+        }
+        return tools;
+    }
     static #writeEmployee(w: BinaryWriter, value: EmployeeDetails): void {
         w.str(value.name)
             .str(value.role)
@@ -303,7 +349,7 @@ export class CompanyProtocol {
             team: this.#readStrings(r, 32),
         };
     }
-    static #writeState(w: BinaryWriter, state: CompanyState): void {
+    static #writeState(w: BinaryWriter, state: CompanyState, version: number): void {
         w.u64(state.revision).str(state.name).u32(state.employees.length);
         for (const employee of state.employees) {
             w.str(employee.id).u8(employee.desk);
@@ -312,6 +358,9 @@ export class CompanyProtocol {
         w.u32(state.departments.length);
         for (const team of state.departments) {
             w.str(team.id).str(team.name).str(team.instructions);
+            if (version === 2) {
+                this.#writeTools(w, team.tools ?? null);
+            }
         }
         w.u32(state.projects.length);
         for (const project of state.projects) {
@@ -319,7 +368,7 @@ export class CompanyProtocol {
             this.#writeProject(w, project);
         }
     }
-    static #readState(r: BinaryReader): CompanyState {
+    static #readState(r: BinaryReader, version: number): CompanyState {
         const revision: bigint = r.u64(),
             name: string = this.#text(r, 80);
         const employees: CompanyEmployee[] = [],
@@ -335,6 +384,7 @@ export class CompanyProtocol {
                 id: this.#text(r, 64),
                 name: this.#text(r, 80),
                 instructions: this.#text(r, 16000),
+                ...(version === 2 ? { tools: this.#readTools(r) } : {}),
             });
         }
         const projectCount: number = this.#count(r, 128);

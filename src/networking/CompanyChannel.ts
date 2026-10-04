@@ -19,7 +19,7 @@ export class CompanyChannel<
     State extends { readonly revision: bigint },
     Command extends { readonly id: string },
 > {
-    readonly #format: CompanyChannelFormat<State, Command>;
+    #format: CompanyChannelFormat<State, Command>;
     /** Select wire operations while sharing bounded delivery and cleanup. */
     public constructor(format: CompanyChannelFormat<State, Command>) {
         this.#format = format;
@@ -28,7 +28,11 @@ export class CompanyChannel<
     readonly #watches: Map<string, CompanyWatch<State>> = new Map();
     #send: ((bytes: Uint8Array<ArrayBuffer>) => void) | undefined;
     /** Reconnect only read subscriptions; durable mutations require an explicit retry. */
-    public resume(send: (bytes: Uint8Array<ArrayBuffer>) => void): void {
+    public resume(
+        send: (bytes: Uint8Array<ArrayBuffer>) => void,
+        format: CompanyChannelFormat<State, Command> = this.#format,
+    ): void {
+        this.#format = format;
         this.#send = send;
         for (const [id, watch] of this.#watches) {
             this.#start(id, watch);

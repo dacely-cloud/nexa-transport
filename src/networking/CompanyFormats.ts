@@ -34,6 +34,13 @@ export class CompanyFormats {
             return undefined;
         },
     };
+    /** Version two adds department tools while retaining the staffing stream lifecycle. */
+    public static readonly departmentTools: CompanyChannelFormat<CompanyState, CompanyCommand> = {
+        ...CompanyFormats.staffing,
+        encode: (command) => CompanyProtocol.encode({ ...command, version: 2 }),
+        subscribe: (id) => CompanyProtocol.encode({ op: CompanyOp.Subscribe, id, version: 2 }),
+        unsubscribe: (id) => CompanyProtocol.encode({ op: CompanyOp.Unsubscribe, id, version: 2 }),
+    };
     /** Spending changes independently of the approved policy revision. */
     public static readonly limits: CompanyChannelFormat<
         CompanyLimits,
