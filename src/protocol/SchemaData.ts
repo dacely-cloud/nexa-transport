@@ -1899,6 +1899,11 @@ export const schema: Schema = {
                     description: 'NCMP v4 owner construction and NGOP v5 public floor plans.',
                     type: 'boolean',
                 },
+                officeDepartmentKnowledge: {
+                    const: true,
+                    description: 'Private owner-reviewed department knowledge.',
+                    type: 'boolean',
+                },
                 officeDepartmentTools: {
                     const: true,
                     description:

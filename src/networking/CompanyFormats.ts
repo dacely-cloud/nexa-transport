@@ -41,6 +41,15 @@ export class CompanyFormats {
         subscribe: (id) => CompanyProtocol.encode({ op: CompanyOp.Subscribe, id, version: 2 }),
         unsubscribe: (id) => CompanyProtocol.encode({ op: CompanyOp.Unsubscribe, id, version: 2 }),
     };
+    /** Version three carries saved drafts and published department guidance. */
+    public static readonly departmentKnowledge: CompanyChannelFormat<CompanyState, CompanyCommand> =
+        {
+            ...CompanyFormats.staffing,
+            encode: (command) => CompanyProtocol.encode({ ...command, version: 3 }),
+            subscribe: (id) => CompanyProtocol.encode({ op: CompanyOp.Subscribe, id, version: 3 }),
+            unsubscribe: (id) =>
+                CompanyProtocol.encode({ op: CompanyOp.Unsubscribe, id, version: 3 }),
+        };
     /** Spending changes independently of the approved policy revision. */
     public static readonly limits: CompanyChannelFormat<
         CompanyLimits,

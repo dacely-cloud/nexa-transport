@@ -1220,6 +1220,8 @@ export interface GatewayFeaturesShape {
     readonly officeCompanyUpdates?: true;
     /** officeConstruction as defined by the Nexa gateway. */
     readonly officeConstruction?: true;
+    /** officeDepartmentKnowledge as defined by the Nexa gateway. */
+    readonly officeDepartmentKnowledge?: true;
     /** officeDepartmentTools as defined by the Nexa gateway. */
     readonly officeDepartmentTools?: true;
     /** officeDeskAssignments as defined by the Nexa gateway. */

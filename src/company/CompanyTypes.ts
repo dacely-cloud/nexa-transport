@@ -17,6 +17,9 @@ export const CompanyOp = {
     SubscribeLimits: 10,
     UnsubscribeLimits: 11,
     DepartmentPolicy: 12,
+    KnowledgeDraft: 13,
+    KnowledgePublish: 14,
+    KnowledgeArchive: 15,
     LimitsSnapshot: 133,
     LimitsUpdate: 134,
     LimitsStopped: 135,
@@ -42,8 +45,19 @@ export interface CompanyEmployee extends EmployeeDetails {
     readonly id: string;
     readonly desk: number;
 }
+/** Owner-reviewed guidance; saving edits returns an entry to draft until explicit publication. */
+export interface CompanyKnowledge {
+    readonly id: string;
+    readonly title: string;
+    readonly body: string;
+    readonly kind: 'note' | 'procedure';
+    readonly revision: number;
+    readonly reviewedAt: bigint;
+    readonly archived: boolean;
+}
 /** Shared instructions for a named team. */
 export interface CompanyDepartment {
+    readonly library?: readonly CompanyKnowledge[];
     /** Absent or null inherits deployment access; an empty list permits no action tools. */
     readonly tools?: readonly string[] | null;
     readonly id: string;
@@ -70,9 +84,9 @@ export interface CompanyState {
     readonly departments: readonly CompanyDepartment[];
     readonly projects: readonly CompanyProject[];
 }
-/** Version two includes department resource policies in private company snapshots. */
+/** Negotiated company snapshots add department tools in version two and private knowledge in version three. */
 export interface CompanyWireVersion {
-    readonly version?: 2;
+    readonly version?: 2 | 3;
 }
 /** A durable command ID is reusable only with the identical command body. */
 export interface CompanyRequest extends CompanyWireVersion {
@@ -108,6 +122,21 @@ export interface CompanyDepartmentPolicy extends CompanyRequest {
     readonly instructions: string;
     readonly tools: readonly string[] | null;
 }
+/** Save a private draft without changing employee guidance until the owner publishes it. */
+export interface CompanyKnowledgeDraft extends CompanyRequest {
+    readonly op: typeof CompanyOp.KnowledgeDraft;
+    readonly departmentId: string;
+    readonly entryId: string;
+    readonly title: string;
+    readonly body: string;
+    readonly kind: 'note' | 'procedure';
+}
+/** Publish the current saved draft or archive existing guidance at the reviewed company revision. */
+export interface CompanyKnowledgeDecision extends CompanyRequest {
+    readonly op: typeof CompanyOp.KnowledgePublish | typeof CompanyOp.KnowledgeArchive;
+    readonly departmentId: string;
+    readonly entryId: string;
+}
 /** Create a project brief and its initial staffing without starting execution. */
 export interface CompanyBrief extends CompanyRequest, ProjectDetails {
     readonly op: typeof CompanyOp.Project;
@@ -119,7 +148,9 @@ export type CompanyCommand =
     | CompanyStaff
     | CompanyTeam
     | CompanyBrief
-    | CompanyDepartmentPolicy;
+    | CompanyDepartmentPolicy
+    | CompanyKnowledgeDraft
+    | CompanyKnowledgeDecision;
 /** Correlated authoritative state after a read or committed command. */
 export interface CompanySnapshot {
     readonly op: typeof CompanyOp.Snapshot;

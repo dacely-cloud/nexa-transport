@@ -12,6 +12,7 @@ import {
     type ProjectDetails,
     type CompanyEmployee,
     type CompanyDepartment,
+    type CompanyKnowledge,
     type CompanyProject,
 } from './CompanyTypes.js';
 
@@ -30,7 +31,12 @@ export class CompanyProtocol {
     public static encode(packet: CompanyPacket): Uint8Array<ArrayBuffer> {
         const w: BinaryWriter = new BinaryWriter(256);
         const version: number =
-            packet.version ?? (packet.op === CompanyOp.DepartmentPolicy ? 2 : 1);
+            packet.version ??
+            (packet.op >= CompanyOp.KnowledgeDraft && packet.op <= CompanyOp.KnowledgeArchive
+                ? 3
+                : packet.op === CompanyOp.DepartmentPolicy
+                  ? 2
+                  : 1);
         w.u32(this.#magic).u8(version).u8(packet.op).str(packet.id);
         if (packet.op === CompanyOp.LimitsSnapshot || packet.op === CompanyOp.LimitsUpdate) {
             w.u64(packet.sequence);
@@ -75,6 +81,17 @@ export class CompanyProtocol {
                     w.str(packet.employeeId);
                     this.#writeEmployee(w, packet);
                     break;
+                case CompanyOp.KnowledgeDraft:
+                    w.str(packet.departmentId)
+                        .str(packet.entryId)
+                        .str(packet.title)
+                        .str(packet.body)
+                        .u8(packet.kind === 'note' ? 0 : packet.kind === 'procedure' ? 1 : 255);
+                    break;
+                case CompanyOp.KnowledgePublish:
+                case CompanyOp.KnowledgeArchive:
+                    w.str(packet.departmentId).str(packet.entryId);
+                    break;
                 case CompanyOp.DepartmentPolicy:
                     w.str(packet.departmentId).str(packet.name).str(packet.instructions);
                     this.#writeTools(w, packet.tools);
@@ -98,7 +115,7 @@ export class CompanyProtocol {
             throw new Error('Unsupported company protocol');
         }
         const version: number = r.u8();
-        if (version !== 1 && version !== 2) {
+        if (version !== 1 && version !== 2 && version !== 3) {
             throw new Error('Unsupported company protocol');
         }
         const op: number = r.u8();
@@ -154,8 +171,51 @@ export class CompanyProtocol {
                         ...this.#readEmployee(r),
                     };
                     break;
+                case CompanyOp.KnowledgeDraft: {
+                    if (version !== 3) {
+                        throw new Error('Department knowledge requires company protocol version 3');
+                    }
+                    const departmentId: string = this.#text(r, 64),
+                        entryId: string = this.#text(r, 64),
+                        title: string = this.#text(r, 80),
+                        body: string = this.#text(r, 8000),
+                        kind: number = r.u8();
+                    if (kind > 1) {
+                        throw new Error('Invalid knowledge kind');
+                    }
+                    packet = {
+                        op,
+                        id,
+                        revision,
+                        departmentId,
+                        entryId,
+                        title,
+                        body,
+                        kind: kind === 0 ? 'note' : 'procedure',
+                    };
+                    break;
+                }
+                case CompanyOp.KnowledgePublish:
+                case CompanyOp.KnowledgeArchive: {
+                    if (version !== 3) {
+                        throw new Error('Department knowledge requires company protocol version 3');
+                    }
+                    const departmentId: string = this.#text(r, 64),
+                        entryId: string = this.#text(r, 64);
+                    if (!departmentId || !entryId) {
+                        throw new Error('Invalid knowledge decision');
+                    }
+                    packet = {
+                        op,
+                        id,
+                        revision,
+                        departmentId,
+                        entryId,
+                    };
+                    break;
+                }
                 case CompanyOp.DepartmentPolicy:
-                    if (version !== 2) {
+                    if (version < 2) {
                         throw new Error(
                             'Department permissions require company protocol version 2',
                         );
@@ -190,7 +250,7 @@ export class CompanyProtocol {
         if (r.remaining) {
             throw new Error('Trailing company data');
         }
-        return version === 2 ? { ...packet, version: 2 } : packet;
+        return version === 1 ? packet : { ...packet, version };
     }
     static #writeLimits(w: BinaryWriter, state: CompanyLimits): void {
         if ((state.limit === null) !== (state.concurrency === null)) {
@@ -349,6 +409,52 @@ export class CompanyProtocol {
             team: this.#readStrings(r, 32),
         };
     }
+    static #writeLibrary(w: BinaryWriter, library: readonly CompanyKnowledge[]): void {
+        w.u32(library.length);
+        for (const entry of library) {
+            w.str(entry.id)
+                .str(entry.title)
+                .str(entry.body)
+                .u8(entry.kind === 'note' ? 0 : entry.kind === 'procedure' ? 1 : 255)
+                .u32(entry.revision)
+                .u64(entry.reviewedAt)
+                .u8(entry.archived ? 1 : 0);
+        }
+    }
+    static #readLibrary(r: BinaryReader): readonly CompanyKnowledge[] {
+        const count: number = this.#count(r, 8),
+            library: CompanyKnowledge[] = [];
+        for (let index: number = 0; index < count; index++) {
+            const id: string = this.#text(r, 64),
+                title: string = this.#text(r, 80),
+                body: string = this.#text(r, 8000),
+                kind: number = r.u8(),
+                revision: number = r.u32(),
+                reviewedAt: bigint = r.u64(),
+                archived: number = r.u8();
+            if (
+                !id ||
+                !title.trim() ||
+                !body.trim() ||
+                kind > 1 ||
+                revision === 0 ||
+                archived > 1 ||
+                library.some((entry: CompanyKnowledge): boolean => entry.id === id)
+            ) {
+                throw new Error('Invalid department knowledge');
+            }
+            library.push({
+                id,
+                title,
+                body,
+                kind: kind === 0 ? 'note' : 'procedure',
+                revision,
+                reviewedAt,
+                archived: archived === 1,
+            });
+        }
+        return library;
+    }
     static #writeState(w: BinaryWriter, state: CompanyState, version: number): void {
         w.u64(state.revision).str(state.name).u32(state.employees.length);
         for (const employee of state.employees) {
@@ -358,8 +464,11 @@ export class CompanyProtocol {
         w.u32(state.departments.length);
         for (const team of state.departments) {
             w.str(team.id).str(team.name).str(team.instructions);
-            if (version === 2) {
+            if (version >= 2) {
                 this.#writeTools(w, team.tools ?? null);
+            }
+            if (version === 3) {
+                this.#writeLibrary(w, team.library ?? []);
             }
         }
         w.u32(state.projects.length);
@@ -384,7 +493,8 @@ export class CompanyProtocol {
                 id: this.#text(r, 64),
                 name: this.#text(r, 80),
                 instructions: this.#text(r, 16000),
-                ...(version === 2 ? { tools: this.#readTools(r) } : {}),
+                ...(version >= 2 ? { tools: this.#readTools(r) } : {}),
+                ...(version === 3 ? { library: this.#readLibrary(r) } : {}),
             });
         }
         const projectCount: number = this.#count(r, 128);

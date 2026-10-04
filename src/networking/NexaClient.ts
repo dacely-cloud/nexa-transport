@@ -132,6 +132,10 @@ export class NexaClient {
     public get supportsDepartmentTools(): boolean {
         return this.#hello?.features.officeDepartmentTools === true;
     }
+    /** Whether the connection supports owner-reviewed department guidance. */
+    public get supportsDepartmentKnowledge(): boolean {
+        return this.#hello?.features.officeDepartmentKnowledge === true;
+    }
     /** Whether the connected owner gateway exposes real company limits. */
     public get supportsCompanyLimits(): boolean {
         return this.#hello?.features.officeCompanyLimits === true;
@@ -182,6 +186,16 @@ export class NexaClient {
     public company(
         command: CompanyCommand = { op: CompanyOp.Read, id: crypto.randomUUID(), revision: 0n },
     ): Promise<CompanyState> {
+        if (
+            (command.op === CompanyOp.KnowledgeDraft ||
+                command.op === CompanyOp.KnowledgePublish ||
+                command.op === CompanyOp.KnowledgeArchive) &&
+            !this.supportsDepartmentKnowledge
+        ) {
+            return Promise.reject(
+                new Error('Department knowledge requires the updated NEXA gateway.'),
+            );
+        }
         if (command.op === CompanyOp.DepartmentPolicy && !this.supportsDepartmentTools) {
             return Promise.reject(
                 new Error('Department permissions require the updated NEXA gateway.'),
@@ -489,9 +503,11 @@ export class NexaClient {
                         }
                         this.#socket.send(bytes);
                     },
-                    this.supportsDepartmentTools
-                        ? CompanyFormats.departmentTools
-                        : CompanyFormats.staffing,
+                    this.supportsDepartmentKnowledge
+                        ? CompanyFormats.departmentKnowledge
+                        : this.supportsDepartmentTools
+                          ? CompanyFormats.departmentTools
+                          : CompanyFormats.staffing,
                 );
             }
             if (this.#hello.features.officeCompanyLimits === true) {
@@ -995,6 +1011,9 @@ export class NexaClient {
                     this.#hello.features.officeCompanyLimits !== true
                 ) {
                     throw new Error('Unnegotiated budget frame');
+                }
+                if (packet.version === 3 && !this.supportsDepartmentKnowledge) {
+                    throw new Error('Unnegotiated department knowledge');
                 }
                 if (packet.version === 2 && !this.supportsDepartmentTools) {
                     throw new Error('Unnegotiated company policy frame');
