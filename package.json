@@ -16,6 +16,10 @@
         "docs"
     ],
     "exports": {
+        "./company-hosts": {
+            "types": "./dist/company/CompanyHostTypes.d.ts",
+            "import": "./dist/company-hosts.js"
+        },
         "./employee-results": {
             "types": "./dist/company/CompanyEmployeeTypes.d.ts",
             "import": "./dist/employee-results.js"

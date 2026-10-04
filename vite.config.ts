@@ -14,6 +14,7 @@ const config: UserConfig = {
                 'project-types': 'src/company/CompanyProjectTypes.ts',
                 'company-types': 'src/company/CompanyTypes.ts',
                 'employee-results': 'src/company/CompanyEmployeeTypes.ts',
+                'company-hosts': 'src/company/CompanyHostTypes.ts',
                 errors: 'src/networking/TransportError.ts',
             },
             formats: ['es'],

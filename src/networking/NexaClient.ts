@@ -1,5 +1,8 @@
 import { CompanyFormats } from './CompanyFormats.js';
 import { EmployeeChannels } from './EmployeeChannels.js';
+import { CompanyHostFormat } from './CompanyHostFormat.js';
+import { CompanyHostProtocol } from '../company/CompanyHostProtocol.js';
+import { HostOp, type CompanyHostState } from '../company/CompanyHostTypes.js';
 import { CompanyEmployeeProtocol } from '../company/CompanyEmployeeProtocol.js';
 import type { CompanyEmployeeResults } from '../company/CompanyEmployeeTypes.js';
 import type { CompanyLimits, CompanyLimitsCommand } from '../company/CompanyLimitsTypes.js';
@@ -99,6 +102,35 @@ export class NexaClient {
     readonly #company = new CompanyChannel(CompanyFormats.staffing);
     readonly #companyLimits = new CompanyChannel(CompanyFormats.limits);
     readonly #employees = new EmployeeChannels();
+    readonly #hosts = new CompanyChannel(CompanyHostFormat.format);
+    /** Passive execution reports are negotiated only on the private owner's existing socket. */
+    public get supportsExecutionHosts(): boolean {
+        return this.connected && this.#hello?.features.officeExecutionHosts === true;
+    }
+    /** A read cannot configure, provision or reconnect the owner's execution machine. */
+    public executionHost(): Promise<CompanyHostState> {
+        if (!this.supportsExecutionHosts)
+            return Promise.reject(
+                new Error('Workspace resources require the updated NEXA gateway.'),
+            );
+        return this.#hosts.request({ op: HostOp.Read, id: crypto.randomUUID() }, (bytes) => {
+            if (!this.connected || this.#socket.bufferedAmount > 256 * 1024)
+                throw new Error('Workspace resources connection is unavailable or busy.');
+            this.#socket.send(bytes);
+        });
+    }
+    /** Reconnect restores only the read watch; closing the last view releases it. */
+    public subscribeExecutionHost(
+        listener: (state: CompanyHostState) => void,
+        onError: (error: Error) => void,
+    ): () => void {
+        if (!this.supportsExecutionHosts)
+            throw new Error('Workspace resources require the updated NEXA gateway.');
+        return this.#hosts.watch(
+            (state) => this.#notify(() => listener(state)),
+            (error) => this.#notify(() => onError(error)),
+        );
+    }
     /** Private saved evidence, supported only by gateways advertising this read-only capability. */
     public get supportsEmployeeResults(): boolean {
         return this.#hello?.features.officeEmployeeResults === true;
@@ -533,6 +565,13 @@ export class NexaClient {
                 );
             }
             this.#ready = true;
+            if (this.supportsExecutionHosts) {
+                this.#hosts.resume((bytes) => {
+                    if (!this.connected || this.#socket.bufferedAmount > 256 * 1024)
+                        throw new Error('Workspace resources connection is unavailable or busy.');
+                    this.#socket.send(bytes);
+                });
+            }
             if (this.supportsEmployeeResults) {
                 this.#employees.resume(
                     (bytes): void => {
@@ -1057,6 +1096,12 @@ export class NexaClient {
             if (complete === null) {
                 return;
             }
+            if (CompanyHostProtocol.isFrame(new Uint8Array(complete))) {
+                if (!this.supportsExecutionHosts)
+                    throw new Error('Unnegotiated workspace resource frame');
+                this.#hosts.receive(CompanyHostProtocol.decode(new Uint8Array(complete)));
+                return;
+            }
             if (CompanyEmployeeProtocol.isFrame(new Uint8Array(complete))) {
                 if (!this.supportsEmployeeResults) {
                     throw new Error('Unnegotiated employee results frame');
@@ -1297,6 +1342,7 @@ export class NexaClient {
         this.#company.close(error);
         this.#companyLimits.close(error);
         this.#employees.close(error);
+        this.#hosts.close(error);
         this.#projects.disconnect(error);
         for (const pending of this.#layouts.values()) {
             clearTimeout(pending.timer);
@@ -1322,6 +1368,7 @@ export class NexaClient {
         this.#company.clear();
         this.#companyLimits.clear();
         this.#employees.clear();
+        this.#hosts.clear();
         this.#officeListeners.clear();
         this.#subscriptions.clear();
         this.#streamIds.clear();
