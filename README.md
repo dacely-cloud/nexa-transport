@@ -479,3 +479,11 @@ For inline CSV, TSV, JSON, JSONL, PDF and Office files, use `NexaMedia.document(
 ### Office building
 
 Read your layout with `client.officeLayout()`, then save `{ revision, pieces }` with the same method. This requires `hello.features.officeLayout`. Layouts use bounded half-metre coordinates and quarter turns. The OLAY binary protocol shares the existing authenticated socket. Only the owner can save; visitors receive public geometry through `subscribeOffice`. Concurrent edits use revision checks and cannot silently overwrite each other.
+
+### Private employee evidence
+
+Gate employee portfolios on `client.supportsEmployeeResults`. Read saved contributions with `client.employeeResults(employeeId)` or watch them with `client.subscribeEmployeeResults(employeeId, onResults, onError)`. Call the returned unsubscribe function when the view closes. The NCE1 binary channel uses the existing authenticated Chat socket; visitors cannot read these reports. No read starts inference, changes assignments, or approves spending.
+
+Reports retain the employee who executed each saved attempt after reassignment. Accepted implementation credit goes to the final successful worker after owner acceptance. Counts distinguish completed, blocked, interrupted, running, and repeated implementation work. Repeated work is not automatically a defect. `recordedChecks` counts tool evidence receipts on completed attempts, not passed tests. Input/output token totals are exact `bigint` values; project-wide costs are not attributed to one employee. Empty histories do not imply a skill rating or model improvement.
+
+Up to eight reads and watches may be active per client. Snapshots are followed by ordered changes; reconnect restores watches only. Unsupported gateways reject calls locally, and closing the client releases pending reads and listeners. Types are exported from `nexa-transport/employee-results`.

@@ -18,10 +18,11 @@ interface CompanyWatch<State> {
 export class CompanyChannel<
     State extends { readonly revision: bigint },
     Command extends { readonly id: string },
+    Packet extends { readonly id: string; readonly op: number } = CompanyPacket,
 > {
-    #format: CompanyChannelFormat<State, Command>;
+    #format: CompanyChannelFormat<State, Command, Packet>;
     /** Select wire operations while sharing bounded delivery and cleanup. */
-    public constructor(format: CompanyChannelFormat<State, Command>) {
+    public constructor(format: CompanyChannelFormat<State, Command, Packet>) {
         this.#format = format;
     }
     readonly #pending = new Map<string, PendingCompany<State>>();
@@ -30,7 +31,7 @@ export class CompanyChannel<
     /** Reconnect only read subscriptions; durable mutations require an explicit retry. */
     public resume(
         send: (bytes: Uint8Array<ArrayBuffer>) => void,
-        format: CompanyChannelFormat<State, Command> = this.#format,
+        format: CompanyChannelFormat<State, Command, Packet> = this.#format,
     ): void {
         this.#format = format;
         this.#send = send;
@@ -123,7 +124,7 @@ export class CompanyChannel<
         });
     }
     /** Only snapshots and errors may arrive from the gateway. */
-    public receive(raw: CompanyPacket): void {
+    public receive(raw: Packet): void {
         if (raw.op < CompanyOp.Snapshot) {
             throw new Error('Unexpected company command');
         }

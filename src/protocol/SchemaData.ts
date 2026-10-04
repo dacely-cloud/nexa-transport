@@ -1920,6 +1920,12 @@ export const schema: Schema = {
                     description: 'Saved physical workstation positions in NGOP v8 and NCMP v8.',
                     type: 'boolean',
                 },
+                officeEmployeeResults: {
+                    const: true,
+                    description:
+                        'Read-only employee evidence on the existing private office connection.',
+                    type: 'boolean',
+                },
                 officeExecution: {
                     const: true,
                     description: 'Scheduler workload summaries in NGOP v6.',

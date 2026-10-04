@@ -16,6 +16,10 @@
         "docs"
     ],
     "exports": {
+        "./employee-results": {
+            "types": "./dist/company/CompanyEmployeeTypes.d.ts",
+            "import": "./dist/employee-results.js"
+        },
         ".": {
             "types": "./dist/networking/NexaClient.d.ts",
             "import": "./dist/nexa-transport.js"

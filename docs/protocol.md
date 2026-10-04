@@ -789,22 +789,29 @@ Evidence returned to the model; raw player/session identifiers are not included.
 
 Methods, events, and additive capabilities supported by this gateway.
 
-| Field                   | Required | Type                                               | Description                                                                    |
-| ----------------------- | -------- | -------------------------------------------------- | ------------------------------------------------------------------------------ |
-| `attachments`           | No       | `true`                                             | User media attachments are validated and forwarded to the agent.               |
-| `binaryMedia`           | No       | `true`                                             | NXMD frames carry outbound file bytes; JSON results contain matching metadata. |
-| `events`                | Yes      | Array of `string`                                  |                                                                                |
-| `methodScopes`          | Yes      | [RecordstringScope](protocol.md#recordstringscope) | The scope each method requires.                                                |
-| `methods`               | Yes      | Array of `string`                                  |                                                                                |
-| `officeAppearance`      | No       | `true`                                             | Stable employee cosmetics in NGOP v7.                                          |
-| `officeCompany`         | No       | `true`                                             | NCO2 persistent company staffing and project briefs.                           |
-| `officeConstruction`    | No       | `true`                                             | NCMP v4 owner construction and NGOP v5 public floor plans.                     |
-| `officeDeskAssignments` | No       | `true`                                             | Accepts NGOP v4 with saved visual desk assignments.                            |
-| `officeDeskPositions`   | No       | `true`                                             | Saved physical workstation positions in NGOP v8 and NCMP v8.                   |
-| `officeExecution`       | No       | `true`                                             | Scheduler workload summaries in NGOP v6.                                       |
-| `officeGame`            | No       | `true`                                             | NGOP office state and player input share the authenticated gateway socket.     |
-| `officeGameVersion`     | No       | `3`                                                | NGOP version supporting server-issued acceptance celebrations.                 |
-| `officeLayout`          | No       | `true`                                             | Owner-only OLAY geometry commands.                                             |
+| Field                       | Required | Type                                               | Description                                                                    |
+| --------------------------- | -------- | -------------------------------------------------- | ------------------------------------------------------------------------------ |
+| `attachments`               | No       | `true`                                             | User media attachments are validated and forwarded to the agent.               |
+| `binaryMedia`               | No       | `true`                                             | NXMD frames carry outbound file bytes; JSON results contain matching metadata. |
+| `events`                    | Yes      | Array of `string`                                  |                                                                                |
+| `methodScopes`              | Yes      | [RecordstringScope](protocol.md#recordstringscope) | The scope each method requires.                                                |
+| `methods`                   | Yes      | Array of `string`                                  |                                                                                |
+| `officeAppearance`          | No       | `true`                                             | Stable employee cosmetics in NGOP v7.                                          |
+| `officeCompany`             | No       | `true`                                             | NCO2 persistent company staffing and project briefs.                           |
+| `officeCompanyLimits`       | No       | `true`                                             | Private company-wide funding and capacity over the existing connection.        |
+| `officeCompanyUpdates`      | No       | `true`                                             | Ordered private company subscriptions over the existing socket.                |
+| `officeConstruction`        | No       | `true`                                             | NCMP v4 owner construction and NGOP v5 public floor plans.                     |
+| `officeDepartmentKnowledge` | No       | `true`                                             | Private owner-reviewed department knowledge.                                   |
+| `officeDepartmentTools`     | No       | `true`                                             | NCO2 version two carries owner-approved department tool ceilings.              |
+| `officeDeskAssignments`     | No       | `true`                                             | Accepts NGOP v4 with saved visual desk assignments.                            |
+| `officeDeskPositions`       | No       | `true`                                             | Saved physical workstation positions in NGOP v8 and NCMP v8.                   |
+| `officeEmployeeResults`     | No       | `true`                                             | Read-only employee evidence on the existing private office connection.         |
+| `officeExecution`           | No       | `true`                                             | Scheduler workload summaries in NGOP v6.                                       |
+| `officeGame`                | No       | `true`                                             | NGOP office state and player input share the authenticated gateway socket.     |
+| `officeGameVersion`         | No       | `3`                                                | NGOP version supporting server-issued acceptance celebrations.                 |
+| `officeLayout`              | No       | `true`                                             | Owner-only OLAY geometry commands.                                             |
+| `officeProjectBaselines`    | No       | `true`                                             | NCP2 version 2 with accepted-product baselines for new projects.               |
+| `officeProjects`            | No       | `true`                                             | NCP2 private project decisions, subscriptions, and delivery chunks.            |
 
 ## GatewayLimits
 

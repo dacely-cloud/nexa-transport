@@ -238,6 +238,8 @@ for (const name of [
     'CompanyBudgetTypes',
     'CompanyProjectTypes',
     'CompanyProjectProtocol',
+    'CompanyEmployeeTypes',
+    'CompanyEmployeeProtocol',
 ]) {
     writeFileSync(`src/company/${name}.ts`, readFileSync(`../nexa/src/company/${name}.ts`, 'utf8'));
 }

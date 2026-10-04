@@ -24,10 +24,10 @@ export interface ChannelUpdate<State> {
 export type CompanyChannelReply<State> =
     ChannelSnapshot<State> | ChannelLiveSnapshot<State> | ChannelUpdate<State> | CompanyFailure;
 /** Wire-specific operations remain separate from the bounded request/subscription lifecycle. */
-export interface CompanyChannelFormat<State, Command> {
+export interface CompanyChannelFormat<State, Command, Packet = CompanyPacket> {
     readonly sameRevision: boolean;
     encode(command: Command): Uint8Array<ArrayBuffer>;
     subscribe(id: string): Uint8Array<ArrayBuffer>;
     unsubscribe(id: string): Uint8Array<ArrayBuffer>;
-    read(packet: CompanyPacket, watching: boolean): CompanyChannelReply<State> | undefined;
+    read(packet: Packet, watching: boolean): CompanyChannelReply<State> | undefined;
 }
