@@ -22,9 +22,11 @@ interface EmployeeChannelEntry {
 export class EmployeeChannels {
     readonly #entries = new Map<string, EmployeeChannelEntry>();
     #references = 0;
+    #version: 2 | undefined;
     #send: ((bytes: Uint8Array<ArrayBuffer>) => void) | undefined;
     /** Restore read subscriptions after authentication, never infer or dispatch work. */
-    public resume(send: (bytes: Uint8Array<ArrayBuffer>) => void): void {
+    public resume(send: (bytes: Uint8Array<ArrayBuffer>) => void, version?: 2): void {
+        this.#version = version;
         this.#send = send;
         for (const entry of this.#entries.values()) {
             entry.channel.resume(send);
@@ -104,11 +106,9 @@ export class EmployeeChannels {
                 CompanyEmployeePacket
             > = {
                 sameRevision: true,
-                encode: (packet) => CompanyEmployeeProtocol.encode(packet),
-                subscribe: (id) =>
-                    CompanyEmployeeProtocol.encode({ op: EmployeeOp.Subscribe, id, employeeId }),
-                unsubscribe: (id) =>
-                    CompanyEmployeeProtocol.encode({ op: EmployeeOp.Unsubscribe, id, employeeId }),
+                encode: (packet) => this.#encode(packet),
+                subscribe: (id) => this.#encode({ op: EmployeeOp.Subscribe, id, employeeId }),
+                unsubscribe: (id) => this.#encode({ op: EmployeeOp.Unsubscribe, id, employeeId }),
                 read: (packet, watching) => {
                     if (packet.op === EmployeeOp.Snapshot) {
                         return {
@@ -147,5 +147,11 @@ export class EmployeeChannels {
             entry.channel.clear();
             this.#entries.delete(employeeId);
         }
+    }
+    #encode(packet: CompanyEmployeeControl): Uint8Array<ArrayBuffer> {
+        return CompanyEmployeeProtocol.encode({
+            ...packet,
+            ...(this.#version ? { version: this.#version } : {}),
+        });
     }
 }

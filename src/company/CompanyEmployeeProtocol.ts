@@ -32,7 +32,11 @@ export class CompanyEmployeeProtocol {
     /** Encode exact counts and tokens, then validate the complete envelope before sending. */
     public static encode(packet: CompanyEmployeePacket): Uint8Array<ArrayBuffer> {
         const w: BinaryWriter = new BinaryWriter(1024);
-        w.u32(this.#magic).u8(1).u8(packet.op).str(packet.id).str(packet.employeeId);
+        w.u32(this.#magic)
+            .u8(packet.version ?? 1)
+            .u8(packet.op)
+            .str(packet.id)
+            .str(packet.employeeId);
         if (packet.op === EmployeeOp.Snapshot || packet.op === EmployeeOp.Update) {
             if (packet.state.employeeId !== packet.employeeId) {
                 throw new Error('Employee report identity mismatch');
@@ -64,6 +68,22 @@ export class CompanyEmployeeProtocol {
                     }
                     w.u64(value & 0xffffffffffffffffn).u64(value >> 64n);
                 }
+                if (packet.version === 2) {
+                    w.u8(project.verification ? 1 : 0);
+                    if (project.verification) {
+                        for (const value of [
+                            project.verification.passedCommands,
+                            project.verification.failedCommands,
+                            project.verification.fileInspections,
+                            project.verification.unclassifiedReceipts,
+                        ]) {
+                            if (!Number.isInteger(value) || value < 0 || value > 65536) {
+                                throw new Error('Invalid employee verification count');
+                            }
+                            w.u32(value);
+                        }
+                    }
+                }
             }
         } else if (packet.op === EmployeeOp.Stopped || packet.op === EmployeeOp.Error) {
             w.str(packet.message);
@@ -78,7 +98,9 @@ export class CompanyEmployeeProtocol {
             throw new Error('Employee report is too large');
         }
         const r: BinaryReader = new BinaryReader(bytes);
-        if (r.u32() !== this.#magic || r.u8() !== 1) {
+        const magic: number = r.u32(),
+            version: number = r.u8();
+        if (magic !== this.#magic || (version !== 1 && version !== 2)) {
             throw new Error('Unsupported employee report protocol');
         }
         const op: number = r.u8(),
@@ -137,6 +159,36 @@ export class CompanyEmployeeProtocol {
                 if (acceptedTasks > 0 && (phase !== 'accepted' || acceptedAt === 0n)) {
                     throw new Error('Unaccepted employee delivery credit');
                 }
+                const inputTokens: bigint = this.#tokens(r, attempts),
+                    outputTokens: bigint = this.#tokens(r, attempts);
+                const present: number = version === 2 ? r.u8() : 0;
+                if (present > 1) {
+                    throw new Error('Invalid employee verification presence');
+                }
+                const verification =
+                    present === 1
+                        ? {
+                              passedCommands: this.#count(r),
+                              failedCommands: this.#count(r),
+                              fileInspections: this.#count(r),
+                              unclassifiedReceipts: this.#count(r),
+                          }
+                        : undefined;
+                if (
+                    verification &&
+                    (verification.passedCommands +
+                        verification.failedCommands +
+                        verification.fileInspections +
+                        verification.unclassifiedReceipts >
+                        attempts * 64 ||
+                        verification.passedCommands +
+                            verification.failedCommands +
+                            verification.fileInspections +
+                            verification.unclassifiedReceipts <
+                            recordedChecks)
+                ) {
+                    throw new Error('Inconsistent employee verification counts');
+                }
                 projects.push({
                     projectId,
                     name,
@@ -150,8 +202,9 @@ export class CompanyEmployeeProtocol {
                     acceptedTasks,
                     repeatedTasks,
                     recordedChecks,
-                    inputTokens: this.#tokens(r, attempts),
-                    outputTokens: this.#tokens(r, attempts),
+                    inputTokens,
+                    outputTokens,
+                    ...(verification ? { verification } : {}),
                 });
             }
             packet = { op, id, employeeId, sequence, state: { revision, employeeId, projects } };
@@ -163,7 +216,7 @@ export class CompanyEmployeeProtocol {
         if (r.remaining !== 0) {
             throw new Error('Trailing employee report bytes');
         }
-        return packet;
+        return version === 2 ? { ...packet, version: 2 } : packet;
     }
     static #count(r: BinaryReader): number {
         const value: number = r.u32();

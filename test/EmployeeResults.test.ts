@@ -8,6 +8,37 @@ import {
 } from '../src/company/CompanyEmployeeTypes.js';
 
 afterEach(() => vi.useRealTimers());
+
+it('negotiates verification reads and watches, then downgrades read subscriptions when reconnecting to an older gateway', async () => {
+    const channel = new EmployeeChannels();
+    const sent: CompanyEmployeePacket[] = [];
+    const send = (bytes: Uint8Array<ArrayBuffer>) =>
+        sent.push(CompanyEmployeeProtocol.decode(bytes));
+    channel.resume(send, 2);
+    const listener = vi.fn(),
+        error = vi.fn<(error: Error) => void>();
+    const leave = channel.watch('employee', listener, error);
+    expect(sent[0]).toMatchObject({ version: 2, op: EmployeeOp.Subscribe });
+    const read = channel.read('employee');
+    expect(sent[1]).toMatchObject({ version: 2, op: EmployeeOp.Read });
+    channel.receive({
+        version: 2,
+        op: EmployeeOp.Snapshot,
+        employeeId: 'employee',
+        id: sent[1]?.id ?? '',
+        sequence: 0n,
+        state,
+    });
+    expect(await read).toEqual(state);
+    channel.close(new Error('Disconnected'));
+    channel.resume(send);
+    expect(sent.at(-1)).toMatchObject({ op: EmployeeOp.Subscribe });
+    expect(sent.at(-1)?.version).toBeUndefined();
+    leave();
+    channel.clear();
+    expect(error).toHaveBeenCalledOnce();
+    expect(error.mock.calls[0]?.[0].message).toBe('Disconnected');
+});
 const state: CompanyEmployeeResults = { revision: 1n, employeeId: 'employee', projects: [] };
 
 it('correlates binary reads by employee and releases completed references', async () => {

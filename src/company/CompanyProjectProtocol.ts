@@ -34,7 +34,11 @@ export class CompanyProjectProtocol {
             case ProjectOp.Stopped:
                 break;
             case ProjectOp.Command: {
-                if (packet.command.kind === 'baseline' && packet.version !== 2) {
+                if (
+                    packet.command.kind === 'baseline' &&
+                    packet.version !== 2 &&
+                    packet.version !== 3
+                ) {
                     throw new Error('Starting products require project protocol version 2');
                 }
                 const bytes: Uint8Array = CompanyWorkCodec.command(packet.command);
@@ -46,10 +50,13 @@ export class CompanyProjectProtocol {
                 break;
             case ProjectOp.Snapshot:
             case ProjectOp.Update: {
-                if (packet.state.work.baseline && packet.version !== 2) {
+                if (packet.state.work.baseline && packet.version !== 2 && packet.version !== 3) {
                     throw new Error('Starting products require project protocol version 2');
                 }
-                const bytes: Uint8Array = CompanyWorkCodec.encode(packet.state.work);
+                const bytes: Uint8Array = CompanyWorkCodec.encode(
+                    packet.state.work,
+                    packet.version === 3,
+                );
                 w.u64(packet.sequence)
                     .u32(bytes.length)
                     .bytes(bytes)
@@ -79,7 +86,7 @@ export class CompanyProjectProtocol {
         const r: BinaryReader = new BinaryReader(bytes);
         const magic: number = r.u32();
         const version: number = r.u8();
-        if (magic !== this.#magic || (version !== 1 && version !== 2)) {
+        if (magic !== this.#magic || (version !== 1 && version !== 2 && version !== 3)) {
             throw new Error('Unsupported project protocol');
         }
         const op: number = r.u8();
@@ -166,7 +173,16 @@ export class CompanyProjectProtocol {
         ) {
             throw new Error('Starting products require project protocol version 2');
         }
-        return version === 2 ? { ...packet, version: 2 } : packet;
+        if (
+            version !== 3 &&
+            (packet.op === ProjectOp.Snapshot || packet.op === ProjectOp.Update) &&
+            packet.state.work.attempts.some((attempt) =>
+                attempt.evidence.some((evidence) => evidence.outcome !== undefined),
+            )
+        ) {
+            throw new Error('Verification outcomes require project protocol version 3');
+        }
+        return version === 2 || version === 3 ? { ...packet, version } : packet;
     }
     static #text(r: BinaryReader, maximum: number): string {
         const text: string = r.str();

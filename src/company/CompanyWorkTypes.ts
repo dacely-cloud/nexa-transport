@@ -26,7 +26,11 @@ export interface CompanyEvidence {
     readonly callId: string;
     readonly tool: string;
     readonly summary: string;
+    /** Host-classified completed command or file inspection; absent on legacy, unclassified receipts. */
+    readonly outcome?: CompanyVerificationOutcome;
 }
+/** A successful command exit is evidence of execution, not a claim about individual test cases. */
+export type CompanyVerificationOutcome = 'command-passed' | 'command-failed' | 'file-inspected';
 /** Execution history records the employee who actually worked, even after reassignment. */
 export interface CompanyWorkAttempt {
     readonly id: string;

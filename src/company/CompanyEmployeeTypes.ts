@@ -27,10 +27,19 @@ export interface CompanyEmployeeProject {
     readonly running: number;
     readonly acceptedTasks: number;
     readonly repeatedTasks: number;
-    /** Tool evidence receipts on completed attempts; this does not assert that tests passed. */
+    /** Legacy count of tool receipts on completed attempts; this does not assert that tests passed. */
     readonly recordedChecks: number;
     readonly inputTokens: bigint;
     readonly outputTokens: bigint;
+    /** Available only when host-classified outcomes exist; legacy receipts remain unclassified. */
+    readonly verification?: CompanyEmployeeVerification;
+}
+/** Completed command exits and file reads are distinct evidence, including failures on blocked runs. */
+export interface CompanyEmployeeVerification {
+    readonly passedCommands: number;
+    readonly failedCommands: number;
+    readonly fileInspections: number;
+    readonly unclassifiedReceipts: number;
 }
 
 /** Company revision fences names and ownership; ordered updates also carry operational changes. */
@@ -42,6 +51,8 @@ export interface CompanyEmployeeResults {
 
 /** No employee report operation can execute work or change persistent records. */
 export interface CompanyEmployeeControl {
+    /** Version 2 carries host verification counters; absent retains the original binary layout. */
+    readonly version?: 2;
     readonly op:
         typeof EmployeeOp.Read | typeof EmployeeOp.Subscribe | typeof EmployeeOp.Unsubscribe;
     readonly id: string;
@@ -50,6 +61,8 @@ export interface CompanyEmployeeControl {
 
 /** First snapshot and subsequent changes remain correlated to the selected employee. */
 export interface CompanyEmployeeSnapshot {
+    /** Version 2 carries host verification counters. */
+    readonly version?: 2;
     readonly op: typeof EmployeeOp.Snapshot | typeof EmployeeOp.Update;
     readonly id: string;
     readonly employeeId: string;
@@ -59,6 +72,8 @@ export interface CompanyEmployeeSnapshot {
 
 /** A stopped or rejected subscription never includes private project records. */
 export interface CompanyEmployeeTerminal {
+    /** Correlates the selected read protocol without including private records. */
+    readonly version?: 2;
     readonly op: typeof EmployeeOp.Stopped | typeof EmployeeOp.Error;
     readonly id: string;
     readonly employeeId: string;

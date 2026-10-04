@@ -10,16 +10,31 @@ import type {
     CompanyArtifact,
     CompanyEvidence,
     CompanyBaseline,
+    CompanyVerificationOutcome,
 } from './CompanyWorkTypes.js';
 
 /** Versioned, bounded binary persistence; prompts and artifact contents are never public office data. */
 export class CompanyWorkCodec {
+    static readonly #outcomes: readonly CompanyVerificationOutcome[] = [
+        'command-passed',
+        'command-failed',
+        'file-inspected',
+    ];
     /** NCW2 distinguishes these records from the removed project implementation. */
     static readonly #magic: number = 0x3257434e;
     /** Encode private state with exact integer accounting and bounded lists. */
-    public static encode(work: CompanyWork): Uint8Array {
+    public static encode(work: CompanyWork, verification: boolean = true): Uint8Array {
         const w: BinaryWriter = new BinaryWriter(1024);
-        w.u32(this.#magic).u8(work.baseline ? 2 : 1);
+        const version: number =
+            verification &&
+            work.attempts.some((attempt) =>
+                attempt.evidence.some((evidence) => evidence.outcome !== undefined),
+            )
+                ? 3
+                : work.baseline
+                  ? 2
+                  : 1;
+        w.u32(this.#magic).u8(version);
         w.str(work.projectId)
             .u64(work.revision)
             .str(work.phase)
@@ -61,8 +76,21 @@ export class CompanyWorkCodec {
             });
             this.#writeList(w, attempt.evidence, (evidence: CompanyEvidence): void => {
                 w.str(evidence.callId).str(evidence.tool).str(evidence.summary);
+                if (version === 3) {
+                    const outcome: number =
+                        evidence.outcome === undefined
+                            ? 0
+                            : this.#outcomes.indexOf(evidence.outcome) + 1;
+                    if (evidence.outcome !== undefined && outcome === 0) {
+                        throw new Error('Invalid verification outcome');
+                    }
+                    w.u8(outcome);
+                }
             });
         });
+        if (version === 3) {
+            w.u8(work.baseline ? 1 : 0);
+        }
         if (work.baseline) {
             const base: CompanyBaseline = work.baseline;
             w.str(base.projectId).u64(base.revision).u64(base.acceptedAt);
@@ -79,7 +107,7 @@ export class CompanyWorkCodec {
         const r: BinaryReader = new BinaryReader(packet);
         const magic: number = r.u32();
         const version: number = r.u8();
-        if (magic !== this.#magic || (version !== 1 && version !== 2)) {
+        if (magic !== this.#magic || (version !== 1 && version !== 2 && version !== 3)) {
             throw new Error('Unsupported company work record');
         }
         const projectId: string = r.str();
@@ -186,16 +214,43 @@ export class CompanyWorkCodec {
                         digest: r.str(),
                         bytes: r.u64(),
                     })),
-                    evidence: this.#readList(r, (): CompanyEvidence => ({
-                        callId: r.str(),
-                        tool: r.str(),
-                        summary: r.str(),
-                    })),
+                    evidence: this.#readList(r, (): CompanyEvidence => {
+                        const evidence: CompanyEvidence = {
+                            callId: r.str(),
+                            tool: r.str(),
+                            summary: r.str(),
+                        };
+                        const code: number = version === 3 ? r.u8() : 0;
+                        if (code > this.#outcomes.length) {
+                            throw new Error('Invalid verification outcome');
+                        }
+                        if (
+                            (code === 3 && evidence.tool !== 'read_file') ||
+                            ((code === 1 || code === 2) &&
+                                evidence.tool !== 'run_bash' &&
+                                evidence.tool !== 'read_bash')
+                        ) {
+                            throw new Error('Verification outcome does not match its tool');
+                        }
+                        if (code === 0) {
+                            return evidence;
+                        }
+                        const outcome: CompanyVerificationOutcome | undefined =
+                            this.#outcomes[code - 1];
+                        if (!outcome) {
+                            throw new Error('Invalid verification outcome');
+                        }
+                        return { ...evidence, outcome };
+                    }),
                 };
             },
         );
+        const present: number = version === 3 ? r.u8() : version === 2 ? 1 : 0;
+        if (present > 1) {
+            throw new Error('Invalid stored baseline presence');
+        }
         const baseline: CompanyBaseline | undefined =
-            version === 2
+            present === 1
                 ? {
                       projectId: r.str(),
                       revision: r.u64(),
