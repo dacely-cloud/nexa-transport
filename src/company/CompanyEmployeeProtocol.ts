@@ -69,7 +69,7 @@ export class CompanyEmployeeProtocol {
                     }
                     w.u64(value & 0xffffffffffffffffn).u64(value >> 64n);
                 }
-                if (packet.version === 2 || packet.version === 3) {
+                if (packet.version !== undefined && packet.version >= 2) {
                     w.u8(project.verification ? 1 : 0);
                     if (project.verification) {
                         for (const value of [
@@ -85,7 +85,7 @@ export class CompanyEmployeeProtocol {
                         }
                     }
                 }
-                if (packet.version === 3) {
+                if (packet.version !== undefined && packet.version >= 3) {
                     w.u8(project.cost ? 1 : 0);
                     if (project.cost) {
                         this.#validateCost(project.cost);
@@ -93,6 +93,13 @@ export class CompanyEmployeeProtocol {
                             .u64(project.cost.reserved)
                             .u64(project.cost.charges)
                             .u64(project.cost.unresolved);
+                    }
+                }
+                if (packet.version === 4) {
+                    w.u8(project.singleRunAcceptedTasks === undefined ? 0 : 1);
+                    if (project.singleRunAcceptedTasks !== undefined) {
+                        this.#validateDelivery(project);
+                        w.u32(project.singleRunAcceptedTasks);
                     }
                 }
             }
@@ -111,7 +118,10 @@ export class CompanyEmployeeProtocol {
         const r: BinaryReader = new BinaryReader(bytes);
         const magic: number = r.u32(),
             version: number = r.u8();
-        if (magic !== this.#magic || (version !== 1 && version !== 2 && version !== 3)) {
+        if (
+            magic !== this.#magic ||
+            (version !== 1 && version !== 2 && version !== 3 && version !== 4)
+        ) {
             throw new Error('Unsupported employee report protocol');
         }
         const op: number = r.u8(),
@@ -200,7 +210,7 @@ export class CompanyEmployeeProtocol {
                 ) {
                     throw new Error('Inconsistent employee verification counts');
                 }
-                const costPresent: number = version === 3 ? r.u8() : 0;
+                const costPresent: number = version >= 3 ? r.u8() : 0;
                 if (costPresent > 1) {
                     throw new Error('Invalid employee cost presence');
                 }
@@ -216,7 +226,13 @@ export class CompanyEmployeeProtocol {
                 if (cost) {
                     this.#validateCost(cost);
                 }
-                projects.push({
+                const deliveryPresent: number = version === 4 ? r.u8() : 0;
+                if (deliveryPresent > 1) {
+                    throw new Error('Invalid employee delivery presence');
+                }
+                const singleRunAcceptedTasks: number | undefined =
+                    deliveryPresent === 1 ? this.#count(r) : undefined;
+                const project: CompanyEmployeeProject = {
                     projectId,
                     name,
                     revision: projectRevision,
@@ -233,7 +249,10 @@ export class CompanyEmployeeProtocol {
                     outputTokens,
                     ...(verification ? { verification } : {}),
                     ...(cost ? { cost } : {}),
-                });
+                    ...(singleRunAcceptedTasks !== undefined ? { singleRunAcceptedTasks } : {}),
+                };
+                this.#validateDelivery(project);
+                projects.push(project);
             }
             packet = { op, id, employeeId, sequence, state: { revision, employeeId, projects } };
         } else if (op === EmployeeOp.Stopped || op === EmployeeOp.Error) {
@@ -244,7 +263,16 @@ export class CompanyEmployeeProtocol {
         if (r.remaining !== 0) {
             throw new Error('Trailing employee report bytes');
         }
-        return version === 2 || version === 3 ? { ...packet, version } : packet;
+        return version === 2 || version === 3 || version === 4 ? { ...packet, version } : packet;
+    }
+    static #validateDelivery(project: CompanyEmployeeProject): void {
+        const count: number | undefined = project.singleRunAcceptedTasks;
+        if (
+            count !== undefined &&
+            (!Number.isInteger(count) || count < 0 || count > project.acceptedTasks)
+        ) {
+            throw new Error('Inconsistent employee single-run delivery count');
+        }
     }
     static #validateCost(cost: CompanyEmployeeCost): void {
         for (const value of [cost.spent, cost.reserved, cost.charges, cost.unresolved]) {

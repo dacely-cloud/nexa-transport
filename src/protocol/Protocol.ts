@@ -1243,6 +1243,8 @@ export interface GatewayFeaturesShape {
     readonly officeDeskPositions?: true;
     /** officeEmployeeCosts as defined by the Nexa gateway. */
     readonly officeEmployeeCosts?: true;
+    /** officeEmployeeDevelopment as defined by the Nexa gateway. */
+    readonly officeEmployeeDevelopment?: true;
     /** officeEmployeeResults as defined by the Nexa gateway. */
     readonly officeEmployeeResults?: true;
     /** officeExecution as defined by the Nexa gateway. */

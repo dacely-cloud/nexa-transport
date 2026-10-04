@@ -26,6 +26,8 @@ export interface CompanyEmployeeProject {
     readonly interrupted: number;
     readonly running: number;
     readonly acceptedTasks: number;
+    /** Accepted implementation with exactly one saved run across all employees, excluding plans and reviews. */
+    readonly singleRunAcceptedTasks?: number;
     readonly repeatedTasks: number;
     /** Legacy count of tool receipts on completed attempts; this does not assert that tests passed. */
     readonly recordedChecks: number;
@@ -60,8 +62,8 @@ export interface CompanyEmployeeResults {
 
 /** No employee report operation can execute work or change persistent records. */
 export interface CompanyEmployeeControl {
-    /** Version 2 carries host verification counters; absent retains the original binary layout. */
-    readonly version?: 2 | 3;
+    /** Version 4 adds accepted single-run delivery counts; absent retains the original binary layout. */
+    readonly version?: 2 | 3 | 4;
     readonly op:
         typeof EmployeeOp.Read | typeof EmployeeOp.Subscribe | typeof EmployeeOp.Unsubscribe;
     readonly id: string;
@@ -70,8 +72,8 @@ export interface CompanyEmployeeControl {
 
 /** First snapshot and subsequent changes remain correlated to the selected employee. */
 export interface CompanyEmployeeSnapshot {
-    /** Version 2 carries host verification counters. */
-    readonly version?: 2 | 3;
+    /** Version 4 adds accepted single-run delivery counts. */
+    readonly version?: 2 | 3 | 4;
     readonly op: typeof EmployeeOp.Snapshot | typeof EmployeeOp.Update;
     readonly id: string;
     readonly employeeId: string;
@@ -82,7 +84,7 @@ export interface CompanyEmployeeSnapshot {
 /** A stopped or rejected subscription never includes private project records. */
 export interface CompanyEmployeeTerminal {
     /** Correlates the selected read protocol without including private records. */
-    readonly version?: 2 | 3;
+    readonly version?: 2 | 3 | 4;
     readonly op: typeof EmployeeOp.Stopped | typeof EmployeeOp.Error;
     readonly id: string;
     readonly employeeId: string;

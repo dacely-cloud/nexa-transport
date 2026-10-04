@@ -9,6 +9,64 @@ import {
 
 afterEach(() => vi.useRealTimers());
 
+it('uses version four for saved delivery measures and restores only read watches on reconnect', async () => {
+    const channel = new EmployeeChannels();
+    const sent: CompanyEmployeePacket[] = [];
+    const send = (bytes: Uint8Array<ArrayBuffer>) =>
+        sent.push(CompanyEmployeeProtocol.decode(bytes));
+    channel.resume(send, 4);
+    const read = channel.read('employee');
+    const listener = vi.fn<(results: CompanyEmployeeResults) => void>(),
+        error = vi.fn<(error: Error) => void>();
+    const leave = channel.watch('employee', listener, error);
+    const results: CompanyEmployeeResults = {
+        ...state,
+        projects: [
+            {
+                projectId: 'project',
+                name: 'Product',
+                revision: 1n,
+                phase: 'accepted',
+                acceptedAt: 100n,
+                completed: 3,
+                blocked: 0,
+                interrupted: 0,
+                running: 0,
+                acceptedTasks: 3,
+                singleRunAcceptedTasks: 2,
+                repeatedTasks: 0,
+                recordedChecks: 0,
+                inputTokens: 0n,
+                outputTokens: 0n,
+                cost: { spent: 9007199254740993n, reserved: 0n, charges: 3n, unresolved: 0n },
+            },
+        ],
+    };
+    for (const control of sent.slice()) {
+        expect(control.version).toBe(4);
+        channel.receive(
+            CompanyEmployeeProtocol.decode(
+                CompanyEmployeeProtocol.encode({
+                    version: 4,
+                    op: EmployeeOp.Snapshot,
+                    id: control.id,
+                    employeeId: 'employee',
+                    sequence: 0n,
+                    state: results,
+                }),
+            ),
+        );
+    }
+    expect((await read).projects[0]?.singleRunAcceptedTasks).toBe(2);
+    expect(listener.mock.calls[0]?.[0].projects[0]?.cost?.spent).toBe(9007199254740993n);
+    channel.close(new Error('Disconnected'));
+    channel.resume(send, 3);
+    expect(sent.at(-1)).toMatchObject({ op: EmployeeOp.Subscribe, version: 3 });
+    expect(sent.filter((packet) => packet.op === EmployeeOp.Read)).toHaveLength(1);
+    leave();
+    channel.clear();
+});
+
 it('negotiates exact private employee costs and downgrades reads after reconnect without replaying work', async () => {
     const channel = new EmployeeChannels();
     const sent: CompanyEmployeePacket[] = [];
