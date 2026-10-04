@@ -47,6 +47,14 @@ export interface CompanyWorkAttempt {
     readonly outputTokens: bigint;
     readonly artifacts: readonly CompanyArtifact[];
     readonly evidence: readonly CompanyEvidence[];
+    /** Owner acknowledgement after the host confirms that no provider liability remains unresolved. */
+    readonly interruptionReview?: CompanyInterruptionReview;
+}
+/** A recovery decision preserves execution receipts and never certifies a successful delivery. */
+export interface CompanyInterruptionReview {
+    readonly id: string;
+    readonly at: bigint;
+    readonly evidence: string;
 }
 /** An immutable accepted source, copied into a separate workspace before the first paid turn. */
 export interface CompanyBaseline {
@@ -131,6 +139,12 @@ export interface CompanyAccept extends CompanyWorkRequest {
     readonly kind: 'accept';
     readonly evidence: string;
 }
+/** Review uncertain external outcomes without retrying work or setting its price or result. */
+export interface CompanyReviewInterruption extends CompanyWorkRequest {
+    readonly kind: 'review-interruption';
+    readonly attemptId: string;
+    readonly evidence: string;
+}
 /** Change queued assignments without interrupting a running tool call. */
 export interface CompanyAssign extends CompanyWorkRequest {
     readonly kind: 'assign';
@@ -165,7 +179,8 @@ export type CompanyWorkCommand =
     | CompanyAssign
     | CompanySchedule
     | CompanySetBaseline
-    | CompanySetShowcase;
+    | CompanySetShowcase
+    | CompanyReviewInterruption;
 /** Exact completed-run receipts passed by the host, never by an owner or visitor command. */
 export interface CompanyWorkResult {
     readonly succeeded: boolean;

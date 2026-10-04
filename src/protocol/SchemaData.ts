@@ -1976,6 +1976,12 @@ export const schema: Schema = {
                     description: 'NCP2 version 2 with accepted-product baselines for new projects.',
                     type: 'boolean',
                 },
+                officeProjectRecovery: {
+                    const: true,
+                    description:
+                        'Owner-only NCP2 v5 interruption reviews, with independently enforced financial recovery.',
+                    type: 'boolean',
+                },
                 officeProjects: {
                     const: true,
                     description:

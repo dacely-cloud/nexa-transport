@@ -297,3 +297,105 @@ it('negotiates baseline state and restores versioned subscriptions without repla
     release();
     channel.clear();
 });
+
+it('negotiates owner interruption reviews and resumes only reads after connection loss', async () => {
+    const channel = new ProjectChannel();
+    const packets: ReturnType<typeof CompanyProjectProtocol.decode>[] = [];
+    const send = (bytes: Uint8Array): void => {
+        packets.push(CompanyProjectProtocol.decode(bytes));
+    };
+    const request: ProjectClientPacket = {
+        op: ProjectOp.Command,
+        id: 'owner-recovery',
+        project: 'project',
+        command: {
+            kind: 'review-interruption',
+            id: 'owner-recovery',
+            revision: 8n,
+            attemptId: 'interrupted-attempt',
+            evidence: 'Checked the external outcome; no action needs repeating.',
+        },
+    };
+    channel.resume(send, 4);
+    await expect(channel.state(request)).rejects.toThrow('version 5');
+    expect(packets).toEqual([]);
+    channel.resume(send, 5);
+    const listener = vi.fn(),
+        error = vi.fn();
+    const release = channel.watch('project', listener, error);
+    const watch = packets[0];
+    if (!watch) {
+        throw new Error('Missing watch');
+    }
+    const pending = channel.state(request);
+    const failed = expect(pending).rejects.toThrow('Connection interrupted');
+    expect(packets[1]).toMatchObject({
+        version: 5,
+        op: ProjectOp.Command,
+        command: request.command,
+    });
+    channel.disconnect(new Error('Connection interrupted'));
+    await failed;
+    channel.resume(send, 5);
+    expect(packets.filter((packet) => packet.op === ProjectOp.Command)).toHaveLength(1);
+    expect(packets.at(-1)).toMatchObject({ op: ProjectOp.Subscribe, version: 5, id: watch.id });
+    const resumed = {
+        ...state,
+        work: {
+            ...state.work,
+            phase: 'blocked',
+            revision: 9n,
+            attempts: [
+                {
+                    id: 'interrupted-attempt',
+                    taskId: 'work',
+                    employeeId: 'dev',
+                    holder: 'private-host',
+                    expires: 9n,
+                    started: 1n,
+                    finished: 10n,
+                    status: 'blocked',
+                    summary: 'Host stopped',
+                    sessionId: 'session',
+                    inputTokens: 12n,
+                    outputTokens: 3n,
+                    artifacts: [],
+                    evidence: [],
+                    interruptionReview: {
+                        id: 'owner-recovery',
+                        at: 10n,
+                        evidence: 'Checked the external outcome; no action needs repeating.',
+                    },
+                },
+            ],
+        },
+    } as const;
+    channel.receive(
+        CompanyProjectProtocol.decode(
+            CompanyProjectProtocol.encode({
+                version: 5,
+                op: ProjectOp.Snapshot,
+                id: watch.id,
+                project: 'project',
+                sequence: 0n,
+                state: resumed,
+            }),
+        ),
+    );
+    expect(listener).toHaveBeenLastCalledWith(resumed);
+    const legacy = CompanyProjectProtocol.decode(
+        CompanyProjectProtocol.encode({
+            version: 4,
+            op: ProjectOp.Snapshot,
+            id: 'legacy',
+            project: 'project',
+            sequence: 0n,
+            state: resumed,
+        }),
+    );
+    expect(
+        legacy.op === ProjectOp.Snapshot && legacy.state.work.attempts[0]?.interruptionReview,
+    ).toBeUndefined();
+    release();
+    channel.clear();
+});

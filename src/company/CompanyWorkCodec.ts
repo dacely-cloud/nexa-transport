@@ -12,6 +12,7 @@ import type {
     CompanyBaseline,
     CompanyShowcase,
     CompanyVerificationOutcome,
+    CompanyInterruptionReview,
 } from './CompanyWorkTypes.js';
 
 /** Versioned, bounded binary persistence; prompts and artifact contents are never public office data. */
@@ -28,19 +29,22 @@ export class CompanyWorkCodec {
         work: CompanyWork,
         verification: boolean = true,
         showcase: boolean = true,
+        recovery: boolean = true,
     ): Uint8Array {
         const w: BinaryWriter = new BinaryWriter(1024);
         const version: number =
-            showcase && work.showcase
-                ? 4
-                : verification &&
-                    work.attempts.some((attempt) =>
-                        attempt.evidence.some((evidence) => evidence.outcome !== undefined),
-                    )
-                  ? 3
-                  : work.baseline
-                    ? 2
-                    : 1;
+            recovery && work.attempts.some((attempt) => attempt.interruptionReview !== undefined)
+                ? 5
+                : showcase && work.showcase
+                  ? 4
+                  : verification &&
+                      work.attempts.some((attempt) =>
+                          attempt.evidence.some((evidence) => evidence.outcome !== undefined),
+                      )
+                    ? 3
+                    : work.baseline
+                      ? 2
+                      : 1;
         w.u32(this.#magic).u8(version);
         w.str(work.projectId)
             .u64(work.revision)
@@ -94,6 +98,14 @@ export class CompanyWorkCodec {
                     w.u8(outcome);
                 }
             });
+            if (version >= 5) {
+                w.u8(attempt.interruptionReview ? 1 : 0);
+                if (attempt.interruptionReview) {
+                    w.str(attempt.interruptionReview.id)
+                        .u64(attempt.interruptionReview.at)
+                        .str(attempt.interruptionReview.evidence);
+                }
+            }
         });
         if (version >= 3) {
             w.u8(work.baseline ? 1 : 0);
@@ -105,7 +117,10 @@ export class CompanyWorkCodec {
                 w.str(file.path).str(file.digest).u64(file.bytes);
             });
         }
-        if (version === 4 && work.showcase) {
+        if (version >= 5) {
+            w.u8(showcase && work.showcase ? 1 : 0);
+        }
+        if (version >= 4 && showcase && work.showcase) {
             w.str(work.showcase.name).str(work.showcase.description).u64(work.showcase.publishedAt);
         }
         const packet: Uint8Array = w.toBytes();
@@ -119,7 +134,7 @@ export class CompanyWorkCodec {
         const version: number = r.u8();
         if (
             magic !== this.#magic ||
-            (version !== 1 && version !== 2 && version !== 3 && version !== 4)
+            (version !== 1 && version !== 2 && version !== 3 && version !== 4 && version !== 5)
         ) {
             throw new Error('Unsupported company work record');
         }
@@ -209,7 +224,7 @@ export class CompanyWorkCodec {
                 ) {
                     throw new Error('Invalid stored attempt status');
                 }
-                return {
+                const attempt: CompanyWorkAttempt = {
                     id,
                     taskId,
                     employeeId,
@@ -256,6 +271,29 @@ export class CompanyWorkCodec {
                         return { ...evidence, outcome };
                     }),
                 };
+                const reviewed: number = version >= 5 ? r.u8() : 0;
+                if (reviewed > 1) {
+                    throw new Error('Invalid interruption review presence');
+                }
+                if (reviewed === 0) {
+                    return attempt;
+                }
+                const review: CompanyInterruptionReview = {
+                    id: r.str(),
+                    at: r.u64(),
+                    evidence: r.str(),
+                };
+                if (
+                    status !== 'blocked' ||
+                    review.at !== finished ||
+                    review.at < started ||
+                    !/^[a-zA-Z0-9-]{1,64}$/.test(review.id) ||
+                    !review.evidence.trim() ||
+                    review.evidence.length > 8000
+                ) {
+                    throw new Error('Invalid stored interruption review');
+                }
+                return { ...attempt, interruptionReview: review };
             },
         );
         const present: number = version >= 3 ? r.u8() : version === 2 ? 1 : 0;
@@ -275,8 +313,12 @@ export class CompanyWorkCodec {
                       })),
                   }
                 : undefined;
+        const showcased: number = version >= 5 ? r.u8() : version === 4 ? 1 : 0;
+        if (showcased > 1) {
+            throw new Error('Invalid stored public showcase presence');
+        }
         const showcase: CompanyShowcase | undefined =
-            version === 4
+            showcased === 1
                 ? {
                       name: r.str(),
                       description: r.str(),
@@ -337,6 +379,9 @@ export class CompanyWorkCodec {
         const w: BinaryWriter = new BinaryWriter(256);
         w.str(command.kind).str(command.id).u64(command.revision);
         switch (command.kind) {
+            case 'review-interruption':
+                w.str(command.attemptId).str(command.evidence);
+                break;
             case 'showcase':
                 w.u8(command.published ? 1 : 0)
                     .str(command.name)
@@ -384,6 +429,19 @@ export class CompanyWorkCodec {
         }
         let command: CompanyWorkCommand;
         switch (kind) {
+            case 'review-interruption': {
+                const attemptId: string = r.str();
+                const evidence: string = r.str();
+                if (
+                    !/^[a-zA-Z0-9-]{1,80}$/.test(attemptId) ||
+                    !evidence.trim() ||
+                    evidence.length > 8000
+                ) {
+                    throw new Error('Invalid interruption review');
+                }
+                command = { kind, id, revision, attemptId, evidence };
+                break;
+            }
             case 'showcase': {
                 const published: number = r.u8();
                 const name: string = r.str(),

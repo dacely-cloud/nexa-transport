@@ -35,6 +35,9 @@ export class CompanyProjectProtocol {
             case ProjectOp.Stopped:
                 break;
             case ProjectOp.Command: {
+                if (packet.command.kind === 'review-interruption' && version < 5) {
+                    throw new Error('Interruption reviews require project protocol version 5');
+                }
                 if (packet.command.kind === 'showcase' && version < 4) {
                     throw new Error('Public showroom controls require project protocol version 4');
                 }
@@ -42,7 +45,8 @@ export class CompanyProjectProtocol {
                     packet.command.kind === 'baseline' &&
                     packet.version !== 2 &&
                     packet.version !== 3 &&
-                    packet.version !== 4
+                    packet.version !== 4 &&
+                    packet.version !== 5
                 ) {
                     throw new Error('Starting products require project protocol version 2');
                 }
@@ -59,7 +63,8 @@ export class CompanyProjectProtocol {
                     packet.state.work.baseline &&
                     packet.version !== 2 &&
                     packet.version !== 3 &&
-                    packet.version !== 4
+                    packet.version !== 4 &&
+                    packet.version !== 5
                 ) {
                     throw new Error('Starting products require project protocol version 2');
                 }
@@ -67,6 +72,7 @@ export class CompanyProjectProtocol {
                     packet.state.work,
                     version >= 3,
                     version >= 4,
+                    version >= 5,
                 );
                 w.u64(packet.sequence)
                     .u32(bytes.length)
@@ -99,7 +105,7 @@ export class CompanyProjectProtocol {
         const version: number = r.u8();
         if (
             magic !== this.#magic ||
-            (version !== 1 && version !== 2 && version !== 3 && version !== 4)
+            (version !== 1 && version !== 2 && version !== 3 && version !== 4 && version !== 5)
         ) {
             throw new Error('Unsupported project protocol');
         }
@@ -180,6 +186,16 @@ export class CompanyProjectProtocol {
             throw new Error('Trailing project packet data');
         }
         if (
+            version < 5 &&
+            ((packet.op === ProjectOp.Command && packet.command.kind === 'review-interruption') ||
+                ((packet.op === ProjectOp.Snapshot || packet.op === ProjectOp.Update) &&
+                    packet.state.work.attempts.some(
+                        (attempt) => attempt.interruptionReview !== undefined,
+                    )))
+        ) {
+            throw new Error('Interruption reviews require project protocol version 5');
+        }
+        if (
             version === 1 &&
             ((packet.op === ProjectOp.Command && packet.command.kind === 'baseline') ||
                 ((packet.op === ProjectOp.Snapshot || packet.op === ProjectOp.Update) &&
@@ -204,7 +220,9 @@ export class CompanyProjectProtocol {
         ) {
             throw new Error('Public showroom controls require project protocol version 4');
         }
-        return version === 2 || version === 3 || version === 4 ? { ...packet, version } : packet;
+        return version === 2 || version === 3 || version === 4 || version === 5
+            ? { ...packet, version }
+            : packet;
     }
     static #text(r: BinaryReader, maximum: number): string {
         const text: string = r.str();

@@ -483,6 +483,10 @@ For inline CSV, TSV, JSON, JSONL, PDF and Office files, use `NexaMedia.document(
 
 Read your layout with `client.officeLayout()`, then save `{ revision, pieces }` with the same method. This requires `hello.features.officeLayout`. Layouts use bounded half-metre coordinates and quarter turns. The OLAY binary protocol shares the existing authenticated socket. Only the owner can save; visitors receive public geometry through `subscribeOffice`. Concurrent edits use revision checks and cannot silently overwrite each other.
 
+### Interrupted project work
+
+Check `client.supportsProjectRecovery` before submitting a `review-interruption` decision through `client.project(projectId, { kind: 'review-interruption', id, revision, attemptId, evidence })`. The owner records checked external outcomes; the host independently rejects unresolved provider charges or a live attempt. This never sets prices, token receipts, files or a successful result. Work stays blocked until another explicit approval. The original attempt retains `interruptionReview` with the saved decision ID, timestamp and private note. NCP2 version 5 uses the existing Chat socket. Explicit retries must reuse the same command body and ID; reconnect restores only read subscriptions. Visitors and read-only credentials cannot submit the decision.
+
 ### Private employee evidence
 
 Gate employee portfolios on `client.supportsEmployeeResults`. Read saved contributions with `client.employeeResults(employeeId)` or watch them with `client.subscribeEmployeeResults(employeeId, onResults, onError)`. Call the returned unsubscribe function when the view closes. The NCE1 binary channel uses the existing authenticated Chat socket; visitors cannot read these reports. No read starts inference, changes assignments, or approves spending.

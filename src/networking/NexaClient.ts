@@ -193,6 +193,14 @@ export class NexaClient {
     public get supportsProjectBaselines(): boolean {
         return this.connected && this.#hello?.features.officeProjectBaselines === true;
     }
+    /** Whether an owner can review an interrupted task after the gateway checks its financial state. */
+    public get supportsProjectRecovery(): boolean {
+        return (
+            this.connected &&
+            this.#hello?.features.officeProjects === true &&
+            this.#hello.features.officeProjectRecovery === true
+        );
+    }
     /** Whether private company snapshots include department resource permissions. */
     public get supportsDepartmentTools(): boolean {
         return this.#hello?.features.officeDepartmentTools === true;
@@ -624,13 +632,15 @@ export class NexaClient {
                         }
                         this.#socket.send(bytes);
                     },
-                    this.#hello.features.officeShowroom === true
-                        ? 4
-                        : this.#hello.features.officeVerification === true
-                          ? 3
-                          : this.#hello.features.officeProjectBaselines === true
-                            ? 2
-                            : undefined,
+                    this.#hello.features.officeProjectRecovery === true
+                        ? 5
+                        : this.#hello.features.officeShowroom === true
+                          ? 4
+                          : this.#hello.features.officeVerification === true
+                            ? 3
+                            : this.#hello.features.officeProjectBaselines === true
+                              ? 2
+                              : undefined,
                 );
             }
             if (this.#officeListeners.size > 0) {
