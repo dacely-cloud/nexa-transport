@@ -56,6 +56,17 @@
         "./company-types": {
             "types": "./dist/company/CompanyTypes.d.ts",
             "import": "./dist/company-types.js"
+        },
+        "./projects": {
+            "types": "./dist/company/CompanyProjectProtocol.d.ts",
+            "import": "./dist/projects.js"
+        },
+        "./project-types": {
+            "types": "./dist/company/CompanyProjectTypes.d.ts",
+            "import": "./dist/project-types.js"
+        },
+        "./work-types": {
+            "types": "./dist/company/CompanyWorkTypes.d.ts"
         }
     },
     "scripts": {

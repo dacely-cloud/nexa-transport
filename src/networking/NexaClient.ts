@@ -1,3 +1,7 @@
+import { ProjectChannel } from './ProjectChannel.js';
+import { CompanyProjectProtocol } from '../company/CompanyProjectProtocol.js';
+import { ProjectOp, type CompanyProjectState } from '../company/CompanyProjectTypes.js';
+import type { CompanyWorkCommand } from '../company/CompanyWorkTypes.js';
 import { OfficeLayoutProtocol, type OfficeLayoutState } from '../office/OfficeProtocol.js';
 import { CompanyProtocol } from '../company/CompanyProtocol.js';
 import { CompanyOp, type CompanyCommand, type CompanyState } from '../company/CompanyTypes.js';
@@ -88,6 +92,35 @@ export interface CollaborationOffice {
 /** Authenticated Nexa gateway connection shared by browsers and Node.js. */
 export class NexaClient {
     readonly #company = new CompanyChannel();
+    readonly #projects: ProjectChannel = new ProjectChannel();
+    /** Read a private project or submit one revision-checked decision on the existing socket. */
+    public project(project: string, command?: CompanyWorkCommand): Promise<CompanyProjectState> {
+        return this.#projects.state(
+            command === undefined
+                ? { op: ProjectOp.Read, id: crypto.randomUUID(), project }
+                : { op: ProjectOp.Command, id: command.id, project, command },
+        );
+    }
+    /** Download a captured artifact; workspace paths and another account's deliveries are inaccessible. */
+    public projectFile(
+        project: string,
+        attempt: string,
+        path: string,
+    ): Promise<Uint8Array<ArrayBuffer>> {
+        return this.#projects.file(project, attempt, path);
+    }
+    /** Private ordered state, automatically resubscribed after reconnect without replaying decisions. */
+    public subscribeProject(
+        project: string,
+        listener: (state: CompanyProjectState) => void,
+        onError: (error: Error) => void,
+    ): () => void {
+        return this.#projects.watch(
+            project,
+            (state): void => this.#notify((): void => listener(state)),
+            (error): void => this.#notify((): void => onError(error)),
+        );
+    }
     /** Read private staffing and briefs, or submit one revision-checked idempotent company command. */
     public company(
         command: CompanyCommand = { op: CompanyOp.Read, id: crypto.randomUUID(), revision: 0n },
@@ -361,6 +394,14 @@ export class NexaClient {
                 );
             }
             this.#ready = true;
+            if (this.#hello.features.officeProjects === true) {
+                this.#projects.resume((bytes): void => {
+                    if (!this.connected || this.#socket.bufferedAmount > 256 * 1024) {
+                        throw new Error('Project connection is unavailable or busy.');
+                    }
+                    this.#socket.send(bytes);
+                });
+            }
             if (this.#officeListeners.size > 0) {
                 this.#sendOffice(OfficeProtocol.control(OfficeGameOp.Request));
             }
@@ -826,6 +867,13 @@ export class NexaClient {
             if (complete === null) {
                 return;
             }
+            if (CompanyProjectProtocol.isFrame(new Uint8Array(complete))) {
+                if (this.#hello.features.officeProjects !== true) {
+                    throw new Error('Unnegotiated project frame');
+                }
+                this.#projects.receive(CompanyProjectProtocol.decode(new Uint8Array(complete)));
+                return;
+            }
             if (CompanyProtocol.isFrame(new Uint8Array(complete))) {
                 if (this.#hello.features.officeCompany !== true) {
                     throw new Error('Unnegotiated company frame');
@@ -1036,6 +1084,7 @@ export class NexaClient {
         this.#failure = materializeError(error);
         this.#pending.close(error);
         this.#company.close(error);
+        this.#projects.disconnect(error);
         for (const pending of this.#layouts.values()) {
             clearTimeout(pending.timer);
             pending.reject(error);
@@ -1056,6 +1105,7 @@ export class NexaClient {
         }
     }
     #clearListeners(): void {
+        this.#projects.clear();
         this.#officeListeners.clear();
         this.#subscriptions.clear();
         this.#streamIds.clear();

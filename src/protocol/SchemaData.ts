@@ -1919,6 +1919,12 @@ export const schema: Schema = {
                     description: 'Owner-only OLAY geometry commands.',
                     type: 'boolean',
                 },
+                officeProjects: {
+                    const: true,
+                    description:
+                        'NCP2 private project decisions, subscriptions, and delivery chunks.',
+                    type: 'boolean',
+                },
             },
             required: ['events', 'methodScopes', 'methods'],
             type: 'object',
