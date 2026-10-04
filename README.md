@@ -152,7 +152,10 @@ Nexa retains conversation history server-side. Save the `sessionKey` to resume a
 import type { AskResult } from 'nexa-transport/protocol';
 import type { TurnStream } from 'nexa-transport/stream';
 
-const turn: TurnStream = client.stream({ message: 'Review this project' });
+const turn: TurnStream = client.stream({
+    message: 'Review this project',
+    reasoningEffort: 'xhigh',
+});
 
 for await (const event of turn) {
     switch (event.type) {

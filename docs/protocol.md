@@ -173,14 +173,15 @@ The payload of a {@link GATEWAY_EVENTS.ApprovalResolved} event.
 
 What one turn is asked for.
 
-| Field            | Required | Type                                                        | Description                                                              |
-| ---------------- | -------- | ----------------------------------------------------------- | ------------------------------------------------------------------------ |
-| `agentId`        | No       | `string`                                                    |                                                                          |
-| `attachments`    | No       | Array of [InboundAttachment](protocol.md#inboundattachment) | User-authored image, video, document, and text blocks, in display order. |
-| `conversationId` | No       | `string`                                                    | Continues an existing conversation.                                      |
-| `cwd`            | No       | `string`                                                    | Where tools operate.                                                     |
-| `message`        | Yes      | `string`                                                    |                                                                          |
-| `userId`         | No       | `string`                                                    | The principal the turn is billed and authorized as.                      |
+| Field             | Required | Type                                                                          | Description                                                                 |
+| ----------------- | -------- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `agentId`         | No       | `string`                                                                      |                                                                             |
+| `attachments`     | No       | Array of [InboundAttachment](protocol.md#inboundattachment)                   | User-authored image, video, document, and text blocks, in display order.    |
+| `conversationId`  | No       | `string`                                                                      | Continues an existing conversation.                                         |
+| `cwd`             | No       | `string`                                                                      | Where tools operate.                                                        |
+| `message`         | Yes      | `string`                                                                      |                                                                             |
+| `reasoningEffort` | No       | `"high"` / `"low"` / `"max"` / `"medium"` / `"minimal"` / `"off"` / `"xhigh"` | Per-turn reasoning preference; never changes the saved agent configuration. |
+| `userId`          | No       | `string`                                                                      | The principal the turn is billed and authorized as.                         |
 
 ## AskResult
 
@@ -2652,15 +2653,16 @@ The acknowledgement of a streaming run.
 
 What one turn is asked for, when the client wants its events streamed.
 
-| Field            | Required | Type                                                        | Description                                                              |
-| ---------------- | -------- | ----------------------------------------------------------- | ------------------------------------------------------------------------ |
-| `agentId`        | No       | `string`                                                    |                                                                          |
-| `attachments`    | No       | Array of [InboundAttachment](protocol.md#inboundattachment) | User-authored image, video, document, and text blocks, in display order. |
-| `conversationId` | No       | `string`                                                    | Continues an existing conversation.                                      |
-| `cwd`            | No       | `string`                                                    | Where tools operate.                                                     |
-| `message`        | Yes      | `string`                                                    |                                                                          |
-| `streamId`       | No       | `string`                                                    | The stream's id, chosen by the CLIENT.                                   |
-| `userId`         | No       | `string`                                                    | The principal the turn is billed and authorized as.                      |
+| Field             | Required | Type                                                                          | Description                                                                 |
+| ----------------- | -------- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `agentId`         | No       | `string`                                                                      |                                                                             |
+| `attachments`     | No       | Array of [InboundAttachment](protocol.md#inboundattachment)                   | User-authored image, video, document, and text blocks, in display order.    |
+| `conversationId`  | No       | `string`                                                                      | Continues an existing conversation.                                         |
+| `cwd`             | No       | `string`                                                                      | Where tools operate.                                                        |
+| `message`         | Yes      | `string`                                                                      |                                                                             |
+| `reasoningEffort` | No       | `"high"` / `"low"` / `"max"` / `"medium"` / `"minimal"` / `"off"` / `"xhigh"` | Per-turn reasoning preference; never changes the saved agent configuration. |
+| `streamId`        | No       | `string`                                                                      | The stream's id, chosen by the CLIENT.                                      |
+| `userId`          | No       | `string`                                                                      | The principal the turn is billed and authorized as.                         |
 
 ## SurfaceFormatting
 
