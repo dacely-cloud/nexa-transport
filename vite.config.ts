@@ -13,6 +13,7 @@ const config: UserConfig = {
                 projects: 'src/company/CompanyProjectProtocol.ts',
                 'project-types': 'src/company/CompanyProjectTypes.ts',
                 'company-types': 'src/company/CompanyTypes.ts',
+                'employee-results': 'src/company/CompanyEmployeeTypes.ts',
                 errors: 'src/networking/TransportError.ts',
             },
             formats: ['es'],

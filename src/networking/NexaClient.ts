@@ -1,4 +1,7 @@
 import { CompanyFormats } from './CompanyFormats.js';
+import { EmployeeChannels } from './EmployeeChannels.js';
+import { CompanyEmployeeProtocol } from '../company/CompanyEmployeeProtocol.js';
+import type { CompanyEmployeeResults } from '../company/CompanyEmployeeTypes.js';
 import type { CompanyLimits, CompanyLimitsCommand } from '../company/CompanyLimitsTypes.js';
 import { ProjectChannel } from './ProjectChannel.js';
 import { CompanyProjectProtocol } from '../company/CompanyProjectProtocol.js';
@@ -95,6 +98,33 @@ export interface CollaborationOffice {
 export class NexaClient {
     readonly #company = new CompanyChannel(CompanyFormats.staffing);
     readonly #companyLimits = new CompanyChannel(CompanyFormats.limits);
+    readonly #employees = new EmployeeChannels();
+    /** Private saved evidence, supported only by gateways advertising this read-only capability. */
+    public get supportsEmployeeResults(): boolean {
+        return this.#hello?.features.officeEmployeeResults === true;
+    }
+    /** Reading results cannot execute work, approve spending or alter an employee. */
+    public employeeResults(employeeId: string): Promise<CompanyEmployeeResults> {
+        if (!this.supportsEmployeeResults) {
+            return Promise.reject(new Error('Employee results require the updated NEXA gateway.'));
+        }
+        return this.#employees.read(employeeId);
+    }
+    /** Release when the employee view closes; reconnect restores only this read subscription. */
+    public subscribeEmployeeResults(
+        employeeId: string,
+        listener: (state: CompanyEmployeeResults) => void,
+        onError: (error: Error) => void,
+    ): () => void {
+        if (!this.supportsEmployeeResults) {
+            throw new Error('Employee results require the updated NEXA gateway.');
+        }
+        return this.#employees.watch(
+            employeeId,
+            (state) => this.#notify(() => listener(state)),
+            (error) => this.#notify(() => onError(error)),
+        );
+    }
     readonly #projects: ProjectChannel = new ProjectChannel();
     /** Read a private project or submit one revision-checked decision on the existing socket. */
     public project(project: string, command?: CompanyWorkCommand): Promise<CompanyProjectState> {
@@ -495,6 +525,14 @@ export class NexaClient {
                 );
             }
             this.#ready = true;
+            if (this.supportsEmployeeResults) {
+                this.#employees.resume((bytes): void => {
+                    if (!this.connected || this.#socket.bufferedAmount > 256 * 1024) {
+                        throw new Error('Employee results connection is unavailable or busy.');
+                    }
+                    this.#socket.send(bytes);
+                });
+            }
             if (this.#hello.features.officeCompanyUpdates === true) {
                 this.#company.resume(
                     (bytes): void => {
@@ -994,6 +1032,13 @@ export class NexaClient {
             if (complete === null) {
                 return;
             }
+            if (CompanyEmployeeProtocol.isFrame(new Uint8Array(complete))) {
+                if (!this.supportsEmployeeResults) {
+                    throw new Error('Unnegotiated employee results frame');
+                }
+                this.#employees.receive(CompanyEmployeeProtocol.decode(new Uint8Array(complete)));
+                return;
+            }
             if (CompanyProjectProtocol.isFrame(new Uint8Array(complete))) {
                 if (this.#hello.features.officeProjects !== true) {
                     throw new Error('Unnegotiated project frame');
@@ -1226,6 +1271,7 @@ export class NexaClient {
         this.#pending.close(error);
         this.#company.close(error);
         this.#companyLimits.close(error);
+        this.#employees.close(error);
         this.#projects.disconnect(error);
         for (const pending of this.#layouts.values()) {
             clearTimeout(pending.timer);
@@ -1250,6 +1296,7 @@ export class NexaClient {
         this.#projects.clear();
         this.#company.clear();
         this.#companyLimits.clear();
+        this.#employees.clear();
         this.#officeListeners.clear();
         this.#subscriptions.clear();
         this.#streamIds.clear();
