@@ -180,7 +180,7 @@ export class CompanyEmployeeProtocol {
                         verification.failedCommands +
                         verification.fileInspections +
                         verification.unclassifiedReceipts >
-                        attempts * 64 ||
+                            attempts * 128 ||
                         verification.passedCommands +
                             verification.failedCommands +
                             verification.fileInspections +
