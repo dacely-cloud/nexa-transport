@@ -109,6 +109,79 @@ export interface OfficeTask {
     readonly title: string;
     readonly activity: string;
 }
+/** Visual task state carried in the existing activity field, without private work text. */
+export type OfficeTaskStatus = 'active' | 'waiting' | 'done' | 'error';
+/** Shared activity selection keeps owner and visitor desks consistent across concurrent turns. */
+export class OfficeWork {
+    /** Permanent desks and root turns represent employees; delegated workers keep their own avatars. */
+    public static isRoot(
+        agent: Pick<OfficeAgent, 'id' | 'streamId' | 'workerId' | 'desk'>,
+    ): boolean {
+        return (
+            agent.id === agent.streamId ||
+            (agent.desk !== undefined && agent.streamId === undefined && !agent.workerId)
+        );
+    }
+    /** Prefer active work over waiting and finished turns, independently of snapshot ordering. */
+    public static roots<
+        Agent extends Pick<
+            OfficeAgent,
+            'id' | 'agentId' | 'streamId' | 'workerId' | 'desk' | 'state' | 'source'
+        >,
+    >(agents: readonly Agent[]): ReadonlyMap<string, Agent> {
+        const roots: Map<string, Agent> = new Map();
+        for (const agent of agents) {
+            if (!OfficeWork.isRoot(agent)) {
+                continue;
+            }
+            const previous: Agent | undefined = roots.get(agent.agentId);
+            if (
+                !previous ||
+                OfficeWork.#priority(agent.state) > OfficeWork.#priority(previous.state) ||
+                (OfficeWork.#priority(agent.state) === OfficeWork.#priority(previous.state) &&
+                    (OfficeWork.#priority(agent.state) === 0 ||
+                        (previous.source === 'company project' &&
+                            agent.source !== 'company project') ||
+                        ((previous.source === 'company project') ===
+                            (agent.source === 'company project') &&
+                            agent.id < previous.id)))
+            ) {
+                roots.set(agent.agentId, agent);
+            }
+        }
+        return roots;
+    }
+    /** Each monitor reflects its own turn, rather than borrowing another task's avatar state. */
+    public static status(agent: Pick<OfficeAgent, 'state' | 'phaseStatus'>): OfficeTaskStatus {
+        if (agent.phaseStatus === 'failed' || agent.state === 'failed') {
+            return 'error';
+        }
+        return agent.state === 'working'
+            ? 'active'
+            : agent.state === 'waiting'
+              ? 'waiting'
+              : 'done';
+    }
+    /** Recognize only the public visual vocabulary; arbitrary runtime descriptions remain private. */
+    public static task(activity: string): OfficeTaskStatus | undefined {
+        return activity === 'active' ||
+            activity === 'waiting' ||
+            activity === 'done' ||
+            activity === 'error'
+            ? activity
+            : undefined;
+    }
+    static #priority(state: OfficeState): number {
+        switch (state) {
+            case 'working':
+                return 2;
+            case 'waiting':
+                return 1;
+            default:
+                return 0;
+        }
+    }
+}
 /** A stable, bounded cosmetic value; only the value is shared with visitors, never the identity text. */
 export class OfficeAppearance {
     /** Derive permanent visual variation from an immutable employee identity, independent of tasks or desks. */
