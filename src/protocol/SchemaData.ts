@@ -1899,6 +1899,12 @@ export const schema: Schema = {
                     description: 'NCMP v4 owner construction and NGOP v5 public floor plans.',
                     type: 'boolean',
                 },
+                officeDepartmentTools: {
+                    const: true,
+                    description:
+                        'NCO2 version two carries owner-approved department tool ceilings.',
+                    type: 'boolean',
+                },
                 officeDeskAssignments: {
                     const: true,
                     description: 'Accepts NGOP v4 with saved visual desk assignments.',
