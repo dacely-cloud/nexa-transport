@@ -228,7 +228,16 @@ writeFileSync(
 /** NGOP has one canonical codec; copy it without runtime server dependencies. */
 mkdirSync('src/office', { recursive: true });
 mkdirSync('src/company', { recursive: true });
-for (const name of ['CompanyBinary', 'CompanyTypes', 'CompanyProtocol']) {
+for (const name of [
+    'CompanyBinary',
+    'CompanyTypes',
+    'CompanyProtocol',
+    'CompanyWorkTypes',
+    'CompanyWorkCodec',
+    'CompanyBudgetTypes',
+    'CompanyProjectTypes',
+    'CompanyProjectProtocol',
+]) {
     writeFileSync(`src/company/${name}.ts`, readFileSync(`../nexa/src/company/${name}.ts`, 'utf8'));
 }
 writeFileSync(

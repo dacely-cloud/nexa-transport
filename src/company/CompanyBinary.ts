@@ -112,7 +112,7 @@ export class BinaryReader {
     /** Read owned raw bytes. */
     public bytes(size: number): Uint8Array<ArrayBuffer> {
         const offset = this.#take(size);
-        return this.#data.slice(offset, offset + size);
+        return Uint8Array.from(this.#data.subarray(offset, offset + size));
     }
     /** Read bounded, valid UTF-8. */
     public str(): string {

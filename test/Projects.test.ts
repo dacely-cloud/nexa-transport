@@ -1,0 +1,170 @@
+import { afterEach, expect, it, vi } from 'vitest';
+import { ProjectChannel } from '../src/networking/ProjectChannel.js';
+import {
+    ProjectOp,
+    type ProjectClientPacket,
+    type CompanyProjectState,
+} from '../src/company/CompanyProjectTypes.js';
+import { CompanyProjectProtocol } from '../src/company/CompanyProjectProtocol.js';
+
+const state: CompanyProjectState = {
+    allowance: null,
+    work: {
+        projectId: 'project',
+        revision: 0n,
+        phase: 'draft',
+        workspaceId: '',
+        reviewerId: '',
+        plan: '',
+        proposedLimit: 0n,
+        allowanceId: '',
+        allowanceRevision: 0n,
+        limit: 0n,
+        concurrency: 1,
+        maxIterations: 8,
+        paused: false,
+        priority: 1,
+        feedback: '',
+        decision: '',
+        acceptedAt: 0n,
+        tasks: [],
+        attempts: [],
+    },
+};
+afterEach(() => vi.useRealTimers());
+
+it('restores only subscriptions after disconnect and rejects gaps before invoking the listener', () => {
+    const channel = new ProjectChannel();
+    const sent: ProjectClientPacket[] = [];
+    const send = (bytes: Uint8Array): void => {
+        const packet = CompanyProjectProtocol.decode(bytes);
+        if (packet.op === ProjectOp.Subscribe || packet.op === ProjectOp.Unsubscribe) {
+            sent.push(packet);
+        }
+    };
+    channel.resume(send);
+    const listener = vi.fn(),
+        onError = vi.fn();
+    const release = channel.watch('project', listener, onError);
+    const first = sent[0];
+    if (!first) {
+        throw new Error('Missing subscription');
+    }
+    channel.receive({
+        op: ProjectOp.Snapshot,
+        id: first.id,
+        project: 'project',
+        sequence: 0n,
+        state,
+    });
+    channel.receive({
+        op: ProjectOp.Update,
+        id: first.id,
+        project: 'project',
+        sequence: 1n,
+        state,
+    });
+    expect(listener).toHaveBeenCalledTimes(2);
+    channel.disconnect(new Error('Offline'));
+    channel.resume(send);
+    expect(sent).toHaveLength(2);
+    expect(sent.every((packet) => packet.op === ProjectOp.Subscribe)).toBe(true);
+    channel.receive({
+        op: ProjectOp.Snapshot,
+        id: first.id,
+        project: 'project',
+        sequence: 0n,
+        state,
+    });
+    channel.receive({
+        op: ProjectOp.Update,
+        id: first.id,
+        project: 'project',
+        sequence: 2n,
+        state,
+    });
+    expect(listener).toHaveBeenCalledTimes(3);
+    expect(onError).toHaveBeenCalledTimes(2);
+    expect(sent.at(-1)?.op).toBe(ProjectOp.Unsubscribe);
+    release();
+    channel.clear();
+});
+
+it('releases timed out decisions without automatically replaying spending commands', async () => {
+    vi.useFakeTimers();
+    const channel = new ProjectChannel();
+    const send = vi.fn<(bytes: Uint8Array<ArrayBuffer>) => void>();
+    channel.resume(send);
+    const packet: ProjectClientPacket = {
+        op: ProjectOp.Command,
+        id: 'decision',
+        project: 'project',
+        command: {
+            kind: 'approve',
+            id: 'decision',
+            revision: 1n,
+            allowanceRevision: 2n,
+            limit: 12345678901234567n,
+            concurrency: 2,
+            maxIterations: 8,
+        },
+    };
+    const result = channel.state(packet);
+    const rejected = expect(result).rejects.toThrow('timed out');
+    await vi.advanceTimersByTimeAsync(15001);
+    await rejected;
+    channel.disconnect(new Error('Offline'));
+    channel.resume(send);
+    expect(send).toHaveBeenCalledTimes(1);
+    expect(CompanyProjectProtocol.decode(send.mock.calls[0]?.[0] ?? new Uint8Array())).toEqual(
+        packet,
+    );
+    expect(vi.getTimerCount()).toBe(0);
+});
+
+it('assembles only contiguous matching delivery chunks and releases malformed transfers', async () => {
+    const channel = new ProjectChannel();
+    let id = '';
+    channel.resume((bytes): void => {
+        id = CompanyProjectProtocol.decode(bytes).id;
+    });
+    const result = channel.file('project', 'attempt', 'report.bin');
+    channel.receive({
+        op: ProjectOp.Chunk,
+        id,
+        project: 'project',
+        offset: 0,
+        total: 4,
+        bytes: new Uint8Array([1, 2]),
+    });
+    channel.receive({
+        op: ProjectOp.Chunk,
+        id,
+        project: 'project',
+        offset: 2,
+        total: 4,
+        bytes: new Uint8Array([3, 4]),
+    });
+    expect(await result).toEqual(new Uint8Array([1, 2, 3, 4]));
+    const gap = channel.file('project', 'attempt', 'report.bin');
+    channel.receive({
+        op: ProjectOp.Chunk,
+        id,
+        project: 'project',
+        offset: 2,
+        total: 4,
+        bytes: new Uint8Array([3, 4]),
+    });
+    await expect(gap).rejects.toThrow('out-of-order');
+    const wrong = channel.file('project', 'attempt', 'report.bin');
+    channel.receive({
+        op: ProjectOp.Chunk,
+        id,
+        project: 'another-project',
+        offset: 0,
+        total: 0,
+        bytes: new Uint8Array(),
+    });
+    await expect(wrong).rejects.toThrow('identity');
+    channel.disconnect(new Error('Finished'));
+});
