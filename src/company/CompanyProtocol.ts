@@ -30,6 +30,15 @@ export class CompanyProtocol {
         w.u32(this.#magic).u8(1).u8(packet.op).str(packet.id);
         if (packet.op === CompanyOp.Snapshot) {
             this.#writeState(w, packet.state);
+        } else if (packet.op === CompanyOp.LiveSnapshot || packet.op === CompanyOp.Update) {
+            w.u64(packet.sequence);
+            this.#writeState(w, packet.state);
+        } else if (
+            packet.op === CompanyOp.Subscribe ||
+            packet.op === CompanyOp.Unsubscribe ||
+            packet.op === CompanyOp.Stopped
+        ) {
+            /** Watch control frames carry only their correlation ID. */
         } else if (packet.op === CompanyOp.Error) {
             w.str(packet.message);
         } else {
@@ -70,6 +79,14 @@ export class CompanyProtocol {
         let packet: CompanyPacket;
         if (op === CompanyOp.Snapshot) {
             packet = { op, id, state: this.#readState(r) };
+        } else if (op === CompanyOp.LiveSnapshot || op === CompanyOp.Update) {
+            packet = { op, id, sequence: r.u64(), state: this.#readState(r) };
+        } else if (
+            op === CompanyOp.Subscribe ||
+            op === CompanyOp.Unsubscribe ||
+            op === CompanyOp.Stopped
+        ) {
+            packet = { op, id };
         } else if (op === CompanyOp.Error) {
             packet = { op, id, message: this.#text(r, 512) };
         } else {

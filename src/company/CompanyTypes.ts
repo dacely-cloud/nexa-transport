@@ -8,8 +8,13 @@ export const CompanyOp = {
     Employee: 3,
     Department: 4,
     Project: 5,
+    Subscribe: 6,
+    Unsubscribe: 7,
     Snapshot: 128,
     Error: 129,
+    LiveSnapshot: 130,
+    Update: 131,
+    Stopped: 132,
 } as const;
 /** Saved employee configuration; tool names can only narrow deployment permissions. */
 export interface EmployeeDetails {
@@ -97,5 +102,43 @@ export interface CompanyFailure {
     readonly id: string;
     readonly message: string;
 }
+/** Subscribe to the authenticated account's company without creating a durable command. */
+export interface CompanySubscribe {
+    readonly op: typeof CompanyOp.Subscribe;
+    readonly id: string;
+}
+/** Release one private stream. */
+export interface CompanyUnsubscribe {
+    readonly op: typeof CompanyOp.Unsubscribe;
+    readonly id: string;
+}
+/** Ephemeral reads never enter the durable company command journal. */
+export type CompanyWatchControl = CompanySubscribe | CompanyUnsubscribe;
+/** The first subscription packet always has sequence zero. */
+export interface CompanyLiveSnapshot {
+    readonly op: typeof CompanyOp.LiveSnapshot;
+    readonly id: string;
+    readonly sequence: bigint;
+    readonly state: CompanyState;
+}
+/** A subscription has its own contiguous sequence, independent of coalesced company revisions. */
+export interface CompanyUpdate {
+    readonly op: typeof CompanyOp.Update;
+    readonly id: string;
+    readonly sequence: bigint;
+    readonly state: CompanyState;
+}
+/** A cancelled company subscription retains no server state. */
+export interface CompanyStopped {
+    readonly op: typeof CompanyOp.Stopped;
+    readonly id: string;
+}
 /** Binary company request and response union. */
-export type CompanyPacket = CompanyCommand | CompanySnapshot | CompanyFailure;
+export type CompanyPacket =
+    | CompanyCommand
+    | CompanySnapshot
+    | CompanyFailure
+    | CompanyWatchControl
+    | CompanyLiveSnapshot
+    | CompanyUpdate
+    | CompanyStopped;

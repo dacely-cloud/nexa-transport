@@ -121,6 +121,19 @@ export class NexaClient {
             (error): void => this.#notify((): void => onError(error)),
         );
     }
+    /** Live private staffing and project briefs on the same socket, restored after reconnect. */
+    public subscribeCompany(
+        listener: (state: CompanyState) => void,
+        onError: (error: Error) => void,
+    ): () => void {
+        if (!this.connected || this.#hello?.features.officeCompanyUpdates !== true) {
+            throw new Error('Live company updates require the updated NEXA gateway.');
+        }
+        return this.#company.watch(
+            (state): void => this.#notify((): void => listener(state)),
+            (error): void => this.#notify((): void => onError(error)),
+        );
+    }
     /** Read private staffing and briefs, or submit one revision-checked idempotent company command. */
     public company(
         command: CompanyCommand = { op: CompanyOp.Read, id: crypto.randomUUID(), revision: 0n },
@@ -394,6 +407,14 @@ export class NexaClient {
                 );
             }
             this.#ready = true;
+            if (this.#hello.features.officeCompanyUpdates === true) {
+                this.#company.resume((bytes): void => {
+                    if (!this.connected || this.#socket.bufferedAmount > 256 * 1024) {
+                        throw new Error('Company connection is unavailable or busy.');
+                    }
+                    this.#socket.send(bytes);
+                });
+            }
             if (this.#hello.features.officeProjects === true) {
                 this.#projects.resume((bytes): void => {
                     if (!this.connected || this.#socket.bufferedAmount > 256 * 1024) {
@@ -1106,6 +1127,7 @@ export class NexaClient {
     }
     #clearListeners(): void {
         this.#projects.clear();
+        this.#company.clear();
         this.#officeListeners.clear();
         this.#subscriptions.clear();
         this.#streamIds.clear();
