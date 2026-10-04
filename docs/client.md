@@ -197,3 +197,5 @@ Only published, unarchived entries enter member employees' instructions on subse
 ## Per-message reasoning effort
 
 `agent.ask` and `client.stream` accept optional `reasoningEffort`: `off`, `minimal`, `low`, `medium`, `high`, `xhigh`, or `max`. An updated NEXA gateway applies it to that turn without changing the saved agent configuration. Omit it to retain the agent's default. Providers map unsupported levels to their supported effort settings.
+
+`hello.features.officeEmployeeCosts` negotiates NCE1 version 3 for private employee portfolios. Each project can carry exact `bigint` costs: `spent` (settled USD microcents), `reserved` (maximum outstanding liability), `charges` (metered requests including cancellations), and `unresolved`. Attribution uses the original execution employee, including failed work and later receipts. Legacy gateways omit `cost`; absence does not mean free work. One USD is 100,000,000 microcents. Reads do not approve, dispatch, or settle work.
