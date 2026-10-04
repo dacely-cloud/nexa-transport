@@ -815,6 +815,7 @@ Methods, events, and additive capabilities supported by this gateway.
 | `officeLayout`              | No       | `true`                                             | Owner-only OLAY geometry commands.                                             |
 | `officeProjectBaselines`    | No       | `true`                                             | NCP2 version 2 with accepted-product baselines for new projects.               |
 | `officeProjects`            | No       | `true`                                             | NCP2 private project decisions, subscriptions, and delivery chunks.            |
+| `officeShowroom`            | No       | `true`                                             | Accepted product labels in NGOP v9 and owner publication controls in NCP2 v4.  |
 
 ## GatewayLimits
 
