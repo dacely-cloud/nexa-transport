@@ -297,6 +297,26 @@ Each subscription returns a function that removes its listener. Use `Method.Sess
 
 ## Authentication
 
+For a gateway on another domain, have your website issue a short-lived, single-use
+login ticket after verifying its own session. Supply `tokenProvider` to obtain a fresh
+ticket before each socket opens, including automatic reconnects:
+
+```ts
+// Your website's authenticated ticket endpoint, called through its typed client.
+declare function issueNexaTicket(): Promise<string>;
+const client: NexaClient = await NexaClient.connect({
+    url: 'wss://ai.dacely.com',
+    tokenProvider: issueNexaTicket,
+});
+```
+
+The provider runs once per connection attempt, never per RPC or on a timer. Expiring
+a consumed ticket does not close the established socket. The backend still controls
+session expiry and revocation. Keep tickets in memory; never persist them. Credentials
+travel in the WebSocket upgrade query, so redact query strings in gateway access logs.
+Do not combine `tokenProvider` with API keys, cookie auth, pairing or device credentials.
+Closing the client while renewal is pending prevents a replacement socket from opening.
+
 For browser sessions, route the gateway through the website origin and pass `cookieAuth: true`.
 The browser supplies its HttpOnly cookie automatically; the SDK never reads it. Pass `accountId`
 from the verified page bootstrap to prevent a reconnect from adopting a different signed-in account.
