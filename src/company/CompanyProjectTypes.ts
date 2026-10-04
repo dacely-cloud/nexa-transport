@@ -24,6 +24,8 @@ export interface CompanyProjectState {
 }
 /** No packet accepts an owner, execution holder, or workspace filesystem path. */
 export interface ProjectRequest {
+    /** Version 2 supports an accepted starting product; omitted means the original wire format. */
+    readonly version?: 2;
     readonly id: string;
     readonly project: string;
 }

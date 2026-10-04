@@ -9,6 +9,7 @@ import type {
     CompanyWorkCommand,
     CompanyArtifact,
     CompanyEvidence,
+    CompanyBaseline,
 } from './CompanyWorkTypes.js';
 
 /** Versioned, bounded binary persistence; prompts and artifact contents are never public office data. */
@@ -18,7 +19,7 @@ export class CompanyWorkCodec {
     /** Encode private state with exact integer accounting and bounded lists. */
     public static encode(work: CompanyWork): Uint8Array {
         const w: BinaryWriter = new BinaryWriter(1024);
-        w.u32(this.#magic).u8(1);
+        w.u32(this.#magic).u8(work.baseline ? 2 : 1);
         w.str(work.projectId)
             .u64(work.revision)
             .str(work.phase)
@@ -62,6 +63,13 @@ export class CompanyWorkCodec {
                 w.str(evidence.callId).str(evidence.tool).str(evidence.summary);
             });
         });
+        if (work.baseline) {
+            const base: CompanyBaseline = work.baseline;
+            w.str(base.projectId).u64(base.revision).u64(base.acceptedAt);
+            this.#writeList(w, base.files, (file: CompanyArtifact): void => {
+                w.str(file.path).str(file.digest).u64(file.bytes);
+            });
+        }
         const packet: Uint8Array = w.toBytes();
         this.decode(packet);
         return packet;
@@ -69,7 +77,9 @@ export class CompanyWorkCodec {
     /** Validate storage before exposing it to scheduling or rendering. */
     public static decode(packet: Uint8Array): CompanyWork {
         const r: BinaryReader = new BinaryReader(packet);
-        if (r.u32() !== this.#magic || r.u8() !== 1) {
+        const magic: number = r.u32();
+        const version: number = r.u8();
+        if (magic !== this.#magic || (version !== 1 && version !== 2)) {
             throw new Error('Unsupported company work record');
         }
         const projectId: string = r.str();
@@ -184,6 +194,22 @@ export class CompanyWorkCodec {
                 };
             },
         );
+        const baseline: CompanyBaseline | undefined =
+            version === 2
+                ? {
+                      projectId: r.str(),
+                      revision: r.u64(),
+                      acceptedAt: r.u64(),
+                      files: this.#readList(r, (): CompanyArtifact => ({
+                          path: r.str(),
+                          digest: r.str(),
+                          bytes: r.u64(),
+                      })),
+                  }
+                : undefined;
+        if (baseline) {
+            this.#validateBaseline(baseline, projectId);
+        }
         if (r.remaining !== 0) {
             throw new Error('Trailing company work data');
         }
@@ -192,6 +218,7 @@ export class CompanyWorkCodec {
             revision,
             phase,
             workspaceId,
+            ...(baseline ? { baseline } : {}),
             reviewerId,
             plan,
             proposedLimit,
@@ -214,6 +241,9 @@ export class CompanyWorkCodec {
         const w: BinaryWriter = new BinaryWriter(256);
         w.str(command.kind).str(command.id).u64(command.revision);
         switch (command.kind) {
+            case 'baseline':
+                w.str(command.sourceProject).u64(command.sourceRevision);
+                break;
             case 'plan':
                 w.str(command.reviewerId);
                 w.u64(command.limit)
@@ -253,6 +283,9 @@ export class CompanyWorkCodec {
         }
         let command: CompanyWorkCommand;
         switch (kind) {
+            case 'baseline':
+                command = { kind, id, revision, sourceProject: r.str(), sourceRevision: r.u64() };
+                break;
             case 'plan':
                 command = {
                     kind,
@@ -301,6 +334,41 @@ export class CompanyWorkCodec {
             throw new Error('Trailing project decision data');
         }
         return command;
+    }
+    static #validateBaseline(base: CompanyBaseline, project: string): void {
+        let total: bigint = 0n;
+        const paths: Set<string> = new Set();
+        if (
+            !/^[a-zA-Z0-9-]{1,80}$/.test(base.projectId) ||
+            base.projectId === project ||
+            base.revision < 1n ||
+            base.acceptedAt < 1n ||
+            base.files.length < 1 ||
+            base.files.length > 64
+        ) {
+            throw new Error('Invalid accepted project baseline');
+        }
+        for (const file of base.files) {
+            if (
+                !file.path ||
+                file.path.length > 1024 ||
+                /^[a-zA-Z]:/.test(file.path) ||
+                file.path.includes('\\') ||
+                file.path.split('/').some((part) => !part || part === '.' || part === '..') ||
+                /[\p{Cc}\p{Cf}]/u.test(file.path) ||
+                !/^[0-9a-f]{64}$/.test(file.digest) ||
+                file.bytes < 0n ||
+                file.bytes > 4n * 1024n * 1024n ||
+                paths.has(file.path)
+            ) {
+                throw new Error('Invalid baseline file');
+            }
+            paths.add(file.path);
+            total += file.bytes;
+        }
+        if (total > 32n * 1024n * 1024n) {
+            throw new Error('Accepted baseline exceeds 32 MiB');
+        }
     }
     static #writeList<T>(w: BinaryWriter, values: readonly T[], write: (value: T) => void): void {
         if (values.length > 128) {

@@ -1924,6 +1924,11 @@ export const schema: Schema = {
                     description: 'Owner-only OLAY geometry commands.',
                     type: 'boolean',
                 },
+                officeProjectBaselines: {
+                    const: true,
+                    description: 'NCP2 version 2 with accepted-product baselines for new projects.',
+                    type: 'boolean',
+                },
                 officeProjects: {
                     const: true,
                     description:

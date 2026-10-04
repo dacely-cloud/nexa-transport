@@ -22,14 +22,16 @@ interface ProjectWatch {
 export class ProjectChannel {
     readonly #pending: Map<string, PendingProject> = new Map();
     readonly #watches: Map<string, ProjectWatch> = new Map();
+    #version: 2 | undefined;
     #send: ((bytes: Uint8Array<ArrayBuffer>) => void) | undefined;
     /** Restore read subscriptions only. A lost mutation is never automatically replayed. */
-    public resume(send: (bytes: Uint8Array<ArrayBuffer>) => void): void {
+    public resume(send: (bytes: Uint8Array<ArrayBuffer>) => void, version?: 2): void {
+        this.#version = version;
         this.#send = send;
         for (const [id, watch] of this.#watches) {
             watch.sequence = -1n;
             send(
-                CompanyProjectProtocol.encode({
+                this.#encode({
                     op: ProjectOp.Subscribe,
                     id,
                     project: watch.project,
@@ -94,7 +96,7 @@ export class ProjectChannel {
             throw new Error('Project connection is unavailable or has too many subscriptions.');
         }
         const id: string = crypto.randomUUID();
-        const bytes: Uint8Array<ArrayBuffer> = CompanyProjectProtocol.encode({
+        const bytes: Uint8Array<ArrayBuffer> = this.#encode({
             op: ProjectOp.Subscribe,
             id,
             project,
@@ -110,7 +112,7 @@ export class ProjectChannel {
             if (!this.#watches.delete(id)) {
                 return;
             }
-            this.#send?.(CompanyProjectProtocol.encode({ op: ProjectOp.Unsubscribe, id, project }));
+            this.#send?.(this.#encode({ op: ProjectOp.Unsubscribe, id, project }));
         };
     }
     /** Discard uncorrelated late replies and verify the project identity of every matching reply. */
@@ -153,7 +155,7 @@ export class ProjectChannel {
         ) {
             this.#watches.delete(packet.id);
             this.#send?.(
-                CompanyProjectProtocol.encode({
+                this.#encode({
                     op: ProjectOp.Unsubscribe,
                     id: packet.id,
                     project: watch.project,
@@ -188,6 +190,11 @@ export class ProjectChannel {
     public clear(): void {
         this.#watches.clear();
     }
+    #encode(packet: ProjectClientPacket): Uint8Array<ArrayBuffer> {
+        return CompanyProjectProtocol.encode(
+            this.#version ? { ...packet, version: this.#version } : packet,
+        );
+    }
     #request(
         packet: ProjectClientPacket,
         receive: PendingProject['receive'],
@@ -202,7 +209,7 @@ export class ProjectChannel {
             reject(new Error('Project connection is unavailable or request is already pending.'));
             return;
         }
-        const bytes: Uint8Array<ArrayBuffer> = CompanyProjectProtocol.encode(packet);
+        const bytes: Uint8Array<ArrayBuffer> = this.#encode(packet);
         const timer: ReturnType<typeof setTimeout> = setTimeout((): void => {
             this.#pending.delete(packet.id);
             reject(

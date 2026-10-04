@@ -168,3 +168,67 @@ it('assembles only contiguous matching delivery chunks and releases malformed tr
     await expect(wrong).rejects.toThrow('identity');
     channel.disconnect(new Error('Finished'));
 });
+
+it('negotiates baseline state and restores versioned subscriptions without replaying its command', async () => {
+    const channel = new ProjectChannel();
+    const packets: ReturnType<typeof CompanyProjectProtocol.decode>[] = [];
+    const send = (bytes: Uint8Array): void => {
+        packets.push(CompanyProjectProtocol.decode(bytes));
+    };
+    const packet: ProjectClientPacket = {
+        op: ProjectOp.Command,
+        id: 'baseline',
+        project: 'project',
+        command: {
+            kind: 'baseline',
+            id: 'base-choice',
+            revision: 0n,
+            sourceProject: 'source',
+            sourceRevision: 5n,
+        },
+    };
+    channel.resume(send);
+    await expect(channel.state(packet)).rejects.toThrow('version 2');
+    expect(packets).toEqual([]);
+    channel.resume(send, 2);
+    const listener = vi.fn(),
+        failed = vi.fn();
+    const release = channel.watch('project', listener, failed);
+    const watch = packets[0];
+    if (!watch) {
+        throw new Error('Missing watch');
+    }
+    expect(watch.version).toBe(2);
+    const pending = channel.state(packet);
+    const selected: CompanyProjectState = {
+        ...state,
+        work: {
+            ...state.work,
+            revision: 1n,
+            baseline: {
+                projectId: 'source',
+                revision: 5n,
+                acceptedAt: 123n,
+                files: [{ path: 'portal.html', bytes: 12n, digest: 'a'.repeat(64) }],
+            },
+        },
+    };
+    const answer = {
+        op: ProjectOp.Snapshot,
+        version: 2,
+        id: 'baseline',
+        project: 'project',
+        sequence: 0n,
+        state: selected,
+    } as const;
+    channel.receive(CompanyProjectProtocol.decode(CompanyProjectProtocol.encode(answer)));
+    await expect(pending).resolves.toEqual(selected);
+    channel.receive({ ...answer, id: watch.id });
+    expect(listener).toHaveBeenCalledWith(selected);
+    channel.disconnect(new Error('Offline'));
+    channel.resume(send, 2);
+    expect(packets.filter((entry) => entry.op === ProjectOp.Command)).toHaveLength(1);
+    expect(packets.at(-1)).toMatchObject({ op: ProjectOp.Subscribe, version: 2, id: watch.id });
+    release();
+    channel.clear();
+});

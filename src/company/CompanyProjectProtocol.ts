@@ -22,7 +22,11 @@ export class CompanyProjectProtocol {
     /** Encode bounded primitives, preserving bigint revisions and USD microcents. */
     public static encode(packet: ProjectPacket): Uint8Array<ArrayBuffer> {
         const w: BinaryWriter = new BinaryWriter(1024);
-        w.u32(this.#magic).u8(1).u8(packet.op).str(packet.id).str(packet.project);
+        w.u32(this.#magic)
+            .u8(packet.version ?? 1)
+            .u8(packet.op)
+            .str(packet.id)
+            .str(packet.project);
         switch (packet.op) {
             case ProjectOp.Read:
             case ProjectOp.Subscribe:
@@ -30,6 +34,9 @@ export class CompanyProjectProtocol {
             case ProjectOp.Stopped:
                 break;
             case ProjectOp.Command: {
+                if (packet.command.kind === 'baseline' && packet.version !== 2) {
+                    throw new Error('Starting products require project protocol version 2');
+                }
                 const bytes: Uint8Array = CompanyWorkCodec.command(packet.command);
                 w.u32(bytes.length).bytes(bytes);
                 break;
@@ -39,6 +46,9 @@ export class CompanyProjectProtocol {
                 break;
             case ProjectOp.Snapshot:
             case ProjectOp.Update: {
+                if (packet.state.work.baseline && packet.version !== 2) {
+                    throw new Error('Starting products require project protocol version 2');
+                }
                 const bytes: Uint8Array = CompanyWorkCodec.encode(packet.state.work);
                 w.u64(packet.sequence)
                     .u32(bytes.length)
@@ -67,7 +77,9 @@ export class CompanyProjectProtocol {
     /** Reject unknown operations, malformed data, truncation, oversized chunks, and trailing bytes. */
     public static decode(bytes: Uint8Array): ProjectPacket {
         const r: BinaryReader = new BinaryReader(bytes);
-        if (r.u32() !== this.#magic || r.u8() !== 1) {
+        const magic: number = r.u32();
+        const version: number = r.u8();
+        if (magic !== this.#magic || (version !== 1 && version !== 2)) {
             throw new Error('Unsupported project protocol');
         }
         const op: number = r.u8();
@@ -146,7 +158,15 @@ export class CompanyProjectProtocol {
         if (r.remaining !== 0) {
             throw new Error('Trailing project packet data');
         }
-        return packet;
+        if (
+            version === 1 &&
+            ((packet.op === ProjectOp.Command && packet.command.kind === 'baseline') ||
+                ((packet.op === ProjectOp.Snapshot || packet.op === ProjectOp.Update) &&
+                    packet.state.work.baseline))
+        ) {
+            throw new Error('Starting products require project protocol version 2');
+        }
+        return version === 2 ? { ...packet, version: 2 } : packet;
     }
     static #text(r: BinaryReader, maximum: number): string {
         const text: string = r.str();

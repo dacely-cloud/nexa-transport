@@ -44,12 +44,20 @@ export interface CompanyWorkAttempt {
     readonly artifacts: readonly CompanyArtifact[];
     readonly evidence: readonly CompanyEvidence[];
 }
+/** An immutable accepted source, copied into a separate workspace before the first paid turn. */
+export interface CompanyBaseline {
+    readonly projectId: string;
+    readonly revision: bigint;
+    readonly acceptedAt: bigint;
+    readonly files: readonly CompanyArtifact[];
+}
 /** Bounded private execution state; visitor snapshots project only generic activity. */
 export interface CompanyWork {
     readonly projectId: string;
     readonly revision: bigint;
     readonly phase: CompanyWorkPhase;
     readonly workspaceId: string;
+    readonly baseline?: CompanyBaseline;
     readonly reviewerId: string;
     readonly plan: string;
     readonly proposedLimit: bigint;
@@ -124,9 +132,21 @@ export interface CompanySchedule extends CompanyWorkRequest {
     readonly paused: boolean;
     readonly priority: number;
 }
+/** Attach an accepted product to an untouched draft; this grants no authority to spend. */
+export interface CompanySetBaseline extends CompanyWorkRequest {
+    readonly kind: 'baseline';
+    readonly sourceProject: string;
+    readonly sourceRevision: bigint;
+}
 /** All commands are private and take their owner from the authenticated connection. */
 export type CompanyWorkCommand =
-    CompanyPlan | CompanyApprove | CompanyCorrect | CompanyAccept | CompanyAssign | CompanySchedule;
+    | CompanyPlan
+    | CompanyApprove
+    | CompanyCorrect
+    | CompanyAccept
+    | CompanyAssign
+    | CompanySchedule
+    | CompanySetBaseline;
 /** Exact completed-run receipts passed by the host, never by an owner or visitor command. */
 export interface CompanyWorkResult {
     readonly succeeded: boolean;
