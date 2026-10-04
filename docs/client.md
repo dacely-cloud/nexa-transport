@@ -41,6 +41,11 @@ There is no `client.ask()` convenience method. Use `client.call(Method.AgentAsk,
 
 Import `ClientOptions` and `CallOptions` as types from `nexa-transport/options`.
 
+`cookieAuth: true` selects a same-origin browser session. The browser sends its HttpOnly cookie;
+the SDK never accesses it. Set `accountId` to the verified page account's 64-character lowercase
+hex identifier to restrict reconnects to that account. Cookie mode requires a browser, rejects
+API keys/device credentials and existing URL queries, and never accepts replacement gateway tokens.
+
 | Option               | Type                     | Behavior/default                                                                                             |
 | -------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------ |
 | `url`                | `string`                 | Required WebSocket URL. `http:`/`https:` are converted to `ws:`/`wss:`. Userinfo and fragments are rejected. |

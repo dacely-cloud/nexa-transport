@@ -1,5 +1,6 @@
 import { WebSocketServer, WebSocket } from 'ws';
 import type { AddressInfo } from 'node:net';
+import type { IncomingMessage } from 'node:http';
 import type { AskResult, HelloOk, JsonValue } from '../src/protocol/Protocol.js';
 import { BinaryChunks } from '../src/media/BinaryChunks.js';
 import { BinaryEnvelope } from '../src/media/BinaryEnvelope.js';
@@ -47,12 +48,15 @@ export class TestGateway {
     readonly #server: WebSocketServer;
     /** Captured request order. */
     public readonly requests: Request[] = [];
+    /** Upgrade targets, captured to detect credentials leaking into URLs. */
+    public readonly upgradeUrls: string[] = [];
     /** Handler used after the connect handshake. */
     public handler: (socket: WebSocket, request: Request) => void = (): void => {};
     /** Opens an ephemeral loopback port. */
     public constructor(greeting: HelloOk = hello) {
         this.#server = new WebSocketServer({ host: '127.0.0.1', port: 0 });
-        this.#server.on('connection', (socket: WebSocket): void => {
+        this.#server.on('connection', (socket: WebSocket, request: IncomingMessage): void => {
+            this.upgradeUrls.push(request.url ?? '');
             socket.send(
                 JSON.stringify({
                     event: 'connect.challenge',

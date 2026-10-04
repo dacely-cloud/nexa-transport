@@ -14,6 +14,10 @@ export interface ClientOptions {
     readonly url: string;
     /** Nexa token, or a previously provisioned device token. */
     readonly apiKey?: string;
+    /** Use the browser's HttpOnly session cookie through a same-origin gateway proxy. Mutually exclusive with token/device credentials. */
+    readonly cookieAuth?: boolean;
+    /** Restricts cookie authentication to the account verified when this document loaded. Never grants identity. */
+    readonly accountId?: string;
     /** Stable device id for paired-device authentication. */
     readonly deviceId?: string;
     /** Display name when requesting device pairing. */

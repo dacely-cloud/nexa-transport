@@ -297,11 +297,26 @@ Each subscription returns a function that removes its listener. Use `Method.Sess
 
 ## Authentication
 
+For browser sessions, route the gateway through the website origin and pass `cookieAuth: true`.
+The browser supplies its HttpOnly cookie automatically; the SDK never reads it. Pass `accountId`
+from the verified page bootstrap to prevent a reconnect from adopting a different signed-in account.
+The gateway must explicitly allow this origin and forward the cookie to its ToilJS backend.
+
+```ts
+const client: NexaClient = await NexaClient.connect({
+    url: new URL('/nexa', window.location.origin).href,
+    cookieAuth: true,
+});
+```
+
+Cookie mode rejects cross-origin addresses, supplied URL queries, device credentials, and API keys.
+Reconnects retain the cookie mode and account restriction. Close the client on logout or account change.
+
 Connect with an API key, or supply `deviceId` alongside a paired-device token. For initial pairing, use `deviceId`, `deviceName`, and `pairingCode`. A newly issued credential is returned in `client.hello.auth.token`.
 
 `client.hello.auth` contains the authenticated identity and scopes. `client.hello.features` lists supported methods, events, and capabilities.
 
-Browser authentication uses query parameters on the WebSocket upgrade. Use WSS, exclude credentials from application bundles, and redact connection queries in proxy logs. The SDK does not persist credentials. For a separately hosted frontend, add its exact origin to the gateway's `allowedOrigins` configuration.
+Explicit API-key and device authentication use query parameters on the WebSocket upgrade. Use WSS, exclude credentials from application bundles, and redact connection queries in proxy logs. The SDK does not persist credentials. For a separately hosted frontend, add its exact origin to the gateway's `allowedOrigins` configuration.
 
 ## API
 

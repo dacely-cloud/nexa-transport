@@ -237,6 +237,37 @@ export class NexaClient {
                 new TypeError('Expected a ws(s) endpoint without userinfo or fragment'),
             );
         }
+        if (options.cookieAuth === true) {
+            if (
+                typeof window === 'undefined' ||
+                url.host !== window.location.host ||
+                url.protocol !== (window.location.protocol === 'https:' ? 'wss:' : 'ws:')
+            ) {
+                throw materializeError(
+                    new TypeError('Cookie authentication requires a same-origin browser gateway'),
+                );
+            }
+            if (
+                url.search !== '' ||
+                options.apiKey !== undefined ||
+                options.deviceId !== undefined ||
+                options.deviceName !== undefined ||
+                options.pairingCode !== undefined
+            ) {
+                throw materializeError(
+                    new TypeError('Cookie authentication cannot include URL or device credentials'),
+                );
+            }
+            url.searchParams.set('auth', 'cookie');
+            if (options.accountId !== undefined) {
+                if (!/^[0-9a-f]{64}$/.test(options.accountId)) {
+                    throw materializeError(new TypeError('Expected a verified account identifier'));
+                }
+                url.searchParams.set('account', options.accountId);
+            }
+        } else if (options.accountId !== undefined) {
+            throw materializeError(new TypeError('Account pinning requires cookie authentication'));
+        }
         if (options.apiKey !== undefined) {
             if (options.apiKey.length === 0) {
                 throw materializeError(new TypeError('apiKey cannot be empty'));
@@ -395,6 +426,12 @@ export class NexaClient {
                 );
             }
             if (this.#hello.auth.token !== undefined) {
+                if (this.#options.cookieAuth === true) {
+                    throw new TransportError(
+                        TransportErrorCode.Protocol,
+                        'Cookie authentication cannot accept a gateway token',
+                    );
+                }
                 this.#url.searchParams.set('token', this.#hello.auth.token);
                 this.#url.searchParams.delete('pair');
             }
