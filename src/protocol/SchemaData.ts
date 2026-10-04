@@ -1949,6 +1949,12 @@ export const schema: Schema = {
                     description: 'Scheduler workload summaries in NGOP v6.',
                     type: 'boolean',
                 },
+                officeExecutionHosts: {
+                    const: true,
+                    description:
+                        'Passive owner-scoped workspace resources in the private NCH1 binary channel.',
+                    type: 'boolean',
+                },
                 officeGame: {
                     const: true,
                     description:

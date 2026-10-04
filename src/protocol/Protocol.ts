@@ -1249,6 +1249,8 @@ export interface GatewayFeaturesShape {
     readonly officeEmployeeResults?: true;
     /** officeExecution as defined by the Nexa gateway. */
     readonly officeExecution?: true;
+    /** officeExecutionHosts as defined by the Nexa gateway. */
+    readonly officeExecutionHosts?: true;
     /** officeGame as defined by the Nexa gateway. */
     readonly officeGame?: true;
     /** officeGameVersion as defined by the Nexa gateway. */
