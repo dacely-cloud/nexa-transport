@@ -1964,6 +1964,12 @@ export const schema: Schema = {
                         'NCP2 private project decisions, subscriptions, and delivery chunks.',
                     type: 'boolean',
                 },
+                officeVerification: {
+                    const: true,
+                    description:
+                        'Versioned host verification evidence on private project and employee channels.',
+                    type: 'boolean',
+                },
             },
             required: ['events', 'methodScopes', 'methods'],
             type: 'object',

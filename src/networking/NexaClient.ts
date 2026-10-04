@@ -526,12 +526,15 @@ export class NexaClient {
             }
             this.#ready = true;
             if (this.supportsEmployeeResults) {
-                this.#employees.resume((bytes): void => {
-                    if (!this.connected || this.#socket.bufferedAmount > 256 * 1024) {
-                        throw new Error('Employee results connection is unavailable or busy.');
-                    }
-                    this.#socket.send(bytes);
-                });
+                this.#employees.resume(
+                    (bytes): void => {
+                        if (!this.connected || this.#socket.bufferedAmount > 256 * 1024) {
+                            throw new Error('Employee results connection is unavailable or busy.');
+                        }
+                        this.#socket.send(bytes);
+                    },
+                    this.#hello.features.officeVerification === true ? 2 : undefined,
+                );
             }
             if (this.#hello.features.officeCompanyUpdates === true) {
                 this.#company.resume(
@@ -564,7 +567,11 @@ export class NexaClient {
                         }
                         this.#socket.send(bytes);
                     },
-                    this.#hello.features.officeProjectBaselines === true ? 2 : undefined,
+                    this.#hello.features.officeVerification === true
+                        ? 3
+                        : this.#hello.features.officeProjectBaselines === true
+                          ? 2
+                          : undefined,
                 );
             }
             if (this.#officeListeners.size > 0) {
