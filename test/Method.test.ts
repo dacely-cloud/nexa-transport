@@ -18,6 +18,24 @@ function verifyMethodTypes(client: NexaClient): void {
 }
 
 describe('Method enum', (): void => {
+    it('validates optional per-turn effort in ask and stream contracts', (): void => {
+        for (const reasoningEffort of ['off', 'low', 'medium', 'xhigh']) {
+            expect(
+                methodValidators[Method.AgentAsk].params({ message: 'Hi', reasoningEffort }),
+            ).toBe(true);
+            expect(
+                methodValidators[Method.AgentStream].params({ message: 'Hi', reasoningEffort }),
+            ).toBe(true);
+        }
+        for (const reasoningEffort of [null, 2, {}, 'ultra']) {
+            expect(
+                methodValidators[Method.AgentAsk].params({ message: 'Hi', reasoningEffort }),
+            ).toBe(false);
+            expect(
+                methodValidators[Method.AgentStream].params({ message: 'Hi', reasoningEffort }),
+            ).toBe(false);
+        }
+    });
     it('covers the complete gateway catalog without changing wire values', (): void => {
         expect(Object.values(Method).toSorted()).toEqual(Object.keys(methodValidators).toSorted());
         expect(Method.AgentAsk).toBe('agent.ask');

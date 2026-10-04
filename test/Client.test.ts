@@ -56,6 +56,7 @@ describe('Nexa websocket lifetimes', (): void => {
         };
         const answer: AskResult = await connected.call(Method.AgentAsk, {
             message: 'Continue',
+            reasoningEffort: 'xhigh',
             conversationId: 'test::main',
             attachments: [{ type: 'text', text: 'Context' }],
         });
@@ -64,6 +65,7 @@ describe('Nexa websocket lifetimes', (): void => {
             method: Method.AgentAsk,
             params: {
                 message: 'Continue',
+                reasoningEffort: 'xhigh',
                 conversationId: 'test::main',
                 attachments: [{ type: 'text', text: 'Context' }],
             },

@@ -180,14 +180,15 @@ With a personal API key, omit `userId`; the gateway uses the authenticated ident
 
 Parameters: [AskParams](protocol.md#askparams).
 
-| Field            | Required | Type                                                        | Description                                                              |
-| ---------------- | -------- | ----------------------------------------------------------- | ------------------------------------------------------------------------ |
-| `agentId`        | No       | `string`                                                    |                                                                          |
-| `attachments`    | No       | Array of [InboundAttachment](protocol.md#inboundattachment) | User-authored image, video, document, and text blocks, in display order. |
-| `conversationId` | No       | `string`                                                    | Continues an existing conversation.                                      |
-| `cwd`            | No       | `string`                                                    | Where tools operate.                                                     |
-| `message`        | Yes      | `string`                                                    |                                                                          |
-| `userId`         | No       | `string`                                                    | The principal the turn is billed and authorized as.                      |
+| Field             | Required | Type                                                                          | Description                                                                 |
+| ----------------- | -------- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `agentId`         | No       | `string`                                                                      |                                                                             |
+| `attachments`     | No       | Array of [InboundAttachment](protocol.md#inboundattachment)                   | User-authored image, video, document, and text blocks, in display order.    |
+| `conversationId`  | No       | `string`                                                                      | Continues an existing conversation.                                         |
+| `cwd`             | No       | `string`                                                                      | Where tools operate.                                                        |
+| `message`         | Yes      | `string`                                                                      |                                                                             |
+| `reasoningEffort` | No       | `"high"` / `"low"` / `"max"` / `"medium"` / `"minimal"` / `"off"` / `"xhigh"` | Per-turn reasoning preference; never changes the saved agent configuration. |
+| `userId`          | No       | `string`                                                                      | The principal the turn is billed and authorized as.                         |
 
 Result: [AskResult](protocol.md#askresult).
 
@@ -227,15 +228,16 @@ With a personal API key, omit `userId`; the gateway uses the authenticated ident
 
 Parameters: [StreamParams](protocol.md#streamparams).
 
-| Field            | Required | Type                                                        | Description                                                              |
-| ---------------- | -------- | ----------------------------------------------------------- | ------------------------------------------------------------------------ |
-| `agentId`        | No       | `string`                                                    |                                                                          |
-| `attachments`    | No       | Array of [InboundAttachment](protocol.md#inboundattachment) | User-authored image, video, document, and text blocks, in display order. |
-| `conversationId` | No       | `string`                                                    | Continues an existing conversation.                                      |
-| `cwd`            | No       | `string`                                                    | Where tools operate.                                                     |
-| `message`        | Yes      | `string`                                                    |                                                                          |
-| `streamId`       | No       | `string`                                                    | The stream's id, chosen by the CLIENT.                                   |
-| `userId`         | No       | `string`                                                    | The principal the turn is billed and authorized as.                      |
+| Field             | Required | Type                                                                          | Description                                                                 |
+| ----------------- | -------- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `agentId`         | No       | `string`                                                                      |                                                                             |
+| `attachments`     | No       | Array of [InboundAttachment](protocol.md#inboundattachment)                   | User-authored image, video, document, and text blocks, in display order.    |
+| `conversationId`  | No       | `string`                                                                      | Continues an existing conversation.                                         |
+| `cwd`             | No       | `string`                                                                      | Where tools operate.                                                        |
+| `message`         | Yes      | `string`                                                                      |                                                                             |
+| `reasoningEffort` | No       | `"high"` / `"low"` / `"max"` / `"medium"` / `"minimal"` / `"off"` / `"xhigh"` | Per-turn reasoning preference; never changes the saved agent configuration. |
+| `streamId`        | No       | `string`                                                                      | The stream's id, chosen by the CLIENT.                                      |
+| `userId`          | No       | `string`                                                                      | The principal the turn is billed and authorized as.                         |
 
 Result: [StreamAccepted](protocol.md#streamaccepted).
 

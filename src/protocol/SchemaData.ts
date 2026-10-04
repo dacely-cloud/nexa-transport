@@ -425,6 +425,12 @@ export const schema: Schema = {
                 message: {
                     type: 'string',
                 },
+                reasoningEffort: {
+                    description:
+                        'Per-turn reasoning preference; never changes the saved agent configuration.',
+                    enum: ['high', 'low', 'max', 'medium', 'minimal', 'off', 'xhigh'],
+                    type: 'string',
+                },
                 userId: {
                     description: 'The principal the turn is billed and authorized as.',
                     type: 'string',
@@ -5732,6 +5738,12 @@ export const schema: Schema = {
                     type: 'string',
                 },
                 message: {
+                    type: 'string',
+                },
+                reasoningEffort: {
+                    description:
+                        'Per-turn reasoning preference; never changes the saved agent configuration.',
+                    enum: ['high', 'low', 'max', 'medium', 'minimal', 'off', 'xhigh'],
                     type: 'string',
                 },
                 streamId: {

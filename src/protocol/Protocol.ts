@@ -253,6 +253,17 @@ export interface ApprovalResolvedDataShape {
 /** ApprovalResolvedData from the Nexa wire protocol. */
 export type ApprovalResolvedData = ApprovalResolvedDataShape;
 
+/** Allowed values for AskParamsreasoningEffort. */
+export const AskParamsreasoningEffortValues = {
+    Value0: 'high',
+    Value1: 'low',
+    Value2: 'max',
+    Value3: 'medium',
+    Value4: 'minimal',
+    Value5: 'off',
+    Value6: 'xhigh',
+} as const;
+
 /** AskParams wire fields. */
 export interface AskParamsShape {
     /** agentId as defined by the Nexa gateway. */
@@ -265,6 +276,8 @@ export interface AskParamsShape {
     readonly cwd?: string;
     /** message as defined by the Nexa gateway. */
     readonly message: string;
+    /** reasoningEffort as defined by the Nexa gateway. */
+    readonly reasoningEffort?: (typeof AskParamsreasoningEffortValues)[keyof typeof AskParamsreasoningEffortValues];
     /** userId as defined by the Nexa gateway. */
     readonly userId?: string;
 }
@@ -3710,6 +3723,17 @@ export interface StreamAcceptedShape {
 /** StreamAccepted from the Nexa wire protocol. */
 export type StreamAccepted = StreamAcceptedShape;
 
+/** Allowed values for StreamParamsreasoningEffort. */
+export const StreamParamsreasoningEffortValues = {
+    Value0: 'high',
+    Value1: 'low',
+    Value2: 'max',
+    Value3: 'medium',
+    Value4: 'minimal',
+    Value5: 'off',
+    Value6: 'xhigh',
+} as const;
+
 /** StreamParams wire fields. */
 export interface StreamParamsShape {
     /** agentId as defined by the Nexa gateway. */
@@ -3722,6 +3746,8 @@ export interface StreamParamsShape {
     readonly cwd?: string;
     /** message as defined by the Nexa gateway. */
     readonly message: string;
+    /** reasoningEffort as defined by the Nexa gateway. */
+    readonly reasoningEffort?: (typeof StreamParamsreasoningEffortValues)[keyof typeof StreamParamsreasoningEffortValues];
     /** streamId as defined by the Nexa gateway. */
     readonly streamId?: string;
     /** userId as defined by the Nexa gateway. */
