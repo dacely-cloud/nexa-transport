@@ -309,12 +309,20 @@ export class NexaClient {
         if (this.#layouts.size >= 8 || this.#socket.bufferedAmount > 256 * 1024) {
             return Promise.reject(new Error('Office connection is busy.'));
         }
+        if (state?.desks !== undefined && this.#hello.features.officeLayoutDesks !== true) {
+            return Promise.reject(new Error('Moving desks requires the updated NEXA gateway.'));
+        }
         const id = ++this.#layoutId;
         const bytes = OfficeLayoutProtocol.encode({
             op: state ? 2 : 1,
             id,
             revision: state?.revision ?? 0n,
             pieces: state?.pieces ?? [],
+            ...(state?.desks !== undefined
+                ? { desks: state.desks }
+                : !state && this.#hello.features.officeLayoutDesks === true
+                  ? { desks: [] }
+                  : {}),
         });
         return new Promise((resolve, reject) => {
             const timer = setTimeout(() => {
@@ -1164,7 +1172,11 @@ export class NexaClient {
                     if (packet.op === 4) {
                         pending.reject(new Error(packet.message));
                     } else {
-                        pending.resolve({ revision: packet.revision, pieces: packet.pieces });
+                        pending.resolve({
+                            revision: packet.revision,
+                            pieces: packet.pieces,
+                            ...(packet.desks === undefined ? {} : { desks: packet.desks }),
+                        });
                     }
                 }
                 return;

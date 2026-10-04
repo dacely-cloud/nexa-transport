@@ -983,6 +983,8 @@ export class OfficeProtocol {
 export interface OfficeLayoutState {
     readonly revision: bigint;
     readonly pieces: readonly OfficePlacement[];
+    /** Omitted by legacy geometry-only clients; an empty list restores automatic placement. */
+    readonly desks?: readonly OfficeDeskPlacement[];
 }
 /** Read=1, save=2, snapshot=3, error=4. No account ID is accepted from the client. */
 export interface OfficeLayoutPacket extends OfficeLayoutState {
@@ -1001,8 +1003,13 @@ export class OfficeLayoutProtocol {
         );
     }
     /** Encode half-metre coordinates without JSON or private agent content. */
-    public static encode(packet: OfficeLayoutPacket): Uint8Array<ArrayBuffer> {
+    public static encode(
+        packet: OfficeLayoutPacket,
+        version: 1 | 2 = packet.desks === undefined ? 1 : 2,
+    ): Uint8Array<ArrayBuffer> {
         OfficeConstruction.validate(packet.pieces);
+        const desks: readonly OfficeDeskPlacement[] = version === 2 ? (packet.desks ?? []) : [];
+        OfficeDesks.validate(desks);
         if (
             !Number.isInteger(packet.id) ||
             packet.id < 0 ||
@@ -1016,21 +1023,28 @@ export class OfficeLayoutProtocol {
         if (
             message.length > 512 ||
             (packet.op !== 4 && message.length) ||
-            ((packet.op === 1 || packet.op === 4) && packet.pieces.length)
+            ![1, 2, 3, 4].includes(packet.op) ||
+            ((packet.op === 1 || packet.op === 4) && (packet.pieces.length || desks.length))
         ) {
             throw new Error('Invalid layout payload');
         }
-        const bytes = new Uint8Array(20 + packet.pieces.length * 8 + message.length);
+        const header: number = version === 2 ? 22 : 20;
+        const bytes = new Uint8Array(
+            header + packet.pieces.length * 8 + desks.length * 5 + message.length,
+        );
         const view = new DataView(bytes.buffer);
         view.setUint32(0, 0x4f4c4159);
-        view.setUint8(4, 1);
+        view.setUint8(4, version);
         view.setUint8(5, packet.op);
         view.setUint32(6, packet.id);
         view.setBigUint64(10, packet.revision);
         view.setUint16(18, packet.op === 4 ? message.length : packet.pieces.length);
+        if (version === 2) {
+            view.setUint16(20, desks.length);
+        }
         const kinds = ['wall', 'window', 'door', 'plant', 'sofa', 'table', 'team'];
         packet.pieces.forEach((piece, index) => {
-            const offset = 20 + index * 8;
+            const offset = header + index * 8;
             view.setUint8(offset, piece.id);
             view.setUint8(offset + 1, kinds.indexOf(piece.kind));
             view.setUint8(offset + 2, piece.floor);
@@ -1038,26 +1052,44 @@ export class OfficeLayoutProtocol {
             view.setInt16(offset + 4, piece.x);
             view.setInt16(offset + 6, piece.z);
         });
+        desks.forEach((desk, index) => {
+            const offset: number = header + packet.pieces.length * 8 + index * 5;
+            view.setUint8(offset, desk.desk);
+            view.setInt16(offset + 1, desk.x);
+            view.setInt16(offset + 3, desk.z);
+        });
         if (packet.op === 4) {
-            bytes.set(message, 20);
+            bytes.set(message, header);
         }
         return bytes;
     }
     /** Reject unknown versions, opcodes, trailing bytes and oversized input before allocation. */
     public static decode(bytes: Uint8Array): OfficeLayoutPacket {
-        if (!this.isFrame(bytes) || bytes.length < 20 || bytes.length > 1044 || bytes[4] !== 1) {
+        if (
+            !this.isFrame(bytes) ||
+            bytes.length < 20 ||
+            bytes.length > 2326 ||
+            (bytes[4] !== 1 && bytes[4] !== 2)
+        ) {
             throw new Error('Invalid layout frame');
         }
         const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
         const op = view.getUint8(5);
+        const header: number = bytes[4] === 2 ? 22 : 20;
+        if (bytes.length < header) {
+            throw new Error('Invalid layout header');
+        }
         const count = view.getUint16(18);
+        const deskCount: number = header === 22 ? view.getUint16(20) : 0;
         if (op !== 1 && op !== 2 && op !== 3 && op !== 4) {
             throw new Error('Invalid layout operation');
         }
         if (
             (op === 1 && count !== 0) ||
             count > (op === 4 ? 512 : 128) ||
-            bytes.length !== 20 + count * (op === 4 ? 1 : 8)
+            deskCount > 256 ||
+            ((op === 1 || op === 4) && deskCount !== 0) ||
+            bytes.length !== header + count * (op === 4 ? 1 : 8) + deskCount * 5
         ) {
             throw new Error('Invalid layout length');
         }
@@ -1073,7 +1105,7 @@ export class OfficeLayoutProtocol {
         ];
         if (op !== 4) {
             for (let index = 0; index < count; index++) {
-                const offset = 20 + index * 8;
+                const offset = header + index * 8;
                 const kind = kinds[view.getUint8(offset + 1)];
                 if (!kind) {
                     throw new Error('Invalid layout asset');
@@ -1089,13 +1121,28 @@ export class OfficeLayoutProtocol {
             }
         }
         OfficeConstruction.validate(pieces);
+        const desks: OfficeDeskPlacement[] = [];
+        for (let index: number = 0; index < deskCount; index++) {
+            const offset: number = header + count * 8 + index * 5;
+            desks.push({
+                desk: view.getUint8(offset),
+                x: view.getInt16(offset + 1),
+                z: view.getInt16(offset + 3),
+            });
+        }
+        OfficeDesks.validate(desks);
         return {
             op,
             id: view.getUint32(6),
             revision: view.getBigUint64(10),
             pieces,
+            ...(header === 22 ? { desks } : {}),
             ...(op === 4
-                ? { message: new TextDecoder('utf-8', { fatal: true }).decode(bytes.subarray(20)) }
+                ? {
+                      message: new TextDecoder('utf-8', { fatal: true }).decode(
+                          bytes.subarray(header),
+                      ),
+                  }
                 : {}),
         };
     }

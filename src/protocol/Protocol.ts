@@ -1257,6 +1257,8 @@ export interface GatewayFeaturesShape {
     readonly officeGameVersion?: 3;
     /** officeLayout as defined by the Nexa gateway. */
     readonly officeLayout?: true;
+    /** officeLayoutDesks as defined by the Nexa gateway. */
+    readonly officeLayoutDesks?: true;
     /** officeProjectBaselines as defined by the Nexa gateway. */
     readonly officeProjectBaselines?: true;
     /** officeProjectRecovery as defined by the Nexa gateway. */

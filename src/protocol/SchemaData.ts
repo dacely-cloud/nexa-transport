@@ -1971,6 +1971,12 @@ export const schema: Schema = {
                     description: 'Owner-only OLAY geometry commands.',
                     type: 'boolean',
                 },
+                officeLayoutDesks: {
+                    const: true,
+                    description:
+                        'OLAY v2 atomically saves construction and permanent workstation coordinates.',
+                    type: 'boolean',
+                },
                 officeProjectBaselines: {
                     const: true,
                     description: 'NCP2 version 2 with accepted-product baselines for new projects.',
