@@ -121,6 +121,10 @@ export class NexaClient {
             (error): void => this.#notify((): void => onError(error)),
         );
     }
+    /** Whether this connection can attach captured accepted products to new project drafts. */
+    public get supportsProjectBaselines(): boolean {
+        return this.connected && this.#hello?.features.officeProjectBaselines === true;
+    }
     /** Live private staffing and project briefs on the same socket, restored after reconnect. */
     public subscribeCompany(
         listener: (state: CompanyState) => void,
@@ -453,12 +457,15 @@ export class NexaClient {
                 });
             }
             if (this.#hello.features.officeProjects === true) {
-                this.#projects.resume((bytes): void => {
-                    if (!this.connected || this.#socket.bufferedAmount > 256 * 1024) {
-                        throw new Error('Project connection is unavailable or busy.');
-                    }
-                    this.#socket.send(bytes);
-                });
+                this.#projects.resume(
+                    (bytes): void => {
+                        if (!this.connected || this.#socket.bufferedAmount > 256 * 1024) {
+                            throw new Error('Project connection is unavailable or busy.');
+                        }
+                        this.#socket.send(bytes);
+                    },
+                    this.#hello.features.officeProjectBaselines === true ? 2 : undefined,
+                );
             }
             if (this.#officeListeners.size > 0) {
                 this.#sendOffice(OfficeProtocol.control(OfficeGameOp.Request));
