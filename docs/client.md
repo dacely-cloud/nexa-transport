@@ -194,6 +194,24 @@ Use the current company revision and retain the exact command ID/payload for an 
 
 Only published, unarchived entries enter member employees' instructions on subsequent turns, including connected chats and background work. Drafts never enter their context. Existing turns retain their starting instructions and tool permissions. Archiving preserves the record; saving an archived entry restores it as a new draft. These are owner-reviewed notes and procedures, not an automatic skill rating or a claim that the model became smarter. Versions 1 and 2 omit the library, and legacy department edits preserve it. Visitors receive neither this capability nor the private contents. The website/backend and NEXA need the matching update; no new environment setting or connection is required.
 
+## Accepted products in the public showroom
+
+`client.supportsProjectShowroom` requires the private `officeProjects` capability and
+`officeShowroom`. Owners can call `client.project(projectId, { kind: 'showcase', id, revision,
+published: true, name, description })` after acceptance. The name is 1–64 characters and the
+description is at most 280 characters. Both are separate, owner-reviewed public labels; the
+command exposes no captured files, source code, prompts or private task titles. Withdrawal
+uses `published: false` with both strings empty. Retain the exact decision ID and payload
+for uncertain retries; reconnect restores subscriptions without replaying publication.
+
+The capability negotiates NCP2 version 4 for private work records and NGOP version 9 for
+public office updates, on the same socket. Published projects carry optional
+`showcase: { name, description }` alongside their accepted execution phase. Visitor snapshots
+use the public name as their project goal and retain opaque public identifiers. Visitors
+receive only these labels and existing sanitized work state, with no private project
+commands or file transfers. Older gateways retain their original packet versions and reject
+showroom decisions locally before sending.
+
 ## Per-message reasoning effort
 
 `agent.ask` and `client.stream` accept optional `reasoningEffort`: `off`, `minimal`, `low`, `medium`, `high`, `xhigh`, or `max`. An updated NEXA gateway applies it to that turn without changing the saved agent configuration. Omit it to retain the agent's default. Providers map unsupported levels to their supported effort settings.

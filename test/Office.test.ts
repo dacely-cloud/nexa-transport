@@ -5,7 +5,7 @@ import { OfficeGameOp, OfficeProtocol, type OfficeGamePacket } from '../src/offi
 import { Method } from '../src/protocol/Protocol';
 import { hello } from './Support';
 
-it.each([2, 3, 4, 5, 6, 7, 8] as const)(
+it.each([2, 3, 4, 5, 6, 7, 8, 9] as const)(
     'multiplexes office v%i with RPC and restores negotiated subscriptions',
     async (version) => {
         const server = new WebSocketServer({ host: '127.0.0.1', port: 0 });
@@ -44,8 +44,16 @@ it.each([2, 3, 4, 5, 6, 7, 8] as const)(
                                                 blocked: 0,
                                                 slots: 2,
                                                 paused: false,
-                                                phase: 'running',
+                                                phase: version >= 9 ? 'accepted' : 'running',
                                             },
+                                            ...(version >= 9
+                                                ? {
+                                                      showcase: {
+                                                          name: 'Support portal',
+                                                          description: 'Owner-published product',
+                                                      },
+                                                  }
+                                                : {}),
                                         },
                                     ],
                                     construction: [
@@ -99,6 +107,7 @@ it.each([2, 3, 4, 5, 6, 7, 8] as const)(
                                           features: {
                                               ...hello.features,
                                               officeGame: true,
+                                              ...(version >= 9 ? { officeShowroom: true } : {}),
                                               ...(version >= 3 ? { officeGameVersion: 3 } : {}),
                                               ...(version >= 7 ? { officeAppearance: true } : {}),
                                               ...(version >= 8
@@ -127,7 +136,12 @@ it.each([2, 3, 4, 5, 6, 7, 8] as const)(
             const snapshots: OfficeGamePacket[] = [];
             const stop = client.subscribeOffice((packet) => snapshots.push(packet));
             await expect.poll(() => snapshots.length).toBe(1);
-            expect(input[0]?.version ?? 8).toBe(version);
+            expect(input[0]?.version ?? 9).toBe(version);
+            expect(snapshots[0]?.projects[0]?.showcase).toEqual(
+                version >= 9
+                    ? { name: 'Support portal', description: 'Owner-published product' }
+                    : undefined,
+            );
             expect(snapshots[0]?.agents[0]?.reaction?.reason).toBe(
                 version >= 3 ? 'accepted' : undefined,
             );

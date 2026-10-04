@@ -1970,6 +1970,12 @@ export const schema: Schema = {
                         'NCP2 private project decisions, subscriptions, and delivery chunks.',
                     type: 'boolean',
                 },
+                officeShowroom: {
+                    const: true,
+                    description:
+                        'Owner-published accepted product labels in NGOP v9 and private NCP2 v4.',
+                    type: 'boolean',
+                },
                 officeVerification: {
                     const: true,
                     description:

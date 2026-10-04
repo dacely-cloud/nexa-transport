@@ -1257,6 +1257,8 @@ export interface GatewayFeaturesShape {
     readonly officeProjectBaselines?: true;
     /** officeProjects as defined by the Nexa gateway. */
     readonly officeProjects?: true;
+    /** officeShowroom as defined by the Nexa gateway. */
+    readonly officeShowroom?: true;
     /** officeVerification as defined by the Nexa gateway. */
     readonly officeVerification?: true;
 }

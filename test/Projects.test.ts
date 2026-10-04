@@ -33,6 +33,71 @@ const state: CompanyProjectState = {
 };
 afterEach(() => vi.useRealTimers());
 
+it('negotiates public labels and rejects older gateways without replaying a lost publication', async () => {
+    const channel = new ProjectChannel();
+    const packets: ReturnType<typeof CompanyProjectProtocol.decode>[] = [];
+    const send = (bytes: Uint8Array): void => {
+        packets.push(CompanyProjectProtocol.decode(bytes));
+    };
+    const publication: ProjectClientPacket = {
+        op: ProjectOp.Command,
+        id: 'publication',
+        project: 'project',
+        command: {
+            kind: 'showcase',
+            id: 'stable-decision',
+            revision: 5n,
+            published: true,
+            name: '<img src=x onerror=alert(1)>',
+            description: 'Owner-entered public labels',
+        },
+    };
+    channel.resume(send, 3);
+    await expect(channel.state(publication)).rejects.toThrow('version 4');
+    expect(packets).toEqual([]);
+    channel.resume(send, 4);
+    const listener = vi.fn(),
+        failed = vi.fn();
+    const release = channel.watch('project', listener, failed);
+    const watch = packets[0];
+    if (!watch) {
+        throw new Error('Missing showroom watch');
+    }
+    const pending = channel.state(publication);
+    const lost = expect(pending).rejects.toThrow('Lost acknowledgement');
+    expect(packets.at(-1)).toMatchObject({ ...publication, version: 4 });
+    channel.disconnect(new Error('Lost acknowledgement'));
+    await lost;
+    channel.resume(send, 4);
+    expect(packets.filter((packet) => packet.op === ProjectOp.Command)).toHaveLength(1);
+    expect(packets.at(-1)).toMatchObject({ op: ProjectOp.Subscribe, id: watch.id, version: 4 });
+    const published: CompanyProjectState = {
+        ...state,
+        work: {
+            ...state.work,
+            revision: 6n,
+            phase: 'accepted',
+            acceptedAt: 100n,
+            showcase: { name: 'Portal', description: 'Public labels', publishedAt: 200n },
+        },
+    };
+    channel.receive(
+        CompanyProjectProtocol.decode(
+            CompanyProjectProtocol.encode({
+                version: 4,
+                op: ProjectOp.Snapshot,
+                id: watch.id,
+                project: 'project',
+                sequence: 0n,
+                state: published,
+            }),
+        ),
+    );
+    expect(listener).toHaveBeenCalledExactlyOnceWith(published);
+    release();
+    channel.clear();
+});
+
 it('restores only subscriptions after disconnect and rejects gaps before invoking the listener', () => {
     const channel = new ProjectChannel();
     const sent: ProjectClientPacket[] = [];

@@ -162,6 +162,14 @@ export class NexaClient {
     public get supportsDepartmentTools(): boolean {
         return this.#hello?.features.officeDepartmentTools === true;
     }
+    /** Whether accepted products can publish owner-reviewed showroom labels. */
+    public get supportsProjectShowroom(): boolean {
+        return (
+            this.connected &&
+            this.#hello?.features.officeProjects === true &&
+            this.#hello.features.officeShowroom === true
+        );
+    }
     /** Whether the connection supports owner-reviewed department guidance. */
     public get supportsDepartmentKnowledge(): boolean {
         return this.#hello?.features.officeDepartmentKnowledge === true;
@@ -571,11 +579,13 @@ export class NexaClient {
                         }
                         this.#socket.send(bytes);
                     },
-                    this.#hello.features.officeVerification === true
-                        ? 3
-                        : this.#hello.features.officeProjectBaselines === true
-                          ? 2
-                          : undefined,
+                    this.#hello.features.officeShowroom === true
+                        ? 4
+                        : this.#hello.features.officeVerification === true
+                          ? 3
+                          : this.#hello.features.officeProjectBaselines === true
+                            ? 2
+                            : undefined,
                 );
             }
             if (this.#officeListeners.size > 0) {
@@ -811,19 +821,21 @@ export class NexaClient {
         }
         const bytes = OfficeProtocol.encode(
             packet,
-            this.#hello.features.officeDeskPositions === true
-                ? 8
-                : this.#hello.features.officeAppearance === true
-                  ? 7
-                  : this.#hello.features.officeExecution === true
-                    ? 6
-                    : this.#hello.features.officeConstruction === true
-                      ? 5
-                      : this.#hello.features.officeDeskAssignments === true
-                        ? 4
-                        : this.#hello.features.officeGameVersion === 3
-                          ? 3
-                          : 2,
+            this.#hello.features.officeShowroom === true
+                ? 9
+                : this.#hello.features.officeDeskPositions === true
+                  ? 8
+                  : this.#hello.features.officeAppearance === true
+                    ? 7
+                    : this.#hello.features.officeExecution === true
+                      ? 6
+                      : this.#hello.features.officeConstruction === true
+                        ? 5
+                        : this.#hello.features.officeDeskAssignments === true
+                          ? 4
+                          : this.#hello.features.officeGameVersion === 3
+                            ? 3
+                            : 2,
         );
         if (this.#socket.bufferedAmount > 256 * 1024) {
             if (packet.op === OfficeGameOp.Player) {

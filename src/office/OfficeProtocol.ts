@@ -185,12 +185,18 @@ export interface OfficeProject {
     readonly sessionId?: string;
     readonly goal: string;
     readonly execution?: OfficeExecution;
+    readonly showcase?: OfficeShowcase;
     readonly declaredItemCount?: number;
     readonly state: 'running' | 'ended' | 'interrupted';
     readonly items: readonly OfficeWorkItem[];
     readonly agents: readonly OfficeAssignment[];
     readonly outcome?: { done: number; failed: number; skipped: number; stoppedBy: string };
     readonly steering?: { round: number; summary: string };
+}
+/** Owner-published labels of an accepted product; no private work or file references. */
+export interface OfficeShowcase {
+    readonly name: string;
+    readonly description: string;
 }
 /** OfficeReactionReason in the fixed-schema office protocol. */
 export type OfficeReactionReason = 'error' | 'feedback' | 'self-correction' | 'accepted';
@@ -216,7 +222,7 @@ export interface OfficeAssignment {
 }
 /** NGOP: fixed-field binary office packets multiplexed on the authenticated gateway socket. */
 /** OFFICE_GAME_VERSION in the fixed-schema office protocol. */
-export const OFFICE_GAME_VERSION = 8;
+export const OFFICE_GAME_VERSION = 9;
 /** OFFICE_GAME_LIMIT in the fixed-schema office protocol. */
 export const OFFICE_GAME_LIMIT = 4 * 1024 * 1024;
 /** OfficeGameOp in the fixed-schema office protocol. */
@@ -250,7 +256,7 @@ export interface OfficeGameState {
 /** OfficeGamePacket in the fixed-schema office protocol. */
 export interface OfficeGamePacket extends OfficeGameState {
     /** Present for an older peer; absent means the current protocol. */
-    readonly version?: 2 | 3 | 4 | 5 | 6 | 7;
+    readonly version?: 2 | 3 | 4 | 5 | 6 | 7 | 8;
     readonly op: (typeof OfficeGameOp)[keyof typeof OfficeGameOp];
     readonly sequence: number;
     readonly peer: string;
@@ -513,7 +519,7 @@ const assignment = record<OfficeProject['agents'][number]>({
     tokens: number,
     turn: number,
 });
-const project = record<Omit<OfficeProject, 'execution'>>({
+const project = record<Omit<OfficeProject, 'execution' | 'showcase'>>({
     id: string,
     owner: string,
     sessionId: optional(string),
@@ -568,6 +574,50 @@ const executionProjects = list<OfficeProject>({
         const value = project.read(r),
             status = execution.read(r);
         return status === undefined ? value : { ...value, execution: status };
+    },
+});
+const showcasedProjects = list<OfficeProject>({
+    write(w, value) {
+        project.write(w, value);
+        execution.write(w, value.execution);
+        w.u8(value.showcase ? 1 : 0);
+        if (value.showcase) {
+            if (
+                value.execution?.phase !== 'accepted' ||
+                !value.showcase.name ||
+                value.showcase.name.length > 64 ||
+                value.showcase.description.length > 280
+            ) {
+                throw new Error('Invalid office showcase');
+            }
+            string.write(w, value.showcase.name);
+            string.write(w, value.showcase.description);
+        }
+    },
+    read(r) {
+        const value = project.read(r),
+            status = execution.read(r),
+            present = r.u8();
+        if (present > 1) {
+            throw new Error('Invalid office showcase presence');
+        }
+        const showcase = present
+            ? { name: string.read(r), description: string.read(r) }
+            : undefined;
+        if (
+            showcase &&
+            (status?.phase !== 'accepted' ||
+                !showcase.name ||
+                showcase.name.length > 64 ||
+                showcase.description.length > 280)
+        ) {
+            throw new Error('Invalid office showcase');
+        }
+        return {
+            ...value,
+            ...(status ? { execution: status } : {}),
+            ...(showcase ? { showcase } : {}),
+        };
     },
 });
 const desk: Codec<number | undefined> = optional({
@@ -702,7 +752,7 @@ const player: Codec<OfficePlayer> = {
 };
 function encodeOfficeGame(
     packet: OfficeGamePacket,
-    version: 2 | 3 | 4 | 5 | 6 | 7 | 8,
+    version: 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9,
 ): Uint8Array<ArrayBuffer> {
     if (
         version !== 2 &&
@@ -711,7 +761,8 @@ function encodeOfficeGame(
         version !== 5 &&
         version !== 6 &&
         version !== 7 &&
-        version !== 8
+        version !== 8 &&
+        version !== 9
     ) {
         throw new Error('Unsupported office protocol');
     }
@@ -756,7 +807,10 @@ function encodeOfficeGame(
                   })
                 : packet.agents,
         );
-        (version >= 6 ? executionProjects : projects).write(w, packet.projects);
+        (version >= 9 ? showcasedProjects : version >= 6 ? executionProjects : projects).write(
+            w,
+            packet.projects,
+        );
         if (version >= 5 && packet.op === OfficeGameOp.Snapshot) {
             const items = packet.construction ?? [];
             OfficeConstruction.validate(items);
@@ -793,6 +847,7 @@ function decodeOfficeGame(bytes: Uint8Array): OfficeGamePacket {
     if (
         h.getUint32(0, true) !== 0x504f474e ||
         (h.getUint8(4) !== OFFICE_GAME_VERSION &&
+            h.getUint8(4) !== 8 &&
             h.getUint8(4) !== 7 &&
             h.getUint8(4) !== 6 &&
             h.getUint8(4) !== 5 &&
@@ -815,7 +870,7 @@ function decodeOfficeGame(bytes: Uint8Array): OfficeGamePacket {
         throw new Error('Invalid office peer');
     }
     const packet: { -readonly [K in keyof OfficeGamePacket]: OfficeGamePacket[K] } = {
-        ...(h.getUint8(4) < 8 ? { version: h.getUint8(4) as 2 | 3 | 4 | 5 | 6 | 7 } : {}),
+        ...(h.getUint8(4) < 9 ? { version: h.getUint8(4) as 2 | 3 | 4 | 5 | 6 | 7 | 8 } : {}),
         op,
         peer,
         sequence: h.getUint32(8, true),
@@ -848,7 +903,13 @@ function decodeOfficeGame(bytes: Uint8Array): OfficeGamePacket {
         ) {
             throw new Error('Celebrations require office protocol v3');
         }
-        packet.projects = (h.getUint8(4) >= 6 ? executionProjects : projects).read(r);
+        packet.projects = (
+            h.getUint8(4) >= 9
+                ? showcasedProjects
+                : h.getUint8(4) >= 6
+                  ? executionProjects
+                  : projects
+        ).read(r);
         if (h.getUint8(4) >= 5 && op === OfficeGameOp.Snapshot) {
             const count: number = r.u32();
             if (count > 128) {
@@ -892,7 +953,7 @@ export class OfficeProtocol {
     /** Encode one complete packet. */
     public static encode(
         packet: OfficeGamePacket,
-        version: 2 | 3 | 4 | 5 | 6 | 7 | 8 = packet.version ?? OFFICE_GAME_VERSION,
+        version: 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 = packet.version ?? OFFICE_GAME_VERSION,
     ): Uint8Array<ArrayBuffer> {
         return encodeOfficeGame(packet, version);
     }

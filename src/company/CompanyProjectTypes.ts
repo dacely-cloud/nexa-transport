@@ -24,8 +24,8 @@ export interface CompanyProjectState {
 }
 /** No packet accepts an owner, execution holder, or workspace filesystem path. */
 export interface ProjectRequest {
-    /** Version 2 supports starting products; version 3 also carries host verification outcomes. */
-    readonly version?: 2 | 3;
+    /** Version 2 adds starting products, 3 adds verification, and 4 adds public showroom controls. */
+    readonly version?: 2 | 3 | 4;
     readonly id: string;
     readonly project: string;
 }

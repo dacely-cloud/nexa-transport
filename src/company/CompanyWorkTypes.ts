@@ -55,6 +55,12 @@ export interface CompanyBaseline {
     readonly acceptedAt: bigint;
     readonly files: readonly CompanyArtifact[];
 }
+/** Explicitly owner-published labels; captured files and private project text remain private. */
+export interface CompanyShowcase {
+    readonly name: string;
+    readonly description: string;
+    readonly publishedAt: bigint;
+}
 /** Bounded private execution state; visitor snapshots project only generic activity. */
 export interface CompanyWork {
     readonly projectId: string;
@@ -62,6 +68,7 @@ export interface CompanyWork {
     readonly phase: CompanyWorkPhase;
     readonly workspaceId: string;
     readonly baseline?: CompanyBaseline;
+    readonly showcase?: CompanyShowcase;
     readonly reviewerId: string;
     readonly plan: string;
     readonly proposedLimit: bigint;
@@ -142,6 +149,13 @@ export interface CompanySetBaseline extends CompanyWorkRequest {
     readonly sourceProject: string;
     readonly sourceRevision: bigint;
 }
+/** Publish or withdraw only the labels of an already accepted product. */
+export interface CompanySetShowcase extends CompanyWorkRequest {
+    readonly kind: 'showcase';
+    readonly published: boolean;
+    readonly name: string;
+    readonly description: string;
+}
 /** All commands are private and take their owner from the authenticated connection. */
 export type CompanyWorkCommand =
     | CompanyPlan
@@ -150,7 +164,8 @@ export type CompanyWorkCommand =
     | CompanyAccept
     | CompanyAssign
     | CompanySchedule
-    | CompanySetBaseline;
+    | CompanySetBaseline
+    | CompanySetShowcase;
 /** Exact completed-run receipts passed by the host, never by an owner or visitor command. */
 export interface CompanyWorkResult {
     readonly succeeded: boolean;
@@ -164,6 +179,8 @@ export interface CompanyWorkResult {
 }
 /** A durable ready-project key contains no private prompt or output content. */
 export interface CompanyReadyWork {
+    /** Untrusted operational definition, used only to verify a backend approval before loading its account. */
+    readonly authorization: CompanyWork;
     readonly principal: string;
     readonly project: string;
 }

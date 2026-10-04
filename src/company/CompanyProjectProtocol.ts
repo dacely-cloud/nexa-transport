@@ -22,6 +22,7 @@ export class CompanyProjectProtocol {
     /** Encode bounded primitives, preserving bigint revisions and USD microcents. */
     public static encode(packet: ProjectPacket): Uint8Array<ArrayBuffer> {
         const w: BinaryWriter = new BinaryWriter(1024);
+        const version: number = packet.version ?? 1;
         w.u32(this.#magic)
             .u8(packet.version ?? 1)
             .u8(packet.op)
@@ -34,10 +35,14 @@ export class CompanyProjectProtocol {
             case ProjectOp.Stopped:
                 break;
             case ProjectOp.Command: {
+                if (packet.command.kind === 'showcase' && version < 4) {
+                    throw new Error('Public showroom controls require project protocol version 4');
+                }
                 if (
                     packet.command.kind === 'baseline' &&
                     packet.version !== 2 &&
-                    packet.version !== 3
+                    packet.version !== 3 &&
+                    packet.version !== 4
                 ) {
                     throw new Error('Starting products require project protocol version 2');
                 }
@@ -50,12 +55,18 @@ export class CompanyProjectProtocol {
                 break;
             case ProjectOp.Snapshot:
             case ProjectOp.Update: {
-                if (packet.state.work.baseline && packet.version !== 2 && packet.version !== 3) {
+                if (
+                    packet.state.work.baseline &&
+                    packet.version !== 2 &&
+                    packet.version !== 3 &&
+                    packet.version !== 4
+                ) {
                     throw new Error('Starting products require project protocol version 2');
                 }
                 const bytes: Uint8Array = CompanyWorkCodec.encode(
                     packet.state.work,
-                    packet.version === 3,
+                    version >= 3,
+                    version >= 4,
                 );
                 w.u64(packet.sequence)
                     .u32(bytes.length)
@@ -86,7 +97,10 @@ export class CompanyProjectProtocol {
         const r: BinaryReader = new BinaryReader(bytes);
         const magic: number = r.u32();
         const version: number = r.u8();
-        if (magic !== this.#magic || (version !== 1 && version !== 2 && version !== 3)) {
+        if (
+            magic !== this.#magic ||
+            (version !== 1 && version !== 2 && version !== 3 && version !== 4)
+        ) {
             throw new Error('Unsupported project protocol');
         }
         const op: number = r.u8();
@@ -174,7 +188,7 @@ export class CompanyProjectProtocol {
             throw new Error('Starting products require project protocol version 2');
         }
         if (
-            version !== 3 &&
+            version < 3 &&
             (packet.op === ProjectOp.Snapshot || packet.op === ProjectOp.Update) &&
             packet.state.work.attempts.some((attempt) =>
                 attempt.evidence.some((evidence) => evidence.outcome !== undefined),
@@ -182,7 +196,15 @@ export class CompanyProjectProtocol {
         ) {
             throw new Error('Verification outcomes require project protocol version 3');
         }
-        return version === 2 || version === 3 ? { ...packet, version } : packet;
+        if (
+            version < 4 &&
+            ((packet.op === ProjectOp.Command && packet.command.kind === 'showcase') ||
+                ((packet.op === ProjectOp.Snapshot || packet.op === ProjectOp.Update) &&
+                    packet.state.work.showcase))
+        ) {
+            throw new Error('Public showroom controls require project protocol version 4');
+        }
+        return version === 2 || version === 3 || version === 4 ? { ...packet, version } : packet;
     }
     static #text(r: BinaryReader, maximum: number): string {
         const text: string = r.str();

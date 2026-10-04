@@ -10,6 +10,7 @@ import type {
     CompanyArtifact,
     CompanyEvidence,
     CompanyBaseline,
+    CompanyShowcase,
     CompanyVerificationOutcome,
 } from './CompanyWorkTypes.js';
 
@@ -23,17 +24,23 @@ export class CompanyWorkCodec {
     /** NCW2 distinguishes these records from the removed project implementation. */
     static readonly #magic: number = 0x3257434e;
     /** Encode private state with exact integer accounting and bounded lists. */
-    public static encode(work: CompanyWork, verification: boolean = true): Uint8Array {
+    public static encode(
+        work: CompanyWork,
+        verification: boolean = true,
+        showcase: boolean = true,
+    ): Uint8Array {
         const w: BinaryWriter = new BinaryWriter(1024);
         const version: number =
-            verification &&
-            work.attempts.some((attempt) =>
-                attempt.evidence.some((evidence) => evidence.outcome !== undefined),
-            )
-                ? 3
-                : work.baseline
-                  ? 2
-                  : 1;
+            showcase && work.showcase
+                ? 4
+                : verification &&
+                    work.attempts.some((attempt) =>
+                        attempt.evidence.some((evidence) => evidence.outcome !== undefined),
+                    )
+                  ? 3
+                  : work.baseline
+                    ? 2
+                    : 1;
         w.u32(this.#magic).u8(version);
         w.str(work.projectId)
             .u64(work.revision)
@@ -76,7 +83,7 @@ export class CompanyWorkCodec {
             });
             this.#writeList(w, attempt.evidence, (evidence: CompanyEvidence): void => {
                 w.str(evidence.callId).str(evidence.tool).str(evidence.summary);
-                if (version === 3) {
+                if (version >= 3) {
                     const outcome: number =
                         evidence.outcome === undefined
                             ? 0
@@ -88,7 +95,7 @@ export class CompanyWorkCodec {
                 }
             });
         });
-        if (version === 3) {
+        if (version >= 3) {
             w.u8(work.baseline ? 1 : 0);
         }
         if (work.baseline) {
@@ -97,6 +104,9 @@ export class CompanyWorkCodec {
             this.#writeList(w, base.files, (file: CompanyArtifact): void => {
                 w.str(file.path).str(file.digest).u64(file.bytes);
             });
+        }
+        if (version === 4 && work.showcase) {
+            w.str(work.showcase.name).str(work.showcase.description).u64(work.showcase.publishedAt);
         }
         const packet: Uint8Array = w.toBytes();
         this.decode(packet);
@@ -107,7 +117,10 @@ export class CompanyWorkCodec {
         const r: BinaryReader = new BinaryReader(packet);
         const magic: number = r.u32();
         const version: number = r.u8();
-        if (magic !== this.#magic || (version !== 1 && version !== 2 && version !== 3)) {
+        if (
+            magic !== this.#magic ||
+            (version !== 1 && version !== 2 && version !== 3 && version !== 4)
+        ) {
             throw new Error('Unsupported company work record');
         }
         const projectId: string = r.str();
@@ -220,7 +233,7 @@ export class CompanyWorkCodec {
                             tool: r.str(),
                             summary: r.str(),
                         };
-                        const code: number = version === 3 ? r.u8() : 0;
+                        const code: number = version >= 3 ? r.u8() : 0;
                         if (code > this.#outcomes.length) {
                             throw new Error('Invalid verification outcome');
                         }
@@ -245,7 +258,7 @@ export class CompanyWorkCodec {
                 };
             },
         );
-        const present: number = version === 3 ? r.u8() : version === 2 ? 1 : 0;
+        const present: number = version >= 3 ? r.u8() : version === 2 ? 1 : 0;
         if (present > 1) {
             throw new Error('Invalid stored baseline presence');
         }
@@ -262,6 +275,33 @@ export class CompanyWorkCodec {
                       })),
                   }
                 : undefined;
+        const showcase: CompanyShowcase | undefined =
+            version === 4
+                ? {
+                      name: r.str(),
+                      description: r.str(),
+                      publishedAt: r.u64(),
+                  }
+                : undefined;
+        if (
+            showcase &&
+            (phase !== 'accepted' ||
+                !showcase.name ||
+                showcase.name.length > 64 ||
+                showcase.description.length > 280 ||
+                showcase.name !== showcase.name.trim() ||
+                showcase.description !== showcase.description.trim() ||
+                Array.from(showcase.name).some(
+                    (character: string): boolean =>
+                        character.charCodeAt(0) < 32 || character.charCodeAt(0) === 127,
+                ) ||
+                Array.from(showcase.description).some((character: string): boolean => {
+                    const code: number = character.charCodeAt(0);
+                    return (code < 32 && code !== 9 && code !== 10 && code !== 13) || code === 127;
+                }))
+        ) {
+            throw new Error('Invalid stored public showcase');
+        }
         if (baseline) {
             this.#validateBaseline(baseline, projectId);
         }
@@ -274,6 +314,7 @@ export class CompanyWorkCodec {
             phase,
             workspaceId,
             ...(baseline ? { baseline } : {}),
+            ...(showcase ? { showcase } : {}),
             reviewerId,
             plan,
             proposedLimit,
@@ -296,6 +337,11 @@ export class CompanyWorkCodec {
         const w: BinaryWriter = new BinaryWriter(256);
         w.str(command.kind).str(command.id).u64(command.revision);
         switch (command.kind) {
+            case 'showcase':
+                w.u8(command.published ? 1 : 0)
+                    .str(command.name)
+                    .str(command.description);
+                break;
             case 'baseline':
                 w.str(command.sourceProject).u64(command.sourceRevision);
                 break;
@@ -338,6 +384,21 @@ export class CompanyWorkCodec {
         }
         let command: CompanyWorkCommand;
         switch (kind) {
+            case 'showcase': {
+                const published: number = r.u8();
+                const name: string = r.str(),
+                    description: string = r.str();
+                if (
+                    published > 1 ||
+                    name.length > 64 ||
+                    description.length > 280 ||
+                    (published === 0 && (name !== '' || description !== ''))
+                ) {
+                    throw new Error('Invalid public showcase decision');
+                }
+                command = { kind, id, revision, published: published === 1, name, description };
+                break;
+            }
             case 'baseline':
                 command = { kind, id, revision, sourceProject: r.str(), sourceRevision: r.u64() };
                 break;
