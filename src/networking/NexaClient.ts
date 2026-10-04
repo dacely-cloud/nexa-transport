@@ -388,6 +388,19 @@ export class NexaClient {
 
     /** Opens, authenticates, and negotiates protocol v1 before returning. */
     public static async connect(options: ClientOptions): Promise<NexaClient> {
+        if (
+            options.tokenProvider !== undefined &&
+            (options.apiKey !== undefined ||
+                options.cookieAuth === true ||
+                options.deviceId !== undefined ||
+                options.deviceName !== undefined ||
+                options.pairingCode !== undefined ||
+                new URL(options.url).search !== '')
+        ) {
+            throw materializeError(
+                new TypeError('A token provider cannot include other credentials'),
+            );
+        }
         for (const value of [
             options.connectTimeoutMs,
             options.requestTimeoutMs,
@@ -407,7 +420,14 @@ export class NexaClient {
         if (options.signal?.aborted === true) {
             throw new TransportError(TransportErrorCode.Aborted, 'Connection aborted');
         }
-        const client: NexaClient = new NexaClient(options);
+        const token: string | undefined =
+            options.tokenProvider === undefined ? undefined : await options.tokenProvider();
+        if (options.signal?.aborted) {
+            throw new TransportError(TransportErrorCode.Aborted, 'Connection aborted');
+        }
+        const client: NexaClient = new NexaClient(
+            token === undefined ? options : { ...options, apiKey: token },
+        );
         try {
             await client.#handshake(options.signal);
             return client;
@@ -466,10 +486,13 @@ export class NexaClient {
                 );
             }
             if (this.#hello.auth.token !== undefined) {
-                if (this.#options.cookieAuth === true) {
+                if (
+                    this.#options.cookieAuth === true ||
+                    this.#options.tokenProvider !== undefined
+                ) {
                     throw new TransportError(
                         TransportErrorCode.Protocol,
-                        'Cookie authentication cannot accept a gateway token',
+                        'Session authentication cannot accept a gateway token',
                     );
                 }
                 this.#url.searchParams.set('token', this.#hello.auth.token);
@@ -1269,6 +1292,16 @@ export class NexaClient {
         this.#challenge = null;
         this.#sequence = 0n;
         try {
+            if (this.#options.tokenProvider !== undefined) {
+                const token: string = await this.#options.tokenProvider();
+                if (this.#disposed) {
+                    return;
+                }
+                if (token.length === 0) {
+                    throw new TypeError('Token provider returned an empty token');
+                }
+                this.#url.searchParams.set('token', token);
+            }
             this.#socket = this.#openSocket();
             await this.#handshake();
             for (const listener of this.#reconnectListeners) {
