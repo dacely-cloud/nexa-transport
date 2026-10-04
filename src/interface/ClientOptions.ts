@@ -16,10 +16,6 @@ export interface ClientOptions {
     readonly apiKey?: string;
     /** Obtains a fresh single-use token for every socket, including reconnects. Mutually exclusive with other credentials. */
     readonly tokenProvider?: () => Promise<string>;
-    /** Use the browser's HttpOnly session cookie through a same-origin gateway proxy. Mutually exclusive with token/device credentials. */
-    readonly cookieAuth?: boolean;
-    /** Restricts cookie authentication to the account verified when this document loaded. Never grants identity. */
-    readonly accountId?: string;
     /** Stable device id for paired-device authentication. */
     readonly deviceId?: string;
     /** Display name when requesting device pairing. */

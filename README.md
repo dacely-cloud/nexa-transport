@@ -314,23 +314,8 @@ The provider runs once per connection attempt, never per RPC or on a timer. Expi
 a consumed ticket does not close the established socket. The backend still controls
 session expiry and revocation. Keep tickets in memory; never persist them. Credentials
 travel in the WebSocket upgrade query, so redact query strings in gateway access logs.
-Do not combine `tokenProvider` with API keys, cookie auth, pairing or device credentials.
+Do not combine `tokenProvider` with API keys, pairing or device credentials.
 Closing the client while renewal is pending prevents a replacement socket from opening.
-
-For browser sessions, route the gateway through the website origin and pass `cookieAuth: true`.
-The browser supplies its HttpOnly cookie automatically; the SDK never reads it. Pass `accountId`
-from the verified page bootstrap to prevent a reconnect from adopting a different signed-in account.
-The gateway must explicitly allow this origin and forward the cookie to its ToilJS backend.
-
-```ts
-const client: NexaClient = await NexaClient.connect({
-    url: new URL('/nexa', window.location.origin).href,
-    cookieAuth: true,
-});
-```
-
-Cookie mode rejects cross-origin addresses, supplied URL queries, device credentials, and API keys.
-Reconnects retain the cookie mode and account restriction. Close the client on logout or account change.
 
 Connect with an API key, or supply `deviceId` alongside a paired-device token. For initial pairing, use `deviceId`, `deviceName`, and `pairingCode`. A newly issued credential is returned in `client.hello.auth.token`.
 

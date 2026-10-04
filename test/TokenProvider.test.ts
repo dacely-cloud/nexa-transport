@@ -2,7 +2,7 @@ import { afterEach, expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
 import { NexaClient } from '../src/networking/NexaClient.js';
 import { Method } from '../src/protocol/Protocol.js';
-import { TestGateway, type Request } from './Support.js';
+import { hello, TestGateway, type Request } from './Support.js';
 
 let gateway: TestGateway | undefined;
 let client: NexaClient | undefined;
@@ -88,4 +88,14 @@ it('manual close while renewal is pending prevents the replacement socket', asyn
         setTimeout(resolve, 30);
     });
     expect(gateway.upgradeUrls).toHaveLength(1);
+});
+
+it('does not replace a session ticket with a gateway-issued reusable token', async (): Promise<void> => {
+    gateway = new TestGateway({ ...hello, auth: { ...hello.auth, token: 'unexpected-secret' } });
+    await expect(
+        NexaClient.connect({
+            url: await gateway.url(),
+            tokenProvider: (): Promise<string> => Promise.resolve('one-time-ticket'),
+        }),
+    ).rejects.toThrow('cannot accept a gateway token');
 });

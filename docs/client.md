@@ -41,10 +41,10 @@ There is no `client.ask()` convenience method. Use `client.call(Method.AgentAsk,
 
 Import `ClientOptions` and `CallOptions` as types from `nexa-transport/options`.
 
-`cookieAuth: true` selects a same-origin browser session. The browser sends its HttpOnly cookie;
-the SDK never accesses it. Set `accountId` to the verified page account's 64-character lowercase
-hex identifier to restrict reconnects to that account. Cookie mode requires a browser, rejects
-API keys/device credentials and existing URL queries, and never accepts replacement gateway tokens.
+`tokenProvider` obtains a fresh one-time website ticket before each socket opens,
+including reconnects. Tickets remain in memory; established sockets do not need
+periodic renewal. The backend continues enforcing session expiry and revocation.
+The provider cannot be combined with API keys, pairing or device credentials.
 
 | Option               | Type                     | Behavior/default                                                                                             |
 | -------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------ |
