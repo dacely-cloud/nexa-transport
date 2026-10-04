@@ -1,4 +1,5 @@
 import { afterEach, expect, it, vi } from 'vitest';
+import { CompanyFormats } from '../src/networking/CompanyFormats.js';
 import { CompanyChannel } from '../src/networking/CompanyChannel.js';
 import { CompanyProtocol } from '../src/company/CompanyProtocol.js';
 import { CompanyOp, type CompanyCommand } from '../src/company/CompanyTypes.js';
@@ -12,7 +13,7 @@ const command: CompanyCommand = {
 };
 
 it('preserves exact command IDs and revisions and correlates binary responses', async () => {
-    const channel = new CompanyChannel();
+    const channel = new CompanyChannel(CompanyFormats.staffing);
     const send = vi.fn<(bytes: Uint8Array<ArrayBuffer>) => void>();
     const response = channel.request(command, send);
     expect(CompanyProtocol.decode(send.mock.calls[0]?.[0] ?? new Uint8Array())).toEqual(command);
@@ -25,7 +26,7 @@ it('preserves exact command IDs and revisions and correlates binary responses', 
 
 it('releases failed and timed-out waits without automatically repeating a mutation', async () => {
     vi.useFakeTimers();
-    const channel = new CompanyChannel();
+    const channel = new CompanyChannel(CompanyFormats.staffing);
     const send = vi.fn<(bytes: Uint8Array<ArrayBuffer>) => void>();
     const response = channel.request(command, send);
     const rejected = expect(response).rejects.toThrow('timed out');
@@ -40,7 +41,7 @@ it('releases failed and timed-out waits without automatically repeating a mutati
 });
 
 it('restores only watches after reconnect, discards sequence gaps, and releases listeners on disposal', async () => {
-    const channel = new CompanyChannel();
+    const channel = new CompanyChannel(CompanyFormats.staffing);
     const sent: Array<ReturnType<typeof CompanyProtocol.decode>> = [];
     const send = (bytes: Uint8Array<ArrayBuffer>): void => {
         sent.push(CompanyProtocol.decode(bytes));
@@ -81,7 +82,7 @@ it('restores only watches after reconnect, discards sequence gaps, and releases 
 
 it('bounds subscriptions, expires unanswered snapshots, and rejects regressing company revisions', async () => {
     vi.useFakeTimers();
-    const channel = new CompanyChannel();
+    const channel = new CompanyChannel(CompanyFormats.staffing);
     const packets: Array<ReturnType<typeof CompanyProtocol.decode>> = [];
     channel.resume((bytes) => {
         packets.push(CompanyProtocol.decode(bytes));

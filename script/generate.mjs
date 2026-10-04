@@ -231,6 +231,7 @@ mkdirSync('src/company', { recursive: true });
 for (const name of [
     'CompanyBinary',
     'CompanyTypes',
+    'CompanyLimitsTypes',
     'CompanyProtocol',
     'CompanyWorkTypes',
     'CompanyWorkCodec',

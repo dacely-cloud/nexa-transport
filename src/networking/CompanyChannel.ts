@@ -1,28 +1,31 @@
-import { CompanyProtocol } from '../company/CompanyProtocol.js';
-import {
-    CompanyOp,
-    type CompanyCommand,
-    type CompanyState,
-    type CompanyPacket,
-} from '../company/CompanyTypes.js';
+import type { CompanyChannelFormat, CompanyChannelReply } from './CompanyChannelFormat.js';
+import { CompanyOp, type CompanyPacket } from '../company/CompanyTypes.js';
 
 /** One bounded request waiting for an authoritative company snapshot. */
-interface PendingCompany {
-    readonly resolve: (state: CompanyState) => void;
+interface PendingCompany<State> {
+    readonly resolve: (state: State) => void;
     readonly reject: (error: Error) => void;
     readonly timer: ReturnType<typeof setTimeout>;
 }
-interface CompanyWatch {
-    readonly listener: (state: CompanyState) => void;
+interface CompanyWatch<State> {
+    readonly listener: (state: State) => void;
     readonly error: (error: Error) => void;
     sequence: bigint;
     revision: bigint;
     timer: ReturnType<typeof setTimeout> | undefined;
 }
 /** Private commands multiplexed on NexaClient's existing socket, without automatic write replay. */
-export class CompanyChannel {
-    readonly #pending = new Map<string, PendingCompany>();
-    readonly #watches: Map<string, CompanyWatch> = new Map();
+export class CompanyChannel<
+    State extends { readonly revision: bigint },
+    Command extends { readonly id: string },
+> {
+    readonly #format: CompanyChannelFormat<State, Command>;
+    /** Select wire operations while sharing bounded delivery and cleanup. */
+    public constructor(format: CompanyChannelFormat<State, Command>) {
+        this.#format = format;
+    }
+    readonly #pending = new Map<string, PendingCompany<State>>();
+    readonly #watches: Map<string, CompanyWatch<State>> = new Map();
     #send: ((bytes: Uint8Array<ArrayBuffer>) => void) | undefined;
     /** Reconnect only read subscriptions; durable mutations require an explicit retry. */
     public resume(send: (bytes: Uint8Array<ArrayBuffer>) => void): void {
@@ -32,15 +35,12 @@ export class CompanyChannel {
         }
     }
     /** Start a bounded private snapshot/update stream on the already connected socket. */
-    public watch(
-        listener: (state: CompanyState) => void,
-        error: (error: Error) => void,
-    ): () => void {
+    public watch(listener: (state: State) => void, error: (error: Error) => void): () => void {
         if (!this.#send || this.#watches.size >= 8) {
             throw new Error('Company connection is unavailable or has too many subscriptions.');
         }
         const id: string = crypto.randomUUID();
-        const watch: CompanyWatch = {
+        const watch: CompanyWatch<State> = {
             listener,
             error,
             sequence: -1n,
@@ -57,7 +57,7 @@ export class CompanyChannel {
         }
         return (): void => this.#remove(id);
     }
-    #start(id: string, watch: CompanyWatch): void {
+    #start(id: string, watch: CompanyWatch<State>): void {
         clearTimeout(watch.timer);
         watch.sequence = -1n;
         watch.revision = -1n;
@@ -65,7 +65,7 @@ export class CompanyChannel {
             this.#remove(id);
             watch.error(new Error('Company subscription timed out. Reconnect the company desk.'));
         }, 15000);
-        this.#send?.(CompanyProtocol.encode({ op: CompanyOp.Subscribe, id }));
+        this.#send?.(this.#format.subscribe(id));
     }
     #remove(id: string): void {
         const watch = this.#watches.get(id);
@@ -75,7 +75,7 @@ export class CompanyChannel {
         clearTimeout(watch.timer);
         this.#watches.delete(id);
         try {
-            this.#send?.(CompanyProtocol.encode({ op: CompanyOp.Unsubscribe, id }));
+            this.#send?.(this.#format.unsubscribe(id));
         } catch {
             /** A disconnected peer releases subscriptions when its socket closes. */
         }
@@ -90,9 +90,9 @@ export class CompanyChannel {
     }
     /** Retrying a timed-out command uses its original ID and payload for durable deduplication. */
     public request(
-        command: CompanyCommand,
+        command: Command,
         send: (bytes: Uint8Array<ArrayBuffer>) => void,
-    ): Promise<CompanyState> {
+    ): Promise<State> {
         if (
             this.#pending.size >= 8 ||
             this.#pending.has(command.id) ||
@@ -102,7 +102,7 @@ export class CompanyChannel {
                 new Error('Company request is already pending or the connection is busy.'),
             );
         }
-        const bytes: Uint8Array<ArrayBuffer> = CompanyProtocol.encode(command);
+        const bytes: Uint8Array<ArrayBuffer> = this.#format.encode(command);
         return new Promise((resolve, reject) => {
             const timer = setTimeout(() => {
                 this.#pending.delete(command.id);
@@ -119,18 +119,29 @@ export class CompanyChannel {
         });
     }
     /** Only snapshots and errors may arrive from the gateway. */
-    public receive(packet: CompanyPacket): void {
+    public receive(raw: CompanyPacket): void {
+        if (raw.op < CompanyOp.Snapshot) {
+            throw new Error('Unexpected company command');
+        }
+        const packet: CompanyChannelReply<State> | undefined = this.#format.read(
+            raw,
+            this.#watches.has(raw.id),
+        );
+        if (!packet) {
+            return;
+        }
         if (packet.op < CompanyOp.Snapshot) {
             throw new Error('Unexpected company command');
         }
-        const watch: CompanyWatch | undefined = this.#watches.get(packet.id);
+        const watch: CompanyWatch<State> | undefined = this.#watches.get(packet.id);
         if (watch) {
             clearTimeout(watch.timer);
             watch.timer = undefined;
             if (
                 (packet.op !== CompanyOp.LiveSnapshot && packet.op !== CompanyOp.Update) ||
                 packet.sequence !== watch.sequence + 1n ||
-                packet.state.revision <= watch.revision ||
+                packet.state.revision < watch.revision ||
+                (!this.#format.sameRevision && packet.state.revision === watch.revision) ||
                 (watch.sequence === -1n
                     ? packet.op !== CompanyOp.LiveSnapshot
                     : packet.op !== CompanyOp.Update)
@@ -150,7 +161,7 @@ export class CompanyChannel {
             watch.listener(packet.state);
             return;
         }
-        const pending: PendingCompany | undefined = this.#pending.get(packet.id);
+        const pending: PendingCompany<State> | undefined = this.#pending.get(packet.id);
         if (!pending) {
             return;
         }

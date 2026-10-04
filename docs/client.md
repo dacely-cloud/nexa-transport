@@ -169,3 +169,11 @@ The OLAY binary channel uses the existing authenticated Chat socket. The gateway
 Keep that exact command until its outcome is known. If a request times out or the connection closes, retry the same ID and payload: the gateway's durable command log returns current state without repeating the change. Reusing an ID with different contents is rejected. An unrelated stale edit requires a fresh read and a new command ID after reconciling the changes.
 
 NCO2 uses the existing Chat socket and accepts no client-supplied account identity. Visitors cannot read or write company records. Employee configuration inherits the deployment's tool restrictions; an explicit tool list only narrows them. Creating a brief saves its objective and staffing; execution approval, budgets, and review belong to the subsequent project workflow.
+
+## Company budget
+
+`client.supportsCompanyLimits` reports the negotiated `officeCompanyLimits` capability. `client.companyLimits()` reads the current company-project ceiling, settled spending, committed funds, running count, and concurrency. Money is `bigint` USD microcents (100,000,000 per dollar). A `null` ceiling means each project's approved allowance applies without an additional company cap; zero is a real cap.
+
+`client.subscribeCompanyLimits(listener, onError)` returns an unsubscribe function. It receives a snapshot followed by contiguous binary NCO2 updates on the existing owner connection. Usage may change without increasing the policy revision. Disconnection reports an error and restores only read subscriptions after reconnect; rejected streams require explicitly subscribing again. Release the subscription when the budget view closes.
+
+To change limits, pass `{ id, revision, limit, concurrency }` to `client.companyLimits`. Keep the original ID and payload for an uncertain retry. The backend rejects stale approvals and a ceiling below spent plus committed funds. Concurrency is 1–32; reducing it does not cancel running tasks. Each project still requires its own approval. This controls real project usage, independently of ordinary Chat spending and game progression. Visitors have no budget capability, commands, or financial packets.

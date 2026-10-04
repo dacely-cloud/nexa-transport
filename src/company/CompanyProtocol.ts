@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { CompanyLimits } from './CompanyLimitsTypes.js';
+
 import { BinaryReader, BinaryWriter } from './CompanyBinary.js';
 import {
     CompanyOp,
@@ -28,7 +30,21 @@ export class CompanyProtocol {
     public static encode(packet: CompanyPacket): Uint8Array<ArrayBuffer> {
         const w: BinaryWriter = new BinaryWriter(256);
         w.u32(this.#magic).u8(1).u8(packet.op).str(packet.id);
-        if (packet.op === CompanyOp.Snapshot) {
+        if (packet.op === CompanyOp.LimitsSnapshot || packet.op === CompanyOp.LimitsUpdate) {
+            w.u64(packet.sequence);
+            this.#writeLimits(w, packet.state);
+        } else if (packet.op === CompanyOp.SetLimits) {
+            this.#validAmount(packet.revision);
+            this.#validAmount(packet.limit);
+            if (
+                !Number.isInteger(packet.concurrency) ||
+                packet.concurrency < 1 ||
+                packet.concurrency > 32
+            ) {
+                throw new Error('Invalid company capacity');
+            }
+            w.u64(packet.revision).u64(packet.limit).u8(packet.concurrency);
+        } else if (packet.op === CompanyOp.Snapshot) {
             this.#writeState(w, packet.state);
         } else if (packet.op === CompanyOp.LiveSnapshot || packet.op === CompanyOp.Update) {
             w.u64(packet.sequence);
@@ -36,10 +52,14 @@ export class CompanyProtocol {
         } else if (
             packet.op === CompanyOp.Subscribe ||
             packet.op === CompanyOp.Unsubscribe ||
-            packet.op === CompanyOp.Stopped
+            packet.op === CompanyOp.Stopped ||
+            packet.op === CompanyOp.ReadLimits ||
+            packet.op === CompanyOp.SubscribeLimits ||
+            packet.op === CompanyOp.UnsubscribeLimits ||
+            packet.op === CompanyOp.LimitsStopped
         ) {
             /** Watch control frames carry only their correlation ID. */
-        } else if (packet.op === CompanyOp.Error) {
+        } else if (packet.op === CompanyOp.Error || packet.op === CompanyOp.LimitsError) {
             w.str(packet.message);
         } else {
             w.u64(packet.revision);
@@ -77,17 +97,34 @@ export class CompanyProtocol {
             throw new Error('Invalid company command ID');
         }
         let packet: CompanyPacket;
-        if (op === CompanyOp.Snapshot) {
+        if (op === CompanyOp.LimitsSnapshot || op === CompanyOp.LimitsUpdate) {
+            packet = { op, id, sequence: r.u64(), state: this.#readLimits(r) };
+        } else if (op === CompanyOp.SetLimits) {
+            packet = {
+                op,
+                id,
+                revision: this.#amount(r),
+                limit: this.#amount(r),
+                concurrency: r.u8(),
+            };
+            if (packet.concurrency < 1 || packet.concurrency > 32) {
+                throw new Error('Invalid company capacity');
+            }
+        } else if (op === CompanyOp.Snapshot) {
             packet = { op, id, state: this.#readState(r) };
         } else if (op === CompanyOp.LiveSnapshot || op === CompanyOp.Update) {
             packet = { op, id, sequence: r.u64(), state: this.#readState(r) };
         } else if (
             op === CompanyOp.Subscribe ||
             op === CompanyOp.Unsubscribe ||
-            op === CompanyOp.Stopped
+            op === CompanyOp.Stopped ||
+            op === CompanyOp.ReadLimits ||
+            op === CompanyOp.SubscribeLimits ||
+            op === CompanyOp.UnsubscribeLimits ||
+            op === CompanyOp.LimitsStopped
         ) {
             packet = { op, id };
-        } else if (op === CompanyOp.Error) {
+        } else if (op === CompanyOp.Error || op === CompanyOp.LimitsError) {
             packet = { op, id, message: this.#text(r, 512) };
         } else {
             const revision: bigint = r.u64();
@@ -128,6 +165,67 @@ export class CompanyProtocol {
             throw new Error('Trailing company data');
         }
         return packet;
+    }
+    static #writeLimits(w: BinaryWriter, state: CompanyLimits): void {
+        if ((state.limit === null) !== (state.concurrency === null)) {
+            throw new Error('Invalid company limits');
+        }
+        this.#validAmount(state.revision);
+        this.#validAmount(state.spent);
+        this.#validAmount(state.reserved);
+        if (state.limit !== null) {
+            this.#validAmount(state.limit);
+        }
+        if (
+            !Number.isInteger(state.running) ||
+            state.running < 0 ||
+            state.running > 16384 ||
+            (state.concurrency !== null &&
+                (!Number.isInteger(state.concurrency) ||
+                    state.concurrency < 1 ||
+                    state.concurrency > 32))
+        ) {
+            throw new Error('Invalid company capacity');
+        }
+        w.u64(state.revision)
+            .u64(state.spent)
+            .u64(state.reserved)
+            .u32(state.running)
+            .u8(state.limit === null ? 0 : 1);
+        if (state.limit !== null && state.concurrency !== null) {
+            w.u64(state.limit).u8(state.concurrency);
+        }
+    }
+    static #validAmount(value: bigint): void {
+        if (value < 0n || value > 9223372036854775807n) {
+            throw new Error('Company amount exceeds limits');
+        }
+    }
+    static #amount(r: BinaryReader): bigint {
+        const value: bigint = r.u64();
+        if (value > 9223372036854775807n) {
+            throw new Error('Company amount exceeds limits');
+        }
+        return value;
+    }
+    static #readLimits(r: BinaryReader): CompanyLimits {
+        const revision: bigint = this.#amount(r),
+            spent: bigint = this.#amount(r),
+            reserved: bigint = this.#amount(r);
+        const running: number = r.u32(),
+            flag: number = r.u8();
+        if (flag > 1 || running > 16384) {
+            throw new Error('Invalid company limits');
+        }
+        const limit: bigint | null = flag === 1 ? this.#amount(r) : null;
+        const concurrency: number | null = flag === 1 ? r.u8() : null;
+        if (
+            (revision === 0n) !== (limit === null) ||
+            (concurrency !== null && (concurrency < 1 || concurrency > 32))
+        ) {
+            throw new Error('Invalid company capacity');
+        }
+        return { revision, spent, reserved, running, limit, concurrency };
     }
     static #text(r: BinaryReader, maximum: number): string {
         const value: string = r.str();

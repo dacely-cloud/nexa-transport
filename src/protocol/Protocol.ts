@@ -1214,6 +1214,8 @@ export interface GatewayFeaturesShape {
     readonly officeAppearance?: true;
     /** officeCompany as defined by the Nexa gateway. */
     readonly officeCompany?: true;
+    /** officeCompanyLimits as defined by the Nexa gateway. */
+    readonly officeCompanyLimits?: true;
     /** officeCompanyUpdates as defined by the Nexa gateway. */
     readonly officeCompanyUpdates?: true;
     /** officeConstruction as defined by the Nexa gateway. */

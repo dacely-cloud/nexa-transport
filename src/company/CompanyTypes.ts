@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { CompanyLimitsPacket } from './CompanyLimitsTypes.js';
+
 /** Private company operations on the existing authenticated game connection. */
 export const CompanyOp = {
     Read: 1,
@@ -10,6 +12,14 @@ export const CompanyOp = {
     Project: 5,
     Subscribe: 6,
     Unsubscribe: 7,
+    ReadLimits: 8,
+    SetLimits: 9,
+    SubscribeLimits: 10,
+    UnsubscribeLimits: 11,
+    LimitsSnapshot: 133,
+    LimitsUpdate: 134,
+    LimitsStopped: 135,
+    LimitsError: 136,
     Snapshot: 128,
     Error: 129,
     LiveSnapshot: 130,
@@ -141,4 +151,5 @@ export type CompanyPacket =
     | CompanyWatchControl
     | CompanyLiveSnapshot
     | CompanyUpdate
-    | CompanyStopped;
+    | CompanyStopped
+    | CompanyLimitsPacket;

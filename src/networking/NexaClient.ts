@@ -1,3 +1,5 @@
+import { CompanyFormats } from './CompanyFormats.js';
+import type { CompanyLimits, CompanyLimitsCommand } from '../company/CompanyLimitsTypes.js';
 import { ProjectChannel } from './ProjectChannel.js';
 import { CompanyProjectProtocol } from '../company/CompanyProjectProtocol.js';
 import { ProjectOp, type CompanyProjectState } from '../company/CompanyProjectTypes.js';
@@ -91,7 +93,8 @@ export interface CollaborationOffice {
 }
 /** Authenticated Nexa gateway connection shared by browsers and Node.js. */
 export class NexaClient {
-    readonly #company = new CompanyChannel();
+    readonly #company = new CompanyChannel(CompanyFormats.staffing);
+    readonly #companyLimits = new CompanyChannel(CompanyFormats.limits);
     readonly #projects: ProjectChannel = new ProjectChannel();
     /** Read a private project or submit one revision-checked decision on the existing socket. */
     public project(project: string, command?: CompanyWorkCommand): Promise<CompanyProjectState> {
@@ -124,6 +127,39 @@ export class NexaClient {
     /** Whether this connection can attach captured accepted products to new project drafts. */
     public get supportsProjectBaselines(): boolean {
         return this.connected && this.#hello?.features.officeProjectBaselines === true;
+    }
+    /** Whether the connected owner gateway exposes real company limits. */
+    public get supportsCompanyLimits(): boolean {
+        return this.#hello?.features.officeCompanyLimits === true;
+    }
+    /** Read totals or explicitly approve a revision-checked company-wide policy. */
+    public companyLimits(command?: CompanyLimitsCommand): Promise<CompanyLimits> {
+        if (
+            !this.connected ||
+            !this.supportsCompanyLimits ||
+            this.#socket.bufferedAmount > 256 * 1024
+        ) {
+            return Promise.reject(new Error('Company budget connection is unavailable or busy.'));
+        }
+        return this.#companyLimits.request(
+            command
+                ? { ...command, op: CompanyOp.SetLimits }
+                : { op: CompanyOp.ReadLimits, id: crypto.randomUUID() },
+            (bytes) => this.#socket.send(bytes),
+        );
+    }
+    /** Snapshot followed by ordered usage updates on the existing owner connection. */
+    public subscribeCompanyLimits(
+        listener: (state: CompanyLimits) => void,
+        onError: (error: Error) => void,
+    ): () => void {
+        if (!this.connected || !this.supportsCompanyLimits) {
+            throw new Error('Live budgets require the updated NEXA gateway.');
+        }
+        return this.#companyLimits.watch(
+            (state): void => this.#notify((): void => listener(state)),
+            (error): void => this.#notify((): void => onError(error)),
+        );
     }
     /** Live private staffing and project briefs on the same socket, restored after reconnect. */
     public subscribeCompany(
@@ -452,6 +488,14 @@ export class NexaClient {
                 this.#company.resume((bytes): void => {
                     if (!this.connected || this.#socket.bufferedAmount > 256 * 1024) {
                         throw new Error('Company connection is unavailable or busy.');
+                    }
+                    this.#socket.send(bytes);
+                });
+            }
+            if (this.#hello.features.officeCompanyLimits === true) {
+                this.#companyLimits.resume((bytes): void => {
+                    if (!this.connected || this.#socket.bufferedAmount > 256 * 1024) {
+                        throw new Error('Company budget connection is unavailable or busy.');
                     }
                     this.#socket.send(bytes);
                 });
@@ -943,7 +987,15 @@ export class NexaClient {
                 if (this.#hello.features.officeCompany !== true) {
                     throw new Error('Unnegotiated company frame');
                 }
-                this.#company.receive(CompanyProtocol.decode(new Uint8Array(complete)));
+                const packet = CompanyProtocol.decode(new Uint8Array(complete));
+                if (
+                    packet.op >= CompanyOp.LimitsSnapshot &&
+                    this.#hello.features.officeCompanyLimits !== true
+                ) {
+                    throw new Error('Unnegotiated budget frame');
+                }
+                this.#company.receive(packet);
+                this.#companyLimits.receive(packet);
                 return;
             }
             if (OfficeLayoutProtocol.isFrame(new Uint8Array(complete))) {
@@ -1149,6 +1201,7 @@ export class NexaClient {
         this.#failure = materializeError(error);
         this.#pending.close(error);
         this.#company.close(error);
+        this.#companyLimits.close(error);
         this.#projects.disconnect(error);
         for (const pending of this.#layouts.values()) {
             clearTimeout(pending.timer);
@@ -1172,6 +1225,7 @@ export class NexaClient {
     #clearListeners(): void {
         this.#projects.clear();
         this.#company.clear();
+        this.#companyLimits.clear();
         this.#officeListeners.clear();
         this.#subscriptions.clear();
         this.#streamIds.clear();
