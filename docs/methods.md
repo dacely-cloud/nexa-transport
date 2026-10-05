@@ -57,6 +57,7 @@ All 54 protocol methods. `connect` is managed by `NexaClient.connect`; the remai
 - [sessions.download](#sessions-download)
 - [sessions.files](#sessions-files)
 - [sessions.get](#sessions-get)
+- [sessions.history](#sessions-history)
 - [sessions.list](#sessions-list)
 - [sessions.messages](#sessions-messages)
 - [sessions.subscribe](#sessions-subscribe)
@@ -186,7 +187,7 @@ Parameters: [AskParams](protocol.md#askparams).
 | `attachments`     | No       | Array of [InboundAttachment](protocol.md#inboundattachment)                   | User-authored image, video, document, and text blocks, in display order.    |
 | `conversationId`  | No       | `string`                                                                      | Continues an existing conversation.                                         |
 | `cwd`             | No       | `string`                                                                      | Where tools operate.                                                        |
-| `message`         | Yes      | `string`                                                                      |                                                                             |
+| `message`         | Yes      | `string`                                                                      | User text; may be blank when at least one attachment contains content.      |
 | `reasoningEffort` | No       | `"high"` / `"low"` / `"max"` / `"medium"` / `"minimal"` / `"off"` / `"xhigh"` | Per-turn reasoning preference; never changes the saved agent configuration. |
 | `userId`          | No       | `string`                                                                      | The principal the turn is billed and authorized as.                         |
 
@@ -234,7 +235,7 @@ Parameters: [StreamParams](protocol.md#streamparams).
 | `attachments`     | No       | Array of [InboundAttachment](protocol.md#inboundattachment)                   | User-authored image, video, document, and text blocks, in display order.    |
 | `conversationId`  | No       | `string`                                                                      | Continues an existing conversation.                                         |
 | `cwd`             | No       | `string`                                                                      | Where tools operate.                                                        |
-| `message`         | Yes      | `string`                                                                      |                                                                             |
+| `message`         | Yes      | `string`                                                                      | User text; may be blank when at least one attachment contains content.      |
 | `reasoningEffort` | No       | `"high"` / `"low"` / `"max"` / `"medium"` / `"minimal"` / `"off"` / `"xhigh"` | Per-turn reasoning preference; never changes the saved agent configuration. |
 | `streamId`        | No       | `string`                                                                      | The stream's id, chosen by the CLIENT.                                      |
 | `userId`          | No       | `string`                                                                      | The principal the turn is billed and authorized as.                         |
@@ -1252,6 +1253,30 @@ Parameters: [IdParams](protocol.md#idparams).
 | `id`  | Yes      | `string` |             |
 
 Result: [Session](protocol.md#session) / `null`.
+
+## sessions.history
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.SessionsHistory> = {
+    id: 'YOUR_ID',
+};
+const result: ResultOf<typeof Method.SessionsHistory> = await client.call(
+    Method.SessionsHistory,
+    params,
+);
+```
+
+Parameters: [SessionHistoryParams](protocol.md#sessionhistoryparams).
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `cursor`    | No       | `string` |             |
+| `endCursor` | No       | `string` |             |
+| `id`        | Yes      | `string` |             |
+
+Result: [SessionHistoryPage](protocol.md#sessionhistorypage).
 
 ## sessions.list
 

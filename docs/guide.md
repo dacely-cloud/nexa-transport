@@ -523,6 +523,19 @@ async function downloadSavedFile(attachmentId: string): Promise<void> {
 
 Downloads use the same raw, chunked binary transport and `onAttachment` callback as live files. Session ownership is checked for both listing and downloading. The gateway saves files before attempting live delivery. Deleting a session removes its saved files. Reconnect restores subscriptions but does not replay missed events; refresh saved history and tasks to reconcile your UI. A snapshot may overlap live events, so reconcile by session/task identity instead of appending the same state twice.
 
+Gateways advertising `hello.features.sessionHistory` preserve the complete presentation transcript independently of model-context compaction. `resumeSession()` includes `history` on these gateways. `client.readHistory(sessionKey)` reads a fixed snapshot through bounded pages, validates each record, and preserves native worker events, reasoning, tools, approvals, site cards, inputs, attachment identities, terminal outcomes, and their original times. Replace the restored conversation by its session identity; do not append another copy on each read. Records have stable IDs for reconciliation.
+
+```ts
+import type { SessionHistoryRecord } from 'nexa-transport/protocol';
+
+if (client.supportsSessionHistory) {
+    const records: readonly SessionHistoryRecord[] = await client.readHistory(sessionKey);
+    console.log(records);
+}
+```
+
+`client.downloadSessionFile(sessionKey, attachmentId)` returns the original bytes through authenticated binary delivery and matches both session and attachment IDs. Restore image, video, document, and 3D previews through the same renderer used for live delivery. The SDK never repeats a user input to resume a view. Older sessions import recoverable canonical entries and archived transcripts; events and bytes already discarded by an older server cannot be reconstructed. A torn final journal write preserves its incomplete bytes on the server and adds an explicit recovery notice. Complete invalid records cause a read error rather than a silently shortened view.
+
 ## Individual worker status
 
 Nexa streams `agents-status` updates for its delegated workers, independently of parent text and tool completion. Use each worker's `id` as the UI key; multiple workers can share an `agentId` (persona). `parentId` and `rootId` describe the delegation tree. Updates include `goal`, `depth`, `state`, `activity`, `startedAt`, and `lastActivityAt`. Times are decimal epoch-millisecond strings.
@@ -550,4 +563,4 @@ console.log(result.text);
 
 States are `WorkerState.Queued`, `Working`, `Stopping`, `Done`, `Failed`, `Aborted`, and `Refused`. Upsert updates rather than replacing the whole UI list: completed workers can disappear from later snapshots after their reports are collected. Fast updates may be coalesced to the latest status per worker. A quiet worker is not automatically marked failed.
 
-This requires an engine version that emits `agents-status`. It is live progress, not a durable worker-history API. Existing session subscriptions receive these turn events too; workers still tracked by the engine are included when a new turn starts. For provider-native NCAP agents, continue using `NexaMedia.nativeEvent(event)?.agent`, keyed by its `item`; those are a separate provider-managed lifecycle.
+This requires an engine version that emits `agents-status`. Gateways advertising `sessionHistory` retain these updates and nested worker events in the durable presentation transcript. Existing session subscriptions receive these turn events too; workers still tracked by the engine are included when a new turn starts. For provider-native NCAP agents, continue using `NexaMedia.nativeEvent(event)?.agent`, keyed by its `item`; those are a separate provider-managed lifecycle.

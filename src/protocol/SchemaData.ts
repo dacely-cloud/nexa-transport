@@ -298,6 +298,28 @@ export const schema: Schema = {
             required: ['id', 'model', 'name', 'provider'],
             type: 'object',
         },
+        AgentMessage: {
+            anyOf: [
+                {
+                    $ref: '#/definitions/UserMessage',
+                },
+                {
+                    $ref: '#/definitions/AssistantMessage',
+                },
+                {
+                    $ref: '#/definitions/ToolResultMessage',
+                },
+                {
+                    $ref: '#/definitions/CustomMessage',
+                },
+                {
+                    $ref: '#/definitions/CompactionSummaryMessage',
+                },
+                {
+                    $ref: '#/definitions/BranchSummaryMessage',
+                },
+            ],
+        },
         AgentVoice: {
             description: 'How an agent speaks.',
             properties: {
@@ -423,6 +445,8 @@ export const schema: Schema = {
                     type: 'string',
                 },
                 message: {
+                    description:
+                        'User text; may be blank when at least one attachment contains content.',
                     type: 'string',
                 },
                 reasoningEffort: {
@@ -489,6 +513,162 @@ export const schema: Schema = {
             ],
             type: 'object',
         },
+        AssistantContentBlock: {
+            anyOf: [
+                {
+                    properties: {
+                        text: {
+                            type: 'string',
+                        },
+                        type: {
+                            const: 'text',
+                            type: 'string',
+                        },
+                    },
+                    required: ['text', 'type'],
+                    type: 'object',
+                },
+                {
+                    properties: {
+                        signature: {
+                            type: 'string',
+                        },
+                        thinking: {
+                            type: 'string',
+                        },
+                        type: {
+                            const: 'thinking',
+                            description:
+                                "The model's reasoning trace. `signature` is Anthropic's integrity token: it MUST be\nround-tripped verbatim on a later turn or the API rejects the thinking block.",
+                            type: 'string',
+                        },
+                    },
+                    required: ['thinking', 'type'],
+                    type: 'object',
+                },
+                {
+                    properties: {
+                        data: {
+                            type: 'string',
+                        },
+                        type: {
+                            const: 'redacted-thinking',
+                            description:
+                                'Reasoning the provider encrypted. Opaque, and round-tripped as-is.',
+                            type: 'string',
+                        },
+                    },
+                    required: ['data', 'type'],
+                    type: 'object',
+                },
+                {
+                    properties: {
+                        id: {
+                            type: 'string',
+                        },
+                        input: {
+                            $ref: '#/definitions/JsonValue',
+                        },
+                        name: {
+                            type: 'string',
+                        },
+                        signature: {
+                            description:
+                                'An integrity token some providers attach to a tool call made while reasoning.\n\nOpaque, and round-tripped verbatim on the next turn. Gemini rejects a replayed function\ncall whose thought signature is missing or altered, so this must travel WITH the block\nrather than in a side table — a cache keyed by call id does not survive a session being\nreloaded from disk, which is exactly when the replay happens.',
+                            type: 'string',
+                        },
+                        type: {
+                            const: 'tool-use',
+                            description:
+                                "The model asking for a tool to run. `id` is the provider's own call id and is what a\nresult must quote back.",
+                            type: 'string',
+                        },
+                    },
+                    required: ['id', 'input', 'name', 'type'],
+                    type: 'object',
+                },
+            ],
+            description:
+                'What an assistant turn may contain. `tool-use` is legal here and nowhere else.',
+        },
+        AssistantMessage: {
+            description:
+                "One provider response.\n\n**Provenance is not optional.** `provider`, `model`, `usage` and `stopReason` are required. A run\nthat failed before the provider answered still produces an assistant message — a failure message\nwith `stopReason: 'error' | 'aborted'`, an `errorMessage`, and zero usage. Persisting that\noutcome is what stops session post-processing from compacting or continuing from the preceding\n`tool-use` message as if the turn were still open. If provenance were optional, half a transcript\nwould carry `undefined` provider and the credit ledger could not attribute a single token.",
+            properties: {
+                content: {
+                    items: {
+                        $ref: '#/definitions/AssistantContentBlock',
+                    },
+                    type: 'array',
+                },
+                errorCode: {
+                    type: 'string',
+                },
+                errorMessage: {
+                    type: 'string',
+                },
+                excludeFromContext: {
+                    description:
+                        'Kept in session history, hidden from the model.\n\nOn the base rather than a separate role because *any* role can need it: a bash-execution\nrecord, a long tool output the user asked to keep, a channel join notice. All of them stay\nvisible, searchable and exportable without eating context.',
+                    type: 'boolean',
+                },
+                id: {
+                    description:
+                        'UUIDv7. Stable across persistence; the session tree addresses messages by it.',
+                    type: 'string',
+                },
+                model: {
+                    type: 'string',
+                },
+                provider: {
+                    type: 'string',
+                },
+                responseId: {
+                    description: 'Provider-assigned response id, when one exists.',
+                    type: 'string',
+                },
+                responseModel: {
+                    description:
+                        'The concrete model a gateway actually used, when it differs from `model`.',
+                    type: 'string',
+                },
+                role: {
+                    const: 'assistant',
+                    type: 'string',
+                },
+                stopReason: {
+                    $ref: '#/definitions/StopReason',
+                },
+                tainted: {
+                    description:
+                        'This turn has consumed network-sourced tool output. Clears on a real user message.\n\nStored on the message rather than held in a runtime variable because a session reloaded from\ndisk mid-turn must not silently launder its own injection exposure: taint that lives only as\na local in the turn loop is gone the moment the process restarts, and the resumed turn then\nself-approves an exec it would have been blocked from before the crash.',
+                    type: 'boolean',
+                },
+                timestamp: {
+                    description: 'Epoch milliseconds.',
+                    type: 'number',
+                },
+                turnId: {
+                    description:
+                        'Runtime-assigned UUIDv7, stamped at message-end BEFORE any tool runs.\n\nDistinct from `responseId` because most providers expose no id at all, and an approval\nrecord, an audit entry and a tool result all need something to bind to regardless.',
+                    type: 'string',
+                },
+                usage: {
+                    $ref: '#/definitions/TokenUsage',
+                },
+            },
+            required: [
+                'content',
+                'id',
+                'model',
+                'provider',
+                'role',
+                'stopReason',
+                'timestamp',
+                'usage',
+            ],
+            type: 'object',
+        },
         BinarySource: {
             anyOf: [
                 {
@@ -523,6 +703,38 @@ export const schema: Schema = {
             ],
             description:
                 'Where binary content comes from: inline base64, or a URL the provider fetches.',
+        },
+        BranchSummaryMessage: {
+            description: 'The artifact of returning from a branch.',
+            properties: {
+                excludeFromContext: {
+                    description:
+                        'Kept in session history, hidden from the model.\n\nOn the base rather than a separate role because *any* role can need it: a bash-execution\nrecord, a long tool output the user asked to keep, a channel join notice. All of them stay\nvisible, searchable and exportable without eating context.',
+                    type: 'boolean',
+                },
+                fromId: {
+                    description: 'Session entry id the branch forked from.',
+                    type: 'string',
+                },
+                id: {
+                    description:
+                        'UUIDv7. Stable across persistence; the session tree addresses messages by it.',
+                    type: 'string',
+                },
+                role: {
+                    const: 'branch-summary',
+                    type: 'string',
+                },
+                summary: {
+                    type: 'string',
+                },
+                timestamp: {
+                    description: 'Epoch milliseconds.',
+                    type: 'number',
+                },
+            },
+            required: ['fromId', 'id', 'role', 'summary', 'timestamp'],
+            type: 'object',
         },
         Budget: {
             description: 'A spending limit over one scope.',
@@ -702,6 +914,45 @@ export const schema: Schema = {
                 'running',
                 'signal',
             ],
+            type: 'object',
+        },
+        CompactionSummaryMessage: {
+            description:
+                "The artifact of a compaction.\n\nNot a `custom` message because the session store's context projection has a hard branch on it and\ncompaction needs `tokensBefore` / `firstKeptEntryId` typed rather than buried in a `details` bag.",
+            properties: {
+                excludeFromContext: {
+                    description:
+                        'Kept in session history, hidden from the model.\n\nOn the base rather than a separate role because *any* role can need it: a bash-execution\nrecord, a long tool output the user asked to keep, a channel join notice. All of them stay\nvisible, searchable and exportable without eating context.',
+                    type: 'boolean',
+                },
+                firstKeptEntryId: {
+                    description: 'Session entry id the retained tail starts at.',
+                    type: 'string',
+                },
+                id: {
+                    description:
+                        'UUIDv7. Stable across persistence; the session tree addresses messages by it.',
+                    type: 'string',
+                },
+                role: {
+                    const: 'compaction-summary',
+                    type: 'string',
+                },
+                summary: {
+                    type: 'string',
+                },
+                timestamp: {
+                    description: 'Epoch milliseconds.',
+                    type: 'number',
+                },
+                tokensAfter: {
+                    type: 'number',
+                },
+                tokensBefore: {
+                    type: 'number',
+                },
+            },
+            required: ['id', 'role', 'summary', 'timestamp', 'tokensBefore'],
             type: 'object',
         },
         ConfigResult: {
@@ -1149,6 +1400,78 @@ export const schema: Schema = {
             },
             type: 'object',
         },
+        CustomMessage: {
+            description:
+                'A UI-only or bookkeeping message: `nexa:turn-aborted`, `nexa:model-switched`, a join notice.',
+            properties: {
+                content: {
+                    anyOf: [
+                        {
+                            items: {
+                                $ref: '#/definitions/UserContentBlock',
+                            },
+                            type: 'array',
+                        },
+                        {
+                            type: 'string',
+                        },
+                    ],
+                },
+                customType: {
+                    description: "Namespaced, e.g. `'nexa:turn-aborted'`.",
+                    type: 'string',
+                },
+                details: {
+                    anyOf: [
+                        {
+                            items: {
+                                $ref: '#/definitions/JsonValue',
+                            },
+                            type: 'array',
+                        },
+                        {
+                            additionalProperties: {
+                                $ref: '#/definitions/JsonValue',
+                            },
+                            type: 'object',
+                        },
+                        {
+                            type: ['null', 'string', 'number', 'boolean'],
+                        },
+                    ],
+                    description:
+                        "A JSON value, as it appears in a tool's arguments or a JSON Schema.",
+                },
+                display: {
+                    description:
+                        'Whether a surface renders it. Has no effect on the model projection.',
+                    type: 'boolean',
+                },
+                excludeFromContext: {
+                    description:
+                        'Kept in session history, hidden from the model.\n\nOn the base rather than a separate role because *any* role can need it: a bash-execution\nrecord, a long tool output the user asked to keep, a channel join notice. All of them stay\nvisible, searchable and exportable without eating context.',
+                    type: 'boolean',
+                },
+                id: {
+                    description:
+                        'UUIDv7. Stable across persistence; the session tree addresses messages by it.',
+                    type: 'string',
+                },
+                role: {
+                    const: 'custom',
+                    type: 'string',
+                },
+                runtimeContextCarrier: {
+                    type: 'boolean',
+                },
+                timestamp: {
+                    description: 'Epoch milliseconds.',
+                    type: 'number',
+                },
+            },
+            required: ['content', 'customType', 'display', 'id', 'role', 'timestamp'],
+            type: 'object',
+        },
         DataFile: {
             description: 'A complete source file the agent can process directly in its workspace.',
             properties: {
@@ -1588,6 +1911,35 @@ export const schema: Schema = {
             ],
             type: 'string',
         },
+        'Flatten<{readonlyid:string;readonlyparentId:string|null;readonlysessionId:string;readonlytimestamp:number;readonlyvisibility:"active"|"compacted"|"rewound";}&{readonlyappendMode?:"side"|undefined;}>':
+            {
+                description:
+                    'Collapses the required/optional intersection into one object type.\n\nHomomorphic (`in keyof T` over a naked type parameter), so `readonly` and `?` are carried through\nrather than flattened away — without it every derived type would lose its modifiers and a caller\ncould assign to a field the store treats as immutable.',
+                properties: {
+                    appendMode: {
+                        const: 'side',
+                        type: 'string',
+                    },
+                    id: {
+                        type: 'string',
+                    },
+                    parentId: {
+                        type: ['null', 'string'],
+                    },
+                    sessionId: {
+                        type: 'string',
+                    },
+                    timestamp: {
+                        type: 'number',
+                    },
+                    visibility: {
+                        enum: ['active', 'compacted', 'rewound'],
+                        type: 'string',
+                    },
+                },
+                required: ['id', 'parentId', 'sessionId', 'timestamp', 'visibility'],
+                type: 'object',
+            },
         'Flatten<{readonlytitle:string|null;readonlyid:string;readonlyagentId:string;readonlycreatedAt:number;readonlyupdatedAt:number;readonlyconversationId:string|null;readonlyparticipants:readonlystring[];readonlymessageCount:number;readonlyusage:TokenUsage;}&{readonlyactiveToolFamilies?:readonlystring[]|undefined;readonlyprojectId?:string|undefined;readonlyuserId?:string|undefined;readonlyworkspaceId?:string|undefined;readonlyturnOpen?:boolean|undefined;readonlyresumePending?:boolean|undefined;readonlyresumeEligible?:boolean|undefined;readonlyresumePrincipal?:ToolPrincipal|undefined;readonlyresumeCwd?:string|undefined;readonlyresumeSurface?:ConversationSurface|undefined;}>':
             {
                 description:
@@ -2010,6 +2362,11 @@ export const schema: Schema = {
                     const: true,
                     description:
                         'Versioned host verification evidence on private project and employee channels.',
+                    type: 'boolean',
+                },
+                sessionHistory: {
+                    const: true,
+                    description: 'Durable complete presentation history and binary restoration.',
                     type: 'boolean',
                 },
             },
@@ -2893,6 +3250,18 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'sessions.history': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/SessionHistoryParams',
+                        },
+                        result: {
+                            $ref: '#/definitions/SessionHistoryPage',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'sessions.list': {
                     properties: {
                         params: {
@@ -3239,6 +3608,7 @@ export const schema: Schema = {
                 'sessions.download',
                 'sessions.files',
                 'sessions.get',
+                'sessions.history',
                 'sessions.list',
                 'sessions.messages',
                 'sessions.subscribe',
@@ -3402,6 +3772,153 @@ export const schema: Schema = {
                 'snapshot',
                 'type',
             ],
+            type: 'object',
+        },
+        HistoryApprovalRequested: {
+            description: 'Approval controls retain their original request identity.',
+            properties: {
+                at: {
+                    type: 'number',
+                },
+                data: {
+                    $ref: '#/definitions/ApprovalRequestedData',
+                },
+                id: {
+                    type: 'string',
+                },
+                kind: {
+                    const: 'approval-requested',
+                    type: 'string',
+                },
+                runId: {
+                    type: ['null', 'string'],
+                },
+            },
+            required: ['at', 'data', 'id', 'kind', 'runId'],
+            type: 'object',
+        },
+        HistoryApprovalResolved: {
+            description: 'Settled approvals must not become actionable again when restored.',
+            properties: {
+                at: {
+                    type: 'number',
+                },
+                data: {
+                    $ref: '#/definitions/ApprovalResolvedData',
+                },
+                id: {
+                    type: 'string',
+                },
+                kind: {
+                    const: 'approval-resolved',
+                    type: 'string',
+                },
+            },
+            required: ['at', 'data', 'id', 'kind'],
+            type: 'object',
+        },
+        HistoryEnd: {
+            description: 'Terminal outcome, session identity, and final usage.',
+            properties: {
+                at: {
+                    type: 'number',
+                },
+                data: {
+                    $ref: '#/definitions/TurnEndData',
+                },
+                id: {
+                    type: 'string',
+                },
+                kind: {
+                    const: 'end',
+                    type: 'string',
+                },
+            },
+            required: ['at', 'data', 'id', 'kind'],
+            type: 'object',
+        },
+        HistoryEvent: {
+            description: 'Complete wire event, including native worker and media events.',
+            properties: {
+                at: {
+                    type: 'number',
+                },
+                data: {
+                    $ref: '#/definitions/TurnEventData',
+                },
+                id: {
+                    type: 'string',
+                },
+                kind: {
+                    const: 'event',
+                    type: 'string',
+                },
+            },
+            required: ['at', 'data', 'id', 'kind'],
+            type: 'object',
+        },
+        HistoryInput: {
+            description: 'Original user input, including attachments and steering messages.',
+            properties: {
+                at: {
+                    type: 'number',
+                },
+                data: {
+                    $ref: '#/definitions/SessionMessageData',
+                },
+                id: {
+                    type: 'string',
+                },
+                kind: {
+                    const: 'input',
+                    type: 'string',
+                },
+            },
+            required: ['at', 'data', 'id', 'kind'],
+            type: 'object',
+        },
+        HistoryLegacy: {
+            description:
+                'Recoverable canonical entries from sessions predating presentation recording.',
+            properties: {
+                at: {
+                    type: 'number',
+                },
+                entries: {
+                    items: {
+                        $ref: '#/definitions/SessionEntry',
+                    },
+                    type: 'array',
+                },
+                id: {
+                    type: 'string',
+                },
+                kind: {
+                    const: 'legacy',
+                    type: 'string',
+                },
+            },
+            required: ['at', 'entries', 'id', 'kind'],
+            type: 'object',
+        },
+        HistorySites: {
+            description: 'Site decorations arrive separately from the tool result.',
+            properties: {
+                at: {
+                    type: 'number',
+                },
+                data: {
+                    $ref: '#/definitions/ToolSitesData',
+                },
+                id: {
+                    type: 'string',
+                },
+                kind: {
+                    const: 'sites',
+                    type: 'string',
+                },
+            },
+            required: ['at', 'data', 'id', 'kind'],
             type: 'object',
         },
         IdParams: {
@@ -5496,6 +6013,12 @@ export const schema: Schema = {
             required: ['entries', 'next', 'userId'],
             type: 'object',
         },
+        ResetReason: {
+            description:
+                "Why a session was reset. Distinguishes a user's `/reset` from an idle or scheduled one.",
+            enum: ['cron-stale', 'daily', 'idle', 'new', 'reset'],
+            type: 'string',
+        },
         ResetSnapshot: {
             description:
                 'JSON-safe reset state; generation tokens prevent stale tabs consuming another entitlement.',
@@ -5568,6 +6091,279 @@ export const schema: Schema = {
             required: ['payload', 'type'],
             type: 'object',
         },
+        SessionEntry: {
+            anyOf: [
+                {
+                    allOf: [
+                        {
+                            $ref: '#/definitions/Flatten%3C%7Breadonlyid%3Astring%3BreadonlyparentId%3Astring%7Cnull%3BreadonlysessionId%3Astring%3Breadonlytimestamp%3Anumber%3Breadonlyvisibility%3A%22active%22%7C%22compacted%22%7C%22rewound%22%3B%7D%26%7BreadonlyappendMode%3F%3A%22side%22%7Cundefined%3B%7D%3E',
+                        },
+                        {
+                            properties: {
+                                kind: {
+                                    const: 'message',
+                                    type: 'string',
+                                },
+                                message: {
+                                    $ref: '#/definitions/AgentMessage',
+                                },
+                            },
+                            required: ['kind', 'message'],
+                            type: 'object',
+                        },
+                    ],
+                },
+                {
+                    allOf: [
+                        {
+                            $ref: '#/definitions/Flatten%3C%7Breadonlyid%3Astring%3BreadonlyparentId%3Astring%7Cnull%3BreadonlysessionId%3Astring%3Breadonlytimestamp%3Anumber%3Breadonlyvisibility%3A%22active%22%7C%22compacted%22%7C%22rewound%22%3B%7D%26%7BreadonlyappendMode%3F%3A%22side%22%7Cundefined%3B%7D%3E',
+                        },
+                        {
+                            properties: {
+                                kind: {
+                                    const: 'legacy-message',
+                                    type: 'string',
+                                },
+                                message: {
+                                    $ref: '#/definitions/ModelMessage',
+                                },
+                            },
+                            required: ['kind', 'message'],
+                            type: 'object',
+                        },
+                    ],
+                },
+                {
+                    allOf: [
+                        {
+                            $ref: '#/definitions/Flatten%3C%7Breadonlyid%3Astring%3BreadonlyparentId%3Astring%7Cnull%3BreadonlysessionId%3Astring%3Breadonlytimestamp%3Anumber%3Breadonlyvisibility%3A%22active%22%7C%22compacted%22%7C%22rewound%22%3B%7D%26%7BreadonlyappendMode%3F%3A%22side%22%7Cundefined%3B%7D%3E',
+                        },
+                        {
+                            properties: {
+                                kind: {
+                                    const: 'model-change',
+                                    type: 'string',
+                                },
+                                modelId: {
+                                    type: 'string',
+                                },
+                                provider: {
+                                    type: 'string',
+                                },
+                            },
+                            required: ['kind', 'modelId', 'provider'],
+                            type: 'object',
+                        },
+                    ],
+                },
+                {
+                    allOf: [
+                        {
+                            $ref: '#/definitions/Flatten%3C%7Breadonlyid%3Astring%3BreadonlyparentId%3Astring%7Cnull%3BreadonlysessionId%3Astring%3Breadonlytimestamp%3Anumber%3Breadonlyvisibility%3A%22active%22%7C%22compacted%22%7C%22rewound%22%3B%7D%26%7BreadonlyappendMode%3F%3A%22side%22%7Cundefined%3B%7D%3E',
+                        },
+                        {
+                            properties: {
+                                kind: {
+                                    const: 'thinking-level-change',
+                                    type: 'string',
+                                },
+                                thinkingLevel: {
+                                    type: 'string',
+                                },
+                            },
+                            required: ['kind', 'thinkingLevel'],
+                            type: 'object',
+                        },
+                    ],
+                },
+                {
+                    allOf: [
+                        {
+                            $ref: '#/definitions/Flatten%3C%7Breadonlyid%3Astring%3BreadonlyparentId%3Astring%7Cnull%3BreadonlysessionId%3Astring%3Breadonlytimestamp%3Anumber%3Breadonlyvisibility%3A%22active%22%7C%22compacted%22%7C%22rewound%22%3B%7D%26%7BreadonlyappendMode%3F%3A%22side%22%7Cundefined%3B%7D%3E',
+                        },
+                        {
+                            properties: {
+                                firstKeptEntryId: {
+                                    description:
+                                        'The entry the retained tail starts at. Validated against the log on append.',
+                                    type: 'string',
+                                },
+                                kind: {
+                                    const: 'compaction',
+                                    description:
+                                        'The boundary. The messages it replaced stay in the log, marked `compacted`.',
+                                    type: 'string',
+                                },
+                                summary: {
+                                    type: 'string',
+                                },
+                                tokensAfter: {
+                                    type: 'number',
+                                },
+                                tokensBefore: {
+                                    type: 'number',
+                                },
+                            },
+                            required: ['firstKeptEntryId', 'kind', 'summary', 'tokensBefore'],
+                            type: 'object',
+                        },
+                    ],
+                },
+                {
+                    allOf: [
+                        {
+                            $ref: '#/definitions/Flatten%3C%7Breadonlyid%3Astring%3BreadonlyparentId%3Astring%7Cnull%3BreadonlysessionId%3Astring%3Breadonlytimestamp%3Anumber%3Breadonlyvisibility%3A%22active%22%7C%22compacted%22%7C%22rewound%22%3B%7D%26%7BreadonlyappendMode%3F%3A%22side%22%7Cundefined%3B%7D%3E',
+                        },
+                        {
+                            properties: {
+                                firstKeptEntryId: {
+                                    description: 'Absent means the reset keeps nothing before it.',
+                                    type: 'string',
+                                },
+                                kind: {
+                                    const: 'reset',
+                                    type: 'string',
+                                },
+                                reason: {
+                                    $ref: '#/definitions/ResetReason',
+                                },
+                            },
+                            required: ['kind', 'reason'],
+                            type: 'object',
+                        },
+                    ],
+                },
+                {
+                    allOf: [
+                        {
+                            $ref: '#/definitions/Flatten%3C%7Breadonlyid%3Astring%3BreadonlyparentId%3Astring%7Cnull%3BreadonlysessionId%3Astring%3Breadonlytimestamp%3Anumber%3Breadonlyvisibility%3A%22active%22%7C%22compacted%22%7C%22rewound%22%3B%7D%26%7BreadonlyappendMode%3F%3A%22side%22%7Cundefined%3B%7D%3E',
+                        },
+                        {
+                            properties: {
+                                fromId: {
+                                    type: 'string',
+                                },
+                                kind: {
+                                    const: 'branch-summary',
+                                    type: 'string',
+                                },
+                                summary: {
+                                    type: 'string',
+                                },
+                            },
+                            required: ['fromId', 'kind', 'summary'],
+                            type: 'object',
+                        },
+                    ],
+                },
+                {
+                    allOf: [
+                        {
+                            $ref: '#/definitions/Flatten%3C%7Breadonlyid%3Astring%3BreadonlyparentId%3Astring%7Cnull%3BreadonlysessionId%3Astring%3Breadonlytimestamp%3Anumber%3Breadonlyvisibility%3A%22active%22%7C%22compacted%22%7C%22rewound%22%3B%7D%26%7BreadonlyappendMode%3F%3A%22side%22%7Cundefined%3B%7D%3E',
+                        },
+                        {
+                            properties: {
+                                customType: {
+                                    type: 'string',
+                                },
+                                data: {
+                                    anyOf: [
+                                        {
+                                            items: {
+                                                $ref: '#/definitions/JsonValue',
+                                            },
+                                            type: 'array',
+                                        },
+                                        {
+                                            additionalProperties: {
+                                                $ref: '#/definitions/JsonValue',
+                                            },
+                                            type: 'object',
+                                        },
+                                        {
+                                            type: ['null', 'string', 'number', 'boolean'],
+                                        },
+                                    ],
+                                    description:
+                                        "A JSON value, as it appears in a tool's arguments or a JSON Schema.",
+                                },
+                                kind: {
+                                    const: 'custom',
+                                    type: 'string',
+                                },
+                            },
+                            required: ['customType', 'kind'],
+                            type: 'object',
+                        },
+                    ],
+                },
+                {
+                    allOf: [
+                        {
+                            $ref: '#/definitions/Flatten%3C%7Breadonlyid%3Astring%3BreadonlyparentId%3Astring%7Cnull%3BreadonlysessionId%3Astring%3Breadonlytimestamp%3Anumber%3Breadonlyvisibility%3A%22active%22%7C%22compacted%22%7C%22rewound%22%3B%7D%26%7BreadonlyappendMode%3F%3A%22side%22%7Cundefined%3B%7D%3E',
+                        },
+                        {
+                            properties: {
+                                kind: {
+                                    const: 'label',
+                                    type: 'string',
+                                },
+                                label: {
+                                    type: ['null', 'string'],
+                                },
+                                targetId: {
+                                    type: 'string',
+                                },
+                            },
+                            required: ['kind', 'label', 'targetId'],
+                            type: 'object',
+                        },
+                    ],
+                },
+                {
+                    allOf: [
+                        {
+                            $ref: '#/definitions/Flatten%3C%7Breadonlyid%3Astring%3BreadonlyparentId%3Astring%7Cnull%3BreadonlysessionId%3Astring%3Breadonlytimestamp%3Anumber%3Breadonlyvisibility%3A%22active%22%7C%22compacted%22%7C%22rewound%22%3B%7D%26%7BreadonlyappendMode%3F%3A%22side%22%7Cundefined%3B%7D%3E',
+                        },
+                        {
+                            properties: {
+                                kind: {
+                                    const: 'session-info',
+                                    type: 'string',
+                                },
+                                name: {
+                                    type: ['null', 'string'],
+                                },
+                            },
+                            required: ['kind', 'name'],
+                            type: 'object',
+                        },
+                    ],
+                },
+                {
+                    allOf: [
+                        {
+                            $ref: '#/definitions/Flatten%3C%7Breadonlyid%3Astring%3BreadonlyparentId%3Astring%7Cnull%3BreadonlysessionId%3Astring%3Breadonlytimestamp%3Anumber%3Breadonlyvisibility%3A%22active%22%7C%22compacted%22%7C%22rewound%22%3B%7D%26%7BreadonlyappendMode%3F%3A%22side%22%7Cundefined%3B%7D%3E',
+                        },
+                        {
+                            properties: {
+                                kind: {
+                                    const: 'leaf',
+                                    description:
+                                        'Where the session was pointing.\n\nAn entry rather than a mutable column on the session row, so "where was this pointing at\n14:02" is answerable from the log alone. That is what makes a rewind auditable instead of\na fact that only the current value remembers.',
+                                    type: 'string',
+                                },
+                                targetId: {
+                                    type: ['null', 'string'],
+                                },
+                            },
+                            required: ['kind', 'targetId'],
+                            type: 'object',
+                        },
+                    ],
+                },
+            ],
+        },
         SessionFileParams: {
             description: 'Identifies a saved file within an owned session.',
             properties: {
@@ -5580,6 +6376,70 @@ export const schema: Schema = {
             },
             required: ['attachmentId', 'id'],
             type: 'object',
+        },
+        SessionHistoryPage: {
+            description:
+                'Bounded binary pages can split even a very large individual native event.',
+            properties: {
+                chunk: {
+                    type: 'string',
+                },
+                endCursor: {
+                    type: 'string',
+                },
+                format: {
+                    const: 1,
+                    type: 'number',
+                },
+                nextCursor: {
+                    type: 'string',
+                },
+            },
+            required: ['chunk', 'endCursor', 'format'],
+            type: 'object',
+        },
+        SessionHistoryParams: {
+            description: 'Byte cursors are decimal strings so large journals retain exact offsets.',
+            properties: {
+                cursor: {
+                    type: 'string',
+                },
+                endCursor: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+            },
+            required: ['id'],
+            type: 'object',
+        },
+        SessionHistoryRecord: {
+            anyOf: [
+                {
+                    $ref: '#/definitions/HistoryInput',
+                },
+                {
+                    $ref: '#/definitions/HistoryEvent',
+                },
+                {
+                    $ref: '#/definitions/HistorySites',
+                },
+                {
+                    $ref: '#/definitions/HistoryEnd',
+                },
+                {
+                    $ref: '#/definitions/HistoryApprovalRequested',
+                },
+                {
+                    $ref: '#/definitions/HistoryApprovalResolved',
+                },
+                {
+                    $ref: '#/definitions/HistoryLegacy',
+                },
+            ],
+            description:
+                'Append-only presentation history, independent of model-context compaction.',
         },
         SessionListParams: {
             description: 'A filter over sessions.',
@@ -5748,12 +6608,23 @@ export const schema: Schema = {
             required: ['message', 'runId'],
             type: 'object',
         },
+        StopReason: {
+            description:
+                'Why an assistant turn stopped, in agent terms. Narrower than provider `FinishReason`.',
+            enum: ['aborted', 'error', 'length', 'stop', 'tool-use'],
+            type: 'string',
+        },
         StreamAccepted: {
             description: 'The acknowledgement of a streaming run.',
             properties: {
                 runId: {
                     description:
                         "The SERVER's name for the run, which is the one `tasks.*` uses.\n\nDistinct from `streamId` because the stream id is chosen by the client — deliberately, so the\naccept response cannot race the first events — and two clients therefore pick the same one\nroutinely. A `tasks.cancel` keyed on the client's id would abort somebody else's run by\ncoincidence; keyed on this one it cannot.",
+                    type: 'string',
+                },
+                sessionKey: {
+                    description:
+                        'Resolved durable conversation identity, including a newly allocated chat.',
                     type: 'string',
                 },
                 streamId: {
@@ -5786,6 +6657,8 @@ export const schema: Schema = {
                     type: 'string',
                 },
                 message: {
+                    description:
+                        'User text; may be blank when at least one attachment contains content.',
                     type: 'string',
                 },
                 reasoningEffort: {
@@ -6562,6 +7435,146 @@ export const schema: Schema = {
             required: ['content', 'status'],
             type: 'object',
         },
+        ToolResultContentBlock: {
+            anyOf: [
+                {
+                    properties: {
+                        text: {
+                            type: 'string',
+                        },
+                        type: {
+                            const: 'text',
+                            type: 'string',
+                        },
+                    },
+                    required: ['text', 'type'],
+                    type: 'object',
+                },
+                {
+                    properties: {
+                        source: {
+                            $ref: '#/definitions/BinarySource',
+                        },
+                        title: {
+                            type: 'string',
+                        },
+                        type: {
+                            const: 'image',
+                            type: 'string',
+                        },
+                    },
+                    required: ['source', 'type'],
+                    type: 'object',
+                },
+                {
+                    properties: {
+                        source: {
+                            $ref: '#/definitions/BinarySource',
+                        },
+                        title: {
+                            type: 'string',
+                        },
+                        type: {
+                            const: 'video',
+                            description:
+                                'An encoded video or animation container decoded natively by a multimodal model.',
+                            type: 'string',
+                        },
+                    },
+                    required: ['source', 'type'],
+                    type: 'object',
+                },
+                {
+                    properties: {
+                        source: {
+                            $ref: '#/definitions/BinarySource',
+                        },
+                        title: {
+                            type: 'string',
+                        },
+                        type: {
+                            const: 'video-frame',
+                            description:
+                                'One ordered frame of a video or animation. Consecutive frames form one clip.',
+                            type: 'string',
+                        },
+                    },
+                    required: ['source', 'type'],
+                    type: 'object',
+                },
+            ],
+            description:
+                'What a tool result may contain: text and images only.\n\nA screenshot tool, a chart renderer and a PDF page extractor all return images, so `image` has to\nbe here. `thinking` is not legal inside a tool result on any provider and `tool-use` is not legal\noutside assistant content, and excluding both from the union makes each a compile error rather\nthan a 400 discovered in production.',
+        },
+        ToolResultMessage: {
+            description:
+                "A tool's outcome, as a top-level message rather than a block nested inside a user turn.\n\nMaking it a peer role is what lets the session tree address a single tool result — to rewind to\nit, to truncate it, or to find it in a search. As a block inside a user message it has no id of\nits own and no independent position in the tree.",
+            properties: {
+                content: {
+                    items: {
+                        $ref: '#/definitions/ToolResultContentBlock',
+                    },
+                    type: 'array',
+                },
+                details: {
+                    anyOf: [
+                        {
+                            items: {
+                                $ref: '#/definitions/JsonValue',
+                            },
+                            type: 'array',
+                        },
+                        {
+                            additionalProperties: {
+                                $ref: '#/definitions/JsonValue',
+                            },
+                            type: 'object',
+                        },
+                        {
+                            type: ['null', 'string', 'number', 'boolean'],
+                        },
+                    ],
+                    description:
+                        'Structured payload for UI, logs, and audit. Never sent to the model.',
+                },
+                excludeFromContext: {
+                    description:
+                        'Kept in session history, hidden from the model.\n\nOn the base rather than a separate role because *any* role can need it: a bash-execution\nrecord, a long tool output the user asked to keep, a channel join notice. All of them stay\nvisible, searchable and exportable without eating context.',
+                    type: 'boolean',
+                },
+                id: {
+                    description:
+                        'UUIDv7. Stable across persistence; the session tree addresses messages by it.',
+                    type: 'string',
+                },
+                isError: {
+                    type: 'boolean',
+                },
+                resultSource: {
+                    description:
+                        "`'network'` taints the turn: a fetched page, an MCP call, a browser read.",
+                    enum: ['network', 'trusted'],
+                    type: 'string',
+                },
+                role: {
+                    const: 'tool-result',
+                    type: 'string',
+                },
+                timestamp: {
+                    description: 'Epoch milliseconds.',
+                    type: 'number',
+                },
+                toolName: {
+                    type: 'string',
+                },
+                toolUseId: {
+                    description: 'Quotes `ContentBlock.tool-use.id` exactly.',
+                    type: 'string',
+                },
+            },
+            required: ['content', 'id', 'isError', 'role', 'timestamp', 'toolName', 'toolUseId'],
+            type: 'object',
+        },
         ToolSitesData: {
             description:
                 'Asynchronous tool decoration; may arrive after turn.end and never blocks it.',
@@ -6680,6 +7693,141 @@ export const schema: Schema = {
                 },
             },
             required: ['event', 'streamId'],
+            type: 'object',
+        },
+        UserContentBlock: {
+            anyOf: [
+                {
+                    properties: {
+                        text: {
+                            type: 'string',
+                        },
+                        type: {
+                            const: 'text',
+                            type: 'string',
+                        },
+                    },
+                    required: ['text', 'type'],
+                    type: 'object',
+                },
+                {
+                    properties: {
+                        source: {
+                            $ref: '#/definitions/BinarySource',
+                        },
+                        title: {
+                            type: 'string',
+                        },
+                        type: {
+                            const: 'image',
+                            type: 'string',
+                        },
+                    },
+                    required: ['source', 'type'],
+                    type: 'object',
+                },
+                {
+                    properties: {
+                        source: {
+                            $ref: '#/definitions/BinarySource',
+                        },
+                        title: {
+                            type: 'string',
+                        },
+                        type: {
+                            const: 'video',
+                            description:
+                                'An encoded video or animation container decoded natively by a multimodal model.',
+                            type: 'string',
+                        },
+                    },
+                    required: ['source', 'type'],
+                    type: 'object',
+                },
+                {
+                    properties: {
+                        source: {
+                            $ref: '#/definitions/BinarySource',
+                        },
+                        title: {
+                            type: 'string',
+                        },
+                        type: {
+                            const: 'video-frame',
+                            description:
+                                'One ordered frame of a video or animation. Consecutive frames form one clip.',
+                            type: 'string',
+                        },
+                    },
+                    required: ['source', 'type'],
+                    type: 'object',
+                },
+                {
+                    properties: {
+                        source: {
+                            $ref: '#/definitions/BinarySource',
+                        },
+                        title: {
+                            type: 'string',
+                        },
+                        type: {
+                            const: 'document',
+                            type: 'string',
+                        },
+                    },
+                    required: ['source', 'type'],
+                    type: 'object',
+                },
+            ],
+            description:
+                'What a user turn may contain.\n\nDerived from `ContentBlock` with `Extract` rather than redeclared, so a block gaining a field in\n`providers/Types.ts` gains it here too. A hand-copied parallel union would drift on the first\nchange, and the drift would only surface as a provider rejecting a replayed block.',
+        },
+        UserMessage: {
+            properties: {
+                content: {
+                    anyOf: [
+                        {
+                            items: {
+                                $ref: '#/definitions/UserContentBlock',
+                            },
+                            type: 'array',
+                        },
+                        {
+                            type: 'string',
+                        },
+                    ],
+                },
+                excludeFromContext: {
+                    description:
+                        'Kept in session history, hidden from the model.\n\nOn the base rather than a separate role because *any* role can need it: a bash-execution\nrecord, a long tool output the user asked to keep, a channel join notice. All of them stay\nvisible, searchable and exportable without eating context.',
+                    type: 'boolean',
+                },
+                id: {
+                    description:
+                        'UUIDv7. Stable across persistence; the session tree addresses messages by it.',
+                    type: 'string',
+                },
+                role: {
+                    const: 'user',
+                    type: 'string',
+                },
+                runtimeContextCarrier: {
+                    description:
+                        'Bytes regenerated every turn; never anchors a prompt-cache breakpoint (033).',
+                    type: 'boolean',
+                },
+                source: {
+                    description:
+                        "Who produced the turn.\n\n`'human'` and `'channel'` are a person typing; `'injected'` and `'resumed'` are the runtime\nsynthesizing a user turn. {@link isActiveTurnTainted} treats the two groups differently, which\nis the whole reason this field is not just documentation.",
+                    enum: ['channel', 'human', 'injected', 'resumed'],
+                    type: 'string',
+                },
+                timestamp: {
+                    description: 'Epoch milliseconds.',
+                    type: 'number',
+                },
+            },
+            required: ['content', 'id', 'role', 'timestamp'],
             type: 'object',
         },
         VoiceAudioParams: {
@@ -7557,6 +8705,9 @@ export const schema: Schema = {
         error: {
             $ref: '#/definitions/WireError',
         },
+        historyRecord: {
+            $ref: '#/definitions/SessionHistoryRecord',
+        },
         methods: {
             $ref: '#/definitions/GatewayMethods',
         },
@@ -7585,6 +8736,7 @@ export const schema: Schema = {
         'challenge',
         'changed',
         'error',
+        'historyRecord',
         'methods',
         'native',
         'sessionMessage',
