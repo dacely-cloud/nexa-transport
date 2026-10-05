@@ -4,6 +4,7 @@ import type {
     ChangedData,
     ConnectChallengeData,
     SessionMessageData,
+    SessionHistoryData,
     TurnEndData,
     TurnEventData,
     ToolSitesData,
@@ -18,6 +19,7 @@ export const EventName = {
     ToolSites: 'tool.sites',
     TurnEnd: 'turn.end',
     SessionMessage: 'session.message',
+    SessionHistory: 'session.history',
     ApprovalRequested: 'approval.requested',
     ApprovalResolved: 'approval.resolved',
     JobsChanged: 'jobs.changed',
@@ -52,6 +54,7 @@ export interface EventMap {
     readonly 'tool.sites': ToolSitesData;
     readonly 'turn.end': TurnEndData;
     readonly 'session.message': SessionMessageData;
+    readonly 'session.history': SessionHistoryData;
     readonly 'approval.requested': ApprovalRequestedData;
     readonly 'approval.resolved': ApprovalResolvedData;
     readonly 'jobs.changed': ChangedData;
@@ -66,6 +69,7 @@ const eventValidators: Readonly<Record<keyof EventMap, Validator>> = {
     'tool.sites': validators.toolSites,
     'turn.end': validators.turnEnd,
     'session.message': validators.sessionMessage,
+    'session.history': validators.sessionHistory,
     'approval.requested': validators.approvalRequested,
     'approval.resolved': validators.approvalResolved,
     'jobs.changed': validators.changed,

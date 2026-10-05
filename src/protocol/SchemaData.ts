@@ -2369,6 +2369,12 @@ export const schema: Schema = {
                     description: 'Durable complete presentation history and binary restoration.',
                     type: 'boolean',
                 },
+                sessionHistoryUpdates: {
+                    const: true,
+                    description:
+                        'Session subscriptions notify exact journal ranges for live catch-up.',
+                    type: 'boolean',
+                },
             },
             required: ['events', 'methodScopes', 'methods'],
             type: 'object',
@@ -3792,6 +3798,11 @@ export const schema: Schema = {
                 },
                 runId: {
                     type: ['null', 'string'],
+                },
+                streamId: {
+                    description:
+                        'Owning stream, retained when multiple turns share a conversation.',
+                    type: 'string',
                 },
             },
             required: ['at', 'data', 'id', 'kind', 'runId'],
@@ -6377,6 +6388,23 @@ export const schema: Schema = {
             required: ['attachmentId', 'id'],
             type: 'object',
         },
+        SessionHistoryData: {
+            description:
+                'A small live notification; large records remain in bounded authenticated pages.',
+            properties: {
+                cursor: {
+                    type: 'string',
+                },
+                endCursor: {
+                    type: 'string',
+                },
+                sessionId: {
+                    type: 'string',
+                },
+            },
+            required: ['cursor', 'endCursor', 'sessionId'],
+            type: 'object',
+        },
         SessionHistoryPage: {
             description:
                 'Bounded binary pages can split even a very large individual native event.',
@@ -8714,6 +8742,9 @@ export const schema: Schema = {
         native: {
             $ref: '#/definitions/NcapDelta',
         },
+        sessionHistory: {
+            $ref: '#/definitions/SessionHistoryData',
+        },
         sessionMessage: {
             $ref: '#/definitions/SessionMessageData',
         },
@@ -8739,6 +8770,7 @@ export const schema: Schema = {
         'historyRecord',
         'methods',
         'native',
+        'sessionHistory',
         'sessionMessage',
         'toolSites',
         'turnEnd',

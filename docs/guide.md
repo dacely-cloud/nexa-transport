@@ -407,7 +407,7 @@ await client.call(Method.SessionsUnsubscribe, { sessionId: sessionKey });
 stopMessages();
 ```
 
-Subscriptions require gateway authorization; the current personal-key allowlist does not include these two RPCs. Subscribe with an appropriate device/operator credential, or refresh authorized history with `SessionsMessages`. Locally started streams already deliver their events; avoid displaying duplicates when combining stream and subscription feeds.
+Subscriptions require gateway authorization and session ownership. Personal account credentials can subscribe to their own sessions. Locally started streams already deliver their events; avoid displaying duplicates when combining stream and subscription feeds.
 
 Use `client.onSequenceGap(({ expected, received }) => ...)` to detect missing events and refresh affected state. The library does not replay gaps. Use `onClose()` to report interruptions and release live audio resources, and `onReconnect()` to refresh session state. Event and attachment listeners remain registered across automatic reconnects. Use `onListenerError` in connection options to report exceptions thrown by application listeners.
 
@@ -564,3 +564,18 @@ console.log(result.text);
 States are `WorkerState.Queued`, `Working`, `Stopping`, `Done`, `Failed`, `Aborted`, and `Refused`. Upsert updates rather than replacing the whole UI list: completed workers can disappear from later snapshots after their reports are collected. Fast updates may be coalesced to the latest status per worker. A quiet worker is not automatically marked failed.
 
 This requires an engine version that emits `agents-status`. Gateways advertising `sessionHistory` retain these updates and nested worker events in the durable presentation transcript. Existing session subscriptions receive these turn events too; workers still tracked by the engine are included when a new turn starts. For provider-native NCAP agents, continue using `NexaMedia.nativeEvent(event)?.agent`, keyed by its `item`; those are a separate provider-managed lifecycle.
+
+### Keeping another window attached
+
+When `client.supportsSessionHistoryUpdates` is true, register `EventName.SessionHistory`, `onReconnect`, and `onSequenceGap` listeners before calling `Method.SessionsSubscribe`. Read the initial journal after subscribing. A `session.history` event announces a durable byte range for its `sessionId`; it does not contain a copy of the presentation payload. Serialize catch-up reads using the previous complete cursor, apply each record ID once, and ignore other session IDs. If a notification arrives during a read, read again after that read finishes. Reconnect and sequence gaps also require catch-up. Unsubscribe and remove listeners when the view closes.
+
+```ts
+import type { SavedHistorySnapshot } from 'nexa-transport';
+const saved: SavedHistorySnapshot = await client.readHistorySnapshot(sessionKey);
+const later: SavedHistorySnapshot = await client.readHistorySnapshot(sessionKey, saved.endCursor);
+console.log(later.records, later.endCursor);
+```
+
+Task snapshots expose the canonical saved session ID. Use a task's `runId` with `Method.AgentSteer` or `Method.TasksCancel` to control an owned run from a reopened window; `streamId` identifies presentation events. Refresh tasks after catching up and discard tasks whose journal already contains their terminal record.
+
+Call `turn.detach()` when leaving a local stream view while accepted work should continue. It rejects that local iterator/result and releases its listeners without sending cancellation. Keep attachment receipt attached to the authenticated client while it remains connected, including for detached turns, so live file acknowledgements still succeed. Explicit Stop uses `turn.cancel()`; abort signals and breaking an unfinished iterator continue to cancel. A full page close leaves the gateway's saved file destination available to other views.

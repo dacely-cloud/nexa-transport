@@ -72,3 +72,31 @@ it.each([
         await expect(connected.readHistory('saved')).rejects.toThrow();
     },
 );
+
+it('returns a complete cursor and reads only records after a prior snapshot', async (): Promise<void> => {
+    const first: SessionHistoryRecord = {
+        id: 'first',
+        at: 1000,
+        kind: 'event',
+        data: { streamId: 'stream', event: { type: 'text', text: '🙂 First' } },
+    };
+    const second: SessionHistoryRecord = {
+        id: 'second',
+        at: 1001,
+        kind: 'event',
+        data: { streamId: 'stream', event: { type: 'text', text: 'Second' } },
+    };
+    const prefix: string = `${JSON.stringify(first)}\n`;
+    const text: string = prefix + `${JSON.stringify(second)}\n`;
+    const connected: NexaClient = await connect(text, 7);
+    const snapshot = await connected.readHistorySnapshot(
+        'saved',
+        Buffer.byteLength(prefix).toString(),
+    );
+    expect(snapshot).toEqual({ records: [second], endCursor: Buffer.byteLength(text).toString() });
+    expect(await connected.readHistorySnapshot('saved', snapshot.endCursor)).toEqual({
+        records: [],
+        endCursor: snapshot.endCursor,
+    });
+    expect(gateway?.requests[1]?.params['cursor']).toBe(Buffer.byteLength(prefix).toString());
+});

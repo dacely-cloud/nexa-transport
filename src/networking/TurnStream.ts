@@ -105,6 +105,11 @@ export class TurnStream implements AsyncIterable<WireTurnEvent> {
         this.#events.discard();
         await this.#cancel(new TransportError(TransportErrorCode.Aborted, 'Turn cancelled'));
     }
+    /** Releases this local view while accepted server work continues for other subscribers. */
+    public detach(): void {
+        this.#events.discard();
+        this.#end(new TransportError(TransportErrorCode.Aborted, 'Turn view detached'));
+    }
     /** Consuming partially and breaking cancels the remaining server run. */
     public async *[Symbol.asyncIterator](): AsyncGenerator<WireTurnEvent, void> {
         try {
