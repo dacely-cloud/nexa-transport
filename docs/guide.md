@@ -284,6 +284,13 @@ stopFiles();
 
 `attachments` in the final result and `attachment` stream events contain metadata, not another copy of the bytes. Match their `id` with the callback's `id`; `streamId` identifies streaming deliveries. The SDK does not retain delivered bytes after notifying listeners. Files can be up to **100 MiB each**. Transfers use **256 KiB binary chunks**, with backpressure, ordering checks, and cleanup after disconnect or 30 seconds without progress. The SDK reassembles a file before calling `onAttachment`. At most 64 files can be delivered per turn. Uploads may contain multiple attachments with at most 100 MiB of combined bytes per request; larger batches should use separate requests. Delivery receipts require a successful client attachment handler. Register `onAttachment` before requesting files. Handlers may return a promise; resolve it after adding the file to your UI or saving it, and throw or reject on failure. The SDK sends `Method.MediaAcknowledge` automatically. Missing handlers, rejected handlers, and a 15-second acknowledgment timeout produce a tool error visible to the model. When a client disconnects, the gateway continues the accepted turn and saves its files to the owned session for later download; offline storage does not claim live receipt. Receipt does not prove a human viewed the file. Clients using older library versions must update to send acknowledgments.
 
+Keep delivered file and video bytes outside the chat transcript. For a browser preview or download,
+create a Blob from `file.data` with `file.mimeType`, then use `URL.createObjectURL(blob)`. Retain that
+short URL with the owning conversation and revoke it when the last owner releases the file. A
+100 MiB file becomes about 133 MiB when base64-encoded; placing that string in a chat transcript
+can hit a text display limit even though the binary transfer succeeded. JSON frame and chat text
+limits are separate from the 100 MiB file limit, including for unchunked binary deliveries.
+
 Other deliverables may appear as native artifact events, tool-result content, document/media blocks, or links in the final answer. Preserve all of these channels when building an artifact viewer. `NcapArtifactDelta` contains `item`, `title`, and an `artifact` string; that string is not guaranteed to be a URL or file bytes.
 
 ```ts
