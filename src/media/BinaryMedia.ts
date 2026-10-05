@@ -16,6 +16,9 @@ export class BinaryMedia {
         streamId?: string,
         sessionId?: string,
     ): Uint8Array<ArrayBuffer> {
+        if (!BinaryMedia.#metadata(attachment) || bytes.byteLength !== attachment.byteLength) {
+            throw new RangeError('Invalid binary media metadata or byte length');
+        }
         const header: Uint8Array<ArrayBuffer> = new TextEncoder().encode(
             JSON.stringify({
                 attachment,
@@ -23,8 +26,8 @@ export class BinaryMedia {
                 ...(sessionId === undefined ? {} : { sessionId }),
             }),
         );
-        if (header.byteLength > 16_384 || bytes.byteLength !== attachment.byteLength) {
-            throw new RangeError('Invalid binary media header or byte length');
+        if (header.byteLength > 16_384) {
+            throw new RangeError('Invalid binary media header');
         }
         const frame: Uint8Array<ArrayBuffer> = new Uint8Array(
             8 + header.byteLength + bytes.byteLength,

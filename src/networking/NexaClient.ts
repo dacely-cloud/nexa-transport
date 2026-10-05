@@ -1118,7 +1118,10 @@ export class NexaClient {
             return;
         }
         if (raw instanceof ArrayBuffer) {
-            if (raw.byteLength > (this.#options.maxMessageBytes ?? 16 * 1024 * 1024)) {
+            const binaryLimit: number = BinaryChunks.isChunk(raw)
+                ? 28 + BinaryChunks.CHUNK_BYTES
+                : BinaryChunks.MAX_TRANSFER_BYTES;
+            if (raw.byteLength > binaryLimit) {
                 throw materializeError(new RangeError('Binary frame exceeds limit'));
             }
             if (this.#hello === null) {

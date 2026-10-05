@@ -49,10 +49,11 @@ export class BinaryEnvelope {
         return frame;
     }
 
+    /** Restores fields within the wire limit and a bounded base64 expansion budget, or an explicit JSON cap. */
     public static decode(
         buffer: ArrayBuffer,
         maxBytes: number,
-        maxJsonBytes: number = maxBytes,
+        maxJsonBytes: number = Math.ceil(maxBytes / 3) * 4,
     ): JsonValue {
         if (buffer.byteLength < 8 || buffer.byteLength > maxBytes) {
             throw new RangeError('Invalid binary envelope size');
