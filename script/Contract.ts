@@ -1,3 +1,4 @@
+import type { SessionHistoryRecord } from '../../nexa/src/gateway/HistoryTypes';
 /** Server-only generation input; never imported by the published package. */
 import type {
     GatewayMethods,
@@ -15,6 +16,7 @@ import type { NcapDelta } from '../../nexa/src/protocol/ncap/Delta';
 import type { VoiceCallEvent } from '../../nexa/src/voice/VoiceCall';
 /** All protocol contracts reachable from the public transport. */
 export interface Contract {
+    readonly historyRecord: SessionHistoryRecord;
     readonly methods: GatewayMethods;
     readonly challenge: ConnectChallengeData;
     readonly turnEvent: TurnEventData;

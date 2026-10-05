@@ -5,7 +5,11 @@ const definitions = schema.definitions;
 const names = new Map();
 const used = new Set();
 for (const name of Object.keys(definitions)) {
-    const clean = name.startsWith('Flatten<') ? 'Session' : name.replace(/[^a-zA-Z0-9_]/g, '');
+    const clean = name.startsWith('Flatten<')
+        ? definitions[name].properties?.agentId
+            ? 'Session'
+            : 'SessionEntryBase'
+        : name.replace(/[^a-zA-Z0-9_]/g, '');
     let unique = clean;
     let index = 2;
     while (used.has(unique)) unique = `${clean}${index++}`;

@@ -77,6 +77,10 @@ export class TurnStream implements AsyncIterable<WireTurnEvent> {
         void this.#observeResult();
         options.signal?.addEventListener('abort', this.#abort, { once: true });
     }
+    /** Stable resolved session identity supplied before the first turn completes. */
+    public get accepted(): Promise<StreamAccepted> {
+        return this.#accepted;
+    }
     /** Adds a correction to this active run without starting or cancelling a turn. */
     public async steer(message: string): Promise<boolean> {
         if (!message.trim() || message.length > 16_384) {

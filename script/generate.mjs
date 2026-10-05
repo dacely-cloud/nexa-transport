@@ -63,7 +63,11 @@ const names = new Map();
 const used = new Set();
 function nameFor(name) {
     if (names.has(name)) return names.get(name);
-    let clean = name.startsWith('Flatten<') ? 'Session' : name.replace(/[^a-zA-Z0-9_]/g, '');
+    let clean = name.startsWith('Flatten<')
+        ? schema.definitions[name].properties?.agentId
+            ? 'Session'
+            : 'SessionEntryBase'
+        : name.replace(/[^a-zA-Z0-9_]/g, '');
     if (!/^[A-Za-z]/.test(clean)) clean = `Value${clean}`;
     let unique = clean;
     let suffix = 2;

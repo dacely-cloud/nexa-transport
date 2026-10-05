@@ -1,3 +1,5 @@
+import { SessionHistoryReader } from './SessionHistoryReader.js';
+import type { SessionHistoryRecord } from '../protocol/Protocol.js';
 import { CompanyFormats } from './CompanyFormats.js';
 import { EmployeeChannels } from './EmployeeChannels.js';
 import { CompanyHostFormat } from './CompanyHostFormat.js';
@@ -89,6 +91,8 @@ export interface SessionSnapshot {
     readonly messages: ResultOf<Method.SessionsMessages>;
     readonly tasks: ResultOf<Method.TasksList>;
     readonly files: ResultOf<Method.SessionsFiles>;
+    /** Full presentation events when supported by the gateway. */
+    readonly history?: readonly SessionHistoryRecord[];
 }
 /** One scoped public office stream on your personal connection. */
 export interface CollaborationOffice {
@@ -99,6 +103,19 @@ export interface CollaborationOffice {
 }
 /** Authenticated Nexa gateway connection shared by browsers and Node.js. */
 export class NexaClient {
+    /** Whether the gateway preserves the complete visible event stream. */
+    public get supportsSessionHistory(): boolean {
+        return this.#hello?.features.sessionHistory === true;
+    }
+    /** Reads a fixed history snapshot without repeating any user input. */
+    public readHistory(id: string): Promise<readonly SessionHistoryRecord[]> {
+        return SessionHistoryReader.read(this, id);
+    }
+    /** Restores original archived bytes through the account-scoped gateway. */
+    public downloadSessionFile(id: string, attachmentId: string): Promise<ReceivedAttachment> {
+        return SessionHistoryReader.download(this, id, attachmentId);
+    }
+
     readonly #company = new CompanyChannel(CompanyFormats.staffing);
     readonly #companyLimits = new CompanyChannel(CompanyFormats.limits);
     readonly #employees = new EmployeeChannels();
@@ -729,14 +746,16 @@ export class NexaClient {
     /** Restores messages, active tasks and file metadata without downloading saved attachments or repeating a turn. */
     public async resumeSession(sessionId: string): Promise<SessionSnapshot> {
         await this.call(Method.SessionsSubscribe, { sessionId });
-        const [messages, tasks, files]: [
+        const [messages, tasks, files, history]: [
             ResultOf<Method.SessionsMessages>,
             ResultOf<Method.TasksList>,
             ResultOf<Method.SessionsFiles>,
+            readonly SessionHistoryRecord[] | undefined,
         ] = await Promise.all([
             this.call(Method.SessionsMessages, { id: sessionId }),
             this.call(Method.TasksList, {}),
             this.call(Method.SessionsFiles, { id: sessionId }),
+            this.supportsSessionHistory ? this.readHistory(sessionId) : Promise.resolve(undefined),
         ]);
         return {
             messages,
@@ -744,6 +763,7 @@ export class NexaClient {
                 (task: ResultOf<Method.TasksList>[number]): boolean => task.sessionId === sessionId,
             ),
             files,
+            ...(history === undefined ? {} : { history }),
         };
     }
     /** Subscribes to a catalogued event with a fully validated payload. */
