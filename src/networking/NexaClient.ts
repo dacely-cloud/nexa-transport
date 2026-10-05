@@ -86,6 +86,13 @@ export interface ReceivedTranscript {
     /** False replaces the current hypothesis; true appends a settled utterance. */
     readonly final: boolean;
 }
+/** Validated journal records and the complete boundary of this history read. */
+export interface SavedHistorySnapshot {
+    /** Original validated records in journal order. */
+    readonly records: readonly SessionHistoryRecord[];
+    /** Complete byte boundary for the next incremental read. */
+    readonly endCursor: string;
+}
 /** Saved history, live tasks and downloadable files for a subscribed session. */
 export interface SessionSnapshot {
     readonly messages: ResultOf<Method.SessionsMessages>;
@@ -107,9 +114,21 @@ export class NexaClient {
     public get supportsSessionHistory(): boolean {
         return this.#hello?.features.sessionHistory === true;
     }
+    /** Whether session subscriptions announce durable history additions. */
+    public get supportsSessionHistoryUpdates(): boolean {
+        return this.#hello?.features.sessionHistoryUpdates === true;
+    }
     /** Reads a fixed history snapshot without repeating any user input. */
     public readHistory(id: string): Promise<readonly SessionHistoryRecord[]> {
         return SessionHistoryReader.read(this, id);
+    }
+    /** Captures a complete snapshot or catches up from a previous complete boundary. */
+    public readHistorySnapshot(
+        id: string,
+        cursor?: string,
+        endCursor?: string,
+    ): Promise<SavedHistorySnapshot> {
+        return SessionHistoryReader.snapshot(this, id, cursor, endCursor);
     }
     /** Restores original archived bytes through the account-scoped gateway. */
     public downloadSessionFile(id: string, attachmentId: string): Promise<ReceivedAttachment> {

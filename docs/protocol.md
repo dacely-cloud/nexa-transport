@@ -1024,6 +1024,7 @@ Methods, events, and additive capabilities supported by this gateway.
 | `officeShowroom`            | No       | `true`                                             | Owner-published accepted product labels in NGOP v9 and private NCP2 v4.                        |
 | `officeVerification`        | No       | `true`                                             | Versioned host verification evidence on private project and employee channels.                 |
 | `sessionHistory`            | No       | `true`                                             | Durable complete presentation history and binary restoration.                                  |
+| `sessionHistoryUpdates`     | No       | `true`                                             | Session subscriptions notify exact journal ranges for live catch-up.                           |
 
 ## GatewayLimits
 
@@ -1813,13 +1814,14 @@ Liveness and identity.
 
 Approval controls retain their original request identity.
 
-| Field   | Required | Type                                                       | Description |
-| ------- | -------- | ---------------------------------------------------------- | ----------- |
-| `at`    | Yes      | `number`                                                   |             |
-| `data`  | Yes      | [ApprovalRequestedData](protocol.md#approvalrequesteddata) |             |
-| `id`    | Yes      | `string`                                                   |             |
-| `kind`  | Yes      | `"approval-requested"`                                     |             |
-| `runId` | Yes      | `null,string`                                              |             |
+| Field      | Required | Type                                                       | Description                                                       |
+| ---------- | -------- | ---------------------------------------------------------- | ----------------------------------------------------------------- |
+| `at`       | Yes      | `number`                                                   |                                                                   |
+| `data`     | Yes      | [ApprovalRequestedData](protocol.md#approvalrequesteddata) |                                                                   |
+| `id`       | Yes      | `string`                                                   |                                                                   |
+| `kind`     | Yes      | `"approval-requested"`                                     |                                                                   |
+| `runId`    | Yes      | `null,string`                                              |                                                                   |
+| `streamId` | No       | `string`                                                   | Owning stream, retained when multiple turns share a conversation. |
 
 ## HistoryApprovalResolved
 
@@ -2898,6 +2900,16 @@ Identifies a saved file within an owned session.
 | `attachmentId` | Yes      | `string` |             |
 | `id`           | Yes      | `string` |             |
 
+## SessionHistoryData
+
+A small live notification; large records remain in bounded authenticated pages.
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `cursor`    | Yes      | `string` |             |
+| `endCursor` | Yes      | `string` |             |
+| `sessionId` | Yes      | `string` |             |
+
 ## SessionHistoryPage
 
 Bounded binary pages can split even a very large individual native event.
@@ -2961,13 +2973,14 @@ Variant 4: [HistoryEnd](protocol.md#historyend)
 
 Variant 5: [HistoryApprovalRequested](protocol.md#historyapprovalrequested)
 
-| Field   | Required | Type                                                       | Description |
-| ------- | -------- | ---------------------------------------------------------- | ----------- |
-| `at`    | Yes      | `number`                                                   |             |
-| `data`  | Yes      | [ApprovalRequestedData](protocol.md#approvalrequesteddata) |             |
-| `id`    | Yes      | `string`                                                   |             |
-| `kind`  | Yes      | `"approval-requested"`                                     |             |
-| `runId` | Yes      | `null,string`                                              |             |
+| Field      | Required | Type                                                       | Description                                                       |
+| ---------- | -------- | ---------------------------------------------------------- | ----------------------------------------------------------------- |
+| `at`       | Yes      | `number`                                                   |                                                                   |
+| `data`     | Yes      | [ApprovalRequestedData](protocol.md#approvalrequesteddata) |                                                                   |
+| `id`       | Yes      | `string`                                                   |                                                                   |
+| `kind`     | Yes      | `"approval-requested"`                                     |                                                                   |
+| `runId`    | Yes      | `null,string`                                              |                                                                   |
+| `streamId` | No       | `string`                                                   | Owning stream, retained when multiple turns share a conversation. |
 
 Variant 6: [HistoryApprovalResolved](protocol.md#historyapprovalresolved)
 

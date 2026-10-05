@@ -5,7 +5,7 @@ import {
 } from '../protocol/Protocol.js';
 import { historyRecord } from '../protocol/Validators.js';
 import type { ReceivedAttachment } from '../media/BinaryMedia.js';
-import type { NexaClient } from './NexaClient.js';
+import type { NexaClient, SavedHistorySnapshot } from './NexaClient.js';
 
 /** Restores bounded journal pages and exact binary files through authenticated RPCs. */
 export class SessionHistoryReader {
@@ -14,12 +14,20 @@ export class SessionHistoryReader {
         client: NexaClient,
         id: string,
     ): Promise<readonly SessionHistoryRecord[]> {
+        return (await this.snapshot(client, id)).records;
+    }
+
+    /** Reads complete records after a prior boundary, without downloading their prefix again. */
+    public static async snapshot(
+        client: NexaClient,
+        id: string,
+        cursor: string = '0',
+        endCursor?: string,
+    ): Promise<SavedHistorySnapshot> {
         const records: SessionHistoryRecord[] = [];
         const decoder: TextDecoder = new TextDecoder('utf-8', { fatal: true });
         const seen: Set<string> = new Set();
         let pending: string = '';
-        let cursor: string = '0';
-        let endCursor: string | undefined;
         for (;;) {
             const page: SessionHistoryPage = await client.call(Method.SessionsHistory, {
                 id,
@@ -71,7 +79,7 @@ export class SessionHistoryReader {
         if (pending.length !== 0) {
             throw new Error('Incomplete saved history record');
         }
-        return records;
+        return { records, endCursor: endCursor ?? cursor };
     }
 
     /** Subscribes before requesting bytes, matching both session and attachment identity. */

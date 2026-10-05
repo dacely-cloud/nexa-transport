@@ -36,6 +36,10 @@ export function methods(value: unknown): value is protocol.GatewayMethods {
 export function native(value: unknown): value is protocol.NcapDelta {
     return validator.validate('#/definitions/NcapDelta', value);
 }
+/** Validates sessionHistory. */
+export function sessionHistory(value: unknown): value is protocol.SessionHistoryData {
+    return validator.validate('#/definitions/SessionHistoryData', value);
+}
 /** Validates sessionMessage. */
 export function sessionMessage(value: unknown): value is protocol.SessionMessageData {
     return validator.validate('#/definitions/SessionMessageData', value);

@@ -1465,6 +1465,8 @@ export interface GatewayFeaturesShape {
     readonly officeVerification?: true;
     /** sessionHistory as defined by the Nexa gateway. */
     readonly sessionHistory?: true;
+    /** sessionHistoryUpdates as defined by the Nexa gateway. */
+    readonly sessionHistoryUpdates?: true;
 }
 
 /** GatewayFeatures from the Nexa wire protocol. */
@@ -2473,6 +2475,8 @@ export interface HistoryApprovalRequestedShape {
     readonly kind: 'approval-requested';
     /** runId as defined by the Nexa gateway. */
     readonly runId: null | string;
+    /** streamId as defined by the Nexa gateway. */
+    readonly streamId?: string;
 }
 
 /** HistoryApprovalRequested from the Nexa wire protocol. */
@@ -4047,6 +4051,19 @@ export interface SessionFileParamsShape {
 
 /** SessionFileParams from the Nexa wire protocol. */
 export type SessionFileParams = SessionFileParamsShape;
+
+/** SessionHistoryData wire fields. */
+export interface SessionHistoryDataShape {
+    /** cursor as defined by the Nexa gateway. */
+    readonly cursor: string;
+    /** endCursor as defined by the Nexa gateway. */
+    readonly endCursor: string;
+    /** sessionId as defined by the Nexa gateway. */
+    readonly sessionId: string;
+}
+
+/** SessionHistoryData from the Nexa wire protocol. */
+export type SessionHistoryData = SessionHistoryDataShape;
 
 /** SessionHistoryPage wire fields. */
 export interface SessionHistoryPageShape {

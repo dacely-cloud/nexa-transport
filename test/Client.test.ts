@@ -252,6 +252,39 @@ describe('Nexa websocket lifetimes', (): void => {
         await expect(turn.result).rejects.toMatchObject({ code: TransportErrorCode.Aborted });
         expect(gateway.requests.at(-1)?.params['id']).toBe('server-owned-id');
     });
+    it('detaches a view without cancelling the accepted server run', async (): Promise<void> => {
+        const connected: NexaClient = await connect();
+        if (gateway === undefined) {
+            throw new Error('Missing gateway');
+        }
+        gateway.handler = (socket: WebSocket, request: Request): void => {
+            socket.send(
+                JSON.stringify({
+                    id: request.id,
+                    ok: true,
+                    result: { runId: 'server-run', streamId: request.params['streamId'] },
+                }),
+            );
+        };
+        const turn: TurnStream = connected.stream({ message: 'hello' });
+        await turn.accepted;
+        const events: Promise<IteratorResult<unknown>> = turn[Symbol.asyncIterator]().next();
+        turn.detach();
+        turn.detach();
+        await expect(events).rejects.toMatchObject({ code: TransportErrorCode.Aborted });
+        await expect(turn.result).rejects.toMatchObject({ code: TransportErrorCode.Aborted });
+        expect(
+            gateway.requests.filter(
+                (request: Request): boolean => request.method === 'tasks.cancel',
+            ),
+        ).toEqual([]);
+        const next: TurnStream = connected.stream({
+            message: 'another turn',
+            streamId: turn.streamId,
+        });
+        await next.accepted;
+        next.detach();
+    });
     it('bounds buffered events and cancels a producer that outruns its consumer', async (): Promise<void> => {
         const connected: NexaClient = await connect();
         if (gateway === undefined) {
