@@ -18,6 +18,20 @@ function verifyMethodTypes(client: NexaClient): void {
 }
 
 describe('Method enum', (): void => {
+    it('validates bounded soft execution targets in both contracts', (): void => {
+        for (const method of [Method.AgentAsk, Method.AgentStream]) {
+            for (const targetTimeSeconds of [120, 300, 900, 172800]) {
+                expect(methodValidators[method].params({ message: 'Hi', targetTimeSeconds })).toBe(
+                    true,
+                );
+            }
+            for (const targetTimeSeconds of [null, '120', 0, -1, 1.5, 172801]) {
+                expect(methodValidators[method].params({ message: 'Hi', targetTimeSeconds })).toBe(
+                    false,
+                );
+            }
+        }
+    });
     it('validates optional per-turn effort in ask and stream contracts', (): void => {
         for (const reasoningEffort of ['off', 'low', 'medium', 'xhigh']) {
             expect(
