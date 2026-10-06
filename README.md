@@ -146,6 +146,14 @@ if (session !== undefined) {
 
 Nexa retains conversation history server-side. Save the `sessionKey` to resume after reconnecting. The result's `conversationId` belongs to the model provider; use `sessionKey` for gateway requests.
 
+`await client.readHistorySnapshot(sessionKey)` reads the complete presentation journal,
+including reasoning and tools. Pass a previous snapshot's `endCursor` to read only
+new records. Large snapshots overlap up to 16 page requests, reserving half the
+client's pending RPC capacity and at most 4 MiB of raw page lookahead. Pages are
+decoded in journal order against one fixed snapshot boundary; every record is
+validated, and failed reads cancel outstanding lookahead. The stored history is
+preserved in full.
+
 ## Streaming
 
 ```ts

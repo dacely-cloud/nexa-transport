@@ -119,8 +119,8 @@ export class NexaClient {
         return this.#hello?.features.sessionHistoryUpdates === true;
     }
     /** Reads a fixed history snapshot without repeating any user input. */
-    public readHistory(id: string): Promise<readonly SessionHistoryRecord[]> {
-        return SessionHistoryReader.read(this, id);
+    public async readHistory(id: string): Promise<readonly SessionHistoryRecord[]> {
+        return (await this.readHistorySnapshot(id)).records;
     }
     /** Captures a complete snapshot or catches up from a previous complete boundary. */
     public readHistorySnapshot(
@@ -128,7 +128,13 @@ export class NexaClient {
         cursor?: string,
         endCursor?: string,
     ): Promise<SavedHistorySnapshot> {
-        return SessionHistoryReader.snapshot(this, id, cursor, endCursor);
+        return SessionHistoryReader.snapshot(
+            this,
+            id,
+            cursor,
+            endCursor,
+            Math.max(1, Math.min(16, Math.floor(this.#pending.limit / 2))),
+        );
     }
     /** Restores original archived bytes through the account-scoped gateway. */
     public downloadSessionFile(id: string, attachmentId: string): Promise<ReceivedAttachment> {
