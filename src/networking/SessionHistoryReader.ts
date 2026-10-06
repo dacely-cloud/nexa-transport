@@ -7,79 +7,166 @@ import { historyRecord } from '../protocol/Validators.js';
 import type { ReceivedAttachment } from '../media/BinaryMedia.js';
 import type { NexaClient, SavedHistorySnapshot } from './NexaClient.js';
 
-/** Restores bounded journal pages and exact binary files through authenticated RPCs. */
-export class SessionHistoryReader {
-    /** Decodes across UTF-8 and JSON boundaries and validates every original record. */
-    public static async read(
-        client: NexaClient,
-        id: string,
-    ): Promise<readonly SessionHistoryRecord[]> {
-        return (await this.snapshot(client, id)).records;
+/** A speculative read whose rejection is handled even before its turn to decode. */
+interface PendingHistoryPage {
+    readonly controller: AbortController;
+    readonly result: Promise<PromiseSettledResult<SessionHistoryPage>>;
+}
+
+/** Bounded lookahead over a fixed byte snapshot; decoding remains strictly ordered. */
+class HistoryPageWindow {
+    static readonly #MAX_BYTES: bigint = 4n * 1024n * 1024n;
+    readonly #pending: Map<string, PendingHistoryPage> = new Map();
+
+    public constructor(
+        private readonly client: NexaClient,
+        private readonly id: string,
+        private readonly concurrency: number,
+    ) {}
+
+    public async read(cursor: string, endCursor?: string): Promise<SessionHistoryPage> {
+        const pending: PendingHistoryPage =
+            this.#pending.get(cursor) ?? this.#request(cursor, endCursor);
+        const result: PromiseSettledResult<SessionHistoryPage> = await pending.result;
+        this.#pending.delete(cursor);
+        if (result.status === 'rejected') {
+            throw result.reason;
+        }
+        return result.value;
     }
 
+    /** Infer the server's page stride; a changed stride cancels obsolete lookahead. */
+    public prefetch(cursor: string, endCursor: string, stride: bigint): void {
+        const remaining: Set<string> = new Set();
+        const capacity: number = Math.min(
+            this.concurrency,
+            Number(HistoryPageWindow.#MAX_BYTES / stride),
+        );
+        for (
+            let offset: bigint = BigInt(cursor), count: number = 0;
+            offset < BigInt(endCursor) && count < capacity;
+            offset += stride, count += 1
+        ) {
+            remaining.add(offset.toString());
+        }
+        for (const [offset, pending] of this.#pending) {
+            if (!remaining.has(offset)) {
+                pending.controller.abort();
+                this.#pending.delete(offset);
+            }
+        }
+        for (const offset of remaining) {
+            if (!this.#pending.has(offset)) {
+                this.#request(offset, endCursor);
+            }
+        }
+    }
+
+    public close(): void {
+        for (const pending of this.#pending.values()) {
+            pending.controller.abort();
+        }
+        this.#pending.clear();
+    }
+
+    #request(cursor: string, endCursor?: string): PendingHistoryPage {
+        const controller: AbortController = new AbortController();
+        const pending: PendingHistoryPage = {
+            controller,
+            result: this.client
+                .call(
+                    Method.SessionsHistory,
+                    {
+                        id: this.id,
+                        cursor,
+                        ...(endCursor === undefined ? {} : { endCursor }),
+                    },
+                    { signal: controller.signal },
+                )
+                .then(
+                    (value: SessionHistoryPage): PromiseFulfilledResult<SessionHistoryPage> => ({
+                        status: 'fulfilled',
+                        value,
+                    }),
+                    (reason: unknown): PromiseRejectedResult => ({ status: 'rejected', reason }),
+                ),
+        };
+        this.#pending.set(cursor, pending);
+        return pending;
+    }
+}
+
+/** Restores bounded journal pages and exact binary files through authenticated RPCs. */
+export class SessionHistoryReader {
     /** Reads complete records after a prior boundary, without downloading their prefix again. */
     public static async snapshot(
         client: NexaClient,
         id: string,
         cursor: string = '0',
         endCursor?: string,
+        concurrency: number = 16,
     ): Promise<SavedHistorySnapshot> {
         const records: SessionHistoryRecord[] = [];
         const decoder: TextDecoder = new TextDecoder('utf-8', { fatal: true });
         const seen: Set<string> = new Set();
         let pending: string = '';
-        for (;;) {
-            const page: SessionHistoryPage = await client.call(Method.SessionsHistory, {
-                id,
-                cursor,
-                ...(endCursor === undefined ? {} : { endCursor }),
-            });
-            if (
-                page.format !== 1 ||
-                !/^\d+$/.test(page.endCursor) ||
-                (endCursor !== undefined && page.endCursor !== endCursor)
-            ) {
-                throw new Error('Invalid history snapshot boundary');
-            }
-            endCursor = page.endCursor;
-            const raw: string = atob(page.chunk);
-            const bytes: Uint8Array<ArrayBuffer> = Uint8Array.from(raw, (char): number =>
-                char.charCodeAt(0),
-            );
-            const next: bigint = BigInt(cursor) + BigInt(bytes.byteLength);
-            if (
-                next > BigInt(endCursor) ||
-                (page.nextCursor !== undefined &&
-                    (page.nextCursor !== next.toString() || next <= BigInt(cursor))) ||
-                (page.nextCursor === undefined && next !== BigInt(endCursor))
-            ) {
-                throw new Error('Invalid history page cursor');
-            }
-            pending += decoder.decode(bytes, { stream: page.nextCursor !== undefined });
-            let newline: number;
-            while ((newline = pending.indexOf('\n')) !== -1) {
-                const line: string = pending.slice(0, newline);
-                pending = pending.slice(newline + 1);
-                const record: unknown = JSON.parse(line);
+        const pages: HistoryPageWindow = new HistoryPageWindow(client, id, concurrency);
+        try {
+            for (;;) {
+                const page: SessionHistoryPage = await pages.read(cursor, endCursor);
                 if (
-                    !historyRecord(record) ||
-                    seen.has(record.id) ||
-                    !Number.isSafeInteger(record.at)
+                    page.format !== 1 ||
+                    !/^\d+$/.test(page.endCursor) ||
+                    (endCursor !== undefined && page.endCursor !== endCursor)
                 ) {
-                    throw new Error('Invalid or duplicate history record');
+                    throw new Error('Invalid history snapshot boundary');
                 }
-                seen.add(record.id);
-                records.push(record);
+                endCursor = page.endCursor;
+                const raw: string = atob(page.chunk);
+                const bytes: Uint8Array<ArrayBuffer> = new Uint8Array(raw.length);
+                for (let index: number = 0; index < raw.length; index += 1) {
+                    bytes[index] = raw.charCodeAt(index);
+                }
+                const next: bigint = BigInt(cursor) + BigInt(bytes.byteLength);
+                if (
+                    next > BigInt(endCursor) ||
+                    (page.nextCursor !== undefined &&
+                        (page.nextCursor !== next.toString() || next <= BigInt(cursor))) ||
+                    (page.nextCursor === undefined && next !== BigInt(endCursor))
+                ) {
+                    throw new Error('Invalid history page cursor');
+                }
+                if (page.nextCursor !== undefined) {
+                    pages.prefetch(page.nextCursor, endCursor, BigInt(bytes.byteLength));
+                }
+                pending += decoder.decode(bytes, { stream: page.nextCursor !== undefined });
+                let newline: number;
+                while ((newline = pending.indexOf('\n')) !== -1) {
+                    const line: string = pending.slice(0, newline);
+                    pending = pending.slice(newline + 1);
+                    const record: unknown = JSON.parse(line);
+                    if (
+                        !historyRecord(record) ||
+                        seen.has(record.id) ||
+                        !Number.isSafeInteger(record.at)
+                    ) {
+                        throw new Error('Invalid or duplicate history record');
+                    }
+                    seen.add(record.id);
+                    records.push(record);
+                }
+                if (page.nextCursor === undefined) {
+                    break;
+                }
+                cursor = page.nextCursor;
             }
-            if (page.nextCursor === undefined) {
-                break;
+            if (pending.length !== 0) {
+                throw new Error('Incomplete saved history record');
             }
-            cursor = page.nextCursor;
+            return { records, endCursor: endCursor ?? cursor };
+        } finally {
+            pages.close();
         }
-        if (pending.length !== 0) {
-            throw new Error('Incomplete saved history record');
-        }
-        return { records, endCursor: endCursor ?? cursor };
     }
 
     /** Subscribes before requesting bytes, matching both session and attachment identity. */
