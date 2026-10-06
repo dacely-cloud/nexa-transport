@@ -12,6 +12,8 @@ export interface Schema {
     readonly additionalProperties?: boolean | Schema;
     readonly definitions?: Readonly<Record<string, Schema>>;
     readonly description?: string;
+    readonly minimum?: number;
+    readonly maximum?: number;
     readonly $id?: string;
     readonly $schema?: string;
 }
@@ -82,6 +84,13 @@ export class SchemaValidator {
                 return false;
             }
         } else if (typeof schema.type === 'string' && !this.#matchesType(schema.type, value)) {
+            return false;
+        }
+        if (
+            typeof value === 'number' &&
+            ((schema.minimum !== undefined && value < schema.minimum) ||
+                (schema.maximum !== undefined && value > schema.maximum))
+        ) {
             return false;
         }
         if (Array.isArray(value) && schema.items !== undefined) {

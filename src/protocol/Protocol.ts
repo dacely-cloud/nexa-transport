@@ -287,6 +287,8 @@ export interface AskParamsShape {
     readonly message: string;
     /** reasoningEffort as defined by the Nexa gateway. */
     readonly reasoningEffort?: (typeof AskParamsreasoningEffortValues)[keyof typeof AskParamsreasoningEffortValues];
+    /** targetTimeSeconds as defined by the Nexa gateway. */
+    readonly targetTimeSeconds?: number;
     /** userId as defined by the Nexa gateway. */
     readonly userId?: string;
 }
@@ -4282,6 +4284,8 @@ export interface StreamParamsShape {
     readonly reasoningEffort?: (typeof StreamParamsreasoningEffortValues)[keyof typeof StreamParamsreasoningEffortValues];
     /** streamId as defined by the Nexa gateway. */
     readonly streamId?: string;
+    /** targetTimeSeconds as defined by the Nexa gateway. */
+    readonly targetTimeSeconds?: number;
     /** userId as defined by the Nexa gateway. */
     readonly userId?: string;
 }

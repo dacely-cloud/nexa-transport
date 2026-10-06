@@ -455,6 +455,12 @@ export const schema: Schema = {
                     enum: ['high', 'low', 'max', 'medium', 'minimal', 'off', 'xhigh'],
                     type: 'string',
                 },
+                targetTimeSeconds: {
+                    description: 'Soft task time target in seconds; never a cancellation deadline.',
+                    maximum: 172800,
+                    minimum: 1,
+                    type: 'integer',
+                },
                 userId: {
                     description: 'The principal the turn is billed and authorized as.',
                     type: 'string',
@@ -6699,6 +6705,12 @@ export const schema: Schema = {
                     description:
                         "The stream's id, chosen by the CLIENT.\n\nDeliberate: the accept response and the first events can arrive in the same TCP segment, so a\nclient that waited for a server-assigned id would already have dropped events by the time it\nhad somewhere to put them. Letting the client name the stream removes the race entirely.",
                     type: 'string',
+                },
+                targetTimeSeconds: {
+                    description: 'Soft task time target in seconds; never a cancellation deadline.',
+                    maximum: 172800,
+                    minimum: 1,
+                    type: 'integer',
                 },
                 userId: {
                     description: 'The principal the turn is billed and authorized as.',
