@@ -18,6 +18,16 @@ function verifyMethodTypes(client: NexaClient): void {
 }
 
 describe('Method enum', (): void => {
+    it('validates terminal input, resize and incremental logs with session ownership fields', (): void => {
+        const ref = { sessionId: 'owner::chat', processId: 'p_terminal' };
+        expect(methodValidators[Method.ProcessesInput].params({ ...ref, data: '\u0003' })).toBe(true);
+        expect(methodValidators[Method.ProcessesInput].params({ processId: 'p_terminal', data: 'hello' })).toBe(false);
+        expect(methodValidators[Method.ProcessesInput].params({ ...ref, data: 42 })).toBe(false);
+        expect(methodValidators[Method.ProcessesResize].params({ ...ref, cols: 80, rows: 12 })).toBe(true);
+        expect(methodValidators[Method.ProcessesResize].params({ ...ref, cols: '80', rows: 12 })).toBe(false);
+        expect(methodValidators[Method.ProcessesLog].params({ ...ref, offset: '9007199254740993' })).toBe(true);
+        expect(methodValidators[Method.ProcessesLog].params({ ...ref, offset: 9007199254740993 })).toBe(false);
+    });
     it('validates bounded soft execution targets in both contracts', (): void => {
         for (const method of [Method.AgentAsk, Method.AgentStream]) {
             for (const targetTimeSeconds of [120, 300, 900, 172800]) {

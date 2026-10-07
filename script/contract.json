@@ -648,6 +648,79 @@
             ],
             "type": "object"
         },
+        "BackgroundProcess": {
+            "description": "Browser-safe background job receipt, without host pids or log paths.",
+            "properties": {
+                "command": {
+                    "type": "string"
+                },
+                "cwd": {
+                    "type": "string"
+                },
+                "endedAt": {
+                    "type": ["null", "string"]
+                },
+                "exitCode": {
+                    "type": ["null", "number"]
+                },
+                "foreground": {
+                    "description": "A command still attached to its launching tool has an inline terminal.",
+                    "type": "boolean"
+                },
+                "processId": {
+                    "type": "string"
+                },
+                "running": {
+                    "type": "boolean"
+                },
+                "signal": {
+                    "type": ["null", "string"]
+                },
+                "startedAt": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "command",
+                "cwd",
+                "endedAt",
+                "exitCode",
+                "processId",
+                "running",
+                "signal",
+                "startedAt"
+            ],
+            "type": "object"
+        },
+        "BackgroundProcessLog": {
+            "description": "A bounded tail and complete byte boundary, represented losslessly on the wire.",
+            "properties": {
+                "endOffset": {
+                    "type": "string"
+                },
+                "text": {
+                    "type": "string"
+                },
+                "truncated": {
+                    "type": "boolean"
+                }
+            },
+            "required": ["endOffset", "text", "truncated"],
+            "type": "object"
+        },
+        "BackgroundProcessRef": {
+            "description": "A process must always be addressed inside its owning conversation.",
+            "properties": {
+                "processId": {
+                    "type": "string"
+                },
+                "sessionId": {
+                    "type": "string"
+                }
+            },
+            "required": ["processId", "sessionId"],
+            "type": "object"
+        },
         "BinarySource": {
             "anyOf": [
                 {
@@ -873,6 +946,10 @@
                 },
                 "signal": {
                     "type": ["null", "string"]
+                },
+                "terminalOutput": {
+                    "description": "Original terminal stream, including ANSI styles and cursor controls.",
+                    "type": "string"
                 }
             },
             "required": [
@@ -1219,54 +1296,6 @@
                 }
             ],
             "description": "One block of a message's content."
-        },
-        "ConversationSurface": {
-            "description": "Where a conversation is happening.",
-            "properties": {
-                "channel": {
-                    "description": "The channel id: `telegram`, `slack`, `discord`, `cli`, `gateway`, …",
-                    "type": "string"
-                },
-                "formatting": {
-                    "$ref": "#/definitions/SurfaceFormatting",
-                    "description": "What the platform can render, so the model writes for it rather than for a web page."
-                },
-                "kind": {
-                    "$ref": "#/definitions/SurfaceKind"
-                },
-                "lenders": {
-                    "description": "Who lends this room their memory. Not rendered — what the agent recalls is not something\nthe prompt announces — but carried here because the room is the thing it belongs to.",
-                    "items": {
-                        "$ref": "#/definitions/MemoryLender"
-                    },
-                    "type": "array"
-                },
-                "participants": {
-                    "description": "Everyone known to be in the conversation. For a DM, the one person.",
-                    "items": {
-                        "$ref": "#/definitions/SurfaceParticipant"
-                    },
-                    "type": "array"
-                },
-                "personalPlace": {
-                    "description": "A user-installed app invocation whose files belong to this user in this specific place.\nThe room remains a group for conversational formatting, but it must not share the room's\nfilesystem with invocations by this user in another DM, channel, or thread.",
-                    "type": "boolean"
-                },
-                "roomId": {
-                    "description": "The stable id of the room or DM on that channel — the router's chat id, not the session key.\nFor a group this is what its workspace, its memory scope and its approval record key on.",
-                    "type": "string"
-                },
-                "roomTitle": {
-                    "description": "The room's title, when the platform has one.",
-                    "type": "string"
-                },
-                "speaker": {
-                    "$ref": "#/definitions/SurfaceParticipant",
-                    "description": "Who sent the message this turn answers. Per turn, so it never lands in the cached band."
-                }
-            },
-            "required": ["channel", "kind", "roomId"],
-            "type": "object"
         },
         "CreditScope": {
             "description": "The scopes a balance or budget can be defined over.",
@@ -1873,7 +1902,7 @@
             "required": ["id", "parentId", "sessionId", "timestamp", "visibility"],
             "type": "object"
         },
-        "Flatten<{readonlytitle:string|null;readonlyid:string;readonlyagentId:string;readonlycreatedAt:number;readonlyupdatedAt:number;readonlyconversationId:string|null;readonlyparticipants:readonlystring[];readonlymessageCount:number;readonlyusage:TokenUsage;}&{readonlyactiveToolFamilies?:readonlystring[]|undefined;readonlyprojectId?:string|undefined;readonlyuserId?:string|undefined;readonlyworkspaceId?:string|undefined;readonlyturnOpen?:boolean|undefined;readonlyresumePending?:boolean|undefined;readonlyresumeEligible?:boolean|undefined;readonlyresumePrincipal?:ToolPrincipal|undefined;readonlyresumeCwd?:string|undefined;readonlyresumeSurface?:ConversationSurface|undefined;}>": {
+        "Flatten<{readonlytitle:string|null;readonlyid:string;readonlyagentId:string;readonlycreatedAt:number;readonlyupdatedAt:number;readonlyconversationId:string|null;readonlyparticipants:readonlystring[];readonlymessageCount:number;readonlyusage:TokenUsage;}&{readonlyactiveToolFamilies?:readonlystring[]|undefined;readonlyprojectId?:string|undefined;readonlyuserId?:string|undefined;readonlyworkspaceId?:string|undefined;readonlyturnOpen?:boolean|undefined;}>": {
             "description": "Collapses the required/optional intersection into one object type.\n\nHomomorphic (`in keyof T` over a naked type parameter), so `readonly` and `?` are carried through\nrather than flattened away — without it every derived type would lose its modifiers and a caller\ncould assign to a field the store treats as immutable.",
             "properties": {
                 "activeToolFamilies": {
@@ -1905,21 +1934,6 @@
                 },
                 "projectId": {
                     "type": "string"
-                },
-                "resumeCwd": {
-                    "type": "string"
-                },
-                "resumeEligible": {
-                    "type": "boolean"
-                },
-                "resumePending": {
-                    "type": "boolean"
-                },
-                "resumePrincipal": {
-                    "$ref": "#/definitions/ToolPrincipal"
-                },
-                "resumeSurface": {
-                    "$ref": "#/definitions/ConversationSurface"
                 },
                 "title": {
                     "type": ["null", "string"]
@@ -3026,6 +3040,69 @@
                     "required": ["params", "result"],
                     "type": "object"
                 },
+                "processes.input": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/ProcessInput"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/OkResult"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "processes.list": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/SessionRef"
+                        },
+                        "result": {
+                            "items": {
+                                "$ref": "#/definitions/BackgroundProcess"
+                            },
+                            "type": "array"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "processes.log": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/ProcessLogRef"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/BackgroundProcessLog"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "processes.resize": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/ProcessResize"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/OkResult"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "processes.stop": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/BackgroundProcessRef"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/OkResult"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
                 "roblox.credentials.remove": {
                     "properties": {
                         "params": {
@@ -3148,7 +3225,7 @@
                         "result": {
                             "anyOf": [
                                 {
-                                    "$ref": "#/definitions/Flatten%3C%7Breadonlytitle%3Astring%7Cnull%3Breadonlyid%3Astring%3BreadonlyagentId%3Astring%3BreadonlycreatedAt%3Anumber%3BreadonlyupdatedAt%3Anumber%3BreadonlyconversationId%3Astring%7Cnull%3Breadonlyparticipants%3Areadonlystring%5B%5D%3BreadonlymessageCount%3Anumber%3Breadonlyusage%3ATokenUsage%3B%7D%26%7BreadonlyactiveToolFamilies%3F%3Areadonlystring%5B%5D%7Cundefined%3BreadonlyprojectId%3F%3Astring%7Cundefined%3BreadonlyuserId%3F%3Astring%7Cundefined%3BreadonlyworkspaceId%3F%3Astring%7Cundefined%3BreadonlyturnOpen%3F%3Aboolean%7Cundefined%3BreadonlyresumePending%3F%3Aboolean%7Cundefined%3BreadonlyresumeEligible%3F%3Aboolean%7Cundefined%3BreadonlyresumePrincipal%3F%3AToolPrincipal%7Cundefined%3BreadonlyresumeCwd%3F%3Astring%7Cundefined%3BreadonlyresumeSurface%3F%3AConversationSurface%7Cundefined%3B%7D%3E",
+                                    "$ref": "#/definitions/Flatten%3C%7Breadonlytitle%3Astring%7Cnull%3Breadonlyid%3Astring%3BreadonlyagentId%3Astring%3BreadonlycreatedAt%3Anumber%3BreadonlyupdatedAt%3Anumber%3BreadonlyconversationId%3Astring%7Cnull%3Breadonlyparticipants%3Areadonlystring%5B%5D%3BreadonlymessageCount%3Anumber%3Breadonlyusage%3ATokenUsage%3B%7D%26%7BreadonlyactiveToolFamilies%3F%3Areadonlystring%5B%5D%7Cundefined%3BreadonlyprojectId%3F%3Astring%7Cundefined%3BreadonlyuserId%3F%3Astring%7Cundefined%3BreadonlyworkspaceId%3F%3Astring%7Cundefined%3BreadonlyturnOpen%3F%3Aboolean%7Cundefined%3B%7D%3E",
                                     "description": "Collapses the required/optional intersection into one object type.\n\nHomomorphic (`in keyof T` over a naked type parameter), so `readonly` and `?` are carried through\nrather than flattened away — without it every derived type would lose its modifiers and a caller\ncould assign to a field the store treats as immutable."
                                 },
                                 {
@@ -3179,7 +3256,7 @@
                         },
                         "result": {
                             "items": {
-                                "$ref": "#/definitions/Flatten%3C%7Breadonlytitle%3Astring%7Cnull%3Breadonlyid%3Astring%3BreadonlyagentId%3Astring%3BreadonlycreatedAt%3Anumber%3BreadonlyupdatedAt%3Anumber%3BreadonlyconversationId%3Astring%7Cnull%3Breadonlyparticipants%3Areadonlystring%5B%5D%3BreadonlymessageCount%3Anumber%3Breadonlyusage%3ATokenUsage%3B%7D%26%7BreadonlyactiveToolFamilies%3F%3Areadonlystring%5B%5D%7Cundefined%3BreadonlyprojectId%3F%3Astring%7Cundefined%3BreadonlyuserId%3F%3Astring%7Cundefined%3BreadonlyworkspaceId%3F%3Astring%7Cundefined%3BreadonlyturnOpen%3F%3Aboolean%7Cundefined%3BreadonlyresumePending%3F%3Aboolean%7Cundefined%3BreadonlyresumeEligible%3F%3Aboolean%7Cundefined%3BreadonlyresumePrincipal%3F%3AToolPrincipal%7Cundefined%3BreadonlyresumeCwd%3F%3Astring%7Cundefined%3BreadonlyresumeSurface%3F%3AConversationSurface%7Cundefined%3B%7D%3E"
+                                "$ref": "#/definitions/Flatten%3C%7Breadonlytitle%3Astring%7Cnull%3Breadonlyid%3Astring%3BreadonlyagentId%3Astring%3BreadonlycreatedAt%3Anumber%3BreadonlyupdatedAt%3Anumber%3BreadonlyconversationId%3Astring%7Cnull%3Breadonlyparticipants%3Areadonlystring%5B%5D%3BreadonlymessageCount%3Anumber%3Breadonlyusage%3ATokenUsage%3B%7D%26%7BreadonlyactiveToolFamilies%3F%3Areadonlystring%5B%5D%7Cundefined%3BreadonlyprojectId%3F%3Astring%7Cundefined%3BreadonlyuserId%3F%3Astring%7Cundefined%3BreadonlyworkspaceId%3F%3Astring%7Cundefined%3BreadonlyturnOpen%3F%3Aboolean%7Cundefined%3B%7D%3E"
                             },
                             "type": "array"
                         }
@@ -3508,6 +3585,11 @@
                 "logs.tail",
                 "media.acknowledge",
                 "office.ownerProof",
+                "processes.input",
+                "processes.list",
+                "processes.log",
+                "processes.resize",
+                "processes.stop",
                 "roblox.credentials.remove",
                 "roblox.credentials.set",
                 "roblox.credentials.status",
@@ -4314,28 +4396,6 @@
                 }
             },
             "required": ["id", "received"],
-            "type": "object"
-        },
-        "MemoryLender": {
-            "description": "One person who lends a room what the agent remembers about them.",
-            "properties": {
-                "id": {
-                    "description": "The platform's stable id for them, as in {@link SurfaceParticipant.id}.",
-                    "type": "string"
-                },
-                "mode": {
-                    "enum": ["all", "partial"],
-                    "type": "string"
-                },
-                "subjects": {
-                    "description": "For `partial`: the subjects lent.",
-                    "items": {
-                        "type": "string"
-                    },
-                    "type": "array"
-                }
-            },
-            "required": ["id", "mode"],
             "type": "object"
         },
         "MessageRole": {
@@ -5672,6 +5732,57 @@
             "required": ["id", "instructions", "name"],
             "type": "object"
         },
+        "ProcessInput": {
+            "description": "Keystrokes are bounded and addressed through the owning session.",
+            "properties": {
+                "data": {
+                    "type": "string"
+                },
+                "processId": {
+                    "type": "string"
+                },
+                "sessionId": {
+                    "type": "string"
+                }
+            },
+            "required": ["data", "processId", "sessionId"],
+            "type": "object"
+        },
+        "ProcessLogRef": {
+            "description": "Incremental reads share the same bounded log endpoint as background job tails.",
+            "properties": {
+                "offset": {
+                    "type": "string"
+                },
+                "processId": {
+                    "type": "string"
+                },
+                "sessionId": {
+                    "type": "string"
+                }
+            },
+            "required": ["processId", "sessionId"],
+            "type": "object"
+        },
+        "ProcessResize": {
+            "description": "Terminal dimensions are small positive integers.",
+            "properties": {
+                "cols": {
+                    "type": "number"
+                },
+                "processId": {
+                    "type": "string"
+                },
+                "rows": {
+                    "type": "number"
+                },
+                "sessionId": {
+                    "type": "string"
+                }
+            },
+            "required": ["cols", "processId", "rows", "sessionId"],
+            "type": "object"
+        },
         "ReasoningOptions": {
             "description": "Reasoning configuration for a request.",
             "properties": {
@@ -6510,50 +6621,6 @@
             "required": ["message"],
             "type": "object"
         },
-        "SurfaceFormatting": {
-            "description": "What the platform can render, so the model writes for it rather than for a web page.",
-            "properties": {
-                "markup": {
-                    "description": "The markup dialect the platform renders: CommonMark, Telegram's MarkdownV2 subset, Slack's\nmrkdwn, or none at all.",
-                    "enum": ["commonmark", "plain", "slack", "telegram"],
-                    "type": "string"
-                },
-                "maxChars": {
-                    "description": "The most characters one message may carry; longer replies are split by the channel.",
-                    "type": "number"
-                },
-                "tables": {
-                    "description": "Whether tables render. On most chat platforms they do not.",
-                    "type": "boolean"
-                }
-            },
-            "required": ["markup", "tables"],
-            "type": "object"
-        },
-        "SurfaceKind": {
-            "description": "What kind of place the conversation is.",
-            "enum": ["direct", "group"],
-            "type": "string"
-        },
-        "SurfaceParticipant": {
-            "properties": {
-                "displayName": {
-                    "description": "What to call them. The label a group message is prefixed with.",
-                    "type": "string"
-                },
-                "id": {
-                    "description": "The platform's stable id for them (a Telegram user id, a Slack member id).",
-                    "type": "string"
-                },
-                "role": {
-                    "description": "Their standing in this deployment, when the access registry knows it.",
-                    "enum": ["admin", "guest", "member", "owner"],
-                    "type": "string"
-                }
-            },
-            "required": ["displayName", "id"],
-            "type": "object"
-        },
         "TaskRecord": {
             "description": "One streaming run, as an operator or a second client sees it.\n\nReported from the gateway's own registry rather than from the agent, because the gateway is the\nonly place that knows which CONNECTION owns a run — and \"cancel the run my phone started from my\nlaptop\" is the reason this family exists at all.",
             "properties": {
@@ -6944,79 +7011,6 @@
             "required": ["call", "durationMs", "result"],
             "type": "object"
         },
-        "ToolPrincipal": {
-            "description": "Who is making a tool call.",
-            "properties": {
-                "agentId": {
-                    "type": "string"
-                },
-                "channelAccessLevel": {
-                    "description": "Authenticated channel role. Absent for the local operator/CLI.",
-                    "enum": ["admin", "denied", "member", "owner"],
-                    "type": "string"
-                },
-                "channelConversationId": {
-                    "description": "Native channel carrying the active request, authenticated by the channel adapter.",
-                    "type": "string"
-                },
-                "channelGuildId": {
-                    "description": "The server/guild containing this channel turn, when the platform supplies one.",
-                    "type": "string"
-                },
-                "channelPlatformAdministrator": {
-                    "description": "Native Discord Administrator authority, independently verified by the Discord adapter.",
-                    "type": "boolean"
-                },
-                "channelPlatformRoleIds": {
-                    "description": "Native Discord role ids used for tool-time authority verification.",
-                    "items": {
-                        "type": "string"
-                    },
-                    "type": "array"
-                },
-                "channelPlatformUserId": {
-                    "description": "Native channel account id, retained separately from the mapped Nexa principal id.",
-                    "type": "string"
-                },
-                "channelThreadId": {
-                    "description": "Native thread carrying the active request, when distinct from its parent channel.",
-                    "type": "string"
-                },
-                "companyExecution": {
-                    "const": true,
-                    "description": "Host-issued company execution is always confined, never the local machine operator.",
-                    "type": "boolean"
-                },
-                "conversationId": {
-                    "type": "string"
-                },
-                "discordAppOnly": {
-                    "description": "Authenticated personal Discord app invocation, without server-bot capabilities.",
-                    "type": "boolean"
-                },
-                "machineId": {
-                    "description": "The machine this caller's work runs on, when their account names one.\n\nOnly meaningful in a data-plane deployment with `dataPlane.perUser`. Absent means the router\nderives a machine from the principal id, which is one box per person and the right default.\n\nIt exists so the mapping is a DECISION rather than a derivation: an operator can put two\naccounts on one box because they are working on the same thing, and put a contractor on their\nown, and neither is expressible when the key is a function of the user id.",
-                    "type": "string"
-                },
-                "maxRisk": {
-                    "description": "The highest risk this caller may reach, whatever the deployment ceiling allows.\n\nSet by the surface that knows WHO is calling — the channel router derives it from the sender's\naccess level. Absent means \"the deployment's own ceiling\", which is right for a CLI turn whose\ncaller already owns the machine.\n\nThis exists because an allowlist that only answers yes-or-no is not a permission model. Before\nit, an allowlisted `member` on a chat channel reached exactly the tools the owner did: the same\nshell, the same workspace, the same budget. Adding a colleague to a group meant handing them\nthe operator's machine.",
-                    "enum": ["destructive", "execute", "read", "write"],
-                    "type": "string"
-                },
-                "projectId": {
-                    "type": "string"
-                },
-                "sourceAccessDenied": {
-                    "description": "Host-enforced source confinement for gateway callers, including the web UI.",
-                    "type": "boolean"
-                },
-                "userId": {
-                    "type": "string"
-                }
-            },
-            "required": ["agentId"],
-            "type": "object"
-        },
         "ToolProgress": {
             "properties": {
                 "attachment": {
@@ -7030,6 +7024,10 @@
                 "status": {
                     "description": "A one-line status, e.g. `running tests…`.",
                     "type": "string"
+                },
+                "terminal": {
+                    "$ref": "#/definitions/ToolTerminal",
+                    "description": "Live pseudoterminal identity for authenticated input and resize controls."
                 },
                 "text": {
                     "description": "Text appended to the live view.",
@@ -7356,6 +7354,14 @@
                 "callId": {
                     "type": "string"
                 },
+                "historyAt": {
+                    "description": "Original event time, retained across checkpoint and replay.",
+                    "type": "number"
+                },
+                "historyId": {
+                    "description": "Stable record identity shared by the immediate event and its later durable copy.",
+                    "type": "string"
+                },
                 "sessionId": {
                     "type": "string"
                 },
@@ -7376,6 +7382,25 @@
             "description": "What a tool did, from the agent's point of view.",
             "enum": ["aborted", "denied", "error", "ok"],
             "type": "string"
+        },
+        "ToolTerminal": {
+            "description": "A terminal belongs to the session that launched this exact process.",
+            "properties": {
+                "cols": {
+                    "type": "number"
+                },
+                "processId": {
+                    "type": "string"
+                },
+                "rows": {
+                    "type": "number"
+                },
+                "sessionId": {
+                    "type": "string"
+                }
+            },
+            "required": ["cols", "processId", "rows", "sessionId"],
+            "type": "object"
         },
         "TruncationRecord": {
             "description": "What a truncation did, in numbers the marker quotes and a UI can render.",
@@ -7431,6 +7456,14 @@
                     "$ref": "#/definitions/WireError",
                     "description": "An error, in the shape a client can act on without parsing prose."
                 },
+                "historyAt": {
+                    "description": "Original event time, retained across checkpoint and replay.",
+                    "type": "number"
+                },
+                "historyId": {
+                    "description": "Stable record identity shared by the immediate event and its later durable copy.",
+                    "type": "string"
+                },
                 "ok": {
                     "type": "boolean"
                 },
@@ -7452,6 +7485,14 @@
             "properties": {
                 "event": {
                     "$ref": "#/definitions/WireTurnEvent"
+                },
+                "historyAt": {
+                    "description": "Original event time, retained across checkpoint and replay.",
+                    "type": "number"
+                },
+                "historyId": {
+                    "description": "Stable record identity shared by the immediate event and its later durable copy.",
+                    "type": "string"
                 },
                 "sessionId": {
                     "type": "string"
