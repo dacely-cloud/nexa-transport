@@ -405,6 +405,55 @@ export interface AssistantMessageShape {
 /** AssistantMessage from the Nexa wire protocol. */
 export type AssistantMessage = AssistantMessageShape;
 
+/** BackgroundProcess wire fields. */
+export interface BackgroundProcessShape {
+    /** command as defined by the Nexa gateway. */
+    readonly command: string;
+    /** cwd as defined by the Nexa gateway. */
+    readonly cwd: string;
+    /** endedAt as defined by the Nexa gateway. */
+    readonly endedAt: null | string;
+    /** exitCode as defined by the Nexa gateway. */
+    readonly exitCode: null | number;
+    /** foreground as defined by the Nexa gateway. */
+    readonly foreground?: boolean;
+    /** processId as defined by the Nexa gateway. */
+    readonly processId: string;
+    /** running as defined by the Nexa gateway. */
+    readonly running: boolean;
+    /** signal as defined by the Nexa gateway. */
+    readonly signal: null | string;
+    /** startedAt as defined by the Nexa gateway. */
+    readonly startedAt: string;
+}
+
+/** BackgroundProcess from the Nexa wire protocol. */
+export type BackgroundProcess = BackgroundProcessShape;
+
+/** BackgroundProcessLog wire fields. */
+export interface BackgroundProcessLogShape {
+    /** endOffset as defined by the Nexa gateway. */
+    readonly endOffset: string;
+    /** text as defined by the Nexa gateway. */
+    readonly text: string;
+    /** truncated as defined by the Nexa gateway. */
+    readonly truncated: boolean;
+}
+
+/** BackgroundProcessLog from the Nexa wire protocol. */
+export type BackgroundProcessLog = BackgroundProcessLogShape;
+
+/** BackgroundProcessRef wire fields. */
+export interface BackgroundProcessRefShape {
+    /** processId as defined by the Nexa gateway. */
+    readonly processId: string;
+    /** sessionId as defined by the Nexa gateway. */
+    readonly sessionId: string;
+}
+
+/** BackgroundProcessRef from the Nexa wire protocol. */
+export type BackgroundProcessRef = BackgroundProcessRefShape;
+
 /** BinarySourceVariant0 wire fields. */
 export interface BinarySourceVariant0Shape {
     /** data as defined by the Nexa gateway. */
@@ -575,6 +624,8 @@ export interface CommandExecutionReceiptShape {
     readonly running: boolean;
     /** signal as defined by the Nexa gateway. */
     readonly signal: null | string;
+    /** terminalOutput as defined by the Nexa gateway. */
+    readonly terminalOutput?: string;
 }
 
 /** CommandExecutionReceipt from the Nexa wire protocol. */
@@ -801,31 +852,6 @@ export type ContentBlock =
     | ContentBlockVariant6Shape
     | ContentBlockVariant7Shape
     | ContentBlockVariant8Shape;
-
-/** ConversationSurface wire fields. */
-export interface ConversationSurfaceShape {
-    /** channel as defined by the Nexa gateway. */
-    readonly channel: string;
-    /** formatting as defined by the Nexa gateway. */
-    readonly formatting?: SurfaceFormatting;
-    /** kind as defined by the Nexa gateway. */
-    readonly kind: SurfaceKind;
-    /** lenders as defined by the Nexa gateway. */
-    readonly lenders?: ReadonlyArray<MemoryLender>;
-    /** participants as defined by the Nexa gateway. */
-    readonly participants?: ReadonlyArray<SurfaceParticipant>;
-    /** personalPlace as defined by the Nexa gateway. */
-    readonly personalPlace?: boolean;
-    /** roomId as defined by the Nexa gateway. */
-    readonly roomId: string;
-    /** roomTitle as defined by the Nexa gateway. */
-    readonly roomTitle?: string;
-    /** speaker as defined by the Nexa gateway. */
-    readonly speaker?: SurfaceParticipant;
-}
-
-/** ConversationSurface from the Nexa wire protocol. */
-export type ConversationSurface = ConversationSurfaceShape;
 
 /** Allowed values for CreditScope. */
 export const CreditScopeValues = {
@@ -1276,16 +1302,6 @@ export interface SessionShape {
     readonly participants: ReadonlyArray<string>;
     /** projectId as defined by the Nexa gateway. */
     readonly projectId?: string;
-    /** resumeCwd as defined by the Nexa gateway. */
-    readonly resumeCwd?: string;
-    /** resumeEligible as defined by the Nexa gateway. */
-    readonly resumeEligible?: boolean;
-    /** resumePending as defined by the Nexa gateway. */
-    readonly resumePending?: boolean;
-    /** resumePrincipal as defined by the Nexa gateway. */
-    readonly resumePrincipal?: ToolPrincipal;
-    /** resumeSurface as defined by the Nexa gateway. */
-    readonly resumeSurface?: ConversationSurface;
     /** title as defined by the Nexa gateway. */
     readonly title: null | string;
     /** turnOpen as defined by the Nexa gateway. */
@@ -1943,6 +1959,46 @@ export interface GatewayMethodsoffice_ownerProofShape {
     readonly result: GatewayMethodsoffice_ownerProofresultShape;
 }
 
+/** GatewayMethodsprocesses_input wire fields. */
+export interface GatewayMethodsprocesses_inputShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ProcessInput;
+    /** result as defined by the Nexa gateway. */
+    readonly result: OkResult;
+}
+
+/** GatewayMethodsprocesses_list wire fields. */
+export interface GatewayMethodsprocesses_listShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: SessionRef;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ReadonlyArray<BackgroundProcess>;
+}
+
+/** GatewayMethodsprocesses_log wire fields. */
+export interface GatewayMethodsprocesses_logShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ProcessLogRef;
+    /** result as defined by the Nexa gateway. */
+    readonly result: BackgroundProcessLog;
+}
+
+/** GatewayMethodsprocesses_resize wire fields. */
+export interface GatewayMethodsprocesses_resizeShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ProcessResize;
+    /** result as defined by the Nexa gateway. */
+    readonly result: OkResult;
+}
+
+/** GatewayMethodsprocesses_stop wire fields. */
+export interface GatewayMethodsprocesses_stopShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: BackgroundProcessRef;
+    /** result as defined by the Nexa gateway. */
+    readonly result: OkResult;
+}
+
 /** GatewayMethodsroblox_credentials_remove wire fields. */
 export interface GatewayMethodsroblox_credentials_removeShape {
     /** params as defined by the Nexa gateway. */
@@ -2299,6 +2355,16 @@ export interface GatewayMethodsShape {
     readonly 'media.acknowledge': GatewayMethodsmedia_acknowledgeShape;
     /** office.ownerProof as defined by the Nexa gateway. */
     readonly 'office.ownerProof': GatewayMethodsoffice_ownerProofShape;
+    /** processes.input as defined by the Nexa gateway. */
+    readonly 'processes.input': GatewayMethodsprocesses_inputShape;
+    /** processes.list as defined by the Nexa gateway. */
+    readonly 'processes.list': GatewayMethodsprocesses_listShape;
+    /** processes.log as defined by the Nexa gateway. */
+    readonly 'processes.log': GatewayMethodsprocesses_logShape;
+    /** processes.resize as defined by the Nexa gateway. */
+    readonly 'processes.resize': GatewayMethodsprocesses_resizeShape;
+    /** processes.stop as defined by the Nexa gateway. */
+    readonly 'processes.stop': GatewayMethodsprocesses_stopShape;
     /** roblox.credentials.remove as defined by the Nexa gateway. */
     readonly 'roblox.credentials.remove': GatewayMethodsroblox_credentials_removeShape;
     /** roblox.credentials.set as defined by the Nexa gateway. */
@@ -2897,22 +2963,6 @@ export interface MediaAcknowledgeParamsShape {
 
 /** MediaAcknowledgeParams from the Nexa wire protocol. */
 export type MediaAcknowledgeParams = MediaAcknowledgeParamsShape;
-
-/** Allowed values for MemoryLendermode. */
-export const MemoryLendermodeValues = { Value0: 'all', Value1: 'partial' } as const;
-
-/** MemoryLender wire fields. */
-export interface MemoryLenderShape {
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** mode as defined by the Nexa gateway. */
-    readonly mode: (typeof MemoryLendermodeValues)[keyof typeof MemoryLendermodeValues];
-    /** subjects as defined by the Nexa gateway. */
-    readonly subjects?: ReadonlyArray<string>;
-}
-
-/** MemoryLender from the Nexa wire protocol. */
-export type MemoryLender = MemoryLenderShape;
 
 /** Allowed values for MessageRole. */
 export const MessageRoleValues = {
@@ -3725,6 +3775,47 @@ export interface PersonalAgentInputShape {
 /** PersonalAgentInput from the Nexa wire protocol. */
 export type PersonalAgentInput = PersonalAgentInputShape;
 
+/** ProcessInput wire fields. */
+export interface ProcessInputShape {
+    /** data as defined by the Nexa gateway. */
+    readonly data: string;
+    /** processId as defined by the Nexa gateway. */
+    readonly processId: string;
+    /** sessionId as defined by the Nexa gateway. */
+    readonly sessionId: string;
+}
+
+/** ProcessInput from the Nexa wire protocol. */
+export type ProcessInput = ProcessInputShape;
+
+/** ProcessLogRef wire fields. */
+export interface ProcessLogRefShape {
+    /** offset as defined by the Nexa gateway. */
+    readonly offset?: string;
+    /** processId as defined by the Nexa gateway. */
+    readonly processId: string;
+    /** sessionId as defined by the Nexa gateway. */
+    readonly sessionId: string;
+}
+
+/** ProcessLogRef from the Nexa wire protocol. */
+export type ProcessLogRef = ProcessLogRefShape;
+
+/** ProcessResize wire fields. */
+export interface ProcessResizeShape {
+    /** cols as defined by the Nexa gateway. */
+    readonly cols: number;
+    /** processId as defined by the Nexa gateway. */
+    readonly processId: string;
+    /** rows as defined by the Nexa gateway. */
+    readonly rows: number;
+    /** sessionId as defined by the Nexa gateway. */
+    readonly sessionId: string;
+}
+
+/** ProcessResize from the Nexa wire protocol. */
+export type ProcessResize = ProcessResizeShape;
+
 /** Allowed values for ReasoningOptionseffort. */
 export const ReasoningOptionseffortValues = {
     Value0: 'high',
@@ -4293,54 +4384,6 @@ export interface StreamParamsShape {
 /** StreamParams from the Nexa wire protocol. */
 export type StreamParams = StreamParamsShape;
 
-/** Allowed values for SurfaceFormattingmarkup. */
-export const SurfaceFormattingmarkupValues = {
-    Value0: 'commonmark',
-    Value1: 'plain',
-    Value2: 'slack',
-    Value3: 'telegram',
-} as const;
-
-/** SurfaceFormatting wire fields. */
-export interface SurfaceFormattingShape {
-    /** markup as defined by the Nexa gateway. */
-    readonly markup: (typeof SurfaceFormattingmarkupValues)[keyof typeof SurfaceFormattingmarkupValues];
-    /** maxChars as defined by the Nexa gateway. */
-    readonly maxChars?: number;
-    /** tables as defined by the Nexa gateway. */
-    readonly tables: boolean;
-}
-
-/** SurfaceFormatting from the Nexa wire protocol. */
-export type SurfaceFormatting = SurfaceFormattingShape;
-
-/** Allowed values for SurfaceKind. */
-export const SurfaceKindValues = { Value0: 'direct', Value1: 'group' } as const;
-
-/** SurfaceKind from the Nexa wire protocol. */
-export type SurfaceKind = (typeof SurfaceKindValues)[keyof typeof SurfaceKindValues];
-
-/** Allowed values for SurfaceParticipantrole. */
-export const SurfaceParticipantroleValues = {
-    Value0: 'admin',
-    Value1: 'guest',
-    Value2: 'member',
-    Value3: 'owner',
-} as const;
-
-/** SurfaceParticipant wire fields. */
-export interface SurfaceParticipantShape {
-    /** displayName as defined by the Nexa gateway. */
-    readonly displayName: string;
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** role as defined by the Nexa gateway. */
-    readonly role?: (typeof SurfaceParticipantroleValues)[keyof typeof SurfaceParticipantroleValues];
-}
-
-/** SurfaceParticipant from the Nexa wire protocol. */
-export type SurfaceParticipant = SurfaceParticipantShape;
-
 /** TaskRecord wire fields. */
 export interface TaskRecordShape {
     /** agentId as defined by the Nexa gateway. */
@@ -4599,61 +4642,6 @@ export interface ToolOutcomeShape {
 /** ToolOutcome from the Nexa wire protocol. */
 export type ToolOutcome = ToolOutcomeShape;
 
-/** Allowed values for ToolPrincipalchannelAccessLevel. */
-export const ToolPrincipalchannelAccessLevelValues = {
-    Value0: 'admin',
-    Value1: 'denied',
-    Value2: 'member',
-    Value3: 'owner',
-} as const;
-
-/** Allowed values for ToolPrincipalmaxRisk. */
-export const ToolPrincipalmaxRiskValues = {
-    Value0: 'destructive',
-    Value1: 'execute',
-    Value2: 'read',
-    Value3: 'write',
-} as const;
-
-/** ToolPrincipal wire fields. */
-export interface ToolPrincipalShape {
-    /** agentId as defined by the Nexa gateway. */
-    readonly agentId: string;
-    /** channelAccessLevel as defined by the Nexa gateway. */
-    readonly channelAccessLevel?: (typeof ToolPrincipalchannelAccessLevelValues)[keyof typeof ToolPrincipalchannelAccessLevelValues];
-    /** channelConversationId as defined by the Nexa gateway. */
-    readonly channelConversationId?: string;
-    /** channelGuildId as defined by the Nexa gateway. */
-    readonly channelGuildId?: string;
-    /** channelPlatformAdministrator as defined by the Nexa gateway. */
-    readonly channelPlatformAdministrator?: boolean;
-    /** channelPlatformRoleIds as defined by the Nexa gateway. */
-    readonly channelPlatformRoleIds?: ReadonlyArray<string>;
-    /** channelPlatformUserId as defined by the Nexa gateway. */
-    readonly channelPlatformUserId?: string;
-    /** channelThreadId as defined by the Nexa gateway. */
-    readonly channelThreadId?: string;
-    /** companyExecution as defined by the Nexa gateway. */
-    readonly companyExecution?: true;
-    /** conversationId as defined by the Nexa gateway. */
-    readonly conversationId?: string;
-    /** discordAppOnly as defined by the Nexa gateway. */
-    readonly discordAppOnly?: boolean;
-    /** machineId as defined by the Nexa gateway. */
-    readonly machineId?: string;
-    /** maxRisk as defined by the Nexa gateway. */
-    readonly maxRisk?: (typeof ToolPrincipalmaxRiskValues)[keyof typeof ToolPrincipalmaxRiskValues];
-    /** projectId as defined by the Nexa gateway. */
-    readonly projectId?: string;
-    /** sourceAccessDenied as defined by the Nexa gateway. */
-    readonly sourceAccessDenied?: boolean;
-    /** userId as defined by the Nexa gateway. */
-    readonly userId?: string;
-}
-
-/** ToolPrincipal from the Nexa wire protocol. */
-export type ToolPrincipal = ToolPrincipalShape;
-
 /** ToolProgress wire fields. */
 export interface ToolProgressShape {
     /** attachment as defined by the Nexa gateway. */
@@ -4662,6 +4650,8 @@ export interface ToolProgressShape {
     readonly fraction?: number;
     /** status as defined by the Nexa gateway. */
     readonly status?: string;
+    /** terminal as defined by the Nexa gateway. */
+    readonly terminal?: ToolTerminal;
     /** text as defined by the Nexa gateway. */
     readonly text?: string;
 }
@@ -4853,6 +4843,10 @@ export type ToolResultMessage = ToolResultMessageShape;
 export interface ToolSitesDataShape {
     /** callId as defined by the Nexa gateway. */
     readonly callId: string;
+    /** historyAt as defined by the Nexa gateway. */
+    readonly historyAt?: number;
+    /** historyId as defined by the Nexa gateway. */
+    readonly historyId?: string;
     /** sessionId as defined by the Nexa gateway. */
     readonly sessionId?: string;
     /** sites as defined by the Nexa gateway. */
@@ -4874,6 +4868,21 @@ export const ToolStatusValues = {
 
 /** ToolStatus from the Nexa wire protocol. */
 export type ToolStatus = (typeof ToolStatusValues)[keyof typeof ToolStatusValues];
+
+/** ToolTerminal wire fields. */
+export interface ToolTerminalShape {
+    /** cols as defined by the Nexa gateway. */
+    readonly cols: number;
+    /** processId as defined by the Nexa gateway. */
+    readonly processId: string;
+    /** rows as defined by the Nexa gateway. */
+    readonly rows: number;
+    /** sessionId as defined by the Nexa gateway. */
+    readonly sessionId: string;
+}
+
+/** ToolTerminal from the Nexa wire protocol. */
+export type ToolTerminal = ToolTerminalShape;
 
 /** TruncationRecord wire fields. */
 export interface TruncationRecordShape {
@@ -4915,6 +4924,10 @@ export type TruncationStrategy =
 export interface TurnEndDataShape {
     /** error as defined by the Nexa gateway. */
     readonly error?: WireError;
+    /** historyAt as defined by the Nexa gateway. */
+    readonly historyAt?: number;
+    /** historyId as defined by the Nexa gateway. */
+    readonly historyId?: string;
     /** ok as defined by the Nexa gateway. */
     readonly ok: boolean;
     /** result as defined by the Nexa gateway. */
@@ -4932,6 +4945,10 @@ export type TurnEndData = TurnEndDataShape;
 export interface TurnEventDataShape {
     /** event as defined by the Nexa gateway. */
     readonly event: WireTurnEvent;
+    /** historyAt as defined by the Nexa gateway. */
+    readonly historyAt?: number;
+    /** historyId as defined by the Nexa gateway. */
+    readonly historyId?: string;
     /** sessionId as defined by the Nexa gateway. */
     readonly sessionId?: string;
     /** streamId as defined by the Nexa gateway. */
@@ -5708,6 +5725,16 @@ export enum Method {
     MediaAcknowledge = 'media.acknowledge',
     /** Calls office.ownerProof. */
     OfficeOwnerProof = 'office.ownerProof',
+    /** Calls processes.input. */
+    ProcessesInput = 'processes.input',
+    /** Calls processes.list. */
+    ProcessesList = 'processes.list',
+    /** Calls processes.log. */
+    ProcessesLog = 'processes.log',
+    /** Calls processes.resize. */
+    ProcessesResize = 'processes.resize',
+    /** Calls processes.stop. */
+    ProcessesStop = 'processes.stop',
     /** Calls roblox.credentials.remove. */
     RobloxCredentialsRemove = 'roblox.credentials.remove',
     /** Calls roblox.credentials.set. */
