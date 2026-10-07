@@ -1297,6 +1297,239 @@
             ],
             "description": "One block of a message's content."
         },
+        "ConversationBranchParams": {
+            "description": "Creates a durable independent branch of the complete saved conversation.",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "requestId": {
+                    "type": "string"
+                }
+            },
+            "required": ["id", "requestId"],
+            "type": "object"
+        },
+        "ConversationInput": {
+            "description": "Only editable text and a media count cross the wire when opening the message editor.",
+            "properties": {
+                "attachmentCount": {
+                    "type": "number"
+                },
+                "text": {
+                    "type": "string"
+                }
+            },
+            "required": ["attachmentCount", "text"],
+            "type": "object"
+        },
+        "ConversationMessageRef": {
+            "description": "A stable input, response stream, or canonical entry in a saved conversation.",
+            "properties": {
+                "key": {
+                    "type": "string"
+                },
+                "kind": {
+                    "enum": ["entry", "input", "input-stream", "response"],
+                    "type": "string"
+                }
+            },
+            "required": ["key", "kind"],
+            "type": "object"
+        },
+        "ConversationPin": {
+            "description": "A private, durable bookmark with an authoritative saved excerpt.",
+            "properties": {
+                "createdAt": {
+                    "type": "number"
+                },
+                "excerpt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "message": {
+                    "$ref": "#/definitions/ConversationMessageRef"
+                },
+                "role": {
+                    "enum": ["assistant", "user"],
+                    "type": "string"
+                },
+                "sessionId": {
+                    "type": "string"
+                },
+                "timestamp": {
+                    "type": "number"
+                },
+                "title": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "createdAt",
+                "excerpt",
+                "id",
+                "message",
+                "role",
+                "sessionId",
+                "timestamp",
+                "title"
+            ],
+            "type": "object"
+        },
+        "ConversationPinParams": {
+            "description": "A message selected from an owned saved conversation.",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "message": {
+                    "$ref": "#/definitions/ConversationMessageRef"
+                }
+            },
+            "required": ["id", "message"],
+            "type": "object"
+        },
+        "ConversationPinsPage": {
+            "description": "A page of owned pins, with the continuation cursor if more records exist.",
+            "properties": {
+                "nextBefore": {
+                    "type": "string"
+                },
+                "pins": {
+                    "items": {
+                        "$ref": "#/definitions/ConversationPin"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": ["pins"],
+            "type": "object"
+        },
+        "ConversationPinsParams": {
+            "description": "Bounded newest-first bookmarks, with an opaque owned-record cursor.",
+            "properties": {
+                "before": {
+                    "type": "string"
+                },
+                "limit": {
+                    "type": "number"
+                }
+            },
+            "type": "object"
+        },
+        "ConversationRenameParams": {
+            "description": "Changes a title only if the editor still sees the current title.",
+            "properties": {
+                "expectedTitle": {
+                    "type": ["null", "string"]
+                },
+                "id": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            },
+            "required": ["expectedTitle", "id", "title"],
+            "type": "object"
+        },
+        "ConversationRetryParams": {
+            "description": "Edits a human prompt or repeats its response in a separate saved version.",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "message": {
+                    "$ref": "#/definitions/ConversationMessageRef"
+                },
+                "mode": {
+                    "enum": ["edit", "regenerate"],
+                    "type": "string"
+                },
+                "reasoningEffort": {
+                    "enum": ["high", "low", "max", "medium", "minimal", "off", "xhigh"],
+                    "type": "string"
+                },
+                "requestId": {
+                    "type": "string"
+                },
+                "targetTimeSeconds": {
+                    "type": "number"
+                },
+                "text": {
+                    "type": "string"
+                }
+            },
+            "required": ["id", "message", "mode", "requestId"],
+            "type": "object"
+        },
+        "ConversationRetryResult": {
+            "description": "A saved version is returned even when its model run was already started by a lost acknowledgement.",
+            "properties": {
+                "session": {
+                    "$ref": "#/definitions/Flatten%3C%7Breadonlytitle%3Astring%7Cnull%3Breadonlyid%3Astring%3BreadonlyagentId%3Astring%3BreadonlycreatedAt%3Anumber%3BreadonlyupdatedAt%3Anumber%3BreadonlyconversationId%3Astring%7Cnull%3Breadonlyparticipants%3Areadonlystring%5B%5D%3BreadonlymessageCount%3Anumber%3Breadonlyusage%3ATokenUsage%3B%7D%26%7BreadonlytitleEdited%3F%3Aboolean%7Cundefined%3BreadonlybranchedFrom%3F%3Astring%7Cundefined%3BreadonlybranchRequestId%3F%3Astring%7Cundefined%3BreadonlyretryState%3F%3Astring%7Cundefined%3BreadonlyretryFingerprint%3F%3Astring%7Cundefined%3BreadonlyactiveToolFamilies%3F%3Areadonlystring%5B%5D%7Cundefined%3BreadonlyprojectId%3F%3Astring%7Cundefined%3BreadonlyuserId%3F%3Astring%7Cundefined%3BreadonlyworkspaceId%3F%3Astring%7Cundefined%3BreadonlyturnOpen%3F%3Aboolean%7Cundefined%3B%7D%3E"
+                },
+                "started": {
+                    "type": "boolean"
+                },
+                "streamId": {
+                    "type": "string"
+                }
+            },
+            "required": ["session", "started", "streamId"],
+            "type": "object"
+        },
+        "ConversationSearchHit": {
+            "description": "One owned conversation and a bounded matching message excerpt.",
+            "properties": {
+                "entryId": {
+                    "type": ["null", "string"]
+                },
+                "message": {
+                    "$ref": "#/definitions/ConversationMessageRef",
+                    "description": "A stable input, response stream, or canonical entry in a saved conversation."
+                },
+                "role": {
+                    "type": "string"
+                },
+                "session": {
+                    "$ref": "#/definitions/Flatten%3C%7Breadonlytitle%3Astring%7Cnull%3Breadonlyid%3Astring%3BreadonlyagentId%3Astring%3BreadonlycreatedAt%3Anumber%3BreadonlyupdatedAt%3Anumber%3BreadonlyconversationId%3Astring%7Cnull%3Breadonlyparticipants%3Areadonlystring%5B%5D%3BreadonlymessageCount%3Anumber%3Breadonlyusage%3ATokenUsage%3B%7D%26%7BreadonlytitleEdited%3F%3Aboolean%7Cundefined%3BreadonlybranchedFrom%3F%3Astring%7Cundefined%3BreadonlybranchRequestId%3F%3Astring%7Cundefined%3BreadonlyretryState%3F%3Astring%7Cundefined%3BreadonlyretryFingerprint%3F%3Astring%7Cundefined%3BreadonlyactiveToolFamilies%3F%3Areadonlystring%5B%5D%7Cundefined%3BreadonlyprojectId%3F%3Astring%7Cundefined%3BreadonlyuserId%3F%3Astring%7Cundefined%3BreadonlyworkspaceId%3F%3Astring%7Cundefined%3BreadonlyturnOpen%3F%3Aboolean%7Cundefined%3B%7D%3E"
+                },
+                "snippet": {
+                    "type": "string"
+                },
+                "timestamp": {
+                    "type": "number"
+                }
+            },
+            "required": ["entryId", "role", "session", "snippet", "timestamp"],
+            "type": "object"
+        },
+        "ConversationSearchParams": {
+            "description": "An account-scoped full message search, including compacted history.",
+            "properties": {
+                "limit": {
+                    "type": "number"
+                },
+                "query": {
+                    "type": "string"
+                }
+            },
+            "required": ["query"],
+            "type": "object"
+        },
+        "ConversationUnpinParams": {
+            "description": "Removes only a bookmark belonging to the current authenticated principal.",
+            "properties": {
+                "pinId": {
+                    "type": "string"
+                }
+            },
+            "required": ["pinId"],
+            "type": "object"
+        },
         "CreditScope": {
             "description": "The scopes a balance or budget can be defined over.",
             "enum": ["agent", "conversation", "global", "project", "user"],
@@ -1902,7 +2135,7 @@
             "required": ["id", "parentId", "sessionId", "timestamp", "visibility"],
             "type": "object"
         },
-        "Flatten<{readonlytitle:string|null;readonlyid:string;readonlyagentId:string;readonlycreatedAt:number;readonlyupdatedAt:number;readonlyconversationId:string|null;readonlyparticipants:readonlystring[];readonlymessageCount:number;readonlyusage:TokenUsage;}&{readonlyactiveToolFamilies?:readonlystring[]|undefined;readonlyprojectId?:string|undefined;readonlyuserId?:string|undefined;readonlyworkspaceId?:string|undefined;readonlyturnOpen?:boolean|undefined;}>": {
+        "Flatten<{readonlytitle:string|null;readonlyid:string;readonlyagentId:string;readonlycreatedAt:number;readonlyupdatedAt:number;readonlyconversationId:string|null;readonlyparticipants:readonlystring[];readonlymessageCount:number;readonlyusage:TokenUsage;}&{readonlytitleEdited?:boolean|undefined;readonlybranchedFrom?:string|undefined;readonlybranchRequestId?:string|undefined;readonlyretryState?:string|undefined;readonlyretryFingerprint?:string|undefined;readonlyactiveToolFamilies?:readonlystring[]|undefined;readonlyprojectId?:string|undefined;readonlyuserId?:string|undefined;readonlyworkspaceId?:string|undefined;readonlyturnOpen?:boolean|undefined;}>": {
             "description": "Collapses the required/optional intersection into one object type.\n\nHomomorphic (`in keyof T` over a naked type parameter), so `readonly` and `?` are carried through\nrather than flattened away — without it every derived type would lose its modifiers and a caller\ncould assign to a field the store treats as immutable.",
             "properties": {
                 "activeToolFamilies": {
@@ -1912,6 +2145,12 @@
                     "type": "array"
                 },
                 "agentId": {
+                    "type": "string"
+                },
+                "branchRequestId": {
+                    "type": "string"
+                },
+                "branchedFrom": {
                     "type": "string"
                 },
                 "conversationId": {
@@ -1935,8 +2174,17 @@
                 "projectId": {
                     "type": "string"
                 },
+                "retryFingerprint": {
+                    "type": "string"
+                },
+                "retryState": {
+                    "type": "string"
+                },
                 "title": {
                     "type": ["null", "string"]
+                },
+                "titleEdited": {
+                    "type": "boolean"
                 },
                 "turnOpen": {
                     "type": "boolean"
@@ -3178,6 +3426,18 @@
                     "required": ["params", "result"],
                     "type": "object"
                 },
+                "sessions.branch": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/ConversationBranchParams"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/Flatten%3C%7Breadonlytitle%3Astring%7Cnull%3Breadonlyid%3Astring%3BreadonlyagentId%3Astring%3BreadonlycreatedAt%3Anumber%3BreadonlyupdatedAt%3Anumber%3BreadonlyconversationId%3Astring%7Cnull%3Breadonlyparticipants%3Areadonlystring%5B%5D%3BreadonlymessageCount%3Anumber%3Breadonlyusage%3ATokenUsage%3B%7D%26%7BreadonlytitleEdited%3F%3Aboolean%7Cundefined%3BreadonlybranchedFrom%3F%3Astring%7Cundefined%3BreadonlybranchRequestId%3F%3Astring%7Cundefined%3BreadonlyretryState%3F%3Astring%7Cundefined%3BreadonlyretryFingerprint%3F%3Astring%7Cundefined%3BreadonlyactiveToolFamilies%3F%3Areadonlystring%5B%5D%7Cundefined%3BreadonlyprojectId%3F%3Astring%7Cundefined%3BreadonlyuserId%3F%3Astring%7Cundefined%3BreadonlyworkspaceId%3F%3Astring%7Cundefined%3BreadonlyturnOpen%3F%3Aboolean%7Cundefined%3B%7D%3E"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
                 "sessions.delete": {
                     "properties": {
                         "params": {
@@ -3225,7 +3485,7 @@
                         "result": {
                             "anyOf": [
                                 {
-                                    "$ref": "#/definitions/Flatten%3C%7Breadonlytitle%3Astring%7Cnull%3Breadonlyid%3Astring%3BreadonlyagentId%3Astring%3BreadonlycreatedAt%3Anumber%3BreadonlyupdatedAt%3Anumber%3BreadonlyconversationId%3Astring%7Cnull%3Breadonlyparticipants%3Areadonlystring%5B%5D%3BreadonlymessageCount%3Anumber%3Breadonlyusage%3ATokenUsage%3B%7D%26%7BreadonlyactiveToolFamilies%3F%3Areadonlystring%5B%5D%7Cundefined%3BreadonlyprojectId%3F%3Astring%7Cundefined%3BreadonlyuserId%3F%3Astring%7Cundefined%3BreadonlyworkspaceId%3F%3Astring%7Cundefined%3BreadonlyturnOpen%3F%3Aboolean%7Cundefined%3B%7D%3E",
+                                    "$ref": "#/definitions/Flatten%3C%7Breadonlytitle%3Astring%7Cnull%3Breadonlyid%3Astring%3BreadonlyagentId%3Astring%3BreadonlycreatedAt%3Anumber%3BreadonlyupdatedAt%3Anumber%3BreadonlyconversationId%3Astring%7Cnull%3Breadonlyparticipants%3Areadonlystring%5B%5D%3BreadonlymessageCount%3Anumber%3Breadonlyusage%3ATokenUsage%3B%7D%26%7BreadonlytitleEdited%3F%3Aboolean%7Cundefined%3BreadonlybranchedFrom%3F%3Astring%7Cundefined%3BreadonlybranchRequestId%3F%3Astring%7Cundefined%3BreadonlyretryState%3F%3Astring%7Cundefined%3BreadonlyretryFingerprint%3F%3Astring%7Cundefined%3BreadonlyactiveToolFamilies%3F%3Areadonlystring%5B%5D%7Cundefined%3BreadonlyprojectId%3F%3Astring%7Cundefined%3BreadonlyuserId%3F%3Astring%7Cundefined%3BreadonlyworkspaceId%3F%3Astring%7Cundefined%3BreadonlyturnOpen%3F%3Aboolean%7Cundefined%3B%7D%3E",
                                     "description": "Collapses the required/optional intersection into one object type.\n\nHomomorphic (`in keyof T` over a naked type parameter), so `readonly` and `?` are carried through\nrather than flattened away — without it every derived type would lose its modifiers and a caller\ncould assign to a field the store treats as immutable."
                                 },
                                 {
@@ -3249,6 +3509,18 @@
                     "required": ["params", "result"],
                     "type": "object"
                 },
+                "sessions.input": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/ConversationPinParams"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/ConversationInput"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
                 "sessions.list": {
                     "properties": {
                         "params": {
@@ -3256,7 +3528,7 @@
                         },
                         "result": {
                             "items": {
-                                "$ref": "#/definitions/Flatten%3C%7Breadonlytitle%3Astring%7Cnull%3Breadonlyid%3Astring%3BreadonlyagentId%3Astring%3BreadonlycreatedAt%3Anumber%3BreadonlyupdatedAt%3Anumber%3BreadonlyconversationId%3Astring%7Cnull%3Breadonlyparticipants%3Areadonlystring%5B%5D%3BreadonlymessageCount%3Anumber%3Breadonlyusage%3ATokenUsage%3B%7D%26%7BreadonlyactiveToolFamilies%3F%3Areadonlystring%5B%5D%7Cundefined%3BreadonlyprojectId%3F%3Astring%7Cundefined%3BreadonlyuserId%3F%3Astring%7Cundefined%3BreadonlyworkspaceId%3F%3Astring%7Cundefined%3BreadonlyturnOpen%3F%3Aboolean%7Cundefined%3B%7D%3E"
+                                "$ref": "#/definitions/Flatten%3C%7Breadonlytitle%3Astring%7Cnull%3Breadonlyid%3Astring%3BreadonlyagentId%3Astring%3BreadonlycreatedAt%3Anumber%3BreadonlyupdatedAt%3Anumber%3BreadonlyconversationId%3Astring%7Cnull%3Breadonlyparticipants%3Areadonlystring%5B%5D%3BreadonlymessageCount%3Anumber%3Breadonlyusage%3ATokenUsage%3B%7D%26%7BreadonlytitleEdited%3F%3Aboolean%7Cundefined%3BreadonlybranchedFrom%3F%3Astring%7Cundefined%3BreadonlybranchRequestId%3F%3Astring%7Cundefined%3BreadonlyretryState%3F%3Astring%7Cundefined%3BreadonlyretryFingerprint%3F%3Astring%7Cundefined%3BreadonlyactiveToolFamilies%3F%3Areadonlystring%5B%5D%7Cundefined%3BreadonlyprojectId%3F%3Astring%7Cundefined%3BreadonlyuserId%3F%3Astring%7Cundefined%3BreadonlyworkspaceId%3F%3Astring%7Cundefined%3BreadonlyturnOpen%3F%3Aboolean%7Cundefined%3B%7D%3E"
                             },
                             "type": "array"
                         }
@@ -3279,10 +3551,85 @@
                     "required": ["params", "result"],
                     "type": "object"
                 },
+                "sessions.pin": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/ConversationPinParams"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/ConversationPin"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "sessions.pins": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/ConversationPinsParams"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/ConversationPinsPage"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "sessions.rename": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/ConversationRenameParams"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/Flatten%3C%7Breadonlytitle%3Astring%7Cnull%3Breadonlyid%3Astring%3BreadonlyagentId%3Astring%3BreadonlycreatedAt%3Anumber%3BreadonlyupdatedAt%3Anumber%3BreadonlyconversationId%3Astring%7Cnull%3Breadonlyparticipants%3Areadonlystring%5B%5D%3BreadonlymessageCount%3Anumber%3Breadonlyusage%3ATokenUsage%3B%7D%26%7BreadonlytitleEdited%3F%3Aboolean%7Cundefined%3BreadonlybranchedFrom%3F%3Astring%7Cundefined%3BreadonlybranchRequestId%3F%3Astring%7Cundefined%3BreadonlyretryState%3F%3Astring%7Cundefined%3BreadonlyretryFingerprint%3F%3Astring%7Cundefined%3BreadonlyactiveToolFamilies%3F%3Areadonlystring%5B%5D%7Cundefined%3BreadonlyprojectId%3F%3Astring%7Cundefined%3BreadonlyuserId%3F%3Astring%7Cundefined%3BreadonlyworkspaceId%3F%3Astring%7Cundefined%3BreadonlyturnOpen%3F%3Aboolean%7Cundefined%3B%7D%3E"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "sessions.retry": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/ConversationRetryParams"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/ConversationRetryResult"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "sessions.search": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/ConversationSearchParams"
+                        },
+                        "result": {
+                            "items": {
+                                "$ref": "#/definitions/ConversationSearchHit"
+                            },
+                            "type": "array"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
                 "sessions.subscribe": {
                     "properties": {
                         "params": {
                             "$ref": "#/definitions/SessionRef"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/OkResult"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "sessions.unpin": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/ConversationUnpinParams"
                         },
                         "result": {
                             "$ref": "#/definitions/OkResult"
@@ -3596,14 +3943,22 @@
                 "roblox.telemetry.funnel",
                 "roblox.telemetry.performance",
                 "roblox.telemetry.projects",
+                "sessions.branch",
                 "sessions.delete",
                 "sessions.download",
                 "sessions.files",
                 "sessions.get",
                 "sessions.history",
+                "sessions.input",
                 "sessions.list",
                 "sessions.messages",
+                "sessions.pin",
+                "sessions.pins",
+                "sessions.rename",
+                "sessions.retry",
+                "sessions.search",
                 "sessions.subscribe",
+                "sessions.unpin",
                 "sessions.unsubscribe",
                 "shares.create",
                 "shares.list",
@@ -4409,7 +4764,6 @@
             "type": "string"
         },
         "ModelMessage": {
-            "description": "One message in a conversation.",
             "properties": {
                 "content": {
                     "anyOf": [
@@ -4424,11 +4778,34 @@
                         }
                     ]
                 },
+                "identity": {
+                    "$ref": "#/definitions/ModelMessageIdentity",
+                    "description": "Durable host metadata; provider adapters send only the role and content to models."
+                },
                 "role": {
                     "$ref": "#/definitions/MessageRole"
                 }
             },
             "required": ["content", "role"],
+            "type": "object"
+        },
+        "ModelMessageIdentity": {
+            "description": "Durable host metadata; provider adapters send only the role and content to models.",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "inputId": {
+                    "type": "string"
+                },
+                "streamId": {
+                    "type": "string"
+                },
+                "timestamp": {
+                    "type": "number"
+                }
+            },
+            "required": ["id", "streamId", "timestamp"],
             "type": "object"
         },
         "NcapAgentDelta": {
@@ -6558,6 +6935,10 @@
         "StreamAccepted": {
             "description": "The acknowledgement of a streaming run.",
             "properties": {
+                "inputId": {
+                    "description": "Original saved input identity, assigned by the authorized gateway.",
+                    "type": "string"
+                },
                 "runId": {
                     "description": "The SERVER's name for the run, which is the one `tasks.*` uses.\n\nDistinct from `streamId` because the stream id is chosen by the client — deliberately, so the\naccept response cannot race the first events — and two clients therefore pick the same one\nroutinely. A `tasks.cancel` keyed on the client's id would abort somebody else's run by\ncoincidence; keyed on this one it cannot.",
                     "type": "string"

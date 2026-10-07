@@ -853,6 +853,206 @@ export type ContentBlock =
     | ContentBlockVariant7Shape
     | ContentBlockVariant8Shape;
 
+/** ConversationBranchParams wire fields. */
+export interface ConversationBranchParamsShape {
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** requestId as defined by the Nexa gateway. */
+    readonly requestId: string;
+}
+
+/** ConversationBranchParams from the Nexa wire protocol. */
+export type ConversationBranchParams = ConversationBranchParamsShape;
+
+/** ConversationInput wire fields. */
+export interface ConversationInputShape {
+    /** attachmentCount as defined by the Nexa gateway. */
+    readonly attachmentCount: number;
+    /** text as defined by the Nexa gateway. */
+    readonly text: string;
+}
+
+/** ConversationInput from the Nexa wire protocol. */
+export type ConversationInput = ConversationInputShape;
+
+/** Allowed values for ConversationMessageRefkind. */
+export const ConversationMessageRefkindValues = {
+    Value0: 'entry',
+    Value1: 'input',
+    Value2: 'input-stream',
+    Value3: 'response',
+} as const;
+
+/** ConversationMessageRef wire fields. */
+export interface ConversationMessageRefShape {
+    /** key as defined by the Nexa gateway. */
+    readonly key: string;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: (typeof ConversationMessageRefkindValues)[keyof typeof ConversationMessageRefkindValues];
+}
+
+/** ConversationMessageRef from the Nexa wire protocol. */
+export type ConversationMessageRef = ConversationMessageRefShape;
+
+/** Allowed values for ConversationPinrole. */
+export const ConversationPinroleValues = { Value0: 'assistant', Value1: 'user' } as const;
+
+/** ConversationPin wire fields. */
+export interface ConversationPinShape {
+    /** createdAt as defined by the Nexa gateway. */
+    readonly createdAt: number;
+    /** excerpt as defined by the Nexa gateway. */
+    readonly excerpt: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** message as defined by the Nexa gateway. */
+    readonly message: ConversationMessageRef;
+    /** role as defined by the Nexa gateway. */
+    readonly role: (typeof ConversationPinroleValues)[keyof typeof ConversationPinroleValues];
+    /** sessionId as defined by the Nexa gateway. */
+    readonly sessionId: string;
+    /** timestamp as defined by the Nexa gateway. */
+    readonly timestamp: number;
+    /** title as defined by the Nexa gateway. */
+    readonly title: string;
+}
+
+/** ConversationPin from the Nexa wire protocol. */
+export type ConversationPin = ConversationPinShape;
+
+/** ConversationPinParams wire fields. */
+export interface ConversationPinParamsShape {
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** message as defined by the Nexa gateway. */
+    readonly message: ConversationMessageRef;
+}
+
+/** ConversationPinParams from the Nexa wire protocol. */
+export type ConversationPinParams = ConversationPinParamsShape;
+
+/** ConversationPinsPage wire fields. */
+export interface ConversationPinsPageShape {
+    /** nextBefore as defined by the Nexa gateway. */
+    readonly nextBefore?: string;
+    /** pins as defined by the Nexa gateway. */
+    readonly pins: ReadonlyArray<ConversationPin>;
+}
+
+/** ConversationPinsPage from the Nexa wire protocol. */
+export type ConversationPinsPage = ConversationPinsPageShape;
+
+/** ConversationPinsParams wire fields. */
+export interface ConversationPinsParamsShape {
+    /** before as defined by the Nexa gateway. */
+    readonly before?: string;
+    /** limit as defined by the Nexa gateway. */
+    readonly limit?: number;
+}
+
+/** ConversationPinsParams from the Nexa wire protocol. */
+export type ConversationPinsParams = ConversationPinsParamsShape;
+
+/** ConversationRenameParams wire fields. */
+export interface ConversationRenameParamsShape {
+    /** expectedTitle as defined by the Nexa gateway. */
+    readonly expectedTitle: null | string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** title as defined by the Nexa gateway. */
+    readonly title: string;
+}
+
+/** ConversationRenameParams from the Nexa wire protocol. */
+export type ConversationRenameParams = ConversationRenameParamsShape;
+
+/** Allowed values for ConversationRetryParamsmode. */
+export const ConversationRetryParamsmodeValues = { Value0: 'edit', Value1: 'regenerate' } as const;
+
+/** Allowed values for ConversationRetryParamsreasoningEffort. */
+export const ConversationRetryParamsreasoningEffortValues = {
+    Value0: 'high',
+    Value1: 'low',
+    Value2: 'max',
+    Value3: 'medium',
+    Value4: 'minimal',
+    Value5: 'off',
+    Value6: 'xhigh',
+} as const;
+
+/** ConversationRetryParams wire fields. */
+export interface ConversationRetryParamsShape {
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** message as defined by the Nexa gateway. */
+    readonly message: ConversationMessageRef;
+    /** mode as defined by the Nexa gateway. */
+    readonly mode: (typeof ConversationRetryParamsmodeValues)[keyof typeof ConversationRetryParamsmodeValues];
+    /** reasoningEffort as defined by the Nexa gateway. */
+    readonly reasoningEffort?: (typeof ConversationRetryParamsreasoningEffortValues)[keyof typeof ConversationRetryParamsreasoningEffortValues];
+    /** requestId as defined by the Nexa gateway. */
+    readonly requestId: string;
+    /** targetTimeSeconds as defined by the Nexa gateway. */
+    readonly targetTimeSeconds?: number;
+    /** text as defined by the Nexa gateway. */
+    readonly text?: string;
+}
+
+/** ConversationRetryParams from the Nexa wire protocol. */
+export type ConversationRetryParams = ConversationRetryParamsShape;
+
+/** ConversationRetryResult wire fields. */
+export interface ConversationRetryResultShape {
+    /** session as defined by the Nexa gateway. */
+    readonly session: Session;
+    /** started as defined by the Nexa gateway. */
+    readonly started: boolean;
+    /** streamId as defined by the Nexa gateway. */
+    readonly streamId: string;
+}
+
+/** ConversationRetryResult from the Nexa wire protocol. */
+export type ConversationRetryResult = ConversationRetryResultShape;
+
+/** ConversationSearchHit wire fields. */
+export interface ConversationSearchHitShape {
+    /** entryId as defined by the Nexa gateway. */
+    readonly entryId: null | string;
+    /** message as defined by the Nexa gateway. */
+    readonly message?: ConversationMessageRef;
+    /** role as defined by the Nexa gateway. */
+    readonly role: string;
+    /** session as defined by the Nexa gateway. */
+    readonly session: Session;
+    /** snippet as defined by the Nexa gateway. */
+    readonly snippet: string;
+    /** timestamp as defined by the Nexa gateway. */
+    readonly timestamp: number;
+}
+
+/** ConversationSearchHit from the Nexa wire protocol. */
+export type ConversationSearchHit = ConversationSearchHitShape;
+
+/** ConversationSearchParams wire fields. */
+export interface ConversationSearchParamsShape {
+    /** limit as defined by the Nexa gateway. */
+    readonly limit?: number;
+    /** query as defined by the Nexa gateway. */
+    readonly query: string;
+}
+
+/** ConversationSearchParams from the Nexa wire protocol. */
+export type ConversationSearchParams = ConversationSearchParamsShape;
+
+/** ConversationUnpinParams wire fields. */
+export interface ConversationUnpinParamsShape {
+    /** pinId as defined by the Nexa gateway. */
+    readonly pinId: string;
+}
+
+/** ConversationUnpinParams from the Nexa wire protocol. */
+export type ConversationUnpinParams = ConversationUnpinParamsShape;
+
 /** Allowed values for CreditScope. */
 export const CreditScopeValues = {
     Value0: 'agent',
@@ -1290,6 +1490,10 @@ export interface SessionShape {
     readonly activeToolFamilies?: ReadonlyArray<string>;
     /** agentId as defined by the Nexa gateway. */
     readonly agentId: string;
+    /** branchRequestId as defined by the Nexa gateway. */
+    readonly branchRequestId?: string;
+    /** branchedFrom as defined by the Nexa gateway. */
+    readonly branchedFrom?: string;
     /** conversationId as defined by the Nexa gateway. */
     readonly conversationId: null | string;
     /** createdAt as defined by the Nexa gateway. */
@@ -1302,8 +1506,14 @@ export interface SessionShape {
     readonly participants: ReadonlyArray<string>;
     /** projectId as defined by the Nexa gateway. */
     readonly projectId?: string;
+    /** retryFingerprint as defined by the Nexa gateway. */
+    readonly retryFingerprint?: string;
+    /** retryState as defined by the Nexa gateway. */
+    readonly retryState?: string;
     /** title as defined by the Nexa gateway. */
     readonly title: null | string;
+    /** titleEdited as defined by the Nexa gateway. */
+    readonly titleEdited?: boolean;
     /** turnOpen as defined by the Nexa gateway. */
     readonly turnOpen?: boolean;
     /** updatedAt as defined by the Nexa gateway. */
@@ -2047,6 +2257,14 @@ export interface GatewayMethodsroblox_telemetry_projectsShape {
     readonly result: ReadonlyArray<TelemetryProject>;
 }
 
+/** GatewayMethodssessions_branch wire fields. */
+export interface GatewayMethodssessions_branchShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConversationBranchParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: Session;
+}
+
 /** GatewayMethodssessions_delete wire fields. */
 export interface GatewayMethodssessions_deleteShape {
     /** params as defined by the Nexa gateway. */
@@ -2087,6 +2305,14 @@ export interface GatewayMethodssessions_historyShape {
     readonly result: SessionHistoryPage;
 }
 
+/** GatewayMethodssessions_input wire fields. */
+export interface GatewayMethodssessions_inputShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConversationPinParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConversationInput;
+}
+
 /** GatewayMethodssessions_list wire fields. */
 export interface GatewayMethodssessions_listShape {
     /** params as defined by the Nexa gateway. */
@@ -2103,10 +2329,58 @@ export interface GatewayMethodssessions_messagesShape {
     readonly result: ReadonlyArray<ModelMessage>;
 }
 
+/** GatewayMethodssessions_pin wire fields. */
+export interface GatewayMethodssessions_pinShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConversationPinParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConversationPin;
+}
+
+/** GatewayMethodssessions_pins wire fields. */
+export interface GatewayMethodssessions_pinsShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConversationPinsParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConversationPinsPage;
+}
+
+/** GatewayMethodssessions_rename wire fields. */
+export interface GatewayMethodssessions_renameShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConversationRenameParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: Session;
+}
+
+/** GatewayMethodssessions_retry wire fields. */
+export interface GatewayMethodssessions_retryShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConversationRetryParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConversationRetryResult;
+}
+
+/** GatewayMethodssessions_search wire fields. */
+export interface GatewayMethodssessions_searchShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConversationSearchParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ReadonlyArray<ConversationSearchHit>;
+}
+
 /** GatewayMethodssessions_subscribe wire fields. */
 export interface GatewayMethodssessions_subscribeShape {
     /** params as defined by the Nexa gateway. */
     readonly params: SessionRef;
+    /** result as defined by the Nexa gateway. */
+    readonly result: OkResult;
+}
+
+/** GatewayMethodssessions_unpin wire fields. */
+export interface GatewayMethodssessions_unpinShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConversationUnpinParams;
     /** result as defined by the Nexa gateway. */
     readonly result: OkResult;
 }
@@ -2377,6 +2651,8 @@ export interface GatewayMethodsShape {
     readonly 'roblox.telemetry.performance': GatewayMethodsroblox_telemetry_performanceShape;
     /** roblox.telemetry.projects as defined by the Nexa gateway. */
     readonly 'roblox.telemetry.projects': GatewayMethodsroblox_telemetry_projectsShape;
+    /** sessions.branch as defined by the Nexa gateway. */
+    readonly 'sessions.branch': GatewayMethodssessions_branchShape;
     /** sessions.delete as defined by the Nexa gateway. */
     readonly 'sessions.delete': GatewayMethodssessions_deleteShape;
     /** sessions.download as defined by the Nexa gateway. */
@@ -2387,12 +2663,26 @@ export interface GatewayMethodsShape {
     readonly 'sessions.get': GatewayMethodssessions_getShape;
     /** sessions.history as defined by the Nexa gateway. */
     readonly 'sessions.history': GatewayMethodssessions_historyShape;
+    /** sessions.input as defined by the Nexa gateway. */
+    readonly 'sessions.input': GatewayMethodssessions_inputShape;
     /** sessions.list as defined by the Nexa gateway. */
     readonly 'sessions.list': GatewayMethodssessions_listShape;
     /** sessions.messages as defined by the Nexa gateway. */
     readonly 'sessions.messages': GatewayMethodssessions_messagesShape;
+    /** sessions.pin as defined by the Nexa gateway. */
+    readonly 'sessions.pin': GatewayMethodssessions_pinShape;
+    /** sessions.pins as defined by the Nexa gateway. */
+    readonly 'sessions.pins': GatewayMethodssessions_pinsShape;
+    /** sessions.rename as defined by the Nexa gateway. */
+    readonly 'sessions.rename': GatewayMethodssessions_renameShape;
+    /** sessions.retry as defined by the Nexa gateway. */
+    readonly 'sessions.retry': GatewayMethodssessions_retryShape;
+    /** sessions.search as defined by the Nexa gateway. */
+    readonly 'sessions.search': GatewayMethodssessions_searchShape;
     /** sessions.subscribe as defined by the Nexa gateway. */
     readonly 'sessions.subscribe': GatewayMethodssessions_subscribeShape;
+    /** sessions.unpin as defined by the Nexa gateway. */
+    readonly 'sessions.unpin': GatewayMethodssessions_unpinShape;
     /** sessions.unsubscribe as defined by the Nexa gateway. */
     readonly 'sessions.unsubscribe': GatewayMethodssessions_unsubscribeShape;
     /** shares.create as defined by the Nexa gateway. */
@@ -2990,12 +3280,29 @@ export type MisfirePolicy = (typeof MisfirePolicyValues)[keyof typeof MisfirePol
 export interface ModelMessageShape {
     /** content as defined by the Nexa gateway. */
     readonly content: ReadonlyArray<ContentBlock> | string;
+    /** identity as defined by the Nexa gateway. */
+    readonly identity?: ModelMessageIdentity;
     /** role as defined by the Nexa gateway. */
     readonly role: MessageRole;
 }
 
 /** ModelMessage from the Nexa wire protocol. */
 export type ModelMessage = ModelMessageShape;
+
+/** ModelMessageIdentity wire fields. */
+export interface ModelMessageIdentityShape {
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** inputId as defined by the Nexa gateway. */
+    readonly inputId?: string;
+    /** streamId as defined by the Nexa gateway. */
+    readonly streamId: string;
+    /** timestamp as defined by the Nexa gateway. */
+    readonly timestamp: number;
+}
+
+/** ModelMessageIdentity from the Nexa wire protocol. */
+export type ModelMessageIdentity = ModelMessageIdentityShape;
 
 /** NcapAgentDelta wire fields. */
 export interface NcapAgentDeltaShape {
@@ -4337,6 +4644,8 @@ export type StopReason = (typeof StopReasonValues)[keyof typeof StopReasonValues
 
 /** StreamAccepted wire fields. */
 export interface StreamAcceptedShape {
+    /** inputId as defined by the Nexa gateway. */
+    readonly inputId?: string;
     /** runId as defined by the Nexa gateway. */
     readonly runId: string;
     /** sessionKey as defined by the Nexa gateway. */
@@ -5747,6 +6056,8 @@ export enum Method {
     RobloxTelemetryPerformance = 'roblox.telemetry.performance',
     /** Calls roblox.telemetry.projects. */
     RobloxTelemetryProjects = 'roblox.telemetry.projects',
+    /** Calls sessions.branch. */
+    SessionsBranch = 'sessions.branch',
     /** Calls sessions.delete. */
     SessionsDelete = 'sessions.delete',
     /** Calls sessions.download. */
@@ -5757,12 +6068,26 @@ export enum Method {
     SessionsGet = 'sessions.get',
     /** Calls sessions.history. */
     SessionsHistory = 'sessions.history',
+    /** Calls sessions.input. */
+    SessionsInput = 'sessions.input',
     /** Calls sessions.list. */
     SessionsList = 'sessions.list',
     /** Calls sessions.messages. */
     SessionsMessages = 'sessions.messages',
+    /** Calls sessions.pin. */
+    SessionsPin = 'sessions.pin',
+    /** Calls sessions.pins. */
+    SessionsPins = 'sessions.pins',
+    /** Calls sessions.rename. */
+    SessionsRename = 'sessions.rename',
+    /** Calls sessions.retry. */
+    SessionsRetry = 'sessions.retry',
+    /** Calls sessions.search. */
+    SessionsSearch = 'sessions.search',
     /** Calls sessions.subscribe. */
     SessionsSubscribe = 'sessions.subscribe',
+    /** Calls sessions.unpin. */
+    SessionsUnpin = 'sessions.unpin',
     /** Calls sessions.unsubscribe. */
     SessionsUnsubscribe = 'sessions.unsubscribe',
     /** Calls shares.create. */
