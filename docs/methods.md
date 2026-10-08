@@ -101,6 +101,7 @@ All 54 protocol methods. `connect` is managed by `NexaClient.connect`; the remai
 - [workflows.planning.sources](#workflows-planning-sources)
 - [workflows.read](#workflows-read)
 - [workflows.record](#workflows-record)
+- [workflows.runs.artifact](#workflows-runs-artifact)
 - [workflows.runs.cancel](#workflows-runs-cancel)
 - [workflows.runs.events](#workflows-runs-events)
 - [workflows.runs.list](#workflows-runs-list)
@@ -2344,6 +2345,32 @@ Parameters: [WorkflowRecordRequest](protocol.md#workflowrecordrequest).
 | `workflowId` | Yes      | `string` |             |
 
 Result: [WorkflowRecordPage](protocol.md#workflowrecordpage).
+
+## workflows.runs.artifact
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsRunsArtifact> = {
+    artifactId: 'YOUR_ARTIFACTID',
+    offset: 1,
+    runId: 'YOUR_RUNID',
+};
+const result: ResultOf<typeof Method.WorkflowsRunsArtifact> = await client.call(
+    Method.WorkflowsRunsArtifact,
+    params,
+);
+```
+
+Parameters: [WorkflowRunArtifactRequest](protocol.md#workflowrunartifactrequest).
+
+| Field        | Required | Type     | Description |
+| ------------ | -------- | -------- | ----------- |
+| `artifactId` | Yes      | `string` |             |
+| `offset`     | Yes      | `number` |             |
+| `runId`      | Yes      | `string` |             |
+
+Result: [WorkflowRunArtifactPage](protocol.md#workflowrunartifactpage).
 
 ## workflows.runs.cancel
 

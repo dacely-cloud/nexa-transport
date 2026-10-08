@@ -2800,6 +2800,14 @@ export interface GatewayMethodsworkflows_recordShape {
     readonly result: WorkflowRecordPage;
 }
 
+/** GatewayMethodsworkflows_runs_artifact wire fields. */
+export interface GatewayMethodsworkflows_runs_artifactShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkflowRunArtifactRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WorkflowRunArtifactPage;
+}
+
 /** GatewayMethodsworkflows_runs_cancel wire fields. */
 export interface GatewayMethodsworkflows_runs_cancelShape {
     /** params as defined by the Nexa gateway. */
@@ -3104,6 +3112,8 @@ export interface GatewayMethodsShape {
     readonly 'workflows.read': GatewayMethodsworkflows_readShape;
     /** workflows.record as defined by the Nexa gateway. */
     readonly 'workflows.record': GatewayMethodsworkflows_recordShape;
+    /** workflows.runs.artifact as defined by the Nexa gateway. */
+    readonly 'workflows.runs.artifact': GatewayMethodsworkflows_runs_artifactShape;
     /** workflows.runs.cancel as defined by the Nexa gateway. */
     readonly 'workflows.runs.cancel': GatewayMethodsworkflows_runs_cancelShape;
     /** workflows.runs.events as defined by the Nexa gateway. */
@@ -7126,6 +7136,57 @@ export interface WorkflowRecordRequestShape {
 /** WorkflowRecordRequest from the Nexa wire protocol. */
 export type WorkflowRecordRequest = WorkflowRecordRequestShape;
 
+/** WorkflowRunArtifact wire fields. */
+export interface WorkflowRunArtifactShape {
+    /** artifactId as defined by the Nexa gateway. */
+    readonly artifactId: string;
+    /** bytes as defined by the Nexa gateway. */
+    readonly bytes: string;
+    /** contentType as defined by the Nexa gateway. */
+    readonly contentType: string;
+    /** expiresAtMs as defined by the Nexa gateway. */
+    readonly expiresAtMs: null | string;
+    /** name as defined by the Nexa gateway. */
+    readonly name: string;
+    /** sha256 as defined by the Nexa gateway. */
+    readonly sha256: string;
+}
+
+/** WorkflowRunArtifact from the Nexa wire protocol. */
+export type WorkflowRunArtifact = WorkflowRunArtifactShape;
+
+/** WorkflowRunArtifactPage wire fields. */
+export interface WorkflowRunArtifactPageShape {
+    /** artifact as defined by the Nexa gateway. */
+    readonly artifact: WorkflowRunArtifact;
+    /** artifactId as defined by the Nexa gateway. */
+    readonly artifactId: string;
+    /** base64 as defined by the Nexa gateway. */
+    readonly base64: string;
+    /** nextOffset as defined by the Nexa gateway. */
+    readonly nextOffset: null | number;
+    /** offset as defined by the Nexa gateway. */
+    readonly offset: number;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+}
+
+/** WorkflowRunArtifactPage from the Nexa wire protocol. */
+export type WorkflowRunArtifactPage = WorkflowRunArtifactPageShape;
+
+/** WorkflowRunArtifactRequest wire fields. */
+export interface WorkflowRunArtifactRequestShape {
+    /** artifactId as defined by the Nexa gateway. */
+    readonly artifactId: string;
+    /** offset as defined by the Nexa gateway. */
+    readonly offset: number;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+}
+
+/** WorkflowRunArtifactRequest from the Nexa wire protocol. */
+export type WorkflowRunArtifactRequest = WorkflowRunArtifactRequestShape;
+
 /** Allowed values for WorkflowRunEventstatus. */
 export const WorkflowRunEventstatusValues = {
     Value0: 'cancelled',
@@ -7853,6 +7914,8 @@ export enum Method {
     WorkflowsRead = 'workflows.read',
     /** Calls workflows.record. */
     WorkflowsRecord = 'workflows.record',
+    /** Calls workflows.runs.artifact. */
+    WorkflowsRunsArtifact = 'workflows.runs.artifact',
     /** Calls workflows.runs.cancel. */
     WorkflowsRunsCancel = 'workflows.runs.cancel',
     /** Calls workflows.runs.events. */

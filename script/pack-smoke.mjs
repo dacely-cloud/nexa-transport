@@ -25,6 +25,7 @@ try {
         join(directory, 'consumer.ts'),
         `import { NexaClient } from 'nexa-transport';
 import { NexaMedia } from 'nexa-transport/media';
+import { WorkflowArtifactDownloads, type WorkflowArtifactDownload } from 'nexa-transport/workflow-artifacts';
 import { EventName } from 'nexa-transport/events';
 import { TransportError } from 'nexa-transport/errors';
 import type { AskResult } from 'nexa-transport/protocol';
@@ -41,6 +42,10 @@ async function consume(): Promise<AskResult> {
 }
 void consume;
 void TransportError;
+async function downloadArtifact(client: NexaClient): Promise<WorkflowArtifactDownload> {
+    return WorkflowArtifactDownloads.forClient(client).download({ runId: 'run', artifactId: 'artifact' }, new AbortController().signal);
+}
+void downloadArtifact;
 `,
     );
     await writeFile(
@@ -68,7 +73,7 @@ void TransportError;
         [
             '--input-type=module',
             '-e',
-            `import { NexaClient } from 'nexa-transport'; import { NexaMedia } from 'nexa-transport/media'; import { EventName } from 'nexa-transport/events'; if (typeof NexaClient.connect !== 'function' || NexaMedia.base64(new Uint8Array([1,2,3])) !== 'AQID' || EventName.TurnEvent !== 'turn.event') throw new Error('Package exports failed');`,
+            `import { NexaClient } from 'nexa-transport'; import { NexaMedia } from 'nexa-transport/media'; import { EventName } from 'nexa-transport/events'; import { WorkflowArtifactDownloads } from 'nexa-transport/workflow-artifacts'; if (typeof NexaClient.connect !== 'function' || typeof WorkflowArtifactDownloads.forClient !== 'function' || NexaMedia.base64(new Uint8Array([1,2,3])) !== 'AQID' || EventName.TurnEvent !== 'turn.event') throw new Error('Package exports failed');`,
         ],
         { cwd: directory, stdio: 'pipe' },
     );

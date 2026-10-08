@@ -1375,6 +1375,7 @@ Configurable bounds on gateway-owned work and memory.
 | `workflows.planning.sources`   | Yes      | Object (fields below) |                                                                                            |
 | `workflows.read`               | Yes      | Object (fields below) |                                                                                            |
 | `workflows.record`             | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.artifact`      | Yes      | Object (fields below) |                                                                                            |
 | `workflows.runs.cancel`        | Yes      | Object (fields below) |                                                                                            |
 | `workflows.runs.events`        | Yes      | Object (fields below) |                                                                                            |
 | `workflows.runs.list`          | Yes      | Object (fields below) |                                                                                            |
@@ -2154,6 +2155,13 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ---------------------------------------------------------- | ----------- |
 | `params` | Yes      | [WorkflowRecordRequest](protocol.md#workflowrecordrequest) |             |
 | `result` | Yes      | [WorkflowRecordPage](protocol.md#workflowrecordpage)       |             |
+
+**workflows.runs.artifact**
+
+| Field    | Required | Type                                                                 | Description |
+| -------- | -------- | -------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [WorkflowRunArtifactRequest](protocol.md#workflowrunartifactrequest) |             |
+| `result` | Yes      | [WorkflowRunArtifactPage](protocol.md#workflowrunartifactpage)       |             |
 
 **workflows.runs.cancel**
 
@@ -5056,6 +5064,42 @@ A reference identifies immutable content within the authenticated owner's workfl
 | `offset`     | Yes      | `number` |             |
 | `reference`  | Yes      | `string` |             |
 | `workflowId` | Yes      | `string` |             |
+
+## WorkflowRunArtifact
+
+Public immutable file metadata; neither storage paths nor global media IDs cross this boundary.
+
+| Field         | Required | Type          | Description |
+| ------------- | -------- | ------------- | ----------- |
+| `artifactId`  | Yes      | `string`      |             |
+| `bytes`       | Yes      | `string`      |             |
+| `contentType` | Yes      | `string`      |             |
+| `expiresAtMs` | Yes      | `null,string` |             |
+| `name`        | Yes      | `string`      |             |
+| `sha256`      | Yes      | `string`      |             |
+
+## WorkflowRunArtifactPage
+
+A bounded binary fragment; clients verify the complete SHA-256 after assembling all fragments.
+
+| Field        | Required | Type                                                   | Description |
+| ------------ | -------- | ------------------------------------------------------ | ----------- |
+| `artifact`   | Yes      | [WorkflowRunArtifact](protocol.md#workflowrunartifact) |             |
+| `artifactId` | Yes      | `string`                                               |             |
+| `base64`     | Yes      | `string`                                               |             |
+| `nextOffset` | Yes      | `null,number`                                          |             |
+| `offset`     | Yes      | `number`                                               |             |
+| `runId`      | Yes      | `string`                                               |             |
+
+## WorkflowRunArtifactRequest
+
+One exact operation's artifact, addressed within the authenticated account and run.
+
+| Field        | Required | Type     | Description |
+| ------------ | -------- | -------- | ----------- |
+| `artifactId` | Yes      | `string` |             |
+| `offset`     | Yes      | `number` |             |
+| `runId`      | Yes      | `string` |             |
 
 ## WorkflowRunEvent
 
