@@ -2,6 +2,8 @@
 import { execFileSync } from 'node:child_process';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 
+execFileSync(process.execPath, ['script/workflows.ts'], { stdio: 'inherit' });
+
 execFileSync('./node_modules/.bin/typescript-json-schema', [
     'script/Contract.ts',
     'Contract',
@@ -122,6 +124,19 @@ for (const [name, def] of Object.entries(schema.definitions)) {
     if (name === 'JsonValue') {
         declarations.push(
             '/** Arbitrary JSON object. */\nexport interface JsonObject { readonly [key: string]: JsonValue; }\n/** Lossless JSON values carried by extensible protocol fields. */\nexport type JsonValue = string | number | boolean | null | ReadonlyArray<JsonValue> | JsonObject;',
+        );
+        continue;
+    }
+    // Index-signature interfaces permit recursive JSON dictionaries. A mapped Record alias
+    // creates an illegal alias cycle when a value union refers back to this dictionary.
+    if (
+        def.type === 'object' &&
+        !def.properties &&
+        def.additionalProperties &&
+        typeof def.additionalProperties === 'object'
+    ) {
+        declarations.push(
+            `/** ${outputName} from the Nexa wire protocol. */\nexport interface ${outputName} { readonly [key: string]: ${type(def.additionalProperties, `${outputName}Value`)}; }`,
         );
         continue;
     }

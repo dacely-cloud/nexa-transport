@@ -967,6 +967,325 @@
             "required": ["id", "role", "summary", "timestamp", "tokensBefore"],
             "type": "object"
         },
+        "ComponentCategory": {
+            "description": "Catalog grouping retains all requested capability areas without declaring runtime support.",
+            "enum": [
+                "agents",
+                "api",
+                "browser",
+                "cache",
+                "collection",
+                "conditions",
+                "connections",
+                "context",
+                "documents",
+                "entities",
+                "experiments",
+                "flow",
+                "human",
+                "media",
+                "messaging",
+                "models",
+                "observability",
+                "output",
+                "personas",
+                "planning",
+                "policy",
+                "programs",
+                "prompts",
+                "quality",
+                "research",
+                "resources",
+                "storage",
+                "teams",
+                "time",
+                "tools",
+                "transform",
+                "triggers",
+                "utilities"
+            ],
+            "type": "string"
+        },
+        "ComponentDefinition": {
+            "description": "Registry version is pinned in every saved node. Runtime and UI share this exact definition.",
+            "properties": {
+                "category": {
+                    "$ref": "#/definitions/ComponentCategory"
+                },
+                "configuration": {
+                    "$ref": "#/definitions/ObjectSchema"
+                },
+                "defaults": {
+                    "$ref": "#/definitions/WorkflowObject"
+                },
+                "display": {
+                    "$ref": "#/definitions/ComponentDisplay"
+                },
+                "execution": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/ComponentExecution"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "externalFamily": {
+                    "description": "Present only on external resource cards, distinct from account or editor workspaces.",
+                    "enum": [
+                        "application",
+                        "compute",
+                        "computer",
+                        "database",
+                        "feed",
+                        "files",
+                        "workspace"
+                    ],
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "migratesFrom": {
+                    "description": "Older versions requiring explicit migrations; no silent rewrite is permitted.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "ports": {
+                    "items": {
+                        "$ref": "#/definitions/ComponentPort"
+                    },
+                    "type": "array"
+                },
+                "resourceRole": {
+                    "type": ["null", "string"]
+                },
+                "resources": {
+                    "items": {
+                        "$ref": "#/definitions/ComponentResourceSlot"
+                    },
+                    "type": "array"
+                },
+                "role": {
+                    "$ref": "#/definitions/ComponentRole"
+                },
+                "version": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "category",
+                "configuration",
+                "defaults",
+                "display",
+                "execution",
+                "id",
+                "migratesFrom",
+                "ports",
+                "resourceRole",
+                "resources",
+                "role",
+                "version"
+            ],
+            "type": "object"
+        },
+        "ComponentDisplay": {
+            "description": "Declarative presentation hints support family-specific cards without coupling contracts to React.",
+            "properties": {
+                "accent": {
+                    "type": "string"
+                },
+                "card": {
+                    "type": "string"
+                },
+                "compactFields": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "example": {
+                    "type": "string"
+                },
+                "inspectorFields": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "tags": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "title": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "accent",
+                "card",
+                "compactFields",
+                "description",
+                "example",
+                "inspectorFields",
+                "tags",
+                "title"
+            ],
+            "type": "object"
+        },
+        "ComponentEffect": {
+            "enum": ["external", "inference", "pure", "wait"],
+            "type": "string"
+        },
+        "ComponentExecution": {
+            "description": "Runtime availability is explicit; a schema definition alone cannot authorize or execute work.",
+            "properties": {
+                "cancellation": {
+                    "type": "string"
+                },
+                "capabilities": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "credits": {
+                    "type": "string"
+                },
+                "effect": {
+                    "$ref": "#/definitions/ComponentEffect"
+                },
+                "handler": {
+                    "type": ["null", "string"]
+                },
+                "maxAttempts": {
+                    "type": "number"
+                },
+                "mock": {
+                    "$ref": "#/definitions/MockBehavior"
+                },
+                "permissions": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "persistence": {
+                    "type": "string"
+                },
+                "retryErrors": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "streaming": {
+                    "type": "boolean"
+                },
+                "timeoutMs": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "cancellation",
+                "capabilities",
+                "credits",
+                "effect",
+                "handler",
+                "maxAttempts",
+                "mock",
+                "permissions",
+                "persistence",
+                "retryErrors",
+                "streaming",
+                "timeoutMs"
+            ],
+            "type": "object"
+        },
+        "ComponentPort": {
+            "description": "Literal inputs and wire inputs share one schema; connecting both is ambiguous and rejected.",
+            "properties": {
+                "cardinality": {
+                    "$ref": "#/definitions/PortCardinality"
+                },
+                "direction": {
+                    "$ref": "#/definitions/PortDirection"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "incoming": {
+                    "$ref": "#/definitions/IncomingPolicy"
+                },
+                "kind": {
+                    "$ref": "#/definitions/WorkflowEdgeKind"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "literalField": {
+                    "type": ["null", "string"]
+                },
+                "maxConnections": {
+                    "type": "number"
+                },
+                "modelCapabilities": {
+                    "description": "Authoring hint; runtime must still verify the provider's actual supported operations.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "required": {
+                    "type": "boolean"
+                },
+                "schema": {
+                    "$ref": "#/definitions/ValueSchema"
+                }
+            },
+            "required": [
+                "cardinality",
+                "direction",
+                "id",
+                "incoming",
+                "kind",
+                "label",
+                "literalField",
+                "maxConnections",
+                "required",
+                "schema"
+            ],
+            "type": "object"
+        },
+        "ComponentResourceSlot": {
+            "description": "Inline resource bindings have the same capability requirements as exposed resource cards.",
+            "properties": {
+                "family": {
+                    "$ref": "#/definitions/ResourceFamily"
+                },
+                "uses": {
+                    "items": {
+                        "$ref": "#/definitions/ResourceUse"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": ["family", "uses"],
+            "type": "object"
+        },
+        "ComponentRole": {
+            "description": "The four authoring roles have different scheduling semantics.",
+            "enum": ["resource", "step", "trigger", "visual"],
+            "type": "string"
+        },
         "ConfigResult": {
             "description": "The effective configuration, with secrets removed.",
             "properties": {
@@ -2048,6 +2367,25 @@
             ],
             "type": "string"
         },
+        "Exclude": {
+            "enum": [
+                "audio",
+                "boolean",
+                "datetime",
+                "file",
+                "flow",
+                "image",
+                "integer",
+                "json",
+                "message",
+                "number",
+                "table",
+                "text",
+                "timestamp",
+                "video"
+            ],
+            "type": "string"
+        },
         "FinishReason": {
             "description": "Why a turn stopped.",
             "enum": [
@@ -2500,6 +2838,16 @@
                     "const": true,
                     "description": "Session subscriptions notify exact journal ranges for live catch-up.",
                     "type": "boolean"
+                },
+                "workflowDraftsVersion": {
+                    "const": 1,
+                    "description": "Owner-scoped draft storage with bounded reads and revision-safe direct patches.",
+                    "type": "number"
+                },
+                "workflowGraphVersion": {
+                    "const": 1,
+                    "description": "Exact component catalog and structural validation of pinned drafts.",
+                    "type": "number"
                 }
             },
             "required": ["events", "methodScopes", "methods"],
@@ -3776,6 +4124,90 @@
                     "required": ["params", "result"],
                     "type": "object"
                 },
+                "workflows.catalog": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/Record%3Cstring%2Cnever%3E"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/WorkflowCatalog"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "workflows.create": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/WorkflowCreateRequest"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/WorkflowReceipt"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "workflows.list": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/WorkflowListRequest"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/WorkflowListPage"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "workflows.read": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/WorkflowReadRequest"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/WorkflowManifestPage"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "workflows.record": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/WorkflowRecordRequest"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/WorkflowRecordPage"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "workflows.save": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/WorkflowSaveRequest"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/WorkflowReceipt"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "workflows.validate": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/WorkflowValidateRequest"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/GraphValidation"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
                 "workspaces.create": {
                     "properties": {
                         "params": {
@@ -3915,6 +4347,13 @@
                 "voice.audio",
                 "voice.start",
                 "voice.stop",
+                "workflows.catalog",
+                "workflows.create",
+                "workflows.list",
+                "workflows.read",
+                "workflows.record",
+                "workflows.save",
+                "workflows.validate",
                 "workspaces.create",
                 "workspaces.describe",
                 "workspaces.destroy",
@@ -3926,6 +4365,114 @@
             "description": "Supported serialized 3D asset formats; radiance fields remain unspecified.",
             "enum": ["gaussian_ply", "glb"],
             "type": "string"
+        },
+        "GraphIssue": {
+            "description": "Stable identities let all surfaces focus the same problem without parsing its message.",
+            "properties": {
+                "code": {
+                    "$ref": "#/definitions/GraphIssueCode"
+                },
+                "edgeId": {
+                    "type": ["null", "string"]
+                },
+                "message": {
+                    "type": "string"
+                },
+                "nodeId": {
+                    "type": ["null", "string"]
+                },
+                "path": {
+                    "type": ["null", "string"]
+                },
+                "severity": {
+                    "$ref": "#/definitions/GraphSeverity"
+                }
+            },
+            "required": ["code", "edgeId", "message", "nodeId", "path", "severity"],
+            "type": "object"
+        },
+        "GraphIssueCode": {
+            "enum": [
+                "ambiguous",
+                "cardinality",
+                "component",
+                "configuration",
+                "connection",
+                "cycle",
+                "duplicate",
+                "endpoint",
+                "required",
+                "resource",
+                "runtime",
+                "setup",
+                "trigger",
+                "unreachable"
+            ],
+            "type": "string"
+        },
+        "GraphSeverity": {
+            "enum": ["error", "warning"],
+            "type": "string"
+        },
+        "GraphValidation": {
+            "description": "A structural result is never an execution grant or a connection authorization snapshot.",
+            "properties": {
+                "issues": {
+                    "items": {
+                        "$ref": "#/definitions/GraphIssue"
+                    },
+                    "type": "array"
+                },
+                "order": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "requiredCapabilities": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "resourceRequirements": {
+                    "type": "number"
+                },
+                "revision": {
+                    "type": "string"
+                },
+                "totalIssues": {
+                    "type": "number"
+                },
+                "truncated": {
+                    "type": "boolean"
+                },
+                "unavailableHandlers": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "valid": {
+                    "type": "boolean"
+                },
+                "workflowId": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "issues",
+                "order",
+                "requiredCapabilities",
+                "resourceRequirements",
+                "revision",
+                "totalIssues",
+                "truncated",
+                "unavailableHandlers",
+                "valid",
+                "workflowId"
+            ],
+            "type": "object"
         },
         "HealthResult": {
             "description": "Liveness and identity.",
@@ -4301,6 +4848,11 @@
             ],
             "description": "A user attachment cannot inject tool results or provider reasoning into history."
         },
+        "IncomingPolicy": {
+            "description": "Multiple inputs require an explicit collector or join. Last-writer-wins is not an option.",
+            "enum": ["collect", "join", "reject"],
+            "type": "string"
+        },
         "Job": {
             "description": "A scheduled job as it is stored.",
             "properties": {
@@ -4631,6 +5183,29 @@
                 }
             ]
         },
+        "ListSchema": {
+            "description": "A list is a finalized collection; it is not a stream.",
+            "properties": {
+                "item": {
+                    "$ref": "#/definitions/ValueSchema"
+                },
+                "kind": {
+                    "const": "list",
+                    "type": "string"
+                },
+                "maxItems": {
+                    "type": "number"
+                },
+                "minItems": {
+                    "type": "number"
+                },
+                "nullable": {
+                    "type": "boolean"
+                }
+            },
+            "required": ["item", "kind", "maxItems", "minItems", "nullable"],
+            "type": "object"
+        },
         "LogLevel": {
             "description": "Log severity, least → most severe.",
             "enum": ["debug", "error", "info", "warn"],
@@ -4702,6 +5277,10 @@
         "MisfirePolicy": {
             "description": "What to do about occurrences that elapsed while the process was down.\n\nThere is no safe default here, which is exactly why it is a per-job field. A daily digest that\nmissed three days should send ONE digest (`run-once`); a billing rollup that missed three days\nmust process all three (`run-all`); a \"remind me at 9am\" whose 9am passed six hours ago should\nprobably stay quiet (`skip`). Choosing one globally is wrong for the other two.",
             "enum": ["run-all", "run-if-recent", "run-once", "skip"],
+            "type": "string"
+        },
+        "MockBehavior": {
+            "enum": ["deterministic", "fixture", "none"],
             "type": "string"
         },
         "ModelMessage": {
@@ -5820,6 +6399,29 @@
             "required": ["cachedTokens", "completionTokens", "maxTokens", "promptTokens"],
             "type": "object"
         },
+        "ObjectSchema": {
+            "description": "Closed objects reject accidental fields, while open objects retain extension data.",
+            "properties": {
+                "additional": {
+                    "type": "boolean"
+                },
+                "fields": {
+                    "items": {
+                        "$ref": "#/definitions/SchemaField"
+                    },
+                    "type": "array"
+                },
+                "kind": {
+                    "const": "object",
+                    "type": "string"
+                },
+                "nullable": {
+                    "type": "boolean"
+                }
+            },
+            "required": ["additional", "fields", "kind", "nullable"],
+            "type": "object"
+        },
         "OkResult": {
             "description": "The answer to a method that only reports success.",
             "properties": {
@@ -6049,6 +6651,14 @@
             },
             "required": ["id", "instructions", "name"],
             "type": "object"
+        },
+        "PortCardinality": {
+            "enum": ["item", "list", "stream"],
+            "type": "string"
+        },
+        "PortDirection": {
+            "enum": ["input", "output"],
+            "type": "string"
         },
         "ProcessInput": {
             "description": "Keystrokes are bounded and addressed through the owning session.",
@@ -6297,6 +6907,144 @@
             "required": ["asOf", "available", "cycle", "userId", "week"],
             "type": "object"
         },
+        "ResourceBinding": {
+            "description": "Saved requirement, including incomplete drafts. Never stores credentials or telemetry.",
+            "properties": {
+                "alias": {
+                    "type": "string"
+                },
+                "consumerId": {
+                    "description": "Stable node/group identity controls which agent or step receives access.",
+                    "type": "string"
+                },
+                "family": {
+                    "$ref": "#/definitions/ResourceFamily"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "limits": {
+                    "$ref": "#/definitions/ResourceLimits"
+                },
+                "maxAgeMs": {
+                    "description": "Null allows unknown freshness. Otherwise runtime requires a fresh observed source time.",
+                    "type": ["null", "string"]
+                },
+                "operations": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "selection": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/ResourceSelection"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "use": {
+                    "$ref": "#/definitions/ResourceUse"
+                },
+                "version": {
+                    "const": 1,
+                    "type": "number"
+                }
+            },
+            "required": [
+                "alias",
+                "consumerId",
+                "family",
+                "id",
+                "limits",
+                "maxAgeMs",
+                "operations",
+                "selection",
+                "use",
+                "version"
+            ],
+            "type": "object"
+        },
+        "ResourceFamily": {
+            "description": "External resource identity; these families never confer access themselves.\nSupported external resource families, distinct from account tenancy.",
+            "enum": [
+                "application",
+                "compute",
+                "computer",
+                "database",
+                "feed",
+                "files",
+                "workspace"
+            ],
+            "type": "string"
+        },
+        "ResourceLimits": {
+            "description": "Bounded read or job outputs, not a grant to ingest a whole source.",
+            "properties": {
+                "maxBytes": {
+                    "description": "Unsigned canonical decimal, lossless on the JSON wire.",
+                    "type": "string"
+                },
+                "maxItems": {
+                    "type": "number"
+                }
+            },
+            "required": ["maxBytes", "maxItems"],
+            "type": "object"
+        },
+        "ResourceSchema": {
+            "description": "Resource roles are nominal identities, not implicit runtime permissions.",
+            "properties": {
+                "kind": {
+                    "const": "resource",
+                    "type": "string"
+                },
+                "nullable": {
+                    "type": "boolean"
+                },
+                "role": {
+                    "type": "string"
+                }
+            },
+            "required": ["kind", "nullable", "role"],
+            "type": "object"
+        },
+        "ResourceSelection": {
+            "description": "An exact dataset/endpoint selection; paths never act as implicit permission prefixes.",
+            "properties": {
+                "connectionId": {
+                    "type": "string"
+                },
+                "connectorId": {
+                    "type": "string"
+                },
+                "connectorVersion": {
+                    "type": "string"
+                },
+                "resourceId": {
+                    "type": "string"
+                },
+                "targetId": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "connectionId",
+                "connectorId",
+                "connectorVersion",
+                "resourceId",
+                "targetId"
+            ],
+            "type": "object"
+        },
+        "ResourceUse": {
+            "description": "Attaching access, reading data, and placing computation are different operations.\nMeaning of a resource binding in the graph.",
+            "enum": ["attach", "compute", "read"],
+            "type": "string"
+        },
         "RiskLevel": {
             "description": "How dangerous an action is.",
             "enum": ["destructive", "execute", "read", "write"],
@@ -6323,6 +7071,56 @@
                 }
             },
             "required": ["connected", "validated"],
+            "type": "object"
+        },
+        "ScalarSchema": {
+            "description": "Primitive or named envelope type. Number values must be finite and safely represented.",
+            "properties": {
+                "choices": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "kind": {
+                    "$ref": "#/definitions/Exclude"
+                },
+                "maxLength": {
+                    "type": "number"
+                },
+                "maximum": {
+                    "type": "number"
+                },
+                "minLength": {
+                    "type": "number"
+                },
+                "minimum": {
+                    "type": "number"
+                },
+                "nullable": {
+                    "type": "boolean"
+                },
+                "whole": {
+                    "type": "boolean"
+                }
+            },
+            "required": ["kind", "nullable"],
+            "type": "object"
+        },
+        "SchemaField": {
+            "description": "Named nested field contracts keep missing, null and empty values distinct.",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "required": {
+                    "type": "boolean"
+                },
+                "schema": {
+                    "$ref": "#/definitions/ValueSchema"
+                }
+            },
+            "required": ["name", "required", "schema"],
             "type": "object"
         },
         "Scope": {
@@ -7931,6 +8729,23 @@
             "required": ["content", "id", "role", "timestamp"],
             "type": "object"
         },
+        "ValueSchema": {
+            "anyOf": [
+                {
+                    "$ref": "#/definitions/ScalarSchema"
+                },
+                {
+                    "$ref": "#/definitions/ObjectSchema"
+                },
+                {
+                    "$ref": "#/definitions/ListSchema"
+                },
+                {
+                    "$ref": "#/definitions/ResourceSchema"
+                }
+            ],
+            "description": "Declarative portable schema subset. No callbacks, JavaScript evaluation, or credentials."
+        },
         "VoiceAudioParams": {
             "properties": {
                 "callId": {
@@ -8463,6 +9278,500 @@
                 "state"
             ],
             "type": "object"
+        },
+        "WorkflowCatalog": {
+            "description": "Catalog format is separate from saved component versions and draft storage format.",
+            "properties": {
+                "components": {
+                    "items": {
+                        "$ref": "#/definitions/ComponentDefinition"
+                    },
+                    "type": "array"
+                },
+                "format": {
+                    "const": 1,
+                    "type": "number"
+                }
+            },
+            "required": ["components", "format"],
+            "type": "object"
+        },
+        "WorkflowCreateRequest": {
+            "description": "Client-chosen identities make an unacknowledged create safe to retry.",
+            "properties": {
+                "commandId": {
+                    "type": "string"
+                },
+                "details": {
+                    "$ref": "#/definitions/WorkflowDetails"
+                },
+                "workflowId": {
+                    "type": "string"
+                }
+            },
+            "required": ["commandId", "details", "workflowId"],
+            "type": "object"
+        },
+        "WorkflowDetails": {
+            "description": "User-owned descriptive fields, independent of run and automation state.",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "folder": {
+                    "type": ["null", "string"]
+                },
+                "name": {
+                    "type": "string"
+                },
+                "tags": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": ["description", "folder", "name", "tags"],
+            "type": "object"
+        },
+        "WorkflowEdge": {
+            "description": "A draft can retain a dangling edge so validation can explain an unfinished edit.",
+            "properties": {
+                "from": {
+                    "$ref": "#/definitions/WorkflowEndpoint"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "kind": {
+                    "$ref": "#/definitions/WorkflowEdgeKind"
+                },
+                "to": {
+                    "$ref": "#/definitions/WorkflowEndpoint"
+                }
+            },
+            "required": ["from", "id", "kind", "to"],
+            "type": "object"
+        },
+        "WorkflowEdgeKind": {
+            "description": "Execution, values, and resource attachments have separate connection semantics.\nConnection purpose does not depend on visual position.",
+            "enum": ["data", "flow", "resource"],
+            "type": "string"
+        },
+        "WorkflowEdgeReference": {
+            "description": "One immutable connection.",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                }
+            },
+            "required": ["content", "id"],
+            "type": "object"
+        },
+        "WorkflowEndpoint": {
+            "description": "Stable endpoint identities survive cosmetic renames.",
+            "properties": {
+                "node": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "string"
+                }
+            },
+            "required": ["node", "port"],
+            "type": "object"
+        },
+        "WorkflowListCursor": {
+            "description": "Cursor uses a timestamp plus stable identity to handle equal update times.",
+            "properties": {
+                "updatedAtMs": {
+                    "type": "string"
+                },
+                "workflowId": {
+                    "type": "string"
+                }
+            },
+            "required": ["updatedAtMs", "workflowId"],
+            "type": "object"
+        },
+        "WorkflowListPage": {
+            "description": "Bounded management page.",
+            "properties": {
+                "items": {
+                    "items": {
+                        "$ref": "#/definitions/WorkflowSummary"
+                    },
+                    "type": "array"
+                },
+                "next": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/WorkflowListCursor"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                }
+            },
+            "required": ["items", "next"],
+            "type": "object"
+        },
+        "WorkflowListRequest": {
+            "description": "Metadata pagination carries no node payloads.",
+            "properties": {
+                "cursor": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/WorkflowListCursor"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "limit": {
+                    "type": "number"
+                }
+            },
+            "required": ["cursor", "limit"],
+            "type": "object"
+        },
+        "WorkflowManifestPage": {
+            "description": "Bounded manifest page; offsets count references, never bytes or revisions.",
+            "properties": {
+                "details": {
+                    "$ref": "#/definitions/WorkflowDetails"
+                },
+                "edges": {
+                    "items": {
+                        "$ref": "#/definitions/WorkflowEdgeReference"
+                    },
+                    "type": "array"
+                },
+                "format": {
+                    "const": 1,
+                    "type": "number"
+                },
+                "nextEdgeOffset": {
+                    "type": ["null", "number"]
+                },
+                "nextNodeOffset": {
+                    "type": ["null", "number"]
+                },
+                "nodes": {
+                    "items": {
+                        "$ref": "#/definitions/WorkflowNodeReference"
+                    },
+                    "type": "array"
+                },
+                "revision": {
+                    "type": "string"
+                },
+                "workflowId": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "details",
+                "edges",
+                "format",
+                "nextEdgeOffset",
+                "nextNodeOffset",
+                "nodes",
+                "revision",
+                "workflowId"
+            ],
+            "type": "object"
+        },
+        "WorkflowNode": {
+            "description": "Versioned component configuration; unsupported or incomplete components can be saved.",
+            "properties": {
+                "component": {
+                    "type": "string"
+                },
+                "componentVersion": {
+                    "type": "string"
+                },
+                "configuration": {
+                    "$ref": "#/definitions/WorkflowObject"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "resources": {
+                    "items": {
+                        "$ref": "#/definitions/ResourceBinding"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": [
+                "component",
+                "componentVersion",
+                "configuration",
+                "id",
+                "label",
+                "resources"
+            ],
+            "type": "object"
+        },
+        "WorkflowNodeReference": {
+            "description": "One node's immutable content and independently versioned layout.",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "position": {
+                    "type": "string"
+                }
+            },
+            "required": ["content", "id", "position"],
+            "type": "object"
+        },
+        "WorkflowObject": {
+            "additionalProperties": {
+                "$ref": "#/definitions/WorkflowValue"
+            },
+            "description": "JSON configuration is data, not an executable plan or authorization.",
+            "type": "object"
+        },
+        "WorkflowPatch": {
+            "description": "A bounded edit; layout changes never include node configuration.",
+            "properties": {
+                "details": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/WorkflowDetails"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "edges": {
+                    "items": {
+                        "$ref": "#/definitions/WorkflowEdge"
+                    },
+                    "type": "array"
+                },
+                "nodes": {
+                    "items": {
+                        "$ref": "#/definitions/WorkflowNode"
+                    },
+                    "type": "array"
+                },
+                "positions": {
+                    "items": {
+                        "$ref": "#/definitions/WorkflowPosition"
+                    },
+                    "type": "array"
+                },
+                "removeEdges": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "removeNodes": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": ["details", "edges", "nodes", "positions", "removeEdges", "removeNodes"],
+            "type": "object"
+        },
+        "WorkflowPosition": {
+            "description": "Personal viewport is excluded; these positions belong to the workflow itself.",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "x": {
+                    "type": "number"
+                },
+                "y": {
+                    "type": "number"
+                }
+            },
+            "required": ["id", "x", "y"],
+            "type": "object"
+        },
+        "WorkflowReadRequest": {
+            "description": "Null resolves the current revision only for the first page. Subsequent pages pin it.",
+            "properties": {
+                "edgeOffset": {
+                    "type": "number"
+                },
+                "nodeOffset": {
+                    "type": "number"
+                },
+                "revision": {
+                    "type": ["null", "string"]
+                },
+                "workflowId": {
+                    "type": "string"
+                }
+            },
+            "required": ["edgeOffset", "nodeOffset", "revision", "workflowId"],
+            "type": "object"
+        },
+        "WorkflowReceipt": {
+            "description": "Result retained by command receipts, including after subsequent edits.",
+            "properties": {
+                "revision": {
+                    "type": "string"
+                },
+                "workflowId": {
+                    "type": "string"
+                }
+            },
+            "required": ["revision", "workflowId"],
+            "type": "object"
+        },
+        "WorkflowRecordPage": {
+            "description": "JSON text chunks are concatenated before parsing. Offsets count UTF-16 code units.",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "nextOffset": {
+                    "type": ["null", "number"]
+                },
+                "offset": {
+                    "type": "number"
+                },
+                "reference": {
+                    "type": "string"
+                },
+                "totalCharacters": {
+                    "type": "number"
+                },
+                "workflowId": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "content",
+                "nextOffset",
+                "offset",
+                "reference",
+                "totalCharacters",
+                "workflowId"
+            ],
+            "type": "object"
+        },
+        "WorkflowRecordRequest": {
+            "description": "A reference identifies immutable content within the authenticated owner's workflow.",
+            "properties": {
+                "offset": {
+                    "type": "number"
+                },
+                "reference": {
+                    "type": "string"
+                },
+                "workflowId": {
+                    "type": "string"
+                }
+            },
+            "required": ["offset", "reference", "workflowId"],
+            "type": "object"
+        },
+        "WorkflowSaveRequest": {
+            "description": "Command identity and expected revision serve different purposes.",
+            "properties": {
+                "commandId": {
+                    "type": "string"
+                },
+                "expectedRevision": {
+                    "type": "string"
+                },
+                "patch": {
+                    "$ref": "#/definitions/WorkflowPatch"
+                },
+                "workflowId": {
+                    "type": "string"
+                }
+            },
+            "required": ["commandId", "expectedRevision", "patch", "workflowId"],
+            "type": "object"
+        },
+        "WorkflowSummary": {
+            "description": "Small management projection; contains no graph, prompts, or run histories.",
+            "properties": {
+                "createdAtMs": {
+                    "type": "string"
+                },
+                "details": {
+                    "$ref": "#/definitions/WorkflowDetails"
+                },
+                "edgeCount": {
+                    "type": "number"
+                },
+                "nodeCount": {
+                    "type": "number"
+                },
+                "revision": {
+                    "type": "string"
+                },
+                "updatedAtMs": {
+                    "type": "string"
+                },
+                "workflowId": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "createdAtMs",
+                "details",
+                "edgeCount",
+                "nodeCount",
+                "revision",
+                "updatedAtMs",
+                "workflowId"
+            ],
+            "type": "object"
+        },
+        "WorkflowValidateRequest": {
+            "description": "Authoritative validation always names one immutable saved revision.",
+            "properties": {
+                "revision": {
+                    "type": "string"
+                },
+                "workflowId": {
+                    "type": "string"
+                }
+            },
+            "required": ["revision", "workflowId"],
+            "type": "object"
+        },
+        "WorkflowValue": {
+            "anyOf": [
+                {
+                    "$ref": "#/definitions/WorkflowObject"
+                },
+                {
+                    "items": {
+                        "$ref": "#/definitions/WorkflowValue"
+                    },
+                    "type": "array"
+                },
+                {
+                    "type": ["null", "string", "number", "boolean"]
+                }
+            ],
+            "description": "Large integers and financial values must use decimal strings."
         },
         "Workspace": {
             "description": "An isolated place an agent works.",

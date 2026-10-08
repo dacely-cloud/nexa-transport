@@ -51,7 +51,10 @@ export class SchemaValidator {
         return schema;
     }
     #check(schema: Schema, value: unknown, depth: number): boolean {
-        if (depth > 128) {
+        // This counts schema references and union branches as well as data nesting. A valid
+        // 32-level workflow configuration traverses more than 128 schema nodes. Keep a finite
+        // stack budget with room for its enclosing method/patch/node schemas.
+        if (depth > 256) {
             return false;
         }
         if (schema.$ref !== undefined) {
