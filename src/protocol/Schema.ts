@@ -17,10 +17,18 @@ export interface Schema {
     readonly $id?: string;
     readonly $schema?: string;
 }
+
+/** Mutually exclusive required string tags select one complete union branch. */
+interface DiscriminatedSchema {
+    readonly key: string;
+    readonly branches: ReadonlyMap<string, Schema>;
+}
 /** Validates JSON contracts without runtime code generation, suitable for browser CSPs. */
 export class SchemaValidator {
     /** Owns a schema snapshot independent of the running Nexa installation. */
     readonly #root: Schema;
+    readonly #resolved: Map<string, Schema | undefined> = new Map();
+    readonly #unions: WeakMap<Schema, DiscriminatedSchema | null> = new WeakMap();
     public constructor(root: Schema) {
         this.#root = root;
     }
@@ -30,6 +38,7 @@ export class SchemaValidator {
         return schema !== undefined && this.#check(schema, value, 0);
     }
     #resolve(path: string): Schema | undefined {
+        if (this.#resolved.has(path)) return this.#resolved.get(path);
         const parts: string[] = path.replace(/^.*#\//, '').split('/');
         let schema: Schema | undefined = this.#root;
         for (let i: number = 0; i < parts.length; i += 2) {
@@ -48,7 +57,49 @@ export class SchemaValidator {
                 return undefined;
             }
         }
+        if (schema !== undefined && this.#resolved.size < 4096) this.#resolved.set(path, schema);
         return schema;
+    }
+
+    /** Index only branches whose required, distinct constants prove all other branches impossible. */
+    #discriminator(schema: Schema): DiscriminatedSchema | null {
+        const cached: DiscriminatedSchema | null | undefined = this.#unions.get(schema);
+        if (cached !== undefined) return cached;
+        this.#unions.set(schema, null);
+        const alternatives: readonly Schema[] | undefined = schema.anyOf;
+        if (alternatives === undefined || alternatives.length < 2) return null;
+        const resolved: Schema[] = [];
+        for (const alternative of alternatives) {
+            let branch: Schema | undefined = alternative;
+            for (let depth: number = 0; branch?.$ref !== undefined && depth <= 256; depth++) {
+                branch = this.#resolve(branch.$ref);
+            }
+            if (branch === undefined || branch.$ref !== undefined) return null;
+            resolved.push(branch);
+        }
+        const first: Schema | undefined = resolved[0];
+        for (const key of first?.required ?? []) {
+            const branches: Map<string, Schema> = new Map();
+            for (let index: number = 0; index < resolved.length; index++) {
+                const branch: Schema | undefined = resolved[index];
+                const original: Schema | undefined = alternatives[index];
+                const tag: Schema | undefined = branch?.properties?.[key];
+                if (
+                    !branch?.required?.includes(key) ||
+                    typeof tag?.const !== 'string' ||
+                    branches.has(tag.const) ||
+                    original === undefined
+                )
+                    break;
+                branches.set(tag.const, original);
+            }
+            if (branches.size === alternatives.length) {
+                const discriminator: DiscriminatedSchema = { key, branches };
+                this.#unions.set(schema, discriminator);
+                return discriminator;
+            }
+        }
+        return null;
     }
     #check(schema: Schema, value: unknown, depth: number): boolean {
         // This counts schema references and union branches as well as data nesting. A valid
@@ -70,11 +121,18 @@ export class SchemaValidator {
         ) {
             return false;
         }
-        if (
-            schema.anyOf !== undefined &&
-            !schema.anyOf.some((item: Schema): boolean => this.#check(item, value, depth + 1))
-        ) {
-            return false;
+        if (schema.anyOf !== undefined) {
+            const discriminator: DiscriminatedSchema | null = this.#discriminator(schema);
+            if (discriminator !== null && isRecord(value)) {
+                const tag: unknown = value[discriminator.key];
+                const branch: Schema | undefined =
+                    typeof tag === 'string' ? discriminator.branches.get(tag) : undefined;
+                if (branch === undefined || !this.#check(branch, value, depth + 1)) return false;
+            } else if (
+                !schema.anyOf.some((item: Schema): boolean => this.#check(item, value, depth + 1))
+            ) {
+                return false;
+            }
         }
         if (
             schema.allOf !== undefined &&

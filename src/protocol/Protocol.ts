@@ -898,6 +898,8 @@ export const ConnectClientInfomodeValues = {
 export interface ConnectClientInfoShape {
     /** id as defined by the Nexa gateway. */
     readonly id: string;
+    /** metadataOnlyAttachments as defined by the Nexa gateway. */
+    readonly metadataOnlyAttachments?: boolean;
     /** mode as defined by the Nexa gateway. */
     readonly mode: (typeof ConnectClientInfomodeValues)[keyof typeof ConnectClientInfomodeValues];
     /** platform as defined by the Nexa gateway. */
@@ -5461,6 +5463,8 @@ export interface SessionHistoryParamsShape {
     readonly endCursor?: string;
     /** id as defined by the Nexa gateway. */
     readonly id: string;
+    /** pageBytes as defined by the Nexa gateway. */
+    readonly pageBytes?: number;
 }
 
 /** SessionHistoryParams from the Nexa wire protocol. */
