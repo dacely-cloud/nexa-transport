@@ -7,6 +7,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 const files: readonly string[] = [
     'planning/PlanningTypes',
     'planning/PlanningCodec',
+    'planning/PlanningSources',
     'planning/PlanningEdits',
     'runtime/RunTypes',
     'runtime/RunRequests',

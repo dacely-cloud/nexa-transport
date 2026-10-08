@@ -4331,6 +4331,18 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'workflows.planning.sources': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/PlanningSourcesRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/PlanningSourcesPage',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'workflows.read': {
                     properties: {
                         params: {
@@ -4612,6 +4624,7 @@ export const schema: Schema = {
                 'workflows.planning.history',
                 'workflows.planning.read',
                 'workflows.planning.send',
+                'workflows.planning.sources',
                 'workflows.read',
                 'workflows.record',
                 'workflows.runs.cancel',
@@ -7205,6 +7218,14 @@ export const schema: Schema = {
                 requestId: {
                     type: 'string',
                 },
+                sourceIds: {
+                    description:
+                        'Explicit metadata selections; never resource grants. Omitted by older clients.',
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
                 workflowId: {
                     type: 'string',
                 },
@@ -7242,6 +7263,64 @@ export const schema: Schema = {
             required: ['id', 'nodeIds', 'state', 'text'],
             type: 'object',
         },
+        PlanningSource: {
+            description:
+                'Metadata only. No filesystem paths, credentials, file contents, or host telemetry.',
+            properties: {
+                id: {
+                    type: 'string',
+                },
+                name: {
+                    type: 'string',
+                },
+                reason: {
+                    type: 'string',
+                },
+                state: {
+                    $ref: '#/definitions/PlanningSourceState',
+                },
+            },
+            required: ['id', 'name', 'reason', 'state'],
+            type: 'object',
+        },
+        PlanningSourceState: {
+            description:
+                'Discovery of a registered source is not a grant or an executable resource binding.',
+            enum: ['needs-adapter', 'unavailable'],
+            type: 'string',
+        },
+        PlanningSourcesPage: {
+            properties: {
+                available: {
+                    type: 'boolean',
+                },
+                items: {
+                    items: {
+                        $ref: '#/definitions/PlanningSource',
+                    },
+                    type: 'array',
+                },
+                next: {
+                    type: ['null', 'string'],
+                },
+            },
+            required: ['available', 'items', 'next'],
+            type: 'object',
+        },
+        PlanningSourcesRequest: {
+            description:
+                'Owner-scoped catalog pagination; a cursor is an opaque source identity, not a path.',
+            properties: {
+                after: {
+                    type: ['null', 'string'],
+                },
+                workflowId: {
+                    type: 'string',
+                },
+            },
+            required: ['after', 'workflowId'],
+            type: 'object',
+        },
         PlanningStatus: {
             enum: ['canceled', 'complete', 'failed', 'working'],
             type: 'string',
@@ -7273,6 +7352,14 @@ export const schema: Schema = {
                 },
                 requestId: {
                     type: 'string',
+                },
+                sourceIds: {
+                    description:
+                        'Explicit metadata selections retained with this conversation turn.',
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
                 },
                 status: {
                     $ref: '#/definitions/PlanningStatus',

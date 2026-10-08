@@ -60,6 +60,8 @@ export interface PlanningReply extends PlanningProposal {
     readonly validation: GraphValidation;
 }
 export interface PlanningRequest {
+    /** Explicit metadata selections; never resource grants. Omitted by older clients. */
+    readonly sourceIds?: readonly string[];
     readonly workflowId: string;
     readonly requestId: string;
     readonly baseRevision: string;
@@ -76,6 +78,8 @@ export const PlanningStatus = {
 export type PlanningStatus = (typeof PlanningStatus)[keyof typeof PlanningStatus];
 /** A turn is a separate bounded record, not an ever-growing workflow field. */
 export interface PlanningTurn {
+    /** Explicit metadata selections retained with this conversation turn. */
+    readonly sourceIds?: readonly string[];
     readonly workflowId: string;
     readonly requestId: string;
     readonly previousRequestId: string | null;

@@ -2748,6 +2748,14 @@ export interface GatewayMethodsworkflows_planning_sendShape {
     readonly result: PlanningTurn;
 }
 
+/** GatewayMethodsworkflows_planning_sources wire fields. */
+export interface GatewayMethodsworkflows_planning_sourcesShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: PlanningSourcesRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: PlanningSourcesPage;
+}
+
 /** GatewayMethodsworkflows_read wire fields. */
 export interface GatewayMethodsworkflows_readShape {
     /** params as defined by the Nexa gateway. */
@@ -3056,6 +3064,8 @@ export interface GatewayMethodsShape {
     readonly 'workflows.planning.read': GatewayMethodsworkflows_planning_readShape;
     /** workflows.planning.send as defined by the Nexa gateway. */
     readonly 'workflows.planning.send': GatewayMethodsworkflows_planning_sendShape;
+    /** workflows.planning.sources as defined by the Nexa gateway. */
+    readonly 'workflows.planning.sources': GatewayMethodsworkflows_planning_sourcesShape;
     /** workflows.read as defined by the Nexa gateway. */
     readonly 'workflows.read': GatewayMethodsworkflows_readShape;
     /** workflows.record as defined by the Nexa gateway. */
@@ -4680,6 +4690,8 @@ export interface PlanningRequestShape {
     readonly previousRequestId: null | string;
     /** requestId as defined by the Nexa gateway. */
     readonly requestId: string;
+    /** sourceIds as defined by the Nexa gateway. */
+    readonly sourceIds?: ReadonlyArray<string>;
     /** workflowId as defined by the Nexa gateway. */
     readonly workflowId: string;
 }
@@ -4701,6 +4713,55 @@ export interface PlanningRequirementShape {
 
 /** PlanningRequirement from the Nexa wire protocol. */
 export type PlanningRequirement = PlanningRequirementShape;
+
+/** PlanningSource wire fields. */
+export interface PlanningSourceShape {
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** name as defined by the Nexa gateway. */
+    readonly name: string;
+    /** reason as defined by the Nexa gateway. */
+    readonly reason: string;
+    /** state as defined by the Nexa gateway. */
+    readonly state: PlanningSourceState;
+}
+
+/** PlanningSource from the Nexa wire protocol. */
+export type PlanningSource = PlanningSourceShape;
+
+/** Allowed values for PlanningSourceState. */
+export const PlanningSourceStateValues = {
+    Value0: 'needs-adapter',
+    Value1: 'unavailable',
+} as const;
+
+/** PlanningSourceState from the Nexa wire protocol. */
+export type PlanningSourceState =
+    (typeof PlanningSourceStateValues)[keyof typeof PlanningSourceStateValues];
+
+/** PlanningSourcesPage wire fields. */
+export interface PlanningSourcesPageShape {
+    /** available as defined by the Nexa gateway. */
+    readonly available: boolean;
+    /** items as defined by the Nexa gateway. */
+    readonly items: ReadonlyArray<PlanningSource>;
+    /** next as defined by the Nexa gateway. */
+    readonly next: null | string;
+}
+
+/** PlanningSourcesPage from the Nexa wire protocol. */
+export type PlanningSourcesPage = PlanningSourcesPageShape;
+
+/** PlanningSourcesRequest wire fields. */
+export interface PlanningSourcesRequestShape {
+    /** after as defined by the Nexa gateway. */
+    readonly after: null | string;
+    /** workflowId as defined by the Nexa gateway. */
+    readonly workflowId: string;
+}
+
+/** PlanningSourcesRequest from the Nexa wire protocol. */
+export type PlanningSourcesRequest = PlanningSourcesRequestShape;
 
 /** Allowed values for PlanningStatus. */
 export const PlanningStatusValues = {
@@ -4727,6 +4788,8 @@ export interface PlanningTurnShape {
     readonly reply: PlanningReply | null;
     /** requestId as defined by the Nexa gateway. */
     readonly requestId: string;
+    /** sourceIds as defined by the Nexa gateway. */
+    readonly sourceIds?: ReadonlyArray<string>;
     /** status as defined by the Nexa gateway. */
     readonly status: PlanningStatus;
     /** workflowId as defined by the Nexa gateway. */
@@ -7527,6 +7590,8 @@ export enum Method {
     WorkflowsPlanningRead = 'workflows.planning.read',
     /** Calls workflows.planning.send. */
     WorkflowsPlanningSend = 'workflows.planning.send',
+    /** Calls workflows.planning.sources. */
+    WorkflowsPlanningSources = 'workflows.planning.sources',
     /** Calls workflows.read. */
     WorkflowsRead = 'workflows.read',
     /** Calls workflows.record. */

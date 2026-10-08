@@ -1,3 +1,4 @@
+import { PlanningSourceCodec } from './PlanningSources.js';
 // SPDX-License-Identifier: Apache-2.0
 
 import { WorkflowInput } from '../WorkflowInput.js';
@@ -20,7 +21,10 @@ import {
 /** Shared wire and model-output boundary. Strict fields prevent silently ignored model instructions. */
 export class PlanningCodec {
     public static request(raw: unknown): PlanningRequest {
-        const value: Readonly<Record<string, unknown>> = WorkflowInput.record(raw, [
+        const input: Readonly<Record<string, unknown>> = WorkflowInput.object(raw);
+        const hasSources: boolean = Object.hasOwn(input, 'sourceIds');
+        const value: Readonly<Record<string, unknown>> = WorkflowInput.record(input, [
+            ...(hasSources ? ['sourceIds'] : []),
             'workflowId',
             'requestId',
             'baseRevision',
@@ -38,6 +42,7 @@ export class PlanningCodec {
                     : WorkflowInput.id(value['previousRequestId']),
             message: WorkflowInput.text(value['message'], PlanningLimits.messageCharacters),
             document: this.document(value['document']),
+            ...(hasSources ? { sourceIds: PlanningSourceCodec.ids(value['sourceIds']) } : {}),
         };
         this.bytes(request, PlanningLimits.requestBytes);
         return Object.freeze(request);
