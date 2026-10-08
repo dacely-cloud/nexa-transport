@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { WorkflowGroupCodec } from './WorkflowGroupCodec.js';
+import type { WorkflowGroup, WorkflowGroupReference } from './WorkflowGroupTypes.js';
 import { WorkflowInput } from './WorkflowInput.js';
 import { WorkflowJson } from './WorkflowJson.js';
 import { ResourceBindingCodec } from './ResourceBindingCodec.js';
@@ -112,6 +114,9 @@ export class WorkflowCodec {
     }
     /** An edit has explicit, nonoverlapping upserts and deletions. */
     public static patch(raw: unknown): WorkflowPatch {
+        const source: Readonly<Record<string, unknown>> = WorkflowInput.object(raw);
+        const hierarchy: boolean =
+            Object.hasOwn(source, 'groups') || Object.hasOwn(source, 'removeGroups');
         const value: Readonly<Record<string, unknown>> = WorkflowInput.record(raw, [
             'details',
             'nodes',
@@ -119,6 +124,7 @@ export class WorkflowCodec {
             'edges',
             'removeNodes',
             'removeEdges',
+            ...(hierarchy ? ['groups', 'removeGroups'] : []),
         ]);
         const nodes: readonly WorkflowNode[] = WorkflowInput.list(
             value['nodes'],
@@ -157,7 +163,24 @@ export class WorkflowCodec {
             ...edges.map((edge: WorkflowEdge): string => edge.id),
             ...removeEdges,
         ]);
+        const groups: readonly WorkflowGroup[] | undefined = hierarchy
+            ? WorkflowInput.list(value['groups'], 256, (entry: unknown): WorkflowGroup =>
+                  WorkflowGroupCodec.parse(entry),
+              )
+            : undefined;
+        const removeGroups: readonly string[] | undefined = hierarchy
+            ? WorkflowInput.list(value['removeGroups'], 1000, (entry: unknown): string =>
+                  WorkflowInput.id(entry),
+              )
+            : undefined;
+        if (groups !== undefined && removeGroups !== undefined) {
+            WorkflowInput.unique([
+                ...groups.map((group: WorkflowGroup): string => group.id),
+                ...removeGroups,
+            ]);
+        }
         return Object.freeze({
+            ...(groups === undefined || removeGroups === undefined ? {} : { groups, removeGroups }),
             details: value['details'] === null ? null : this.details(value['details']),
             nodes,
             positions,
@@ -168,6 +191,8 @@ export class WorkflowCodec {
     }
     /** Stored manifests have bounded reference arrays and a version gate. */
     public static manifest(raw: unknown): WorkflowManifest {
+        const source: Readonly<Record<string, unknown>> = WorkflowInput.object(raw);
+        const hierarchy: boolean = Object.hasOwn(source, 'groups');
         const value: Readonly<Record<string, unknown>> = WorkflowInput.record(raw, [
             'format',
             'workflowId',
@@ -175,6 +200,7 @@ export class WorkflowCodec {
             'details',
             'nodes',
             'edges',
+            ...(hierarchy ? ['groups'] : []),
         ]);
         if (value['format'] !== 1) {
             throw new Error('Unsupported workflow format');
@@ -211,7 +237,27 @@ export class WorkflowCodec {
         );
         WorkflowInput.unique(nodes.map((node: WorkflowNodeReference): string => node.id));
         WorkflowInput.unique(edges.map((edge: WorkflowEdgeReference): string => edge.id));
+        const groups: readonly WorkflowGroupReference[] | undefined = hierarchy
+            ? WorkflowInput.list(
+                  value['groups'],
+                  1000,
+                  (entry: unknown): WorkflowGroupReference => {
+                      const group: Readonly<Record<string, unknown>> = WorkflowInput.record(entry, [
+                          'id',
+                          'content',
+                      ]);
+                      return Object.freeze({
+                          id: WorkflowInput.id(group['id']),
+                          content: WorkflowInput.id(group['content']),
+                      });
+                  },
+              )
+            : undefined;
+        if (groups !== undefined) {
+            WorkflowInput.unique(groups.map((group: WorkflowGroupReference): string => group.id));
+        }
         return Object.freeze({
+            ...(groups === undefined ? {} : { groups }),
             format: 1,
             workflowId: WorkflowInput.id(value['workflowId']),
             revision: ResourceBindingCodec.decimal(value['revision']),

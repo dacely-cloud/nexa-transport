@@ -1896,6 +1896,8 @@ export interface GatewayFeaturesShape {
     readonly workflowDraftsVersion?: 1;
     /** workflowGraphVersion as defined by the Nexa gateway. */
     readonly workflowGraphVersion?: 1;
+    /** workflowGroupsVersion as defined by the Nexa gateway. */
+    readonly workflowGroupsVersion?: 1;
     /** workflowPlanningVersion as defined by the Nexa gateway. */
     readonly workflowPlanningVersion?: 1;
     /** workflowRunsVersion as defined by the Nexa gateway. */
@@ -6803,6 +6805,55 @@ export interface WorkflowEndpointShape {
 /** WorkflowEndpoint from the Nexa wire protocol. */
 export type WorkflowEndpoint = WorkflowEndpointShape;
 
+/** WorkflowGroup wire fields. */
+export interface WorkflowGroupShape {
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** nodes as defined by the Nexa gateway. */
+    readonly nodes: ReadonlyArray<string>;
+    /** objective as defined by the Nexa gateway. */
+    readonly objective: string;
+    /** parent as defined by the Nexa gateway. */
+    readonly parent: null | string;
+    /** ports as defined by the Nexa gateway. */
+    readonly ports: ReadonlyArray<WorkflowGroupPort>;
+    /** title as defined by the Nexa gateway. */
+    readonly title: string;
+    /** x as defined by the Nexa gateway. */
+    readonly x: number;
+    /** y as defined by the Nexa gateway. */
+    readonly y: number;
+}
+
+/** WorkflowGroup from the Nexa wire protocol. */
+export type WorkflowGroup = WorkflowGroupShape;
+
+/** WorkflowGroupPort wire fields. */
+export interface WorkflowGroupPortShape {
+    /** direction as defined by the Nexa gateway. */
+    readonly direction: PortDirection;
+    /** endpoint as defined by the Nexa gateway. */
+    readonly endpoint: WorkflowEndpoint;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** label as defined by the Nexa gateway. */
+    readonly label: string;
+}
+
+/** WorkflowGroupPort from the Nexa wire protocol. */
+export type WorkflowGroupPort = WorkflowGroupPortShape;
+
+/** WorkflowGroupReference wire fields. */
+export interface WorkflowGroupReferenceShape {
+    /** content as defined by the Nexa gateway. */
+    readonly content: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+}
+
+/** WorkflowGroupReference from the Nexa wire protocol. */
+export type WorkflowGroupReference = WorkflowGroupReferenceShape;
+
 /** WorkflowImageCandidate wire fields. */
 export interface WorkflowImageCandidateShape {
     /** evidence as defined by the Nexa gateway. */
@@ -7031,8 +7082,12 @@ export interface WorkflowManifestPageShape {
     readonly edges: ReadonlyArray<WorkflowEdgeReference>;
     /** format as defined by the Nexa gateway. */
     readonly format: 1;
+    /** groups as defined by the Nexa gateway. */
+    readonly groups?: ReadonlyArray<WorkflowGroupReference>;
     /** nextEdgeOffset as defined by the Nexa gateway. */
     readonly nextEdgeOffset: null | number;
+    /** nextGroupOffset as defined by the Nexa gateway. */
+    readonly nextGroupOffset?: null | number;
     /** nextNodeOffset as defined by the Nexa gateway. */
     readonly nextNodeOffset: null | number;
     /** nodes as defined by the Nexa gateway. */
@@ -7271,12 +7326,16 @@ export interface WorkflowPatchShape {
     readonly details: WorkflowDetails | null;
     /** edges as defined by the Nexa gateway. */
     readonly edges: ReadonlyArray<WorkflowEdge>;
+    /** groups as defined by the Nexa gateway. */
+    readonly groups?: ReadonlyArray<WorkflowGroup>;
     /** nodes as defined by the Nexa gateway. */
     readonly nodes: ReadonlyArray<WorkflowNode>;
     /** positions as defined by the Nexa gateway. */
     readonly positions: ReadonlyArray<WorkflowPosition>;
     /** removeEdges as defined by the Nexa gateway. */
     readonly removeEdges: ReadonlyArray<string>;
+    /** removeGroups as defined by the Nexa gateway. */
+    readonly removeGroups?: ReadonlyArray<string>;
     /** removeNodes as defined by the Nexa gateway. */
     readonly removeNodes: ReadonlyArray<string>;
 }
@@ -7301,6 +7360,8 @@ export type WorkflowPosition = WorkflowPositionShape;
 export interface WorkflowReadRequestShape {
     /** edgeOffset as defined by the Nexa gateway. */
     readonly edgeOffset: number;
+    /** groupOffset as defined by the Nexa gateway. */
+    readonly groupOffset?: number;
     /** nodeOffset as defined by the Nexa gateway. */
     readonly nodeOffset: number;
     /** revision as defined by the Nexa gateway. */

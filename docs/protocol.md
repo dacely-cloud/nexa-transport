@@ -1100,6 +1100,10 @@ Type: `"aborted"` / `"auth"` / `"budget-exhausted"` / `"config"` / `"context-ove
 
 ## Exclude
 
+Type: `"reasoning"` / `"text"`.
+
+## Exclude_1
+
 Type: `"audio"` / `"boolean"` / `"datetime"` / `"file"` / `"flow"` / `"image"` / `"integer"` / `"json"` / `"message"` / `"number"` / `"table"` / `"text"` / `"timestamp"` / `"video"`.
 
 ## FinishReason
@@ -1251,6 +1255,7 @@ Methods, events, and additive capabilities supported by this gateway.
 | `sessionHistoryUpdates`     | No       | `true`                                             | Session subscriptions notify exact journal ranges for live catch-up.                           |
 | `workflowDraftsVersion`     | No       | `1`                                                |                                                                                                |
 | `workflowGraphVersion`      | No       | `1`                                                | Exact component catalog and structural validation of pinned drafts.                            |
+| `workflowGroupsVersion`     | No       | `1`                                                | Saved parent-local groups, published aliases and paginated immutable group records.            |
 | `workflowPlanningVersion`   | No       | `1`                                                | Owner-scoped draft storage with bounded reads and revision-safe direct patches.                |
 | `workflowRunsVersion`       | No       | `1`                                                | Durable core workflow test runs and bounded output inspection.                                 |
 
@@ -1274,121 +1279,123 @@ Configurable bounds on gateway-owned work and memory.
 
 ## GatewayMethods
 
-| Field                          | Required | Type                  | Description                                                                                |
-| ------------------------------ | -------- | --------------------- | ------------------------------------------------------------------------------------------ |
-| `accounts.create`              | Yes      | Object (fields below) |                                                                                            |
-| `accounts.list`                | Yes      | Object (fields below) |                                                                                            |
-| `accounts.remove`              | Yes      | Object (fields below) |                                                                                            |
-| `accounts.usage`               | Yes      | Object (fields below) |                                                                                            |
-| `agent.ask`                    | Yes      | Object (fields below) |                                                                                            |
-| `agent.steer`                  | Yes      | Object (fields below) |                                                                                            |
-| `agent.stream`                 | Yes      | Object (fields below) |                                                                                            |
-| `agents.define`                | Yes      | Object (fields below) |                                                                                            |
-| `agents.list`                  | Yes      | Object (fields below) |                                                                                            |
-| `agents.personal.list`         | Yes      | Object (fields below) |                                                                                            |
-| `agents.personal.remove`       | Yes      | Object (fields below) |                                                                                            |
-| `agents.personal.save`         | Yes      | Object (fields below) |                                                                                            |
-| `approvals.list`               | Yes      | Object (fields below) |                                                                                            |
-| `approvals.resolve`            | Yes      | Object (fields below) |                                                                                            |
-| `channels.deadLetters.list`    | Yes      | Object (fields below) |                                                                                            |
-| `channels.list`                | Yes      | Object (fields below) |                                                                                            |
-| `channels.status`              | Yes      | Object (fields below) |                                                                                            |
-| `config.get`                   | Yes      | Object (fields below) |                                                                                            |
-| `config.set`                   | Yes      | Object (fields below) |                                                                                            |
-| `config.unset`                 | Yes      | Object (fields below) |                                                                                            |
-| `connect`                      | Yes      | Object (fields below) |                                                                                            |
-| `credit.budgets`               | Yes      | Object (fields below) |                                                                                            |
-| `credit.removeBudget`          | Yes      | Object (fields below) |                                                                                            |
-| `credit.resetAllowance`        | Yes      | Object (fields below) |                                                                                            |
-| `credit.resetHistory`          | Yes      | Object (fields below) |                                                                                            |
-| `credit.resets`                | Yes      | Object (fields below) |                                                                                            |
-| `credit.setBudget`             | Yes      | Object (fields below) |                                                                                            |
-| `credit.summary`               | Yes      | Object (fields below) |                                                                                            |
-| `credit.wallet`                | Yes      | Object (fields below) |                                                                                            |
-| `credit.walletHistory`         | Yes      | Object (fields below) |                                                                                            |
-| `data.upload.cancel`           | Yes      | Object (fields below) |                                                                                            |
-| `data.upload.chunk`            | Yes      | Object (fields below) |                                                                                            |
-| `data.upload.finish`           | Yes      | Object (fields below) |                                                                                            |
-| `data.upload.start`            | Yes      | Object (fields below) |                                                                                            |
-| `devices.approve`              | Yes      | Object (fields below) |                                                                                            |
-| `devices.list`                 | Yes      | Object (fields below) |                                                                                            |
-| `devices.reject`               | Yes      | Object (fields below) |                                                                                            |
-| `devices.revoke`               | Yes      | Object (fields below) |                                                                                            |
-| `health`                       | Yes      | Object (fields below) |                                                                                            |
-| `jobs.add`                     | Yes      | Object (fields below) |                                                                                            |
-| `jobs.list`                    | Yes      | Object (fields below) |                                                                                            |
-| `jobs.remove`                  | Yes      | Object (fields below) |                                                                                            |
-| `logs.tail`                    | Yes      | Object (fields below) |                                                                                            |
-| `media.acknowledge`            | Yes      | Object (fields below) |                                                                                            |
-| `office.ownerProof`            | Yes      | Object (fields below) | Bind an invitation to the authenticated socket's office, using a short-lived signed proof. |
-| `processes.input`              | Yes      | Object (fields below) |                                                                                            |
-| `processes.list`               | Yes      | Object (fields below) |                                                                                            |
-| `processes.log`                | Yes      | Object (fields below) |                                                                                            |
-| `processes.resize`             | Yes      | Object (fields below) |                                                                                            |
-| `processes.stop`               | Yes      | Object (fields below) |                                                                                            |
-| `roblox.credentials.remove`    | Yes      | Object (fields below) |                                                                                            |
-| `roblox.credentials.set`       | Yes      | Object (fields below) |                                                                                            |
-| `roblox.credentials.status`    | Yes      | Object (fields below) |                                                                                            |
-| `roblox.telemetry.funnel`      | Yes      | Object (fields below) |                                                                                            |
-| `roblox.telemetry.performance` | Yes      | Object (fields below) |                                                                                            |
-| `roblox.telemetry.projects`    | Yes      | Object (fields below) |                                                                                            |
-| `sessions.delete`              | Yes      | Object (fields below) |                                                                                            |
-| `sessions.download`            | Yes      | Object (fields below) |                                                                                            |
-| `sessions.files`               | Yes      | Object (fields below) |                                                                                            |
-| `sessions.get`                 | Yes      | Object (fields below) |                                                                                            |
-| `sessions.history`             | Yes      | Object (fields below) |                                                                                            |
-| `sessions.input`               | Yes      | Object (fields below) |                                                                                            |
-| `sessions.list`                | Yes      | Object (fields below) |                                                                                            |
-| `sessions.messages`            | Yes      | Object (fields below) |                                                                                            |
-| `sessions.pin`                 | Yes      | Object (fields below) |                                                                                            |
-| `sessions.pins`                | Yes      | Object (fields below) |                                                                                            |
-| `sessions.rename`              | Yes      | Object (fields below) |                                                                                            |
-| `sessions.retry`               | Yes      | Object (fields below) |                                                                                            |
-| `sessions.search`              | Yes      | Object (fields below) |                                                                                            |
-| `sessions.subscribe`           | Yes      | Object (fields below) |                                                                                            |
-| `sessions.unpin`               | Yes      | Object (fields below) |                                                                                            |
-| `sessions.unsubscribe`         | Yes      | Object (fields below) |                                                                                            |
-| `shares.create`                | Yes      | Object (fields below) |                                                                                            |
-| `shares.list`                  | Yes      | Object (fields below) |                                                                                            |
-| `shares.remove`                | Yes      | Object (fields below) |                                                                                            |
-| `shares.setMember`             | Yes      | Object (fields below) |                                                                                            |
-| `tasks.cancel`                 | Yes      | Object (fields below) |                                                                                            |
-| `tasks.get`                    | Yes      | Object (fields below) |                                                                                            |
-| `tasks.list`                   | Yes      | Object (fields below) |                                                                                            |
-| `teams.create`                 | Yes      | Object (fields below) |                                                                                            |
-| `teams.list`                   | Yes      | Object (fields below) |                                                                                            |
-| `teams.remove`                 | Yes      | Object (fields below) |                                                                                            |
-| `teams.setMember`              | Yes      | Object (fields below) |                                                                                            |
-| `voice.audio`                  | Yes      | Object (fields below) |                                                                                            |
-| `voice.start`                  | Yes      | Object (fields below) |                                                                                            |
-| `voice.stop`                   | Yes      | Object (fields below) |                                                                                            |
-| `workflows.catalog`            | Yes      | Object (fields below) |                                                                                            |
-| `workflows.create`             | Yes      | Object (fields below) |                                                                                            |
-| `workflows.list`               | Yes      | Object (fields below) |                                                                                            |
-| `workflows.models`             | Yes      | Object (fields below) |                                                                                            |
-| `workflows.models.refresh`     | Yes      | Object (fields below) |                                                                                            |
-| `workflows.models.resolve`     | Yes      | Object (fields below) |                                                                                            |
-| `workflows.planning.cancel`    | Yes      | Object (fields below) |                                                                                            |
-| `workflows.planning.history`   | Yes      | Object (fields below) |                                                                                            |
-| `workflows.planning.read`      | Yes      | Object (fields below) |                                                                                            |
-| `workflows.planning.send`      | Yes      | Object (fields below) |                                                                                            |
-| `workflows.planning.sources`   | Yes      | Object (fields below) |                                                                                            |
-| `workflows.read`               | Yes      | Object (fields below) |                                                                                            |
-| `workflows.record`             | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.artifact`      | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.cancel`        | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.events`        | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.list`          | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.output`        | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.read`          | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.start`         | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.steps`         | Yes      | Object (fields below) |                                                                                            |
-| `workflows.save`               | Yes      | Object (fields below) |                                                                                            |
-| `workflows.validate`           | Yes      | Object (fields below) |                                                                                            |
-| `workspaces.create`            | Yes      | Object (fields below) |                                                                                            |
-| `workspaces.describe`          | Yes      | Object (fields below) |                                                                                            |
-| `workspaces.destroy`           | Yes      | Object (fields below) |                                                                                            |
-| `workspaces.list`              | Yes      | Object (fields below) |                                                                                            |
+| Field                            | Required | Type                  | Description                                                                                |
+| -------------------------------- | -------- | --------------------- | ------------------------------------------------------------------------------------------ |
+| `accounts.create`                | Yes      | Object (fields below) |                                                                                            |
+| `accounts.list`                  | Yes      | Object (fields below) |                                                                                            |
+| `accounts.remove`                | Yes      | Object (fields below) |                                                                                            |
+| `accounts.usage`                 | Yes      | Object (fields below) |                                                                                            |
+| `agent.ask`                      | Yes      | Object (fields below) |                                                                                            |
+| `agent.steer`                    | Yes      | Object (fields below) |                                                                                            |
+| `agent.stream`                   | Yes      | Object (fields below) |                                                                                            |
+| `agents.define`                  | Yes      | Object (fields below) |                                                                                            |
+| `agents.list`                    | Yes      | Object (fields below) |                                                                                            |
+| `agents.personal.list`           | Yes      | Object (fields below) |                                                                                            |
+| `agents.personal.remove`         | Yes      | Object (fields below) |                                                                                            |
+| `agents.personal.save`           | Yes      | Object (fields below) |                                                                                            |
+| `approvals.list`                 | Yes      | Object (fields below) |                                                                                            |
+| `approvals.resolve`              | Yes      | Object (fields below) |                                                                                            |
+| `channels.deadLetters.list`      | Yes      | Object (fields below) |                                                                                            |
+| `channels.list`                  | Yes      | Object (fields below) |                                                                                            |
+| `channels.status`                | Yes      | Object (fields below) |                                                                                            |
+| `config.get`                     | Yes      | Object (fields below) |                                                                                            |
+| `config.set`                     | Yes      | Object (fields below) |                                                                                            |
+| `config.unset`                   | Yes      | Object (fields below) |                                                                                            |
+| `connect`                        | Yes      | Object (fields below) |                                                                                            |
+| `credit.budgets`                 | Yes      | Object (fields below) |                                                                                            |
+| `credit.removeBudget`            | Yes      | Object (fields below) |                                                                                            |
+| `credit.resetAllowance`          | Yes      | Object (fields below) |                                                                                            |
+| `credit.resetHistory`            | Yes      | Object (fields below) |                                                                                            |
+| `credit.resets`                  | Yes      | Object (fields below) |                                                                                            |
+| `credit.setBudget`               | Yes      | Object (fields below) |                                                                                            |
+| `credit.summary`                 | Yes      | Object (fields below) |                                                                                            |
+| `credit.wallet`                  | Yes      | Object (fields below) |                                                                                            |
+| `credit.walletHistory`           | Yes      | Object (fields below) |                                                                                            |
+| `data.upload.cancel`             | Yes      | Object (fields below) |                                                                                            |
+| `data.upload.chunk`              | Yes      | Object (fields below) |                                                                                            |
+| `data.upload.finish`             | Yes      | Object (fields below) |                                                                                            |
+| `data.upload.start`              | Yes      | Object (fields below) |                                                                                            |
+| `devices.approve`                | Yes      | Object (fields below) |                                                                                            |
+| `devices.list`                   | Yes      | Object (fields below) |                                                                                            |
+| `devices.reject`                 | Yes      | Object (fields below) |                                                                                            |
+| `devices.revoke`                 | Yes      | Object (fields below) |                                                                                            |
+| `health`                         | Yes      | Object (fields below) |                                                                                            |
+| `jobs.add`                       | Yes      | Object (fields below) |                                                                                            |
+| `jobs.list`                      | Yes      | Object (fields below) |                                                                                            |
+| `jobs.remove`                    | Yes      | Object (fields below) |                                                                                            |
+| `logs.tail`                      | Yes      | Object (fields below) |                                                                                            |
+| `media.acknowledge`              | Yes      | Object (fields below) |                                                                                            |
+| `office.ownerProof`              | Yes      | Object (fields below) | Bind an invitation to the authenticated socket's office, using a short-lived signed proof. |
+| `processes.input`                | Yes      | Object (fields below) |                                                                                            |
+| `processes.list`                 | Yes      | Object (fields below) |                                                                                            |
+| `processes.log`                  | Yes      | Object (fields below) |                                                                                            |
+| `processes.resize`               | Yes      | Object (fields below) |                                                                                            |
+| `processes.stop`                 | Yes      | Object (fields below) |                                                                                            |
+| `roblox.credentials.remove`      | Yes      | Object (fields below) |                                                                                            |
+| `roblox.credentials.set`         | Yes      | Object (fields below) |                                                                                            |
+| `roblox.credentials.status`      | Yes      | Object (fields below) |                                                                                            |
+| `roblox.telemetry.funnel`        | Yes      | Object (fields below) |                                                                                            |
+| `roblox.telemetry.performance`   | Yes      | Object (fields below) |                                                                                            |
+| `roblox.telemetry.projects`      | Yes      | Object (fields below) |                                                                                            |
+| `sessions.delete`                | Yes      | Object (fields below) |                                                                                            |
+| `sessions.download`              | Yes      | Object (fields below) |                                                                                            |
+| `sessions.files`                 | Yes      | Object (fields below) |                                                                                            |
+| `sessions.get`                   | Yes      | Object (fields below) |                                                                                            |
+| `sessions.history`               | Yes      | Object (fields below) |                                                                                            |
+| `sessions.input`                 | Yes      | Object (fields below) |                                                                                            |
+| `sessions.list`                  | Yes      | Object (fields below) |                                                                                            |
+| `sessions.messages`              | Yes      | Object (fields below) |                                                                                            |
+| `sessions.pin`                   | Yes      | Object (fields below) |                                                                                            |
+| `sessions.pins`                  | Yes      | Object (fields below) |                                                                                            |
+| `sessions.rename`                | Yes      | Object (fields below) |                                                                                            |
+| `sessions.retry`                 | Yes      | Object (fields below) |                                                                                            |
+| `sessions.search`                | Yes      | Object (fields below) |                                                                                            |
+| `sessions.subscribe`             | Yes      | Object (fields below) |                                                                                            |
+| `sessions.unpin`                 | Yes      | Object (fields below) |                                                                                            |
+| `sessions.unsubscribe`           | Yes      | Object (fields below) |                                                                                            |
+| `shares.create`                  | Yes      | Object (fields below) |                                                                                            |
+| `shares.list`                    | Yes      | Object (fields below) |                                                                                            |
+| `shares.remove`                  | Yes      | Object (fields below) |                                                                                            |
+| `shares.setMember`               | Yes      | Object (fields below) |                                                                                            |
+| `tasks.cancel`                   | Yes      | Object (fields below) |                                                                                            |
+| `tasks.get`                      | Yes      | Object (fields below) |                                                                                            |
+| `tasks.list`                     | Yes      | Object (fields below) |                                                                                            |
+| `teams.create`                   | Yes      | Object (fields below) |                                                                                            |
+| `teams.list`                     | Yes      | Object (fields below) |                                                                                            |
+| `teams.remove`                   | Yes      | Object (fields below) |                                                                                            |
+| `teams.setMember`                | Yes      | Object (fields below) |                                                                                            |
+| `voice.audio`                    | Yes      | Object (fields below) |                                                                                            |
+| `voice.start`                    | Yes      | Object (fields below) |                                                                                            |
+| `voice.stop`                     | Yes      | Object (fields below) |                                                                                            |
+| `workflows.catalog`              | Yes      | Object (fields below) |                                                                                            |
+| `workflows.create`               | Yes      | Object (fields below) |                                                                                            |
+| `workflows.list`                 | Yes      | Object (fields below) |                                                                                            |
+| `workflows.models`               | Yes      | Object (fields below) |                                                                                            |
+| `workflows.models.image.quote`   | Yes      | Object (fields below) |                                                                                            |
+| `workflows.models.image.resolve` | Yes      | Object (fields below) |                                                                                            |
+| `workflows.models.refresh`       | Yes      | Object (fields below) |                                                                                            |
+| `workflows.models.resolve`       | Yes      | Object (fields below) |                                                                                            |
+| `workflows.planning.cancel`      | Yes      | Object (fields below) |                                                                                            |
+| `workflows.planning.history`     | Yes      | Object (fields below) |                                                                                            |
+| `workflows.planning.read`        | Yes      | Object (fields below) |                                                                                            |
+| `workflows.planning.send`        | Yes      | Object (fields below) |                                                                                            |
+| `workflows.planning.sources`     | Yes      | Object (fields below) |                                                                                            |
+| `workflows.read`                 | Yes      | Object (fields below) |                                                                                            |
+| `workflows.record`               | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.artifact`        | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.cancel`          | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.events`          | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.list`            | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.output`          | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.read`            | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.start`           | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.steps`           | Yes      | Object (fields below) |                                                                                            |
+| `workflows.save`                 | Yes      | Object (fields below) |                                                                                            |
+| `workflows.validate`             | Yes      | Object (fields below) |                                                                                            |
+| `workspaces.create`              | Yes      | Object (fields below) |                                                                                            |
+| `workspaces.describe`            | Yes      | Object (fields below) |                                                                                            |
+| `workspaces.destroy`             | Yes      | Object (fields below) |                                                                                            |
+| `workspaces.list`                | Yes      | Object (fields below) |                                                                                            |
 
 **accounts.create**
 
@@ -2092,6 +2099,20 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ---------------------------------------------------------- | ----------- |
 | `params` | Yes      | [WorkflowModelsRequest](protocol.md#workflowmodelsrequest) |             |
 | `result` | Yes      | [WorkflowModelsPage](protocol.md#workflowmodelspage)       |             |
+
+**workflows.models.image.quote**
+
+| Field    | Required | Type                                                               | Description |
+| -------- | -------- | ------------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [WorkflowImageQuoteRequest](protocol.md#workflowimagequoterequest) |             |
+| `result` | Yes      | [WorkflowImageQuote](protocol.md#workflowimagequote)               |             |
+
+**workflows.models.image.resolve**
+
+| Field    | Required | Type                                                                         | Description |
+| -------- | -------- | ---------------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [WorkflowImageResolutionRequest](protocol.md#workflowimageresolutionrequest) |             |
+| `result` | Yes      | [WorkflowImageResolution](protocol.md#workflowimageresolution)               |             |
 
 **workflows.models.refresh**
 
@@ -3686,16 +3707,16 @@ Presence only: neither saved key material nor claims about Roblox permissions.
 
 Primitive or named envelope type. Number values must be finite and safely represented.
 
-| Field       | Required | Type                           | Description |
-| ----------- | -------- | ------------------------------ | ----------- |
-| `choices`   | No       | Array of `string`              |             |
-| `kind`      | Yes      | [Exclude](protocol.md#exclude) |             |
-| `maxLength` | No       | `number`                       |             |
-| `maximum`   | No       | `number`                       |             |
-| `minLength` | No       | `number`                       |             |
-| `minimum`   | No       | `number`                       |             |
-| `nullable`  | Yes      | `boolean`                      |             |
-| `whole`     | No       | `boolean`                      |             |
+| Field       | Required | Type                               | Description |
+| ----------- | -------- | ---------------------------------- | ----------- |
+| `choices`   | No       | Array of `string`                  |             |
+| `kind`      | Yes      | [Exclude_1](protocol.md#exclude_1) |             |
+| `maxLength` | No       | `number`                           |             |
+| `maximum`   | No       | `number`                           |             |
+| `minLength` | No       | `number`                           |             |
+| `minimum`   | No       | `number`                           |             |
+| `nullable`  | Yes      | `boolean`                          |             |
+| `whole`     | No       | `boolean`                          |             |
 
 ## SchemaField
 
@@ -4424,16 +4445,16 @@ Declarative portable schema subset. No callbacks, JavaScript evaluation, or cred
 
 Variant 1: [ScalarSchema](protocol.md#scalarschema)
 
-| Field       | Required | Type                           | Description |
-| ----------- | -------- | ------------------------------ | ----------- |
-| `choices`   | No       | Array of `string`              |             |
-| `kind`      | Yes      | [Exclude](protocol.md#exclude) |             |
-| `maxLength` | No       | `number`                       |             |
-| `maximum`   | No       | `number`                       |             |
-| `minLength` | No       | `number`                       |             |
-| `minimum`   | No       | `number`                       |             |
-| `nullable`  | Yes      | `boolean`                      |             |
-| `whole`     | No       | `boolean`                      |             |
+| Field       | Required | Type                               | Description |
+| ----------- | -------- | ---------------------------------- | ----------- |
+| `choices`   | No       | Array of `string`                  |             |
+| `kind`      | Yes      | [Exclude_1](protocol.md#exclude_1) |             |
+| `maxLength` | No       | `number`                           |             |
+| `maximum`   | No       | `number`                           |             |
+| `minLength` | No       | `number`                           |             |
+| `minimum`   | No       | `number`                           |             |
+| `nullable`  | Yes      | `boolean`                          |             |
+| `whole`     | No       | `boolean`                          |             |
 
 Variant 2: [ObjectSchema](protocol.md#objectschema)
 
@@ -4812,6 +4833,173 @@ Stable endpoint identities survive cosmetic renames.
 | `node` | Yes      | `string` |             |
 | `port` | Yes      | `string` |             |
 
+## WorkflowGroup
+
+Saved hierarchy owns parent-local geometry; collapse and viewport remain editor preferences.
+
+| Field       | Required | Type                                                        | Description |
+| ----------- | -------- | ----------------------------------------------------------- | ----------- |
+| `id`        | Yes      | `string`                                                    |             |
+| `nodes`     | Yes      | Array of `string`                                           |             |
+| `objective` | Yes      | `string`                                                    |             |
+| `parent`    | Yes      | `null,string`                                               |             |
+| `ports`     | Yes      | Array of [WorkflowGroupPort](protocol.md#workflowgroupport) |             |
+| `title`     | Yes      | `string`                                                    |             |
+| `x`         | Yes      | `number`                                                    |             |
+| `y`         | Yes      | `number`                                                    |             |
+
+## WorkflowGroupPort
+
+Published ports retain the original executable endpoint and explicit direction.
+
+| Field       | Required | Type                                             | Description |
+| ----------- | -------- | ------------------------------------------------ | ----------- |
+| `direction` | Yes      | [PortDirection](protocol.md#portdirection)       |             |
+| `endpoint`  | Yes      | [WorkflowEndpoint](protocol.md#workflowendpoint) |             |
+| `id`        | Yes      | `string`                                         |             |
+| `label`     | Yes      | `string`                                         |             |
+
+## WorkflowGroupReference
+
+Each revision references an immutable group body independently from executable node content.
+
+| Field     | Required | Type     | Description |
+| --------- | -------- | -------- | ----------- |
+| `content` | Yes      | `string` |             |
+| `id`      | Yes      | `string` |             |
+
+## WorkflowImageCandidate
+
+All connected render quotes share the selected snapshot and its evidence.
+
+| Field      | Required | Type                                                                   | Description |
+| ---------- | -------- | ---------------------------------------------------------------------- | ----------- |
+| `evidence` | Yes      | [WorkflowImagePolicyEvidence](protocol.md#workflowimagepolicyevidence) |             |
+| `model`    | Yes      | `string`                                                               |             |
+| `provider` | Yes      | `string`                                                               |             |
+| `quotes`   | Yes      | Array of [WorkflowImageQuote](protocol.md#workflowimagequote)          |             |
+
+## WorkflowImageCapabilities
+
+Supported image settings from the same adapter used by execution.
+
+| Field             | Required | Type                                                                    | Description |
+| ----------------- | -------- | ----------------------------------------------------------------------- | ----------- |
+| `dimensions`      | Yes      | [WorkflowImageDimensions](protocol.md#workflowimagedimensions) / `null` |             |
+| `maxCount`        | Yes      | `number`                                                                |             |
+| `outputFormats`   | Yes      | Array of `string`                                                       |             |
+| `providerOptions` | Yes      | [Recordstringstring](protocol.md#recordstringstring)                    |             |
+| `qualities`       | Yes      | Array of `string`                                                       |             |
+| `sizes`           | Yes      | Array of `string`                                                       |             |
+
+## WorkflowImageDimensions
+
+Pixel limits for a model that supports custom dimensions.
+
+| Field                     | Required | Type     | Description |
+| ------------------------- | -------- | -------- | ----------- |
+| `experimentalAbovePixels` | Yes      | `number` |             |
+| `maxAspectRatio`          | Yes      | `number` |             |
+| `maxEdge`                 | Yes      | `number` |             |
+| `maxPixels`               | Yes      | `number` |             |
+| `minPixels`               | Yes      | `number` |             |
+| `multiple`                | Yes      | `number` |             |
+
+## WorkflowImagePolicy
+
+Image policies bound each complete render; token rate ceilings do not apply to image tariffs.
+
+| Field                     | Required | Type          | Description                                                                           |
+| ------------------------- | -------- | ------------- | ------------------------------------------------------------------------------------- |
+| `allowPreview`            | Yes      | `boolean`     |                                                                                       |
+| `maxCatalogAgeMs`         | Yes      | `string`      |                                                                                       |
+| `maxGenerationMicrocents` | Yes      | `null,string` | Null retains the existing run budget. A value additionally caps each image operation. |
+| `region`                  | Yes      | `null,string` |                                                                                       |
+
+## WorkflowImagePolicyEvidence
+
+Immutable evidence for a concrete image model selected at run creation.
+
+| Field                     | Required | Type                                                   | Description |
+| ------------------------- | -------- | ------------------------------------------------------ | ----------- |
+| `catalogCheckedAtMs`      | Yes      | `string`                                               |             |
+| `eligibilityReference`    | Yes      | `string`                                               |             |
+| `eligibilityVerifiedAtMs` | Yes      | `string`                                               |             |
+| `factsDigest`             | Yes      | `string`                                               |             |
+| `format`                  | Yes      | `1`                                                    |             |
+| `policy`                  | Yes      | [WorkflowImagePolicy](protocol.md#workflowimagepolicy) |             |
+| `releaseAtMs`             | Yes      | `string`                                               |             |
+| `releaseReference`        | Yes      | `string`                                               |             |
+
+## WorkflowImageQuote
+
+An estimate creates no reservation and is recalculated when accepting a run.
+
+| Field                 | Required | Type                                                       | Description |
+| --------------------- | -------- | ---------------------------------------------------------- | ----------- |
+| `capabilityReference` | Yes      | `string`                                                   |             |
+| `estimatedMicrocents` | Yes      | `string`                                                   |             |
+| `model`               | Yes      | `string`                                                   |             |
+| `nodeId`              | Yes      | `string`                                                   |             |
+| `pricingReference`    | Yes      | `string`                                                   |             |
+| `provider`            | Yes      | `string`                                                   |             |
+| `quotedAtMs`          | Yes      | `string`                                                   |             |
+| `settings`            | Yes      | [WorkflowImageSettings](protocol.md#workflowimagesettings) |             |
+| `workflowId`          | Yes      | `string`                                                   |             |
+
+## WorkflowImageQuoteRequest
+
+Unsaved render settings may be priced only in an owned workflow.
+
+| Field        | Required | Type                                                       | Description |
+| ------------ | -------- | ---------------------------------------------------------- | ----------- |
+| `model`      | Yes      | `string`                                                   |             |
+| `nodeId`     | Yes      | `string`                                                   |             |
+| `provider`   | Yes      | `string`                                                   |             |
+| `settings`   | Yes      | [WorkflowImageSettings](protocol.md#workflowimagesettings) |             |
+| `workflowId` | Yes      | `string`                                                   |             |
+
+## WorkflowImageRequirement
+
+Per-operation settings sharing one reusable image-model binding.
+
+| Field      | Required | Type                                                       | Description |
+| ---------- | -------- | ---------------------------------------------------------- | ----------- |
+| `nodeId`   | Yes      | `string`                                                   |             |
+| `settings` | Yes      | [WorkflowImageSettings](protocol.md#workflowimagesettings) |             |
+
+## WorkflowImageResolution
+
+An unresolved policy has a reason, never an invented candidate or zero-price placeholder.
+
+| Field       | Required | Type                                                                  | Description |
+| ----------- | -------- | --------------------------------------------------------------------- | ----------- |
+| `candidate` | Yes      | [WorkflowImageCandidate](protocol.md#workflowimagecandidate) / `null` |             |
+| `reason`    | Yes      | `null,string`                                                         |             |
+
+## WorkflowImageResolutionRequest
+
+A read-only policy preview uses unsaved settings and authenticated account pricing.
+
+| Field          | Required | Type                                                                      | Description |
+| -------------- | -------- | ------------------------------------------------------------------------- | ----------- |
+| `policy`       | Yes      | [WorkflowImagePolicy](protocol.md#workflowimagepolicy)                    |             |
+| `provider`     | Yes      | `string`                                                                  |             |
+| `requirements` | Yes      | Array of [WorkflowImageRequirement](protocol.md#workflowimagerequirement) |             |
+| `workflowId`   | Yes      | `string`                                                                  |             |
+
+## WorkflowImageSettings
+
+An exact request, bounded before admission and independent of a text model binding.
+
+| Field          | Required | Type                                                                           | Description |
+| -------------- | -------- | ------------------------------------------------------------------------------ | ----------- |
+| `count`        | Yes      | `number`                                                                       |             |
+| `options`      | Yes      | [Recordstringstringnumberboolean](protocol.md#recordstringstringnumberboolean) |             |
+| `outputFormat` | Yes      | `string`                                                                       |             |
+| `quality`      | Yes      | `string`                                                                       |             |
+| `size`         | Yes      | `string`                                                                       |             |
+
 ## WorkflowListCursor
 
 Cursor uses a timestamp plus stable identity to handle equal update times.
@@ -4843,42 +5031,45 @@ Metadata pagination carries no node payloads.
 
 Bounded manifest page; offsets count references, never bytes or revisions.
 
-| Field            | Required | Type                                                                | Description |
-| ---------------- | -------- | ------------------------------------------------------------------- | ----------- |
-| `details`        | Yes      | [WorkflowDetails](protocol.md#workflowdetails)                      |             |
-| `edges`          | Yes      | Array of [WorkflowEdgeReference](protocol.md#workflowedgereference) |             |
-| `format`         | Yes      | `1`                                                                 |             |
-| `nextEdgeOffset` | Yes      | `null,number`                                                       |             |
-| `nextNodeOffset` | Yes      | `null,number`                                                       |             |
-| `nodes`          | Yes      | Array of [WorkflowNodeReference](protocol.md#workflownodereference) |             |
-| `revision`       | Yes      | `string`                                                            |             |
-| `workflowId`     | Yes      | `string`                                                            |             |
+| Field             | Required | Type                                                                  | Description |
+| ----------------- | -------- | --------------------------------------------------------------------- | ----------- |
+| `details`         | Yes      | [WorkflowDetails](protocol.md#workflowdetails)                        |             |
+| `edges`           | Yes      | Array of [WorkflowEdgeReference](protocol.md#workflowedgereference)   |             |
+| `format`          | Yes      | `1`                                                                   |             |
+| `groups`          | No       | Array of [WorkflowGroupReference](protocol.md#workflowgroupreference) |             |
+| `nextEdgeOffset`  | Yes      | `null,number`                                                         |             |
+| `nextGroupOffset` | No       | `null,number`                                                         |             |
+| `nextNodeOffset`  | Yes      | `null,number`                                                         |             |
+| `nodes`           | Yes      | Array of [WorkflowNodeReference](protocol.md#workflownodereference)   |             |
+| `revision`        | Yes      | `string`                                                              |             |
+| `workflowId`      | Yes      | `string`                                                              |             |
 
 ## WorkflowModelCapability
 
-Operations currently supported by the direct text handler.
+Operations available through the workflow model picker.
 
-Type: `"reasoning"` / `"text"`.
+Type: `"image"` / `"reasoning"` / `"text"`.
 
 ## WorkflowModelChoice
 
 Public model metadata only: no endpoints, keys, account names, or adapter options.
 
-| Field              | Required | Type                                                          | Description                                                                             |
-| ------------------ | -------- | ------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| `availableAtCheck` | No       | `null,boolean`                                                | Null/absent means no explicit endpoint check, rather than proof that a model is absent. |
-| `compatible`       | Yes      | `boolean`                                                     |                                                                                         |
-| `contextWindow`    | Yes      | `null,number`                                                 |                                                                                         |
-| `id`               | Yes      | `string`                                                      |                                                                                         |
-| `input`            | Yes      | Array of `string`                                             |                                                                                         |
-| `maxOutputTokens`  | Yes      | `null,number`                                                 |                                                                                         |
-| `name`             | Yes      | `string`                                                      |                                                                                         |
-| `price`            | Yes      | [WorkflowModelPrice](protocol.md#workflowmodelprice) / `null` |                                                                                         |
-| `provider`         | Yes      | `string`                                                      |                                                                                         |
-| `reason`           | Yes      | `null,string`                                                 |                                                                                         |
-| `reasoning`        | Yes      | `null,boolean`                                                |                                                                                         |
-| `source`           | Yes      | `string`                                                      |                                                                                         |
-| `status`           | Yes      | `string`                                                      |                                                                                         |
+| Field              | Required | Type                                                               | Description                                                                             |
+| ------------------ | -------- | ------------------------------------------------------------------ | --------------------------------------------------------------------------------------- |
+| `availableAtCheck` | No       | `null,boolean`                                                     | Null/absent means no explicit endpoint check, rather than proof that a model is absent. |
+| `compatible`       | Yes      | `boolean`                                                          |                                                                                         |
+| `contextWindow`    | Yes      | `null,number`                                                      |                                                                                         |
+| `id`               | Yes      | `string`                                                           |                                                                                         |
+| `image`            | No       | [WorkflowImageCapabilities](protocol.md#workflowimagecapabilities) | Present only for generation models; token prices do not describe image tariffs.         |
+| `input`            | Yes      | Array of `string`                                                  |                                                                                         |
+| `maxOutputTokens`  | Yes      | `null,number`                                                      |                                                                                         |
+| `name`             | Yes      | `string`                                                           |                                                                                         |
+| `price`            | Yes      | [WorkflowModelPrice](protocol.md#workflowmodelprice) / `null`      |                                                                                         |
+| `provider`         | Yes      | `string`                                                           |                                                                                         |
+| `reason`           | Yes      | `null,string`                                                      |                                                                                         |
+| `reasoning`        | Yes      | `null,boolean`                                                     |                                                                                         |
+| `source`           | Yes      | `string`                                                           |                                                                                         |
+| `status`           | Yes      | `string`                                                           |                                                                                         |
 
 ## WorkflowModelFeature
 
@@ -4936,13 +5127,13 @@ Existing ledger rate-card values, represented as decimal text without client-sid
 
 Owner-authorized policy preview; never saves a draft or performs inference.
 
-| Field             | Required | Type                                                           | Description |
-| ----------------- | -------- | -------------------------------------------------------------- | ----------- |
-| `capability`      | Yes      | [WorkflowModelCapability](protocol.md#workflowmodelcapability) |             |
-| `maxOutputTokens` | Yes      | `number`                                                       |             |
-| `policy`          | Yes      | [WorkflowModelPolicy](protocol.md#workflowmodelpolicy)         |             |
-| `provider`        | Yes      | `string`                                                       |             |
-| `workflowId`      | Yes      | `string`                                                       |             |
+| Field             | Required | Type                                                   | Description |
+| ----------------- | -------- | ------------------------------------------------------ | ----------- |
+| `capability`      | Yes      | [Exclude](protocol.md#exclude)                         |             |
+| `maxOutputTokens` | Yes      | `number`                                               |             |
+| `policy`          | Yes      | [WorkflowModelPolicy](protocol.md#workflowmodelpolicy) |             |
+| `provider`        | Yes      | `string`                                               |             |
+| `workflowId`      | Yes      | `string`                                               |             |
 
 ## WorkflowModelsPage
 
@@ -5003,14 +5194,16 @@ Type: Dictionary.
 
 A bounded edit; layout changes never include node configuration.
 
-| Field         | Required | Type                                                      | Description |
-| ------------- | -------- | --------------------------------------------------------- | ----------- |
-| `details`     | Yes      | [WorkflowDetails](protocol.md#workflowdetails) / `null`   |             |
-| `edges`       | Yes      | Array of [WorkflowEdge](protocol.md#workflowedge)         |             |
-| `nodes`       | Yes      | Array of [WorkflowNode](protocol.md#workflownode)         |             |
-| `positions`   | Yes      | Array of [WorkflowPosition](protocol.md#workflowposition) |             |
-| `removeEdges` | Yes      | Array of `string`                                         |             |
-| `removeNodes` | Yes      | Array of `string`                                         |             |
+| Field          | Required | Type                                                      | Description                                                                  |
+| -------------- | -------- | --------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `details`      | Yes      | [WorkflowDetails](protocol.md#workflowdetails) / `null`   |                                                                              |
+| `edges`        | Yes      | Array of [WorkflowEdge](protocol.md#workflowedge)         |                                                                              |
+| `groups`       | No       | Array of [WorkflowGroup](protocol.md#workflowgroup)       | Present together on hierarchy-aware edits; omission denotes a legacy writer. |
+| `nodes`        | Yes      | Array of [WorkflowNode](protocol.md#workflownode)         |                                                                              |
+| `positions`    | Yes      | Array of [WorkflowPosition](protocol.md#workflowposition) |                                                                              |
+| `removeEdges`  | Yes      | Array of `string`                                         |                                                                              |
+| `removeGroups` | No       | Array of `string`                                         |                                                                              |
+| `removeNodes`  | Yes      | Array of `string`                                         |                                                                              |
 
 ## WorkflowPosition
 
@@ -5026,12 +5219,13 @@ Personal viewport is excluded; these positions belong to the workflow itself.
 
 Null resolves the current revision only for the first page. Subsequent pages pin it.
 
-| Field        | Required | Type          | Description |
-| ------------ | -------- | ------------- | ----------- |
-| `edgeOffset` | Yes      | `number`      |             |
-| `nodeOffset` | Yes      | `number`      |             |
-| `revision`   | Yes      | `null,string` |             |
-| `workflowId` | Yes      | `string`      |             |
+| Field         | Required | Type          | Description |
+| ------------- | -------- | ------------- | ----------- |
+| `edgeOffset`  | Yes      | `number`      |             |
+| `groupOffset` | No       | `number`      |             |
+| `nodeOffset`  | Yes      | `number`      |             |
+| `revision`    | Yes      | `null,string` |             |
+| `workflowId`  | Yes      | `string`      |             |
 
 ## WorkflowReceipt
 

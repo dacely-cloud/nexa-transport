@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { WorkflowGroup, WorkflowGroupReference } from './WorkflowGroupTypes.js';
 import type { ResourceBinding } from './ResourceTypes.js';
 
 /** JSON configuration is data, not an executable plan or authorization. */
@@ -50,6 +51,9 @@ export interface WorkflowEdge {
 }
 /** A bounded edit; layout changes never include node configuration. */
 export interface WorkflowPatch {
+    /** Present together on hierarchy-aware edits; omission denotes a legacy writer. */
+    readonly groups?: readonly WorkflowGroup[];
+    readonly removeGroups?: readonly string[];
     readonly details: WorkflowDetails | null;
     readonly nodes: readonly WorkflowNode[];
     readonly positions: readonly WorkflowPosition[];
@@ -71,7 +75,12 @@ export interface WorkflowSummary extends WorkflowReceipt {
     readonly edgeCount: number;
 }
 /** Record families share bounded storage while preserving typed reads. */
-export const WorkflowRecordKind = { Node: 'node', Position: 'position', Edge: 'edge' } as const;
+export const WorkflowRecordKind = {
+    Node: 'node',
+    Position: 'position',
+    Edge: 'edge',
+    Group: 'group',
+} as const;
 /** Stored graph record family. */
 export type WorkflowRecordKind = (typeof WorkflowRecordKind)[keyof typeof WorkflowRecordKind];
 /** One node's immutable content and independently versioned layout. */
@@ -87,6 +96,7 @@ export interface WorkflowEdgeReference {
 }
 /** Immutable revision manifest. Large manifests themselves use bounded payload storage. */
 export interface WorkflowManifest extends WorkflowReceipt {
+    readonly groups?: readonly WorkflowGroupReference[];
     readonly format: 1;
     readonly details: WorkflowDetails;
     readonly nodes: readonly WorkflowNodeReference[];
@@ -121,5 +131,12 @@ export interface WorkflowReadEdge {
     readonly kind: typeof WorkflowRecordKind.Edge;
     readonly value: WorkflowEdge;
 }
+/** Decoded group layout contains no run state or executable configuration. */
+export interface WorkflowReadGroup {
+    readonly reference: string;
+    readonly kind: typeof WorkflowRecordKind.Group;
+    readonly value: WorkflowGroup;
+}
 /** The reader can select only the record families it needs. */
-export type WorkflowReadRecord = WorkflowReadNode | WorkflowReadPosition | WorkflowReadEdge;
+export type WorkflowReadRecord =
+    WorkflowReadNode | WorkflowReadPosition | WorkflowReadEdge | WorkflowReadGroup;

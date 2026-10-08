@@ -84,22 +84,32 @@ export class WorkflowRequestCodec {
     }
     /** Requires immutable revision pinning after the initial page. */
     public static read(raw: unknown): WorkflowReadRequest {
+        const source: Readonly<Record<string, unknown>> = WorkflowInput.object(raw);
+        const hierarchy: boolean = Object.hasOwn(source, 'groupOffset');
         const input: Readonly<Record<string, unknown>> = WorkflowInput.record(raw, [
             'workflowId',
             'revision',
             'nodeOffset',
             'edgeOffset',
+            ...(hierarchy ? ['groupOffset'] : []),
         ]);
         const nodeOffset: number = this.offset(input['nodeOffset'], 10_000);
         const edgeOffset: number = this.offset(input['edgeOffset'], 50_000);
         const revision: string | null =
             input['revision'] === null ? null : ResourceBindingCodec.decimal(input['revision']);
-        if (revision === null && (nodeOffset !== 0 || edgeOffset !== 0)) {
+        const groupOffset: number | undefined = hierarchy
+            ? this.offset(input['groupOffset'], 1000)
+            : undefined;
+        if (
+            revision === null &&
+            (nodeOffset !== 0 || edgeOffset !== 0 || (groupOffset ?? 0) !== 0)
+        ) {
             throw new Error('Pin the workflow revision before reading subsequent pages');
         }
         return Object.freeze({
             workflowId: WorkflowInput.id(input['workflowId']),
             revision,
+            ...(groupOffset === undefined ? {} : { groupOffset }),
             nodeOffset,
             edgeOffset,
         });

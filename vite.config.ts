@@ -27,6 +27,8 @@ const config: UserConfig = {
                 'workflow-schemas': 'src/workflows/Schemas.ts',
                 'workflow-schema-types': 'src/workflows/SchemaTypes.ts',
                 'workflow-values': 'src/workflows/SchemaValues.ts',
+                'workflow-group-types': 'src/workflows/WorkflowGroupTypes.ts',
+                'workflow-group-codec': 'src/workflows/WorkflowGroupCodec.ts',
                 'workflow-types': 'src/workflows/WorkflowTypes.ts',
                 'workflow-codec': 'src/workflows/WorkflowCodec.ts',
                 'workflow-requests': 'src/workflows/WorkflowRequests.ts',

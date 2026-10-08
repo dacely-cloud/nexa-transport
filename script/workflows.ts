@@ -23,6 +23,8 @@ const files: readonly string[] = [
     'ResourceTypes',
     'ResourceBindingCodec',
     'ResourceReadiness',
+    'WorkflowGroupTypes',
+    'WorkflowGroupCodec',
     'WorkflowTypes',
     'WorkflowInput',
     'WorkflowJson',

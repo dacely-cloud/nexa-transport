@@ -24,6 +24,10 @@ try {
     await writeFile(
         join(directory, 'consumer.ts'),
         `import { NexaClient } from 'nexa-transport';
+import { WorkflowGroupCodec } from 'nexa-transport/workflow-group-codec';
+import type { WorkflowGroup } from 'nexa-transport/workflow-group-types';
+const savedGroup: WorkflowGroup = WorkflowGroupCodec.parse({id: 'group', title: 'Research', objective: '', parent: null, x: 0, y: 0, nodes: [], ports: []});
+void savedGroup;
 import { WorkflowImagePolicies } from 'nexa-transport/workflow-image-policy';
 import { WorkflowImageResolutionCodec } from 'nexa-transport/workflow-image-resolution';
 void WorkflowImagePolicies.defaults;

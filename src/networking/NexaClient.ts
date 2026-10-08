@@ -754,6 +754,10 @@ export class NexaClient {
             this.#hello.features.methods.includes(Method.WorkflowsValidate)
         );
     }
+    /** Hierarchy-aware draft reads and patches preserve local coordinates and published aliases. */
+    public get supportsWorkflowGroups(): boolean {
+        return this.supportsWorkflowGraph && this.#hello?.features.workflowGroupsVersion === 1;
+    }
     /** Planning proposes checked edits without saving or activating the draft. */
     public get supportsWorkflowPlanning(): boolean {
         return (
@@ -813,6 +817,19 @@ export class NexaClient {
             throw new TransportError(
                 TransportErrorCode.Protocol,
                 'Workflow source selection requires an updated NEXA gateway',
+            );
+        }
+        const patch: unknown =
+            method === Method.WorkflowsSave ? Reflect.get(params, 'patch') : undefined;
+        const hierarchy: boolean =
+            (method === Method.WorkflowsRead && Object.hasOwn(params, 'groupOffset')) ||
+            (patch !== null &&
+                typeof patch === 'object' &&
+                (Object.hasOwn(patch, 'groups') || Object.hasOwn(patch, 'removeGroups')));
+        if (hierarchy && !this.supportsWorkflowGroups) {
+            throw new TransportError(
+                TransportErrorCode.Protocol,
+                'Workflow groups require an updated NEXA gateway',
             );
         }
         if (method.startsWith('workflows.planning.') && !this.supportsWorkflowPlanning) {

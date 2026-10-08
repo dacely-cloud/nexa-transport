@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { WorkflowGroupReference } from './WorkflowGroupTypes.js';
 import type {
     WorkflowDetails,
     WorkflowPatch,
@@ -27,6 +28,7 @@ export const WorkflowGatewayLimits = {
     textChunkCharacters: 65_536,
     manifestNodes: 128,
     manifestEdges: 256,
+    manifestGroups: 128,
 } as const;
 
 /** Client-chosen identities make an unacknowledged create safe to retry. */
@@ -49,6 +51,7 @@ export interface WorkflowListRequest {
 }
 /** Null resolves the current revision only for the first page. Subsequent pages pin it. */
 export interface WorkflowReadRequest {
+    readonly groupOffset?: number;
     readonly workflowId: string;
     readonly revision: string | null;
     readonly nodeOffset: number;
@@ -56,6 +59,8 @@ export interface WorkflowReadRequest {
 }
 /** Bounded manifest page; offsets count references, never bytes or revisions. */
 export interface WorkflowManifestPage {
+    readonly groups?: readonly WorkflowGroupReference[];
+    readonly nextGroupOffset?: number | null;
     readonly format: 1;
     readonly workflowId: string;
     readonly revision: string;
