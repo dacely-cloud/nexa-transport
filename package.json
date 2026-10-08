@@ -138,6 +138,22 @@
         "./workflow-values": {
             "types": "./dist/workflows/SchemaValues.d.ts",
             "import": "./dist/workflow-values.js"
+        },
+        "./workflow-run-types": {
+            "types": "./dist/workflows/runtime/RunTypes.d.ts",
+            "import": "./dist/workflow-run-types.js"
+        },
+        "./workflow-run-requests": {
+            "types": "./dist/workflows/runtime/RunRequests.d.ts",
+            "import": "./dist/workflow-run-requests.js"
+        },
+        "./workflow-run-codec": {
+            "types": "./dist/workflows/runtime/RunCodec.d.ts",
+            "import": "./dist/workflow-run-codec.js"
+        },
+        "./workflow-run-request-codec": {
+            "types": "./dist/workflows/runtime/RunRequestCodec.d.ts",
+            "import": "./dist/workflow-run-request-codec.js"
         }
     },
     "scripts": {

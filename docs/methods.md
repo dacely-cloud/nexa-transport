@@ -88,6 +88,20 @@ All 54 protocol methods. `connect` is managed by `NexaClient.connect`; the remai
 - [voice.audio](#voice-audio)
 - [voice.start](#voice-start)
 - [voice.stop](#voice-stop)
+- [workflows.catalog](#workflows-catalog)
+- [workflows.create](#workflows-create)
+- [workflows.list](#workflows-list)
+- [workflows.read](#workflows-read)
+- [workflows.record](#workflows-record)
+- [workflows.runs.cancel](#workflows-runs-cancel)
+- [workflows.runs.events](#workflows-runs-events)
+- [workflows.runs.list](#workflows-runs-list)
+- [workflows.runs.output](#workflows-runs-output)
+- [workflows.runs.read](#workflows-runs-read)
+- [workflows.runs.start](#workflows-runs-start)
+- [workflows.runs.steps](#workflows-runs-steps)
+- [workflows.save](#workflows-save)
+- [workflows.validate](#workflows-validate)
 - [workspaces.create](#workspaces-create)
 - [workspaces.describe](#workspaces-describe)
 - [workspaces.destroy](#workspaces-destroy)
@@ -1947,6 +1961,386 @@ Parameters: [VoiceStopParams](protocol.md#voicestopparams).
 | `callId` | Yes      | `string` |             |
 
 Result: [OkResult](protocol.md#okresult).
+
+## workflows.catalog
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsCatalog> = {};
+const result: ResultOf<typeof Method.WorkflowsCatalog> = await client.call(
+    Method.WorkflowsCatalog,
+    params,
+);
+```
+
+Parameters: [Recordstringnever](protocol.md#recordstringnever).
+
+Type: Dictionary.
+
+Result: [WorkflowCatalog](protocol.md#workflowcatalog).
+
+## workflows.create
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsCreate> = {
+    commandId: 'YOUR_COMMANDID',
+    details: {
+        description: 'YOUR_DESCRIPTION',
+        folder: 'YOUR_FOLDER',
+        name: 'YOUR_NAME',
+        tags: [],
+    },
+    workflowId: 'YOUR_WORKFLOWID',
+};
+const result: ResultOf<typeof Method.WorkflowsCreate> = await client.call(
+    Method.WorkflowsCreate,
+    params,
+);
+```
+
+Parameters: [WorkflowCreateRequest](protocol.md#workflowcreaterequest).
+
+| Field        | Required | Type                                           | Description |
+| ------------ | -------- | ---------------------------------------------- | ----------- |
+| `commandId`  | Yes      | `string`                                       |             |
+| `details`    | Yes      | [WorkflowDetails](protocol.md#workflowdetails) |             |
+| `workflowId` | Yes      | `string`                                       |             |
+
+Result: [WorkflowReceipt](protocol.md#workflowreceipt).
+
+## workflows.list
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsList> = {
+    cursor: {
+        updatedAtMs: 'YOUR_UPDATEDATMS',
+        workflowId: 'YOUR_WORKFLOWID',
+    },
+    limit: 1,
+};
+const result: ResultOf<typeof Method.WorkflowsList> = await client.call(
+    Method.WorkflowsList,
+    params,
+);
+```
+
+Parameters: [WorkflowListRequest](protocol.md#workflowlistrequest).
+
+| Field    | Required | Type                                                          | Description |
+| -------- | -------- | ------------------------------------------------------------- | ----------- |
+| `cursor` | Yes      | [WorkflowListCursor](protocol.md#workflowlistcursor) / `null` |             |
+| `limit`  | Yes      | `number`                                                      |             |
+
+Result: [WorkflowListPage](protocol.md#workflowlistpage).
+
+## workflows.read
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsRead> = {
+    edgeOffset: 1,
+    nodeOffset: 1,
+    revision: 'YOUR_REVISION',
+    workflowId: 'YOUR_WORKFLOWID',
+};
+const result: ResultOf<typeof Method.WorkflowsRead> = await client.call(
+    Method.WorkflowsRead,
+    params,
+);
+```
+
+Parameters: [WorkflowReadRequest](protocol.md#workflowreadrequest).
+
+| Field        | Required | Type          | Description |
+| ------------ | -------- | ------------- | ----------- |
+| `edgeOffset` | Yes      | `number`      |             |
+| `nodeOffset` | Yes      | `number`      |             |
+| `revision`   | Yes      | `null,string` |             |
+| `workflowId` | Yes      | `string`      |             |
+
+Result: [WorkflowManifestPage](protocol.md#workflowmanifestpage).
+
+## workflows.record
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsRecord> = {
+    offset: 1,
+    reference: 'YOUR_REFERENCE',
+    workflowId: 'YOUR_WORKFLOWID',
+};
+const result: ResultOf<typeof Method.WorkflowsRecord> = await client.call(
+    Method.WorkflowsRecord,
+    params,
+);
+```
+
+Parameters: [WorkflowRecordRequest](protocol.md#workflowrecordrequest).
+
+| Field        | Required | Type     | Description |
+| ------------ | -------- | -------- | ----------- |
+| `offset`     | Yes      | `number` |             |
+| `reference`  | Yes      | `string` |             |
+| `workflowId` | Yes      | `string` |             |
+
+Result: [WorkflowRecordPage](protocol.md#workflowrecordpage).
+
+## workflows.runs.cancel
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsRunsCancel> = {
+    runId: 'YOUR_RUNID',
+};
+const result: ResultOf<typeof Method.WorkflowsRunsCancel> = await client.call(
+    Method.WorkflowsRunsCancel,
+    params,
+);
+```
+
+Parameters: [WorkflowRunRequest](protocol.md#workflowrunrequest).
+
+| Field   | Required | Type     | Description |
+| ------- | -------- | -------- | ----------- |
+| `runId` | Yes      | `string` |             |
+
+Result: [WorkflowRunSummary](protocol.md#workflowrunsummary).
+
+## workflows.runs.events
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsRunsEvents> = {
+    after: 'YOUR_AFTER',
+    limit: 1,
+    runId: 'YOUR_RUNID',
+};
+const result: ResultOf<typeof Method.WorkflowsRunsEvents> = await client.call(
+    Method.WorkflowsRunsEvents,
+    params,
+);
+```
+
+Parameters: [WorkflowRunEventsRequest](protocol.md#workflowruneventsrequest).
+
+| Field   | Required | Type     | Description |
+| ------- | -------- | -------- | ----------- |
+| `after` | Yes      | `string` |             |
+| `limit` | Yes      | `number` |             |
+| `runId` | Yes      | `string` |             |
+
+Result: Array of [WorkflowRunEvent](protocol.md#workflowrunevent).
+
+## workflows.runs.list
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsRunsList> = {
+    afterRunId: 'YOUR_AFTERRUNID',
+    limit: 1,
+    workflowId: 'YOUR_WORKFLOWID',
+};
+const result: ResultOf<typeof Method.WorkflowsRunsList> = await client.call(
+    Method.WorkflowsRunsList,
+    params,
+);
+```
+
+Parameters: [WorkflowRunListRequest](protocol.md#workflowrunlistrequest).
+
+| Field        | Required | Type          | Description |
+| ------------ | -------- | ------------- | ----------- |
+| `afterRunId` | Yes      | `null,string` |             |
+| `limit`      | Yes      | `number`      |             |
+| `workflowId` | Yes      | `string`      |             |
+
+Result: [WorkflowRunListPage](protocol.md#workflowrunlistpage).
+
+## workflows.runs.output
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsRunsOutput> = {
+    invocationId: 'YOUR_INVOCATIONID',
+    nodeId: 'YOUR_NODEID',
+    offset: 1,
+    runId: 'YOUR_RUNID',
+};
+const result: ResultOf<typeof Method.WorkflowsRunsOutput> = await client.call(
+    Method.WorkflowsRunsOutput,
+    params,
+);
+```
+
+Parameters: [WorkflowRunOutputRequest](protocol.md#workflowrunoutputrequest).
+
+| Field          | Required | Type     | Description |
+| -------------- | -------- | -------- | ----------- |
+| `invocationId` | Yes      | `string` |             |
+| `nodeId`       | Yes      | `string` |             |
+| `offset`       | Yes      | `number` |             |
+| `runId`        | Yes      | `string` |             |
+
+Result: [WorkflowRunOutputPage](protocol.md#workflowrunoutputpage).
+
+## workflows.runs.read
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsRunsRead> = {
+    runId: 'YOUR_RUNID',
+};
+const result: ResultOf<typeof Method.WorkflowsRunsRead> = await client.call(
+    Method.WorkflowsRunsRead,
+    params,
+);
+```
+
+Parameters: [WorkflowRunRequest](protocol.md#workflowrunrequest).
+
+| Field   | Required | Type     | Description |
+| ------- | -------- | -------- | ----------- |
+| `runId` | Yes      | `string` |             |
+
+Result: [WorkflowRunSummary](protocol.md#workflowrunsummary).
+
+## workflows.runs.start
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsRunsStart> = {
+    input: {},
+    maxConcurrency: 1,
+    mode: 'live-test',
+    revision: 'YOUR_REVISION',
+    runId: 'YOUR_RUNID',
+    timeoutMs: 'YOUR_TIMEOUTMS',
+    triggerNodeId: 'YOUR_TRIGGERNODEID',
+    workflowId: 'YOUR_WORKFLOWID',
+};
+const result: ResultOf<typeof Method.WorkflowsRunsStart> = await client.call(
+    Method.WorkflowsRunsStart,
+    params,
+);
+```
+
+Parameters: [WorkflowRunStartRequest](protocol.md#workflowrunstartrequest).
+
+| Field            | Required | Type                                           | Description |
+| ---------------- | -------- | ---------------------------------------------- | ----------- |
+| `input`          | Yes      | [WorkflowObject](protocol.md#workflowobject)   |             |
+| `maxConcurrency` | Yes      | `number`                                       |             |
+| `mode`           | Yes      | [WorkflowRunMode](protocol.md#workflowrunmode) |             |
+| `revision`       | Yes      | `string`                                       |             |
+| `runId`          | Yes      | `string`                                       |             |
+| `timeoutMs`      | Yes      | `string`                                       |             |
+| `triggerNodeId`  | Yes      | `string`                                       |             |
+| `workflowId`     | Yes      | `string`                                       |             |
+
+Result: [WorkflowRunSummary](protocol.md#workflowrunsummary).
+
+## workflows.runs.steps
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsRunsSteps> = {
+    afterNodeId: 'YOUR_AFTERNODEID',
+    limit: 1,
+    runId: 'YOUR_RUNID',
+};
+const result: ResultOf<typeof Method.WorkflowsRunsSteps> = await client.call(
+    Method.WorkflowsRunsSteps,
+    params,
+);
+```
+
+Parameters: [WorkflowRunStepsRequest](protocol.md#workflowrunstepsrequest).
+
+| Field         | Required | Type          | Description |
+| ------------- | -------- | ------------- | ----------- |
+| `afterNodeId` | Yes      | `null,string` |             |
+| `limit`       | Yes      | `number`      |             |
+| `runId`       | Yes      | `string`      |             |
+
+Result: [WorkflowRunStepsPage](protocol.md#workflowrunstepspage).
+
+## workflows.save
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsSave> = {
+    commandId: 'YOUR_COMMANDID',
+    expectedRevision: 'YOUR_EXPECTEDREVISION',
+    patch: {
+        details: {
+            description: 'YOUR_DESCRIPTION',
+            folder: 'YOUR_FOLDER',
+            name: 'YOUR_NAME',
+            tags: [],
+        },
+        edges: [],
+        nodes: [],
+        positions: [],
+        removeEdges: [],
+        removeNodes: [],
+    },
+    workflowId: 'YOUR_WORKFLOWID',
+};
+const result: ResultOf<typeof Method.WorkflowsSave> = await client.call(
+    Method.WorkflowsSave,
+    params,
+);
+```
+
+Parameters: [WorkflowSaveRequest](protocol.md#workflowsaverequest).
+
+| Field              | Required | Type                                       | Description |
+| ------------------ | -------- | ------------------------------------------ | ----------- |
+| `commandId`        | Yes      | `string`                                   |             |
+| `expectedRevision` | Yes      | `string`                                   |             |
+| `patch`            | Yes      | [WorkflowPatch](protocol.md#workflowpatch) |             |
+| `workflowId`       | Yes      | `string`                                   |             |
+
+Result: [WorkflowReceipt](protocol.md#workflowreceipt).
+
+## workflows.validate
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsValidate> = {
+    revision: 'YOUR_REVISION',
+    workflowId: 'YOUR_WORKFLOWID',
+};
+const result: ResultOf<typeof Method.WorkflowsValidate> = await client.call(
+    Method.WorkflowsValidate,
+    params,
+);
+```
+
+Parameters: [WorkflowValidateRequest](protocol.md#workflowvalidaterequest).
+
+| Field        | Required | Type     | Description |
+| ------------ | -------- | -------- | ----------- |
+| `revision`   | Yes      | `string` |             |
+| `workflowId` | Yes      | `string` |             |
+
+Result: [GraphValidation](protocol.md#graphvalidation).
 
 ## workspaces.create
 

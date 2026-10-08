@@ -486,6 +486,103 @@ The artifact of a compaction.
 | `tokensAfter`        | No       | `number`               |                                                                               |
 | `tokensBefore`       | Yes      | `number`               |                                                                               |
 
+## ComponentCategory
+
+Catalog grouping retains all requested capability areas without declaring runtime support.
+
+Type: `"agents"` / `"api"` / `"browser"` / `"cache"` / `"collection"` / `"conditions"` / `"connections"` / `"context"` / `"documents"` / `"entities"` / `"experiments"` / `"flow"` / `"human"` / `"media"` / `"messaging"` / `"models"` / `"observability"` / `"output"` / `"personas"` / `"planning"` / `"policy"` / `"programs"` / `"prompts"` / `"quality"` / `"research"` / `"resources"` / `"storage"` / `"teams"` / `"time"` / `"tools"` / `"transform"` / `"triggers"` / `"utilities"`.
+
+## ComponentDefinition
+
+Registry version is pinned in every saved node. Runtime and UI share this exact definition.
+
+| Field            | Required | Type                                                                                               | Description                                                                          |
+| ---------------- | -------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `category`       | Yes      | [ComponentCategory](protocol.md#componentcategory)                                                 |                                                                                      |
+| `configuration`  | Yes      | [ObjectSchema](protocol.md#objectschema)                                                           |                                                                                      |
+| `defaults`       | Yes      | [WorkflowObject](protocol.md#workflowobject)                                                       |                                                                                      |
+| `display`        | Yes      | [ComponentDisplay](protocol.md#componentdisplay)                                                   |                                                                                      |
+| `execution`      | Yes      | [ComponentExecution](protocol.md#componentexecution) / `null`                                      |                                                                                      |
+| `externalFamily` | No       | `"application"` / `"compute"` / `"computer"` / `"database"` / `"feed"` / `"files"` / `"workspace"` | Present only on external resource cards, distinct from account or editor workspaces. |
+| `id`             | Yes      | `string`                                                                                           |                                                                                      |
+| `migratesFrom`   | Yes      | Array of `string`                                                                                  | Older versions requiring explicit migrations; no silent rewrite is permitted.        |
+| `ports`          | Yes      | Array of [ComponentPort](protocol.md#componentport)                                                |                                                                                      |
+| `resourceRole`   | Yes      | `null,string`                                                                                      |                                                                                      |
+| `resources`      | Yes      | Array of [ComponentResourceSlot](protocol.md#componentresourceslot)                                |                                                                                      |
+| `role`           | Yes      | [ComponentRole](protocol.md#componentrole)                                                         |                                                                                      |
+| `version`        | Yes      | `string`                                                                                           |                                                                                      |
+
+## ComponentDisplay
+
+Declarative presentation hints support family-specific cards without coupling contracts to React.
+
+| Field             | Required | Type              | Description |
+| ----------------- | -------- | ----------------- | ----------- |
+| `accent`          | Yes      | `string`          |             |
+| `card`            | Yes      | `string`          |             |
+| `compactFields`   | Yes      | Array of `string` |             |
+| `description`     | Yes      | `string`          |             |
+| `example`         | Yes      | `string`          |             |
+| `inspectorFields` | Yes      | Array of `string` |             |
+| `tags`            | Yes      | Array of `string` |             |
+| `title`           | Yes      | `string`          |             |
+
+## ComponentEffect
+
+Type: `"external"` / `"inference"` / `"pure"` / `"wait"`.
+
+## ComponentExecution
+
+Runtime availability is explicit; a schema definition alone cannot authorize or execute work.
+
+| Field          | Required | Type                                           | Description |
+| -------------- | -------- | ---------------------------------------------- | ----------- |
+| `cancellation` | Yes      | `string`                                       |             |
+| `capabilities` | Yes      | Array of `string`                              |             |
+| `credits`      | Yes      | `string`                                       |             |
+| `effect`       | Yes      | [ComponentEffect](protocol.md#componenteffect) |             |
+| `handler`      | Yes      | `null,string`                                  |             |
+| `maxAttempts`  | Yes      | `number`                                       |             |
+| `mock`         | Yes      | [MockBehavior](protocol.md#mockbehavior)       |             |
+| `permissions`  | Yes      | Array of `string`                              |             |
+| `persistence`  | Yes      | `string`                                       |             |
+| `retryErrors`  | Yes      | Array of `string`                              |             |
+| `streaming`    | Yes      | `boolean`                                      |             |
+| `timeoutMs`    | Yes      | `string`                                       |             |
+
+## ComponentPort
+
+Literal inputs and wire inputs share one schema; connecting both is ambiguous and rejected.
+
+| Field               | Required | Type                                             | Description                                                                           |
+| ------------------- | -------- | ------------------------------------------------ | ------------------------------------------------------------------------------------- |
+| `cardinality`       | Yes      | [PortCardinality](protocol.md#portcardinality)   |                                                                                       |
+| `direction`         | Yes      | [PortDirection](protocol.md#portdirection)       |                                                                                       |
+| `id`                | Yes      | `string`                                         |                                                                                       |
+| `incoming`          | Yes      | [IncomingPolicy](protocol.md#incomingpolicy)     |                                                                                       |
+| `kind`              | Yes      | [WorkflowEdgeKind](protocol.md#workflowedgekind) |                                                                                       |
+| `label`             | Yes      | `string`                                         |                                                                                       |
+| `literalField`      | Yes      | `null,string`                                    |                                                                                       |
+| `maxConnections`    | Yes      | `number`                                         |                                                                                       |
+| `modelCapabilities` | No       | Array of `string`                                | Authoring hint; runtime must still verify the provider's actual supported operations. |
+| `required`          | Yes      | `boolean`                                        |                                                                                       |
+| `schema`            | Yes      | [ValueSchema](protocol.md#valueschema)           |                                                                                       |
+
+## ComponentResourceSlot
+
+Inline resource bindings have the same capability requirements as exposed resource cards.
+
+| Field    | Required | Type                                            | Description |
+| -------- | -------- | ----------------------------------------------- | ----------- |
+| `family` | Yes      | [ResourceFamily](protocol.md#resourcefamily)    |             |
+| `uses`   | Yes      | Array of [ResourceUse](protocol.md#resourceuse) |             |
+
+## ComponentRole
+
+The four authoring roles have different scheduling semantics.
+
+Type: `"resource"` / `"step"` / `"trigger"` / `"visual"`.
+
 ## ConfigResult
 
 The effective configuration, with secrets removed.
@@ -999,6 +1096,10 @@ A stable, machine-readable failure classification.
 
 Type: `"aborted"` / `"auth"` / `"budget-exhausted"` / `"config"` / `"context-overflow"` / `"delivery-unconfirmed"` / `"denied"` / `"forbidden"` / `"internal"` / `"invalid-request"` / `"network"` / `"not-found"` / `"protocol"` / `"rate-limit"` / `"timeout"` / `"tool-execution"` / `"tool-input"` / `"upstream"`.
 
+## Exclude
+
+Type: `"audio"` / `"boolean"` / `"datetime"` / `"file"` / `"flow"` / `"image"` / `"integer"` / `"json"` / `"message"` / `"number"` / `"table"` / `"text"` / `"timestamp"` / `"video"`.
+
 ## FinishReason
 
 Why a turn stopped.
@@ -1146,6 +1247,9 @@ Methods, events, and additive capabilities supported by this gateway.
 | `officeVerification`        | No       | `true`                                             | Versioned host verification evidence on private project and employee channels.                 |
 | `sessionHistory`            | No       | `true`                                             | Durable complete presentation history and binary restoration.                                  |
 | `sessionHistoryUpdates`     | No       | `true`                                             | Session subscriptions notify exact journal ranges for live catch-up.                           |
+| `workflowDraftsVersion`     | No       | `1`                                                | Owner-scoped draft storage with bounded reads and revision-safe direct patches.                |
+| `workflowGraphVersion`      | No       | `1`                                                | Exact component catalog and structural validation of pinned drafts.                            |
+| `workflowRunsVersion`       | No       | `1`                                                | Durable core workflow test runs and bounded output inspection.                                 |
 
 ## GatewayLimits
 
@@ -1255,6 +1359,20 @@ Configurable bounds on gateway-owned work and memory.
 | `voice.audio`                  | Yes      | Object (fields below) |                                                                                            |
 | `voice.start`                  | Yes      | Object (fields below) |                                                                                            |
 | `voice.stop`                   | Yes      | Object (fields below) |                                                                                            |
+| `workflows.catalog`            | Yes      | Object (fields below) |                                                                                            |
+| `workflows.create`             | Yes      | Object (fields below) |                                                                                            |
+| `workflows.list`               | Yes      | Object (fields below) |                                                                                            |
+| `workflows.read`               | Yes      | Object (fields below) |                                                                                            |
+| `workflows.record`             | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.cancel`        | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.events`        | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.list`          | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.output`        | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.read`          | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.start`         | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.steps`         | Yes      | Object (fields below) |                                                                                            |
+| `workflows.save`               | Yes      | Object (fields below) |                                                                                            |
+| `workflows.validate`           | Yes      | Object (fields below) |                                                                                            |
 | `workspaces.create`            | Yes      | Object (fields below) |                                                                                            |
 | `workspaces.describe`          | Yes      | Object (fields below) |                                                                                            |
 | `workspaces.destroy`           | Yes      | Object (fields below) |                                                                                            |
@@ -1935,6 +2053,104 @@ Configurable bounds on gateway-owned work and memory.
 | `params` | Yes      | [VoiceStopParams](protocol.md#voicestopparams) |             |
 | `result` | Yes      | [OkResult](protocol.md#okresult)               |             |
 
+**workflows.catalog**
+
+| Field    | Required | Type                                               | Description |
+| -------- | -------- | -------------------------------------------------- | ----------- |
+| `params` | Yes      | [Recordstringnever](protocol.md#recordstringnever) |             |
+| `result` | Yes      | [WorkflowCatalog](protocol.md#workflowcatalog)     |             |
+
+**workflows.create**
+
+| Field    | Required | Type                                                       | Description |
+| -------- | -------- | ---------------------------------------------------------- | ----------- |
+| `params` | Yes      | [WorkflowCreateRequest](protocol.md#workflowcreaterequest) |             |
+| `result` | Yes      | [WorkflowReceipt](protocol.md#workflowreceipt)             |             |
+
+**workflows.list**
+
+| Field    | Required | Type                                                   | Description |
+| -------- | -------- | ------------------------------------------------------ | ----------- |
+| `params` | Yes      | [WorkflowListRequest](protocol.md#workflowlistrequest) |             |
+| `result` | Yes      | [WorkflowListPage](protocol.md#workflowlistpage)       |             |
+
+**workflows.read**
+
+| Field    | Required | Type                                                     | Description |
+| -------- | -------- | -------------------------------------------------------- | ----------- |
+| `params` | Yes      | [WorkflowReadRequest](protocol.md#workflowreadrequest)   |             |
+| `result` | Yes      | [WorkflowManifestPage](protocol.md#workflowmanifestpage) |             |
+
+**workflows.record**
+
+| Field    | Required | Type                                                       | Description |
+| -------- | -------- | ---------------------------------------------------------- | ----------- |
+| `params` | Yes      | [WorkflowRecordRequest](protocol.md#workflowrecordrequest) |             |
+| `result` | Yes      | [WorkflowRecordPage](protocol.md#workflowrecordpage)       |             |
+
+**workflows.runs.cancel**
+
+| Field    | Required | Type                                                 | Description |
+| -------- | -------- | ---------------------------------------------------- | ----------- |
+| `params` | Yes      | [WorkflowRunRequest](protocol.md#workflowrunrequest) |             |
+| `result` | Yes      | [WorkflowRunSummary](protocol.md#workflowrunsummary) |             |
+
+**workflows.runs.events**
+
+| Field    | Required | Type                                                             | Description |
+| -------- | -------- | ---------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [WorkflowRunEventsRequest](protocol.md#workflowruneventsrequest) |             |
+| `result` | Yes      | Array of [WorkflowRunEvent](protocol.md#workflowrunevent)        |             |
+
+**workflows.runs.list**
+
+| Field    | Required | Type                                                         | Description |
+| -------- | -------- | ------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [WorkflowRunListRequest](protocol.md#workflowrunlistrequest) |             |
+| `result` | Yes      | [WorkflowRunListPage](protocol.md#workflowrunlistpage)       |             |
+
+**workflows.runs.output**
+
+| Field    | Required | Type                                                             | Description |
+| -------- | -------- | ---------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [WorkflowRunOutputRequest](protocol.md#workflowrunoutputrequest) |             |
+| `result` | Yes      | [WorkflowRunOutputPage](protocol.md#workflowrunoutputpage)       |             |
+
+**workflows.runs.read**
+
+| Field    | Required | Type                                                 | Description |
+| -------- | -------- | ---------------------------------------------------- | ----------- |
+| `params` | Yes      | [WorkflowRunRequest](protocol.md#workflowrunrequest) |             |
+| `result` | Yes      | [WorkflowRunSummary](protocol.md#workflowrunsummary) |             |
+
+**workflows.runs.start**
+
+| Field    | Required | Type                                                           | Description |
+| -------- | -------- | -------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [WorkflowRunStartRequest](protocol.md#workflowrunstartrequest) |             |
+| `result` | Yes      | [WorkflowRunSummary](protocol.md#workflowrunsummary)           |             |
+
+**workflows.runs.steps**
+
+| Field    | Required | Type                                                           | Description |
+| -------- | -------- | -------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [WorkflowRunStepsRequest](protocol.md#workflowrunstepsrequest) |             |
+| `result` | Yes      | [WorkflowRunStepsPage](protocol.md#workflowrunstepspage)       |             |
+
+**workflows.save**
+
+| Field    | Required | Type                                                   | Description |
+| -------- | -------- | ------------------------------------------------------ | ----------- |
+| `params` | Yes      | [WorkflowSaveRequest](protocol.md#workflowsaverequest) |             |
+| `result` | Yes      | [WorkflowReceipt](protocol.md#workflowreceipt)         |             |
+
+**workflows.validate**
+
+| Field    | Required | Type                                                           | Description |
+| -------- | -------- | -------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [WorkflowValidateRequest](protocol.md#workflowvalidaterequest) |             |
+| `result` | Yes      | [GraphValidation](protocol.md#graphvalidation)                 |             |
+
 **workspaces.create**
 
 | Field    | Required | Type                                                       | Description |
@@ -1968,6 +2184,44 @@ Configurable bounds on gateway-owned work and memory.
 Supported serialized 3D asset formats; radiance fields remain unspecified.
 
 Type: `"gaussian_ply"` / `"glb"`.
+
+## GraphIssue
+
+Stable identities let all surfaces focus the same problem without parsing its message.
+
+| Field      | Required | Type                                         | Description |
+| ---------- | -------- | -------------------------------------------- | ----------- |
+| `code`     | Yes      | [GraphIssueCode](protocol.md#graphissuecode) |             |
+| `edgeId`   | Yes      | `null,string`                                |             |
+| `message`  | Yes      | `string`                                     |             |
+| `nodeId`   | Yes      | `null,string`                                |             |
+| `path`     | Yes      | `null,string`                                |             |
+| `severity` | Yes      | [GraphSeverity](protocol.md#graphseverity)   |             |
+
+## GraphIssueCode
+
+Type: `"ambiguous"` / `"cardinality"` / `"component"` / `"configuration"` / `"connection"` / `"cycle"` / `"duplicate"` / `"endpoint"` / `"required"` / `"resource"` / `"runtime"` / `"setup"` / `"trigger"` / `"unreachable"`.
+
+## GraphSeverity
+
+Type: `"error"` / `"warning"`.
+
+## GraphValidation
+
+A structural result is never an execution grant or a connection authorization snapshot.
+
+| Field                  | Required | Type                                          | Description |
+| ---------------------- | -------- | --------------------------------------------- | ----------- |
+| `issues`               | Yes      | Array of [GraphIssue](protocol.md#graphissue) |             |
+| `order`                | Yes      | Array of `string`                             |             |
+| `requiredCapabilities` | Yes      | Array of `string`                             |             |
+| `resourceRequirements` | Yes      | `number`                                      |             |
+| `revision`             | Yes      | `string`                                      |             |
+| `totalIssues`          | Yes      | `number`                                      |             |
+| `truncated`            | Yes      | `boolean`                                     |             |
+| `unavailableHandlers`  | Yes      | Array of `string`                             |             |
+| `valid`                | Yes      | `boolean`                                     |             |
+| `workflowId`           | Yes      | `string`                                      |             |
 
 ## HealthResult
 
@@ -2157,6 +2411,12 @@ Variant 5: Object (fields below)
 | `title`  | No       | `string`                                 |             |
 | `type`   | Yes      | `"document"`                             |             |
 
+## IncomingPolicy
+
+Multiple inputs require an explicit collector or join. Last-writer-wins is not an option.
+
+Type: `"collect"` / `"join"` / `"reject"`.
+
 ## Job
 
 A scheduled job as it is stored.
@@ -2331,6 +2591,18 @@ Variant 6: Dictionary
 
 Type: Dictionary.
 
+## ListSchema
+
+A list is a finalized collection; it is not a stream.
+
+| Field      | Required | Type                                   | Description |
+| ---------- | -------- | -------------------------------------- | ----------- |
+| `item`     | Yes      | [ValueSchema](protocol.md#valueschema) |             |
+| `kind`     | Yes      | `"list"`                               |             |
+| `maxItems` | Yes      | `number`                               |             |
+| `minItems` | Yes      | `number`                               |             |
+| `nullable` | Yes      | `boolean`                              |             |
+
 ## LogLevel
 
 Log severity, least → most severe.
@@ -2380,6 +2652,10 @@ Type: `"assistant"` / `"system"` / `"tool"` / `"user"`.
 What to do about occurrences that elapsed while the process was down.
 
 Type: `"run-all"` / `"run-if-recent"` / `"run-once"` / `"skip"`.
+
+## MockBehavior
+
+Type: `"deterministic"` / `"fixture"` / `"none"`.
 
 ## ModelMessage
 
@@ -2822,6 +3098,17 @@ Live, non-terminal token usage for the whole turn.
 | `maxTokens`        | Yes      | `number` | The max-token ceiling; `0` means uncapped.                 |
 | `promptTokens`     | Yes      | `number` |                                                            |
 
+## ObjectSchema
+
+Closed objects reject accidental fields, while open objects retain extension data.
+
+| Field        | Required | Type                                            | Description |
+| ------------ | -------- | ----------------------------------------------- | ----------- |
+| `additional` | Yes      | `boolean`                                       |             |
+| `fields`     | Yes      | Array of [SchemaField](protocol.md#schemafield) |             |
+| `kind`       | Yes      | `"object"`                                      |             |
+| `nullable`   | Yes      | `boolean`                                       |             |
+
 ## OkResult
 
 The answer to a method that only reports success.
@@ -2920,6 +3207,14 @@ Create with an empty id, or update an existing owned agent.
 | `id`           | Yes      | `string` |             |
 | `instructions` | Yes      | `string` |             |
 | `name`         | Yes      | `string` |             |
+
+## PortCardinality
+
+Type: `"item"` / `"list"` / `"stream"`.
+
+## PortDirection
+
+Type: `"input"` / `"output"`.
 
 ## ProcessInput
 
@@ -3059,6 +3354,66 @@ JSON-safe reset state; generation tokens prevent stale tabs consuming another en
 | `userId`    | Yes      | `string` |             |
 | `week`      | Yes      | `string` |             |
 
+## ResourceBinding
+
+Saved requirement, including incomplete drafts. Never stores credentials or telemetry.
+
+| Field        | Required | Type                                                        | Description                                                                             |
+| ------------ | -------- | ----------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `alias`      | Yes      | `string`                                                    |                                                                                         |
+| `consumerId` | Yes      | `string`                                                    | Stable node/group identity controls which agent or step receives access.                |
+| `family`     | Yes      | [ResourceFamily](protocol.md#resourcefamily)                |                                                                                         |
+| `id`         | Yes      | `string`                                                    |                                                                                         |
+| `limits`     | Yes      | [ResourceLimits](protocol.md#resourcelimits)                |                                                                                         |
+| `maxAgeMs`   | Yes      | `null,string`                                               | Null allows unknown freshness. Otherwise runtime requires a fresh observed source time. |
+| `operations` | Yes      | Array of `string`                                           |                                                                                         |
+| `selection`  | Yes      | [ResourceSelection](protocol.md#resourceselection) / `null` |                                                                                         |
+| `use`        | Yes      | [ResourceUse](protocol.md#resourceuse)                      |                                                                                         |
+| `version`    | Yes      | `1`                                                         |                                                                                         |
+
+## ResourceFamily
+
+External resource identity; these families never confer access themselves.
+
+Type: `"application"` / `"compute"` / `"computer"` / `"database"` / `"feed"` / `"files"` / `"workspace"`.
+
+## ResourceLimits
+
+Bounded read or job outputs, not a grant to ingest a whole source.
+
+| Field      | Required | Type     | Description                                            |
+| ---------- | -------- | -------- | ------------------------------------------------------ |
+| `maxBytes` | Yes      | `string` | Unsigned canonical decimal, lossless on the JSON wire. |
+| `maxItems` | Yes      | `number` |                                                        |
+
+## ResourceSchema
+
+Resource roles are nominal identities, not implicit runtime permissions.
+
+| Field      | Required | Type         | Description |
+| ---------- | -------- | ------------ | ----------- |
+| `kind`     | Yes      | `"resource"` |             |
+| `nullable` | Yes      | `boolean`    |             |
+| `role`     | Yes      | `string`     |             |
+
+## ResourceSelection
+
+An exact dataset/endpoint selection; paths never act as implicit permission prefixes.
+
+| Field              | Required | Type     | Description |
+| ------------------ | -------- | -------- | ----------- |
+| `connectionId`     | Yes      | `string` |             |
+| `connectorId`      | Yes      | `string` |             |
+| `connectorVersion` | Yes      | `string` |             |
+| `resourceId`       | Yes      | `string` |             |
+| `targetId`         | Yes      | `string` |             |
+
+## ResourceUse
+
+Attaching access, reading data, and placing computation are different operations.
+
+Type: `"attach"` / `"compute"` / `"read"`.
+
 ## RiskLevel
 
 How dangerous an action is.
@@ -3079,6 +3434,31 @@ Presence only: neither saved key material nor claims about Roblox permissions.
 | ----------- | -------- | --------- | ----------- |
 | `connected` | Yes      | `boolean` |             |
 | `validated` | Yes      | `false`   |             |
+
+## ScalarSchema
+
+Primitive or named envelope type. Number values must be finite and safely represented.
+
+| Field       | Required | Type                           | Description |
+| ----------- | -------- | ------------------------------ | ----------- |
+| `choices`   | No       | Array of `string`              |             |
+| `kind`      | Yes      | [Exclude](protocol.md#exclude) |             |
+| `maxLength` | No       | `number`                       |             |
+| `maximum`   | No       | `number`                       |             |
+| `minLength` | No       | `number`                       |             |
+| `minimum`   | No       | `number`                       |             |
+| `nullable`  | Yes      | `boolean`                      |             |
+| `whole`     | No       | `boolean`                      |             |
+
+## SchemaField
+
+Named nested field contracts keep missing, null and empty values distinct.
+
+| Field      | Required | Type                                   | Description |
+| ---------- | -------- | -------------------------------------- | ----------- |
+| `name`     | Yes      | `string`                               |             |
+| `required` | Yes      | `boolean`                              |             |
+| `schema`   | Yes      | [ValueSchema](protocol.md#valueschema) |             |
 
 ## Scope
 
@@ -3791,6 +4171,50 @@ Variant 5: Object (fields below)
 | `source`                | No       | `"channel"` / `"human"` / `"injected"` / `"resumed"`                 | Who produced the turn.                                                        |
 | `timestamp`             | Yes      | `number`                                                             | Epoch milliseconds.                                                           |
 
+## ValueSchema
+
+Declarative portable schema subset. No callbacks, JavaScript evaluation, or credentials.
+
+Variant 1: [ScalarSchema](protocol.md#scalarschema)
+
+| Field       | Required | Type                           | Description |
+| ----------- | -------- | ------------------------------ | ----------- |
+| `choices`   | No       | Array of `string`              |             |
+| `kind`      | Yes      | [Exclude](protocol.md#exclude) |             |
+| `maxLength` | No       | `number`                       |             |
+| `maximum`   | No       | `number`                       |             |
+| `minLength` | No       | `number`                       |             |
+| `minimum`   | No       | `number`                       |             |
+| `nullable`  | Yes      | `boolean`                      |             |
+| `whole`     | No       | `boolean`                      |             |
+
+Variant 2: [ObjectSchema](protocol.md#objectschema)
+
+| Field        | Required | Type                                            | Description |
+| ------------ | -------- | ----------------------------------------------- | ----------- |
+| `additional` | Yes      | `boolean`                                       |             |
+| `fields`     | Yes      | Array of [SchemaField](protocol.md#schemafield) |             |
+| `kind`       | Yes      | `"object"`                                      |             |
+| `nullable`   | Yes      | `boolean`                                       |             |
+
+Variant 3: [ListSchema](protocol.md#listschema)
+
+| Field      | Required | Type                                   | Description |
+| ---------- | -------- | -------------------------------------- | ----------- |
+| `item`     | Yes      | [ValueSchema](protocol.md#valueschema) |             |
+| `kind`     | Yes      | `"list"`                               |             |
+| `maxItems` | Yes      | `number`                               |             |
+| `minItems` | Yes      | `number`                               |             |
+| `nullable` | Yes      | `boolean`                              |             |
+
+Variant 4: [ResourceSchema](protocol.md#resourceschema)
+
+| Field      | Required | Type         | Description |
+| ---------- | -------- | ------------ | ----------- |
+| `kind`     | Yes      | `"resource"` |             |
+| `nullable` | Yes      | `boolean`    |             |
+| `role`     | Yes      | `string`     |             |
+
 ## VoiceAudioParams
 
 | Field    | Required | Type     | Description                                        |
@@ -4065,6 +4489,394 @@ One worker, identified independently of its shared persona. Times are decimal ep
 | `rootId`         | Yes      | `string`                               |             |
 | `startedAt`      | Yes      | `string`                               |             |
 | `state`          | Yes      | [WorkerState](protocol.md#workerstate) |             |
+
+## WorkflowCatalog
+
+Catalog format is separate from saved component versions and draft storage format.
+
+| Field        | Required | Type                                                            | Description |
+| ------------ | -------- | --------------------------------------------------------------- | ----------- |
+| `components` | Yes      | Array of [ComponentDefinition](protocol.md#componentdefinition) |             |
+| `format`     | Yes      | `1`                                                             |             |
+
+## WorkflowCreateRequest
+
+Client-chosen identities make an unacknowledged create safe to retry.
+
+| Field        | Required | Type                                           | Description |
+| ------------ | -------- | ---------------------------------------------- | ----------- |
+| `commandId`  | Yes      | `string`                                       |             |
+| `details`    | Yes      | [WorkflowDetails](protocol.md#workflowdetails) |             |
+| `workflowId` | Yes      | `string`                                       |             |
+
+## WorkflowDetails
+
+User-owned descriptive fields, independent of run and automation state.
+
+| Field         | Required | Type              | Description |
+| ------------- | -------- | ----------------- | ----------- |
+| `description` | Yes      | `string`          |             |
+| `folder`      | Yes      | `null,string`     |             |
+| `name`        | Yes      | `string`          |             |
+| `tags`        | Yes      | Array of `string` |             |
+
+## WorkflowEdge
+
+A draft can retain a dangling edge so validation can explain an unfinished edit.
+
+| Field  | Required | Type                                             | Description |
+| ------ | -------- | ------------------------------------------------ | ----------- |
+| `from` | Yes      | [WorkflowEndpoint](protocol.md#workflowendpoint) |             |
+| `id`   | Yes      | `string`                                         |             |
+| `kind` | Yes      | [WorkflowEdgeKind](protocol.md#workflowedgekind) |             |
+| `to`   | Yes      | [WorkflowEndpoint](protocol.md#workflowendpoint) |             |
+
+## WorkflowEdgeKind
+
+Execution, values, and resource attachments have separate connection semantics.
+
+Type: `"data"` / `"flow"` / `"resource"`.
+
+## WorkflowEdgeReference
+
+One immutable connection.
+
+| Field     | Required | Type     | Description |
+| --------- | -------- | -------- | ----------- |
+| `content` | Yes      | `string` |             |
+| `id`      | Yes      | `string` |             |
+
+## WorkflowEndpoint
+
+Stable endpoint identities survive cosmetic renames.
+
+| Field  | Required | Type     | Description |
+| ------ | -------- | -------- | ----------- |
+| `node` | Yes      | `string` |             |
+| `port` | Yes      | `string` |             |
+
+## WorkflowListCursor
+
+Cursor uses a timestamp plus stable identity to handle equal update times.
+
+| Field         | Required | Type     | Description |
+| ------------- | -------- | -------- | ----------- |
+| `updatedAtMs` | Yes      | `string` |             |
+| `workflowId`  | Yes      | `string` |             |
+
+## WorkflowListPage
+
+Bounded management page.
+
+| Field   | Required | Type                                                          | Description |
+| ------- | -------- | ------------------------------------------------------------- | ----------- |
+| `items` | Yes      | Array of [WorkflowSummary](protocol.md#workflowsummary)       |             |
+| `next`  | Yes      | [WorkflowListCursor](protocol.md#workflowlistcursor) / `null` |             |
+
+## WorkflowListRequest
+
+Metadata pagination carries no node payloads.
+
+| Field    | Required | Type                                                          | Description |
+| -------- | -------- | ------------------------------------------------------------- | ----------- |
+| `cursor` | Yes      | [WorkflowListCursor](protocol.md#workflowlistcursor) / `null` |             |
+| `limit`  | Yes      | `number`                                                      |             |
+
+## WorkflowManifestPage
+
+Bounded manifest page; offsets count references, never bytes or revisions.
+
+| Field            | Required | Type                                                                | Description |
+| ---------------- | -------- | ------------------------------------------------------------------- | ----------- |
+| `details`        | Yes      | [WorkflowDetails](protocol.md#workflowdetails)                      |             |
+| `edges`          | Yes      | Array of [WorkflowEdgeReference](protocol.md#workflowedgereference) |             |
+| `format`         | Yes      | `1`                                                                 |             |
+| `nextEdgeOffset` | Yes      | `null,number`                                                       |             |
+| `nextNodeOffset` | Yes      | `null,number`                                                       |             |
+| `nodes`          | Yes      | Array of [WorkflowNodeReference](protocol.md#workflownodereference) |             |
+| `revision`       | Yes      | `string`                                                            |             |
+| `workflowId`     | Yes      | `string`                                                            |             |
+
+## WorkflowNode
+
+Versioned component configuration; unsupported or incomplete components can be saved.
+
+| Field              | Required | Type                                                    | Description |
+| ------------------ | -------- | ------------------------------------------------------- | ----------- |
+| `component`        | Yes      | `string`                                                |             |
+| `componentVersion` | Yes      | `string`                                                |             |
+| `configuration`    | Yes      | [WorkflowObject](protocol.md#workflowobject)            |             |
+| `id`               | Yes      | `string`                                                |             |
+| `label`            | Yes      | `string`                                                |             |
+| `resources`        | Yes      | Array of [ResourceBinding](protocol.md#resourcebinding) |             |
+
+## WorkflowNodeReference
+
+One node's immutable content and independently versioned layout.
+
+| Field      | Required | Type     | Description |
+| ---------- | -------- | -------- | ----------- |
+| `content`  | Yes      | `string` |             |
+| `id`       | Yes      | `string` |             |
+| `position` | Yes      | `string` |             |
+
+## WorkflowObject
+
+JSON configuration is data, not an executable plan or authorization.
+
+Type: Dictionary.
+
+## WorkflowPatch
+
+A bounded edit; layout changes never include node configuration.
+
+| Field         | Required | Type                                                      | Description |
+| ------------- | -------- | --------------------------------------------------------- | ----------- |
+| `details`     | Yes      | [WorkflowDetails](protocol.md#workflowdetails) / `null`   |             |
+| `edges`       | Yes      | Array of [WorkflowEdge](protocol.md#workflowedge)         |             |
+| `nodes`       | Yes      | Array of [WorkflowNode](protocol.md#workflownode)         |             |
+| `positions`   | Yes      | Array of [WorkflowPosition](protocol.md#workflowposition) |             |
+| `removeEdges` | Yes      | Array of `string`                                         |             |
+| `removeNodes` | Yes      | Array of `string`                                         |             |
+
+## WorkflowPosition
+
+Personal viewport is excluded; these positions belong to the workflow itself.
+
+| Field | Required | Type     | Description |
+| ----- | -------- | -------- | ----------- |
+| `id`  | Yes      | `string` |             |
+| `x`   | Yes      | `number` |             |
+| `y`   | Yes      | `number` |             |
+
+## WorkflowReadRequest
+
+Null resolves the current revision only for the first page. Subsequent pages pin it.
+
+| Field        | Required | Type          | Description |
+| ------------ | -------- | ------------- | ----------- |
+| `edgeOffset` | Yes      | `number`      |             |
+| `nodeOffset` | Yes      | `number`      |             |
+| `revision`   | Yes      | `null,string` |             |
+| `workflowId` | Yes      | `string`      |             |
+
+## WorkflowReceipt
+
+Result retained by command receipts, including after subsequent edits.
+
+| Field        | Required | Type     | Description |
+| ------------ | -------- | -------- | ----------- |
+| `revision`   | Yes      | `string` |             |
+| `workflowId` | Yes      | `string` |             |
+
+## WorkflowRecordPage
+
+JSON text chunks are concatenated before parsing. Offsets count UTF-16 code units.
+
+| Field             | Required | Type          | Description |
+| ----------------- | -------- | ------------- | ----------- |
+| `content`         | Yes      | `string`      |             |
+| `nextOffset`      | Yes      | `null,number` |             |
+| `offset`          | Yes      | `number`      |             |
+| `reference`       | Yes      | `string`      |             |
+| `totalCharacters` | Yes      | `number`      |             |
+| `workflowId`      | Yes      | `string`      |             |
+
+## WorkflowRecordRequest
+
+A reference identifies immutable content within the authenticated owner's workflow.
+
+| Field        | Required | Type     | Description |
+| ------------ | -------- | -------- | ----------- |
+| `offset`     | Yes      | `number` |             |
+| `reference`  | Yes      | `string` |             |
+| `workflowId` | Yes      | `string` |             |
+
+## WorkflowRunEvent
+
+| Field          | Required | Type                                                                                                                  | Description |
+| -------------- | -------- | --------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `atMs`         | Yes      | `string`                                                                                                              |             |
+| `invocationId` | Yes      | `null,string`                                                                                                         |             |
+| `kind`         | Yes      | [WorkflowRunEventKind](protocol.md#workflowruneventkind)                                                              |             |
+| `message`      | Yes      | `null,string`                                                                                                         |             |
+| `nodeId`       | Yes      | `null,string`                                                                                                         |             |
+| `runId`        | Yes      | `string`                                                                                                              |             |
+| `sequence`     | Yes      | `string`                                                                                                              |             |
+| `status`       | Yes      | `"cancelled"` / `"failed"` / `"interrupted"` / `"queued"` / `"running"` / `"skipped"` / `"succeeded"` / `"uncertain"` |             |
+
+## WorkflowRunEventKind
+
+Type: `"accepted"` / `"cancelled"` / `"claimed"` / `"finished"` / `"step-finished"` / `"step-started"`.
+
+## WorkflowRunEventsRequest
+
+| Field   | Required | Type     | Description |
+| ------- | -------- | -------- | ----------- |
+| `after` | Yes      | `string` |             |
+| `limit` | Yes      | `number` |             |
+| `runId` | Yes      | `string` |             |
+
+## WorkflowRunListPage
+
+| Field   | Required | Type                                                          | Description |
+| ------- | -------- | ------------------------------------------------------------- | ----------- |
+| `items` | Yes      | Array of [WorkflowRunSummary](protocol.md#workflowrunsummary) |             |
+| `next`  | Yes      | `null,string`                                                 |             |
+
+## WorkflowRunListRequest
+
+| Field        | Required | Type          | Description |
+| ------------ | -------- | ------------- | ----------- |
+| `afterRunId` | Yes      | `null,string` |             |
+| `limit`      | Yes      | `number`      |             |
+| `workflowId` | Yes      | `string`      |             |
+
+## WorkflowRunMode
+
+Type: `"live-test"` / `"mock-test"`.
+
+## WorkflowRunOutputPage
+
+| Field             | Required | Type          | Description |
+| ----------------- | -------- | ------------- | ----------- |
+| `content`         | Yes      | `string`      |             |
+| `invocationId`    | Yes      | `string`      |             |
+| `nextOffset`      | Yes      | `null,number` |             |
+| `nodeId`          | Yes      | `string`      |             |
+| `offset`          | Yes      | `number`      |             |
+| `runId`           | Yes      | `string`      |             |
+| `totalCharacters` | Yes      | `number`      |             |
+
+## WorkflowRunOutputRequest
+
+| Field          | Required | Type     | Description |
+| -------------- | -------- | -------- | ----------- |
+| `invocationId` | Yes      | `string` |             |
+| `nodeId`       | Yes      | `string` |             |
+| `offset`       | Yes      | `number` |             |
+| `runId`        | Yes      | `string` |             |
+
+## WorkflowRunRequest
+
+| Field   | Required | Type     | Description |
+| ------- | -------- | -------- | ----------- |
+| `runId` | Yes      | `string` |             |
+
+## WorkflowRunStartRequest
+
+| Field            | Required | Type                                           | Description |
+| ---------------- | -------- | ---------------------------------------------- | ----------- |
+| `input`          | Yes      | [WorkflowObject](protocol.md#workflowobject)   |             |
+| `maxConcurrency` | Yes      | `number`                                       |             |
+| `mode`           | Yes      | [WorkflowRunMode](protocol.md#workflowrunmode) |             |
+| `revision`       | Yes      | `string`                                       |             |
+| `runId`          | Yes      | `string`                                       |             |
+| `timeoutMs`      | Yes      | `string`                                       |             |
+| `triggerNodeId`  | Yes      | `string`                                       |             |
+| `workflowId`     | Yes      | `string`                                       |             |
+
+## WorkflowRunStatus
+
+Type: `"cancelled"` / `"failed"` / `"queued"` / `"running"` / `"succeeded"`.
+
+## WorkflowRunStepsPage
+
+| Field   | Required | Type                                                      | Description |
+| ------- | -------- | --------------------------------------------------------- | ----------- |
+| `items` | Yes      | Array of [WorkflowStepView](protocol.md#workflowstepview) |             |
+| `next`  | Yes      | `null,string`                                             |             |
+
+## WorkflowRunStepsRequest
+
+| Field         | Required | Type          | Description |
+| ------------- | -------- | ------------- | ----------- |
+| `afterNodeId` | Yes      | `null,string` |             |
+| `limit`       | Yes      | `number`      |             |
+| `runId`       | Yes      | `string`      |             |
+
+## WorkflowRunSummary
+
+| Field              | Required | Type                                               | Description |
+| ------------------ | -------- | -------------------------------------------------- | ----------- |
+| `createdAtMs`      | Yes      | `string`                                           |             |
+| `message`          | Yes      | `null,string`                                      |             |
+| `mode`             | Yes      | [WorkflowRunMode](protocol.md#workflowrunmode)     |             |
+| `runId`            | Yes      | `string`                                           |             |
+| `sequence`         | Yes      | `string`                                           |             |
+| `status`           | Yes      | [WorkflowRunStatus](protocol.md#workflowrunstatus) |             |
+| `updatedAtMs`      | Yes      | `string`                                           |             |
+| `workflowId`       | Yes      | `string`                                           |             |
+| `workflowRevision` | Yes      | `string`                                           |             |
+
+## WorkflowSaveRequest
+
+Command identity and expected revision serve different purposes.
+
+| Field              | Required | Type                                       | Description |
+| ------------------ | -------- | ------------------------------------------ | ----------- |
+| `commandId`        | Yes      | `string`                                   |             |
+| `expectedRevision` | Yes      | `string`                                   |             |
+| `patch`            | Yes      | [WorkflowPatch](protocol.md#workflowpatch) |             |
+| `workflowId`       | Yes      | `string`                                   |             |
+
+## WorkflowStepStatus
+
+Type: `"cancelled"` / `"failed"` / `"interrupted"` / `"running"` / `"skipped"` / `"succeeded"` / `"uncertain"`.
+
+## WorkflowStepView
+
+| Field          | Required | Type                                                 | Description |
+| -------------- | -------- | ---------------------------------------------------- | ----------- |
+| `attempt`      | Yes      | `number`                                             |             |
+| `component`    | Yes      | `string`                                             |             |
+| `finishedAtMs` | Yes      | `null,string`                                        |             |
+| `hasResult`    | Yes      | `boolean`                                            |             |
+| `invocationId` | Yes      | `string`                                             |             |
+| `label`        | Yes      | `string`                                             |             |
+| `message`      | Yes      | `null,string`                                        |             |
+| `nodeId`       | Yes      | `string`                                             |             |
+| `startedAtMs`  | Yes      | `string`                                             |             |
+| `status`       | Yes      | [WorkflowStepStatus](protocol.md#workflowstepstatus) |             |
+
+## WorkflowSummary
+
+Small management projection; contains no graph, prompts, or run histories.
+
+| Field         | Required | Type                                           | Description |
+| ------------- | -------- | ---------------------------------------------- | ----------- |
+| `createdAtMs` | Yes      | `string`                                       |             |
+| `details`     | Yes      | [WorkflowDetails](protocol.md#workflowdetails) |             |
+| `edgeCount`   | Yes      | `number`                                       |             |
+| `nodeCount`   | Yes      | `number`                                       |             |
+| `revision`    | Yes      | `string`                                       |             |
+| `updatedAtMs` | Yes      | `string`                                       |             |
+| `workflowId`  | Yes      | `string`                                       |             |
+
+## WorkflowValidateRequest
+
+Authoritative validation always names one immutable saved revision.
+
+| Field        | Required | Type     | Description |
+| ------------ | -------- | -------- | ----------- |
+| `revision`   | Yes      | `string` |             |
+| `workflowId` | Yes      | `string` |             |
+
+## WorkflowValue
+
+Large integers and financial values must use decimal strings.
+
+Variant 1: [WorkflowObject](protocol.md#workflowobject)
+
+Type: Dictionary.
+
+Variant 2: Array of [WorkflowValue](protocol.md#workflowvalue)
+
+Type: Array of [WorkflowValue](protocol.md#workflowvalue).
+
+Variant 3: `null,string,number,boolean`
+
+Type: `null,string,number,boolean`.
 
 ## Workspace
 

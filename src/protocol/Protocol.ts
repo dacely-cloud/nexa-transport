@@ -1886,6 +1886,8 @@ export interface GatewayFeaturesShape {
     readonly workflowDraftsVersion?: 1;
     /** workflowGraphVersion as defined by the Nexa gateway. */
     readonly workflowGraphVersion?: 1;
+    /** workflowRunsVersion as defined by the Nexa gateway. */
+    readonly workflowRunsVersion?: 1;
 }
 
 /** GatewayFeatures from the Nexa wire protocol. */
@@ -2728,6 +2730,62 @@ export interface GatewayMethodsworkflows_recordShape {
     readonly result: WorkflowRecordPage;
 }
 
+/** GatewayMethodsworkflows_runs_cancel wire fields. */
+export interface GatewayMethodsworkflows_runs_cancelShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkflowRunRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WorkflowRunSummary;
+}
+
+/** GatewayMethodsworkflows_runs_events wire fields. */
+export interface GatewayMethodsworkflows_runs_eventsShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkflowRunEventsRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ReadonlyArray<WorkflowRunEvent>;
+}
+
+/** GatewayMethodsworkflows_runs_list wire fields. */
+export interface GatewayMethodsworkflows_runs_listShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkflowRunListRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WorkflowRunListPage;
+}
+
+/** GatewayMethodsworkflows_runs_output wire fields. */
+export interface GatewayMethodsworkflows_runs_outputShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkflowRunOutputRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WorkflowRunOutputPage;
+}
+
+/** GatewayMethodsworkflows_runs_read wire fields. */
+export interface GatewayMethodsworkflows_runs_readShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkflowRunRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WorkflowRunSummary;
+}
+
+/** GatewayMethodsworkflows_runs_start wire fields. */
+export interface GatewayMethodsworkflows_runs_startShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkflowRunStartRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WorkflowRunSummary;
+}
+
+/** GatewayMethodsworkflows_runs_steps wire fields. */
+export interface GatewayMethodsworkflows_runs_stepsShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkflowRunStepsRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WorkflowRunStepsPage;
+}
+
 /** GatewayMethodsworkflows_save wire fields. */
 export interface GatewayMethodsworkflows_saveShape {
     /** params as defined by the Nexa gateway. */
@@ -2960,6 +3018,20 @@ export interface GatewayMethodsShape {
     readonly 'workflows.read': GatewayMethodsworkflows_readShape;
     /** workflows.record as defined by the Nexa gateway. */
     readonly 'workflows.record': GatewayMethodsworkflows_recordShape;
+    /** workflows.runs.cancel as defined by the Nexa gateway. */
+    readonly 'workflows.runs.cancel': GatewayMethodsworkflows_runs_cancelShape;
+    /** workflows.runs.events as defined by the Nexa gateway. */
+    readonly 'workflows.runs.events': GatewayMethodsworkflows_runs_eventsShape;
+    /** workflows.runs.list as defined by the Nexa gateway. */
+    readonly 'workflows.runs.list': GatewayMethodsworkflows_runs_listShape;
+    /** workflows.runs.output as defined by the Nexa gateway. */
+    readonly 'workflows.runs.output': GatewayMethodsworkflows_runs_outputShape;
+    /** workflows.runs.read as defined by the Nexa gateway. */
+    readonly 'workflows.runs.read': GatewayMethodsworkflows_runs_readShape;
+    /** workflows.runs.start as defined by the Nexa gateway. */
+    readonly 'workflows.runs.start': GatewayMethodsworkflows_runs_startShape;
+    /** workflows.runs.steps as defined by the Nexa gateway. */
+    readonly 'workflows.runs.steps': GatewayMethodsworkflows_runs_stepsShape;
     /** workflows.save as defined by the Nexa gateway. */
     readonly 'workflows.save': GatewayMethodsworkflows_saveShape;
     /** workflows.validate as defined by the Nexa gateway. */
@@ -6513,6 +6585,228 @@ export interface WorkflowRecordRequestShape {
 /** WorkflowRecordRequest from the Nexa wire protocol. */
 export type WorkflowRecordRequest = WorkflowRecordRequestShape;
 
+/** Allowed values for WorkflowRunEventstatus. */
+export const WorkflowRunEventstatusValues = {
+    Value0: 'cancelled',
+    Value1: 'failed',
+    Value2: 'interrupted',
+    Value3: 'queued',
+    Value4: 'running',
+    Value5: 'skipped',
+    Value6: 'succeeded',
+    Value7: 'uncertain',
+} as const;
+
+/** WorkflowRunEvent wire fields. */
+export interface WorkflowRunEventShape {
+    /** atMs as defined by the Nexa gateway. */
+    readonly atMs: string;
+    /** invocationId as defined by the Nexa gateway. */
+    readonly invocationId: null | string;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: WorkflowRunEventKind;
+    /** message as defined by the Nexa gateway. */
+    readonly message: null | string;
+    /** nodeId as defined by the Nexa gateway. */
+    readonly nodeId: null | string;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+    /** sequence as defined by the Nexa gateway. */
+    readonly sequence: string;
+    /** status as defined by the Nexa gateway. */
+    readonly status: (typeof WorkflowRunEventstatusValues)[keyof typeof WorkflowRunEventstatusValues];
+}
+
+/** WorkflowRunEvent from the Nexa wire protocol. */
+export type WorkflowRunEvent = WorkflowRunEventShape;
+
+/** Allowed values for WorkflowRunEventKind. */
+export const WorkflowRunEventKindValues = {
+    Value0: 'accepted',
+    Value1: 'cancelled',
+    Value2: 'claimed',
+    Value3: 'finished',
+    Value4: 'step-finished',
+    Value5: 'step-started',
+} as const;
+
+/** WorkflowRunEventKind from the Nexa wire protocol. */
+export type WorkflowRunEventKind =
+    (typeof WorkflowRunEventKindValues)[keyof typeof WorkflowRunEventKindValues];
+
+/** WorkflowRunEventsRequest wire fields. */
+export interface WorkflowRunEventsRequestShape {
+    /** after as defined by the Nexa gateway. */
+    readonly after: string;
+    /** limit as defined by the Nexa gateway. */
+    readonly limit: number;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+}
+
+/** WorkflowRunEventsRequest from the Nexa wire protocol. */
+export type WorkflowRunEventsRequest = WorkflowRunEventsRequestShape;
+
+/** WorkflowRunListPage wire fields. */
+export interface WorkflowRunListPageShape {
+    /** items as defined by the Nexa gateway. */
+    readonly items: ReadonlyArray<WorkflowRunSummary>;
+    /** next as defined by the Nexa gateway. */
+    readonly next: null | string;
+}
+
+/** WorkflowRunListPage from the Nexa wire protocol. */
+export type WorkflowRunListPage = WorkflowRunListPageShape;
+
+/** WorkflowRunListRequest wire fields. */
+export interface WorkflowRunListRequestShape {
+    /** afterRunId as defined by the Nexa gateway. */
+    readonly afterRunId: null | string;
+    /** limit as defined by the Nexa gateway. */
+    readonly limit: number;
+    /** workflowId as defined by the Nexa gateway. */
+    readonly workflowId: string;
+}
+
+/** WorkflowRunListRequest from the Nexa wire protocol. */
+export type WorkflowRunListRequest = WorkflowRunListRequestShape;
+
+/** Allowed values for WorkflowRunMode. */
+export const WorkflowRunModeValues = { Value0: 'live-test', Value1: 'mock-test' } as const;
+
+/** WorkflowRunMode from the Nexa wire protocol. */
+export type WorkflowRunMode = (typeof WorkflowRunModeValues)[keyof typeof WorkflowRunModeValues];
+
+/** WorkflowRunOutputPage wire fields. */
+export interface WorkflowRunOutputPageShape {
+    /** content as defined by the Nexa gateway. */
+    readonly content: string;
+    /** invocationId as defined by the Nexa gateway. */
+    readonly invocationId: string;
+    /** nextOffset as defined by the Nexa gateway. */
+    readonly nextOffset: null | number;
+    /** nodeId as defined by the Nexa gateway. */
+    readonly nodeId: string;
+    /** offset as defined by the Nexa gateway. */
+    readonly offset: number;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+    /** totalCharacters as defined by the Nexa gateway. */
+    readonly totalCharacters: number;
+}
+
+/** WorkflowRunOutputPage from the Nexa wire protocol. */
+export type WorkflowRunOutputPage = WorkflowRunOutputPageShape;
+
+/** WorkflowRunOutputRequest wire fields. */
+export interface WorkflowRunOutputRequestShape {
+    /** invocationId as defined by the Nexa gateway. */
+    readonly invocationId: string;
+    /** nodeId as defined by the Nexa gateway. */
+    readonly nodeId: string;
+    /** offset as defined by the Nexa gateway. */
+    readonly offset: number;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+}
+
+/** WorkflowRunOutputRequest from the Nexa wire protocol. */
+export type WorkflowRunOutputRequest = WorkflowRunOutputRequestShape;
+
+/** WorkflowRunRequest wire fields. */
+export interface WorkflowRunRequestShape {
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+}
+
+/** WorkflowRunRequest from the Nexa wire protocol. */
+export type WorkflowRunRequest = WorkflowRunRequestShape;
+
+/** WorkflowRunStartRequest wire fields. */
+export interface WorkflowRunStartRequestShape {
+    /** input as defined by the Nexa gateway. */
+    readonly input: WorkflowObject;
+    /** maxConcurrency as defined by the Nexa gateway. */
+    readonly maxConcurrency: number;
+    /** mode as defined by the Nexa gateway. */
+    readonly mode: WorkflowRunMode;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: string;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+    /** timeoutMs as defined by the Nexa gateway. */
+    readonly timeoutMs: string;
+    /** triggerNodeId as defined by the Nexa gateway. */
+    readonly triggerNodeId: string;
+    /** workflowId as defined by the Nexa gateway. */
+    readonly workflowId: string;
+}
+
+/** WorkflowRunStartRequest from the Nexa wire protocol. */
+export type WorkflowRunStartRequest = WorkflowRunStartRequestShape;
+
+/** Allowed values for WorkflowRunStatus. */
+export const WorkflowRunStatusValues = {
+    Value0: 'cancelled',
+    Value1: 'failed',
+    Value2: 'queued',
+    Value3: 'running',
+    Value4: 'succeeded',
+} as const;
+
+/** WorkflowRunStatus from the Nexa wire protocol. */
+export type WorkflowRunStatus =
+    (typeof WorkflowRunStatusValues)[keyof typeof WorkflowRunStatusValues];
+
+/** WorkflowRunStepsPage wire fields. */
+export interface WorkflowRunStepsPageShape {
+    /** items as defined by the Nexa gateway. */
+    readonly items: ReadonlyArray<WorkflowStepView>;
+    /** next as defined by the Nexa gateway. */
+    readonly next: null | string;
+}
+
+/** WorkflowRunStepsPage from the Nexa wire protocol. */
+export type WorkflowRunStepsPage = WorkflowRunStepsPageShape;
+
+/** WorkflowRunStepsRequest wire fields. */
+export interface WorkflowRunStepsRequestShape {
+    /** afterNodeId as defined by the Nexa gateway. */
+    readonly afterNodeId: null | string;
+    /** limit as defined by the Nexa gateway. */
+    readonly limit: number;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+}
+
+/** WorkflowRunStepsRequest from the Nexa wire protocol. */
+export type WorkflowRunStepsRequest = WorkflowRunStepsRequestShape;
+
+/** WorkflowRunSummary wire fields. */
+export interface WorkflowRunSummaryShape {
+    /** createdAtMs as defined by the Nexa gateway. */
+    readonly createdAtMs: string;
+    /** message as defined by the Nexa gateway. */
+    readonly message: null | string;
+    /** mode as defined by the Nexa gateway. */
+    readonly mode: WorkflowRunMode;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+    /** sequence as defined by the Nexa gateway. */
+    readonly sequence: string;
+    /** status as defined by the Nexa gateway. */
+    readonly status: WorkflowRunStatus;
+    /** updatedAtMs as defined by the Nexa gateway. */
+    readonly updatedAtMs: string;
+    /** workflowId as defined by the Nexa gateway. */
+    readonly workflowId: string;
+    /** workflowRevision as defined by the Nexa gateway. */
+    readonly workflowRevision: string;
+}
+
+/** WorkflowRunSummary from the Nexa wire protocol. */
+export type WorkflowRunSummary = WorkflowRunSummaryShape;
+
 /** WorkflowSaveRequest wire fields. */
 export interface WorkflowSaveRequestShape {
     /** commandId as defined by the Nexa gateway. */
@@ -6527,6 +6821,48 @@ export interface WorkflowSaveRequestShape {
 
 /** WorkflowSaveRequest from the Nexa wire protocol. */
 export type WorkflowSaveRequest = WorkflowSaveRequestShape;
+
+/** Allowed values for WorkflowStepStatus. */
+export const WorkflowStepStatusValues = {
+    Value0: 'cancelled',
+    Value1: 'failed',
+    Value2: 'interrupted',
+    Value3: 'running',
+    Value4: 'skipped',
+    Value5: 'succeeded',
+    Value6: 'uncertain',
+} as const;
+
+/** WorkflowStepStatus from the Nexa wire protocol. */
+export type WorkflowStepStatus =
+    (typeof WorkflowStepStatusValues)[keyof typeof WorkflowStepStatusValues];
+
+/** WorkflowStepView wire fields. */
+export interface WorkflowStepViewShape {
+    /** attempt as defined by the Nexa gateway. */
+    readonly attempt: number;
+    /** component as defined by the Nexa gateway. */
+    readonly component: string;
+    /** finishedAtMs as defined by the Nexa gateway. */
+    readonly finishedAtMs: null | string;
+    /** hasResult as defined by the Nexa gateway. */
+    readonly hasResult: boolean;
+    /** invocationId as defined by the Nexa gateway. */
+    readonly invocationId: string;
+    /** label as defined by the Nexa gateway. */
+    readonly label: string;
+    /** message as defined by the Nexa gateway. */
+    readonly message: null | string;
+    /** nodeId as defined by the Nexa gateway. */
+    readonly nodeId: string;
+    /** startedAtMs as defined by the Nexa gateway. */
+    readonly startedAtMs: string;
+    /** status as defined by the Nexa gateway. */
+    readonly status: WorkflowStepStatus;
+}
+
+/** WorkflowStepView from the Nexa wire protocol. */
+export type WorkflowStepView = WorkflowStepViewShape;
 
 /** WorkflowSummary wire fields. */
 export interface WorkflowSummaryShape {
@@ -6960,6 +7296,20 @@ export enum Method {
     WorkflowsRead = 'workflows.read',
     /** Calls workflows.record. */
     WorkflowsRecord = 'workflows.record',
+    /** Calls workflows.runs.cancel. */
+    WorkflowsRunsCancel = 'workflows.runs.cancel',
+    /** Calls workflows.runs.events. */
+    WorkflowsRunsEvents = 'workflows.runs.events',
+    /** Calls workflows.runs.list. */
+    WorkflowsRunsList = 'workflows.runs.list',
+    /** Calls workflows.runs.output. */
+    WorkflowsRunsOutput = 'workflows.runs.output',
+    /** Calls workflows.runs.read. */
+    WorkflowsRunsRead = 'workflows.runs.read',
+    /** Calls workflows.runs.start. */
+    WorkflowsRunsStart = 'workflows.runs.start',
+    /** Calls workflows.runs.steps. */
+    WorkflowsRunsSteps = 'workflows.runs.steps',
     /** Calls workflows.save. */
     WorkflowsSave = 'workflows.save',
     /** Calls workflows.validate. */

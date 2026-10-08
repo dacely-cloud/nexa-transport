@@ -2957,6 +2957,11 @@ export const schema: Schema = {
                         'Exact component catalog and structural validation of pinned drafts.',
                     type: 'number',
                 },
+                workflowRunsVersion: {
+                    const: 1,
+                    description: 'Durable core workflow test runs and bounded output inspection.',
+                    type: 'number',
+                },
             },
             required: ['events', 'methodScopes', 'methods'],
             type: 'object',
@@ -4298,6 +4303,93 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'workflows.runs.cancel': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/WorkflowRunRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/WorkflowRunSummary',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'workflows.runs.events': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/WorkflowRunEventsRequest',
+                        },
+                        result: {
+                            items: {
+                                $ref: '#/definitions/WorkflowRunEvent',
+                            },
+                            type: 'array',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'workflows.runs.list': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/WorkflowRunListRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/WorkflowRunListPage',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'workflows.runs.output': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/WorkflowRunOutputRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/WorkflowRunOutputPage',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'workflows.runs.read': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/WorkflowRunRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/WorkflowRunSummary',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'workflows.runs.start': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/WorkflowRunStartRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/WorkflowRunSummary',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'workflows.runs.steps': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/WorkflowRunStepsRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/WorkflowRunStepsPage',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'workflows.save': {
                     properties: {
                         params: {
@@ -4466,6 +4558,13 @@ export const schema: Schema = {
                 'workflows.list',
                 'workflows.read',
                 'workflows.record',
+                'workflows.runs.cancel',
+                'workflows.runs.events',
+                'workflows.runs.list',
+                'workflows.runs.output',
+                'workflows.runs.read',
+                'workflows.runs.start',
+                'workflows.runs.steps',
                 'workflows.save',
                 'workflows.validate',
                 'workspaces.create',
@@ -9986,6 +10085,286 @@ export const schema: Schema = {
             required: ['offset', 'reference', 'workflowId'],
             type: 'object',
         },
+        WorkflowRunEvent: {
+            properties: {
+                atMs: {
+                    type: 'string',
+                },
+                invocationId: {
+                    type: ['null', 'string'],
+                },
+                kind: {
+                    $ref: '#/definitions/WorkflowRunEventKind',
+                },
+                message: {
+                    type: ['null', 'string'],
+                },
+                nodeId: {
+                    type: ['null', 'string'],
+                },
+                runId: {
+                    type: 'string',
+                },
+                sequence: {
+                    type: 'string',
+                },
+                status: {
+                    enum: [
+                        'cancelled',
+                        'failed',
+                        'interrupted',
+                        'queued',
+                        'running',
+                        'skipped',
+                        'succeeded',
+                        'uncertain',
+                    ],
+                    type: 'string',
+                },
+            },
+            required: [
+                'atMs',
+                'invocationId',
+                'kind',
+                'message',
+                'nodeId',
+                'runId',
+                'sequence',
+                'status',
+            ],
+            type: 'object',
+        },
+        WorkflowRunEventKind: {
+            enum: ['accepted', 'cancelled', 'claimed', 'finished', 'step-finished', 'step-started'],
+            type: 'string',
+        },
+        WorkflowRunEventsRequest: {
+            properties: {
+                after: {
+                    type: 'string',
+                },
+                limit: {
+                    type: 'number',
+                },
+                runId: {
+                    type: 'string',
+                },
+            },
+            required: ['after', 'limit', 'runId'],
+            type: 'object',
+        },
+        WorkflowRunListPage: {
+            properties: {
+                items: {
+                    items: {
+                        $ref: '#/definitions/WorkflowRunSummary',
+                    },
+                    type: 'array',
+                },
+                next: {
+                    type: ['null', 'string'],
+                },
+            },
+            required: ['items', 'next'],
+            type: 'object',
+        },
+        WorkflowRunListRequest: {
+            properties: {
+                afterRunId: {
+                    type: ['null', 'string'],
+                },
+                limit: {
+                    type: 'number',
+                },
+                workflowId: {
+                    type: 'string',
+                },
+            },
+            required: ['afterRunId', 'limit', 'workflowId'],
+            type: 'object',
+        },
+        WorkflowRunMode: {
+            enum: ['live-test', 'mock-test'],
+            type: 'string',
+        },
+        WorkflowRunOutputPage: {
+            properties: {
+                content: {
+                    type: 'string',
+                },
+                invocationId: {
+                    type: 'string',
+                },
+                nextOffset: {
+                    type: ['null', 'number'],
+                },
+                nodeId: {
+                    type: 'string',
+                },
+                offset: {
+                    type: 'number',
+                },
+                runId: {
+                    type: 'string',
+                },
+                totalCharacters: {
+                    type: 'number',
+                },
+            },
+            required: [
+                'content',
+                'invocationId',
+                'nextOffset',
+                'nodeId',
+                'offset',
+                'runId',
+                'totalCharacters',
+            ],
+            type: 'object',
+        },
+        WorkflowRunOutputRequest: {
+            properties: {
+                invocationId: {
+                    type: 'string',
+                },
+                nodeId: {
+                    type: 'string',
+                },
+                offset: {
+                    type: 'number',
+                },
+                runId: {
+                    type: 'string',
+                },
+            },
+            required: ['invocationId', 'nodeId', 'offset', 'runId'],
+            type: 'object',
+        },
+        WorkflowRunRequest: {
+            properties: {
+                runId: {
+                    type: 'string',
+                },
+            },
+            required: ['runId'],
+            type: 'object',
+        },
+        WorkflowRunStartRequest: {
+            properties: {
+                input: {
+                    $ref: '#/definitions/WorkflowObject',
+                },
+                maxConcurrency: {
+                    type: 'number',
+                },
+                mode: {
+                    $ref: '#/definitions/WorkflowRunMode',
+                },
+                revision: {
+                    type: 'string',
+                },
+                runId: {
+                    type: 'string',
+                },
+                timeoutMs: {
+                    type: 'string',
+                },
+                triggerNodeId: {
+                    type: 'string',
+                },
+                workflowId: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'input',
+                'maxConcurrency',
+                'mode',
+                'revision',
+                'runId',
+                'timeoutMs',
+                'triggerNodeId',
+                'workflowId',
+            ],
+            type: 'object',
+        },
+        WorkflowRunStatus: {
+            enum: ['cancelled', 'failed', 'queued', 'running', 'succeeded'],
+            type: 'string',
+        },
+        WorkflowRunStepsPage: {
+            properties: {
+                items: {
+                    items: {
+                        $ref: '#/definitions/WorkflowStepView',
+                    },
+                    type: 'array',
+                },
+                next: {
+                    type: ['null', 'string'],
+                },
+            },
+            required: ['items', 'next'],
+            type: 'object',
+        },
+        WorkflowRunStepsRequest: {
+            properties: {
+                afterNodeId: {
+                    type: ['null', 'string'],
+                },
+                limit: {
+                    type: 'number',
+                },
+                runId: {
+                    type: 'string',
+                },
+            },
+            required: ['afterNodeId', 'limit', 'runId'],
+            type: 'object',
+        },
+        WorkflowRunSummary: {
+            properties: {
+                createdAtMs: {
+                    type: 'string',
+                },
+                message: {
+                    type: ['null', 'string'],
+                },
+                mode: {
+                    $ref: '#/definitions/WorkflowRunMode',
+                },
+                runId: {
+                    type: 'string',
+                },
+                sequence: {
+                    type: 'string',
+                },
+                status: {
+                    $ref: '#/definitions/WorkflowRunStatus',
+                },
+                updatedAtMs: {
+                    type: 'string',
+                },
+                workflowId: {
+                    type: 'string',
+                },
+                workflowRevision: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'createdAtMs',
+                'message',
+                'mode',
+                'runId',
+                'sequence',
+                'status',
+                'updatedAtMs',
+                'workflowId',
+                'workflowRevision',
+            ],
+            type: 'object',
+        },
         WorkflowSaveRequest: {
             description: 'Command identity and expected revision serve different purposes.',
             properties: {
@@ -10003,6 +10382,65 @@ export const schema: Schema = {
                 },
             },
             required: ['commandId', 'expectedRevision', 'patch', 'workflowId'],
+            type: 'object',
+        },
+        WorkflowStepStatus: {
+            enum: [
+                'cancelled',
+                'failed',
+                'interrupted',
+                'running',
+                'skipped',
+                'succeeded',
+                'uncertain',
+            ],
+            type: 'string',
+        },
+        WorkflowStepView: {
+            properties: {
+                attempt: {
+                    type: 'number',
+                },
+                component: {
+                    type: 'string',
+                },
+                finishedAtMs: {
+                    type: ['null', 'string'],
+                },
+                hasResult: {
+                    type: 'boolean',
+                },
+                invocationId: {
+                    type: 'string',
+                },
+                label: {
+                    type: 'string',
+                },
+                message: {
+                    type: ['null', 'string'],
+                },
+                nodeId: {
+                    type: 'string',
+                },
+                startedAtMs: {
+                    type: 'string',
+                },
+                status: {
+                    $ref: '#/definitions/WorkflowStepStatus',
+                },
+            },
+            required: [
+                'attempt',
+                'component',
+                'finishedAtMs',
+                'hasResult',
+                'invocationId',
+                'label',
+                'message',
+                'nodeId',
+                'startedAtMs',
+                'status',
+            ],
             type: 'object',
         },
         WorkflowSummary: {

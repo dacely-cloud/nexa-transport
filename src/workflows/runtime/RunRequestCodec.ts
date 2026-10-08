@@ -1,0 +1,120 @@
+// SPDX-FileCopyrightText: 2026 Nexa contributors
+// SPDX-License-Identifier: Apache-2.0
+
+import { WorkflowInput } from '../WorkflowInput.js';
+import { WorkflowJson } from '../WorkflowJson.js';
+import { ResourceBindingCodec } from '../ResourceBindingCodec.js';
+import { WorkflowRunMode } from './RunTypes.js';
+import type {
+    WorkflowRunStartRequest,
+    WorkflowRunRequest,
+    WorkflowRunEventsRequest,
+    WorkflowRunStepsRequest,
+    WorkflowRunOutputRequest,
+    WorkflowRunListRequest,
+} from './RunRequests.js';
+
+/** Portable strict request validation. Caller identity never comes from the payload. */
+export class WorkflowRunRequestCodec {
+    /** Validates a pinned test command and its execution limits. */
+    public static start(raw: unknown): WorkflowRunStartRequest {
+        const value: Readonly<Record<string, unknown>> = WorkflowInput.record(raw, [
+            'runId',
+            'workflowId',
+            'revision',
+            'triggerNodeId',
+            'mode',
+            'input',
+            'maxConcurrency',
+            'timeoutMs',
+        ]);
+        const mode: unknown = value['mode'];
+        if (mode !== WorkflowRunMode.LiveTest && mode !== WorkflowRunMode.MockTest) {
+            throw new Error('Select a supported test mode');
+        }
+        const revision: string = ResourceBindingCodec.decimal(value['revision']);
+        if (revision === '0') {
+            throw new Error('Select a saved workflow revision');
+        }
+        const timeoutMs: string = ResourceBindingCodec.decimal(value['timeoutMs']);
+        if (BigInt(timeoutMs) < 1_000n || BigInt(timeoutMs) > 86_400_000n) {
+            throw new Error('Run timeout must be between one second and one day');
+        }
+        return {
+            runId: WorkflowInput.id(value['runId']),
+            workflowId: WorkflowInput.id(value['workflowId']),
+            revision,
+            triggerNodeId: WorkflowInput.id(value['triggerNodeId']),
+            mode,
+            input: WorkflowJson.object(value['input']),
+            maxConcurrency: this.#integer(value['maxConcurrency'], 1, 32),
+            timeoutMs,
+        };
+    }
+    /** Validates a run identity without accepting caller-supplied ownership. */
+    public static run(raw: unknown): WorkflowRunRequest {
+        const value: Readonly<Record<string, unknown>> = WorkflowInput.record(raw, ['runId']);
+        return { runId: WorkflowInput.id(value['runId']) };
+    }
+    /** Validates the journal cursor and page bound. */
+    public static events(raw: unknown): WorkflowRunEventsRequest {
+        const value: Readonly<Record<string, unknown>> = WorkflowInput.record(raw, [
+            'runId',
+            'after',
+            'limit',
+        ]);
+        return {
+            runId: WorkflowInput.id(value['runId']),
+            after: ResourceBindingCodec.decimal(value['after']),
+            limit: this.#integer(value['limit'], 1, 100),
+        };
+    }
+    /** Validates the step metadata cursor and page bound. */
+    public static steps(raw: unknown): WorkflowRunStepsRequest {
+        const value: Readonly<Record<string, unknown>> = WorkflowInput.record(raw, [
+            'runId',
+            'afterNodeId',
+            'limit',
+        ]);
+        return {
+            runId: WorkflowInput.id(value['runId']),
+            afterNodeId:
+                value['afterNodeId'] === null ? null : WorkflowInput.id(value['afterNodeId']),
+            limit: this.#integer(value['limit'], 1, 100),
+        };
+    }
+    /** Validates the attempt identity and bounded UTF-16 offset. */
+    public static output(raw: unknown): WorkflowRunOutputRequest {
+        const value: Readonly<Record<string, unknown>> = WorkflowInput.record(raw, [
+            'runId',
+            'nodeId',
+            'invocationId',
+            'offset',
+        ]);
+        return {
+            runId: WorkflowInput.id(value['runId']),
+            nodeId: WorkflowInput.id(value['nodeId']),
+            invocationId: WorkflowInput.id(value['invocationId']),
+            offset: this.#integer(value['offset'], 0, 512 * 1024 * 1024),
+        };
+    }
+    /** Validates a workflow history cursor and page bound. */
+    public static list(raw: unknown): WorkflowRunListRequest {
+        const value: Readonly<Record<string, unknown>> = WorkflowInput.record(raw, [
+            'workflowId',
+            'afterRunId',
+            'limit',
+        ]);
+        return {
+            workflowId: WorkflowInput.id(value['workflowId']),
+            afterRunId: value['afterRunId'] === null ? null : WorkflowInput.id(value['afterRunId']),
+            limit: this.#integer(value['limit'], 1, 60),
+        };
+    }
+    static #integer(raw: unknown, minimum: number, maximum: number): number {
+        if (typeof raw !== 'number' || !Number.isInteger(raw) || raw < minimum || raw > maximum) {
+            throw new Error(`Expected an integer between ${minimum} and ${maximum}`);
+        }
+        return raw;
+    }
+}

@@ -4,6 +4,10 @@ const config: UserConfig = {
         target: 'es2023',
         lib: {
             entry: {
+                'workflow-run-types': 'src/workflows/runtime/RunTypes.ts',
+                'workflow-run-requests': 'src/workflows/runtime/RunRequests.ts',
+                'workflow-run-codec': 'src/workflows/runtime/RunCodec.ts',
+                'workflow-run-request-codec': 'src/workflows/runtime/RunRequestCodec.ts',
                 'workflow-catalog': 'src/workflows/ComponentRegistry.ts',
                 'workflow-component-types': 'src/workflows/ComponentTypes.ts',
                 'workflow-validation': 'src/workflows/GraphValidation.ts',

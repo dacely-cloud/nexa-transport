@@ -2,23 +2,23 @@
 
 The workflow foundation has these portable package entry points:
 
-| Import | Purpose |
-| --- | --- |
-| `nexa-transport/workflow-resources` | Binding, descriptor, family, use, mode and readiness types/constants |
-| `nexa-transport/workflow-resource-codec` | Validate and detach version 1 binding data |
-| `nexa-transport/workflow-resource-readiness` | Compute advisory readiness without I/O |
-| `nexa-transport/workflow-types` | Versioned draft nodes, edges, patches, manifests and compact management projections |
-| `nexa-transport/workflow-codec` | Validate draft syntax while preserving incomplete configuration |
-| `nexa-transport/workflow-requests` | Draft RPC types and bounded transport limits |
-| `nexa-transport/workflow-request-codec` | Strict create/save/list/read/record request parsing |
-| `nexa-transport/workflow-catalog` | Exact-version component registry and default node creation |
-| `nexa-transport/workflow-component-types` | Roles, categories, ports and execution declarations |
-| `nexa-transport/workflow-validation` | Pure graph validation without external I/O |
-| `nexa-transport/workflow-graph-types` | Graph snapshots and bounded validation results |
-| `nexa-transport/workflow-ports` | Port compatibility for connection pickers |
-| `nexa-transport/workflow-schemas` | Shared schema constructors and managed envelopes |
-| `nexa-transport/workflow-schema-types` | Value, envelope and schema contracts |
-| `nexa-transport/workflow-values` | Bounded runtime value validation |
+| Import                                       | Purpose                                                                             |
+| -------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `nexa-transport/workflow-resources`          | Binding, descriptor, family, use, mode and readiness types/constants                |
+| `nexa-transport/workflow-resource-codec`     | Validate and detach version 1 binding data                                          |
+| `nexa-transport/workflow-resource-readiness` | Compute advisory readiness without I/O                                              |
+| `nexa-transport/workflow-types`              | Versioned draft nodes, edges, patches, manifests and compact management projections |
+| `nexa-transport/workflow-codec`              | Validate draft syntax while preserving incomplete configuration                     |
+| `nexa-transport/workflow-requests`           | Draft RPC types and bounded transport limits                                        |
+| `nexa-transport/workflow-request-codec`      | Strict create/save/list/read/record request parsing                                 |
+| `nexa-transport/workflow-catalog`            | Exact-version component registry and default node creation                          |
+| `nexa-transport/workflow-component-types`    | Roles, categories, ports and execution declarations                                 |
+| `nexa-transport/workflow-validation`         | Pure graph validation without external I/O                                          |
+| `nexa-transport/workflow-graph-types`        | Graph snapshots and bounded validation results                                      |
+| `nexa-transport/workflow-ports`              | Port compatibility for connection pickers                                           |
+| `nexa-transport/workflow-schemas`            | Shared schema constructors and managed envelopes                                    |
+| `nexa-transport/workflow-schema-types`       | Value, envelope and schema contracts                                                |
+| `nexa-transport/workflow-values`             | Bounded runtime value validation                                                    |
 
 Nexa owns the canonical files in `src/workflows/`. Run `npm run generate:workflows`
 to copy them, or run the full protocol generator. Parity tests reject drift.

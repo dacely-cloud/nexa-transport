@@ -36,6 +36,10 @@ describe('portable workflow resource contracts', (): void => {
         'GraphOrder',
         'GraphValidation',
         'PortCompatibility',
+        'runtime/RunTypes',
+        'runtime/RunRequests',
+        'runtime/RunRequestCodec',
+        'runtime/RunCodec',
     ])(
         'keeps %s identical to the authoritative Nexa source',
         async (file: string): Promise<void> => {
