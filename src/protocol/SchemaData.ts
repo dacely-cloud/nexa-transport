@@ -10746,6 +10746,11 @@ export const schema: Schema = {
                 count: {
                     type: 'number',
                 },
+                operation: {
+                    description: 'Older generation-only snapshots omit this field.',
+                    enum: ['edit', 'generate'],
+                    type: 'string',
+                },
                 options: {
                     $ref: '#/definitions/Record%3Cstring%2Cstring%7Cnumber%7Cboolean%3E',
                 },
