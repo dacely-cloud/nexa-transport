@@ -4,7 +4,11 @@
 import { WorkflowInput } from '../WorkflowInput.js';
 import { WorkflowModelsCodec } from '../WorkflowModels.js';
 import { WorkflowImagePolicies } from '../ImageModelPolicy.js';
-import type { WorkflowImageSettings, WorkflowResolvedImage } from './RunImageTypes.js';
+import {
+    WorkflowImageOperation,
+    type WorkflowImageSettings,
+    type WorkflowResolvedImage,
+} from './RunImageTypes.js';
 
 /** Stored image bindings validate independently from server-only provider and ledger code. */
 export class WorkflowRunImageCodec {
@@ -20,13 +24,23 @@ export class WorkflowRunImageCodec {
     }
     /** Request settings cannot hide nested credentials, endpoints or arbitrary payloads. */
     public static settings(raw: unknown): WorkflowImageSettings {
+        const fields: Readonly<Record<string, unknown>> = WorkflowInput.object(raw);
         const value: Readonly<Record<string, unknown>> = WorkflowInput.record(raw, [
             'size',
             'quality',
             'count',
             'outputFormat',
             'options',
+            ...(fields['operation'] === undefined ? [] : ['operation']),
         ]);
+        const operation: unknown = value['operation'];
+        if (
+            operation !== undefined &&
+            operation !== WorkflowImageOperation.Generate &&
+            operation !== WorkflowImageOperation.Edit
+        ) {
+            throw new Error('Invalid workflow image operation');
+        }
         const count: unknown = value['count'];
         const quality: string = WorkflowInput.text(value['quality'], 16);
         const outputFormat: string = WorkflowInput.text(value['outputFormat'], 8);
@@ -61,6 +75,7 @@ export class WorkflowRunImageCodec {
             options[key] = option;
         }
         return Object.freeze({
+            ...(operation === undefined ? {} : { operation }),
             size: WorkflowInput.text(value['size'], 32),
             quality,
             count,

@@ -4,8 +4,16 @@
 import type { WorkflowImagePolicyEvidence } from '../ImageModelPolicy.js';
 import type { WorkflowModelSelection } from './RunModelTypes.js';
 
+/** The image operation is part of immutable settings and pricing identity. */
+export const WorkflowImageOperation = { Generate: 'generate', Edit: 'edit' } as const;
+/** Supported image operations, independent of server-only provider code. */
+export type WorkflowImageOperation =
+    (typeof WorkflowImageOperation)[keyof typeof WorkflowImageOperation];
+
 /** An exact request, bounded before admission and independent of a text model binding. */
 export interface WorkflowImageSettings {
+    /** Older generation-only snapshots omit this field. */
+    readonly operation?: WorkflowImageOperation;
     readonly size: string;
     readonly quality: string;
     readonly count: number;

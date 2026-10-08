@@ -7024,10 +7024,15 @@ export interface WorkflowImageResolutionRequestShape {
 /** WorkflowImageResolutionRequest from the Nexa wire protocol. */
 export type WorkflowImageResolutionRequest = WorkflowImageResolutionRequestShape;
 
+/** Allowed values for WorkflowImageSettingsoperation. */
+export const WorkflowImageSettingsoperationValues = { Value0: 'edit', Value1: 'generate' } as const;
+
 /** WorkflowImageSettings wire fields. */
 export interface WorkflowImageSettingsShape {
     /** count as defined by the Nexa gateway. */
     readonly count: number;
+    /** operation as defined by the Nexa gateway. */
+    readonly operation?: (typeof WorkflowImageSettingsoperationValues)[keyof typeof WorkflowImageSettingsoperationValues];
     /** options as defined by the Nexa gateway. */
     readonly options: Recordstringstringnumberboolean;
     /** outputFormat as defined by the Nexa gateway. */
