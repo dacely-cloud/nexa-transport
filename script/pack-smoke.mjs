@@ -31,6 +31,15 @@ import { TransportError } from 'nexa-transport/errors';
 import type { AskResult } from 'nexa-transport/protocol';
 import type { ClientOptions } from 'nexa-transport/options';
 import type { TurnStream } from 'nexa-transport/stream';
+import { ComponentRegistry } from 'nexa-transport/workflow-catalog';
+import { WorkflowRunCodec } from 'nexa-transport/workflow-run-codec';
+import type { WorkflowRunSnapshot } from 'nexa-transport/workflow-run-types';
+function imageSnapshot(snapshot: WorkflowRunSnapshot): string | undefined {
+    const parsed: WorkflowRunSnapshot = WorkflowRunCodec.snapshot(snapshot);
+    return parsed.imageModels?.[0]?.model;
+}
+void imageSnapshot;
+if (ComponentRegistry.builtin().get('inference.image', '1') === null) throw new Error('Missing image component');
 const options: ClientOptions = { url: 'ws://localhost:18830' };
 async function consume(): Promise<AskResult> {
     const client: NexaClient = await NexaClient.connect(options);
