@@ -1894,6 +1894,8 @@ export interface GatewayFeaturesShape {
     readonly sessionHistory?: true;
     /** sessionHistoryUpdates as defined by the Nexa gateway. */
     readonly sessionHistoryUpdates?: true;
+    /** transcriptBlocks as defined by the Nexa gateway. */
+    readonly transcriptBlocks?: true;
     /** workflowDraftsVersion as defined by the Nexa gateway. */
     readonly workflowDraftsVersion?: 1;
     /** workflowGraphVersion as defined by the Nexa gateway. */
@@ -2578,6 +2580,14 @@ export interface GatewayMethodssessions_subscribeShape {
     readonly result: OkResult;
 }
 
+/** GatewayMethodssessions_transcript wire fields. */
+export interface GatewayMethodssessions_transcriptShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: SessionHistoryParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: SessionHistoryPage;
+}
+
 /** GatewayMethodssessions_unpin wire fields. */
 export interface GatewayMethodssessions_unpinShape {
     /** params as defined by the Nexa gateway. */
@@ -3080,6 +3090,8 @@ export interface GatewayMethodsShape {
     readonly 'sessions.search': GatewayMethodssessions_searchShape;
     /** sessions.subscribe as defined by the Nexa gateway. */
     readonly 'sessions.subscribe': GatewayMethodssessions_subscribeShape;
+    /** sessions.transcript as defined by the Nexa gateway. */
+    readonly 'sessions.transcript': GatewayMethodssessions_transcriptShape;
     /** sessions.unpin as defined by the Nexa gateway. */
     readonly 'sessions.unpin': GatewayMethodssessions_unpinShape;
     /** sessions.unsubscribe as defined by the Nexa gateway. */
@@ -5450,6 +5462,8 @@ export interface SessionHistoryPageShape {
     readonly format: 1;
     /** nextCursor as defined by the Nexa gateway. */
     readonly nextCursor?: string;
+    /** raw as defined by the Nexa gateway. */
+    readonly raw?: true;
 }
 
 /** SessionHistoryPage from the Nexa wire protocol. */
@@ -8145,6 +8159,8 @@ export enum Method {
     SessionsSearch = 'sessions.search',
     /** Calls sessions.subscribe. */
     SessionsSubscribe = 'sessions.subscribe',
+    /** Calls sessions.transcript. */
+    SessionsTranscript = 'sessions.transcript',
     /** Calls sessions.unpin. */
     SessionsUnpin = 'sessions.unpin',
     /** Calls sessions.unsubscribe. */

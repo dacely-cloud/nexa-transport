@@ -2858,6 +2858,11 @@
                     "description": "Session subscriptions notify exact journal ranges for live catch-up.",
                     "type": "boolean"
                 },
+                "transcriptBlocks": {
+                    "const": true,
+                    "description": "Server-coalesced NDJSON blocks, retaining physical journal cursors.",
+                    "type": "boolean"
+                },
                 "workflowDraftsVersion": {
                     "const": 1,
                     "type": "number"
@@ -3949,6 +3954,19 @@
                     "required": ["params", "result"],
                     "type": "object"
                 },
+                "sessions.transcript": {
+                    "description": "Compact transcript blocks with original journal byte cursors.",
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/SessionHistoryParams"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/SessionHistoryPage"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
                 "sessions.unpin": {
                     "properties": {
                         "params": {
@@ -4583,6 +4601,7 @@
                 "sessions.retry",
                 "sessions.search",
                 "sessions.subscribe",
+                "sessions.transcript",
                 "sessions.unpin",
                 "sessions.unsubscribe",
                 "shares.create",
@@ -8110,6 +8129,11 @@
                 },
                 "nextCursor": {
                     "type": "string"
+                },
+                "raw": {
+                    "const": true,
+                    "description": "Oversized legacy records use the original split-record reader.",
+                    "type": "boolean"
                 }
             },
             "required": ["chunk", "endCursor", "format"],
