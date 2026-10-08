@@ -1614,7 +1614,13 @@ export const ErrorCodeValues = {
 export type ErrorCode = (typeof ErrorCodeValues)[keyof typeof ErrorCodeValues];
 
 /** Allowed values for Exclude. */
-export const ExcludeValues = {
+export const ExcludeValues = { Value0: 'reasoning', Value1: 'text' } as const;
+
+/** Exclude from the Nexa wire protocol. */
+export type Exclude = (typeof ExcludeValues)[keyof typeof ExcludeValues];
+
+/** Allowed values for Exclude_1. */
+export const Exclude_1Values = {
     Value0: 'audio',
     Value1: 'boolean',
     Value2: 'datetime',
@@ -1631,8 +1637,8 @@ export const ExcludeValues = {
     Value13: 'video',
 } as const;
 
-/** Exclude from the Nexa wire protocol. */
-export type Exclude = (typeof ExcludeValues)[keyof typeof ExcludeValues];
+/** Exclude_1 from the Nexa wire protocol. */
+export type Exclude_1 = (typeof Exclude_1Values)[keyof typeof Exclude_1Values];
 
 /** Allowed values for FinishReason. */
 export const FinishReasonValues = {
@@ -5225,7 +5231,7 @@ export interface ScalarSchemaShape {
     /** choices as defined by the Nexa gateway. */
     readonly choices?: ReadonlyArray<string>;
     /** kind as defined by the Nexa gateway. */
-    readonly kind: Exclude;
+    readonly kind: Exclude_1;
     /** maxLength as defined by the Nexa gateway. */
     readonly maxLength?: number;
     /** maximum as defined by the Nexa gateway. */
@@ -6777,6 +6783,44 @@ export interface WorkflowEndpointShape {
 /** WorkflowEndpoint from the Nexa wire protocol. */
 export type WorkflowEndpoint = WorkflowEndpointShape;
 
+/** WorkflowImageCapabilities wire fields. */
+export interface WorkflowImageCapabilitiesShape {
+    /** dimensions as defined by the Nexa gateway. */
+    readonly dimensions: WorkflowImageDimensions | null;
+    /** maxCount as defined by the Nexa gateway. */
+    readonly maxCount: number;
+    /** outputFormats as defined by the Nexa gateway. */
+    readonly outputFormats: ReadonlyArray<string>;
+    /** providerOptions as defined by the Nexa gateway. */
+    readonly providerOptions: Recordstringstring;
+    /** qualities as defined by the Nexa gateway. */
+    readonly qualities: ReadonlyArray<string>;
+    /** sizes as defined by the Nexa gateway. */
+    readonly sizes: ReadonlyArray<string>;
+}
+
+/** WorkflowImageCapabilities from the Nexa wire protocol. */
+export type WorkflowImageCapabilities = WorkflowImageCapabilitiesShape;
+
+/** WorkflowImageDimensions wire fields. */
+export interface WorkflowImageDimensionsShape {
+    /** experimentalAbovePixels as defined by the Nexa gateway. */
+    readonly experimentalAbovePixels: number;
+    /** maxAspectRatio as defined by the Nexa gateway. */
+    readonly maxAspectRatio: number;
+    /** maxEdge as defined by the Nexa gateway. */
+    readonly maxEdge: number;
+    /** maxPixels as defined by the Nexa gateway. */
+    readonly maxPixels: number;
+    /** minPixels as defined by the Nexa gateway. */
+    readonly minPixels: number;
+    /** multiple as defined by the Nexa gateway. */
+    readonly multiple: number;
+}
+
+/** WorkflowImageDimensions from the Nexa wire protocol. */
+export type WorkflowImageDimensions = WorkflowImageDimensionsShape;
+
 /** WorkflowListCursor wire fields. */
 export interface WorkflowListCursorShape {
     /** updatedAtMs as defined by the Nexa gateway. */
@@ -6834,7 +6878,11 @@ export interface WorkflowManifestPageShape {
 export type WorkflowManifestPage = WorkflowManifestPageShape;
 
 /** Allowed values for WorkflowModelCapability. */
-export const WorkflowModelCapabilityValues = { Value0: 'reasoning', Value1: 'text' } as const;
+export const WorkflowModelCapabilityValues = {
+    Value0: 'image',
+    Value1: 'reasoning',
+    Value2: 'text',
+} as const;
 
 /** WorkflowModelCapability from the Nexa wire protocol. */
 export type WorkflowModelCapability =
@@ -6850,6 +6898,8 @@ export interface WorkflowModelChoiceShape {
     readonly contextWindow: null | number;
     /** id as defined by the Nexa gateway. */
     readonly id: string;
+    /** image as defined by the Nexa gateway. */
+    readonly image?: WorkflowImageCapabilities;
     /** input as defined by the Nexa gateway. */
     readonly input: ReadonlyArray<string>;
     /** maxOutputTokens as defined by the Nexa gateway. */
@@ -6957,7 +7007,7 @@ export type WorkflowModelResolution = WorkflowModelResolutionShape;
 /** WorkflowModelResolutionRequest wire fields. */
 export interface WorkflowModelResolutionRequestShape {
     /** capability as defined by the Nexa gateway. */
-    readonly capability: WorkflowModelCapability;
+    readonly capability: Exclude;
     /** maxOutputTokens as defined by the Nexa gateway. */
     readonly maxOutputTokens: number;
     /** policy as defined by the Nexa gateway. */
