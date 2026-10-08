@@ -754,6 +754,25 @@ export class NexaClient {
             this.#hello.features.methods.includes(Method.WorkflowsValidate)
         );
     }
+    /** Durable execution is advertised separately from editing and validation. */
+    public get supportsWorkflowRuns(): boolean {
+        return (
+            this.supportsWorkflowGraph &&
+            this.#hello?.features.workflowRunsVersion === 1 &&
+            [
+                Method.WorkflowsRunsStart,
+                Method.WorkflowsRunsRead,
+                Method.WorkflowsRunsCancel,
+                Method.WorkflowsRunsEvents,
+                Method.WorkflowsRunsSteps,
+                Method.WorkflowsRunsOutput,
+                Method.WorkflowsRunsList,
+            ].every(
+                (method: Method): boolean =>
+                    this.#hello?.features.methods.includes(method) === true,
+            )
+        );
+    }
     /** Calls any Nexa RPC with validated parameters and result. Mutations are never replayed. */
     public async call<M extends Exclude<Method, Method.Connect>>(
         method: M,
@@ -762,6 +781,12 @@ export class NexaClient {
     ): Promise<ResultOf<M>> {
         if (!this.connected) {
             throw new TransportError(TransportErrorCode.Closed, 'Client is not connected');
+        }
+        if (method.startsWith('workflows.runs.') && !this.supportsWorkflowRuns) {
+            throw new TransportError(
+                TransportErrorCode.Protocol,
+                'Workflow execution requires an updated NEXA gateway',
+            );
         }
         if (method.startsWith('workflows.') && !this.supportsWorkflowDrafts) {
             throw new TransportError(

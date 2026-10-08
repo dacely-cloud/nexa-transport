@@ -43,6 +43,28 @@ describe('Nexa websocket lifetimes', (): void => {
         ).rejects.toThrow('updated NEXA gateway');
         expect(gateway.requests.length).toBe(before);
     });
+    it('requires the runtime version and every run method before sending run commands', async (): Promise<void> => {
+        gateway = new TestGateway({
+            ...hello,
+            features: {
+                ...hello.features,
+                workflowDraftsVersion: 1,
+                workflowGraphVersion: 1,
+                workflowRunsVersion: 1,
+                methods: hello.features.methods.filter(
+                    (method: string): boolean => method !== 'workflows.runs.cancel',
+                ),
+            },
+        });
+        client = await NexaClient.connect({ url: await gateway.url(), reconnect: false });
+        expect(client.supportsWorkflowGraph).toBe(true);
+        expect(client.supportsWorkflowRuns).toBe(false);
+        const before: number = gateway.requests.length;
+        await expect(client.call(Method.WorkflowsRunsRead, { runId: 'test-run' })).rejects.toThrow(
+            'updated NEXA gateway',
+        );
+        expect(gateway.requests.length).toBe(before);
+    });
     it('does not send workflow commands without the negotiated draft capability', async (): Promise<void> => {
         const connected: NexaClient = await connect();
         const before: number = gateway?.requests.length ?? 0;
