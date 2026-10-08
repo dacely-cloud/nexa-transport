@@ -51,3 +51,11 @@ Record returns bounded JSON text chunks to concatenate before parsing. Large
 uploads still require a future staged-upload capability. Planning, execution and
 UI integration remain under development. No new operational workspace connector
 is implemented. Syntax validation is not graph validation or permission to publish.
+
+## Nested workflow groups
+
+`supportsWorkflowGroups` requires the advertised `workflowGroupsVersion: 1` plus complete graph/draft support. Use `nexa-transport/workflow-group-types` and `nexa-transport/workflow-group-codec` for the canonical group, published-port and immutable-reference shapes. Group records store a parent-local origin and directly owned node identities; they do not store collapse, viewport, execution state or resource credentials. Published ports alias exact original node/port endpoints without rewriting executable edges.
+
+Hierarchy-aware patches include both `groups` upserts and `removeGroups` identities, even when one or both arrays are empty. The writer validates the complete resulting hierarchy atomically against the post-edit node set. Orphan parents, cycles, duplicate ownership, publications outside their subtree, more than 1000 groups or more than 16 nesting levels are rejected. Parent movement writes a new group record and retains unchanged child node, position and group references. Node removal must also repair membership/publications in the same patch.
+
+Pass `groupOffset: 0` on the initial manifest read, then pin its revision and follow `nextGroupOffset` together with node/edge offsets. Group pages contain at most 128 immutable references; their bodies use the existing owner-scoped, bounded `workflows.record` text chunks with kind `group`. A grouped draft refuses legacy reads and writes that omit hierarchy fields. The SDK refuses hierarchy-shaped calls before sending them to a gateway that has not negotiated support. Flat legacy drafts and their old request shapes remain supported. Direct patches retain the existing 1 MiB limit.

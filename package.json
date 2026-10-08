@@ -198,6 +198,14 @@
         "./workflow-image-policy": {
             "types": "./dist/workflows/ImageModelPolicy.d.ts",
             "import": "./dist/workflow-image-policy.js"
+        },
+        "./workflow-group-types": {
+            "types": "./dist/workflows/WorkflowGroupTypes.d.ts",
+            "import": "./dist/workflow-group-types.js"
+        },
+        "./workflow-group-codec": {
+            "types": "./dist/workflows/WorkflowGroupCodec.d.ts",
+            "import": "./dist/workflow-group-codec.js"
         }
     },
     "scripts": {

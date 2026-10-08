@@ -2972,6 +2972,12 @@ export const schema: Schema = {
                         'Exact component catalog and structural validation of pinned drafts.',
                     type: 'number',
                 },
+                workflowGroupsVersion: {
+                    const: 1,
+                    description:
+                        'Saved parent-local groups, published aliases and paginated immutable group records.',
+                    type: 'number',
+                },
                 workflowPlanningVersion: {
                     const: 1,
                     description:
@@ -10371,6 +10377,78 @@ export const schema: Schema = {
             required: ['node', 'port'],
             type: 'object',
         },
+        WorkflowGroup: {
+            description:
+                'Saved hierarchy owns parent-local geometry; collapse and viewport remain editor preferences.',
+            properties: {
+                id: {
+                    type: 'string',
+                },
+                nodes: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                objective: {
+                    type: 'string',
+                },
+                parent: {
+                    type: ['null', 'string'],
+                },
+                ports: {
+                    items: {
+                        $ref: '#/definitions/WorkflowGroupPort',
+                    },
+                    type: 'array',
+                },
+                title: {
+                    type: 'string',
+                },
+                x: {
+                    type: 'number',
+                },
+                y: {
+                    type: 'number',
+                },
+            },
+            required: ['id', 'nodes', 'objective', 'parent', 'ports', 'title', 'x', 'y'],
+            type: 'object',
+        },
+        WorkflowGroupPort: {
+            description:
+                'Published ports retain the original executable endpoint and explicit direction.',
+            properties: {
+                direction: {
+                    $ref: '#/definitions/PortDirection',
+                },
+                endpoint: {
+                    $ref: '#/definitions/WorkflowEndpoint',
+                },
+                id: {
+                    type: 'string',
+                },
+                label: {
+                    type: 'string',
+                },
+            },
+            required: ['direction', 'endpoint', 'id', 'label'],
+            type: 'object',
+        },
+        WorkflowGroupReference: {
+            description:
+                'Each revision references an immutable group body independently from executable node content.',
+            properties: {
+                content: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+            },
+            required: ['content', 'id'],
+            type: 'object',
+        },
         WorkflowImageCandidate: {
             description:
                 'All connected render quotes share the selected snapshot and its evidence.',
@@ -10758,7 +10836,16 @@ export const schema: Schema = {
                     const: 1,
                     type: 'number',
                 },
+                groups: {
+                    items: {
+                        $ref: '#/definitions/WorkflowGroupReference',
+                    },
+                    type: 'array',
+                },
                 nextEdgeOffset: {
+                    type: ['null', 'number'],
+                },
+                nextGroupOffset: {
                     type: ['null', 'number'],
                 },
                 nextNodeOffset: {
@@ -11185,6 +11272,14 @@ export const schema: Schema = {
                     },
                     type: 'array',
                 },
+                groups: {
+                    description:
+                        'Present together on hierarchy-aware edits; omission denotes a legacy writer.',
+                    items: {
+                        $ref: '#/definitions/WorkflowGroup',
+                    },
+                    type: 'array',
+                },
                 nodes: {
                     items: {
                         $ref: '#/definitions/WorkflowNode',
@@ -11198,6 +11293,12 @@ export const schema: Schema = {
                     type: 'array',
                 },
                 removeEdges: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                removeGroups: {
                     items: {
                         type: 'string',
                     },
@@ -11235,6 +11336,9 @@ export const schema: Schema = {
                 'Null resolves the current revision only for the first page. Subsequent pages pin it.',
             properties: {
                 edgeOffset: {
+                    type: 'number',
+                },
+                groupOffset: {
                     type: 'number',
                 },
                 nodeOffset: {

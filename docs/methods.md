@@ -92,6 +92,8 @@ All 54 protocol methods. `connect` is managed by `NexaClient.connect`; the remai
 - [workflows.create](#workflows-create)
 - [workflows.list](#workflows-list)
 - [workflows.models](#workflows-models)
+- [workflows.models.image.quote](#workflows-models-image-quote)
+- [workflows.models.image.resolve](#workflows-models-image-resolve)
 - [workflows.models.refresh](#workflows-models-refresh)
 - [workflows.models.resolve](#workflows-models-resolve)
 - [workflows.planning.cancel](#workflows-planning-cancel)
@@ -2054,7 +2056,7 @@ import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsModels> = {
     after: 'YOUR_AFTER',
-    capability: 'reasoning',
+    capability: 'image',
     compatibleOnly: false,
     favorites: [],
     provider: 'YOUR_PROVIDER',
@@ -2081,6 +2083,75 @@ Parameters: [WorkflowModelsRequest](protocol.md#workflowmodelsrequest).
 
 Result: [WorkflowModelsPage](protocol.md#workflowmodelspage).
 
+## workflows.models.image.quote
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsModelsImageQuote> = {
+    model: 'YOUR_MODEL',
+    nodeId: 'YOUR_NODEID',
+    provider: 'YOUR_PROVIDER',
+    settings: {
+        count: 1,
+        options: {},
+        outputFormat: 'YOUR_OUTPUTFORMAT',
+        quality: 'YOUR_QUALITY',
+        size: 'YOUR_SIZE',
+    },
+    workflowId: 'YOUR_WORKFLOWID',
+};
+const result: ResultOf<typeof Method.WorkflowsModelsImageQuote> = await client.call(
+    Method.WorkflowsModelsImageQuote,
+    params,
+);
+```
+
+Parameters: [WorkflowImageQuoteRequest](protocol.md#workflowimagequoterequest).
+
+| Field        | Required | Type                                                       | Description |
+| ------------ | -------- | ---------------------------------------------------------- | ----------- |
+| `model`      | Yes      | `string`                                                   |             |
+| `nodeId`     | Yes      | `string`                                                   |             |
+| `provider`   | Yes      | `string`                                                   |             |
+| `settings`   | Yes      | [WorkflowImageSettings](protocol.md#workflowimagesettings) |             |
+| `workflowId` | Yes      | `string`                                                   |             |
+
+Result: [WorkflowImageQuote](protocol.md#workflowimagequote).
+
+## workflows.models.image.resolve
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsModelsImageResolve> = {
+    policy: {
+        allowPreview: false,
+        maxCatalogAgeMs: 'YOUR_MAXCATALOGAGEMS',
+        maxGenerationMicrocents: 'YOUR_MAXGENERATIONMICROCENTS',
+        region: 'YOUR_REGION',
+    },
+    provider: 'YOUR_PROVIDER',
+    requirements: [],
+    workflowId: 'YOUR_WORKFLOWID',
+};
+const result: ResultOf<typeof Method.WorkflowsModelsImageResolve> = await client.call(
+    Method.WorkflowsModelsImageResolve,
+    params,
+);
+```
+
+Parameters: [WorkflowImageResolutionRequest](protocol.md#workflowimageresolutionrequest).
+
+| Field          | Required | Type                                                                      | Description |
+| -------------- | -------- | ------------------------------------------------------------------------- | ----------- |
+| `policy`       | Yes      | [WorkflowImagePolicy](protocol.md#workflowimagepolicy)                    |             |
+| `provider`     | Yes      | `string`                                                                  |             |
+| `requirements` | Yes      | Array of [WorkflowImageRequirement](protocol.md#workflowimagerequirement) |             |
+| `workflowId`   | Yes      | `string`                                                                  |             |
+
+Result: [WorkflowImageResolution](protocol.md#workflowimageresolution).
+
 ## workflows.models.refresh
 
 ```ts
@@ -2088,7 +2159,7 @@ import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsModelsRefresh> = {
     after: 'YOUR_AFTER',
-    capability: 'reasoning',
+    capability: 'image',
     compatibleOnly: false,
     favorites: [],
     provider: 'YOUR_PROVIDER',
@@ -2143,13 +2214,13 @@ const result: ResultOf<typeof Method.WorkflowsModelsResolve> = await client.call
 
 Parameters: [WorkflowModelResolutionRequest](protocol.md#workflowmodelresolutionrequest).
 
-| Field             | Required | Type                                                           | Description |
-| ----------------- | -------- | -------------------------------------------------------------- | ----------- |
-| `capability`      | Yes      | [WorkflowModelCapability](protocol.md#workflowmodelcapability) |             |
-| `maxOutputTokens` | Yes      | `number`                                                       |             |
-| `policy`          | Yes      | [WorkflowModelPolicy](protocol.md#workflowmodelpolicy)         |             |
-| `provider`        | Yes      | `string`                                                       |             |
-| `workflowId`      | Yes      | `string`                                                       |             |
+| Field             | Required | Type                                                   | Description |
+| ----------------- | -------- | ------------------------------------------------------ | ----------- |
+| `capability`      | Yes      | [Exclude](protocol.md#exclude)                         |             |
+| `maxOutputTokens` | Yes      | `number`                                               |             |
+| `policy`          | Yes      | [WorkflowModelPolicy](protocol.md#workflowmodelpolicy) |             |
+| `provider`        | Yes      | `string`                                               |             |
+| `workflowId`      | Yes      | `string`                                               |             |
 
 Result: [WorkflowModelResolution](protocol.md#workflowmodelresolution).
 
@@ -2311,12 +2382,13 @@ const result: ResultOf<typeof Method.WorkflowsRead> = await client.call(
 
 Parameters: [WorkflowReadRequest](protocol.md#workflowreadrequest).
 
-| Field        | Required | Type          | Description |
-| ------------ | -------- | ------------- | ----------- |
-| `edgeOffset` | Yes      | `number`      |             |
-| `nodeOffset` | Yes      | `number`      |             |
-| `revision`   | Yes      | `null,string` |             |
-| `workflowId` | Yes      | `string`      |             |
+| Field         | Required | Type          | Description |
+| ------------- | -------- | ------------- | ----------- |
+| `edgeOffset`  | Yes      | `number`      |             |
+| `groupOffset` | No       | `number`      |             |
+| `nodeOffset`  | Yes      | `number`      |             |
+| `revision`    | Yes      | `null,string` |             |
+| `workflowId`  | Yes      | `string`      |             |
 
 Result: [WorkflowManifestPage](protocol.md#workflowmanifestpage).
 
