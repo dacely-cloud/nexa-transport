@@ -1424,6 +1424,11 @@ export const schema: Schema = {
                     description: 'Stable per install, so a reconnect is recognisable in the logs.',
                     type: 'string',
                 },
+                metadataOnlyAttachments: {
+                    description:
+                        'Deliver saved file descriptors; clients explicitly request original bytes.',
+                    type: 'boolean',
+                },
                 mode: {
                     enum: ['automation', 'cli', 'node', 'tui', 'ui'],
                     type: 'string',
@@ -8344,6 +8349,11 @@ export const schema: Schema = {
                 },
                 id: {
                     type: 'string',
+                },
+                pageBytes: {
+                    description:
+                        'Optional bounded read window; old clients retain the 256 KiB default.',
+                    type: 'number',
                 },
             },
             required: ['id'],

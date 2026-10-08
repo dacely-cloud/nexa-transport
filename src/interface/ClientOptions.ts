@@ -6,6 +6,8 @@ export interface ClientIdentity {
     readonly version: string;
     /** Runtime description for gateway operators. */
     readonly platform: string;
+    /** Opt into metadata-only live attachments; request originals with downloadSessionFile. */
+    readonly metadataOnlyAttachments?: boolean;
 }
 
 /** Browser and Node.js connection configuration. Credentials stay in memory. */

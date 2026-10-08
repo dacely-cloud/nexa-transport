@@ -15,7 +15,7 @@ interface PendingHistoryPage {
 
 /** Bounded lookahead over a fixed byte snapshot; decoding remains strictly ordered. */
 class HistoryPageWindow {
-    static readonly #MAX_BYTES: bigint = 4n * 1024n * 1024n;
+    static readonly #MAX_BYTES: bigint = 16n * 1024n * 1024n;
     readonly #pending: Map<string, PendingHistoryPage> = new Map();
 
     public constructor(
@@ -79,6 +79,7 @@ class HistoryPageWindow {
                     {
                         id: this.id,
                         cursor,
+                        pageBytes: 1024 * 1024,
                         ...(endCursor === undefined ? {} : { endCursor }),
                     },
                     { signal: controller.signal },
@@ -174,7 +175,9 @@ export class SessionHistoryReader {
         client: NexaClient,
         id: string,
         attachmentId: string,
+        signal?: AbortSignal,
     ): Promise<ReceivedAttachment> {
+        signal?.throwIfAborted();
         const delivery: PromiseWithResolvers<ReceivedAttachment> =
             Promise.withResolvers<ReceivedAttachment>();
         const stop: () => void = client.onAttachment((file): void => {
@@ -183,16 +186,23 @@ export class SessionHistoryReader {
             }
         });
         const stopClose: () => void = client.onClose((error): void => delivery.reject(error));
+        const abort: () => void = (): void => delivery.reject(signal?.reason);
+        signal?.addEventListener('abort', abort, { once: true });
         const timeout: ReturnType<typeof setTimeout> = setTimeout((): void => {
             delivery.reject(new Error('Saved file delivery timed out'));
         }, 120_000);
         try {
             const [, file] = await Promise.all([
-                client.call(Method.SessionsDownload, { id, attachmentId }, { timeoutMs: 120_000 }),
+                client.call(
+                    Method.SessionsDownload,
+                    { id, attachmentId },
+                    { timeoutMs: 120_000, ...(signal === undefined ? {} : { signal }) },
+                ),
                 delivery.promise,
             ]);
             return file;
         } finally {
+            signal?.removeEventListener('abort', abort);
             clearTimeout(timeout);
             stop();
             stopClose();

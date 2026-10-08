@@ -137,8 +137,12 @@ export class NexaClient {
         );
     }
     /** Restores original archived bytes through the account-scoped gateway. */
-    public downloadSessionFile(id: string, attachmentId: string): Promise<ReceivedAttachment> {
-        return SessionHistoryReader.download(this, id, attachmentId);
+    public downloadSessionFile(
+        id: string,
+        attachmentId: string,
+        signal?: AbortSignal,
+    ): Promise<ReceivedAttachment> {
+        return SessionHistoryReader.download(this, id, attachmentId, signal);
     }
 
     readonly #company = new CompanyChannel(CompanyFormats.staffing);
@@ -605,6 +609,12 @@ export class NexaClient {
                         version: this.#options.client?.version ?? '0.1.0',
                         platform: this.#options.client?.platform ?? 'javascript',
                         mode: 'ui',
+                        ...(this.#options.client?.metadataOnlyAttachments === undefined
+                            ? {}
+                            : {
+                                  metadataOnlyAttachments:
+                                      this.#options.client.metadataOnlyAttachments,
+                              }),
                     },
                 },
                 {},
