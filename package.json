@@ -175,6 +175,10 @@
             "types": "./dist/workflows/planning/PlanningAlignment.d.ts",
             "import": "./dist/workflow-planning-alignment.js"
         },
+        "./workflow-model-policy": {
+            "types": "./dist/workflows/ModelResolution.d.ts",
+            "import": "./dist/workflow-model-policy.js"
+        },
         "./workflow-models": {
             "types": "./dist/workflows/WorkflowModels.d.ts",
             "import": "./dist/workflow-models.js"

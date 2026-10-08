@@ -142,6 +142,34 @@ export class AgentComponents {
                 Schemas.field('selection', Schemas.choice(['exact', 'latest-compatible'])),
                 Schemas.field('modelId', { ...Schemas.text, nullable: true }),
                 Schemas.field('options', Schemas.object([], true)),
+                Schemas.field(
+                    'policy',
+                    Schemas.object([
+                        Schemas.field('allowPreview', Schemas.boolean),
+                        Schemas.field('region', { ...Schemas.text, nullable: true }),
+                        Schemas.field(
+                            'requiredFeatures',
+                            Schemas.list(
+                                Schemas.choice([
+                                    'reasoning',
+                                    'vision',
+                                    'documents',
+                                    'tools',
+                                    'structuredOutput',
+                                ]),
+                                5,
+                            ),
+                        ),
+                        Schemas.field('maxInputUsdPerMillion', { ...Schemas.text, nullable: true }),
+                        Schemas.field('maxOutputUsdPerMillion', {
+                            ...Schemas.text,
+                            nullable: true,
+                        }),
+                        Schemas.field('allowUnpriced', Schemas.boolean),
+                        Schemas.field('maxCatalogAgeMs', Schemas.text),
+                    ]),
+                    false,
+                ),
             ]),
             defaults: {
                 provider: null,

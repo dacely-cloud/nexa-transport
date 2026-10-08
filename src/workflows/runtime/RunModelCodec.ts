@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
+import { WorkflowModelPolicies, type WorkflowModelPolicyEvidence } from '../ModelPolicy.js';
 import { WorkflowModelsCodec } from '../WorkflowModels.js';
 import { WorkflowInput } from '../WorkflowInput.js';
 import {
@@ -22,6 +23,8 @@ export class WorkflowRunModelCodec {
     }
     /** Rejects malformed identities, hidden options, and unsupported selection policies. */
     public static model(raw: unknown): WorkflowResolvedModel {
+        const fields: Readonly<Record<string, unknown>> = WorkflowInput.object(raw);
+        const latest: boolean = fields['selection'] === WorkflowModelSelection.Latest;
         const value: Readonly<Record<string, unknown>> = WorkflowInput.record(raw, [
             'nodeId',
             'bindingId',
@@ -31,11 +34,12 @@ export class WorkflowRunModelCodec {
             'capability',
             'maxOutputTokens',
             'pricingReference',
+            ...(latest ? ['policy'] : []),
         ]);
         const capability: unknown = value['capability'];
         const maxOutputTokens: unknown = value['maxOutputTokens'];
         if (
-            value['selection'] !== WorkflowModelSelection.Exact ||
+            (!latest && value['selection'] !== WorkflowModelSelection.Exact) ||
             (capability !== WorkflowTextCapability.Text &&
                 capability !== WorkflowTextCapability.Reasoning) ||
             typeof maxOutputTokens !== 'number' ||
@@ -49,12 +53,16 @@ export class WorkflowRunModelCodec {
         if (price !== null && (typeof price !== 'string' || !/^[a-f0-9]{64}$/u.test(price))) {
             throw new Error('Invalid workflow model pricing reference');
         }
+        const policy: WorkflowModelPolicyEvidence | undefined = latest
+            ? WorkflowModelPolicies.evidence(value['policy'])
+            : undefined;
         return Object.freeze({
             nodeId: WorkflowInput.id(value['nodeId']),
             bindingId: WorkflowInput.id(value['bindingId']),
             provider: WorkflowInput.id(value['provider']),
             model: WorkflowModelsCodec.identity(value['model']),
-            selection: WorkflowModelSelection.Exact,
+            selection: latest ? WorkflowModelSelection.Latest : WorkflowModelSelection.Exact,
+            ...(policy === undefined ? {} : { policy }),
             capability,
             maxOutputTokens,
             pricingReference: price,

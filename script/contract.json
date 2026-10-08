@@ -4204,6 +4204,18 @@
                     "required": ["params", "result"],
                     "type": "object"
                 },
+                "workflows.models.resolve": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/WorkflowModelResolutionRequest"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/WorkflowModelResolution"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
                 "workflows.planning.cancel": {
                     "properties": {
                         "params": {
@@ -4543,6 +4555,7 @@
                 "workflows.list",
                 "workflows.models",
                 "workflows.models.refresh",
+                "workflows.models.resolve",
                 "workflows.planning.cancel",
                 "workflows.planning.history",
                 "workflows.planning.read",
@@ -10190,6 +10203,93 @@
             ],
             "type": "object"
         },
+        "WorkflowModelFeature": {
+            "description": "Features that integrations can explicitly verify for model selection.",
+            "enum": ["documents", "reasoning", "structuredOutput", "tools", "vision"],
+            "type": "string"
+        },
+        "WorkflowModelPolicy": {
+            "description": "Saved, explicit constraints for the latest supported model on one provider.",
+            "properties": {
+                "allowPreview": {
+                    "type": "boolean"
+                },
+                "allowUnpriced": {
+                    "type": "boolean"
+                },
+                "maxCatalogAgeMs": {
+                    "description": "Endpoint observation age, between one second and one day.",
+                    "type": "string"
+                },
+                "maxInputUsdPerMillion": {
+                    "description": "Decimal USD per million tokens. Null is no additional rate ceiling.",
+                    "type": ["null", "string"]
+                },
+                "maxOutputUsdPerMillion": {
+                    "type": ["null", "string"]
+                },
+                "region": {
+                    "type": ["null", "string"]
+                },
+                "requiredFeatures": {
+                    "items": {
+                        "$ref": "#/definitions/WorkflowModelFeature"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": [
+                "allowPreview",
+                "allowUnpriced",
+                "maxCatalogAgeMs",
+                "maxInputUsdPerMillion",
+                "maxOutputUsdPerMillion",
+                "region",
+                "requiredFeatures"
+            ],
+            "type": "object"
+        },
+        "WorkflowModelPolicyEvidence": {
+            "description": "The facts and constraints used for one immutable latest-policy decision.",
+            "properties": {
+                "capabilityDigest": {
+                    "type": "string"
+                },
+                "catalogCheckedAtMs": {
+                    "type": "string"
+                },
+                "eligibilityReference": {
+                    "type": "string"
+                },
+                "eligibilityVerifiedAtMs": {
+                    "type": "string"
+                },
+                "format": {
+                    "const": 1,
+                    "type": "number"
+                },
+                "policy": {
+                    "$ref": "#/definitions/WorkflowModelPolicy"
+                },
+                "releaseAtMs": {
+                    "type": "string"
+                },
+                "releaseReference": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "capabilityDigest",
+                "catalogCheckedAtMs",
+                "eligibilityReference",
+                "eligibilityVerifiedAtMs",
+                "format",
+                "policy",
+                "releaseAtMs",
+                "releaseReference"
+            ],
+            "type": "object"
+        },
         "WorkflowModelPrice": {
             "description": "Existing ledger rate-card values, represented as decimal text without client-side money math.",
             "properties": {
@@ -10201,6 +10301,57 @@
                 }
             },
             "required": ["inputUsdPerMillion", "outputUsdPerMillion"],
+            "type": "object"
+        },
+        "WorkflowModelResolution": {
+            "properties": {
+                "candidate": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/WorkflowModelChoice"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "evidence": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/WorkflowModelPolicyEvidence"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "reason": {
+                    "type": ["null", "string"]
+                }
+            },
+            "required": ["candidate", "evidence", "reason"],
+            "type": "object"
+        },
+        "WorkflowModelResolutionRequest": {
+            "description": "Owner-authorized policy preview; never saves a draft or performs inference.",
+            "properties": {
+                "capability": {
+                    "$ref": "#/definitions/WorkflowModelCapability"
+                },
+                "maxOutputTokens": {
+                    "type": "number"
+                },
+                "policy": {
+                    "$ref": "#/definitions/WorkflowModelPolicy"
+                },
+                "provider": {
+                    "type": "string"
+                },
+                "workflowId": {
+                    "type": "string"
+                }
+            },
+            "required": ["capability", "maxOutputTokens", "policy", "provider", "workflowId"],
             "type": "object"
         },
         "WorkflowModelsPage": {

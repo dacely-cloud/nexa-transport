@@ -93,6 +93,7 @@ All 54 protocol methods. `connect` is managed by `NexaClient.connect`; the remai
 - [workflows.list](#workflows-list)
 - [workflows.models](#workflows-models)
 - [workflows.models.refresh](#workflows-models-refresh)
+- [workflows.models.resolve](#workflows-models-resolve)
 - [workflows.planning.cancel](#workflows-planning-cancel)
 - [workflows.planning.history](#workflows-planning-history)
 - [workflows.planning.read](#workflows-planning-read)
@@ -2112,6 +2113,44 @@ Parameters: [WorkflowModelsRequest](protocol.md#workflowmodelsrequest).
 | `workflowId`     | Yes      | `string`                                                       |             |
 
 Result: [WorkflowModelsPage](protocol.md#workflowmodelspage).
+
+## workflows.models.resolve
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsModelsResolve> = {
+    capability: 'reasoning',
+    maxOutputTokens: 1,
+    policy: {
+        allowPreview: false,
+        allowUnpriced: false,
+        maxCatalogAgeMs: 'YOUR_MAXCATALOGAGEMS',
+        maxInputUsdPerMillion: 'YOUR_MAXINPUTUSDPERMILLION',
+        maxOutputUsdPerMillion: 'YOUR_MAXOUTPUTUSDPERMILLION',
+        region: 'YOUR_REGION',
+        requiredFeatures: [],
+    },
+    provider: 'YOUR_PROVIDER',
+    workflowId: 'YOUR_WORKFLOWID',
+};
+const result: ResultOf<typeof Method.WorkflowsModelsResolve> = await client.call(
+    Method.WorkflowsModelsResolve,
+    params,
+);
+```
+
+Parameters: [WorkflowModelResolutionRequest](protocol.md#workflowmodelresolutionrequest).
+
+| Field             | Required | Type                                                           | Description |
+| ----------------- | -------- | -------------------------------------------------------------- | ----------- |
+| `capability`      | Yes      | [WorkflowModelCapability](protocol.md#workflowmodelcapability) |             |
+| `maxOutputTokens` | Yes      | `number`                                                       |             |
+| `policy`          | Yes      | [WorkflowModelPolicy](protocol.md#workflowmodelpolicy)         |             |
+| `provider`        | Yes      | `string`                                                       |             |
+| `workflowId`      | Yes      | `string`                                                       |             |
+
+Result: [WorkflowModelResolution](protocol.md#workflowmodelresolution).
 
 ## workflows.planning.cancel
 

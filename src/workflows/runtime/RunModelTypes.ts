@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
+import type { WorkflowModelPolicyEvidence } from '../ModelPolicy.js';
 import type { WorkflowRunSnapshot } from './RunTypes.js';
 
 /** Resolution uses the selected provider only; policies require their own verified resolver. */
-export const WorkflowModelSelection = { Exact: 'exact' } as const;
+export const WorkflowModelSelection = { Exact: 'exact', Latest: 'latest-compatible' } as const;
 /** Required operation capabilities for the text handler. */
 export const WorkflowTextCapability = { Text: 'text', Reasoning: 'reasoning' } as const;
 /** A supported text operation. */
@@ -15,7 +16,8 @@ export interface WorkflowResolvedModel {
     readonly bindingId: string;
     readonly provider: string;
     readonly model: string;
-    readonly selection: typeof WorkflowModelSelection.Exact;
+    readonly selection: (typeof WorkflowModelSelection)[keyof typeof WorkflowModelSelection];
+    readonly policy?: WorkflowModelPolicyEvidence;
     readonly capability: WorkflowTextCapability;
     readonly maxOutputTokens: number;
     /** Digest of the existing ledger rate card; null means unpriced. */
