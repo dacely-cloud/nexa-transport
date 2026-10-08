@@ -26,6 +26,44 @@ async function connect(): Promise<NexaClient> {
     return client;
 }
 describe('Nexa websocket lifetimes', (): void => {
+    it('keeps ordinary planning compatible while refusing selections on an older gateway', async (): Promise<void> => {
+        gateway = new TestGateway({
+            ...hello,
+            features: {
+                ...hello.features,
+                workflowDraftsVersion: 1,
+                workflowGraphVersion: 1,
+                workflowPlanningVersion: 1,
+                methods: hello.features.methods.filter(
+                    (method: string): boolean => method !== 'workflows.planning.sources',
+                ),
+            },
+        });
+        client = await NexaClient.connect({ url: await gateway.url(), reconnect: false });
+        expect(client.supportsWorkflowPlanning).toBe(true);
+        expect(client.supportsWorkflowPlanningSources).toBe(false);
+        const before: number = gateway.requests.length;
+        await expect(
+            client.call(Method.WorkflowsPlanningSources, { workflowId: 'draft', after: null }),
+        ).rejects.toThrow('updated NEXA gateway');
+        await expect(
+            client.call(Method.WorkflowsPlanningSend, {
+                workflowId: 'draft',
+                requestId: 'request',
+                baseRevision: '1',
+                previousRequestId: null,
+                message: 'Make a report',
+                document: {
+                    details: { name: 'Draft', description: '', tags: [], folder: null },
+                    nodes: [],
+                    positions: [],
+                    edges: [],
+                },
+                sourceIds: ['workspace:mine'],
+            }),
+        ).rejects.toThrow('updated NEXA gateway');
+        expect(gateway.requests.length).toBe(before);
+    });
     it('negotiates graph validation separately from draft storage', async (): Promise<void> => {
         gateway = new TestGateway({
             ...hello,

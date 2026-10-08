@@ -789,6 +789,13 @@ export class NexaClient {
             )
         );
     }
+    /** Metadata discovery is additive; older planning gateways do not accept source selections. */
+    public get supportsWorkflowPlanningSources(): boolean {
+        return (
+            this.supportsWorkflowPlanning &&
+            this.#hello?.features.methods.includes(Method.WorkflowsPlanningSources) === true
+        );
+    }
     /** Calls any Nexa RPC with validated parameters and result. Mutations are never replayed. */
     public async call<M extends Exclude<Method, Method.Connect>>(
         method: M,
@@ -797,6 +804,16 @@ export class NexaClient {
     ): Promise<ResultOf<M>> {
         if (!this.connected) {
             throw new TransportError(TransportErrorCode.Closed, 'Client is not connected');
+        }
+        if (
+            (method === Method.WorkflowsPlanningSources ||
+                (method === Method.WorkflowsPlanningSend && Object.hasOwn(params, 'sourceIds'))) &&
+            !this.supportsWorkflowPlanningSources
+        ) {
+            throw new TransportError(
+                TransportErrorCode.Protocol,
+                'Workflow source selection requires an updated NEXA gateway',
+            );
         }
         if (method.startsWith('workflows.planning.') && !this.supportsWorkflowPlanning) {
             throw new TransportError(

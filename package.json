@@ -166,6 +166,10 @@
         "./workflow-run-request-codec": {
             "types": "./dist/workflows/runtime/RunRequestCodec.d.ts",
             "import": "./dist/workflow-run-request-codec.js"
+        },
+        "./workflow-planning-sources": {
+            "types": "./dist/workflows/planning/PlanningSources.d.ts",
+            "import": "./dist/workflow-planning-sources.js"
         }
     },
     "scripts": {
