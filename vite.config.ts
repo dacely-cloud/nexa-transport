@@ -4,6 +4,7 @@ const config: UserConfig = {
         target: 'es2023',
         lib: {
             entry: {
+                'workflow-planning-alignment': 'src/workflows/planning/PlanningAlignment.ts',
                 'workflow-planning-sources': 'src/workflows/planning/PlanningSources.ts',
                 'workflow-planning-types': 'src/workflows/planning/PlanningTypes.ts',
                 'workflow-planning-codec': 'src/workflows/planning/PlanningCodec.ts',

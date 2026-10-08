@@ -4582,6 +4582,21 @@ export interface PersonalAgentInputShape {
 /** PersonalAgentInput from the Nexa wire protocol. */
 export type PersonalAgentInput = PersonalAgentInputShape;
 
+/** PlanningAlignmentAnchor wire fields. */
+export interface PlanningAlignmentAnchorShape {
+    /** beforeHash as defined by the Nexa gateway. */
+    readonly beforeHash: string;
+    /** graphHash as defined by the Nexa gateway. */
+    readonly graphHash: string;
+    /** requirements as defined by the Nexa gateway. */
+    readonly requirements: ReadonlyArray<PlanningRequirementFingerprint>;
+    /** version as defined by the Nexa gateway. */
+    readonly version: 1;
+}
+
+/** PlanningAlignmentAnchor from the Nexa wire protocol. */
+export type PlanningAlignmentAnchor = PlanningAlignmentAnchorShape;
+
 /** PlanningBrief wire fields. */
 export interface PlanningBriefShape {
     /** assumptions as defined by the Nexa gateway. */
@@ -4659,6 +4674,8 @@ export type PlanningQuestion = PlanningQuestionShape;
 
 /** PlanningReply wire fields. */
 export interface PlanningReplyShape {
+    /** alignment as defined by the Nexa gateway. */
+    readonly alignment?: PlanningAlignmentAnchor;
     /** baseRevision as defined by the Nexa gateway. */
     readonly baseRevision: string;
     /** brief as defined by the Nexa gateway. */
@@ -4713,6 +4730,17 @@ export interface PlanningRequirementShape {
 
 /** PlanningRequirement from the Nexa wire protocol. */
 export type PlanningRequirement = PlanningRequirementShape;
+
+/** PlanningRequirementFingerprint wire fields. */
+export interface PlanningRequirementFingerprintShape {
+    /** hash as defined by the Nexa gateway. */
+    readonly hash: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+}
+
+/** PlanningRequirementFingerprint from the Nexa wire protocol. */
+export type PlanningRequirementFingerprint = PlanningRequirementFingerprintShape;
 
 /** PlanningSource wire fields. */
 export interface PlanningSourceShape {
