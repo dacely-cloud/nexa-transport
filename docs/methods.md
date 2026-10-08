@@ -91,6 +91,7 @@ All 54 protocol methods. `connect` is managed by `NexaClient.connect`; the remai
 - [workflows.catalog](#workflows-catalog)
 - [workflows.create](#workflows-create)
 - [workflows.list](#workflows-list)
+- [workflows.models](#workflows-models)
 - [workflows.planning.cancel](#workflows-planning-cancel)
 - [workflows.planning.history](#workflows-planning-history)
 - [workflows.planning.read](#workflows-planning-read)
@@ -2042,6 +2043,40 @@ Parameters: [WorkflowListRequest](protocol.md#workflowlistrequest).
 | `limit`  | Yes      | `number`                                                      |             |
 
 Result: [WorkflowListPage](protocol.md#workflowlistpage).
+
+## workflows.models
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsModels> = {
+    after: 'YOUR_AFTER',
+    capability: 'reasoning',
+    compatibleOnly: false,
+    favorites: [],
+    provider: 'YOUR_PROVIDER',
+    query: 'YOUR_QUERY',
+    workflowId: 'YOUR_WORKFLOWID',
+};
+const result: ResultOf<typeof Method.WorkflowsModels> = await client.call(
+    Method.WorkflowsModels,
+    params,
+);
+```
+
+Parameters: [WorkflowModelsRequest](protocol.md#workflowmodelsrequest).
+
+| Field            | Required | Type                                                           | Description |
+| ---------------- | -------- | -------------------------------------------------------------- | ----------- |
+| `after`          | Yes      | `null,string`                                                  |             |
+| `capability`     | Yes      | [WorkflowModelCapability](protocol.md#workflowmodelcapability) |             |
+| `compatibleOnly` | Yes      | `boolean`                                                      |             |
+| `favorites`      | Yes      | Array of `string` / `null`                                     |             |
+| `provider`       | Yes      | `null,string`                                                  |             |
+| `query`          | Yes      | `string`                                                       |             |
+| `workflowId`     | Yes      | `string`                                                       |             |
+
+Result: [WorkflowModelsPage](protocol.md#workflowmodelspage).
 
 ## workflows.planning.cancel
 
