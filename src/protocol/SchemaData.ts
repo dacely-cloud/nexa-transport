@@ -1917,6 +1917,14 @@ export const schema: Schema = {
                 scopeId: {
                     type: 'string',
                 },
+                supportedWorkloads: {
+                    description:
+                        'Classified reports this authority accepts; absent on earlier deployments.',
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
                 to: {
                     type: 'number',
                 },
