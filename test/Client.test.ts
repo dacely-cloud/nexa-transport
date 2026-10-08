@@ -9,7 +9,7 @@ import type { WebSocket } from 'ws';
 import { NexaClient } from '../src/networking/NexaClient.js';
 import { TransportErrorCode } from '../src/networking/TransportError.js';
 import type { TurnStream } from '../src/networking/TurnStream.js';
-import { result, TestGateway, type Request } from './Support.js';
+import { hello, result, TestGateway, type Request } from './Support.js';
 
 let gateway: TestGateway | undefined;
 let client: NexaClient | undefined;
@@ -26,6 +26,32 @@ async function connect(): Promise<NexaClient> {
     return client;
 }
 describe('Nexa websocket lifetimes', (): void => {
+    it('negotiates graph validation separately from draft storage', async (): Promise<void> => {
+        gateway = new TestGateway({
+            ...hello,
+            features: { ...hello.features, workflowDraftsVersion: 1 },
+        });
+        client = await NexaClient.connect({ url: await gateway.url(), reconnect: false });
+        expect(client.supportsWorkflowDrafts).toBe(true);
+        expect(client.supportsWorkflowGraph).toBe(false);
+        const before: number = gateway.requests.length;
+        await expect(client.call(Method.WorkflowsCatalog, {})).rejects.toThrow(
+            'updated NEXA gateway',
+        );
+        await expect(
+            client.call(Method.WorkflowsValidate, { workflowId: 'draft', revision: '1' }),
+        ).rejects.toThrow('updated NEXA gateway');
+        expect(gateway.requests.length).toBe(before);
+    });
+    it('does not send workflow commands without the negotiated draft capability', async (): Promise<void> => {
+        const connected: NexaClient = await connect();
+        const before: number = gateway?.requests.length ?? 0;
+        expect(connected.supportsWorkflowDrafts).toBe(false);
+        await expect(
+            connected.call(Method.WorkflowsList, { limit: 30, cursor: null }),
+        ).rejects.toThrow('updated NEXA gateway');
+        expect(gateway?.requests.length).toBe(before);
+    });
     it('rejects employee evidence locally when the private capability is absent', async (): Promise<void> => {
         const connected = await connect();
         const before = gateway?.requests.length ?? 0;

@@ -728,6 +728,32 @@ export class NexaClient {
     public get connected(): boolean {
         return !this.#closed && this.#ready && this.#socket.readyState === WebSocket.OPEN;
     }
+    /** Draft storage support is distinct from workflow publishing or execution. */
+    public get supportsWorkflowDrafts(): boolean {
+        return (
+            this.connected &&
+            this.#hello?.features.workflowDraftsVersion === 1 &&
+            [
+                Method.WorkflowsCreate,
+                Method.WorkflowsSave,
+                Method.WorkflowsList,
+                Method.WorkflowsRead,
+                Method.WorkflowsRecord,
+            ].every(
+                (method: Method): boolean =>
+                    this.#hello?.features.methods.includes(method) === true,
+            )
+        );
+    }
+    /** Structural validation and component discovery are separate from execution readiness. */
+    public get supportsWorkflowGraph(): boolean {
+        return (
+            this.supportsWorkflowDrafts &&
+            this.#hello?.features.workflowGraphVersion === 1 &&
+            this.#hello.features.methods.includes(Method.WorkflowsCatalog) &&
+            this.#hello.features.methods.includes(Method.WorkflowsValidate)
+        );
+    }
     /** Calls any Nexa RPC with validated parameters and result. Mutations are never replayed. */
     public async call<M extends Exclude<Method, Method.Connect>>(
         method: M,
@@ -736,6 +762,21 @@ export class NexaClient {
     ): Promise<ResultOf<M>> {
         if (!this.connected) {
             throw new TransportError(TransportErrorCode.Closed, 'Client is not connected');
+        }
+        if (method.startsWith('workflows.') && !this.supportsWorkflowDrafts) {
+            throw new TransportError(
+                TransportErrorCode.Protocol,
+                'Workflow drafts require an updated NEXA gateway',
+            );
+        }
+        if (
+            (method === Method.WorkflowsCatalog || method === Method.WorkflowsValidate) &&
+            !this.supportsWorkflowGraph
+        ) {
+            throw new TransportError(
+                TransportErrorCode.Protocol,
+                'Workflow validation requires an updated NEXA gateway',
+            );
         }
         if (!this.hello.features.methods.includes(method)) {
             throw new TransportError(
