@@ -35,14 +35,24 @@ export interface WorkflowModelChoice {
     readonly maxOutputTokens: number | null;
     readonly contextWindow: number | null;
     readonly price: WorkflowModelPrice | null;
+    /** Null/absent means no explicit endpoint check, rather than proof that a model is absent. */
+    readonly availableAtCheck?: boolean | null;
+}
+/** An observation time is not a release date, freshness guarantee, or permission grant. */
+export interface WorkflowCatalogObservation {
+    readonly checkedAt: string | null;
+    readonly refreshAvailable: boolean;
+    readonly refreshFailed: boolean;
 }
 /** Registered providers and a bounded page from the selected provider's maintained catalog. */
 export interface WorkflowModelsPage {
     readonly providers: readonly string[];
     readonly items: readonly WorkflowModelChoice[];
     readonly next: string | null;
-    /** The current registry does not expose catalog observation time; retrieval is not freshness. */
+    /** Legacy marker retained for older clients; endpoint check times are in observation. */
     readonly freshness: 'not-reported';
+    /** Optional for older clients. The legacy freshness marker remains unchanged. */
+    readonly observation?: WorkflowCatalogObservation;
 }
 /** Strict request parsing shared with the typed SDK. */
 export class WorkflowModelsCodec {

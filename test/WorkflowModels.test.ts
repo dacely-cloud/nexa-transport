@@ -42,6 +42,20 @@ it('validates catalog metadata without treating missing price or freshness as a 
         freshness: 'not-reported',
     };
     expect(methodValidators[Method.WorkflowsModels].result(result)).toBe(true);
+    expect(methodValidators[Method.WorkflowsModelsRefresh].params(request)).toBe(true);
+    expect(methodValidators[Method.WorkflowsModelsRefresh].result(result)).toBe(true);
+    const observed: WorkflowModelsPage = {
+        ...result,
+        observation: { checkedAt: '1791457200000', refreshAvailable: true, refreshFailed: false },
+        items: result.items.map((model): typeof model => ({ ...model, availableAtCheck: true })),
+    };
+    expect(methodValidators[Method.WorkflowsModelsRefresh].result(observed)).toBe(true);
+    expect(
+        methodValidators[Method.WorkflowsModelsRefresh].result({
+            ...observed,
+            observation: { ...observed.observation, checkedAt: 1791457200000 },
+        }),
+    ).toBe(false);
     expect(methodValidators[Method.WorkflowsModels].result({ ...result, freshness: 'fresh' })).toBe(
         false,
     );

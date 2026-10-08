@@ -2728,6 +2728,14 @@ export interface GatewayMethodsworkflows_modelsShape {
     readonly result: WorkflowModelsPage;
 }
 
+/** GatewayMethodsworkflows_models_refresh wire fields. */
+export interface GatewayMethodsworkflows_models_refreshShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkflowModelsRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WorkflowModelsPage;
+}
+
 /** GatewayMethodsworkflows_planning_cancel wire fields. */
 export interface GatewayMethodsworkflows_planning_cancelShape {
     /** params as defined by the Nexa gateway. */
@@ -3070,6 +3078,8 @@ export interface GatewayMethodsShape {
     readonly 'workflows.list': GatewayMethodsworkflows_listShape;
     /** workflows.models as defined by the Nexa gateway. */
     readonly 'workflows.models': GatewayMethodsworkflows_modelsShape;
+    /** workflows.models.refresh as defined by the Nexa gateway. */
+    readonly 'workflows.models.refresh': GatewayMethodsworkflows_models_refreshShape;
     /** workflows.planning.cancel as defined by the Nexa gateway. */
     readonly 'workflows.planning.cancel': GatewayMethodsworkflows_planning_cancelShape;
     /** workflows.planning.history as defined by the Nexa gateway. */
@@ -6659,6 +6669,19 @@ export interface WorkflowCatalogShape {
 /** WorkflowCatalog from the Nexa wire protocol. */
 export type WorkflowCatalog = WorkflowCatalogShape;
 
+/** WorkflowCatalogObservation wire fields. */
+export interface WorkflowCatalogObservationShape {
+    /** checkedAt as defined by the Nexa gateway. */
+    readonly checkedAt: null | string;
+    /** refreshAvailable as defined by the Nexa gateway. */
+    readonly refreshAvailable: boolean;
+    /** refreshFailed as defined by the Nexa gateway. */
+    readonly refreshFailed: boolean;
+}
+
+/** WorkflowCatalogObservation from the Nexa wire protocol. */
+export type WorkflowCatalogObservation = WorkflowCatalogObservationShape;
+
 /** WorkflowCreateRequest wire fields. */
 export interface WorkflowCreateRequestShape {
     /** commandId as defined by the Nexa gateway. */
@@ -6799,6 +6822,8 @@ export type WorkflowModelCapability =
 
 /** WorkflowModelChoice wire fields. */
 export interface WorkflowModelChoiceShape {
+    /** availableAtCheck as defined by the Nexa gateway. */
+    readonly availableAtCheck?: null | boolean;
     /** compatible as defined by the Nexa gateway. */
     readonly compatible: boolean;
     /** contextWindow as defined by the Nexa gateway. */
@@ -6847,6 +6872,8 @@ export interface WorkflowModelsPageShape {
     readonly items: ReadonlyArray<WorkflowModelChoice>;
     /** next as defined by the Nexa gateway. */
     readonly next: null | string;
+    /** observation as defined by the Nexa gateway. */
+    readonly observation?: WorkflowCatalogObservation;
     /** providers as defined by the Nexa gateway. */
     readonly providers: ReadonlyArray<string>;
 }
@@ -7711,6 +7738,8 @@ export enum Method {
     WorkflowsList = 'workflows.list',
     /** Calls workflows.models. */
     WorkflowsModels = 'workflows.models',
+    /** Calls workflows.models.refresh. */
+    WorkflowsModelsRefresh = 'workflows.models.refresh',
     /** Calls workflows.planning.cancel. */
     WorkflowsPlanningCancel = 'workflows.planning.cancel',
     /** Calls workflows.planning.history. */

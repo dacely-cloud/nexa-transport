@@ -1366,6 +1366,7 @@ Configurable bounds on gateway-owned work and memory.
 | `workflows.create`             | Yes      | Object (fields below) |                                                                                            |
 | `workflows.list`               | Yes      | Object (fields below) |                                                                                            |
 | `workflows.models`             | Yes      | Object (fields below) |                                                                                            |
+| `workflows.models.refresh`     | Yes      | Object (fields below) |                                                                                            |
 | `workflows.planning.cancel`    | Yes      | Object (fields below) |                                                                                            |
 | `workflows.planning.history`   | Yes      | Object (fields below) |                                                                                            |
 | `workflows.planning.read`      | Yes      | Object (fields below) |                                                                                            |
@@ -2084,6 +2085,13 @@ Configurable bounds on gateway-owned work and memory.
 | `result` | Yes      | [WorkflowListPage](protocol.md#workflowlistpage)       |             |
 
 **workflows.models**
+
+| Field    | Required | Type                                                       | Description |
+| -------- | -------- | ---------------------------------------------------------- | ----------- |
+| `params` | Yes      | [WorkflowModelsRequest](protocol.md#workflowmodelsrequest) |             |
+| `result` | Yes      | [WorkflowModelsPage](protocol.md#workflowmodelspage)       |             |
+
+**workflows.models.refresh**
 
 | Field    | Required | Type                                                       | Description |
 | -------- | -------- | ---------------------------------------------------------- | ----------- |
@@ -4722,6 +4730,16 @@ Catalog format is separate from saved component versions and draft storage forma
 | `components` | Yes      | Array of [ComponentDefinition](protocol.md#componentdefinition) |             |
 | `format`     | Yes      | `1`                                                             |             |
 
+## WorkflowCatalogObservation
+
+An observation time is not a release date, freshness guarantee, or permission grant.
+
+| Field              | Required | Type          | Description |
+| ------------------ | -------- | ------------- | ----------- |
+| `checkedAt`        | Yes      | `null,string` |             |
+| `refreshAvailable` | Yes      | `boolean`     |             |
+| `refreshFailed`    | Yes      | `boolean`     |             |
+
 ## WorkflowCreateRequest
 
 Client-chosen identities make an unacknowledged create safe to retry.
@@ -4830,20 +4848,21 @@ Type: `"reasoning"` / `"text"`.
 
 Public model metadata only: no endpoints, keys, account names, or adapter options.
 
-| Field             | Required | Type                                                          | Description |
-| ----------------- | -------- | ------------------------------------------------------------- | ----------- |
-| `compatible`      | Yes      | `boolean`                                                     |             |
-| `contextWindow`   | Yes      | `null,number`                                                 |             |
-| `id`              | Yes      | `string`                                                      |             |
-| `input`           | Yes      | Array of `string`                                             |             |
-| `maxOutputTokens` | Yes      | `null,number`                                                 |             |
-| `name`            | Yes      | `string`                                                      |             |
-| `price`           | Yes      | [WorkflowModelPrice](protocol.md#workflowmodelprice) / `null` |             |
-| `provider`        | Yes      | `string`                                                      |             |
-| `reason`          | Yes      | `null,string`                                                 |             |
-| `reasoning`       | Yes      | `null,boolean`                                                |             |
-| `source`          | Yes      | `string`                                                      |             |
-| `status`          | Yes      | `string`                                                      |             |
+| Field              | Required | Type                                                          | Description                                                                             |
+| ------------------ | -------- | ------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `availableAtCheck` | No       | `null,boolean`                                                | Null/absent means no explicit endpoint check, rather than proof that a model is absent. |
+| `compatible`       | Yes      | `boolean`                                                     |                                                                                         |
+| `contextWindow`    | Yes      | `null,number`                                                 |                                                                                         |
+| `id`               | Yes      | `string`                                                      |                                                                                         |
+| `input`            | Yes      | Array of `string`                                             |                                                                                         |
+| `maxOutputTokens`  | Yes      | `null,number`                                                 |                                                                                         |
+| `name`             | Yes      | `string`                                                      |                                                                                         |
+| `price`            | Yes      | [WorkflowModelPrice](protocol.md#workflowmodelprice) / `null` |                                                                                         |
+| `provider`         | Yes      | `string`                                                      |                                                                                         |
+| `reason`           | Yes      | `null,string`                                                 |                                                                                         |
+| `reasoning`        | Yes      | `null,boolean`                                                |                                                                                         |
+| `source`           | Yes      | `string`                                                      |                                                                                         |
+| `status`           | Yes      | `string`                                                      |                                                                                         |
 
 ## WorkflowModelPrice
 
@@ -4858,12 +4877,13 @@ Existing ledger rate-card values, represented as decimal text without client-sid
 
 Registered providers and a bounded page from the selected provider's maintained catalog.
 
-| Field       | Required | Type                                                            | Description                                                                                |
-| ----------- | -------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| `freshness` | Yes      | `"not-reported"`                                                | The current registry does not expose catalog observation time; retrieval is not freshness. |
-| `items`     | Yes      | Array of [WorkflowModelChoice](protocol.md#workflowmodelchoice) |                                                                                            |
-| `next`      | Yes      | `null,string`                                                   |                                                                                            |
-| `providers` | Yes      | Array of `string`                                               |                                                                                            |
+| Field         | Required | Type                                                                 | Description                                                                        |
+| ------------- | -------- | -------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `freshness`   | Yes      | `"not-reported"`                                                     | Legacy marker retained for older clients; endpoint check times are in observation. |
+| `items`       | Yes      | Array of [WorkflowModelChoice](protocol.md#workflowmodelchoice)      |                                                                                    |
+| `next`        | Yes      | `null,string`                                                        |                                                                                    |
+| `observation` | No       | [WorkflowCatalogObservation](protocol.md#workflowcatalogobservation) | Optional for older clients. The legacy freshness marker remains unchanged.         |
+| `providers`   | Yes      | Array of `string`                                                    |                                                                                    |
 
 ## WorkflowModelsRequest
 
