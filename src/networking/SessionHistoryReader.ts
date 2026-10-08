@@ -170,6 +170,74 @@ export class SessionHistoryReader {
         }
     }
 
+    /** Bulk compact blocks keep source cursors independent of their smaller encoded size. */
+    public static async transcript(
+        client: NexaClient,
+        id: string,
+        cursor: string = '0',
+        endCursor?: string,
+    ): Promise<SavedHistorySnapshot> {
+        const records: SessionHistoryRecord[] = [];
+        const seen: Set<string> = new Set();
+        for (;;) {
+            const page: SessionHistoryPage = await client.call(Method.SessionsTranscript, {
+                id,
+                cursor,
+                ...(endCursor === undefined ? {} : { endCursor }),
+            });
+            if (
+                page.format !== 1 ||
+                !/^\d+$/.test(page.endCursor) ||
+                BigInt(page.endCursor) < BigInt(cursor) ||
+                (endCursor !== undefined && page.endCursor !== endCursor) ||
+                (page.nextCursor !== undefined &&
+                    (!/^\d+$/.test(page.nextCursor) ||
+                        BigInt(page.nextCursor) <= BigInt(cursor) ||
+                        BigInt(page.nextCursor) >= BigInt(page.endCursor)))
+            ) {
+                throw new Error('Invalid compact transcript cursor');
+            }
+            endCursor = page.endCursor;
+            if (page.raw === true) {
+                const suffix: SavedHistorySnapshot = await SessionHistoryReader.snapshot(
+                    client,
+                    id,
+                    cursor,
+                    endCursor,
+                );
+                for (const record of suffix.records) {
+                    if (seen.has(record.id))
+                        throw new Error('Duplicate transcript fallback record');
+                    seen.add(record.id);
+                    records.push(record);
+                }
+                return { records, endCursor: suffix.endCursor };
+            }
+            const raw: string = atob(page.chunk);
+            const bytes: Uint8Array<ArrayBuffer> = new Uint8Array(raw.length);
+            for (let index: number = 0; index < raw.length; index += 1)
+                bytes[index] = raw.charCodeAt(index);
+            const text: string = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+            if (text.length !== 0 && !text.endsWith('\n'))
+                throw new Error('Incomplete compact transcript block');
+            for (const line of text.split('\n')) {
+                if (line.length === 0) continue;
+                const record: unknown = JSON.parse(line);
+                if (
+                    !historyRecord(record) ||
+                    seen.has(record.id) ||
+                    !Number.isSafeInteger(record.at)
+                ) {
+                    throw new Error('Invalid or duplicate compact transcript record');
+                }
+                seen.add(record.id);
+                records.push(record);
+            }
+            if (page.nextCursor === undefined) return { records, endCursor };
+            cursor = page.nextCursor;
+        }
+    }
+
     /** Subscribes before requesting bytes, matching both session and attachment identity. */
     public static async download(
         client: NexaClient,

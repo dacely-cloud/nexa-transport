@@ -2967,6 +2967,12 @@ export const schema: Schema = {
                         'Session subscriptions notify exact journal ranges for live catch-up.',
                     type: 'boolean',
                 },
+                transcriptBlocks: {
+                    const: true,
+                    description:
+                        'Server-coalesced NDJSON blocks, retaining physical journal cursors.',
+                    type: 'boolean',
+                },
                 workflowDraftsVersion: {
                     const: 1,
                     type: 'number',
@@ -4067,6 +4073,19 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'sessions.transcript': {
+                    description: 'Compact transcript blocks with original journal byte cursors.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/SessionHistoryParams',
+                        },
+                        result: {
+                            $ref: '#/definitions/SessionHistoryPage',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'sessions.unpin': {
                     properties: {
                         params: {
@@ -4701,6 +4720,7 @@ export const schema: Schema = {
                 'sessions.retry',
                 'sessions.search',
                 'sessions.subscribe',
+                'sessions.transcript',
                 'sessions.unpin',
                 'sessions.unsubscribe',
                 'shares.create',
@@ -8333,6 +8353,11 @@ export const schema: Schema = {
                 },
                 nextCursor: {
                     type: 'string',
+                },
+                raw: {
+                    const: true,
+                    description: 'Oversized legacy records use the original split-record reader.',
+                    type: 'boolean',
                 },
             },
             required: ['chunk', 'endCursor', 'format'],

@@ -628,12 +628,13 @@ The payload of a {@link GATEWAY_EVENTS.ConnectChallenge}.
 
 How a client identifies itself in the handshake.
 
-| Field      | Required | Type                                                   | Description                                                     |
-| ---------- | -------- | ------------------------------------------------------ | --------------------------------------------------------------- |
-| `id`       | Yes      | `string`                                               | Stable per install, so a reconnect is recognisable in the logs. |
-| `mode`     | Yes      | `"automation"` / `"cli"` / `"node"` / `"tui"` / `"ui"` |                                                                 |
-| `platform` | Yes      | `string`                                               |                                                                 |
-| `version`  | Yes      | `string`                                               |                                                                 |
+| Field                     | Required | Type                                                   | Description                                                                |
+| ------------------------- | -------- | ------------------------------------------------------ | -------------------------------------------------------------------------- |
+| `id`                      | Yes      | `string`                                               | Stable per install, so a reconnect is recognisable in the logs.            |
+| `metadataOnlyAttachments` | No       | `boolean`                                              | Deliver saved file descriptors; clients explicitly request original bytes. |
+| `mode`                    | Yes      | `"automation"` / `"cli"` / `"node"` / `"tui"` / `"ui"` |                                                                            |
+| `platform`                | Yes      | `string`                                               |                                                                            |
+| `version`                 | Yes      | `string`                                               |                                                                            |
 
 ## ConnectParams
 
@@ -1253,6 +1254,7 @@ Methods, events, and additive capabilities supported by this gateway.
 | `officeVerification`        | No       | `true`                                             | Versioned host verification evidence on private project and employee channels.                 |
 | `sessionHistory`            | No       | `true`                                             | Durable complete presentation history and binary restoration.                                  |
 | `sessionHistoryUpdates`     | No       | `true`                                             | Session subscriptions notify exact journal ranges for live catch-up.                           |
+| `transcriptBlocks`          | No       | `true`                                             | Server-coalesced NDJSON blocks, retaining physical journal cursors.                            |
 | `workflowDraftsVersion`     | No       | `1`                                                |                                                                                                |
 | `workflowGraphVersion`      | No       | `1`                                                | Exact component catalog and structural validation of pinned drafts.                            |
 | `workflowGroupsVersion`     | No       | `1`                                                | Saved parent-local groups, published aliases and paginated immutable group records.            |
@@ -1351,6 +1353,7 @@ Configurable bounds on gateway-owned work and memory.
 | `sessions.retry`                 | Yes      | Object (fields below) |                                                                                            |
 | `sessions.search`                | Yes      | Object (fields below) |                                                                                            |
 | `sessions.subscribe`             | Yes      | Object (fields below) |                                                                                            |
+| `sessions.transcript`            | Yes      | Object (fields below) | Compact transcript blocks with original journal byte cursors.                              |
 | `sessions.unpin`                 | Yes      | Object (fields below) |                                                                                            |
 | `sessions.unsubscribe`           | Yes      | Object (fields below) |                                                                                            |
 | `shares.create`                  | Yes      | Object (fields below) |                                                                                            |
@@ -1959,6 +1962,13 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ------------------------------------ | ----------- |
 | `params` | Yes      | [SessionRef](protocol.md#sessionref) |             |
 | `result` | Yes      | [OkResult](protocol.md#okresult)     |             |
+
+**sessions.transcript**
+
+| Field    | Required | Type                                                     | Description |
+| -------- | -------- | -------------------------------------------------------- | ----------- |
+| `params` | Yes      | [SessionHistoryParams](protocol.md#sessionhistoryparams) |             |
+| `result` | Yes      | [SessionHistoryPage](protocol.md#sessionhistorypage)     |             |
 
 **sessions.unpin**
 
@@ -3806,22 +3816,24 @@ A small live notification; large records remain in bounded authenticated pages.
 
 Bounded binary pages can split even a very large individual native event.
 
-| Field        | Required | Type     | Description |
-| ------------ | -------- | -------- | ----------- |
-| `chunk`      | Yes      | `string` |             |
-| `endCursor`  | Yes      | `string` |             |
-| `format`     | Yes      | `1`      |             |
-| `nextCursor` | No       | `string` |             |
+| Field        | Required | Type     | Description                                                    |
+| ------------ | -------- | -------- | -------------------------------------------------------------- |
+| `chunk`      | Yes      | `string` |                                                                |
+| `endCursor`  | Yes      | `string` |                                                                |
+| `format`     | Yes      | `1`      |                                                                |
+| `nextCursor` | No       | `string` |                                                                |
+| `raw`        | No       | `true`   | Oversized legacy records use the original split-record reader. |
 
 ## SessionHistoryParams
 
 Byte cursors are decimal strings so large journals retain exact offsets.
 
-| Field       | Required | Type     | Description |
-| ----------- | -------- | -------- | ----------- |
-| `cursor`    | No       | `string` |             |
-| `endCursor` | No       | `string` |             |
-| `id`        | Yes      | `string` |             |
+| Field       | Required | Type     | Description                                                           |
+| ----------- | -------- | -------- | --------------------------------------------------------------------- |
+| `cursor`    | No       | `string` |                                                                       |
+| `endCursor` | No       | `string` |                                                                       |
+| `id`        | Yes      | `string` |                                                                       |
+| `pageBytes` | No       | `number` | Optional bounded read window; old clients retain the 256 KiB default. |
 
 ## SessionHistoryRecord
 
@@ -4992,13 +5004,14 @@ A read-only policy preview uses unsaved settings and authenticated account prici
 
 An exact request, bounded before admission and independent of a text model binding.
 
-| Field          | Required | Type                                                                           | Description |
-| -------------- | -------- | ------------------------------------------------------------------------------ | ----------- |
-| `count`        | Yes      | `number`                                                                       |             |
-| `options`      | Yes      | [Recordstringstringnumberboolean](protocol.md#recordstringstringnumberboolean) |             |
-| `outputFormat` | Yes      | `string`                                                                       |             |
-| `quality`      | Yes      | `string`                                                                       |             |
-| `size`         | Yes      | `string`                                                                       |             |
+| Field          | Required | Type                                                                           | Description                                      |
+| -------------- | -------- | ------------------------------------------------------------------------------ | ------------------------------------------------ |
+| `count`        | Yes      | `number`                                                                       |                                                  |
+| `operation`    | No       | `"edit"` / `"generate"`                                                        | Older generation-only snapshots omit this field. |
+| `options`      | Yes      | [Recordstringstringnumberboolean](protocol.md#recordstringstringnumberboolean) |                                                  |
+| `outputFormat` | Yes      | `string`                                                                       |                                                  |
+| `quality`      | Yes      | `string`                                                                       |                                                  |
+| `size`         | Yes      | `string`                                                                       |                                                  |
 
 ## WorkflowListCursor
 

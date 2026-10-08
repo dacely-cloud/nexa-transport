@@ -1,7 +1,7 @@
 import { afterEach, expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
 import { NexaClient } from '../src/networking/NexaClient.js';
-import type { SessionHistoryRecord } from '../src/protocol/Protocol.js';
+import { Method, type SessionHistoryRecord } from '../src/protocol/Protocol.js';
 import { hello, TestGateway, type Request } from './Support.js';
 
 let gateway: TestGateway | undefined;
@@ -16,8 +16,16 @@ async function connect(
     text: string,
     pageBytes: number | ((offset: number) => number),
     maxPendingRequests: number = 64,
+    compact: boolean = false,
 ): Promise<NexaClient> {
-    gateway = new TestGateway({ ...hello, features: { ...hello.features, sessionHistory: true } });
+    gateway = new TestGateway({
+        ...hello,
+        features: {
+            ...hello.features,
+            sessionHistory: true,
+            ...(compact ? { transcriptBlocks: true as const } : {}),
+        },
+    });
     const bytes: Buffer = Buffer.from(text, 'utf8');
     gateway.handler = (socket: WebSocket, request: Request): void => {
         const offset: number = Number(request.params['cursor'] ?? '0');
@@ -29,6 +37,7 @@ async function connect(
                 ok: true,
                 result: {
                     format: 1,
+                    ...(request.method === Method.SessionsTranscript ? { raw: true } : {}),
                     chunk: bytes.subarray(offset, end).toString('base64'),
                     endCursor: bytes.length.toString(),
                     ...(end < bytes.length ? { nextCursor: end.toString() } : {}),
@@ -222,4 +231,65 @@ it('returns a complete cursor and reads only records after a prior snapshot', as
         endCursor: snapshot.endCursor,
     });
     expect(gateway?.requests[1]?.params['cursor']).toBe(Buffer.byteLength(prefix).toString());
+});
+
+/** Compact wire bytes are intentionally unrelated to physical journal cursor distances. */
+it('reads compact UTF-8 blocks using physical cursors and a fixed snapshot end', async (): Promise<void> => {
+    gateway = new TestGateway({
+        ...hello,
+        features: { ...hello.features, sessionHistory: true, transcriptBlocks: true },
+    });
+    const requested: string[] = [];
+    gateway.handler = (socket: WebSocket, request: Request): void => {
+        requested.push(request.method);
+        const cursor: string = String(request.params['cursor']);
+        const record: SessionHistoryRecord = {
+            id: cursor,
+            at: 1,
+            kind: 'event',
+            data: {
+                streamId: 'stream',
+                event: { type: 'text', text: cursor === '0' ? 'ap' : 'ple🙂' },
+            },
+        };
+        socket.send(
+            JSON.stringify({
+                id: request.id,
+                ok: true,
+                result: {
+                    format: 1,
+                    chunk: Buffer.from(JSON.stringify(record) + '\n').toString('base64'),
+                    endCursor: '100000',
+                    ...(cursor === '0' ? { nextCursor: '50000' } : {}),
+                },
+            }),
+        );
+    };
+    client = await NexaClient.connect({ url: await gateway.url() });
+    const saved = await client.readHistorySnapshot('saved');
+    expect(saved.endCursor).toBe('100000');
+    expect(
+        saved.records
+            .map((record): string =>
+                record.kind === 'event' && record.data.event.type === 'text'
+                    ? record.data.event.text
+                    : '',
+            )
+            .join(''),
+    ).toBe('apple🙂');
+    expect(requested).toEqual([Method.SessionsTranscript, Method.SessionsTranscript]);
+    expect(gateway.requests.at(-1)?.params['endCursor']).toBe('100000');
+});
+
+it('falls back to split-record paging for oversized legacy records without losing UTF-8', async (): Promise<void> => {
+    const record: SessionHistoryRecord = {
+        id: 'oversized',
+        at: 1,
+        kind: 'event',
+        data: { streamId: 'stream', event: { type: 'text', text: 'apple🙂' } },
+    };
+    const connected: NexaClient = await connect(JSON.stringify(record) + '\n', 7, 64, true);
+    expect(await connected.readHistory('saved')).toEqual([record]);
+    expect(gateway?.requests[1]?.method).toBe(Method.SessionsTranscript);
+    expect(gateway?.requests[2]?.method).toBe(Method.SessionsHistory);
 });

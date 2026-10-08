@@ -72,6 +72,7 @@ All 54 protocol methods. `connect` is managed by `NexaClient.connect`; the remai
 - [sessions.retry](#sessions-retry)
 - [sessions.search](#sessions-search)
 - [sessions.subscribe](#sessions-subscribe)
+- [sessions.transcript](#sessions-transcript)
 - [sessions.unpin](#sessions-unpin)
 - [sessions.unsubscribe](#sessions-unsubscribe)
 - [shares.create](#shares-create)
@@ -1431,11 +1432,12 @@ const result: ResultOf<typeof Method.SessionsHistory> = await client.call(
 
 Parameters: [SessionHistoryParams](protocol.md#sessionhistoryparams).
 
-| Field       | Required | Type     | Description |
-| ----------- | -------- | -------- | ----------- |
-| `cursor`    | No       | `string` |             |
-| `endCursor` | No       | `string` |             |
-| `id`        | Yes      | `string` |             |
+| Field       | Required | Type     | Description                                                           |
+| ----------- | -------- | -------- | --------------------------------------------------------------------- |
+| `cursor`    | No       | `string` |                                                                       |
+| `endCursor` | No       | `string` |                                                                       |
+| `id`        | Yes      | `string` |                                                                       |
+| `pageBytes` | No       | `number` | Optional bounded read window; old clients retain the 256 KiB default. |
 
 Result: [SessionHistoryPage](protocol.md#sessionhistorypage).
 
@@ -1653,6 +1655,31 @@ Parameters: [SessionRef](protocol.md#sessionref).
 | `sessionId` | Yes      | `string` |             |
 
 Result: [OkResult](protocol.md#okresult).
+
+## sessions.transcript
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.SessionsTranscript> = {
+    id: 'YOUR_ID',
+};
+const result: ResultOf<typeof Method.SessionsTranscript> = await client.call(
+    Method.SessionsTranscript,
+    params,
+);
+```
+
+Parameters: [SessionHistoryParams](protocol.md#sessionhistoryparams).
+
+| Field       | Required | Type     | Description                                                           |
+| ----------- | -------- | -------- | --------------------------------------------------------------------- |
+| `cursor`    | No       | `string` |                                                                       |
+| `endCursor` | No       | `string` |                                                                       |
+| `id`        | Yes      | `string` |                                                                       |
+| `pageBytes` | No       | `number` | Optional bounded read window; old clients retain the 256 KiB default. |
+
+Result: [SessionHistoryPage](protocol.md#sessionhistorypage).
 
 ## sessions.unpin
 
