@@ -1367,6 +1367,7 @@ Configurable bounds on gateway-owned work and memory.
 | `workflows.list`               | Yes      | Object (fields below) |                                                                                            |
 | `workflows.models`             | Yes      | Object (fields below) |                                                                                            |
 | `workflows.models.refresh`     | Yes      | Object (fields below) |                                                                                            |
+| `workflows.models.resolve`     | Yes      | Object (fields below) |                                                                                            |
 | `workflows.planning.cancel`    | Yes      | Object (fields below) |                                                                                            |
 | `workflows.planning.history`   | Yes      | Object (fields below) |                                                                                            |
 | `workflows.planning.read`      | Yes      | Object (fields below) |                                                                                            |
@@ -2097,6 +2098,13 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ---------------------------------------------------------- | ----------- |
 | `params` | Yes      | [WorkflowModelsRequest](protocol.md#workflowmodelsrequest) |             |
 | `result` | Yes      | [WorkflowModelsPage](protocol.md#workflowmodelspage)       |             |
+
+**workflows.models.resolve**
+
+| Field    | Required | Type                                                                         | Description |
+| -------- | -------- | ---------------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [WorkflowModelResolutionRequest](protocol.md#workflowmodelresolutionrequest) |             |
+| `result` | Yes      | [WorkflowModelResolution](protocol.md#workflowmodelresolution)               |             |
 
 **workflows.planning.cancel**
 
@@ -4864,6 +4872,41 @@ Public model metadata only: no endpoints, keys, account names, or adapter option
 | `source`           | Yes      | `string`                                                      |                                                                                         |
 | `status`           | Yes      | `string`                                                      |                                                                                         |
 
+## WorkflowModelFeature
+
+Features that integrations can explicitly verify for model selection.
+
+Type: `"documents"` / `"reasoning"` / `"structuredOutput"` / `"tools"` / `"vision"`.
+
+## WorkflowModelPolicy
+
+Saved, explicit constraints for the latest supported model on one provider.
+
+| Field                    | Required | Type                                                              | Description                                                         |
+| ------------------------ | -------- | ----------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `allowPreview`           | Yes      | `boolean`                                                         |                                                                     |
+| `allowUnpriced`          | Yes      | `boolean`                                                         |                                                                     |
+| `maxCatalogAgeMs`        | Yes      | `string`                                                          | Endpoint observation age, between one second and one day.           |
+| `maxInputUsdPerMillion`  | Yes      | `null,string`                                                     | Decimal USD per million tokens. Null is no additional rate ceiling. |
+| `maxOutputUsdPerMillion` | Yes      | `null,string`                                                     |                                                                     |
+| `region`                 | Yes      | `null,string`                                                     |                                                                     |
+| `requiredFeatures`       | Yes      | Array of [WorkflowModelFeature](protocol.md#workflowmodelfeature) |                                                                     |
+
+## WorkflowModelPolicyEvidence
+
+The facts and constraints used for one immutable latest-policy decision.
+
+| Field                     | Required | Type                                                   | Description |
+| ------------------------- | -------- | ------------------------------------------------------ | ----------- |
+| `capabilityDigest`        | Yes      | `string`                                               |             |
+| `catalogCheckedAtMs`      | Yes      | `string`                                               |             |
+| `eligibilityReference`    | Yes      | `string`                                               |             |
+| `eligibilityVerifiedAtMs` | Yes      | `string`                                               |             |
+| `format`                  | Yes      | `1`                                                    |             |
+| `policy`                  | Yes      | [WorkflowModelPolicy](protocol.md#workflowmodelpolicy) |             |
+| `releaseAtMs`             | Yes      | `string`                                               |             |
+| `releaseReference`        | Yes      | `string`                                               |             |
+
 ## WorkflowModelPrice
 
 Existing ledger rate-card values, represented as decimal text without client-side money math.
@@ -4872,6 +4915,26 @@ Existing ledger rate-card values, represented as decimal text without client-sid
 | --------------------- | -------- | ------------- | ----------- |
 | `inputUsdPerMillion`  | Yes      | `null,string` |             |
 | `outputUsdPerMillion` | Yes      | `null,string` |             |
+
+## WorkflowModelResolution
+
+| Field       | Required | Type                                                                            | Description |
+| ----------- | -------- | ------------------------------------------------------------------------------- | ----------- |
+| `candidate` | Yes      | [WorkflowModelChoice](protocol.md#workflowmodelchoice) / `null`                 |             |
+| `evidence`  | Yes      | [WorkflowModelPolicyEvidence](protocol.md#workflowmodelpolicyevidence) / `null` |             |
+| `reason`    | Yes      | `null,string`                                                                   |             |
+
+## WorkflowModelResolutionRequest
+
+Owner-authorized policy preview; never saves a draft or performs inference.
+
+| Field             | Required | Type                                                           | Description |
+| ----------------- | -------- | -------------------------------------------------------------- | ----------- |
+| `capability`      | Yes      | [WorkflowModelCapability](protocol.md#workflowmodelcapability) |             |
+| `maxOutputTokens` | Yes      | `number`                                                       |             |
+| `policy`          | Yes      | [WorkflowModelPolicy](protocol.md#workflowmodelpolicy)         |             |
+| `provider`        | Yes      | `string`                                                       |             |
+| `workflowId`      | Yes      | `string`                                                       |             |
 
 ## WorkflowModelsPage
 

@@ -2736,6 +2736,14 @@ export interface GatewayMethodsworkflows_models_refreshShape {
     readonly result: WorkflowModelsPage;
 }
 
+/** GatewayMethodsworkflows_models_resolve wire fields. */
+export interface GatewayMethodsworkflows_models_resolveShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkflowModelResolutionRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WorkflowModelResolution;
+}
+
 /** GatewayMethodsworkflows_planning_cancel wire fields. */
 export interface GatewayMethodsworkflows_planning_cancelShape {
     /** params as defined by the Nexa gateway. */
@@ -3080,6 +3088,8 @@ export interface GatewayMethodsShape {
     readonly 'workflows.models': GatewayMethodsworkflows_modelsShape;
     /** workflows.models.refresh as defined by the Nexa gateway. */
     readonly 'workflows.models.refresh': GatewayMethodsworkflows_models_refreshShape;
+    /** workflows.models.resolve as defined by the Nexa gateway. */
+    readonly 'workflows.models.resolve': GatewayMethodsworkflows_models_resolveShape;
     /** workflows.planning.cancel as defined by the Nexa gateway. */
     readonly 'workflows.planning.cancel': GatewayMethodsworkflows_planning_cancelShape;
     /** workflows.planning.history as defined by the Nexa gateway. */
@@ -6853,6 +6863,63 @@ export interface WorkflowModelChoiceShape {
 /** WorkflowModelChoice from the Nexa wire protocol. */
 export type WorkflowModelChoice = WorkflowModelChoiceShape;
 
+/** Allowed values for WorkflowModelFeature. */
+export const WorkflowModelFeatureValues = {
+    Value0: 'documents',
+    Value1: 'reasoning',
+    Value2: 'structuredOutput',
+    Value3: 'tools',
+    Value4: 'vision',
+} as const;
+
+/** WorkflowModelFeature from the Nexa wire protocol. */
+export type WorkflowModelFeature =
+    (typeof WorkflowModelFeatureValues)[keyof typeof WorkflowModelFeatureValues];
+
+/** WorkflowModelPolicy wire fields. */
+export interface WorkflowModelPolicyShape {
+    /** allowPreview as defined by the Nexa gateway. */
+    readonly allowPreview: boolean;
+    /** allowUnpriced as defined by the Nexa gateway. */
+    readonly allowUnpriced: boolean;
+    /** maxCatalogAgeMs as defined by the Nexa gateway. */
+    readonly maxCatalogAgeMs: string;
+    /** maxInputUsdPerMillion as defined by the Nexa gateway. */
+    readonly maxInputUsdPerMillion: null | string;
+    /** maxOutputUsdPerMillion as defined by the Nexa gateway. */
+    readonly maxOutputUsdPerMillion: null | string;
+    /** region as defined by the Nexa gateway. */
+    readonly region: null | string;
+    /** requiredFeatures as defined by the Nexa gateway. */
+    readonly requiredFeatures: ReadonlyArray<WorkflowModelFeature>;
+}
+
+/** WorkflowModelPolicy from the Nexa wire protocol. */
+export type WorkflowModelPolicy = WorkflowModelPolicyShape;
+
+/** WorkflowModelPolicyEvidence wire fields. */
+export interface WorkflowModelPolicyEvidenceShape {
+    /** capabilityDigest as defined by the Nexa gateway. */
+    readonly capabilityDigest: string;
+    /** catalogCheckedAtMs as defined by the Nexa gateway. */
+    readonly catalogCheckedAtMs: string;
+    /** eligibilityReference as defined by the Nexa gateway. */
+    readonly eligibilityReference: string;
+    /** eligibilityVerifiedAtMs as defined by the Nexa gateway. */
+    readonly eligibilityVerifiedAtMs: string;
+    /** format as defined by the Nexa gateway. */
+    readonly format: 1;
+    /** policy as defined by the Nexa gateway. */
+    readonly policy: WorkflowModelPolicy;
+    /** releaseAtMs as defined by the Nexa gateway. */
+    readonly releaseAtMs: string;
+    /** releaseReference as defined by the Nexa gateway. */
+    readonly releaseReference: string;
+}
+
+/** WorkflowModelPolicyEvidence from the Nexa wire protocol. */
+export type WorkflowModelPolicyEvidence = WorkflowModelPolicyEvidenceShape;
+
 /** WorkflowModelPrice wire fields. */
 export interface WorkflowModelPriceShape {
     /** inputUsdPerMillion as defined by the Nexa gateway. */
@@ -6863,6 +6930,36 @@ export interface WorkflowModelPriceShape {
 
 /** WorkflowModelPrice from the Nexa wire protocol. */
 export type WorkflowModelPrice = WorkflowModelPriceShape;
+
+/** WorkflowModelResolution wire fields. */
+export interface WorkflowModelResolutionShape {
+    /** candidate as defined by the Nexa gateway. */
+    readonly candidate: WorkflowModelChoice | null;
+    /** evidence as defined by the Nexa gateway. */
+    readonly evidence: WorkflowModelPolicyEvidence | null;
+    /** reason as defined by the Nexa gateway. */
+    readonly reason: null | string;
+}
+
+/** WorkflowModelResolution from the Nexa wire protocol. */
+export type WorkflowModelResolution = WorkflowModelResolutionShape;
+
+/** WorkflowModelResolutionRequest wire fields. */
+export interface WorkflowModelResolutionRequestShape {
+    /** capability as defined by the Nexa gateway. */
+    readonly capability: WorkflowModelCapability;
+    /** maxOutputTokens as defined by the Nexa gateway. */
+    readonly maxOutputTokens: number;
+    /** policy as defined by the Nexa gateway. */
+    readonly policy: WorkflowModelPolicy;
+    /** provider as defined by the Nexa gateway. */
+    readonly provider: string;
+    /** workflowId as defined by the Nexa gateway. */
+    readonly workflowId: string;
+}
+
+/** WorkflowModelResolutionRequest from the Nexa wire protocol. */
+export type WorkflowModelResolutionRequest = WorkflowModelResolutionRequestShape;
 
 /** WorkflowModelsPage wire fields. */
 export interface WorkflowModelsPageShape {
@@ -7740,6 +7837,8 @@ export enum Method {
     WorkflowsModels = 'workflows.models',
     /** Calls workflows.models.refresh. */
     WorkflowsModelsRefresh = 'workflows.models.refresh',
+    /** Calls workflows.models.resolve. */
+    WorkflowsModelsResolve = 'workflows.models.resolve',
     /** Calls workflows.planning.cancel. */
     WorkflowsPlanningCancel = 'workflows.planning.cancel',
     /** Calls workflows.planning.history. */
