@@ -16,6 +16,10 @@
         "docs"
     ],
     "exports": {
+        "./workflow-image-quote": {
+            "types": "./dist/workflows/WorkflowImageQuote.d.ts",
+            "import": "./dist/workflow-image-quote.js"
+        },
         "./workflow-planning-types": {
             "types": "./dist/workflows/planning/PlanningTypes.d.ts",
             "import": "./dist/workflow-planning-types.js"

@@ -4312,6 +4312,18 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'workflows.models.image.quote': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/WorkflowImageQuoteRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/WorkflowImageQuote',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'workflows.models.refresh': {
                     properties: {
                         params: {
@@ -4686,6 +4698,7 @@ export const schema: Schema = {
                 'workflows.create',
                 'workflows.list',
                 'workflows.models',
+                'workflows.models.image.quote',
                 'workflows.models.refresh',
                 'workflows.models.resolve',
                 'workflows.planning.cancel',
@@ -10423,6 +10436,96 @@ export const schema: Schema = {
                 'minPixels',
                 'multiple',
             ],
+            type: 'object',
+        },
+        WorkflowImageQuote: {
+            description:
+                'An estimate creates no reservation and is recalculated when accepting a run.',
+            properties: {
+                capabilityReference: {
+                    type: 'string',
+                },
+                estimatedMicrocents: {
+                    type: 'string',
+                },
+                model: {
+                    type: 'string',
+                },
+                nodeId: {
+                    type: 'string',
+                },
+                pricingReference: {
+                    type: 'string',
+                },
+                provider: {
+                    type: 'string',
+                },
+                quotedAtMs: {
+                    type: 'string',
+                },
+                settings: {
+                    $ref: '#/definitions/WorkflowImageSettings',
+                },
+                workflowId: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'capabilityReference',
+                'estimatedMicrocents',
+                'model',
+                'nodeId',
+                'pricingReference',
+                'provider',
+                'quotedAtMs',
+                'settings',
+                'workflowId',
+            ],
+            type: 'object',
+        },
+        WorkflowImageQuoteRequest: {
+            description: 'Unsaved render settings may be priced only in an owned workflow.',
+            properties: {
+                model: {
+                    type: 'string',
+                },
+                nodeId: {
+                    type: 'string',
+                },
+                provider: {
+                    type: 'string',
+                },
+                settings: {
+                    $ref: '#/definitions/WorkflowImageSettings',
+                },
+                workflowId: {
+                    type: 'string',
+                },
+            },
+            required: ['model', 'nodeId', 'provider', 'settings', 'workflowId'],
+            type: 'object',
+        },
+        WorkflowImageSettings: {
+            description:
+                'An exact request, bounded before admission and independent of a text model binding.',
+            properties: {
+                count: {
+                    type: 'number',
+                },
+                options: {
+                    $ref: '#/definitions/Record%3Cstring%2Cstring%7Cnumber%7Cboolean%3E',
+                },
+                outputFormat: {
+                    type: 'string',
+                },
+                quality: {
+                    type: 'string',
+                },
+                size: {
+                    type: 'string',
+                },
+            },
+            required: ['count', 'options', 'outputFormat', 'quality', 'size'],
             type: 'object',
         },
         WorkflowListCursor: {

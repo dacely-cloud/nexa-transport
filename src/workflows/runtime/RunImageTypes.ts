@@ -9,17 +9,21 @@ export interface WorkflowImageSettings {
     readonly outputFormat: string;
     readonly options: Readonly<Record<string, string | number | boolean>>;
 }
-/** Immutable image identity, capability signature and authoritative price quote. */
-export interface WorkflowResolvedImage {
-    readonly nodeId: string;
-    readonly bindingId: string;
+/** Image request identity and its configured account tariff. */
+export interface WorkflowImagePrice {
     readonly provider: string;
     readonly model: string;
-    readonly capability: 'image';
-    readonly selection: 'exact';
     readonly settings: WorkflowImageSettings;
     readonly capabilityReference: string;
     readonly pricingReference: string;
     readonly priceServiceId: string;
     readonly estimatedMicrocents: string;
+}
+
+/** Immutable run bindings retain the exact request and price selected at acceptance. */
+export interface WorkflowResolvedImage extends WorkflowImagePrice {
+    readonly nodeId: string;
+    readonly bindingId: string;
+    readonly capability: 'image';
+    readonly selection: 'exact';
 }

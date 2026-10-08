@@ -527,3 +527,9 @@ const file: Blob = new Blob([download.bytes], { type: download.artifact.contentT
 ```
 
 The helper bounds total content to 32 MiB, checks contiguous 256 KiB fragments, and supports cancellation. Missing or expired artifacts reject rather than returning partial bytes. Applications own any Blob URLs they create and must revoke them. This API does not publish files or grant another account access.
+
+### Workflow image price estimates
+
+`Method.WorkflowsModelsImageQuote` accepts a workflow ID, node ID, exact provider/model, and bounded image settings. Import `WorkflowImageQuoteCodec` and the request/result types from `nexa-transport/workflow-image-quote`. Check that the method was negotiated before calling it. The gateway authorizes the workflow owner before consulting the same account tariff used by run preparation.
+
+Results retain exact microcent strings, request settings, pricing/capability references and a quote timestamp. A quote does not save the graph, create a run, reserve funds, generate an image, or establish provider account access. Invalidate an estimate when settings or the selected model change; run acceptance rechecks the price.

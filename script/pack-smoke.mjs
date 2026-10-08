@@ -34,6 +34,9 @@ import type { TurnStream } from 'nexa-transport/stream';
 import { ComponentRegistry } from 'nexa-transport/workflow-catalog';
 import { WorkflowRunCodec } from 'nexa-transport/workflow-run-codec';
 import type { WorkflowRunSnapshot } from 'nexa-transport/workflow-run-types';
+import { WorkflowImageQuoteCodec, type WorkflowImageQuoteRequest } from 'nexa-transport/workflow-image-quote';
+const quoteRequest: WorkflowImageQuoteRequest = WorkflowImageQuoteCodec.request({ workflowId: 'draft', nodeId: 'image', provider: 'images', model: 'model', settings: { size: '1024x1024', quality: 'high', count: 1, outputFormat: 'png', options: {} } });
+void quoteRequest;
 function imageSnapshot(snapshot: WorkflowRunSnapshot): string | undefined {
     const parsed: WorkflowRunSnapshot = WorkflowRunCodec.snapshot(snapshot);
     return parsed.imageModels?.[0]?.model;

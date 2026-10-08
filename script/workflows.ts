@@ -29,6 +29,7 @@ const files: readonly string[] = [
     'WorkflowCodec',
     'WorkflowRequests',
     'WorkflowModels',
+    'WorkflowImageQuote',
     'ModelPolicy',
     'ModelResolution',
     'WorkflowRequestCodec',

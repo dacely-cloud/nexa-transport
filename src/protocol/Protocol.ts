@@ -2734,6 +2734,14 @@ export interface GatewayMethodsworkflows_modelsShape {
     readonly result: WorkflowModelsPage;
 }
 
+/** GatewayMethodsworkflows_models_image_quote wire fields. */
+export interface GatewayMethodsworkflows_models_image_quoteShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkflowImageQuoteRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WorkflowImageQuote;
+}
+
 /** GatewayMethodsworkflows_models_refresh wire fields. */
 export interface GatewayMethodsworkflows_models_refreshShape {
     /** params as defined by the Nexa gateway. */
@@ -3100,6 +3108,8 @@ export interface GatewayMethodsShape {
     readonly 'workflows.list': GatewayMethodsworkflows_listShape;
     /** workflows.models as defined by the Nexa gateway. */
     readonly 'workflows.models': GatewayMethodsworkflows_modelsShape;
+    /** workflows.models.image.quote as defined by the Nexa gateway. */
+    readonly 'workflows.models.image.quote': GatewayMethodsworkflows_models_image_quoteShape;
     /** workflows.models.refresh as defined by the Nexa gateway. */
     readonly 'workflows.models.refresh': GatewayMethodsworkflows_models_refreshShape;
     /** workflows.models.resolve as defined by the Nexa gateway. */
@@ -6821,6 +6831,65 @@ export interface WorkflowImageDimensionsShape {
 /** WorkflowImageDimensions from the Nexa wire protocol. */
 export type WorkflowImageDimensions = WorkflowImageDimensionsShape;
 
+/** WorkflowImageQuote wire fields. */
+export interface WorkflowImageQuoteShape {
+    /** capabilityReference as defined by the Nexa gateway. */
+    readonly capabilityReference: string;
+    /** estimatedMicrocents as defined by the Nexa gateway. */
+    readonly estimatedMicrocents: string;
+    /** model as defined by the Nexa gateway. */
+    readonly model: string;
+    /** nodeId as defined by the Nexa gateway. */
+    readonly nodeId: string;
+    /** pricingReference as defined by the Nexa gateway. */
+    readonly pricingReference: string;
+    /** provider as defined by the Nexa gateway. */
+    readonly provider: string;
+    /** quotedAtMs as defined by the Nexa gateway. */
+    readonly quotedAtMs: string;
+    /** settings as defined by the Nexa gateway. */
+    readonly settings: WorkflowImageSettings;
+    /** workflowId as defined by the Nexa gateway. */
+    readonly workflowId: string;
+}
+
+/** WorkflowImageQuote from the Nexa wire protocol. */
+export type WorkflowImageQuote = WorkflowImageQuoteShape;
+
+/** WorkflowImageQuoteRequest wire fields. */
+export interface WorkflowImageQuoteRequestShape {
+    /** model as defined by the Nexa gateway. */
+    readonly model: string;
+    /** nodeId as defined by the Nexa gateway. */
+    readonly nodeId: string;
+    /** provider as defined by the Nexa gateway. */
+    readonly provider: string;
+    /** settings as defined by the Nexa gateway. */
+    readonly settings: WorkflowImageSettings;
+    /** workflowId as defined by the Nexa gateway. */
+    readonly workflowId: string;
+}
+
+/** WorkflowImageQuoteRequest from the Nexa wire protocol. */
+export type WorkflowImageQuoteRequest = WorkflowImageQuoteRequestShape;
+
+/** WorkflowImageSettings wire fields. */
+export interface WorkflowImageSettingsShape {
+    /** count as defined by the Nexa gateway. */
+    readonly count: number;
+    /** options as defined by the Nexa gateway. */
+    readonly options: Recordstringstringnumberboolean;
+    /** outputFormat as defined by the Nexa gateway. */
+    readonly outputFormat: string;
+    /** quality as defined by the Nexa gateway. */
+    readonly quality: string;
+    /** size as defined by the Nexa gateway. */
+    readonly size: string;
+}
+
+/** WorkflowImageSettings from the Nexa wire protocol. */
+export type WorkflowImageSettings = WorkflowImageSettingsShape;
+
 /** WorkflowListCursor wire fields. */
 export interface WorkflowListCursorShape {
     /** updatedAtMs as defined by the Nexa gateway. */
@@ -7946,6 +8015,8 @@ export enum Method {
     WorkflowsList = 'workflows.list',
     /** Calls workflows.models. */
     WorkflowsModels = 'workflows.models',
+    /** Calls workflows.models.image.quote. */
+    WorkflowsModelsImageQuote = 'workflows.models.image.quote',
     /** Calls workflows.models.refresh. */
     WorkflowsModelsRefresh = 'workflows.models.refresh',
     /** Calls workflows.models.resolve. */
