@@ -4308,6 +4308,18 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'workflows.models.refresh': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/WorkflowModelsRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/WorkflowModelsPage',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'workflows.planning.cancel': {
                     properties: {
                         params: {
@@ -4646,6 +4658,7 @@ export const schema: Schema = {
                 'workflows.create',
                 'workflows.list',
                 'workflows.models',
+                'workflows.models.refresh',
                 'workflows.planning.cancel',
                 'workflows.planning.history',
                 'workflows.planning.read',
@@ -10195,6 +10208,23 @@ export const schema: Schema = {
             required: ['components', 'format'],
             type: 'object',
         },
+        WorkflowCatalogObservation: {
+            description:
+                'An observation time is not a release date, freshness guarantee, or permission grant.',
+            properties: {
+                checkedAt: {
+                    type: ['null', 'string'],
+                },
+                refreshAvailable: {
+                    type: 'boolean',
+                },
+                refreshFailed: {
+                    type: 'boolean',
+                },
+            },
+            required: ['checkedAt', 'refreshAvailable', 'refreshFailed'],
+            type: 'object',
+        },
         WorkflowCreateRequest: {
             description: 'Client-chosen identities make an unacknowledged create safe to retry.',
             properties: {
@@ -10399,6 +10429,11 @@ export const schema: Schema = {
             description:
                 'Public model metadata only: no endpoints, keys, account names, or adapter options.',
             properties: {
+                availableAtCheck: {
+                    description:
+                        'Null/absent means no explicit endpoint check, rather than proof that a model is absent.',
+                    type: ['null', 'boolean'],
+                },
                 compatible: {
                     type: 'boolean',
                 },
@@ -10483,7 +10518,7 @@ export const schema: Schema = {
                 freshness: {
                     const: 'not-reported',
                     description:
-                        'The current registry does not expose catalog observation time; retrieval is not freshness.',
+                        'Legacy marker retained for older clients; endpoint check times are in observation.',
                     type: 'string',
                 },
                 items: {
@@ -10494,6 +10529,11 @@ export const schema: Schema = {
                 },
                 next: {
                     type: ['null', 'string'],
+                },
+                observation: {
+                    $ref: '#/definitions/WorkflowCatalogObservation',
+                    description:
+                        'Optional for older clients. The legacy freshness marker remains unchanged.',
                 },
                 providers: {
                     items: {
