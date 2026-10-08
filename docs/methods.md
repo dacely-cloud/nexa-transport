@@ -62,7 +62,6 @@ All 54 protocol methods. `connect` is managed by `NexaClient.connect`; the remai
 - [sessions.download](#sessions-download)
 - [sessions.files](#sessions-files)
 - [sessions.get](#sessions-get)
-- [sessions.history](#sessions-history)
 - [sessions.input](#sessions-input)
 - [sessions.list](#sessions-list)
 - [sessions.messages](#sessions-messages)
@@ -1415,31 +1414,6 @@ Parameters: [IdParams](protocol.md#idparams).
 
 Result: [Session](protocol.md#session) / `null`.
 
-## sessions.history
-
-```ts
-import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
-
-const params: ParamsOf<typeof Method.SessionsHistory> = {
-    id: 'YOUR_ID',
-};
-const result: ResultOf<typeof Method.SessionsHistory> = await client.call(
-    Method.SessionsHistory,
-    params,
-);
-```
-
-Parameters: [SessionHistoryParams](protocol.md#sessionhistoryparams).
-
-| Field       | Required | Type     | Description                                                           |
-| ----------- | -------- | -------- | --------------------------------------------------------------------- |
-| `cursor`    | No       | `string` |                                                                       |
-| `endCursor` | No       | `string` |                                                                       |
-| `id`        | Yes      | `string` |                                                                       |
-| `pageBytes` | No       | `number` | Optional bounded read window; old clients retain the 256 KiB default. |
-
-Result: [SessionHistoryPage](protocol.md#sessionhistorypage).
-
 ## sessions.input
 
 ```ts
@@ -1648,12 +1622,12 @@ const result: ResultOf<typeof Method.SessionsTranscript> = await client.call(
 
 Parameters: [SessionHistoryParams](protocol.md#sessionhistoryparams).
 
-| Field       | Required | Type     | Description                                                           |
-| ----------- | -------- | -------- | --------------------------------------------------------------------- |
-| `cursor`    | No       | `string` |                                                                       |
-| `endCursor` | No       | `string` |                                                                       |
-| `id`        | Yes      | `string` |                                                                       |
-| `pageBytes` | No       | `number` | Optional bounded read window; old clients retain the 256 KiB default. |
+| Field       | Required | Type     | Description                                |
+| ----------- | -------- | -------- | ------------------------------------------ |
+| `cursor`    | No       | `string` |                                            |
+| `endCursor` | No       | `string` |                                            |
+| `id`        | Yes      | `string` |                                            |
+| `pageBytes` | No       | `number` | Optional bounded read window, up to 1 MiB. |
 
 Result: [SessionHistoryPage](protocol.md#sessionhistorypage).
 

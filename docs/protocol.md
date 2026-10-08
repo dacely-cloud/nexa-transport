@@ -122,82 +122,6 @@ One agent's configuration.
 | `tools`              | No       | Array of `string`                                             | Tools this agent may use. Absent means every registered tool.                             |
 | `voice`              | No       | [AgentVoice](protocol.md#agentvoice)                          | Voice settings, when the agent speaks.                                                    |
 
-## AgentMessage
-
-Variant 1: [UserMessage](protocol.md#usermessage)
-
-| Field                   | Required | Type                                                                 | Description                                                                   |
-| ----------------------- | -------- | -------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| `content`               | Yes      | Array of [UserContentBlock](protocol.md#usercontentblock) / `string` |                                                                               |
-| `excludeFromContext`    | No       | `boolean`                                                            | Kept in session history, hidden from the model.                               |
-| `id`                    | Yes      | `string`                                                             | UUIDv7. Stable across persistence; the session tree addresses messages by it. |
-| `role`                  | Yes      | `"user"`                                                             |                                                                               |
-| `runtimeContextCarrier` | No       | `boolean`                                                            | Bytes regenerated every turn; never anchors a prompt-cache breakpoint (033).  |
-| `source`                | No       | `"channel"` / `"human"` / `"injected"` / `"resumed"`                 | Who produced the turn.                                                        |
-| `timestamp`             | Yes      | `number`                                                             | Epoch milliseconds.                                                           |
-
-Variant 2: [AssistantMessage](protocol.md#assistantmessage)
-
-| Field                | Required | Type                                                                | Description                                                                        |
-| -------------------- | -------- | ------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| `content`            | Yes      | Array of [AssistantContentBlock](protocol.md#assistantcontentblock) |                                                                                    |
-| `errorCode`          | No       | `string`                                                            |                                                                                    |
-| `errorMessage`       | No       | `string`                                                            |                                                                                    |
-| `excludeFromContext` | No       | `boolean`                                                           | Kept in session history, hidden from the model.                                    |
-| `id`                 | Yes      | `string`                                                            | UUIDv7. Stable across persistence; the session tree addresses messages by it.      |
-| `model`              | Yes      | `string`                                                            |                                                                                    |
-| `provider`           | Yes      | `string`                                                            |                                                                                    |
-| `responseId`         | No       | `string`                                                            | Provider-assigned response id, when one exists.                                    |
-| `responseModel`      | No       | `string`                                                            | The concrete model a gateway actually used, when it differs from `model`.          |
-| `role`               | Yes      | `"assistant"`                                                       |                                                                                    |
-| `stopReason`         | Yes      | [StopReason](protocol.md#stopreason)                                |                                                                                    |
-| `tainted`            | No       | `boolean`                                                           | This turn has consumed network-sourced tool output. Clears on a real user message. |
-| `timestamp`          | Yes      | `number`                                                            | Epoch milliseconds.                                                                |
-| `turnId`             | No       | `string`                                                            | Runtime-assigned UUIDv7, stamped at message-end BEFORE any tool runs.              |
-| `usage`              | Yes      | [TokenUsage](protocol.md#tokenusage)                                |                                                                                    |
-
-Variant 3: [ToolResultMessage](protocol.md#toolresultmessage)
-
-| Field                | Required | Type                                                                                    | Description                                                                   |
-| -------------------- | -------- | --------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| `content`            | Yes      | Array of [ToolResultContentBlock](protocol.md#toolresultcontentblock)                   |                                                                               |
-| `details`            | No       | Array of [JsonValue](protocol.md#jsonvalue) / Dictionary / `null,string,number,boolean` | Structured payload for UI, logs, and audit. Never sent to the model.          |
-| `excludeFromContext` | No       | `boolean`                                                                               | Kept in session history, hidden from the model.                               |
-| `id`                 | Yes      | `string`                                                                                | UUIDv7. Stable across persistence; the session tree addresses messages by it. |
-| `isError`            | Yes      | `boolean`                                                                               |                                                                               |
-| `resultSource`       | No       | `"network"` / `"trusted"`                                                               | `'network'` taints the turn: a fetched page, an MCP call, a browser read.     |
-| `role`               | Yes      | `"tool-result"`                                                                         |                                                                               |
-| `timestamp`          | Yes      | `number`                                                                                | Epoch milliseconds.                                                           |
-| `toolName`           | Yes      | `string`                                                                                |                                                                               |
-| `toolUseId`          | Yes      | `string`                                                                                | Quotes `ContentBlock.tool-use.id` exactly.                                    |
-
-Variant 4: [CustomMessage](protocol.md#custommessage)
-
-| Field                   | Required | Type                                                                                    | Description                                                                   |
-| ----------------------- | -------- | --------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| `content`               | Yes      | Array of [UserContentBlock](protocol.md#usercontentblock) / `string`                    |                                                                               |
-| `customType`            | Yes      | `string`                                                                                | Namespaced, e.g. `'nexa:turn-aborted'`.                                       |
-| `details`               | No       | Array of [JsonValue](protocol.md#jsonvalue) / Dictionary / `null,string,number,boolean` | A JSON value, as it appears in a tool's arguments or a JSON Schema.           |
-| `display`               | Yes      | `boolean`                                                                               | Whether a surface renders it. Has no effect on the model projection.          |
-| `excludeFromContext`    | No       | `boolean`                                                                               | Kept in session history, hidden from the model.                               |
-| `id`                    | Yes      | `string`                                                                                | UUIDv7. Stable across persistence; the session tree addresses messages by it. |
-| `role`                  | Yes      | `"custom"`                                                                              |                                                                               |
-| `runtimeContextCarrier` | No       | `boolean`                                                                               |                                                                               |
-| `timestamp`             | Yes      | `number`                                                                                | Epoch milliseconds.                                                           |
-
-Variant 5: [CompactionSummaryMessage](protocol.md#compactionsummarymessage)
-
-| Field                | Required | Type                   | Description                                                                   |
-| -------------------- | -------- | ---------------------- | ----------------------------------------------------------------------------- |
-| `excludeFromContext` | No       | `boolean`              | Kept in session history, hidden from the model.                               |
-| `firstKeptEntryId`   | No       | `string`               | Session entry id the retained tail starts at.                                 |
-| `id`                 | Yes      | `string`               | UUIDv7. Stable across persistence; the session tree addresses messages by it. |
-| `role`               | Yes      | `"compaction-summary"` |                                                                               |
-| `summary`            | Yes      | `string`               |                                                                               |
-| `timestamp`          | Yes      | `number`               | Epoch milliseconds.                                                           |
-| `tokensAfter`        | No       | `number`               |                                                                               |
-| `tokensBefore`       | Yes      | `number`               |                                                                               |
-
 ## AgentVoice
 
 How an agent speaks.
@@ -275,64 +199,6 @@ What a finished turn produced.
 | `text`           | Yes      | `string`                                                        |                                                                                     |
 | `turnId`         | Yes      | `string`                                                        |                                                                                     |
 | `usage`          | Yes      | [TokenUsage](protocol.md#tokenusage)                            |                                                                                     |
-
-## AssistantContentBlock
-
-What an assistant turn may contain. `tool-use` is legal here and nowhere else.
-
-Variant 1: Object (fields below)
-
-| Field  | Required | Type     | Description |
-| ------ | -------- | -------- | ----------- |
-| `text` | Yes      | `string` |             |
-| `type` | Yes      | `"text"` |             |
-
-Variant 2: Object (fields below)
-
-| Field       | Required | Type         | Description                                                                         |
-| ----------- | -------- | ------------ | ----------------------------------------------------------------------------------- |
-| `signature` | No       | `string`     |                                                                                     |
-| `thinking`  | Yes      | `string`     |                                                                                     |
-| `type`      | Yes      | `"thinking"` | The model's reasoning trace. `signature` is Anthropic's integrity token: it MUST be |
-
-Variant 3: Object (fields below)
-
-| Field  | Required | Type                  | Description                                                        |
-| ------ | -------- | --------------------- | ------------------------------------------------------------------ |
-| `data` | Yes      | `string`              |                                                                    |
-| `type` | Yes      | `"redacted-thinking"` | Reasoning the provider encrypted. Opaque, and round-tripped as-is. |
-
-Variant 4: Object (fields below)
-
-| Field       | Required | Type                               | Description                                                                          |
-| ----------- | -------- | ---------------------------------- | ------------------------------------------------------------------------------------ |
-| `id`        | Yes      | `string`                           |                                                                                      |
-| `input`     | Yes      | [JsonValue](protocol.md#jsonvalue) |                                                                                      |
-| `name`      | Yes      | `string`                           |                                                                                      |
-| `signature` | No       | `string`                           | An integrity token some providers attach to a tool call made while reasoning.        |
-| `type`      | Yes      | `"tool-use"`                       | The model asking for a tool to run. `id` is the provider's own call id and is what a |
-
-## AssistantMessage
-
-One provider response.
-
-| Field                | Required | Type                                                                | Description                                                                        |
-| -------------------- | -------- | ------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| `content`            | Yes      | Array of [AssistantContentBlock](protocol.md#assistantcontentblock) |                                                                                    |
-| `errorCode`          | No       | `string`                                                            |                                                                                    |
-| `errorMessage`       | No       | `string`                                                            |                                                                                    |
-| `excludeFromContext` | No       | `boolean`                                                           | Kept in session history, hidden from the model.                                    |
-| `id`                 | Yes      | `string`                                                            | UUIDv7. Stable across persistence; the session tree addresses messages by it.      |
-| `model`              | Yes      | `string`                                                            |                                                                                    |
-| `provider`           | Yes      | `string`                                                            |                                                                                    |
-| `responseId`         | No       | `string`                                                            | Provider-assigned response id, when one exists.                                    |
-| `responseModel`      | No       | `string`                                                            | The concrete model a gateway actually used, when it differs from `model`.          |
-| `role`               | Yes      | `"assistant"`                                                       |                                                                                    |
-| `stopReason`         | Yes      | [StopReason](protocol.md#stopreason)                                |                                                                                    |
-| `tainted`            | No       | `boolean`                                                           | This turn has consumed network-sourced tool output. Clears on a real user message. |
-| `timestamp`          | Yes      | `number`                                                            | Epoch milliseconds.                                                                |
-| `turnId`             | No       | `string`                                                            | Runtime-assigned UUIDv7, stamped at message-end BEFORE any tool runs.              |
-| `usage`              | Yes      | [TokenUsage](protocol.md#tokenusage)                                |                                                                                    |
 
 ## BackgroundProcess
 
@@ -470,21 +336,6 @@ Host-produced command termination evidence, separate from model-visible output.
 | `running`        | Yes      | `boolean`     |                                                                      |
 | `signal`         | Yes      | `null,string` |                                                                      |
 | `terminalOutput` | No       | `string`      | Original terminal stream, including ANSI styles and cursor controls. |
-
-## CompactionSummaryMessage
-
-The artifact of a compaction.
-
-| Field                | Required | Type                   | Description                                                                   |
-| -------------------- | -------- | ---------------------- | ----------------------------------------------------------------------------- |
-| `excludeFromContext` | No       | `boolean`              | Kept in session history, hidden from the model.                               |
-| `firstKeptEntryId`   | No       | `string`               | Session entry id the retained tail starts at.                                 |
-| `id`                 | Yes      | `string`               | UUIDv7. Stable across persistence; the session tree addresses messages by it. |
-| `role`               | Yes      | `"compaction-summary"` |                                                                               |
-| `summary`            | Yes      | `string`               |                                                                               |
-| `timestamp`          | Yes      | `number`               | Epoch milliseconds.                                                           |
-| `tokensAfter`        | No       | `number`               |                                                                               |
-| `tokensBefore`       | Yes      | `number`               |                                                                               |
 
 ## ComponentCategory
 
@@ -864,22 +715,6 @@ A spend query.
 | `scopeId` | No       | `string`                                                           |                                                     |
 | `to`      | No       | `number`                                                           |                                                     |
 
-## CustomMessage
-
-A UI-only or bookkeeping message: `nexa:turn-aborted`, `nexa:model-switched`, a join notice.
-
-| Field                   | Required | Type                                                                                    | Description                                                                   |
-| ----------------------- | -------- | --------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| `content`               | Yes      | Array of [UserContentBlock](protocol.md#usercontentblock) / `string`                    |                                                                               |
-| `customType`            | Yes      | `string`                                                                                | Namespaced, e.g. `'nexa:turn-aborted'`.                                       |
-| `details`               | No       | Array of [JsonValue](protocol.md#jsonvalue) / Dictionary / `null,string,number,boolean` | A JSON value, as it appears in a tool's arguments or a JSON Schema.           |
-| `display`               | Yes      | `boolean`                                                                               | Whether a surface renders it. Has no effect on the model projection.          |
-| `excludeFromContext`    | No       | `boolean`                                                                               | Kept in session history, hidden from the model.                               |
-| `id`                    | Yes      | `string`                                                                                | UUIDv7. Stable across persistence; the session tree addresses messages by it. |
-| `role`                  | Yes      | `"custom"`                                                                              |                                                                               |
-| `runtimeContextCarrier` | No       | `boolean`                                                                               |                                                                               |
-| `timestamp`             | Yes      | `number`                                                                                | Epoch milliseconds.                                                           |
-
 ## DataFile
 
 A complete source file the agent can process directly in its workspace.
@@ -1091,19 +926,6 @@ Why a turn stopped.
 
 Type: `"aborted"` / `"error"` / `"length"` / `"refusal"` / `"stop"` / `"stop-sequence"` / `"tool-use"` / `"unknown"`.
 
-## SessionEntryBase
-
-Collapses the required/optional intersection into one object type.
-
-| Field        | Required | Type                                     | Description |
-| ------------ | -------- | ---------------------------------------- | ----------- |
-| `appendMode` | No       | `"side"`                                 |             |
-| `id`         | Yes      | `string`                                 |             |
-| `parentId`   | Yes      | `null,string`                            |             |
-| `sessionId`  | Yes      | `string`                                 |             |
-| `timestamp`  | Yes      | `number`                                 |             |
-| `visibility` | Yes      | `"active"` / `"compacted"` / `"rewound"` |             |
-
 ## Session
 
 Collapses the required/optional intersection into one object type.
@@ -1232,7 +1054,7 @@ Methods, events, and additive capabilities supported by this gateway.
 | `officeVerification`        | No       | `true`                                             | Versioned host verification evidence on private project and employee channels.                 |
 | `sessionHistory`            | No       | `true`                                             | Durable complete presentation history and binary restoration.                                  |
 | `sessionHistoryUpdates`     | No       | `true`                                             | Session subscriptions notify exact journal ranges for live catch-up.                           |
-| `transcriptBlocks`          | No       | `true`                                             | Server-coalesced NDJSON blocks, retaining physical journal cursors.                            |
+| `transcriptBlocks`          | No       | `true`                                             | Compact persisted NDJSON blocks, read in bounded byte pages.                                   |
 | `workflowDraftsVersion`     | No       | `1`                                                |                                                                                                |
 | `workflowGraphVersion`      | No       | `1`                                                | Exact component catalog and structural validation of pinned drafts.                            |
 | `workflowGroupsVersion`     | No       | `1`                                                | Saved parent-local groups, published aliases and paginated immutable group records.            |
@@ -1321,7 +1143,6 @@ Configurable bounds on gateway-owned work and memory.
 | `sessions.download`              | Yes      | Object (fields below) |                                                                                            |
 | `sessions.files`                 | Yes      | Object (fields below) |                                                                                            |
 | `sessions.get`                   | Yes      | Object (fields below) |                                                                                            |
-| `sessions.history`               | Yes      | Object (fields below) |                                                                                            |
 | `sessions.input`                 | Yes      | Object (fields below) |                                                                                            |
 | `sessions.list`                  | Yes      | Object (fields below) |                                                                                            |
 | `sessions.messages`              | Yes      | Object (fields below) |                                                                                            |
@@ -1870,13 +1691,6 @@ Configurable bounds on gateway-owned work and memory.
 | `params` | Yes      | [IdParams](protocol.md#idparams)        |             |
 | `result` | Yes      | [Session](protocol.md#session) / `null` |             |
 
-**sessions.history**
-
-| Field    | Required | Type                                                     | Description |
-| -------- | -------- | -------------------------------------------------------- | ----------- |
-| `params` | Yes      | [SessionHistoryParams](protocol.md#sessionhistoryparams) |             |
-| `result` | Yes      | [SessionHistoryPage](protocol.md#sessionhistorypage)     |             |
-
 **sessions.input**
 
 | Field    | Required | Type                                                       | Description |
@@ -2413,17 +2227,6 @@ Original user input, including attachments and steering messages.
 | `data` | Yes      | [SessionMessageData](protocol.md#sessionmessagedata) |             |
 | `id`   | Yes      | `string`                                             |             |
 | `kind` | Yes      | `"input"`                                            |             |
-
-## HistoryLegacy
-
-Recoverable canonical entries from sessions predating presentation recording.
-
-| Field     | Required | Type                                              | Description |
-| --------- | -------- | ------------------------------------------------- | ----------- |
-| `at`      | Yes      | `number`                                          |             |
-| `entries` | Yes      | Array of [SessionEntry](protocol.md#sessionentry) |             |
-| `id`      | Yes      | `string`                                          |             |
-| `kind`    | Yes      | `"legacy"`                                        |             |
 
 ## HistorySites
 
@@ -3584,12 +3387,6 @@ Stable descending pagination.
 | `next`    | Yes      | `null,string`                                               |             |
 | `userId`  | Yes      | `string`                                                    |             |
 
-## ResetReason
-
-Why a session was reset. Distinguishes a user's `/reset` from an idle or scheduled one.
-
-Type: `"cron-stale"` / `"daily"` / `"idle"` / `"new"` / `"reset"`.
-
 ## ResetSnapshot
 
 JSON-safe reset state; generation tokens prevent stale tabs consuming another entitlement.
@@ -3721,48 +3518,6 @@ Type: `"admin"` / `"read"` / `"write"`.
 | `payload` | Yes      | Array of `number` |             |
 | `type`    | Yes      | `number`          |             |
 
-## SessionEntry
-
-Variant 1: `JSON`
-
-Type: `JSON`.
-
-Variant 2: `JSON`
-
-Type: `JSON`.
-
-Variant 3: `JSON`
-
-Type: `JSON`.
-
-Variant 4: `JSON`
-
-Type: `JSON`.
-
-Variant 5: `JSON`
-
-Type: `JSON`.
-
-Variant 6: `JSON`
-
-Type: `JSON`.
-
-Variant 7: `JSON`
-
-Type: `JSON`.
-
-Variant 8: `JSON`
-
-Type: `JSON`.
-
-Variant 9: `JSON`
-
-Type: `JSON`.
-
-Variant 10: `JSON`
-
-Type: `JSON`.
-
 ## SessionFileParams
 
 Identifies a saved file within an owned session.
@@ -3786,24 +3541,23 @@ A small live notification; large records remain in bounded authenticated pages.
 
 Bounded binary pages can split even a very large individual native event.
 
-| Field        | Required | Type     | Description                                                    |
-| ------------ | -------- | -------- | -------------------------------------------------------------- |
-| `chunk`      | Yes      | `string` |                                                                |
-| `endCursor`  | Yes      | `string` |                                                                |
-| `format`     | Yes      | `1`      |                                                                |
-| `nextCursor` | No       | `string` |                                                                |
-| `raw`        | No       | `true`   | Oversized legacy records use the original split-record reader. |
+| Field        | Required | Type     | Description |
+| ------------ | -------- | -------- | ----------- |
+| `chunk`      | Yes      | `string` |             |
+| `endCursor`  | Yes      | `string` |             |
+| `format`     | Yes      | `1`      |             |
+| `nextCursor` | No       | `string` |             |
 
 ## SessionHistoryParams
 
 Byte cursors are decimal strings so large journals retain exact offsets.
 
-| Field       | Required | Type     | Description                                                           |
-| ----------- | -------- | -------- | --------------------------------------------------------------------- |
-| `cursor`    | No       | `string` |                                                                       |
-| `endCursor` | No       | `string` |                                                                       |
-| `id`        | Yes      | `string` |                                                                       |
-| `pageBytes` | No       | `number` | Optional bounded read window; old clients retain the 256 KiB default. |
+| Field       | Required | Type     | Description                                |
+| ----------- | -------- | -------- | ------------------------------------------ |
+| `cursor`    | No       | `string` |                                            |
+| `endCursor` | No       | `string` |                                            |
+| `id`        | Yes      | `string` |                                            |
+| `pageBytes` | No       | `number` | Optional bounded read window, up to 1 MiB. |
 
 ## SessionHistoryRecord
 
@@ -3864,15 +3618,6 @@ Variant 6: [HistoryApprovalResolved](protocol.md#historyapprovalresolved)
 | `data` | Yes      | [ApprovalResolvedData](protocol.md#approvalresolveddata) |             |
 | `id`   | Yes      | `string`                                                 |             |
 | `kind` | Yes      | `"approval-resolved"`                                    |             |
-
-Variant 7: [HistoryLegacy](protocol.md#historylegacy)
-
-| Field     | Required | Type                                              | Description |
-| --------- | -------- | ------------------------------------------------- | ----------- |
-| `at`      | Yes      | `number`                                          |             |
-| `entries` | Yes      | Array of [SessionEntry](protocol.md#sessionentry) |             |
-| `id`      | Yes      | `string`                                          |             |
-| `kind`    | Yes      | `"legacy"`                                        |             |
 
 ## SessionListParams
 
@@ -3964,12 +3709,6 @@ A correction for the server-minted active run, not a follow-up turn.
 | --------- | -------- | -------- | ----------- |
 | `message` | Yes      | `string` |             |
 | `runId`   | Yes      | `string` |             |
-
-## StopReason
-
-Why an assistant turn stopped, in agent terms. Narrower than provider `FinishReason`.
-
-Type: `"aborted"` / `"error"` / `"length"` / `"stop"` / `"tool-use"`.
 
 ## StreamAccepted
 
@@ -4239,58 +3978,6 @@ What a tool returns.
 | `truncation`           | No       | [TruncationRecord](protocol.md#truncationrecord)                                        | What the registry's backstop removed, when it removed anything.                              |
 | `verifiedCodePaths`    | No       | Array of `string`                                                                       | Absolute source paths accepted by a native engineering workflow, never model-supplied.       |
 
-## ToolResultContentBlock
-
-What a tool result may contain: text and images only.
-
-Variant 1: Object (fields below)
-
-| Field  | Required | Type     | Description |
-| ------ | -------- | -------- | ----------- |
-| `text` | Yes      | `string` |             |
-| `type` | Yes      | `"text"` |             |
-
-Variant 2: Object (fields below)
-
-| Field    | Required | Type                                     | Description |
-| -------- | -------- | ---------------------------------------- | ----------- |
-| `source` | Yes      | [BinarySource](protocol.md#binarysource) |             |
-| `title`  | No       | `string`                                 |             |
-| `type`   | Yes      | `"image"`                                |             |
-
-Variant 3: Object (fields below)
-
-| Field    | Required | Type                                     | Description                                                                     |
-| -------- | -------- | ---------------------------------------- | ------------------------------------------------------------------------------- |
-| `source` | Yes      | [BinarySource](protocol.md#binarysource) |                                                                                 |
-| `title`  | No       | `string`                                 |                                                                                 |
-| `type`   | Yes      | `"video"`                                | An encoded video or animation container decoded natively by a multimodal model. |
-
-Variant 4: Object (fields below)
-
-| Field    | Required | Type                                     | Description                                                                  |
-| -------- | -------- | ---------------------------------------- | ---------------------------------------------------------------------------- |
-| `source` | Yes      | [BinarySource](protocol.md#binarysource) |                                                                              |
-| `title`  | No       | `string`                                 |                                                                              |
-| `type`   | Yes      | `"video-frame"`                          | One ordered frame of a video or animation. Consecutive frames form one clip. |
-
-## ToolResultMessage
-
-A tool's outcome, as a top-level message rather than a block nested inside a user turn.
-
-| Field                | Required | Type                                                                                    | Description                                                                   |
-| -------------------- | -------- | --------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| `content`            | Yes      | Array of [ToolResultContentBlock](protocol.md#toolresultcontentblock)                   |                                                                               |
-| `details`            | No       | Array of [JsonValue](protocol.md#jsonvalue) / Dictionary / `null,string,number,boolean` | Structured payload for UI, logs, and audit. Never sent to the model.          |
-| `excludeFromContext` | No       | `boolean`                                                                               | Kept in session history, hidden from the model.                               |
-| `id`                 | Yes      | `string`                                                                                | UUIDv7. Stable across persistence; the session tree addresses messages by it. |
-| `isError`            | Yes      | `boolean`                                                                               |                                                                               |
-| `resultSource`       | No       | `"network"` / `"trusted"`                                                               | `'network'` taints the turn: a fetched page, an MCP call, a browser read.     |
-| `role`               | Yes      | `"tool-result"`                                                                         |                                                                               |
-| `timestamp`          | Yes      | `number`                                                                                | Epoch milliseconds.                                                           |
-| `toolName`           | Yes      | `string`                                                                                |                                                                               |
-| `toolUseId`          | Yes      | `string`                                                                                | Quotes `ContentBlock.tool-use.id` exactly.                                    |
-
 ## ToolSitesData
 
 Asynchronous tool decoration; may arrive after turn.end and never blocks it.
@@ -4365,61 +4052,6 @@ The payload of a {@link GATEWAY_EVENTS.TurnEnd} event.
 | `historyId` | No       | `string`                                   | Stable record identity shared by the immediate event and its later durable copy. |
 | `sessionId` | No       | `string`                                   |                                                                                  |
 | `streamId`  | Yes      | `string`                                   |                                                                                  |
-
-## UserContentBlock
-
-What a user turn may contain.
-
-Variant 1: Object (fields below)
-
-| Field  | Required | Type     | Description |
-| ------ | -------- | -------- | ----------- |
-| `text` | Yes      | `string` |             |
-| `type` | Yes      | `"text"` |             |
-
-Variant 2: Object (fields below)
-
-| Field    | Required | Type                                     | Description |
-| -------- | -------- | ---------------------------------------- | ----------- |
-| `source` | Yes      | [BinarySource](protocol.md#binarysource) |             |
-| `title`  | No       | `string`                                 |             |
-| `type`   | Yes      | `"image"`                                |             |
-
-Variant 3: Object (fields below)
-
-| Field    | Required | Type                                     | Description                                                                     |
-| -------- | -------- | ---------------------------------------- | ------------------------------------------------------------------------------- |
-| `source` | Yes      | [BinarySource](protocol.md#binarysource) |                                                                                 |
-| `title`  | No       | `string`                                 |                                                                                 |
-| `type`   | Yes      | `"video"`                                | An encoded video or animation container decoded natively by a multimodal model. |
-
-Variant 4: Object (fields below)
-
-| Field    | Required | Type                                     | Description                                                                  |
-| -------- | -------- | ---------------------------------------- | ---------------------------------------------------------------------------- |
-| `source` | Yes      | [BinarySource](protocol.md#binarysource) |                                                                              |
-| `title`  | No       | `string`                                 |                                                                              |
-| `type`   | Yes      | `"video-frame"`                          | One ordered frame of a video or animation. Consecutive frames form one clip. |
-
-Variant 5: Object (fields below)
-
-| Field    | Required | Type                                     | Description |
-| -------- | -------- | ---------------------------------------- | ----------- |
-| `source` | Yes      | [BinarySource](protocol.md#binarysource) |             |
-| `title`  | No       | `string`                                 |             |
-| `type`   | Yes      | `"document"`                             |             |
-
-## UserMessage
-
-| Field                   | Required | Type                                                                 | Description                                                                   |
-| ----------------------- | -------- | -------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| `content`               | Yes      | Array of [UserContentBlock](protocol.md#usercontentblock) / `string` |                                                                               |
-| `excludeFromContext`    | No       | `boolean`                                                            | Kept in session history, hidden from the model.                               |
-| `id`                    | Yes      | `string`                                                             | UUIDv7. Stable across persistence; the session tree addresses messages by it. |
-| `role`                  | Yes      | `"user"`                                                             |                                                                               |
-| `runtimeContextCarrier` | No       | `boolean`                                                            | Bytes regenerated every turn; never anchors a prompt-cache breakpoint (033).  |
-| `source`                | No       | `"channel"` / `"human"` / `"injected"` / `"resumed"`                 | Who produced the turn.                                                        |
-| `timestamp`             | Yes      | `number`                                                             | Epoch milliseconds.                                                           |
 
 ## ValueSchema
 

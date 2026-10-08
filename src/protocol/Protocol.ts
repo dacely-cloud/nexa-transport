@@ -180,10 +180,6 @@ export interface AgentDefinitionShape {
 /** AgentDefinition from the Nexa wire protocol. */
 export type AgentDefinition = AgentDefinitionShape;
 
-/** AgentMessage from the Nexa wire protocol. */
-export type AgentMessage =
-    UserMessage | AssistantMessage | ToolResultMessage | CustomMessage | CompactionSummaryMessage;
-
 /** AgentVoice wire fields. */
 export interface AgentVoiceShape {
     /** autoSpeak as defined by the Nexa gateway. */
@@ -315,90 +311,6 @@ export interface AskResultShape {
 
 /** AskResult from the Nexa wire protocol. */
 export type AskResult = AskResultShape;
-
-/** AssistantContentBlockVariant0 wire fields. */
-export interface AssistantContentBlockVariant0Shape {
-    /** text as defined by the Nexa gateway. */
-    readonly text: string;
-    /** type as defined by the Nexa gateway. */
-    readonly type: 'text';
-}
-
-/** AssistantContentBlockVariant1 wire fields. */
-export interface AssistantContentBlockVariant1Shape {
-    /** signature as defined by the Nexa gateway. */
-    readonly signature?: string;
-    /** thinking as defined by the Nexa gateway. */
-    readonly thinking: string;
-    /** type as defined by the Nexa gateway. */
-    readonly type: 'thinking';
-}
-
-/** AssistantContentBlockVariant2 wire fields. */
-export interface AssistantContentBlockVariant2Shape {
-    /** data as defined by the Nexa gateway. */
-    readonly data: string;
-    /** type as defined by the Nexa gateway. */
-    readonly type: 'redacted-thinking';
-}
-
-/** AssistantContentBlockVariant3 wire fields. */
-export interface AssistantContentBlockVariant3Shape {
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** input as defined by the Nexa gateway. */
-    readonly input: JsonValue;
-    /** name as defined by the Nexa gateway. */
-    readonly name: string;
-    /** signature as defined by the Nexa gateway. */
-    readonly signature?: string;
-    /** type as defined by the Nexa gateway. */
-    readonly type: 'tool-use';
-}
-
-/** AssistantContentBlock from the Nexa wire protocol. */
-export type AssistantContentBlock =
-    | AssistantContentBlockVariant0Shape
-    | AssistantContentBlockVariant1Shape
-    | AssistantContentBlockVariant2Shape
-    | AssistantContentBlockVariant3Shape;
-
-/** AssistantMessage wire fields. */
-export interface AssistantMessageShape {
-    /** content as defined by the Nexa gateway. */
-    readonly content: ReadonlyArray<AssistantContentBlock>;
-    /** errorCode as defined by the Nexa gateway. */
-    readonly errorCode?: string;
-    /** errorMessage as defined by the Nexa gateway. */
-    readonly errorMessage?: string;
-    /** excludeFromContext as defined by the Nexa gateway. */
-    readonly excludeFromContext?: boolean;
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** model as defined by the Nexa gateway. */
-    readonly model: string;
-    /** provider as defined by the Nexa gateway. */
-    readonly provider: string;
-    /** responseId as defined by the Nexa gateway. */
-    readonly responseId?: string;
-    /** responseModel as defined by the Nexa gateway. */
-    readonly responseModel?: string;
-    /** role as defined by the Nexa gateway. */
-    readonly role: 'assistant';
-    /** stopReason as defined by the Nexa gateway. */
-    readonly stopReason: StopReason;
-    /** tainted as defined by the Nexa gateway. */
-    readonly tainted?: boolean;
-    /** timestamp as defined by the Nexa gateway. */
-    readonly timestamp: number;
-    /** turnId as defined by the Nexa gateway. */
-    readonly turnId?: string;
-    /** usage as defined by the Nexa gateway. */
-    readonly usage: TokenUsage;
-}
-
-/** AssistantMessage from the Nexa wire protocol. */
-export type AssistantMessage = AssistantMessageShape;
 
 /** BackgroundProcess wire fields. */
 export interface BackgroundProcessShape {
@@ -606,29 +518,6 @@ export interface CommandExecutionReceiptShape {
 
 /** CommandExecutionReceipt from the Nexa wire protocol. */
 export type CommandExecutionReceipt = CommandExecutionReceiptShape;
-
-/** CompactionSummaryMessage wire fields. */
-export interface CompactionSummaryMessageShape {
-    /** excludeFromContext as defined by the Nexa gateway. */
-    readonly excludeFromContext?: boolean;
-    /** firstKeptEntryId as defined by the Nexa gateway. */
-    readonly firstKeptEntryId?: string;
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** role as defined by the Nexa gateway. */
-    readonly role: 'compaction-summary';
-    /** summary as defined by the Nexa gateway. */
-    readonly summary: string;
-    /** timestamp as defined by the Nexa gateway. */
-    readonly timestamp: number;
-    /** tokensAfter as defined by the Nexa gateway. */
-    readonly tokensAfter?: number;
-    /** tokensBefore as defined by the Nexa gateway. */
-    readonly tokensBefore: number;
-}
-
-/** CompactionSummaryMessage from the Nexa wire protocol. */
-export type CompactionSummaryMessage = CompactionSummaryMessageShape;
 
 /** Allowed values for ComponentCategory. */
 export const ComponentCategoryValues = {
@@ -1260,37 +1149,6 @@ export interface CreditSummaryParamsShape {
 /** CreditSummaryParams from the Nexa wire protocol. */
 export type CreditSummaryParams = CreditSummaryParamsShape;
 
-/** CustomMessage wire fields. */
-export interface CustomMessageShape {
-    /** content as defined by the Nexa gateway. */
-    readonly content: ReadonlyArray<UserContentBlock> | string;
-    /** customType as defined by the Nexa gateway. */
-    readonly customType: string;
-    /** details as defined by the Nexa gateway. */
-    readonly details?:
-        | ReadonlyArray<JsonValue>
-        | Readonly<Record<string, JsonValue>>
-        | null
-        | string
-        | number
-        | boolean;
-    /** display as defined by the Nexa gateway. */
-    readonly display: boolean;
-    /** excludeFromContext as defined by the Nexa gateway. */
-    readonly excludeFromContext?: boolean;
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** role as defined by the Nexa gateway. */
-    readonly role: 'custom';
-    /** runtimeContextCarrier as defined by the Nexa gateway. */
-    readonly runtimeContextCarrier?: boolean;
-    /** timestamp as defined by the Nexa gateway. */
-    readonly timestamp: number;
-}
-
-/** CustomMessage from the Nexa wire protocol. */
-export type CustomMessage = CustomMessageShape;
-
 /** DataFile wire fields. */
 export interface DataFileShape {
     /** byteLength as defined by the Nexa gateway. */
@@ -1626,32 +1484,6 @@ export const FinishReasonValues = {
 
 /** FinishReason from the Nexa wire protocol. */
 export type FinishReason = (typeof FinishReasonValues)[keyof typeof FinishReasonValues];
-
-/** Allowed values for SessionEntryBasevisibility. */
-export const SessionEntryBasevisibilityValues = {
-    Value0: 'active',
-    Value1: 'compacted',
-    Value2: 'rewound',
-} as const;
-
-/** SessionEntryBase wire fields. */
-export interface SessionEntryBaseShape {
-    /** appendMode as defined by the Nexa gateway. */
-    readonly appendMode?: 'side';
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** parentId as defined by the Nexa gateway. */
-    readonly parentId: null | string;
-    /** sessionId as defined by the Nexa gateway. */
-    readonly sessionId: string;
-    /** timestamp as defined by the Nexa gateway. */
-    readonly timestamp: number;
-    /** visibility as defined by the Nexa gateway. */
-    readonly visibility: (typeof SessionEntryBasevisibilityValues)[keyof typeof SessionEntryBasevisibilityValues];
-}
-
-/** SessionEntryBase from the Nexa wire protocol. */
-export type SessionEntryBase = SessionEntryBaseShape;
 
 /** Session wire fields. */
 export interface SessionShape {
@@ -2470,14 +2302,6 @@ export interface GatewayMethodssessions_getShape {
     readonly result: Session | null;
 }
 
-/** GatewayMethodssessions_history wire fields. */
-export interface GatewayMethodssessions_historyShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: SessionHistoryParams;
-    /** result as defined by the Nexa gateway. */
-    readonly result: SessionHistoryPage;
-}
-
 /** GatewayMethodssessions_input wire fields. */
 export interface GatewayMethodssessions_inputShape {
     /** params as defined by the Nexa gateway. */
@@ -3032,8 +2856,6 @@ export interface GatewayMethodsShape {
     readonly 'sessions.files': GatewayMethodssessions_filesShape;
     /** sessions.get as defined by the Nexa gateway. */
     readonly 'sessions.get': GatewayMethodssessions_getShape;
-    /** sessions.history as defined by the Nexa gateway. */
-    readonly 'sessions.history': GatewayMethodssessions_historyShape;
     /** sessions.input as defined by the Nexa gateway. */
     readonly 'sessions.input': GatewayMethodssessions_inputShape;
     /** sessions.list as defined by the Nexa gateway. */
@@ -3393,21 +3215,6 @@ export interface HistoryInputShape {
 
 /** HistoryInput from the Nexa wire protocol. */
 export type HistoryInput = HistoryInputShape;
-
-/** HistoryLegacy wire fields. */
-export interface HistoryLegacyShape {
-    /** at as defined by the Nexa gateway. */
-    readonly at: number;
-    /** entries as defined by the Nexa gateway. */
-    readonly entries: ReadonlyArray<SessionEntry>;
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** kind as defined by the Nexa gateway. */
-    readonly kind: 'legacy';
-}
-
-/** HistoryLegacy from the Nexa wire protocol. */
-export type HistoryLegacy = HistoryLegacyShape;
 
 /** HistorySites wire fields. */
 export interface HistorySitesShape {
@@ -5074,18 +4881,6 @@ export interface ResetHistoryPageShape {
 /** ResetHistoryPage from the Nexa wire protocol. */
 export type ResetHistoryPage = ResetHistoryPageShape;
 
-/** Allowed values for ResetReason. */
-export const ResetReasonValues = {
-    Value0: 'cron-stale',
-    Value1: 'daily',
-    Value2: 'idle',
-    Value3: 'new',
-    Value4: 'reset',
-} as const;
-
-/** ResetReason from the Nexa wire protocol. */
-export type ResetReason = (typeof ResetReasonValues)[keyof typeof ResetReasonValues];
-
 /** ResetSnapshot wire fields. */
 export interface ResetSnapshotShape {
     /** asOf as defined by the Nexa gateway. */
@@ -5275,119 +5070,6 @@ export interface SegmentationFrameShape {
 /** SegmentationFrame from the Nexa wire protocol. */
 export type SegmentationFrame = SegmentationFrameShape;
 
-/** SessionEntryVariant0Part1 wire fields. */
-export interface SessionEntryVariant0Part1Shape {
-    /** kind as defined by the Nexa gateway. */
-    readonly kind: 'message';
-    /** message as defined by the Nexa gateway. */
-    readonly message: AgentMessage;
-}
-
-/** SessionEntryVariant1Part1 wire fields. */
-export interface SessionEntryVariant1Part1Shape {
-    /** kind as defined by the Nexa gateway. */
-    readonly kind: 'legacy-message';
-    /** message as defined by the Nexa gateway. */
-    readonly message: ModelMessage;
-}
-
-/** SessionEntryVariant2Part1 wire fields. */
-export interface SessionEntryVariant2Part1Shape {
-    /** kind as defined by the Nexa gateway. */
-    readonly kind: 'model-change';
-    /** modelId as defined by the Nexa gateway. */
-    readonly modelId: string;
-    /** provider as defined by the Nexa gateway. */
-    readonly provider: string;
-}
-
-/** SessionEntryVariant3Part1 wire fields. */
-export interface SessionEntryVariant3Part1Shape {
-    /** kind as defined by the Nexa gateway. */
-    readonly kind: 'thinking-level-change';
-    /** thinkingLevel as defined by the Nexa gateway. */
-    readonly thinkingLevel: string;
-}
-
-/** SessionEntryVariant4Part1 wire fields. */
-export interface SessionEntryVariant4Part1Shape {
-    /** firstKeptEntryId as defined by the Nexa gateway. */
-    readonly firstKeptEntryId: string;
-    /** kind as defined by the Nexa gateway. */
-    readonly kind: 'compaction';
-    /** summary as defined by the Nexa gateway. */
-    readonly summary: string;
-    /** tokensAfter as defined by the Nexa gateway. */
-    readonly tokensAfter?: number;
-    /** tokensBefore as defined by the Nexa gateway. */
-    readonly tokensBefore: number;
-}
-
-/** SessionEntryVariant5Part1 wire fields. */
-export interface SessionEntryVariant5Part1Shape {
-    /** firstKeptEntryId as defined by the Nexa gateway. */
-    readonly firstKeptEntryId?: string;
-    /** kind as defined by the Nexa gateway. */
-    readonly kind: 'reset';
-    /** reason as defined by the Nexa gateway. */
-    readonly reason: ResetReason;
-}
-
-/** SessionEntryVariant6Part1 wire fields. */
-export interface SessionEntryVariant6Part1Shape {
-    /** customType as defined by the Nexa gateway. */
-    readonly customType: string;
-    /** data as defined by the Nexa gateway. */
-    readonly data?:
-        | ReadonlyArray<JsonValue>
-        | Readonly<Record<string, JsonValue>>
-        | null
-        | string
-        | number
-        | boolean;
-    /** kind as defined by the Nexa gateway. */
-    readonly kind: 'custom';
-}
-
-/** SessionEntryVariant7Part1 wire fields. */
-export interface SessionEntryVariant7Part1Shape {
-    /** kind as defined by the Nexa gateway. */
-    readonly kind: 'label';
-    /** label as defined by the Nexa gateway. */
-    readonly label: null | string;
-    /** targetId as defined by the Nexa gateway. */
-    readonly targetId: string;
-}
-
-/** SessionEntryVariant8Part1 wire fields. */
-export interface SessionEntryVariant8Part1Shape {
-    /** kind as defined by the Nexa gateway. */
-    readonly kind: 'session-info';
-    /** name as defined by the Nexa gateway. */
-    readonly name: null | string;
-}
-
-/** SessionEntryVariant9Part1 wire fields. */
-export interface SessionEntryVariant9Part1Shape {
-    /** kind as defined by the Nexa gateway. */
-    readonly kind: 'leaf';
-    /** targetId as defined by the Nexa gateway. */
-    readonly targetId: null | string;
-}
-
-/** SessionEntry from the Nexa wire protocol. */
-export type SessionEntry =
-    | (SessionEntryBase & SessionEntryVariant0Part1Shape)
-    | (SessionEntryBase & SessionEntryVariant1Part1Shape)
-    | (SessionEntryBase & SessionEntryVariant2Part1Shape)
-    | (SessionEntryBase & SessionEntryVariant3Part1Shape)
-    | (SessionEntryBase & SessionEntryVariant4Part1Shape)
-    | (SessionEntryBase & SessionEntryVariant5Part1Shape)
-    | (SessionEntryBase & SessionEntryVariant6Part1Shape)
-    | (SessionEntryBase & SessionEntryVariant7Part1Shape)
-    | (SessionEntryBase & SessionEntryVariant8Part1Shape)
-    | (SessionEntryBase & SessionEntryVariant9Part1Shape);
-
 /** SessionFileParams wire fields. */
 export interface SessionFileParamsShape {
     /** attachmentId as defined by the Nexa gateway. */
@@ -5422,8 +5104,6 @@ export interface SessionHistoryPageShape {
     readonly format: 1;
     /** nextCursor as defined by the Nexa gateway. */
     readonly nextCursor?: string;
-    /** raw as defined by the Nexa gateway. */
-    readonly raw?: true;
 }
 
 /** SessionHistoryPage from the Nexa wire protocol. */
@@ -5451,8 +5131,7 @@ export type SessionHistoryRecord =
     | HistorySites
     | HistoryEnd
     | HistoryApprovalRequested
-    | HistoryApprovalResolved
-    | HistoryLegacy;
+    | HistoryApprovalResolved;
 
 /** SessionListParams wire fields. */
 export interface SessionListParamsShape {
@@ -5580,18 +5259,6 @@ export interface SteerParamsShape {
 
 /** SteerParams from the Nexa wire protocol. */
 export type SteerParams = SteerParamsShape;
-
-/** Allowed values for StopReason. */
-export const StopReasonValues = {
-    Value0: 'aborted',
-    Value1: 'error',
-    Value2: 'length',
-    Value3: 'stop',
-    Value4: 'tool-use',
-} as const;
-
-/** StopReason from the Nexa wire protocol. */
-export type StopReason = (typeof StopReasonValues)[keyof typeof StopReasonValues];
 
 /** StreamAccepted wire fields. */
 export interface StreamAcceptedShape {
@@ -6015,90 +5682,6 @@ export interface ToolResultShape {
 /** ToolResult from the Nexa wire protocol. */
 export type ToolResult = ToolResultShape;
 
-/** ToolResultContentBlockVariant0 wire fields. */
-export interface ToolResultContentBlockVariant0Shape {
-    /** text as defined by the Nexa gateway. */
-    readonly text: string;
-    /** type as defined by the Nexa gateway. */
-    readonly type: 'text';
-}
-
-/** ToolResultContentBlockVariant1 wire fields. */
-export interface ToolResultContentBlockVariant1Shape {
-    /** source as defined by the Nexa gateway. */
-    readonly source: BinarySource;
-    /** title as defined by the Nexa gateway. */
-    readonly title?: string;
-    /** type as defined by the Nexa gateway. */
-    readonly type: 'image';
-}
-
-/** ToolResultContentBlockVariant2 wire fields. */
-export interface ToolResultContentBlockVariant2Shape {
-    /** source as defined by the Nexa gateway. */
-    readonly source: BinarySource;
-    /** title as defined by the Nexa gateway. */
-    readonly title?: string;
-    /** type as defined by the Nexa gateway. */
-    readonly type: 'video';
-}
-
-/** ToolResultContentBlockVariant3 wire fields. */
-export interface ToolResultContentBlockVariant3Shape {
-    /** source as defined by the Nexa gateway. */
-    readonly source: BinarySource;
-    /** title as defined by the Nexa gateway. */
-    readonly title?: string;
-    /** type as defined by the Nexa gateway. */
-    readonly type: 'video-frame';
-}
-
-/** ToolResultContentBlock from the Nexa wire protocol. */
-export type ToolResultContentBlock =
-    | ToolResultContentBlockVariant0Shape
-    | ToolResultContentBlockVariant1Shape
-    | ToolResultContentBlockVariant2Shape
-    | ToolResultContentBlockVariant3Shape;
-
-/** Allowed values for ToolResultMessageresultSource. */
-export const ToolResultMessageresultSourceValues = {
-    Value0: 'network',
-    Value1: 'trusted',
-} as const;
-
-/** ToolResultMessage wire fields. */
-export interface ToolResultMessageShape {
-    /** content as defined by the Nexa gateway. */
-    readonly content: ReadonlyArray<ToolResultContentBlock>;
-    /** details as defined by the Nexa gateway. */
-    readonly details?:
-        | ReadonlyArray<JsonValue>
-        | Readonly<Record<string, JsonValue>>
-        | null
-        | string
-        | number
-        | boolean;
-    /** excludeFromContext as defined by the Nexa gateway. */
-    readonly excludeFromContext?: boolean;
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** isError as defined by the Nexa gateway. */
-    readonly isError: boolean;
-    /** resultSource as defined by the Nexa gateway. */
-    readonly resultSource?: (typeof ToolResultMessageresultSourceValues)[keyof typeof ToolResultMessageresultSourceValues];
-    /** role as defined by the Nexa gateway. */
-    readonly role: 'tool-result';
-    /** timestamp as defined by the Nexa gateway. */
-    readonly timestamp: number;
-    /** toolName as defined by the Nexa gateway. */
-    readonly toolName: string;
-    /** toolUseId as defined by the Nexa gateway. */
-    readonly toolUseId: string;
-}
-
-/** ToolResultMessage from the Nexa wire protocol. */
-export type ToolResultMessage = ToolResultMessageShape;
-
 /** ToolSitesData wire fields. */
 export interface ToolSitesDataShape {
     /** callId as defined by the Nexa gateway. */
@@ -6217,91 +5800,6 @@ export interface TurnEventDataShape {
 
 /** TurnEventData from the Nexa wire protocol. */
 export type TurnEventData = TurnEventDataShape;
-
-/** UserContentBlockVariant0 wire fields. */
-export interface UserContentBlockVariant0Shape {
-    /** text as defined by the Nexa gateway. */
-    readonly text: string;
-    /** type as defined by the Nexa gateway. */
-    readonly type: 'text';
-}
-
-/** UserContentBlockVariant1 wire fields. */
-export interface UserContentBlockVariant1Shape {
-    /** source as defined by the Nexa gateway. */
-    readonly source: BinarySource;
-    /** title as defined by the Nexa gateway. */
-    readonly title?: string;
-    /** type as defined by the Nexa gateway. */
-    readonly type: 'image';
-}
-
-/** UserContentBlockVariant2 wire fields. */
-export interface UserContentBlockVariant2Shape {
-    /** source as defined by the Nexa gateway. */
-    readonly source: BinarySource;
-    /** title as defined by the Nexa gateway. */
-    readonly title?: string;
-    /** type as defined by the Nexa gateway. */
-    readonly type: 'video';
-}
-
-/** UserContentBlockVariant3 wire fields. */
-export interface UserContentBlockVariant3Shape {
-    /** source as defined by the Nexa gateway. */
-    readonly source: BinarySource;
-    /** title as defined by the Nexa gateway. */
-    readonly title?: string;
-    /** type as defined by the Nexa gateway. */
-    readonly type: 'video-frame';
-}
-
-/** UserContentBlockVariant4 wire fields. */
-export interface UserContentBlockVariant4Shape {
-    /** source as defined by the Nexa gateway. */
-    readonly source: BinarySource;
-    /** title as defined by the Nexa gateway. */
-    readonly title?: string;
-    /** type as defined by the Nexa gateway. */
-    readonly type: 'document';
-}
-
-/** UserContentBlock from the Nexa wire protocol. */
-export type UserContentBlock =
-    | UserContentBlockVariant0Shape
-    | UserContentBlockVariant1Shape
-    | UserContentBlockVariant2Shape
-    | UserContentBlockVariant3Shape
-    | UserContentBlockVariant4Shape;
-
-/** Allowed values for UserMessagesource. */
-export const UserMessagesourceValues = {
-    Value0: 'channel',
-    Value1: 'human',
-    Value2: 'injected',
-    Value3: 'resumed',
-} as const;
-
-/** UserMessage wire fields. */
-export interface UserMessageShape {
-    /** content as defined by the Nexa gateway. */
-    readonly content: ReadonlyArray<UserContentBlock> | string;
-    /** excludeFromContext as defined by the Nexa gateway. */
-    readonly excludeFromContext?: boolean;
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** role as defined by the Nexa gateway. */
-    readonly role: 'user';
-    /** runtimeContextCarrier as defined by the Nexa gateway. */
-    readonly runtimeContextCarrier?: boolean;
-    /** source as defined by the Nexa gateway. */
-    readonly source?: (typeof UserMessagesourceValues)[keyof typeof UserMessagesourceValues];
-    /** timestamp as defined by the Nexa gateway. */
-    readonly timestamp: number;
-}
-
-/** UserMessage from the Nexa wire protocol. */
-export type UserMessage = UserMessageShape;
 
 /** ValueSchema from the Nexa wire protocol. */
 export type ValueSchema = ScalarSchema | ObjectSchema | ListSchema | ResourceSchema;
@@ -8099,8 +7597,6 @@ export enum Method {
     SessionsFiles = 'sessions.files',
     /** Calls sessions.get. */
     SessionsGet = 'sessions.get',
-    /** Calls sessions.history. */
-    SessionsHistory = 'sessions.history',
     /** Calls sessions.input. */
     SessionsInput = 'sessions.input',
     /** Calls sessions.list. */
