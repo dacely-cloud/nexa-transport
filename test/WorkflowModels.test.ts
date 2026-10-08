@@ -5,6 +5,7 @@ import {
     WorkflowModelsCodec,
     type WorkflowModelsRequest,
     type WorkflowModelsPage,
+    type WorkflowModelChoice,
 } from '../src/workflows/WorkflowModels.js';
 
 it('validates catalog metadata without treating missing price or freshness as a free current model', (): void => {
@@ -60,8 +61,27 @@ it('validates catalog metadata without treating missing price or freshness as a 
         false,
     );
     expect(
-        methodValidators[Method.WorkflowsModels].params({ ...request, capability: 'image' }),
+        methodValidators[Method.WorkflowsModels].params({ ...request, capability: 'video' }),
     ).toBe(false);
+    expect(
+        methodValidators[Method.WorkflowsModels].params({ ...request, capability: 'image' }),
+    ).toBe(true);
+    expect(
+        methodValidators[Method.WorkflowsModels].result({
+            ...result,
+            items: result.items.map((model: WorkflowModelChoice): WorkflowModelChoice => ({
+                ...model,
+                image: {
+                    maxCount: 10,
+                    sizes: ['1024x1024'],
+                    qualities: ['auto'],
+                    outputFormats: ['png'],
+                    dimensions: null,
+                    providerOptions: { background: 'string' },
+                },
+            })),
+        }),
+    ).toBe(true);
     expect((): WorkflowModelsRequest =>
         WorkflowModelsCodec.request({ ...request, favorites: ['same', 'same'] }),
     ).toThrow();

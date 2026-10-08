@@ -12,7 +12,7 @@ import { WorkflowModelCapability, type WorkflowModelChoice } from './WorkflowMod
 export interface WorkflowModelResolutionRequest {
     readonly workflowId: string;
     readonly provider: string;
-    readonly capability: WorkflowModelCapability;
+    readonly capability: Exclude<WorkflowModelCapability, typeof WorkflowModelCapability.Image>;
     readonly maxOutputTokens: number;
     readonly policy: WorkflowModelPolicy;
 }

@@ -2462,6 +2462,10 @@ export const schema: Schema = {
             type: 'string',
         },
         Exclude: {
+            enum: ['reasoning', 'text'],
+            type: 'string',
+        },
+        Exclude_1: {
             enum: [
                 'audio',
                 'boolean',
@@ -7935,7 +7939,7 @@ export const schema: Schema = {
                     type: 'array',
                 },
                 kind: {
-                    $ref: '#/definitions/Exclude',
+                    $ref: '#/definitions/Exclude_1',
                 },
                 maxLength: {
                     type: 'number',
@@ -10341,6 +10345,86 @@ export const schema: Schema = {
             required: ['node', 'port'],
             type: 'object',
         },
+        WorkflowImageCapabilities: {
+            description: 'Supported image settings from the same adapter used by execution.',
+            properties: {
+                dimensions: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/WorkflowImageDimensions',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                maxCount: {
+                    type: 'number',
+                },
+                outputFormats: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                providerOptions: {
+                    $ref: '#/definitions/Record%3Cstring%2Cstring%3E',
+                },
+                qualities: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                sizes: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+            },
+            required: [
+                'dimensions',
+                'maxCount',
+                'outputFormats',
+                'providerOptions',
+                'qualities',
+                'sizes',
+            ],
+            type: 'object',
+        },
+        WorkflowImageDimensions: {
+            description: 'Pixel limits for a model that supports custom dimensions.',
+            properties: {
+                experimentalAbovePixels: {
+                    type: 'number',
+                },
+                maxAspectRatio: {
+                    type: 'number',
+                },
+                maxEdge: {
+                    type: 'number',
+                },
+                maxPixels: {
+                    type: 'number',
+                },
+                minPixels: {
+                    type: 'number',
+                },
+                multiple: {
+                    type: 'number',
+                },
+            },
+            required: [
+                'experimentalAbovePixels',
+                'maxAspectRatio',
+                'maxEdge',
+                'maxPixels',
+                'minPixels',
+                'multiple',
+            ],
+            type: 'object',
+        },
         WorkflowListCursor: {
             description:
                 'Cursor uses a timestamp plus stable identity to handle equal update times.',
@@ -10447,8 +10531,8 @@ export const schema: Schema = {
             type: 'object',
         },
         WorkflowModelCapability: {
-            description: 'Operations currently supported by the direct text handler.',
-            enum: ['reasoning', 'text'],
+            description: 'Operations available through the workflow model picker.',
+            enum: ['image', 'reasoning', 'text'],
             type: 'string',
         },
         WorkflowModelChoice: {
@@ -10468,6 +10552,11 @@ export const schema: Schema = {
                 },
                 id: {
                     type: 'string',
+                },
+                image: {
+                    $ref: '#/definitions/WorkflowImageCapabilities',
+                    description:
+                        'Present only for generation models; token prices do not describe image tariffs.',
                 },
                 input: {
                     items: {
@@ -10660,7 +10749,7 @@ export const schema: Schema = {
                 'Owner-authorized policy preview; never saves a draft or performs inference.',
             properties: {
                 capability: {
-                    $ref: '#/definitions/WorkflowModelCapability',
+                    $ref: '#/definitions/Exclude',
                 },
                 maxOutputTokens: {
                     type: 'number',

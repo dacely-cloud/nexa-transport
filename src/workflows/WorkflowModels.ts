@@ -2,8 +2,12 @@
 
 import { WorkflowInput } from './WorkflowInput.js';
 
-/** Operations currently supported by the direct text handler. */
-export const WorkflowModelCapability = { Text: 'text', Reasoning: 'reasoning' } as const;
+/** Operations available through the workflow model picker. */
+export const WorkflowModelCapability = {
+    Text: 'text',
+    Reasoning: 'reasoning',
+    Image: 'image',
+} as const;
 export type WorkflowModelCapability =
     (typeof WorkflowModelCapability)[keyof typeof WorkflowModelCapability];
 /** Discovery never changes a workflow or grants access to another account's resources. */
@@ -21,6 +25,24 @@ export interface WorkflowModelPrice {
     readonly inputUsdPerMillion: string | null;
     readonly outputUsdPerMillion: string | null;
 }
+/** Pixel limits for a model that supports custom dimensions. */
+export interface WorkflowImageDimensions {
+    readonly multiple: number;
+    readonly maxEdge: number;
+    readonly minPixels: number;
+    readonly maxPixels: number;
+    readonly maxAspectRatio: number;
+    readonly experimentalAbovePixels: number;
+}
+/** Supported image settings from the same adapter used by execution. */
+export interface WorkflowImageCapabilities {
+    readonly maxCount: number;
+    readonly sizes: readonly string[];
+    readonly qualities: readonly string[];
+    readonly outputFormats: readonly string[];
+    readonly dimensions: WorkflowImageDimensions | null;
+    readonly providerOptions: Readonly<Record<string, string>>;
+}
 /** Public model metadata only: no endpoints, keys, account names, or adapter options. */
 export interface WorkflowModelChoice {
     readonly id: string;
@@ -37,6 +59,8 @@ export interface WorkflowModelChoice {
     readonly price: WorkflowModelPrice | null;
     /** Null/absent means no explicit endpoint check, rather than proof that a model is absent. */
     readonly availableAtCheck?: boolean | null;
+    /** Present only for generation models; token prices do not describe image tariffs. */
+    readonly image?: WorkflowImageCapabilities;
 }
 /** An observation time is not a release date, freshness guarantee, or permission grant. */
 export interface WorkflowCatalogObservation {
@@ -78,7 +102,8 @@ export class WorkflowModelsCodec {
         const compatibleOnly: unknown = value['compatibleOnly'];
         if (
             (capability !== WorkflowModelCapability.Text &&
-                capability !== WorkflowModelCapability.Reasoning) ||
+                capability !== WorkflowModelCapability.Reasoning &&
+                capability !== WorkflowModelCapability.Image) ||
             typeof compatibleOnly !== 'boolean'
         ) {
             throw new Error('Invalid workflow model filter');
