@@ -1886,6 +1886,8 @@ export interface GatewayFeaturesShape {
     readonly workflowDraftsVersion?: 1;
     /** workflowGraphVersion as defined by the Nexa gateway. */
     readonly workflowGraphVersion?: 1;
+    /** workflowPlanningVersion as defined by the Nexa gateway. */
+    readonly workflowPlanningVersion?: 1;
     /** workflowRunsVersion as defined by the Nexa gateway. */
     readonly workflowRunsVersion?: 1;
 }
@@ -2714,6 +2716,38 @@ export interface GatewayMethodsworkflows_listShape {
     readonly result: WorkflowListPage;
 }
 
+/** GatewayMethodsworkflows_planning_cancel wire fields. */
+export interface GatewayMethodsworkflows_planning_cancelShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: PlanningTurnRef;
+    /** result as defined by the Nexa gateway. */
+    readonly result: PlanningTurn;
+}
+
+/** GatewayMethodsworkflows_planning_history wire fields. */
+export interface GatewayMethodsworkflows_planning_historyShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: PlanningHistoryRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: PlanningHistory;
+}
+
+/** GatewayMethodsworkflows_planning_read wire fields. */
+export interface GatewayMethodsworkflows_planning_readShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: PlanningTurnRef;
+    /** result as defined by the Nexa gateway. */
+    readonly result: PlanningTurn;
+}
+
+/** GatewayMethodsworkflows_planning_send wire fields. */
+export interface GatewayMethodsworkflows_planning_sendShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: PlanningRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: PlanningTurn;
+}
+
 /** GatewayMethodsworkflows_read wire fields. */
 export interface GatewayMethodsworkflows_readShape {
     /** params as defined by the Nexa gateway. */
@@ -3014,6 +3048,14 @@ export interface GatewayMethodsShape {
     readonly 'workflows.create': GatewayMethodsworkflows_createShape;
     /** workflows.list as defined by the Nexa gateway. */
     readonly 'workflows.list': GatewayMethodsworkflows_listShape;
+    /** workflows.planning.cancel as defined by the Nexa gateway. */
+    readonly 'workflows.planning.cancel': GatewayMethodsworkflows_planning_cancelShape;
+    /** workflows.planning.history as defined by the Nexa gateway. */
+    readonly 'workflows.planning.history': GatewayMethodsworkflows_planning_historyShape;
+    /** workflows.planning.read as defined by the Nexa gateway. */
+    readonly 'workflows.planning.read': GatewayMethodsworkflows_planning_readShape;
+    /** workflows.planning.send as defined by the Nexa gateway. */
+    readonly 'workflows.planning.send': GatewayMethodsworkflows_planning_sendShape;
     /** workflows.read as defined by the Nexa gateway. */
     readonly 'workflows.read': GatewayMethodsworkflows_readShape;
     /** workflows.record as defined by the Nexa gateway. */
@@ -4530,6 +4572,181 @@ export interface PersonalAgentInputShape {
 /** PersonalAgentInput from the Nexa wire protocol. */
 export type PersonalAgentInput = PersonalAgentInputShape;
 
+/** PlanningBrief wire fields. */
+export interface PlanningBriefShape {
+    /** assumptions as defined by the Nexa gateway. */
+    readonly assumptions: ReadonlyArray<string>;
+    /** boundaries as defined by the Nexa gateway. */
+    readonly boundaries: ReadonlyArray<string>;
+    /** budget as defined by the Nexa gateway. */
+    readonly budget: null | string;
+    /** goal as defined by the Nexa gateway. */
+    readonly goal: string;
+    /** outputs as defined by the Nexa gateway. */
+    readonly outputs: ReadonlyArray<string>;
+    /** questions as defined by the Nexa gateway. */
+    readonly questions: ReadonlyArray<PlanningQuestion>;
+    /** requirements as defined by the Nexa gateway. */
+    readonly requirements: ReadonlyArray<PlanningRequirement>;
+    /** schedule as defined by the Nexa gateway. */
+    readonly schedule: null | string;
+    /** sources as defined by the Nexa gateway. */
+    readonly sources: ReadonlyArray<string>;
+}
+
+/** PlanningBrief from the Nexa wire protocol. */
+export type PlanningBrief = PlanningBriefShape;
+
+/** PlanningDocument wire fields. */
+export interface PlanningDocumentShape {
+    /** details as defined by the Nexa gateway. */
+    readonly details: WorkflowDetails;
+    /** edges as defined by the Nexa gateway. */
+    readonly edges: ReadonlyArray<WorkflowEdge>;
+    /** nodes as defined by the Nexa gateway. */
+    readonly nodes: ReadonlyArray<WorkflowNode>;
+    /** positions as defined by the Nexa gateway. */
+    readonly positions: ReadonlyArray<WorkflowPosition>;
+}
+
+/** PlanningDocument from the Nexa wire protocol. */
+export type PlanningDocument = PlanningDocumentShape;
+
+/** PlanningHistory wire fields. */
+export interface PlanningHistoryShape {
+    /** nextRequestId as defined by the Nexa gateway. */
+    readonly nextRequestId: null | string;
+    /** turns as defined by the Nexa gateway. */
+    readonly turns: ReadonlyArray<PlanningTurn>;
+}
+
+/** PlanningHistory from the Nexa wire protocol. */
+export type PlanningHistory = PlanningHistoryShape;
+
+/** PlanningHistoryRequest wire fields. */
+export interface PlanningHistoryRequestShape {
+    /** beforeRequestId as defined by the Nexa gateway. */
+    readonly beforeRequestId: null | string;
+    /** workflowId as defined by the Nexa gateway. */
+    readonly workflowId: string;
+}
+
+/** PlanningHistoryRequest from the Nexa wire protocol. */
+export type PlanningHistoryRequest = PlanningHistoryRequestShape;
+
+/** PlanningQuestion wire fields. */
+export interface PlanningQuestionShape {
+    /** choices as defined by the Nexa gateway. */
+    readonly choices: ReadonlyArray<string>;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** text as defined by the Nexa gateway. */
+    readonly text: string;
+}
+
+/** PlanningQuestion from the Nexa wire protocol. */
+export type PlanningQuestion = PlanningQuestionShape;
+
+/** PlanningReply wire fields. */
+export interface PlanningReplyShape {
+    /** baseRevision as defined by the Nexa gateway. */
+    readonly baseRevision: string;
+    /** brief as defined by the Nexa gateway. */
+    readonly brief: PlanningBrief;
+    /** draftHash as defined by the Nexa gateway. */
+    readonly draftHash: string;
+    /** message as defined by the Nexa gateway. */
+    readonly message: string;
+    /** patch as defined by the Nexa gateway. */
+    readonly patch: WorkflowPatch | null;
+    /** validation as defined by the Nexa gateway. */
+    readonly validation: GraphValidation;
+    /** workflowId as defined by the Nexa gateway. */
+    readonly workflowId: string;
+}
+
+/** PlanningReply from the Nexa wire protocol. */
+export type PlanningReply = PlanningReplyShape;
+
+/** PlanningRequest wire fields. */
+export interface PlanningRequestShape {
+    /** baseRevision as defined by the Nexa gateway. */
+    readonly baseRevision: string;
+    /** document as defined by the Nexa gateway. */
+    readonly document: PlanningDocument;
+    /** message as defined by the Nexa gateway. */
+    readonly message: string;
+    /** previousRequestId as defined by the Nexa gateway. */
+    readonly previousRequestId: null | string;
+    /** requestId as defined by the Nexa gateway. */
+    readonly requestId: string;
+    /** workflowId as defined by the Nexa gateway. */
+    readonly workflowId: string;
+}
+
+/** PlanningRequest from the Nexa wire protocol. */
+export type PlanningRequest = PlanningRequestShape;
+
+/** PlanningRequirement wire fields. */
+export interface PlanningRequirementShape {
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** nodeIds as defined by the Nexa gateway. */
+    readonly nodeIds: ReadonlyArray<string>;
+    /** state as defined by the Nexa gateway. */
+    readonly state: RequirementState;
+    /** text as defined by the Nexa gateway. */
+    readonly text: string;
+}
+
+/** PlanningRequirement from the Nexa wire protocol. */
+export type PlanningRequirement = PlanningRequirementShape;
+
+/** Allowed values for PlanningStatus. */
+export const PlanningStatusValues = {
+    Value0: 'canceled',
+    Value1: 'complete',
+    Value2: 'failed',
+    Value3: 'working',
+} as const;
+
+/** PlanningStatus from the Nexa wire protocol. */
+export type PlanningStatus = (typeof PlanningStatusValues)[keyof typeof PlanningStatusValues];
+
+/** PlanningTurn wire fields. */
+export interface PlanningTurnShape {
+    /** createdAtMs as defined by the Nexa gateway. */
+    readonly createdAtMs: string;
+    /** error as defined by the Nexa gateway. */
+    readonly error: null | string;
+    /** message as defined by the Nexa gateway. */
+    readonly message: string;
+    /** previousRequestId as defined by the Nexa gateway. */
+    readonly previousRequestId: null | string;
+    /** reply as defined by the Nexa gateway. */
+    readonly reply: PlanningReply | null;
+    /** requestId as defined by the Nexa gateway. */
+    readonly requestId: string;
+    /** status as defined by the Nexa gateway. */
+    readonly status: PlanningStatus;
+    /** workflowId as defined by the Nexa gateway. */
+    readonly workflowId: string;
+}
+
+/** PlanningTurn from the Nexa wire protocol. */
+export type PlanningTurn = PlanningTurnShape;
+
+/** PlanningTurnRef wire fields. */
+export interface PlanningTurnRefShape {
+    /** requestId as defined by the Nexa gateway. */
+    readonly requestId: string;
+    /** workflowId as defined by the Nexa gateway. */
+    readonly workflowId: string;
+}
+
+/** PlanningTurnRef from the Nexa wire protocol. */
+export type PlanningTurnRef = PlanningTurnRefShape;
+
 /** Allowed values for PortCardinality. */
 export const PortCardinalityValues = { Value0: 'item', Value1: 'list', Value2: 'stream' } as const;
 
@@ -4651,6 +4868,16 @@ export interface ReminderActionShape {
 
 /** ReminderAction from the Nexa wire protocol. */
 export type ReminderAction = ReminderActionShape;
+
+/** Allowed values for RequirementState. */
+export const RequirementStateValues = {
+    Value0: 'drafted',
+    Value1: 'missing',
+    Value2: 'question',
+} as const;
+
+/** RequirementState from the Nexa wire protocol. */
+export type RequirementState = (typeof RequirementStateValues)[keyof typeof RequirementStateValues];
 
 /** ResetAllowanceParams wire fields. */
 export interface ResetAllowanceParamsShape {
@@ -7292,6 +7519,14 @@ export enum Method {
     WorkflowsCreate = 'workflows.create',
     /** Calls workflows.list. */
     WorkflowsList = 'workflows.list',
+    /** Calls workflows.planning.cancel. */
+    WorkflowsPlanningCancel = 'workflows.planning.cancel',
+    /** Calls workflows.planning.history. */
+    WorkflowsPlanningHistory = 'workflows.planning.history',
+    /** Calls workflows.planning.read. */
+    WorkflowsPlanningRead = 'workflows.planning.read',
+    /** Calls workflows.planning.send. */
+    WorkflowsPlanningSend = 'workflows.planning.send',
     /** Calls workflows.read. */
     WorkflowsRead = 'workflows.read',
     /** Calls workflows.record. */

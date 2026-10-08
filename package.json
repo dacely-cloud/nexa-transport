@@ -16,6 +16,18 @@
         "docs"
     ],
     "exports": {
+        "./workflow-planning-types": {
+            "types": "./dist/workflows/planning/PlanningTypes.d.ts",
+            "import": "./dist/workflow-planning-types.js"
+        },
+        "./workflow-planning-codec": {
+            "types": "./dist/workflows/planning/PlanningCodec.d.ts",
+            "import": "./dist/workflow-planning-codec.js"
+        },
+        "./workflow-planning-edits": {
+            "types": "./dist/workflows/planning/PlanningEdits.d.ts",
+            "import": "./dist/workflow-planning-edits.js"
+        },
         "./workflow-types": {
             "types": "./dist/workflows/WorkflowTypes.d.ts",
             "import": "./dist/workflow-types.js"

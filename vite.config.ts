@@ -4,6 +4,9 @@ const config: UserConfig = {
         target: 'es2023',
         lib: {
             entry: {
+                'workflow-planning-types': 'src/workflows/planning/PlanningTypes.ts',
+                'workflow-planning-codec': 'src/workflows/planning/PlanningCodec.ts',
+                'workflow-planning-edits': 'src/workflows/planning/PlanningEdits.ts',
                 'workflow-run-types': 'src/workflows/runtime/RunTypes.ts',
                 'workflow-run-requests': 'src/workflows/runtime/RunRequests.ts',
                 'workflow-run-codec': 'src/workflows/runtime/RunCodec.ts',
