@@ -182,12 +182,7 @@ export type AgentDefinition = AgentDefinitionShape;
 
 /** AgentMessage from the Nexa wire protocol. */
 export type AgentMessage =
-    | UserMessage
-    | AssistantMessage
-    | ToolResultMessage
-    | CustomMessage
-    | CompactionSummaryMessage
-    | BranchSummaryMessage;
+    UserMessage | AssistantMessage | ToolResultMessage | CustomMessage | CompactionSummaryMessage;
 
 /** AgentVoice wire fields. */
 export interface AgentVoiceShape {
@@ -474,25 +469,6 @@ export interface BinarySourceVariant1Shape {
 
 /** BinarySource from the Nexa wire protocol. */
 export type BinarySource = BinarySourceVariant0Shape | BinarySourceVariant1Shape;
-
-/** BranchSummaryMessage wire fields. */
-export interface BranchSummaryMessageShape {
-    /** excludeFromContext as defined by the Nexa gateway. */
-    readonly excludeFromContext?: boolean;
-    /** fromId as defined by the Nexa gateway. */
-    readonly fromId: string;
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** role as defined by the Nexa gateway. */
-    readonly role: 'branch-summary';
-    /** summary as defined by the Nexa gateway. */
-    readonly summary: string;
-    /** timestamp as defined by the Nexa gateway. */
-    readonly timestamp: number;
-}
-
-/** BranchSummaryMessage from the Nexa wire protocol. */
-export type BranchSummaryMessage = BranchSummaryMessageShape;
 
 /** Budget wire fields. */
 export interface BudgetShape {
@@ -852,17 +828,6 @@ export type ContentBlock =
     | ContentBlockVariant6Shape
     | ContentBlockVariant7Shape
     | ContentBlockVariant8Shape;
-
-/** ConversationBranchParams wire fields. */
-export interface ConversationBranchParamsShape {
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** requestId as defined by the Nexa gateway. */
-    readonly requestId: string;
-}
-
-/** ConversationBranchParams from the Nexa wire protocol. */
-export type ConversationBranchParams = ConversationBranchParamsShape;
 
 /** ConversationInput wire fields. */
 export interface ConversationInputShape {
@@ -1490,10 +1455,6 @@ export interface SessionShape {
     readonly activeToolFamilies?: ReadonlyArray<string>;
     /** agentId as defined by the Nexa gateway. */
     readonly agentId: string;
-    /** branchRequestId as defined by the Nexa gateway. */
-    readonly branchRequestId?: string;
-    /** branchedFrom as defined by the Nexa gateway. */
-    readonly branchedFrom?: string;
     /** conversationId as defined by the Nexa gateway. */
     readonly conversationId: null | string;
     /** createdAt as defined by the Nexa gateway. */
@@ -1508,6 +1469,10 @@ export interface SessionShape {
     readonly projectId?: string;
     /** retryFingerprint as defined by the Nexa gateway. */
     readonly retryFingerprint?: string;
+    /** retryRequestId as defined by the Nexa gateway. */
+    readonly retryRequestId?: string;
+    /** retrySourceId as defined by the Nexa gateway. */
+    readonly retrySourceId?: string;
     /** retryState as defined by the Nexa gateway. */
     readonly retryState?: string;
     /** title as defined by the Nexa gateway. */
@@ -2257,14 +2222,6 @@ export interface GatewayMethodsroblox_telemetry_projectsShape {
     readonly result: ReadonlyArray<TelemetryProject>;
 }
 
-/** GatewayMethodssessions_branch wire fields. */
-export interface GatewayMethodssessions_branchShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: ConversationBranchParams;
-    /** result as defined by the Nexa gateway. */
-    readonly result: Session;
-}
-
 /** GatewayMethodssessions_delete wire fields. */
 export interface GatewayMethodssessions_deleteShape {
     /** params as defined by the Nexa gateway. */
@@ -2651,8 +2608,6 @@ export interface GatewayMethodsShape {
     readonly 'roblox.telemetry.performance': GatewayMethodsroblox_telemetry_performanceShape;
     /** roblox.telemetry.projects as defined by the Nexa gateway. */
     readonly 'roblox.telemetry.projects': GatewayMethodsroblox_telemetry_projectsShape;
-    /** sessions.branch as defined by the Nexa gateway. */
-    readonly 'sessions.branch': GatewayMethodssessions_branchShape;
     /** sessions.delete as defined by the Nexa gateway. */
     readonly 'sessions.delete': GatewayMethodssessions_deleteShape;
     /** sessions.download as defined by the Nexa gateway. */
@@ -4377,16 +4332,6 @@ export interface SessionEntryVariant5Part1Shape {
 
 /** SessionEntryVariant6Part1 wire fields. */
 export interface SessionEntryVariant6Part1Shape {
-    /** fromId as defined by the Nexa gateway. */
-    readonly fromId: string;
-    /** kind as defined by the Nexa gateway. */
-    readonly kind: 'branch-summary';
-    /** summary as defined by the Nexa gateway. */
-    readonly summary: string;
-}
-
-/** SessionEntryVariant7Part1 wire fields. */
-export interface SessionEntryVariant7Part1Shape {
     /** customType as defined by the Nexa gateway. */
     readonly customType: string;
     /** data as defined by the Nexa gateway. */
@@ -4401,8 +4346,8 @@ export interface SessionEntryVariant7Part1Shape {
     readonly kind: 'custom';
 }
 
-/** SessionEntryVariant8Part1 wire fields. */
-export interface SessionEntryVariant8Part1Shape {
+/** SessionEntryVariant7Part1 wire fields. */
+export interface SessionEntryVariant7Part1Shape {
     /** kind as defined by the Nexa gateway. */
     readonly kind: 'label';
     /** label as defined by the Nexa gateway. */
@@ -4411,16 +4356,16 @@ export interface SessionEntryVariant8Part1Shape {
     readonly targetId: string;
 }
 
-/** SessionEntryVariant9Part1 wire fields. */
-export interface SessionEntryVariant9Part1Shape {
+/** SessionEntryVariant8Part1 wire fields. */
+export interface SessionEntryVariant8Part1Shape {
     /** kind as defined by the Nexa gateway. */
     readonly kind: 'session-info';
     /** name as defined by the Nexa gateway. */
     readonly name: null | string;
 }
 
-/** SessionEntryVariant10Part1 wire fields. */
-export interface SessionEntryVariant10Part1Shape {
+/** SessionEntryVariant9Part1 wire fields. */
+export interface SessionEntryVariant9Part1Shape {
     /** kind as defined by the Nexa gateway. */
     readonly kind: 'leaf';
     /** targetId as defined by the Nexa gateway. */
@@ -4438,8 +4383,7 @@ export type SessionEntry =
     | (SessionEntryBase & SessionEntryVariant6Part1Shape)
     | (SessionEntryBase & SessionEntryVariant7Part1Shape)
     | (SessionEntryBase & SessionEntryVariant8Part1Shape)
-    | (SessionEntryBase & SessionEntryVariant9Part1Shape)
-    | (SessionEntryBase & SessionEntryVariant10Part1Shape);
+    | (SessionEntryBase & SessionEntryVariant9Part1Shape);
 
 /** SessionFileParams wire fields. */
 export interface SessionFileParamsShape {
@@ -6056,8 +6000,6 @@ export enum Method {
     RobloxTelemetryPerformance = 'roblox.telemetry.performance',
     /** Calls roblox.telemetry.projects. */
     RobloxTelemetryProjects = 'roblox.telemetry.projects',
-    /** Calls sessions.branch. */
-    SessionsBranch = 'sessions.branch',
     /** Calls sessions.delete. */
     SessionsDelete = 'sessions.delete',
     /** Calls sessions.download. */

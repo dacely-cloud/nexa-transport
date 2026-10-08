@@ -198,17 +198,6 @@ Variant 5: [CompactionSummaryMessage](protocol.md#compactionsummarymessage)
 | `tokensAfter`        | No       | `number`               |                                                                               |
 | `tokensBefore`       | Yes      | `number`               |                                                                               |
 
-Variant 6: [BranchSummaryMessage](protocol.md#branchsummarymessage)
-
-| Field                | Required | Type               | Description                                                                   |
-| -------------------- | -------- | ------------------ | ----------------------------------------------------------------------------- |
-| `excludeFromContext` | No       | `boolean`          | Kept in session history, hidden from the model.                               |
-| `fromId`             | Yes      | `string`           | Session entry id the branch forked from.                                      |
-| `id`                 | Yes      | `string`           | UUIDv7. Stable across persistence; the session tree addresses messages by it. |
-| `role`               | Yes      | `"branch-summary"` |                                                                               |
-| `summary`            | Yes      | `string`           |                                                                               |
-| `timestamp`          | Yes      | `number`           | Epoch milliseconds.                                                           |
-
 ## AgentVoice
 
 How an agent speaks.
@@ -260,15 +249,16 @@ The payload of a {@link GATEWAY_EVENTS.ApprovalResolved} event.
 
 What one turn is asked for.
 
-| Field             | Required | Type                                                                          | Description                                                                 |
-| ----------------- | -------- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| `agentId`         | No       | `string`                                                                      |                                                                             |
-| `attachments`     | No       | Array of [InboundAttachment](protocol.md#inboundattachment)                   | User-authored image, video, document, and text blocks, in display order.    |
-| `conversationId`  | No       | `string`                                                                      | Continues an existing conversation.                                         |
-| `cwd`             | No       | `string`                                                                      | Where tools operate.                                                        |
-| `message`         | Yes      | `string`                                                                      | User text; may be blank when at least one attachment contains content.      |
-| `reasoningEffort` | No       | `"high"` / `"low"` / `"max"` / `"medium"` / `"minimal"` / `"off"` / `"xhigh"` | Per-turn reasoning preference; never changes the saved agent configuration. |
-| `userId`          | No       | `string`                                                                      | The principal the turn is billed and authorized as.                         |
+| Field               | Required | Type                                                                          | Description                                                                 |
+| ------------------- | -------- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `agentId`           | No       | `string`                                                                      |                                                                             |
+| `attachments`       | No       | Array of [InboundAttachment](protocol.md#inboundattachment)                   | User-authored image, video, document, and text blocks, in display order.    |
+| `conversationId`    | No       | `string`                                                                      | Continues an existing conversation.                                         |
+| `cwd`               | No       | `string`                                                                      | Where tools operate.                                                        |
+| `message`           | Yes      | `string`                                                                      | User text; may be blank when at least one attachment contains content.      |
+| `reasoningEffort`   | No       | `"high"` / `"low"` / `"max"` / `"medium"` / `"minimal"` / `"off"` / `"xhigh"` | Per-turn reasoning preference; never changes the saved agent configuration. |
+| `targetTimeSeconds` | No       | `integer`                                                                     | Soft task time target in seconds; never a cancellation deadline.            |
+| `userId`            | No       | `string`                                                                      | The principal the turn is billed and authorized as.                         |
 
 ## AskResult
 
@@ -344,6 +334,41 @@ One provider response.
 | `turnId`             | No       | `string`                                                            | Runtime-assigned UUIDv7, stamped at message-end BEFORE any tool runs.              |
 | `usage`              | Yes      | [TokenUsage](protocol.md#tokenusage)                                |                                                                                    |
 
+## BackgroundProcess
+
+Browser-safe background job receipt, without host pids or log paths.
+
+| Field        | Required | Type          | Description                                                            |
+| ------------ | -------- | ------------- | ---------------------------------------------------------------------- |
+| `command`    | Yes      | `string`      |                                                                        |
+| `cwd`        | Yes      | `string`      |                                                                        |
+| `endedAt`    | Yes      | `null,string` |                                                                        |
+| `exitCode`   | Yes      | `null,number` |                                                                        |
+| `foreground` | No       | `boolean`     | A command still attached to its launching tool has an inline terminal. |
+| `processId`  | Yes      | `string`      |                                                                        |
+| `running`    | Yes      | `boolean`     |                                                                        |
+| `signal`     | Yes      | `null,string` |                                                                        |
+| `startedAt`  | Yes      | `string`      |                                                                        |
+
+## BackgroundProcessLog
+
+A bounded tail and complete byte boundary, represented losslessly on the wire.
+
+| Field       | Required | Type      | Description |
+| ----------- | -------- | --------- | ----------- |
+| `endOffset` | Yes      | `string`  |             |
+| `text`      | Yes      | `string`  |             |
+| `truncated` | Yes      | `boolean` |             |
+
+## BackgroundProcessRef
+
+A process must always be addressed inside its owning conversation.
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `processId` | Yes      | `string` |             |
+| `sessionId` | Yes      | `string` |             |
+
 ## BinarySource
 
 Where binary content comes from: inline base64, or a URL the provider fetches.
@@ -362,19 +387,6 @@ Variant 2: Object (fields below)
 | ------ | -------- | -------- | ----------- |
 | `kind` | Yes      | `"url"`  |             |
 | `url`  | Yes      | `string` |             |
-
-## BranchSummaryMessage
-
-The artifact of returning from a branch.
-
-| Field                | Required | Type               | Description                                                                   |
-| -------------------- | -------- | ------------------ | ----------------------------------------------------------------------------- |
-| `excludeFromContext` | No       | `boolean`          | Kept in session history, hidden from the model.                               |
-| `fromId`             | Yes      | `string`           | Session entry id the branch forked from.                                      |
-| `id`                 | Yes      | `string`           | UUIDv7. Stable across persistence; the session tree addresses messages by it. |
-| `role`               | Yes      | `"branch-summary"` |                                                                               |
-| `summary`            | Yes      | `string`           |                                                                               |
-| `timestamp`          | Yes      | `number`           | Epoch milliseconds.                                                           |
 
 ## Budget
 
@@ -447,16 +459,17 @@ A channel's live health, as its own adapter reports it.
 
 Host-produced command termination evidence, separate from model-visible output.
 
-| Field          | Required | Type          | Description |
-| -------------- | -------- | ------------- | ----------- |
-| `command`      | Yes      | `string`      |             |
-| `cwd`          | Yes      | `string`      |             |
-| `exitCode`     | Yes      | `null,number` |             |
-| `processId`    | Yes      | `null,string` |             |
-| `processToken` | Yes      | `null,string` |             |
-| `remote`       | Yes      | `boolean`     |             |
-| `running`      | Yes      | `boolean`     |             |
-| `signal`       | Yes      | `null,string` |             |
+| Field            | Required | Type          | Description                                                          |
+| ---------------- | -------- | ------------- | -------------------------------------------------------------------- |
+| `command`        | Yes      | `string`      |                                                                      |
+| `cwd`            | Yes      | `string`      |                                                                      |
+| `exitCode`       | Yes      | `null,number` |                                                                      |
+| `processId`      | Yes      | `null,string` |                                                                      |
+| `processToken`   | Yes      | `null,string` |                                                                      |
+| `remote`         | Yes      | `boolean`     |                                                                      |
+| `running`        | Yes      | `boolean`     |                                                                      |
+| `signal`         | Yes      | `null,string` |                                                                      |
+| `terminalOutput` | No       | `string`      | Original terminal stream, including ANSI styles and cursor controls. |
 
 ## CompactionSummaryMessage
 
@@ -614,21 +627,129 @@ Variant 9: Object (fields below)
 | `toolUseId`            | Yes      | `string`                                                     |                                                                       |
 | `type`                 | Yes      | `"tool-result"`                                              | The outcome of a tool call, sent back on the next turn.               |
 
-## ConversationSurface
+## ConversationInput
 
-Where a conversation is happening.
+Only editable text and a media count cross the wire when opening the message editor.
 
-| Field           | Required | Type                                                          | Description                                                                                  |
-| --------------- | -------- | ------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| `channel`       | Yes      | `string`                                                      | The channel id: `telegram`, `slack`, `discord`, `cli`, `gateway`, …                          |
-| `formatting`    | No       | [SurfaceFormatting](protocol.md#surfaceformatting)            | What the platform can render, so the model writes for it rather than for a web page.         |
-| `kind`          | Yes      | [SurfaceKind](protocol.md#surfacekind)                        |                                                                                              |
-| `lenders`       | No       | Array of [MemoryLender](protocol.md#memorylender)             | Who lends this room their memory. Not rendered — what the agent recalls is not something     |
-| `participants`  | No       | Array of [SurfaceParticipant](protocol.md#surfaceparticipant) | Everyone known to be in the conversation. For a DM, the one person.                          |
-| `personalPlace` | No       | `boolean`                                                     | A user-installed app invocation whose files belong to this user in this specific place.      |
-| `roomId`        | Yes      | `string`                                                      | The stable id of the room or DM on that channel — the router's chat id, not the session key. |
-| `roomTitle`     | No       | `string`                                                      | The room's title, when the platform has one.                                                 |
-| `speaker`       | No       | [SurfaceParticipant](protocol.md#surfaceparticipant)          | Who sent the message this turn answers. Per turn, so it never lands in the cached band.      |
+| Field             | Required | Type     | Description |
+| ----------------- | -------- | -------- | ----------- |
+| `attachmentCount` | Yes      | `number` |             |
+| `text`            | Yes      | `string` |             |
+
+## ConversationMessageRef
+
+A stable input, response stream, or canonical entry in a saved conversation.
+
+| Field  | Required | Type                                                    | Description |
+| ------ | -------- | ------------------------------------------------------- | ----------- |
+| `key`  | Yes      | `string`                                                |             |
+| `kind` | Yes      | `"entry"` / `"input"` / `"input-stream"` / `"response"` |             |
+
+## ConversationPin
+
+A private, durable bookmark with an authoritative saved excerpt.
+
+| Field       | Required | Type                                                         | Description |
+| ----------- | -------- | ------------------------------------------------------------ | ----------- |
+| `createdAt` | Yes      | `number`                                                     |             |
+| `excerpt`   | Yes      | `string`                                                     |             |
+| `id`        | Yes      | `string`                                                     |             |
+| `message`   | Yes      | [ConversationMessageRef](protocol.md#conversationmessageref) |             |
+| `role`      | Yes      | `"assistant"` / `"user"`                                     |             |
+| `sessionId` | Yes      | `string`                                                     |             |
+| `timestamp` | Yes      | `number`                                                     |             |
+| `title`     | Yes      | `string`                                                     |             |
+
+## ConversationPinParams
+
+A message selected from an owned saved conversation.
+
+| Field     | Required | Type                                                         | Description |
+| --------- | -------- | ------------------------------------------------------------ | ----------- |
+| `id`      | Yes      | `string`                                                     |             |
+| `message` | Yes      | [ConversationMessageRef](protocol.md#conversationmessageref) |             |
+
+## ConversationPinsPage
+
+A page of owned pins, with the continuation cursor if more records exist.
+
+| Field        | Required | Type                                                    | Description |
+| ------------ | -------- | ------------------------------------------------------- | ----------- |
+| `nextBefore` | No       | `string`                                                |             |
+| `pins`       | Yes      | Array of [ConversationPin](protocol.md#conversationpin) |             |
+
+## ConversationPinsParams
+
+Bounded newest-first bookmarks, with an opaque owned-record cursor.
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `before` | No       | `string` |             |
+| `limit`  | No       | `number` |             |
+
+## ConversationRenameParams
+
+Changes a title only if the editor still sees the current title.
+
+| Field           | Required | Type          | Description |
+| --------------- | -------- | ------------- | ----------- |
+| `expectedTitle` | Yes      | `null,string` |             |
+| `id`            | Yes      | `string`      |             |
+| `title`         | Yes      | `string`      |             |
+
+## ConversationRetryParams
+
+Edits a human prompt or repeats its response in a separate saved version.
+
+| Field               | Required | Type                                                                          | Description |
+| ------------------- | -------- | ----------------------------------------------------------------------------- | ----------- |
+| `id`                | Yes      | `string`                                                                      |             |
+| `message`           | Yes      | [ConversationMessageRef](protocol.md#conversationmessageref)                  |             |
+| `mode`              | Yes      | `"edit"` / `"regenerate"`                                                     |             |
+| `reasoningEffort`   | No       | `"high"` / `"low"` / `"max"` / `"medium"` / `"minimal"` / `"off"` / `"xhigh"` |             |
+| `requestId`         | Yes      | `string`                                                                      |             |
+| `targetTimeSeconds` | No       | `number`                                                                      |             |
+| `text`              | No       | `string`                                                                      |             |
+
+## ConversationRetryResult
+
+A saved version is returned even when its model run was already started by a lost acknowledgement.
+
+| Field      | Required | Type                           | Description |
+| ---------- | -------- | ------------------------------ | ----------- |
+| `session`  | Yes      | [Session](protocol.md#session) |             |
+| `started`  | Yes      | `boolean`                      |             |
+| `streamId` | Yes      | `string`                       |             |
+
+## ConversationSearchHit
+
+One owned conversation and a bounded matching message excerpt.
+
+| Field       | Required | Type                                                         | Description                                                                  |
+| ----------- | -------- | ------------------------------------------------------------ | ---------------------------------------------------------------------------- |
+| `entryId`   | Yes      | `null,string`                                                |                                                                              |
+| `message`   | No       | [ConversationMessageRef](protocol.md#conversationmessageref) | A stable input, response stream, or canonical entry in a saved conversation. |
+| `role`      | Yes      | `string`                                                     |                                                                              |
+| `session`   | Yes      | [Session](protocol.md#session)                               |                                                                              |
+| `snippet`   | Yes      | `string`                                                     |                                                                              |
+| `timestamp` | Yes      | `number`                                                     |                                                                              |
+
+## ConversationSearchParams
+
+An account-scoped full message search, including compacted history.
+
+| Field   | Required | Type     | Description |
+| ------- | -------- | -------- | ----------- |
+| `limit` | No       | `number` |             |
+| `query` | Yes      | `string` |             |
+
+## ConversationUnpinParams
+
+Removes only a bookmark belonging to the current authenticated principal.
+
+| Field   | Required | Type     | Description |
+| ------- | -------- | -------- | ----------- |
+| `pinId` | Yes      | `string` |             |
 
 ## CreditScope
 
@@ -901,27 +1022,27 @@ Collapses the required/optional intersection into one object type.
 
 Collapses the required/optional intersection into one object type.
 
-| Field                | Required | Type                                                   | Description |
-| -------------------- | -------- | ------------------------------------------------------ | ----------- |
-| `activeToolFamilies` | No       | Array of `string`                                      |             |
-| `agentId`            | Yes      | `string`                                               |             |
-| `conversationId`     | Yes      | `null,string`                                          |             |
-| `createdAt`          | Yes      | `number`                                               |             |
-| `id`                 | Yes      | `string`                                               |             |
-| `messageCount`       | Yes      | `number`                                               |             |
-| `participants`       | Yes      | Array of `string`                                      |             |
-| `projectId`          | No       | `string`                                               |             |
-| `resumeCwd`          | No       | `string`                                               |             |
-| `resumeEligible`     | No       | `boolean`                                              |             |
-| `resumePending`      | No       | `boolean`                                              |             |
-| `resumePrincipal`    | No       | [ToolPrincipal](protocol.md#toolprincipal)             |             |
-| `resumeSurface`      | No       | [ConversationSurface](protocol.md#conversationsurface) |             |
-| `title`              | Yes      | `null,string`                                          |             |
-| `turnOpen`           | No       | `boolean`                                              |             |
-| `updatedAt`          | Yes      | `number`                                               |             |
-| `usage`              | Yes      | [TokenUsage](protocol.md#tokenusage)                   |             |
-| `userId`             | No       | `string`                                               |             |
-| `workspaceId`        | No       | `string`                                               |             |
+| Field                | Required | Type                                 | Description |
+| -------------------- | -------- | ------------------------------------ | ----------- |
+| `activeToolFamilies` | No       | Array of `string`                    |             |
+| `agentId`            | Yes      | `string`                             |             |
+| `conversationId`     | Yes      | `null,string`                        |             |
+| `createdAt`          | Yes      | `number`                             |             |
+| `id`                 | Yes      | `string`                             |             |
+| `messageCount`       | Yes      | `number`                             |             |
+| `participants`       | Yes      | Array of `string`                    |             |
+| `projectId`          | No       | `string`                             |             |
+| `retryFingerprint`   | No       | `string`                             |             |
+| `retryRequestId`     | No       | `string`                             |             |
+| `retrySourceId`      | No       | `string`                             |             |
+| `retryState`         | No       | `string`                             |             |
+| `title`              | Yes      | `null,string`                        |             |
+| `titleEdited`        | No       | `boolean`                            |             |
+| `turnOpen`           | No       | `boolean`                            |             |
+| `updatedAt`          | Yes      | `number`                             |             |
+| `usage`              | Yes      | [TokenUsage](protocol.md#tokenusage) |             |
+| `userId`             | No       | `string`                             |             |
+| `workspaceId`        | No       | `string`                             |             |
 
 ## FunnelCohort
 
@@ -1093,6 +1214,11 @@ Configurable bounds on gateway-owned work and memory.
 | `logs.tail`                    | Yes      | Object (fields below) |                                                                                            |
 | `media.acknowledge`            | Yes      | Object (fields below) |                                                                                            |
 | `office.ownerProof`            | Yes      | Object (fields below) | Bind an invitation to the authenticated socket's office, using a short-lived signed proof. |
+| `processes.input`              | Yes      | Object (fields below) |                                                                                            |
+| `processes.list`               | Yes      | Object (fields below) |                                                                                            |
+| `processes.log`                | Yes      | Object (fields below) |                                                                                            |
+| `processes.resize`             | Yes      | Object (fields below) |                                                                                            |
+| `processes.stop`               | Yes      | Object (fields below) |                                                                                            |
 | `roblox.credentials.remove`    | Yes      | Object (fields below) |                                                                                            |
 | `roblox.credentials.set`       | Yes      | Object (fields below) |                                                                                            |
 | `roblox.credentials.status`    | Yes      | Object (fields below) |                                                                                            |
@@ -1104,9 +1230,16 @@ Configurable bounds on gateway-owned work and memory.
 | `sessions.files`               | Yes      | Object (fields below) |                                                                                            |
 | `sessions.get`                 | Yes      | Object (fields below) |                                                                                            |
 | `sessions.history`             | Yes      | Object (fields below) |                                                                                            |
+| `sessions.input`               | Yes      | Object (fields below) |                                                                                            |
 | `sessions.list`                | Yes      | Object (fields below) |                                                                                            |
 | `sessions.messages`            | Yes      | Object (fields below) |                                                                                            |
+| `sessions.pin`                 | Yes      | Object (fields below) |                                                                                            |
+| `sessions.pins`                | Yes      | Object (fields below) |                                                                                            |
+| `sessions.rename`              | Yes      | Object (fields below) |                                                                                            |
+| `sessions.retry`               | Yes      | Object (fields below) |                                                                                            |
+| `sessions.search`              | Yes      | Object (fields below) |                                                                                            |
 | `sessions.subscribe`           | Yes      | Object (fields below) |                                                                                            |
+| `sessions.unpin`               | Yes      | Object (fields below) |                                                                                            |
 | `sessions.unsubscribe`         | Yes      | Object (fields below) |                                                                                            |
 | `shares.create`                | Yes      | Object (fields below) |                                                                                            |
 | `shares.list`                  | Yes      | Object (fields below) |                                                                                            |
@@ -1515,6 +1648,41 @@ Configurable bounds on gateway-owned work and memory.
 | ------- | -------- | -------- | ----------- |
 | `proof` | Yes      | `string` |             |
 
+**processes.input**
+
+| Field    | Required | Type                                     | Description |
+| -------- | -------- | ---------------------------------------- | ----------- |
+| `params` | Yes      | [ProcessInput](protocol.md#processinput) |             |
+| `result` | Yes      | [OkResult](protocol.md#okresult)         |             |
+
+**processes.list**
+
+| Field    | Required | Type                                                        | Description |
+| -------- | -------- | ----------------------------------------------------------- | ----------- |
+| `params` | Yes      | [SessionRef](protocol.md#sessionref)                        |             |
+| `result` | Yes      | Array of [BackgroundProcess](protocol.md#backgroundprocess) |             |
+
+**processes.log**
+
+| Field    | Required | Type                                                     | Description |
+| -------- | -------- | -------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ProcessLogRef](protocol.md#processlogref)               |             |
+| `result` | Yes      | [BackgroundProcessLog](protocol.md#backgroundprocesslog) |             |
+
+**processes.resize**
+
+| Field    | Required | Type                                       | Description |
+| -------- | -------- | ------------------------------------------ | ----------- |
+| `params` | Yes      | [ProcessResize](protocol.md#processresize) |             |
+| `result` | Yes      | [OkResult](protocol.md#okresult)           |             |
+
+**processes.stop**
+
+| Field    | Required | Type                                                     | Description |
+| -------- | -------- | -------------------------------------------------------- | ----------- |
+| `params` | Yes      | [BackgroundProcessRef](protocol.md#backgroundprocessref) |             |
+| `result` | Yes      | [OkResult](protocol.md#okresult)                         |             |
+
 **roblox.credentials.remove**
 
 | Field    | Required | Type                                                         | Description |
@@ -1592,6 +1760,13 @@ Configurable bounds on gateway-owned work and memory.
 | `params` | Yes      | [SessionHistoryParams](protocol.md#sessionhistoryparams) |             |
 | `result` | Yes      | [SessionHistoryPage](protocol.md#sessionhistorypage)     |             |
 
+**sessions.input**
+
+| Field    | Required | Type                                                       | Description |
+| -------- | -------- | ---------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ConversationPinParams](protocol.md#conversationpinparams) |             |
+| `result` | Yes      | [ConversationInput](protocol.md#conversationinput)         |             |
+
 **sessions.list**
 
 | Field    | Required | Type                                               | Description |
@@ -1606,12 +1781,54 @@ Configurable bounds on gateway-owned work and memory.
 | `params` | Yes      | [IdParams](protocol.md#idparams)                  |             |
 | `result` | Yes      | Array of [ModelMessage](protocol.md#modelmessage) |             |
 
+**sessions.pin**
+
+| Field    | Required | Type                                                       | Description |
+| -------- | -------- | ---------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ConversationPinParams](protocol.md#conversationpinparams) |             |
+| `result` | Yes      | [ConversationPin](protocol.md#conversationpin)             |             |
+
+**sessions.pins**
+
+| Field    | Required | Type                                                         | Description |
+| -------- | -------- | ------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [ConversationPinsParams](protocol.md#conversationpinsparams) |             |
+| `result` | Yes      | [ConversationPinsPage](protocol.md#conversationpinspage)     |             |
+
+**sessions.rename**
+
+| Field    | Required | Type                                                             | Description |
+| -------- | -------- | ---------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ConversationRenameParams](protocol.md#conversationrenameparams) |             |
+| `result` | Yes      | [Session](protocol.md#session)                                   |             |
+
+**sessions.retry**
+
+| Field    | Required | Type                                                           | Description |
+| -------- | -------- | -------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ConversationRetryParams](protocol.md#conversationretryparams) |             |
+| `result` | Yes      | [ConversationRetryResult](protocol.md#conversationretryresult) |             |
+
+**sessions.search**
+
+| Field    | Required | Type                                                                | Description |
+| -------- | -------- | ------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ConversationSearchParams](protocol.md#conversationsearchparams)    |             |
+| `result` | Yes      | Array of [ConversationSearchHit](protocol.md#conversationsearchhit) |             |
+
 **sessions.subscribe**
 
 | Field    | Required | Type                                 | Description |
 | -------- | -------- | ------------------------------------ | ----------- |
 | `params` | Yes      | [SessionRef](protocol.md#sessionref) |             |
 | `result` | Yes      | [OkResult](protocol.md#okresult)     |             |
+
+**sessions.unpin**
+
+| Field    | Required | Type                                                           | Description |
+| -------- | -------- | -------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ConversationUnpinParams](protocol.md#conversationunpinparams) |             |
+| `result` | Yes      | [OkResult](protocol.md#okresult)                               |             |
 
 **sessions.unsubscribe**
 
@@ -2152,16 +2369,6 @@ Client attachment handler outcome; receipt does not assert that a human viewed i
 | `id`       | Yes      | `string`  |             |
 | `received` | Yes      | `boolean` |             |
 
-## MemoryLender
-
-One person who lends a room what the agent remembers about them.
-
-| Field      | Required | Type                  | Description                                                             |
-| ---------- | -------- | --------------------- | ----------------------------------------------------------------------- |
-| `id`       | Yes      | `string`              | The platform's stable id for them, as in {@link SurfaceParticipant.id}. |
-| `mode`     | Yes      | `"all"` / `"partial"` |                                                                         |
-| `subjects` | No       | Array of `string`     | For `partial`: the subjects lent.                                       |
-
 ## MessageRole
 
 Who authored a message.
@@ -2176,12 +2383,22 @@ Type: `"run-all"` / `"run-if-recent"` / `"run-once"` / `"skip"`.
 
 ## ModelMessage
 
-One message in a conversation.
+| Field      | Required | Type                                                         | Description                                                                        |
+| ---------- | -------- | ------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
+| `content`  | Yes      | Array of [ContentBlock](protocol.md#contentblock) / `string` |                                                                                    |
+| `identity` | No       | [ModelMessageIdentity](protocol.md#modelmessageidentity)     | Durable host metadata; provider adapters send only the role and content to models. |
+| `role`     | Yes      | [MessageRole](protocol.md#messagerole)                       |                                                                                    |
 
-| Field     | Required | Type                                                         | Description |
-| --------- | -------- | ------------------------------------------------------------ | ----------- |
-| `content` | Yes      | Array of [ContentBlock](protocol.md#contentblock) / `string` |             |
-| `role`    | Yes      | [MessageRole](protocol.md#messagerole)                       |             |
+## ModelMessageIdentity
+
+Durable host metadata; provider adapters send only the role and content to models.
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `id`        | Yes      | `string` |             |
+| `inputId`   | No       | `string` |             |
+| `streamId`  | Yes      | `string` |             |
+| `timestamp` | Yes      | `number` |             |
 
 ## NcapAgentDelta
 
@@ -2704,6 +2921,37 @@ Create with an empty id, or update an existing owned agent.
 | `instructions` | Yes      | `string` |             |
 | `name`         | Yes      | `string` |             |
 
+## ProcessInput
+
+Keystrokes are bounded and addressed through the owning session.
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `data`      | Yes      | `string` |             |
+| `processId` | Yes      | `string` |             |
+| `sessionId` | Yes      | `string` |             |
+
+## ProcessLogRef
+
+Incremental reads share the same bounded log endpoint as background job tails.
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `offset`    | No       | `string` |             |
+| `processId` | Yes      | `string` |             |
+| `sessionId` | Yes      | `string` |             |
+
+## ProcessResize
+
+Terminal dimensions are small positive integers.
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `cols`      | Yes      | `number` |             |
+| `processId` | Yes      | `string` |             |
+| `rows`      | Yes      | `number` |             |
+| `sessionId` | Yes      | `string` |             |
+
 ## ReasoningOptions
 
 Reasoning configuration for a request.
@@ -2884,10 +3132,6 @@ Variant 9: `JSON`
 Type: `JSON`.
 
 Variant 10: `JSON`
-
-Type: `JSON`.
-
-Variant 11: `JSON`
 
 Type: `JSON`.
 
@@ -3103,6 +3347,7 @@ The acknowledgement of a streaming run.
 
 | Field        | Required | Type     | Description                                                               |
 | ------------ | -------- | -------- | ------------------------------------------------------------------------- |
+| `inputId`    | No       | `string` | Original saved input identity, assigned by the authorized gateway.        |
 | `runId`      | Yes      | `string` | The SERVER's name for the run, which is the one `tasks.*` uses.           |
 | `sessionKey` | No       | `string` | Resolved durable conversation identity, including a newly allocated chat. |
 | `streamId`   | Yes      | `string` |                                                                           |
@@ -3111,40 +3356,17 @@ The acknowledgement of a streaming run.
 
 What one turn is asked for, when the client wants its events streamed.
 
-| Field             | Required | Type                                                                          | Description                                                                 |
-| ----------------- | -------- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| `agentId`         | No       | `string`                                                                      |                                                                             |
-| `attachments`     | No       | Array of [InboundAttachment](protocol.md#inboundattachment)                   | User-authored image, video, document, and text blocks, in display order.    |
-| `conversationId`  | No       | `string`                                                                      | Continues an existing conversation.                                         |
-| `cwd`             | No       | `string`                                                                      | Where tools operate.                                                        |
-| `message`         | Yes      | `string`                                                                      | User text; may be blank when at least one attachment contains content.      |
-| `reasoningEffort` | No       | `"high"` / `"low"` / `"max"` / `"medium"` / `"minimal"` / `"off"` / `"xhigh"` | Per-turn reasoning preference; never changes the saved agent configuration. |
-| `streamId`        | No       | `string`                                                                      | The stream's id, chosen by the CLIENT.                                      |
-| `userId`          | No       | `string`                                                                      | The principal the turn is billed and authorized as.                         |
-
-## SurfaceFormatting
-
-What the platform can render, so the model writes for it rather than for a web page.
-
-| Field      | Required | Type                                                  | Description                                                                                |
-| ---------- | -------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| `markup`   | Yes      | `"commonmark"` / `"plain"` / `"slack"` / `"telegram"` | The markup dialect the platform renders: CommonMark, Telegram's MarkdownV2 subset, Slack's |
-| `maxChars` | No       | `number`                                              | The most characters one message may carry; longer replies are split by the channel.        |
-| `tables`   | Yes      | `boolean`                                             | Whether tables render. On most chat platforms they do not.                                 |
-
-## SurfaceKind
-
-What kind of place the conversation is.
-
-Type: `"direct"` / `"group"`.
-
-## SurfaceParticipant
-
-| Field         | Required | Type                                           | Description                                                                |
-| ------------- | -------- | ---------------------------------------------- | -------------------------------------------------------------------------- |
-| `displayName` | Yes      | `string`                                       | What to call them. The label a group message is prefixed with.             |
-| `id`          | Yes      | `string`                                       | The platform's stable id for them (a Telegram user id, a Slack member id). |
-| `role`        | No       | `"admin"` / `"guest"` / `"member"` / `"owner"` | Their standing in this deployment, when the access registry knows it.      |
+| Field               | Required | Type                                                                          | Description                                                                 |
+| ------------------- | -------- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `agentId`           | No       | `string`                                                                      |                                                                             |
+| `attachments`       | No       | Array of [InboundAttachment](protocol.md#inboundattachment)                   | User-authored image, video, document, and text blocks, in display order.    |
+| `conversationId`    | No       | `string`                                                                      | Continues an existing conversation.                                         |
+| `cwd`               | No       | `string`                                                                      | Where tools operate.                                                        |
+| `message`           | Yes      | `string`                                                                      | User text; may be blank when at least one attachment contains content.      |
+| `reasoningEffort`   | No       | `"high"` / `"low"` / `"max"` / `"medium"` / `"minimal"` / `"off"` / `"xhigh"` | Per-turn reasoning preference; never changes the saved agent configuration. |
+| `streamId`          | No       | `string`                                                                      | The stream's id, chosen by the CLIENT.                                      |
+| `targetTimeSeconds` | No       | `integer`                                                                     | Soft task time target in seconds; never a cancellation deadline.            |
+| `userId`            | No       | `string`                                                                      | The principal the turn is billed and authorized as.                         |
 
 ## TaskRecord
 
@@ -3322,29 +3544,6 @@ One tool call's outcome, paired back to its call.
 | `durationMs` | Yes      | `number`                             |             |
 | `result`     | Yes      | [ToolResult](protocol.md#toolresult) |             |
 
-## ToolPrincipal
-
-Who is making a tool call.
-
-| Field                          | Required | Type                                                 | Description                                                                            |
-| ------------------------------ | -------- | ---------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| `agentId`                      | Yes      | `string`                                             |                                                                                        |
-| `channelAccessLevel`           | No       | `"admin"` / `"denied"` / `"member"` / `"owner"`      | Authenticated channel role. Absent for the local operator/CLI.                         |
-| `channelConversationId`        | No       | `string`                                             | Native channel carrying the active request, authenticated by the channel adapter.      |
-| `channelGuildId`               | No       | `string`                                             | The server/guild containing this channel turn, when the platform supplies one.         |
-| `channelPlatformAdministrator` | No       | `boolean`                                            | Native Discord Administrator authority, independently verified by the Discord adapter. |
-| `channelPlatformRoleIds`       | No       | Array of `string`                                    | Native Discord role ids used for tool-time authority verification.                     |
-| `channelPlatformUserId`        | No       | `string`                                             | Native channel account id, retained separately from the mapped Nexa principal id.      |
-| `channelThreadId`              | No       | `string`                                             | Native thread carrying the active request, when distinct from its parent channel.      |
-| `companyExecution`             | No       | `true`                                               | Host-issued company execution is always confined, never the local machine operator.    |
-| `conversationId`               | No       | `string`                                             |                                                                                        |
-| `discordAppOnly`               | No       | `boolean`                                            | Authenticated personal Discord app invocation, without server-bot capabilities.        |
-| `machineId`                    | No       | `string`                                             | The machine this caller's work runs on, when their account names one.                  |
-| `maxRisk`                      | No       | `"destructive"` / `"execute"` / `"read"` / `"write"` | The highest risk this caller may reach, whatever the deployment ceiling allows.        |
-| `projectId`                    | No       | `string`                                             |                                                                                        |
-| `sourceAccessDenied`           | No       | `boolean`                                            | Host-enforced source confinement for gateway callers, including the web UI.            |
-| `userId`                       | No       | `string`                                             |                                                                                        |
-
 ## ToolProgress
 
 | Field        | Required | Type                                                         | Description                                                                       |
@@ -3352,6 +3551,7 @@ Who is making a tool call.
 | `attachment` | No       | [ToolProgressAttachment](protocol.md#toolprogressattachment) | Transient visual progress for the active chat; never persisted in the transcript. |
 | `fraction`   | No       | `number`                                                     | Completed fraction in `[0, 1]`, when the tool can know it.                        |
 | `status`     | No       | `string`                                                     | A one-line status, e.g. `running tests…`.                                         |
+| `terminal`   | No       | [ToolTerminal](protocol.md#toolterminal)                     | Live pseudoterminal identity for authenticated input and resize controls.         |
 | `text`       | No       | `string`                                                     | Text appended to the live view.                                                   |
 
 ## ToolProgressAttachment
@@ -3465,18 +3665,31 @@ A tool's outcome, as a top-level message rather than a block nested inside a use
 
 Asynchronous tool decoration; may arrive after turn.end and never blocks it.
 
-| Field       | Required | Type                                            | Description |
-| ----------- | -------- | ----------------------------------------------- | ----------- |
-| `callId`    | Yes      | `string`                                        |             |
-| `sessionId` | No       | `string`                                        |             |
-| `sites`     | Yes      | Array of [SitePreview](protocol.md#sitepreview) |             |
-| `streamId`  | Yes      | `string`                                        |             |
+| Field       | Required | Type                                            | Description                                                                      |
+| ----------- | -------- | ----------------------------------------------- | -------------------------------------------------------------------------------- |
+| `callId`    | Yes      | `string`                                        |                                                                                  |
+| `historyAt` | No       | `number`                                        | Original event time, retained across checkpoint and replay.                      |
+| `historyId` | No       | `string`                                        | Stable record identity shared by the immediate event and its later durable copy. |
+| `sessionId` | No       | `string`                                        |                                                                                  |
+| `sites`     | Yes      | Array of [SitePreview](protocol.md#sitepreview) |                                                                                  |
+| `streamId`  | Yes      | `string`                                        |                                                                                  |
 
 ## ToolStatus
 
 What a tool did, from the agent's point of view.
 
 Type: `"aborted"` / `"denied"` / `"error"` / `"ok"`.
+
+## ToolTerminal
+
+A terminal belongs to the session that launched this exact process.
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `cols`      | Yes      | `number` |             |
+| `processId` | Yes      | `string` |             |
+| `rows`      | Yes      | `number` |             |
+| `sessionId` | Yes      | `string` |             |
 
 ## TruncationRecord
 
@@ -3503,21 +3716,25 @@ Type: `"head"` / `"head-tail"` / `"hunk-head"` / `"summary-head"` / `"tail"`.
 
 The payload of a {@link GATEWAY_EVENTS.TurnEnd} event.
 
-| Field       | Required | Type                               | Description                                                       |
-| ----------- | -------- | ---------------------------------- | ----------------------------------------------------------------- |
-| `error`     | No       | [WireError](protocol.md#wireerror) | An error, in the shape a client can act on without parsing prose. |
-| `ok`        | Yes      | `boolean`                          |                                                                   |
-| `result`    | No       | [AskResult](protocol.md#askresult) | What a finished turn produced.                                    |
-| `sessionId` | No       | `string`                           |                                                                   |
-| `streamId`  | Yes      | `string`                           |                                                                   |
+| Field       | Required | Type                               | Description                                                                      |
+| ----------- | -------- | ---------------------------------- | -------------------------------------------------------------------------------- |
+| `error`     | No       | [WireError](protocol.md#wireerror) | An error, in the shape a client can act on without parsing prose.                |
+| `historyAt` | No       | `number`                           | Original event time, retained across checkpoint and replay.                      |
+| `historyId` | No       | `string`                           | Stable record identity shared by the immediate event and its later durable copy. |
+| `ok`        | Yes      | `boolean`                          |                                                                                  |
+| `result`    | No       | [AskResult](protocol.md#askresult) | What a finished turn produced.                                                   |
+| `sessionId` | No       | `string`                           |                                                                                  |
+| `streamId`  | Yes      | `string`                           |                                                                                  |
 
 ## TurnEventData
 
-| Field       | Required | Type                                       | Description |
-| ----------- | -------- | ------------------------------------------ | ----------- |
-| `event`     | Yes      | [WireTurnEvent](protocol.md#wireturnevent) |             |
-| `sessionId` | No       | `string`                                   |             |
-| `streamId`  | Yes      | `string`                                   |             |
+| Field       | Required | Type                                       | Description                                                                      |
+| ----------- | -------- | ------------------------------------------ | -------------------------------------------------------------------------------- |
+| `event`     | Yes      | [WireTurnEvent](protocol.md#wireturnevent) |                                                                                  |
+| `historyAt` | No       | `number`                                   | Original event time, retained across checkpoint and replay.                      |
+| `historyId` | No       | `string`                                   | Stable record identity shared by the immediate event and its later durable copy. |
+| `sessionId` | No       | `string`                                   |                                                                                  |
+| `streamId`  | Yes      | `string`                                   |                                                                                  |
 
 ## UserContentBlock
 

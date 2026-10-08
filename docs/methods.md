@@ -47,6 +47,11 @@ All 54 protocol methods. `connect` is managed by `NexaClient.connect`; the remai
 - [logs.tail](#logs-tail)
 - [media.acknowledge](#media-acknowledge)
 - [office.ownerProof](#office-ownerProof)
+- [processes.input](#processes-input)
+- [processes.list](#processes-list)
+- [processes.log](#processes-log)
+- [processes.resize](#processes-resize)
+- [processes.stop](#processes-stop)
 - [roblox.credentials.remove](#roblox-credentials-remove)
 - [roblox.credentials.set](#roblox-credentials-set)
 - [roblox.credentials.status](#roblox-credentials-status)
@@ -58,9 +63,16 @@ All 54 protocol methods. `connect` is managed by `NexaClient.connect`; the remai
 - [sessions.files](#sessions-files)
 - [sessions.get](#sessions-get)
 - [sessions.history](#sessions-history)
+- [sessions.input](#sessions-input)
 - [sessions.list](#sessions-list)
 - [sessions.messages](#sessions-messages)
+- [sessions.pin](#sessions-pin)
+- [sessions.pins](#sessions-pins)
+- [sessions.rename](#sessions-rename)
+- [sessions.retry](#sessions-retry)
+- [sessions.search](#sessions-search)
 - [sessions.subscribe](#sessions-subscribe)
+- [sessions.unpin](#sessions-unpin)
 - [sessions.unsubscribe](#sessions-unsubscribe)
 - [shares.create](#shares-create)
 - [shares.list](#shares-list)
@@ -181,15 +193,16 @@ With a personal API key, omit `userId`; the gateway uses the authenticated ident
 
 Parameters: [AskParams](protocol.md#askparams).
 
-| Field             | Required | Type                                                                          | Description                                                                 |
-| ----------------- | -------- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| `agentId`         | No       | `string`                                                                      |                                                                             |
-| `attachments`     | No       | Array of [InboundAttachment](protocol.md#inboundattachment)                   | User-authored image, video, document, and text blocks, in display order.    |
-| `conversationId`  | No       | `string`                                                                      | Continues an existing conversation.                                         |
-| `cwd`             | No       | `string`                                                                      | Where tools operate.                                                        |
-| `message`         | Yes      | `string`                                                                      | User text; may be blank when at least one attachment contains content.      |
-| `reasoningEffort` | No       | `"high"` / `"low"` / `"max"` / `"medium"` / `"minimal"` / `"off"` / `"xhigh"` | Per-turn reasoning preference; never changes the saved agent configuration. |
-| `userId`          | No       | `string`                                                                      | The principal the turn is billed and authorized as.                         |
+| Field               | Required | Type                                                                          | Description                                                                 |
+| ------------------- | -------- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `agentId`           | No       | `string`                                                                      |                                                                             |
+| `attachments`       | No       | Array of [InboundAttachment](protocol.md#inboundattachment)                   | User-authored image, video, document, and text blocks, in display order.    |
+| `conversationId`    | No       | `string`                                                                      | Continues an existing conversation.                                         |
+| `cwd`               | No       | `string`                                                                      | Where tools operate.                                                        |
+| `message`           | Yes      | `string`                                                                      | User text; may be blank when at least one attachment contains content.      |
+| `reasoningEffort`   | No       | `"high"` / `"low"` / `"max"` / `"medium"` / `"minimal"` / `"off"` / `"xhigh"` | Per-turn reasoning preference; never changes the saved agent configuration. |
+| `targetTimeSeconds` | No       | `integer`                                                                     | Soft task time target in seconds; never a cancellation deadline.            |
+| `userId`            | No       | `string`                                                                      | The principal the turn is billed and authorized as.                         |
 
 Result: [AskResult](protocol.md#askresult).
 
@@ -229,16 +242,17 @@ With a personal API key, omit `userId`; the gateway uses the authenticated ident
 
 Parameters: [StreamParams](protocol.md#streamparams).
 
-| Field             | Required | Type                                                                          | Description                                                                 |
-| ----------------- | -------- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| `agentId`         | No       | `string`                                                                      |                                                                             |
-| `attachments`     | No       | Array of [InboundAttachment](protocol.md#inboundattachment)                   | User-authored image, video, document, and text blocks, in display order.    |
-| `conversationId`  | No       | `string`                                                                      | Continues an existing conversation.                                         |
-| `cwd`             | No       | `string`                                                                      | Where tools operate.                                                        |
-| `message`         | Yes      | `string`                                                                      | User text; may be blank when at least one attachment contains content.      |
-| `reasoningEffort` | No       | `"high"` / `"low"` / `"max"` / `"medium"` / `"minimal"` / `"off"` / `"xhigh"` | Per-turn reasoning preference; never changes the saved agent configuration. |
-| `streamId`        | No       | `string`                                                                      | The stream's id, chosen by the CLIENT.                                      |
-| `userId`          | No       | `string`                                                                      | The principal the turn is billed and authorized as.                         |
+| Field               | Required | Type                                                                          | Description                                                                 |
+| ------------------- | -------- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `agentId`           | No       | `string`                                                                      |                                                                             |
+| `attachments`       | No       | Array of [InboundAttachment](protocol.md#inboundattachment)                   | User-authored image, video, document, and text blocks, in display order.    |
+| `conversationId`    | No       | `string`                                                                      | Continues an existing conversation.                                         |
+| `cwd`               | No       | `string`                                                                      | Where tools operate.                                                        |
+| `message`           | Yes      | `string`                                                                      | User text; may be blank when at least one attachment contains content.      |
+| `reasoningEffort`   | No       | `"high"` / `"low"` / `"max"` / `"medium"` / `"minimal"` / `"off"` / `"xhigh"` | Per-turn reasoning preference; never changes the saved agent configuration. |
+| `streamId`          | No       | `string`                                                                      | The stream's id, chosen by the CLIENT.                                      |
+| `targetTimeSeconds` | No       | `integer`                                                                     | Soft task time target in seconds; never a cancellation deadline.            |
+| `userId`            | No       | `string`                                                                      | The principal the turn is billed and authorized as.                         |
 
 Result: [StreamAccepted](protocol.md#streamaccepted).
 
@@ -1031,6 +1045,128 @@ Parameters: Object (fields below).
 
 Result: Object (fields below).
 
+## processes.input
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ProcessesInput> = {
+    data: 'YOUR_DATA',
+    processId: 'YOUR_PROCESSID',
+    sessionId: 'YOUR_SESSIONID',
+};
+const result: ResultOf<typeof Method.ProcessesInput> = await client.call(
+    Method.ProcessesInput,
+    params,
+);
+```
+
+Parameters: [ProcessInput](protocol.md#processinput).
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `data`      | Yes      | `string` |             |
+| `processId` | Yes      | `string` |             |
+| `sessionId` | Yes      | `string` |             |
+
+Result: [OkResult](protocol.md#okresult).
+
+## processes.list
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ProcessesList> = {
+    sessionId: 'YOUR_SESSIONID',
+};
+const result: ResultOf<typeof Method.ProcessesList> = await client.call(
+    Method.ProcessesList,
+    params,
+);
+```
+
+Parameters: [SessionRef](protocol.md#sessionref).
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `sessionId` | Yes      | `string` |             |
+
+Result: Array of [BackgroundProcess](protocol.md#backgroundprocess).
+
+## processes.log
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ProcessesLog> = {
+    processId: 'YOUR_PROCESSID',
+    sessionId: 'YOUR_SESSIONID',
+};
+const result: ResultOf<typeof Method.ProcessesLog> = await client.call(Method.ProcessesLog, params);
+```
+
+Parameters: [ProcessLogRef](protocol.md#processlogref).
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `offset`    | No       | `string` |             |
+| `processId` | Yes      | `string` |             |
+| `sessionId` | Yes      | `string` |             |
+
+Result: [BackgroundProcessLog](protocol.md#backgroundprocesslog).
+
+## processes.resize
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ProcessesResize> = {
+    cols: 1,
+    processId: 'YOUR_PROCESSID',
+    rows: 1,
+    sessionId: 'YOUR_SESSIONID',
+};
+const result: ResultOf<typeof Method.ProcessesResize> = await client.call(
+    Method.ProcessesResize,
+    params,
+);
+```
+
+Parameters: [ProcessResize](protocol.md#processresize).
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `cols`      | Yes      | `number` |             |
+| `processId` | Yes      | `string` |             |
+| `rows`      | Yes      | `number` |             |
+| `sessionId` | Yes      | `string` |             |
+
+Result: [OkResult](protocol.md#okresult).
+
+## processes.stop
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ProcessesStop> = {
+    processId: 'YOUR_PROCESSID',
+    sessionId: 'YOUR_SESSIONID',
+};
+const result: ResultOf<typeof Method.ProcessesStop> = await client.call(
+    Method.ProcessesStop,
+    params,
+);
+```
+
+Parameters: [BackgroundProcessRef](protocol.md#backgroundprocessref).
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `processId` | Yes      | `string` |             |
+| `sessionId` | Yes      | `string` |             |
+
+Result: [OkResult](protocol.md#okresult).
+
 ## roblox.credentials.remove
 
 ```ts
@@ -1278,6 +1414,33 @@ Parameters: [SessionHistoryParams](protocol.md#sessionhistoryparams).
 
 Result: [SessionHistoryPage](protocol.md#sessionhistorypage).
 
+## sessions.input
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.SessionsInput> = {
+    id: 'YOUR_ID',
+    message: {
+        key: 'YOUR_KEY',
+        kind: 'entry',
+    },
+};
+const result: ResultOf<typeof Method.SessionsInput> = await client.call(
+    Method.SessionsInput,
+    params,
+);
+```
+
+Parameters: [ConversationPinParams](protocol.md#conversationpinparams).
+
+| Field     | Required | Type                                                         | Description |
+| --------- | -------- | ------------------------------------------------------------ | ----------- |
+| `id`      | Yes      | `string`                                                     |             |
+| `message` | Yes      | [ConversationMessageRef](protocol.md#conversationmessageref) |             |
+
+Result: [ConversationInput](protocol.md#conversationinput).
+
 ## sessions.list
 
 ```ts
@@ -1319,6 +1482,131 @@ Parameters: [IdParams](protocol.md#idparams).
 
 Result: Array of [ModelMessage](protocol.md#modelmessage).
 
+## sessions.pin
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.SessionsPin> = {
+    id: 'YOUR_ID',
+    message: {
+        key: 'YOUR_KEY',
+        kind: 'entry',
+    },
+};
+const result: ResultOf<typeof Method.SessionsPin> = await client.call(Method.SessionsPin, params);
+```
+
+Parameters: [ConversationPinParams](protocol.md#conversationpinparams).
+
+| Field     | Required | Type                                                         | Description |
+| --------- | -------- | ------------------------------------------------------------ | ----------- |
+| `id`      | Yes      | `string`                                                     |             |
+| `message` | Yes      | [ConversationMessageRef](protocol.md#conversationmessageref) |             |
+
+Result: [ConversationPin](protocol.md#conversationpin).
+
+## sessions.pins
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.SessionsPins> = {};
+const result: ResultOf<typeof Method.SessionsPins> = await client.call(Method.SessionsPins, params);
+```
+
+Parameters: [ConversationPinsParams](protocol.md#conversationpinsparams).
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `before` | No       | `string` |             |
+| `limit`  | No       | `number` |             |
+
+Result: [ConversationPinsPage](protocol.md#conversationpinspage).
+
+## sessions.rename
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.SessionsRename> = {
+    expectedTitle: 'YOUR_EXPECTEDTITLE',
+    id: 'YOUR_ID',
+    title: 'YOUR_TITLE',
+};
+const result: ResultOf<typeof Method.SessionsRename> = await client.call(
+    Method.SessionsRename,
+    params,
+);
+```
+
+Parameters: [ConversationRenameParams](protocol.md#conversationrenameparams).
+
+| Field           | Required | Type          | Description |
+| --------------- | -------- | ------------- | ----------- |
+| `expectedTitle` | Yes      | `null,string` |             |
+| `id`            | Yes      | `string`      |             |
+| `title`         | Yes      | `string`      |             |
+
+Result: [Session](protocol.md#session).
+
+## sessions.retry
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.SessionsRetry> = {
+    id: 'YOUR_ID',
+    message: {
+        key: 'YOUR_KEY',
+        kind: 'entry',
+    },
+    mode: 'edit',
+    requestId: 'YOUR_REQUESTID',
+};
+const result: ResultOf<typeof Method.SessionsRetry> = await client.call(
+    Method.SessionsRetry,
+    params,
+);
+```
+
+Parameters: [ConversationRetryParams](protocol.md#conversationretryparams).
+
+| Field               | Required | Type                                                                          | Description |
+| ------------------- | -------- | ----------------------------------------------------------------------------- | ----------- |
+| `id`                | Yes      | `string`                                                                      |             |
+| `message`           | Yes      | [ConversationMessageRef](protocol.md#conversationmessageref)                  |             |
+| `mode`              | Yes      | `"edit"` / `"regenerate"`                                                     |             |
+| `reasoningEffort`   | No       | `"high"` / `"low"` / `"max"` / `"medium"` / `"minimal"` / `"off"` / `"xhigh"` |             |
+| `requestId`         | Yes      | `string`                                                                      |             |
+| `targetTimeSeconds` | No       | `number`                                                                      |             |
+| `text`              | No       | `string`                                                                      |             |
+
+Result: [ConversationRetryResult](protocol.md#conversationretryresult).
+
+## sessions.search
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.SessionsSearch> = {
+    query: 'YOUR_QUERY',
+};
+const result: ResultOf<typeof Method.SessionsSearch> = await client.call(
+    Method.SessionsSearch,
+    params,
+);
+```
+
+Parameters: [ConversationSearchParams](protocol.md#conversationsearchparams).
+
+| Field   | Required | Type     | Description |
+| ------- | -------- | -------- | ----------- |
+| `limit` | No       | `number` |             |
+| `query` | Yes      | `string` |             |
+
+Result: Array of [ConversationSearchHit](protocol.md#conversationsearchhit).
+
 ## sessions.subscribe
 
 ```ts
@@ -1338,6 +1626,28 @@ Parameters: [SessionRef](protocol.md#sessionref).
 | Field       | Required | Type     | Description |
 | ----------- | -------- | -------- | ----------- |
 | `sessionId` | Yes      | `string` |             |
+
+Result: [OkResult](protocol.md#okresult).
+
+## sessions.unpin
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.SessionsUnpin> = {
+    pinId: 'YOUR_PINID',
+};
+const result: ResultOf<typeof Method.SessionsUnpin> = await client.call(
+    Method.SessionsUnpin,
+    params,
+);
+```
+
+Parameters: [ConversationUnpinParams](protocol.md#conversationunpinparams).
+
+| Field   | Required | Type     | Description |
+| ------- | -------- | -------- | ----------- |
+| `pinId` | Yes      | `string` |             |
 
 Result: [OkResult](protocol.md#okresult).
 

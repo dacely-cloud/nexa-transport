@@ -315,9 +315,6 @@ export const schema: Schema = {
                 {
                     $ref: '#/definitions/CompactionSummaryMessage',
                 },
-                {
-                    $ref: '#/definitions/BranchSummaryMessage',
-                },
             ],
         },
         AgentVoice: {
@@ -784,38 +781,6 @@ export const schema: Schema = {
             ],
             description:
                 'Where binary content comes from: inline base64, or a URL the provider fetches.',
-        },
-        BranchSummaryMessage: {
-            description: 'The artifact of returning from a branch.',
-            properties: {
-                excludeFromContext: {
-                    description:
-                        'Kept in session history, hidden from the model.\n\nOn the base rather than a separate role because *any* role can need it: a bash-execution\nrecord, a long tool output the user asked to keep, a channel join notice. All of them stay\nvisible, searchable and exportable without eating context.',
-                    type: 'boolean',
-                },
-                fromId: {
-                    description: 'Session entry id the branch forked from.',
-                    type: 'string',
-                },
-                id: {
-                    description:
-                        'UUIDv7. Stable across persistence; the session tree addresses messages by it.',
-                    type: 'string',
-                },
-                role: {
-                    const: 'branch-summary',
-                    type: 'string',
-                },
-                summary: {
-                    type: 'string',
-                },
-                timestamp: {
-                    description: 'Epoch milliseconds.',
-                    type: 'number',
-                },
-            },
-            required: ['fromId', 'id', 'role', 'summary', 'timestamp'],
-            type: 'object',
         },
         Budget: {
             description: 'A spending limit over one scope.',
@@ -1351,19 +1316,6 @@ export const schema: Schema = {
             ],
             description: "One block of a message's content.",
         },
-        ConversationBranchParams: {
-            description: 'Creates a durable independent branch of the complete saved conversation.',
-            properties: {
-                id: {
-                    type: 'string',
-                },
-                requestId: {
-                    type: 'string',
-                },
-            },
-            required: ['id', 'requestId'],
-            type: 'object',
-        },
         ConversationInput: {
             description:
                 'Only editable text and a media count cross the wire when opening the message editor.',
@@ -1528,7 +1480,7 @@ export const schema: Schema = {
                 'A saved version is returned even when its model run was already started by a lost acknowledgement.',
             properties: {
                 session: {
-                    $ref: '#/definitions/Flatten%3C%7Breadonlytitle%3Astring%7Cnull%3Breadonlyid%3Astring%3BreadonlyagentId%3Astring%3BreadonlycreatedAt%3Anumber%3BreadonlyupdatedAt%3Anumber%3BreadonlyconversationId%3Astring%7Cnull%3Breadonlyparticipants%3Areadonlystring%5B%5D%3BreadonlymessageCount%3Anumber%3Breadonlyusage%3ATokenUsage%3B%7D%26%7BreadonlytitleEdited%3F%3Aboolean%7Cundefined%3BreadonlybranchedFrom%3F%3Astring%7Cundefined%3BreadonlybranchRequestId%3F%3Astring%7Cundefined%3BreadonlyretryState%3F%3Astring%7Cundefined%3BreadonlyretryFingerprint%3F%3Astring%7Cundefined%3BreadonlyactiveToolFamilies%3F%3Areadonlystring%5B%5D%7Cundefined%3BreadonlyprojectId%3F%3Astring%7Cundefined%3BreadonlyuserId%3F%3Astring%7Cundefined%3BreadonlyworkspaceId%3F%3Astring%7Cundefined%3BreadonlyturnOpen%3F%3Aboolean%7Cundefined%3B%7D%3E',
+                    $ref: '#/definitions/Flatten%3C%7Breadonlytitle%3Astring%7Cnull%3Breadonlyid%3Astring%3BreadonlyagentId%3Astring%3BreadonlycreatedAt%3Anumber%3BreadonlyupdatedAt%3Anumber%3BreadonlyconversationId%3Astring%7Cnull%3Breadonlyparticipants%3Areadonlystring%5B%5D%3BreadonlymessageCount%3Anumber%3Breadonlyusage%3ATokenUsage%3B%7D%26%7BreadonlytitleEdited%3F%3Aboolean%7Cundefined%3BreadonlyretrySourceId%3F%3Astring%7Cundefined%3BreadonlyretryRequestId%3F%3Astring%7Cundefined%3BreadonlyretryState%3F%3Astring%7Cundefined%3BreadonlyretryFingerprint%3F%3Astring%7Cundefined%3BreadonlyactiveToolFamilies%3F%3Areadonlystring%5B%5D%7Cundefined%3BreadonlyprojectId%3F%3Astring%7Cundefined%3BreadonlyuserId%3F%3Astring%7Cundefined%3BreadonlyworkspaceId%3F%3Astring%7Cundefined%3BreadonlyturnOpen%3F%3Aboolean%7Cundefined%3B%7D%3E',
                 },
                 started: {
                     type: 'boolean',
@@ -1555,7 +1507,7 @@ export const schema: Schema = {
                     type: 'string',
                 },
                 session: {
-                    $ref: '#/definitions/Flatten%3C%7Breadonlytitle%3Astring%7Cnull%3Breadonlyid%3Astring%3BreadonlyagentId%3Astring%3BreadonlycreatedAt%3Anumber%3BreadonlyupdatedAt%3Anumber%3BreadonlyconversationId%3Astring%7Cnull%3Breadonlyparticipants%3Areadonlystring%5B%5D%3BreadonlymessageCount%3Anumber%3Breadonlyusage%3ATokenUsage%3B%7D%26%7BreadonlytitleEdited%3F%3Aboolean%7Cundefined%3BreadonlybranchedFrom%3F%3Astring%7Cundefined%3BreadonlybranchRequestId%3F%3Astring%7Cundefined%3BreadonlyretryState%3F%3Astring%7Cundefined%3BreadonlyretryFingerprint%3F%3Astring%7Cundefined%3BreadonlyactiveToolFamilies%3F%3Areadonlystring%5B%5D%7Cundefined%3BreadonlyprojectId%3F%3Astring%7Cundefined%3BreadonlyuserId%3F%3Astring%7Cundefined%3BreadonlyworkspaceId%3F%3Astring%7Cundefined%3BreadonlyturnOpen%3F%3Aboolean%7Cundefined%3B%7D%3E',
+                    $ref: '#/definitions/Flatten%3C%7Breadonlytitle%3Astring%7Cnull%3Breadonlyid%3Astring%3BreadonlyagentId%3Astring%3BreadonlycreatedAt%3Anumber%3BreadonlyupdatedAt%3Anumber%3BreadonlyconversationId%3Astring%7Cnull%3Breadonlyparticipants%3Areadonlystring%5B%5D%3BreadonlymessageCount%3Anumber%3Breadonlyusage%3ATokenUsage%3B%7D%26%7BreadonlytitleEdited%3F%3Aboolean%7Cundefined%3BreadonlyretrySourceId%3F%3Astring%7Cundefined%3BreadonlyretryRequestId%3F%3Astring%7Cundefined%3BreadonlyretryState%3F%3Astring%7Cundefined%3BreadonlyretryFingerprint%3F%3Astring%7Cundefined%3BreadonlyactiveToolFamilies%3F%3Areadonlystring%5B%5D%7Cundefined%3BreadonlyprojectId%3F%3Astring%7Cundefined%3BreadonlyuserId%3F%3Astring%7Cundefined%3BreadonlyworkspaceId%3F%3Astring%7Cundefined%3BreadonlyturnOpen%3F%3Aboolean%7Cundefined%3B%7D%3E',
                 },
                 snippet: {
                     type: 'string',
@@ -2211,7 +2163,7 @@ export const schema: Schema = {
                 required: ['id', 'parentId', 'sessionId', 'timestamp', 'visibility'],
                 type: 'object',
             },
-        'Flatten<{readonlytitle:string|null;readonlyid:string;readonlyagentId:string;readonlycreatedAt:number;readonlyupdatedAt:number;readonlyconversationId:string|null;readonlyparticipants:readonlystring[];readonlymessageCount:number;readonlyusage:TokenUsage;}&{readonlytitleEdited?:boolean|undefined;readonlybranchedFrom?:string|undefined;readonlybranchRequestId?:string|undefined;readonlyretryState?:string|undefined;readonlyretryFingerprint?:string|undefined;readonlyactiveToolFamilies?:readonlystring[]|undefined;readonlyprojectId?:string|undefined;readonlyuserId?:string|undefined;readonlyworkspaceId?:string|undefined;readonlyturnOpen?:boolean|undefined;}>':
+        'Flatten<{readonlytitle:string|null;readonlyid:string;readonlyagentId:string;readonlycreatedAt:number;readonlyupdatedAt:number;readonlyconversationId:string|null;readonlyparticipants:readonlystring[];readonlymessageCount:number;readonlyusage:TokenUsage;}&{readonlytitleEdited?:boolean|undefined;readonlyretrySourceId?:string|undefined;readonlyretryRequestId?:string|undefined;readonlyretryState?:string|undefined;readonlyretryFingerprint?:string|undefined;readonlyactiveToolFamilies?:readonlystring[]|undefined;readonlyprojectId?:string|undefined;readonlyuserId?:string|undefined;readonlyworkspaceId?:string|undefined;readonlyturnOpen?:boolean|undefined;}>':
             {
                 description:
                     'Collapses the required/optional intersection into one object type.\n\nHomomorphic (`in keyof T` over a naked type parameter), so `readonly` and `?` are carried through\nrather than flattened away — without it every derived type would lose its modifiers and a caller\ncould assign to a field the store treats as immutable.',
@@ -2223,12 +2175,6 @@ export const schema: Schema = {
                         type: 'array',
                     },
                     agentId: {
-                        type: 'string',
-                    },
-                    branchRequestId: {
-                        type: 'string',
-                    },
-                    branchedFrom: {
                         type: 'string',
                     },
                     conversationId: {
@@ -2253,6 +2199,12 @@ export const schema: Schema = {
                         type: 'string',
                     },
                     retryFingerprint: {
+                        type: 'string',
+                    },
+                    retryRequestId: {
+                        type: 'string',
+                    },
+                    retrySourceId: {
                         type: 'string',
                     },
                     retryState: {
@@ -3530,18 +3482,6 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
-                'sessions.branch': {
-                    properties: {
-                        params: {
-                            $ref: '#/definitions/ConversationBranchParams',
-                        },
-                        result: {
-                            $ref: '#/definitions/Flatten%3C%7Breadonlytitle%3Astring%7Cnull%3Breadonlyid%3Astring%3BreadonlyagentId%3Astring%3BreadonlycreatedAt%3Anumber%3BreadonlyupdatedAt%3Anumber%3BreadonlyconversationId%3Astring%7Cnull%3Breadonlyparticipants%3Areadonlystring%5B%5D%3BreadonlymessageCount%3Anumber%3Breadonlyusage%3ATokenUsage%3B%7D%26%7BreadonlytitleEdited%3F%3Aboolean%7Cundefined%3BreadonlybranchedFrom%3F%3Astring%7Cundefined%3BreadonlybranchRequestId%3F%3Astring%7Cundefined%3BreadonlyretryState%3F%3Astring%7Cundefined%3BreadonlyretryFingerprint%3F%3Astring%7Cundefined%3BreadonlyactiveToolFamilies%3F%3Areadonlystring%5B%5D%7Cundefined%3BreadonlyprojectId%3F%3Astring%7Cundefined%3BreadonlyuserId%3F%3Astring%7Cundefined%3BreadonlyworkspaceId%3F%3Astring%7Cundefined%3BreadonlyturnOpen%3F%3Aboolean%7Cundefined%3B%7D%3E',
-                        },
-                    },
-                    required: ['params', 'result'],
-                    type: 'object',
-                },
                 'sessions.delete': {
                     properties: {
                         params: {
@@ -3589,7 +3529,7 @@ export const schema: Schema = {
                         result: {
                             anyOf: [
                                 {
-                                    $ref: '#/definitions/Flatten%3C%7Breadonlytitle%3Astring%7Cnull%3Breadonlyid%3Astring%3BreadonlyagentId%3Astring%3BreadonlycreatedAt%3Anumber%3BreadonlyupdatedAt%3Anumber%3BreadonlyconversationId%3Astring%7Cnull%3Breadonlyparticipants%3Areadonlystring%5B%5D%3BreadonlymessageCount%3Anumber%3Breadonlyusage%3ATokenUsage%3B%7D%26%7BreadonlytitleEdited%3F%3Aboolean%7Cundefined%3BreadonlybranchedFrom%3F%3Astring%7Cundefined%3BreadonlybranchRequestId%3F%3Astring%7Cundefined%3BreadonlyretryState%3F%3Astring%7Cundefined%3BreadonlyretryFingerprint%3F%3Astring%7Cundefined%3BreadonlyactiveToolFamilies%3F%3Areadonlystring%5B%5D%7Cundefined%3BreadonlyprojectId%3F%3Astring%7Cundefined%3BreadonlyuserId%3F%3Astring%7Cundefined%3BreadonlyworkspaceId%3F%3Astring%7Cundefined%3BreadonlyturnOpen%3F%3Aboolean%7Cundefined%3B%7D%3E',
+                                    $ref: '#/definitions/Flatten%3C%7Breadonlytitle%3Astring%7Cnull%3Breadonlyid%3Astring%3BreadonlyagentId%3Astring%3BreadonlycreatedAt%3Anumber%3BreadonlyupdatedAt%3Anumber%3BreadonlyconversationId%3Astring%7Cnull%3Breadonlyparticipants%3Areadonlystring%5B%5D%3BreadonlymessageCount%3Anumber%3Breadonlyusage%3ATokenUsage%3B%7D%26%7BreadonlytitleEdited%3F%3Aboolean%7Cundefined%3BreadonlyretrySourceId%3F%3Astring%7Cundefined%3BreadonlyretryRequestId%3F%3Astring%7Cundefined%3BreadonlyretryState%3F%3Astring%7Cundefined%3BreadonlyretryFingerprint%3F%3Astring%7Cundefined%3BreadonlyactiveToolFamilies%3F%3Areadonlystring%5B%5D%7Cundefined%3BreadonlyprojectId%3F%3Astring%7Cundefined%3BreadonlyuserId%3F%3Astring%7Cundefined%3BreadonlyworkspaceId%3F%3Astring%7Cundefined%3BreadonlyturnOpen%3F%3Aboolean%7Cundefined%3B%7D%3E',
                                     description:
                                         'Collapses the required/optional intersection into one object type.\n\nHomomorphic (`in keyof T` over a naked type parameter), so `readonly` and `?` are carried through\nrather than flattened away — without it every derived type would lose its modifiers and a caller\ncould assign to a field the store treats as immutable.',
                                 },
@@ -3633,7 +3573,7 @@ export const schema: Schema = {
                         },
                         result: {
                             items: {
-                                $ref: '#/definitions/Flatten%3C%7Breadonlytitle%3Astring%7Cnull%3Breadonlyid%3Astring%3BreadonlyagentId%3Astring%3BreadonlycreatedAt%3Anumber%3BreadonlyupdatedAt%3Anumber%3BreadonlyconversationId%3Astring%7Cnull%3Breadonlyparticipants%3Areadonlystring%5B%5D%3BreadonlymessageCount%3Anumber%3Breadonlyusage%3ATokenUsage%3B%7D%26%7BreadonlytitleEdited%3F%3Aboolean%7Cundefined%3BreadonlybranchedFrom%3F%3Astring%7Cundefined%3BreadonlybranchRequestId%3F%3Astring%7Cundefined%3BreadonlyretryState%3F%3Astring%7Cundefined%3BreadonlyretryFingerprint%3F%3Astring%7Cundefined%3BreadonlyactiveToolFamilies%3F%3Areadonlystring%5B%5D%7Cundefined%3BreadonlyprojectId%3F%3Astring%7Cundefined%3BreadonlyuserId%3F%3Astring%7Cundefined%3BreadonlyworkspaceId%3F%3Astring%7Cundefined%3BreadonlyturnOpen%3F%3Aboolean%7Cundefined%3B%7D%3E',
+                                $ref: '#/definitions/Flatten%3C%7Breadonlytitle%3Astring%7Cnull%3Breadonlyid%3Astring%3BreadonlyagentId%3Astring%3BreadonlycreatedAt%3Anumber%3BreadonlyupdatedAt%3Anumber%3BreadonlyconversationId%3Astring%7Cnull%3Breadonlyparticipants%3Areadonlystring%5B%5D%3BreadonlymessageCount%3Anumber%3Breadonlyusage%3ATokenUsage%3B%7D%26%7BreadonlytitleEdited%3F%3Aboolean%7Cundefined%3BreadonlyretrySourceId%3F%3Astring%7Cundefined%3BreadonlyretryRequestId%3F%3Astring%7Cundefined%3BreadonlyretryState%3F%3Astring%7Cundefined%3BreadonlyretryFingerprint%3F%3Astring%7Cundefined%3BreadonlyactiveToolFamilies%3F%3Areadonlystring%5B%5D%7Cundefined%3BreadonlyprojectId%3F%3Astring%7Cundefined%3BreadonlyuserId%3F%3Astring%7Cundefined%3BreadonlyworkspaceId%3F%3Astring%7Cundefined%3BreadonlyturnOpen%3F%3Aboolean%7Cundefined%3B%7D%3E',
                             },
                             type: 'array',
                         },
@@ -3686,7 +3626,7 @@ export const schema: Schema = {
                             $ref: '#/definitions/ConversationRenameParams',
                         },
                         result: {
-                            $ref: '#/definitions/Flatten%3C%7Breadonlytitle%3Astring%7Cnull%3Breadonlyid%3Astring%3BreadonlyagentId%3Astring%3BreadonlycreatedAt%3Anumber%3BreadonlyupdatedAt%3Anumber%3BreadonlyconversationId%3Astring%7Cnull%3Breadonlyparticipants%3Areadonlystring%5B%5D%3BreadonlymessageCount%3Anumber%3Breadonlyusage%3ATokenUsage%3B%7D%26%7BreadonlytitleEdited%3F%3Aboolean%7Cundefined%3BreadonlybranchedFrom%3F%3Astring%7Cundefined%3BreadonlybranchRequestId%3F%3Astring%7Cundefined%3BreadonlyretryState%3F%3Astring%7Cundefined%3BreadonlyretryFingerprint%3F%3Astring%7Cundefined%3BreadonlyactiveToolFamilies%3F%3Areadonlystring%5B%5D%7Cundefined%3BreadonlyprojectId%3F%3Astring%7Cundefined%3BreadonlyuserId%3F%3Astring%7Cundefined%3BreadonlyworkspaceId%3F%3Astring%7Cundefined%3BreadonlyturnOpen%3F%3Aboolean%7Cundefined%3B%7D%3E',
+                            $ref: '#/definitions/Flatten%3C%7Breadonlytitle%3Astring%7Cnull%3Breadonlyid%3Astring%3BreadonlyagentId%3Astring%3BreadonlycreatedAt%3Anumber%3BreadonlyupdatedAt%3Anumber%3BreadonlyconversationId%3Astring%7Cnull%3Breadonlyparticipants%3Areadonlystring%5B%5D%3BreadonlymessageCount%3Anumber%3Breadonlyusage%3ATokenUsage%3B%7D%26%7BreadonlytitleEdited%3F%3Aboolean%7Cundefined%3BreadonlyretrySourceId%3F%3Astring%7Cundefined%3BreadonlyretryRequestId%3F%3Astring%7Cundefined%3BreadonlyretryState%3F%3Astring%7Cundefined%3BreadonlyretryFingerprint%3F%3Astring%7Cundefined%3BreadonlyactiveToolFamilies%3F%3Areadonlystring%5B%5D%7Cundefined%3BreadonlyprojectId%3F%3Astring%7Cundefined%3BreadonlyuserId%3F%3Astring%7Cundefined%3BreadonlyworkspaceId%3F%3Astring%7Cundefined%3BreadonlyturnOpen%3F%3Aboolean%7Cundefined%3B%7D%3E',
                         },
                     },
                     required: ['params', 'result'],
@@ -4048,7 +3988,6 @@ export const schema: Schema = {
                 'roblox.telemetry.funnel',
                 'roblox.telemetry.performance',
                 'roblox.telemetry.projects',
-                'sessions.branch',
                 'sessions.delete',
                 'sessions.download',
                 'sessions.files',
@@ -6739,29 +6678,6 @@ export const schema: Schema = {
                                 },
                             },
                             required: ['kind', 'reason'],
-                            type: 'object',
-                        },
-                    ],
-                },
-                {
-                    allOf: [
-                        {
-                            $ref: '#/definitions/Flatten%3C%7Breadonlyid%3Astring%3BreadonlyparentId%3Astring%7Cnull%3BreadonlysessionId%3Astring%3Breadonlytimestamp%3Anumber%3Breadonlyvisibility%3A%22active%22%7C%22compacted%22%7C%22rewound%22%3B%7D%26%7BreadonlyappendMode%3F%3A%22side%22%7Cundefined%3B%7D%3E',
-                        },
-                        {
-                            properties: {
-                                fromId: {
-                                    type: 'string',
-                                },
-                                kind: {
-                                    const: 'branch-summary',
-                                    type: 'string',
-                                },
-                                summary: {
-                                    type: 'string',
-                                },
-                            },
-                            required: ['fromId', 'kind', 'summary'],
                             type: 'object',
                         },
                     ],
