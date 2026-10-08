@@ -4296,6 +4296,18 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'workflows.models': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/WorkflowModelsRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/WorkflowModelsPage',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'workflows.planning.cancel': {
                     properties: {
                         params: {
@@ -4633,6 +4645,7 @@ export const schema: Schema = {
                 'workflows.catalog',
                 'workflows.create',
                 'workflows.list',
+                'workflows.models',
                 'workflows.planning.cancel',
                 'workflows.planning.history',
                 'workflows.planning.read',
@@ -10373,6 +10386,168 @@ export const schema: Schema = {
                 'nextNodeOffset',
                 'nodes',
                 'revision',
+                'workflowId',
+            ],
+            type: 'object',
+        },
+        WorkflowModelCapability: {
+            description: 'Operations currently supported by the direct text handler.',
+            enum: ['reasoning', 'text'],
+            type: 'string',
+        },
+        WorkflowModelChoice: {
+            description:
+                'Public model metadata only: no endpoints, keys, account names, or adapter options.',
+            properties: {
+                compatible: {
+                    type: 'boolean',
+                },
+                contextWindow: {
+                    type: ['null', 'number'],
+                },
+                id: {
+                    type: 'string',
+                },
+                input: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                maxOutputTokens: {
+                    type: ['null', 'number'],
+                },
+                name: {
+                    type: 'string',
+                },
+                price: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/WorkflowModelPrice',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                provider: {
+                    type: 'string',
+                },
+                reason: {
+                    type: ['null', 'string'],
+                },
+                reasoning: {
+                    type: ['null', 'boolean'],
+                },
+                source: {
+                    type: 'string',
+                },
+                status: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'compatible',
+                'contextWindow',
+                'id',
+                'input',
+                'maxOutputTokens',
+                'name',
+                'price',
+                'provider',
+                'reason',
+                'reasoning',
+                'source',
+                'status',
+            ],
+            type: 'object',
+        },
+        WorkflowModelPrice: {
+            description:
+                'Existing ledger rate-card values, represented as decimal text without client-side money math.',
+            properties: {
+                inputUsdPerMillion: {
+                    type: ['null', 'string'],
+                },
+                outputUsdPerMillion: {
+                    type: ['null', 'string'],
+                },
+            },
+            required: ['inputUsdPerMillion', 'outputUsdPerMillion'],
+            type: 'object',
+        },
+        WorkflowModelsPage: {
+            description:
+                "Registered providers and a bounded page from the selected provider's maintained catalog.",
+            properties: {
+                freshness: {
+                    const: 'not-reported',
+                    description:
+                        'The current registry does not expose catalog observation time; retrieval is not freshness.',
+                    type: 'string',
+                },
+                items: {
+                    items: {
+                        $ref: '#/definitions/WorkflowModelChoice',
+                    },
+                    type: 'array',
+                },
+                next: {
+                    type: ['null', 'string'],
+                },
+                providers: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+            },
+            required: ['freshness', 'items', 'next', 'providers'],
+            type: 'object',
+        },
+        WorkflowModelsRequest: {
+            description:
+                "Discovery never changes a workflow or grants access to another account's resources.",
+            properties: {
+                after: {
+                    type: ['null', 'string'],
+                },
+                capability: {
+                    $ref: '#/definitions/WorkflowModelCapability',
+                },
+                compatibleOnly: {
+                    type: 'boolean',
+                },
+                favorites: {
+                    anyOf: [
+                        {
+                            items: {
+                                type: 'string',
+                            },
+                            type: 'array',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                provider: {
+                    type: ['null', 'string'],
+                },
+                query: {
+                    type: 'string',
+                },
+                workflowId: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'after',
+                'capability',
+                'compatibleOnly',
+                'favorites',
+                'provider',
+                'query',
                 'workflowId',
             ],
             type: 'object',

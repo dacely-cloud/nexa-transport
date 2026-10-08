@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
+import { WorkflowModelsCodec } from '../WorkflowModels.js';
 import { WorkflowInput } from '../WorkflowInput.js';
 import {
     WorkflowModelSelection,
@@ -52,7 +53,7 @@ export class WorkflowRunModelCodec {
             nodeId: WorkflowInput.id(value['nodeId']),
             bindingId: WorkflowInput.id(value['bindingId']),
             provider: WorkflowInput.id(value['provider']),
-            model: WorkflowInput.id(value['model']),
+            model: WorkflowModelsCodec.identity(value['model']),
             selection: WorkflowModelSelection.Exact,
             capability,
             maxOutputTokens,

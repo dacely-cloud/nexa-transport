@@ -1365,6 +1365,7 @@ Configurable bounds on gateway-owned work and memory.
 | `workflows.catalog`            | Yes      | Object (fields below) |                                                                                            |
 | `workflows.create`             | Yes      | Object (fields below) |                                                                                            |
 | `workflows.list`               | Yes      | Object (fields below) |                                                                                            |
+| `workflows.models`             | Yes      | Object (fields below) |                                                                                            |
 | `workflows.planning.cancel`    | Yes      | Object (fields below) |                                                                                            |
 | `workflows.planning.history`   | Yes      | Object (fields below) |                                                                                            |
 | `workflows.planning.read`      | Yes      | Object (fields below) |                                                                                            |
@@ -2081,6 +2082,13 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ------------------------------------------------------ | ----------- |
 | `params` | Yes      | [WorkflowListRequest](protocol.md#workflowlistrequest) |             |
 | `result` | Yes      | [WorkflowListPage](protocol.md#workflowlistpage)       |             |
+
+**workflows.models**
+
+| Field    | Required | Type                                                       | Description |
+| -------- | -------- | ---------------------------------------------------------- | ----------- |
+| `params` | Yes      | [WorkflowModelsRequest](protocol.md#workflowmodelsrequest) |             |
+| `result` | Yes      | [WorkflowModelsPage](protocol.md#workflowmodelspage)       |             |
 
 **workflows.planning.cancel**
 
@@ -4811,6 +4819,65 @@ Bounded manifest page; offsets count references, never bytes or revisions.
 | `nodes`          | Yes      | Array of [WorkflowNodeReference](protocol.md#workflownodereference) |             |
 | `revision`       | Yes      | `string`                                                            |             |
 | `workflowId`     | Yes      | `string`                                                            |             |
+
+## WorkflowModelCapability
+
+Operations currently supported by the direct text handler.
+
+Type: `"reasoning"` / `"text"`.
+
+## WorkflowModelChoice
+
+Public model metadata only: no endpoints, keys, account names, or adapter options.
+
+| Field             | Required | Type                                                          | Description |
+| ----------------- | -------- | ------------------------------------------------------------- | ----------- |
+| `compatible`      | Yes      | `boolean`                                                     |             |
+| `contextWindow`   | Yes      | `null,number`                                                 |             |
+| `id`              | Yes      | `string`                                                      |             |
+| `input`           | Yes      | Array of `string`                                             |             |
+| `maxOutputTokens` | Yes      | `null,number`                                                 |             |
+| `name`            | Yes      | `string`                                                      |             |
+| `price`           | Yes      | [WorkflowModelPrice](protocol.md#workflowmodelprice) / `null` |             |
+| `provider`        | Yes      | `string`                                                      |             |
+| `reason`          | Yes      | `null,string`                                                 |             |
+| `reasoning`       | Yes      | `null,boolean`                                                |             |
+| `source`          | Yes      | `string`                                                      |             |
+| `status`          | Yes      | `string`                                                      |             |
+
+## WorkflowModelPrice
+
+Existing ledger rate-card values, represented as decimal text without client-side money math.
+
+| Field                 | Required | Type          | Description |
+| --------------------- | -------- | ------------- | ----------- |
+| `inputUsdPerMillion`  | Yes      | `null,string` |             |
+| `outputUsdPerMillion` | Yes      | `null,string` |             |
+
+## WorkflowModelsPage
+
+Registered providers and a bounded page from the selected provider's maintained catalog.
+
+| Field       | Required | Type                                                            | Description                                                                                |
+| ----------- | -------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `freshness` | Yes      | `"not-reported"`                                                | The current registry does not expose catalog observation time; retrieval is not freshness. |
+| `items`     | Yes      | Array of [WorkflowModelChoice](protocol.md#workflowmodelchoice) |                                                                                            |
+| `next`      | Yes      | `null,string`                                                   |                                                                                            |
+| `providers` | Yes      | Array of `string`                                               |                                                                                            |
+
+## WorkflowModelsRequest
+
+Discovery never changes a workflow or grants access to another account's resources.
+
+| Field            | Required | Type                                                           | Description |
+| ---------------- | -------- | -------------------------------------------------------------- | ----------- |
+| `after`          | Yes      | `null,string`                                                  |             |
+| `capability`     | Yes      | [WorkflowModelCapability](protocol.md#workflowmodelcapability) |             |
+| `compatibleOnly` | Yes      | `boolean`                                                      |             |
+| `favorites`      | Yes      | Array of `string` / `null`                                     |             |
+| `provider`       | Yes      | `null,string`                                                  |             |
+| `query`          | Yes      | `string`                                                       |             |
+| `workflowId`     | Yes      | `string`                                                       |             |
 
 ## WorkflowNode
 
