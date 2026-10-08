@@ -7021,6 +7021,29 @@ export const schema: Schema = {
             required: ['id', 'instructions', 'name'],
             type: 'object',
         },
+        PlanningAlignmentAnchor: {
+            description: 'Server-created semantic anchors for the request and the proposed graph.',
+            properties: {
+                beforeHash: {
+                    type: 'string',
+                },
+                graphHash: {
+                    type: 'string',
+                },
+                requirements: {
+                    items: {
+                        $ref: '#/definitions/PlanningRequirementFingerprint',
+                    },
+                    type: 'array',
+                },
+                version: {
+                    const: 1,
+                    type: 'number',
+                },
+            },
+            required: ['beforeHash', 'graphHash', 'requirements', 'version'],
+            type: 'object',
+        },
         PlanningBrief: {
             description: 'A bounded product brief; unanswered operational choices remain explicit.',
             properties: {
@@ -7161,6 +7184,10 @@ export const schema: Schema = {
             description:
                 'Fingerprint pins the proposal to unsaved state as well as the persisted base revision.',
             properties: {
+                alignment: {
+                    $ref: '#/definitions/PlanningAlignmentAnchor',
+                    description: 'Omitted on older stored replies; never supplied by the model.',
+                },
                 baseRevision: {
                     type: 'string',
                 },
@@ -7261,6 +7288,20 @@ export const schema: Schema = {
                 },
             },
             required: ['id', 'nodeIds', 'state', 'text'],
+            type: 'object',
+        },
+        PlanningRequirementFingerprint: {
+            description:
+                'A fingerprint detects graph drift; it never proves a requirement is fulfilled or runnable.',
+            properties: {
+                hash: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+            },
+            required: ['hash', 'id'],
             type: 'object',
         },
         PlanningSource: {

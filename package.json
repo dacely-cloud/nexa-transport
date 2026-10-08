@@ -170,6 +170,10 @@
         "./workflow-planning-sources": {
             "types": "./dist/workflows/planning/PlanningSources.d.ts",
             "import": "./dist/workflow-planning-sources.js"
+        },
+        "./workflow-planning-alignment": {
+            "types": "./dist/workflows/planning/PlanningAlignment.d.ts",
+            "import": "./dist/workflow-planning-alignment.js"
         }
     },
     "scripts": {

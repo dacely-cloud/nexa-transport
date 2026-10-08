@@ -7,6 +7,7 @@ import type {
     WorkflowEdge,
     WorkflowPatch,
 } from '../WorkflowTypes.js';
+import type { PlanningAlignmentAnchor } from './PlanningAlignment.js';
 import type { GraphValidation } from '../GraphTypes.js';
 
 /** Unsaved editor state is planning context, never an execution plan or permission grant. */
@@ -54,6 +55,8 @@ export interface PlanningProposal {
 }
 /** Fingerprint pins the proposal to unsaved state as well as the persisted base revision. */
 export interface PlanningReply extends PlanningProposal {
+    /** Omitted on older stored replies; never supplied by the model. */
+    readonly alignment?: PlanningAlignmentAnchor;
     readonly workflowId: string;
     readonly baseRevision: string;
     readonly draftHash: string;
