@@ -754,6 +754,22 @@ export class NexaClient {
             this.#hello.features.methods.includes(Method.WorkflowsValidate)
         );
     }
+    /** Planning proposes checked edits without saving or activating the draft. */
+    public get supportsWorkflowPlanning(): boolean {
+        return (
+            this.supportsWorkflowGraph &&
+            this.#hello?.features.workflowPlanningVersion === 1 &&
+            [
+                Method.WorkflowsPlanningSend,
+                Method.WorkflowsPlanningRead,
+                Method.WorkflowsPlanningCancel,
+                Method.WorkflowsPlanningHistory,
+            ].every(
+                (method: Method): boolean =>
+                    this.#hello?.features.methods.includes(method) === true,
+            )
+        );
+    }
     /** Durable execution is advertised separately from editing and validation. */
     public get supportsWorkflowRuns(): boolean {
         return (
@@ -781,6 +797,12 @@ export class NexaClient {
     ): Promise<ResultOf<M>> {
         if (!this.connected) {
             throw new TransportError(TransportErrorCode.Closed, 'Client is not connected');
+        }
+        if (method.startsWith('workflows.planning.') && !this.supportsWorkflowPlanning) {
+            throw new TransportError(
+                TransportErrorCode.Protocol,
+                'Ask Nexa requires an updated NEXA gateway',
+            );
         }
         if (method.startsWith('workflows.runs.') && !this.supportsWorkflowRuns) {
             throw new TransportError(

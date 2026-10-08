@@ -2947,14 +2947,18 @@ export const schema: Schema = {
                 },
                 workflowDraftsVersion: {
                     const: 1,
-                    description:
-                        'Owner-scoped draft storage with bounded reads and revision-safe direct patches.',
                     type: 'number',
                 },
                 workflowGraphVersion: {
                     const: 1,
                     description:
                         'Exact component catalog and structural validation of pinned drafts.',
+                    type: 'number',
+                },
+                workflowPlanningVersion: {
+                    const: 1,
+                    description:
+                        'Owner-scoped draft storage with bounded reads and revision-safe direct patches.',
                     type: 'number',
                 },
                 workflowRunsVersion: {
@@ -4279,6 +4283,54 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'workflows.planning.cancel': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/PlanningTurnRef',
+                        },
+                        result: {
+                            $ref: '#/definitions/PlanningTurn',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'workflows.planning.history': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/PlanningHistoryRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/PlanningHistory',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'workflows.planning.read': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/PlanningTurnRef',
+                        },
+                        result: {
+                            $ref: '#/definitions/PlanningTurn',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'workflows.planning.send': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/PlanningRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/PlanningTurn',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'workflows.read': {
                     properties: {
                         params: {
@@ -4556,6 +4608,10 @@ export const schema: Schema = {
                 'workflows.catalog',
                 'workflows.create',
                 'workflows.list',
+                'workflows.planning.cancel',
+                'workflows.planning.history',
+                'workflows.planning.read',
+                'workflows.planning.send',
                 'workflows.read',
                 'workflows.record',
                 'workflows.runs.cancel',
@@ -6952,6 +7008,303 @@ export const schema: Schema = {
             required: ['id', 'instructions', 'name'],
             type: 'object',
         },
+        PlanningBrief: {
+            description: 'A bounded product brief; unanswered operational choices remain explicit.',
+            properties: {
+                assumptions: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                boundaries: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                budget: {
+                    type: ['null', 'string'],
+                },
+                goal: {
+                    type: 'string',
+                },
+                outputs: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                questions: {
+                    items: {
+                        $ref: '#/definitions/PlanningQuestion',
+                    },
+                    type: 'array',
+                },
+                requirements: {
+                    items: {
+                        $ref: '#/definitions/PlanningRequirement',
+                    },
+                    type: 'array',
+                },
+                schedule: {
+                    type: ['null', 'string'],
+                },
+                sources: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+            },
+            required: [
+                'assumptions',
+                'boundaries',
+                'budget',
+                'goal',
+                'outputs',
+                'questions',
+                'requirements',
+                'schedule',
+                'sources',
+            ],
+            type: 'object',
+        },
+        PlanningDocument: {
+            description:
+                'Unsaved editor state is planning context, never an execution plan or permission grant.',
+            properties: {
+                details: {
+                    $ref: '#/definitions/WorkflowDetails',
+                },
+                edges: {
+                    items: {
+                        $ref: '#/definitions/WorkflowEdge',
+                    },
+                    type: 'array',
+                },
+                nodes: {
+                    items: {
+                        $ref: '#/definitions/WorkflowNode',
+                    },
+                    type: 'array',
+                },
+                positions: {
+                    items: {
+                        $ref: '#/definitions/WorkflowPosition',
+                    },
+                    type: 'array',
+                },
+            },
+            required: ['details', 'edges', 'nodes', 'positions'],
+            type: 'object',
+        },
+        PlanningHistory: {
+            properties: {
+                nextRequestId: {
+                    type: ['null', 'string'],
+                },
+                turns: {
+                    items: {
+                        $ref: '#/definitions/PlanningTurn',
+                    },
+                    type: 'array',
+                },
+            },
+            required: ['nextRequestId', 'turns'],
+            type: 'object',
+        },
+        PlanningHistoryRequest: {
+            properties: {
+                beforeRequestId: {
+                    type: ['null', 'string'],
+                },
+                workflowId: {
+                    type: 'string',
+                },
+            },
+            required: ['beforeRequestId', 'workflowId'],
+            type: 'object',
+        },
+        PlanningQuestion: {
+            properties: {
+                choices: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                id: {
+                    type: 'string',
+                },
+                text: {
+                    type: 'string',
+                },
+            },
+            required: ['choices', 'id', 'text'],
+            type: 'object',
+        },
+        PlanningReply: {
+            description:
+                'Fingerprint pins the proposal to unsaved state as well as the persisted base revision.',
+            properties: {
+                baseRevision: {
+                    type: 'string',
+                },
+                brief: {
+                    $ref: '#/definitions/PlanningBrief',
+                },
+                draftHash: {
+                    type: 'string',
+                },
+                message: {
+                    type: 'string',
+                },
+                patch: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/WorkflowPatch',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                validation: {
+                    $ref: '#/definitions/GraphValidation',
+                },
+                workflowId: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'baseRevision',
+                'brief',
+                'draftHash',
+                'message',
+                'patch',
+                'validation',
+                'workflowId',
+            ],
+            type: 'object',
+        },
+        PlanningRequest: {
+            properties: {
+                baseRevision: {
+                    type: 'string',
+                },
+                document: {
+                    $ref: '#/definitions/PlanningDocument',
+                },
+                message: {
+                    type: 'string',
+                },
+                previousRequestId: {
+                    type: ['null', 'string'],
+                },
+                requestId: {
+                    type: 'string',
+                },
+                workflowId: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'baseRevision',
+                'document',
+                'message',
+                'previousRequestId',
+                'requestId',
+                'workflowId',
+            ],
+            type: 'object',
+        },
+        PlanningRequirement: {
+            description:
+                "Links the user's intent to stable component identities without claiming execution readiness.",
+            properties: {
+                id: {
+                    type: 'string',
+                },
+                nodeIds: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                state: {
+                    $ref: '#/definitions/RequirementState',
+                },
+                text: {
+                    type: 'string',
+                },
+            },
+            required: ['id', 'nodeIds', 'state', 'text'],
+            type: 'object',
+        },
+        PlanningStatus: {
+            enum: ['canceled', 'complete', 'failed', 'working'],
+            type: 'string',
+        },
+        PlanningTurn: {
+            description: 'A turn is a separate bounded record, not an ever-growing workflow field.',
+            properties: {
+                createdAtMs: {
+                    type: 'string',
+                },
+                error: {
+                    type: ['null', 'string'],
+                },
+                message: {
+                    type: 'string',
+                },
+                previousRequestId: {
+                    type: ['null', 'string'],
+                },
+                reply: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/PlanningReply',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                requestId: {
+                    type: 'string',
+                },
+                status: {
+                    $ref: '#/definitions/PlanningStatus',
+                },
+                workflowId: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'createdAtMs',
+                'error',
+                'message',
+                'previousRequestId',
+                'reply',
+                'requestId',
+                'status',
+                'workflowId',
+            ],
+            type: 'object',
+        },
+        PlanningTurnRef: {
+            properties: {
+                requestId: {
+                    type: 'string',
+                },
+                workflowId: {
+                    type: 'string',
+                },
+            },
+            required: ['requestId', 'workflowId'],
+            type: 'object',
+        },
         PortCardinality: {
             enum: ['item', 'list', 'stream'],
             type: 'string',
@@ -7100,6 +7453,10 @@ export const schema: Schema = {
             },
             required: ['channelId', 'conversationId', 'kind', 'text'],
             type: 'object',
+        },
+        RequirementState: {
+            enum: ['drafted', 'missing', 'question'],
+            type: 'string',
         },
         ResetAllowanceParams: {
             description:
@@ -10139,6 +10496,7 @@ export const schema: Schema = {
             type: 'string',
         },
         WorkflowRunEventsRequest: {
+            description: 'Reads ordered journal events after an exclusive sequence.',
             properties: {
                 after: {
                     type: 'string',
@@ -10154,6 +10512,7 @@ export const schema: Schema = {
             type: 'object',
         },
         WorkflowRunListPage: {
+            description: 'A bounded history page ordered by creation time and run ID.',
             properties: {
                 items: {
                     items: {
@@ -10169,6 +10528,7 @@ export const schema: Schema = {
             type: 'object',
         },
         WorkflowRunListRequest: {
+            description: 'Pages run history for one owned workflow.',
             properties: {
                 afterRunId: {
                     type: ['null', 'string'],
@@ -10188,6 +10548,7 @@ export const schema: Schema = {
             type: 'string',
         },
         WorkflowRunOutputPage: {
+            description: 'A bounded JSON fragment with total length and continuation offset.',
             properties: {
                 content: {
                     type: 'string',
@@ -10223,6 +10584,7 @@ export const schema: Schema = {
             type: 'object',
         },
         WorkflowRunOutputRequest: {
+            description: 'Addresses one exact attempt and a UTF-16 offset into its encoded result.',
             properties: {
                 invocationId: {
                     type: 'string',
@@ -10241,6 +10603,7 @@ export const schema: Schema = {
             type: 'object',
         },
         WorkflowRunRequest: {
+            description: 'Addresses a run within the authenticated principal.',
             properties: {
                 runId: {
                     type: 'string',
@@ -10250,6 +10613,7 @@ export const schema: Schema = {
             type: 'object',
         },
         WorkflowRunStartRequest: {
+            description: 'Starts one idempotent run of an owned saved revision.',
             properties: {
                 input: {
                     $ref: '#/definitions/WorkflowObject',
@@ -10293,6 +10657,7 @@ export const schema: Schema = {
             type: 'string',
         },
         WorkflowRunStepsPage: {
+            description: 'A bounded step page and its continuation cursor.',
             properties: {
                 items: {
                     items: {
@@ -10308,6 +10673,7 @@ export const schema: Schema = {
             type: 'object',
         },
         WorkflowRunStepsRequest: {
+            description: 'Reads bounded step metadata after an exclusive node ID.',
             properties: {
                 afterNodeId: {
                     type: ['null', 'string'],
@@ -10397,6 +10763,8 @@ export const schema: Schema = {
             type: 'string',
         },
         WorkflowStepView: {
+            description:
+                'Exposes step metadata without embedding potentially large result payloads.',
             properties: {
                 attempt: {
                     type: 'number',
