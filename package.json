@@ -190,6 +190,14 @@
         "./workflow-artifacts": {
             "types": "./dist/workflows/runtime/ArtifactDownload.d.ts",
             "import": "./dist/workflow-artifacts.js"
+        },
+        "./workflow-image-resolution": {
+            "types": "./dist/workflows/ImageResolution.d.ts",
+            "import": "./dist/workflow-image-resolution.js"
+        },
+        "./workflow-image-policy": {
+            "types": "./dist/workflows/ImageModelPolicy.d.ts",
+            "import": "./dist/workflow-image-policy.js"
         }
     },
     "scripts": {
