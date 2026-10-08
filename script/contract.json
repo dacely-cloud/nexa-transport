@@ -4300,6 +4300,18 @@
                     "required": ["params", "result"],
                     "type": "object"
                 },
+                "workflows.runs.artifact": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/WorkflowRunArtifactRequest"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/WorkflowRunArtifactPage"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
                 "workflows.runs.cancel": {
                     "properties": {
                         "params": {
@@ -4563,6 +4575,7 @@
                 "workflows.planning.sources",
                 "workflows.read",
                 "workflows.record",
+                "workflows.runs.artifact",
                 "workflows.runs.cancel",
                 "workflows.runs.events",
                 "workflows.runs.list",
@@ -10630,6 +10643,72 @@
                 }
             },
             "required": ["offset", "reference", "workflowId"],
+            "type": "object"
+        },
+        "WorkflowRunArtifact": {
+            "description": "Public immutable file metadata; neither storage paths nor global media IDs cross this boundary.",
+            "properties": {
+                "artifactId": {
+                    "type": "string"
+                },
+                "bytes": {
+                    "type": "string"
+                },
+                "contentType": {
+                    "type": "string"
+                },
+                "expiresAtMs": {
+                    "type": ["null", "string"]
+                },
+                "name": {
+                    "type": "string"
+                },
+                "sha256": {
+                    "type": "string"
+                }
+            },
+            "required": ["artifactId", "bytes", "contentType", "expiresAtMs", "name", "sha256"],
+            "type": "object"
+        },
+        "WorkflowRunArtifactPage": {
+            "description": "A bounded binary fragment; clients verify the complete SHA-256 after assembling all fragments.",
+            "properties": {
+                "artifact": {
+                    "$ref": "#/definitions/WorkflowRunArtifact"
+                },
+                "artifactId": {
+                    "type": "string"
+                },
+                "base64": {
+                    "type": "string"
+                },
+                "nextOffset": {
+                    "type": ["null", "number"]
+                },
+                "offset": {
+                    "type": "number"
+                },
+                "runId": {
+                    "type": "string"
+                }
+            },
+            "required": ["artifact", "artifactId", "base64", "nextOffset", "offset", "runId"],
+            "type": "object"
+        },
+        "WorkflowRunArtifactRequest": {
+            "description": "One exact operation's artifact, addressed within the authenticated account and run.",
+            "properties": {
+                "artifactId": {
+                    "type": "string"
+                },
+                "offset": {
+                    "type": "number"
+                },
+                "runId": {
+                    "type": "string"
+                }
+            },
+            "required": ["artifactId", "offset", "runId"],
             "type": "object"
         },
         "WorkflowRunEvent": {

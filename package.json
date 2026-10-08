@@ -182,6 +182,10 @@
         "./workflow-models": {
             "types": "./dist/workflows/WorkflowModels.d.ts",
             "import": "./dist/workflow-models.js"
+        },
+        "./workflow-artifacts": {
+            "types": "./dist/workflows/runtime/ArtifactDownload.d.ts",
+            "import": "./dist/workflow-artifacts.js"
         }
     },
     "scripts": {
