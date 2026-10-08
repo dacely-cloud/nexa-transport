@@ -128,9 +128,6 @@ export class NexaClient {
         cursor?: string,
         endCursor?: string,
     ): Promise<SavedHistorySnapshot> {
-        if (this.#hello?.features.transcriptBlocks === true) {
-            return SessionHistoryReader.transcript(this, id, cursor, endCursor);
-        }
         return SessionHistoryReader.snapshot(
             this,
             id,
