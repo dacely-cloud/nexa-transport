@@ -1879,6 +1879,11 @@ export const schema: Schema = {
         CreditSummary: {
             description: 'Spend totals over some slice of the ledger.',
             properties: {
+                byCategory: {
+                    $ref: '#/definitions/Record%3Cstring%2Cnumber%3E',
+                    description:
+                        'Missing on older authorities; other includes historical unclassified usage.',
+                },
                 byKind: {
                     $ref: '#/definitions/Record%3Cstring%2Cnumber%3E',
                     description:

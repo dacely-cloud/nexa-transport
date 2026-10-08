@@ -1233,6 +1233,8 @@ export type CreditScope = (typeof CreditScopeValues)[keyof typeof CreditScopeVal
 
 /** CreditSummary wire fields. */
 export interface CreditSummaryShape {
+    /** byCategory as defined by the Nexa gateway. */
+    readonly byCategory?: Recordstringnumber;
     /** byKind as defined by the Nexa gateway. */
     readonly byKind: Recordstringnumber;
     /** byModel as defined by the Nexa gateway. */
