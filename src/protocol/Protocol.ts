@@ -1255,6 +1255,8 @@ export interface CreditSummaryShape {
     readonly scope: CreditScope;
     /** scopeId as defined by the Nexa gateway. */
     readonly scopeId: string;
+    /** supportedWorkloads as defined by the Nexa gateway. */
+    readonly supportedWorkloads?: ReadonlyArray<string>;
     /** to as defined by the Nexa gateway. */
     readonly to: number;
 }

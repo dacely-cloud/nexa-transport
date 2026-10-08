@@ -91,6 +91,11 @@ All 54 protocol methods. `connect` is managed by `NexaClient.connect`; the remai
 - [workflows.catalog](#workflows-catalog)
 - [workflows.create](#workflows-create)
 - [workflows.list](#workflows-list)
+- [workflows.planning.cancel](#workflows-planning-cancel)
+- [workflows.planning.history](#workflows-planning-history)
+- [workflows.planning.read](#workflows-planning-read)
+- [workflows.planning.send](#workflows-planning-send)
+- [workflows.planning.sources](#workflows-planning-sources)
 - [workflows.read](#workflows-read)
 - [workflows.record](#workflows-record)
 - [workflows.runs.cancel](#workflows-runs-cancel)
@@ -2037,6 +2042,145 @@ Parameters: [WorkflowListRequest](protocol.md#workflowlistrequest).
 | `limit`  | Yes      | `number`                                                      |             |
 
 Result: [WorkflowListPage](protocol.md#workflowlistpage).
+
+## workflows.planning.cancel
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsPlanningCancel> = {
+    requestId: 'YOUR_REQUESTID',
+    workflowId: 'YOUR_WORKFLOWID',
+};
+const result: ResultOf<typeof Method.WorkflowsPlanningCancel> = await client.call(
+    Method.WorkflowsPlanningCancel,
+    params,
+);
+```
+
+Parameters: [PlanningTurnRef](protocol.md#planningturnref).
+
+| Field        | Required | Type     | Description |
+| ------------ | -------- | -------- | ----------- |
+| `requestId`  | Yes      | `string` |             |
+| `workflowId` | Yes      | `string` |             |
+
+Result: [PlanningTurn](protocol.md#planningturn).
+
+## workflows.planning.history
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsPlanningHistory> = {
+    beforeRequestId: 'YOUR_BEFOREREQUESTID',
+    workflowId: 'YOUR_WORKFLOWID',
+};
+const result: ResultOf<typeof Method.WorkflowsPlanningHistory> = await client.call(
+    Method.WorkflowsPlanningHistory,
+    params,
+);
+```
+
+Parameters: [PlanningHistoryRequest](protocol.md#planninghistoryrequest).
+
+| Field             | Required | Type          | Description |
+| ----------------- | -------- | ------------- | ----------- |
+| `beforeRequestId` | Yes      | `null,string` |             |
+| `workflowId`      | Yes      | `string`      |             |
+
+Result: [PlanningHistory](protocol.md#planninghistory).
+
+## workflows.planning.read
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsPlanningRead> = {
+    requestId: 'YOUR_REQUESTID',
+    workflowId: 'YOUR_WORKFLOWID',
+};
+const result: ResultOf<typeof Method.WorkflowsPlanningRead> = await client.call(
+    Method.WorkflowsPlanningRead,
+    params,
+);
+```
+
+Parameters: [PlanningTurnRef](protocol.md#planningturnref).
+
+| Field        | Required | Type     | Description |
+| ------------ | -------- | -------- | ----------- |
+| `requestId`  | Yes      | `string` |             |
+| `workflowId` | Yes      | `string` |             |
+
+Result: [PlanningTurn](protocol.md#planningturn).
+
+## workflows.planning.send
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsPlanningSend> = {
+    baseRevision: 'YOUR_BASEREVISION',
+    document: {
+        details: {
+            description: 'YOUR_DESCRIPTION',
+            folder: 'YOUR_FOLDER',
+            name: 'YOUR_NAME',
+            tags: [],
+        },
+        edges: [],
+        nodes: [],
+        positions: [],
+    },
+    message: 'Your request',
+    previousRequestId: 'YOUR_PREVIOUSREQUESTID',
+    requestId: 'YOUR_REQUESTID',
+    workflowId: 'YOUR_WORKFLOWID',
+};
+const result: ResultOf<typeof Method.WorkflowsPlanningSend> = await client.call(
+    Method.WorkflowsPlanningSend,
+    params,
+);
+```
+
+Parameters: [PlanningRequest](protocol.md#planningrequest).
+
+| Field               | Required | Type                                             | Description                                                                    |
+| ------------------- | -------- | ------------------------------------------------ | ------------------------------------------------------------------------------ |
+| `baseRevision`      | Yes      | `string`                                         |                                                                                |
+| `document`          | Yes      | [PlanningDocument](protocol.md#planningdocument) |                                                                                |
+| `message`           | Yes      | `string`                                         |                                                                                |
+| `previousRequestId` | Yes      | `null,string`                                    |                                                                                |
+| `requestId`         | Yes      | `string`                                         |                                                                                |
+| `sourceIds`         | No       | Array of `string`                                | Explicit metadata selections; never resource grants. Omitted by older clients. |
+| `workflowId`        | Yes      | `string`                                         |                                                                                |
+
+Result: [PlanningTurn](protocol.md#planningturn).
+
+## workflows.planning.sources
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsPlanningSources> = {
+    after: 'YOUR_AFTER',
+    workflowId: 'YOUR_WORKFLOWID',
+};
+const result: ResultOf<typeof Method.WorkflowsPlanningSources> = await client.call(
+    Method.WorkflowsPlanningSources,
+    params,
+);
+```
+
+Parameters: [PlanningSourcesRequest](protocol.md#planningsourcesrequest).
+
+| Field        | Required | Type          | Description |
+| ------------ | -------- | ------------- | ----------- |
+| `after`      | Yes      | `null,string` |             |
+| `workflowId` | Yes      | `string`      |             |
+
+Result: [PlanningSourcesPage](protocol.md#planningsourcespage).
 
 ## workflows.read
 

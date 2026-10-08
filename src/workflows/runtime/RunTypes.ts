@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { WorkflowResolvedModel } from './RunModelTypes.js';
 import type { WorkflowGraph } from '../GraphTypes.js';
 import type {
     WorkflowNode,
@@ -42,6 +43,8 @@ export type WorkflowRunEventKind = (typeof WorkflowRunEventKind)[keyof typeof Wo
 
 /** Immutable semantic snapshot; no canvas layout, credentials, or mutable draft pointer. */
 export interface WorkflowRunSnapshot {
+    /** Host-resolved exact bindings pinned before acceptance; absent on deterministic runs. */
+    readonly models?: readonly WorkflowResolvedModel[];
     readonly format: 1;
     readonly graph: WorkflowGraph;
     readonly triggerNodeId: string;

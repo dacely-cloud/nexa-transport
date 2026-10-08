@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { WorkflowRunModelCodec } from './RunModelCodec.js';
 import { WorkflowInput } from '../WorkflowInput.js';
 import { WorkflowCodec } from '../WorkflowCodec.js';
 import { WorkflowJson } from '../WorkflowJson.js';
@@ -22,6 +23,9 @@ import {
 export class WorkflowRunCodec {
     public static snapshot(raw: unknown): WorkflowRunSnapshot {
         const value: Readonly<Record<string, unknown>> = WorkflowInput.record(raw, [
+            ...(raw !== null && typeof raw === 'object' && Object.hasOwn(raw, 'models')
+                ? ['models']
+                : []),
             'format',
             'graph',
             'triggerNodeId',
@@ -74,6 +78,9 @@ export class WorkflowRunCodec {
         }
         const input: WorkflowObject = WorkflowJson.object(value['input']);
         return Object.freeze({
+            ...(value['models'] === undefined
+                ? {}
+                : { models: WorkflowRunModelCodec.list(value['models']) }),
             format: 1,
             graph: Object.freeze({
                 workflowId: WorkflowInput.id(graph['workflowId']),

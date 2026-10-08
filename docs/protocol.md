@@ -858,19 +858,21 @@ Type: `"agent"` / `"conversation"` / `"global"` / `"project"` / `"user"`.
 
 Spend totals over some slice of the ledger.
 
-| Field               | Required | Type                                                 | Description                                                                 |
-| ------------------- | -------- | ---------------------------------------------------- | --------------------------------------------------------------------------- |
-| `byKind`            | Yes      | [Recordstringnumber](protocol.md#recordstringnumber) | Totals split by charge kind, so "how much of this was voice" is answerable. |
-| `byModel`           | Yes      | [Recordstringnumber](protocol.md#recordstringnumber) | Totals split by model.                                                      |
-| `cachedInputTokens` | Yes      | `number`                                             |                                                                             |
-| `entries`           | Yes      | `number`                                             |                                                                             |
-| `from`              | Yes      | `number`                                             |                                                                             |
-| `inputTokens`       | Yes      | `number`                                             |                                                                             |
-| `microcents`        | Yes      | `number`                                             |                                                                             |
-| `outputTokens`      | Yes      | `number`                                             |                                                                             |
-| `scope`             | Yes      | [CreditScope](protocol.md#creditscope)               |                                                                             |
-| `scopeId`           | Yes      | `string`                                             |                                                                             |
-| `to`                | Yes      | `number`                                             |                                                                             |
+| Field                | Required | Type                                                 | Description                                                                 |
+| -------------------- | -------- | ---------------------------------------------------- | --------------------------------------------------------------------------- |
+| `byCategory`         | No       | [Recordstringnumber](protocol.md#recordstringnumber) | Missing on older authorities; other includes historical unclassified usage. |
+| `byKind`             | Yes      | [Recordstringnumber](protocol.md#recordstringnumber) | Totals split by charge kind, so "how much of this was voice" is answerable. |
+| `byModel`            | Yes      | [Recordstringnumber](protocol.md#recordstringnumber) | Totals split by model.                                                      |
+| `cachedInputTokens`  | Yes      | `number`                                             |                                                                             |
+| `entries`            | Yes      | `number`                                             |                                                                             |
+| `from`               | Yes      | `number`                                             |                                                                             |
+| `inputTokens`        | Yes      | `number`                                             |                                                                             |
+| `microcents`         | Yes      | `number`                                             |                                                                             |
+| `outputTokens`       | Yes      | `number`                                             |                                                                             |
+| `scope`              | Yes      | [CreditScope](protocol.md#creditscope)               |                                                                             |
+| `scopeId`            | Yes      | `string`                                             |                                                                             |
+| `supportedWorkloads` | No       | Array of `string`                                    | Classified reports this authority accepts; absent on earlier deployments.   |
+| `to`                 | Yes      | `number`                                             |                                                                             |
 
 ## CreditSummaryParams
 
@@ -1247,8 +1249,9 @@ Methods, events, and additive capabilities supported by this gateway.
 | `officeVerification`        | No       | `true`                                             | Versioned host verification evidence on private project and employee channels.                 |
 | `sessionHistory`            | No       | `true`                                             | Durable complete presentation history and binary restoration.                                  |
 | `sessionHistoryUpdates`     | No       | `true`                                             | Session subscriptions notify exact journal ranges for live catch-up.                           |
-| `workflowDraftsVersion`     | No       | `1`                                                | Owner-scoped draft storage with bounded reads and revision-safe direct patches.                |
+| `workflowDraftsVersion`     | No       | `1`                                                |                                                                                                |
 | `workflowGraphVersion`      | No       | `1`                                                | Exact component catalog and structural validation of pinned drafts.                            |
+| `workflowPlanningVersion`   | No       | `1`                                                | Owner-scoped draft storage with bounded reads and revision-safe direct patches.                |
 | `workflowRunsVersion`       | No       | `1`                                                | Durable core workflow test runs and bounded output inspection.                                 |
 
 ## GatewayLimits
@@ -1362,6 +1365,11 @@ Configurable bounds on gateway-owned work and memory.
 | `workflows.catalog`            | Yes      | Object (fields below) |                                                                                            |
 | `workflows.create`             | Yes      | Object (fields below) |                                                                                            |
 | `workflows.list`               | Yes      | Object (fields below) |                                                                                            |
+| `workflows.planning.cancel`    | Yes      | Object (fields below) |                                                                                            |
+| `workflows.planning.history`   | Yes      | Object (fields below) |                                                                                            |
+| `workflows.planning.read`      | Yes      | Object (fields below) |                                                                                            |
+| `workflows.planning.send`      | Yes      | Object (fields below) |                                                                                            |
+| `workflows.planning.sources`   | Yes      | Object (fields below) |                                                                                            |
 | `workflows.read`               | Yes      | Object (fields below) |                                                                                            |
 | `workflows.record`             | Yes      | Object (fields below) |                                                                                            |
 | `workflows.runs.cancel`        | Yes      | Object (fields below) |                                                                                            |
@@ -2073,6 +2081,41 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ------------------------------------------------------ | ----------- |
 | `params` | Yes      | [WorkflowListRequest](protocol.md#workflowlistrequest) |             |
 | `result` | Yes      | [WorkflowListPage](protocol.md#workflowlistpage)       |             |
+
+**workflows.planning.cancel**
+
+| Field    | Required | Type                                           | Description |
+| -------- | -------- | ---------------------------------------------- | ----------- |
+| `params` | Yes      | [PlanningTurnRef](protocol.md#planningturnref) |             |
+| `result` | Yes      | [PlanningTurn](protocol.md#planningturn)       |             |
+
+**workflows.planning.history**
+
+| Field    | Required | Type                                                         | Description |
+| -------- | -------- | ------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [PlanningHistoryRequest](protocol.md#planninghistoryrequest) |             |
+| `result` | Yes      | [PlanningHistory](protocol.md#planninghistory)               |             |
+
+**workflows.planning.read**
+
+| Field    | Required | Type                                           | Description |
+| -------- | -------- | ---------------------------------------------- | ----------- |
+| `params` | Yes      | [PlanningTurnRef](protocol.md#planningturnref) |             |
+| `result` | Yes      | [PlanningTurn](protocol.md#planningturn)       |             |
+
+**workflows.planning.send**
+
+| Field    | Required | Type                                           | Description |
+| -------- | -------- | ---------------------------------------------- | ----------- |
+| `params` | Yes      | [PlanningRequest](protocol.md#planningrequest) |             |
+| `result` | Yes      | [PlanningTurn](protocol.md#planningturn)       |             |
+
+**workflows.planning.sources**
+
+| Field    | Required | Type                                                         | Description |
+| -------- | -------- | ------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [PlanningSourcesRequest](protocol.md#planningsourcesrequest) |             |
+| `result` | Yes      | [PlanningSourcesPage](protocol.md#planningsourcespage)       |             |
 
 **workflows.read**
 
@@ -3208,6 +3251,174 @@ Create with an empty id, or update an existing owned agent.
 | `instructions` | Yes      | `string` |             |
 | `name`         | Yes      | `string` |             |
 
+## PlanningAlignmentAnchor
+
+Server-created semantic anchors for the request and the proposed graph.
+
+| Field          | Required | Type                                                                                  | Description |
+| -------------- | -------- | ------------------------------------------------------------------------------------- | ----------- |
+| `beforeHash`   | Yes      | `string`                                                                              |             |
+| `graphHash`    | Yes      | `string`                                                                              |             |
+| `requirements` | Yes      | Array of [PlanningRequirementFingerprint](protocol.md#planningrequirementfingerprint) |             |
+| `version`      | Yes      | `1`                                                                                   |             |
+
+## PlanningBrief
+
+A bounded product brief; unanswered operational choices remain explicit.
+
+| Field          | Required | Type                                                            | Description |
+| -------------- | -------- | --------------------------------------------------------------- | ----------- |
+| `assumptions`  | Yes      | Array of `string`                                               |             |
+| `boundaries`   | Yes      | Array of `string`                                               |             |
+| `budget`       | Yes      | `null,string`                                                   |             |
+| `goal`         | Yes      | `string`                                                        |             |
+| `outputs`      | Yes      | Array of `string`                                               |             |
+| `questions`    | Yes      | Array of [PlanningQuestion](protocol.md#planningquestion)       |             |
+| `requirements` | Yes      | Array of [PlanningRequirement](protocol.md#planningrequirement) |             |
+| `schedule`     | Yes      | `null,string`                                                   |             |
+| `sources`      | Yes      | Array of `string`                                               |             |
+
+## PlanningDocument
+
+Unsaved editor state is planning context, never an execution plan or permission grant.
+
+| Field       | Required | Type                                                      | Description |
+| ----------- | -------- | --------------------------------------------------------- | ----------- |
+| `details`   | Yes      | [WorkflowDetails](protocol.md#workflowdetails)            |             |
+| `edges`     | Yes      | Array of [WorkflowEdge](protocol.md#workflowedge)         |             |
+| `nodes`     | Yes      | Array of [WorkflowNode](protocol.md#workflownode)         |             |
+| `positions` | Yes      | Array of [WorkflowPosition](protocol.md#workflowposition) |             |
+
+## PlanningHistory
+
+| Field           | Required | Type                                              | Description |
+| --------------- | -------- | ------------------------------------------------- | ----------- |
+| `nextRequestId` | Yes      | `null,string`                                     |             |
+| `turns`         | Yes      | Array of [PlanningTurn](protocol.md#planningturn) |             |
+
+## PlanningHistoryRequest
+
+| Field             | Required | Type          | Description |
+| ----------------- | -------- | ------------- | ----------- |
+| `beforeRequestId` | Yes      | `null,string` |             |
+| `workflowId`      | Yes      | `string`      |             |
+
+## PlanningQuestion
+
+| Field     | Required | Type              | Description |
+| --------- | -------- | ----------------- | ----------- |
+| `choices` | Yes      | Array of `string` |             |
+| `id`      | Yes      | `string`          |             |
+| `text`    | Yes      | `string`          |             |
+
+## PlanningReply
+
+Fingerprint pins the proposal to unsaved state as well as the persisted base revision.
+
+| Field          | Required | Type                                                           | Description                                                   |
+| -------------- | -------- | -------------------------------------------------------------- | ------------------------------------------------------------- |
+| `alignment`    | No       | [PlanningAlignmentAnchor](protocol.md#planningalignmentanchor) | Omitted on older stored replies; never supplied by the model. |
+| `baseRevision` | Yes      | `string`                                                       |                                                               |
+| `brief`        | Yes      | [PlanningBrief](protocol.md#planningbrief)                     |                                                               |
+| `draftHash`    | Yes      | `string`                                                       |                                                               |
+| `message`      | Yes      | `string`                                                       |                                                               |
+| `patch`        | Yes      | [WorkflowPatch](protocol.md#workflowpatch) / `null`            |                                                               |
+| `validation`   | Yes      | [GraphValidation](protocol.md#graphvalidation)                 |                                                               |
+| `workflowId`   | Yes      | `string`                                                       |                                                               |
+
+## PlanningRequest
+
+| Field               | Required | Type                                             | Description                                                                    |
+| ------------------- | -------- | ------------------------------------------------ | ------------------------------------------------------------------------------ |
+| `baseRevision`      | Yes      | `string`                                         |                                                                                |
+| `document`          | Yes      | [PlanningDocument](protocol.md#planningdocument) |                                                                                |
+| `message`           | Yes      | `string`                                         |                                                                                |
+| `previousRequestId` | Yes      | `null,string`                                    |                                                                                |
+| `requestId`         | Yes      | `string`                                         |                                                                                |
+| `sourceIds`         | No       | Array of `string`                                | Explicit metadata selections; never resource grants. Omitted by older clients. |
+| `workflowId`        | Yes      | `string`                                         |                                                                                |
+
+## PlanningRequirement
+
+Links the user's intent to stable component identities without claiming execution readiness.
+
+| Field     | Required | Type                                             | Description |
+| --------- | -------- | ------------------------------------------------ | ----------- |
+| `id`      | Yes      | `string`                                         |             |
+| `nodeIds` | Yes      | Array of `string`                                |             |
+| `state`   | Yes      | [RequirementState](protocol.md#requirementstate) |             |
+| `text`    | Yes      | `string`                                         |             |
+
+## PlanningRequirementFingerprint
+
+A fingerprint detects graph drift; it never proves a requirement is fulfilled or runnable.
+
+| Field  | Required | Type     | Description |
+| ------ | -------- | -------- | ----------- |
+| `hash` | Yes      | `string` |             |
+| `id`   | Yes      | `string` |             |
+
+## PlanningSource
+
+Metadata only. No filesystem paths, credentials, file contents, or host telemetry.
+
+| Field    | Required | Type                                                   | Description |
+| -------- | -------- | ------------------------------------------------------ | ----------- |
+| `id`     | Yes      | `string`                                               |             |
+| `name`   | Yes      | `string`                                               |             |
+| `reason` | Yes      | `string`                                               |             |
+| `state`  | Yes      | [PlanningSourceState](protocol.md#planningsourcestate) |             |
+
+## PlanningSourceState
+
+Discovery of a registered source is not a grant or an executable resource binding.
+
+Type: `"needs-adapter"` / `"unavailable"`.
+
+## PlanningSourcesPage
+
+| Field       | Required | Type                                                  | Description |
+| ----------- | -------- | ----------------------------------------------------- | ----------- |
+| `available` | Yes      | `boolean`                                             |             |
+| `items`     | Yes      | Array of [PlanningSource](protocol.md#planningsource) |             |
+| `next`      | Yes      | `null,string`                                         |             |
+
+## PlanningSourcesRequest
+
+Owner-scoped catalog pagination; a cursor is an opaque source identity, not a path.
+
+| Field        | Required | Type          | Description |
+| ------------ | -------- | ------------- | ----------- |
+| `after`      | Yes      | `null,string` |             |
+| `workflowId` | Yes      | `string`      |             |
+
+## PlanningStatus
+
+Type: `"canceled"` / `"complete"` / `"failed"` / `"working"`.
+
+## PlanningTurn
+
+A turn is a separate bounded record, not an ever-growing workflow field.
+
+| Field               | Required | Type                                                | Description                                                        |
+| ------------------- | -------- | --------------------------------------------------- | ------------------------------------------------------------------ |
+| `createdAtMs`       | Yes      | `string`                                            |                                                                    |
+| `error`             | Yes      | `null,string`                                       |                                                                    |
+| `message`           | Yes      | `string`                                            |                                                                    |
+| `previousRequestId` | Yes      | `null,string`                                       |                                                                    |
+| `reply`             | Yes      | [PlanningReply](protocol.md#planningreply) / `null` |                                                                    |
+| `requestId`         | Yes      | `string`                                            |                                                                    |
+| `sourceIds`         | No       | Array of `string`                                   | Explicit metadata selections retained with this conversation turn. |
+| `status`            | Yes      | [PlanningStatus](protocol.md#planningstatus)        |                                                                    |
+| `workflowId`        | Yes      | `string`                                            |                                                                    |
+
+## PlanningTurnRef
+
+| Field        | Required | Type     | Description |
+| ------------ | -------- | -------- | ----------- |
+| `requestId`  | Yes      | `string` |             |
+| `workflowId` | Yes      | `string` |             |
+
 ## PortCardinality
 
 Type: `"item"` / `"list"` / `"stream"`.
@@ -3292,6 +3503,10 @@ A durable message to the conversation that requested it; no model execution.
 | `kind`           | Yes      | `"reminder"` |             |
 | `text`           | Yes      | `string`     |             |
 | `threadId`       | No       | `string`     |             |
+
+## RequirementState
+
+Type: `"drafted"` / `"missing"` / `"question"`.
 
 ## ResetAllowanceParams
 
@@ -4711,6 +4926,8 @@ Type: `"accepted"` / `"cancelled"` / `"claimed"` / `"finished"` / `"step-finishe
 
 ## WorkflowRunEventsRequest
 
+Reads ordered journal events after an exclusive sequence.
+
 | Field   | Required | Type     | Description |
 | ------- | -------- | -------- | ----------- |
 | `after` | Yes      | `string` |             |
@@ -4719,12 +4936,16 @@ Type: `"accepted"` / `"cancelled"` / `"claimed"` / `"finished"` / `"step-finishe
 
 ## WorkflowRunListPage
 
+A bounded history page ordered by creation time and run ID.
+
 | Field   | Required | Type                                                          | Description |
 | ------- | -------- | ------------------------------------------------------------- | ----------- |
 | `items` | Yes      | Array of [WorkflowRunSummary](protocol.md#workflowrunsummary) |             |
 | `next`  | Yes      | `null,string`                                                 |             |
 
 ## WorkflowRunListRequest
+
+Pages run history for one owned workflow.
 
 | Field        | Required | Type          | Description |
 | ------------ | -------- | ------------- | ----------- |
@@ -4738,6 +4959,8 @@ Type: `"live-test"` / `"mock-test"`.
 
 ## WorkflowRunOutputPage
 
+A bounded JSON fragment with total length and continuation offset.
+
 | Field             | Required | Type          | Description |
 | ----------------- | -------- | ------------- | ----------- |
 | `content`         | Yes      | `string`      |             |
@@ -4750,6 +4973,8 @@ Type: `"live-test"` / `"mock-test"`.
 
 ## WorkflowRunOutputRequest
 
+Addresses one exact attempt and a UTF-16 offset into its encoded result.
+
 | Field          | Required | Type     | Description |
 | -------------- | -------- | -------- | ----------- |
 | `invocationId` | Yes      | `string` |             |
@@ -4759,11 +4984,15 @@ Type: `"live-test"` / `"mock-test"`.
 
 ## WorkflowRunRequest
 
+Addresses a run within the authenticated principal.
+
 | Field   | Required | Type     | Description |
 | ------- | -------- | -------- | ----------- |
 | `runId` | Yes      | `string` |             |
 
 ## WorkflowRunStartRequest
+
+Starts one idempotent run of an owned saved revision.
 
 | Field            | Required | Type                                           | Description |
 | ---------------- | -------- | ---------------------------------------------- | ----------- |
@@ -4782,12 +5011,16 @@ Type: `"cancelled"` / `"failed"` / `"queued"` / `"running"` / `"succeeded"`.
 
 ## WorkflowRunStepsPage
 
+A bounded step page and its continuation cursor.
+
 | Field   | Required | Type                                                      | Description |
 | ------- | -------- | --------------------------------------------------------- | ----------- |
 | `items` | Yes      | Array of [WorkflowStepView](protocol.md#workflowstepview) |             |
 | `next`  | Yes      | `null,string`                                             |             |
 
 ## WorkflowRunStepsRequest
+
+Reads bounded step metadata after an exclusive node ID.
 
 | Field         | Required | Type          | Description |
 | ------------- | -------- | ------------- | ----------- |
@@ -4825,6 +5058,8 @@ Command identity and expected revision serve different purposes.
 Type: `"cancelled"` / `"failed"` / `"interrupted"` / `"running"` / `"skipped"` / `"succeeded"` / `"uncertain"`.
 
 ## WorkflowStepView
+
+Exposes step metadata without embedding potentially large result payloads.
 
 | Field          | Required | Type                                                 | Description |
 | -------------- | -------- | ---------------------------------------------------- | ----------- |

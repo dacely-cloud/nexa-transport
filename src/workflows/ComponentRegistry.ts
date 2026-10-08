@@ -10,6 +10,7 @@ import {
     type ComponentResourceSlot,
 } from './ComponentTypes.js';
 import { CoreComponents } from './CoreComponents.js';
+import { InferenceComponents } from './InferenceComponents.js';
 import { AgentComponents } from './AgentComponents.js';
 import { ResourceComponents } from './ResourceComponents.js';
 import { WorkflowInput } from './WorkflowInput.js';
@@ -41,6 +42,7 @@ export class ComponentRegistry {
         this.#builtin ??= new ComponentRegistry([
             ...CoreComponents.definitions(),
             ...AgentComponents.definitions(),
+            ...InferenceComponents.definitions(),
             ...ResourceComponents.definitions(),
         ]);
         return this.#builtin;
