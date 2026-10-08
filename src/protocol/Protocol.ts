@@ -1182,36 +1182,6 @@ export interface ConversationRetryResultShape {
 /** ConversationRetryResult from the Nexa wire protocol. */
 export type ConversationRetryResult = ConversationRetryResultShape;
 
-/** ConversationSearchHit wire fields. */
-export interface ConversationSearchHitShape {
-    /** entryId as defined by the Nexa gateway. */
-    readonly entryId: null | string;
-    /** message as defined by the Nexa gateway. */
-    readonly message?: ConversationMessageRef;
-    /** role as defined by the Nexa gateway. */
-    readonly role: string;
-    /** session as defined by the Nexa gateway. */
-    readonly session: Session;
-    /** snippet as defined by the Nexa gateway. */
-    readonly snippet: string;
-    /** timestamp as defined by the Nexa gateway. */
-    readonly timestamp: number;
-}
-
-/** ConversationSearchHit from the Nexa wire protocol. */
-export type ConversationSearchHit = ConversationSearchHitShape;
-
-/** ConversationSearchParams wire fields. */
-export interface ConversationSearchParamsShape {
-    /** limit as defined by the Nexa gateway. */
-    readonly limit?: number;
-    /** query as defined by the Nexa gateway. */
-    readonly query: string;
-}
-
-/** ConversationSearchParams from the Nexa wire protocol. */
-export type ConversationSearchParams = ConversationSearchParamsShape;
-
 /** ConversationUnpinParams wire fields. */
 export interface ConversationUnpinParamsShape {
     /** pinId as defined by the Nexa gateway. */
@@ -2564,14 +2534,6 @@ export interface GatewayMethodssessions_retryShape {
     readonly result: ConversationRetryResult;
 }
 
-/** GatewayMethodssessions_search wire fields. */
-export interface GatewayMethodssessions_searchShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: ConversationSearchParams;
-    /** result as defined by the Nexa gateway. */
-    readonly result: ReadonlyArray<ConversationSearchHit>;
-}
-
 /** GatewayMethodssessions_subscribe wire fields. */
 export interface GatewayMethodssessions_subscribeShape {
     /** params as defined by the Nexa gateway. */
@@ -3086,8 +3048,6 @@ export interface GatewayMethodsShape {
     readonly 'sessions.rename': GatewayMethodssessions_renameShape;
     /** sessions.retry as defined by the Nexa gateway. */
     readonly 'sessions.retry': GatewayMethodssessions_retryShape;
-    /** sessions.search as defined by the Nexa gateway. */
-    readonly 'sessions.search': GatewayMethodssessions_searchShape;
     /** sessions.subscribe as defined by the Nexa gateway. */
     readonly 'sessions.subscribe': GatewayMethodssessions_subscribeShape;
     /** sessions.transcript as defined by the Nexa gateway. */
@@ -8155,8 +8115,6 @@ export enum Method {
     SessionsRename = 'sessions.rename',
     /** Calls sessions.retry. */
     SessionsRetry = 'sessions.retry',
-    /** Calls sessions.search. */
-    SessionsSearch = 'sessions.search',
     /** Calls sessions.subscribe. */
     SessionsSubscribe = 'sessions.subscribe',
     /** Calls sessions.transcript. */

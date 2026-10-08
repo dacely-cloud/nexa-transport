@@ -1825,46 +1825,6 @@ export const schema: Schema = {
             required: ['session', 'started', 'streamId'],
             type: 'object',
         },
-        ConversationSearchHit: {
-            description: 'One owned conversation and a bounded matching message excerpt.',
-            properties: {
-                entryId: {
-                    type: ['null', 'string'],
-                },
-                message: {
-                    $ref: '#/definitions/ConversationMessageRef',
-                    description:
-                        'A stable input, response stream, or canonical entry in a saved conversation.',
-                },
-                role: {
-                    type: 'string',
-                },
-                session: {
-                    $ref: '#/definitions/Flatten%3C%7Breadonlytitle%3Astring%7Cnull%3Breadonlyid%3Astring%3BreadonlyagentId%3Astring%3BreadonlycreatedAt%3Anumber%3BreadonlyupdatedAt%3Anumber%3BreadonlyconversationId%3Astring%7Cnull%3Breadonlyparticipants%3Areadonlystring%5B%5D%3BreadonlymessageCount%3Anumber%3Breadonlyusage%3ATokenUsage%3B%7D%26%7BreadonlytitleEdited%3F%3Aboolean%7Cundefined%3BreadonlyretrySourceId%3F%3Astring%7Cundefined%3BreadonlyretryRequestId%3F%3Astring%7Cundefined%3BreadonlyretryState%3F%3Astring%7Cundefined%3BreadonlyretryFingerprint%3F%3Astring%7Cundefined%3BreadonlyactiveToolFamilies%3F%3Areadonlystring%5B%5D%7Cundefined%3BreadonlyprojectId%3F%3Astring%7Cundefined%3BreadonlyuserId%3F%3Astring%7Cundefined%3BreadonlyworkspaceId%3F%3Astring%7Cundefined%3BreadonlyturnOpen%3F%3Aboolean%7Cundefined%3B%7D%3E',
-                },
-                snippet: {
-                    type: 'string',
-                },
-                timestamp: {
-                    type: 'number',
-                },
-            },
-            required: ['entryId', 'role', 'session', 'snippet', 'timestamp'],
-            type: 'object',
-        },
-        ConversationSearchParams: {
-            description: 'An account-scoped full message search, including compacted history.',
-            properties: {
-                limit: {
-                    type: 'number',
-                },
-                query: {
-                    type: 'string',
-                },
-            },
-            required: ['query'],
-            type: 'object',
-        },
         ConversationUnpinParams: {
             description:
                 'Removes only a bookmark belonging to the current authenticated principal.',
@@ -4046,21 +4006,6 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
-                'sessions.search': {
-                    properties: {
-                        params: {
-                            $ref: '#/definitions/ConversationSearchParams',
-                        },
-                        result: {
-                            items: {
-                                $ref: '#/definitions/ConversationSearchHit',
-                            },
-                            type: 'array',
-                        },
-                    },
-                    required: ['params', 'result'],
-                    type: 'object',
-                },
                 'sessions.subscribe': {
                     properties: {
                         params: {
@@ -4718,7 +4663,6 @@ export const schema: Schema = {
                 'sessions.pins',
                 'sessions.rename',
                 'sessions.retry',
-                'sessions.search',
                 'sessions.subscribe',
                 'sessions.transcript',
                 'sessions.unpin',

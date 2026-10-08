@@ -70,7 +70,6 @@ All 54 protocol methods. `connect` is managed by `NexaClient.connect`; the remai
 - [sessions.pins](#sessions-pins)
 - [sessions.rename](#sessions-rename)
 - [sessions.retry](#sessions-retry)
-- [sessions.search](#sessions-search)
 - [sessions.subscribe](#sessions-subscribe)
 - [sessions.transcript](#sessions-transcript)
 - [sessions.unpin](#sessions-unpin)
@@ -1610,29 +1609,6 @@ Parameters: [ConversationRetryParams](protocol.md#conversationretryparams).
 | `text`              | No       | `string`                                                                      |             |
 
 Result: [ConversationRetryResult](protocol.md#conversationretryresult).
-
-## sessions.search
-
-```ts
-import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
-
-const params: ParamsOf<typeof Method.SessionsSearch> = {
-    query: 'YOUR_QUERY',
-};
-const result: ResultOf<typeof Method.SessionsSearch> = await client.call(
-    Method.SessionsSearch,
-    params,
-);
-```
-
-Parameters: [ConversationSearchParams](protocol.md#conversationsearchparams).
-
-| Field   | Required | Type     | Description |
-| ------- | -------- | -------- | ----------- |
-| `limit` | No       | `number` |             |
-| `query` | Yes      | `string` |             |
-
-Result: Array of [ConversationSearchHit](protocol.md#conversationsearchhit).
 
 ## sessions.subscribe
 
