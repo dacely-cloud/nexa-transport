@@ -819,28 +819,6 @@ A saved version is returned even when its model run was already started by a los
 | `started`  | Yes      | `boolean`                      |             |
 | `streamId` | Yes      | `string`                       |             |
 
-## ConversationSearchHit
-
-One owned conversation and a bounded matching message excerpt.
-
-| Field       | Required | Type                                                         | Description                                                                  |
-| ----------- | -------- | ------------------------------------------------------------ | ---------------------------------------------------------------------------- |
-| `entryId`   | Yes      | `null,string`                                                |                                                                              |
-| `message`   | No       | [ConversationMessageRef](protocol.md#conversationmessageref) | A stable input, response stream, or canonical entry in a saved conversation. |
-| `role`      | Yes      | `string`                                                     |                                                                              |
-| `session`   | Yes      | [Session](protocol.md#session)                               |                                                                              |
-| `snippet`   | Yes      | `string`                                                     |                                                                              |
-| `timestamp` | Yes      | `number`                                                     |                                                                              |
-
-## ConversationSearchParams
-
-An account-scoped full message search, including compacted history.
-
-| Field   | Required | Type     | Description |
-| ------- | -------- | -------- | ----------- |
-| `limit` | No       | `number` |             |
-| `query` | Yes      | `string` |             |
-
 ## ConversationUnpinParams
 
 Removes only a bookmark belonging to the current authenticated principal.
@@ -1351,7 +1329,6 @@ Configurable bounds on gateway-owned work and memory.
 | `sessions.pins`                  | Yes      | Object (fields below) |                                                                                            |
 | `sessions.rename`                | Yes      | Object (fields below) |                                                                                            |
 | `sessions.retry`                 | Yes      | Object (fields below) |                                                                                            |
-| `sessions.search`                | Yes      | Object (fields below) |                                                                                            |
 | `sessions.subscribe`             | Yes      | Object (fields below) |                                                                                            |
 | `sessions.transcript`            | Yes      | Object (fields below) | Compact transcript blocks with original journal byte cursors.                              |
 | `sessions.unpin`                 | Yes      | Object (fields below) |                                                                                            |
@@ -1948,13 +1925,6 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | -------------------------------------------------------------- | ----------- |
 | `params` | Yes      | [ConversationRetryParams](protocol.md#conversationretryparams) |             |
 | `result` | Yes      | [ConversationRetryResult](protocol.md#conversationretryresult) |             |
-
-**sessions.search**
-
-| Field    | Required | Type                                                                | Description |
-| -------- | -------- | ------------------------------------------------------------------- | ----------- |
-| `params` | Yes      | [ConversationSearchParams](protocol.md#conversationsearchparams)    |             |
-| `result` | Yes      | Array of [ConversationSearchHit](protocol.md#conversationsearchhit) |             |
 
 **sessions.subscribe**
 
