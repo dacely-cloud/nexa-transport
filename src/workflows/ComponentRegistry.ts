@@ -11,6 +11,7 @@ import {
 } from './ComponentTypes.js';
 import { CoreComponents } from './CoreComponents.js';
 import { InferenceComponents } from './InferenceComponents.js';
+import { ImageComponents } from './ImageComponents.js';
 import { AgentComponents } from './AgentComponents.js';
 import { ResourceComponents } from './ResourceComponents.js';
 import { WorkflowInput } from './WorkflowInput.js';
@@ -43,6 +44,7 @@ export class ComponentRegistry {
             ...CoreComponents.definitions(),
             ...AgentComponents.definitions(),
             ...InferenceComponents.definitions(),
+            ...ImageComponents.definitions(),
             ...ResourceComponents.definitions(),
         ]);
         return this.#builtin;
