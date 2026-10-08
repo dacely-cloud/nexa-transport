@@ -1,6 +1,9 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { WorkflowImagePolicyEvidence } from '../ImageModelPolicy.js';
+import type { WorkflowModelSelection } from './RunModelTypes.js';
+
 /** An exact request, bounded before admission and independent of a text model binding. */
 export interface WorkflowImageSettings {
     readonly size: string;
@@ -8,6 +11,11 @@ export interface WorkflowImageSettings {
     readonly count: number;
     readonly outputFormat: string;
     readonly options: Readonly<Record<string, string | number | boolean>>;
+}
+/** Per-operation settings sharing one reusable image-model binding. */
+export interface WorkflowImageRequirement {
+    readonly nodeId: string;
+    readonly settings: WorkflowImageSettings;
 }
 /** Image request identity and its configured account tariff. */
 export interface WorkflowImagePrice {
@@ -25,5 +33,6 @@ export interface WorkflowResolvedImage extends WorkflowImagePrice {
     readonly nodeId: string;
     readonly bindingId: string;
     readonly capability: 'image';
-    readonly selection: 'exact';
+    readonly selection: (typeof WorkflowModelSelection)[keyof typeof WorkflowModelSelection];
+    readonly policy?: WorkflowImagePolicyEvidence;
 }

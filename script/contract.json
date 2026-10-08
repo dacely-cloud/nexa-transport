@@ -4208,6 +4208,18 @@
                     "required": ["params", "result"],
                     "type": "object"
                 },
+                "workflows.models.image.resolve": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/WorkflowImageResolutionRequest"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/WorkflowImageResolution"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
                 "workflows.models.refresh": {
                     "properties": {
                         "params": {
@@ -4583,6 +4595,7 @@
                 "workflows.list",
                 "workflows.models",
                 "workflows.models.image.quote",
+                "workflows.models.image.resolve",
                 "workflows.models.refresh",
                 "workflows.models.resolve",
                 "workflows.planning.cancel",
@@ -10055,6 +10068,28 @@
             "required": ["node", "port"],
             "type": "object"
         },
+        "WorkflowImageCandidate": {
+            "description": "All connected render quotes share the selected snapshot and its evidence.",
+            "properties": {
+                "evidence": {
+                    "$ref": "#/definitions/WorkflowImagePolicyEvidence"
+                },
+                "model": {
+                    "type": "string"
+                },
+                "provider": {
+                    "type": "string"
+                },
+                "quotes": {
+                    "items": {
+                        "$ref": "#/definitions/WorkflowImageQuote"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": ["evidence", "model", "provider", "quotes"],
+            "type": "object"
+        },
         "WorkflowImageCapabilities": {
             "description": "Supported image settings from the same adapter used by execution.",
             "properties": {
@@ -10135,6 +10170,67 @@
             ],
             "type": "object"
         },
+        "WorkflowImagePolicy": {
+            "description": "Image policies bound each complete render; token rate ceilings do not apply to image tariffs.",
+            "properties": {
+                "allowPreview": {
+                    "type": "boolean"
+                },
+                "maxCatalogAgeMs": {
+                    "type": "string"
+                },
+                "maxGenerationMicrocents": {
+                    "description": "Null retains the existing run budget. A value additionally caps each image operation.",
+                    "type": ["null", "string"]
+                },
+                "region": {
+                    "type": ["null", "string"]
+                }
+            },
+            "required": ["allowPreview", "maxCatalogAgeMs", "maxGenerationMicrocents", "region"],
+            "type": "object"
+        },
+        "WorkflowImagePolicyEvidence": {
+            "description": "Immutable evidence for a concrete image model selected at run creation.",
+            "properties": {
+                "catalogCheckedAtMs": {
+                    "type": "string"
+                },
+                "eligibilityReference": {
+                    "type": "string"
+                },
+                "eligibilityVerifiedAtMs": {
+                    "type": "string"
+                },
+                "factsDigest": {
+                    "type": "string"
+                },
+                "format": {
+                    "const": 1,
+                    "type": "number"
+                },
+                "policy": {
+                    "$ref": "#/definitions/WorkflowImagePolicy"
+                },
+                "releaseAtMs": {
+                    "type": "string"
+                },
+                "releaseReference": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "catalogCheckedAtMs",
+                "eligibilityReference",
+                "eligibilityVerifiedAtMs",
+                "factsDigest",
+                "format",
+                "policy",
+                "releaseAtMs",
+                "releaseReference"
+            ],
+            "type": "object"
+        },
         "WorkflowImageQuote": {
             "description": "An estimate creates no reservation and is recalculated when accepting a run.",
             "properties": {
@@ -10199,6 +10295,61 @@
                 }
             },
             "required": ["model", "nodeId", "provider", "settings", "workflowId"],
+            "type": "object"
+        },
+        "WorkflowImageRequirement": {
+            "description": "Per-operation settings sharing one reusable image-model binding.",
+            "properties": {
+                "nodeId": {
+                    "type": "string"
+                },
+                "settings": {
+                    "$ref": "#/definitions/WorkflowImageSettings"
+                }
+            },
+            "required": ["nodeId", "settings"],
+            "type": "object"
+        },
+        "WorkflowImageResolution": {
+            "description": "An unresolved policy has a reason, never an invented candidate or zero-price placeholder.",
+            "properties": {
+                "candidate": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/WorkflowImageCandidate"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "reason": {
+                    "type": ["null", "string"]
+                }
+            },
+            "required": ["candidate", "reason"],
+            "type": "object"
+        },
+        "WorkflowImageResolutionRequest": {
+            "description": "A read-only policy preview uses unsaved settings and authenticated account pricing.",
+            "properties": {
+                "policy": {
+                    "$ref": "#/definitions/WorkflowImagePolicy"
+                },
+                "provider": {
+                    "type": "string"
+                },
+                "requirements": {
+                    "items": {
+                        "$ref": "#/definitions/WorkflowImageRequirement"
+                    },
+                    "type": "array"
+                },
+                "workflowId": {
+                    "type": "string"
+                }
+            },
+            "required": ["policy", "provider", "requirements", "workflowId"],
             "type": "object"
         },
         "WorkflowImageSettings": {

@@ -3,6 +3,7 @@
 
 import { WorkflowInput } from '../WorkflowInput.js';
 import { WorkflowModelsCodec } from '../WorkflowModels.js';
+import { WorkflowImagePolicies } from '../ImageModelPolicy.js';
 import type { WorkflowImageSettings, WorkflowResolvedImage } from './RunImageTypes.js';
 
 /** Stored image bindings validate independently from server-only provider and ledger code. */
@@ -69,6 +70,8 @@ export class WorkflowRunImageCodec {
     }
     /** Monetary values remain decimal integers; the existing ledger performs pricing. */
     public static model(raw: unknown): WorkflowResolvedImage {
+        const fields: Readonly<Record<string, unknown>> = WorkflowInput.object(raw);
+        const latest: boolean = fields['selection'] === 'latest-compatible';
         const value: Readonly<Record<string, unknown>> = WorkflowInput.record(raw, [
             'nodeId',
             'bindingId',
@@ -81,11 +84,13 @@ export class WorkflowRunImageCodec {
             'pricingReference',
             'priceServiceId',
             'estimatedMicrocents',
+            ...(latest ? ['policy'] : []),
         ]);
         const amount: string = WorkflowInput.text(value['estimatedMicrocents'], 16);
         if (
             value['capability'] !== 'image' ||
-            value['selection'] !== 'exact' ||
+            (value['selection'] !== 'exact' && value['selection'] !== 'latest-compatible') ||
+            (value['selection'] === 'exact' && value['policy'] !== undefined) ||
             !/^(0|[1-9][0-9]*)$/u.test(amount) ||
             BigInt(amount) > BigInt(Number.MAX_SAFE_INTEGER)
         ) {
@@ -97,7 +102,10 @@ export class WorkflowRunImageCodec {
             provider: WorkflowInput.id(value['provider']),
             model: WorkflowModelsCodec.identity(value['model']),
             capability: 'image',
-            selection: 'exact',
+            selection: value['selection'],
+            ...(value['selection'] === 'latest-compatible'
+                ? { policy: WorkflowImagePolicies.evidence(value['policy']) }
+                : {}),
             settings: this.settings(value['settings']),
             capabilityReference: this.#digest(value['capabilityReference']),
             pricingReference: this.#digest(value['pricingReference']),

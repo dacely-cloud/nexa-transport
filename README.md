@@ -533,3 +533,11 @@ The helper bounds total content to 32 MiB, checks contiguous 256 KiB fragments, 
 `Method.WorkflowsModelsImageQuote` accepts a workflow ID, node ID, exact provider/model, and bounded image settings. Import `WorkflowImageQuoteCodec` and the request/result types from `nexa-transport/workflow-image-quote`. Check that the method was negotiated before calling it. The gateway authorizes the workflow owner before consulting the same account tariff used by run preparation.
 
 Results retain exact microcent strings, request settings, pricing/capability references and a quote timestamp. A quote does not save the graph, create a run, reserve funds, generate an image, or establish provider account access. Invalidate an estimate when settings or the selected model change; run acceptance rechecks the price.
+
+### Image model policies
+
+`workflows.models.image.resolve` is an authenticated read-only preview for a configured image provider, an image policy and the settings of every connected render. The `workflow-image-policy` entry point exposes strict policy/evidence validation; `workflow-image-resolution` exposes request/result codecs. Image limits use a decimal-integer microcent ceiling per complete render, independently of text-token rates. Negotiate the method through the server hello before calling it. Previewing does not save a graph, generate an image or reserve credits.
+
+Latest image run snapshots retain their exact provider/model, original policy evidence, supported settings and pricing reference. The portable run codec accepts these records while preserving existing exact image snapshots. Failed or ambiguous resolution returns an explicit reason. A model listing is not a successful generation or billing check.
+
+Validation for this addition: 179 SDK tests, 12 memory checks, 143 documentation examples, strict types/lint and the packed Node/NodeNext consumer passed. Editor policy controls and live mixed-provider verification remain outside this completed transport increment.

@@ -143,6 +143,19 @@ export class AgentComponents {
                 Schemas.field('modelId', { ...Schemas.text, nullable: true }),
                 Schemas.field('options', Schemas.object([], true)),
                 Schemas.field(
+                    'imagePolicy',
+                    Schemas.object([
+                        Schemas.field('allowPreview', Schemas.boolean),
+                        Schemas.field('region', { ...Schemas.text, nullable: true }),
+                        Schemas.field('maxCatalogAgeMs', Schemas.text),
+                        Schemas.field('maxGenerationMicrocents', {
+                            ...Schemas.text,
+                            nullable: true,
+                        }),
+                    ]),
+                    false,
+                ),
+                Schemas.field(
                     'policy',
                     Schemas.object([
                         Schemas.field('allowPreview', Schemas.boolean),

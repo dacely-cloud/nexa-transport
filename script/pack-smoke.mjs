@@ -24,6 +24,10 @@ try {
     await writeFile(
         join(directory, 'consumer.ts'),
         `import { NexaClient } from 'nexa-transport';
+import { WorkflowImagePolicies } from 'nexa-transport/workflow-image-policy';
+import { WorkflowImageResolutionCodec } from 'nexa-transport/workflow-image-resolution';
+void WorkflowImagePolicies.defaults;
+void WorkflowImageResolutionCodec.result;
 import { NexaMedia } from 'nexa-transport/media';
 import { WorkflowArtifactDownloads, type WorkflowArtifactDownload } from 'nexa-transport/workflow-artifacts';
 import { EventName } from 'nexa-transport/events';
