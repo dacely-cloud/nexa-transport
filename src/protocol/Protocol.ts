@@ -7435,7 +7435,8 @@ export const WorkflowApplicationValues = {
     Value0: 'claude-code',
     Value1: 'codex',
     Value2: 'grok-build',
-    Value3: 'nerva-code',
+    Value3: 'mistral-vibe',
+    Value4: 'nerva-code',
 } as const;
 
 /** WorkflowApplication from the Nexa wire protocol. */

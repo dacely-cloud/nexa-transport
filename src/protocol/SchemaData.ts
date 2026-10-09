@@ -11187,7 +11187,7 @@ export const schema: Schema = {
             type: 'object',
         },
         WorkflowApplication: {
-            enum: ['claude-code', 'codex', 'grok-build', 'nerva-code'],
+            enum: ['claude-code', 'codex', 'grok-build', 'mistral-vibe', 'nerva-code'],
             type: 'string',
         },
         WorkflowApplicationRequest: {
