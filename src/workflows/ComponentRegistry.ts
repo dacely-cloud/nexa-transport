@@ -12,6 +12,7 @@ import {
 import { ApprovalComponents } from './ApprovalComponents.js';
 import { HumanComponents } from './HumanComponents.js';
 import { ConversionComponents } from './ConversionComponents.js';
+import { RepeatComponents } from './RepeatComponents.js';
 import { EachComponents } from './EachComponents.js';
 import { ListComponents } from './ListComponents.js';
 import { MappingComponents } from './MappingComponents.js';
@@ -60,6 +61,7 @@ export class ComponentRegistry {
             MappingComponents.definition(),
             ListComponents.definition(),
             ...EachComponents.definitions(),
+            ...RepeatComponents.definitions(),
             ...ConversionComponents.definitions(),
             ...AgentComponents.definitions(),
             ...TerminalComponents.definitions(),

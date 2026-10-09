@@ -11,6 +11,8 @@ import type { ResourceBinding } from '../src/workflows/ResourceTypes.js';
 describe('portable workflow resource contracts', (): void => {
     it.each([
         'EachComponents',
+        'RepeatComponents',
+        'LoopComponents',
         'GraphEach',
         'ConversionComponents',
         'ScalarConversion',

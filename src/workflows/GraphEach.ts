@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { LoopComponents } from './LoopComponents.js';
 import type { WorkflowGraph } from './GraphTypes.js';
 import type { WorkflowEdge, WorkflowNode } from './WorkflowTypes.js';
 
@@ -30,7 +31,7 @@ export class GraphEach {
         const regions: WorkflowEachRegion[] = [];
         const owned: Set<string> = new Set();
         for (const loop of graph.nodes) {
-            if (loop.component !== 'flow.each') {
+            if (!LoopComponents.isLoop(loop.component)) {
                 continue;
             }
             const members: Set<string> = new Set();
@@ -45,20 +46,21 @@ export class GraphEach {
                 }
                 const node: WorkflowNode | undefined = nodes.get(id);
                 if (node === undefined) {
-                    throw new Error('For each item has a missing body component');
+                    throw new Error('Loop has a missing body component');
                 }
-                if (node.component === 'flow.each') {
-                    throw new Error('Nested For each item bodies are not supported yet');
+                if (LoopComponents.isLoop(node.component)) {
+                    throw new Error('Nested loop bodies are not supported yet');
                 }
                 if (owned.has(id)) {
-                    throw new Error('A component cannot belong to two For each item bodies');
+                    throw new Error('A component cannot belong to two loop bodies');
                 }
                 members.add(id);
-                if (node.component === 'flow.each-result') {
-                    if (node.configuration['loop'] !== loop.id) {
-                        throw new Error(
-                            'Collect item result must name its owning For each item component',
-                        );
+                if (LoopComponents.isResult(node.component)) {
+                    if (
+                        node.configuration['loop'] !== loop.id ||
+                        node.component !== LoopComponents.result(loop.component)
+                    ) {
+                        throw new Error('Result boundary must match its owning loop component');
                     }
                     ends.push(id);
                 } else {
@@ -68,17 +70,15 @@ export class GraphEach {
                 }
             }
             if (ends.length !== 1) {
-                throw new Error(
-                    'For each item requires exactly one reachable Collect item result component',
-                );
+                throw new Error('Loop requires exactly one reachable matching result boundary');
             }
             const end: string | undefined = ends[0];
             if (end === undefined) {
-                throw new Error('Missing item collection boundary');
+                throw new Error('Missing loop result boundary');
             }
             for (const id of members) {
                 if (id !== end && (outgoing.get(id)?.length ?? 0) === 0) {
-                    throw new Error('Every item body branch must lead to Collect item result');
+                    throw new Error('Every loop body branch must lead to its result boundary');
                 }
                 owned.add(id);
             }
@@ -89,18 +89,18 @@ export class GraphEach {
                 const fromBody: boolean = members.has(edge.from.node);
                 const toBody: boolean = members.has(edge.to.node);
                 if (fromBody && !toBody) {
-                    throw new Error('Item body values must leave through Collect item result');
+                    throw new Error('Loop body values must leave through its result boundary');
                 }
                 if (toBody && !fromBody && edge.from.node !== loop.id) {
-                    throw new Error('Pass shared data through the For each item Context input');
+                    throw new Error('Pass shared data through the loop Context input');
                 }
                 if (edge.from.node === loop.id) {
-                    const itemPort: boolean = ['body', 'item', 'index', 'shared'].includes(
+                    const itemPort: boolean = ['body', 'item', 'state', 'index', 'shared'].includes(
                         edge.from.port,
                     );
                     if (itemPort !== toBody) {
                         throw new Error(
-                            'Use item ports inside the body and completed results outside it',
+                            'Use iteration ports inside the body and completed results outside it',
                         );
                     }
                 }
@@ -108,8 +108,8 @@ export class GraphEach {
             regions.push({ loop, end, members });
         }
         for (const node of graph.nodes) {
-            if (node.component === 'flow.each-result' && !owned.has(node.id)) {
-                throw new Error('Collect item result must be inside its For each item body');
+            if (LoopComponents.isResult(node.component) && !owned.has(node.id)) {
+                throw new Error('Result boundary must be inside its owning loop body');
             }
         }
         return regions;
