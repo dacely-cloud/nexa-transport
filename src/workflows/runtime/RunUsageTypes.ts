@@ -30,8 +30,9 @@ export interface WorkflowModelUsage extends WorkflowSpendingBucket {
     readonly usage: WorkflowUsageDimensions;
     readonly usageEntries: WorkflowUsageDimensions;
 }
-/** One consistent retained total and at most ten groups from that same observation. */
-export interface WorkflowRunUsage extends WorkflowRunUsageRequest {
+/** Retained evidence shared by whole-run and attributed breakdowns. */
+export interface WorkflowUsageEvidence {
+    readonly runId: string;
     readonly workflowId: string;
     readonly revision: string;
     readonly observedAtMs: string;
@@ -41,6 +42,9 @@ export interface WorkflowRunUsage extends WorkflowRunUsageRequest {
     readonly retainedFromMs: string | null;
     readonly expiresAtMs: string | null;
     readonly pricing: readonly WorkflowSpendingBucket[];
+}
+/** One consistent retained total and at most ten groups from that same observation. */
+export interface WorkflowRunUsage extends WorkflowRunUsageRequest, WorkflowUsageEvidence {
     readonly models: readonly WorkflowModelUsage[];
     readonly modelCount: string;
     readonly next: string | null;

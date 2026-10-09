@@ -38,6 +38,7 @@ const config: UserConfig = {
                 'workflow-schedule-codec': 'src/workflows/schedule/ScheduleCodec.ts',
                 'workflow-schedule-times': 'src/workflows/schedule/ScheduleTiming.ts',
                 'workflow-publication-codec': 'src/workflows/PublicationCodec.ts',
+                'workflow-breakdown-codec': 'src/workflows/runtime/RunBreakdownCodec.ts',
                 'workflow-usage-codec': 'src/workflows/runtime/RunUsageCodec.ts',
                 'workflow-spending-codec': 'src/workflows/runtime/RunSpendingCodec.ts',
                 'workflow-run-types': 'src/workflows/runtime/RunTypes.ts',
