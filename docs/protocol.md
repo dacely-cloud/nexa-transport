@@ -797,6 +797,35 @@ Pixel outcomes keep tolerated changes separate from exact equality.
 
 Type: `"different"` / `"dimension-mismatch"` / `"identical"` / `"within-threshold"`.
 
+## BrowserSchemaProperty
+
+Schema keys are retained as escaped JSON pointers; leaf values are excluded.
+
+| Field          | Required | Type                                                        | Description |
+| -------------- | -------- | ----------------------------------------------------------- | ----------- |
+| `id`           | Yes      | `string`                                                    |             |
+| `observations` | Yes      | `string`                                                    |             |
+| `path`         | Yes      | `string`                                                    |             |
+| `types`        | Yes      | Array of [BrowserSchemaType](protocol.md#browserschematype) |             |
+
+## BrowserSchemaSummary
+
+Structural coverage reports a finite observed schema traversal rather than parameter validation.
+
+| Field           | Required | Type                                               | Description |
+| --------------- | -------- | -------------------------------------------------- | ----------- |
+| `complete`      | Yes      | `boolean`                                          |             |
+| `maximumDepth`  | Yes      | `number`                                           |             |
+| `nodeCount`     | Yes      | `string`                                           |             |
+| `propertyCount` | Yes      | `string`                                           |             |
+| `rootType`      | Yes      | [BrowserSchemaType](protocol.md#browserschematype) |             |
+
+## BrowserSchemaType
+
+Value-free schema summaries use the native JSON value vocabulary.
+
+Type: `"array"` / `"boolean"` / `"null"` / `"number"` / `"object"` / `"string"`.
+
 ## BrowserScreenshotComparisonSnapshot
 
 Body-free progress also identifies the archived comparison report.
@@ -1459,6 +1488,140 @@ A progress receipt references structure without carrying complete trees.
 Independent tree representations use the same immutable document capture.
 
 Type: `"accessibility"` / `"dom"`.
+
+## BrowserWebMcpAnnotations
+
+Page-provided booleans remain untrusted annotations, never authorization decisions.
+
+| Field              | Required | Type           | Description |
+| ------------------ | -------- | -------------- | ----------- |
+| `autosubmit`       | Yes      | `null,boolean` |             |
+| `consequential`    | Yes      | `null,boolean` |             |
+| `debugging`        | Yes      | `null,boolean` |             |
+| `readOnly`         | Yes      | `null,boolean` |             |
+| `untrustedContent` | Yes      | `null,boolean` |             |
+
+## BrowserWebMcpDeclaration
+
+Declarations are inventory evidence; they never become executable Nexa tools.
+
+Type: `"declarative"` / `"imperative"`.
+
+## BrowserWebMcpDescriptor
+
+A directory row excludes its separately paged structural schema properties.
+
+| Field                | Required | Type                                                              | Description |
+| -------------------- | -------- | ----------------------------------------------------------------- | ----------- |
+| `annotations`        | Yes      | [BrowserWebMcpAnnotations](protocol.md#browserwebmcpannotations)  |             |
+| `declaration`        | Yes      | [BrowserWebMcpDeclaration](protocol.md#browserwebmcpdeclaration)  |             |
+| `description`        | Yes      | `string`                                                          |             |
+| `frameId`            | Yes      | `string`                                                          |             |
+| `frameUrl`           | Yes      | `string`                                                          |             |
+| `id`                 | Yes      | `string`                                                          |             |
+| `inputSchema`        | Yes      | [BrowserSchemaSummary](protocol.md#browserschemasummary) / `null` |             |
+| `key`                | Yes      | `string`                                                          |             |
+| `name`               | Yes      | `string`                                                          |             |
+| `origin`             | Yes      | `string`                                                          |             |
+| `registrationSource` | Yes      | [BrowserWebMcpSource](protocol.md#browserwebmcpsource) / `null`   |             |
+| `trust`              | Yes      | `"page-declared-untrusted"`                                       |             |
+
+## BrowserWebMcpMetadata
+
+Captured scope distinguishes unsupported protocols and explicit retention/authority gaps.
+
+| Field                    | Required | Type              | Description |
+| ------------------------ | -------- | ----------------- | ----------- |
+| `allowedOrigins`         | Yes      | Array of `string` |             |
+| `available`              | Yes      | `boolean`         |             |
+| `capturedAt`             | Yes      | `string`          |             |
+| `complete`               | Yes      | `boolean`         |             |
+| `dropped`                | Yes      | `string`          |             |
+| `frameCoverageComplete`  | Yes      | `boolean`         |             |
+| `frameId`                | Yes      | `string`          |             |
+| `invocationAvailable`    | Yes      | `false`           |             |
+| `limitations`            | Yes      | Array of `string` |             |
+| `observationMs`          | Yes      | `number`          |             |
+| `origin`                 | Yes      | `string`          |             |
+| `provider`               | Yes      | `"cdp-passive"`   |             |
+| `schemaCoverageComplete` | Yes      | `boolean`         |             |
+| `schemaValuesExcluded`   | Yes      | `true`            |             |
+| `targetId`               | Yes      | `string`          |             |
+| `toolCount`              | Yes      | `string`          |             |
+| `url`                    | Yes      | `string`          |             |
+
+## BrowserWebMcpPage
+
+Only selected rows are transferred; schema leaves and complete originals remain host-side.
+
+| Field           | Required | Type                                                                    | Description |
+| --------------- | -------- | ----------------------------------------------------------------------- | ----------- |
+| `captureSha256` | Yes      | `string`                                                                |             |
+| `cursor`        | Yes      | `string`                                                                |             |
+| `evidenceId`    | Yes      | `string`                                                                |             |
+| `metadata`      | Yes      | [BrowserWebMcpMetadata](protocol.md#browserwebmcpmetadata)              |             |
+| `nextCursor`    | Yes      | `null,string`                                                           |             |
+| `properties`    | Yes      | Array of [BrowserSchemaProperty](protocol.md#browserschemaproperty)     |             |
+| `runId`         | Yes      | `string`                                                                |             |
+| `selectedTool`  | Yes      | [BrowserWebMcpDescriptor](protocol.md#browserwebmcpdescriptor) / `null` |             |
+| `selector`      | Yes      | `null,string`                                                           |             |
+| `sha256`        | Yes      | `string`                                                                |             |
+| `tools`         | Yes      | Array of [BrowserWebMcpDescriptor](protocol.md#browserwebmcpdescriptor) |             |
+| `view`          | Yes      | [BrowserWebMcpView](protocol.md#browserwebmcpview)                      |             |
+
+## BrowserWebMcpQuery
+
+Gateway authority is checked against the original owner and conversation before any index read.
+
+| Field        | Required | Type                                  | Description                                                                           |
+| ------------ | -------- | ------------------------------------- | ------------------------------------------------------------------------------------- |
+| `cursor`     | No       | `string`                              |                                                                                       |
+| `evidenceId` | Yes      | `string`                              |                                                                                       |
+| `id`         | Yes      | `string`                              |                                                                                       |
+| `runId`      | Yes      | `string`                              |                                                                                       |
+| `selector`   | No       | `string`                              |                                                                                       |
+| `view`       | No       | `"metadata"` / `"schema"` / `"tools"` | Metadata, declaration rows and one selected schema have independent transfer budgets. |
+
+## BrowserWebMcpSnapshot
+
+Progress binds metadata to the original report without tool/schema arrays.
+
+| Field                    | Required | Type                                                           | Description |
+| ------------------------ | -------- | -------------------------------------------------------------- | ----------- |
+| `allowedOrigins`         | Yes      | Array of `string`                                              |             |
+| `available`              | Yes      | `boolean`                                                      |             |
+| `capturedAt`             | Yes      | `string`                                                       |             |
+| `complete`               | Yes      | `boolean`                                                      |             |
+| `dropped`                | Yes      | `string`                                                       |             |
+| `frameCoverageComplete`  | Yes      | `boolean`                                                      |             |
+| `frameId`                | Yes      | `string`                                                       |             |
+| `invocationAvailable`    | Yes      | `false`                                                        |             |
+| `limitations`            | Yes      | Array of `string`                                              |             |
+| `observationMs`          | Yes      | `number`                                                       |             |
+| `origin`                 | Yes      | `string`                                                       |             |
+| `provider`               | Yes      | `"cdp-passive"`                                                |             |
+| `reference`              | Yes      | [ReverseBrowserReference](protocol.md#reversebrowserreference) |             |
+| `schemaCoverageComplete` | Yes      | `boolean`                                                      |             |
+| `schemaValuesExcluded`   | Yes      | `true`                                                         |             |
+| `targetId`               | Yes      | `string`                                                       |             |
+| `toolCount`              | Yes      | `string`                                                       |             |
+| `url`                    | Yes      | `string`                                                       |             |
+
+## BrowserWebMcpSource
+
+A registration call frame is exposed only for an admitted HTTP(S) source origin.
+
+| Field    | Required | Type          | Description |
+| -------- | -------- | ------------- | ----------- |
+| `column` | Yes      | `null,number` |             |
+| `line`   | Yes      | `null,number` |             |
+| `url`    | Yes      | `string`      |             |
+
+## BrowserWebMcpView
+
+Metadata, declaration rows and one selected schema have independent transfer budgets.
+
+Type: `"metadata"` / `"schema"` / `"tools"`.
 
 ## Budget
 
@@ -2391,6 +2554,7 @@ Configurable bounds on gateway-owned work and memory.
 | `reverse.browser.storage`            | Yes      | Object (fields below) |                                                                                            |
 | `reverse.browser.storage.comparison` | Yes      | Object (fields below) |                                                                                            |
 | `reverse.browser.structure`          | Yes      | Object (fields below) |                                                                                            |
+| `reverse.browser.webmcp`             | Yes      | Object (fields below) |                                                                                            |
 | `reverse.catalog`                    | Yes      | Object (fields below) |                                                                                            |
 | `reverse.evidence`                   | Yes      | Object (fields below) |                                                                                            |
 | `reverse.functions`                  | Yes      | Object (fields below) |                                                                                            |
@@ -2481,6 +2645,7 @@ Configurable bounds on gateway-owned work and memory.
 | `workflows.runs.terminal.command`    | Yes      | Object (fields below) |                                                                                            |
 | `workflows.runs.terminal.read`       | Yes      | Object (fields below) |                                                                                            |
 | `workflows.runs.usage`               | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.usageBreakdown`      | Yes      | Object (fields below) |                                                                                            |
 | `workflows.save`                     | Yes      | Object (fields below) |                                                                                            |
 | `workflows.schedules.disable`        | Yes      | Object (fields below) |                                                                                            |
 | `workflows.schedules.enable`         | Yes      | Object (fields below) |                                                                                            |
@@ -2963,6 +3128,13 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ---------------------------------------------------------- | ----------- |
 | `params` | Yes      | [BrowserStructureQuery](protocol.md#browserstructurequery) |             |
 | `result` | Yes      | [BrowserStructurePage](protocol.md#browserstructurepage)   |             |
+
+**reverse.browser.webmcp**
+
+| Field    | Required | Type                                                 | Description |
+| -------- | -------- | ---------------------------------------------------- | ----------- |
+| `params` | Yes      | [BrowserWebMcpQuery](protocol.md#browserwebmcpquery) |             |
+| `result` | Yes      | [BrowserWebMcpPage](protocol.md#browserwebmcppage)   |             |
 
 **reverse.catalog**
 
@@ -3593,6 +3765,13 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | -------------------------------------------------------------- | ----------- |
 | `params` | Yes      | [WorkflowRunUsageRequest](protocol.md#workflowrunusagerequest) |             |
 | `result` | Yes      | [WorkflowRunUsageView](protocol.md#workflowrunusageview)       |             |
+
+**workflows.runs.usageBreakdown**
+
+| Field    | Required | Type                                                                   | Description |
+| -------- | -------- | ---------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [WorkflowRunBreakdownRequest](protocol.md#workflowrunbreakdownrequest) |             |
+| `result` | Yes      | [WorkflowRunBreakdownView](protocol.md#workflowrunbreakdownview)       |             |
 
 **workflows.save**
 
@@ -5618,6 +5797,7 @@ Bounded, capability-free projection carried by live tool events and the final re
 | `browserStorage`           | No       | [BrowserStorageSnapshot](protocol.md#browserstoragesnapshot)                           | Progress identifies a saved redacted capture without embedding its rows.                        |
 | `browserStorageComparison` | No       | [BrowserStorageComparisonSnapshot](protocol.md#browserstoragecomparisonsnapshot)       | Archived progress binds the report itself independently of its two source captures.             |
 | `browserStructure`         | No       | [BrowserStructureSnapshot](protocol.md#browserstructuresnapshot)                       | A progress receipt references structure without carrying complete trees.                        |
+| `browserWebMcp`            | No       | [BrowserWebMcpSnapshot](protocol.md#browserwebmcpsnapshot)                             | Progress binds metadata to the original report without tool/schema arrays.                      |
 | `cleanupErrors`            | Yes      | Array of `string`                                                                      |                                                                                                 |
 | `evidence`                 | Yes      | Array of [ReverseEvidenceRecord](protocol.md#reverseevidencerecord)                    |                                                                                                 |
 | `evidenceCount`            | Yes      | `number`                                                                               |                                                                                                 |
@@ -6650,6 +6830,13 @@ One exact agent invocation; identities are never retargeted to a newer attempt.
 | `invocationId` | Yes      | `string` |             |
 | `nodeId`       | Yes      | `string` |             |
 | `runId`        | Yes      | `string` |             |
+
+## WorkflowAgentUsageIdentity
+
+| Field     | Required | Type     | Description |
+| --------- | -------- | -------- | ----------- |
+| `agentId` | Yes      | `string` |             |
+| `nodeId`  | Yes      | `string` |             |
 
 ## WorkflowAnswerType
 
@@ -7714,6 +7901,37 @@ Lists exact invocations for a node without including captured input/output bodie
 | `nodeId`       | Yes      | `string`      |             |
 | `runId`        | Yes      | `string`      |             |
 
+## WorkflowRunBreakdownRequest
+
+| Field       | Required | Type                                                         | Description |
+| ----------- | -------- | ------------------------------------------------------------ | ----------- |
+| `dimension` | Yes      | [WorkflowUsageDimension](protocol.md#workflowusagedimension) |             |
+| `offset`    | Yes      | `string`                                                     |             |
+| `runId`     | Yes      | `string`                                                     |             |
+
+## WorkflowRunBreakdownView
+
+| Field                | Required | Type                                                                    | Description |
+| -------------------- | -------- | ----------------------------------------------------------------------- | ----------- |
+| `dimension`          | Yes      | [WorkflowUsageDimension](protocol.md#workflowusagedimension)            |             |
+| `entries`            | Yes      | `string`                                                                |             |
+| `expiresAtMs`        | Yes      | `null,string`                                                           |             |
+| `groupCount`         | Yes      | `string`                                                                |             |
+| `groups`             | Yes      | Array of [WorkflowUsageGroup](protocol.md#workflowusagegroup)           |             |
+| `labels`             | Yes      | Array of [WorkflowUsageGroupLabel](protocol.md#workflowusagegrouplabel) |             |
+| `lastReportedAtMs`   | Yes      | `null,string`                                                           |             |
+| `next`               | Yes      | `null,string`                                                           |             |
+| `observedAtMs`       | Yes      | `string`                                                                |             |
+| `offset`             | Yes      | `string`                                                                |             |
+| `pricing`            | Yes      | Array of [WorkflowSpendingBucket](protocol.md#workflowspendingbucket)   |             |
+| `reportedMicrocents` | Yes      | `null,string`                                                           |             |
+| `retainedFromMs`     | Yes      | `null,string`                                                           |             |
+| `revision`           | Yes      | `string`                                                                |             |
+| `runEntries`         | Yes      | `string`                                                                |             |
+| `runId`              | Yes      | `string`                                                                |             |
+| `simulated`          | Yes      | `boolean`                                                               |             |
+| `workflowId`         | Yes      | `string`                                                                |             |
+
 ## WorkflowRunEvent
 
 | Field          | Required | Type                                                                                                                                | Description                                                                               |
@@ -8068,6 +8286,23 @@ An execution instance points back to the immutable authored card and its collect
 
 Type: `"cancelled"` / `"failed"` / `"interrupted"` / `"running"` / `"skipped"` / `"succeeded"` / `"uncertain"` / `"waiting"`.
 
+## WorkflowStepUsageIdentity
+
+| Field          | Required | Type                                                                    | Description |
+| -------------- | -------- | ----------------------------------------------------------------------- | ----------- |
+| `attempt`      | Yes      | `string`                                                                |             |
+| `invocationId` | Yes      | `string`                                                                |             |
+| `nodeId`       | Yes      | `string`                                                                |             |
+| `origin`       | Yes      | [WorkflowStepUsageOrigin](protocol.md#workflowstepusageorigin) / `null` |             |
+
+## WorkflowStepUsageOrigin
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `itemIndex` | Yes      | `string` |             |
+| `loopId`    | Yes      | `string` |             |
+| `nodeId`    | Yes      | `string` |             |
+
 ## WorkflowStepView
 
 Exposes step metadata without embedding potentially large result payloads.
@@ -8136,6 +8371,12 @@ Small management projection; contains no graph, prompts, or run histories.
 | `setup`           | Yes      | `boolean`                                              |             |
 | `status`          | Yes      | [TerminalStatus](protocol.md#terminalstatus)           |             |
 
+## WorkflowUsageDimension
+
+Alternative partitions of the same reported usage.
+
+Type: `"agents"` / `"steps"`.
+
 ## WorkflowUsageDimensions
 
 Exact counters; missing dimensions were not reported.
@@ -8146,6 +8387,28 @@ Exact counters; missing dimensions were not reported.
 | `inputTokens`       | No       | `string` |             |
 | `outputTokens`      | No       | `string` |             |
 | `reasoningTokens`   | No       | `string` |             |
+
+## WorkflowUsageGroup
+
+| Field              | Required | Type                                                                                                                                      | Description |
+| ------------------ | -------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `entries`          | Yes      | `string`                                                                                                                                  |             |
+| `expiresAtMs`      | Yes      | `string`                                                                                                                                  |             |
+| `id`               | Yes      | `string`                                                                                                                                  |             |
+| `identity`         | Yes      | [WorkflowStepUsageIdentity](protocol.md#workflowstepusageidentity) / [WorkflowAgentUsageIdentity](protocol.md#workflowagentusageidentity) |             |
+| `lastReportedAtMs` | Yes      | `string`                                                                                                                                  |             |
+| `microcents`       | Yes      | `string`                                                                                                                                  |             |
+| `pricing`          | Yes      | Array of [WorkflowSpendingBucket](protocol.md#workflowspendingbucket)                                                                     |             |
+
+## WorkflowUsageGroupLabel
+
+Labels come from the owned immutable graph; they do not choose the billing partition.
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `component` | Yes      | `string` |             |
+| `id`        | Yes      | `string` |             |
+| `label`     | Yes      | `string` |             |
 
 ## WorkflowValidateRequest
 

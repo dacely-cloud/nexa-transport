@@ -4,6 +4,9 @@ import { BrowserStorageGatewayReceipt } from './BrowserStorageGatewayReceipt.js'
 import { BrowserStorageReceipt } from './BrowserStorageReceipt.js';
 import { BrowserStorageChangeReceipt } from './BrowserStorageChangeReceipt.js';
 import { BrowserStorageComparisonReceipt } from './BrowserStorageComparisonReceipt.js';
+import { BrowserWebMcpReceipt } from './BrowserWebMcpReceipt.js';
+import { BrowserWebMcpPageReceipt } from './BrowserWebMcpPageReceipt.js';
+import type { BrowserWebMcpMetadata, BrowserWebMcpPage } from '../protocol/Protocol.js';
 import type {
     BrowserStorageComparison,
     BrowserStorageComparisonPage,
@@ -49,6 +52,14 @@ export type {
 
 /** Portable investigation receipt decoding and monotonic replay for multi-agent consumers. */
 export class ReverseInvestigation {
+    /** Validates independently paged passive declarations or one selected structural schema. */
+    public static webMcp(input: unknown): BrowserWebMcpPage {
+        return BrowserWebMcpPageReceipt.read(input);
+    }
+    /** Pins every WebMCP page to the exact captured scope and coverage without schema bodies. */
+    public static webMcpIdentity(metadata: BrowserWebMcpMetadata): string {
+        return BrowserWebMcpReceipt.identity(metadata);
+    }
     /** Validates independently paged saved module relationships, captured versions and exact context fields. */
     public static modules(input: unknown): BrowserModulePage {
         return BrowserModuleReceipt.read(input);
@@ -135,6 +146,12 @@ export class ReverseInvestigation {
                 input.id,
                 input.archive?.sessionId,
             );
+        }
+        if (input.browserWebMcp !== undefined) {
+            if (input.kind !== 'browser') {
+                throw new TypeError('WebMCP discovery requires a browser target');
+            }
+            BrowserWebMcpReceipt.snapshot(input.browserWebMcp, input.id, input.archive?.sessionId);
         }
         if (input.browserSources !== undefined) {
             if (input.kind !== 'browser') {

@@ -1140,6 +1140,52 @@ export const BrowserPixelStatusValues = {
 export type BrowserPixelStatus =
     (typeof BrowserPixelStatusValues)[keyof typeof BrowserPixelStatusValues];
 
+/** BrowserSchemaProperty wire fields. */
+export interface BrowserSchemaPropertyShape {
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** observations as defined by the Nexa gateway. */
+    readonly observations: string;
+    /** path as defined by the Nexa gateway. */
+    readonly path: string;
+    /** types as defined by the Nexa gateway. */
+    readonly types: ReadonlyArray<BrowserSchemaType>;
+}
+
+/** BrowserSchemaProperty from the Nexa wire protocol. */
+export type BrowserSchemaProperty = BrowserSchemaPropertyShape;
+
+/** BrowserSchemaSummary wire fields. */
+export interface BrowserSchemaSummaryShape {
+    /** complete as defined by the Nexa gateway. */
+    readonly complete: boolean;
+    /** maximumDepth as defined by the Nexa gateway. */
+    readonly maximumDepth: number;
+    /** nodeCount as defined by the Nexa gateway. */
+    readonly nodeCount: string;
+    /** propertyCount as defined by the Nexa gateway. */
+    readonly propertyCount: string;
+    /** rootType as defined by the Nexa gateway. */
+    readonly rootType: BrowserSchemaType;
+}
+
+/** BrowserSchemaSummary from the Nexa wire protocol. */
+export type BrowserSchemaSummary = BrowserSchemaSummaryShape;
+
+/** Allowed values for BrowserSchemaType. */
+export const BrowserSchemaTypeValues = {
+    Value0: 'array',
+    Value1: 'boolean',
+    Value2: 'null',
+    Value3: 'number',
+    Value4: 'object',
+    Value5: 'string',
+} as const;
+
+/** BrowserSchemaType from the Nexa wire protocol. */
+export type BrowserSchemaType =
+    (typeof BrowserSchemaTypeValues)[keyof typeof BrowserSchemaTypeValues];
+
 /** BrowserScreenshotComparisonSnapshot wire fields. */
 export interface BrowserScreenshotComparisonSnapshotShape {
     /** after as defined by the Nexa gateway. */
@@ -2084,6 +2130,229 @@ export const BrowserStructureViewValues = { Value0: 'accessibility', Value1: 'do
 /** BrowserStructureView from the Nexa wire protocol. */
 export type BrowserStructureView =
     (typeof BrowserStructureViewValues)[keyof typeof BrowserStructureViewValues];
+
+/** BrowserWebMcpAnnotations wire fields. */
+export interface BrowserWebMcpAnnotationsShape {
+    /** autosubmit as defined by the Nexa gateway. */
+    readonly autosubmit: null | boolean;
+    /** consequential as defined by the Nexa gateway. */
+    readonly consequential: null | boolean;
+    /** debugging as defined by the Nexa gateway. */
+    readonly debugging: null | boolean;
+    /** readOnly as defined by the Nexa gateway. */
+    readonly readOnly: null | boolean;
+    /** untrustedContent as defined by the Nexa gateway. */
+    readonly untrustedContent: null | boolean;
+}
+
+/** BrowserWebMcpAnnotations from the Nexa wire protocol. */
+export type BrowserWebMcpAnnotations = BrowserWebMcpAnnotationsShape;
+
+/** Allowed values for BrowserWebMcpDeclaration. */
+export const BrowserWebMcpDeclarationValues = {
+    Value0: 'declarative',
+    Value1: 'imperative',
+} as const;
+
+/** BrowserWebMcpDeclaration from the Nexa wire protocol. */
+export type BrowserWebMcpDeclaration =
+    (typeof BrowserWebMcpDeclarationValues)[keyof typeof BrowserWebMcpDeclarationValues];
+
+/** BrowserWebMcpDescriptor wire fields. */
+export interface BrowserWebMcpDescriptorShape {
+    /** annotations as defined by the Nexa gateway. */
+    readonly annotations: BrowserWebMcpAnnotations;
+    /** declaration as defined by the Nexa gateway. */
+    readonly declaration: BrowserWebMcpDeclaration;
+    /** description as defined by the Nexa gateway. */
+    readonly description: string;
+    /** frameId as defined by the Nexa gateway. */
+    readonly frameId: string;
+    /** frameUrl as defined by the Nexa gateway. */
+    readonly frameUrl: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** inputSchema as defined by the Nexa gateway. */
+    readonly inputSchema: BrowserSchemaSummary | null;
+    /** key as defined by the Nexa gateway. */
+    readonly key: string;
+    /** name as defined by the Nexa gateway. */
+    readonly name: string;
+    /** origin as defined by the Nexa gateway. */
+    readonly origin: string;
+    /** registrationSource as defined by the Nexa gateway. */
+    readonly registrationSource: BrowserWebMcpSource | null;
+    /** trust as defined by the Nexa gateway. */
+    readonly trust: 'page-declared-untrusted';
+}
+
+/** BrowserWebMcpDescriptor from the Nexa wire protocol. */
+export type BrowserWebMcpDescriptor = BrowserWebMcpDescriptorShape;
+
+/** BrowserWebMcpMetadata wire fields. */
+export interface BrowserWebMcpMetadataShape {
+    /** allowedOrigins as defined by the Nexa gateway. */
+    readonly allowedOrigins: ReadonlyArray<string>;
+    /** available as defined by the Nexa gateway. */
+    readonly available: boolean;
+    /** capturedAt as defined by the Nexa gateway. */
+    readonly capturedAt: string;
+    /** complete as defined by the Nexa gateway. */
+    readonly complete: boolean;
+    /** dropped as defined by the Nexa gateway. */
+    readonly dropped: string;
+    /** frameCoverageComplete as defined by the Nexa gateway. */
+    readonly frameCoverageComplete: boolean;
+    /** frameId as defined by the Nexa gateway. */
+    readonly frameId: string;
+    /** invocationAvailable as defined by the Nexa gateway. */
+    readonly invocationAvailable: false;
+    /** limitations as defined by the Nexa gateway. */
+    readonly limitations: ReadonlyArray<string>;
+    /** observationMs as defined by the Nexa gateway. */
+    readonly observationMs: number;
+    /** origin as defined by the Nexa gateway. */
+    readonly origin: string;
+    /** provider as defined by the Nexa gateway. */
+    readonly provider: 'cdp-passive';
+    /** schemaCoverageComplete as defined by the Nexa gateway. */
+    readonly schemaCoverageComplete: boolean;
+    /** schemaValuesExcluded as defined by the Nexa gateway. */
+    readonly schemaValuesExcluded: true;
+    /** targetId as defined by the Nexa gateway. */
+    readonly targetId: string;
+    /** toolCount as defined by the Nexa gateway. */
+    readonly toolCount: string;
+    /** url as defined by the Nexa gateway. */
+    readonly url: string;
+}
+
+/** BrowserWebMcpMetadata from the Nexa wire protocol. */
+export type BrowserWebMcpMetadata = BrowserWebMcpMetadataShape;
+
+/** BrowserWebMcpPage wire fields. */
+export interface BrowserWebMcpPageShape {
+    /** captureSha256 as defined by the Nexa gateway. */
+    readonly captureSha256: string;
+    /** cursor as defined by the Nexa gateway. */
+    readonly cursor: string;
+    /** evidenceId as defined by the Nexa gateway. */
+    readonly evidenceId: string;
+    /** metadata as defined by the Nexa gateway. */
+    readonly metadata: BrowserWebMcpMetadata;
+    /** nextCursor as defined by the Nexa gateway. */
+    readonly nextCursor: null | string;
+    /** properties as defined by the Nexa gateway. */
+    readonly properties: ReadonlyArray<BrowserSchemaProperty>;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+    /** selectedTool as defined by the Nexa gateway. */
+    readonly selectedTool: BrowserWebMcpDescriptor | null;
+    /** selector as defined by the Nexa gateway. */
+    readonly selector: null | string;
+    /** sha256 as defined by the Nexa gateway. */
+    readonly sha256: string;
+    /** tools as defined by the Nexa gateway. */
+    readonly tools: ReadonlyArray<BrowserWebMcpDescriptor>;
+    /** view as defined by the Nexa gateway. */
+    readonly view: BrowserWebMcpView;
+}
+
+/** BrowserWebMcpPage from the Nexa wire protocol. */
+export type BrowserWebMcpPage = BrowserWebMcpPageShape;
+
+/** Allowed values for BrowserWebMcpQueryview. */
+export const BrowserWebMcpQueryviewValues = {
+    Value0: 'metadata',
+    Value1: 'schema',
+    Value2: 'tools',
+} as const;
+
+/** BrowserWebMcpQuery wire fields. */
+export interface BrowserWebMcpQueryShape {
+    /** cursor as defined by the Nexa gateway. */
+    readonly cursor?: string;
+    /** evidenceId as defined by the Nexa gateway. */
+    readonly evidenceId: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+    /** selector as defined by the Nexa gateway. */
+    readonly selector?: string;
+    /** view as defined by the Nexa gateway. */
+    readonly view?: (typeof BrowserWebMcpQueryviewValues)[keyof typeof BrowserWebMcpQueryviewValues];
+}
+
+/** BrowserWebMcpQuery from the Nexa wire protocol. */
+export type BrowserWebMcpQuery = BrowserWebMcpQueryShape;
+
+/** BrowserWebMcpSnapshot wire fields. */
+export interface BrowserWebMcpSnapshotShape {
+    /** allowedOrigins as defined by the Nexa gateway. */
+    readonly allowedOrigins: ReadonlyArray<string>;
+    /** available as defined by the Nexa gateway. */
+    readonly available: boolean;
+    /** capturedAt as defined by the Nexa gateway. */
+    readonly capturedAt: string;
+    /** complete as defined by the Nexa gateway. */
+    readonly complete: boolean;
+    /** dropped as defined by the Nexa gateway. */
+    readonly dropped: string;
+    /** frameCoverageComplete as defined by the Nexa gateway. */
+    readonly frameCoverageComplete: boolean;
+    /** frameId as defined by the Nexa gateway. */
+    readonly frameId: string;
+    /** invocationAvailable as defined by the Nexa gateway. */
+    readonly invocationAvailable: false;
+    /** limitations as defined by the Nexa gateway. */
+    readonly limitations: ReadonlyArray<string>;
+    /** observationMs as defined by the Nexa gateway. */
+    readonly observationMs: number;
+    /** origin as defined by the Nexa gateway. */
+    readonly origin: string;
+    /** provider as defined by the Nexa gateway. */
+    readonly provider: 'cdp-passive';
+    /** reference as defined by the Nexa gateway. */
+    readonly reference: ReverseBrowserReference;
+    /** schemaCoverageComplete as defined by the Nexa gateway. */
+    readonly schemaCoverageComplete: boolean;
+    /** schemaValuesExcluded as defined by the Nexa gateway. */
+    readonly schemaValuesExcluded: true;
+    /** targetId as defined by the Nexa gateway. */
+    readonly targetId: string;
+    /** toolCount as defined by the Nexa gateway. */
+    readonly toolCount: string;
+    /** url as defined by the Nexa gateway. */
+    readonly url: string;
+}
+
+/** BrowserWebMcpSnapshot from the Nexa wire protocol. */
+export type BrowserWebMcpSnapshot = BrowserWebMcpSnapshotShape;
+
+/** BrowserWebMcpSource wire fields. */
+export interface BrowserWebMcpSourceShape {
+    /** column as defined by the Nexa gateway. */
+    readonly column: null | number;
+    /** line as defined by the Nexa gateway. */
+    readonly line: null | number;
+    /** url as defined by the Nexa gateway. */
+    readonly url: string;
+}
+
+/** BrowserWebMcpSource from the Nexa wire protocol. */
+export type BrowserWebMcpSource = BrowserWebMcpSourceShape;
+
+/** Allowed values for BrowserWebMcpView. */
+export const BrowserWebMcpViewValues = {
+    Value0: 'metadata',
+    Value1: 'schema',
+    Value2: 'tools',
+} as const;
+
+/** BrowserWebMcpView from the Nexa wire protocol. */
+export type BrowserWebMcpView =
+    (typeof BrowserWebMcpViewValues)[keyof typeof BrowserWebMcpViewValues];
 
 /** Budget wire fields. */
 export interface BudgetShape {
@@ -4057,6 +4326,14 @@ export interface GatewayMethodsreverse_browser_structureShape {
     readonly result: BrowserStructurePage;
 }
 
+/** GatewayMethodsreverse_browser_webmcp wire fields. */
+export interface GatewayMethodsreverse_browser_webmcpShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: BrowserWebMcpQuery;
+    /** result as defined by the Nexa gateway. */
+    readonly result: BrowserWebMcpPage;
+}
+
 /** GatewayMethodsreverse_catalog wire fields. */
 export interface GatewayMethodsreverse_catalogShape {
     /** params as defined by the Nexa gateway. */
@@ -4981,6 +5258,8 @@ export interface GatewayMethodsShape {
     readonly 'reverse.browser.storage.comparison': GatewayMethodsreverse_browser_storage_comparisonShape;
     /** reverse.browser.structure as defined by the Nexa gateway. */
     readonly 'reverse.browser.structure': GatewayMethodsreverse_browser_structureShape;
+    /** reverse.browser.webmcp as defined by the Nexa gateway. */
+    readonly 'reverse.browser.webmcp': GatewayMethodsreverse_browser_webmcpShape;
     /** reverse.catalog as defined by the Nexa gateway. */
     readonly 'reverse.catalog': GatewayMethodsreverse_catalogShape;
     /** reverse.evidence as defined by the Nexa gateway. */
@@ -8090,6 +8369,8 @@ export interface ReverseRunSnapshotShape {
     readonly browserStorageComparison?: BrowserStorageComparisonSnapshot;
     /** browserStructure as defined by the Nexa gateway. */
     readonly browserStructure?: BrowserStructureSnapshot;
+    /** browserWebMcp as defined by the Nexa gateway. */
+    readonly browserWebMcp?: BrowserWebMcpSnapshot;
     /** cleanupErrors as defined by the Nexa gateway. */
     readonly cleanupErrors: ReadonlyArray<string>;
     /** evidence as defined by the Nexa gateway. */
@@ -12212,6 +12493,8 @@ export enum Method {
     ReverseBrowserStorageComparison = 'reverse.browser.storage.comparison',
     /** Calls reverse.browser.structure. */
     ReverseBrowserStructure = 'reverse.browser.structure',
+    /** Calls reverse.browser.webmcp. */
+    ReverseBrowserWebmcp = 'reverse.browser.webmcp',
     /** Calls reverse.catalog. */
     ReverseCatalog = 'reverse.catalog',
     /** Calls reverse.evidence. */

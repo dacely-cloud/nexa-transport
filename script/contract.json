@@ -1765,6 +1765,55 @@
             "enum": ["different", "dimension-mismatch", "identical", "within-threshold"],
             "type": "string"
         },
+        "BrowserSchemaProperty": {
+            "description": "Schema keys are retained as escaped JSON pointers; leaf values are excluded.",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "observations": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "types": {
+                    "items": {
+                        "$ref": "#/definitions/BrowserSchemaType"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": ["id", "observations", "path", "types"],
+            "type": "object"
+        },
+        "BrowserSchemaSummary": {
+            "description": "Structural coverage reports a finite observed schema traversal rather than parameter validation.",
+            "properties": {
+                "complete": {
+                    "type": "boolean"
+                },
+                "maximumDepth": {
+                    "type": "number"
+                },
+                "nodeCount": {
+                    "type": "string"
+                },
+                "propertyCount": {
+                    "type": "string"
+                },
+                "rootType": {
+                    "$ref": "#/definitions/BrowserSchemaType"
+                }
+            },
+            "required": ["complete", "maximumDepth", "nodeCount", "propertyCount", "rootType"],
+            "type": "object"
+        },
+        "BrowserSchemaType": {
+            "description": "Value-free schema summaries use the native JSON value vocabulary.\nOne observed JSON value kind, independent of a schema's declared semantics.",
+            "enum": ["array", "boolean", "null", "number", "object", "string"],
+            "type": "string"
+        },
         "BrowserScreenshotComparisonSnapshot": {
             "description": "Body-free progress also identifies the archived comparison report.",
             "properties": {
@@ -3270,6 +3319,401 @@
         "BrowserStructureView": {
             "description": "Independent tree representations use the same immutable document capture.\nThe finite browser structure representations.",
             "enum": ["accessibility", "dom"],
+            "type": "string"
+        },
+        "BrowserWebMcpAnnotations": {
+            "description": "Page-provided booleans remain untrusted annotations, never authorization decisions.",
+            "properties": {
+                "autosubmit": {
+                    "type": ["null", "boolean"]
+                },
+                "consequential": {
+                    "type": ["null", "boolean"]
+                },
+                "debugging": {
+                    "type": ["null", "boolean"]
+                },
+                "readOnly": {
+                    "type": ["null", "boolean"]
+                },
+                "untrustedContent": {
+                    "type": ["null", "boolean"]
+                }
+            },
+            "required": [
+                "autosubmit",
+                "consequential",
+                "debugging",
+                "readOnly",
+                "untrustedContent"
+            ],
+            "type": "object"
+        },
+        "BrowserWebMcpDeclaration": {
+            "description": "Declarations are inventory evidence; they never become executable Nexa tools.\nHow the page registered a declaration.",
+            "enum": ["declarative", "imperative"],
+            "type": "string"
+        },
+        "BrowserWebMcpDescriptor": {
+            "description": "A directory row excludes its separately paged structural schema properties.",
+            "properties": {
+                "annotations": {
+                    "$ref": "#/definitions/BrowserWebMcpAnnotations"
+                },
+                "declaration": {
+                    "$ref": "#/definitions/BrowserWebMcpDeclaration"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "frameId": {
+                    "type": "string"
+                },
+                "frameUrl": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "inputSchema": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/BrowserSchemaSummary"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "key": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "origin": {
+                    "type": "string"
+                },
+                "registrationSource": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/BrowserWebMcpSource"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "trust": {
+                    "const": "page-declared-untrusted",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "annotations",
+                "declaration",
+                "description",
+                "frameId",
+                "frameUrl",
+                "id",
+                "inputSchema",
+                "key",
+                "name",
+                "origin",
+                "registrationSource",
+                "trust"
+            ],
+            "type": "object"
+        },
+        "BrowserWebMcpMetadata": {
+            "description": "Captured scope distinguishes unsupported protocols and explicit retention/authority gaps.",
+            "properties": {
+                "allowedOrigins": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "available": {
+                    "type": "boolean"
+                },
+                "capturedAt": {
+                    "type": "string"
+                },
+                "complete": {
+                    "type": "boolean"
+                },
+                "dropped": {
+                    "type": "string"
+                },
+                "frameCoverageComplete": {
+                    "type": "boolean"
+                },
+                "frameId": {
+                    "type": "string"
+                },
+                "invocationAvailable": {
+                    "const": false,
+                    "type": "boolean"
+                },
+                "limitations": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "observationMs": {
+                    "type": "number"
+                },
+                "origin": {
+                    "type": "string"
+                },
+                "provider": {
+                    "const": "cdp-passive",
+                    "type": "string"
+                },
+                "schemaCoverageComplete": {
+                    "type": "boolean"
+                },
+                "schemaValuesExcluded": {
+                    "const": true,
+                    "type": "boolean"
+                },
+                "targetId": {
+                    "type": "string"
+                },
+                "toolCount": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "allowedOrigins",
+                "available",
+                "capturedAt",
+                "complete",
+                "dropped",
+                "frameCoverageComplete",
+                "frameId",
+                "invocationAvailable",
+                "limitations",
+                "observationMs",
+                "origin",
+                "provider",
+                "schemaCoverageComplete",
+                "schemaValuesExcluded",
+                "targetId",
+                "toolCount",
+                "url"
+            ],
+            "type": "object"
+        },
+        "BrowserWebMcpPage": {
+            "description": "Only selected rows are transferred; schema leaves and complete originals remain host-side.",
+            "properties": {
+                "captureSha256": {
+                    "type": "string"
+                },
+                "cursor": {
+                    "type": "string"
+                },
+                "evidenceId": {
+                    "type": "string"
+                },
+                "metadata": {
+                    "$ref": "#/definitions/BrowserWebMcpMetadata"
+                },
+                "nextCursor": {
+                    "type": ["null", "string"]
+                },
+                "properties": {
+                    "items": {
+                        "$ref": "#/definitions/BrowserSchemaProperty"
+                    },
+                    "type": "array"
+                },
+                "runId": {
+                    "type": "string"
+                },
+                "selectedTool": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/BrowserWebMcpDescriptor"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "selector": {
+                    "type": ["null", "string"]
+                },
+                "sha256": {
+                    "type": "string"
+                },
+                "tools": {
+                    "items": {
+                        "$ref": "#/definitions/BrowserWebMcpDescriptor"
+                    },
+                    "type": "array"
+                },
+                "view": {
+                    "$ref": "#/definitions/BrowserWebMcpView"
+                }
+            },
+            "required": [
+                "captureSha256",
+                "cursor",
+                "evidenceId",
+                "metadata",
+                "nextCursor",
+                "properties",
+                "runId",
+                "selectedTool",
+                "selector",
+                "sha256",
+                "tools",
+                "view"
+            ],
+            "type": "object"
+        },
+        "BrowserWebMcpQuery": {
+            "description": "Gateway authority is checked against the original owner and conversation before any index read.",
+            "properties": {
+                "cursor": {
+                    "type": "string"
+                },
+                "evidenceId": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "runId": {
+                    "type": "string"
+                },
+                "selector": {
+                    "type": "string"
+                },
+                "view": {
+                    "description": "Metadata, declaration rows and one selected schema have independent transfer budgets.\nOne selected saved representation.",
+                    "enum": ["metadata", "schema", "tools"],
+                    "type": "string"
+                }
+            },
+            "required": ["evidenceId", "id", "runId"],
+            "type": "object"
+        },
+        "BrowserWebMcpSnapshot": {
+            "description": "Progress binds metadata to the original report without tool/schema arrays.",
+            "properties": {
+                "allowedOrigins": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "available": {
+                    "type": "boolean"
+                },
+                "capturedAt": {
+                    "type": "string"
+                },
+                "complete": {
+                    "type": "boolean"
+                },
+                "dropped": {
+                    "type": "string"
+                },
+                "frameCoverageComplete": {
+                    "type": "boolean"
+                },
+                "frameId": {
+                    "type": "string"
+                },
+                "invocationAvailable": {
+                    "const": false,
+                    "type": "boolean"
+                },
+                "limitations": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "observationMs": {
+                    "type": "number"
+                },
+                "origin": {
+                    "type": "string"
+                },
+                "provider": {
+                    "const": "cdp-passive",
+                    "type": "string"
+                },
+                "reference": {
+                    "$ref": "#/definitions/ReverseBrowserReference"
+                },
+                "schemaCoverageComplete": {
+                    "type": "boolean"
+                },
+                "schemaValuesExcluded": {
+                    "const": true,
+                    "type": "boolean"
+                },
+                "targetId": {
+                    "type": "string"
+                },
+                "toolCount": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "allowedOrigins",
+                "available",
+                "capturedAt",
+                "complete",
+                "dropped",
+                "frameCoverageComplete",
+                "frameId",
+                "invocationAvailable",
+                "limitations",
+                "observationMs",
+                "origin",
+                "provider",
+                "reference",
+                "schemaCoverageComplete",
+                "schemaValuesExcluded",
+                "targetId",
+                "toolCount",
+                "url"
+            ],
+            "type": "object"
+        },
+        "BrowserWebMcpSource": {
+            "description": "A registration call frame is exposed only for an admitted HTTP(S) source origin.",
+            "properties": {
+                "column": {
+                    "type": ["null", "number"]
+                },
+                "line": {
+                    "type": ["null", "number"]
+                },
+                "url": {
+                    "type": "string"
+                }
+            },
+            "required": ["column", "line", "url"],
+            "type": "object"
+        },
+        "BrowserWebMcpView": {
+            "description": "Metadata, declaration rows and one selected schema have independent transfer budgets.\nOne selected saved representation.",
+            "enum": ["metadata", "schema", "tools"],
             "type": "string"
         },
         "Budget": {
@@ -6213,6 +6657,18 @@
                     "required": ["params", "result"],
                     "type": "object"
                 },
+                "reverse.browser.webmcp": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/BrowserWebMcpQuery"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/BrowserWebMcpPage"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
                 "reverse.catalog": {
                     "properties": {
                         "params": {
@@ -7554,6 +8010,7 @@
                 "reverse.browser.storage",
                 "reverse.browser.storage.comparison",
                 "reverse.browser.structure",
+                "reverse.browser.webmcp",
                 "reverse.catalog",
                 "reverse.evidence",
                 "reverse.functions",
@@ -12083,6 +12540,10 @@
                 "browserStructure": {
                     "$ref": "#/definitions/BrowserStructureSnapshot",
                     "description": "A progress receipt references structure without carrying complete trees."
+                },
+                "browserWebMcp": {
+                    "$ref": "#/definitions/BrowserWebMcpSnapshot",
+                    "description": "Progress binds metadata to the original report without tool/schema arrays."
                 },
                 "cleanupErrors": {
                     "items": {
@@ -17970,6 +18431,9 @@
         "reverseBrowserStructure": {
             "$ref": "#/definitions/BrowserStructurePage"
         },
+        "reverseBrowserWebMcp": {
+            "$ref": "#/definitions/BrowserWebMcpPage"
+        },
         "reverseCatalog": {
             "$ref": "#/definitions/ReverseCatalogPage"
         },
@@ -18029,6 +18493,7 @@
         "reverseBrowserStorage",
         "reverseBrowserStorageComparison",
         "reverseBrowserStructure",
+        "reverseBrowserWebMcp",
         "reverseCatalog",
         "reverseEvidence",
         "reverseFunctions",

@@ -29,6 +29,7 @@ import type { BrowserSourcesPage } from '../../nexa/src/reverse/BrowserSourcesDi
 import type { BrowserScreenshotPage } from '../../nexa/src/reverse/BrowserScreenshotTypes';
 import type { BrowserStoragePage } from '../../nexa/src/reverse/BrowserStorageTypes';
 import type { BrowserStorageComparisonPage } from '../../nexa/src/reverse/BrowserStorageComparisonTypes';
+import type { BrowserWebMcpPage } from '../../nexa/src/reverse/BrowserWebMcpDirectoryTypes';
 import type { BrowserModulePage } from '../../nexa/src/reverse/BrowserModuleDirectoryTypes';
 /** All protocol contracts reachable from the public transport. */
 export interface Contract {
@@ -37,6 +38,7 @@ export interface Contract {
     readonly reverseBrowserScreenshot: BrowserScreenshotPage;
     readonly reverseBrowserStorage: BrowserStoragePage;
     readonly reverseBrowserStorageComparison: BrowserStorageComparisonPage;
+    readonly reverseBrowserWebMcp: BrowserWebMcpPage;
     readonly reverseBrowserSources: BrowserSourcesPage;
     readonly reverseBrowserModules: BrowserModulePage;
     readonly reverseNetworkDetail: ReverseNetworkDetailPage;

@@ -100,7 +100,12 @@ writeFileSync(
         '\n\n/** Complete host reports stay separate from paged wire contracts. */\nexport interface BrowserStorageComparisonCapture { readonly comparison: BrowserStorageComparison; readonly changes: readonly BrowserStorageChange[]; }\n',
 );
 /** Native imports are partitioned without adding unused generated bindings. */
-function portableComparisonImport(typeOnly, members, valuesModule) {
+function portableComparisonImport(
+    typeOnly,
+    members,
+    valuesModule,
+    captureModule = './BrowserStorageComparisonDefinitions.js',
+) {
     const values = [];
     const types = [];
     const captures = [];
@@ -110,7 +115,12 @@ function portableComparisonImport(typeOnly, members, valuesModule) {
         .filter(Boolean)) {
         const isType = typeOnly !== undefined || member.startsWith('type ');
         const binding = member.replace(/^type /u, '');
-        if (binding === 'BrowserStorageComparisonCapture') captures.push(binding);
+        if (
+            binding === 'BrowserStorageComparisonCapture' ||
+            binding === 'BrowserWebMcpCapture' ||
+            binding === 'BrowserWebMcpTool'
+        )
+            captures.push(binding);
         else if (isType) types.push(binding);
         else values.push(binding);
     }
@@ -120,9 +130,7 @@ function portableComparisonImport(typeOnly, members, valuesModule) {
             ? 'import type { ' + types.join(', ') + " } from '../protocol/Protocol.js';"
             : '',
         captures.length
-            ? 'import type { ' +
-              captures.join(', ') +
-              " } from './BrowserStorageComparisonDefinitions.js';"
+            ? 'import type { ' + captures.join(', ') + " } from '" + captureModule + "';"
             : '',
     ]
         .filter(Boolean)
@@ -149,6 +157,60 @@ for (const name of [
         /import (type )?\{([^}]*)\} from '\.\/BrowserStorageComparisonTypes';/gu,
         (_match, typeOnly, members) =>
             portableComparisonImport(typeOnly, members, './BrowserStorageComparisonDefinitions.js'),
+    );
+    source = source.replace(
+        /from '(\.\/[^']+)'/gu,
+        (_match, path) => "from '" + (path.endsWith('.js') ? path : path + '.js') + "'",
+    );
+    writeFileSync('src/reverse/' + name + '.ts', source);
+}
+
+/** Passive WebMCP validators retain the exact native authority and value-exclusion rules. */
+const webMcpTypes = readFileSync('../nexa/src/reverse/BrowserWebMcpTypes.ts', 'utf8');
+const webMcpDirectoryTypes = readFileSync(
+    '../nexa/src/reverse/BrowserWebMcpDirectoryTypes.ts',
+    'utf8',
+);
+const webMcpEnums = ['BrowserSchemaType', 'BrowserWebMcpDeclaration', 'BrowserWebMcpView']
+    .map((name) => {
+        const source = name === 'BrowserWebMcpView' ? webMcpDirectoryTypes : webMcpTypes;
+        const declaration = source.match(
+            new RegExp('export const ' + name + ' = [\\s\\S]*?as const;', 'u'),
+        )?.[0];
+        if (declaration === undefined)
+            throw new Error('Native WebMCP enumeration is missing: ' + name);
+        return (
+            '/** Native passive WebMCP enumeration. */\n' +
+            declaration +
+            '\n/** Native passive WebMCP selection type. */\nexport type ' +
+            name +
+            ' = (typeof ' +
+            name +
+            ')[keyof typeof ' +
+            name +
+            '];'
+        );
+    })
+    .join('\n\n');
+writeFileSync(
+    'src/reverse/BrowserWebMcpDefinitions.ts',
+    '// SPDX-FileCopyrightText: 2026 Nexa contributors\n// SPDX-License-Identifier: Apache-2.0\n\n' +
+        "import type { BrowserWebMcpMetadata, BrowserWebMcpDescriptor, BrowserSchemaProperty } from '../protocol/Protocol.js';\n\n" +
+        webMcpEnums +
+        '\n\n/** Host-only originals are separate from bounded wire pages. */\nexport interface BrowserWebMcpTool extends BrowserWebMcpDescriptor { readonly properties: readonly BrowserSchemaProperty[]; }\n' +
+        '\n/** Complete captures are validated without publishing their arrays in progress. */\nexport interface BrowserWebMcpCapture { readonly metadata: BrowserWebMcpMetadata; readonly tools: readonly BrowserWebMcpTool[]; }\n',
+);
+for (const name of ['BrowserWebMcpReceipt', 'BrowserWebMcpPageReceipt']) {
+    let source = readFileSync('../nexa/src/reverse/' + name + '.ts', 'utf8');
+    source = source.replace(
+        /import (type )?\{([^}]*)\} from '\.\/(?:BrowserWebMcpTypes|BrowserWebMcpDirectoryTypes|BrowserCaptureTypes)';/gu,
+        (_match, typeOnly, members) =>
+            portableComparisonImport(
+                typeOnly,
+                members,
+                './BrowserWebMcpDefinitions.js',
+                './BrowserWebMcpDefinitions.js',
+            ),
     );
     source = source.replace(
         /from '(\.\/[^']+)'/gu,
