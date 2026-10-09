@@ -55,6 +55,7 @@ All 54 protocol methods. `connect` is managed by `NexaClient.connect`; the remai
 - [reverse.catalog](#reverse-catalog)
 - [reverse.evidence](#reverse-evidence)
 - [reverse.functions](#reverse-functions)
+- [reverse.graph](#reverse-graph)
 - [reverse.inspect](#reverse-inspect)
 - [roblox.credentials.remove](#roblox-credentials-remove)
 - [roblox.credentials.set](#roblox-credentials-set)
@@ -1278,6 +1279,31 @@ Parameters: [ReverseFunctionsQuery](protocol.md#reversefunctionsquery).
 | `runId`  | Yes      | `string`                                   |                                                                              |
 
 Result: [ReverseFunctionsPage](protocol.md#reversefunctionspage).
+
+## reverse.graph
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ReverseGraph> = {
+    evidenceId: 'YOUR_EVIDENCEID',
+    id: 'YOUR_ID',
+    runId: 'YOUR_RUNID',
+};
+const result: ResultOf<typeof Method.ReverseGraph> = await client.call(Method.ReverseGraph, params);
+```
+
+Parameters: [ReverseGraphQuery](protocol.md#reversegraphquery).
+
+| Field        | Required | Type     | Description                                                                            |
+| ------------ | -------- | -------- | -------------------------------------------------------------------------------------- |
+| `blockId`    | No       | `string` | When present, cursor addresses instructions in this block rather than captured blocks. |
+| `cursor`     | No       | `string` |                                                                                        |
+| `evidenceId` | Yes      | `string` |                                                                                        |
+| `id`         | Yes      | `string` |                                                                                        |
+| `runId`      | Yes      | `string` |                                                                                        |
+
+Result: [ReverseGraphPage](protocol.md#reversegraphpage).
 
 ## reverse.inspect
 

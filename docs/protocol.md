@@ -1192,6 +1192,7 @@ Configurable bounds on gateway-owned work and memory.
 | `reverse.catalog`                | Yes      | Object (fields below) |                                                                                            |
 | `reverse.evidence`               | Yes      | Object (fields below) |                                                                                            |
 | `reverse.functions`              | Yes      | Object (fields below) |                                                                                            |
+| `reverse.graph`                  | Yes      | Object (fields below) |                                                                                            |
 | `reverse.inspect`                | Yes      | Object (fields below) |                                                                                            |
 | `roblox.credentials.remove`      | Yes      | Object (fields below) |                                                                                            |
 | `roblox.credentials.set`         | Yes      | Object (fields below) |                                                                                            |
@@ -1704,6 +1705,13 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ---------------------------------------------------------- | ----------- |
 | `params` | Yes      | [ReverseFunctionsQuery](protocol.md#reversefunctionsquery) |             |
 | `result` | Yes      | [ReverseFunctionsPage](protocol.md#reversefunctionspage)   |             |
+
+**reverse.graph**
+
+| Field    | Required | Type                                               | Description |
+| -------- | -------- | -------------------------------------------------- | ----------- |
+| `params` | Yes      | [ReverseGraphQuery](protocol.md#reversegraphquery) |             |
+| `result` | Yes      | [ReverseGraphPage](protocol.md#reversegraphpage)   |             |
 
 **reverse.inspect**
 
@@ -3623,6 +3631,15 @@ Reads only an authenticated session's indexed investigation, never a workspace p
 | `id`     | Yes      | `string` |             |
 | `runId`  | Yes      | `string` |             |
 
+## ReverseControlFlowInstruction
+
+One actual analyzer instruction, with an exact unsigned native address.
+
+| Field         | Required | Type     | Description |
+| ------------- | -------- | -------- | ----------- |
+| `address`     | Yes      | `string` |             |
+| `instruction` | Yes      | `string` |             |
+
 ## ReverseDirectoryState
 
 Explicit inventory coverage distinguishes absent, partial and complete indexing.
@@ -3717,6 +3734,66 @@ An authenticated directory read never accepts analyzer handles or filesystem pat
 | `filter` | No       | `string`                                   | Literal case-insensitive name or address prefix, never a regular expression. |
 | `id`     | Yes      | `string`                                   |                                                                              |
 | `runId`  | Yes      | `string`                                   |                                                                              |
+
+## ReverseGraphBlock
+
+Original coverage and presentation paging remain separate.
+
+| Field                   | Required | Type                                                                                | Description                                                               |
+| ----------------------- | -------- | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| `end`                   | Yes      | `string`                                                                            |                                                                           |
+| `endInclusive`          | No       | `boolean`                                                                           | Ghidra uses an inclusive last address; IDA uses an exclusive end address. |
+| `id`                    | Yes      | `string`                                                                            |                                                                           |
+| `instructionCount`      | Yes      | `number`                                                                            |                                                                           |
+| `instructionOffset`     | Yes      | `number`                                                                            |                                                                           |
+| `instructions`          | Yes      | Array of [ReverseControlFlowInstruction](protocol.md#reversecontrolflowinstruction) |                                                                           |
+| `instructionsTruncated` | Yes      | `boolean`                                                                           |                                                                           |
+| `nextInstructionOffset` | Yes      | `null,number`                                                                       |                                                                           |
+| `start`                 | Yes      | `string`                                                                            |                                                                           |
+| `successors`            | Yes      | Array of `string`                                                                   |                                                                           |
+
+## ReverseGraphPage
+
+Immutable graph provenance, with bounded block and instruction navigation.
+
+| Field              | Required | Type                                                         | Description                                                                           |
+| ------------------ | -------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------- |
+| `blockId`          | Yes      | `null,string`                                                |                                                                                       |
+| `capturedBlocks`   | Yes      | `number`                                                     |                                                                                       |
+| `capturedOffset`   | Yes      | `number`                                                     |                                                                                       |
+| `cursor`           | Yes      | `string`                                                     |                                                                                       |
+| `evidenceSha256`   | Yes      | `string`                                                     |                                                                                       |
+| `graph`            | Yes      | [ReverseGraphProjection](protocol.md#reversegraphprojection) |                                                                                       |
+| `nextCursor`       | Yes      | `null,string`                                                |                                                                                       |
+| `record`           | Yes      | [ReverseEvidenceRecord](protocol.md#reverseevidencerecord)   |                                                                                       |
+| `runId`            | Yes      | `string`                                                     |                                                                                       |
+| `sha256`           | Yes      | `string`                                                     |                                                                                       |
+| `uncapturedOffset` | Yes      | `null,number`                                                | The next analyzer offset is absent from this capture; another inspection is required. |
+
+## ReverseGraphProjection
+
+At most four captured blocks and 12000 serialized block characters.
+
+| Field         | Required | Type                                                        | Description |
+| ------------- | -------- | ----------------------------------------------------------- | ----------- |
+| `address`     | Yes      | `string`                                                    |             |
+| `blocks`      | Yes      | Array of [ReverseGraphBlock](protocol.md#reversegraphblock) |             |
+| `function`    | Yes      | `string`                                                    |             |
+| `nextOffset`  | Yes      | `null,number`                                               |             |
+| `offset`      | Yes      | `number`                                                    |             |
+| `totalBlocks` | Yes      | `number`                                                    |             |
+
+## ReverseGraphQuery
+
+Reads captured blocks, or an instruction page from one captured block.
+
+| Field        | Required | Type     | Description                                                                            |
+| ------------ | -------- | -------- | -------------------------------------------------------------------------------------- |
+| `blockId`    | No       | `string` | When present, cursor addresses instructions in this block rather than captured blocks. |
+| `cursor`     | No       | `string` |                                                                                        |
+| `evidenceId` | Yes      | `string` |                                                                                        |
+| `id`         | Yes      | `string` |                                                                                        |
+| `runId`      | Yes      | `string` |                                                                                        |
 
 ## ReverseInspectQuery
 
