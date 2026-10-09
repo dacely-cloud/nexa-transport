@@ -3,6 +3,8 @@ import { execFileSync } from 'node:child_process';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 
 execFileSync(process.execPath, ['script/workflows.ts'], { stdio: 'inherit' });
+mkdirSync('src/graphs', { recursive: true });
+writeFileSync('src/graphs/ChatGraph.ts', readFileSync('../nexa/src/graphs/ChatGraph.ts', 'utf8'));
 // Native capture validation is portable and owned by Nexa.
 writeFileSync(
     'src/reverse/ControlFlow.ts',

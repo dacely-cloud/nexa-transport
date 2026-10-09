@@ -16,6 +16,10 @@
         "docs"
     ],
     "exports": {
+        "./chat-graph": {
+            "types": "./dist/graphs/ChatGraph.d.ts",
+            "import": "./dist/chat-graph.js"
+        },
         "./reverse-investigation": {
             "types": "./dist/reverse/ReverseInvestigation.d.ts",
             "import": "./dist/reverse-investigation.js"
