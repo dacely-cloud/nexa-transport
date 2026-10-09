@@ -15556,6 +15556,11 @@ export const schema: Schema = {
                 status: {
                     $ref: '#/definitions/WorkflowStepStatus',
                 },
+                wakeAtMs: {
+                    description:
+                        'Persisted timer target; retained after completion or cancellation as timing evidence.',
+                    type: 'string',
+                },
             },
             required: [
                 'attempt',

@@ -262,6 +262,10 @@
         "./workflow-json": {
             "types": "./dist/workflows/WorkflowJson.d.ts",
             "import": "./dist/workflow-json.js"
+        },
+        "./workflow-wait-codec": {
+            "types": "./dist/workflows/WaitCodec.d.ts",
+            "import": "./dist/workflow-wait-codec.js"
         }
     },
     "scripts": {

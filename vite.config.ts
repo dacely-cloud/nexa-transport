@@ -20,6 +20,7 @@ const config: UserConfig = {
                 'workflow-calendar-codec': 'src/workflows/schedule/CalendarCodec.ts',
                 'workflow-json': 'src/workflows/WorkflowJson.ts',
                 'workflow-timed-trigger': 'src/workflows/TimedTrigger.ts',
+                'workflow-wait-codec': 'src/workflows/WaitCodec.ts',
                 'workflow-schedule-types': 'src/workflows/schedule/ScheduleTypes.ts',
                 'workflow-schedule-codec': 'src/workflows/schedule/ScheduleCodec.ts',
                 'workflow-schedule-times': 'src/workflows/schedule/ScheduleTiming.ts',
