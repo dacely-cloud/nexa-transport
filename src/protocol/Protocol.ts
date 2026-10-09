@@ -604,6 +604,66 @@ export interface ChannelStatusResultShape {
 /** ChannelStatusResult from the Nexa wire protocol. */
 export type ChannelStatusResult = ChannelStatusResultShape;
 
+/** ChatGraph wire fields. */
+export interface ChatGraphShape {
+    /** description as defined by the Nexa gateway. */
+    readonly description: string;
+    /** edges as defined by the Nexa gateway. */
+    readonly edges: ReadonlyArray<ChatGraphEdge>;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** nodes as defined by the Nexa gateway. */
+    readonly nodes: ReadonlyArray<ChatGraphNode>;
+    /** title as defined by the Nexa gateway. */
+    readonly title: string;
+}
+
+/** ChatGraph from the Nexa wire protocol. */
+export type ChatGraph = ChatGraphShape;
+
+/** Allowed values for ChatGraphColor. */
+export const ChatGraphColorValues = {
+    Value0: 'blue',
+    Value1: 'gray',
+    Value2: 'green',
+    Value3: 'orange',
+    Value4: 'purple',
+    Value5: 'red',
+} as const;
+
+/** ChatGraphColor from the Nexa wire protocol. */
+export type ChatGraphColor = (typeof ChatGraphColorValues)[keyof typeof ChatGraphColorValues];
+
+/** ChatGraphEdge wire fields. */
+export interface ChatGraphEdgeShape {
+    /** from as defined by the Nexa gateway. */
+    readonly from: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** label as defined by the Nexa gateway. */
+    readonly label: string;
+    /** to as defined by the Nexa gateway. */
+    readonly to: string;
+}
+
+/** ChatGraphEdge from the Nexa wire protocol. */
+export type ChatGraphEdge = ChatGraphEdgeShape;
+
+/** ChatGraphNode wire fields. */
+export interface ChatGraphNodeShape {
+    /** color as defined by the Nexa gateway. */
+    readonly color: ChatGraphColor;
+    /** description as defined by the Nexa gateway. */
+    readonly description: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** label as defined by the Nexa gateway. */
+    readonly label: string;
+}
+
+/** ChatGraphNode from the Nexa wire protocol. */
+export type ChatGraphNode = ChatGraphNodeShape;
+
 /** CommandExecutionReceipt wire fields. */
 export interface CommandExecutionReceiptShape {
     /** command as defined by the Nexa gateway. */
@@ -1007,6 +1067,8 @@ export interface ContentBlockVariant7Shape {
 
 /** ContentBlockVariant8 wire fields. */
 export interface ContentBlockVariant8Shape {
+    /** chatGraph as defined by the Nexa gateway. */
+    readonly chatGraph?: ChatGraph;
     /** content as defined by the Nexa gateway. */
     readonly content: ReadonlyArray<ContentBlock> | string;
     /** inspectedMediaSha256 as defined by the Nexa gateway. */
@@ -6639,6 +6701,8 @@ export const ToolResultsourceValues = {
 
 /** ToolResult wire fields. */
 export interface ToolResultShape {
+    /** chatGraph as defined by the Nexa gateway. */
+    readonly chatGraph?: ChatGraph;
     /** commandExecution as defined by the Nexa gateway. */
     readonly commandExecution?: CommandExecutionReceipt;
     /** content as defined by the Nexa gateway. */

@@ -354,6 +354,21 @@ There is no `NexaMedia.audio()` attachment helper or generic inbound audio-file 
 
 The transport does not execute tools on the client or send a local tool catalog. Nexa chooses and executes tools under the authenticated user's permissions. Work mode receives the server's tools, skills, and execution context; conversational replies can omit them. `tool-start`, `tool-progress`, and `tool-finish` expose execution to your UI. A server skill is not an SDK plugin; there is no standalone skill-installation RPC in this contract.
 
+### Interactive chat graphs
+
+Nexa's `render_graph` tool delivers a typed relationship graph in `ToolResult.chatGraph`. It contains a title, description, colored nodes and labelled directed edges. These are visual explanations; they do not execute workflow steps. The agent reads `nexa_capabilities` and relevant integration status before making a capability map.
+
+```ts
+import { ChatGraphs, type ChatGraph } from 'nexa-transport/chat-graph';
+
+if (event.type === 'tool-finish' && event.outcome.result.chatGraph !== undefined) {
+    const graph: ChatGraph = ChatGraphs.parse(event.outcome.result.chatGraph);
+    console.log(graph.title, graph.nodes, graph.edges);
+}
+```
+
+`ChatGraphs.parse` rejects missing endpoints, duplicate identities, invalid colors and oversized graphs. Graph deliveries remain in saved `tool-result` content blocks and session event journals, independently of bounded tool-output previews. Render their text as text, and reuse your graph canvas for camera and node layout interaction. Nexa accepts up to 100 nodes and 300 edges per delivery.
+
 Approval events are notifications, not authority to approve:
 
 ```ts

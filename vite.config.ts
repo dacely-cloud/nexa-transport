@@ -4,6 +4,7 @@ const config: UserConfig = {
         target: 'es2023',
         lib: {
             entry: {
+                'chat-graph': 'src/graphs/ChatGraph.ts',
                 'workflow-applications': 'src/workflows/terminal/Applications.ts',
                 'workflow-terminal-types': 'src/workflows/terminal/TerminalTypes.ts',
                 'reverse-investigation': 'src/reverse/ReverseInvestigation.ts',

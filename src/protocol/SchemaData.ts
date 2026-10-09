@@ -872,6 +872,78 @@ export const schema: Schema = {
             required: ['configured', 'connected', 'id', 'issues', 'lifecycle'],
             type: 'object',
         },
+        ChatGraph: {
+            description: 'A non-executable graph delivered directly into a conversation.',
+            properties: {
+                description: {
+                    type: 'string',
+                },
+                edges: {
+                    items: {
+                        $ref: '#/definitions/ChatGraphEdge',
+                    },
+                    type: 'array',
+                },
+                id: {
+                    type: 'string',
+                },
+                nodes: {
+                    items: {
+                        $ref: '#/definitions/ChatGraphNode',
+                    },
+                    type: 'array',
+                },
+                title: {
+                    type: 'string',
+                },
+            },
+            required: ['description', 'edges', 'id', 'nodes', 'title'],
+            type: 'object',
+        },
+        ChatGraphColor: {
+            description:
+                'Available semantic colors, shared by the agent and workflow-based chat renderer.\nA supported graph card color.',
+            enum: ['blue', 'gray', 'green', 'orange', 'purple', 'red'],
+            type: 'string',
+        },
+        ChatGraphEdge: {
+            description: 'A directed, labelled relationship between two existing nodes.',
+            properties: {
+                from: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                label: {
+                    type: 'string',
+                },
+                to: {
+                    type: 'string',
+                },
+            },
+            required: ['from', 'id', 'label', 'to'],
+            type: 'object',
+        },
+        ChatGraphNode: {
+            description: 'A named idea or capability; descriptions are plain text.',
+            properties: {
+                color: {
+                    $ref: '#/definitions/ChatGraphColor',
+                },
+                description: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                label: {
+                    type: 'string',
+                },
+            },
+            required: ['color', 'description', 'id', 'label'],
+            type: 'object',
+        },
         CommandExecutionReceipt: {
             description:
                 'Host-produced command termination evidence, separate from model-visible output.',
@@ -1522,6 +1594,11 @@ export const schema: Schema = {
                 },
                 {
                     properties: {
+                        chatGraph: {
+                            $ref: '#/definitions/ChatGraph',
+                            description:
+                                'Saved visual delivery; providers only consume the ordinary content.',
+                        },
                         content: {
                             anyOf: [
                                 {
@@ -9990,6 +10067,11 @@ export const schema: Schema = {
         ToolResult: {
             description: 'What a tool returns.',
             properties: {
+                chatGraph: {
+                    $ref: '#/definitions/ChatGraph',
+                    description:
+                        'Validated graph presentation, independent of bounded model-visible result text.',
+                },
                 commandExecution: {
                     $ref: '#/definitions/CommandExecutionReceipt',
                     description:
