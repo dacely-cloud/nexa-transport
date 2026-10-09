@@ -210,6 +210,14 @@
         "./workflow-group-codec": {
             "types": "./dist/workflows/WorkflowGroupCodec.d.ts",
             "import": "./dist/workflow-group-codec.js"
+        },
+        "./workflow-applications": {
+            "types": "./dist/workflows/terminal/Applications.d.ts",
+            "import": "./dist/workflow-applications.js"
+        },
+        "./workflow-terminal-types": {
+            "types": "./dist/workflows/terminal/TerminalTypes.d.ts",
+            "import": "./dist/workflow-terminal-types.js"
         }
     },
     "scripts": {

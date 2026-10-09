@@ -46,6 +46,10 @@ const files: readonly string[] = [
     'CoreComponents',
     'DataComponents',
     'AgentComponents',
+    'TerminalComponents',
+    'terminal/Applications',
+    'terminal/TerminalTypes',
+    'terminal/TerminalCodec',
     'InferenceComponents',
     'ImageComponents',
     'ResourceComponents',
@@ -62,6 +66,7 @@ const destination: URL = new URL('../src/workflows/', import.meta.url);
 await mkdir(destination, { recursive: true });
 await mkdir(new URL('runtime/', destination), { recursive: true });
 await mkdir(new URL('planning/', destination), { recursive: true });
+await mkdir(new URL('terminal/', destination), { recursive: true });
 for (const file of files) {
     const content: string = await readFile(
         new URL(`../../nexa/src/workflows/${file}.ts`, import.meta.url),

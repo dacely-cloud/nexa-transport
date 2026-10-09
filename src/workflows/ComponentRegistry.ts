@@ -13,6 +13,7 @@ import { DataComponents } from './DataComponents.js';
 import { CoreComponents } from './CoreComponents.js';
 import { InferenceComponents } from './InferenceComponents.js';
 import { ImageComponents } from './ImageComponents.js';
+import { TerminalComponents } from './TerminalComponents.js';
 import { AgentComponents } from './AgentComponents.js';
 import { ResourceComponents } from './ResourceComponents.js';
 import { WorkflowInput } from './WorkflowInput.js';
@@ -45,6 +46,7 @@ export class ComponentRegistry {
             ...CoreComponents.definitions(),
             ...DataComponents.definitions(),
             ...AgentComponents.definitions(),
+            ...TerminalComponents.definitions(),
             ...InferenceComponents.definitions(),
             ...ImageComponents.definitions(),
             ...ResourceComponents.definitions(),

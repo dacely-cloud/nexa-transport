@@ -344,6 +344,10 @@ export const schema: Schema = {
             enum: ['browser-window', 'context-bridge', 'ipc', 'native-addon', 'preload', 'route'],
             type: 'string',
         },
+        ApplicationConnection: {
+            enum: ['connected', 'setup-required', 'unavailable'],
+            type: 'string',
+        },
         ApplicationIssue: {
             description:
                 'Explicit incomplete coverage rather than silently omitted files or unsupported syntax.',
@@ -4309,6 +4313,33 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'workflows.runs.applications.check': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/WorkflowApplicationRequest',
+                        },
+                        result: {
+                            items: {
+                                $ref: '#/definitions/WorkflowApplicationStatus',
+                            },
+                            type: 'array',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'workflows.runs.applications.setup': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/WorkflowApplicationSetupRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/WorkflowTerminalSnapshot',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'workflows.runs.artifact': {
                     properties: {
                         params: {
@@ -4403,6 +4434,30 @@ export const schema: Schema = {
                         },
                         result: {
                             $ref: '#/definitions/WorkflowRunStepsPage',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'workflows.runs.terminal.command': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/WorkflowTerminalCommand',
+                        },
+                        result: {
+                            $ref: '#/definitions/WorkflowTerminalSnapshot',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'workflows.runs.terminal.read': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/WorkflowTerminalRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/WorkflowTerminalSnapshot',
                         },
                     },
                     required: ['params', 'result'],
@@ -4593,6 +4648,8 @@ export const schema: Schema = {
                 'workflows.runs.agent.control',
                 'workflows.runs.agent.input',
                 'workflows.runs.agent.read',
+                'workflows.runs.applications.check',
+                'workflows.runs.applications.setup',
                 'workflows.runs.artifact',
                 'workflows.runs.cancel',
                 'workflows.runs.events',
@@ -4601,6 +4658,8 @@ export const schema: Schema = {
                 'workflows.runs.read',
                 'workflows.runs.start',
                 'workflows.runs.steps',
+                'workflows.runs.terminal.command',
+                'workflows.runs.terminal.read',
                 'workflows.save',
                 'workflows.validate',
                 'workspaces.create',
@@ -8445,6 +8504,11 @@ export const schema: Schema = {
                 evidenceCount: {
                     type: 'number',
                 },
+                execution: {
+                    description:
+                        'Explicit resumed execution epoch; absent means the original execution.',
+                    type: 'number',
+                },
                 id: {
                     type: 'string',
                 },
@@ -9331,6 +9395,14 @@ export const schema: Schema = {
             },
             required: ['id', 'name', 'universeId', 'userId'],
             type: 'object',
+        },
+        TerminalAction: {
+            enum: ['input', 'resize', 'stop'],
+            type: 'string',
+        },
+        TerminalStatus: {
+            enum: ['exited', 'interrupted', 'running', 'starting'],
+            type: 'string',
         },
         TokenUsage: {
             description: 'Token accounting for a turn.',
@@ -10514,6 +10586,55 @@ export const schema: Schema = {
                 },
             },
             required: ['invocationId', 'nodeId', 'runId'],
+            type: 'object',
+        },
+        WorkflowApplication: {
+            enum: ['claude-code', 'codex', 'grok-build', 'nerva-code'],
+            type: 'string',
+        },
+        WorkflowApplicationRequest: {
+            properties: {
+                revision: {
+                    type: 'string',
+                },
+                workflowId: {
+                    type: 'string',
+                },
+            },
+            required: ['revision', 'workflowId'],
+            type: 'object',
+        },
+        WorkflowApplicationSetupRequest: {
+            properties: {
+                application: {
+                    $ref: '#/definitions/WorkflowApplication',
+                },
+                revision: {
+                    type: 'string',
+                },
+                sessionId: {
+                    type: 'string',
+                },
+                workflowId: {
+                    type: 'string',
+                },
+            },
+            required: ['application', 'revision', 'sessionId', 'workflowId'],
+            type: 'object',
+        },
+        WorkflowApplicationStatus: {
+            properties: {
+                application: {
+                    $ref: '#/definitions/WorkflowApplication',
+                },
+                status: {
+                    $ref: '#/definitions/ApplicationConnection',
+                },
+                title: {
+                    type: 'string',
+                },
+            },
+            required: ['application', 'status', 'title'],
             type: 'object',
         },
         WorkflowCatalog: {
@@ -12158,6 +12279,101 @@ export const schema: Schema = {
                 'revision',
                 'updatedAtMs',
                 'workflowId',
+            ],
+            type: 'object',
+        },
+        WorkflowTerminalCommand: {
+            properties: {
+                action: {
+                    $ref: '#/definitions/TerminalAction',
+                },
+                cols: {
+                    type: 'number',
+                },
+                commandId: {
+                    type: 'string',
+                },
+                expectedRevision: {
+                    type: 'string',
+                },
+                input: {
+                    type: 'string',
+                },
+                rows: {
+                    type: 'number',
+                },
+                sessionId: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'action',
+                'cols',
+                'commandId',
+                'expectedRevision',
+                'input',
+                'rows',
+                'sessionId',
+            ],
+            type: 'object',
+        },
+        WorkflowTerminalRequest: {
+            properties: {
+                sessionId: {
+                    type: 'string',
+                },
+            },
+            required: ['sessionId'],
+            type: 'object',
+        },
+        WorkflowTerminalSnapshot: {
+            properties: {
+                application: {
+                    $ref: '#/definitions/WorkflowApplication',
+                },
+                cols: {
+                    type: 'number',
+                },
+                commandId: {
+                    type: 'string',
+                },
+                commandRevision: {
+                    type: 'string',
+                },
+                error: {
+                    type: 'string',
+                },
+                revision: {
+                    type: 'string',
+                },
+                rows: {
+                    type: 'number',
+                },
+                screen: {
+                    type: 'string',
+                },
+                sessionId: {
+                    type: 'string',
+                },
+                setup: {
+                    type: 'boolean',
+                },
+                status: {
+                    $ref: '#/definitions/TerminalStatus',
+                },
+            },
+            required: [
+                'application',
+                'cols',
+                'commandId',
+                'commandRevision',
+                'error',
+                'revision',
+                'rows',
+                'screen',
+                'sessionId',
+                'setup',
+                'status',
             ],
             type: 'object',
         },
