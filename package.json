@@ -254,6 +254,14 @@
         "./workflow-calendar-codec": {
             "types": "./dist/workflows/schedule/CalendarCodec.d.ts",
             "import": "./dist/workflow-calendar-codec.js"
+        },
+        "./workflow-timed-trigger": {
+            "types": "./dist/workflows/TimedTrigger.d.ts",
+            "import": "./dist/workflow-timed-trigger.js"
+        },
+        "./workflow-json": {
+            "types": "./dist/workflows/WorkflowJson.d.ts",
+            "import": "./dist/workflow-json.js"
         }
     },
     "scripts": {

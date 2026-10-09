@@ -17,3 +17,13 @@ The existing workflow queue starts a bounded schedule discovery loop alongside r
 Deploy gateways, workers and the typed SDK together before enabling schedules against a shared database. Older readers do not understand the new optional schedule provenance. No migration, retention deletion, live schedule or service restart is performed by this change. Enable does not add financial reservations, run-only sharing, event subscriptions; those remain separate requirements.
 
 Calendar timing adds a new wire union variant. Deploy gateways, workers and clients together before using it with a shared database. Existing fixed-interval and one-time records do not need rewriting.
+
+## Timed Event components
+
+`trigger.timed@1` is a real registry trigger with the same start-flow and submitted-input outputs as Manual start, plus a typed timing event. Its `schedule` field stores validated interval, one-time or calendar rules and the explicit missed-run/concurrency limits. Structural graph validation reports invalid rules on that component. The planner receives this contract and may propose the node, but cannot activate it through a graph patch.
+
+Publishing does not register or enable automation. The owner separately reviews and enables the selected publication. For a Timed Event entry point, both activation and dispatch require the exact rules saved in that immutable publication. Changing the current draft does not retarget an existing registration. To change its cadence, publish the revised component and explicitly replace the activation. Existing Manual start publications can still use separately configured schedules.
+
+Manual tests, mock tests and explicit published runs may select Timed Event without enabling a schedule. Its `event` output distinguishes `scheduled`, `manual` and `mock`, includes the intended occurrence/activation revision only for scheduled work, and records the time the handler observed execution. Only the selected trigger runs; other triggers retain the existing skipped-branch semantics. Worker lifetime, atomic admission, recovery, cancellation and billing all remain on the established run path. A zero interval anchor means alignment to the UTC clock; activation only admits future occurrences.
+
+The editor retains incomplete timing edits in its bounded field journal. Apply creates one undoable graph edit; Save validates and includes pending settings. Neither action activates work. The Schedule page takes Timed Event rules from the pinned publication and prevents local overrides, while allowing explicit runtime input. Existing exact millisecond instants, intervals and fractional grace periods survive reopening without rounding. Multiple independent registrations and completion-relative intervals remain unfinished.
