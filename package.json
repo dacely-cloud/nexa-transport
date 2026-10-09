@@ -302,6 +302,10 @@
         "./workflow-mapping-validation": {
             "types": "./dist/workflows/mapping/MappingValidation.d.ts",
             "import": "./dist/workflow-mapping-validation.js"
+        },
+        "./workflow-scalar-conversion": {
+            "types": "./dist/workflows/ScalarConversion.d.ts",
+            "import": "./dist/workflow-scalar-conversion.js"
         }
     },
     "scripts": {
