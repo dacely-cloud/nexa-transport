@@ -1,5 +1,9 @@
 import { BrowserScreenshotComparisonReceipt } from './BrowserScreenshotComparisonReceipt.js';
 import { BrowserScreenshotReceipt } from './BrowserScreenshotReceipt.js';
+import { BrowserStorageGatewayReceipt } from './BrowserStorageGatewayReceipt.js';
+import { BrowserStorageReceipt } from './BrowserStorageReceipt.js';
+import type { BrowserStorageMetadata } from '../protocol/Protocol.js';
+import type { BrowserStoragePage } from '../protocol/Protocol.js';
 import type { BrowserScreenshotPage } from '../protocol/Protocol.js';
 import type {
     ReverseBrowserPage,
@@ -102,6 +106,16 @@ export class ReverseInvestigation {
             }
             BrowserScreenshotReceipt.snapshot(
                 input.browserScreenshot,
+                input.id,
+                input.archive?.sessionId,
+            );
+        }
+        if (input.browserStorage !== undefined) {
+            if (input.kind !== 'browser') {
+                throw new TypeError('Browser storage requires a browser target');
+            }
+            BrowserStorageGatewayReceipt.snapshot(
+                input.browserStorage,
                 input.id,
                 input.archive?.sessionId,
             );
@@ -226,6 +240,14 @@ export class ReverseInvestigation {
     /** Decodes a selected saved viewport metadata or bounded PNG byte page. */
     public static screenshot(input: unknown): BrowserScreenshotPage {
         return BrowserScreenshotReceipt.read(input);
+    }
+    /** Validates redacted storage headers and selected group pages without returning original values. */
+    public static storage(input: unknown): BrowserStoragePage {
+        return BrowserStorageGatewayReceipt.read(input);
+    }
+    /** Pins storage header provenance and selection independently of JSON field insertion order. */
+    public static storageIdentity(metadata: BrowserStorageMetadata): string {
+        return BrowserStorageReceipt.identity(metadata);
     }
     /** Validates script/resource directories or independently selected immutable source text pages. */
     public static sources(input: unknown): BrowserSourcesPage {

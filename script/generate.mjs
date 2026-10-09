@@ -29,6 +29,41 @@ writeFileSync(
     ),
 );
 
+/** Storage validation is portable and shared with native capture/archive publication. */
+const storageTypes = readFileSync('../nexa/src/reverse/BrowserStorageTypes.ts', 'utf8');
+const storageEnums = ['BrowserStorageGroup', 'BrowserStorageKind']
+    .map((name) => {
+        const declaration = storageTypes.match(
+            new RegExp('export const ' + name + ' = [\\s\\S]*?as const;', 'u'),
+        )?.[0];
+        if (declaration === undefined)
+            throw new Error('Native storage declaration is missing: ' + name);
+        return (
+            '/** Native storage enumeration. */\n' +
+            declaration +
+            '\n/** Native storage selection type. */\nexport type ' +
+            name +
+            ' = (typeof ' +
+            name +
+            ')[keyof typeof ' +
+            name +
+            '];'
+        );
+    })
+    .join('\n\n');
+const storageReceipt = readFileSync('../nexa/src/reverse/BrowserStorageReceipt.ts', 'utf8');
+const storageImport = /import \{[\s\S]*?\} from '\.\/BrowserStorageTypes';/u;
+if (!storageImport.test(storageReceipt)) throw new Error('Native storage receipt import changed');
+writeFileSync(
+    'src/reverse/BrowserStorageReceipt.ts',
+    storageReceipt.replace(
+        storageImport,
+        "import type { BrowserStorageMetadata, BrowserStorageCoverage, BrowserStorageQuota, BrowserStorageRow, BrowserStoragePage } from '../protocol/Protocol.js';\n\n" +
+            storageEnums +
+            '\n\n/** Host captures remain separate from paged wire responses. */\nexport interface BrowserStorageCapture { readonly metadata: BrowserStorageMetadata; readonly rows: readonly BrowserStorageRow[]; }',
+    ),
+);
+
 const temporary = mkdtempSync(join(tmpdir(), 'nexa-contract-'));
 let schema;
 try {
