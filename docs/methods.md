@@ -106,6 +106,9 @@ All 54 protocol methods. `connect` is managed by `NexaClient.connect`; the remai
 - [workflows.planning.sources](#workflows-planning-sources)
 - [workflows.read](#workflows-read)
 - [workflows.record](#workflows-record)
+- [workflows.runs.agent.control](#workflows-runs-agent-control)
+- [workflows.runs.agent.input](#workflows-runs-agent-input)
+- [workflows.runs.agent.read](#workflows-runs-agent-read)
 - [workflows.runs.artifact](#workflows-runs-artifact)
 - [workflows.runs.cancel](#workflows-runs-cancel)
 - [workflows.runs.events](#workflows-runs-events)
@@ -2512,6 +2515,94 @@ Parameters: [WorkflowRecordRequest](protocol.md#workflowrecordrequest).
 | `workflowId` | Yes      | `string` |             |
 
 Result: [WorkflowRecordPage](protocol.md#workflowrecordpage).
+
+## workflows.runs.agent.control
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsRunsAgentControl> = {
+    controlId: 'YOUR_CONTROLID',
+    expectedRevision: 'YOUR_EXPECTEDREVISION',
+    invocationId: 'YOUR_INVOCATIONID',
+    nodeId: 'YOUR_NODEID',
+    paused: false,
+    runId: 'YOUR_RUNID',
+};
+const result: ResultOf<typeof Method.WorkflowsRunsAgentControl> = await client.call(
+    Method.WorkflowsRunsAgentControl,
+    params,
+);
+```
+
+Parameters: [WorkflowAgentControlRequest](protocol.md#workflowagentcontrolrequest).
+
+| Field              | Required | Type      | Description |
+| ------------------ | -------- | --------- | ----------- |
+| `controlId`        | Yes      | `string`  |             |
+| `expectedRevision` | Yes      | `string`  |             |
+| `invocationId`     | Yes      | `string`  |             |
+| `nodeId`           | Yes      | `string`  |             |
+| `paused`           | Yes      | `boolean` |             |
+| `runId`            | Yes      | `string`  |             |
+
+Result: [WorkflowAgentSession](protocol.md#workflowagentsession).
+
+## workflows.runs.agent.input
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsRunsAgentInput> = {
+    inputId: 'YOUR_INPUTID',
+    invocationId: 'YOUR_INVOCATIONID',
+    nodeId: 'YOUR_NODEID',
+    runId: 'YOUR_RUNID',
+    text: 'YOUR_TEXT',
+};
+const result: ResultOf<typeof Method.WorkflowsRunsAgentInput> = await client.call(
+    Method.WorkflowsRunsAgentInput,
+    params,
+);
+```
+
+Parameters: [WorkflowAgentInputRequest](protocol.md#workflowagentinputrequest).
+
+| Field          | Required | Type     | Description |
+| -------------- | -------- | -------- | ----------- |
+| `inputId`      | Yes      | `string` |             |
+| `invocationId` | Yes      | `string` |             |
+| `nodeId`       | Yes      | `string` |             |
+| `runId`        | Yes      | `string` |             |
+| `text`         | Yes      | `string` |             |
+
+Result: [WorkflowAgentSession](protocol.md#workflowagentsession).
+
+## workflows.runs.agent.read
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsRunsAgentRead> = {
+    invocationId: 'YOUR_INVOCATIONID',
+    nodeId: 'YOUR_NODEID',
+    runId: 'YOUR_RUNID',
+};
+const result: ResultOf<typeof Method.WorkflowsRunsAgentRead> = await client.call(
+    Method.WorkflowsRunsAgentRead,
+    params,
+);
+```
+
+Parameters: [WorkflowAgentSessionRequest](protocol.md#workflowagentsessionrequest).
+
+| Field          | Required | Type     | Description |
+| -------------- | -------- | -------- | ----------- |
+| `invocationId` | Yes      | `string` |             |
+| `nodeId`       | Yes      | `string` |             |
+| `runId`        | Yes      | `string` |             |
+
+Result: [WorkflowAgentSession](protocol.md#workflowagentsession).
 
 ## workflows.runs.artifact
 

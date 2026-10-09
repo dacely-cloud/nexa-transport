@@ -2753,6 +2753,30 @@ export interface GatewayMethodsworkflows_recordShape {
     readonly result: WorkflowRecordPage;
 }
 
+/** GatewayMethodsworkflows_runs_agent_control wire fields. */
+export interface GatewayMethodsworkflows_runs_agent_controlShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkflowAgentControlRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WorkflowAgentSession;
+}
+
+/** GatewayMethodsworkflows_runs_agent_input wire fields. */
+export interface GatewayMethodsworkflows_runs_agent_inputShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkflowAgentInputRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WorkflowAgentSession;
+}
+
+/** GatewayMethodsworkflows_runs_agent_read wire fields. */
+export interface GatewayMethodsworkflows_runs_agent_readShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkflowAgentSessionRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WorkflowAgentSession;
+}
+
 /** GatewayMethodsworkflows_runs_artifact wire fields. */
 export interface GatewayMethodsworkflows_runs_artifactShape {
     /** params as defined by the Nexa gateway. */
@@ -3075,6 +3099,12 @@ export interface GatewayMethodsShape {
     readonly 'workflows.read': GatewayMethodsworkflows_readShape;
     /** workflows.record as defined by the Nexa gateway. */
     readonly 'workflows.record': GatewayMethodsworkflows_recordShape;
+    /** workflows.runs.agent.control as defined by the Nexa gateway. */
+    readonly 'workflows.runs.agent.control': GatewayMethodsworkflows_runs_agent_controlShape;
+    /** workflows.runs.agent.input as defined by the Nexa gateway. */
+    readonly 'workflows.runs.agent.input': GatewayMethodsworkflows_runs_agent_inputShape;
+    /** workflows.runs.agent.read as defined by the Nexa gateway. */
+    readonly 'workflows.runs.agent.read': GatewayMethodsworkflows_runs_agent_readShape;
     /** workflows.runs.artifact as defined by the Nexa gateway. */
     readonly 'workflows.runs.artifact': GatewayMethodsworkflows_runs_artifactShape;
     /** workflows.runs.cancel as defined by the Nexa gateway. */
@@ -6729,6 +6759,114 @@ export interface WorkerStatusShape {
 /** WorkerStatus from the Nexa wire protocol. */
 export type WorkerStatus = WorkerStatusShape;
 
+/** WorkflowAgentControlRequest wire fields. */
+export interface WorkflowAgentControlRequestShape {
+    /** controlId as defined by the Nexa gateway. */
+    readonly controlId: string;
+    /** expectedRevision as defined by the Nexa gateway. */
+    readonly expectedRevision: string;
+    /** invocationId as defined by the Nexa gateway. */
+    readonly invocationId: string;
+    /** nodeId as defined by the Nexa gateway. */
+    readonly nodeId: string;
+    /** paused as defined by the Nexa gateway. */
+    readonly paused: boolean;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+}
+
+/** WorkflowAgentControlRequest from the Nexa wire protocol. */
+export type WorkflowAgentControlRequest = WorkflowAgentControlRequestShape;
+
+/** WorkflowAgentInput wire fields. */
+export interface WorkflowAgentInputShape {
+    /** inputId as defined by the Nexa gateway. */
+    readonly inputId: string;
+    /** status as defined by the Nexa gateway. */
+    readonly status: WorkflowAgentInputStatus;
+    /** text as defined by the Nexa gateway. */
+    readonly text: string;
+}
+
+/** WorkflowAgentInput from the Nexa wire protocol. */
+export type WorkflowAgentInput = WorkflowAgentInputShape;
+
+/** WorkflowAgentInputRequest wire fields. */
+export interface WorkflowAgentInputRequestShape {
+    /** inputId as defined by the Nexa gateway. */
+    readonly inputId: string;
+    /** invocationId as defined by the Nexa gateway. */
+    readonly invocationId: string;
+    /** nodeId as defined by the Nexa gateway. */
+    readonly nodeId: string;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+    /** text as defined by the Nexa gateway. */
+    readonly text: string;
+}
+
+/** WorkflowAgentInputRequest from the Nexa wire protocol. */
+export type WorkflowAgentInputRequest = WorkflowAgentInputRequestShape;
+
+/** Allowed values for WorkflowAgentInputStatus. */
+export const WorkflowAgentInputStatusValues = {
+    Value0: 'accepted',
+    Value1: 'queued',
+    Value2: 'rejected',
+} as const;
+
+/** WorkflowAgentInputStatus from the Nexa wire protocol. */
+export type WorkflowAgentInputStatus =
+    (typeof WorkflowAgentInputStatusValues)[keyof typeof WorkflowAgentInputStatusValues];
+
+/** WorkflowAgentSession wire fields. */
+export interface WorkflowAgentSessionShape {
+    /** activity as defined by the Nexa gateway. */
+    readonly activity: string;
+    /** controlId as defined by the Nexa gateway. */
+    readonly controlId: string;
+    /** controlRevision as defined by the Nexa gateway. */
+    readonly controlRevision: string;
+    /** inputs as defined by the Nexa gateway. */
+    readonly inputs: ReadonlyArray<WorkflowAgentInput>;
+    /** invocationId as defined by the Nexa gateway. */
+    readonly invocationId: string;
+    /** model as defined by the Nexa gateway. */
+    readonly model: string;
+    /** nodeId as defined by the Nexa gateway. */
+    readonly nodeId: string;
+    /** pauseRequested as defined by the Nexa gateway. */
+    readonly pauseRequested: boolean;
+    /** paused as defined by the Nexa gateway. */
+    readonly paused: boolean;
+    /** provider as defined by the Nexa gateway. */
+    readonly provider: string;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+    /** status as defined by the Nexa gateway. */
+    readonly status: WorkflowStepStatus;
+    /** task as defined by the Nexa gateway. */
+    readonly task: string;
+    /** text as defined by the Nexa gateway. */
+    readonly text: string;
+}
+
+/** WorkflowAgentSession from the Nexa wire protocol. */
+export type WorkflowAgentSession = WorkflowAgentSessionShape;
+
+/** WorkflowAgentSessionRequest wire fields. */
+export interface WorkflowAgentSessionRequestShape {
+    /** invocationId as defined by the Nexa gateway. */
+    readonly invocationId: string;
+    /** nodeId as defined by the Nexa gateway. */
+    readonly nodeId: string;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+}
+
+/** WorkflowAgentSessionRequest from the Nexa wire protocol. */
+export type WorkflowAgentSessionRequest = WorkflowAgentSessionRequestShape;
+
 /** WorkflowCatalog wire fields. */
 export interface WorkflowCatalogShape {
     /** components as defined by the Nexa gateway. */
@@ -8232,6 +8370,12 @@ export enum Method {
     WorkflowsRead = 'workflows.read',
     /** Calls workflows.record. */
     WorkflowsRecord = 'workflows.record',
+    /** Calls workflows.runs.agent.control. */
+    WorkflowsRunsAgentControl = 'workflows.runs.agent.control',
+    /** Calls workflows.runs.agent.input. */
+    WorkflowsRunsAgentInput = 'workflows.runs.agent.input',
+    /** Calls workflows.runs.agent.read. */
+    WorkflowsRunsAgentRead = 'workflows.runs.agent.read',
     /** Calls workflows.runs.artifact. */
     WorkflowsRunsArtifact = 'workflows.runs.artifact',
     /** Calls workflows.runs.cancel. */
