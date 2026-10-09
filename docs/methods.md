@@ -1,6 +1,6 @@
 # RPC reference
 
-All 152 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 151 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
+All 153 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 152 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
 
 - [accounts.create](#accounts-create)
 - [accounts.list](#accounts-list)
@@ -135,6 +135,7 @@ All 152 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [workflows.runs.events](#workflows-runs-events)
 - [workflows.runs.inputs](#workflows-runs-inputs)
 - [workflows.runs.list](#workflows-runs-list)
+- [workflows.runs.loopSpending](#workflows-runs-loopSpending)
 - [workflows.runs.output](#workflows-runs-output)
 - [workflows.runs.question.answer](#workflows-runs-question-answer)
 - [workflows.runs.question.read](#workflows-runs-question-read)
@@ -3355,6 +3356,30 @@ Parameters: [WorkflowRunListRequest](protocol.md#workflowrunlistrequest).
 | `workflowId` | Yes      | `string`      |             |
 
 Result: [WorkflowRunListPage](protocol.md#workflowrunlistpage).
+
+## workflows.runs.loopSpending
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsRunsLoopSpending> = {
+    loopId: 'YOUR_LOOPID',
+    runId: 'YOUR_RUNID',
+};
+const result: ResultOf<typeof Method.WorkflowsRunsLoopSpending> = await client.call(
+    Method.WorkflowsRunsLoopSpending,
+    params,
+);
+```
+
+Parameters: [WorkflowLoopSpendingRequest](protocol.md#workflowloopspendingrequest).
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `loopId` | Yes      | `string` |             |
+| `runId`  | Yes      | `string` |             |
+
+Result: [WorkflowLoopSpendingView](protocol.md#workflowloopspendingview).
 
 ## workflows.runs.output
 

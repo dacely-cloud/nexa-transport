@@ -1,6 +1,8 @@
 /** Server-only protocol snapshot generator. Run after changing Nexa's gateway contracts. */
 import { execFileSync } from 'node:child_process';
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { readFileSync, writeFileSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 
 execFileSync(process.execPath, ['script/workflows.ts'], { stdio: 'inherit' });
 mkdirSync('src/graphs', { recursive: true });
@@ -27,16 +29,23 @@ writeFileSync(
     ),
 );
 
-execFileSync('./node_modules/.bin/typescript-json-schema', [
-    'script/Contract.ts',
-    'Contract',
-    '--ignoreErrors',
-    '--strictNullChecks',
-    '--required',
-    '--out',
-    '/tmp/nexa-transport-contract.json',
-]);
-const schema = JSON.parse(readFileSync('/tmp/nexa-transport-contract.json', 'utf8'));
+const temporary = mkdtempSync(join(tmpdir(), 'nexa-contract-'));
+let schema;
+try {
+    const output = join(temporary, 'contract.json');
+    execFileSync('./node_modules/.bin/typescript-json-schema', [
+        'script/Contract.ts',
+        'Contract',
+        '--ignoreErrors',
+        '--strictNullChecks',
+        '--required',
+        '--out',
+        output,
+    ]);
+    schema = JSON.parse(readFileSync(output, 'utf8'));
+} finally {
+    rmSync(temporary, { recursive: true, force: true });
+}
 /** Keep arbitrary JSON fields fully typed and structurally validated. */
 schema.definitions.JsonValue = {
     anyOf: [

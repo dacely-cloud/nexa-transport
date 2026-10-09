@@ -45,6 +45,8 @@ const files: readonly string[] = [
     'planning/PlanningCodec',
     'planning/PlanningSources',
     'planning/PlanningEdits',
+    'runtime/RunSpendingTypes',
+    'runtime/RunSpendingCodec',
     'runtime/RunTypes',
     'runtime/RunHumanTypes',
     'runtime/RunHumanCodec',

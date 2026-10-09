@@ -6511,6 +6511,18 @@
                     "required": ["params", "result"],
                     "type": "object"
                 },
+                "workflows.runs.loopSpending": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/WorkflowLoopSpendingRequest"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/WorkflowLoopSpendingView"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
                 "workflows.runs.output": {
                     "properties": {
                         "params": {
@@ -6887,6 +6899,7 @@
                 "workflows.runs.events",
                 "workflows.runs.inputs",
                 "workflows.runs.list",
+                "workflows.runs.loopSpending",
                 "workflows.runs.output",
                 "workflows.runs.question.answer",
                 "workflows.runs.question.read",
@@ -14515,6 +14528,79 @@
                 }
             },
             "required": ["cursor", "limit"],
+            "type": "object"
+        },
+        "WorkflowLoopSpendingRequest": {
+            "description": "Select one authored loop in an owned immutable run.",
+            "properties": {
+                "loopId": {
+                    "type": "string"
+                },
+                "runId": {
+                    "type": "string"
+                }
+            },
+            "required": ["loopId", "runId"],
+            "type": "object"
+        },
+        "WorkflowLoopSpendingView": {
+            "description": "The public projection adds run-pinned configuration and explicitly marks mocked execution.",
+            "properties": {
+                "deadlineAtMs": {
+                    "type": ["null", "string"]
+                },
+                "entries": {
+                    "type": "string"
+                },
+                "lastReportedAtMs": {
+                    "type": ["null", "string"]
+                },
+                "limitMicrocents": {
+                    "type": ["null", "string"]
+                },
+                "loopId": {
+                    "type": "string"
+                },
+                "observedAtMs": {
+                    "type": "string"
+                },
+                "reportedMicrocents": {
+                    "type": ["null", "string"]
+                },
+                "reservationCount": {
+                    "type": "number"
+                },
+                "reservedMicrocents": {
+                    "type": "string"
+                },
+                "revision": {
+                    "type": "string"
+                },
+                "runId": {
+                    "type": "string"
+                },
+                "simulated": {
+                    "type": "boolean"
+                },
+                "workflowId": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "deadlineAtMs",
+                "entries",
+                "lastReportedAtMs",
+                "limitMicrocents",
+                "loopId",
+                "observedAtMs",
+                "reportedMicrocents",
+                "reservationCount",
+                "reservedMicrocents",
+                "revision",
+                "runId",
+                "simulated",
+                "workflowId"
+            ],
             "type": "object"
         },
         "WorkflowManifestPage": {

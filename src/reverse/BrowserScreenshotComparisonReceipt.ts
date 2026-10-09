@@ -22,8 +22,9 @@ export class BrowserScreenshotComparisonReceipt {
                     !['before', 'after', 'metrics', 'reference'].includes(key),
             ) ||
             JSON.stringify(value).length > 24000
-        )
-            {throw new Error('Screenshot comparison exceeds its metadata contract');}
+        ) {
+            throw new Error('Screenshot comparison exceeds its metadata contract');
+        }
         this.#source(value.before, value.reference.sessionId);
         this.#source(value.after, value.reference.sessionId);
         BrowserPixelReceipt.read(value.metrics);
@@ -38,8 +39,9 @@ export class BrowserScreenshotComparisonReceipt {
             value.metrics.beforeHeight !== value.before.metadata.height ||
             value.metrics.afterWidth !== value.after.metadata.width ||
             value.metrics.afterHeight !== value.after.metadata.height
-        )
-            {throw new Error('Comparison metrics left their source dimensions');}
+        ) {
+            throw new Error('Comparison metrics left their source dimensions');
+        }
     }
     static #source(value: BrowserScreenshotComparisonSource, sessionId: string): void {
         if (
@@ -47,8 +49,9 @@ export class BrowserScreenshotComparisonReceipt {
                 (key: string): boolean => !['reference', 'sha256', 'metadata'].includes(key),
             ) ||
             !/^[a-f0-9]{64}$/u.test(value.sha256)
-        )
-            {throw new Error('Invalid comparison source identity');}
+        ) {
+            throw new Error('Invalid comparison source identity');
+        }
         BrowserScreenshotReceipt.snapshot(
             { ...value.metadata, reference: value.reference },
             value.reference.runId,
