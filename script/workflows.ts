@@ -15,6 +15,8 @@ const files: readonly string[] = [
     'runtime/RunHumanCodec',
     'runtime/RunApprovalTypes',
     'runtime/RunApprovalCodec',
+    'runtime/RunAttentionTypes',
+    'runtime/RunAttentionCodec',
     'runtime/RunArtifactTypes',
     'runtime/RunArtifactCodec',
     'runtime/RunModelTypes',

@@ -1,6 +1,6 @@
 # RPC reference
 
-All 138 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 137 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
+All 139 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 138 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
 
 - [accounts.create](#accounts-create)
 - [accounts.list](#accounts-list)
@@ -95,6 +95,7 @@ All 138 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [voice.audio](#voice-audio)
 - [voice.start](#voice-start)
 - [voice.stop](#voice-stop)
+- [workflows.attention.list](#workflows-attention-list)
 - [workflows.catalog](#workflows-catalog)
 - [workflows.create](#workflows-create)
 - [workflows.delete](#workflows-delete)
@@ -2196,6 +2197,35 @@ Parameters: [VoiceStopParams](protocol.md#voicestopparams).
 | `callId` | Yes      | `string` |             |
 
 Result: [OkResult](protocol.md#okresult).
+
+## workflows.attention.list
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsAttentionList> = {
+    after: {
+        nodeId: null,
+        runId: 'YOUR_RUNID',
+    },
+    category: 'failures',
+    limit: 1,
+};
+const result: ResultOf<typeof Method.WorkflowsAttentionList> = await client.call(
+    Method.WorkflowsAttentionList,
+    params,
+);
+```
+
+Parameters: [WorkflowAttentionQuery](protocol.md#workflowattentionquery).
+
+| Field      | Required | Type                                                                    | Description |
+| ---------- | -------- | ----------------------------------------------------------------------- | ----------- |
+| `after`    | Yes      | [WorkflowAttentionCursor](protocol.md#workflowattentioncursor) / `null` |             |
+| `category` | Yes      | [WorkflowAttentionCategory](protocol.md#workflowattentioncategory)      |             |
+| `limit`    | Yes      | `number`                                                                |             |
+
+Result: [WorkflowAttentionPage](protocol.md#workflowattentionpage).
 
 ## workflows.catalog
 

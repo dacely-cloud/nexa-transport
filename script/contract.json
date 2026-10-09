@@ -4353,6 +4353,18 @@
                     "required": ["params", "result"],
                     "type": "object"
                 },
+                "workflows.attention.list": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/WorkflowAttentionQuery"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/WorkflowAttentionPage"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
                 "workflows.catalog": {
                     "properties": {
                         "params": {
@@ -5004,6 +5016,7 @@
                 "voice.audio",
                 "voice.start",
                 "voice.stop",
+                "workflows.attention.list",
                 "workflows.catalog",
                 "workflows.create",
                 "workflows.delete",
@@ -11611,6 +11624,142 @@
                 "nodeId",
                 "status"
             ],
+            "type": "object"
+        },
+        "WorkflowAttentionCategory": {
+            "description": "Inbox views share authoritative execution records, never copied request state.\nSupported attention sources.",
+            "enum": ["failures", "requests"],
+            "type": "string"
+        },
+        "WorkflowAttentionCursor": {
+            "description": "Stable owner-scoped position, still usable after the preceding request is answered.",
+            "properties": {
+                "nodeId": {
+                    "type": ["null", "string"]
+                },
+                "runId": {
+                    "type": "string"
+                }
+            },
+            "required": ["nodeId", "runId"],
+            "type": "object"
+        },
+        "WorkflowAttentionItem": {
+            "description": "Display metadata points to an exact invocation; proposal bodies are loaded only on review.",
+            "properties": {
+                "canRespond": {
+                    "type": "boolean"
+                },
+                "createdAtMs": {
+                    "type": "string"
+                },
+                "detail": {
+                    "type": "string"
+                },
+                "expiresAtMs": {
+                    "type": ["null", "string"]
+                },
+                "invocationId": {
+                    "type": ["null", "string"]
+                },
+                "kind": {
+                    "enum": ["approval", "failure", "question"],
+                    "type": "string"
+                },
+                "nodeId": {
+                    "type": ["null", "string"]
+                },
+                "recipient": {
+                    "type": "string"
+                },
+                "runId": {
+                    "type": "string"
+                },
+                "status": {
+                    "enum": ["expired", "failed", "pending"],
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "workflowId": {
+                    "type": "string"
+                },
+                "workflowName": {
+                    "type": ["null", "string"]
+                },
+                "workflowRevision": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "canRespond",
+                "createdAtMs",
+                "detail",
+                "expiresAtMs",
+                "invocationId",
+                "kind",
+                "nodeId",
+                "recipient",
+                "runId",
+                "status",
+                "title",
+                "workflowId",
+                "workflowName",
+                "workflowRevision"
+            ],
+            "type": "object"
+        },
+        "WorkflowAttentionPage": {
+            "description": "Stable pagination may return an empty page with a continuation after stale records are filtered.",
+            "properties": {
+                "category": {
+                    "$ref": "#/definitions/WorkflowAttentionCategory"
+                },
+                "items": {
+                    "items": {
+                        "$ref": "#/definitions/WorkflowAttentionItem"
+                    },
+                    "type": "array"
+                },
+                "next": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/WorkflowAttentionCursor"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "observedAtMs": {
+                    "type": "string"
+                }
+            },
+            "required": ["category", "items", "next", "observedAtMs"],
+            "type": "object"
+        },
+        "WorkflowAttentionQuery": {
+            "description": "Bounded metadata query; the authenticated owner is not client input.",
+            "properties": {
+                "after": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/WorkflowAttentionCursor"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "category": {
+                    "$ref": "#/definitions/WorkflowAttentionCategory"
+                },
+                "limit": {
+                    "type": "number"
+                }
+            },
+            "required": ["after", "category", "limit"],
             "type": "object"
         },
         "WorkflowCatalog": {

@@ -1421,6 +1421,7 @@ Configurable bounds on gateway-owned work and memory.
 | `voice.audio`                       | Yes      | Object (fields below) |                                                                                            |
 | `voice.start`                       | Yes      | Object (fields below) |                                                                                            |
 | `voice.stop`                        | Yes      | Object (fields below) |                                                                                            |
+| `workflows.attention.list`          | Yes      | Object (fields below) |                                                                                            |
 | `workflows.catalog`                 | Yes      | Object (fields below) |                                                                                            |
 | `workflows.create`                  | Yes      | Object (fields below) |                                                                                            |
 | `workflows.delete`                  | Yes      | Object (fields below) |                                                                                            |
@@ -2190,6 +2191,13 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ---------------------------------------------- | ----------- |
 | `params` | Yes      | [VoiceStopParams](protocol.md#voicestopparams) |             |
 | `result` | Yes      | [OkResult](protocol.md#okresult)               |             |
+
+**workflows.attention.list**
+
+| Field    | Required | Type                                                         | Description |
+| -------- | -------- | ------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [WorkflowAttentionQuery](protocol.md#workflowattentionquery) |             |
+| `result` | Yes      | [WorkflowAttentionPage](protocol.md#workflowattentionpage)   |             |
 
 **workflows.catalog**
 
@@ -5546,6 +5554,63 @@ Recorded producing identity and public file metadata, without storage identifier
 | `label`        | Yes      | `string`                                                                                                                        |             |
 | `nodeId`       | Yes      | `string`                                                                                                                        |             |
 | `status`       | Yes      | `"cancelled"` / `"failed"` / `"interrupted"` / `"running"` / `"skipped"` / `"succeeded"` / `"uncertain"` / `"waiting"` / `null` |             |
+
+## WorkflowAttentionCategory
+
+Inbox views share authoritative execution records, never copied request state.
+
+Type: `"failures"` / `"requests"`.
+
+## WorkflowAttentionCursor
+
+Stable owner-scoped position, still usable after the preceding request is answered.
+
+| Field    | Required | Type          | Description |
+| -------- | -------- | ------------- | ----------- |
+| `nodeId` | Yes      | `null,string` |             |
+| `runId`  | Yes      | `string`      |             |
+
+## WorkflowAttentionItem
+
+Display metadata points to an exact invocation; proposal bodies are loaded only on review.
+
+| Field              | Required | Type                                      | Description |
+| ------------------ | -------- | ----------------------------------------- | ----------- |
+| `canRespond`       | Yes      | `boolean`                                 |             |
+| `createdAtMs`      | Yes      | `string`                                  |             |
+| `detail`           | Yes      | `string`                                  |             |
+| `expiresAtMs`      | Yes      | `null,string`                             |             |
+| `invocationId`     | Yes      | `null,string`                             |             |
+| `kind`             | Yes      | `"approval"` / `"failure"` / `"question"` |             |
+| `nodeId`           | Yes      | `null,string`                             |             |
+| `recipient`        | Yes      | `string`                                  |             |
+| `runId`            | Yes      | `string`                                  |             |
+| `status`           | Yes      | `"expired"` / `"failed"` / `"pending"`    |             |
+| `title`            | Yes      | `string`                                  |             |
+| `workflowId`       | Yes      | `string`                                  |             |
+| `workflowName`     | Yes      | `null,string`                             |             |
+| `workflowRevision` | Yes      | `string`                                  |             |
+
+## WorkflowAttentionPage
+
+Stable pagination may return an empty page with a continuation after stale records are filtered.
+
+| Field          | Required | Type                                                                    | Description |
+| -------------- | -------- | ----------------------------------------------------------------------- | ----------- |
+| `category`     | Yes      | [WorkflowAttentionCategory](protocol.md#workflowattentioncategory)      |             |
+| `items`        | Yes      | Array of [WorkflowAttentionItem](protocol.md#workflowattentionitem)     |             |
+| `next`         | Yes      | [WorkflowAttentionCursor](protocol.md#workflowattentioncursor) / `null` |             |
+| `observedAtMs` | Yes      | `string`                                                                |             |
+
+## WorkflowAttentionQuery
+
+Bounded metadata query; the authenticated owner is not client input.
+
+| Field      | Required | Type                                                                    | Description |
+| ---------- | -------- | ----------------------------------------------------------------------- | ----------- |
+| `after`    | Yes      | [WorkflowAttentionCursor](protocol.md#workflowattentioncursor) / `null` |             |
+| `category` | Yes      | [WorkflowAttentionCategory](protocol.md#workflowattentioncategory)      |             |
+| `limit`    | Yes      | `number`                                                                |             |
 
 ## WorkflowCatalog
 
