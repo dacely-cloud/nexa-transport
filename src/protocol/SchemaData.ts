@@ -4390,6 +4390,18 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'workflows.records': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/WorkflowRecordsRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/WorkflowRecordsPage',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'workflows.runs.agent.control': {
                     properties: {
                         params: {
@@ -4792,6 +4804,7 @@ export const schema: Schema = {
                 'workflows.planning.sources',
                 'workflows.read',
                 'workflows.record',
+                'workflows.records',
                 'workflows.runs.agent.control',
                 'workflows.runs.agent.input',
                 'workflows.runs.agent.read',
@@ -12420,6 +12433,40 @@ export const schema: Schema = {
                 },
             },
             required: ['offset', 'reference', 'workflowId'],
+            type: 'object',
+        },
+        WorkflowRecordsPage: {
+            description:
+                'The response remains bounded even when a selected record contains a large prompt.',
+            properties: {
+                records: {
+                    items: {
+                        $ref: '#/definitions/WorkflowRecordPage',
+                    },
+                    type: 'array',
+                },
+                workflowId: {
+                    type: 'string',
+                },
+            },
+            required: ['records', 'workflowId'],
+            type: 'object',
+        },
+        WorkflowRecordsRequest: {
+            description:
+                'Batches first pages of immutable values; larger records continue through workflows.record.',
+            properties: {
+                references: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                workflowId: {
+                    type: 'string',
+                },
+            },
+            required: ['references', 'workflowId'],
             type: 'object',
         },
         WorkflowRunArtifact: {

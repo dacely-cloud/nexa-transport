@@ -26,6 +26,8 @@ export interface WorkflowValidateRequest {
 export const WorkflowGatewayLimits = {
     patchBytes: 1_048_576,
     textChunkCharacters: 65_536,
+    recordBatch: 32,
+    recordBatchChunkCharacters: 2048,
     manifestNodes: 128,
     manifestEdges: 256,
     manifestGroups: 128,
@@ -86,6 +88,16 @@ export interface WorkflowRecordRequest {
     readonly workflowId: string;
     readonly reference: string;
     readonly offset: number;
+}
+/** Batches first pages of immutable values; larger records continue through workflows.record. */
+export interface WorkflowRecordsRequest {
+    readonly workflowId: string;
+    readonly references: readonly string[];
+}
+/** The response remains bounded even when a selected record contains a large prompt. */
+export interface WorkflowRecordsPage {
+    readonly workflowId: string;
+    readonly records: readonly WorkflowRecordPage[];
 }
 /** JSON text chunks are concatenated before parsing. Offsets count UTF-16 code units. */
 export interface WorkflowRecordPage {

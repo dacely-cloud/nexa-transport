@@ -4,6 +4,7 @@
 import { WorkflowInput } from './WorkflowInput.js';
 import { WorkflowCodec } from './WorkflowCodec.js';
 import { ResourceBindingCodec } from './ResourceBindingCodec.js';
+import { WorkflowGatewayLimits } from './WorkflowRequests.js';
 import type {
     WorkflowCreateRequest,
     WorkflowSaveRequest,
@@ -11,6 +12,7 @@ import type {
     WorkflowListRequest,
     WorkflowReadRequest,
     WorkflowRecordRequest,
+    WorkflowRecordsRequest,
     WorkflowValidateRequest,
 } from './WorkflowRequests.js';
 import type { WorkflowListCursor } from './WorkflowTypes.js';
@@ -138,6 +140,23 @@ export class WorkflowRequestCodec {
             reference: WorkflowInput.id(input['reference']),
             offset: this.offset(input['offset'], 1_073_741_824),
         });
+    }
+    /** Reads a bounded unique selection without accepting an owner override. */
+    public static records(raw: unknown): WorkflowRecordsRequest {
+        const input: Readonly<Record<string, unknown>> = WorkflowInput.record(raw, [
+            'workflowId',
+            'references',
+        ]);
+        const references: readonly string[] = WorkflowInput.list(
+            input['references'],
+            WorkflowGatewayLimits.recordBatch,
+            (entry: unknown): string => WorkflowInput.id(entry),
+        );
+        if (references.length === 0) {
+            throw new Error('Select at least one workflow record');
+        }
+        WorkflowInput.unique(references);
+        return Object.freeze({ workflowId: WorkflowInput.id(input['workflowId']), references });
     }
     /** Offsets are bounded local collection/string indices, never external integer identities. */
     public static offset(raw: unknown, maximum: number): number {

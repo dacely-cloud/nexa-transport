@@ -2858,6 +2858,14 @@ export interface GatewayMethodsworkflows_recordShape {
     readonly result: WorkflowRecordPage;
 }
 
+/** GatewayMethodsworkflows_records wire fields. */
+export interface GatewayMethodsworkflows_recordsShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkflowRecordsRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WorkflowRecordsPage;
+}
+
 /** GatewayMethodsworkflows_runs_agent_control wire fields. */
 export interface GatewayMethodsworkflows_runs_agent_controlShape {
     /** params as defined by the Nexa gateway. */
@@ -3260,6 +3268,8 @@ export interface GatewayMethodsShape {
     readonly 'workflows.read': GatewayMethodsworkflows_readShape;
     /** workflows.record as defined by the Nexa gateway. */
     readonly 'workflows.record': GatewayMethodsworkflows_recordShape;
+    /** workflows.records as defined by the Nexa gateway. */
+    readonly 'workflows.records': GatewayMethodsworkflows_recordsShape;
     /** workflows.runs.agent.control as defined by the Nexa gateway. */
     readonly 'workflows.runs.agent.control': GatewayMethodsworkflows_runs_agent_controlShape;
     /** workflows.runs.agent.input as defined by the Nexa gateway. */
@@ -8210,6 +8220,28 @@ export interface WorkflowRecordRequestShape {
 /** WorkflowRecordRequest from the Nexa wire protocol. */
 export type WorkflowRecordRequest = WorkflowRecordRequestShape;
 
+/** WorkflowRecordsPage wire fields. */
+export interface WorkflowRecordsPageShape {
+    /** records as defined by the Nexa gateway. */
+    readonly records: ReadonlyArray<WorkflowRecordPage>;
+    /** workflowId as defined by the Nexa gateway. */
+    readonly workflowId: string;
+}
+
+/** WorkflowRecordsPage from the Nexa wire protocol. */
+export type WorkflowRecordsPage = WorkflowRecordsPageShape;
+
+/** WorkflowRecordsRequest wire fields. */
+export interface WorkflowRecordsRequestShape {
+    /** references as defined by the Nexa gateway. */
+    readonly references: ReadonlyArray<string>;
+    /** workflowId as defined by the Nexa gateway. */
+    readonly workflowId: string;
+}
+
+/** WorkflowRecordsRequest from the Nexa wire protocol. */
+export type WorkflowRecordsRequest = WorkflowRecordsRequestShape;
+
 /** WorkflowRunArtifact wire fields. */
 export interface WorkflowRunArtifactShape {
     /** artifactId as defined by the Nexa gateway. */
@@ -9091,6 +9123,8 @@ export enum Method {
     WorkflowsRead = 'workflows.read',
     /** Calls workflows.record. */
     WorkflowsRecord = 'workflows.record',
+    /** Calls workflows.records. */
+    WorkflowsRecords = 'workflows.records',
     /** Calls workflows.runs.agent.control. */
     WorkflowsRunsAgentControl = 'workflows.runs.agent.control',
     /** Calls workflows.runs.agent.input. */
