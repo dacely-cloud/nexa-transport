@@ -2482,6 +2482,274 @@ export const schema: Schema = {
             enum: ['resources', 'scripts', 'source'],
             type: 'string',
         },
+        BrowserStorageChange: {
+            description:
+                'Stable comparison ordinals refer to the original saved rows without returning their values.',
+            properties: {
+                after: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/BrowserStorageRow',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                before: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/BrowserStorageRow',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                change: {
+                    $ref: '#/definitions/BrowserStorageChangeKind',
+                },
+                group: {
+                    $ref: '#/definitions/BrowserStorageGroup',
+                },
+                id: {
+                    type: 'string',
+                },
+            },
+            required: ['after', 'before', 'change', 'group', 'id'],
+            type: 'object',
+        },
+        BrowserStorageChangeKind: {
+            description:
+                'Absence becomes a change only when both inventories are complete.\nA proven difference between admissible saved rows.',
+            enum: ['added', 'modified', 'removed'],
+            type: 'string',
+        },
+        BrowserStorageCompareMode: {
+            description:
+                'Independent opt-ins determine whether content or only a name inventory can be compared.\nSelected comparison authority for one store.',
+            enum: ['fingerprints', 'names', 'unavailable'],
+            type: 'string',
+        },
+        BrowserStorageCompareStatus: {
+            description:
+                'Matching observations prove equality only within their declared complete coverage.\nOne storage comparison outcome independent of whether its detail list was retained in full.',
+            enum: ['changed', 'unchanged', 'unknown'],
+            type: 'string',
+        },
+        BrowserStorageComparison: {
+            description:
+                'Progress includes counters and provenance while changes stay in independently paged evidence.',
+            properties: {
+                after: {
+                    $ref: '#/definitions/BrowserStorageComparisonSource',
+                },
+                algorithm: {
+                    const: 'storage-observations-v1',
+                    type: 'string',
+                },
+                before: {
+                    $ref: '#/definitions/BrowserStorageComparisonSource',
+                },
+                complete: {
+                    type: 'boolean',
+                },
+                detailsComplete: {
+                    type: 'boolean',
+                },
+                groups: {
+                    $ref: '#/definitions/Record%3CBrowserStorageGroup%2CBrowserStorageGroupComparison%3E',
+                },
+                limitations: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                quota: {
+                    $ref: '#/definitions/BrowserStorageQuotaComparison',
+                },
+                status: {
+                    $ref: '#/definitions/BrowserStorageCompareStatus',
+                },
+            },
+            required: [
+                'after',
+                'algorithm',
+                'before',
+                'complete',
+                'detailsComplete',
+                'groups',
+                'limitations',
+                'quota',
+                'status',
+            ],
+            type: 'object',
+        },
+        BrowserStorageComparisonPage: {
+            description:
+                'Header reads contain no changes; store reads return at most twenty directly indexed differences.',
+            properties: {
+                captureSha256: {
+                    type: 'string',
+                },
+                changes: {
+                    items: {
+                        $ref: '#/definitions/BrowserStorageChange',
+                    },
+                    type: 'array',
+                },
+                comparison: {
+                    $ref: '#/definitions/BrowserStorageComparison',
+                },
+                cursor: {
+                    type: 'string',
+                },
+                evidenceId: {
+                    type: 'string',
+                },
+                group: {
+                    anyOf: [
+                        {
+                            enum: [
+                                'cache-storage',
+                                'cookies',
+                                'indexed-db',
+                                'local-storage',
+                                'session-storage',
+                            ],
+                            type: 'string',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                nextCursor: {
+                    type: ['null', 'string'],
+                },
+                runId: {
+                    type: 'string',
+                },
+                sha256: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'captureSha256',
+                'changes',
+                'comparison',
+                'cursor',
+                'evidenceId',
+                'group',
+                'nextCursor',
+                'runId',
+                'sha256',
+            ],
+            type: 'object',
+        },
+        BrowserStorageComparisonQuery: {
+            description:
+                'A comparison directory selects one store and a retained-change ordinal, independently from text offsets.',
+            properties: {
+                cursor: {
+                    type: 'string',
+                },
+                evidenceId: {
+                    type: 'string',
+                },
+                group: {
+                    description:
+                        'Each storage authority has independently reported coverage.\nFinite storage authorities admitted by passive capture and saved row queries.',
+                    enum: [
+                        'cache-storage',
+                        'cookies',
+                        'indexed-db',
+                        'local-storage',
+                        'session-storage',
+                    ],
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                runId: {
+                    type: 'string',
+                },
+            },
+            required: ['evidenceId', 'id', 'runId'],
+            type: 'object',
+        },
+        BrowserStorageComparisonSnapshot: {
+            description:
+                'Archived progress binds the report itself independently of its two source captures.',
+            properties: {
+                after: {
+                    $ref: '#/definitions/BrowserStorageComparisonSource',
+                },
+                algorithm: {
+                    const: 'storage-observations-v1',
+                    type: 'string',
+                },
+                before: {
+                    $ref: '#/definitions/BrowserStorageComparisonSource',
+                },
+                complete: {
+                    type: 'boolean',
+                },
+                detailsComplete: {
+                    type: 'boolean',
+                },
+                groups: {
+                    $ref: '#/definitions/Record%3CBrowserStorageGroup%2CBrowserStorageGroupComparison%3E',
+                },
+                limitations: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                quota: {
+                    $ref: '#/definitions/BrowserStorageQuotaComparison',
+                },
+                reference: {
+                    $ref: '#/definitions/ReverseBrowserReference',
+                },
+                status: {
+                    $ref: '#/definitions/BrowserStorageCompareStatus',
+                },
+            },
+            required: [
+                'after',
+                'algorithm',
+                'before',
+                'complete',
+                'detailsComplete',
+                'groups',
+                'limitations',
+                'quota',
+                'reference',
+                'status',
+            ],
+            type: 'object',
+        },
+        BrowserStorageComparisonSource: {
+            description:
+                'Body-free source provenance retains the independent run and original capture hashes.',
+            properties: {
+                metadata: {
+                    $ref: '#/definitions/BrowserStorageMetadata',
+                },
+                reference: {
+                    $ref: '#/definitions/ReverseBrowserReference',
+                },
+                sha256: {
+                    type: 'string',
+                },
+            },
+            required: ['metadata', 'reference', 'sha256'],
+            type: 'object',
+        },
         BrowserStorageCoverage: {
             description: 'Omitted rows or observed mutations prevent completeness claims.',
             properties: {
@@ -2519,6 +2787,63 @@ export const schema: Schema = {
                 'Each storage authority has independently reported coverage.\nFinite storage authorities admitted by passive capture and saved row queries.',
             enum: ['cache-storage', 'cookies', 'indexed-db', 'local-storage', 'session-storage'],
             type: 'string',
+        },
+        BrowserStorageGroupComparison: {
+            description:
+                'Decimal counts cover all proven differences even if the bounded detail inventory is truncated.',
+            properties: {
+                added: {
+                    type: 'string',
+                },
+                ambiguousIdentities: {
+                    type: 'string',
+                },
+                complete: {
+                    type: 'boolean',
+                },
+                mode: {
+                    $ref: '#/definitions/BrowserStorageCompareMode',
+                },
+                modified: {
+                    type: 'string',
+                },
+                omittedChanges: {
+                    type: 'string',
+                },
+                reason: {
+                    type: ['null', 'string'],
+                },
+                removed: {
+                    type: 'string',
+                },
+                retainedChanges: {
+                    type: 'string',
+                },
+                status: {
+                    $ref: '#/definitions/BrowserStorageCompareStatus',
+                },
+                totalChanges: {
+                    type: 'string',
+                },
+                unchanged: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'added',
+                'ambiguousIdentities',
+                'complete',
+                'mode',
+                'modified',
+                'omittedChanges',
+                'reason',
+                'removed',
+                'retainedChanges',
+                'status',
+                'totalChanges',
+                'unchanged',
+            ],
+            type: 'object',
         },
         BrowserStorageKind: {
             description:
@@ -2704,6 +3029,23 @@ export const schema: Schema = {
                 },
             },
             required: ['available', 'quotaBytes', 'usageBytes'],
+            type: 'object',
+        },
+        BrowserStorageQuotaComparison: {
+            description:
+                'Byte deltas are exact signed integers and are available only for the same reported origin.',
+            properties: {
+                quotaDeltaBytes: {
+                    type: ['null', 'string'],
+                },
+                status: {
+                    $ref: '#/definitions/BrowserStorageCompareStatus',
+                },
+                usageDeltaBytes: {
+                    type: ['null', 'string'],
+                },
+            },
+            required: ['quotaDeltaBytes', 'status', 'usageDeltaBytes'],
             type: 'object',
         },
         BrowserStorageRow: {
@@ -6001,6 +6343,18 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'reverse.browser.storage.comparison': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/BrowserStorageComparisonQuery',
+                        },
+                        result: {
+                            $ref: '#/definitions/BrowserStorageComparisonPage',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'reverse.browser.structure': {
                     properties: {
                         params: {
@@ -7341,6 +7695,7 @@ export const schema: Schema = {
                 'reverse.browser.screenshot',
                 'reverse.browser.sources',
                 'reverse.browser.storage',
+                'reverse.browser.storage.comparison',
                 'reverse.browser.structure',
                 'reverse.catalog',
                 'reverse.evidence',
@@ -10522,6 +10877,33 @@ export const schema: Schema = {
             ],
             type: 'object',
         },
+        'Record<BrowserStorageGroup,BrowserStorageGroupComparison>': {
+            properties: {
+                'cache-storage': {
+                    $ref: '#/definitions/BrowserStorageGroupComparison',
+                },
+                cookies: {
+                    $ref: '#/definitions/BrowserStorageGroupComparison',
+                },
+                'indexed-db': {
+                    $ref: '#/definitions/BrowserStorageGroupComparison',
+                },
+                'local-storage': {
+                    $ref: '#/definitions/BrowserStorageGroupComparison',
+                },
+                'session-storage': {
+                    $ref: '#/definitions/BrowserStorageGroupComparison',
+                },
+            },
+            required: [
+                'cache-storage',
+                'cookies',
+                'indexed-db',
+                'local-storage',
+                'session-storage',
+            ],
+            type: 'object',
+        },
         'Record<string,Scope>': {
             type: 'object',
             additionalProperties: {
@@ -11974,6 +12356,11 @@ export const schema: Schema = {
                     $ref: '#/definitions/BrowserStorageSnapshot',
                     description:
                         'Progress identifies a saved redacted capture without embedding its rows.',
+                },
+                browserStorageComparison: {
+                    $ref: '#/definitions/BrowserStorageComparisonSnapshot',
+                    description:
+                        'Archived progress binds the report itself independently of its two source captures.',
                 },
                 browserStructure: {
                     $ref: '#/definitions/BrowserStructureSnapshot',
@@ -17811,6 +18198,9 @@ export const schema: Schema = {
         reverseBrowserStorage: {
             $ref: '#/definitions/BrowserStoragePage',
         },
+        reverseBrowserStorageComparison: {
+            $ref: '#/definitions/BrowserStorageComparisonPage',
+        },
         reverseBrowserStructure: {
             $ref: '#/definitions/BrowserStructurePage',
         },
@@ -17871,6 +18261,7 @@ export const schema: Schema = {
         'reverseBrowserScreenshot',
         'reverseBrowserSources',
         'reverseBrowserStorage',
+        'reverseBrowserStorageComparison',
         'reverseBrowserStructure',
         'reverseCatalog',
         'reverseEvidence',
