@@ -229,4 +229,3 @@ it('returns a complete cursor and reads only records after a prior snapshot', as
     });
     expect(gateway?.requests[1]?.params['cursor']).toBe(Buffer.byteLength(prefix).toString());
 });
-
