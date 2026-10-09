@@ -294,6 +294,32 @@ describe('native investigation transport', (): void => {
         ).toThrow('identity');
     });
 
+    it('accepts explicit resume epochs and cumulative attempts while rejecting stale execution and completed revival', (): void => {
+        const stopped: ReverseRunSnapshot = { ...snapshot('5'), state: 'cancelled' };
+        const resumed: ReverseRunSnapshot = {
+            ...snapshot('6'),
+            execution: 1,
+            tasks: snapshot().tasks.map((task) => ({ ...task, attempts: 3 })),
+        };
+        expect(ReverseInvestigation.advance(stopped, resumed)).toBe(resumed);
+        const late: ReverseRunSnapshot = { ...snapshot('7'), state: 'cancelled' };
+        expect(ReverseInvestigation.advance(resumed, late)).toBe(resumed);
+        for (const execution of [-1, 0.5, 4]) {
+            expect((): ReverseRunSnapshot =>
+                ReverseInvestigation.parse({ ...resumed, execution }),
+            ).toThrow();
+        }
+        expect((): ReverseRunSnapshot =>
+            ReverseInvestigation.parse({
+                ...resumed,
+                tasks: resumed.tasks.map((task) => ({ ...task, attempts: 7 })),
+            }),
+        ).toThrow();
+        expect((): ReverseRunSnapshot =>
+            ReverseInvestigation.advance({ ...stopped, state: 'done' }, resumed),
+        ).toThrow('Completed');
+    });
+
     it('preserves plan, specialist failures and evidence across websocket progress and final outcomes', async (): Promise<void> => {
         gateway = new TestGateway();
         client = await NexaClient.connect({ url: await gateway.url(), reconnect: false });

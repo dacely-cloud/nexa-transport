@@ -45,6 +45,10 @@ export class ReverseInvestigation {
         }
         if (
             input.version !== 1 ||
+            (input.execution !== undefined &&
+                (!Number.isSafeInteger(input.execution) ||
+                    input.execution < 0 ||
+                    input.execution > 3)) ||
             (input.archive !== undefined &&
                 (input.archive.sessionId.length === 0 || input.archive.sessionId.length > 1024)) ||
             !/^[0-9]{1,40}$/u.test(input.revision) ||
@@ -100,7 +104,7 @@ export class ReverseInvestigation {
                     step.dependsOn.length > 6 ||
                     new Set(step.dependsOn).size !== step.dependsOn.length ||
                     step.dependsOn.some((id: string): boolean => !steps.has(id)) ||
-                    this.#invalidTask(step),
+                    this.#invalidTask(step, Math.min(2 * ((input.execution ?? 0) + 1), 6)),
             ) ||
             input.tasks.some(
                 (task): boolean =>
@@ -109,7 +113,7 @@ export class ReverseInvestigation {
                     task.dependsOn.some(
                         (id: string): boolean => !experts.has(id) || id === task.expert,
                     ) ||
-                    this.#invalidTask(task),
+                    this.#invalidTask(task, Math.min(2 * ((input.execution ?? 0) + 1), 6)),
             ) ||
             input.evidence.some(
                 (record): boolean =>
@@ -143,11 +147,11 @@ export class ReverseInvestigation {
         return NavigationReceipt.inspection(input);
     }
 
-    static #invalidTask(task: ReverseTaskSnapshot): boolean {
+    static #invalidTask(task: ReverseTaskSnapshot, maximum: number): boolean {
         return (
             !Number.isSafeInteger(task.attempts) ||
             task.attempts < 0 ||
-            task.attempts > 2 ||
+            task.attempts > maximum ||
             (task.report !== null && task.report.length > 3000) ||
             (task.error !== null && task.error.length > 2000) ||
             (task.startedAtMs !== null && !/^[0-9]{1,40}$/u.test(task.startedAtMs)) ||
@@ -210,7 +214,19 @@ export class ReverseInvestigation {
         if (BigInt(next.revision) <= BigInt(previous.revision)) {
             return previous;
         }
-        if (previous.state !== 'pending' && previous.state !== 'running') {
+        const previousExecution: number = previous.execution ?? 0;
+        const nextExecution: number = next.execution ?? 0;
+        if (nextExecution < previousExecution) {
+            return previous;
+        }
+        if (nextExecution > previousExecution && previous.state === 'done') {
+            throw new Error('Completed investigation cannot resume execution');
+        }
+        if (
+            nextExecution === previousExecution &&
+            previous.state !== 'pending' &&
+            previous.state !== 'running'
+        ) {
             return previous;
         }
         return next;
