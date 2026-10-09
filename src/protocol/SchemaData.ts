@@ -13181,6 +13181,27 @@ export const schema: Schema = {
             required: ['checkedAt', 'refreshAvailable', 'refreshFailed'],
             type: 'object',
         },
+        WorkflowCompletionTiming: {
+            description:
+                'One run at a time, followed by a delay from its persisted terminal transition.',
+            properties: {
+                endAtMs: {
+                    type: ['null', 'string'],
+                },
+                intervalMs: {
+                    type: 'string',
+                },
+                kind: {
+                    const: 'after-completion',
+                    type: 'string',
+                },
+                startAtMs: {
+                    type: 'string',
+                },
+            },
+            required: ['endAtMs', 'intervalMs', 'kind', 'startAtMs'],
+            type: 'object',
+        },
         WorkflowCreateRequest: {
             description: 'Client-chosen identities make an unacknowledged create safe to retry.',
             properties: {
@@ -15429,6 +15450,9 @@ export const schema: Schema = {
                 },
                 {
                     $ref: '#/definitions/WorkflowOnceTiming',
+                },
+                {
+                    $ref: '#/definitions/WorkflowCompletionTiming',
                 },
             ],
             description: 'Supported timing forms, with inclusive start and end instants.',

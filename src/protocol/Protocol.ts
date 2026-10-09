@@ -8687,6 +8687,21 @@ export interface WorkflowCatalogObservationShape {
 /** WorkflowCatalogObservation from the Nexa wire protocol. */
 export type WorkflowCatalogObservation = WorkflowCatalogObservationShape;
 
+/** WorkflowCompletionTiming wire fields. */
+export interface WorkflowCompletionTimingShape {
+    /** endAtMs as defined by the Nexa gateway. */
+    readonly endAtMs: null | string;
+    /** intervalMs as defined by the Nexa gateway. */
+    readonly intervalMs: string;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: 'after-completion';
+    /** startAtMs as defined by the Nexa gateway. */
+    readonly startAtMs: string;
+}
+
+/** WorkflowCompletionTiming from the Nexa wire protocol. */
+export type WorkflowCompletionTiming = WorkflowCompletionTimingShape;
+
 /** WorkflowCreateRequest wire fields. */
 export interface WorkflowCreateRequestShape {
     /** commandId as defined by the Nexa gateway. */
@@ -10212,7 +10227,7 @@ export type WorkflowScheduleStatus =
 
 /** WorkflowScheduleTiming from the Nexa wire protocol. */
 export type WorkflowScheduleTiming =
-    WorkflowCalendarTiming | WorkflowIntervalTiming | WorkflowOnceTiming;
+    WorkflowCalendarTiming | WorkflowIntervalTiming | WorkflowOnceTiming | WorkflowCompletionTiming;
 
 /** WorkflowScheduleView wire fields. */
 export interface WorkflowScheduleViewShape {

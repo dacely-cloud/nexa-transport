@@ -8,6 +8,7 @@ import {
     WorkflowScheduleKind,
     WorkflowScheduleMissed,
     type WorkflowScheduleTiming,
+    type WorkflowCompletionTiming,
     type WorkflowScheduleConfiguration,
 } from './ScheduleTypes.js';
 
@@ -28,10 +29,23 @@ export class WorkflowScheduleTimes {
         if (timing.kind === WorkflowScheduleKind.Once) {
             return BigInt(timing.atMs) > after ? timing.atMs : null;
         }
+        if (timing.kind === WorkflowScheduleKind.Completion) {
+            return after < BigInt(timing.startAtMs)
+                ? timing.startAtMs
+                : this.completed(timing, after);
+        }
         const start: bigint = BigInt(timing.startAtMs);
         const interval: bigint = BigInt(timing.intervalMs);
         const next: bigint =
             after < start ? start : start + ((after - start) / interval + 1n) * interval;
+        return next > 8_640_000_000_000_000n ||
+            (timing.endAtMs !== null && next > BigInt(timing.endAtMs))
+            ? null
+            : next.toString();
+    }
+    /** Terminal run timestamps anchor the next delay, regardless of when recovery notices completion. */
+    public static completed(timing: WorkflowCompletionTiming, finishedAt: bigint): string | null {
+        const next: bigint = finishedAt + BigInt(timing.intervalMs);
         return next > 8_640_000_000_000_000n ||
             (timing.endAtMs !== null && next > BigInt(timing.endAtMs))
             ? null
@@ -47,6 +61,9 @@ export class WorkflowScheduleTimes {
                 break;
             }
             times.push(next);
+            if (timing.kind === WorkflowScheduleKind.Completion) {
+                break;
+            }
             cursor = BigInt(next);
         }
         return times;
@@ -65,6 +82,16 @@ export class WorkflowScheduleTimes {
         const timing: WorkflowScheduleTiming = configuration.timing;
         if (timing.kind === WorkflowScheduleKind.Calendar) {
             return WorkflowCalendarBatches.due(configuration, timing, firstMs, now, recovery);
+        }
+        if (timing.kind === WorkflowScheduleKind.Completion) {
+            const skip: boolean =
+                configuration.missed === WorkflowScheduleMissed.Skip &&
+                now - first > BigInt(configuration.lateGraceMs);
+            return {
+                pending: skip ? [] : [firstMs],
+                nextAtMs: skip ? this.completed(timing, now) : null,
+                skipped: skip ? '1' : '0',
+            };
         }
         const interval: bigint =
             timing.kind === WorkflowScheduleKind.Once ? 1n : BigInt(timing.intervalMs);

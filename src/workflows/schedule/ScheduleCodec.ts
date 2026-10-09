@@ -48,8 +48,11 @@ export class WorkflowScheduleCodec {
         if (value['kind'] === WorkflowScheduleKind.Once) {
             return { kind: WorkflowScheduleKind.Once, atMs: this.instant(value['atMs']) };
         }
-        if (value['kind'] !== WorkflowScheduleKind.Interval) {
-            throw new Error('Select an interval or one-time schedule');
+        if (
+            value['kind'] !== WorkflowScheduleKind.Interval &&
+            value['kind'] !== WorkflowScheduleKind.Completion
+        ) {
+            throw new Error('Choose a supported schedule timing mode');
         }
         const startAtMs: string = this.instant(value['startAtMs']);
         const endAtMs: string | null =
@@ -61,7 +64,7 @@ export class WorkflowScheduleCodec {
         if (endAtMs !== null && BigInt(endAtMs) < BigInt(startAtMs)) {
             throw new Error('Schedule end must be at or after its start');
         }
-        return { kind: WorkflowScheduleKind.Interval, startAtMs, intervalMs, endAtMs };
+        return { kind: value['kind'], startAtMs, intervalMs, endAtMs };
     }
     /** Bounded recovery and overlap are part of the owner's reviewed activation. */
     public static configuration(raw: unknown): WorkflowScheduleConfiguration {
@@ -113,13 +116,24 @@ export class WorkflowScheduleCodec {
         if (BigInt(lateGraceMs) < 1_000n || BigInt(lateGraceMs) > 300_000n) {
             throw new Error('Schedule lateness grace must be between one second and five minutes');
         }
-        return {
+        const rules: WorkflowScheduleRules = {
             timing: this.timing(value['timing']),
             missed,
             catchUpLimit: this.#count(value['catchUpLimit'], 20),
             lateGraceMs,
             maxConcurrentRuns: this.#count(value['maxConcurrentRuns'], 32),
         };
+        if (
+            rules.timing.kind === WorkflowScheduleKind.Completion &&
+            (rules.maxConcurrentRuns !== 1 ||
+                rules.catchUpLimit !== 1 ||
+                rules.missed === WorkflowScheduleMissed.CatchUp)
+        ) {
+            throw new Error(
+                'After-completion timing requires one run at a time and a recovery limit of one. Choose skip or run the missed occurrence.',
+            );
+        }
+        return rules;
     }
     /** A missing schedule has revision zero; every enable/disable creates a new revision. */
     public static command(raw: unknown): WorkflowScheduleCommand {

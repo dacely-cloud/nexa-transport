@@ -110,3 +110,30 @@ it('ships a real Timed Event contract and rejects activation rules that differ f
         WorkflowTimedTrigger.assert(snapshot, { ...configuration, missed: 'latest' }),
     ).toThrow('does not match');
 });
+
+it('carries completion-relative timing and refuses policy combinations that would imply overlapping runs', (): void => {
+    const configuration: WorkflowScheduleConfiguration = {
+        publicationId: 'release',
+        input: {},
+        timing: { kind: 'after-completion', startAtMs: '0', intervalMs: '60001', endAtMs: null },
+        missed: 'latest',
+        catchUpLimit: 1,
+        maxConcurrentRuns: 1,
+        lateGraceMs: '1001',
+    };
+    const request: WorkflowScheduleEnable = {
+        workflowId: 'workflow',
+        commandId: 'enable',
+        expectedRevision: '0',
+        configuration,
+    };
+    expect(methodValidators[Method.WorkflowsSchedulesEnable].params(request)).toBe(true);
+    expect(WorkflowScheduleCodec.enable(request)).toEqual(request);
+    expect(WorkflowScheduleTimes.preview(configuration.timing, 100n)).toEqual(['60101']);
+    expect((): WorkflowScheduleEnable =>
+        WorkflowScheduleCodec.enable({
+            ...request,
+            configuration: { ...configuration, maxConcurrentRuns: 2 },
+        }),
+    ).toThrow('one run at a time');
+});

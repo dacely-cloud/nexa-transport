@@ -4,18 +4,26 @@
 import type { WorkflowCalendarTiming } from './CalendarTypes.js';
 import type { WorkflowObject } from '../WorkflowTypes.js';
 
-/** Fixed elapsed intervals are anchored to an instant; they never drift with run completion. */
+/** Fixed schedules and completion-relative delays have distinct activation semantics. */
 export const WorkflowScheduleKind = {
     Interval: 'interval',
     Once: 'once',
     Calendar: 'calendar',
+    Completion: 'after-completion',
 } as const;
 /** Supported timing forms, with inclusive start and end instants. */
 export type WorkflowScheduleTiming =
-    WorkflowIntervalTiming | WorkflowOnceTiming | WorkflowCalendarTiming;
+    WorkflowIntervalTiming | WorkflowOnceTiming | WorkflowCalendarTiming | WorkflowCompletionTiming;
 /** Millisecond strings preserve exact instants across transport and MongoDB. */
 export interface WorkflowIntervalTiming {
     readonly kind: typeof WorkflowScheduleKind.Interval;
+    readonly startAtMs: string;
+    readonly intervalMs: string;
+    readonly endAtMs: string | null;
+}
+/** One run at a time, followed by a delay from its persisted terminal transition. */
+export interface WorkflowCompletionTiming {
+    readonly kind: typeof WorkflowScheduleKind.Completion;
     readonly startAtMs: string;
     readonly intervalMs: string;
     readonly endAtMs: string | null;
