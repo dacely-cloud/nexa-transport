@@ -4393,6 +4393,22 @@ export interface GatewayMethodsvoice_stopShape {
     readonly result: OkResult;
 }
 
+/** GatewayMethodsworkflows_agents_list wire fields. */
+export interface GatewayMethodsworkflows_agents_listShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkflowAgentListRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WorkflowAgentList;
+}
+
+/** GatewayMethodsworkflows_agents_pin wire fields. */
+export interface GatewayMethodsworkflows_agents_pinShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkflowAgentPinRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WorkflowAgentPin;
+}
+
 /** GatewayMethodsworkflows_attention_list wire fields. */
 export interface GatewayMethodsworkflows_attention_listShape {
     /** params as defined by the Nexa gateway. */
@@ -5065,6 +5081,10 @@ export interface GatewayMethodsShape {
     readonly 'voice.start': GatewayMethodsvoice_startShape;
     /** voice.stop as defined by the Nexa gateway. */
     readonly 'voice.stop': GatewayMethodsvoice_stopShape;
+    /** workflows.agents.list as defined by the Nexa gateway. */
+    readonly 'workflows.agents.list': GatewayMethodsworkflows_agents_listShape;
+    /** workflows.agents.pin as defined by the Nexa gateway. */
+    readonly 'workflows.agents.pin': GatewayMethodsworkflows_agents_pinShape;
     /** workflows.attention.list as defined by the Nexa gateway. */
     readonly 'workflows.attention.list': GatewayMethodsworkflows_attention_listShape;
     /** workflows.catalog as defined by the Nexa gateway. */
@@ -9452,6 +9472,50 @@ export const WorkflowAgentInputStatusValues = {
 export type WorkflowAgentInputStatus =
     (typeof WorkflowAgentInputStatusValues)[keyof typeof WorkflowAgentInputStatusValues];
 
+/** WorkflowAgentList wire fields. */
+export interface WorkflowAgentListShape {
+    /** agents as defined by the Nexa gateway. */
+    readonly agents: ReadonlyArray<WorkflowAgentVersion>;
+    /** workflowId as defined by the Nexa gateway. */
+    readonly workflowId: string;
+}
+
+/** WorkflowAgentList from the Nexa wire protocol. */
+export type WorkflowAgentList = WorkflowAgentListShape;
+
+/** WorkflowAgentListRequest wire fields. */
+export interface WorkflowAgentListRequestShape {
+    /** workflowId as defined by the Nexa gateway. */
+    readonly workflowId: string;
+}
+
+/** WorkflowAgentListRequest from the Nexa wire protocol. */
+export type WorkflowAgentListRequest = WorkflowAgentListRequestShape;
+
+/** WorkflowAgentPin wire fields. */
+export interface WorkflowAgentPinShape {
+    /** agent as defined by the Nexa gateway. */
+    readonly agent: WorkflowAgentVersion;
+    /** workflowId as defined by the Nexa gateway. */
+    readonly workflowId: string;
+}
+
+/** WorkflowAgentPin from the Nexa wire protocol. */
+export type WorkflowAgentPin = WorkflowAgentPinShape;
+
+/** WorkflowAgentPinRequest wire fields. */
+export interface WorkflowAgentPinRequestShape {
+    /** agentId as defined by the Nexa gateway. */
+    readonly agentId: string;
+    /** version as defined by the Nexa gateway. */
+    readonly version: string;
+    /** workflowId as defined by the Nexa gateway. */
+    readonly workflowId: string;
+}
+
+/** WorkflowAgentPinRequest from the Nexa wire protocol. */
+export type WorkflowAgentPinRequest = WorkflowAgentPinRequestShape;
+
 /** WorkflowAgentSession wire fields. */
 export interface WorkflowAgentSessionShape {
     /** activity as defined by the Nexa gateway. */
@@ -9510,6 +9574,21 @@ export interface WorkflowAgentUsageIdentityShape {
 
 /** WorkflowAgentUsageIdentity from the Nexa wire protocol. */
 export type WorkflowAgentUsageIdentity = WorkflowAgentUsageIdentityShape;
+
+/** WorkflowAgentVersion wire fields. */
+export interface WorkflowAgentVersionShape {
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** instructions as defined by the Nexa gateway. */
+    readonly instructions: string;
+    /** name as defined by the Nexa gateway. */
+    readonly name: string;
+    /** version as defined by the Nexa gateway. */
+    readonly version: string;
+}
+
+/** WorkflowAgentVersion from the Nexa wire protocol. */
+export type WorkflowAgentVersion = WorkflowAgentVersionShape;
 
 /** Allowed values for WorkflowAnswerType. */
 export const WorkflowAnswerTypeValues = {
@@ -12296,6 +12375,10 @@ export enum Method {
     VoiceStart = 'voice.start',
     /** Calls voice.stop. */
     VoiceStop = 'voice.stop',
+    /** Calls workflows.agents.list. */
+    WorkflowsAgentsList = 'workflows.agents.list',
+    /** Calls workflows.agents.pin. */
+    WorkflowsAgentsPin = 'workflows.agents.pin',
     /** Calls workflows.attention.list. */
     WorkflowsAttentionList = 'workflows.attention.list',
     /** Calls workflows.catalog. */

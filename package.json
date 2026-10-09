@@ -338,6 +338,10 @@
         "./workflow-spending-codec": {
             "types": "./dist/workflows/runtime/RunSpendingCodec.d.ts",
             "import": "./dist/workflow-spending-codec.js"
+        },
+        "./workflow-agent-versions": {
+            "types": "./dist/workflows/AgentVersions.d.ts",
+            "import": "./dist/workflow-agent-versions.js"
         }
     },
     "scripts": {

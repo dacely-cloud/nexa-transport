@@ -6909,6 +6909,30 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'workflows.agents.list': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/WorkflowAgentListRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/WorkflowAgentList',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'workflows.agents.pin': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/WorkflowAgentPinRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/WorkflowAgentPin',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'workflows.attention.list': {
                     properties: {
                         params: {
@@ -7751,6 +7775,8 @@ export const schema: Schema = {
                 'voice.audio',
                 'voice.start',
                 'voice.stop',
+                'workflows.agents.list',
+                'workflows.agents.pin',
                 'workflows.attention.list',
                 'workflows.catalog',
                 'workflows.create',
@@ -14404,6 +14430,57 @@ export const schema: Schema = {
             enum: ['accepted', 'queued', 'rejected'],
             type: 'string',
         },
+        WorkflowAgentList: {
+            properties: {
+                agents: {
+                    items: {
+                        $ref: '#/definitions/WorkflowAgentVersion',
+                    },
+                    type: 'array',
+                },
+                workflowId: {
+                    type: 'string',
+                },
+            },
+            required: ['agents', 'workflowId'],
+            type: 'object',
+        },
+        WorkflowAgentListRequest: {
+            properties: {
+                workflowId: {
+                    type: 'string',
+                },
+            },
+            required: ['workflowId'],
+            type: 'object',
+        },
+        WorkflowAgentPin: {
+            properties: {
+                agent: {
+                    $ref: '#/definitions/WorkflowAgentVersion',
+                },
+                workflowId: {
+                    type: 'string',
+                },
+            },
+            required: ['agent', 'workflowId'],
+            type: 'object',
+        },
+        WorkflowAgentPinRequest: {
+            properties: {
+                agentId: {
+                    type: 'string',
+                },
+                version: {
+                    type: 'string',
+                },
+                workflowId: {
+                    type: 'string',
+                },
+            },
+            required: ['agentId', 'version', 'workflowId'],
+            type: 'object',
+        },
         WorkflowAgentSession: {
             description:
                 'Bounded live text is a preview; completed graph outputs remain authoritative.',
@@ -14499,6 +14576,26 @@ export const schema: Schema = {
                 },
             },
             required: ['agentId', 'nodeId'],
+            type: 'object',
+        },
+        WorkflowAgentVersion: {
+            description:
+                'Immutable content identity; updates to the shared agent create a different version.',
+            properties: {
+                id: {
+                    type: 'string',
+                },
+                instructions: {
+                    type: 'string',
+                },
+                name: {
+                    type: 'string',
+                },
+                version: {
+                    type: 'string',
+                },
+            },
+            required: ['id', 'instructions', 'name', 'version'],
             type: 'object',
         },
         WorkflowAnswerType: {
