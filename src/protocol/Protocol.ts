@@ -2898,6 +2898,14 @@ export interface GatewayMethodsworkflows_runs_artifactShape {
     readonly result: WorkflowRunArtifactPage;
 }
 
+/** GatewayMethodsworkflows_runs_attempts wire fields. */
+export interface GatewayMethodsworkflows_runs_attemptsShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkflowRunAttemptsRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WorkflowRunAttemptsPage;
+}
+
 /** GatewayMethodsworkflows_runs_cancel wire fields. */
 export interface GatewayMethodsworkflows_runs_cancelShape {
     /** params as defined by the Nexa gateway. */
@@ -3254,6 +3262,8 @@ export interface GatewayMethodsShape {
     readonly 'workflows.runs.applications.setup': GatewayMethodsworkflows_runs_applications_setupShape;
     /** workflows.runs.artifact as defined by the Nexa gateway. */
     readonly 'workflows.runs.artifact': GatewayMethodsworkflows_runs_artifactShape;
+    /** workflows.runs.attempts as defined by the Nexa gateway. */
+    readonly 'workflows.runs.attempts': GatewayMethodsworkflows_runs_attemptsShape;
     /** workflows.runs.cancel as defined by the Nexa gateway. */
     readonly 'workflows.runs.cancel': GatewayMethodsworkflows_runs_cancelShape;
     /** workflows.runs.events as defined by the Nexa gateway. */
@@ -8217,6 +8227,32 @@ export interface WorkflowRunArtifactRequestShape {
 /** WorkflowRunArtifactRequest from the Nexa wire protocol. */
 export type WorkflowRunArtifactRequest = WorkflowRunArtifactRequestShape;
 
+/** WorkflowRunAttemptsPage wire fields. */
+export interface WorkflowRunAttemptsPageShape {
+    /** items as defined by the Nexa gateway. */
+    readonly items: ReadonlyArray<WorkflowStepView>;
+    /** next as defined by the Nexa gateway. */
+    readonly next: null | number;
+}
+
+/** WorkflowRunAttemptsPage from the Nexa wire protocol. */
+export type WorkflowRunAttemptsPage = WorkflowRunAttemptsPageShape;
+
+/** WorkflowRunAttemptsRequest wire fields. */
+export interface WorkflowRunAttemptsRequestShape {
+    /** afterAttempt as defined by the Nexa gateway. */
+    readonly afterAttempt: null | number;
+    /** limit as defined by the Nexa gateway. */
+    readonly limit: number;
+    /** nodeId as defined by the Nexa gateway. */
+    readonly nodeId: string;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+}
+
+/** WorkflowRunAttemptsRequest from the Nexa wire protocol. */
+export type WorkflowRunAttemptsRequest = WorkflowRunAttemptsRequestShape;
+
 /** Allowed values for WorkflowRunEventstatus. */
 export const WorkflowRunEventstatusValues = {
     Value0: 'cancelled',
@@ -9031,6 +9067,8 @@ export enum Method {
     WorkflowsRunsApplicationsSetup = 'workflows.runs.applications.setup',
     /** Calls workflows.runs.artifact. */
     WorkflowsRunsArtifact = 'workflows.runs.artifact',
+    /** Calls workflows.runs.attempts. */
+    WorkflowsRunsAttempts = 'workflows.runs.attempts',
     /** Calls workflows.runs.cancel. */
     WorkflowsRunsCancel = 'workflows.runs.cancel',
     /** Calls workflows.runs.events. */

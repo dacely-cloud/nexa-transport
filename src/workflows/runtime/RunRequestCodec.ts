@@ -10,6 +10,7 @@ import type {
     WorkflowRunRequest,
     WorkflowRunEventsRequest,
     WorkflowRunStepsRequest,
+    WorkflowRunAttemptsRequest,
     WorkflowRunOutputRequest,
     WorkflowRunListRequest,
     WorkflowAgentSessionRequest,
@@ -141,6 +142,24 @@ export class WorkflowRunRequestCodec {
             afterNodeId:
                 value['afterNodeId'] === null ? null : WorkflowInput.id(value['afterNodeId']),
             limit: this.#integer(value['limit'], 1, 100),
+        };
+    }
+    /** Attempt counters are bounded by the engine's recovery limit. */
+    public static attempts(raw: unknown): WorkflowRunAttemptsRequest {
+        const value: Readonly<Record<string, unknown>> = WorkflowInput.record(raw, [
+            'runId',
+            'nodeId',
+            'afterAttempt',
+            'limit',
+        ]);
+        return {
+            runId: WorkflowInput.id(value['runId']),
+            nodeId: WorkflowInput.id(value['nodeId']),
+            afterAttempt:
+                value['afterAttempt'] === null
+                    ? null
+                    : this.#integer(value['afterAttempt'], 1, 100),
+            limit: this.#integer(value['limit'], 1, 60),
         };
     }
     /** Validates the attempt identity and bounded UTF-16 offset. */

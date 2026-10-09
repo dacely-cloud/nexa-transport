@@ -4453,6 +4453,18 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'workflows.runs.attempts': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/WorkflowRunAttemptsRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/WorkflowRunAttemptsPage',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'workflows.runs.cancel': {
                     properties: {
                         params: {
@@ -4773,6 +4785,7 @@ export const schema: Schema = {
                 'workflows.runs.applications.check',
                 'workflows.runs.applications.setup',
                 'workflows.runs.artifact',
+                'workflows.runs.attempts',
                 'workflows.runs.cancel',
                 'workflows.runs.events',
                 'workflows.runs.inputs',
@@ -12433,6 +12446,41 @@ export const schema: Schema = {
                 },
             },
             required: ['artifactId', 'offset', 'runId'],
+            type: 'object',
+        },
+        WorkflowRunAttemptsPage: {
+            properties: {
+                items: {
+                    items: {
+                        $ref: '#/definitions/WorkflowStepView',
+                    },
+                    type: 'array',
+                },
+                next: {
+                    type: ['null', 'number'],
+                },
+            },
+            required: ['items', 'next'],
+            type: 'object',
+        },
+        WorkflowRunAttemptsRequest: {
+            description:
+                'Lists exact invocations for a node without including captured input/output bodies.',
+            properties: {
+                afterAttempt: {
+                    type: ['null', 'number'],
+                },
+                limit: {
+                    type: 'number',
+                },
+                nodeId: {
+                    type: 'string',
+                },
+                runId: {
+                    type: 'string',
+                },
+            },
+            required: ['afterAttempt', 'limit', 'nodeId', 'runId'],
             type: 'object',
         },
         WorkflowRunEvent: {

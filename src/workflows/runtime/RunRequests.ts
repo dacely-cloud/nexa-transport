@@ -118,3 +118,14 @@ export interface WorkflowInvocationInputs {
     readonly configuration: WorkflowObject;
     readonly trigger: WorkflowObject | null;
 }
+
+/** Lists exact invocations for a node without including captured input/output bodies. */
+export interface WorkflowRunAttemptsRequest extends WorkflowRunRequest {
+    readonly nodeId: string;
+    readonly afterAttempt: number | null;
+    readonly limit: number;
+}
+export interface WorkflowRunAttemptsPage {
+    readonly items: readonly WorkflowStepView[];
+    readonly next: number | null;
+}
