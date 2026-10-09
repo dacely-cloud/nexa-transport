@@ -224,6 +224,17 @@ export const ApplicationBoundaryKindValues = {
 export type ApplicationBoundaryKind =
     (typeof ApplicationBoundaryKindValues)[keyof typeof ApplicationBoundaryKindValues];
 
+/** Allowed values for ApplicationConnection. */
+export const ApplicationConnectionValues = {
+    Value0: 'connected',
+    Value1: 'setup-required',
+    Value2: 'unavailable',
+} as const;
+
+/** ApplicationConnection from the Nexa wire protocol. */
+export type ApplicationConnection =
+    (typeof ApplicationConnectionValues)[keyof typeof ApplicationConnectionValues];
+
 /** ApplicationIssue wire fields. */
 export interface ApplicationIssueShape {
     /** message as defined by the Nexa gateway. */
@@ -2785,6 +2796,22 @@ export interface GatewayMethodsworkflows_runs_agent_readShape {
     readonly result: WorkflowAgentSession;
 }
 
+/** GatewayMethodsworkflows_runs_applications_check wire fields. */
+export interface GatewayMethodsworkflows_runs_applications_checkShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkflowApplicationRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ReadonlyArray<WorkflowApplicationStatus>;
+}
+
+/** GatewayMethodsworkflows_runs_applications_setup wire fields. */
+export interface GatewayMethodsworkflows_runs_applications_setupShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkflowApplicationSetupRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WorkflowTerminalSnapshot;
+}
+
 /** GatewayMethodsworkflows_runs_artifact wire fields. */
 export interface GatewayMethodsworkflows_runs_artifactShape {
     /** params as defined by the Nexa gateway. */
@@ -2847,6 +2874,22 @@ export interface GatewayMethodsworkflows_runs_stepsShape {
     readonly params: WorkflowRunStepsRequest;
     /** result as defined by the Nexa gateway. */
     readonly result: WorkflowRunStepsPage;
+}
+
+/** GatewayMethodsworkflows_runs_terminal_command wire fields. */
+export interface GatewayMethodsworkflows_runs_terminal_commandShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkflowTerminalCommand;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WorkflowTerminalSnapshot;
+}
+
+/** GatewayMethodsworkflows_runs_terminal_read wire fields. */
+export interface GatewayMethodsworkflows_runs_terminal_readShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkflowTerminalRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WorkflowTerminalSnapshot;
 }
 
 /** GatewayMethodsworkflows_save wire fields. */
@@ -3115,6 +3158,10 @@ export interface GatewayMethodsShape {
     readonly 'workflows.runs.agent.input': GatewayMethodsworkflows_runs_agent_inputShape;
     /** workflows.runs.agent.read as defined by the Nexa gateway. */
     readonly 'workflows.runs.agent.read': GatewayMethodsworkflows_runs_agent_readShape;
+    /** workflows.runs.applications.check as defined by the Nexa gateway. */
+    readonly 'workflows.runs.applications.check': GatewayMethodsworkflows_runs_applications_checkShape;
+    /** workflows.runs.applications.setup as defined by the Nexa gateway. */
+    readonly 'workflows.runs.applications.setup': GatewayMethodsworkflows_runs_applications_setupShape;
     /** workflows.runs.artifact as defined by the Nexa gateway. */
     readonly 'workflows.runs.artifact': GatewayMethodsworkflows_runs_artifactShape;
     /** workflows.runs.cancel as defined by the Nexa gateway. */
@@ -3131,6 +3178,10 @@ export interface GatewayMethodsShape {
     readonly 'workflows.runs.start': GatewayMethodsworkflows_runs_startShape;
     /** workflows.runs.steps as defined by the Nexa gateway. */
     readonly 'workflows.runs.steps': GatewayMethodsworkflows_runs_stepsShape;
+    /** workflows.runs.terminal.command as defined by the Nexa gateway. */
+    readonly 'workflows.runs.terminal.command': GatewayMethodsworkflows_runs_terminal_commandShape;
+    /** workflows.runs.terminal.read as defined by the Nexa gateway. */
+    readonly 'workflows.runs.terminal.read': GatewayMethodsworkflows_runs_terminal_readShape;
     /** workflows.save as defined by the Nexa gateway. */
     readonly 'workflows.save': GatewayMethodsworkflows_saveShape;
     /** workflows.validate as defined by the Nexa gateway. */
@@ -5599,6 +5650,8 @@ export interface ReverseRunSnapshotShape {
     readonly evidence: ReadonlyArray<ReverseEvidenceRecord>;
     /** evidenceCount as defined by the Nexa gateway. */
     readonly evidenceCount: number;
+    /** execution as defined by the Nexa gateway. */
+    readonly execution?: number;
     /** id as defined by the Nexa gateway. */
     readonly id: string;
     /** inputName as defined by the Nexa gateway. */
@@ -6207,6 +6260,23 @@ export interface TelemetryProjectShape {
 
 /** TelemetryProject from the Nexa wire protocol. */
 export type TelemetryProject = TelemetryProjectShape;
+
+/** Allowed values for TerminalAction. */
+export const TerminalActionValues = { Value0: 'input', Value1: 'resize', Value2: 'stop' } as const;
+
+/** TerminalAction from the Nexa wire protocol. */
+export type TerminalAction = (typeof TerminalActionValues)[keyof typeof TerminalActionValues];
+
+/** Allowed values for TerminalStatus. */
+export const TerminalStatusValues = {
+    Value0: 'exited',
+    Value1: 'interrupted',
+    Value2: 'running',
+    Value3: 'starting',
+} as const;
+
+/** TerminalStatus from the Nexa wire protocol. */
+export type TerminalStatus = (typeof TerminalStatusValues)[keyof typeof TerminalStatusValues];
 
 /** TokenUsage wire fields. */
 export interface TokenUsageShape {
@@ -6979,6 +7049,57 @@ export interface WorkflowAgentSessionRequestShape {
 
 /** WorkflowAgentSessionRequest from the Nexa wire protocol. */
 export type WorkflowAgentSessionRequest = WorkflowAgentSessionRequestShape;
+
+/** Allowed values for WorkflowApplication. */
+export const WorkflowApplicationValues = {
+    Value0: 'claude-code',
+    Value1: 'codex',
+    Value2: 'grok-build',
+    Value3: 'nerva-code',
+} as const;
+
+/** WorkflowApplication from the Nexa wire protocol. */
+export type WorkflowApplication =
+    (typeof WorkflowApplicationValues)[keyof typeof WorkflowApplicationValues];
+
+/** WorkflowApplicationRequest wire fields. */
+export interface WorkflowApplicationRequestShape {
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: string;
+    /** workflowId as defined by the Nexa gateway. */
+    readonly workflowId: string;
+}
+
+/** WorkflowApplicationRequest from the Nexa wire protocol. */
+export type WorkflowApplicationRequest = WorkflowApplicationRequestShape;
+
+/** WorkflowApplicationSetupRequest wire fields. */
+export interface WorkflowApplicationSetupRequestShape {
+    /** application as defined by the Nexa gateway. */
+    readonly application: WorkflowApplication;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: string;
+    /** sessionId as defined by the Nexa gateway. */
+    readonly sessionId: string;
+    /** workflowId as defined by the Nexa gateway. */
+    readonly workflowId: string;
+}
+
+/** WorkflowApplicationSetupRequest from the Nexa wire protocol. */
+export type WorkflowApplicationSetupRequest = WorkflowApplicationSetupRequestShape;
+
+/** WorkflowApplicationStatus wire fields. */
+export interface WorkflowApplicationStatusShape {
+    /** application as defined by the Nexa gateway. */
+    readonly application: WorkflowApplication;
+    /** status as defined by the Nexa gateway. */
+    readonly status: ApplicationConnection;
+    /** title as defined by the Nexa gateway. */
+    readonly title: string;
+}
+
+/** WorkflowApplicationStatus from the Nexa wire protocol. */
+export type WorkflowApplicationStatus = WorkflowApplicationStatusShape;
 
 /** WorkflowCatalog wire fields. */
 export interface WorkflowCatalogShape {
@@ -8046,6 +8167,65 @@ export interface WorkflowSummaryShape {
 /** WorkflowSummary from the Nexa wire protocol. */
 export type WorkflowSummary = WorkflowSummaryShape;
 
+/** WorkflowTerminalCommand wire fields. */
+export interface WorkflowTerminalCommandShape {
+    /** action as defined by the Nexa gateway. */
+    readonly action: TerminalAction;
+    /** cols as defined by the Nexa gateway. */
+    readonly cols: number;
+    /** commandId as defined by the Nexa gateway. */
+    readonly commandId: string;
+    /** expectedRevision as defined by the Nexa gateway. */
+    readonly expectedRevision: string;
+    /** input as defined by the Nexa gateway. */
+    readonly input: string;
+    /** rows as defined by the Nexa gateway. */
+    readonly rows: number;
+    /** sessionId as defined by the Nexa gateway. */
+    readonly sessionId: string;
+}
+
+/** WorkflowTerminalCommand from the Nexa wire protocol. */
+export type WorkflowTerminalCommand = WorkflowTerminalCommandShape;
+
+/** WorkflowTerminalRequest wire fields. */
+export interface WorkflowTerminalRequestShape {
+    /** sessionId as defined by the Nexa gateway. */
+    readonly sessionId: string;
+}
+
+/** WorkflowTerminalRequest from the Nexa wire protocol. */
+export type WorkflowTerminalRequest = WorkflowTerminalRequestShape;
+
+/** WorkflowTerminalSnapshot wire fields. */
+export interface WorkflowTerminalSnapshotShape {
+    /** application as defined by the Nexa gateway. */
+    readonly application: WorkflowApplication;
+    /** cols as defined by the Nexa gateway. */
+    readonly cols: number;
+    /** commandId as defined by the Nexa gateway. */
+    readonly commandId: string;
+    /** commandRevision as defined by the Nexa gateway. */
+    readonly commandRevision: string;
+    /** error as defined by the Nexa gateway. */
+    readonly error: string;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: string;
+    /** rows as defined by the Nexa gateway. */
+    readonly rows: number;
+    /** screen as defined by the Nexa gateway. */
+    readonly screen: string;
+    /** sessionId as defined by the Nexa gateway. */
+    readonly sessionId: string;
+    /** setup as defined by the Nexa gateway. */
+    readonly setup: boolean;
+    /** status as defined by the Nexa gateway. */
+    readonly status: TerminalStatus;
+}
+
+/** WorkflowTerminalSnapshot from the Nexa wire protocol. */
+export type WorkflowTerminalSnapshot = WorkflowTerminalSnapshotShape;
+
 /** WorkflowValidateRequest wire fields. */
 export interface WorkflowValidateRequestShape {
     /** revision as defined by the Nexa gateway. */
@@ -8491,6 +8671,10 @@ export enum Method {
     WorkflowsRunsAgentInput = 'workflows.runs.agent.input',
     /** Calls workflows.runs.agent.read. */
     WorkflowsRunsAgentRead = 'workflows.runs.agent.read',
+    /** Calls workflows.runs.applications.check. */
+    WorkflowsRunsApplicationsCheck = 'workflows.runs.applications.check',
+    /** Calls workflows.runs.applications.setup. */
+    WorkflowsRunsApplicationsSetup = 'workflows.runs.applications.setup',
     /** Calls workflows.runs.artifact. */
     WorkflowsRunsArtifact = 'workflows.runs.artifact',
     /** Calls workflows.runs.cancel. */
@@ -8507,6 +8691,10 @@ export enum Method {
     WorkflowsRunsStart = 'workflows.runs.start',
     /** Calls workflows.runs.steps. */
     WorkflowsRunsSteps = 'workflows.runs.steps',
+    /** Calls workflows.runs.terminal.command. */
+    WorkflowsRunsTerminalCommand = 'workflows.runs.terminal.command',
+    /** Calls workflows.runs.terminal.read. */
+    WorkflowsRunsTerminalRead = 'workflows.runs.terminal.read',
     /** Calls workflows.save. */
     WorkflowsSave = 'workflows.save',
     /** Calls workflows.validate. */

@@ -4,6 +4,8 @@ const config: UserConfig = {
         target: 'es2023',
         lib: {
             entry: {
+                'workflow-applications': 'src/workflows/terminal/Applications.ts',
+                'workflow-terminal-types': 'src/workflows/terminal/TerminalTypes.ts',
                 'reverse-investigation': 'src/reverse/ReverseInvestigation.ts',
                 'workflow-planning-alignment': 'src/workflows/planning/PlanningAlignment.ts',
                 'workflow-planning-sources': 'src/workflows/planning/PlanningSources.ts',

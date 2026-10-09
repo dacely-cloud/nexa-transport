@@ -110,6 +110,8 @@ All 54 protocol methods. `connect` is managed by `NexaClient.connect`; the remai
 - [workflows.runs.agent.control](#workflows-runs-agent-control)
 - [workflows.runs.agent.input](#workflows-runs-agent-input)
 - [workflows.runs.agent.read](#workflows-runs-agent-read)
+- [workflows.runs.applications.check](#workflows-runs-applications-check)
+- [workflows.runs.applications.setup](#workflows-runs-applications-setup)
 - [workflows.runs.artifact](#workflows-runs-artifact)
 - [workflows.runs.cancel](#workflows-runs-cancel)
 - [workflows.runs.events](#workflows-runs-events)
@@ -118,6 +120,8 @@ All 54 protocol methods. `connect` is managed by `NexaClient.connect`; the remai
 - [workflows.runs.read](#workflows-runs-read)
 - [workflows.runs.start](#workflows-runs-start)
 - [workflows.runs.steps](#workflows-runs-steps)
+- [workflows.runs.terminal.command](#workflows-runs-terminal-command)
+- [workflows.runs.terminal.read](#workflows-runs-terminal-read)
 - [workflows.save](#workflows-save)
 - [workflows.validate](#workflows-validate)
 - [workspaces.create](#workspaces-create)
@@ -2630,6 +2634,58 @@ Parameters: [WorkflowAgentSessionRequest](protocol.md#workflowagentsessionreques
 
 Result: [WorkflowAgentSession](protocol.md#workflowagentsession).
 
+## workflows.runs.applications.check
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsRunsApplicationsCheck> = {
+    revision: 'YOUR_REVISION',
+    workflowId: 'YOUR_WORKFLOWID',
+};
+const result: ResultOf<typeof Method.WorkflowsRunsApplicationsCheck> = await client.call(
+    Method.WorkflowsRunsApplicationsCheck,
+    params,
+);
+```
+
+Parameters: [WorkflowApplicationRequest](protocol.md#workflowapplicationrequest).
+
+| Field        | Required | Type     | Description |
+| ------------ | -------- | -------- | ----------- |
+| `revision`   | Yes      | `string` |             |
+| `workflowId` | Yes      | `string` |             |
+
+Result: Array of [WorkflowApplicationStatus](protocol.md#workflowapplicationstatus).
+
+## workflows.runs.applications.setup
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsRunsApplicationsSetup> = {
+    application: 'claude-code',
+    revision: 'YOUR_REVISION',
+    sessionId: 'YOUR_SESSIONID',
+    workflowId: 'YOUR_WORKFLOWID',
+};
+const result: ResultOf<typeof Method.WorkflowsRunsApplicationsSetup> = await client.call(
+    Method.WorkflowsRunsApplicationsSetup,
+    params,
+);
+```
+
+Parameters: [WorkflowApplicationSetupRequest](protocol.md#workflowapplicationsetuprequest).
+
+| Field         | Required | Type                                                   | Description |
+| ------------- | -------- | ------------------------------------------------------ | ----------- |
+| `application` | Yes      | [WorkflowApplication](protocol.md#workflowapplication) |             |
+| `revision`    | Yes      | `string`                                               |             |
+| `sessionId`   | Yes      | `string`                                               |             |
+| `workflowId`  | Yes      | `string`                                               |             |
+
+Result: [WorkflowTerminalSnapshot](protocol.md#workflowterminalsnapshot).
+
 ## workflows.runs.artifact
 
 ```ts
@@ -2841,6 +2897,62 @@ Parameters: [WorkflowRunStepsRequest](protocol.md#workflowrunstepsrequest).
 | `runId`       | Yes      | `string`      |             |
 
 Result: [WorkflowRunStepsPage](protocol.md#workflowrunstepspage).
+
+## workflows.runs.terminal.command
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsRunsTerminalCommand> = {
+    action: 'input',
+    cols: 1,
+    commandId: 'YOUR_COMMANDID',
+    expectedRevision: 'YOUR_EXPECTEDREVISION',
+    input: 'YOUR_INPUT',
+    rows: 1,
+    sessionId: 'YOUR_SESSIONID',
+};
+const result: ResultOf<typeof Method.WorkflowsRunsTerminalCommand> = await client.call(
+    Method.WorkflowsRunsTerminalCommand,
+    params,
+);
+```
+
+Parameters: [WorkflowTerminalCommand](protocol.md#workflowterminalcommand).
+
+| Field              | Required | Type                                         | Description |
+| ------------------ | -------- | -------------------------------------------- | ----------- |
+| `action`           | Yes      | [TerminalAction](protocol.md#terminalaction) |             |
+| `cols`             | Yes      | `number`                                     |             |
+| `commandId`        | Yes      | `string`                                     |             |
+| `expectedRevision` | Yes      | `string`                                     |             |
+| `input`            | Yes      | `string`                                     |             |
+| `rows`             | Yes      | `number`                                     |             |
+| `sessionId`        | Yes      | `string`                                     |             |
+
+Result: [WorkflowTerminalSnapshot](protocol.md#workflowterminalsnapshot).
+
+## workflows.runs.terminal.read
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsRunsTerminalRead> = {
+    sessionId: 'YOUR_SESSIONID',
+};
+const result: ResultOf<typeof Method.WorkflowsRunsTerminalRead> = await client.call(
+    Method.WorkflowsRunsTerminalRead,
+    params,
+);
+```
+
+Parameters: [WorkflowTerminalRequest](protocol.md#workflowterminalrequest).
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `sessionId` | Yes      | `string` |             |
+
+Result: [WorkflowTerminalSnapshot](protocol.md#workflowterminalsnapshot).
 
 ## workflows.save
 
