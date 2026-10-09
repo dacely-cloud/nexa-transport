@@ -17,6 +17,7 @@ export type WorkflowRunMode = (typeof WorkflowRunMode)[keyof typeof WorkflowRunM
 export const WorkflowRunStatus = {
     Queued: 'queued',
     Running: 'running',
+    Waiting: 'waiting',
     Succeeded: 'succeeded',
     Failed: 'failed',
     Cancelled: 'cancelled',
@@ -24,6 +25,7 @@ export const WorkflowRunStatus = {
 export type WorkflowRunStatus = (typeof WorkflowRunStatus)[keyof typeof WorkflowRunStatus];
 export const WorkflowStepStatus = {
     Running: 'running',
+    Waiting: 'waiting',
     Succeeded: 'succeeded',
     Failed: 'failed',
     Skipped: 'skipped',
@@ -36,6 +38,9 @@ export const WorkflowRunEventKind = {
     Accepted: 'accepted',
     Claimed: 'claimed',
     StepStarted: 'step-started',
+    StepWaiting: 'step-waiting',
+    Suspended: 'suspended',
+    Resumed: 'resumed',
     StepFinished: 'step-finished',
     Finished: 'finished',
     Cancelled: 'cancelled',
