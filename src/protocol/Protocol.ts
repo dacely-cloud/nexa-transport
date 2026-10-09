@@ -744,6 +744,244 @@ export interface BrowserPageProjectionShape {
 /** BrowserPageProjection from the Nexa wire protocol. */
 export type BrowserPageProjection = BrowserPageProjectionShape;
 
+/** BrowserScriptSourceMap wire fields. */
+export interface BrowserScriptSourceMapShape {
+    /** declarationLength as defined by the Nexa gateway. */
+    readonly declarationLength: string;
+    /** declarationSha256 as defined by the Nexa gateway. */
+    readonly declarationSha256: string;
+    /** inline as defined by the Nexa gateway. */
+    readonly inline: boolean;
+    /** url as defined by the Nexa gateway. */
+    readonly url: null | string;
+}
+
+/** BrowserScriptSourceMap from the Nexa wire protocol. */
+export type BrowserScriptSourceMap = BrowserScriptSourceMapShape;
+
+/** Allowed values for BrowserScriptSourceState. */
+export const BrowserScriptSourceStateValues = {
+    Value0: 'budget-exhausted',
+    Value1: 'captured',
+    Value2: 'non-javascript',
+    Value3: 'not-selected',
+} as const;
+
+/** BrowserScriptSourceState from the Nexa wire protocol. */
+export type BrowserScriptSourceState =
+    (typeof BrowserScriptSourceStateValues)[keyof typeof BrowserScriptSourceStateValues];
+
+/** BrowserSourceDirectoryRow from the Nexa wire protocol. */
+export type BrowserSourceDirectoryRow = BrowserSourceScriptRow | BrowserSourceResourceRow;
+
+/** BrowserSourceResourceRow wire fields. */
+export interface BrowserSourceResourceRowShape {
+    /** canceled as defined by the Nexa gateway. */
+    readonly canceled: boolean;
+    /** contentSize as defined by the Nexa gateway. */
+    readonly contentSize: null | string;
+    /** failed as defined by the Nexa gateway. */
+    readonly failed: boolean;
+    /** frameId as defined by the Nexa gateway. */
+    readonly frameId: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: 'resource';
+    /** mimeType as defined by the Nexa gateway. */
+    readonly mimeType: string;
+    /** type as defined by the Nexa gateway. */
+    readonly type: string;
+    /** url as defined by the Nexa gateway. */
+    readonly url: string;
+}
+
+/** BrowserSourceResourceRow from the Nexa wire protocol. */
+export type BrowserSourceResourceRow = BrowserSourceResourceRowShape;
+
+/** BrowserSourceScriptRow wire fields. */
+export interface BrowserSourceScriptRowShape {
+    /** cdpHash as defined by the Nexa gateway. */
+    readonly cdpHash: null | string;
+    /** endColumn as defined by the Nexa gateway. */
+    readonly endColumn: number;
+    /** endLine as defined by the Nexa gateway. */
+    readonly endLine: number;
+    /** frameId as defined by the Nexa gateway. */
+    readonly frameId: string;
+    /** hasSourceUrl as defined by the Nexa gateway. */
+    readonly hasSourceUrl: boolean;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** isModule as defined by the Nexa gateway. */
+    readonly isModule: boolean;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: 'script';
+    /** language as defined by the Nexa gateway. */
+    readonly language: string;
+    /** length as defined by the Nexa gateway. */
+    readonly length: null | string;
+    /** resourceIds as defined by the Nexa gateway. */
+    readonly resourceIds: ReadonlyArray<string>;
+    /** source as defined by the Nexa gateway. */
+    readonly source: OmitBrowserScriptSourcetext;
+    /** sourceMap as defined by the Nexa gateway. */
+    readonly sourceMap: BrowserScriptSourceMap | null;
+    /** sourceMapOmitted as defined by the Nexa gateway. */
+    readonly sourceMapOmitted: boolean;
+    /** startColumn as defined by the Nexa gateway. */
+    readonly startColumn: number;
+    /** startLine as defined by the Nexa gateway. */
+    readonly startLine: number;
+    /** url as defined by the Nexa gateway. */
+    readonly url: string;
+}
+
+/** BrowserSourceScriptRow from the Nexa wire protocol. */
+export type BrowserSourceScriptRow = BrowserSourceScriptRowShape;
+
+/** BrowserSourcesCoverage wire fields. */
+export interface BrowserSourcesCoverageShape {
+    /** capturedSources as defined by the Nexa gateway. */
+    readonly capturedSources: string;
+    /** excludedFrames as defined by the Nexa gateway. */
+    readonly excludedFrames: boolean;
+    /** excludedResources as defined by the Nexa gateway. */
+    readonly excludedResources: string;
+    /** excludedScriptObservations as defined by the Nexa gateway. */
+    readonly excludedScriptObservations: string;
+    /** omittedScriptObservations as defined by the Nexa gateway. */
+    readonly omittedScriptObservations: string;
+    /** partial as defined by the Nexa gateway. */
+    readonly partial: boolean;
+    /** sourceBytes as defined by the Nexa gateway. */
+    readonly sourceBytes: string;
+}
+
+/** BrowserSourcesCoverage from the Nexa wire protocol. */
+export type BrowserSourcesCoverage = BrowserSourcesCoverageShape;
+
+/** BrowserSourcesPage wire fields. */
+export interface BrowserSourcesPageShape {
+    /** captureSha256 as defined by the Nexa gateway. */
+    readonly captureSha256: string;
+    /** cursor as defined by the Nexa gateway. */
+    readonly cursor: string;
+    /** evidenceId as defined by the Nexa gateway. */
+    readonly evidenceId: string;
+    /** metadata as defined by the Nexa gateway. */
+    readonly metadata: BrowserSourcesProjection;
+    /** nextCursor as defined by the Nexa gateway. */
+    readonly nextCursor: null | string;
+    /** records as defined by the Nexa gateway. */
+    readonly records: ReadonlyArray<BrowserSourceDirectoryRow>;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+    /** selector as defined by the Nexa gateway. */
+    readonly selector: null | string;
+    /** sha256 as defined by the Nexa gateway. */
+    readonly sha256: string;
+    /** sourceBytes as defined by the Nexa gateway. */
+    readonly sourceBytes: null | string;
+    /** sourceSha256 as defined by the Nexa gateway. */
+    readonly sourceSha256: null | string;
+    /** text as defined by the Nexa gateway. */
+    readonly text: null | string;
+    /** total as defined by the Nexa gateway. */
+    readonly total: string;
+    /** view as defined by the Nexa gateway. */
+    readonly view: BrowserSourcesView;
+}
+
+/** BrowserSourcesPage from the Nexa wire protocol. */
+export type BrowserSourcesPage = BrowserSourcesPageShape;
+
+/** BrowserSourcesProjection wire fields. */
+export interface BrowserSourcesProjectionShape {
+    /** capturedAt as defined by the Nexa gateway. */
+    readonly capturedAt: string;
+    /** coverage as defined by the Nexa gateway. */
+    readonly coverage: BrowserSourcesCoverage;
+    /** frameId as defined by the Nexa gateway. */
+    readonly frameId: string;
+    /** includeSources as defined by the Nexa gateway. */
+    readonly includeSources: boolean;
+    /** origin as defined by the Nexa gateway. */
+    readonly origin: string;
+    /** priorActivityAvailable as defined by the Nexa gateway. */
+    readonly priorActivityAvailable: false;
+    /** provider as defined by the Nexa gateway. */
+    readonly provider: 'cdp-passive';
+    /** resourceCount as defined by the Nexa gateway. */
+    readonly resourceCount: string;
+    /** scriptCount as defined by the Nexa gateway. */
+    readonly scriptCount: string;
+    /** targetId as defined by the Nexa gateway. */
+    readonly targetId: string;
+}
+
+/** BrowserSourcesProjection from the Nexa wire protocol. */
+export type BrowserSourcesProjection = BrowserSourcesProjectionShape;
+
+/** BrowserSourcesQuery wire fields. */
+export interface BrowserSourcesQueryShape {
+    /** cursor as defined by the Nexa gateway. */
+    readonly cursor?: string;
+    /** evidenceId as defined by the Nexa gateway. */
+    readonly evidenceId: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+    /** selector as defined by the Nexa gateway. */
+    readonly selector?: string;
+    /** view as defined by the Nexa gateway. */
+    readonly view: BrowserSourcesView;
+}
+
+/** BrowserSourcesQuery from the Nexa wire protocol. */
+export type BrowserSourcesQuery = BrowserSourcesQueryShape;
+
+/** BrowserSourcesSnapshot wire fields. */
+export interface BrowserSourcesSnapshotShape {
+    /** capturedAt as defined by the Nexa gateway. */
+    readonly capturedAt: string;
+    /** coverage as defined by the Nexa gateway. */
+    readonly coverage: BrowserSourcesCoverage;
+    /** frameId as defined by the Nexa gateway. */
+    readonly frameId: string;
+    /** includeSources as defined by the Nexa gateway. */
+    readonly includeSources: boolean;
+    /** origin as defined by the Nexa gateway. */
+    readonly origin: string;
+    /** priorActivityAvailable as defined by the Nexa gateway. */
+    readonly priorActivityAvailable: false;
+    /** provider as defined by the Nexa gateway. */
+    readonly provider: 'cdp-passive';
+    /** reference as defined by the Nexa gateway. */
+    readonly reference: ReverseBrowserReference;
+    /** resourceCount as defined by the Nexa gateway. */
+    readonly resourceCount: string;
+    /** scriptCount as defined by the Nexa gateway. */
+    readonly scriptCount: string;
+    /** targetId as defined by the Nexa gateway. */
+    readonly targetId: string;
+}
+
+/** BrowserSourcesSnapshot from the Nexa wire protocol. */
+export type BrowserSourcesSnapshot = BrowserSourcesSnapshotShape;
+
+/** Allowed values for BrowserSourcesView. */
+export const BrowserSourcesViewValues = {
+    Value0: 'resources',
+    Value1: 'scripts',
+    Value2: 'source',
+} as const;
+
+/** BrowserSourcesView from the Nexa wire protocol. */
+export type BrowserSourcesView =
+    (typeof BrowserSourcesViewValues)[keyof typeof BrowserSourcesViewValues];
+
 /** BrowserStructureCount wire fields. */
 export interface BrowserStructureCountShape {
     /** count as defined by the Nexa gateway. */
@@ -2769,6 +3007,14 @@ export interface GatewayMethodsreverse_browserShape {
     readonly result: ReverseBrowserPage;
 }
 
+/** GatewayMethodsreverse_browser_sources wire fields. */
+export interface GatewayMethodsreverse_browser_sourcesShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: BrowserSourcesQuery;
+    /** result as defined by the Nexa gateway. */
+    readonly result: BrowserSourcesPage;
+}
+
 /** GatewayMethodsreverse_browser_structure wire fields. */
 export interface GatewayMethodsreverse_browser_structureShape {
     /** params as defined by the Nexa gateway. */
@@ -3657,6 +3903,8 @@ export interface GatewayMethodsShape {
     readonly 'processes.stop': GatewayMethodsprocesses_stopShape;
     /** reverse.browser as defined by the Nexa gateway. */
     readonly 'reverse.browser': GatewayMethodsreverse_browserShape;
+    /** reverse.browser.sources as defined by the Nexa gateway. */
+    readonly 'reverse.browser.sources': GatewayMethodsreverse_browser_sourcesShape;
     /** reverse.browser.structure as defined by the Nexa gateway. */
     readonly 'reverse.browser.structure': GatewayMethodsreverse_browser_structureShape;
     /** reverse.catalog as defined by the Nexa gateway. */
@@ -5294,6 +5542,19 @@ export interface OkResultShape {
 /** OkResult from the Nexa wire protocol. */
 export type OkResult = OkResultShape;
 
+/** OmitBrowserScriptSourcetext wire fields. */
+export interface OmitBrowserScriptSourcetextShape {
+    /** bytes as defined by the Nexa gateway. */
+    readonly bytes: null | string;
+    /** sha256 as defined by the Nexa gateway. */
+    readonly sha256: null | string;
+    /** state as defined by the Nexa gateway. */
+    readonly state: BrowserScriptSourceState;
+}
+
+/** OmitBrowserScriptSourcetext from the Nexa wire protocol. */
+export type OmitBrowserScriptSourcetext = OmitBrowserScriptSourcetextShape;
+
 /** PendingApproval wire fields. */
 export interface PendingApprovalShape {
     /** approvalId as defined by the Nexa gateway. */
@@ -6665,6 +6926,8 @@ export interface ReverseRunSnapshotShape {
     readonly archive?: ReverseArchiveRef;
     /** browser as defined by the Nexa gateway. */
     readonly browser?: ReverseBrowserSnapshot;
+    /** browserSources as defined by the Nexa gateway. */
+    readonly browserSources?: BrowserSourcesSnapshot;
     /** browserStructure as defined by the Nexa gateway. */
     readonly browserStructure?: BrowserStructureSnapshot;
     /** cleanupErrors as defined by the Nexa gateway. */
@@ -10432,6 +10695,8 @@ export enum Method {
     ProcessesStop = 'processes.stop',
     /** Calls reverse.browser. */
     ReverseBrowser = 'reverse.browser',
+    /** Calls reverse.browser.sources. */
+    ReverseBrowserSources = 'reverse.browser.sources',
     /** Calls reverse.browser.structure. */
     ReverseBrowserStructure = 'reverse.browser.structure',
     /** Calls reverse.catalog. */

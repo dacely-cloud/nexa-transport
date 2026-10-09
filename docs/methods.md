@@ -1,6 +1,6 @@
 # RPC reference
 
-All 145 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 144 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
+All 150 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 149 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
 
 - [accounts.create](#accounts-create)
 - [accounts.list](#accounts-list)
@@ -53,6 +53,7 @@ All 145 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [processes.resize](#processes-resize)
 - [processes.stop](#processes-stop)
 - [reverse.browser](#reverse-browser)
+- [reverse.browser.sources](#reverse-browser-sources)
 - [reverse.browser.structure](#reverse-browser-structure)
 - [reverse.catalog](#reverse-catalog)
 - [reverse.evidence](#reverse-evidence)
@@ -142,6 +143,10 @@ All 145 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [workflows.runs.terminal.command](#workflows-runs-terminal-command)
 - [workflows.runs.terminal.read](#workflows-runs-terminal-read)
 - [workflows.save](#workflows-save)
+- [workflows.schedules.disable](#workflows-schedules-disable)
+- [workflows.schedules.enable](#workflows-schedules-enable)
+- [workflows.schedules.preview](#workflows-schedules-preview)
+- [workflows.schedules.read](#workflows-schedules-read)
 - [workflows.validate](#workflows-validate)
 - [workspaces.create](#workspaces-create)
 - [workspaces.describe](#workspaces-describe)
@@ -1248,6 +1253,36 @@ Parameters: [ReverseBrowserQuery](protocol.md#reversebrowserquery).
 | `runId`      | Yes      | `string` |             |
 
 Result: [ReverseBrowserPage](protocol.md#reversebrowserpage).
+
+## reverse.browser.sources
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ReverseBrowserSources> = {
+    evidenceId: 'YOUR_EVIDENCEID',
+    id: 'YOUR_ID',
+    runId: 'YOUR_RUNID',
+    view: 'resources',
+};
+const result: ResultOf<typeof Method.ReverseBrowserSources> = await client.call(
+    Method.ReverseBrowserSources,
+    params,
+);
+```
+
+Parameters: [BrowserSourcesQuery](protocol.md#browsersourcesquery).
+
+| Field        | Required | Type                                                 | Description |
+| ------------ | -------- | ---------------------------------------------------- | ----------- |
+| `cursor`     | No       | `string`                                             |             |
+| `evidenceId` | Yes      | `string`                                             |             |
+| `id`         | Yes      | `string`                                             |             |
+| `runId`      | Yes      | `string`                                             |             |
+| `selector`   | No       | `string`                                             |             |
+| `view`       | Yes      | [BrowserSourcesView](protocol.md#browsersourcesview) |             |
+
+Result: [BrowserSourcesPage](protocol.md#browsersourcespage).
 
 ## reverse.browser.structure
 
@@ -3544,6 +3579,134 @@ Parameters: [WorkflowSaveRequest](protocol.md#workflowsaverequest).
 | `workflowId`       | Yes      | `string`                                   |             |
 
 Result: [WorkflowReceipt](protocol.md#workflowreceipt).
+
+## workflows.schedules.disable
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsSchedulesDisable> = {
+    commandId: 'YOUR_COMMANDID',
+    expectedRevision: 'YOUR_EXPECTEDREVISION',
+    workflowId: 'YOUR_WORKFLOWID',
+};
+const result: ResultOf<typeof Method.WorkflowsSchedulesDisable> = await client.call(
+    Method.WorkflowsSchedulesDisable,
+    params,
+);
+```
+
+Parameters: [WorkflowScheduleCommand](protocol.md#workflowschedulecommand).
+
+| Field              | Required | Type     | Description |
+| ------------------ | -------- | -------- | ----------- |
+| `commandId`        | Yes      | `string` |             |
+| `expectedRevision` | Yes      | `string` |             |
+| `workflowId`       | Yes      | `string` |             |
+
+Result: [WorkflowScheduleView](protocol.md#workflowscheduleview).
+
+## workflows.schedules.enable
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsSchedulesEnable> = {
+    commandId: 'YOUR_COMMANDID',
+    configuration: {
+        catchUpLimit: 1,
+        input: {},
+        lateGraceMs: 'YOUR_LATEGRACEMS',
+        maxConcurrentRuns: 1,
+        missed: 'catch-up',
+        publicationId: 'YOUR_PUBLICATIONID',
+        timing: {
+            endDate: null,
+            exceptDates: [],
+            fold: 'first',
+            gap: 'next-valid',
+            kind: 'calendar',
+            startDate: 'YOUR_STARTDATE',
+            time: 'YOUR_TIME',
+            timeZone: 'YOUR_TIMEZONE',
+            weekdays: [],
+        },
+    },
+    expectedRevision: 'YOUR_EXPECTEDREVISION',
+    workflowId: 'YOUR_WORKFLOWID',
+};
+const result: ResultOf<typeof Method.WorkflowsSchedulesEnable> = await client.call(
+    Method.WorkflowsSchedulesEnable,
+    params,
+);
+```
+
+Parameters: [WorkflowScheduleEnable](protocol.md#workflowscheduleenable).
+
+| Field              | Required | Type                                                                       | Description |
+| ------------------ | -------- | -------------------------------------------------------------------------- | ----------- |
+| `commandId`        | Yes      | `string`                                                                   |             |
+| `configuration`    | Yes      | [WorkflowScheduleConfiguration](protocol.md#workflowscheduleconfiguration) |             |
+| `expectedRevision` | Yes      | `string`                                                                   |             |
+| `workflowId`       | Yes      | `string`                                                                   |             |
+
+Result: [WorkflowScheduleView](protocol.md#workflowscheduleview).
+
+## workflows.schedules.preview
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsSchedulesPreview> = {
+    afterMs: 'YOUR_AFTERMS',
+    timing: {
+        endDate: null,
+        exceptDates: [],
+        fold: 'first',
+        gap: 'next-valid',
+        kind: 'calendar',
+        startDate: 'YOUR_STARTDATE',
+        time: 'YOUR_TIME',
+        timeZone: 'YOUR_TIMEZONE',
+        weekdays: [],
+    },
+};
+const result: ResultOf<typeof Method.WorkflowsSchedulesPreview> = await client.call(
+    Method.WorkflowsSchedulesPreview,
+    params,
+);
+```
+
+Parameters: [WorkflowSchedulePreview](protocol.md#workflowschedulepreview).
+
+| Field     | Required | Type                                                         | Description |
+| --------- | -------- | ------------------------------------------------------------ | ----------- |
+| `afterMs` | Yes      | `string`                                                     |             |
+| `timing`  | Yes      | [WorkflowScheduleTiming](protocol.md#workflowscheduletiming) |             |
+
+Result: Array of `string`.
+
+## workflows.schedules.read
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsSchedulesRead> = {
+    workflowId: 'YOUR_WORKFLOWID',
+};
+const result: ResultOf<typeof Method.WorkflowsSchedulesRead> = await client.call(
+    Method.WorkflowsSchedulesRead,
+    params,
+);
+```
+
+Parameters: [WorkflowScheduleRead](protocol.md#workflowscheduleread).
+
+| Field        | Required | Type     | Description |
+| ------------ | -------- | -------- | ----------- |
+| `workflowId` | Yes      | `string` |             |
+
+Result: [WorkflowScheduleView](protocol.md#workflowscheduleview) / `null`.
 
 ## workflows.validate
 

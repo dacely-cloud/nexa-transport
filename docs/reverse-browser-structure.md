@@ -30,5 +30,6 @@ Chat's right-side RE panel shows separate DOM and Accessibility tabs, one siblin
 page, selected-node details and explicitly opened attribute-name pages. Original
 JSON is fetched only through All evidence. The demo includes Browser structure.
 
-Script/resource export, screenshots, storage, WebMCP, browser specialist
+Script/resource directories and exports are covered in [saved browser sources](reverse-browser-sources.md).
+Screenshots, storage, WebMCP, browser specialist
 analysis/planning, scenarios, comparisons and full REA parity remain unfinished.
