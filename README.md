@@ -201,6 +201,35 @@ const turn: TurnStream = client.stream(
 controller.abort();
 ```
 
+## Shared investigations
+
+Native `reverse_engineer` calls carry structured investigation receipts in tool
+progress and final outcomes. They describe the shared task plan, dependency
+edges, specialist states, retries and evidence provenance. They contain no query
+capability fields. Use the same receipts when replaying presentation history.
+
+```ts
+import { ReverseInvestigation } from 'nexa-transport/reverse-investigation';
+import type { ReverseRunSnapshot } from 'nexa-transport/protocol';
+
+let investigation: ReverseRunSnapshot | undefined;
+for await (const update of client.stream({ message: 'Reverse engineer sample.bin' })) {
+    const receipt: ReverseRunSnapshot | undefined = ReverseInvestigation.event(update);
+    if (receipt !== undefined) {
+        investigation = ReverseInvestigation.advance(investigation, receipt);
+        console.log(investigation.state, investigation.tasks, investigation.evidence);
+    }
+}
+```
+
+`parse` validates untrusted receipts and their presentation limits. `advance`
+rejects identity changes and ignores stale revisions or attempts to revive a
+terminal run. Revisions and timestamps remain decimal strings. Live projections
+include at most 16 recent evidence records; specialists use `reverse_evidence`
+to page through their entire shared index and read saved observations. A `done`
+specialist has submitted a report; its claims still need verification. A tool's
+`ok` result can contain a run with `partial` coverage, which should remain visible.
+
 ## Media and artifacts
 
 Attachments accept inline base64 or HTTP(S) URLs using Nexa content blocks.
@@ -541,3 +570,10 @@ Results retain exact microcent strings, request settings, pricing/capability ref
 Latest image run snapshots retain their exact provider/model, original policy evidence, supported settings and pricing reference. The portable run codec accepts these records while preserving existing exact image snapshots. Failed or ambiguous resolution returns an explicit reason. A model listing is not a successful generation or billing check.
 
 Validation for this addition: 179 SDK tests, 12 memory checks, 143 documentation examples, strict types/lint and the packed Node/NodeNext consumer passed. Editor policy controls and live mixed-provider verification remain outside this completed transport increment.
+
+Investigation receipts may include an adaptive `plan` with evidence-linked
+follow-ups, scope owners, dependency step ids and runtime states. Missing `plan`
+means the receipt predates adaptive planning. `ReverseInvestigation.parse` bounds
+these steps, checks owner/provenance references and rejects dependency cycles.
+Plan evidence ids can refer to earlier records outside the latest evidence preview.
+Use the native shared evidence index to page through those records.

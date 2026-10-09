@@ -7351,6 +7351,231 @@
             "enum": ["attach", "compute", "read"],
             "type": "string"
         },
+        "ReverseEvidenceRecord": {
+            "description": "Provenance for one immutable evidence file, shared by specialists in the same run.",
+            "properties": {
+                "characters": {
+                    "type": "string"
+                },
+                "createdAtMs": {
+                    "type": "string"
+                },
+                "excerpt": {
+                    "type": "string"
+                },
+                "expert": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "operation": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "selector": {
+                    "type": ["null", "string"]
+                },
+                "stepId": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "characters",
+                "createdAtMs",
+                "excerpt",
+                "expert",
+                "id",
+                "operation",
+                "path",
+                "selector"
+            ],
+            "type": "object"
+        },
+        "ReversePlanStep": {
+            "description": "An evidence-linked follow-up requested by a specialist and executed by the runtime.",
+            "properties": {
+                "attempts": {
+                    "type": "number"
+                },
+                "dependsOn": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "error": {
+                    "type": ["null", "string"]
+                },
+                "evidenceIds": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "expert": {
+                    "type": "string"
+                },
+                "finishedAtMs": {
+                    "type": ["null", "string"]
+                },
+                "id": {
+                    "type": "string"
+                },
+                "objective": {
+                    "type": "string"
+                },
+                "report": {
+                    "type": ["null", "string"]
+                },
+                "requestedBy": {
+                    "type": "string"
+                },
+                "scope": {
+                    "type": "string"
+                },
+                "startedAtMs": {
+                    "type": ["null", "string"]
+                },
+                "state": {
+                    "$ref": "#/definitions/ReverseState"
+                }
+            },
+            "required": [
+                "attempts",
+                "dependsOn",
+                "error",
+                "evidenceIds",
+                "expert",
+                "finishedAtMs",
+                "id",
+                "objective",
+                "report",
+                "requestedBy",
+                "scope",
+                "startedAtMs",
+                "state"
+            ],
+            "type": "object"
+        },
+        "ReverseRunSnapshot": {
+            "description": "Bounded, capability-free projection carried by live tool events and the final receipt.",
+            "properties": {
+                "cleanupErrors": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "evidence": {
+                    "items": {
+                        "$ref": "#/definitions/ReverseEvidenceRecord"
+                    },
+                    "type": "array"
+                },
+                "evidenceCount": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "inputName": {
+                    "type": "string"
+                },
+                "plan": {
+                    "items": {
+                        "$ref": "#/definitions/ReversePlanStep"
+                    },
+                    "type": "array"
+                },
+                "question": {
+                    "type": "string"
+                },
+                "revision": {
+                    "type": "string"
+                },
+                "sha256": {
+                    "type": "string"
+                },
+                "state": {
+                    "$ref": "#/definitions/ReverseState"
+                },
+                "tasks": {
+                    "items": {
+                        "$ref": "#/definitions/ReverseTaskSnapshot"
+                    },
+                    "type": "array"
+                },
+                "version": {
+                    "const": 1,
+                    "type": "number"
+                }
+            },
+            "required": [
+                "cleanupErrors",
+                "evidence",
+                "evidenceCount",
+                "id",
+                "inputName",
+                "question",
+                "revision",
+                "sha256",
+                "state",
+                "tasks",
+                "version"
+            ],
+            "type": "object"
+        },
+        "ReverseState": {
+            "description": "Runtime task lifecycle, distinct from the truth of model-authored findings.\nPossible task and workflow states.",
+            "enum": ["cancelled", "done", "failed", "partial", "pending", "running"],
+            "type": "string"
+        },
+        "ReverseTaskSnapshot": {
+            "description": "A runtime-owned step in the shared investigation plan. Reports remain unverified findings.",
+            "properties": {
+                "attempts": {
+                    "type": "number"
+                },
+                "dependsOn": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "error": {
+                    "type": ["null", "string"]
+                },
+                "expert": {
+                    "type": "string"
+                },
+                "finishedAtMs": {
+                    "type": ["null", "string"]
+                },
+                "report": {
+                    "type": ["null", "string"]
+                },
+                "startedAtMs": {
+                    "type": ["null", "string"]
+                },
+                "state": {
+                    "$ref": "#/definitions/ReverseState"
+                }
+            },
+            "required": [
+                "attempts",
+                "dependsOn",
+                "error",
+                "expert",
+                "finishedAtMs",
+                "report",
+                "startedAtMs",
+                "state"
+            ],
+            "type": "object"
+        },
         "RiskLevel": {
             "description": "How dangerous an action is.",
             "enum": ["destructive", "execute", "read", "write"],
@@ -8174,6 +8399,10 @@
                     "description": "Completed fraction in `[0, 1]`, when the tool can know it.",
                     "type": "number"
                 },
+                "reverse": {
+                    "$ref": "#/definitions/ReverseRunSnapshot",
+                    "description": "Shared investigation plan and evidence provenance, without live query capabilities."
+                },
                 "status": {
                     "description": "A one-line status, e.g. `running tests…`.",
                     "type": "string"
@@ -8341,6 +8570,10 @@
                 "question": {
                     "$ref": "#/definitions/ToolQuestion",
                     "description": "A question handed back to the conversation surface for native delivery.\n\nFinite choices become buttons or a menu on capable channels and numbered text elsewhere.\nWith no choices, the question remains an ordinary text reply. The channel router, not the\ntool, owns delivery because only it knows the active address and platform capabilities."
+                },
+                "reverse": {
+                    "$ref": "#/definitions/ReverseRunSnapshot",
+                    "description": "Runtime-authored investigation receipt, retained in presentation history."
                 },
                 "source": {
                     "description": "Where the content came from, for taint tracking.",
@@ -11045,6 +11278,9 @@
         "native": {
             "$ref": "#/definitions/NcapDelta"
         },
+        "reverseSnapshot": {
+            "$ref": "#/definitions/ReverseRunSnapshot"
+        },
         "sessionHistory": {
             "$ref": "#/definitions/SessionHistoryData"
         },
@@ -11073,6 +11309,7 @@
         "historyRecord",
         "methods",
         "native",
+        "reverseSnapshot",
         "sessionHistory",
         "sessionMessage",
         "toolSites",

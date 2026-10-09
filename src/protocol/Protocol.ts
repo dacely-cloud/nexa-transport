@@ -4986,6 +4986,131 @@ export const ResourceUseValues = { Value0: 'attach', Value1: 'compute', Value2: 
 /** ResourceUse from the Nexa wire protocol. */
 export type ResourceUse = (typeof ResourceUseValues)[keyof typeof ResourceUseValues];
 
+/** ReverseEvidenceRecord wire fields. */
+export interface ReverseEvidenceRecordShape {
+    /** characters as defined by the Nexa gateway. */
+    readonly characters: string;
+    /** createdAtMs as defined by the Nexa gateway. */
+    readonly createdAtMs: string;
+    /** excerpt as defined by the Nexa gateway. */
+    readonly excerpt: string;
+    /** expert as defined by the Nexa gateway. */
+    readonly expert: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** operation as defined by the Nexa gateway. */
+    readonly operation: string;
+    /** path as defined by the Nexa gateway. */
+    readonly path: string;
+    /** selector as defined by the Nexa gateway. */
+    readonly selector: null | string;
+    /** stepId as defined by the Nexa gateway. */
+    readonly stepId?: string;
+}
+
+/** ReverseEvidenceRecord from the Nexa wire protocol. */
+export type ReverseEvidenceRecord = ReverseEvidenceRecordShape;
+
+/** ReversePlanStep wire fields. */
+export interface ReversePlanStepShape {
+    /** attempts as defined by the Nexa gateway. */
+    readonly attempts: number;
+    /** dependsOn as defined by the Nexa gateway. */
+    readonly dependsOn: ReadonlyArray<string>;
+    /** error as defined by the Nexa gateway. */
+    readonly error: null | string;
+    /** evidenceIds as defined by the Nexa gateway. */
+    readonly evidenceIds: ReadonlyArray<string>;
+    /** expert as defined by the Nexa gateway. */
+    readonly expert: string;
+    /** finishedAtMs as defined by the Nexa gateway. */
+    readonly finishedAtMs: null | string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** objective as defined by the Nexa gateway. */
+    readonly objective: string;
+    /** report as defined by the Nexa gateway. */
+    readonly report: null | string;
+    /** requestedBy as defined by the Nexa gateway. */
+    readonly requestedBy: string;
+    /** scope as defined by the Nexa gateway. */
+    readonly scope: string;
+    /** startedAtMs as defined by the Nexa gateway. */
+    readonly startedAtMs: null | string;
+    /** state as defined by the Nexa gateway. */
+    readonly state: ReverseState;
+}
+
+/** ReversePlanStep from the Nexa wire protocol. */
+export type ReversePlanStep = ReversePlanStepShape;
+
+/** ReverseRunSnapshot wire fields. */
+export interface ReverseRunSnapshotShape {
+    /** cleanupErrors as defined by the Nexa gateway. */
+    readonly cleanupErrors: ReadonlyArray<string>;
+    /** evidence as defined by the Nexa gateway. */
+    readonly evidence: ReadonlyArray<ReverseEvidenceRecord>;
+    /** evidenceCount as defined by the Nexa gateway. */
+    readonly evidenceCount: number;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** inputName as defined by the Nexa gateway. */
+    readonly inputName: string;
+    /** plan as defined by the Nexa gateway. */
+    readonly plan?: ReadonlyArray<ReversePlanStep>;
+    /** question as defined by the Nexa gateway. */
+    readonly question: string;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: string;
+    /** sha256 as defined by the Nexa gateway. */
+    readonly sha256: string;
+    /** state as defined by the Nexa gateway. */
+    readonly state: ReverseState;
+    /** tasks as defined by the Nexa gateway. */
+    readonly tasks: ReadonlyArray<ReverseTaskSnapshot>;
+    /** version as defined by the Nexa gateway. */
+    readonly version: 1;
+}
+
+/** ReverseRunSnapshot from the Nexa wire protocol. */
+export type ReverseRunSnapshot = ReverseRunSnapshotShape;
+
+/** Allowed values for ReverseState. */
+export const ReverseStateValues = {
+    Value0: 'cancelled',
+    Value1: 'done',
+    Value2: 'failed',
+    Value3: 'partial',
+    Value4: 'pending',
+    Value5: 'running',
+} as const;
+
+/** ReverseState from the Nexa wire protocol. */
+export type ReverseState = (typeof ReverseStateValues)[keyof typeof ReverseStateValues];
+
+/** ReverseTaskSnapshot wire fields. */
+export interface ReverseTaskSnapshotShape {
+    /** attempts as defined by the Nexa gateway. */
+    readonly attempts: number;
+    /** dependsOn as defined by the Nexa gateway. */
+    readonly dependsOn: ReadonlyArray<string>;
+    /** error as defined by the Nexa gateway. */
+    readonly error: null | string;
+    /** expert as defined by the Nexa gateway. */
+    readonly expert: string;
+    /** finishedAtMs as defined by the Nexa gateway. */
+    readonly finishedAtMs: null | string;
+    /** report as defined by the Nexa gateway. */
+    readonly report: null | string;
+    /** startedAtMs as defined by the Nexa gateway. */
+    readonly startedAtMs: null | string;
+    /** state as defined by the Nexa gateway. */
+    readonly state: ReverseState;
+}
+
+/** ReverseTaskSnapshot from the Nexa wire protocol. */
+export type ReverseTaskSnapshot = ReverseTaskSnapshotShape;
+
 /** Allowed values for RiskLevel. */
 export const RiskLevelValues = {
     Value0: 'destructive',
@@ -5575,6 +5700,8 @@ export interface ToolProgressShape {
     readonly attachment?: ToolProgressAttachment;
     /** fraction as defined by the Nexa gateway. */
     readonly fraction?: number;
+    /** reverse as defined by the Nexa gateway. */
+    readonly reverse?: ReverseRunSnapshot;
     /** status as defined by the Nexa gateway. */
     readonly status?: string;
     /** terminal as defined by the Nexa gateway. */
@@ -5667,6 +5794,8 @@ export interface ToolResultShape {
     readonly protocolPayload?: boolean;
     /** question as defined by the Nexa gateway. */
     readonly question?: ToolQuestion;
+    /** reverse as defined by the Nexa gateway. */
+    readonly reverse?: ReverseRunSnapshot;
     /** source as defined by the Nexa gateway. */
     readonly source?: (typeof ToolResultsourceValues)[keyof typeof ToolResultsourceValues];
     /** status as defined by the Nexa gateway. */
