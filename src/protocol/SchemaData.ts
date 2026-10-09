@@ -3639,6 +3639,18 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'reverse.network': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/ReverseNetworkDirectoryQuery',
+                        },
+                        result: {
+                            $ref: '#/definitions/ReverseNetworkDirectoryPage',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'roblox.credentials.remove': {
                     properties: {
                         params: {
@@ -4595,6 +4607,7 @@ export const schema: Schema = {
                 'reverse.functions',
                 'reverse.graph',
                 'reverse.inspect',
+                'reverse.network',
                 'roblox.credentials.remove',
                 'roblox.credentials.set',
                 'roblox.credentials.status',
@@ -8509,6 +8522,140 @@ export const schema: Schema = {
                 'Read-only browser operations supported by an existing native analyzer lease.\nOne bounded native inspection operation.',
             enum: ['decompile', 'disassemble', 'graph', 'xrefs'],
             type: 'string',
+        },
+        ReverseNetworkDirectoryPage: {
+            description:
+                'Source-ordered metadata pages hold at most twenty rows and 12,000 serialized characters.',
+            properties: {
+                cursor: {
+                    type: 'string',
+                },
+                error: {
+                    type: ['null', 'string'],
+                },
+                nextCursor: {
+                    type: ['null', 'string'],
+                },
+                requests: {
+                    items: {
+                        $ref: '#/definitions/ReverseNetworkDirectoryRow',
+                    },
+                    type: 'array',
+                },
+                runId: {
+                    type: 'string',
+                },
+                sha256: {
+                    type: 'string',
+                },
+                sourceEntries: {
+                    type: 'string',
+                },
+                state: {
+                    $ref: '#/definitions/ReverseDirectoryState',
+                },
+                total: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'cursor',
+                'error',
+                'nextCursor',
+                'requests',
+                'runId',
+                'sha256',
+                'sourceEntries',
+                'state',
+                'total',
+            ],
+            type: 'object',
+        },
+        ReverseNetworkDirectoryQuery: {
+            description: 'Metadata navigation never accepts a file path or analyzer capability.',
+            properties: {
+                cursor: {
+                    type: 'string',
+                },
+                filter: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                method: {
+                    type: 'string',
+                },
+                runId: {
+                    type: 'string',
+                },
+                status: {
+                    type: 'number',
+                },
+            },
+            required: ['id', 'runId'],
+            type: 'object',
+        },
+        ReverseNetworkDirectoryRow: {
+            description:
+                'A request retains metadata even when no agent has captured either payload.',
+            properties: {
+                durationMs: {
+                    type: 'number',
+                },
+                id: {
+                    type: 'string',
+                },
+                location: {
+                    type: 'string',
+                },
+                method: {
+                    type: 'string',
+                },
+                mimeType: {
+                    type: 'string',
+                },
+                requestBody: {
+                    $ref: '#/definitions/NetworkBody',
+                },
+                requestEvidenceId: {
+                    type: ['null', 'string'],
+                },
+                responseBody: {
+                    $ref: '#/definitions/NetworkBody',
+                },
+                responseEvidenceId: {
+                    type: ['null', 'string'],
+                },
+                startedDateTime: {
+                    type: 'string',
+                },
+                status: {
+                    type: 'number',
+                },
+                url: {
+                    type: 'string',
+                },
+                urlTruncated: {
+                    type: 'boolean',
+                },
+            },
+            required: [
+                'durationMs',
+                'id',
+                'location',
+                'method',
+                'mimeType',
+                'requestBody',
+                'requestEvidenceId',
+                'responseBody',
+                'responseEvidenceId',
+                'startedDateTime',
+                'status',
+                'url',
+                'urlTruncated',
+            ],
+            type: 'object',
         },
         ReverseNetworkSnapshot: {
             description:
@@ -12921,6 +13068,9 @@ export const schema: Schema = {
         reverseInspection: {
             $ref: '#/definitions/ReverseInspectResult',
         },
+        reverseNetworkDirectory: {
+            $ref: '#/definitions/ReverseNetworkDirectoryPage',
+        },
         reverseSnapshot: {
             $ref: '#/definitions/ReverseRunSnapshot',
         },
@@ -12957,6 +13107,7 @@ export const schema: Schema = {
         'reverseFunctions',
         'reverseGraph',
         'reverseInspection',
+        'reverseNetworkDirectory',
         'reverseSnapshot',
         'sessionHistory',
         'sessionMessage',

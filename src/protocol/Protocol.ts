@@ -2372,6 +2372,14 @@ export interface GatewayMethodsreverse_inspectShape {
     readonly result: ReverseInspectResult;
 }
 
+/** GatewayMethodsreverse_network wire fields. */
+export interface GatewayMethodsreverse_networkShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ReverseNetworkDirectoryQuery;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ReverseNetworkDirectoryPage;
+}
+
 /** GatewayMethodsroblox_credentials_remove wire fields. */
 export interface GatewayMethodsroblox_credentials_removeShape {
     /** params as defined by the Nexa gateway. */
@@ -3052,6 +3060,8 @@ export interface GatewayMethodsShape {
     readonly 'reverse.graph': GatewayMethodsreverse_graphShape;
     /** reverse.inspect as defined by the Nexa gateway. */
     readonly 'reverse.inspect': GatewayMethodsreverse_inspectShape;
+    /** reverse.network as defined by the Nexa gateway. */
+    readonly 'reverse.network': GatewayMethodsreverse_networkShape;
     /** roblox.credentials.remove as defined by the Nexa gateway. */
     readonly 'roblox.credentials.remove': GatewayMethodsroblox_credentials_removeShape;
     /** roblox.credentials.set as defined by the Nexa gateway. */
@@ -5658,6 +5668,83 @@ export const ReverseInspectionValues = {
 /** ReverseInspection from the Nexa wire protocol. */
 export type ReverseInspection =
     (typeof ReverseInspectionValues)[keyof typeof ReverseInspectionValues];
+
+/** ReverseNetworkDirectoryPage wire fields. */
+export interface ReverseNetworkDirectoryPageShape {
+    /** cursor as defined by the Nexa gateway. */
+    readonly cursor: string;
+    /** error as defined by the Nexa gateway. */
+    readonly error: null | string;
+    /** nextCursor as defined by the Nexa gateway. */
+    readonly nextCursor: null | string;
+    /** requests as defined by the Nexa gateway. */
+    readonly requests: ReadonlyArray<ReverseNetworkDirectoryRow>;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+    /** sha256 as defined by the Nexa gateway. */
+    readonly sha256: string;
+    /** sourceEntries as defined by the Nexa gateway. */
+    readonly sourceEntries: string;
+    /** state as defined by the Nexa gateway. */
+    readonly state: ReverseDirectoryState;
+    /** total as defined by the Nexa gateway. */
+    readonly total: string;
+}
+
+/** ReverseNetworkDirectoryPage from the Nexa wire protocol. */
+export type ReverseNetworkDirectoryPage = ReverseNetworkDirectoryPageShape;
+
+/** ReverseNetworkDirectoryQuery wire fields. */
+export interface ReverseNetworkDirectoryQueryShape {
+    /** cursor as defined by the Nexa gateway. */
+    readonly cursor?: string;
+    /** filter as defined by the Nexa gateway. */
+    readonly filter?: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** method as defined by the Nexa gateway. */
+    readonly method?: string;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+    /** status as defined by the Nexa gateway. */
+    readonly status?: number;
+}
+
+/** ReverseNetworkDirectoryQuery from the Nexa wire protocol. */
+export type ReverseNetworkDirectoryQuery = ReverseNetworkDirectoryQueryShape;
+
+/** ReverseNetworkDirectoryRow wire fields. */
+export interface ReverseNetworkDirectoryRowShape {
+    /** durationMs as defined by the Nexa gateway. */
+    readonly durationMs: number;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** location as defined by the Nexa gateway. */
+    readonly location: string;
+    /** method as defined by the Nexa gateway. */
+    readonly method: string;
+    /** mimeType as defined by the Nexa gateway. */
+    readonly mimeType: string;
+    /** requestBody as defined by the Nexa gateway. */
+    readonly requestBody: NetworkBody;
+    /** requestEvidenceId as defined by the Nexa gateway. */
+    readonly requestEvidenceId: null | string;
+    /** responseBody as defined by the Nexa gateway. */
+    readonly responseBody: NetworkBody;
+    /** responseEvidenceId as defined by the Nexa gateway. */
+    readonly responseEvidenceId: null | string;
+    /** startedDateTime as defined by the Nexa gateway. */
+    readonly startedDateTime: string;
+    /** status as defined by the Nexa gateway. */
+    readonly status: number;
+    /** url as defined by the Nexa gateway. */
+    readonly url: string;
+    /** urlTruncated as defined by the Nexa gateway. */
+    readonly urlTruncated: boolean;
+}
+
+/** ReverseNetworkDirectoryRow from the Nexa wire protocol. */
+export type ReverseNetworkDirectoryRow = ReverseNetworkDirectoryRowShape;
 
 /** ReverseNetworkSnapshot wire fields. */
 export interface ReverseNetworkSnapshotShape {
@@ -8652,6 +8739,8 @@ export enum Method {
     ReverseGraph = 'reverse.graph',
     /** Calls reverse.inspect. */
     ReverseInspect = 'reverse.inspect',
+    /** Calls reverse.network. */
+    ReverseNetwork = 'reverse.network',
     /** Calls roblox.credentials.remove. */
     RobloxCredentialsRemove = 'roblox.credentials.remove',
     /** Calls roblox.credentials.set. */
