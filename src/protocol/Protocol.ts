@@ -492,6 +492,143 @@ export interface BinarySourceVariant1Shape {
 /** BinarySource from the Nexa wire protocol. */
 export type BinarySource = BinarySourceVariant0Shape | BinarySourceVariant1Shape;
 
+/** BrowserActivityConsole wire fields. */
+export interface BrowserActivityConsoleShape {
+    /** argumentTypes as defined by the Nexa gateway. */
+    readonly argumentTypes: ReadonlyArray<string>;
+    /** callType as defined by the Nexa gateway. */
+    readonly callType: string;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: 'console';
+    /** ordinal as defined by the Nexa gateway. */
+    readonly ordinal: number;
+    /** source as defined by the Nexa gateway. */
+    readonly source: BrowserActivityLocation | null;
+    /** timestamp as defined by the Nexa gateway. */
+    readonly timestamp: string;
+}
+
+/** BrowserActivityConsole from the Nexa wire protocol. */
+export type BrowserActivityConsole = BrowserActivityConsoleShape;
+
+/** BrowserActivityCoverage wire fields. */
+export interface BrowserActivityCoverageShape {
+    /** excluded as defined by the Nexa gateway. */
+    readonly excluded: string;
+    /** missingPredecessors as defined by the Nexa gateway. */
+    readonly missingPredecessors: string;
+    /** networkCompleteWithinWindow as defined by the Nexa gateway. */
+    readonly networkCompleteWithinWindow: boolean;
+    /** priorActivityAvailable as defined by the Nexa gateway. */
+    readonly priorActivityAvailable: false;
+    /** reusedRequestIds as defined by the Nexa gateway. */
+    readonly reusedRequestIds: string;
+    /** truncated as defined by the Nexa gateway. */
+    readonly truncated: boolean;
+    /** unfinishedRequests as defined by the Nexa gateway. */
+    readonly unfinishedRequests: string;
+}
+
+/** BrowserActivityCoverage from the Nexa wire protocol. */
+export type BrowserActivityCoverage = BrowserActivityCoverageShape;
+
+/** BrowserActivityLocation wire fields. */
+export interface BrowserActivityLocationShape {
+    /** column as defined by the Nexa gateway. */
+    readonly column: number;
+    /** line as defined by the Nexa gateway. */
+    readonly line: number;
+    /** url as defined by the Nexa gateway. */
+    readonly url: string;
+}
+
+/** BrowserActivityLocation from the Nexa wire protocol. */
+export type BrowserActivityLocation = BrowserActivityLocationShape;
+
+/** BrowserActivityNavigation wire fields. */
+export interface BrowserActivityNavigationShape {
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: 'navigation';
+    /** ordinal as defined by the Nexa gateway. */
+    readonly ordinal: number;
+    /** sameDocument as defined by the Nexa gateway. */
+    readonly sameDocument: boolean;
+    /** url as defined by the Nexa gateway. */
+    readonly url: string;
+}
+
+/** BrowserActivityNavigation from the Nexa wire protocol. */
+export type BrowserActivityNavigation = BrowserActivityNavigationShape;
+
+/** BrowserActivityRecord from the Nexa wire protocol. */
+export type BrowserActivityRecord =
+    | BrowserActivityRequest
+    | BrowserActivityConsole
+    | BrowserActivitySocket
+    | BrowserActivityNavigation;
+
+/** BrowserActivityRequest wire fields. */
+export interface BrowserActivityRequestShape {
+    /** encodedBytes as defined by the Nexa gateway. */
+    readonly encodedBytes: null | string;
+    /** failed as defined by the Nexa gateway. */
+    readonly failed: boolean;
+    /** finished as defined by the Nexa gateway. */
+    readonly finished: boolean;
+    /** frameId as defined by the Nexa gateway. */
+    readonly frameId: string;
+    /** initiator as defined by the Nexa gateway. */
+    readonly initiator: BrowserActivityLocation | null;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: 'request';
+    /** method as defined by the Nexa gateway. */
+    readonly method: string;
+    /** mimeType as defined by the Nexa gateway. */
+    readonly mimeType: null | string;
+    /** ordinal as defined by the Nexa gateway. */
+    readonly ordinal: number;
+    /** redirectedTo as defined by the Nexa gateway. */
+    readonly redirectedTo: null | number;
+    /** requestId as defined by the Nexa gateway. */
+    readonly requestId: string;
+    /** resourceType as defined by the Nexa gateway. */
+    readonly resourceType: string;
+    /** reusedWithoutRedirect as defined by the Nexa gateway. */
+    readonly reusedWithoutRedirect: boolean;
+    /** status as defined by the Nexa gateway. */
+    readonly status: null | number;
+    /** timestamp as defined by the Nexa gateway. */
+    readonly timestamp: string;
+    /** url as defined by the Nexa gateway. */
+    readonly url: string;
+}
+
+/** BrowserActivityRequest from the Nexa wire protocol. */
+export type BrowserActivityRequest = BrowserActivityRequestShape;
+
+/** BrowserActivitySocket wire fields. */
+export interface BrowserActivitySocketShape {
+    /** bytes as defined by the Nexa gateway. */
+    readonly bytes: string;
+    /** direction as defined by the Nexa gateway. */
+    readonly direction: string;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: 'websocket';
+    /** opcode as defined by the Nexa gateway. */
+    readonly opcode: number;
+    /** ordinal as defined by the Nexa gateway. */
+    readonly ordinal: number;
+    /** requestId as defined by the Nexa gateway. */
+    readonly requestId: string;
+    /** timestamp as defined by the Nexa gateway. */
+    readonly timestamp: string;
+    /** url as defined by the Nexa gateway. */
+    readonly url: string;
+}
+
+/** BrowserActivitySocket from the Nexa wire protocol. */
+export type BrowserActivitySocket = BrowserActivitySocketShape;
+
 /** Budget wire fields. */
 export interface BudgetShape {
     /** alertThresholds as defined by the Nexa gateway. */
@@ -2394,6 +2531,14 @@ export interface GatewayMethodsprocesses_stopShape {
     readonly result: OkResult;
 }
 
+/** GatewayMethodsreverse_browser wire fields. */
+export interface GatewayMethodsreverse_browserShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ReverseBrowserQuery;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ReverseBrowserPage;
+}
+
 /** GatewayMethodsreverse_catalog wire fields. */
 export interface GatewayMethodsreverse_catalogShape {
     /** params as defined by the Nexa gateway. */
@@ -3184,6 +3329,8 @@ export interface GatewayMethodsShape {
     readonly 'processes.resize': GatewayMethodsprocesses_resizeShape;
     /** processes.stop as defined by the Nexa gateway. */
     readonly 'processes.stop': GatewayMethodsprocesses_stopShape;
+    /** reverse.browser as defined by the Nexa gateway. */
+    readonly 'reverse.browser': GatewayMethodsreverse_browserShape;
     /** reverse.catalog as defined by the Nexa gateway. */
     readonly 'reverse.catalog': GatewayMethodsreverse_catalogShape;
     /** reverse.evidence as defined by the Nexa gateway. */
@@ -5525,6 +5672,111 @@ export interface ReverseArchiveRefShape {
 /** ReverseArchiveRef from the Nexa wire protocol. */
 export type ReverseArchiveRef = ReverseArchiveRefShape;
 
+/** ReverseBrowserMetadata wire fields. */
+export interface ReverseBrowserMetadataShape {
+    /** coverage as defined by the Nexa gateway. */
+    readonly coverage: BrowserActivityCoverage;
+    /** endedAt as defined by the Nexa gateway. */
+    readonly endedAt: string;
+    /** observationMs as defined by the Nexa gateway. */
+    readonly observationMs: number;
+    /** origin as defined by the Nexa gateway. */
+    readonly origin: string;
+    /** provider as defined by the Nexa gateway. */
+    readonly provider: 'cdp-passive';
+    /** startedAt as defined by the Nexa gateway. */
+    readonly startedAt: string;
+    /** targetId as defined by the Nexa gateway. */
+    readonly targetId: string;
+    /** url as defined by the Nexa gateway. */
+    readonly url: string;
+}
+
+/** ReverseBrowserMetadata from the Nexa wire protocol. */
+export type ReverseBrowserMetadata = ReverseBrowserMetadataShape;
+
+/** ReverseBrowserPage wire fields. */
+export interface ReverseBrowserPageShape {
+    /** captureSha256 as defined by the Nexa gateway. */
+    readonly captureSha256: string;
+    /** cursor as defined by the Nexa gateway. */
+    readonly cursor: string;
+    /** evidenceId as defined by the Nexa gateway. */
+    readonly evidenceId: string;
+    /** metadata as defined by the Nexa gateway. */
+    readonly metadata: ReverseBrowserMetadata;
+    /** nextCursor as defined by the Nexa gateway. */
+    readonly nextCursor: null | string;
+    /** records as defined by the Nexa gateway. */
+    readonly records: ReadonlyArray<BrowserActivityRecord>;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+    /** sha256 as defined by the Nexa gateway. */
+    readonly sha256: string;
+    /** total as defined by the Nexa gateway. */
+    readonly total: number;
+}
+
+/** ReverseBrowserPage from the Nexa wire protocol. */
+export type ReverseBrowserPage = ReverseBrowserPageShape;
+
+/** ReverseBrowserQuery wire fields. */
+export interface ReverseBrowserQueryShape {
+    /** cursor as defined by the Nexa gateway. */
+    readonly cursor?: string;
+    /** evidenceId as defined by the Nexa gateway. */
+    readonly evidenceId: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+}
+
+/** ReverseBrowserQuery from the Nexa wire protocol. */
+export type ReverseBrowserQuery = ReverseBrowserQueryShape;
+
+/** ReverseBrowserReference wire fields. */
+export interface ReverseBrowserReferenceShape {
+    /** captureSha256 as defined by the Nexa gateway. */
+    readonly captureSha256: string;
+    /** evidenceId as defined by the Nexa gateway. */
+    readonly evidenceId: string;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+    /** sessionId as defined by the Nexa gateway. */
+    readonly sessionId: string;
+}
+
+/** ReverseBrowserReference from the Nexa wire protocol. */
+export type ReverseBrowserReference = ReverseBrowserReferenceShape;
+
+/** ReverseBrowserSnapshot wire fields. */
+export interface ReverseBrowserSnapshotShape {
+    /** coverage as defined by the Nexa gateway. */
+    readonly coverage: BrowserActivityCoverage;
+    /** endedAt as defined by the Nexa gateway. */
+    readonly endedAt: string;
+    /** observationMs as defined by the Nexa gateway. */
+    readonly observationMs: number;
+    /** origin as defined by the Nexa gateway. */
+    readonly origin: string;
+    /** provider as defined by the Nexa gateway. */
+    readonly provider: 'cdp-passive';
+    /** recordCount as defined by the Nexa gateway. */
+    readonly recordCount: number;
+    /** reference as defined by the Nexa gateway. */
+    readonly reference: ReverseBrowserReference;
+    /** startedAt as defined by the Nexa gateway. */
+    readonly startedAt: string;
+    /** targetId as defined by the Nexa gateway. */
+    readonly targetId: string;
+    /** url as defined by the Nexa gateway. */
+    readonly url: string;
+}
+
+/** ReverseBrowserSnapshot from the Nexa wire protocol. */
+export type ReverseBrowserSnapshot = ReverseBrowserSnapshotShape;
+
 /** ReverseCatalogPage wire fields. */
 export interface ReverseCatalogPageShape {
     /** cursor as defined by the Nexa gateway. */
@@ -6048,10 +6300,11 @@ export type ReversePlanStep = ReversePlanStepShape;
 
 /** Allowed values for ReverseRunSnapshotkind. */
 export const ReverseRunSnapshotkindValues = {
-    Value0: 'javascript',
-    Value1: 'native',
-    Value2: 'network',
-    Value3: 'source',
+    Value0: 'browser',
+    Value1: 'javascript',
+    Value2: 'native',
+    Value3: 'network',
+    Value4: 'source',
 } as const;
 
 /** ReverseRunSnapshot wire fields. */
@@ -6060,6 +6313,8 @@ export interface ReverseRunSnapshotShape {
     readonly application?: ReverseApplicationSnapshot;
     /** archive as defined by the Nexa gateway. */
     readonly archive?: ReverseArchiveRef;
+    /** browser as defined by the Nexa gateway. */
+    readonly browser?: ReverseBrowserSnapshot;
     /** cleanupErrors as defined by the Nexa gateway. */
     readonly cleanupErrors: ReadonlyArray<string>;
     /** evidence as defined by the Nexa gateway. */
@@ -8164,6 +8419,8 @@ export interface WorkflowModelChoiceShape {
     readonly compatible: boolean;
     /** contextWindow as defined by the Nexa gateway. */
     readonly contextWindow: null | number;
+    /** efforts as defined by the Nexa gateway. */
+    readonly efforts?: ReadonlyArray<WorkflowModelEffort>;
     /** id as defined by the Nexa gateway. */
     readonly id: string;
     /** image as defined by the Nexa gateway. */
@@ -8186,8 +8443,6 @@ export interface WorkflowModelChoiceShape {
     readonly source: string;
     /** status as defined by the Nexa gateway. */
     readonly status: string;
-    /** efforts as defined by the Nexa gateway. */
-    readonly efforts?: ReadonlyArray<WorkflowModelEffort>;
 }
 
 /** WorkflowModelChoice from the Nexa wire protocol. */
@@ -9270,6 +9525,8 @@ export enum Method {
     ProcessesResize = 'processes.resize',
     /** Calls processes.stop. */
     ProcessesStop = 'processes.stop',
+    /** Calls reverse.browser. */
+    ReverseBrowser = 'reverse.browser',
     /** Calls reverse.catalog. */
     ReverseCatalog = 'reverse.catalog',
     /** Calls reverse.evidence. */
