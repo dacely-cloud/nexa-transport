@@ -99,6 +99,8 @@ export interface WorkflowStepResult {
     readonly result: WorkflowNamedResult | null;
 }
 export interface WorkflowStepState {
+    /** Persisted timer target; retained after completion or cancellation as timing evidence. */
+    readonly wakeAtMs?: string;
     readonly nodeId: string;
     readonly invocationId: string;
     readonly attempt: number;

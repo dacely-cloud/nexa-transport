@@ -10292,6 +10292,8 @@ export interface WorkflowStepViewShape {
     readonly startedAtMs: string;
     /** status as defined by the Nexa gateway. */
     readonly status: WorkflowStepStatus;
+    /** wakeAtMs as defined by the Nexa gateway. */
+    readonly wakeAtMs?: string;
 }
 
 /** WorkflowStepView from the Nexa wire protocol. */
