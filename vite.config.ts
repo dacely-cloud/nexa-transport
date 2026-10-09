@@ -18,6 +18,8 @@ const config: UserConfig = {
                 'workflow-artifacts': 'src/workflows/runtime/ArtifactDownload.ts',
                 'workflow-calendar-types': 'src/workflows/schedule/CalendarTypes.ts',
                 'workflow-calendar-codec': 'src/workflows/schedule/CalendarCodec.ts',
+                'workflow-json': 'src/workflows/WorkflowJson.ts',
+                'workflow-timed-trigger': 'src/workflows/TimedTrigger.ts',
                 'workflow-schedule-types': 'src/workflows/schedule/ScheduleTypes.ts',
                 'workflow-schedule-codec': 'src/workflows/schedule/ScheduleCodec.ts',
                 'workflow-schedule-times': 'src/workflows/schedule/ScheduleTiming.ts',

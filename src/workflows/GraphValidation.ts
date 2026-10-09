@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { WorkflowTimedTrigger } from './TimedTrigger.js';
 import { ComponentRegistry } from './ComponentRegistry.js';
 import {
     ComponentRole,
@@ -164,6 +165,19 @@ export class WorkflowGraphValidation {
         connections: GraphConnectionsResult,
         problems: GraphProblems,
     ): void {
+        if (entry.node.component === WorkflowTimedTrigger.component) {
+            try {
+                WorkflowTimedTrigger.read(entry.node);
+            } catch (error: unknown) {
+                problems.add(
+                    GraphIssueCode.Configuration,
+                    error instanceof Error ? error.message : 'Review this Timed Event',
+                    entry.node.id,
+                    null,
+                    'schedule',
+                );
+            }
+        }
         if (entry.definition.id === 'flow.join') {
             const mode: WorkflowValue | undefined = entry.node.configuration['mode'];
             const count: WorkflowValue | undefined = entry.node.configuration['requiredCount'];

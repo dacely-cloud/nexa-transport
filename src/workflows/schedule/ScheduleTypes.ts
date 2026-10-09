@@ -35,14 +35,17 @@ export const WorkflowScheduleMissed = {
 export type WorkflowScheduleMissed =
     (typeof WorkflowScheduleMissed)[keyof typeof WorkflowScheduleMissed];
 /** Activation never follows a mutable published pointer or changes a draft. */
-export interface WorkflowScheduleConfiguration {
-    readonly publicationId: string;
+export interface WorkflowScheduleRules {
     readonly timing: WorkflowScheduleTiming;
-    readonly input: WorkflowObject;
     readonly missed: WorkflowScheduleMissed;
     readonly catchUpLimit: number;
     readonly lateGraceMs: string;
     readonly maxConcurrentRuns: number;
+}
+/** Activation binds saved timing rules to one publication and its submitted input. */
+export interface WorkflowScheduleConfiguration extends WorkflowScheduleRules {
+    readonly publicationId: string;
+    readonly input: WorkflowObject;
 }
 /** Configuration revision is independent of execution progress. */
 export interface WorkflowScheduleCommand {

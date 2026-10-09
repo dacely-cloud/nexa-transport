@@ -1,3 +1,12 @@
+import { ComponentRegistry } from '../src/workflows/ComponentRegistry.js';
+import { WorkflowTimedTrigger } from '../src/workflows/TimedTrigger.js';
+import { WorkflowGraphValidation } from '../src/workflows/GraphValidation.js';
+import type { WorkflowNode } from '../src/workflows/WorkflowTypes.js';
+import type { WorkflowRunSnapshot } from '../src/workflows/runtime/RunTypes.js';
+import type {
+    WorkflowScheduleRules,
+    WorkflowScheduleConfiguration,
+} from '../src/workflows/schedule/ScheduleTypes.js';
 import type { WorkflowCalendarTiming } from '../src/workflows/schedule/CalendarTypes.js';
 import type { WorkflowScheduleTiming } from '../src/workflows/schedule/ScheduleTypes.js';
 import { WorkflowScheduleTimes } from '../src/workflows/schedule/ScheduleTiming.js';
@@ -74,4 +83,30 @@ it('preserves named-zone calendar policies through the wire contract and compute
     expect((): WorkflowScheduleTiming =>
         WorkflowScheduleCodec.timing({ ...timing, weekdays: [] }),
     ).toThrow();
+});
+it('ships a real Timed Event contract and rejects activation rules that differ from its published node', (): void => {
+    const node: WorkflowNode = ComponentRegistry.builtin().create('trigger.timed', '1', 'start');
+    const rules: WorkflowScheduleRules | null = WorkflowTimedTrigger.read(node);
+    if (rules === null) {
+        throw new Error('Timed Event rules are missing');
+    }
+    const snapshot: WorkflowRunSnapshot = {
+        format: 1,
+        graph: { workflowId: 'workflow', revision: '1', nodes: [node], edges: [] },
+        triggerNodeId: 'start',
+        mode: 'live-test',
+        input: {},
+        maxConcurrency: 1,
+        timeoutMs: '60000',
+    };
+    const configuration: WorkflowScheduleConfiguration = {
+        ...rules,
+        publicationId: 'release',
+        input: {},
+    };
+    expect(WorkflowGraphValidation.inspect(snapshot.graph).valid).toBe(true);
+    expect((): void => WorkflowTimedTrigger.assert(snapshot, configuration)).not.toThrow();
+    expect((): void =>
+        WorkflowTimedTrigger.assert(snapshot, { ...configuration, missed: 'latest' }),
+    ).toThrow('does not match');
 });

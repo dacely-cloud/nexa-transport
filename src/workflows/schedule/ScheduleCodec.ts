@@ -10,6 +10,7 @@ import {
     WorkflowScheduleMissed,
     type WorkflowScheduleTiming,
     type WorkflowScheduleConfiguration,
+    type WorkflowScheduleRules,
     type WorkflowScheduleEnable,
     type WorkflowScheduleCommand,
     type WorkflowSchedulePreview,
@@ -73,6 +74,33 @@ export class WorkflowScheduleCodec {
             'lateGraceMs',
             'maxConcurrentRuns',
         ]);
+        const configuration: WorkflowScheduleConfiguration = {
+            publicationId: WorkflowInput.id(value['publicationId']),
+            input: WorkflowJson.object(value['input']),
+            ...this.rules({
+                timing: value['timing'],
+                missed: value['missed'],
+                catchUpLimit: value['catchUpLimit'],
+                lateGraceMs: value['lateGraceMs'],
+                maxConcurrentRuns: value['maxConcurrentRuns'],
+            }),
+        };
+        if (JSON.stringify(configuration).length > 65_536) {
+            throw new Error(
+                'Schedule configuration is too large; use resource references for input',
+            );
+        }
+        return configuration;
+    }
+    /** Shared graph/activation policy validation; neither path invents a different timing contract. */
+    public static rules(raw: unknown): WorkflowScheduleRules {
+        const value: Readonly<Record<string, unknown>> = WorkflowInput.record(raw, [
+            'timing',
+            'missed',
+            'catchUpLimit',
+            'lateGraceMs',
+            'maxConcurrentRuns',
+        ]);
         const missed: unknown = value['missed'];
         if (
             missed !== WorkflowScheduleMissed.Skip &&
@@ -85,21 +113,13 @@ export class WorkflowScheduleCodec {
         if (BigInt(lateGraceMs) < 1_000n || BigInt(lateGraceMs) > 300_000n) {
             throw new Error('Schedule lateness grace must be between one second and five minutes');
         }
-        const configuration: WorkflowScheduleConfiguration = {
-            publicationId: WorkflowInput.id(value['publicationId']),
+        return {
             timing: this.timing(value['timing']),
-            input: WorkflowJson.object(value['input']),
             missed,
             catchUpLimit: this.#count(value['catchUpLimit'], 20),
             lateGraceMs,
             maxConcurrentRuns: this.#count(value['maxConcurrentRuns'], 32),
         };
-        if (JSON.stringify(configuration).length > 65_536) {
-            throw new Error(
-                'Schedule configuration is too large; use resource references for input',
-            );
-        }
-        return configuration;
     }
     /** A missing schedule has revision zero; every enable/disable creates a new revision. */
     public static command(raw: unknown): WorkflowScheduleCommand {

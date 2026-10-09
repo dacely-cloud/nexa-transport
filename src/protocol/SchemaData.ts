@@ -14845,7 +14845,8 @@ export const schema: Schema = {
             type: 'object',
         },
         WorkflowScheduleConfiguration: {
-            description: 'Activation never follows a mutable published pointer or changes a draft.',
+            description:
+                'Activation binds saved timing rules to one publication and its submitted input.',
             properties: {
                 catchUpLimit: {
                     type: 'number',

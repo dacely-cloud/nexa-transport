@@ -12,6 +12,7 @@ import {
 import { ApprovalComponents } from './ApprovalComponents.js';
 import { HumanComponents } from './HumanComponents.js';
 import { DataComponents } from './DataComponents.js';
+import { TimedComponents } from './TimedComponents.js';
 import { CoreComponents } from './CoreComponents.js';
 import { InferenceComponents } from './InferenceComponents.js';
 import { ImageComponents } from './ImageComponents.js';
@@ -46,6 +47,7 @@ export class ComponentRegistry {
     public static builtin(): ComponentRegistry {
         this.#builtin ??= new ComponentRegistry([
             ...CoreComponents.definitions(),
+            TimedComponents.definition(),
             ...HumanComponents.definitions(),
             ...ApprovalComponents.definitions(),
             ...DataComponents.definitions(),
