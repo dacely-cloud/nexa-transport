@@ -10202,6 +10202,8 @@ export interface WorkflowRunEventShape {
     readonly message: null | string;
     /** nodeId as defined by the Nexa gateway. */
     readonly nodeId: null | string;
+    /** origin as defined by the Nexa gateway. */
+    readonly origin?: WorkflowStepOrigin;
     /** runId as defined by the Nexa gateway. */
     readonly runId: string;
     /** sequence as defined by the Nexa gateway. */
@@ -10583,6 +10585,19 @@ export interface WorkflowScheduleViewShape {
 /** WorkflowScheduleView from the Nexa wire protocol. */
 export type WorkflowScheduleView = WorkflowScheduleViewShape;
 
+/** WorkflowStepOrigin wire fields. */
+export interface WorkflowStepOriginShape {
+    /** itemIndex as defined by the Nexa gateway. */
+    readonly itemIndex: number;
+    /** loopId as defined by the Nexa gateway. */
+    readonly loopId: string;
+    /** nodeId as defined by the Nexa gateway. */
+    readonly nodeId: string;
+}
+
+/** WorkflowStepOrigin from the Nexa wire protocol. */
+export type WorkflowStepOrigin = WorkflowStepOriginShape;
+
 /** Allowed values for WorkflowStepStatus. */
 export const WorkflowStepStatusValues = {
     Value0: 'cancelled',
@@ -10617,6 +10632,8 @@ export interface WorkflowStepViewShape {
     readonly message: null | string;
     /** nodeId as defined by the Nexa gateway. */
     readonly nodeId: string;
+    /** origin as defined by the Nexa gateway. */
+    readonly origin?: WorkflowStepOrigin;
     /** startedAtMs as defined by the Nexa gateway. */
     readonly startedAtMs: string;
     /** status as defined by the Nexa gateway. */

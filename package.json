@@ -318,6 +318,10 @@
         "./workflow-list-transform": {
             "types": "./dist/workflows/lists/ListTransform.d.ts",
             "import": "./dist/workflow-list-transform.js"
+        },
+        "./workflow-each": {
+            "types": "./dist/workflows/GraphEach.d.ts",
+            "import": "./dist/workflow-each.js"
         }
     },
     "scripts": {
