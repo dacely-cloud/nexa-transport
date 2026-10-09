@@ -175,16 +175,17 @@ Exact generated-source location of a static observation. Columns and offsets are
 
 An inventoried module with a digest of the exact bytes parsed, including syntax failures.
 
-| Field        | Required | Type          | Description |
-| ------------ | -------- | ------------- | ----------- |
-| `bytes`      | Yes      | `string`      |             |
-| `functions`  | Yes      | `number`      |             |
-| `id`         | Yes      | `string`      |             |
-| `imports`    | Yes      | `number`      |             |
-| `parseError` | Yes      | `null,string` |             |
-| `path`       | Yes      | `string`      |             |
-| `sha256`     | Yes      | `string`      |             |
-| `sourceMap`  | Yes      | `null,string` |             |
+| Field        | Required | Type                                                  | Description                                                                         |
+| ------------ | -------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `bytes`      | Yes      | `string`                                              |                                                                                     |
+| `functions`  | Yes      | `number`                                              |                                                                                     |
+| `id`         | Yes      | `string`                                              |                                                                                     |
+| `imports`    | Yes      | `number`                                              |                                                                                     |
+| `language`   | No       | `"c"` / `"cpp"` / `"javascript"` / `"lua"` / `"luau"` | Source grammars are explicit; bytecode formats use separate version-aware adapters. |
+| `parseError` | Yes      | `null,string`                                         |                                                                                     |
+| `path`       | Yes      | `string`                                              |                                                                                     |
+| `sha256`     | Yes      | `string`                                              |                                                                                     |
+| `sourceMap`  | Yes      | `null,string`                                         |                                                                                     |
 
 ## ApprovalRequestedData
 
@@ -3525,11 +3526,14 @@ Bounded projection for live Chat events; complete indexes are paged by the nativ
 | `ipcCount`         | Yes      | `number`                                                        |             |
 | `issueCount`       | Yes      | `number`                                                        |             |
 | `issues`           | Yes      | Array of [ApplicationIssue](protocol.md#applicationissue)       |             |
+| `languages`        | No       | Array of [SourceLanguage](protocol.md#sourcelanguage)           |             |
 | `moduleCount`      | Yes      | `number`                                                        |             |
 | `modules`          | Yes      | Array of [ApplicationModule](protocol.md#applicationmodule)     |             |
 | `nativeAddonCount` | Yes      | `number`                                                        |             |
+| `referenceCount`   | No       | `number`                                                        |             |
 | `routeCount`       | Yes      | `number`                                                        |             |
 | `sourceMapCount`   | Yes      | `number`                                                        |             |
+| `symbolCount`      | No       | `number`                                                        |             |
 
 ## ReverseEvidenceRecord
 
@@ -3579,7 +3583,7 @@ Bounded, capability-free projection carried by live tool events and the final re
 | `evidenceCount` | Yes      | `number`                                                             |                                                                                                 |
 | `id`            | Yes      | `string`                                                             |                                                                                                 |
 | `inputName`     | Yes      | `string`                                                             |                                                                                                 |
-| `kind`          | No       | `"javascript"` / `"native"`                                          | The runtime selects a target adapter; callers may make the choice explicit for ambiguous files. |
+| `kind`          | No       | `"javascript"` / `"native"` / `"source"`                             | The runtime selects a target adapter; callers may make the choice explicit for ambiguous files. |
 | `plan`          | No       | Array of [ReversePlanStep](protocol.md#reverseplanstep)              |                                                                                                 |
 | `question`      | Yes      | `string`                                                             |                                                                                                 |
 | `revision`      | Yes      | `string`                                                             |                                                                                                 |
@@ -3850,6 +3854,12 @@ Only server-fetched raster bytes cross the gateway; clients never fetch the visi
 | --------- | -------- | -------- | ----------- |
 | `favicon` | Yes      | `string` |             |
 | `origin`  | Yes      | `string` |             |
+
+## SourceLanguage
+
+Source grammars are explicit; bytecode formats use separate version-aware adapters.
+
+Type: `"c"` / `"cpp"` / `"javascript"` / `"lua"` / `"luau"`.
 
 ## SteerParams
 
