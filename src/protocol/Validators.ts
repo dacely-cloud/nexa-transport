@@ -36,6 +36,14 @@ export function methods(value: unknown): value is protocol.GatewayMethods {
 export function native(value: unknown): value is protocol.NcapDelta {
     return validator.validate('#/definitions/NcapDelta', value);
 }
+/** Validates reverseCatalog. */
+export function reverseCatalog(value: unknown): value is protocol.ReverseCatalogPage {
+    return validator.validate('#/definitions/ReverseCatalogPage', value);
+}
+/** Validates reverseEvidence. */
+export function reverseEvidence(value: unknown): value is protocol.ReverseEvidencePage {
+    return validator.validate('#/definitions/ReverseEvidencePage', value);
+}
 /** Validates reverseSnapshot. */
 export function reverseSnapshot(value: unknown): value is protocol.ReverseRunSnapshot {
     return validator.validate('#/definitions/ReverseRunSnapshot', value);

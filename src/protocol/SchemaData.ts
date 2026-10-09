@@ -7829,8 +7829,17 @@ export const schema: Schema = {
                 nextCursor: {
                     type: ['null', 'string'],
                 },
+                originalEvidenceSha256: {
+                    description:
+                        'Present for a derived code page and always identifies the unmodified captured original.',
+                    type: 'string',
+                },
                 record: {
                     $ref: '#/definitions/ReverseEvidenceRecord',
+                },
+                representation: {
+                    enum: ['code', 'original'],
+                    type: 'string',
                 },
                 runId: {
                     type: 'string',
@@ -7865,6 +7874,11 @@ export const schema: Schema = {
                     type: 'string',
                 },
                 id: {
+                    type: 'string',
+                },
+                representation: {
+                    description: 'Code is extracted at capture time; original remains the default.',
+                    enum: ['code', 'original'],
                     type: 'string',
                 },
                 runId: {
@@ -11946,6 +11960,12 @@ export const schema: Schema = {
         native: {
             $ref: '#/definitions/NcapDelta',
         },
+        reverseCatalog: {
+            $ref: '#/definitions/ReverseCatalogPage',
+        },
+        reverseEvidence: {
+            $ref: '#/definitions/ReverseEvidencePage',
+        },
         reverseSnapshot: {
             $ref: '#/definitions/ReverseRunSnapshot',
         },
@@ -11977,6 +11997,8 @@ export const schema: Schema = {
         'historyRecord',
         'methods',
         'native',
+        'reverseCatalog',
+        'reverseEvidence',
         'reverseSnapshot',
         'sessionHistory',
         'sessionMessage',

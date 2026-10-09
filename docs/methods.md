@@ -52,6 +52,8 @@ All 54 protocol methods. `connect` is managed by `NexaClient.connect`; the remai
 - [processes.log](#processes-log)
 - [processes.resize](#processes-resize)
 - [processes.stop](#processes-stop)
+- [reverse.catalog](#reverse-catalog)
+- [reverse.evidence](#reverse-evidence)
 - [roblox.credentials.remove](#roblox-credentials-remove)
 - [roblox.credentials.set](#roblox-credentials-set)
 - [roblox.credentials.status](#roblox-credentials-status)
@@ -1190,6 +1192,59 @@ Parameters: [BackgroundProcessRef](protocol.md#backgroundprocessref).
 | `sessionId` | Yes      | `string` |             |
 
 Result: [OkResult](protocol.md#okresult).
+
+## reverse.catalog
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ReverseCatalog> = {
+    id: 'YOUR_ID',
+    runId: 'YOUR_RUNID',
+};
+const result: ResultOf<typeof Method.ReverseCatalog> = await client.call(
+    Method.ReverseCatalog,
+    params,
+);
+```
+
+Parameters: [ReverseCatalogQuery](protocol.md#reversecatalogquery).
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `cursor` | No       | `string` |             |
+| `id`     | Yes      | `string` |             |
+| `runId`  | Yes      | `string` |             |
+
+Result: [ReverseCatalogPage](protocol.md#reversecatalogpage).
+
+## reverse.evidence
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ReverseEvidence> = {
+    evidenceId: 'YOUR_EVIDENCEID',
+    id: 'YOUR_ID',
+    runId: 'YOUR_RUNID',
+};
+const result: ResultOf<typeof Method.ReverseEvidence> = await client.call(
+    Method.ReverseEvidence,
+    params,
+);
+```
+
+Parameters: [ReverseEvidenceQuery](protocol.md#reverseevidencequery).
+
+| Field            | Required | Type                    | Description                                                      |
+| ---------------- | -------- | ----------------------- | ---------------------------------------------------------------- |
+| `cursor`         | No       | `string`                |                                                                  |
+| `evidenceId`     | Yes      | `string`                |                                                                  |
+| `id`             | Yes      | `string`                |                                                                  |
+| `representation` | No       | `"code"` / `"original"` | Code is extracted at capture time; original remains the default. |
+| `runId`          | Yes      | `string`                |                                                                  |
+
+Result: [ReverseEvidencePage](protocol.md#reverseevidencepage).
 
 ## roblox.credentials.remove
 
