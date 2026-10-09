@@ -5867,3 +5867,13 @@ completed reports. `ReverseInvestigation.advance` accepts an explicit newer
 execution after partial/failure/cancellation and rejects late prior-execution
 updates. Attempts are cumulative, bounded by two per execution and six overall.
 Chat history can contain separate investigation and resume tool calls for one run.
+
+Investigation receipts optionally include `execution`, an integer from zero to
+three. An absent value means the original execution. `reverse_resume` is an agent
+tool that retries an unfinished run under the current caller's permissions;
+there is no browser RPC that bypasses that tool policy. Resumes retain the run id,
+input digest and original archive ownership, increase revisions, and preserve
+completed reports. `ReverseInvestigation.advance` accepts an explicit newer
+execution after partial/failure/cancellation and rejects late prior-execution
+updates. Attempts are cumulative, bounded by two per execution and six overall.
+Chat history can contain separate investigation and resume tool calls for one run.
