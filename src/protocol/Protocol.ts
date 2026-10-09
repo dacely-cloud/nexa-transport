@@ -2875,6 +2875,14 @@ export interface GatewayMethodsvoice_stopShape {
     readonly result: OkResult;
 }
 
+/** GatewayMethodsworkflows_attention_list wire fields. */
+export interface GatewayMethodsworkflows_attention_listShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkflowAttentionQuery;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WorkflowAttentionPage;
+}
+
 /** GatewayMethodsworkflows_catalog wire fields. */
 export interface GatewayMethodsworkflows_catalogShape {
     /** params as defined by the Nexa gateway. */
@@ -3423,6 +3431,8 @@ export interface GatewayMethodsShape {
     readonly 'voice.start': GatewayMethodsvoice_startShape;
     /** voice.stop as defined by the Nexa gateway. */
     readonly 'voice.stop': GatewayMethodsvoice_stopShape;
+    /** workflows.attention.list as defined by the Nexa gateway. */
+    readonly 'workflows.attention.list': GatewayMethodsworkflows_attention_listShape;
     /** workflows.catalog as defined by the Nexa gateway. */
     readonly 'workflows.catalog': GatewayMethodsworkflows_catalogShape;
     /** workflows.create as defined by the Nexa gateway. */
@@ -7920,6 +7930,101 @@ export interface WorkflowArtifactPublicationShape {
 /** WorkflowArtifactPublication from the Nexa wire protocol. */
 export type WorkflowArtifactPublication = WorkflowArtifactPublicationShape;
 
+/** Allowed values for WorkflowAttentionCategory. */
+export const WorkflowAttentionCategoryValues = { Value0: 'failures', Value1: 'requests' } as const;
+
+/** WorkflowAttentionCategory from the Nexa wire protocol. */
+export type WorkflowAttentionCategory =
+    (typeof WorkflowAttentionCategoryValues)[keyof typeof WorkflowAttentionCategoryValues];
+
+/** WorkflowAttentionCursor wire fields. */
+export interface WorkflowAttentionCursorShape {
+    /** nodeId as defined by the Nexa gateway. */
+    readonly nodeId: null | string;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+}
+
+/** WorkflowAttentionCursor from the Nexa wire protocol. */
+export type WorkflowAttentionCursor = WorkflowAttentionCursorShape;
+
+/** Allowed values for WorkflowAttentionItemkind. */
+export const WorkflowAttentionItemkindValues = {
+    Value0: 'approval',
+    Value1: 'failure',
+    Value2: 'question',
+} as const;
+
+/** Allowed values for WorkflowAttentionItemstatus. */
+export const WorkflowAttentionItemstatusValues = {
+    Value0: 'expired',
+    Value1: 'failed',
+    Value2: 'pending',
+} as const;
+
+/** WorkflowAttentionItem wire fields. */
+export interface WorkflowAttentionItemShape {
+    /** canRespond as defined by the Nexa gateway. */
+    readonly canRespond: boolean;
+    /** createdAtMs as defined by the Nexa gateway. */
+    readonly createdAtMs: string;
+    /** detail as defined by the Nexa gateway. */
+    readonly detail: string;
+    /** expiresAtMs as defined by the Nexa gateway. */
+    readonly expiresAtMs: null | string;
+    /** invocationId as defined by the Nexa gateway. */
+    readonly invocationId: null | string;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: (typeof WorkflowAttentionItemkindValues)[keyof typeof WorkflowAttentionItemkindValues];
+    /** nodeId as defined by the Nexa gateway. */
+    readonly nodeId: null | string;
+    /** recipient as defined by the Nexa gateway. */
+    readonly recipient: string;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+    /** status as defined by the Nexa gateway. */
+    readonly status: (typeof WorkflowAttentionItemstatusValues)[keyof typeof WorkflowAttentionItemstatusValues];
+    /** title as defined by the Nexa gateway. */
+    readonly title: string;
+    /** workflowId as defined by the Nexa gateway. */
+    readonly workflowId: string;
+    /** workflowName as defined by the Nexa gateway. */
+    readonly workflowName: null | string;
+    /** workflowRevision as defined by the Nexa gateway. */
+    readonly workflowRevision: string;
+}
+
+/** WorkflowAttentionItem from the Nexa wire protocol. */
+export type WorkflowAttentionItem = WorkflowAttentionItemShape;
+
+/** WorkflowAttentionPage wire fields. */
+export interface WorkflowAttentionPageShape {
+    /** category as defined by the Nexa gateway. */
+    readonly category: WorkflowAttentionCategory;
+    /** items as defined by the Nexa gateway. */
+    readonly items: ReadonlyArray<WorkflowAttentionItem>;
+    /** next as defined by the Nexa gateway. */
+    readonly next: WorkflowAttentionCursor | null;
+    /** observedAtMs as defined by the Nexa gateway. */
+    readonly observedAtMs: string;
+}
+
+/** WorkflowAttentionPage from the Nexa wire protocol. */
+export type WorkflowAttentionPage = WorkflowAttentionPageShape;
+
+/** WorkflowAttentionQuery wire fields. */
+export interface WorkflowAttentionQueryShape {
+    /** after as defined by the Nexa gateway. */
+    readonly after: WorkflowAttentionCursor | null;
+    /** category as defined by the Nexa gateway. */
+    readonly category: WorkflowAttentionCategory;
+    /** limit as defined by the Nexa gateway. */
+    readonly limit: number;
+}
+
+/** WorkflowAttentionQuery from the Nexa wire protocol. */
+export type WorkflowAttentionQuery = WorkflowAttentionQueryShape;
+
 /** WorkflowCatalog wire fields. */
 export interface WorkflowCatalogShape {
     /** components as defined by the Nexa gateway. */
@@ -9685,6 +9790,8 @@ export enum Method {
     VoiceStart = 'voice.start',
     /** Calls voice.stop. */
     VoiceStop = 'voice.stop',
+    /** Calls workflows.attention.list. */
+    WorkflowsAttentionList = 'workflows.attention.list',
     /** Calls workflows.catalog. */
     WorkflowsCatalog = 'workflows.catalog',
     /** Calls workflows.create. */
