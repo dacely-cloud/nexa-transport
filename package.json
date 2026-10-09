@@ -322,6 +322,10 @@
         "./workflow-each": {
             "types": "./dist/workflows/GraphEach.d.ts",
             "import": "./dist/workflow-each.js"
+        },
+        "./workflow-loops": {
+            "types": "./dist/workflows/LoopComponents.d.ts",
+            "import": "./dist/workflow-loops.js"
         }
     },
     "scripts": {
