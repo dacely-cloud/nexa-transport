@@ -317,6 +317,117 @@ export const schema: Schema = {
             required: ['provider', 'voiceId'],
             type: 'object',
         },
+        ApplicationBoundary: {
+            properties: {
+                id: {
+                    type: 'string',
+                },
+                kind: {
+                    $ref: '#/definitions/ApplicationBoundaryKind',
+                },
+                location: {
+                    $ref: '#/definitions/ApplicationLocation',
+                },
+                operation: {
+                    type: 'string',
+                },
+                value: {
+                    type: ['null', 'string'],
+                },
+            },
+            required: ['id', 'kind', 'location', 'operation', 'value'],
+            type: 'object',
+        },
+        ApplicationBoundaryKind: {
+            description:
+                'Observed call sites, never claims that an IPC channel, route or native addon was exercised.',
+            enum: ['browser-window', 'context-bridge', 'ipc', 'native-addon', 'preload', 'route'],
+            type: 'string',
+        },
+        ApplicationIssue: {
+            description:
+                'Explicit incomplete coverage rather than silently omitted files or unsupported syntax.',
+            properties: {
+                message: {
+                    type: 'string',
+                },
+                path: {
+                    type: 'string',
+                },
+            },
+            required: ['message', 'path'],
+            type: 'object',
+        },
+        ApplicationLocation: {
+            description:
+                'Exact generated-source location of a static observation. Columns and offsets are zero-based.',
+            properties: {
+                column: {
+                    type: 'number',
+                },
+                end: {
+                    type: 'number',
+                },
+                endColumn: {
+                    type: 'number',
+                },
+                endLine: {
+                    type: 'number',
+                },
+                line: {
+                    type: 'number',
+                },
+                module: {
+                    type: 'string',
+                },
+                start: {
+                    type: 'number',
+                },
+            },
+            required: ['column', 'end', 'endColumn', 'endLine', 'line', 'module', 'start'],
+            type: 'object',
+        },
+        ApplicationModule: {
+            description:
+                'An inventoried module with a digest of the exact bytes parsed, including syntax failures.',
+            properties: {
+                bytes: {
+                    type: 'string',
+                },
+                functions: {
+                    type: 'number',
+                },
+                id: {
+                    type: 'string',
+                },
+                imports: {
+                    type: 'number',
+                },
+                parseError: {
+                    type: ['null', 'string'],
+                },
+                path: {
+                    type: 'string',
+                },
+                sha256: {
+                    type: 'string',
+                },
+                sourceMap: {
+                    type: ['null', 'string'],
+                },
+            },
+            required: [
+                'bytes',
+                'functions',
+                'id',
+                'imports',
+                'parseError',
+                'path',
+                'sha256',
+                'sourceMap',
+            ],
+            type: 'object',
+        },
         ApprovalRequestedData: {
             description: 'The payload of a {@link GATEWAY_EVENTS.ApprovalRequested} event.',
             properties: {
@@ -7541,6 +7652,68 @@ export const schema: Schema = {
             enum: ['attach', 'compute', 'read'],
             type: 'string',
         },
+        ReverseApplicationSnapshot: {
+            description:
+                'Bounded projection for live Chat events; complete indexes are paged by the native query tool.',
+            properties: {
+                boundaries: {
+                    items: {
+                        $ref: '#/definitions/ApplicationBoundary',
+                    },
+                    type: 'array',
+                },
+                functionCount: {
+                    type: 'number',
+                },
+                importCount: {
+                    type: 'number',
+                },
+                ipcCount: {
+                    type: 'number',
+                },
+                issueCount: {
+                    type: 'number',
+                },
+                issues: {
+                    items: {
+                        $ref: '#/definitions/ApplicationIssue',
+                    },
+                    type: 'array',
+                },
+                moduleCount: {
+                    type: 'number',
+                },
+                modules: {
+                    items: {
+                        $ref: '#/definitions/ApplicationModule',
+                    },
+                    type: 'array',
+                },
+                nativeAddonCount: {
+                    type: 'number',
+                },
+                routeCount: {
+                    type: 'number',
+                },
+                sourceMapCount: {
+                    type: 'number',
+                },
+            },
+            required: [
+                'boundaries',
+                'functionCount',
+                'importCount',
+                'ipcCount',
+                'issueCount',
+                'issues',
+                'moduleCount',
+                'modules',
+                'nativeAddonCount',
+                'routeCount',
+                'sourceMapCount',
+            ],
+            type: 'object',
+        },
         ReverseEvidenceRecord: {
             description:
                 'Provenance for one immutable evidence file, shared by specialists in the same run.',
@@ -7656,6 +7829,11 @@ export const schema: Schema = {
             description:
                 'Bounded, capability-free projection carried by live tool events and the final receipt.',
             properties: {
+                application: {
+                    $ref: '#/definitions/ReverseApplicationSnapshot',
+                    description:
+                        'Bounded projection for live Chat events; complete indexes are paged by the native query tool.',
+                },
                 cleanupErrors: {
                     items: {
                         type: 'string',
@@ -7675,6 +7853,12 @@ export const schema: Schema = {
                     type: 'string',
                 },
                 inputName: {
+                    type: 'string',
+                },
+                kind: {
+                    description:
+                        'The runtime selects a target adapter; callers may make the choice explicit for ambiguous files.',
+                    enum: ['javascript', 'native'],
                     type: 'string',
                 },
                 plan: {

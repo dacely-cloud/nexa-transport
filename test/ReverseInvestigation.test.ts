@@ -4,6 +4,7 @@ import { NexaClient } from '../src/networking/NexaClient.js';
 import { ReverseInvestigation } from '../src/reverse/ReverseInvestigation.js';
 import type {
     ReversePlanStep,
+    ReverseApplicationSnapshot,
     ReverseRunSnapshot,
     WireTurnEvent,
 } from '../src/protocol/Protocol.js';
@@ -85,6 +86,80 @@ function followUp(): ReversePlanStep {
 }
 
 describe('native investigation transport', (): void => {
+    it('validates static application provenance, count limits and compatibility independently of model prose', (): void => {
+        const application: ReverseApplicationSnapshot = {
+            moduleCount: 1,
+            importCount: 0,
+            functionCount: 1,
+            ipcCount: 1,
+            routeCount: 0,
+            nativeAddonCount: 0,
+            sourceMapCount: 0,
+            issueCount: 0,
+            modules: [
+                {
+                    id: 'main.js',
+                    path: 'main.js',
+                    sha256: 'b'.repeat(64),
+                    bytes: '200',
+                    functions: 1,
+                    imports: 0,
+                    sourceMap: null,
+                    parseError: null,
+                },
+            ],
+            boundaries: [
+                {
+                    id: 'ipc:1',
+                    kind: 'ipc',
+                    operation: 'ipcMain.handle',
+                    value: 'files:read',
+                    location: {
+                        module: 'main.js',
+                        line: 1,
+                        column: 0,
+                        endLine: 1,
+                        endColumn: 100,
+                        start: 0,
+                        end: 100,
+                    },
+                },
+            ],
+            issues: [],
+        };
+        const receipt: ReverseRunSnapshot = { ...snapshot(), kind: 'javascript', application };
+        expect(ReverseInvestigation.parse(receipt).application).toEqual(application);
+        for (const invalid of [
+            { ...receipt, kind: 'native' },
+            { ...receipt, application: { ...application, moduleCount: -1 } },
+            {
+                ...receipt,
+                application: { ...application, modules: Array(13).fill(application.modules[0]) },
+            },
+            {
+                ...receipt,
+                application: {
+                    ...application,
+                    boundaries: application.boundaries.map((entry) => ({
+                        ...entry,
+                        location: { ...entry.location, end: -1 },
+                    })),
+                },
+            },
+            {
+                ...receipt,
+                application: {
+                    ...application,
+                    modules: application.modules.map((entry) => ({
+                        ...entry,
+                        bytes: '9007199254740993',
+                    })),
+                },
+            },
+        ]) {
+            expect((): ReverseRunSnapshot => ReverseInvestigation.parse(invalid)).toThrow();
+        }
+    });
     it('validates adaptive work ownership, evidence links and acyclic dependencies with old receipt compatibility', (): void => {
         const initial: ReverseRunSnapshot = snapshot();
         const step: ReversePlanStep = followUp();

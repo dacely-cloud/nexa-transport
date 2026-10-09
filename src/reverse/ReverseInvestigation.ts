@@ -4,6 +4,7 @@ import type {
     WireTurnEvent,
 } from '../protocol/Protocol.js';
 import { reverseSnapshot } from '../protocol/Validators.js';
+import { ApplicationReceipt } from './ApplicationReceipt.js';
 
 /** Portable investigation receipt decoding and monotonic replay for multi-agent consumers. */
 export class ReverseInvestigation {
@@ -11,6 +12,12 @@ export class ReverseInvestigation {
     public static parse(input: unknown): ReverseRunSnapshot {
         if (!reverseSnapshot(input)) {
             throw new TypeError('Invalid investigation receipt');
+        }
+        if (input.application !== undefined) {
+            if (input.kind !== 'javascript') {
+                throw new TypeError('Application projection requires a JavaScript target');
+            }
+            ApplicationReceipt.validate(input.application);
         }
         if (
             input.version !== 1 ||
