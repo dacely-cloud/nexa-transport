@@ -3051,6 +3051,14 @@ export interface GatewayMethodsworkflows_runs_applications_setupShape {
     readonly result: WorkflowTerminalSnapshot;
 }
 
+/** GatewayMethodsworkflows_runs_approval_decide wire fields. */
+export interface GatewayMethodsworkflows_runs_approval_decideShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkflowApprovalDecision;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WorkflowHumanRequest;
+}
+
 /** GatewayMethodsworkflows_runs_artifact wire fields. */
 export interface GatewayMethodsworkflows_runs_artifactShape {
     /** params as defined by the Nexa gateway. */
@@ -3459,6 +3467,8 @@ export interface GatewayMethodsShape {
     readonly 'workflows.runs.applications.check': GatewayMethodsworkflows_runs_applications_checkShape;
     /** workflows.runs.applications.setup as defined by the Nexa gateway. */
     readonly 'workflows.runs.applications.setup': GatewayMethodsworkflows_runs_applications_setupShape;
+    /** workflows.runs.approval.decide as defined by the Nexa gateway. */
+    readonly 'workflows.runs.approval.decide': GatewayMethodsworkflows_runs_approval_decideShape;
     /** workflows.runs.artifact as defined by the Nexa gateway. */
     readonly 'workflows.runs.artifact': GatewayMethodsworkflows_runs_artifactShape;
     /** workflows.runs.artifacts as defined by the Nexa gateway. */
@@ -7788,6 +7798,54 @@ export interface WorkflowApplicationStatusShape {
 /** WorkflowApplicationStatus from the Nexa wire protocol. */
 export type WorkflowApplicationStatus = WorkflowApplicationStatusShape;
 
+/** Allowed values for WorkflowApprovalChoice. */
+export const WorkflowApprovalChoiceValues = {
+    Value0: 'approved',
+    Value1: 'cancelled',
+    Value2: 'changes_requested',
+    Value3: 'rejected',
+} as const;
+
+/** WorkflowApprovalChoice from the Nexa wire protocol. */
+export type WorkflowApprovalChoice =
+    (typeof WorkflowApprovalChoiceValues)[keyof typeof WorkflowApprovalChoiceValues];
+
+/** WorkflowApprovalDecision wire fields. */
+export interface WorkflowApprovalDecisionShape {
+    /** commandId as defined by the Nexa gateway. */
+    readonly commandId: string;
+    /** comment as defined by the Nexa gateway. */
+    readonly comment: string;
+    /** decision as defined by the Nexa gateway. */
+    readonly decision: WorkflowApprovalChoice;
+    /** invocationId as defined by the Nexa gateway. */
+    readonly invocationId: string;
+    /** nodeId as defined by the Nexa gateway. */
+    readonly nodeId: string;
+    /** proposalRevision as defined by the Nexa gateway. */
+    readonly proposalRevision: string;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+}
+
+/** WorkflowApprovalDecision from the Nexa wire protocol. */
+export type WorkflowApprovalDecision = WorkflowApprovalDecisionShape;
+
+/** WorkflowApprovalProposal wire fields. */
+export interface WorkflowApprovalProposalShape {
+    /** action as defined by the Nexa gateway. */
+    readonly action: string;
+    /** content as defined by the Nexa gateway. */
+    readonly content: WorkflowObject;
+    /** destination as defined by the Nexa gateway. */
+    readonly destination: string;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: string;
+}
+
+/** WorkflowApprovalProposal from the Nexa wire protocol. */
+export type WorkflowApprovalProposal = WorkflowApprovalProposalShape;
+
 /** WorkflowArtifactCursor wire fields. */
 export interface WorkflowArtifactCursorShape {
     /** invocationId as defined by the Nexa gateway. */
@@ -8065,7 +8123,14 @@ export interface WorkflowHumanIdentityShape {
 export type WorkflowHumanIdentity = WorkflowHumanIdentityShape;
 
 /** Allowed values for WorkflowHumanOutcome. */
-export const WorkflowHumanOutcomeValues = { Value0: 'answered', Value1: 'expired' } as const;
+export const WorkflowHumanOutcomeValues = {
+    Value0: 'answered',
+    Value1: 'approved',
+    Value2: 'cancelled',
+    Value3: 'changes_requested',
+    Value4: 'expired',
+    Value5: 'rejected',
+} as const;
 
 /** WorkflowHumanOutcome from the Nexa wire protocol. */
 export type WorkflowHumanOutcome =
@@ -8088,6 +8153,8 @@ export type WorkflowHumanPage = WorkflowHumanPageShape;
 export interface WorkflowHumanRequestShape {
     /** answerType as defined by the Nexa gateway. */
     readonly answerType: WorkflowAnswerType;
+    /** approval as defined by the Nexa gateway. */
+    readonly approval?: WorkflowApprovalProposal;
     /** canAnswer as defined by the Nexa gateway. */
     readonly canAnswer: boolean;
     /** choices as defined by the Nexa gateway. */
@@ -8129,8 +8196,12 @@ export interface WorkflowHumanResponseShape {
     readonly atMs: string;
     /** commandId as defined by the Nexa gateway. */
     readonly commandId: null | string;
+    /** comment as defined by the Nexa gateway. */
+    readonly comment?: string;
     /** outcome as defined by the Nexa gateway. */
     readonly outcome: WorkflowHumanOutcome;
+    /** proposalRevision as defined by the Nexa gateway. */
+    readonly proposalRevision?: string;
 }
 
 /** WorkflowHumanResponse from the Nexa wire protocol. */
@@ -8139,9 +8210,12 @@ export type WorkflowHumanResponse = WorkflowHumanResponseShape;
 /** Allowed values for WorkflowHumanStatus. */
 export const WorkflowHumanStatusValues = {
     Value0: 'answered',
-    Value1: 'cancelled',
-    Value2: 'expired',
-    Value3: 'pending',
+    Value1: 'approved',
+    Value2: 'cancelled',
+    Value3: 'changes_requested',
+    Value4: 'expired',
+    Value5: 'pending',
+    Value6: 'rejected',
 } as const;
 
 /** WorkflowHumanStatus from the Nexa wire protocol. */
@@ -9655,6 +9729,8 @@ export enum Method {
     WorkflowsRunsApplicationsCheck = 'workflows.runs.applications.check',
     /** Calls workflows.runs.applications.setup. */
     WorkflowsRunsApplicationsSetup = 'workflows.runs.applications.setup',
+    /** Calls workflows.runs.approval.decide. */
+    WorkflowsRunsApprovalDecide = 'workflows.runs.approval.decide',
     /** Calls workflows.runs.artifact. */
     WorkflowsRunsArtifact = 'workflows.runs.artifact',
     /** Calls workflows.runs.artifacts. */

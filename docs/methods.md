@@ -1,6 +1,6 @@
 # RPC reference
 
-All 137 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 136 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
+All 138 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 137 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
 
 - [accounts.create](#accounts-create)
 - [accounts.list](#accounts-list)
@@ -117,6 +117,7 @@ All 137 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [workflows.runs.agent.read](#workflows-runs-agent-read)
 - [workflows.runs.applications.check](#workflows-runs-applications-check)
 - [workflows.runs.applications.setup](#workflows-runs-applications-setup)
+- [workflows.runs.approval.decide](#workflows-runs-approval-decide)
 - [workflows.runs.artifact](#workflows-runs-artifact)
 - [workflows.runs.artifacts](#workflows-runs-artifacts)
 - [workflows.runs.attempts](#workflows-runs-attempts)
@@ -2828,6 +2829,40 @@ Parameters: [WorkflowApplicationSetupRequest](protocol.md#workflowapplicationset
 | `workflowId`  | Yes      | `string`                                               |             |
 
 Result: [WorkflowTerminalSnapshot](protocol.md#workflowterminalsnapshot).
+
+## workflows.runs.approval.decide
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsRunsApprovalDecide> = {
+    commandId: 'YOUR_COMMANDID',
+    comment: 'YOUR_COMMENT',
+    decision: 'approved',
+    invocationId: 'YOUR_INVOCATIONID',
+    nodeId: 'YOUR_NODEID',
+    proposalRevision: 'YOUR_PROPOSALREVISION',
+    runId: 'YOUR_RUNID',
+};
+const result: ResultOf<typeof Method.WorkflowsRunsApprovalDecide> = await client.call(
+    Method.WorkflowsRunsApprovalDecide,
+    params,
+);
+```
+
+Parameters: [WorkflowApprovalDecision](protocol.md#workflowapprovaldecision).
+
+| Field              | Required | Type                                                         | Description |
+| ------------------ | -------- | ------------------------------------------------------------ | ----------- |
+| `commandId`        | Yes      | `string`                                                     |             |
+| `comment`          | Yes      | `string`                                                     |             |
+| `decision`         | Yes      | [WorkflowApprovalChoice](protocol.md#workflowapprovalchoice) |             |
+| `invocationId`     | Yes      | `string`                                                     |             |
+| `nodeId`           | Yes      | `string`                                                     |             |
+| `proposalRevision` | Yes      | `string`                                                     |             |
+| `runId`            | Yes      | `string`                                                     |             |
+
+Result: [WorkflowHumanRequest](protocol.md#workflowhumanrequest).
 
 ## workflows.runs.artifact
 

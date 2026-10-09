@@ -1443,6 +1443,7 @@ Configurable bounds on gateway-owned work and memory.
 | `workflows.runs.agent.read`         | Yes      | Object (fields below) |                                                                                            |
 | `workflows.runs.applications.check` | Yes      | Object (fields below) |                                                                                            |
 | `workflows.runs.applications.setup` | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.approval.decide`    | Yes      | Object (fields below) |                                                                                            |
 | `workflows.runs.artifact`           | Yes      | Object (fields below) |                                                                                            |
 | `workflows.runs.artifacts`          | Yes      | Object (fields below) |                                                                                            |
 | `workflows.runs.attempts`           | Yes      | Object (fields below) |                                                                                            |
@@ -2343,6 +2344,13 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ------------------------------------------------------------------------------ | ----------- |
 | `params` | Yes      | [WorkflowApplicationSetupRequest](protocol.md#workflowapplicationsetuprequest) |             |
 | `result` | Yes      | [WorkflowTerminalSnapshot](protocol.md#workflowterminalsnapshot)               |             |
+
+**workflows.runs.approval.decide**
+
+| Field    | Required | Type                                                             | Description |
+| -------- | -------- | ---------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [WorkflowApprovalDecision](protocol.md#workflowapprovaldecision) |             |
+| `result` | Yes      | [WorkflowHumanRequest](protocol.md#workflowhumanrequest)         |             |
 
 **workflows.runs.artifact**
 
@@ -5464,6 +5472,37 @@ Type: `"claude-code"` / `"codex"` / `"grok-build"` / `"mistral-vibe"` / `"nerva-
 | `status`      | Yes      | [ApplicationConnection](protocol.md#applicationconnection) |             |
 | `title`       | Yes      | `string`                                                   |             |
 
+## WorkflowApprovalChoice
+
+Explicit decisions; absence of a decision never grants permission.
+
+Type: `"approved"` / `"cancelled"` / `"changes_requested"` / `"rejected"`.
+
+## WorkflowApprovalDecision
+
+One explicit authenticated decision on one exact proposal and invocation.
+
+| Field              | Required | Type                                                         | Description |
+| ------------------ | -------- | ------------------------------------------------------------ | ----------- |
+| `commandId`        | Yes      | `string`                                                     |             |
+| `comment`          | Yes      | `string`                                                     |             |
+| `decision`         | Yes      | [WorkflowApprovalChoice](protocol.md#workflowapprovalchoice) |             |
+| `invocationId`     | Yes      | `string`                                                     |             |
+| `nodeId`           | Yes      | `string`                                                     |             |
+| `proposalRevision` | Yes      | `string`                                                     |             |
+| `runId`            | Yes      | `string`                                                     |             |
+
+## WorkflowApprovalProposal
+
+Immutable canonical content identified by a server-computed SHA-256 revision.
+
+| Field         | Required | Type                                         | Description |
+| ------------- | -------- | -------------------------------------------- | ----------- |
+| `action`      | Yes      | `string`                                     |             |
+| `content`     | Yes      | [WorkflowObject](protocol.md#workflowobject) |             |
+| `destination` | Yes      | `string`                                     |             |
+| `revision`    | Yes      | `string`                                     |             |
+
 ## WorkflowArtifactCursor
 
 Exclusive position in the run's immutable invocation manifests.
@@ -5663,7 +5702,7 @@ Exact invocation identity; the authenticated principal is never supplied by clie
 
 Terminal outcomes never infer an answer from silence.
 
-Type: `"answered"` / `"expired"`.
+Type: `"answered"` / `"approved"` / `"cancelled"` / `"changes_requested"` / `"expired"` / `"rejected"`.
 
 ## WorkflowHumanPage
 
@@ -5679,40 +5718,43 @@ Pending questions are capped per run and returned without completed output bodie
 
 Public owner-scoped read, shared by pending-run views and future inbox navigation.
 
-| Field          | Required | Type                                                                | Description |
-| -------------- | -------- | ------------------------------------------------------------------- | ----------- |
-| `answerType`   | Yes      | [WorkflowAnswerType](protocol.md#workflowanswertype)                |             |
-| `canAnswer`    | Yes      | `boolean`                                                           |             |
-| `choices`      | Yes      | Array of `string`                                                   |             |
-| `createdAtMs`  | Yes      | `string`                                                            |             |
-| `expiresAtMs`  | Yes      | `string`                                                            |             |
-| `invocationId` | Yes      | `string`                                                            |             |
-| `label`        | Yes      | `string`                                                            |             |
-| `nodeId`       | Yes      | `string`                                                            |             |
-| `question`     | Yes      | `string`                                                            |             |
-| `recipient`    | Yes      | `string`                                                            |             |
-| `response`     | Yes      | [WorkflowHumanResponse](protocol.md#workflowhumanresponse) / `null` |             |
-| `runId`        | Yes      | `string`                                                            |             |
-| `status`       | Yes      | [WorkflowHumanStatus](protocol.md#workflowhumanstatus)              |             |
-| `timeoutMs`    | Yes      | `string`                                                            |             |
+| Field          | Required | Type                                                                | Description                                                                   |
+| -------------- | -------- | ------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| `answerType`   | Yes      | [WorkflowAnswerType](protocol.md#workflowanswertype)                |                                                                               |
+| `approval`     | No       | [WorkflowApprovalProposal](protocol.md#workflowapprovalproposal)    | Immutable canonical content identified by a server-computed SHA-256 revision. |
+| `canAnswer`    | Yes      | `boolean`                                                           |                                                                               |
+| `choices`      | Yes      | Array of `string`                                                   |                                                                               |
+| `createdAtMs`  | Yes      | `string`                                                            |                                                                               |
+| `expiresAtMs`  | Yes      | `string`                                                            |                                                                               |
+| `invocationId` | Yes      | `string`                                                            |                                                                               |
+| `label`        | Yes      | `string`                                                            |                                                                               |
+| `nodeId`       | Yes      | `string`                                                            |                                                                               |
+| `question`     | Yes      | `string`                                                            |                                                                               |
+| `recipient`    | Yes      | `string`                                                            |                                                                               |
+| `response`     | Yes      | [WorkflowHumanResponse](protocol.md#workflowhumanresponse) / `null` |                                                                               |
+| `runId`        | Yes      | `string`                                                            |                                                                               |
+| `status`       | Yes      | [WorkflowHumanStatus](protocol.md#workflowhumanstatus)              |                                                                               |
+| `timeoutMs`    | Yes      | `string`                                                            |                                                                               |
 
 ## WorkflowHumanResponse
 
 Recorded response evidence; expiry contains no actor or answer.
 
-| Field       | Required | Type                                                     | Description |
-| ----------- | -------- | -------------------------------------------------------- | ----------- |
-| `actor`     | Yes      | `null,string`                                            |             |
-| `answer`    | Yes      | `null,string,boolean`                                    |             |
-| `atMs`      | Yes      | `string`                                                 |             |
-| `commandId` | Yes      | `null,string`                                            |             |
-| `outcome`   | Yes      | [WorkflowHumanOutcome](protocol.md#workflowhumanoutcome) |             |
+| Field              | Required | Type                                                     | Description |
+| ------------------ | -------- | -------------------------------------------------------- | ----------- |
+| `actor`            | Yes      | `null,string`                                            |             |
+| `answer`           | Yes      | `null,string,boolean`                                    |             |
+| `atMs`             | Yes      | `string`                                                 |             |
+| `commandId`        | Yes      | `null,string`                                            |             |
+| `comment`          | No       | `string`                                                 |             |
+| `outcome`          | Yes      | [WorkflowHumanOutcome](protocol.md#workflowhumanoutcome) |             |
+| `proposalRevision` | No       | `string`                                                 |             |
 
 ## WorkflowHumanStatus
 
 Request presentation state also reflects whole-run cancellation.
 
-Type: `"answered"` / `"cancelled"` / `"expired"` / `"pending"`.
+Type: `"answered"` / `"approved"` / `"cancelled"` / `"changes_requested"` / `"expired"` / `"pending"` / `"rejected"`.
 
 ## WorkflowImageCandidate
 
