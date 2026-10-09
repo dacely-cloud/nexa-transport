@@ -4159,6 +4159,42 @@
                     "required": ["params", "result"],
                     "type": "object"
                 },
+                "workflows.runs.agent.control": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/WorkflowAgentControlRequest"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/WorkflowAgentSession"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "workflows.runs.agent.input": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/WorkflowAgentInputRequest"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/WorkflowAgentSession"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "workflows.runs.agent.read": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/WorkflowAgentSessionRequest"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/WorkflowAgentSession"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
                 "workflows.runs.artifact": {
                     "properties": {
                         "params": {
@@ -4439,6 +4475,9 @@
                 "workflows.planning.sources",
                 "workflows.read",
                 "workflows.record",
+                "workflows.runs.agent.control",
+                "workflows.runs.agent.input",
+                "workflows.runs.agent.read",
                 "workflows.runs.artifact",
                 "workflows.runs.cancel",
                 "workflows.runs.events",
@@ -9840,6 +9879,161 @@
                 "startedAt",
                 "state"
             ],
+            "type": "object"
+        },
+        "WorkflowAgentControlRequest": {
+            "description": "Compare-and-set controls prevent a stale retry from undoing a newer decision.",
+            "properties": {
+                "controlId": {
+                    "type": "string"
+                },
+                "expectedRevision": {
+                    "type": "string"
+                },
+                "invocationId": {
+                    "type": "string"
+                },
+                "nodeId": {
+                    "type": "string"
+                },
+                "paused": {
+                    "type": "boolean"
+                },
+                "runId": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "controlId",
+                "expectedRevision",
+                "invocationId",
+                "nodeId",
+                "paused",
+                "runId"
+            ],
+            "type": "object"
+        },
+        "WorkflowAgentInput": {
+            "properties": {
+                "inputId": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/WorkflowAgentInputStatus"
+                },
+                "text": {
+                    "type": "string"
+                }
+            },
+            "required": ["inputId", "status", "text"],
+            "type": "object"
+        },
+        "WorkflowAgentInputRequest": {
+            "properties": {
+                "inputId": {
+                    "type": "string"
+                },
+                "invocationId": {
+                    "type": "string"
+                },
+                "nodeId": {
+                    "type": "string"
+                },
+                "runId": {
+                    "type": "string"
+                },
+                "text": {
+                    "type": "string"
+                }
+            },
+            "required": ["inputId", "invocationId", "nodeId", "runId", "text"],
+            "type": "object"
+        },
+        "WorkflowAgentInputStatus": {
+            "enum": ["accepted", "queued", "rejected"],
+            "type": "string"
+        },
+        "WorkflowAgentSession": {
+            "description": "Bounded live text is a preview; completed graph outputs remain authoritative.",
+            "properties": {
+                "activity": {
+                    "type": "string"
+                },
+                "controlId": {
+                    "type": "string"
+                },
+                "controlRevision": {
+                    "type": "string"
+                },
+                "inputs": {
+                    "items": {
+                        "$ref": "#/definitions/WorkflowAgentInput"
+                    },
+                    "type": "array"
+                },
+                "invocationId": {
+                    "type": "string"
+                },
+                "model": {
+                    "type": "string"
+                },
+                "nodeId": {
+                    "type": "string"
+                },
+                "pauseRequested": {
+                    "type": "boolean"
+                },
+                "paused": {
+                    "type": "boolean"
+                },
+                "provider": {
+                    "type": "string"
+                },
+                "runId": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/WorkflowStepStatus"
+                },
+                "task": {
+                    "type": "string"
+                },
+                "text": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "activity",
+                "controlId",
+                "controlRevision",
+                "inputs",
+                "invocationId",
+                "model",
+                "nodeId",
+                "pauseRequested",
+                "paused",
+                "provider",
+                "runId",
+                "status",
+                "task",
+                "text"
+            ],
+            "type": "object"
+        },
+        "WorkflowAgentSessionRequest": {
+            "description": "One exact agent invocation; identities are never retargeted to a newer attempt.",
+            "properties": {
+                "invocationId": {
+                    "type": "string"
+                },
+                "nodeId": {
+                    "type": "string"
+                },
+                "runId": {
+                    "type": "string"
+                }
+            },
+            "required": ["invocationId", "nodeId", "runId"],
             "type": "object"
         },
         "WorkflowCatalog": {

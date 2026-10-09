@@ -12,10 +12,70 @@ import type {
     WorkflowRunStepsRequest,
     WorkflowRunOutputRequest,
     WorkflowRunListRequest,
+    WorkflowAgentSessionRequest,
+    WorkflowAgentInputRequest,
+    WorkflowAgentControlRequest,
 } from './RunRequests.js';
 
 /** Portable strict request validation. Caller identity never comes from the payload. */
 export class WorkflowRunRequestCodec {
+    public static agent(raw: unknown): WorkflowAgentSessionRequest {
+        const value: Readonly<Record<string, unknown>> = WorkflowInput.record(raw, [
+            'runId',
+            'nodeId',
+            'invocationId',
+        ]);
+        return {
+            runId: WorkflowInput.id(value['runId']),
+            nodeId: WorkflowInput.id(value['nodeId']),
+            invocationId: WorkflowInput.id(value['invocationId']),
+        };
+    }
+    public static agentControl(raw: unknown): WorkflowAgentControlRequest {
+        const value: Readonly<Record<string, unknown>> = WorkflowInput.record(raw, [
+            'runId',
+            'nodeId',
+            'invocationId',
+            'controlId',
+            'expectedRevision',
+            'paused',
+        ]);
+        const revision: string = WorkflowInput.text(value['expectedRevision'], 19);
+        if (
+            !/^(0|[1-9][0-9]*)$/.test(revision) ||
+            BigInt(revision) >= 9223372036854775807n ||
+            typeof value['paused'] !== 'boolean'
+        )
+            throw new Error('Invalid agent control');
+        return {
+            ...this.agent({
+                runId: value['runId'],
+                nodeId: value['nodeId'],
+                invocationId: value['invocationId'],
+            }),
+            controlId: WorkflowInput.id(value['controlId']),
+            expectedRevision: revision,
+            paused: value['paused'],
+        };
+    }
+    public static agentInput(raw: unknown): WorkflowAgentInputRequest {
+        const value: Readonly<Record<string, unknown>> = WorkflowInput.record(raw, [
+            'runId',
+            'nodeId',
+            'invocationId',
+            'inputId',
+            'text',
+        ]);
+        return {
+            ...this.agent({
+                runId: value['runId'],
+                nodeId: value['nodeId'],
+                invocationId: value['invocationId'],
+            }),
+            inputId: WorkflowInput.id(value['inputId']),
+            text: WorkflowInput.text(value['text'], 16384),
+        };
+    }
     /** Validates a pinned test command and its execution limits. */
     public static start(raw: unknown): WorkflowRunStartRequest {
         const value: Readonly<Record<string, unknown>> = WorkflowInput.record(raw, [

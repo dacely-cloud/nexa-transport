@@ -1243,6 +1243,9 @@ Configurable bounds on gateway-owned work and memory.
 | `workflows.planning.sources`     | Yes      | Object (fields below) |                                                                                            |
 | `workflows.read`                 | Yes      | Object (fields below) |                                                                                            |
 | `workflows.record`               | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.agent.control`   | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.agent.input`     | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.agent.read`      | Yes      | Object (fields below) |                                                                                            |
 | `workflows.runs.artifact`        | Yes      | Object (fields below) |                                                                                            |
 | `workflows.runs.cancel`          | Yes      | Object (fields below) |                                                                                            |
 | `workflows.runs.events`          | Yes      | Object (fields below) |                                                                                            |
@@ -2058,6 +2061,27 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ---------------------------------------------------------- | ----------- |
 | `params` | Yes      | [WorkflowRecordRequest](protocol.md#workflowrecordrequest) |             |
 | `result` | Yes      | [WorkflowRecordPage](protocol.md#workflowrecordpage)       |             |
+
+**workflows.runs.agent.control**
+
+| Field    | Required | Type                                                                   | Description |
+| -------- | -------- | ---------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [WorkflowAgentControlRequest](protocol.md#workflowagentcontrolrequest) |             |
+| `result` | Yes      | [WorkflowAgentSession](protocol.md#workflowagentsession)               |             |
+
+**workflows.runs.agent.input**
+
+| Field    | Required | Type                                                               | Description |
+| -------- | -------- | ------------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [WorkflowAgentInputRequest](protocol.md#workflowagentinputrequest) |             |
+| `result` | Yes      | [WorkflowAgentSession](protocol.md#workflowagentsession)           |             |
+
+**workflows.runs.agent.read**
+
+| Field    | Required | Type                                                                   | Description |
+| -------- | -------- | ---------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [WorkflowAgentSessionRequest](protocol.md#workflowagentsessionrequest) |             |
+| `result` | Yes      | [WorkflowAgentSession](protocol.md#workflowagentsession)               |             |
 
 **workflows.runs.artifact**
 
@@ -4708,6 +4732,72 @@ One worker, identified independently of its shared persona. Times are decimal ep
 | `rootId`         | Yes      | `string`                               |             |
 | `startedAt`      | Yes      | `string`                               |             |
 | `state`          | Yes      | [WorkerState](protocol.md#workerstate) |             |
+
+## WorkflowAgentControlRequest
+
+Compare-and-set controls prevent a stale retry from undoing a newer decision.
+
+| Field              | Required | Type      | Description |
+| ------------------ | -------- | --------- | ----------- |
+| `controlId`        | Yes      | `string`  |             |
+| `expectedRevision` | Yes      | `string`  |             |
+| `invocationId`     | Yes      | `string`  |             |
+| `nodeId`           | Yes      | `string`  |             |
+| `paused`           | Yes      | `boolean` |             |
+| `runId`            | Yes      | `string`  |             |
+
+## WorkflowAgentInput
+
+| Field     | Required | Type                                                             | Description |
+| --------- | -------- | ---------------------------------------------------------------- | ----------- |
+| `inputId` | Yes      | `string`                                                         |             |
+| `status`  | Yes      | [WorkflowAgentInputStatus](protocol.md#workflowagentinputstatus) |             |
+| `text`    | Yes      | `string`                                                         |             |
+
+## WorkflowAgentInputRequest
+
+| Field          | Required | Type     | Description |
+| -------------- | -------- | -------- | ----------- |
+| `inputId`      | Yes      | `string` |             |
+| `invocationId` | Yes      | `string` |             |
+| `nodeId`       | Yes      | `string` |             |
+| `runId`        | Yes      | `string` |             |
+| `text`         | Yes      | `string` |             |
+
+## WorkflowAgentInputStatus
+
+Type: `"accepted"` / `"queued"` / `"rejected"`.
+
+## WorkflowAgentSession
+
+Bounded live text is a preview; completed graph outputs remain authoritative.
+
+| Field             | Required | Type                                                          | Description |
+| ----------------- | -------- | ------------------------------------------------------------- | ----------- |
+| `activity`        | Yes      | `string`                                                      |             |
+| `controlId`       | Yes      | `string`                                                      |             |
+| `controlRevision` | Yes      | `string`                                                      |             |
+| `inputs`          | Yes      | Array of [WorkflowAgentInput](protocol.md#workflowagentinput) |             |
+| `invocationId`    | Yes      | `string`                                                      |             |
+| `model`           | Yes      | `string`                                                      |             |
+| `nodeId`          | Yes      | `string`                                                      |             |
+| `pauseRequested`  | Yes      | `boolean`                                                     |             |
+| `paused`          | Yes      | `boolean`                                                     |             |
+| `provider`        | Yes      | `string`                                                      |             |
+| `runId`           | Yes      | `string`                                                      |             |
+| `status`          | Yes      | [WorkflowStepStatus](protocol.md#workflowstepstatus)          |             |
+| `task`            | Yes      | `string`                                                      |             |
+| `text`            | Yes      | `string`                                                      |             |
+
+## WorkflowAgentSessionRequest
+
+One exact agent invocation; identities are never retargeted to a newer attempt.
+
+| Field          | Required | Type     | Description |
+| -------------- | -------- | -------- | ----------- |
+| `invocationId` | Yes      | `string` |             |
+| `nodeId`       | Yes      | `string` |             |
+| `runId`        | Yes      | `string` |             |
 
 ## WorkflowCatalog
 
