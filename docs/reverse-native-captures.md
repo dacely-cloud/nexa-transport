@@ -1,10 +1,20 @@
 # Native network captures
 
-Nexa imports saved .mitm, .flows and .mitmproxy files through an explicitly
-provisioned Linux mitmproxy 12.2.3 executable. Set
-NEXA_RE_MITMDUMP_COMMAND to its absolute mitmdump path on the workspace host.
-An unavailable or mismatched installation fails the investigation explicitly.
+Nexa imports saved .mitm, .flows and .mitmproxy files through Linux mitmproxy
+12.2.3. Linux x64 hosts automatically install and verify the standalone bundle
+on first use, including its Python runtime. No per-user setup or npm dependency
+is required. Operators can override setup with an absolute
+NEXA_RE_MITMDUMP_COMMAND, choose a host-managed NEXA_RE_MITMPROXY_ROOT, or disable
+downloads with NEXA_RE_MITMPROXY_AUTO_INSTALL=0. An existing verified managed
+runtime remains usable with downloads disabled. Other Linux architectures require
+an explicit executable. Unavailable or mismatched installations fail explicitly.
 Importing does not start a proxy listener or replay captured traffic.
+
+Users share the verified executable. Setup is coalesced within a Nexa process and
+serialized with a kernel lock across processes. Canceling one request does not
+cancel other users' setup. Each decoder has private configuration and temporary
+Python extraction, with four concurrent decoders per Nexa process. Saved metadata
+and detail queries verify both authenticated ownership and conversation scope.
 
 The shared host index uses upstream mitmproxy.io.tnetstring directly.
 It does not use FlowReader migrations or convert native records to HAR.
