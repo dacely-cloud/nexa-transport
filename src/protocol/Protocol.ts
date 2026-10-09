@@ -2319,6 +2319,22 @@ export interface GatewayMethodsprocesses_stopShape {
     readonly result: OkResult;
 }
 
+/** GatewayMethodsreverse_catalog wire fields. */
+export interface GatewayMethodsreverse_catalogShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ReverseCatalogQuery;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ReverseCatalogPage;
+}
+
+/** GatewayMethodsreverse_evidence wire fields. */
+export interface GatewayMethodsreverse_evidenceShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ReverseEvidenceQuery;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ReverseEvidencePage;
+}
+
 /** GatewayMethodsroblox_credentials_remove wire fields. */
 export interface GatewayMethodsroblox_credentials_removeShape {
     /** params as defined by the Nexa gateway. */
@@ -2933,6 +2949,10 @@ export interface GatewayMethodsShape {
     readonly 'processes.resize': GatewayMethodsprocesses_resizeShape;
     /** processes.stop as defined by the Nexa gateway. */
     readonly 'processes.stop': GatewayMethodsprocesses_stopShape;
+    /** reverse.catalog as defined by the Nexa gateway. */
+    readonly 'reverse.catalog': GatewayMethodsreverse_catalogShape;
+    /** reverse.evidence as defined by the Nexa gateway. */
+    readonly 'reverse.evidence': GatewayMethodsreverse_evidenceShape;
     /** roblox.credentials.remove as defined by the Nexa gateway. */
     readonly 'roblox.credentials.remove': GatewayMethodsroblox_credentials_removeShape;
     /** roblox.credentials.set as defined by the Nexa gateway. */
@@ -5118,6 +5138,85 @@ export interface ReverseApplicationSnapshotShape {
 /** ReverseApplicationSnapshot from the Nexa wire protocol. */
 export type ReverseApplicationSnapshot = ReverseApplicationSnapshotShape;
 
+/** ReverseArchiveRef wire fields. */
+export interface ReverseArchiveRefShape {
+    /** sessionId as defined by the Nexa gateway. */
+    readonly sessionId: string;
+}
+
+/** ReverseArchiveRef from the Nexa wire protocol. */
+export type ReverseArchiveRef = ReverseArchiveRefShape;
+
+/** ReverseCatalogPage wire fields. */
+export interface ReverseCatalogPageShape {
+    /** cursor as defined by the Nexa gateway. */
+    readonly cursor: string;
+    /** evidence as defined by the Nexa gateway. */
+    readonly evidence: ReadonlyArray<ReverseEvidenceRecord>;
+    /** nextCursor as defined by the Nexa gateway. */
+    readonly nextCursor: null | string;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+    /** sha256 as defined by the Nexa gateway. */
+    readonly sha256: string;
+    /** total as defined by the Nexa gateway. */
+    readonly total: string;
+}
+
+/** ReverseCatalogPage from the Nexa wire protocol. */
+export type ReverseCatalogPage = ReverseCatalogPageShape;
+
+/** ReverseCatalogQuery wire fields. */
+export interface ReverseCatalogQueryShape {
+    /** cursor as defined by the Nexa gateway. */
+    readonly cursor?: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+}
+
+/** ReverseCatalogQuery from the Nexa wire protocol. */
+export type ReverseCatalogQuery = ReverseCatalogQueryShape;
+
+/** ReverseEvidencePage wire fields. */
+export interface ReverseEvidencePageShape {
+    /** characters as defined by the Nexa gateway. */
+    readonly characters: string;
+    /** cursor as defined by the Nexa gateway. */
+    readonly cursor: string;
+    /** evidenceSha256 as defined by the Nexa gateway. */
+    readonly evidenceSha256: string;
+    /** nextCursor as defined by the Nexa gateway. */
+    readonly nextCursor: null | string;
+    /** record as defined by the Nexa gateway. */
+    readonly record: ReverseEvidenceRecord;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+    /** sha256 as defined by the Nexa gateway. */
+    readonly sha256: string;
+    /** text as defined by the Nexa gateway. */
+    readonly text: string;
+}
+
+/** ReverseEvidencePage from the Nexa wire protocol. */
+export type ReverseEvidencePage = ReverseEvidencePageShape;
+
+/** ReverseEvidenceQuery wire fields. */
+export interface ReverseEvidenceQueryShape {
+    /** cursor as defined by the Nexa gateway. */
+    readonly cursor?: string;
+    /** evidenceId as defined by the Nexa gateway. */
+    readonly evidenceId: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+}
+
+/** ReverseEvidenceQuery from the Nexa wire protocol. */
+export type ReverseEvidenceQuery = ReverseEvidenceQueryShape;
+
 /** ReverseEvidenceRecord wire fields. */
 export interface ReverseEvidenceRecordShape {
     /** characters as defined by the Nexa gateway. */
@@ -5187,6 +5286,8 @@ export const ReverseRunSnapshotkindValues = {
 export interface ReverseRunSnapshotShape {
     /** application as defined by the Nexa gateway. */
     readonly application?: ReverseApplicationSnapshot;
+    /** archive as defined by the Nexa gateway. */
+    readonly archive?: ReverseArchiveRef;
     /** cleanupErrors as defined by the Nexa gateway. */
     readonly cleanupErrors: ReadonlyArray<string>;
     /** evidence as defined by the Nexa gateway. */
@@ -7861,6 +7962,10 @@ export enum Method {
     ProcessesResize = 'processes.resize',
     /** Calls processes.stop. */
     ProcessesStop = 'processes.stop',
+    /** Calls reverse.catalog. */
+    ReverseCatalog = 'reverse.catalog',
+    /** Calls reverse.evidence. */
+    ReverseEvidence = 'reverse.evidence',
     /** Calls roblox.credentials.remove. */
     RobloxCredentialsRemove = 'roblox.credentials.remove',
     /** Calls roblox.credentials.set. */

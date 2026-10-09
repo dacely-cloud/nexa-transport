@@ -3570,6 +3570,30 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'reverse.catalog': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/ReverseCatalogQuery',
+                        },
+                        result: {
+                            $ref: '#/definitions/ReverseCatalogPage',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'reverse.evidence': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/ReverseEvidenceQuery',
+                        },
+                        result: {
+                            $ref: '#/definitions/ReverseEvidencePage',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'roblox.credentials.remove': {
                     properties: {
                         params: {
@@ -4434,6 +4458,8 @@ export const schema: Schema = {
                 'processes.log',
                 'processes.resize',
                 'processes.stop',
+                'reverse.catalog',
+                'reverse.evidence',
                 'roblox.credentials.remove',
                 'roblox.credentials.set',
                 'roblox.credentials.status',
@@ -7732,6 +7758,122 @@ export const schema: Schema = {
             ],
             type: 'object',
         },
+        ReverseArchiveRef: {
+            description: 'A session-owned archive, without query tokens or analyzer handles.',
+            properties: {
+                sessionId: {
+                    type: 'string',
+                },
+            },
+            required: ['sessionId'],
+            type: 'object',
+        },
+        ReverseCatalogPage: {
+            description: 'An append-only catalog page; cursors are exact decimal record offsets.',
+            properties: {
+                cursor: {
+                    type: 'string',
+                },
+                evidence: {
+                    items: {
+                        $ref: '#/definitions/ReverseEvidenceRecord',
+                    },
+                    type: 'array',
+                },
+                nextCursor: {
+                    type: ['null', 'string'],
+                },
+                runId: {
+                    type: 'string',
+                },
+                sha256: {
+                    type: 'string',
+                },
+                total: {
+                    type: 'string',
+                },
+            },
+            required: ['cursor', 'evidence', 'nextCursor', 'runId', 'sha256', 'total'],
+            type: 'object',
+        },
+        ReverseCatalogQuery: {
+            description:
+                "Reads only an authenticated session's indexed investigation, never a workspace path.",
+            properties: {
+                cursor: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                runId: {
+                    type: 'string',
+                },
+            },
+            required: ['id', 'runId'],
+            type: 'object',
+        },
+        ReverseEvidencePage: {
+            description:
+                'Original evidence text paged by UTF-16 offset, independent of model report previews.',
+            properties: {
+                characters: {
+                    type: 'string',
+                },
+                cursor: {
+                    type: 'string',
+                },
+                evidenceSha256: {
+                    type: 'string',
+                },
+                nextCursor: {
+                    type: ['null', 'string'],
+                },
+                record: {
+                    $ref: '#/definitions/ReverseEvidenceRecord',
+                },
+                runId: {
+                    type: 'string',
+                },
+                sha256: {
+                    type: 'string',
+                },
+                text: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'characters',
+                'cursor',
+                'evidenceSha256',
+                'nextCursor',
+                'record',
+                'runId',
+                'sha256',
+                'text',
+            ],
+            type: 'object',
+        },
+        ReverseEvidenceQuery: {
+            description:
+                'Evidence ids come from the saved catalog and cannot authorize arbitrary files.',
+            properties: {
+                cursor: {
+                    type: 'string',
+                },
+                evidenceId: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                runId: {
+                    type: 'string',
+                },
+            },
+            required: ['evidenceId', 'id', 'runId'],
+            type: 'object',
+        },
         ReverseEvidenceRecord: {
             description:
                 'Provenance for one immutable evidence file, shared by specialists in the same run.',
@@ -7851,6 +7993,11 @@ export const schema: Schema = {
                     $ref: '#/definitions/ReverseApplicationSnapshot',
                     description:
                         'Bounded projection for live Chat events; complete indexes are paged by the native query tool.',
+                },
+                archive: {
+                    $ref: '#/definitions/ReverseArchiveRef',
+                    description:
+                        'A session-owned archive, without query tokens or analyzer handles.',
                 },
                 cleanupErrors: {
                     items: {
