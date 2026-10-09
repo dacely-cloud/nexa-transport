@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { WorkflowApprovalProposal } from './RunApprovalTypes.js';
+
 /** Supported answer shapes for the initial owner question component. */
 export const WorkflowAnswerType = { Text: 'text', Choice: 'choice', Boolean: 'boolean' } as const;
 export type WorkflowAnswerType = (typeof WorkflowAnswerType)[keyof typeof WorkflowAnswerType];
@@ -10,6 +12,7 @@ export interface WorkflowHumanQuestion {
     readonly answerType: WorkflowAnswerType;
     readonly choices: readonly string[];
     readonly timeoutMs: string;
+    readonly approval?: WorkflowApprovalProposal;
 }
 /** Exact invocation identity; the authenticated principal is never supplied by clients. */
 export interface WorkflowHumanIdentity {
@@ -23,7 +26,14 @@ export interface WorkflowHumanAnswer extends WorkflowHumanIdentity {
     readonly answer: string | boolean;
 }
 /** Terminal outcomes never infer an answer from silence. */
-export const WorkflowHumanOutcome = { Answered: 'answered', Expired: 'expired' } as const;
+export const WorkflowHumanOutcome = {
+    Answered: 'answered',
+    Expired: 'expired',
+    Cancelled: 'cancelled',
+    Approved: 'approved',
+    Rejected: 'rejected',
+    ChangesRequested: 'changes_requested',
+} as const;
 export type WorkflowHumanOutcome = (typeof WorkflowHumanOutcome)[keyof typeof WorkflowHumanOutcome];
 /** Request presentation state also reflects whole-run cancellation. */
 export const WorkflowHumanStatus = {
@@ -31,6 +41,9 @@ export const WorkflowHumanStatus = {
     Answered: 'answered',
     Expired: 'expired',
     Cancelled: 'cancelled',
+    Approved: 'approved',
+    Rejected: 'rejected',
+    ChangesRequested: 'changes_requested',
 } as const;
 export type WorkflowHumanStatus = (typeof WorkflowHumanStatus)[keyof typeof WorkflowHumanStatus];
 /** Recorded response evidence; expiry contains no actor or answer. */
@@ -40,6 +53,8 @@ export interface WorkflowHumanResponse {
     readonly actor: string | null;
     readonly atMs: string;
     readonly outcome: WorkflowHumanOutcome;
+    readonly proposalRevision?: string;
+    readonly comment?: string;
 }
 /** Bounded persisted metadata alongside the immutable invocation. */
 export interface WorkflowHumanRecord extends WorkflowHumanQuestion {

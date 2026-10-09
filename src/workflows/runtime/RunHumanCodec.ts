@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { WorkflowApprovalCodec } from './RunApprovalCodec.js';
 import { WorkflowInput } from '../WorkflowInput.js';
 import { ResourceBindingCodec } from '../ResourceBindingCodec.js';
 import {
@@ -19,6 +20,7 @@ export class WorkflowHumanCodec {
             'answerType',
             'choices',
             'timeoutMs',
+            ...(Object.hasOwn(WorkflowInput.object(raw), 'approval') ? ['approval'] : []),
         ]);
         const answerType: unknown = value['answerType'];
         if (
@@ -48,7 +50,15 @@ export class WorkflowHumanCodec {
         if (question.trim() === '') {
             throw new Error('Question text is required');
         }
-        return { question, answerType, choices, timeoutMs };
+        return {
+            question,
+            answerType,
+            choices,
+            timeoutMs,
+            ...(value['approval'] === undefined
+                ? {}
+                : { approval: WorkflowApprovalCodec.proposal(value['approval']) }),
+        };
     }
     /** Strict exact request identity with no owner override. */
     public static identity(raw: unknown): WorkflowHumanIdentity {

@@ -9,6 +9,7 @@ import {
     type ComponentPort,
     type ComponentResourceSlot,
 } from './ComponentTypes.js';
+import { ApprovalComponents } from './ApprovalComponents.js';
 import { HumanComponents } from './HumanComponents.js';
 import { DataComponents } from './DataComponents.js';
 import { CoreComponents } from './CoreComponents.js';
@@ -46,6 +47,7 @@ export class ComponentRegistry {
         this.#builtin ??= new ComponentRegistry([
             ...CoreComponents.definitions(),
             ...HumanComponents.definitions(),
+            ...ApprovalComponents.definitions(),
             ...DataComponents.definitions(),
             ...AgentComponents.definitions(),
             ...TerminalComponents.definitions(),

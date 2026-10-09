@@ -4729,6 +4729,18 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'workflows.runs.approval.decide': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/WorkflowApprovalDecision',
+                        },
+                        result: {
+                            $ref: '#/definitions/WorkflowHumanRequest',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'workflows.runs.artifact': {
                     properties: {
                         params: {
@@ -5123,6 +5135,7 @@ export const schema: Schema = {
                 'workflows.runs.agent.read',
                 'workflows.runs.applications.check',
                 'workflows.runs.applications.setup',
+                'workflows.runs.approval.decide',
                 'workflows.runs.artifact',
                 'workflows.runs.artifacts',
                 'workflows.runs.attempts',
@@ -11739,6 +11752,69 @@ export const schema: Schema = {
             required: ['application', 'status', 'title'],
             type: 'object',
         },
+        WorkflowApprovalChoice: {
+            description:
+                'Explicit decisions; absence of a decision never grants permission.\nSupported owner review choices.',
+            enum: ['approved', 'cancelled', 'changes_requested', 'rejected'],
+            type: 'string',
+        },
+        WorkflowApprovalDecision: {
+            description:
+                'One explicit authenticated decision on one exact proposal and invocation.',
+            properties: {
+                commandId: {
+                    type: 'string',
+                },
+                comment: {
+                    type: 'string',
+                },
+                decision: {
+                    $ref: '#/definitions/WorkflowApprovalChoice',
+                },
+                invocationId: {
+                    type: 'string',
+                },
+                nodeId: {
+                    type: 'string',
+                },
+                proposalRevision: {
+                    type: 'string',
+                },
+                runId: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'commandId',
+                'comment',
+                'decision',
+                'invocationId',
+                'nodeId',
+                'proposalRevision',
+                'runId',
+            ],
+            type: 'object',
+        },
+        WorkflowApprovalProposal: {
+            description:
+                'Immutable canonical content identified by a server-computed SHA-256 revision.',
+            properties: {
+                action: {
+                    type: 'string',
+                },
+                content: {
+                    $ref: '#/definitions/WorkflowObject',
+                },
+                destination: {
+                    type: 'string',
+                },
+                revision: {
+                    type: 'string',
+                },
+            },
+            required: ['action', 'content', 'destination', 'revision'],
+            type: 'object',
+        },
         WorkflowArtifactCursor: {
             description: "Exclusive position in the run's immutable invocation manifests.",
             properties: {
@@ -12131,7 +12207,7 @@ export const schema: Schema = {
         },
         WorkflowHumanOutcome: {
             description: 'Terminal outcomes never infer an answer from silence.',
-            enum: ['answered', 'expired'],
+            enum: ['answered', 'approved', 'cancelled', 'changes_requested', 'expired', 'rejected'],
             type: 'string',
         },
         WorkflowHumanPage: {
@@ -12160,6 +12236,11 @@ export const schema: Schema = {
             properties: {
                 answerType: {
                     $ref: '#/definitions/WorkflowAnswerType',
+                },
+                approval: {
+                    $ref: '#/definitions/WorkflowApprovalProposal',
+                    description:
+                        'Immutable canonical content identified by a server-computed SHA-256 revision.',
                 },
                 canAnswer: {
                     type: 'boolean',
@@ -12244,8 +12325,14 @@ export const schema: Schema = {
                 commandId: {
                     type: ['null', 'string'],
                 },
+                comment: {
+                    type: 'string',
+                },
                 outcome: {
                     $ref: '#/definitions/WorkflowHumanOutcome',
+                },
+                proposalRevision: {
+                    type: 'string',
                 },
             },
             required: ['actor', 'answer', 'atMs', 'commandId', 'outcome'],
@@ -12253,7 +12340,15 @@ export const schema: Schema = {
         },
         WorkflowHumanStatus: {
             description: 'Request presentation state also reflects whole-run cancellation.',
-            enum: ['answered', 'cancelled', 'expired', 'pending'],
+            enum: [
+                'answered',
+                'approved',
+                'cancelled',
+                'changes_requested',
+                'expired',
+                'pending',
+                'rejected',
+            ],
             type: 'string',
         },
         WorkflowImageCandidate: {
