@@ -266,6 +266,10 @@
         "./workflow-wait-codec": {
             "types": "./dist/workflows/WaitCodec.d.ts",
             "import": "./dist/workflow-wait-codec.js"
+        },
+        "./workflow-time-limits": {
+            "types": "./dist/workflows/TimeLimits.d.ts",
+            "import": "./dist/workflow-time-limits.js"
         }
     },
     "scripts": {
