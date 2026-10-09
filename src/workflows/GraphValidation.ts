@@ -25,6 +25,7 @@ import { GraphConnections } from './GraphConnections.js';
 import { GraphResources } from './GraphResources.js';
 import { GraphEach } from './GraphEach.js';
 import { GraphOrder } from './GraphOrder.js';
+import { WorkflowHttpInputs } from './HttpInputs.js';
 import { WorkflowTemplateFields } from './TemplateFields.js';
 import { WorkflowJson } from './WorkflowJson.js';
 import type { WorkflowEdge, WorkflowValue, WorkflowObject } from './WorkflowTypes.js';
@@ -178,6 +179,21 @@ export class WorkflowGraphValidation {
         connections: GraphConnectionsResult,
         problems: GraphProblems,
     ): void {
+        if (entry.definition.id === 'http.request') {
+            try {
+                const input: WorkflowObject = {
+                    url: 'https://example.com',
+                    ...entry.node.configuration,
+                };
+                WorkflowHttpInputs.parse(entry.node.configuration, input);
+            } catch (caught: unknown) {
+                problems.add(
+                    GraphIssueCode.Configuration,
+                    caught instanceof Error ? caught.message : 'Review HTTP request settings',
+                    entry.node.id,
+                );
+            }
+        }
         if (entry.definition.id === 'text.template') {
             const template: WorkflowValue | undefined = entry.node.configuration['template'];
             if (typeof template === 'string') {

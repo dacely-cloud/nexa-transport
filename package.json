@@ -350,6 +350,10 @@
         "./workflow-spending-codec": {
             "types": "./dist/workflows/runtime/RunSpendingCodec.d.ts",
             "import": "./dist/workflow-spending-codec.js"
+        },
+        "./workflow-http": {
+            "types": "./dist/workflows/HttpInputs.d.ts",
+            "import": "./dist/workflow-http.js"
         }
     },
     "scripts": {

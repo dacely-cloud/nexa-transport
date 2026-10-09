@@ -4,6 +4,7 @@ const config: UserConfig = {
         target: 'es2023',
         lib: {
             entry: {
+                'workflow-http': 'src/workflows/HttpInputs.ts',
                 'workflow-template-fields': 'src/workflows/TemplateFields.ts',
                 'workflow-template-inputs': 'src/workflows/TemplateInputs.ts',
                 'workflow-list-types': 'src/workflows/lists/ListTypes.ts',

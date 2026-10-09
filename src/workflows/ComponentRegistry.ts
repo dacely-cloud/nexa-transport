@@ -19,6 +19,7 @@ import { MappingComponents } from './MappingComponents.js';
 import { DataComponents } from './DataComponents.js';
 import { TimeComponents } from './TimeComponents.js';
 import { TimedComponents } from './TimedComponents.js';
+import { HttpComponents } from './HttpComponents.js';
 import { CoreComponents } from './CoreComponents.js';
 import { InferenceComponents } from './InferenceComponents.js';
 import { ImageComponents } from './ImageComponents.js';
@@ -58,6 +59,7 @@ export class ComponentRegistry {
             ...HumanComponents.definitions(),
             ...ApprovalComponents.definitions(),
             ...DataComponents.definitions(),
+            HttpComponents.definition(),
             MappingComponents.definition(),
             ListComponents.definition(),
             ...EachComponents.definitions(),
