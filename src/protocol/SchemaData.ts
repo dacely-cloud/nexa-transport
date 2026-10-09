@@ -1047,6 +1047,11 @@ export const schema: Schema = {
                 frameId: {
                     type: 'string',
                 },
+                importMap: {
+                    $ref: '#/definitions/BrowserAnalysisMapInput',
+                    description:
+                        'Body-free identity of an exact map member in the immutable analysis snapshot.',
+                },
                 includeSources: {
                     type: 'boolean',
                 },
@@ -1100,6 +1105,26 @@ export const schema: Schema = {
                 'sourceRunSha256',
                 'targetId',
             ],
+            type: 'object',
+        },
+        BrowserAnalysisMapInput: {
+            description:
+                'Body-free identity of an exact map member in the immutable analysis snapshot.',
+            properties: {
+                baseUrl: {
+                    type: 'string',
+                },
+                bytes: {
+                    type: 'string',
+                },
+                selector: {
+                    type: 'string',
+                },
+                sha256: {
+                    type: 'string',
+                },
+            },
+            required: ['baseUrl', 'bytes', 'selector', 'sha256'],
             type: 'object',
         },
         BrowserAttributeName: {
