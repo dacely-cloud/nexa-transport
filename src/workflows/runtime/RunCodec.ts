@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { WorkflowInvocationInputs } from './RunRequests.js';
 import { WorkflowRunModelCodec } from './RunModelCodec.js';
 import { WorkflowRunImageCodec } from './RunImageCodec.js';
 import { WorkflowInput } from '../WorkflowInput.js';
@@ -22,6 +23,18 @@ import {
 
 /** Validates stored snapshots and completed values as well as incoming execution requests. */
 export class WorkflowRunCodec {
+    public static inputs(raw: unknown): WorkflowInvocationInputs {
+        const value: Readonly<Record<string, unknown>> = WorkflowInput.record(raw, [
+            'values',
+            'configuration',
+            'trigger',
+        ]);
+        return {
+            values: WorkflowJson.object(value['values']),
+            configuration: WorkflowJson.object(value['configuration']),
+            trigger: value['trigger'] === null ? null : WorkflowJson.object(value['trigger']),
+        };
+    }
     public static snapshot(raw: unknown): WorkflowRunSnapshot {
         const value: Readonly<Record<string, unknown>> = WorkflowInput.record(raw, [
             ...(raw !== null && typeof raw === 'object' && Object.hasOwn(raw, 'imageModels')

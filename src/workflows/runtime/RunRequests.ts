@@ -111,3 +111,10 @@ export interface WorkflowRunListPage {
     readonly items: readonly WorkflowRunSummary[];
     readonly next: string | null;
 }
+
+/** Resolved values and immutable configuration passed to one exact step invocation. */
+export interface WorkflowInvocationInputs {
+    readonly values: WorkflowObject;
+    readonly configuration: WorkflowObject;
+    readonly trigger: WorkflowObject | null;
+}
