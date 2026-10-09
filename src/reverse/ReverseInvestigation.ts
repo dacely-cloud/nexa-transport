@@ -14,8 +14,10 @@ export class ReverseInvestigation {
             throw new TypeError('Invalid investigation receipt');
         }
         if (input.application !== undefined) {
-            if (input.kind !== 'javascript') {
-                throw new TypeError('Application projection requires a JavaScript target');
+            if (input.kind !== 'javascript' && input.kind !== 'source') {
+                throw new TypeError(
+                    'Application projection requires a source or JavaScript target',
+                );
             }
             ApplicationReceipt.validate(input.application);
         }

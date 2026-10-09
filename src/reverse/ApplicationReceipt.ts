@@ -13,12 +13,17 @@ export class ApplicationReceipt {
             value.nativeAddonCount,
             value.sourceMapCount,
             value.issueCount,
+            ...(value.symbolCount === undefined ? [] : [value.symbolCount]),
+            ...(value.referenceCount === undefined ? [] : [value.referenceCount]),
         ];
         if (
             counts.some(
                 (count: number): boolean =>
                     !Number.isSafeInteger(count) || count < 0 || count > 200_000,
             ) ||
+            (value.languages !== undefined &&
+                (value.languages.length > 5 ||
+                    new Set(value.languages).size !== value.languages.length)) ||
             value.modules.length > 12 ||
             value.boundaries.length > 16 ||
             value.issues.length > 8 ||
@@ -37,6 +42,9 @@ export class ApplicationReceipt {
                     module.id.length === 0 ||
                     module.id.length > 1024 ||
                     module.path.length > 1024 ||
+                    (module.language !== undefined &&
+                        value.languages !== undefined &&
+                        !value.languages.includes(module.language)) ||
                     !/^[a-f0-9]{64}$/u.test(module.sha256) ||
                     !/^[0-9]{1,10}$/u.test(module.bytes) ||
                     BigInt(module.bytes) > 16_777_216n ||

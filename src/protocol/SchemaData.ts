@@ -403,6 +403,12 @@ export const schema: Schema = {
                 imports: {
                     type: 'number',
                 },
+                language: {
+                    description:
+                        'Source grammars are explicit; bytecode formats use separate version-aware adapters.',
+                    enum: ['c', 'cpp', 'javascript', 'lua', 'luau'],
+                    type: 'string',
+                },
                 parseError: {
                     type: ['null', 'string'],
                 },
@@ -7680,6 +7686,12 @@ export const schema: Schema = {
                     },
                     type: 'array',
                 },
+                languages: {
+                    items: {
+                        $ref: '#/definitions/SourceLanguage',
+                    },
+                    type: 'array',
+                },
                 moduleCount: {
                     type: 'number',
                 },
@@ -7692,10 +7704,16 @@ export const schema: Schema = {
                 nativeAddonCount: {
                     type: 'number',
                 },
+                referenceCount: {
+                    type: 'number',
+                },
                 routeCount: {
                     type: 'number',
                 },
                 sourceMapCount: {
+                    type: 'number',
+                },
+                symbolCount: {
                     type: 'number',
                 },
             },
@@ -7858,7 +7876,7 @@ export const schema: Schema = {
                 kind: {
                     description:
                         'The runtime selects a target adapter; callers may make the choice explicit for ambiguous files.',
-                    enum: ['javascript', 'native'],
+                    enum: ['javascript', 'native', 'source'],
                     type: 'string',
                 },
                 plan: {
@@ -8304,6 +8322,12 @@ export const schema: Schema = {
             },
             required: ['favicon', 'origin'],
             type: 'object',
+        },
+        SourceLanguage: {
+            description:
+                'Source grammars are explicit; bytecode formats use separate version-aware adapters.',
+            enum: ['c', 'cpp', 'javascript', 'lua', 'luau'],
+            type: 'string',
         },
         SteerParams: {
             description: 'A correction for the server-minted active run, not a follow-up turn.',

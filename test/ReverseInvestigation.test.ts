@@ -160,6 +160,49 @@ describe('native investigation transport', (): void => {
             expect((): ReverseRunSnapshot => ReverseInvestigation.parse(invalid)).toThrow();
         }
     });
+    it('carries mixed source observations and rejects inconsistent language metadata', (): void => {
+        const application: ReverseApplicationSnapshot = {
+            languages: ['c', 'lua'],
+            symbolCount: 2,
+            referenceCount: 1,
+            moduleCount: 2,
+            importCount: 0,
+            functionCount: 2,
+            ipcCount: 0,
+            routeCount: 0,
+            nativeAddonCount: 0,
+            sourceMapCount: 0,
+            issueCount: 0,
+            modules: [
+                {
+                    id: 'main.c',
+                    path: 'main.c',
+                    language: 'c',
+                    sha256: 'c'.repeat(64),
+                    bytes: '64',
+                    functions: 1,
+                    imports: 0,
+                    sourceMap: null,
+                    parseError: null,
+                },
+            ],
+            boundaries: [],
+            issues: [],
+        };
+        const receipt: ReverseRunSnapshot = { ...snapshot(), kind: 'source', application };
+        expect(ReverseInvestigation.parse(receipt).application?.languages).toEqual(['c', 'lua']);
+        for (const invalid of [
+            { ...application, languages: ['c', 'c'] },
+            { ...application, languages: ['lua'] },
+            { ...application, languages: ['unsupported'] },
+            { ...application, symbolCount: 200_001 },
+            { ...application, referenceCount: -1 },
+        ]) {
+            expect((): ReverseRunSnapshot =>
+                ReverseInvestigation.parse({ ...receipt, application: invalid }),
+            ).toThrow();
+        }
+    });
     it('validates adaptive work ownership, evidence links and acyclic dependencies with old receipt compatibility', (): void => {
         const initial: ReverseRunSnapshot = snapshot();
         const step: ReversePlanStep = followUp();
@@ -247,7 +290,27 @@ describe('native investigation transport', (): void => {
     it('preserves plan, specialist failures and evidence across websocket progress and final outcomes', async (): Promise<void> => {
         gateway = new TestGateway();
         client = await NexaClient.connect({ url: await gateway.url(), reconnect: false });
-        const running: ReverseRunSnapshot = { ...snapshot(), plan: [followUp()] };
+        const running: ReverseRunSnapshot = {
+            ...snapshot(),
+            kind: 'source',
+            plan: [followUp()],
+            application: {
+                languages: ['cpp', 'luau'],
+                symbolCount: 2,
+                referenceCount: 1,
+                moduleCount: 2,
+                importCount: 0,
+                functionCount: 2,
+                ipcCount: 0,
+                routeCount: 0,
+                nativeAddonCount: 0,
+                sourceMapCount: 0,
+                issueCount: 0,
+                modules: [],
+                boundaries: [],
+                issues: [],
+            },
+        };
         const final: ReverseRunSnapshot = {
             ...running,
             revision: '2',
@@ -319,6 +382,7 @@ describe('native investigation transport', (): void => {
         }
         await turn.result;
         expect(receipts).toEqual([running, final]);
+        expect(receipts.at(-1)?.application?.languages).toEqual(['cpp', 'luau']);
         expect(receipts.at(-1)?.tasks.at(-1)?.error).toBe('Reviewer unavailable');
         expect(receipts.at(-1)?.plan?.[0]?.report).toBe('Header verified');
     });

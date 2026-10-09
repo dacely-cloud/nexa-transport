@@ -256,6 +256,15 @@ export interface ApplicationLocationShape {
 /** ApplicationLocation from the Nexa wire protocol. */
 export type ApplicationLocation = ApplicationLocationShape;
 
+/** Allowed values for ApplicationModulelanguage. */
+export const ApplicationModulelanguageValues = {
+    Value0: 'c',
+    Value1: 'cpp',
+    Value2: 'javascript',
+    Value3: 'lua',
+    Value4: 'luau',
+} as const;
+
 /** ApplicationModule wire fields. */
 export interface ApplicationModuleShape {
     /** bytes as defined by the Nexa gateway. */
@@ -266,6 +275,8 @@ export interface ApplicationModuleShape {
     readonly id: string;
     /** imports as defined by the Nexa gateway. */
     readonly imports: number;
+    /** language as defined by the Nexa gateway. */
+    readonly language?: (typeof ApplicationModulelanguageValues)[keyof typeof ApplicationModulelanguageValues];
     /** parseError as defined by the Nexa gateway. */
     readonly parseError: null | string;
     /** path as defined by the Nexa gateway. */
@@ -5086,16 +5097,22 @@ export interface ReverseApplicationSnapshotShape {
     readonly issueCount: number;
     /** issues as defined by the Nexa gateway. */
     readonly issues: ReadonlyArray<ApplicationIssue>;
+    /** languages as defined by the Nexa gateway. */
+    readonly languages?: ReadonlyArray<SourceLanguage>;
     /** moduleCount as defined by the Nexa gateway. */
     readonly moduleCount: number;
     /** modules as defined by the Nexa gateway. */
     readonly modules: ReadonlyArray<ApplicationModule>;
     /** nativeAddonCount as defined by the Nexa gateway. */
     readonly nativeAddonCount: number;
+    /** referenceCount as defined by the Nexa gateway. */
+    readonly referenceCount?: number;
     /** routeCount as defined by the Nexa gateway. */
     readonly routeCount: number;
     /** sourceMapCount as defined by the Nexa gateway. */
     readonly sourceMapCount: number;
+    /** symbolCount as defined by the Nexa gateway. */
+    readonly symbolCount?: number;
 }
 
 /** ReverseApplicationSnapshot from the Nexa wire protocol. */
@@ -5160,7 +5177,11 @@ export interface ReversePlanStepShape {
 export type ReversePlanStep = ReversePlanStepShape;
 
 /** Allowed values for ReverseRunSnapshotkind. */
-export const ReverseRunSnapshotkindValues = { Value0: 'javascript', Value1: 'native' } as const;
+export const ReverseRunSnapshotkindValues = {
+    Value0: 'javascript',
+    Value1: 'native',
+    Value2: 'source',
+} as const;
 
 /** ReverseRunSnapshot wire fields. */
 export interface ReverseRunSnapshotShape {
@@ -5495,6 +5516,18 @@ export interface SitePreviewShape {
 
 /** SitePreview from the Nexa wire protocol. */
 export type SitePreview = SitePreviewShape;
+
+/** Allowed values for SourceLanguage. */
+export const SourceLanguageValues = {
+    Value0: 'c',
+    Value1: 'cpp',
+    Value2: 'javascript',
+    Value3: 'lua',
+    Value4: 'luau',
+} as const;
+
+/** SourceLanguage from the Nexa wire protocol. */
+export type SourceLanguage = (typeof SourceLanguageValues)[keyof typeof SourceLanguageValues];
 
 /** SteerParams wire fields. */
 export interface SteerParamsShape {
