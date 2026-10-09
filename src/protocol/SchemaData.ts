@@ -15513,6 +15513,11 @@ export const schema: Schema = {
                 nodeId: {
                     type: ['null', 'string'],
                 },
+                origin: {
+                    $ref: '#/definitions/WorkflowStepOrigin',
+                    description:
+                        'An execution instance points back to the immutable authored card and its collection item.',
+                },
                 runId: {
                     type: 'string',
                 },
@@ -16038,6 +16043,23 @@ export const schema: Schema = {
             ],
             type: 'object',
         },
+        WorkflowStepOrigin: {
+            description:
+                'An execution instance points back to the immutable authored card and its collection item.',
+            properties: {
+                itemIndex: {
+                    type: 'number',
+                },
+                loopId: {
+                    type: 'string',
+                },
+                nodeId: {
+                    type: 'string',
+                },
+            },
+            required: ['itemIndex', 'loopId', 'nodeId'],
+            type: 'object',
+        },
         WorkflowStepStatus: {
             enum: [
                 'cancelled',
@@ -16078,6 +16100,11 @@ export const schema: Schema = {
                 },
                 nodeId: {
                     type: 'string',
+                },
+                origin: {
+                    $ref: '#/definitions/WorkflowStepOrigin',
+                    description:
+                        'Only repeated instances carry this provenance; nodeId identifies the execution instance.',
                 },
                 startedAtMs: {
                     type: 'string',

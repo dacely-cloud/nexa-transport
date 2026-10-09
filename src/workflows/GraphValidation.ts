@@ -1,7 +1,7 @@
-import { ListPlans } from './lists/ListPlan.js';
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { ListPlans } from './lists/ListPlan.js';
 import { MappingValidation } from './mapping/MappingValidation.js';
 import { WorkflowTimedTrigger } from './TimedTrigger.js';
 import { ComponentRegistry } from './ComponentRegistry.js';
@@ -23,6 +23,7 @@ import {
 import { GraphProblems } from './GraphProblems.js';
 import { GraphConnections } from './GraphConnections.js';
 import { GraphResources } from './GraphResources.js';
+import { GraphEach } from './GraphEach.js';
 import { GraphOrder } from './GraphOrder.js';
 import type { WorkflowEdge, WorkflowValue } from './WorkflowTypes.js';
 
@@ -103,6 +104,14 @@ export class WorkflowGraphValidation {
                 problems,
             ).length;
             this.#configuration(entry, connections, problems);
+        }
+        try {
+            GraphEach.regions(graph);
+        } catch (caught: unknown) {
+            problems.add(
+                GraphIssueCode.Configuration,
+                caught instanceof Error ? caught.message : 'Invalid For each item body',
+            );
         }
         const order: readonly string[] = GraphOrder.inspect(nodes, connections.edges, problems);
         for (const component of unavailable) {

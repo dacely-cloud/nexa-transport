@@ -50,6 +50,7 @@ const config: UserConfig = {
                 'workflow-catalog': 'src/workflows/ComponentRegistry.ts',
                 'workflow-component-types': 'src/workflows/ComponentTypes.ts',
                 'workflow-validation': 'src/workflows/GraphValidation.ts',
+                'workflow-each': 'src/workflows/GraphEach.ts',
                 'workflow-graph-types': 'src/workflows/GraphTypes.ts',
                 'workflow-ports': 'src/workflows/PortCompatibility.ts',
                 'workflow-schemas': 'src/workflows/Schemas.ts',

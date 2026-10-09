@@ -98,7 +98,15 @@ export interface WorkflowStepResult {
     readonly routes: readonly string[];
     readonly result: WorkflowNamedResult | null;
 }
+/** An execution instance points back to the immutable authored card and its collection item. */
+export interface WorkflowStepOrigin {
+    readonly nodeId: string;
+    readonly loopId: string;
+    readonly itemIndex: number;
+}
 export interface WorkflowStepState {
+    /** Only repeated instances carry this provenance; nodeId identifies the execution instance. */
+    readonly origin?: WorkflowStepOrigin;
     /** Persisted timer target; retained after completion or cancellation as timing evidence. */
     readonly wakeAtMs?: string;
     readonly nodeId: string;
@@ -132,6 +140,7 @@ export interface WorkflowRunSummary {
     readonly message: string | null;
 }
 export interface WorkflowRunEvent {
+    readonly origin?: WorkflowStepOrigin;
     readonly runId: string;
     readonly sequence: string;
     readonly atMs: string;

@@ -10,6 +10,8 @@ import type { ResourceBinding } from '../src/workflows/ResourceTypes.js';
 
 describe('portable workflow resource contracts', (): void => {
     it.each([
+        'EachComponents',
+        'GraphEach',
         'ConversionComponents',
         'ScalarConversion',
         'ListComponents',
