@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest';
 import { WorkflowApprovalCodec } from '../src/workflows/runtime/RunApprovalCodec.js';
 import { ComponentRegistry } from '../src/workflows/ComponentRegistry.js';
-import { Method } from '../src/protocol/Protocol.js';
+import { Method, type WorkflowHumanRequest } from '../src/protocol/Protocol.js';
 import { methodValidators } from '../src/protocol/MethodValidators.js';
 import type { WorkflowApprovalDecision } from '../src/workflows/runtime/RunApprovalTypes.js';
 
@@ -45,7 +45,7 @@ it('registers explicit review routes and validates immutable decision commands',
     ]);
 });
 it('decodes proposal-bound decisions without dropping content or accepting an unmodeled outcome', (): void => {
-    const request = {
+    const request: WorkflowHumanRequest = {
         runId: 'run',
         nodeId: 'review',
         invocationId: 'invoke',
