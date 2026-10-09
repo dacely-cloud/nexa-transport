@@ -306,6 +306,18 @@
         "./workflow-scalar-conversion": {
             "types": "./dist/workflows/ScalarConversion.d.ts",
             "import": "./dist/workflow-scalar-conversion.js"
+        },
+        "./workflow-list-types": {
+            "types": "./dist/workflows/lists/ListTypes.d.ts",
+            "import": "./dist/workflow-list-types.js"
+        },
+        "./workflow-list-plan": {
+            "types": "./dist/workflows/lists/ListPlan.d.ts",
+            "import": "./dist/workflow-list-plan.js"
+        },
+        "./workflow-list-transform": {
+            "types": "./dist/workflows/lists/ListTransform.d.ts",
+            "import": "./dist/workflow-list-transform.js"
         }
     },
     "scripts": {
