@@ -381,6 +381,46 @@ A channel's live health, as its own adapter reports it.
 | `kind`    | Yes      | `string` |             |
 | `message` | Yes      | `string` |             |
 
+## ChatGraph
+
+A non-executable graph delivered directly into a conversation.
+
+| Field         | Required | Type                                                | Description |
+| ------------- | -------- | --------------------------------------------------- | ----------- |
+| `description` | Yes      | `string`                                            |             |
+| `edges`       | Yes      | Array of [ChatGraphEdge](protocol.md#chatgraphedge) |             |
+| `id`          | Yes      | `string`                                            |             |
+| `nodes`       | Yes      | Array of [ChatGraphNode](protocol.md#chatgraphnode) |             |
+| `title`       | Yes      | `string`                                            |             |
+
+## ChatGraphColor
+
+Available semantic colors, shared by the agent and workflow-based chat renderer.
+
+Type: `"blue"` / `"gray"` / `"green"` / `"orange"` / `"purple"` / `"red"`.
+
+## ChatGraphEdge
+
+A directed, labelled relationship between two existing nodes.
+
+| Field   | Required | Type     | Description |
+| ------- | -------- | -------- | ----------- |
+| `from`  | Yes      | `string` |             |
+| `id`    | Yes      | `string` |             |
+| `label` | Yes      | `string` |             |
+| `to`    | Yes      | `string` |             |
+
+## ChatGraphNode
+
+A named idea or capability; descriptions are plain text.
+
+| Field         | Required | Type                                         | Description |
+| ------------- | -------- | -------------------------------------------- | ----------- |
+| `color`       | Yes      | [ChatGraphColor](protocol.md#chatgraphcolor) |             |
+| `description` | Yes      | `string`                                     |             |
+| `id`          | Yes      | `string`                                     |             |
+| `label`       | Yes      | `string`                                     |             |
+
 ## CommandExecutionReceipt
 
 Host-produced command termination evidence, separate from model-visible output.
@@ -630,6 +670,7 @@ Variant 9: Object (fields below)
 
 | Field                  | Required | Type                                                         | Description                                                           |
 | ---------------------- | -------- | ------------------------------------------------------------ | --------------------------------------------------------------------- |
+| `chatGraph`            | No       | [ChatGraph](protocol.md#chatgraph)                           | Saved visual delivery; providers only consume the ordinary content.   |
 | `content`              | Yes      | Array of [ContentBlock](protocol.md#contentblock) / `string` |                                                                       |
 | `inspectedMediaSha256` | No       | Array of `string`                                            | Host-authored observation evidence; never inferred from result prose. |
 | `isError`              | No       | `boolean`                                                    |                                                                       |
@@ -1237,6 +1278,7 @@ Configurable bounds on gateway-owned work and memory.
 | `voice.stop`                        | Yes      | Object (fields below) |                                                                                            |
 | `workflows.catalog`                 | Yes      | Object (fields below) |                                                                                            |
 | `workflows.create`                  | Yes      | Object (fields below) |                                                                                            |
+| `workflows.delete`                  | Yes      | Object (fields below) |                                                                                            |
 | `workflows.list`                    | Yes      | Object (fields below) |                                                                                            |
 | `workflows.models`                  | Yes      | Object (fields below) |                                                                                            |
 | `workflows.models.image.quote`      | Yes      | Object (fields below) |                                                                                            |
@@ -1250,14 +1292,18 @@ Configurable bounds on gateway-owned work and memory.
 | `workflows.planning.sources`        | Yes      | Object (fields below) |                                                                                            |
 | `workflows.read`                    | Yes      | Object (fields below) |                                                                                            |
 | `workflows.record`                  | Yes      | Object (fields below) |                                                                                            |
+| `workflows.records`                 | Yes      | Object (fields below) |                                                                                            |
 | `workflows.runs.agent.control`      | Yes      | Object (fields below) |                                                                                            |
 | `workflows.runs.agent.input`        | Yes      | Object (fields below) |                                                                                            |
 | `workflows.runs.agent.read`         | Yes      | Object (fields below) |                                                                                            |
 | `workflows.runs.applications.check` | Yes      | Object (fields below) |                                                                                            |
 | `workflows.runs.applications.setup` | Yes      | Object (fields below) |                                                                                            |
 | `workflows.runs.artifact`           | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.artifacts`          | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.attempts`           | Yes      | Object (fields below) |                                                                                            |
 | `workflows.runs.cancel`             | Yes      | Object (fields below) |                                                                                            |
 | `workflows.runs.events`             | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.inputs`             | Yes      | Object (fields below) |                                                                                            |
 | `workflows.runs.list`               | Yes      | Object (fields below) |                                                                                            |
 | `workflows.runs.output`             | Yes      | Object (fields below) |                                                                                            |
 | `workflows.runs.read`               | Yes      | Object (fields below) |                                                                                            |
@@ -2003,6 +2049,13 @@ Configurable bounds on gateway-owned work and memory.
 | `params` | Yes      | [WorkflowCreateRequest](protocol.md#workflowcreaterequest) |             |
 | `result` | Yes      | [WorkflowReceipt](protocol.md#workflowreceipt)             |             |
 
+**workflows.delete**
+
+| Field    | Required | Type                                                       | Description |
+| -------- | -------- | ---------------------------------------------------------- | ----------- |
+| `params` | Yes      | [WorkflowDeleteRequest](protocol.md#workflowdeleterequest) |             |
+| `result` | Yes      | [WorkflowDeleteReceipt](protocol.md#workflowdeletereceipt) |             |
+
 **workflows.list**
 
 | Field    | Required | Type                                                   | Description |
@@ -2094,6 +2147,13 @@ Configurable bounds on gateway-owned work and memory.
 | `params` | Yes      | [WorkflowRecordRequest](protocol.md#workflowrecordrequest) |             |
 | `result` | Yes      | [WorkflowRecordPage](protocol.md#workflowrecordpage)       |             |
 
+**workflows.records**
+
+| Field    | Required | Type                                                         | Description |
+| -------- | -------- | ------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [WorkflowRecordsRequest](protocol.md#workflowrecordsrequest) |             |
+| `result` | Yes      | [WorkflowRecordsPage](protocol.md#workflowrecordspage)       |             |
+
 **workflows.runs.agent.control**
 
 | Field    | Required | Type                                                                   | Description |
@@ -2136,6 +2196,20 @@ Configurable bounds on gateway-owned work and memory.
 | `params` | Yes      | [WorkflowRunArtifactRequest](protocol.md#workflowrunartifactrequest) |             |
 | `result` | Yes      | [WorkflowRunArtifactPage](protocol.md#workflowrunartifactpage)       |             |
 
+**workflows.runs.artifacts**
+
+| Field    | Required | Type                                                                   | Description |
+| -------- | -------- | ---------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [WorkflowArtifactListRequest](protocol.md#workflowartifactlistrequest) |             |
+| `result` | Yes      | [WorkflowArtifactListPage](protocol.md#workflowartifactlistpage)       |             |
+
+**workflows.runs.attempts**
+
+| Field    | Required | Type                                                                 | Description |
+| -------- | -------- | -------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [WorkflowRunAttemptsRequest](protocol.md#workflowrunattemptsrequest) |             |
+| `result` | Yes      | [WorkflowRunAttemptsPage](protocol.md#workflowrunattemptspage)       |             |
+
 **workflows.runs.cancel**
 
 | Field    | Required | Type                                                 | Description |
@@ -2149,6 +2223,13 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ---------------------------------------------------------------- | ----------- |
 | `params` | Yes      | [WorkflowRunEventsRequest](protocol.md#workflowruneventsrequest) |             |
 | `result` | Yes      | Array of [WorkflowRunEvent](protocol.md#workflowrunevent)        |             |
+
+**workflows.runs.inputs**
+
+| Field    | Required | Type                                                                | Description |
+| -------- | -------- | ------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [WorkflowRunOutputRequest](protocol.md#workflowrunoutputrequest)    |             |
+| `result` | Yes      | [WorkflowRunOutputPage](protocol.md#workflowrunoutputpage) / `null` |             |
 
 **workflows.runs.list**
 
@@ -3167,7 +3248,13 @@ Metadata for an observed payload, independently of whether its text is available
 
 Request detail views share stable source pointers and independently paged text.
 
-Type: `"query"` / `"request-body"` / `"request-headers"` / `"response-body"` / `"response-headers"` / `"timings"`.
+Type: `"query"` / `"reported"` / `"request-body"` / `"request-headers"` / `"response-body"` / `"response-headers"` / `"timings"`.
+
+## NetworkFormat
+
+Source formats decoded without replaying captured traffic.
+
+Type: `"har"` / `"mitmproxy"`.
 
 ## NetworkIssue
 
@@ -3178,23 +3265,37 @@ Explicit missing or rejected capture coverage.
 | `location` | Yes      | `string` |             |
 | `message`  | Yes      | `string` |             |
 
+## NetworkNativeSource
+
+Native coordinates are exact decimal byte offsets in the immutable input.
+
+| Field          | Required | Type          | Description |
+| -------------- | -------- | ------------- | ----------- |
+| `end`          | Yes      | `string`      |             |
+| `flowId`       | Yes      | `null,string` |             |
+| `flowType`     | Yes      | `null,string` |             |
+| `ordinal`      | Yes      | `string`      |             |
+| `start`        | Yes      | `string`      |             |
+| `stateVersion` | Yes      | `null,string` |             |
+
 ## NetworkRequest
 
 Compact request directory row with an immutable HAR JSON pointer.
 
-| Field             | Required | Type                                   | Description |
-| ----------------- | -------- | -------------------------------------- | ----------- |
-| `durationMs`      | Yes      | `number`                               |             |
-| `id`              | Yes      | `string`                               |             |
-| `location`        | Yes      | `string`                               |             |
-| `method`          | Yes      | `string`                               |             |
-| `mimeType`        | Yes      | `string`                               |             |
-| `requestBody`     | Yes      | [NetworkBody](protocol.md#networkbody) |             |
-| `responseBody`    | Yes      | [NetworkBody](protocol.md#networkbody) |             |
-| `startedDateTime` | Yes      | `string`                               |             |
-| `status`          | Yes      | `number`                               |             |
-| `url`             | Yes      | `string`                               |             |
-| `urlTruncated`    | Yes      | `boolean`                              |             |
+| Field             | Required | Type                                                   | Description                                                               |
+| ----------------- | -------- | ------------------------------------------------------ | ------------------------------------------------------------------------- |
+| `durationMs`      | Yes      | `null,number`                                          |                                                                           |
+| `id`              | Yes      | `string`                                               |                                                                           |
+| `location`        | Yes      | `string`                                               |                                                                           |
+| `method`          | Yes      | `null,string`                                          |                                                                           |
+| `mimeType`        | Yes      | `string`                                               |                                                                           |
+| `native`          | No       | [NetworkNativeSource](protocol.md#networknativesource) | Native coordinates are exact decimal byte offsets in the immutable input. |
+| `requestBody`     | Yes      | [NetworkBody](protocol.md#networkbody)                 |                                                                           |
+| `responseBody`    | Yes      | [NetworkBody](protocol.md#networkbody)                 |                                                                           |
+| `startedDateTime` | Yes      | `null,string`                                          |                                                                           |
+| `status`          | Yes      | `null,number`                                          |                                                                           |
+| `url`             | Yes      | `null,string`                                          |                                                                           |
+| `urlTruncated`    | Yes      | `boolean`                                              |                                                                           |
 
 ## ObjectSchema
 
@@ -3989,21 +4090,22 @@ Metadata navigation never accepts a file path or analyzer capability.
 
 A request retains metadata even when no agent has captured either payload.
 
-| Field                | Required | Type                                   | Description |
-| -------------------- | -------- | -------------------------------------- | ----------- |
-| `durationMs`         | Yes      | `number`                               |             |
-| `id`                 | Yes      | `string`                               |             |
-| `location`           | Yes      | `string`                               |             |
-| `method`             | Yes      | `string`                               |             |
-| `mimeType`           | Yes      | `string`                               |             |
-| `requestBody`        | Yes      | [NetworkBody](protocol.md#networkbody) |             |
-| `requestEvidenceId`  | Yes      | `null,string`                          |             |
-| `responseBody`       | Yes      | [NetworkBody](protocol.md#networkbody) |             |
-| `responseEvidenceId` | Yes      | `null,string`                          |             |
-| `startedDateTime`    | Yes      | `string`                               |             |
-| `status`             | Yes      | `number`                               |             |
-| `url`                | Yes      | `string`                               |             |
-| `urlTruncated`       | Yes      | `boolean`                              |             |
+| Field                | Required | Type                                                   | Description                                                               |
+| -------------------- | -------- | ------------------------------------------------------ | ------------------------------------------------------------------------- |
+| `durationMs`         | Yes      | `null,number`                                          |                                                                           |
+| `id`                 | Yes      | `string`                                               |                                                                           |
+| `location`           | Yes      | `string`                                               |                                                                           |
+| `method`             | Yes      | `null,string`                                          |                                                                           |
+| `mimeType`           | Yes      | `string`                                               |                                                                           |
+| `native`             | No       | [NetworkNativeSource](protocol.md#networknativesource) | Native coordinates are exact decimal byte offsets in the immutable input. |
+| `requestBody`        | Yes      | [NetworkBody](protocol.md#networkbody)                 |                                                                           |
+| `requestEvidenceId`  | Yes      | `null,string`                                          |                                                                           |
+| `responseBody`       | Yes      | [NetworkBody](protocol.md#networkbody)                 |                                                                           |
+| `responseEvidenceId` | Yes      | `null,string`                                          |                                                                           |
+| `startedDateTime`    | Yes      | `null,string`                                          |                                                                           |
+| `status`             | Yes      | `null,number`                                          |                                                                           |
+| `url`                | Yes      | `null,string`                                          |                                                                           |
+| `urlTruncated`       | Yes      | `boolean`                                              |                                                                           |
 
 ## ReverseNetworkSnapshot
 
@@ -4012,7 +4114,7 @@ Bounded capability-free projection; full entries and payloads require paged evid
 | Field            | Required | Type                                                  | Description |
 | ---------------- | -------- | ----------------------------------------------------- | ----------- |
 | `entryCount`     | Yes      | `number`                                              |             |
-| `format`         | Yes      | `"har"`                                               |             |
+| `format`         | Yes      | [NetworkFormat](protocol.md#networkformat)            |             |
 | `issueCount`     | Yes      | `number`                                              |             |
 | `issues`         | Yes      | Array of [NetworkIssue](protocol.md#networkissue)     |             |
 | `missingBodies`  | Yes      | `number`                                              |             |
@@ -4600,6 +4702,7 @@ What a tool returns.
 
 | Field                  | Required | Type                                                                                    | Description                                                                                  |
 | ---------------------- | -------- | --------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `chatGraph`            | No       | [ChatGraph](protocol.md#chatgraph)                                                      | Validated graph presentation, independent of bounded model-visible result text.              |
 | `commandExecution`     | No       | [CommandExecutionReceipt](protocol.md#commandexecutionreceipt)                          | Only the execution adapter supplies this evidence; stdout cannot forge it.                   |
 | `content`              | Yes      | Array of [ContentBlock](protocol.md#contentblock) / `string`                            | What the model sees. A string for the ordinary case; blocks when the result carries an image |
 | `continuation`         | No       | `string`                                                                                | The exact call that would show the next page of this result, written by the tool.            |
@@ -5082,7 +5185,7 @@ One exact agent invocation; identities are never retargeted to a newer attempt.
 
 ## WorkflowApplication
 
-Type: `"claude-code"` / `"codex"` / `"grok-build"` / `"nerva-code"`.
+Type: `"claude-code"` / `"codex"` / `"grok-build"` / `"mistral-vibe"` / `"nerva-code"`.
 
 ## WorkflowApplicationRequest
 
@@ -5107,6 +5210,50 @@ Type: `"claude-code"` / `"codex"` / `"grok-build"` / `"nerva-code"`.
 | `application` | Yes      | [WorkflowApplication](protocol.md#workflowapplication)     |             |
 | `status`      | Yes      | [ApplicationConnection](protocol.md#applicationconnection) |             |
 | `title`       | Yes      | `string`                                                   |             |
+
+## WorkflowArtifactCursor
+
+Exclusive position in the run's immutable invocation manifests.
+
+| Field          | Required | Type     | Description |
+| -------------- | -------- | -------- | ----------- |
+| `invocationId` | Yes      | `string` |             |
+| `nodeId`       | Yes      | `string` |             |
+
+## WorkflowArtifactListPage
+
+Expiry is interpreted against the server observation time; bytes are retrieved separately.
+
+| Field          | Required | Type                                                                            | Description |
+| -------------- | -------- | ------------------------------------------------------------------------------- | ----------- |
+| `items`        | Yes      | Array of [WorkflowArtifactPublication](protocol.md#workflowartifactpublication) |             |
+| `next`         | Yes      | [WorkflowArtifactCursor](protocol.md#workflowartifactcursor) / `null`           |             |
+| `observedAtMs` | Yes      | `string`                                                                        |             |
+| `runId`        | Yes      | `string`                                                                        |             |
+
+## WorkflowArtifactListRequest
+
+Lists metadata only, with at most six publications of at most 32 files each.
+
+| Field   | Required | Type                                                                  | Description |
+| ------- | -------- | --------------------------------------------------------------------- | ----------- |
+| `after` | Yes      | [WorkflowArtifactCursor](protocol.md#workflowartifactcursor) / `null` |             |
+| `limit` | Yes      | `number`                                                              |             |
+| `runId` | Yes      | `string`                                                              |             |
+
+## WorkflowArtifactPublication
+
+Recorded producing identity and public file metadata, without storage identifiers.
+
+| Field          | Required | Type                                                                                                              | Description |
+| -------------- | -------- | ----------------------------------------------------------------------------------------------------------------- | ----------- |
+| `artifacts`    | Yes      | Array of [WorkflowRunArtifact](protocol.md#workflowrunartifact)                                                   |             |
+| `attempt`      | Yes      | `null,number`                                                                                                     |             |
+| `createdAtMs`  | Yes      | `null,string`                                                                                                     |             |
+| `invocationId` | Yes      | `string`                                                                                                          |             |
+| `label`        | Yes      | `string`                                                                                                          |             |
+| `nodeId`       | Yes      | `string`                                                                                                          |             |
+| `status`       | Yes      | `"cancelled"` / `"failed"` / `"interrupted"` / `"running"` / `"skipped"` / `"succeeded"` / `"uncertain"` / `null` |             |
 
 ## WorkflowCatalog
 
@@ -5136,6 +5283,25 @@ Client-chosen identities make an unacknowledged create safe to retry.
 | `commandId`  | Yes      | `string`                                       |             |
 | `details`    | Yes      | [WorkflowDetails](protocol.md#workflowdetails) |             |
 | `workflowId` | Yes      | `string`                                       |             |
+
+## WorkflowDeleteReceipt
+
+An idempotent deletion receipt; immutable execution history is retained.
+
+| Field        | Required | Type     | Description |
+| ------------ | -------- | -------- | ----------- |
+| `deleted`    | Yes      | `true`   |             |
+| `revision`   | Yes      | `string` |             |
+| `workflowId` | Yes      | `string` |             |
+
+## WorkflowDeleteRequest
+
+Deletion must name the saved revision the owner reviewed.
+
+| Field              | Required | Type     | Description |
+| ------------------ | -------- | -------- | ----------- |
+| `expectedRevision` | Yes      | `string` |             |
+| `workflowId`       | Yes      | `string` |             |
 
 ## WorkflowDetails
 
@@ -5610,6 +5776,24 @@ A reference identifies immutable content within the authenticated owner's workfl
 | `reference`  | Yes      | `string` |             |
 | `workflowId` | Yes      | `string` |             |
 
+## WorkflowRecordsPage
+
+The response remains bounded even when a selected record contains a large prompt.
+
+| Field        | Required | Type                                                          | Description |
+| ------------ | -------- | ------------------------------------------------------------- | ----------- |
+| `records`    | Yes      | Array of [WorkflowRecordPage](protocol.md#workflowrecordpage) |             |
+| `workflowId` | Yes      | `string`                                                      |             |
+
+## WorkflowRecordsRequest
+
+Batches first pages of immutable values; larger records continue through workflows.record.
+
+| Field        | Required | Type              | Description |
+| ------------ | -------- | ----------------- | ----------- |
+| `references` | Yes      | Array of `string` |             |
+| `workflowId` | Yes      | `string`          |             |
+
 ## WorkflowRunArtifact
 
 Public immutable file metadata; neither storage paths nor global media IDs cross this boundary.
@@ -5645,6 +5829,24 @@ One exact operation's artifact, addressed within the authenticated account and r
 | `artifactId` | Yes      | `string` |             |
 | `offset`     | Yes      | `number` |             |
 | `runId`      | Yes      | `string` |             |
+
+## WorkflowRunAttemptsPage
+
+| Field   | Required | Type                                                      | Description |
+| ------- | -------- | --------------------------------------------------------- | ----------- |
+| `items` | Yes      | Array of [WorkflowStepView](protocol.md#workflowstepview) |             |
+| `next`  | Yes      | `null,number`                                             |             |
+
+## WorkflowRunAttemptsRequest
+
+Lists exact invocations for a node without including captured input/output bodies.
+
+| Field          | Required | Type          | Description |
+| -------------- | -------- | ------------- | ----------- |
+| `afterAttempt` | Yes      | `null,number` |             |
+| `limit`        | Yes      | `number`      |             |
+| `nodeId`       | Yes      | `string`      |             |
+| `runId`        | Yes      | `string`      |             |
 
 ## WorkflowRunEvent
 
