@@ -3459,6 +3459,82 @@ Attaching access, reading data, and placing computation are different operations
 
 Type: `"attach"` / `"compute"` / `"read"`.
 
+## ReverseEvidenceRecord
+
+Provenance for one immutable evidence file, shared by specialists in the same run.
+
+| Field         | Required | Type          | Description |
+| ------------- | -------- | ------------- | ----------- |
+| `characters`  | Yes      | `string`      |             |
+| `createdAtMs` | Yes      | `string`      |             |
+| `excerpt`     | Yes      | `string`      |             |
+| `expert`      | Yes      | `string`      |             |
+| `id`          | Yes      | `string`      |             |
+| `operation`   | Yes      | `string`      |             |
+| `path`        | Yes      | `string`      |             |
+| `selector`    | Yes      | `null,string` |             |
+| `stepId`      | No       | `string`      |             |
+
+## ReversePlanStep
+
+An evidence-linked follow-up requested by a specialist and executed by the runtime.
+
+| Field          | Required | Type                                     | Description |
+| -------------- | -------- | ---------------------------------------- | ----------- |
+| `attempts`     | Yes      | `number`                                 |             |
+| `dependsOn`    | Yes      | Array of `string`                        |             |
+| `error`        | Yes      | `null,string`                            |             |
+| `evidenceIds`  | Yes      | Array of `string`                        |             |
+| `expert`       | Yes      | `string`                                 |             |
+| `finishedAtMs` | Yes      | `null,string`                            |             |
+| `id`           | Yes      | `string`                                 |             |
+| `objective`    | Yes      | `string`                                 |             |
+| `report`       | Yes      | `null,string`                            |             |
+| `requestedBy`  | Yes      | `string`                                 |             |
+| `scope`        | Yes      | `string`                                 |             |
+| `startedAtMs`  | Yes      | `null,string`                            |             |
+| `state`        | Yes      | [ReverseState](protocol.md#reversestate) |             |
+
+## ReverseRunSnapshot
+
+Bounded, capability-free projection carried by live tool events and the final receipt.
+
+| Field           | Required | Type                                                                | Description |
+| --------------- | -------- | ------------------------------------------------------------------- | ----------- |
+| `cleanupErrors` | Yes      | Array of `string`                                                   |             |
+| `evidence`      | Yes      | Array of [ReverseEvidenceRecord](protocol.md#reverseevidencerecord) |             |
+| `evidenceCount` | Yes      | `number`                                                            |             |
+| `id`            | Yes      | `string`                                                            |             |
+| `inputName`     | Yes      | `string`                                                            |             |
+| `plan`          | No       | Array of [ReversePlanStep](protocol.md#reverseplanstep)             |             |
+| `question`      | Yes      | `string`                                                            |             |
+| `revision`      | Yes      | `string`                                                            |             |
+| `sha256`        | Yes      | `string`                                                            |             |
+| `state`         | Yes      | [ReverseState](protocol.md#reversestate)                            |             |
+| `tasks`         | Yes      | Array of [ReverseTaskSnapshot](protocol.md#reversetasksnapshot)     |             |
+| `version`       | Yes      | `1`                                                                 |             |
+
+## ReverseState
+
+Runtime task lifecycle, distinct from the truth of model-authored findings.
+
+Type: `"cancelled"` / `"done"` / `"failed"` / `"partial"` / `"pending"` / `"running"`.
+
+## ReverseTaskSnapshot
+
+A runtime-owned step in the shared investigation plan. Reports remain unverified findings.
+
+| Field          | Required | Type                                     | Description |
+| -------------- | -------- | ---------------------------------------- | ----------- |
+| `attempts`     | Yes      | `number`                                 |             |
+| `dependsOn`    | Yes      | Array of `string`                        |             |
+| `error`        | Yes      | `null,string`                            |             |
+| `expert`       | Yes      | `string`                                 |             |
+| `finishedAtMs` | Yes      | `null,string`                            |             |
+| `report`       | Yes      | `null,string`                            |             |
+| `startedAtMs`  | Yes      | `null,string`                            |             |
+| `state`        | Yes      | [ReverseState](protocol.md#reversestate) |             |
+
 ## RiskLevel
 
 How dangerous an action is.
@@ -3915,13 +3991,14 @@ One tool call's outcome, paired back to its call.
 
 ## ToolProgress
 
-| Field        | Required | Type                                                         | Description                                                                       |
-| ------------ | -------- | ------------------------------------------------------------ | --------------------------------------------------------------------------------- |
-| `attachment` | No       | [ToolProgressAttachment](protocol.md#toolprogressattachment) | Transient visual progress for the active chat; never persisted in the transcript. |
-| `fraction`   | No       | `number`                                                     | Completed fraction in `[0, 1]`, when the tool can know it.                        |
-| `status`     | No       | `string`                                                     | A one-line status, e.g. `running tests…`.                                         |
-| `terminal`   | No       | [ToolTerminal](protocol.md#toolterminal)                     | Live pseudoterminal identity for authenticated input and resize controls.         |
-| `text`       | No       | `string`                                                     | Text appended to the live view.                                                   |
+| Field        | Required | Type                                                         | Description                                                                         |
+| ------------ | -------- | ------------------------------------------------------------ | ----------------------------------------------------------------------------------- |
+| `attachment` | No       | [ToolProgressAttachment](protocol.md#toolprogressattachment) | Transient visual progress for the active chat; never persisted in the transcript.   |
+| `fraction`   | No       | `number`                                                     | Completed fraction in `[0, 1]`, when the tool can know it.                          |
+| `reverse`    | No       | [ReverseRunSnapshot](protocol.md#reverserunsnapshot)         | Shared investigation plan and evidence provenance, without live query capabilities. |
+| `status`     | No       | `string`                                                     | A one-line status, e.g. `running tests…`.                                           |
+| `terminal`   | No       | [ToolTerminal](protocol.md#toolterminal)                     | Live pseudoterminal identity for authenticated input and resize controls.           |
+| `text`       | No       | `string`                                                     | Text appended to the live view.                                                     |
 
 ## ToolProgressAttachment
 
@@ -3972,6 +4049,7 @@ What a tool returns.
 | `processMissing`       | No       | `boolean`                                                                               | The native process table confirmed the requested handle is absent for this session.          |
 | `protocolPayload`      | No       | `boolean`                                                                               | Preserve the string byte-for-byte instead of applying the registry's display-oriented        |
 | `question`             | No       | [ToolQuestion](protocol.md#toolquestion)                                                | A question handed back to the conversation surface for native delivery.                      |
+| `reverse`              | No       | [ReverseRunSnapshot](protocol.md#reverserunsnapshot)                                    | Runtime-authored investigation receipt, retained in presentation history.                    |
 | `source`               | No       | `"external-model"` / `"local"` / `"model"` / `"network"`                                | Where the content came from, for taint tracking.                                             |
 | `status`               | Yes      | [ToolStatus](protocol.md#toolstatus)                                                    |                                                                                              |
 | `terminate`            | No       | `boolean`                                                                               | Whether this result should END the turn rather than feed back into the model.                |

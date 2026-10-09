@@ -16,6 +16,10 @@
         "docs"
     ],
     "exports": {
+        "./reverse-investigation": {
+            "types": "./dist/reverse/ReverseInvestigation.d.ts",
+            "import": "./dist/reverse-investigation.js"
+        },
         "./workflow-image-quote": {
             "types": "./dist/workflows/WorkflowImageQuote.d.ts",
             "import": "./dist/workflow-image-quote.js"
