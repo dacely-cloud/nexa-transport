@@ -1,12 +1,18 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { WorkflowCalendarTiming } from './CalendarTypes.js';
 import type { WorkflowObject } from '../WorkflowTypes.js';
 
 /** Fixed elapsed intervals are anchored to an instant; they never drift with run completion. */
-export const WorkflowScheduleKind = { Interval: 'interval', Once: 'once' } as const;
+export const WorkflowScheduleKind = {
+    Interval: 'interval',
+    Once: 'once',
+    Calendar: 'calendar',
+} as const;
 /** Supported timing forms, with inclusive start and end instants. */
-export type WorkflowScheduleTiming = WorkflowIntervalTiming | WorkflowOnceTiming;
+export type WorkflowScheduleTiming =
+    WorkflowIntervalTiming | WorkflowOnceTiming | WorkflowCalendarTiming;
 /** Millisecond strings preserve exact instants across transport and MongoDB. */
 export interface WorkflowIntervalTiming {
     readonly kind: typeof WorkflowScheduleKind.Interval;

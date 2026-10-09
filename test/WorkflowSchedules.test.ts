@@ -1,3 +1,6 @@
+import type { WorkflowCalendarTiming } from '../src/workflows/schedule/CalendarTypes.js';
+import type { WorkflowScheduleTiming } from '../src/workflows/schedule/ScheduleTypes.js';
+import { WorkflowScheduleTimes } from '../src/workflows/schedule/ScheduleTiming.js';
 import { expect, it } from 'vitest';
 import { WorkflowScheduleCodec } from '../src/workflows/schedule/ScheduleCodec.js';
 import type { WorkflowScheduleEnable } from '../src/workflows/schedule/ScheduleTypes.js';
@@ -41,4 +44,34 @@ it('carries exact schedule revisions, reviewed policy and bounded scalar time va
             expectedRevision: '9007199254740994',
         }),
     ).toBe(true);
+});
+it('preserves named-zone calendar policies through the wire contract and computes actual DST instants', (): void => {
+    const timing: WorkflowCalendarTiming = {
+        kind: 'calendar',
+        time: '02:30',
+        timeZone: 'America/New_York',
+        weekdays: [7],
+        startDate: '2026-03-01',
+        endDate: '2026-03-31',
+        exceptDates: ['2026-03-15'],
+        gap: 'next-valid',
+        fold: 'second',
+    };
+    expect(
+        methodValidators[Method.WorkflowsSchedulesPreview].params({ timing, afterMs: '0' }),
+    ).toBe(true);
+    expect(WorkflowScheduleCodec.timing(timing)).toEqual(timing);
+    expect(
+        WorkflowScheduleTimes.preview(timing, BigInt(Date.parse('2026-03-07T00:00:00Z'))),
+    ).toEqual(
+        ['2026-03-08T07:00:00Z', '2026-03-22T06:30:00Z', '2026-03-29T06:30:00Z'].map(
+            (instant: string): string => BigInt(Date.parse(instant)).toString(),
+        ),
+    );
+    expect((): WorkflowScheduleTiming =>
+        WorkflowScheduleCodec.timing({ ...timing, timeZone: '+05:00' }),
+    ).toThrow();
+    expect((): WorkflowScheduleTiming =>
+        WorkflowScheduleCodec.timing({ ...timing, weekdays: [] }),
+    ).toThrow();
 });

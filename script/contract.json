@@ -12299,6 +12299,67 @@
             "required": ["after", "category", "limit"],
             "type": "object"
         },
+        "WorkflowCalendarFold": {
+            "description": "A repeated local time always contributes at most one scheduled occurrence.\nExplicit repeated-time policy.",
+            "enum": ["first", "second", "skip"],
+            "type": "string"
+        },
+        "WorkflowCalendarGap": {
+            "description": "Calendar times are resolved in the named zone instead of by adding elapsed milliseconds.\nMissing local times are skipped or moved to the first valid instant on the same local date.",
+            "enum": ["next-valid", "skip"],
+            "type": "string"
+        },
+        "WorkflowCalendarTiming": {
+            "description": "Weekdays use ISO numbering: Monday 1 through Sunday 7; date bounds/exceptions are local dates.",
+            "properties": {
+                "endDate": {
+                    "type": ["null", "string"]
+                },
+                "exceptDates": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "fold": {
+                    "$ref": "#/definitions/WorkflowCalendarFold"
+                },
+                "gap": {
+                    "$ref": "#/definitions/WorkflowCalendarGap"
+                },
+                "kind": {
+                    "const": "calendar",
+                    "type": "string"
+                },
+                "startDate": {
+                    "type": "string"
+                },
+                "time": {
+                    "type": "string"
+                },
+                "timeZone": {
+                    "type": "string"
+                },
+                "weekdays": {
+                    "items": {
+                        "type": "number"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": [
+                "endDate",
+                "exceptDates",
+                "fold",
+                "gap",
+                "kind",
+                "startDate",
+                "time",
+                "timeZone",
+                "weekdays"
+            ],
+            "type": "object"
+        },
         "WorkflowCatalog": {
             "description": "Catalog format is separate from saved component versions and draft storage format.",
             "properties": {
@@ -14525,6 +14586,9 @@
         },
         "WorkflowScheduleTiming": {
             "anyOf": [
+                {
+                    "$ref": "#/definitions/WorkflowCalendarTiming"
+                },
                 {
                     "$ref": "#/definitions/WorkflowIntervalTiming"
                 },

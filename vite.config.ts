@@ -16,6 +16,8 @@ const config: UserConfig = {
                 'workflow-planning-codec': 'src/workflows/planning/PlanningCodec.ts',
                 'workflow-planning-edits': 'src/workflows/planning/PlanningEdits.ts',
                 'workflow-artifacts': 'src/workflows/runtime/ArtifactDownload.ts',
+                'workflow-calendar-types': 'src/workflows/schedule/CalendarTypes.ts',
+                'workflow-calendar-codec': 'src/workflows/schedule/CalendarCodec.ts',
                 'workflow-schedule-types': 'src/workflows/schedule/ScheduleTypes.ts',
                 'workflow-schedule-codec': 'src/workflows/schedule/ScheduleCodec.ts',
                 'workflow-schedule-times': 'src/workflows/schedule/ScheduleTiming.ts',

@@ -8357,6 +8357,49 @@ export interface WorkflowAttentionQueryShape {
 /** WorkflowAttentionQuery from the Nexa wire protocol. */
 export type WorkflowAttentionQuery = WorkflowAttentionQueryShape;
 
+/** Allowed values for WorkflowCalendarFold. */
+export const WorkflowCalendarFoldValues = {
+    Value0: 'first',
+    Value1: 'second',
+    Value2: 'skip',
+} as const;
+
+/** WorkflowCalendarFold from the Nexa wire protocol. */
+export type WorkflowCalendarFold =
+    (typeof WorkflowCalendarFoldValues)[keyof typeof WorkflowCalendarFoldValues];
+
+/** Allowed values for WorkflowCalendarGap. */
+export const WorkflowCalendarGapValues = { Value0: 'next-valid', Value1: 'skip' } as const;
+
+/** WorkflowCalendarGap from the Nexa wire protocol. */
+export type WorkflowCalendarGap =
+    (typeof WorkflowCalendarGapValues)[keyof typeof WorkflowCalendarGapValues];
+
+/** WorkflowCalendarTiming wire fields. */
+export interface WorkflowCalendarTimingShape {
+    /** endDate as defined by the Nexa gateway. */
+    readonly endDate: null | string;
+    /** exceptDates as defined by the Nexa gateway. */
+    readonly exceptDates: ReadonlyArray<string>;
+    /** fold as defined by the Nexa gateway. */
+    readonly fold: WorkflowCalendarFold;
+    /** gap as defined by the Nexa gateway. */
+    readonly gap: WorkflowCalendarGap;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: 'calendar';
+    /** startDate as defined by the Nexa gateway. */
+    readonly startDate: string;
+    /** time as defined by the Nexa gateway. */
+    readonly time: string;
+    /** timeZone as defined by the Nexa gateway. */
+    readonly timeZone: string;
+    /** weekdays as defined by the Nexa gateway. */
+    readonly weekdays: ReadonlyArray<number>;
+}
+
+/** WorkflowCalendarTiming from the Nexa wire protocol. */
+export type WorkflowCalendarTiming = WorkflowCalendarTimingShape;
+
 /** WorkflowCatalog wire fields. */
 export interface WorkflowCatalogShape {
     /** components as defined by the Nexa gateway. */
@@ -9905,7 +9948,8 @@ export type WorkflowScheduleStatus =
     (typeof WorkflowScheduleStatusValues)[keyof typeof WorkflowScheduleStatusValues];
 
 /** WorkflowScheduleTiming from the Nexa wire protocol. */
-export type WorkflowScheduleTiming = WorkflowIntervalTiming | WorkflowOnceTiming;
+export type WorkflowScheduleTiming =
+    WorkflowCalendarTiming | WorkflowIntervalTiming | WorkflowOnceTiming;
 
 /** WorkflowScheduleView wire fields. */
 export interface WorkflowScheduleViewShape {

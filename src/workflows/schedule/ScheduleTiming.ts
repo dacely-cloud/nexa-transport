@@ -1,6 +1,9 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { WorkflowCalendarRecovery } from './CalendarTypes.js';
+import { WorkflowCalendarClock } from './CalendarClock.js';
+import { WorkflowCalendarBatches } from './CalendarRecovery.js';
 import {
     WorkflowScheduleKind,
     WorkflowScheduleMissed,
@@ -10,6 +13,7 @@ import {
 
 /** A bounded recovery batch advances past all evaluated occurrences, including intentionally skipped ones. */
 export interface WorkflowScheduleBatch {
+    readonly recovery?: WorkflowCalendarRecovery;
     readonly pending: readonly string[];
     readonly nextAtMs: string | null;
     readonly skipped: string;
@@ -18,6 +22,9 @@ export interface WorkflowScheduleBatch {
 export class WorkflowScheduleTimes {
     /** First occurrence strictly after an instant; start/end bounds remain inclusive. */
     public static next(timing: WorkflowScheduleTiming, after: bigint): string | null {
+        if (timing.kind === WorkflowScheduleKind.Calendar) {
+            return new WorkflowCalendarClock(timing).next(after);
+        }
         if (timing.kind === WorkflowScheduleKind.Once) {
             return BigInt(timing.atMs) > after ? timing.atMs : null;
         }
@@ -49,12 +56,16 @@ export class WorkflowScheduleTimes {
         configuration: WorkflowScheduleConfiguration,
         firstMs: string,
         now: bigint,
+        recovery: WorkflowCalendarRecovery | null = null,
     ): WorkflowScheduleBatch {
         const first: bigint = BigInt(firstMs);
         if (first > now) {
             return { pending: [], nextAtMs: firstMs, skipped: '0' };
         }
         const timing: WorkflowScheduleTiming = configuration.timing;
+        if (timing.kind === WorkflowScheduleKind.Calendar) {
+            return WorkflowCalendarBatches.due(configuration, timing, firstMs, now, recovery);
+        }
         const interval: bigint =
             timing.kind === WorkflowScheduleKind.Once ? 1n : BigInt(timing.intervalMs);
         const end: bigint =

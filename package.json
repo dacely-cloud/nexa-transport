@@ -246,6 +246,14 @@
         "./workflow-schedule-times": {
             "types": "./dist/workflows/schedule/ScheduleTiming.d.ts",
             "import": "./dist/workflow-schedule-times.js"
+        },
+        "./workflow-calendar-types": {
+            "types": "./dist/workflows/schedule/CalendarTypes.d.ts",
+            "import": "./dist/workflow-calendar-types.js"
+        },
+        "./workflow-calendar-codec": {
+            "types": "./dist/workflows/schedule/CalendarCodec.d.ts",
+            "import": "./dist/workflow-calendar-codec.js"
         }
     },
     "scripts": {
@@ -293,6 +301,7 @@
         "transport"
     ],
     "dependencies": {
+        "@js-temporal/polyfill": "0.5.1",
         "meshoptimizer": "^1.2.0"
     }
 }

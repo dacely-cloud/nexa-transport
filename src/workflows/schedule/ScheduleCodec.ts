@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { WorkflowCalendarCodec } from './CalendarCodec.js';
 import { WorkflowInput } from '../WorkflowInput.js';
 import { WorkflowJson } from '../WorkflowJson.js';
 import { ResourceBindingCodec } from '../ResourceBindingCodec.js';
@@ -28,6 +29,13 @@ export class WorkflowScheduleCodec {
     }
     /** Recurrence is bounded to one minute through one year. */
     public static timing(raw: unknown): WorkflowScheduleTiming {
+        if (
+            raw !== null &&
+            typeof raw === 'object' &&
+            Reflect.get(raw, 'kind') === WorkflowScheduleKind.Calendar
+        ) {
+            return WorkflowCalendarCodec.read(raw);
+        }
         const value: Readonly<Record<string, unknown>> = WorkflowInput.record(
             raw,
             raw !== null &&
