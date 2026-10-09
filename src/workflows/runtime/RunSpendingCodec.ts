@@ -3,6 +3,7 @@
 
 import { ResourceBindingCodec } from '../ResourceBindingCodec.js';
 import { WorkflowInput } from '../WorkflowInput.js';
+import { WorkflowSpendingBasis, type WorkflowSpendingBucket } from './RunSpendingTypes.js';
 import type {
     WorkflowLoopSpending,
     WorkflowLoopSpendingRequest,
@@ -43,7 +44,9 @@ export class WorkflowSpendingCodec {
     }
     /** A bounded snapshot includes its exact scope and observation time. */
     public static report(raw: unknown): WorkflowLoopSpending {
-        const value: Readonly<Record<string, unknown>> = WorkflowInput.record(raw, [
+        const candidate: Readonly<Record<string, unknown>> = WorkflowInput.object(raw);
+        const value: Readonly<Record<string, unknown>> = WorkflowInput.record(candidate, [
+            ...(Object.hasOwn(candidate, 'pricing') ? ['pricing'] : []),
             'runId',
             'loopId',
             'workflowId',
@@ -62,6 +65,9 @@ export class WorkflowSpendingCodec {
             throw new Error('Invalid workflow reservation count');
         }
         const result: WorkflowLoopSpending = {
+            ...(Object.hasOwn(value, 'pricing')
+                ? { pricing: this.#pricing(value['pricing']) }
+                : {}),
             runId: WorkflowInput.id(value['runId']),
             loopId: WorkflowInput.id(value['loopId']),
             workflowId: WorkflowInput.id(value['workflowId']),
@@ -92,11 +98,68 @@ export class WorkflowSpendingCodec {
         ) {
             throw new Error('Inconsistent workflow spending evidence');
         }
+        if (result.pricing !== undefined) {
+            const entries: bigint = result.pricing.reduce(
+                (total: bigint, bucket: WorkflowSpendingBucket): bigint =>
+                    total + BigInt(bucket.entries),
+                0n,
+            );
+            const amount: bigint = result.pricing.reduce(
+                (total: bigint, bucket: WorkflowSpendingBucket): bigint =>
+                    total + BigInt(bucket.microcents),
+                0n,
+            );
+            if (
+                entries !== BigInt(result.entries) ||
+                amount !== BigInt(result.reportedMicrocents ?? '0')
+            ) {
+                throw new Error('Pricing subtotals do not match the spending report');
+            }
+        }
+        return result;
+    }
+    static #pricing(raw: unknown): readonly WorkflowSpendingBucket[] {
+        const result: readonly WorkflowSpendingBucket[] = WorkflowInput.list(
+            raw,
+            8,
+            (item: unknown): WorkflowSpendingBucket => {
+                const value: Readonly<Record<string, unknown>> = WorkflowInput.record(item, [
+                    'basis',
+                    'microcents',
+                    'entries',
+                ]);
+                const basis: WorkflowSpendingBasis | undefined = Object.values(
+                    WorkflowSpendingBasis,
+                ).find((basis: WorkflowSpendingBasis): boolean => basis === value['basis']);
+                if (basis === undefined) {
+                    throw new Error('Invalid spending pricing basis');
+                }
+                const microcents: string = this.amount(
+                    value['microcents'],
+                    basis === WorkflowSpendingBasis.Legacy ||
+                        basis === WorkflowSpendingBasis.Adjustment,
+                );
+                const entries: string = this.amount(value['entries']);
+                if (
+                    entries === '0' ||
+                    ((basis === WorkflowSpendingBasis.Unpriced ||
+                        basis === WorkflowSpendingBasis.Local ||
+                        basis === WorkflowSpendingBasis.IncludedUnpriced) &&
+                        microcents !== '0')
+                ) {
+                    throw new Error('Inconsistent pricing subtotal');
+                }
+                return Object.freeze({ basis, microcents, entries });
+            },
+        );
+        WorkflowInput.unique(result.map((bucket: WorkflowSpendingBucket): string => bucket.basis));
         return result;
     }
     /** Mocked views cannot claim real charges or reservations. */
     public static view(raw: unknown): WorkflowLoopSpendingView {
-        const value: Readonly<Record<string, unknown>> = WorkflowInput.record(raw, [
+        const candidate: Readonly<Record<string, unknown>> = WorkflowInput.object(raw);
+        const value: Readonly<Record<string, unknown>> = WorkflowInput.record(candidate, [
+            ...(Object.hasOwn(candidate, 'pricing') ? ['pricing'] : []),
             'runId',
             'loopId',
             'workflowId',

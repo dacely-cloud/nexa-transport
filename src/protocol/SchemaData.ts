@@ -6656,6 +6656,18 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'workflows.runs.loopPricing': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/WorkflowLoopSpendingRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/WorkflowLoopSpendingView',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'workflows.runs.loopSpending': {
                     properties: {
                         params: {
@@ -7044,6 +7056,7 @@ export const schema: Schema = {
                 'workflows.runs.events',
                 'workflows.runs.inputs',
                 'workflows.runs.list',
+                'workflows.runs.loopPricing',
                 'workflows.runs.loopSpending',
                 'workflows.runs.output',
                 'workflows.runs.question.answer',
@@ -14953,6 +14966,13 @@ export const schema: Schema = {
                 observedAtMs: {
                     type: 'string',
                 },
+                pricing: {
+                    description: 'Present only on the negotiated classified-report method.',
+                    items: {
+                        $ref: '#/definitions/WorkflowSpendingBucket',
+                    },
+                    type: 'array',
+                },
                 reportedMicrocents: {
                     type: ['null', 'string'],
                 },
@@ -16529,6 +16549,38 @@ export const schema: Schema = {
                 'updatedAtMs',
                 'workflowId',
             ],
+            type: 'object',
+        },
+        WorkflowSpendingBasis: {
+            description:
+                'Legacy reporting never infers a pricing classification from its amount.\nA bounded classification independent of mutable provider pricing.',
+            enum: [
+                'adjustment',
+                'estimate',
+                'included-estimate',
+                'included-unpriced',
+                'legacy',
+                'local',
+                'unpriced',
+                'wallet',
+            ],
+            type: 'string',
+        },
+        WorkflowSpendingBucket: {
+            description:
+                'Exact subtotal and usage count; buckets partition the recorded amount, never add another charge.',
+            properties: {
+                basis: {
+                    $ref: '#/definitions/WorkflowSpendingBasis',
+                },
+                entries: {
+                    type: 'string',
+                },
+                microcents: {
+                    type: 'string',
+                },
+            },
+            required: ['basis', 'entries', 'microcents'],
             type: 'object',
         },
         WorkflowStepOrigin: {
