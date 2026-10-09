@@ -1188,6 +1188,8 @@ Configurable bounds on gateway-owned work and memory.
 | `processes.log`                  | Yes      | Object (fields below) |                                                                                            |
 | `processes.resize`               | Yes      | Object (fields below) |                                                                                            |
 | `processes.stop`                 | Yes      | Object (fields below) |                                                                                            |
+| `reverse.catalog`                | Yes      | Object (fields below) |                                                                                            |
+| `reverse.evidence`               | Yes      | Object (fields below) |                                                                                            |
 | `roblox.credentials.remove`      | Yes      | Object (fields below) |                                                                                            |
 | `roblox.credentials.set`         | Yes      | Object (fields below) |                                                                                            |
 | `roblox.credentials.status`      | Yes      | Object (fields below) |                                                                                            |
@@ -1675,6 +1677,20 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | -------------------------------------------------------- | ----------- |
 | `params` | Yes      | [BackgroundProcessRef](protocol.md#backgroundprocessref) |             |
 | `result` | Yes      | [OkResult](protocol.md#okresult)                         |             |
+
+**reverse.catalog**
+
+| Field    | Required | Type                                                   | Description |
+| -------- | -------- | ------------------------------------------------------ | ----------- |
+| `params` | Yes      | [ReverseCatalogQuery](protocol.md#reversecatalogquery) |             |
+| `result` | Yes      | [ReverseCatalogPage](protocol.md#reversecatalogpage)   |             |
+
+**reverse.evidence**
+
+| Field    | Required | Type                                                     | Description |
+| -------- | -------- | -------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ReverseEvidenceQuery](protocol.md#reverseevidencequery) |             |
+| `result` | Yes      | [ReverseEvidencePage](protocol.md#reverseevidencepage)   |             |
 
 **roblox.credentials.remove**
 
@@ -3535,6 +3551,66 @@ Bounded projection for live Chat events; complete indexes are paged by the nativ
 | `sourceMapCount`   | Yes      | `number`                                                        |             |
 | `symbolCount`      | No       | `number`                                                        |             |
 
+## ReverseArchiveRef
+
+A session-owned archive, without query tokens or analyzer handles.
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `sessionId` | Yes      | `string` |             |
+
+## ReverseCatalogPage
+
+An append-only catalog page; cursors are exact decimal record offsets.
+
+| Field        | Required | Type                                                                | Description |
+| ------------ | -------- | ------------------------------------------------------------------- | ----------- |
+| `cursor`     | Yes      | `string`                                                            |             |
+| `evidence`   | Yes      | Array of [ReverseEvidenceRecord](protocol.md#reverseevidencerecord) |             |
+| `nextCursor` | Yes      | `null,string`                                                       |             |
+| `runId`      | Yes      | `string`                                                            |             |
+| `sha256`     | Yes      | `string`                                                            |             |
+| `total`      | Yes      | `string`                                                            |             |
+
+## ReverseCatalogQuery
+
+Reads only an authenticated session's indexed investigation, never a workspace path.
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `cursor` | No       | `string` |             |
+| `id`     | Yes      | `string` |             |
+| `runId`  | Yes      | `string` |             |
+
+## ReverseEvidencePage
+
+Original evidence text paged by UTF-16 offset, independent of model report previews.
+
+| Field                    | Required | Type                                                       | Description                                                                             |
+| ------------------------ | -------- | ---------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `characters`             | Yes      | `string`                                                   |                                                                                         |
+| `cursor`                 | Yes      | `string`                                                   |                                                                                         |
+| `evidenceSha256`         | Yes      | `string`                                                   |                                                                                         |
+| `nextCursor`             | Yes      | `null,string`                                              |                                                                                         |
+| `originalEvidenceSha256` | No       | `string`                                                   | Present for a derived code page and always identifies the unmodified captured original. |
+| `record`                 | Yes      | [ReverseEvidenceRecord](protocol.md#reverseevidencerecord) |                                                                                         |
+| `representation`         | No       | `"code"` / `"original"`                                    |                                                                                         |
+| `runId`                  | Yes      | `string`                                                   |                                                                                         |
+| `sha256`                 | Yes      | `string`                                                   |                                                                                         |
+| `text`                   | Yes      | `string`                                                   |                                                                                         |
+
+## ReverseEvidenceQuery
+
+Evidence ids come from the saved catalog and cannot authorize arbitrary files.
+
+| Field            | Required | Type                    | Description                                                      |
+| ---------------- | -------- | ----------------------- | ---------------------------------------------------------------- |
+| `cursor`         | No       | `string`                |                                                                  |
+| `evidenceId`     | Yes      | `string`                |                                                                  |
+| `id`             | Yes      | `string`                |                                                                  |
+| `representation` | No       | `"code"` / `"original"` | Code is extracted at capture time; original remains the default. |
+| `runId`          | Yes      | `string`                |                                                                  |
+
 ## ReverseEvidenceRecord
 
 Provenance for one immutable evidence file, shared by specialists in the same run.
@@ -3578,6 +3654,7 @@ Bounded, capability-free projection carried by live tool events and the final re
 | Field           | Required | Type                                                                 | Description                                                                                     |
 | --------------- | -------- | -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
 | `application`   | No       | [ReverseApplicationSnapshot](protocol.md#reverseapplicationsnapshot) | Bounded projection for live Chat events; complete indexes are paged by the native query tool.   |
+| `archive`       | No       | [ReverseArchiveRef](protocol.md#reversearchiveref)                   | A session-owned archive, without query tokens or analyzer handles.                              |
 | `cleanupErrors` | Yes      | Array of `string`                                                    |                                                                                                 |
 | `evidence`      | Yes      | Array of [ReverseEvidenceRecord](protocol.md#reverseevidencerecord)  |                                                                                                 |
 | `evidenceCount` | Yes      | `number`                                                             |                                                                                                 |

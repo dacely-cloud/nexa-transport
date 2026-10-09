@@ -2,9 +2,12 @@ import type {
     ReverseRunSnapshot,
     ReverseTaskSnapshot,
     WireTurnEvent,
+    ReverseCatalogPage,
+    ReverseEvidencePage,
 } from '../protocol/Protocol.js';
 import { reverseSnapshot } from '../protocol/Validators.js';
 import { ApplicationReceipt } from './ApplicationReceipt.js';
+import { ArchiveReceipt } from './ArchiveReceipt.js';
 
 /** Portable investigation receipt decoding and monotonic replay for multi-agent consumers. */
 export class ReverseInvestigation {
@@ -23,6 +26,8 @@ export class ReverseInvestigation {
         }
         if (
             input.version !== 1 ||
+            (input.archive !== undefined &&
+                (input.archive.sessionId.length === 0 || input.archive.sessionId.length > 1024)) ||
             !/^[0-9]{1,40}$/u.test(input.revision) ||
             input.id.length > 128 ||
             input.inputName.length > 1024 ||
@@ -89,20 +94,24 @@ export class ReverseInvestigation {
             ) ||
             input.evidence.some(
                 (record): boolean =>
-                    record.id.length > 128 ||
+                    !ArchiveReceipt.validRecord(record) ||
                     (record.stepId !== undefined && !steps.has(record.stepId)) ||
-                    !experts.has(record.expert) ||
-                    record.operation.length > 128 ||
-                    record.path.length > 8192 ||
-                    record.excerpt.length > 240 ||
-                    (record.selector !== null && record.selector.length > 1024) ||
-                    !/^[0-9]{1,40}$/u.test(record.characters) ||
-                    !/^[0-9]{1,40}$/u.test(record.createdAtMs),
+                    !experts.has(record.expert),
             )
         ) {
             throw new RangeError('Invalid investigation plan or evidence provenance');
         }
         return input;
+    }
+
+    /** Validates full catalog pages returned by the session-owned archive RPC. */
+    public static catalog(input: unknown): ReverseCatalogPage {
+        return ArchiveReceipt.catalog(input);
+    }
+
+    /** Validates original evidence pages returned by the session-owned archive RPC. */
+    public static evidence(input: unknown): ReverseEvidencePage {
+        return ArchiveReceipt.evidence(input);
     }
 
     static #invalidTask(task: ReverseTaskSnapshot): boolean {
@@ -162,6 +171,12 @@ export class ReverseInvestigation {
         }
         if (previous.id !== next.id || previous.sha256 !== next.sha256) {
             throw new Error('Investigation identity changed within a tool call');
+        }
+        if (
+            previous.archive !== undefined &&
+            previous.archive.sessionId !== next.archive?.sessionId
+        ) {
+            throw new Error('Investigation archive identity changed within a tool call');
         }
         if (BigInt(next.revision) <= BigInt(previous.revision)) {
             return previous;

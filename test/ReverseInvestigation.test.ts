@@ -280,6 +280,13 @@ describe('native investigation transport', (): void => {
         expect(ReverseInvestigation.advance(initial, newer)).toBe(newer);
         expect(ReverseInvestigation.advance(newer, initial)).toBe(newer);
         expect(ReverseInvestigation.advance(newer, newer)).toBe(newer);
+        const archived: ReverseRunSnapshot = { ...initial, archive: { sessionId: 'alice::main' } };
+        expect((): ReverseRunSnapshot => ReverseInvestigation.advance(archived, newer)).toThrow(
+            'archive identity',
+        );
+        expect((): ReverseRunSnapshot =>
+            ReverseInvestigation.parse({ ...initial, archive: { sessionId: '' } }),
+        ).toThrow();
         const terminal: ReverseRunSnapshot = { ...newer, state: 'partial' };
         expect(ReverseInvestigation.advance(terminal, snapshot('9007199254740994'))).toBe(terminal);
         expect((): ReverseRunSnapshot =>

@@ -5179,6 +5179,12 @@ export interface ReverseCatalogQueryShape {
 /** ReverseCatalogQuery from the Nexa wire protocol. */
 export type ReverseCatalogQuery = ReverseCatalogQueryShape;
 
+/** Allowed values for ReverseEvidencePagerepresentation. */
+export const ReverseEvidencePagerepresentationValues = {
+    Value0: 'code',
+    Value1: 'original',
+} as const;
+
 /** ReverseEvidencePage wire fields. */
 export interface ReverseEvidencePageShape {
     /** characters as defined by the Nexa gateway. */
@@ -5189,8 +5195,12 @@ export interface ReverseEvidencePageShape {
     readonly evidenceSha256: string;
     /** nextCursor as defined by the Nexa gateway. */
     readonly nextCursor: null | string;
+    /** originalEvidenceSha256 as defined by the Nexa gateway. */
+    readonly originalEvidenceSha256?: string;
     /** record as defined by the Nexa gateway. */
     readonly record: ReverseEvidenceRecord;
+    /** representation as defined by the Nexa gateway. */
+    readonly representation?: (typeof ReverseEvidencePagerepresentationValues)[keyof typeof ReverseEvidencePagerepresentationValues];
     /** runId as defined by the Nexa gateway. */
     readonly runId: string;
     /** sha256 as defined by the Nexa gateway. */
@@ -5202,6 +5212,12 @@ export interface ReverseEvidencePageShape {
 /** ReverseEvidencePage from the Nexa wire protocol. */
 export type ReverseEvidencePage = ReverseEvidencePageShape;
 
+/** Allowed values for ReverseEvidenceQueryrepresentation. */
+export const ReverseEvidenceQueryrepresentationValues = {
+    Value0: 'code',
+    Value1: 'original',
+} as const;
+
 /** ReverseEvidenceQuery wire fields. */
 export interface ReverseEvidenceQueryShape {
     /** cursor as defined by the Nexa gateway. */
@@ -5210,6 +5226,8 @@ export interface ReverseEvidenceQueryShape {
     readonly evidenceId: string;
     /** id as defined by the Nexa gateway. */
     readonly id: string;
+    /** representation as defined by the Nexa gateway. */
+    readonly representation?: (typeof ReverseEvidenceQueryrepresentationValues)[keyof typeof ReverseEvidenceQueryrepresentationValues];
     /** runId as defined by the Nexa gateway. */
     readonly runId: string;
 }
