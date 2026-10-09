@@ -327,6 +327,10 @@
             "types": "./dist/workflows/LoopComponents.d.ts",
             "import": "./dist/workflow-loops.js"
         },
+        "./workflow-breakdown-codec": {
+            "types": "./dist/workflows/runtime/RunBreakdownCodec.d.ts",
+            "import": "./dist/workflow-breakdown-codec.js"
+        },
         "./workflow-usage-codec": {
             "types": "./dist/workflows/runtime/RunUsageCodec.d.ts",
             "import": "./dist/workflow-usage-codec.js"

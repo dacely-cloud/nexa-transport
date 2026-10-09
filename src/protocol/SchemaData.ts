@@ -7151,6 +7151,18 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'workflows.runs.usageBreakdown': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/WorkflowRunBreakdownRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/WorkflowRunBreakdownView',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'workflows.save': {
                     properties: {
                         params: {
@@ -7432,6 +7444,7 @@ export const schema: Schema = {
                 'workflows.runs.terminal.command',
                 'workflows.runs.terminal.read',
                 'workflows.runs.usage',
+                'workflows.runs.usageBreakdown',
                 'workflows.save',
                 'workflows.schedules.disable',
                 'workflows.schedules.enable',
@@ -14089,6 +14102,18 @@ export const schema: Schema = {
             required: ['invocationId', 'nodeId', 'runId'],
             type: 'object',
         },
+        WorkflowAgentUsageIdentity: {
+            properties: {
+                agentId: {
+                    type: 'string',
+                },
+                nodeId: {
+                    type: 'string',
+                },
+            },
+            required: ['agentId', 'nodeId'],
+            type: 'object',
+        },
         WorkflowAnswerType: {
             description: 'Supported answer shapes for the initial owner question component.',
             enum: ['boolean', 'choice', 'text'],
@@ -16512,6 +16537,109 @@ export const schema: Schema = {
             required: ['afterAttempt', 'limit', 'nodeId', 'runId'],
             type: 'object',
         },
+        WorkflowRunBreakdownRequest: {
+            properties: {
+                dimension: {
+                    $ref: '#/definitions/WorkflowUsageDimension',
+                },
+                offset: {
+                    type: 'string',
+                },
+                runId: {
+                    type: 'string',
+                },
+            },
+            required: ['dimension', 'offset', 'runId'],
+            type: 'object',
+        },
+        WorkflowRunBreakdownView: {
+            properties: {
+                dimension: {
+                    $ref: '#/definitions/WorkflowUsageDimension',
+                },
+                entries: {
+                    type: 'string',
+                },
+                expiresAtMs: {
+                    type: ['null', 'string'],
+                },
+                groupCount: {
+                    type: 'string',
+                },
+                groups: {
+                    items: {
+                        $ref: '#/definitions/WorkflowUsageGroup',
+                    },
+                    type: 'array',
+                },
+                labels: {
+                    items: {
+                        $ref: '#/definitions/WorkflowUsageGroupLabel',
+                    },
+                    type: 'array',
+                },
+                lastReportedAtMs: {
+                    type: ['null', 'string'],
+                },
+                next: {
+                    type: ['null', 'string'],
+                },
+                observedAtMs: {
+                    type: 'string',
+                },
+                offset: {
+                    type: 'string',
+                },
+                pricing: {
+                    items: {
+                        $ref: '#/definitions/WorkflowSpendingBucket',
+                    },
+                    type: 'array',
+                },
+                reportedMicrocents: {
+                    type: ['null', 'string'],
+                },
+                retainedFromMs: {
+                    type: ['null', 'string'],
+                },
+                revision: {
+                    type: 'string',
+                },
+                runEntries: {
+                    type: 'string',
+                },
+                runId: {
+                    type: 'string',
+                },
+                simulated: {
+                    type: 'boolean',
+                },
+                workflowId: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'dimension',
+                'entries',
+                'expiresAtMs',
+                'groupCount',
+                'groups',
+                'labels',
+                'lastReportedAtMs',
+                'next',
+                'observedAtMs',
+                'offset',
+                'pricing',
+                'reportedMicrocents',
+                'retainedFromMs',
+                'revision',
+                'runEntries',
+                'runId',
+                'simulated',
+                'workflowId',
+            ],
+            type: 'object',
+        },
         WorkflowRunEvent: {
             properties: {
                 atMs: {
@@ -17208,6 +17336,46 @@ export const schema: Schema = {
             ],
             type: 'string',
         },
+        WorkflowStepUsageIdentity: {
+            properties: {
+                attempt: {
+                    type: 'string',
+                },
+                invocationId: {
+                    type: 'string',
+                },
+                nodeId: {
+                    type: 'string',
+                },
+                origin: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/WorkflowStepUsageOrigin',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+            },
+            required: ['attempt', 'invocationId', 'nodeId', 'origin'],
+            type: 'object',
+        },
+        WorkflowStepUsageOrigin: {
+            properties: {
+                itemIndex: {
+                    type: 'string',
+                },
+                loopId: {
+                    type: 'string',
+                },
+                nodeId: {
+                    type: 'string',
+                },
+            },
+            required: ['itemIndex', 'loopId', 'nodeId'],
+            type: 'object',
+        },
         WorkflowStepView: {
             description:
                 'Exposes step metadata without embedding potentially large result payloads.',
@@ -17404,6 +17572,11 @@ export const schema: Schema = {
             ],
             type: 'object',
         },
+        WorkflowUsageDimension: {
+            description: 'Alternative partitions of the same reported usage.',
+            enum: ['agents', 'steps'],
+            type: 'string',
+        },
         WorkflowUsageDimensions: {
             description: 'Exact counters; missing dimensions were not reported.',
             properties: {
@@ -17420,6 +17593,68 @@ export const schema: Schema = {
                     type: 'string',
                 },
             },
+            type: 'object',
+        },
+        WorkflowUsageGroup: {
+            properties: {
+                entries: {
+                    type: 'string',
+                },
+                expiresAtMs: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                identity: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/WorkflowStepUsageIdentity',
+                        },
+                        {
+                            $ref: '#/definitions/WorkflowAgentUsageIdentity',
+                        },
+                    ],
+                },
+                lastReportedAtMs: {
+                    type: 'string',
+                },
+                microcents: {
+                    type: 'string',
+                },
+                pricing: {
+                    items: {
+                        $ref: '#/definitions/WorkflowSpendingBucket',
+                    },
+                    type: 'array',
+                },
+            },
+            required: [
+                'entries',
+                'expiresAtMs',
+                'id',
+                'identity',
+                'lastReportedAtMs',
+                'microcents',
+                'pricing',
+            ],
+            type: 'object',
+        },
+        WorkflowUsageGroupLabel: {
+            description:
+                'Labels come from the owned immutable graph; they do not choose the billing partition.',
+            properties: {
+                component: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                label: {
+                    type: 'string',
+                },
+            },
+            required: ['component', 'id', 'label'],
             type: 'object',
         },
         WorkflowValidateRequest: {
