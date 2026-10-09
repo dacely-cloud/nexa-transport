@@ -1078,6 +1078,96 @@ export interface BrowserPageProjectionShape {
 /** BrowserPageProjection from the Nexa wire protocol. */
 export type BrowserPageProjection = BrowserPageProjectionShape;
 
+/** BrowserPixelBounds wire fields. */
+export interface BrowserPixelBoundsShape {
+    /** height as defined by the Nexa gateway. */
+    readonly height: number;
+    /** width as defined by the Nexa gateway. */
+    readonly width: number;
+    /** x as defined by the Nexa gateway. */
+    readonly x: number;
+    /** y as defined by the Nexa gateway. */
+    readonly y: number;
+}
+
+/** BrowserPixelBounds from the Nexa wire protocol. */
+export type BrowserPixelBounds = BrowserPixelBoundsShape;
+
+/** BrowserPixelComparison wire fields. */
+export interface BrowserPixelComparisonShape {
+    /** absoluteChannelDelta as defined by the Nexa gateway. */
+    readonly absoluteChannelDelta: null | string;
+    /** afterHeight as defined by the Nexa gateway. */
+    readonly afterHeight: number;
+    /** afterWidth as defined by the Nexa gateway. */
+    readonly afterWidth: number;
+    /** algorithm as defined by the Nexa gateway. */
+    readonly algorithm: 'rgba-channel-v1';
+    /** beforeHeight as defined by the Nexa gateway. */
+    readonly beforeHeight: number;
+    /** beforeWidth as defined by the Nexa gateway. */
+    readonly beforeWidth: number;
+    /** bounds as defined by the Nexa gateway. */
+    readonly bounds: BrowserPixelBounds | null;
+    /** changedPixels as defined by the Nexa gateway. */
+    readonly changedPixels: null | string;
+    /** changedRatio as defined by the Nexa gateway. */
+    readonly changedRatio: null | number;
+    /** channelThreshold as defined by the Nexa gateway. */
+    readonly channelThreshold: number;
+    /** comparedPixels as defined by the Nexa gateway. */
+    readonly comparedPixels: string;
+    /** maximumChannelDelta as defined by the Nexa gateway. */
+    readonly maximumChannelDelta: null | number;
+    /** meanAbsoluteChannelDelta as defined by the Nexa gateway. */
+    readonly meanAbsoluteChannelDelta: null | number;
+    /** status as defined by the Nexa gateway. */
+    readonly status: BrowserPixelStatus;
+}
+
+/** BrowserPixelComparison from the Nexa wire protocol. */
+export type BrowserPixelComparison = BrowserPixelComparisonShape;
+
+/** Allowed values for BrowserPixelStatus. */
+export const BrowserPixelStatusValues = {
+    Value0: 'different',
+    Value1: 'dimension-mismatch',
+    Value2: 'identical',
+    Value3: 'within-threshold',
+} as const;
+
+/** BrowserPixelStatus from the Nexa wire protocol. */
+export type BrowserPixelStatus =
+    (typeof BrowserPixelStatusValues)[keyof typeof BrowserPixelStatusValues];
+
+/** BrowserScreenshotComparisonSnapshot wire fields. */
+export interface BrowserScreenshotComparisonSnapshotShape {
+    /** after as defined by the Nexa gateway. */
+    readonly after: BrowserScreenshotComparisonSource;
+    /** before as defined by the Nexa gateway. */
+    readonly before: BrowserScreenshotComparisonSource;
+    /** metrics as defined by the Nexa gateway. */
+    readonly metrics: BrowserPixelComparison;
+    /** reference as defined by the Nexa gateway. */
+    readonly reference: ReverseBrowserReference;
+}
+
+/** BrowserScreenshotComparisonSnapshot from the Nexa wire protocol. */
+export type BrowserScreenshotComparisonSnapshot = BrowserScreenshotComparisonSnapshotShape;
+
+/** BrowserScreenshotComparisonSource wire fields. */
+export interface BrowserScreenshotComparisonSourceShape {
+    /** metadata as defined by the Nexa gateway. */
+    readonly metadata: BrowserScreenshotMetadata;
+    /** reference as defined by the Nexa gateway. */
+    readonly reference: ReverseBrowserReference;
+    /** sha256 as defined by the Nexa gateway. */
+    readonly sha256: string;
+}
+
+/** BrowserScreenshotComparisonSource from the Nexa wire protocol. */
+export type BrowserScreenshotComparisonSource = BrowserScreenshotComparisonSourceShape;
+
 /** BrowserScreenshotMetadata wire fields. */
 export interface BrowserScreenshotMetadataShape {
     /** bytes as defined by the Nexa gateway. */
@@ -7410,6 +7500,8 @@ export interface ReverseRunSnapshotShape {
     readonly archive?: ReverseArchiveRef;
     /** browser as defined by the Nexa gateway. */
     readonly browser?: ReverseBrowserSnapshot;
+    /** browserComparison as defined by the Nexa gateway. */
+    readonly browserComparison?: BrowserScreenshotComparisonSnapshot;
     /** browserInput as defined by the Nexa gateway. */
     readonly browserInput?: BrowserAnalysisInput;
     /** browserScreenshot as defined by the Nexa gateway. */

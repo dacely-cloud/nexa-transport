@@ -22,3 +22,34 @@ removal and archive restart. Chat uses the typed Nexa WebSocket method and opens
 pixels only when selected. Native screenshot tool-result presentation omits image
 blocks from unsolicited live events and saved presentation history while retaining
 the original multimodal provider result.
+
+## Comparison receipts
+
+`ReverseRunSnapshot.browserComparison` is an image-free native report. It includes
+`before` and `after` source receipts, deterministic `rgba-channel-v1` metrics and
+the independently archived comparison reference. `ReverseInvestigation.parse`
+validates exact field declarations, source provenance, bounded metadata and metric
+arithmetic. The generated portable metric validator comes from Nexa's worker
+validator, so both sides enforce the same status and counter rules.
+
+Each source retains its original `reference`, source-run `sha256` and PNG `metadata`.
+Use the original source reference's run/evidence IDs and the original parent
+conversation with `Method.ReverseBrowserScreenshot`. Pin the returned source-run
+hash, original capture hash and all image metadata before opening pixels. Using
+the comparison run ID to read an original image is incorrect. There is no separate
+image transfer protocol and no pixel data embedded in comparison progress.
+
+`channelThreshold` is 0..255. A changed pixel has at least one raw RGBA channel
+above this delta. Maximum and mean include all channel differences; the exact
+absolute channel sum is a decimal string. `identical` means zero raw deltas;
+`within-threshold` retains nonzero raw metrics with no threshold-exceeding pixels;
+`different` retains changed counts and bounds. `dimension-mismatch` carries null
+change metrics with zero compared pixels. This does not resample images or perform
+OCR, semantic layout interpretation or perceptual color correction.
+
+Chat displays metrics immediately and loads the original metadata/paged PNGs
+only when Open images is selected. Before, After and Split modes reuse verified
+originals. Split is available for matching dimensions; cancellation and closing
+release both URLs. Both original metadata reads finish before image reads start.
+
+Reference: [REA deterministic PNG comparison](https://github.com/morluto/rea/blob/main/src/browser/PngVisualDiff.ts).

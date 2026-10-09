@@ -1716,6 +1716,140 @@ export const schema: Schema = {
             ],
             type: 'object',
         },
+        BrowserPixelBounds: {
+            description:
+                'Pixel rectangle uses inclusive left/top and exclusive right/bottom coordinates.',
+            properties: {
+                height: {
+                    type: 'number',
+                },
+                width: {
+                    type: 'number',
+                },
+                x: {
+                    type: 'number',
+                },
+                y: {
+                    type: 'number',
+                },
+            },
+            required: ['height', 'width', 'x', 'y'],
+            type: 'object',
+        },
+        BrowserPixelComparison: {
+            description:
+                'Counts are decimal strings; averages retain all RGBA deltas, including tolerated pixels.',
+            properties: {
+                absoluteChannelDelta: {
+                    type: ['null', 'string'],
+                },
+                afterHeight: {
+                    type: 'number',
+                },
+                afterWidth: {
+                    type: 'number',
+                },
+                algorithm: {
+                    const: 'rgba-channel-v1',
+                    type: 'string',
+                },
+                beforeHeight: {
+                    type: 'number',
+                },
+                beforeWidth: {
+                    type: 'number',
+                },
+                bounds: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/BrowserPixelBounds',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                changedPixels: {
+                    type: ['null', 'string'],
+                },
+                changedRatio: {
+                    type: ['null', 'number'],
+                },
+                channelThreshold: {
+                    type: 'number',
+                },
+                comparedPixels: {
+                    type: 'string',
+                },
+                maximumChannelDelta: {
+                    type: ['null', 'number'],
+                },
+                meanAbsoluteChannelDelta: {
+                    type: ['null', 'number'],
+                },
+                status: {
+                    $ref: '#/definitions/BrowserPixelStatus',
+                },
+            },
+            required: [
+                'absoluteChannelDelta',
+                'afterHeight',
+                'afterWidth',
+                'algorithm',
+                'beforeHeight',
+                'beforeWidth',
+                'bounds',
+                'changedPixels',
+                'changedRatio',
+                'channelThreshold',
+                'comparedPixels',
+                'maximumChannelDelta',
+                'meanAbsoluteChannelDelta',
+                'status',
+            ],
+            type: 'object',
+        },
+        BrowserPixelStatus: {
+            description:
+                'Pixel outcomes keep tolerated changes separate from exact equality.\nOne bounded local pixel-comparison outcome.',
+            enum: ['different', 'dimension-mismatch', 'identical', 'within-threshold'],
+            type: 'string',
+        },
+        BrowserScreenshotComparisonSnapshot: {
+            description: 'Body-free progress also identifies the archived comparison report.',
+            properties: {
+                after: {
+                    $ref: '#/definitions/BrowserScreenshotComparisonSource',
+                },
+                before: {
+                    $ref: '#/definitions/BrowserScreenshotComparisonSource',
+                },
+                metrics: {
+                    $ref: '#/definitions/BrowserPixelComparison',
+                },
+                reference: {
+                    $ref: '#/definitions/ReverseBrowserReference',
+                },
+            },
+            required: ['after', 'before', 'metrics', 'reference'],
+            type: 'object',
+        },
+        BrowserScreenshotComparisonSource: {
+            description: 'Comparison retains each original capture and image digest separately.',
+            properties: {
+                metadata: {
+                    $ref: '#/definitions/BrowserScreenshotMetadata',
+                },
+                reference: {
+                    $ref: '#/definitions/ReverseBrowserReference',
+                },
+                sha256: {
+                    type: 'string',
+                },
+            },
+            required: ['metadata', 'reference', 'sha256'],
+            type: 'object',
+        },
         BrowserScreenshotMetadata: {
             description:
                 'Image-free historical receipt for one explicitly requested visible viewport.',
@@ -11362,6 +11496,11 @@ export const schema: Schema = {
                     $ref: '#/definitions/ReverseBrowserSnapshot',
                     description:
                         'A live run carries capture metadata and an event count, never all event rows.',
+                },
+                browserComparison: {
+                    $ref: '#/definitions/BrowserScreenshotComparisonSnapshot',
+                    description:
+                        'Body-free progress also identifies the archived comparison report.',
                 },
                 browserInput: {
                     $ref: '#/definitions/BrowserAnalysisInput',

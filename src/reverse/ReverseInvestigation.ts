@@ -1,3 +1,4 @@
+import { BrowserScreenshotComparisonReceipt } from './BrowserScreenshotComparisonReceipt.js';
 import { BrowserScreenshotReceipt } from './BrowserScreenshotReceipt.js';
 import type { BrowserScreenshotPage } from '../protocol/Protocol.js';
 import type {
@@ -81,6 +82,15 @@ export class ReverseInvestigation {
             }
             BrowserStructureReceipt.snapshot(
                 input.browserStructure,
+                input.id,
+                input.archive?.sessionId,
+            );
+        }
+        if (input.browserComparison !== undefined) {
+            if (input.kind !== 'browser')
+                {throw new Error('Screenshot comparison requires a browser investigation');}
+            BrowserScreenshotComparisonReceipt.snapshot(
+                input.browserComparison,
                 input.id,
                 input.archive?.sessionId,
             );

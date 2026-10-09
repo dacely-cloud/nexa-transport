@@ -11,6 +11,22 @@ writeFileSync(
     readFileSync('../nexa/src/reverse/ControlFlow.ts', 'utf8'),
 );
 
+/** Pixel metrics have one portable validator shared with the native workers. */
+const pixelTypes = readFileSync('../nexa/src/reverse/BrowserScreenshotComparisonTypes.ts', 'utf8');
+const pixelStatus = pixelTypes.match(/export const BrowserPixelStatus = [\s\S]*?as const;/u)?.[0];
+if (pixelStatus === undefined) throw new Error('Native pixel status declaration is missing');
+const pixelReceipt = readFileSync('../nexa/src/reverse/BrowserPixelReceipt.ts', 'utf8');
+const pixelImport = /import \{[\s\S]*?\} from '\.\/BrowserScreenshotComparisonTypes';/u;
+if (!pixelImport.test(pixelReceipt)) throw new Error('Native pixel receipt import changed');
+writeFileSync(
+    'src/reverse/BrowserPixelReceipt.ts',
+    pixelReceipt.replace(
+        pixelImport,
+        "import type { BrowserPixelComparison, BrowserPixelBounds } from '../protocol/Protocol.js';\n\n" +
+            pixelStatus,
+    ),
+);
+
 execFileSync('./node_modules/.bin/typescript-json-schema', [
     'script/Contract.ts',
     'Contract',
