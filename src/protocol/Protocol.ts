@@ -2345,6 +2345,14 @@ export interface GatewayMethodsreverse_functionsShape {
     readonly result: ReverseFunctionsPage;
 }
 
+/** GatewayMethodsreverse_graph wire fields. */
+export interface GatewayMethodsreverse_graphShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ReverseGraphQuery;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ReverseGraphPage;
+}
+
 /** GatewayMethodsreverse_inspect wire fields. */
 export interface GatewayMethodsreverse_inspectShape {
     /** params as defined by the Nexa gateway. */
@@ -2997,6 +3005,8 @@ export interface GatewayMethodsShape {
     readonly 'reverse.evidence': GatewayMethodsreverse_evidenceShape;
     /** reverse.functions as defined by the Nexa gateway. */
     readonly 'reverse.functions': GatewayMethodsreverse_functionsShape;
+    /** reverse.graph as defined by the Nexa gateway. */
+    readonly 'reverse.graph': GatewayMethodsreverse_graphShape;
     /** reverse.inspect as defined by the Nexa gateway. */
     readonly 'reverse.inspect': GatewayMethodsreverse_inspectShape;
     /** roblox.credentials.remove as defined by the Nexa gateway. */
@@ -5231,6 +5241,17 @@ export interface ReverseCatalogQueryShape {
 /** ReverseCatalogQuery from the Nexa wire protocol. */
 export type ReverseCatalogQuery = ReverseCatalogQueryShape;
 
+/** ReverseControlFlowInstruction wire fields. */
+export interface ReverseControlFlowInstructionShape {
+    /** address as defined by the Nexa gateway. */
+    readonly address: string;
+    /** instruction as defined by the Nexa gateway. */
+    readonly instruction: string;
+}
+
+/** ReverseControlFlowInstruction from the Nexa wire protocol. */
+export type ReverseControlFlowInstruction = ReverseControlFlowInstructionShape;
+
 /** Allowed values for ReverseDirectoryState. */
 export const ReverseDirectoryStateValues = {
     Value0: 'failed',
@@ -5385,6 +5406,98 @@ export interface ReverseFunctionsQueryShape {
 
 /** ReverseFunctionsQuery from the Nexa wire protocol. */
 export type ReverseFunctionsQuery = ReverseFunctionsQueryShape;
+
+/** ReverseGraphBlock wire fields. */
+export interface ReverseGraphBlockShape {
+    /** end as defined by the Nexa gateway. */
+    readonly end: string;
+    /** endInclusive as defined by the Nexa gateway. */
+    readonly endInclusive?: boolean;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** instructionCount as defined by the Nexa gateway. */
+    readonly instructionCount: number;
+    /** instructionOffset as defined by the Nexa gateway. */
+    readonly instructionOffset: number;
+    /** instructions as defined by the Nexa gateway. */
+    readonly instructions: ReadonlyArray<ReverseControlFlowInstruction>;
+    /** instructionsTruncated as defined by the Nexa gateway. */
+    readonly instructionsTruncated: boolean;
+    /** nextInstructionOffset as defined by the Nexa gateway. */
+    readonly nextInstructionOffset: null | number;
+    /** start as defined by the Nexa gateway. */
+    readonly start: string;
+    /** successors as defined by the Nexa gateway. */
+    readonly successors: ReadonlyArray<string>;
+}
+
+/** ReverseGraphBlock from the Nexa wire protocol. */
+export type ReverseGraphBlock = ReverseGraphBlockShape;
+
+/** ReverseGraphPage wire fields. */
+export interface ReverseGraphPageShape {
+    /** blockId as defined by the Nexa gateway. */
+    readonly blockId: null | string;
+    /** capturedBlocks as defined by the Nexa gateway. */
+    readonly capturedBlocks: number;
+    /** capturedOffset as defined by the Nexa gateway. */
+    readonly capturedOffset: number;
+    /** cursor as defined by the Nexa gateway. */
+    readonly cursor: string;
+    /** evidenceSha256 as defined by the Nexa gateway. */
+    readonly evidenceSha256: string;
+    /** graph as defined by the Nexa gateway. */
+    readonly graph: ReverseGraphProjection;
+    /** nextCursor as defined by the Nexa gateway. */
+    readonly nextCursor: null | string;
+    /** record as defined by the Nexa gateway. */
+    readonly record: ReverseEvidenceRecord;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+    /** sha256 as defined by the Nexa gateway. */
+    readonly sha256: string;
+    /** uncapturedOffset as defined by the Nexa gateway. */
+    readonly uncapturedOffset: null | number;
+}
+
+/** ReverseGraphPage from the Nexa wire protocol. */
+export type ReverseGraphPage = ReverseGraphPageShape;
+
+/** ReverseGraphProjection wire fields. */
+export interface ReverseGraphProjectionShape {
+    /** address as defined by the Nexa gateway. */
+    readonly address: string;
+    /** blocks as defined by the Nexa gateway. */
+    readonly blocks: ReadonlyArray<ReverseGraphBlock>;
+    /** function as defined by the Nexa gateway. */
+    readonly function: string;
+    /** nextOffset as defined by the Nexa gateway. */
+    readonly nextOffset: null | number;
+    /** offset as defined by the Nexa gateway. */
+    readonly offset: number;
+    /** totalBlocks as defined by the Nexa gateway. */
+    readonly totalBlocks: number;
+}
+
+/** ReverseGraphProjection from the Nexa wire protocol. */
+export type ReverseGraphProjection = ReverseGraphProjectionShape;
+
+/** ReverseGraphQuery wire fields. */
+export interface ReverseGraphQueryShape {
+    /** blockId as defined by the Nexa gateway. */
+    readonly blockId?: string;
+    /** cursor as defined by the Nexa gateway. */
+    readonly cursor?: string;
+    /** evidenceId as defined by the Nexa gateway. */
+    readonly evidenceId: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+}
+
+/** ReverseGraphQuery from the Nexa wire protocol. */
+export type ReverseGraphQuery = ReverseGraphQueryShape;
 
 /** ReverseInspectQuery wire fields. */
 export interface ReverseInspectQueryShape {
@@ -8268,6 +8381,8 @@ export enum Method {
     ReverseEvidence = 'reverse.evidence',
     /** Calls reverse.functions. */
     ReverseFunctions = 'reverse.functions',
+    /** Calls reverse.graph. */
+    ReverseGraph = 'reverse.graph',
     /** Calls reverse.inspect. */
     ReverseInspect = 'reverse.inspect',
     /** Calls roblox.credentials.remove. */

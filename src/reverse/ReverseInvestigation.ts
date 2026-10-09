@@ -1,4 +1,5 @@
 import type {
+    ReverseGraphPage,
     ReverseRunSnapshot,
     ReverseTaskSnapshot,
     WireTurnEvent,
@@ -8,6 +9,7 @@ import type {
     ReverseInspectResult,
 } from '../protocol/Protocol.js';
 import { reverseSnapshot } from '../protocol/Validators.js';
+import { GraphReceipt } from './GraphReceipt.js';
 import { ApplicationReceipt } from './ApplicationReceipt.js';
 import { ArchiveReceipt } from './ArchiveReceipt.js';
 import { NavigationReceipt } from './NavigationReceipt.js';
@@ -20,6 +22,10 @@ export type {
 
 /** Portable investigation receipt decoding and monotonic replay for multi-agent consumers. */
 export class ReverseInvestigation {
+    /** Validates a bounded immutable graph or selected-block instruction page. */
+    public static graph(input: unknown): ReverseGraphPage {
+        return GraphReceipt.read(input);
+    }
     /** Validates captured IDA or Ghidra basic blocks before rendering or comparing them. */
     public static controlFlow(input: unknown): ReverseControlFlowPage {
         return ReverseControlFlow.read(input);

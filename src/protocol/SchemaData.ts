@@ -3611,6 +3611,18 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'reverse.graph': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/ReverseGraphQuery',
+                        },
+                        result: {
+                            $ref: '#/definitions/ReverseGraphPage',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'reverse.inspect': {
                     properties: {
                         params: {
@@ -4526,6 +4538,7 @@ export const schema: Schema = {
                 'reverse.catalog',
                 'reverse.evidence',
                 'reverse.functions',
+                'reverse.graph',
                 'reverse.inspect',
                 'roblox.credentials.remove',
                 'roblox.credentials.set',
@@ -7883,6 +7896,19 @@ export const schema: Schema = {
             required: ['id', 'runId'],
             type: 'object',
         },
+        ReverseControlFlowInstruction: {
+            description: 'One actual analyzer instruction, with an exact unsigned native address.',
+            properties: {
+                address: {
+                    type: 'string',
+                },
+                instruction: {
+                    type: 'string',
+                },
+            },
+            required: ['address', 'instruction'],
+            type: 'object',
+        },
         ReverseDirectoryState: {
             description:
                 'Explicit inventory coverage distinguishes absent, partial and complete indexing.\nOne function-directory lifecycle state.',
@@ -8102,6 +8128,168 @@ export const schema: Schema = {
                 },
             },
             required: ['engine', 'id', 'runId'],
+            type: 'object',
+        },
+        ReverseGraphBlock: {
+            description: 'Original coverage and presentation paging remain separate.',
+            properties: {
+                end: {
+                    type: 'string',
+                },
+                endInclusive: {
+                    description:
+                        'Ghidra uses an inclusive last address; IDA uses an exclusive end address.',
+                    type: 'boolean',
+                },
+                id: {
+                    type: 'string',
+                },
+                instructionCount: {
+                    type: 'number',
+                },
+                instructionOffset: {
+                    type: 'number',
+                },
+                instructions: {
+                    items: {
+                        $ref: '#/definitions/ReverseControlFlowInstruction',
+                    },
+                    type: 'array',
+                },
+                instructionsTruncated: {
+                    type: 'boolean',
+                },
+                nextInstructionOffset: {
+                    type: ['null', 'number'],
+                },
+                start: {
+                    type: 'string',
+                },
+                successors: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+            },
+            required: [
+                'end',
+                'id',
+                'instructionCount',
+                'instructionOffset',
+                'instructions',
+                'instructionsTruncated',
+                'nextInstructionOffset',
+                'start',
+                'successors',
+            ],
+            type: 'object',
+        },
+        ReverseGraphPage: {
+            description:
+                'Immutable graph provenance, with bounded block and instruction navigation.',
+            properties: {
+                blockId: {
+                    type: ['null', 'string'],
+                },
+                capturedBlocks: {
+                    type: 'number',
+                },
+                capturedOffset: {
+                    type: 'number',
+                },
+                cursor: {
+                    type: 'string',
+                },
+                evidenceSha256: {
+                    type: 'string',
+                },
+                graph: {
+                    $ref: '#/definitions/ReverseGraphProjection',
+                },
+                nextCursor: {
+                    type: ['null', 'string'],
+                },
+                record: {
+                    $ref: '#/definitions/ReverseEvidenceRecord',
+                },
+                runId: {
+                    type: 'string',
+                },
+                sha256: {
+                    type: 'string',
+                },
+                uncapturedOffset: {
+                    description:
+                        'The next analyzer offset is absent from this capture; another inspection is required.',
+                    type: ['null', 'number'],
+                },
+            },
+            required: [
+                'blockId',
+                'capturedBlocks',
+                'capturedOffset',
+                'cursor',
+                'evidenceSha256',
+                'graph',
+                'nextCursor',
+                'record',
+                'runId',
+                'sha256',
+                'uncapturedOffset',
+            ],
+            type: 'object',
+        },
+        ReverseGraphProjection: {
+            description: 'At most four captured blocks and 12000 serialized block characters.',
+            properties: {
+                address: {
+                    type: 'string',
+                },
+                blocks: {
+                    items: {
+                        $ref: '#/definitions/ReverseGraphBlock',
+                    },
+                    type: 'array',
+                },
+                function: {
+                    type: 'string',
+                },
+                nextOffset: {
+                    type: ['null', 'number'],
+                },
+                offset: {
+                    type: 'number',
+                },
+                totalBlocks: {
+                    type: 'number',
+                },
+            },
+            required: ['address', 'blocks', 'function', 'nextOffset', 'offset', 'totalBlocks'],
+            type: 'object',
+        },
+        ReverseGraphQuery: {
+            description: 'Reads captured blocks, or an instruction page from one captured block.',
+            properties: {
+                blockId: {
+                    description:
+                        'When present, cursor addresses instructions in this block rather than captured blocks.',
+                    type: 'string',
+                },
+                cursor: {
+                    type: 'string',
+                },
+                evidenceId: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                runId: {
+                    type: 'string',
+                },
+            },
+            required: ['evidenceId', 'id', 'runId'],
             type: 'object',
         },
         ReverseInspectQuery: {
@@ -12356,6 +12544,9 @@ export const schema: Schema = {
         reverseFunctions: {
             $ref: '#/definitions/ReverseFunctionsPage',
         },
+        reverseGraph: {
+            $ref: '#/definitions/ReverseGraphPage',
+        },
         reverseInspection: {
             $ref: '#/definitions/ReverseInspectResult',
         },
@@ -12393,6 +12584,7 @@ export const schema: Schema = {
         'reverseCatalog',
         'reverseEvidence',
         'reverseFunctions',
+        'reverseGraph',
         'reverseInspection',
         'reverseSnapshot',
         'sessionHistory',
