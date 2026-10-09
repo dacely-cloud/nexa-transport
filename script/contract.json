@@ -4373,6 +4373,18 @@
                     "required": ["params", "result"],
                     "type": "object"
                 },
+                "workflows.runs.artifacts": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/WorkflowArtifactListRequest"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/WorkflowArtifactListPage"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
                 "workflows.runs.attempts": {
                     "properties": {
                         "params": {
@@ -4707,6 +4719,7 @@
                 "workflows.runs.applications.check",
                 "workflows.runs.applications.setup",
                 "workflows.runs.artifact",
+                "workflows.runs.artifacts",
                 "workflows.runs.attempts",
                 "workflows.runs.cancel",
                 "workflows.runs.events",
@@ -10921,6 +10934,126 @@
                 }
             },
             "required": ["application", "status", "title"],
+            "type": "object"
+        },
+        "WorkflowArtifactCursor": {
+            "description": "Exclusive position in the run's immutable invocation manifests.",
+            "properties": {
+                "invocationId": {
+                    "type": "string"
+                },
+                "nodeId": {
+                    "type": "string"
+                }
+            },
+            "required": ["invocationId", "nodeId"],
+            "type": "object"
+        },
+        "WorkflowArtifactListPage": {
+            "description": "Expiry is interpreted against the server observation time; bytes are retrieved separately.",
+            "properties": {
+                "items": {
+                    "items": {
+                        "$ref": "#/definitions/WorkflowArtifactPublication"
+                    },
+                    "type": "array"
+                },
+                "next": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/WorkflowArtifactCursor"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "observedAtMs": {
+                    "type": "string"
+                },
+                "runId": {
+                    "type": "string"
+                }
+            },
+            "required": ["items", "next", "observedAtMs", "runId"],
+            "type": "object"
+        },
+        "WorkflowArtifactListRequest": {
+            "description": "Lists metadata only, with at most six publications of at most 32 files each.",
+            "properties": {
+                "after": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/WorkflowArtifactCursor"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "limit": {
+                    "type": "number"
+                },
+                "runId": {
+                    "type": "string"
+                }
+            },
+            "required": ["after", "limit", "runId"],
+            "type": "object"
+        },
+        "WorkflowArtifactPublication": {
+            "description": "Recorded producing identity and public file metadata, without storage identifiers.",
+            "properties": {
+                "artifacts": {
+                    "items": {
+                        "$ref": "#/definitions/WorkflowRunArtifact"
+                    },
+                    "type": "array"
+                },
+                "attempt": {
+                    "type": ["null", "number"]
+                },
+                "createdAtMs": {
+                    "type": ["null", "string"]
+                },
+                "invocationId": {
+                    "type": "string"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "nodeId": {
+                    "type": "string"
+                },
+                "status": {
+                    "anyOf": [
+                        {
+                            "enum": [
+                                "cancelled",
+                                "failed",
+                                "interrupted",
+                                "running",
+                                "skipped",
+                                "succeeded",
+                                "uncertain"
+                            ],
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                }
+            },
+            "required": [
+                "artifacts",
+                "attempt",
+                "createdAtMs",
+                "invocationId",
+                "label",
+                "nodeId",
+                "status"
+            ],
             "type": "object"
         },
         "WorkflowCatalog": {

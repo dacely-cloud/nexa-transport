@@ -2914,6 +2914,14 @@ export interface GatewayMethodsworkflows_runs_artifactShape {
     readonly result: WorkflowRunArtifactPage;
 }
 
+/** GatewayMethodsworkflows_runs_artifacts wire fields. */
+export interface GatewayMethodsworkflows_runs_artifactsShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkflowArtifactListRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WorkflowArtifactListPage;
+}
+
 /** GatewayMethodsworkflows_runs_attempts wire fields. */
 export interface GatewayMethodsworkflows_runs_attemptsShape {
     /** params as defined by the Nexa gateway. */
@@ -3282,6 +3290,8 @@ export interface GatewayMethodsShape {
     readonly 'workflows.runs.applications.setup': GatewayMethodsworkflows_runs_applications_setupShape;
     /** workflows.runs.artifact as defined by the Nexa gateway. */
     readonly 'workflows.runs.artifact': GatewayMethodsworkflows_runs_artifactShape;
+    /** workflows.runs.artifacts as defined by the Nexa gateway. */
+    readonly 'workflows.runs.artifacts': GatewayMethodsworkflows_runs_artifactsShape;
     /** workflows.runs.attempts as defined by the Nexa gateway. */
     readonly 'workflows.runs.attempts': GatewayMethodsworkflows_runs_attemptsShape;
     /** workflows.runs.cancel as defined by the Nexa gateway. */
@@ -7482,6 +7492,79 @@ export interface WorkflowApplicationStatusShape {
 /** WorkflowApplicationStatus from the Nexa wire protocol. */
 export type WorkflowApplicationStatus = WorkflowApplicationStatusShape;
 
+/** WorkflowArtifactCursor wire fields. */
+export interface WorkflowArtifactCursorShape {
+    /** invocationId as defined by the Nexa gateway. */
+    readonly invocationId: string;
+    /** nodeId as defined by the Nexa gateway. */
+    readonly nodeId: string;
+}
+
+/** WorkflowArtifactCursor from the Nexa wire protocol. */
+export type WorkflowArtifactCursor = WorkflowArtifactCursorShape;
+
+/** WorkflowArtifactListPage wire fields. */
+export interface WorkflowArtifactListPageShape {
+    /** items as defined by the Nexa gateway. */
+    readonly items: ReadonlyArray<WorkflowArtifactPublication>;
+    /** next as defined by the Nexa gateway. */
+    readonly next: WorkflowArtifactCursor | null;
+    /** observedAtMs as defined by the Nexa gateway. */
+    readonly observedAtMs: string;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+}
+
+/** WorkflowArtifactListPage from the Nexa wire protocol. */
+export type WorkflowArtifactListPage = WorkflowArtifactListPageShape;
+
+/** WorkflowArtifactListRequest wire fields. */
+export interface WorkflowArtifactListRequestShape {
+    /** after as defined by the Nexa gateway. */
+    readonly after: WorkflowArtifactCursor | null;
+    /** limit as defined by the Nexa gateway. */
+    readonly limit: number;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+}
+
+/** WorkflowArtifactListRequest from the Nexa wire protocol. */
+export type WorkflowArtifactListRequest = WorkflowArtifactListRequestShape;
+
+/** Allowed values for WorkflowArtifactPublicationstatusVariant0. */
+export const WorkflowArtifactPublicationstatusVariant0Values = {
+    Value0: 'cancelled',
+    Value1: 'failed',
+    Value2: 'interrupted',
+    Value3: 'running',
+    Value4: 'skipped',
+    Value5: 'succeeded',
+    Value6: 'uncertain',
+} as const;
+
+/** WorkflowArtifactPublication wire fields. */
+export interface WorkflowArtifactPublicationShape {
+    /** artifacts as defined by the Nexa gateway. */
+    readonly artifacts: ReadonlyArray<WorkflowRunArtifact>;
+    /** attempt as defined by the Nexa gateway. */
+    readonly attempt: null | number;
+    /** createdAtMs as defined by the Nexa gateway. */
+    readonly createdAtMs: null | string;
+    /** invocationId as defined by the Nexa gateway. */
+    readonly invocationId: string;
+    /** label as defined by the Nexa gateway. */
+    readonly label: string;
+    /** nodeId as defined by the Nexa gateway. */
+    readonly nodeId: string;
+    /** status as defined by the Nexa gateway. */
+    readonly status:
+        | (typeof WorkflowArtifactPublicationstatusVariant0Values)[keyof typeof WorkflowArtifactPublicationstatusVariant0Values]
+        | null;
+}
+
+/** WorkflowArtifactPublication from the Nexa wire protocol. */
+export type WorkflowArtifactPublication = WorkflowArtifactPublicationShape;
+
 /** WorkflowCatalog wire fields. */
 export interface WorkflowCatalogShape {
     /** components as defined by the Nexa gateway. */
@@ -9138,6 +9221,8 @@ export enum Method {
     WorkflowsRunsApplicationsSetup = 'workflows.runs.applications.setup',
     /** Calls workflows.runs.artifact. */
     WorkflowsRunsArtifact = 'workflows.runs.artifact',
+    /** Calls workflows.runs.artifacts. */
+    WorkflowsRunsArtifacts = 'workflows.runs.artifacts',
     /** Calls workflows.runs.attempts. */
     WorkflowsRunsAttempts = 'workflows.runs.attempts',
     /** Calls workflows.runs.cancel. */

@@ -5,12 +5,38 @@ import type {
     WorkflowRunArtifact,
     WorkflowRunArtifactRequest,
     WorkflowRunArtifactPage,
+    WorkflowArtifactListRequest,
+    WorkflowArtifactCursor,
 } from './RunArtifactTypes.js';
 
 /** Strict bounded artifact requests cannot supply paths, URLs, media IDs or another account. */
 export class WorkflowRunArtifactCodec {
     public static readonly chunkBytes: number = 262_144;
     public static readonly maxBytes: number = 32 * 1024 * 1024;
+    /** A listing cannot address another account or introduce database query operators. */
+    public static list(raw: unknown): WorkflowArtifactListRequest {
+        const value: Readonly<Record<string, unknown>> = WorkflowInput.record(raw, [
+            'runId',
+            'after',
+            'limit',
+        ]);
+        const limit: unknown = value['limit'];
+        if (typeof limit !== 'number' || !Number.isSafeInteger(limit) || limit < 1 || limit > 6) {
+            throw new Error('List between 1 and 6 artifact publications');
+        }
+        let after: WorkflowArtifactCursor | null = null;
+        if (value['after'] !== null) {
+            const cursor: Readonly<Record<string, unknown>> = WorkflowInput.record(value['after'], [
+                'nodeId',
+                'invocationId',
+            ]);
+            after = {
+                nodeId: WorkflowInput.id(cursor['nodeId']),
+                invocationId: WorkflowInput.id(cursor['invocationId']),
+            };
+        }
+        return { runId: WorkflowInput.id(value['runId']), after, limit };
+    }
     /** Validates public metadata before allocating an output buffer. */
     public static artifact(raw: unknown): WorkflowRunArtifact {
         const value: Readonly<Record<string, unknown>> = WorkflowInput.record(raw, [

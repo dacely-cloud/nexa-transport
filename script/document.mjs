@@ -67,6 +67,12 @@ function nestedFields(node, prefix = '') {
 function sample(node, key = '', depth = 0) {
     node = resolved(node);
     if (depth > 8) return null;
+    if (Array.isArray(node.type))
+        return sample(
+            { ...node, type: node.type.includes('null') ? 'null' : node.type[0] },
+            key,
+            depth + 1,
+        );
     if (node.const !== undefined) return node.const;
     if (node.enum) return node.enum[0];
     if (node.anyOf || node.oneOf)
@@ -94,8 +100,7 @@ const enumName = (method) =>
         .split('.')
         .map((part) => part[0].toUpperCase() + part.slice(1))
         .join('');
-let reference =
-    '# RPC reference\n\nAll 54 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 53 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.\n\n';
+let reference = `# RPC reference\n\nAll ${Object.keys(methods).length} protocol methods. \`connect\` is managed by \`NexaClient.connect\`; the remaining ${Object.keys(methods).length - 1} use \`client.call(Method.Name, params)\`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.\n\n`;
 reference +=
     Object.keys(methods)
         .map((name) => `- [${name}](#${name.replaceAll('.', '-')})`)

@@ -1,6 +1,6 @@
 # RPC reference
 
-All 54 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 53 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
+All 133 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 132 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
 
 - [accounts.create](#accounts-create)
 - [accounts.list](#accounts-list)
@@ -96,6 +96,7 @@ All 54 protocol methods. `connect` is managed by `NexaClient.connect`; the remai
 - [voice.stop](#voice-stop)
 - [workflows.catalog](#workflows-catalog)
 - [workflows.create](#workflows-create)
+- [workflows.delete](#workflows-delete)
 - [workflows.list](#workflows-list)
 - [workflows.models](#workflows-models)
 - [workflows.models.image.quote](#workflows-models-image-quote)
@@ -109,14 +110,18 @@ All 54 protocol methods. `connect` is managed by `NexaClient.connect`; the remai
 - [workflows.planning.sources](#workflows-planning-sources)
 - [workflows.read](#workflows-read)
 - [workflows.record](#workflows-record)
+- [workflows.records](#workflows-records)
 - [workflows.runs.agent.control](#workflows-runs-agent-control)
 - [workflows.runs.agent.input](#workflows-runs-agent-input)
 - [workflows.runs.agent.read](#workflows-runs-agent-read)
 - [workflows.runs.applications.check](#workflows-runs-applications-check)
 - [workflows.runs.applications.setup](#workflows-runs-applications-setup)
 - [workflows.runs.artifact](#workflows-runs-artifact)
+- [workflows.runs.artifacts](#workflows-runs-artifacts)
+- [workflows.runs.attempts](#workflows-runs-attempts)
 - [workflows.runs.cancel](#workflows-runs-cancel)
 - [workflows.runs.events](#workflows-runs-events)
+- [workflows.runs.inputs](#workflows-runs-inputs)
 - [workflows.runs.list](#workflows-runs-list)
 - [workflows.runs.output](#workflows-runs-output)
 - [workflows.runs.read](#workflows-runs-read)
@@ -1740,7 +1745,7 @@ Result: [ConversationPinsPage](protocol.md#conversationpinspage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.SessionsRename> = {
-    expectedTitle: 'YOUR_EXPECTEDTITLE',
+    expectedTitle: null,
     id: 'YOUR_ID',
     title: 'YOUR_TITLE',
 };
@@ -1948,7 +1953,7 @@ import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.SharesSetMember> = {
     id: 'YOUR_ID',
-    mode: 'YOUR_MODE',
+    mode: null,
     shareId: 'YOUR_SHAREID',
     subject: 'YOUR_SUBJECT',
 };
@@ -2187,7 +2192,7 @@ const params: ParamsOf<typeof Method.WorkflowsCreate> = {
     commandId: 'YOUR_COMMANDID',
     details: {
         description: 'YOUR_DESCRIPTION',
-        folder: 'YOUR_FOLDER',
+        folder: null,
         name: 'YOUR_NAME',
         tags: [],
     },
@@ -2208,6 +2213,30 @@ Parameters: [WorkflowCreateRequest](protocol.md#workflowcreaterequest).
 | `workflowId` | Yes      | `string`                                       |             |
 
 Result: [WorkflowReceipt](protocol.md#workflowreceipt).
+
+## workflows.delete
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsDelete> = {
+    expectedRevision: 'YOUR_EXPECTEDREVISION',
+    workflowId: 'YOUR_WORKFLOWID',
+};
+const result: ResultOf<typeof Method.WorkflowsDelete> = await client.call(
+    Method.WorkflowsDelete,
+    params,
+);
+```
+
+Parameters: [WorkflowDeleteRequest](protocol.md#workflowdeleterequest).
+
+| Field              | Required | Type     | Description |
+| ------------------ | -------- | -------- | ----------- |
+| `expectedRevision` | Yes      | `string` |             |
+| `workflowId`       | Yes      | `string` |             |
+
+Result: [WorkflowDeleteReceipt](protocol.md#workflowdeletereceipt).
 
 ## workflows.list
 
@@ -2242,11 +2271,11 @@ Result: [WorkflowListPage](protocol.md#workflowlistpage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsModels> = {
-    after: 'YOUR_AFTER',
+    after: null,
     capability: 'image',
     compatibleOnly: false,
     favorites: [],
-    provider: 'YOUR_PROVIDER',
+    provider: null,
     query: 'YOUR_QUERY',
     workflowId: 'YOUR_WORKFLOWID',
 };
@@ -2315,8 +2344,8 @@ const params: ParamsOf<typeof Method.WorkflowsModelsImageResolve> = {
     policy: {
         allowPreview: false,
         maxCatalogAgeMs: 'YOUR_MAXCATALOGAGEMS',
-        maxGenerationMicrocents: 'YOUR_MAXGENERATIONMICROCENTS',
-        region: 'YOUR_REGION',
+        maxGenerationMicrocents: null,
+        region: null,
     },
     provider: 'YOUR_PROVIDER',
     requirements: [],
@@ -2345,11 +2374,11 @@ Result: [WorkflowImageResolution](protocol.md#workflowimageresolution).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsModelsRefresh> = {
-    after: 'YOUR_AFTER',
+    after: null,
     capability: 'image',
     compatibleOnly: false,
     favorites: [],
-    provider: 'YOUR_PROVIDER',
+    provider: null,
     query: 'YOUR_QUERY',
     workflowId: 'YOUR_WORKFLOWID',
 };
@@ -2385,9 +2414,9 @@ const params: ParamsOf<typeof Method.WorkflowsModelsResolve> = {
         allowPreview: false,
         allowUnpriced: false,
         maxCatalogAgeMs: 'YOUR_MAXCATALOGAGEMS',
-        maxInputUsdPerMillion: 'YOUR_MAXINPUTUSDPERMILLION',
-        maxOutputUsdPerMillion: 'YOUR_MAXOUTPUTUSDPERMILLION',
-        region: 'YOUR_REGION',
+        maxInputUsdPerMillion: null,
+        maxOutputUsdPerMillion: null,
+        region: null,
         requiredFeatures: [],
     },
     provider: 'YOUR_PROVIDER',
@@ -2441,7 +2470,7 @@ Result: [PlanningTurn](protocol.md#planningturn).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsPlanningHistory> = {
-    beforeRequestId: 'YOUR_BEFOREREQUESTID',
+    beforeRequestId: null,
     workflowId: 'YOUR_WORKFLOWID',
 };
 const result: ResultOf<typeof Method.WorkflowsPlanningHistory> = await client.call(
@@ -2493,7 +2522,7 @@ const params: ParamsOf<typeof Method.WorkflowsPlanningSend> = {
     document: {
         details: {
             description: 'YOUR_DESCRIPTION',
-            folder: 'YOUR_FOLDER',
+            folder: null,
             name: 'YOUR_NAME',
             tags: [],
         },
@@ -2502,7 +2531,7 @@ const params: ParamsOf<typeof Method.WorkflowsPlanningSend> = {
         positions: [],
     },
     message: 'Your request',
-    previousRequestId: 'YOUR_PREVIOUSREQUESTID',
+    previousRequestId: null,
     requestId: 'YOUR_REQUESTID',
     workflowId: 'YOUR_WORKFLOWID',
 };
@@ -2532,7 +2561,7 @@ Result: [PlanningTurn](protocol.md#planningturn).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsPlanningSources> = {
-    after: 'YOUR_AFTER',
+    after: null,
     workflowId: 'YOUR_WORKFLOWID',
 };
 const result: ResultOf<typeof Method.WorkflowsPlanningSources> = await client.call(
@@ -2558,7 +2587,7 @@ import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 const params: ParamsOf<typeof Method.WorkflowsRead> = {
     edgeOffset: 1,
     nodeOffset: 1,
-    revision: 'YOUR_REVISION',
+    revision: null,
     workflowId: 'YOUR_WORKFLOWID',
 };
 const result: ResultOf<typeof Method.WorkflowsRead> = await client.call(
@@ -2604,6 +2633,30 @@ Parameters: [WorkflowRecordRequest](protocol.md#workflowrecordrequest).
 | `workflowId` | Yes      | `string` |             |
 
 Result: [WorkflowRecordPage](protocol.md#workflowrecordpage).
+
+## workflows.records
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsRecords> = {
+    references: [],
+    workflowId: 'YOUR_WORKFLOWID',
+};
+const result: ResultOf<typeof Method.WorkflowsRecords> = await client.call(
+    Method.WorkflowsRecords,
+    params,
+);
+```
+
+Parameters: [WorkflowRecordsRequest](protocol.md#workflowrecordsrequest).
+
+| Field        | Required | Type              | Description |
+| ------------ | -------- | ----------------- | ----------- |
+| `references` | Yes      | Array of `string` |             |
+| `workflowId` | Yes      | `string`          |             |
+
+Result: [WorkflowRecordsPage](protocol.md#workflowrecordspage).
 
 ## workflows.runs.agent.control
 
@@ -2771,6 +2824,63 @@ Parameters: [WorkflowRunArtifactRequest](protocol.md#workflowrunartifactrequest)
 
 Result: [WorkflowRunArtifactPage](protocol.md#workflowrunartifactpage).
 
+## workflows.runs.artifacts
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsRunsArtifacts> = {
+    after: {
+        invocationId: 'YOUR_INVOCATIONID',
+        nodeId: 'YOUR_NODEID',
+    },
+    limit: 1,
+    runId: 'YOUR_RUNID',
+};
+const result: ResultOf<typeof Method.WorkflowsRunsArtifacts> = await client.call(
+    Method.WorkflowsRunsArtifacts,
+    params,
+);
+```
+
+Parameters: [WorkflowArtifactListRequest](protocol.md#workflowartifactlistrequest).
+
+| Field   | Required | Type                                                                  | Description |
+| ------- | -------- | --------------------------------------------------------------------- | ----------- |
+| `after` | Yes      | [WorkflowArtifactCursor](protocol.md#workflowartifactcursor) / `null` |             |
+| `limit` | Yes      | `number`                                                              |             |
+| `runId` | Yes      | `string`                                                              |             |
+
+Result: [WorkflowArtifactListPage](protocol.md#workflowartifactlistpage).
+
+## workflows.runs.attempts
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsRunsAttempts> = {
+    afterAttempt: null,
+    limit: 1,
+    nodeId: 'YOUR_NODEID',
+    runId: 'YOUR_RUNID',
+};
+const result: ResultOf<typeof Method.WorkflowsRunsAttempts> = await client.call(
+    Method.WorkflowsRunsAttempts,
+    params,
+);
+```
+
+Parameters: [WorkflowRunAttemptsRequest](protocol.md#workflowrunattemptsrequest).
+
+| Field          | Required | Type          | Description |
+| -------------- | -------- | ------------- | ----------- |
+| `afterAttempt` | Yes      | `null,number` |             |
+| `limit`        | Yes      | `number`      |             |
+| `nodeId`       | Yes      | `string`      |             |
+| `runId`        | Yes      | `string`      |             |
+
+Result: [WorkflowRunAttemptsPage](protocol.md#workflowrunattemptspage).
+
 ## workflows.runs.cancel
 
 ```ts
@@ -2819,13 +2929,41 @@ Parameters: [WorkflowRunEventsRequest](protocol.md#workflowruneventsrequest).
 
 Result: Array of [WorkflowRunEvent](protocol.md#workflowrunevent).
 
+## workflows.runs.inputs
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsRunsInputs> = {
+    invocationId: 'YOUR_INVOCATIONID',
+    nodeId: 'YOUR_NODEID',
+    offset: 1,
+    runId: 'YOUR_RUNID',
+};
+const result: ResultOf<typeof Method.WorkflowsRunsInputs> = await client.call(
+    Method.WorkflowsRunsInputs,
+    params,
+);
+```
+
+Parameters: [WorkflowRunOutputRequest](protocol.md#workflowrunoutputrequest).
+
+| Field          | Required | Type     | Description |
+| -------------- | -------- | -------- | ----------- |
+| `invocationId` | Yes      | `string` |             |
+| `nodeId`       | Yes      | `string` |             |
+| `offset`       | Yes      | `number` |             |
+| `runId`        | Yes      | `string` |             |
+
+Result: [WorkflowRunOutputPage](protocol.md#workflowrunoutputpage) / `null`.
+
 ## workflows.runs.list
 
 ```ts
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsRunsList> = {
-    afterRunId: 'YOUR_AFTERRUNID',
+    afterRunId: null,
     limit: 1,
     workflowId: 'YOUR_WORKFLOWID',
 };
@@ -2937,7 +3075,7 @@ Result: [WorkflowRunSummary](protocol.md#workflowrunsummary).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsRunsSteps> = {
-    afterNodeId: 'YOUR_AFTERNODEID',
+    afterNodeId: null,
     limit: 1,
     runId: 'YOUR_RUNID',
 };
@@ -3024,7 +3162,7 @@ const params: ParamsOf<typeof Method.WorkflowsSave> = {
     patch: {
         details: {
             description: 'YOUR_DESCRIPTION',
-            folder: 'YOUR_FOLDER',
+            folder: null,
             name: 'YOUR_NAME',
             tags: [],
         },
