@@ -733,6 +733,258 @@ export const schema: Schema = {
             description:
                 'Where binary content comes from: inline base64, or a URL the provider fetches.',
         },
+        BrowserActivityConsole: {
+            description:
+                'Delivered console argument types and an optional validated source, without primitive values.',
+            properties: {
+                argumentTypes: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                callType: {
+                    type: 'string',
+                },
+                kind: {
+                    const: 'console',
+                    type: 'string',
+                },
+                ordinal: {
+                    type: 'number',
+                },
+                source: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/BrowserActivityLocation',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                timestamp: {
+                    type: 'string',
+                },
+            },
+            required: ['argumentTypes', 'callType', 'kind', 'ordinal', 'source', 'timestamp'],
+            type: 'object',
+        },
+        BrowserActivityCoverage: {
+            description:
+                'Coverage describes attach-window evidence and explicitly accounts for missing observations.',
+            properties: {
+                excluded: {
+                    type: 'string',
+                },
+                missingPredecessors: {
+                    type: 'string',
+                },
+                networkCompleteWithinWindow: {
+                    type: 'boolean',
+                },
+                priorActivityAvailable: {
+                    const: false,
+                    type: 'boolean',
+                },
+                reusedRequestIds: {
+                    type: 'string',
+                },
+                truncated: {
+                    type: 'boolean',
+                },
+                unfinishedRequests: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'excluded',
+                'missingPredecessors',
+                'networkCompleteWithinWindow',
+                'priorActivityAvailable',
+                'reusedRequestIds',
+                'truncated',
+                'unfinishedRequests',
+            ],
+            type: 'object',
+        },
+        BrowserActivityLocation: {
+            description: 'A CDP source location is attributed only to the selected origin.',
+            properties: {
+                column: {
+                    type: 'number',
+                },
+                line: {
+                    type: 'number',
+                },
+                url: {
+                    type: 'string',
+                },
+            },
+            required: ['column', 'line', 'url'],
+            type: 'object',
+        },
+        BrowserActivityNavigation: {
+            description:
+                'Same-origin main-frame navigations are observed without driving the page.',
+            properties: {
+                kind: {
+                    const: 'navigation',
+                    type: 'string',
+                },
+                ordinal: {
+                    type: 'number',
+                },
+                sameDocument: {
+                    type: 'boolean',
+                },
+                url: {
+                    type: 'string',
+                },
+            },
+            required: ['kind', 'ordinal', 'sameDocument', 'url'],
+            type: 'object',
+        },
+        BrowserActivityRecord: {
+            anyOf: [
+                {
+                    $ref: '#/definitions/BrowserActivityRequest',
+                },
+                {
+                    $ref: '#/definitions/BrowserActivityConsole',
+                },
+                {
+                    $ref: '#/definitions/BrowserActivitySocket',
+                },
+                {
+                    $ref: '#/definitions/BrowserActivityNavigation',
+                },
+            ],
+            description:
+                'Records form one ordered, bounded capture with independent request-generation identity.',
+        },
+        BrowserActivityRequest: {
+            description: 'One request generation; reused CDP IDs retain distinct predecessors.',
+            properties: {
+                encodedBytes: {
+                    type: ['null', 'string'],
+                },
+                failed: {
+                    type: 'boolean',
+                },
+                finished: {
+                    type: 'boolean',
+                },
+                frameId: {
+                    type: 'string',
+                },
+                initiator: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/BrowserActivityLocation',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                kind: {
+                    const: 'request',
+                    type: 'string',
+                },
+                method: {
+                    type: 'string',
+                },
+                mimeType: {
+                    type: ['null', 'string'],
+                },
+                ordinal: {
+                    type: 'number',
+                },
+                redirectedTo: {
+                    type: ['null', 'number'],
+                },
+                requestId: {
+                    type: 'string',
+                },
+                resourceType: {
+                    type: 'string',
+                },
+                reusedWithoutRedirect: {
+                    type: 'boolean',
+                },
+                status: {
+                    type: ['null', 'number'],
+                },
+                timestamp: {
+                    type: 'string',
+                },
+                url: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'encodedBytes',
+                'failed',
+                'finished',
+                'frameId',
+                'initiator',
+                'kind',
+                'method',
+                'mimeType',
+                'ordinal',
+                'redirectedTo',
+                'requestId',
+                'resourceType',
+                'reusedWithoutRedirect',
+                'status',
+                'timestamp',
+                'url',
+            ],
+            type: 'object',
+        },
+        BrowserActivitySocket: {
+            description:
+                'WebSocket payloads are reduced immediately to direction, opcode and byte count.',
+            properties: {
+                bytes: {
+                    type: 'string',
+                },
+                direction: {
+                    type: 'string',
+                },
+                kind: {
+                    const: 'websocket',
+                    type: 'string',
+                },
+                opcode: {
+                    type: 'number',
+                },
+                ordinal: {
+                    type: 'number',
+                },
+                requestId: {
+                    type: 'string',
+                },
+                timestamp: {
+                    type: 'string',
+                },
+                url: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'bytes',
+                'direction',
+                'kind',
+                'opcode',
+                'ordinal',
+                'requestId',
+                'timestamp',
+                'url',
+            ],
+            type: 'object',
+        },
         Budget: {
             description: 'A spending limit over one scope.',
             properties: {
@@ -3656,6 +3908,18 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'reverse.browser': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/ReverseBrowserQuery',
+                        },
+                        result: {
+                            $ref: '#/definitions/ReverseBrowserPage',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'reverse.catalog': {
                     properties: {
                         params: {
@@ -4794,6 +5058,7 @@ export const schema: Schema = {
                 'processes.log',
                 'processes.resize',
                 'processes.stop',
+                'reverse.browser',
                 'reverse.catalog',
                 'reverse.evidence',
                 'reverse.functions',
@@ -8277,6 +8542,183 @@ export const schema: Schema = {
             required: ['sessionId'],
             type: 'object',
         },
+        ReverseBrowserMetadata: {
+            description: 'Immutable observation metadata, separate from retained event rows.',
+            properties: {
+                coverage: {
+                    $ref: '#/definitions/BrowserActivityCoverage',
+                },
+                endedAt: {
+                    type: 'string',
+                },
+                observationMs: {
+                    type: 'number',
+                },
+                origin: {
+                    type: 'string',
+                },
+                provider: {
+                    const: 'cdp-passive',
+                    type: 'string',
+                },
+                startedAt: {
+                    type: 'string',
+                },
+                targetId: {
+                    type: 'string',
+                },
+                url: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'coverage',
+                'endedAt',
+                'observationMs',
+                'origin',
+                'provider',
+                'startedAt',
+                'targetId',
+                'url',
+            ],
+            type: 'object',
+        },
+        ReverseBrowserPage: {
+            description: 'One bounded archive page proves both investigation and capture identity.',
+            properties: {
+                captureSha256: {
+                    type: 'string',
+                },
+                cursor: {
+                    type: 'string',
+                },
+                evidenceId: {
+                    type: 'string',
+                },
+                metadata: {
+                    $ref: '#/definitions/ReverseBrowserMetadata',
+                },
+                nextCursor: {
+                    type: ['null', 'string'],
+                },
+                records: {
+                    items: {
+                        $ref: '#/definitions/BrowserActivityRecord',
+                    },
+                    type: 'array',
+                },
+                runId: {
+                    type: 'string',
+                },
+                sha256: {
+                    type: 'string',
+                },
+                total: {
+                    type: 'number',
+                },
+            },
+            required: [
+                'captureSha256',
+                'cursor',
+                'evidenceId',
+                'metadata',
+                'nextCursor',
+                'records',
+                'runId',
+                'sha256',
+                'total',
+            ],
+            type: 'object',
+        },
+        ReverseBrowserQuery: {
+            description: 'Only an archived evidence identity can select saved browser activity.',
+            properties: {
+                cursor: {
+                    type: 'string',
+                },
+                evidenceId: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                runId: {
+                    type: 'string',
+                },
+            },
+            required: ['evidenceId', 'id', 'runId'],
+            type: 'object',
+        },
+        ReverseBrowserReference: {
+            description:
+                'Saved browser provenance identifies the original conversation, run and evidence content.',
+            properties: {
+                captureSha256: {
+                    type: 'string',
+                },
+                evidenceId: {
+                    type: 'string',
+                },
+                runId: {
+                    type: 'string',
+                },
+                sessionId: {
+                    type: 'string',
+                },
+            },
+            required: ['captureSha256', 'evidenceId', 'runId', 'sessionId'],
+            type: 'object',
+        },
+        ReverseBrowserSnapshot: {
+            description:
+                'A live run carries capture metadata and an event count, never all event rows.',
+            properties: {
+                coverage: {
+                    $ref: '#/definitions/BrowserActivityCoverage',
+                },
+                endedAt: {
+                    type: 'string',
+                },
+                observationMs: {
+                    type: 'number',
+                },
+                origin: {
+                    type: 'string',
+                },
+                provider: {
+                    const: 'cdp-passive',
+                    type: 'string',
+                },
+                recordCount: {
+                    type: 'number',
+                },
+                reference: {
+                    $ref: '#/definitions/ReverseBrowserReference',
+                },
+                startedAt: {
+                    type: 'string',
+                },
+                targetId: {
+                    type: 'string',
+                },
+                url: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'coverage',
+                'endedAt',
+                'observationMs',
+                'origin',
+                'provider',
+                'recordCount',
+                'reference',
+                'startedAt',
+                'targetId',
+                'url',
+            ],
+            type: 'object',
+        },
         ReverseCatalogPage: {
             description: 'An append-only catalog page; cursors are exact decimal record offsets.',
             properties: {
@@ -9129,6 +9571,11 @@ export const schema: Schema = {
                     description:
                         'A session-owned archive, without query tokens or analyzer handles.',
                 },
+                browser: {
+                    $ref: '#/definitions/ReverseBrowserSnapshot',
+                    description:
+                        'A live run carries capture metadata and an event count, never all event rows.',
+                },
                 cleanupErrors: {
                     items: {
                         type: 'string',
@@ -9158,7 +9605,7 @@ export const schema: Schema = {
                 kind: {
                     description:
                         'The runtime selects a target adapter; callers may make the choice explicit for ambiguous files.',
-                    enum: ['javascript', 'native', 'network', 'source'],
+                    enum: ['browser', 'javascript', 'native', 'network', 'source'],
                     type: 'string',
                 },
                 network: {
@@ -12261,6 +12708,14 @@ export const schema: Schema = {
                 contextWindow: {
                     type: ['null', 'number'],
                 },
+                efforts: {
+                    description:
+                        'Available effort overrides for this model; absent means metadata is unavailable.',
+                    items: {
+                        $ref: '#/definitions/WorkflowModelEffort',
+                    },
+                    type: 'array',
+                },
                 id: {
                     type: 'string',
                 },
@@ -12305,14 +12760,6 @@ export const schema: Schema = {
                 },
                 status: {
                     type: 'string',
-                },
-                efforts: {
-                    description:
-                        'Available effort overrides for this model; absent means metadata is unavailable.',
-                    items: {
-                        $ref: '#/definitions/WorkflowModelEffort',
-                    },
-                    type: 'array',
                 },
             },
             required: [
@@ -13821,6 +14268,9 @@ export const schema: Schema = {
         native: {
             $ref: '#/definitions/NcapDelta',
         },
+        reverseBrowser: {
+            $ref: '#/definitions/ReverseBrowserPage',
+        },
         reverseCatalog: {
             $ref: '#/definitions/ReverseCatalogPage',
         },
@@ -13873,6 +14323,7 @@ export const schema: Schema = {
         'historyRecord',
         'methods',
         'native',
+        'reverseBrowser',
         'reverseCatalog',
         'reverseEvidence',
         'reverseFunctions',

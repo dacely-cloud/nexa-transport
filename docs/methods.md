@@ -1,6 +1,6 @@
 # RPC reference
 
-All 136 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 135 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
+All 137 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 136 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
 
 - [accounts.create](#accounts-create)
 - [accounts.list](#accounts-list)
@@ -52,6 +52,7 @@ All 136 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [processes.log](#processes-log)
 - [processes.resize](#processes-resize)
 - [processes.stop](#processes-stop)
+- [reverse.browser](#reverse-browser)
 - [reverse.catalog](#reverse-catalog)
 - [reverse.evidence](#reverse-evidence)
 - [reverse.functions](#reverse-functions)
@@ -1212,6 +1213,33 @@ Parameters: [BackgroundProcessRef](protocol.md#backgroundprocessref).
 | `sessionId` | Yes      | `string` |             |
 
 Result: [OkResult](protocol.md#okresult).
+
+## reverse.browser
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ReverseBrowser> = {
+    evidenceId: 'YOUR_EVIDENCEID',
+    id: 'YOUR_ID',
+    runId: 'YOUR_RUNID',
+};
+const result: ResultOf<typeof Method.ReverseBrowser> = await client.call(
+    Method.ReverseBrowser,
+    params,
+);
+```
+
+Parameters: [ReverseBrowserQuery](protocol.md#reversebrowserquery).
+
+| Field        | Required | Type     | Description |
+| ------------ | -------- | -------- | ----------- |
+| `cursor`     | No       | `string` |             |
+| `evidenceId` | Yes      | `string` |             |
+| `id`         | Yes      | `string` |             |
+| `runId`      | Yes      | `string` |             |
+
+Result: [ReverseBrowserPage](protocol.md#reversebrowserpage).
 
 ## reverse.catalog
 

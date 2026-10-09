@@ -15,6 +15,7 @@ import type {
 import type { NcapDelta } from '../../nexa/src/protocol/ncap/Delta';
 import type { VoiceCallEvent } from '../../nexa/src/voice/VoiceCall';
 import type { ReverseNetworkDetailPage } from '../../nexa/src/reverse/NetworkDetailTypes';
+import type { ReverseBrowserPage } from '../../nexa/src/reverse/BrowserCaptureTypes';
 import type { ReverseNetworkDirectoryPage } from '../../nexa/src/reverse/NetworkDirectoryTypes';
 import type { ReverseGraphPage } from '../../nexa/src/reverse/GraphTypes';
 import type { ReverseRunSnapshot } from '../../nexa/src/reverse/ProgressTypes';
@@ -25,6 +26,7 @@ import type {
 } from '../../nexa/src/reverse/NavigationTypes';
 /** All protocol contracts reachable from the public transport. */
 export interface Contract {
+    readonly reverseBrowser: ReverseBrowserPage;
     readonly reverseNetworkDetail: ReverseNetworkDetailPage;
     readonly reverseNetworkDirectory: ReverseNetworkDirectoryPage;
     readonly reverseGraph: ReverseGraphPage;

@@ -314,6 +314,150 @@ Variant 2: Object (fields below)
 | `kind` | Yes      | `"url"`  |             |
 | `url`  | Yes      | `string` |             |
 
+## BrowserActivityConsole
+
+Delivered console argument types and an optional validated source, without primitive values.
+
+| Field           | Required | Type                                                                    | Description |
+| --------------- | -------- | ----------------------------------------------------------------------- | ----------- |
+| `argumentTypes` | Yes      | Array of `string`                                                       |             |
+| `callType`      | Yes      | `string`                                                                |             |
+| `kind`          | Yes      | `"console"`                                                             |             |
+| `ordinal`       | Yes      | `number`                                                                |             |
+| `source`        | Yes      | [BrowserActivityLocation](protocol.md#browseractivitylocation) / `null` |             |
+| `timestamp`     | Yes      | `string`                                                                |             |
+
+## BrowserActivityCoverage
+
+Coverage describes attach-window evidence and explicitly accounts for missing observations.
+
+| Field                         | Required | Type      | Description |
+| ----------------------------- | -------- | --------- | ----------- |
+| `excluded`                    | Yes      | `string`  |             |
+| `missingPredecessors`         | Yes      | `string`  |             |
+| `networkCompleteWithinWindow` | Yes      | `boolean` |             |
+| `priorActivityAvailable`      | Yes      | `false`   |             |
+| `reusedRequestIds`            | Yes      | `string`  |             |
+| `truncated`                   | Yes      | `boolean` |             |
+| `unfinishedRequests`          | Yes      | `string`  |             |
+
+## BrowserActivityLocation
+
+A CDP source location is attributed only to the selected origin.
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `column` | Yes      | `number` |             |
+| `line`   | Yes      | `number` |             |
+| `url`    | Yes      | `string` |             |
+
+## BrowserActivityNavigation
+
+Same-origin main-frame navigations are observed without driving the page.
+
+| Field          | Required | Type           | Description |
+| -------------- | -------- | -------------- | ----------- |
+| `kind`         | Yes      | `"navigation"` |             |
+| `ordinal`      | Yes      | `number`       |             |
+| `sameDocument` | Yes      | `boolean`      |             |
+| `url`          | Yes      | `string`       |             |
+
+## BrowserActivityRecord
+
+Records form one ordered, bounded capture with independent request-generation identity.
+
+Variant 1: [BrowserActivityRequest](protocol.md#browseractivityrequest)
+
+| Field                   | Required | Type                                                                    | Description |
+| ----------------------- | -------- | ----------------------------------------------------------------------- | ----------- |
+| `encodedBytes`          | Yes      | `null,string`                                                           |             |
+| `failed`                | Yes      | `boolean`                                                               |             |
+| `finished`              | Yes      | `boolean`                                                               |             |
+| `frameId`               | Yes      | `string`                                                                |             |
+| `initiator`             | Yes      | [BrowserActivityLocation](protocol.md#browseractivitylocation) / `null` |             |
+| `kind`                  | Yes      | `"request"`                                                             |             |
+| `method`                | Yes      | `string`                                                                |             |
+| `mimeType`              | Yes      | `null,string`                                                           |             |
+| `ordinal`               | Yes      | `number`                                                                |             |
+| `redirectedTo`          | Yes      | `null,number`                                                           |             |
+| `requestId`             | Yes      | `string`                                                                |             |
+| `resourceType`          | Yes      | `string`                                                                |             |
+| `reusedWithoutRedirect` | Yes      | `boolean`                                                               |             |
+| `status`                | Yes      | `null,number`                                                           |             |
+| `timestamp`             | Yes      | `string`                                                                |             |
+| `url`                   | Yes      | `string`                                                                |             |
+
+Variant 2: [BrowserActivityConsole](protocol.md#browseractivityconsole)
+
+| Field           | Required | Type                                                                    | Description |
+| --------------- | -------- | ----------------------------------------------------------------------- | ----------- |
+| `argumentTypes` | Yes      | Array of `string`                                                       |             |
+| `callType`      | Yes      | `string`                                                                |             |
+| `kind`          | Yes      | `"console"`                                                             |             |
+| `ordinal`       | Yes      | `number`                                                                |             |
+| `source`        | Yes      | [BrowserActivityLocation](protocol.md#browseractivitylocation) / `null` |             |
+| `timestamp`     | Yes      | `string`                                                                |             |
+
+Variant 3: [BrowserActivitySocket](protocol.md#browseractivitysocket)
+
+| Field       | Required | Type          | Description |
+| ----------- | -------- | ------------- | ----------- |
+| `bytes`     | Yes      | `string`      |             |
+| `direction` | Yes      | `string`      |             |
+| `kind`      | Yes      | `"websocket"` |             |
+| `opcode`    | Yes      | `number`      |             |
+| `ordinal`   | Yes      | `number`      |             |
+| `requestId` | Yes      | `string`      |             |
+| `timestamp` | Yes      | `string`      |             |
+| `url`       | Yes      | `string`      |             |
+
+Variant 4: [BrowserActivityNavigation](protocol.md#browseractivitynavigation)
+
+| Field          | Required | Type           | Description |
+| -------------- | -------- | -------------- | ----------- |
+| `kind`         | Yes      | `"navigation"` |             |
+| `ordinal`      | Yes      | `number`       |             |
+| `sameDocument` | Yes      | `boolean`      |             |
+| `url`          | Yes      | `string`       |             |
+
+## BrowserActivityRequest
+
+One request generation; reused CDP IDs retain distinct predecessors.
+
+| Field                   | Required | Type                                                                    | Description |
+| ----------------------- | -------- | ----------------------------------------------------------------------- | ----------- |
+| `encodedBytes`          | Yes      | `null,string`                                                           |             |
+| `failed`                | Yes      | `boolean`                                                               |             |
+| `finished`              | Yes      | `boolean`                                                               |             |
+| `frameId`               | Yes      | `string`                                                                |             |
+| `initiator`             | Yes      | [BrowserActivityLocation](protocol.md#browseractivitylocation) / `null` |             |
+| `kind`                  | Yes      | `"request"`                                                             |             |
+| `method`                | Yes      | `string`                                                                |             |
+| `mimeType`              | Yes      | `null,string`                                                           |             |
+| `ordinal`               | Yes      | `number`                                                                |             |
+| `redirectedTo`          | Yes      | `null,number`                                                           |             |
+| `requestId`             | Yes      | `string`                                                                |             |
+| `resourceType`          | Yes      | `string`                                                                |             |
+| `reusedWithoutRedirect` | Yes      | `boolean`                                                               |             |
+| `status`                | Yes      | `null,number`                                                           |             |
+| `timestamp`             | Yes      | `string`                                                                |             |
+| `url`                   | Yes      | `string`                                                                |             |
+
+## BrowserActivitySocket
+
+WebSocket payloads are reduced immediately to direction, opcode and byte count.
+
+| Field       | Required | Type          | Description |
+| ----------- | -------- | ------------- | ----------- |
+| `bytes`     | Yes      | `string`      |             |
+| `direction` | Yes      | `string`      |             |
+| `kind`      | Yes      | `"websocket"` |             |
+| `opcode`    | Yes      | `number`      |             |
+| `ordinal`   | Yes      | `number`      |             |
+| `requestId` | Yes      | `string`      |             |
+| `timestamp` | Yes      | `string`      |             |
+| `url`       | Yes      | `string`      |             |
+
 ## Budget
 
 A spending limit over one scope.
@@ -1234,6 +1378,7 @@ Configurable bounds on gateway-owned work and memory.
 | `processes.log`                     | Yes      | Object (fields below) |                                                                                            |
 | `processes.resize`                  | Yes      | Object (fields below) |                                                                                            |
 | `processes.stop`                    | Yes      | Object (fields below) |                                                                                            |
+| `reverse.browser`                   | Yes      | Object (fields below) |                                                                                            |
 | `reverse.catalog`                   | Yes      | Object (fields below) |                                                                                            |
 | `reverse.evidence`                  | Yes      | Object (fields below) |                                                                                            |
 | `reverse.functions`                 | Yes      | Object (fields below) |                                                                                            |
@@ -1743,6 +1888,13 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | -------------------------------------------------------- | ----------- |
 | `params` | Yes      | [BackgroundProcessRef](protocol.md#backgroundprocessref) |             |
 | `result` | Yes      | [OkResult](protocol.md#okresult)                         |             |
+
+**reverse.browser**
+
+| Field    | Required | Type                                                   | Description |
+| -------- | -------- | ------------------------------------------------------ | ----------- |
+| `params` | Yes      | [ReverseBrowserQuery](protocol.md#reversebrowserquery) |             |
+| `result` | Yes      | [ReverseBrowserPage](protocol.md#reversebrowserpage)   |             |
 
 **reverse.catalog**
 
@@ -3832,6 +3984,76 @@ A session-owned archive, without query tokens or analyzer handles.
 | ----------- | -------- | -------- | ----------- |
 | `sessionId` | Yes      | `string` |             |
 
+## ReverseBrowserMetadata
+
+Immutable observation metadata, separate from retained event rows.
+
+| Field           | Required | Type                                                           | Description |
+| --------------- | -------- | -------------------------------------------------------------- | ----------- |
+| `coverage`      | Yes      | [BrowserActivityCoverage](protocol.md#browseractivitycoverage) |             |
+| `endedAt`       | Yes      | `string`                                                       |             |
+| `observationMs` | Yes      | `number`                                                       |             |
+| `origin`        | Yes      | `string`                                                       |             |
+| `provider`      | Yes      | `"cdp-passive"`                                                |             |
+| `startedAt`     | Yes      | `string`                                                       |             |
+| `targetId`      | Yes      | `string`                                                       |             |
+| `url`           | Yes      | `string`                                                       |             |
+
+## ReverseBrowserPage
+
+One bounded archive page proves both investigation and capture identity.
+
+| Field           | Required | Type                                                                | Description |
+| --------------- | -------- | ------------------------------------------------------------------- | ----------- |
+| `captureSha256` | Yes      | `string`                                                            |             |
+| `cursor`        | Yes      | `string`                                                            |             |
+| `evidenceId`    | Yes      | `string`                                                            |             |
+| `metadata`      | Yes      | [ReverseBrowserMetadata](protocol.md#reversebrowsermetadata)        |             |
+| `nextCursor`    | Yes      | `null,string`                                                       |             |
+| `records`       | Yes      | Array of [BrowserActivityRecord](protocol.md#browseractivityrecord) |             |
+| `runId`         | Yes      | `string`                                                            |             |
+| `sha256`        | Yes      | `string`                                                            |             |
+| `total`         | Yes      | `number`                                                            |             |
+
+## ReverseBrowserQuery
+
+Only an archived evidence identity can select saved browser activity.
+
+| Field        | Required | Type     | Description |
+| ------------ | -------- | -------- | ----------- |
+| `cursor`     | No       | `string` |             |
+| `evidenceId` | Yes      | `string` |             |
+| `id`         | Yes      | `string` |             |
+| `runId`      | Yes      | `string` |             |
+
+## ReverseBrowserReference
+
+Saved browser provenance identifies the original conversation, run and evidence content.
+
+| Field           | Required | Type     | Description |
+| --------------- | -------- | -------- | ----------- |
+| `captureSha256` | Yes      | `string` |             |
+| `evidenceId`    | Yes      | `string` |             |
+| `runId`         | Yes      | `string` |             |
+| `sessionId`     | Yes      | `string` |             |
+
+## ReverseBrowserSnapshot
+
+A live run carries capture metadata and an event count, never all event rows.
+
+| Field           | Required | Type                                                           | Description |
+| --------------- | -------- | -------------------------------------------------------------- | ----------- |
+| `coverage`      | Yes      | [BrowserActivityCoverage](protocol.md#browseractivitycoverage) |             |
+| `endedAt`       | Yes      | `string`                                                       |             |
+| `observationMs` | Yes      | `number`                                                       |             |
+| `origin`        | Yes      | `string`                                                       |             |
+| `provider`      | Yes      | `"cdp-passive"`                                                |             |
+| `recordCount`   | Yes      | `number`                                                       |             |
+| `reference`     | Yes      | [ReverseBrowserReference](protocol.md#reversebrowserreference) |             |
+| `startedAt`     | Yes      | `string`                                                       |             |
+| `targetId`      | Yes      | `string`                                                       |             |
+| `url`           | Yes      | `string`                                                       |             |
+
 ## ReverseCatalogPage
 
 An append-only catalog page; cursors are exact decimal record offsets.
@@ -4174,13 +4396,14 @@ Bounded, capability-free projection carried by live tool events and the final re
 | --------------- | -------- | -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
 | `application`   | No       | [ReverseApplicationSnapshot](protocol.md#reverseapplicationsnapshot) | Bounded projection for live Chat events; complete indexes are paged by the native query tool.   |
 | `archive`       | No       | [ReverseArchiveRef](protocol.md#reversearchiveref)                   | A session-owned archive, without query tokens or analyzer handles.                              |
+| `browser`       | No       | [ReverseBrowserSnapshot](protocol.md#reversebrowsersnapshot)         | A live run carries capture metadata and an event count, never all event rows.                   |
 | `cleanupErrors` | Yes      | Array of `string`                                                    |                                                                                                 |
 | `evidence`      | Yes      | Array of [ReverseEvidenceRecord](protocol.md#reverseevidencerecord)  |                                                                                                 |
 | `evidenceCount` | Yes      | `number`                                                             |                                                                                                 |
 | `execution`     | No       | `number`                                                             | Explicit resumed execution epoch; absent means the original execution.                          |
 | `id`            | Yes      | `string`                                                             |                                                                                                 |
 | `inputName`     | Yes      | `string`                                                             |                                                                                                 |
-| `kind`          | No       | `"javascript"` / `"native"` / `"network"` / `"source"`               | The runtime selects a target adapter; callers may make the choice explicit for ambiguous files. |
+| `kind`          | No       | `"browser"` / `"javascript"` / `"native"` / `"network"` / `"source"` | The runtime selects a target adapter; callers may make the choice explicit for ambiguous files. |
 | `network`       | No       | [ReverseNetworkSnapshot](protocol.md#reversenetworksnapshot)         | Bounded capability-free projection; full entries and payloads require paged evidence queries.   |
 | `plan`          | No       | Array of [ReversePlanStep](protocol.md#reverseplanstep)              |                                                                                                 |
 | `question`      | Yes      | `string`                                                             |                                                                                                 |
@@ -5683,6 +5906,7 @@ Public model metadata only: no endpoints, keys, account names, or adapter option
 | `availableAtCheck` | No       | `null,boolean`                                                     | Null/absent means no explicit endpoint check, rather than proof that a model is absent. |
 | `compatible`       | Yes      | `boolean`                                                          |                                                                                         |
 | `contextWindow`    | Yes      | `null,number`                                                      |                                                                                         |
+| `efforts`          | No       | Array of [WorkflowModelEffort](protocol.md#workflowmodeleffort)    | Available effort overrides for this model; absent means metadata is unavailable.        |
 | `id`               | Yes      | `string`                                                           |                                                                                         |
 | `image`            | No       | [WorkflowImageCapabilities](protocol.md#workflowimagecapabilities) | Present only for generation models; token prices do not describe image tariffs.         |
 | `input`            | Yes      | Array of `string`                                                  |                                                                                         |
@@ -5694,7 +5918,6 @@ Public model metadata only: no endpoints, keys, account names, or adapter option
 | `reasoning`        | Yes      | `null,boolean`                                                     |                                                                                         |
 | `source`           | Yes      | `string`                                                           |                                                                                         |
 | `status`           | Yes      | `string`                                                           |                                                                                         |
-| `efforts`          | No       | Array of [WorkflowModelEffort](protocol.md#workflowmodeleffort)    | Available effort overrides for this model; absent means metadata is unavailable.        |
 
 ## WorkflowModelEffort
 
