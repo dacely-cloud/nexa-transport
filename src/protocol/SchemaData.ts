@@ -581,6 +581,11 @@ export const schema: Schema = {
                 finishReason: {
                     $ref: '#/definitions/FinishReason',
                 },
+                incompleteReason: {
+                    description:
+                        'A stopped response may leave the task unfinished and its background resources active.',
+                    type: 'string',
+                },
                 iterations: {
                     type: 'number',
                 },

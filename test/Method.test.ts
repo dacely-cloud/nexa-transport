@@ -2,6 +2,7 @@ import { describe, expect, expectTypeOf, it } from 'vitest';
 import { NexaClient } from '../src/networking/NexaClient.js';
 import { Method, type AskResult, type GatewayMethods } from '../src/protocol/Protocol.js';
 import { methodValidators } from '../src/protocol/MethodValidators.js';
+import { result } from './Support.js';
 
 /** Compile-time contracts; never invokes a live client. */
 function verifyMethodTypes(client: NexaClient): void {
@@ -84,4 +85,17 @@ describe('Method enum', (): void => {
         expectTypeOf<Method>().toExtend<keyof GatewayMethods>();
         expectTypeOf(verifyMethodTypes).toBeFunction();
     });
+});
+
+it('validates unfinished task results without requiring the field from older gateways', (): void => {
+    expect(methodValidators[Method.AgentAsk].result(result)).toBe(true);
+    expect(
+        methodValidators[Method.AgentAsk].result({
+            ...result,
+            incompleteReason: 'Waiting for an answer',
+        }),
+    ).toBe(true);
+    expect(methodValidators[Method.AgentAsk].result({ ...result, incompleteReason: 42 })).toBe(
+        false,
+    );
 });

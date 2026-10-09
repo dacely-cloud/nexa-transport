@@ -243,17 +243,18 @@ What one turn is asked for.
 
 What a finished turn produced.
 
-| Field            | Required | Type                                                            | Description                                                                         |
-| ---------------- | -------- | --------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| `attachments`    | No       | Array of [DeliveredAttachment](protocol.md#deliveredattachment) | Delivered files; IDs match attachment events so clients can deduplicate.            |
-| `conversationId` | Yes      | `null,string`                                                   |                                                                                     |
-| `finishReason`   | Yes      | [FinishReason](protocol.md#finishreason)                        |                                                                                     |
-| `iterations`     | Yes      | `number`                                                        |                                                                                     |
-| `reasoning`      | Yes      | `string`                                                        |                                                                                     |
-| `sessionKey`     | Yes      | `string`                                                        | The session id this turn was filed under — `sessions.get`'s id, not the provider's. |
-| `text`           | Yes      | `string`                                                        |                                                                                     |
-| `turnId`         | Yes      | `string`                                                        |                                                                                     |
-| `usage`          | Yes      | [TokenUsage](protocol.md#tokenusage)                            |                                                                                     |
+| Field              | Required | Type                                                            | Description                                                                           |
+| ------------------ | -------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `attachments`      | No       | Array of [DeliveredAttachment](protocol.md#deliveredattachment) | Delivered files; IDs match attachment events so clients can deduplicate.              |
+| `conversationId`   | Yes      | `null,string`                                                   |                                                                                       |
+| `finishReason`     | Yes      | [FinishReason](protocol.md#finishreason)                        |                                                                                       |
+| `incompleteReason` | No       | `string`                                                        | A stopped response may leave the task unfinished and its background resources active. |
+| `iterations`       | Yes      | `number`                                                        |                                                                                       |
+| `reasoning`        | Yes      | `string`                                                        |                                                                                       |
+| `sessionKey`       | Yes      | `string`                                                        | The session id this turn was filed under — `sessions.get`'s id, not the provider's.   |
+| `text`             | Yes      | `string`                                                        |                                                                                       |
+| `turnId`           | Yes      | `string`                                                        |                                                                                       |
+| `usage`            | Yes      | [TokenUsage](protocol.md#tokenusage)                            |                                                                                       |
 
 ## BackgroundProcess
 
