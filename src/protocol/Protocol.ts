@@ -193,6 +193,92 @@ export interface AgentVoiceShape {
 /** AgentVoice from the Nexa wire protocol. */
 export type AgentVoice = AgentVoiceShape;
 
+/** ApplicationBoundary wire fields. */
+export interface ApplicationBoundaryShape {
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: ApplicationBoundaryKind;
+    /** location as defined by the Nexa gateway. */
+    readonly location: ApplicationLocation;
+    /** operation as defined by the Nexa gateway. */
+    readonly operation: string;
+    /** value as defined by the Nexa gateway. */
+    readonly value: null | string;
+}
+
+/** ApplicationBoundary from the Nexa wire protocol. */
+export type ApplicationBoundary = ApplicationBoundaryShape;
+
+/** Allowed values for ApplicationBoundaryKind. */
+export const ApplicationBoundaryKindValues = {
+    Value0: 'browser-window',
+    Value1: 'context-bridge',
+    Value2: 'ipc',
+    Value3: 'native-addon',
+    Value4: 'preload',
+    Value5: 'route',
+} as const;
+
+/** ApplicationBoundaryKind from the Nexa wire protocol. */
+export type ApplicationBoundaryKind =
+    (typeof ApplicationBoundaryKindValues)[keyof typeof ApplicationBoundaryKindValues];
+
+/** ApplicationIssue wire fields. */
+export interface ApplicationIssueShape {
+    /** message as defined by the Nexa gateway. */
+    readonly message: string;
+    /** path as defined by the Nexa gateway. */
+    readonly path: string;
+}
+
+/** ApplicationIssue from the Nexa wire protocol. */
+export type ApplicationIssue = ApplicationIssueShape;
+
+/** ApplicationLocation wire fields. */
+export interface ApplicationLocationShape {
+    /** column as defined by the Nexa gateway. */
+    readonly column: number;
+    /** end as defined by the Nexa gateway. */
+    readonly end: number;
+    /** endColumn as defined by the Nexa gateway. */
+    readonly endColumn: number;
+    /** endLine as defined by the Nexa gateway. */
+    readonly endLine: number;
+    /** line as defined by the Nexa gateway. */
+    readonly line: number;
+    /** module as defined by the Nexa gateway. */
+    readonly module: string;
+    /** start as defined by the Nexa gateway. */
+    readonly start: number;
+}
+
+/** ApplicationLocation from the Nexa wire protocol. */
+export type ApplicationLocation = ApplicationLocationShape;
+
+/** ApplicationModule wire fields. */
+export interface ApplicationModuleShape {
+    /** bytes as defined by the Nexa gateway. */
+    readonly bytes: string;
+    /** functions as defined by the Nexa gateway. */
+    readonly functions: number;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** imports as defined by the Nexa gateway. */
+    readonly imports: number;
+    /** parseError as defined by the Nexa gateway. */
+    readonly parseError: null | string;
+    /** path as defined by the Nexa gateway. */
+    readonly path: string;
+    /** sha256 as defined by the Nexa gateway. */
+    readonly sha256: string;
+    /** sourceMap as defined by the Nexa gateway. */
+    readonly sourceMap: null | string;
+}
+
+/** ApplicationModule from the Nexa wire protocol. */
+export type ApplicationModule = ApplicationModuleShape;
+
 /** ApprovalRequestedData wire fields. */
 export interface ApprovalRequestedDataShape {
     /** approvalId as defined by the Nexa gateway. */
@@ -4986,6 +5072,35 @@ export const ResourceUseValues = { Value0: 'attach', Value1: 'compute', Value2: 
 /** ResourceUse from the Nexa wire protocol. */
 export type ResourceUse = (typeof ResourceUseValues)[keyof typeof ResourceUseValues];
 
+/** ReverseApplicationSnapshot wire fields. */
+export interface ReverseApplicationSnapshotShape {
+    /** boundaries as defined by the Nexa gateway. */
+    readonly boundaries: ReadonlyArray<ApplicationBoundary>;
+    /** functionCount as defined by the Nexa gateway. */
+    readonly functionCount: number;
+    /** importCount as defined by the Nexa gateway. */
+    readonly importCount: number;
+    /** ipcCount as defined by the Nexa gateway. */
+    readonly ipcCount: number;
+    /** issueCount as defined by the Nexa gateway. */
+    readonly issueCount: number;
+    /** issues as defined by the Nexa gateway. */
+    readonly issues: ReadonlyArray<ApplicationIssue>;
+    /** moduleCount as defined by the Nexa gateway. */
+    readonly moduleCount: number;
+    /** modules as defined by the Nexa gateway. */
+    readonly modules: ReadonlyArray<ApplicationModule>;
+    /** nativeAddonCount as defined by the Nexa gateway. */
+    readonly nativeAddonCount: number;
+    /** routeCount as defined by the Nexa gateway. */
+    readonly routeCount: number;
+    /** sourceMapCount as defined by the Nexa gateway. */
+    readonly sourceMapCount: number;
+}
+
+/** ReverseApplicationSnapshot from the Nexa wire protocol. */
+export type ReverseApplicationSnapshot = ReverseApplicationSnapshotShape;
+
 /** ReverseEvidenceRecord wire fields. */
 export interface ReverseEvidenceRecordShape {
     /** characters as defined by the Nexa gateway. */
@@ -5044,8 +5159,13 @@ export interface ReversePlanStepShape {
 /** ReversePlanStep from the Nexa wire protocol. */
 export type ReversePlanStep = ReversePlanStepShape;
 
+/** Allowed values for ReverseRunSnapshotkind. */
+export const ReverseRunSnapshotkindValues = { Value0: 'javascript', Value1: 'native' } as const;
+
 /** ReverseRunSnapshot wire fields. */
 export interface ReverseRunSnapshotShape {
+    /** application as defined by the Nexa gateway. */
+    readonly application?: ReverseApplicationSnapshot;
     /** cleanupErrors as defined by the Nexa gateway. */
     readonly cleanupErrors: ReadonlyArray<string>;
     /** evidence as defined by the Nexa gateway. */
@@ -5056,6 +5176,8 @@ export interface ReverseRunSnapshotShape {
     readonly id: string;
     /** inputName as defined by the Nexa gateway. */
     readonly inputName: string;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind?: (typeof ReverseRunSnapshotkindValues)[keyof typeof ReverseRunSnapshotkindValues];
     /** plan as defined by the Nexa gateway. */
     readonly plan?: ReadonlyArray<ReversePlanStep>;
     /** question as defined by the Nexa gateway. */

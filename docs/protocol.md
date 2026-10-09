@@ -132,6 +132,60 @@ How an agent speaks.
 | `provider`  | Yes      | `string`  | The TTS provider id, e.g. `elevenlabs`. |
 | `voiceId`   | Yes      | `string`  | The provider's voice id.                |
 
+## ApplicationBoundary
+
+| Field       | Required | Type                                                           | Description |
+| ----------- | -------- | -------------------------------------------------------------- | ----------- |
+| `id`        | Yes      | `string`                                                       |             |
+| `kind`      | Yes      | [ApplicationBoundaryKind](protocol.md#applicationboundarykind) |             |
+| `location`  | Yes      | [ApplicationLocation](protocol.md#applicationlocation)         |             |
+| `operation` | Yes      | `string`                                                       |             |
+| `value`     | Yes      | `null,string`                                                  |             |
+
+## ApplicationBoundaryKind
+
+Observed call sites, never claims that an IPC channel, route or native addon was exercised.
+
+Type: `"browser-window"` / `"context-bridge"` / `"ipc"` / `"native-addon"` / `"preload"` / `"route"`.
+
+## ApplicationIssue
+
+Explicit incomplete coverage rather than silently omitted files or unsupported syntax.
+
+| Field     | Required | Type     | Description |
+| --------- | -------- | -------- | ----------- |
+| `message` | Yes      | `string` |             |
+| `path`    | Yes      | `string` |             |
+
+## ApplicationLocation
+
+Exact generated-source location of a static observation. Columns and offsets are zero-based.
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `column`    | Yes      | `number` |             |
+| `end`       | Yes      | `number` |             |
+| `endColumn` | Yes      | `number` |             |
+| `endLine`   | Yes      | `number` |             |
+| `line`      | Yes      | `number` |             |
+| `module`    | Yes      | `string` |             |
+| `start`     | Yes      | `number` |             |
+
+## ApplicationModule
+
+An inventoried module with a digest of the exact bytes parsed, including syntax failures.
+
+| Field        | Required | Type          | Description |
+| ------------ | -------- | ------------- | ----------- |
+| `bytes`      | Yes      | `string`      |             |
+| `functions`  | Yes      | `number`      |             |
+| `id`         | Yes      | `string`      |             |
+| `imports`    | Yes      | `number`      |             |
+| `parseError` | Yes      | `null,string` |             |
+| `path`       | Yes      | `string`      |             |
+| `sha256`     | Yes      | `string`      |             |
+| `sourceMap`  | Yes      | `null,string` |             |
+
 ## ApprovalRequestedData
 
 The payload of a {@link GATEWAY_EVENTS.ApprovalRequested} event.
@@ -3459,6 +3513,24 @@ Attaching access, reading data, and placing computation are different operations
 
 Type: `"attach"` / `"compute"` / `"read"`.
 
+## ReverseApplicationSnapshot
+
+Bounded projection for live Chat events; complete indexes are paged by the native query tool.
+
+| Field              | Required | Type                                                            | Description |
+| ------------------ | -------- | --------------------------------------------------------------- | ----------- |
+| `boundaries`       | Yes      | Array of [ApplicationBoundary](protocol.md#applicationboundary) |             |
+| `functionCount`    | Yes      | `number`                                                        |             |
+| `importCount`      | Yes      | `number`                                                        |             |
+| `ipcCount`         | Yes      | `number`                                                        |             |
+| `issueCount`       | Yes      | `number`                                                        |             |
+| `issues`           | Yes      | Array of [ApplicationIssue](protocol.md#applicationissue)       |             |
+| `moduleCount`      | Yes      | `number`                                                        |             |
+| `modules`          | Yes      | Array of [ApplicationModule](protocol.md#applicationmodule)     |             |
+| `nativeAddonCount` | Yes      | `number`                                                        |             |
+| `routeCount`       | Yes      | `number`                                                        |             |
+| `sourceMapCount`   | Yes      | `number`                                                        |             |
+
 ## ReverseEvidenceRecord
 
 Provenance for one immutable evidence file, shared by specialists in the same run.
@@ -3499,20 +3571,22 @@ An evidence-linked follow-up requested by a specialist and executed by the runti
 
 Bounded, capability-free projection carried by live tool events and the final receipt.
 
-| Field           | Required | Type                                                                | Description |
-| --------------- | -------- | ------------------------------------------------------------------- | ----------- |
-| `cleanupErrors` | Yes      | Array of `string`                                                   |             |
-| `evidence`      | Yes      | Array of [ReverseEvidenceRecord](protocol.md#reverseevidencerecord) |             |
-| `evidenceCount` | Yes      | `number`                                                            |             |
-| `id`            | Yes      | `string`                                                            |             |
-| `inputName`     | Yes      | `string`                                                            |             |
-| `plan`          | No       | Array of [ReversePlanStep](protocol.md#reverseplanstep)             |             |
-| `question`      | Yes      | `string`                                                            |             |
-| `revision`      | Yes      | `string`                                                            |             |
-| `sha256`        | Yes      | `string`                                                            |             |
-| `state`         | Yes      | [ReverseState](protocol.md#reversestate)                            |             |
-| `tasks`         | Yes      | Array of [ReverseTaskSnapshot](protocol.md#reversetasksnapshot)     |             |
-| `version`       | Yes      | `1`                                                                 |             |
+| Field           | Required | Type                                                                 | Description                                                                                     |
+| --------------- | -------- | -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `application`   | No       | [ReverseApplicationSnapshot](protocol.md#reverseapplicationsnapshot) | Bounded projection for live Chat events; complete indexes are paged by the native query tool.   |
+| `cleanupErrors` | Yes      | Array of `string`                                                    |                                                                                                 |
+| `evidence`      | Yes      | Array of [ReverseEvidenceRecord](protocol.md#reverseevidencerecord)  |                                                                                                 |
+| `evidenceCount` | Yes      | `number`                                                             |                                                                                                 |
+| `id`            | Yes      | `string`                                                             |                                                                                                 |
+| `inputName`     | Yes      | `string`                                                             |                                                                                                 |
+| `kind`          | No       | `"javascript"` / `"native"`                                          | The runtime selects a target adapter; callers may make the choice explicit for ambiguous files. |
+| `plan`          | No       | Array of [ReversePlanStep](protocol.md#reverseplanstep)              |                                                                                                 |
+| `question`      | Yes      | `string`                                                             |                                                                                                 |
+| `revision`      | Yes      | `string`                                                             |                                                                                                 |
+| `sha256`        | Yes      | `string`                                                             |                                                                                                 |
+| `state`         | Yes      | [ReverseState](protocol.md#reversestate)                             |                                                                                                 |
+| `tasks`         | Yes      | Array of [ReverseTaskSnapshot](protocol.md#reversetasksnapshot)      |                                                                                                 |
+| `version`       | Yes      | `1`                                                                  |                                                                                                 |
 
 ## ReverseState
 
