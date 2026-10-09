@@ -1,5 +1,7 @@
 import type { NetworkBody, NetworkRequest, ReverseNetworkSnapshot } from '../protocol/Protocol.js';
 
+import { NetworkSourceReceipt } from './NetworkSourceReceipt.js';
+
 /** Portable bounds for capability-free HAR previews; payloads remain in paged evidence storage. */
 export class NetworkReceipt {
     /** Validates counts, source entry pointers and original payload digests after wire-shape validation. */
@@ -11,8 +13,10 @@ export class NetworkReceipt {
             value.issueCount,
         ];
         if (
-            value.format !== 'har' ||
-            value.version !== '1.2' ||
+            !(
+                (value.format === 'har' && value.version === '1.2') ||
+                (value.format === 'mitmproxy' && value.version === '12.2.3')
+            ) ||
             counts.some(
                 (count: number): boolean =>
                     !Number.isSafeInteger(count) || count < 0 || count > 300000,
@@ -31,6 +35,9 @@ export class NetworkReceipt {
         }
         for (const request of value.requests) {
             this.request(request);
+            if ((value.format === 'mitmproxy') !== (request.native !== undefined)) {
+                throw new RangeError('Capture format changed');
+            }
             if (BigInt(request.id.slice(6)) >= BigInt(value.entryCount)) {
                 throw new RangeError('Invalid HAR request provenance');
             }
@@ -45,21 +52,30 @@ export class NetworkReceipt {
     }
     /** Shared request checks support compact progress previews and full metadata directory rows. */
     public static request(request: NetworkRequest, maximumUrl: number = 512): void {
-        const index: string | undefined = /^entry:(0|[1-9][0-9]{0,4})$/u.exec(request.id)?.[1];
         if (
-            index === undefined ||
-            request.location !== `$.log.entries[${index}]` ||
-            request.url.length > maximumUrl ||
-            request.method.length > 32 ||
+            !NetworkSourceReceipt.request(request) ||
+            (request.url?.length ?? 0) > maximumUrl ||
+            (request.method?.length ?? 0) > 32 ||
             request.mimeType.length > 256 ||
-            request.startedDateTime.length > 128 ||
-            !Number.isFinite(Date.parse(request.startedDateTime)) ||
-            !Number.isInteger(request.status) ||
-            request.status < 0 ||
-            request.status > 999 ||
-            !Number.isFinite(request.durationMs) ||
-            request.durationMs < 0 ||
-            request.durationMs > Number.MAX_SAFE_INTEGER ||
+            (request.startedDateTime !== null &&
+                (request.startedDateTime.length > 128 ||
+                    !Number.isFinite(Date.parse(request.startedDateTime)))) ||
+            (request.status !== null &&
+                (!Number.isInteger(request.status) ||
+                    request.status < 0 ||
+                    request.status > 999)) ||
+            (request.durationMs !== null &&
+                (!Number.isFinite(request.durationMs) ||
+                    request.durationMs < 0 ||
+                    request.durationMs > Number.MAX_SAFE_INTEGER)) ||
+            (request.native === undefined &&
+                [
+                    request.url,
+                    request.method,
+                    request.startedDateTime,
+                    request.status,
+                    request.durationMs,
+                ].includes(null)) ||
             request.mimeType !== request.responseBody.mimeType ||
             Object.keys(request).some(
                 (key: string): boolean =>
@@ -77,6 +93,7 @@ export class NetworkReceipt {
                         'responseBody',
                         'requestEvidenceId',
                         'responseEvidenceId',
+                        'native',
                     ].includes(key),
             )
         ) {

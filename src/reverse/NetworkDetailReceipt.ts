@@ -1,5 +1,6 @@
 import type { ReverseNetworkDetailPage } from '../protocol/Protocol.js';
 import { reverseNetworkDetail } from '../protocol/Validators.js';
+import { NetworkSourceReceipt } from './NetworkSourceReceipt.js';
 import { NetworkReceipt } from './NetworkReceipt.js';
 
 /** Portable validation of immutable request projections, separate from agent-selected evidence. */
@@ -9,14 +10,12 @@ export class NetworkDetailReceipt {
         if (!reverseNetworkDetail(input)) {
             throw new TypeError('Invalid saved request detail page');
         }
-        const index: string | undefined = /^entry:(0|[1-9][0-9]{0,4})$/u.exec(input.selector)?.[1];
         if (
             input.runId.length === 0 ||
             input.runId.length > 128 ||
             !/^[a-f0-9]{64}$/u.test(input.sha256) ||
             !/^[a-f0-9]{64}$/u.test(input.captureSha256) ||
-            index === undefined ||
-            input.location !== `$.log.entries[${index}]` ||
+            !NetworkSourceReceipt.location(input.selector, input.location) ||
             !this.#decimal(input.cursor) ||
             !this.#decimal(input.characters) ||
             (input.nextCursor !== null && !this.#decimal(input.nextCursor)) ||
@@ -47,7 +46,7 @@ export class NetworkDetailReceipt {
         const characters: bigint = BigInt(input.characters);
         const next: bigint = cursor + BigInt(input.text.length);
         if (
-            characters > 8_388_608n ||
+            characters > (input.view === 'reported' ? 67_108_864n : 8_388_608n) ||
             cursor > characters ||
             next > characters ||
             (input.text.length === 0 && cursor < characters) ||
@@ -58,7 +57,10 @@ export class NetworkDetailReceipt {
             throw new RangeError('Inconsistent saved request detail pagination');
         }
         const payload: boolean = input.view === 'request-body' || input.view === 'response-body';
-        if (payload !== (input.body !== null) || (!payload && input.unavailable !== null)) {
+        if (
+            payload !== (input.body !== null) ||
+            (!payload && input.view !== 'reported' && input.unavailable !== null)
+        ) {
             throw new TypeError('Saved request detail representation changed');
         }
         if (input.body !== null) {

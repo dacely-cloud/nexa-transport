@@ -4480,6 +4480,25 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'workflows.runs.inputs': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/WorkflowRunOutputRequest',
+                        },
+                        result: {
+                            anyOf: [
+                                {
+                                    $ref: '#/definitions/WorkflowRunOutputPage',
+                                },
+                                {
+                                    type: 'null',
+                                },
+                            ],
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'workflows.runs.list': {
                     properties: {
                         params: {
@@ -4756,6 +4775,7 @@ export const schema: Schema = {
                 'workflows.runs.artifact',
                 'workflows.runs.cancel',
                 'workflows.runs.events',
+                'workflows.runs.inputs',
                 'workflows.runs.list',
                 'workflows.runs.output',
                 'workflows.runs.read',
@@ -6907,12 +6927,19 @@ export const schema: Schema = {
                 'Request detail views share stable source pointers and independently paged text.\nOne saved request representation.',
             enum: [
                 'query',
+                'reported',
                 'request-body',
                 'request-headers',
                 'response-body',
                 'response-headers',
                 'timings',
             ],
+            type: 'string',
+        },
+        NetworkFormat: {
+            description:
+                'Source formats decoded without replaying captured traffic.\nSupported capture formats.',
+            enum: ['har', 'mitmproxy'],
             type: 'string',
         },
         NetworkIssue: {
@@ -6928,11 +6955,37 @@ export const schema: Schema = {
             required: ['location', 'message'],
             type: 'object',
         },
+        NetworkNativeSource: {
+            description:
+                'Native coordinates are exact decimal byte offsets in the immutable input.',
+            properties: {
+                end: {
+                    type: 'string',
+                },
+                flowId: {
+                    type: ['null', 'string'],
+                },
+                flowType: {
+                    type: ['null', 'string'],
+                },
+                ordinal: {
+                    type: 'string',
+                },
+                start: {
+                    type: 'string',
+                },
+                stateVersion: {
+                    type: ['null', 'string'],
+                },
+            },
+            required: ['end', 'flowId', 'flowType', 'ordinal', 'start', 'stateVersion'],
+            type: 'object',
+        },
         NetworkRequest: {
             description: 'Compact request directory row with an immutable HAR JSON pointer.',
             properties: {
                 durationMs: {
-                    type: 'number',
+                    type: ['null', 'number'],
                 },
                 id: {
                     type: 'string',
@@ -6941,10 +6994,15 @@ export const schema: Schema = {
                     type: 'string',
                 },
                 method: {
-                    type: 'string',
+                    type: ['null', 'string'],
                 },
                 mimeType: {
                     type: 'string',
+                },
+                native: {
+                    $ref: '#/definitions/NetworkNativeSource',
+                    description:
+                        'Native coordinates are exact decimal byte offsets in the immutable input.',
                 },
                 requestBody: {
                     $ref: '#/definitions/NetworkBody',
@@ -6953,13 +7011,13 @@ export const schema: Schema = {
                     $ref: '#/definitions/NetworkBody',
                 },
                 startedDateTime: {
-                    type: 'string',
+                    type: ['null', 'string'],
                 },
                 status: {
-                    type: 'number',
+                    type: ['null', 'number'],
                 },
                 url: {
-                    type: 'string',
+                    type: ['null', 'string'],
                 },
                 urlTruncated: {
                     type: 'boolean',
@@ -8791,7 +8849,7 @@ export const schema: Schema = {
                 'A request retains metadata even when no agent has captured either payload.',
             properties: {
                 durationMs: {
-                    type: 'number',
+                    type: ['null', 'number'],
                 },
                 id: {
                     type: 'string',
@@ -8800,10 +8858,15 @@ export const schema: Schema = {
                     type: 'string',
                 },
                 method: {
-                    type: 'string',
+                    type: ['null', 'string'],
                 },
                 mimeType: {
                     type: 'string',
+                },
+                native: {
+                    $ref: '#/definitions/NetworkNativeSource',
+                    description:
+                        'Native coordinates are exact decimal byte offsets in the immutable input.',
                 },
                 requestBody: {
                     $ref: '#/definitions/NetworkBody',
@@ -8818,13 +8881,13 @@ export const schema: Schema = {
                     type: ['null', 'string'],
                 },
                 startedDateTime: {
-                    type: 'string',
+                    type: ['null', 'string'],
                 },
                 status: {
-                    type: 'number',
+                    type: ['null', 'number'],
                 },
                 url: {
-                    type: 'string',
+                    type: ['null', 'string'],
                 },
                 urlTruncated: {
                     type: 'boolean',
@@ -8855,8 +8918,7 @@ export const schema: Schema = {
                     type: 'number',
                 },
                 format: {
-                    const: 'har',
-                    type: 'string',
+                    $ref: '#/definitions/NetworkFormat',
                 },
                 issueCount: {
                     type: 'number',
