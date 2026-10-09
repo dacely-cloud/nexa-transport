@@ -314,6 +314,22 @@ Variant 2: Object (fields below)
 | `kind` | Yes      | `"url"`  |             |
 | `url`  | Yes      | `string` |             |
 
+## BrowserAccessibilityNode
+
+Accessibility node identity and backend links never imply that names or values were read.
+
+| Field             | Required | Type              | Description |
+| ----------------- | -------- | ----------------- | ----------- |
+| `backendNodeId`   | Yes      | `null,string`     |             |
+| `childCount`      | Yes      | `string`          |             |
+| `depth`           | Yes      | `null,number`     |             |
+| `id`              | Yes      | `string`          |             |
+| `ignored`         | Yes      | `boolean`         |             |
+| `kind`            | Yes      | `"accessibility"` |             |
+| `missingChildren` | Yes      | `string`          |             |
+| `parentId`        | Yes      | `null,string`     |             |
+| `role`            | Yes      | `null,string`     |             |
+
 ## BrowserActivityConsole
 
 Delivered console argument types and an optional validated source, without primitive values.
@@ -457,6 +473,181 @@ WebSocket payloads are reduced immediately to direction, opcode and byte count.
 | `requestId` | Yes      | `string`      |             |
 | `timestamp` | Yes      | `string`      |             |
 | `url`       | Yes      | `string`      |             |
+
+## BrowserAttributeName
+
+An attribute directory contains names only.
+
+| Field    | Required | Type          | Description |
+| -------- | -------- | ------------- | ----------- |
+| `index`  | Yes      | `number`      |             |
+| `kind`   | Yes      | `"attribute"` |             |
+| `name`   | Yes      | `string`      |             |
+| `nodeId` | Yes      | `string`      |             |
+
+## BrowserDomNode
+
+DOM node identity is local to this capture, with attribute values and text excluded.
+
+| Field             | Required | Type                                                 | Description |
+| ----------------- | -------- | ---------------------------------------------------- | ----------- |
+| `attributeCount`  | Yes      | `string`                                             |             |
+| `backendNodeId`   | Yes      | `null,string`                                        |             |
+| `childCount`      | Yes      | `string`                                             |             |
+| `depth`           | Yes      | `number`                                             |             |
+| `id`              | Yes      | `string`                                             |             |
+| `kind`            | Yes      | `"dom"`                                              |             |
+| `localName`       | Yes      | `string`                                             |             |
+| `missingChildren` | Yes      | `string`                                             |             |
+| `name`            | Yes      | `string`                                             |             |
+| `nodeType`        | Yes      | `number`                                             |             |
+| `parentId`        | Yes      | `null,string`                                        |             |
+| `relation`        | Yes      | [BrowserDomRelation](protocol.md#browserdomrelation) |             |
+| `valueLength`     | Yes      | `string`                                             |             |
+
+## BrowserDomRelation
+
+The containment relation preserves the difference between light DOM, shadow and embedded documents.
+
+Type: `"child"` / `"content-document"` / `"document"` / `"imported-document"` / `"pseudo-element"` / `"shadow-root"` / `"template-content"`.
+
+## BrowserPageProjection
+
+One passive structure inspection tied to a stable selected document.
+
+| Field                    | Required | Type                                                                 | Description |
+| ------------------------ | -------- | -------------------------------------------------------------------- | ----------- |
+| `accessibility`          | Yes      | [BrowserStructureProjection](protocol.md#browserstructureprojection) |             |
+| `capturedAt`             | Yes      | `string`                                                             |             |
+| `dom`                    | Yes      | [BrowserStructureProjection](protocol.md#browserstructureprojection) |             |
+| `frameId`                | Yes      | `string`                                                             |             |
+| `limitations`            | Yes      | Array of `string`                                                    |             |
+| `origin`                 | Yes      | `string`                                                             |             |
+| `priorActivityAvailable` | Yes      | `false`                                                              |             |
+| `provider`               | Yes      | `"cdp-passive"`                                                      |             |
+| `targetId`               | Yes      | `string`                                                             |             |
+| `url`                    | Yes      | `string`                                                             |             |
+
+## BrowserStructureCount
+
+Value-free DOM tag and accessibility role counts.
+
+| Field   | Required | Type     | Description |
+| ------- | -------- | -------- | ----------- |
+| `count` | Yes      | `string` |             |
+| `name`  | Yes      | `string` |             |
+
+## BrowserStructurePage
+
+One independently selected, bounded topology or attribute directory.
+
+| Field           | Required | Type                                                            | Description |
+| --------------- | -------- | --------------------------------------------------------------- | ----------- |
+| `captureSha256` | Yes      | `string`                                                        |             |
+| `cursor`        | Yes      | `string`                                                        |             |
+| `evidenceId`    | Yes      | `string`                                                        |             |
+| `metadata`      | Yes      | [BrowserPageProjection](protocol.md#browserpageprojection)      |             |
+| `nextCursor`    | Yes      | `null,string`                                                   |             |
+| `records`       | Yes      | Array of [BrowserStructureRow](protocol.md#browserstructurerow) |             |
+| `runId`         | Yes      | `string`                                                        |             |
+| `selector`      | Yes      | `string`                                                        |             |
+| `sha256`        | Yes      | `string`                                                        |             |
+| `total`         | Yes      | `string`                                                        |             |
+| `view`          | Yes      | [BrowserStructureView](protocol.md#browserstructureview)        |             |
+
+## BrowserStructureProjection
+
+Bounded structure coverage does not imply that page text or earlier activity was inspected.
+
+| Field                 | Required | Type                                                                | Description |
+| --------------------- | -------- | ------------------------------------------------------------------- | ----------- |
+| `available`           | Yes      | `boolean`                                                           |             |
+| `countPreviewPartial` | Yes      | `boolean`                                                           |             |
+| `counts`              | Yes      | Array of [BrowserStructureCount](protocol.md#browserstructurecount) |             |
+| `nodes`               | Yes      | `string`                                                            |             |
+| `partial`             | Yes      | `boolean`                                                           |             |
+
+## BrowserStructureQuery
+
+Selectors are all, roots, node:ID, children:ID or attributes:ID; authority is never supplied by a selector.
+
+| Field        | Required | Type                                                     | Description |
+| ------------ | -------- | -------------------------------------------------------- | ----------- |
+| `cursor`     | No       | `string`                                                 |             |
+| `evidenceId` | Yes      | `string`                                                 |             |
+| `id`         | Yes      | `string`                                                 |             |
+| `runId`      | Yes      | `string`                                                 |             |
+| `selector`   | No       | `string`                                                 |             |
+| `view`       | Yes      | [BrowserStructureView](protocol.md#browserstructureview) |             |
+
+## BrowserStructureRow
+
+Each response row has an explicit representation discriminator.
+
+Variant 1: [BrowserDomNode](protocol.md#browserdomnode)
+
+| Field             | Required | Type                                                 | Description |
+| ----------------- | -------- | ---------------------------------------------------- | ----------- |
+| `attributeCount`  | Yes      | `string`                                             |             |
+| `backendNodeId`   | Yes      | `null,string`                                        |             |
+| `childCount`      | Yes      | `string`                                             |             |
+| `depth`           | Yes      | `number`                                             |             |
+| `id`              | Yes      | `string`                                             |             |
+| `kind`            | Yes      | `"dom"`                                              |             |
+| `localName`       | Yes      | `string`                                             |             |
+| `missingChildren` | Yes      | `string`                                             |             |
+| `name`            | Yes      | `string`                                             |             |
+| `nodeType`        | Yes      | `number`                                             |             |
+| `parentId`        | Yes      | `null,string`                                        |             |
+| `relation`        | Yes      | [BrowserDomRelation](protocol.md#browserdomrelation) |             |
+| `valueLength`     | Yes      | `string`                                             |             |
+
+Variant 2: [BrowserAccessibilityNode](protocol.md#browseraccessibilitynode)
+
+| Field             | Required | Type              | Description |
+| ----------------- | -------- | ----------------- | ----------- |
+| `backendNodeId`   | Yes      | `null,string`     |             |
+| `childCount`      | Yes      | `string`          |             |
+| `depth`           | Yes      | `null,number`     |             |
+| `id`              | Yes      | `string`          |             |
+| `ignored`         | Yes      | `boolean`         |             |
+| `kind`            | Yes      | `"accessibility"` |             |
+| `missingChildren` | Yes      | `string`          |             |
+| `parentId`        | Yes      | `null,string`     |             |
+| `role`            | Yes      | `null,string`     |             |
+
+Variant 3: [BrowserAttributeName](protocol.md#browserattributename)
+
+| Field    | Required | Type          | Description |
+| -------- | -------- | ------------- | ----------- |
+| `index`  | Yes      | `number`      |             |
+| `kind`   | Yes      | `"attribute"` |             |
+| `name`   | Yes      | `string`      |             |
+| `nodeId` | Yes      | `string`      |             |
+
+## BrowserStructureSnapshot
+
+A progress receipt references structure without carrying complete trees.
+
+| Field                    | Required | Type                                                                 | Description |
+| ------------------------ | -------- | -------------------------------------------------------------------- | ----------- |
+| `accessibility`          | Yes      | [BrowserStructureProjection](protocol.md#browserstructureprojection) |             |
+| `capturedAt`             | Yes      | `string`                                                             |             |
+| `dom`                    | Yes      | [BrowserStructureProjection](protocol.md#browserstructureprojection) |             |
+| `frameId`                | Yes      | `string`                                                             |             |
+| `limitations`            | Yes      | Array of `string`                                                    |             |
+| `origin`                 | Yes      | `string`                                                             |             |
+| `priorActivityAvailable` | Yes      | `false`                                                              |             |
+| `provider`               | Yes      | `"cdp-passive"`                                                      |             |
+| `reference`              | Yes      | [ReverseBrowserReference](protocol.md#reversebrowserreference)       |             |
+| `targetId`               | Yes      | `string`                                                             |             |
+| `url`                    | Yes      | `string`                                                             |             |
+
+## BrowserStructureView
+
+Independent tree representations use the same immutable document capture.
+
+Type: `"accessibility"` / `"dom"`.
 
 ## Budget
 
@@ -1379,6 +1570,7 @@ Configurable bounds on gateway-owned work and memory.
 | `processes.resize`                  | Yes      | Object (fields below) |                                                                                            |
 | `processes.stop`                    | Yes      | Object (fields below) |                                                                                            |
 | `reverse.browser`                   | Yes      | Object (fields below) |                                                                                            |
+| `reverse.browser.structure`         | Yes      | Object (fields below) |                                                                                            |
 | `reverse.catalog`                   | Yes      | Object (fields below) |                                                                                            |
 | `reverse.evidence`                  | Yes      | Object (fields below) |                                                                                            |
 | `reverse.functions`                 | Yes      | Object (fields below) |                                                                                            |
@@ -1902,6 +2094,13 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ------------------------------------------------------ | ----------- |
 | `params` | Yes      | [ReverseBrowserQuery](protocol.md#reversebrowserquery) |             |
 | `result` | Yes      | [ReverseBrowserPage](protocol.md#reversebrowserpage)   |             |
+
+**reverse.browser.structure**
+
+| Field    | Required | Type                                                       | Description |
+| -------- | -------- | ---------------------------------------------------------- | ----------- |
+| `params` | Yes      | [BrowserStructureQuery](protocol.md#browserstructurequery) |             |
+| `result` | Yes      | [BrowserStructurePage](protocol.md#browserstructurepage)   |             |
 
 **reverse.catalog**
 
@@ -4448,26 +4647,27 @@ An evidence-linked follow-up requested by a specialist and executed by the runti
 
 Bounded, capability-free projection carried by live tool events and the final receipt.
 
-| Field           | Required | Type                                                                 | Description                                                                                     |
-| --------------- | -------- | -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `application`   | No       | [ReverseApplicationSnapshot](protocol.md#reverseapplicationsnapshot) | Bounded projection for live Chat events; complete indexes are paged by the native query tool.   |
-| `archive`       | No       | [ReverseArchiveRef](protocol.md#reversearchiveref)                   | A session-owned archive, without query tokens or analyzer handles.                              |
-| `browser`       | No       | [ReverseBrowserSnapshot](protocol.md#reversebrowsersnapshot)         | A live run carries capture metadata and an event count, never all event rows.                   |
-| `cleanupErrors` | Yes      | Array of `string`                                                    |                                                                                                 |
-| `evidence`      | Yes      | Array of [ReverseEvidenceRecord](protocol.md#reverseevidencerecord)  |                                                                                                 |
-| `evidenceCount` | Yes      | `number`                                                             |                                                                                                 |
-| `execution`     | No       | `number`                                                             | Explicit resumed execution epoch; absent means the original execution.                          |
-| `id`            | Yes      | `string`                                                             |                                                                                                 |
-| `inputName`     | Yes      | `string`                                                             |                                                                                                 |
-| `kind`          | No       | `"browser"` / `"javascript"` / `"native"` / `"network"` / `"source"` | The runtime selects a target adapter; callers may make the choice explicit for ambiguous files. |
-| `network`       | No       | [ReverseNetworkSnapshot](protocol.md#reversenetworksnapshot)         | Bounded capability-free projection; full entries and payloads require paged evidence queries.   |
-| `plan`          | No       | Array of [ReversePlanStep](protocol.md#reverseplanstep)              |                                                                                                 |
-| `question`      | Yes      | `string`                                                             |                                                                                                 |
-| `revision`      | Yes      | `string`                                                             |                                                                                                 |
-| `sha256`        | Yes      | `string`                                                             |                                                                                                 |
-| `state`         | Yes      | [ReverseState](protocol.md#reversestate)                             |                                                                                                 |
-| `tasks`         | Yes      | Array of [ReverseTaskSnapshot](protocol.md#reversetasksnapshot)      |                                                                                                 |
-| `version`       | Yes      | `1`                                                                  |                                                                                                 |
+| Field              | Required | Type                                                                 | Description                                                                                     |
+| ------------------ | -------- | -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `application`      | No       | [ReverseApplicationSnapshot](protocol.md#reverseapplicationsnapshot) | Bounded projection for live Chat events; complete indexes are paged by the native query tool.   |
+| `archive`          | No       | [ReverseArchiveRef](protocol.md#reversearchiveref)                   | A session-owned archive, without query tokens or analyzer handles.                              |
+| `browser`          | No       | [ReverseBrowserSnapshot](protocol.md#reversebrowsersnapshot)         | A live run carries capture metadata and an event count, never all event rows.                   |
+| `browserStructure` | No       | [BrowserStructureSnapshot](protocol.md#browserstructuresnapshot)     | A progress receipt references structure without carrying complete trees.                        |
+| `cleanupErrors`    | Yes      | Array of `string`                                                    |                                                                                                 |
+| `evidence`         | Yes      | Array of [ReverseEvidenceRecord](protocol.md#reverseevidencerecord)  |                                                                                                 |
+| `evidenceCount`    | Yes      | `number`                                                             |                                                                                                 |
+| `execution`        | No       | `number`                                                             | Explicit resumed execution epoch; absent means the original execution.                          |
+| `id`               | Yes      | `string`                                                             |                                                                                                 |
+| `inputName`        | Yes      | `string`                                                             |                                                                                                 |
+| `kind`             | No       | `"browser"` / `"javascript"` / `"native"` / `"network"` / `"source"` | The runtime selects a target adapter; callers may make the choice explicit for ambiguous files. |
+| `network`          | No       | [ReverseNetworkSnapshot](protocol.md#reversenetworksnapshot)         | Bounded capability-free projection; full entries and payloads require paged evidence queries.   |
+| `plan`             | No       | Array of [ReversePlanStep](protocol.md#reverseplanstep)              |                                                                                                 |
+| `question`         | Yes      | `string`                                                             |                                                                                                 |
+| `revision`         | Yes      | `string`                                                             |                                                                                                 |
+| `sha256`           | Yes      | `string`                                                             |                                                                                                 |
+| `state`            | Yes      | [ReverseState](protocol.md#reversestate)                             |                                                                                                 |
+| `tasks`            | Yes      | Array of [ReverseTaskSnapshot](protocol.md#reversetasksnapshot)      |                                                                                                 |
+| `version`          | Yes      | `1`                                                                  |                                                                                                 |
 
 ## ReverseState
 

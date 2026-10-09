@@ -1,5 +1,6 @@
 import type {
     ReverseBrowserPage,
+    BrowserStructurePage,
     ReverseGraphPage,
     ReverseRunSnapshot,
     ReverseTaskSnapshot,
@@ -11,6 +12,7 @@ import type {
     ReverseNetworkDirectoryPage,
     ReverseNetworkDetailPage,
 } from '../protocol/Protocol.js';
+import { BrowserStructureReceipt } from './BrowserStructureReceipt.js';
 import { BrowserReceipt } from './BrowserReceipt.js';
 import { reverseSnapshot } from '../protocol/Validators.js';
 import { GraphReceipt } from './GraphReceipt.js';
@@ -61,6 +63,16 @@ export class ReverseInvestigation {
                 throw new TypeError('Browser projection requires a browser target');
             }
             BrowserReceipt.snapshot(input.browser, input.id, input.archive?.sessionId);
+        }
+        if (input.browserStructure !== undefined) {
+            if (input.kind !== 'browser') {
+                throw new TypeError('Browser structure requires a browser target');
+            }
+            BrowserStructureReceipt.snapshot(
+                input.browserStructure,
+                input.id,
+                input.archive?.sessionId,
+            );
         }
         if (input.application !== undefined) {
             if (input.kind !== 'javascript' && input.kind !== 'source') {
@@ -157,6 +169,11 @@ export class ReverseInvestigation {
     /** Validates bounded saved browser metadata returned by the session-owned archive RPC. */
     public static browser(input: unknown): ReverseBrowserPage {
         return BrowserReceipt.read(input);
+    }
+
+    /** Validates one bounded saved DOM/AX or attribute directory over the session-owned gateway. */
+    public static structure(input: unknown): BrowserStructurePage {
+        return BrowserStructureReceipt.read(input);
     }
 
     /** Validates full catalog pages returned by the session-owned archive RPC. */

@@ -123,7 +123,7 @@ export class BrowserReceipt {
         ) {
             throw new RangeError('Invalid browser observation metadata');
         }
-        this.#url(value.url, value.origin);
+        this.url(value.url, value.origin);
         const coverage: ReverseBrowserMetadata['coverage'] = value.coverage;
         this.#keys(coverage, [
             'priorActivityAvailable',
@@ -178,7 +178,7 @@ export class BrowserReceipt {
                 'redirectedTo',
                 'reusedWithoutRedirect',
             ]);
-            this.#url(row.url, origin);
+            this.url(row.url, origin);
             this.#location(row.initiator, origin);
             if (
                 !this.#identity(row.requestId) ||
@@ -280,7 +280,7 @@ export class BrowserReceipt {
                 'bytes',
                 'timestamp',
             ]);
-            this.#url(row.url, origin, true);
+            this.url(row.url, origin, true);
             if (
                 !this.#identity(row.requestId) ||
                 !['sent', 'received'].includes(row.direction) ||
@@ -292,7 +292,7 @@ export class BrowserReceipt {
             }
         } else {
             this.#keys(row, ['kind', 'ordinal', 'url', 'sameDocument']);
-            this.#url(row.url, origin);
+            this.url(row.url, origin);
         }
     }
     static #location(value: BrowserActivityLocation | null, origin: string): void {
@@ -300,12 +300,13 @@ export class BrowserReceipt {
             return;
         }
         this.#keys(value, ['url', 'line', 'column']);
-        this.#url(value.url, origin);
+        this.url(value.url, origin);
         if (!this.#integer(value.line, 10000000) || !this.#integer(value.column, 10000000)) {
             throw new RangeError('Invalid browser source location');
         }
     }
-    static #url(value: string, origin: string, socket: boolean = false): void {
+    /** Requires the selected origin and redacted known credentials without rewriting producer metadata. */
+    public static url(value: string, origin: string, socket: boolean = false): void {
         if (value.length > 4096) {
             throw new RangeError('Browser URL exceeds presentation limits');
         }

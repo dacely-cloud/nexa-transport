@@ -708,6 +708,51 @@
             ],
             "description": "Where binary content comes from: inline base64, or a URL the provider fetches."
         },
+        "BrowserAccessibilityNode": {
+            "description": "Accessibility node identity and backend links never imply that names or values were read.",
+            "properties": {
+                "backendNodeId": {
+                    "type": ["null", "string"]
+                },
+                "childCount": {
+                    "type": "string"
+                },
+                "depth": {
+                    "type": ["null", "number"]
+                },
+                "id": {
+                    "type": "string"
+                },
+                "ignored": {
+                    "type": "boolean"
+                },
+                "kind": {
+                    "const": "accessibility",
+                    "type": "string"
+                },
+                "missingChildren": {
+                    "type": "string"
+                },
+                "parentId": {
+                    "type": ["null", "string"]
+                },
+                "role": {
+                    "type": ["null", "string"]
+                }
+            },
+            "required": [
+                "backendNodeId",
+                "childCount",
+                "depth",
+                "id",
+                "ignored",
+                "kind",
+                "missingChildren",
+                "parentId",
+                "role"
+            ],
+            "type": "object"
+        },
         "BrowserActivityConsole": {
             "description": "Delivered console argument types and an optional validated source, without primitive values.",
             "properties": {
@@ -954,6 +999,347 @@
                 "url"
             ],
             "type": "object"
+        },
+        "BrowserAttributeName": {
+            "description": "An attribute directory contains names only.",
+            "properties": {
+                "index": {
+                    "type": "number"
+                },
+                "kind": {
+                    "const": "attribute",
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "nodeId": {
+                    "type": "string"
+                }
+            },
+            "required": ["index", "kind", "name", "nodeId"],
+            "type": "object"
+        },
+        "BrowserDomNode": {
+            "description": "DOM node identity is local to this capture, with attribute values and text excluded.",
+            "properties": {
+                "attributeCount": {
+                    "type": "string"
+                },
+                "backendNodeId": {
+                    "type": ["null", "string"]
+                },
+                "childCount": {
+                    "type": "string"
+                },
+                "depth": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "kind": {
+                    "const": "dom",
+                    "type": "string"
+                },
+                "localName": {
+                    "type": "string"
+                },
+                "missingChildren": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "nodeType": {
+                    "type": "number"
+                },
+                "parentId": {
+                    "type": ["null", "string"]
+                },
+                "relation": {
+                    "$ref": "#/definitions/BrowserDomRelation"
+                },
+                "valueLength": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "attributeCount",
+                "backendNodeId",
+                "childCount",
+                "depth",
+                "id",
+                "kind",
+                "localName",
+                "missingChildren",
+                "name",
+                "nodeType",
+                "parentId",
+                "relation",
+                "valueLength"
+            ],
+            "type": "object"
+        },
+        "BrowserDomRelation": {
+            "description": "The containment relation preserves the difference between light DOM, shadow and embedded documents.\nFinite DOM containment relations.",
+            "enum": [
+                "child",
+                "content-document",
+                "document",
+                "imported-document",
+                "pseudo-element",
+                "shadow-root",
+                "template-content"
+            ],
+            "type": "string"
+        },
+        "BrowserPageProjection": {
+            "description": "One passive structure inspection tied to a stable selected document.",
+            "properties": {
+                "accessibility": {
+                    "$ref": "#/definitions/BrowserStructureProjection"
+                },
+                "capturedAt": {
+                    "type": "string"
+                },
+                "dom": {
+                    "$ref": "#/definitions/BrowserStructureProjection"
+                },
+                "frameId": {
+                    "type": "string"
+                },
+                "limitations": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "origin": {
+                    "type": "string"
+                },
+                "priorActivityAvailable": {
+                    "const": false,
+                    "type": "boolean"
+                },
+                "provider": {
+                    "const": "cdp-passive",
+                    "type": "string"
+                },
+                "targetId": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "accessibility",
+                "capturedAt",
+                "dom",
+                "frameId",
+                "limitations",
+                "origin",
+                "priorActivityAvailable",
+                "provider",
+                "targetId",
+                "url"
+            ],
+            "type": "object"
+        },
+        "BrowserStructureCount": {
+            "description": "Value-free DOM tag and accessibility role counts.",
+            "properties": {
+                "count": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            },
+            "required": ["count", "name"],
+            "type": "object"
+        },
+        "BrowserStructurePage": {
+            "description": "One independently selected, bounded topology or attribute directory.",
+            "properties": {
+                "captureSha256": {
+                    "type": "string"
+                },
+                "cursor": {
+                    "type": "string"
+                },
+                "evidenceId": {
+                    "type": "string"
+                },
+                "metadata": {
+                    "$ref": "#/definitions/BrowserPageProjection"
+                },
+                "nextCursor": {
+                    "type": ["null", "string"]
+                },
+                "records": {
+                    "items": {
+                        "$ref": "#/definitions/BrowserStructureRow"
+                    },
+                    "type": "array"
+                },
+                "runId": {
+                    "type": "string"
+                },
+                "selector": {
+                    "type": "string"
+                },
+                "sha256": {
+                    "type": "string"
+                },
+                "total": {
+                    "type": "string"
+                },
+                "view": {
+                    "$ref": "#/definitions/BrowserStructureView"
+                }
+            },
+            "required": [
+                "captureSha256",
+                "cursor",
+                "evidenceId",
+                "metadata",
+                "nextCursor",
+                "records",
+                "runId",
+                "selector",
+                "sha256",
+                "total",
+                "view"
+            ],
+            "type": "object"
+        },
+        "BrowserStructureProjection": {
+            "description": "Bounded structure coverage does not imply that page text or earlier activity was inspected.",
+            "properties": {
+                "available": {
+                    "type": "boolean"
+                },
+                "countPreviewPartial": {
+                    "type": "boolean"
+                },
+                "counts": {
+                    "items": {
+                        "$ref": "#/definitions/BrowserStructureCount"
+                    },
+                    "type": "array"
+                },
+                "nodes": {
+                    "type": "string"
+                },
+                "partial": {
+                    "type": "boolean"
+                }
+            },
+            "required": ["available", "countPreviewPartial", "counts", "nodes", "partial"],
+            "type": "object"
+        },
+        "BrowserStructureQuery": {
+            "description": "Selectors are all, roots, node:ID, children:ID or attributes:ID; authority is never supplied by a selector.",
+            "properties": {
+                "cursor": {
+                    "type": "string"
+                },
+                "evidenceId": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "runId": {
+                    "type": "string"
+                },
+                "selector": {
+                    "type": "string"
+                },
+                "view": {
+                    "$ref": "#/definitions/BrowserStructureView"
+                }
+            },
+            "required": ["evidenceId", "id", "runId", "view"],
+            "type": "object"
+        },
+        "BrowserStructureRow": {
+            "anyOf": [
+                {
+                    "$ref": "#/definitions/BrowserDomNode"
+                },
+                {
+                    "$ref": "#/definitions/BrowserAccessibilityNode"
+                },
+                {
+                    "$ref": "#/definitions/BrowserAttributeName"
+                }
+            ],
+            "description": "Each response row has an explicit representation discriminator."
+        },
+        "BrowserStructureSnapshot": {
+            "description": "A progress receipt references structure without carrying complete trees.",
+            "properties": {
+                "accessibility": {
+                    "$ref": "#/definitions/BrowserStructureProjection"
+                },
+                "capturedAt": {
+                    "type": "string"
+                },
+                "dom": {
+                    "$ref": "#/definitions/BrowserStructureProjection"
+                },
+                "frameId": {
+                    "type": "string"
+                },
+                "limitations": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "origin": {
+                    "type": "string"
+                },
+                "priorActivityAvailable": {
+                    "const": false,
+                    "type": "boolean"
+                },
+                "provider": {
+                    "const": "cdp-passive",
+                    "type": "string"
+                },
+                "reference": {
+                    "$ref": "#/definitions/ReverseBrowserReference"
+                },
+                "targetId": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "accessibility",
+                "capturedAt",
+                "dom",
+                "frameId",
+                "limitations",
+                "origin",
+                "priorActivityAvailable",
+                "provider",
+                "reference",
+                "targetId",
+                "url"
+            ],
+            "type": "object"
+        },
+        "BrowserStructureView": {
+            "description": "Independent tree representations use the same immutable document capture.\nThe finite browser structure representations.",
+            "enum": ["accessibility", "dom"],
+            "type": "string"
         },
         "Budget": {
             "description": "A spending limit over one scope.",
@@ -3812,6 +4198,18 @@
                     "required": ["params", "result"],
                     "type": "object"
                 },
+                "reverse.browser.structure": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/BrowserStructureQuery"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/BrowserStructurePage"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
                 "reverse.catalog": {
                     "properties": {
                         "params": {
@@ -5041,6 +5439,7 @@
                 "processes.resize",
                 "processes.stop",
                 "reverse.browser",
+                "reverse.browser.structure",
                 "reverse.catalog",
                 "reverse.evidence",
                 "reverse.functions",
@@ -9432,6 +9831,10 @@
                 "browser": {
                     "$ref": "#/definitions/ReverseBrowserSnapshot",
                     "description": "A live run carries capture metadata and an event count, never all event rows."
+                },
+                "browserStructure": {
+                    "$ref": "#/definitions/BrowserStructureSnapshot",
+                    "description": "A progress receipt references structure without carrying complete trees."
                 },
                 "cleanupErrors": {
                     "items": {
@@ -14435,6 +14838,9 @@
         "reverseBrowser": {
             "$ref": "#/definitions/ReverseBrowserPage"
         },
+        "reverseBrowserStructure": {
+            "$ref": "#/definitions/BrowserStructurePage"
+        },
         "reverseCatalog": {
             "$ref": "#/definitions/ReverseCatalogPage"
         },
@@ -14488,6 +14894,7 @@
         "methods",
         "native",
         "reverseBrowser",
+        "reverseBrowserStructure",
         "reverseCatalog",
         "reverseEvidence",
         "reverseFunctions",
