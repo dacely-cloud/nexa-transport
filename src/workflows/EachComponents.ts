@@ -45,6 +45,7 @@ export class EachComponents {
                         minimum: 1,
                         maximum: 32,
                     }),
+                    Schemas.field('creditLimitMicrocents', Schemas.count, false),
                     Schemas.field('timeoutMs', { ...Schemas.count, minimum: 1, maximum: 86400000 }),
                     Schemas.field('onError', Schemas.choice(['stop', 'continue'])),
                     Schemas.field('order', Schemas.choice(['input', 'completion'])),

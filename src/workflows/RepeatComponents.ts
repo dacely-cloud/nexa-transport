@@ -39,6 +39,7 @@ export class RepeatComponents {
                         minimum: 1,
                         maximum: 1000,
                     }),
+                    Schemas.field('creditLimitMicrocents', Schemas.count, false),
                     Schemas.field('timeoutMs', { ...Schemas.count, minimum: 1, maximum: 86400000 }),
                     Schemas.field('collection', Schemas.choice(['all', 'last'])),
                 ]),
