@@ -1,6 +1,6 @@
 # RPC reference
 
-All 139 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 138 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
+All 144 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 143 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
 
 - [accounts.create](#accounts-create)
 - [accounts.list](#accounts-list)
@@ -110,6 +110,11 @@ All 139 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [workflows.planning.read](#workflows-planning-read)
 - [workflows.planning.send](#workflows-planning-send)
 - [workflows.planning.sources](#workflows-planning-sources)
+- [workflows.publications.check](#workflows-publications-check)
+- [workflows.publications.list](#workflows-publications-list)
+- [workflows.publications.publish](#workflows-publications-publish)
+- [workflows.publications.read](#workflows-publications-read)
+- [workflows.publications.run](#workflows-publications-run)
 - [workflows.read](#workflows-read)
 - [workflows.record](#workflows-record)
 - [workflows.records](#workflows-records)
@@ -2640,6 +2645,150 @@ Parameters: [PlanningSourcesRequest](protocol.md#planningsourcesrequest).
 | `workflowId` | Yes      | `string`      |             |
 
 Result: [PlanningSourcesPage](protocol.md#planningsourcespage).
+
+## workflows.publications.check
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsPublicationsCheck> = {
+    policy: {
+        maxConcurrency: 1,
+        timeoutMs: 'YOUR_TIMEOUTMS',
+        triggerNodeId: 'YOUR_TRIGGERNODEID',
+    },
+    revision: 'YOUR_REVISION',
+    workflowId: 'YOUR_WORKFLOWID',
+};
+const result: ResultOf<typeof Method.WorkflowsPublicationsCheck> = await client.call(
+    Method.WorkflowsPublicationsCheck,
+    params,
+);
+```
+
+Parameters: [WorkflowPublicationCheckRequest](protocol.md#workflowpublicationcheckrequest).
+
+| Field        | Required | Type                                                               | Description |
+| ------------ | -------- | ------------------------------------------------------------------ | ----------- |
+| `policy`     | Yes      | [WorkflowPublicationPolicy](protocol.md#workflowpublicationpolicy) |             |
+| `revision`   | Yes      | `string`                                                           |             |
+| `workflowId` | Yes      | `string`                                                           |             |
+
+Result: [WorkflowPublicationCheck](protocol.md#workflowpublicationcheck).
+
+## workflows.publications.list
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsPublicationsList> = {
+    afterVersion: null,
+    limit: 1,
+    workflowId: 'YOUR_WORKFLOWID',
+};
+const result: ResultOf<typeof Method.WorkflowsPublicationsList> = await client.call(
+    Method.WorkflowsPublicationsList,
+    params,
+);
+```
+
+Parameters: [WorkflowPublicationListRequest](protocol.md#workflowpublicationlistrequest).
+
+| Field          | Required | Type          | Description |
+| -------------- | -------- | ------------- | ----------- |
+| `afterVersion` | Yes      | `null,string` |             |
+| `limit`        | Yes      | `number`      |             |
+| `workflowId`   | Yes      | `string`      |             |
+
+Result: [WorkflowPublicationPage](protocol.md#workflowpublicationpage).
+
+## workflows.publications.publish
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsPublicationsPublish> = {
+    commandId: 'YOUR_COMMANDID',
+    expectedDraftRevision: 'YOUR_EXPECTEDDRAFTREVISION',
+    expectedPublicationId: null,
+    policy: {
+        maxConcurrency: 1,
+        timeoutMs: 'YOUR_TIMEOUTMS',
+        triggerNodeId: 'YOUR_TRIGGERNODEID',
+    },
+    revision: 'YOUR_REVISION',
+    workflowId: 'YOUR_WORKFLOWID',
+};
+const result: ResultOf<typeof Method.WorkflowsPublicationsPublish> = await client.call(
+    Method.WorkflowsPublicationsPublish,
+    params,
+);
+```
+
+Parameters: [WorkflowPublishRequest](protocol.md#workflowpublishrequest).
+
+| Field                   | Required | Type                                                               | Description |
+| ----------------------- | -------- | ------------------------------------------------------------------ | ----------- |
+| `commandId`             | Yes      | `string`                                                           |             |
+| `expectedDraftRevision` | Yes      | `string`                                                           |             |
+| `expectedPublicationId` | Yes      | `null,string`                                                      |             |
+| `policy`                | Yes      | [WorkflowPublicationPolicy](protocol.md#workflowpublicationpolicy) |             |
+| `revision`              | Yes      | `string`                                                           |             |
+| `workflowId`            | Yes      | `string`                                                           |             |
+
+Result: [WorkflowPublishResult](protocol.md#workflowpublishresult).
+
+## workflows.publications.read
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsPublicationsRead> = {
+    publicationId: null,
+    workflowId: 'YOUR_WORKFLOWID',
+};
+const result: ResultOf<typeof Method.WorkflowsPublicationsRead> = await client.call(
+    Method.WorkflowsPublicationsRead,
+    params,
+);
+```
+
+Parameters: [WorkflowPublicationReadRequest](protocol.md#workflowpublicationreadrequest).
+
+| Field           | Required | Type          | Description |
+| --------------- | -------- | ------------- | ----------- |
+| `publicationId` | Yes      | `null,string` |             |
+| `workflowId`    | Yes      | `string`      |             |
+
+Result: [WorkflowPublication](protocol.md#workflowpublication) / `null`.
+
+## workflows.publications.run
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsPublicationsRun> = {
+    input: {},
+    publicationId: 'YOUR_PUBLICATIONID',
+    runId: 'YOUR_RUNID',
+    workflowId: 'YOUR_WORKFLOWID',
+};
+const result: ResultOf<typeof Method.WorkflowsPublicationsRun> = await client.call(
+    Method.WorkflowsPublicationsRun,
+    params,
+);
+```
+
+Parameters: [WorkflowPublishedRunRequest](protocol.md#workflowpublishedrunrequest).
+
+| Field           | Required | Type                                         | Description |
+| --------------- | -------- | -------------------------------------------- | ----------- |
+| `input`         | Yes      | [WorkflowObject](protocol.md#workflowobject) |             |
+| `publicationId` | Yes      | `string`                                     |             |
+| `runId`         | Yes      | `string`                                     |             |
+| `workflowId`    | Yes      | `string`                                     |             |
+
+Result: [WorkflowRunSummary](protocol.md#workflowrunsummary).
 
 ## workflows.read
 

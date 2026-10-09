@@ -230,6 +230,10 @@
         "./workflow-application-models": {
             "types": "./dist/workflows/terminal/ApplicationModels.d.ts",
             "import": "./dist/workflow-application-models.js"
+        },
+        "./workflow-publication-codec": {
+            "types": "./dist/workflows/PublicationCodec.d.ts",
+            "import": "./dist/workflow-publication-codec.js"
         }
     },
     "scripts": {

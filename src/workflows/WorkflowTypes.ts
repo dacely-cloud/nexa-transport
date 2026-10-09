@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { WorkflowPublicationReference } from './PublicationTypes.js';
 import type { WorkflowGroup, WorkflowGroupReference } from './WorkflowGroupTypes.js';
 import type { ResourceBinding } from './ResourceTypes.js';
 
@@ -68,6 +69,7 @@ export interface WorkflowReceipt {
 }
 /** Small management projection; contains no graph, prompts, or run histories. */
 export interface WorkflowSummary extends WorkflowReceipt {
+    readonly publication?: WorkflowPublicationReference;
     readonly details: WorkflowDetails;
     readonly createdAtMs: string;
     readonly updatedAtMs: string;

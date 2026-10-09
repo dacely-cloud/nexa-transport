@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { WorkflowPublicationReference } from '../PublicationTypes.js';
 import type { WorkflowResolvedModel } from './RunModelTypes.js';
 import type { WorkflowResolvedImage } from './RunImageTypes.js';
 import type { WorkflowGraph } from '../GraphTypes.js';
@@ -12,7 +13,11 @@ import type {
 } from '../WorkflowTypes.js';
 import type { ComponentDefinition } from '../ComponentTypes.js';
 
-export const WorkflowRunMode = { LiveTest: 'live-test', MockTest: 'mock-test' } as const;
+export const WorkflowRunMode = {
+    LiveTest: 'live-test',
+    MockTest: 'mock-test',
+    Published: 'published',
+} as const;
 export type WorkflowRunMode = (typeof WorkflowRunMode)[keyof typeof WorkflowRunMode];
 export const WorkflowRunStatus = {
     Queued: 'queued',
@@ -49,6 +54,7 @@ export type WorkflowRunEventKind = (typeof WorkflowRunEventKind)[keyof typeof Wo
 
 /** Immutable semantic snapshot; no canvas layout, credentials, or mutable draft pointer. */
 export interface WorkflowRunSnapshot {
+    readonly publication?: WorkflowPublicationReference;
     /** Image settings and prices resolved by the host before acceptance. */
     readonly imageModels?: readonly WorkflowResolvedImage[];
     /** Host-resolved exact bindings pinned before acceptance; absent on deterministic runs. */
@@ -107,6 +113,7 @@ export interface WorkflowRunLease {
     readonly epoch: string;
 }
 export interface WorkflowRunSummary {
+    readonly publication?: WorkflowPublicationReference;
     readonly runId: string;
     readonly workflowId: string;
     readonly workflowRevision: string;

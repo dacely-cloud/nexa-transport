@@ -1436,6 +1436,11 @@ Configurable bounds on gateway-owned work and memory.
 | `workflows.planning.read`           | Yes      | Object (fields below) |                                                                                            |
 | `workflows.planning.send`           | Yes      | Object (fields below) |                                                                                            |
 | `workflows.planning.sources`        | Yes      | Object (fields below) |                                                                                            |
+| `workflows.publications.check`      | Yes      | Object (fields below) |                                                                                            |
+| `workflows.publications.list`       | Yes      | Object (fields below) |                                                                                            |
+| `workflows.publications.publish`    | Yes      | Object (fields below) |                                                                                            |
+| `workflows.publications.read`       | Yes      | Object (fields below) |                                                                                            |
+| `workflows.publications.run`        | Yes      | Object (fields below) |                                                                                            |
 | `workflows.read`                    | Yes      | Object (fields below) |                                                                                            |
 | `workflows.record`                  | Yes      | Object (fields below) |                                                                                            |
 | `workflows.records`                 | Yes      | Object (fields below) |                                                                                            |
@@ -2296,6 +2301,41 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ------------------------------------------------------------ | ----------- |
 | `params` | Yes      | [PlanningSourcesRequest](protocol.md#planningsourcesrequest) |             |
 | `result` | Yes      | [PlanningSourcesPage](protocol.md#planningsourcespage)       |             |
+
+**workflows.publications.check**
+
+| Field    | Required | Type                                                                           | Description |
+| -------- | -------- | ------------------------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [WorkflowPublicationCheckRequest](protocol.md#workflowpublicationcheckrequest) |             |
+| `result` | Yes      | [WorkflowPublicationCheck](protocol.md#workflowpublicationcheck)               |             |
+
+**workflows.publications.list**
+
+| Field    | Required | Type                                                                         | Description |
+| -------- | -------- | ---------------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [WorkflowPublicationListRequest](protocol.md#workflowpublicationlistrequest) |             |
+| `result` | Yes      | [WorkflowPublicationPage](protocol.md#workflowpublicationpage)               |             |
+
+**workflows.publications.publish**
+
+| Field    | Required | Type                                                         | Description |
+| -------- | -------- | ------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [WorkflowPublishRequest](protocol.md#workflowpublishrequest) |             |
+| `result` | Yes      | [WorkflowPublishResult](protocol.md#workflowpublishresult)   |             |
+
+**workflows.publications.read**
+
+| Field    | Required | Type                                                                         | Description |
+| -------- | -------- | ---------------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [WorkflowPublicationReadRequest](protocol.md#workflowpublicationreadrequest) |             |
+| `result` | Yes      | [WorkflowPublication](protocol.md#workflowpublication) / `null`              |             |
+
+**workflows.publications.run**
+
+| Field    | Required | Type                                                                   | Description |
+| -------- | -------- | ---------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [WorkflowPublishedRunRequest](protocol.md#workflowpublishedrunrequest) |             |
+| `result` | Yes      | [WorkflowRunSummary](protocol.md#workflowrunsummary)                   |             |
 
 **workflows.read**
 
@@ -6176,6 +6216,112 @@ Personal viewport is excluded; these positions belong to the workflow itself.
 | `x`   | Yes      | `number` |             |
 | `y`   | Yes      | `number` |             |
 
+## WorkflowPublication
+
+A complete immutable manifest points to retained graph records, never a mutable draft.
+
+| Field           | Required | Type                                                               | Description |
+| --------------- | -------- | ------------------------------------------------------------------ | ----------- |
+| `format`        | Yes      | `1`                                                                |             |
+| `name`          | Yes      | `string`                                                           |             |
+| `policy`        | Yes      | [WorkflowPublicationPolicy](protocol.md#workflowpublicationpolicy) |             |
+| `publicationId` | Yes      | `string`                                                           |             |
+| `publishedAtMs` | Yes      | `string`                                                           |             |
+| `revision`      | Yes      | `string`                                                           |             |
+| `version`       | Yes      | `string`                                                           |             |
+| `workflowId`    | Yes      | `string`                                                           |             |
+
+## WorkflowPublicationCheck
+
+Validation is an observation; publishing and execution each recheck current access.
+
+| Field         | Required | Type                                          | Description |
+| ------------- | -------- | --------------------------------------------- | ----------- |
+| `checkedAtMs` | Yes      | `string`                                      |             |
+| `issues`      | Yes      | Array of [GraphIssue](protocol.md#graphissue) |             |
+| `revision`    | Yes      | `string`                                      |             |
+| `valid`       | Yes      | `boolean`                                     |             |
+| `workflowId`  | Yes      | `string`                                      |             |
+
+## WorkflowPublicationCheckRequest
+
+| Field        | Required | Type                                                               | Description |
+| ------------ | -------- | ------------------------------------------------------------------ | ----------- |
+| `policy`     | Yes      | [WorkflowPublicationPolicy](protocol.md#workflowpublicationpolicy) |             |
+| `revision`   | Yes      | `string`                                                           |             |
+| `workflowId` | Yes      | `string`                                                           |             |
+
+## WorkflowPublicationListRequest
+
+| Field          | Required | Type          | Description |
+| -------------- | -------- | ------------- | ----------- |
+| `afterVersion` | Yes      | `null,string` |             |
+| `limit`        | Yes      | `number`      |             |
+| `workflowId`   | Yes      | `string`      |             |
+
+## WorkflowPublicationPage
+
+| Field   | Required | Type                                                            | Description |
+| ------- | -------- | --------------------------------------------------------------- | ----------- |
+| `items` | Yes      | Array of [WorkflowPublication](protocol.md#workflowpublication) |             |
+| `next`  | Yes      | `null,string`                                                   |             |
+
+## WorkflowPublicationPolicy
+
+Limits reviewed before publication; run callers cannot override them.
+
+| Field            | Required | Type     | Description |
+| ---------------- | -------- | -------- | ----------- |
+| `maxConcurrency` | Yes      | `number` |             |
+| `timeoutMs`      | Yes      | `string` |             |
+| `triggerNodeId`  | Yes      | `string` |             |
+
+## WorkflowPublicationReadRequest
+
+| Field           | Required | Type          | Description |
+| --------------- | -------- | ------------- | ----------- |
+| `publicationId` | Yes      | `null,string` |             |
+| `workflowId`    | Yes      | `string`      |             |
+
+## WorkflowPublicationReference
+
+Immutable publication identity, distinct from its source draft revision.
+
+| Field           | Required | Type     | Description |
+| --------------- | -------- | -------- | ----------- |
+| `publicationId` | Yes      | `string` |             |
+| `revision`      | Yes      | `string` |             |
+| `version`       | Yes      | `string` |             |
+
+## WorkflowPublishRequest
+
+| Field                   | Required | Type                                                               | Description |
+| ----------------------- | -------- | ------------------------------------------------------------------ | ----------- |
+| `commandId`             | Yes      | `string`                                                           |             |
+| `expectedDraftRevision` | Yes      | `string`                                                           |             |
+| `expectedPublicationId` | Yes      | `null,string`                                                      |             |
+| `policy`                | Yes      | [WorkflowPublicationPolicy](protocol.md#workflowpublicationpolicy) |             |
+| `revision`              | Yes      | `string`                                                           |             |
+| `workflowId`            | Yes      | `string`                                                           |             |
+
+## WorkflowPublishResult
+
+| Field         | Required | Type                                                             | Description |
+| ------------- | -------- | ---------------------------------------------------------------- | ----------- |
+| `check`       | Yes      | [WorkflowPublicationCheck](protocol.md#workflowpublicationcheck) |             |
+| `publication` | Yes      | [WorkflowPublication](protocol.md#workflowpublication) / `null`  |             |
+
+## WorkflowPublishedRunRequest
+
+Explicitly selected immutable version, with server-owned execution limits.
+
+| Field           | Required | Type                                         | Description |
+| --------------- | -------- | -------------------------------------------- | ----------- |
+| `input`         | Yes      | [WorkflowObject](protocol.md#workflowobject) |             |
+| `publicationId` | Yes      | `string`                                     |             |
+| `runId`         | Yes      | `string`                                     |             |
+| `workflowId`    | Yes      | `string`                                     |             |
+
 ## WorkflowReadRequest
 
 Null resolves the current revision only for the first page. Subsequent pages pin it.
@@ -6340,7 +6486,7 @@ Pages run history for one owned workflow.
 
 ## WorkflowRunMode
 
-Type: `"live-test"` / `"mock-test"`.
+Type: `"live-test"` / `"mock-test"` / `"published"`.
 
 ## WorkflowRunOutputPage
 
@@ -6415,17 +6561,18 @@ Reads bounded step metadata after an exclusive node ID.
 
 ## WorkflowRunSummary
 
-| Field              | Required | Type                                               | Description |
-| ------------------ | -------- | -------------------------------------------------- | ----------- |
-| `createdAtMs`      | Yes      | `string`                                           |             |
-| `message`          | Yes      | `null,string`                                      |             |
-| `mode`             | Yes      | [WorkflowRunMode](protocol.md#workflowrunmode)     |             |
-| `runId`            | Yes      | `string`                                           |             |
-| `sequence`         | Yes      | `string`                                           |             |
-| `status`           | Yes      | [WorkflowRunStatus](protocol.md#workflowrunstatus) |             |
-| `updatedAtMs`      | Yes      | `string`                                           |             |
-| `workflowId`       | Yes      | `string`                                           |             |
-| `workflowRevision` | Yes      | `string`                                           |             |
+| Field              | Required | Type                                                                     | Description                                                              |
+| ------------------ | -------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------ |
+| `createdAtMs`      | Yes      | `string`                                                                 |                                                                          |
+| `message`          | Yes      | `null,string`                                                            |                                                                          |
+| `mode`             | Yes      | [WorkflowRunMode](protocol.md#workflowrunmode)                           |                                                                          |
+| `publication`      | No       | [WorkflowPublicationReference](protocol.md#workflowpublicationreference) | Immutable publication identity, distinct from its source draft revision. |
+| `runId`            | Yes      | `string`                                                                 |                                                                          |
+| `sequence`         | Yes      | `string`                                                                 |                                                                          |
+| `status`           | Yes      | [WorkflowRunStatus](protocol.md#workflowrunstatus)                       |                                                                          |
+| `updatedAtMs`      | Yes      | `string`                                                                 |                                                                          |
+| `workflowId`       | Yes      | `string`                                                                 |                                                                          |
+| `workflowRevision` | Yes      | `string`                                                                 |                                                                          |
 
 ## WorkflowSaveRequest
 
@@ -6463,15 +6610,16 @@ Exposes step metadata without embedding potentially large result payloads.
 
 Small management projection; contains no graph, prompts, or run histories.
 
-| Field         | Required | Type                                           | Description |
-| ------------- | -------- | ---------------------------------------------- | ----------- |
-| `createdAtMs` | Yes      | `string`                                       |             |
-| `details`     | Yes      | [WorkflowDetails](protocol.md#workflowdetails) |             |
-| `edgeCount`   | Yes      | `number`                                       |             |
-| `nodeCount`   | Yes      | `number`                                       |             |
-| `revision`    | Yes      | `string`                                       |             |
-| `updatedAtMs` | Yes      | `string`                                       |             |
-| `workflowId`  | Yes      | `string`                                       |             |
+| Field         | Required | Type                                                                     | Description                                                              |
+| ------------- | -------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------ |
+| `createdAtMs` | Yes      | `string`                                                                 |                                                                          |
+| `details`     | Yes      | [WorkflowDetails](protocol.md#workflowdetails)                           |                                                                          |
+| `edgeCount`   | Yes      | `number`                                                                 |                                                                          |
+| `nodeCount`   | Yes      | `number`                                                                 |                                                                          |
+| `publication` | No       | [WorkflowPublicationReference](protocol.md#workflowpublicationreference) | Immutable publication identity, distinct from its source draft revision. |
+| `revision`    | Yes      | `string`                                                                 |                                                                          |
+| `updatedAtMs` | Yes      | `string`                                                                 |                                                                          |
+| `workflowId`  | Yes      | `string`                                                                 |                                                                          |
 
 ## WorkflowTerminalCommand
 

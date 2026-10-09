@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { WorkflowPublicationCodec } from '../PublicationCodec.js';
+import type { WorkflowPublicationReference } from '../PublicationTypes.js';
 import type { WorkflowInvocationInputs } from './RunRequests.js';
 import { WorkflowRunModelCodec } from './RunModelCodec.js';
 import { WorkflowRunImageCodec } from './RunImageCodec.js';
@@ -38,6 +40,9 @@ export class WorkflowRunCodec {
     }
     public static snapshot(raw: unknown): WorkflowRunSnapshot {
         const value: Readonly<Record<string, unknown>> = WorkflowInput.record(raw, [
+            ...(raw !== null && typeof raw === 'object' && Object.hasOwn(raw, 'publication')
+                ? ['publication']
+                : []),
             ...(raw !== null && typeof raw === 'object' && Object.hasOwn(raw, 'imageModels')
                 ? ['imageModels']
                 : []),
@@ -74,7 +79,11 @@ export class WorkflowRunCodec {
         WorkflowInput.unique(nodes.map((node: WorkflowNode): string => node.id));
         WorkflowInput.unique(edges.map((edge: WorkflowEdge): string => edge.id));
         const mode: unknown = value['mode'];
-        if (mode !== WorkflowRunMode.LiveTest && mode !== WorkflowRunMode.MockTest) {
+        if (
+            mode !== WorkflowRunMode.LiveTest &&
+            mode !== WorkflowRunMode.MockTest &&
+            mode !== WorkflowRunMode.Published
+        ) {
             throw new Error('Unsupported workflow run mode');
         }
         const concurrency: unknown = value['maxConcurrency'];
@@ -94,8 +103,19 @@ export class WorkflowRunCodec {
         if (revision === '0') {
             throw new Error('Workflow run requires a saved revision');
         }
+        const publication: WorkflowPublicationReference | undefined =
+            value['publication'] === undefined
+                ? undefined
+                : WorkflowPublicationCodec.reference(value['publication']);
+        if (
+            (mode === WorkflowRunMode.Published) !== (publication !== undefined) ||
+            (publication !== undefined && publication.revision !== revision)
+        ) {
+            throw new Error('Published execution requires its matching immutable publication');
+        }
         const input: WorkflowObject = WorkflowJson.object(value['input']);
         return Object.freeze({
+            ...(publication === undefined ? {} : { publication }),
             ...(value['imageModels'] === undefined
                 ? {}
                 : { imageModels: WorkflowRunImageCodec.list(value['imageModels']) }),

@@ -2995,6 +2995,46 @@ export interface GatewayMethodsworkflows_planning_sourcesShape {
     readonly result: PlanningSourcesPage;
 }
 
+/** GatewayMethodsworkflows_publications_check wire fields. */
+export interface GatewayMethodsworkflows_publications_checkShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkflowPublicationCheckRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WorkflowPublicationCheck;
+}
+
+/** GatewayMethodsworkflows_publications_list wire fields. */
+export interface GatewayMethodsworkflows_publications_listShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkflowPublicationListRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WorkflowPublicationPage;
+}
+
+/** GatewayMethodsworkflows_publications_publish wire fields. */
+export interface GatewayMethodsworkflows_publications_publishShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkflowPublishRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WorkflowPublishResult;
+}
+
+/** GatewayMethodsworkflows_publications_read wire fields. */
+export interface GatewayMethodsworkflows_publications_readShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkflowPublicationReadRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WorkflowPublication | null;
+}
+
+/** GatewayMethodsworkflows_publications_run wire fields. */
+export interface GatewayMethodsworkflows_publications_runShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkflowPublishedRunRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WorkflowRunSummary;
+}
+
 /** GatewayMethodsworkflows_read wire fields. */
 export interface GatewayMethodsworkflows_readShape {
     /** params as defined by the Nexa gateway. */
@@ -3461,6 +3501,16 @@ export interface GatewayMethodsShape {
     readonly 'workflows.planning.send': GatewayMethodsworkflows_planning_sendShape;
     /** workflows.planning.sources as defined by the Nexa gateway. */
     readonly 'workflows.planning.sources': GatewayMethodsworkflows_planning_sourcesShape;
+    /** workflows.publications.check as defined by the Nexa gateway. */
+    readonly 'workflows.publications.check': GatewayMethodsworkflows_publications_checkShape;
+    /** workflows.publications.list as defined by the Nexa gateway. */
+    readonly 'workflows.publications.list': GatewayMethodsworkflows_publications_listShape;
+    /** workflows.publications.publish as defined by the Nexa gateway. */
+    readonly 'workflows.publications.publish': GatewayMethodsworkflows_publications_publishShape;
+    /** workflows.publications.read as defined by the Nexa gateway. */
+    readonly 'workflows.publications.read': GatewayMethodsworkflows_publications_readShape;
+    /** workflows.publications.run as defined by the Nexa gateway. */
+    readonly 'workflows.publications.run': GatewayMethodsworkflows_publications_runShape;
     /** workflows.read as defined by the Nexa gateway. */
     readonly 'workflows.read': GatewayMethodsworkflows_readShape;
     /** workflows.record as defined by the Nexa gateway. */
@@ -8851,6 +8901,165 @@ export interface WorkflowPositionShape {
 /** WorkflowPosition from the Nexa wire protocol. */
 export type WorkflowPosition = WorkflowPositionShape;
 
+/** WorkflowPublication wire fields. */
+export interface WorkflowPublicationShape {
+    /** format as defined by the Nexa gateway. */
+    readonly format: 1;
+    /** name as defined by the Nexa gateway. */
+    readonly name: string;
+    /** policy as defined by the Nexa gateway. */
+    readonly policy: WorkflowPublicationPolicy;
+    /** publicationId as defined by the Nexa gateway. */
+    readonly publicationId: string;
+    /** publishedAtMs as defined by the Nexa gateway. */
+    readonly publishedAtMs: string;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: string;
+    /** version as defined by the Nexa gateway. */
+    readonly version: string;
+    /** workflowId as defined by the Nexa gateway. */
+    readonly workflowId: string;
+}
+
+/** WorkflowPublication from the Nexa wire protocol. */
+export type WorkflowPublication = WorkflowPublicationShape;
+
+/** WorkflowPublicationCheck wire fields. */
+export interface WorkflowPublicationCheckShape {
+    /** checkedAtMs as defined by the Nexa gateway. */
+    readonly checkedAtMs: string;
+    /** issues as defined by the Nexa gateway. */
+    readonly issues: ReadonlyArray<GraphIssue>;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: string;
+    /** valid as defined by the Nexa gateway. */
+    readonly valid: boolean;
+    /** workflowId as defined by the Nexa gateway. */
+    readonly workflowId: string;
+}
+
+/** WorkflowPublicationCheck from the Nexa wire protocol. */
+export type WorkflowPublicationCheck = WorkflowPublicationCheckShape;
+
+/** WorkflowPublicationCheckRequest wire fields. */
+export interface WorkflowPublicationCheckRequestShape {
+    /** policy as defined by the Nexa gateway. */
+    readonly policy: WorkflowPublicationPolicy;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: string;
+    /** workflowId as defined by the Nexa gateway. */
+    readonly workflowId: string;
+}
+
+/** WorkflowPublicationCheckRequest from the Nexa wire protocol. */
+export type WorkflowPublicationCheckRequest = WorkflowPublicationCheckRequestShape;
+
+/** WorkflowPublicationListRequest wire fields. */
+export interface WorkflowPublicationListRequestShape {
+    /** afterVersion as defined by the Nexa gateway. */
+    readonly afterVersion: null | string;
+    /** limit as defined by the Nexa gateway. */
+    readonly limit: number;
+    /** workflowId as defined by the Nexa gateway. */
+    readonly workflowId: string;
+}
+
+/** WorkflowPublicationListRequest from the Nexa wire protocol. */
+export type WorkflowPublicationListRequest = WorkflowPublicationListRequestShape;
+
+/** WorkflowPublicationPage wire fields. */
+export interface WorkflowPublicationPageShape {
+    /** items as defined by the Nexa gateway. */
+    readonly items: ReadonlyArray<WorkflowPublication>;
+    /** next as defined by the Nexa gateway. */
+    readonly next: null | string;
+}
+
+/** WorkflowPublicationPage from the Nexa wire protocol. */
+export type WorkflowPublicationPage = WorkflowPublicationPageShape;
+
+/** WorkflowPublicationPolicy wire fields. */
+export interface WorkflowPublicationPolicyShape {
+    /** maxConcurrency as defined by the Nexa gateway. */
+    readonly maxConcurrency: number;
+    /** timeoutMs as defined by the Nexa gateway. */
+    readonly timeoutMs: string;
+    /** triggerNodeId as defined by the Nexa gateway. */
+    readonly triggerNodeId: string;
+}
+
+/** WorkflowPublicationPolicy from the Nexa wire protocol. */
+export type WorkflowPublicationPolicy = WorkflowPublicationPolicyShape;
+
+/** WorkflowPublicationReadRequest wire fields. */
+export interface WorkflowPublicationReadRequestShape {
+    /** publicationId as defined by the Nexa gateway. */
+    readonly publicationId: null | string;
+    /** workflowId as defined by the Nexa gateway. */
+    readonly workflowId: string;
+}
+
+/** WorkflowPublicationReadRequest from the Nexa wire protocol. */
+export type WorkflowPublicationReadRequest = WorkflowPublicationReadRequestShape;
+
+/** WorkflowPublicationReference wire fields. */
+export interface WorkflowPublicationReferenceShape {
+    /** publicationId as defined by the Nexa gateway. */
+    readonly publicationId: string;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: string;
+    /** version as defined by the Nexa gateway. */
+    readonly version: string;
+}
+
+/** WorkflowPublicationReference from the Nexa wire protocol. */
+export type WorkflowPublicationReference = WorkflowPublicationReferenceShape;
+
+/** WorkflowPublishRequest wire fields. */
+export interface WorkflowPublishRequestShape {
+    /** commandId as defined by the Nexa gateway. */
+    readonly commandId: string;
+    /** expectedDraftRevision as defined by the Nexa gateway. */
+    readonly expectedDraftRevision: string;
+    /** expectedPublicationId as defined by the Nexa gateway. */
+    readonly expectedPublicationId: null | string;
+    /** policy as defined by the Nexa gateway. */
+    readonly policy: WorkflowPublicationPolicy;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: string;
+    /** workflowId as defined by the Nexa gateway. */
+    readonly workflowId: string;
+}
+
+/** WorkflowPublishRequest from the Nexa wire protocol. */
+export type WorkflowPublishRequest = WorkflowPublishRequestShape;
+
+/** WorkflowPublishResult wire fields. */
+export interface WorkflowPublishResultShape {
+    /** check as defined by the Nexa gateway. */
+    readonly check: WorkflowPublicationCheck;
+    /** publication as defined by the Nexa gateway. */
+    readonly publication: WorkflowPublication | null;
+}
+
+/** WorkflowPublishResult from the Nexa wire protocol. */
+export type WorkflowPublishResult = WorkflowPublishResultShape;
+
+/** WorkflowPublishedRunRequest wire fields. */
+export interface WorkflowPublishedRunRequestShape {
+    /** input as defined by the Nexa gateway. */
+    readonly input: WorkflowObject;
+    /** publicationId as defined by the Nexa gateway. */
+    readonly publicationId: string;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+    /** workflowId as defined by the Nexa gateway. */
+    readonly workflowId: string;
+}
+
+/** WorkflowPublishedRunRequest from the Nexa wire protocol. */
+export type WorkflowPublishedRunRequest = WorkflowPublishedRunRequestShape;
+
 /** WorkflowReadRequest wire fields. */
 export interface WorkflowReadRequestShape {
     /** edgeOffset as defined by the Nexa gateway. */
@@ -9101,7 +9310,11 @@ export interface WorkflowRunListRequestShape {
 export type WorkflowRunListRequest = WorkflowRunListRequestShape;
 
 /** Allowed values for WorkflowRunMode. */
-export const WorkflowRunModeValues = { Value0: 'live-test', Value1: 'mock-test' } as const;
+export const WorkflowRunModeValues = {
+    Value0: 'live-test',
+    Value1: 'mock-test',
+    Value2: 'published',
+} as const;
 
 /** WorkflowRunMode from the Nexa wire protocol. */
 export type WorkflowRunMode = (typeof WorkflowRunModeValues)[keyof typeof WorkflowRunModeValues];
@@ -9220,6 +9433,8 @@ export interface WorkflowRunSummaryShape {
     readonly message: null | string;
     /** mode as defined by the Nexa gateway. */
     readonly mode: WorkflowRunMode;
+    /** publication as defined by the Nexa gateway. */
+    readonly publication?: WorkflowPublicationReference;
     /** runId as defined by the Nexa gateway. */
     readonly runId: string;
     /** sequence as defined by the Nexa gateway. */
@@ -9305,6 +9520,8 @@ export interface WorkflowSummaryShape {
     readonly edgeCount: number;
     /** nodeCount as defined by the Nexa gateway. */
     readonly nodeCount: number;
+    /** publication as defined by the Nexa gateway. */
+    readonly publication?: WorkflowPublicationReference;
     /** revision as defined by the Nexa gateway. */
     readonly revision: string;
     /** updatedAtMs as defined by the Nexa gateway. */
@@ -9820,6 +10037,16 @@ export enum Method {
     WorkflowsPlanningSend = 'workflows.planning.send',
     /** Calls workflows.planning.sources. */
     WorkflowsPlanningSources = 'workflows.planning.sources',
+    /** Calls workflows.publications.check. */
+    WorkflowsPublicationsCheck = 'workflows.publications.check',
+    /** Calls workflows.publications.list. */
+    WorkflowsPublicationsList = 'workflows.publications.list',
+    /** Calls workflows.publications.publish. */
+    WorkflowsPublicationsPublish = 'workflows.publications.publish',
+    /** Calls workflows.publications.read. */
+    WorkflowsPublicationsRead = 'workflows.publications.read',
+    /** Calls workflows.publications.run. */
+    WorkflowsPublicationsRun = 'workflows.publications.run',
     /** Calls workflows.read. */
     WorkflowsRead = 'workflows.read',
     /** Calls workflows.record. */
