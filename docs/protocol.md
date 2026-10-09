@@ -474,6 +474,28 @@ WebSocket payloads are reduced immediately to direction, opcode and byte count.
 | `timestamp` | Yes      | `string`      |             |
 | `url`       | Yes      | `string`      |             |
 
+## BrowserAnalysisInput
+
+Body-free provenance links a derived shared analysis to the exact original browser capture.
+
+| Field                    | Required | Type                                                           | Description |
+| ------------------------ | -------- | -------------------------------------------------------------- | ----------- |
+| `capturedAt`             | Yes      | `string`                                                       |             |
+| `coverage`               | Yes      | [BrowserSourcesCoverage](protocol.md#browsersourcescoverage)   |             |
+| `exportedFiles`          | Yes      | `string`                                                       |             |
+| `frameId`                | Yes      | `string`                                                       |             |
+| `includeSources`         | Yes      | `boolean`                                                      |             |
+| `manifestBytes`          | Yes      | `string`                                                       |             |
+| `manifestSha256`         | Yes      | `string`                                                       |             |
+| `origin`                 | Yes      | `string`                                                       |             |
+| `priorActivityAvailable` | Yes      | `false`                                                        |             |
+| `provider`               | Yes      | `"cdp-passive"`                                                |             |
+| `reference`              | Yes      | [ReverseBrowserReference](protocol.md#reversebrowserreference) |             |
+| `resourceCount`          | Yes      | `string`                                                       |             |
+| `scriptCount`            | Yes      | `string`                                                       |             |
+| `sourceRunSha256`        | Yes      | `string`                                                       |             |
+| `targetId`               | Yes      | `string`                                                       |             |
+
 ## BrowserAttributeName
 
 An attribute directory contains names only.
@@ -4886,6 +4908,7 @@ Bounded, capability-free projection carried by live tool events and the final re
 | `application`      | No       | [ReverseApplicationSnapshot](protocol.md#reverseapplicationsnapshot) | Bounded projection for live Chat events; complete indexes are paged by the native query tool.   |
 | `archive`          | No       | [ReverseArchiveRef](protocol.md#reversearchiveref)                   | A session-owned archive, without query tokens or analyzer handles.                              |
 | `browser`          | No       | [ReverseBrowserSnapshot](protocol.md#reversebrowsersnapshot)         | A live run carries capture metadata and an event count, never all event rows.                   |
+| `browserInput`     | No       | [BrowserAnalysisInput](protocol.md#browseranalysisinput)             | Body-free provenance links a derived shared analysis to the exact original browser capture.     |
 | `browserSources`   | No       | [BrowserSourcesSnapshot](protocol.md#browsersourcessnapshot)         | A native source capture references one immutable owner-scoped archive.                          |
 | `browserStructure` | No       | [BrowserStructureSnapshot](protocol.md#browserstructuresnapshot)     | A progress receipt references structure without carrying complete trees.                        |
 | `cleanupErrors`    | Yes      | Array of `string`                                                    |                                                                                                 |
@@ -7232,18 +7255,19 @@ Type: `"cancelled"` / `"failed"` / `"interrupted"` / `"running"` / `"skipped"` /
 
 Exposes step metadata without embedding potentially large result payloads.
 
-| Field          | Required | Type                                                 | Description |
-| -------------- | -------- | ---------------------------------------------------- | ----------- |
-| `attempt`      | Yes      | `number`                                             |             |
-| `component`    | Yes      | `string`                                             |             |
-| `finishedAtMs` | Yes      | `null,string`                                        |             |
-| `hasResult`    | Yes      | `boolean`                                            |             |
-| `invocationId` | Yes      | `string`                                             |             |
-| `label`        | Yes      | `string`                                             |             |
-| `message`      | Yes      | `null,string`                                        |             |
-| `nodeId`       | Yes      | `string`                                             |             |
-| `startedAtMs`  | Yes      | `string`                                             |             |
-| `status`       | Yes      | [WorkflowStepStatus](protocol.md#workflowstepstatus) |             |
+| Field          | Required | Type                                                 | Description                                                                           |
+| -------------- | -------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `attempt`      | Yes      | `number`                                             |                                                                                       |
+| `component`    | Yes      | `string`                                             |                                                                                       |
+| `finishedAtMs` | Yes      | `null,string`                                        |                                                                                       |
+| `hasResult`    | Yes      | `boolean`                                            |                                                                                       |
+| `invocationId` | Yes      | `string`                                             |                                                                                       |
+| `label`        | Yes      | `string`                                             |                                                                                       |
+| `message`      | Yes      | `null,string`                                        |                                                                                       |
+| `nodeId`       | Yes      | `string`                                             |                                                                                       |
+| `startedAtMs`  | Yes      | `string`                                             |                                                                                       |
+| `status`       | Yes      | [WorkflowStepStatus](protocol.md#workflowstepstatus) |                                                                                       |
+| `wakeAtMs`     | No       | `string`                                             | Persisted timer target; retained after completion or cancellation as timing evidence. |
 
 ## WorkflowSummary
 

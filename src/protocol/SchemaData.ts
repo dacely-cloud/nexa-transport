@@ -1031,6 +1031,77 @@ export const schema: Schema = {
             ],
             type: 'object',
         },
+        BrowserAnalysisInput: {
+            description:
+                'Body-free provenance links a derived shared analysis to the exact original browser capture.',
+            properties: {
+                capturedAt: {
+                    type: 'string',
+                },
+                coverage: {
+                    $ref: '#/definitions/BrowserSourcesCoverage',
+                },
+                exportedFiles: {
+                    type: 'string',
+                },
+                frameId: {
+                    type: 'string',
+                },
+                includeSources: {
+                    type: 'boolean',
+                },
+                manifestBytes: {
+                    type: 'string',
+                },
+                manifestSha256: {
+                    type: 'string',
+                },
+                origin: {
+                    type: 'string',
+                },
+                priorActivityAvailable: {
+                    const: false,
+                    type: 'boolean',
+                },
+                provider: {
+                    const: 'cdp-passive',
+                    type: 'string',
+                },
+                reference: {
+                    $ref: '#/definitions/ReverseBrowserReference',
+                },
+                resourceCount: {
+                    type: 'string',
+                },
+                scriptCount: {
+                    type: 'string',
+                },
+                sourceRunSha256: {
+                    type: 'string',
+                },
+                targetId: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'capturedAt',
+                'coverage',
+                'exportedFiles',
+                'frameId',
+                'includeSources',
+                'manifestBytes',
+                'manifestSha256',
+                'origin',
+                'priorActivityAvailable',
+                'provider',
+                'reference',
+                'resourceCount',
+                'scriptCount',
+                'sourceRunSha256',
+                'targetId',
+            ],
+            type: 'object',
+        },
         BrowserAttributeName: {
             description: 'An attribute directory contains names only.',
             properties: {
@@ -10581,6 +10652,11 @@ export const schema: Schema = {
                     $ref: '#/definitions/ReverseBrowserSnapshot',
                     description:
                         'A live run carries capture metadata and an event count, never all event rows.',
+                },
+                browserInput: {
+                    $ref: '#/definitions/BrowserAnalysisInput',
+                    description:
+                        'Body-free provenance links a derived shared analysis to the exact original browser capture.',
                 },
                 browserSources: {
                     $ref: '#/definitions/BrowserSourcesSnapshot',

@@ -32,6 +32,19 @@ editor; scrolling loads another bounded text range, retaining at most two editor
 documents. Pending reads are canceled on selection/view changes. Uncaptured code
 and partial coverage remain explicit. RE Demo includes Browser scripts.
 
-Verified source exports can feed the existing shared JavaScript analyzer.
-Browser specialist planning, import maps, runtime reachability, larger captures,
+Native `reverse_browser_analyze` starts a new shared JavaScript investigation from
+one saved source reference and question. Three specialists share one parse/index,
+request evidence-linked follow-ups and finish with independent review. The child
+receipt's `browserInput` retains the original capture reference and source-run
+hash separately from its own identity, plus verified export-manifest metadata.
+`ReverseInvestigation.parse` rejects cross-conversation references, unexpected
+source bodies and inconsistent export counts before presentation.
+
+Read original Scripts/Resources/source pages using `browserInput.reference.runId`
+and `evidenceId` with the same parent conversation. Validate the returned run hash
+against `browserInput.sourceRunSha256`, not the derived run's hash. Static evidence
+and agent progress use the child run. Chat preserves both views and RE Demo
+includes Browser analysis. No target code runs during saved-source analysis.
+
+Import maps, specialized bundle extraction, runtime reachability, larger captures,
 screenshots, storage, WebMCP, scenarios and comparisons remain unfinished.
