@@ -5,6 +5,7 @@ export const WorkflowApplication = {
     ClaudeCode: 'claude-code',
     GrokBuild: 'grok-build',
     NervaCode: 'nerva-code',
+    MistralVibe: 'mistral-vibe',
 } as const;
 export type WorkflowApplication = (typeof WorkflowApplication)[keyof typeof WorkflowApplication];
 export interface WorkflowApplicationDefinition {
@@ -44,6 +45,13 @@ export class WorkflowApplications {
             executable: 'nerva-code',
             login: [],
             docs: '',
+        },
+        {
+            id: WorkflowApplication.MistralVibe,
+            title: 'Mistral Vibe',
+            executable: 'vibe',
+            login: ['--setup'],
+            docs: 'https://github.com/mistralai/mistral-vibe',
         },
     ]);
     public static get(id: string): WorkflowApplicationDefinition {
