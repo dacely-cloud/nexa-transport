@@ -11,9 +11,19 @@ import { reverseSnapshot } from '../protocol/Validators.js';
 import { ApplicationReceipt } from './ApplicationReceipt.js';
 import { ArchiveReceipt } from './ArchiveReceipt.js';
 import { NavigationReceipt } from './NavigationReceipt.js';
+import { ReverseControlFlow, type ReverseControlFlowPage } from './ControlFlow.js';
+export type {
+    ReverseControlFlowPage,
+    ReverseControlFlowBlock,
+    ReverseControlFlowInstruction,
+} from './ControlFlow.js';
 
 /** Portable investigation receipt decoding and monotonic replay for multi-agent consumers. */
 export class ReverseInvestigation {
+    /** Validates captured IDA or Ghidra basic blocks before rendering or comparing them. */
+    public static controlFlow(input: unknown): ReverseControlFlowPage {
+        return ReverseControlFlow.read(input);
+    }
     /** Validates untrusted receipts and bounds their presentation fields before rendering. */
     public static parse(input: unknown): ReverseRunSnapshot {
         if (!reverseSnapshot(input)) {
