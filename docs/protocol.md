@@ -1191,6 +1191,8 @@ Configurable bounds on gateway-owned work and memory.
 | `processes.stop`                 | Yes      | Object (fields below) |                                                                                            |
 | `reverse.catalog`                | Yes      | Object (fields below) |                                                                                            |
 | `reverse.evidence`               | Yes      | Object (fields below) |                                                                                            |
+| `reverse.functions`              | Yes      | Object (fields below) |                                                                                            |
+| `reverse.inspect`                | Yes      | Object (fields below) |                                                                                            |
 | `roblox.credentials.remove`      | Yes      | Object (fields below) |                                                                                            |
 | `roblox.credentials.set`         | Yes      | Object (fields below) |                                                                                            |
 | `roblox.credentials.status`      | Yes      | Object (fields below) |                                                                                            |
@@ -1692,6 +1694,20 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | -------------------------------------------------------- | ----------- |
 | `params` | Yes      | [ReverseEvidenceQuery](protocol.md#reverseevidencequery) |             |
 | `result` | Yes      | [ReverseEvidencePage](protocol.md#reverseevidencepage)   |             |
+
+**reverse.functions**
+
+| Field    | Required | Type                                                       | Description |
+| -------- | -------- | ---------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ReverseFunctionsQuery](protocol.md#reversefunctionsquery) |             |
+| `result` | Yes      | [ReverseFunctionsPage](protocol.md#reversefunctionspage)   |             |
+
+**reverse.inspect**
+
+| Field    | Required | Type                                                     | Description |
+| -------- | -------- | -------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ReverseInspectQuery](protocol.md#reverseinspectquery)   |             |
+| `result` | Yes      | [ReverseInspectResult](protocol.md#reverseinspectresult) |             |
 
 **roblox.credentials.remove**
 
@@ -3583,6 +3599,18 @@ Reads only an authenticated session's indexed investigation, never a workspace p
 | `id`     | Yes      | `string` |             |
 | `runId`  | Yes      | `string` |             |
 
+## ReverseDirectoryState
+
+Explicit inventory coverage distinguishes absent, partial and complete indexing.
+
+Type: `"failed"` / `"indexing"` / `"partial"` / `"ready"` / `"unavailable"`.
+
+## ReverseEngine
+
+Installed native analyzer supplying a function directory.
+
+Type: `"ghidra"` / `"ida"`.
+
 ## ReverseEvidencePage
 
 Original evidence text paged by UTF-16 offset, independent of model report previews.
@@ -3627,6 +3655,75 @@ Provenance for one immutable evidence file, shared by specialists in the same ru
 | `path`        | Yes      | `string`      |             |
 | `selector`    | Yes      | `null,string` |             |
 | `stepId`      | No       | `string`      |             |
+
+## ReverseFunction
+
+Durable metadata, with exact addresses and byte sizes represented as strings.
+
+| Field     | Required | Type          | Description |
+| --------- | -------- | ------------- | ----------- |
+| `address` | Yes      | `string`      |             |
+| `bytes`   | Yes      | `null,string` |             |
+| `name`    | Yes      | `string`      |             |
+
+## ReverseFunctionsPage
+
+At most fifty address-ordered function rows from a single owner-scoped inventory.
+
+| Field        | Required | Type                                                       | Description |
+| ------------ | -------- | ---------------------------------------------------------- | ----------- |
+| `cursor`     | Yes      | `string`                                                   |             |
+| `engine`     | Yes      | [ReverseEngine](protocol.md#reverseengine)                 |             |
+| `error`      | Yes      | `null,string`                                              |             |
+| `functions`  | Yes      | Array of [ReverseFunction](protocol.md#reversefunction)    |             |
+| `nextCursor` | Yes      | `null,string`                                              |             |
+| `runId`      | Yes      | `string`                                                   |             |
+| `sha256`     | Yes      | `string`                                                   |             |
+| `state`      | Yes      | [ReverseDirectoryState](protocol.md#reversedirectorystate) |             |
+| `total`      | Yes      | `string`                                                   |             |
+
+## ReverseFunctionsQuery
+
+An authenticated directory read never accepts analyzer handles or filesystem paths.
+
+| Field    | Required | Type                                       | Description                                                                  |
+| -------- | -------- | ------------------------------------------ | ---------------------------------------------------------------------------- |
+| `cursor` | No       | `string`                                   |                                                                              |
+| `engine` | Yes      | [ReverseEngine](protocol.md#reverseengine) |                                                                              |
+| `filter` | No       | `string`                                   | Literal case-insensitive name or address prefix, never a regular expression. |
+| `id`     | Yes      | `string`                                   |                                                                              |
+| `runId`  | Yes      | `string`                                   |                                                                              |
+
+## ReverseInspectQuery
+
+Operates only on a still-live, owner-scoped analyzer. No database id or query token crosses the wire.
+
+| Field       | Required | Type                                               | Description                                                                  |
+| ----------- | -------- | -------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `cursor`    | No       | `string`                                           |                                                                              |
+| `engine`    | Yes      | [ReverseEngine](protocol.md#reverseengine)         |                                                                              |
+| `filter`    | No       | `string`                                           | Literal case-insensitive name or address prefix, never a regular expression. |
+| `id`        | Yes      | `string`                                           |                                                                              |
+| `offset`    | No       | `number`                                           |                                                                              |
+| `operation` | Yes      | [ReverseInspection](protocol.md#reverseinspection) |                                                                              |
+| `runId`     | Yes      | `string`                                           |                                                                              |
+| `selector`  | Yes      | `string`                                           |                                                                              |
+
+## ReverseInspectResult
+
+Inspection captures immutable evidence; its text is read separately through the existing paged API.
+
+| Field    | Required | Type                                                       | Description |
+| -------- | -------- | ---------------------------------------------------------- | ----------- |
+| `record` | Yes      | [ReverseEvidenceRecord](protocol.md#reverseevidencerecord) |             |
+| `runId`  | Yes      | `string`                                                   |             |
+| `sha256` | Yes      | `string`                                                   |             |
+
+## ReverseInspection
+
+Read-only browser operations supported by an existing native analyzer lease.
+
+Type: `"decompile"` / `"disassemble"` / `"graph"` / `"xrefs"`.
 
 ## ReversePlanStep
 

@@ -4,10 +4,13 @@ import type {
     WireTurnEvent,
     ReverseCatalogPage,
     ReverseEvidencePage,
+    ReverseFunctionsPage,
+    ReverseInspectResult,
 } from '../protocol/Protocol.js';
 import { reverseSnapshot } from '../protocol/Validators.js';
 import { ApplicationReceipt } from './ApplicationReceipt.js';
 import { ArchiveReceipt } from './ArchiveReceipt.js';
+import { NavigationReceipt } from './NavigationReceipt.js';
 
 /** Portable investigation receipt decoding and monotonic replay for multi-agent consumers. */
 export class ReverseInvestigation {
@@ -112,6 +115,16 @@ export class ReverseInvestigation {
     /** Validates original evidence pages returned by the session-owned archive RPC. */
     public static evidence(input: unknown): ReverseEvidencePage {
         return ArchiveReceipt.evidence(input);
+    }
+
+    /** Validates bounded, address-ordered native function metadata. */
+    public static functions(input: unknown): ReverseFunctionsPage {
+        return NavigationReceipt.functions(input);
+    }
+
+    /** Validates immutable provenance returned by a live, owner-scoped analyzer inspection. */
+    public static inspection(input: unknown): ReverseInspectResult {
+        return NavigationReceipt.inspection(input);
     }
 
     static #invalidTask(task: ReverseTaskSnapshot): boolean {

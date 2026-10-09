@@ -3599,6 +3599,30 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'reverse.functions': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/ReverseFunctionsQuery',
+                        },
+                        result: {
+                            $ref: '#/definitions/ReverseFunctionsPage',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'reverse.inspect': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/ReverseInspectQuery',
+                        },
+                        result: {
+                            $ref: '#/definitions/ReverseInspectResult',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'roblox.credentials.remove': {
                     properties: {
                         params: {
@@ -4465,6 +4489,8 @@ export const schema: Schema = {
                 'processes.stop',
                 'reverse.catalog',
                 'reverse.evidence',
+                'reverse.functions',
+                'reverse.inspect',
                 'roblox.credentials.remove',
                 'roblox.credentials.set',
                 'roblox.credentials.status',
@@ -7818,6 +7844,18 @@ export const schema: Schema = {
             required: ['id', 'runId'],
             type: 'object',
         },
+        ReverseDirectoryState: {
+            description:
+                'Explicit inventory coverage distinguishes absent, partial and complete indexing.\nOne function-directory lifecycle state.',
+            enum: ['failed', 'indexing', 'partial', 'ready', 'unavailable'],
+            type: 'string',
+        },
+        ReverseEngine: {
+            description:
+                'Installed native analyzer supplying a function directory.\nA supported native analyzer identity.',
+            enum: ['ghidra', 'ida'],
+            type: 'string',
+        },
         ReverseEvidencePage: {
             description:
                 'Original evidence text paged by UTF-16 offset, independent of model report previews.',
@@ -7936,6 +7974,153 @@ export const schema: Schema = {
                 'selector',
             ],
             type: 'object',
+        },
+        ReverseFunction: {
+            description:
+                'Durable metadata, with exact addresses and byte sizes represented as strings.',
+            properties: {
+                address: {
+                    type: 'string',
+                },
+                bytes: {
+                    type: ['null', 'string'],
+                },
+                name: {
+                    type: 'string',
+                },
+            },
+            required: ['address', 'bytes', 'name'],
+            type: 'object',
+        },
+        ReverseFunctionsPage: {
+            description:
+                'At most fifty address-ordered function rows from a single owner-scoped inventory.',
+            properties: {
+                cursor: {
+                    type: 'string',
+                },
+                engine: {
+                    $ref: '#/definitions/ReverseEngine',
+                },
+                error: {
+                    type: ['null', 'string'],
+                },
+                functions: {
+                    items: {
+                        $ref: '#/definitions/ReverseFunction',
+                    },
+                    type: 'array',
+                },
+                nextCursor: {
+                    type: ['null', 'string'],
+                },
+                runId: {
+                    type: 'string',
+                },
+                sha256: {
+                    type: 'string',
+                },
+                state: {
+                    $ref: '#/definitions/ReverseDirectoryState',
+                },
+                total: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'cursor',
+                'engine',
+                'error',
+                'functions',
+                'nextCursor',
+                'runId',
+                'sha256',
+                'state',
+                'total',
+            ],
+            type: 'object',
+        },
+        ReverseFunctionsQuery: {
+            description:
+                'An authenticated directory read never accepts analyzer handles or filesystem paths.',
+            properties: {
+                cursor: {
+                    type: 'string',
+                },
+                engine: {
+                    $ref: '#/definitions/ReverseEngine',
+                },
+                filter: {
+                    description:
+                        'Literal case-insensitive name or address prefix, never a regular expression.',
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                runId: {
+                    type: 'string',
+                },
+            },
+            required: ['engine', 'id', 'runId'],
+            type: 'object',
+        },
+        ReverseInspectQuery: {
+            description:
+                'Operates only on a still-live, owner-scoped analyzer. No database id or query token crosses the wire.',
+            properties: {
+                cursor: {
+                    type: 'string',
+                },
+                engine: {
+                    $ref: '#/definitions/ReverseEngine',
+                },
+                filter: {
+                    description:
+                        'Literal case-insensitive name or address prefix, never a regular expression.',
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                offset: {
+                    type: 'number',
+                },
+                operation: {
+                    $ref: '#/definitions/ReverseInspection',
+                },
+                runId: {
+                    type: 'string',
+                },
+                selector: {
+                    type: 'string',
+                },
+            },
+            required: ['engine', 'id', 'operation', 'runId', 'selector'],
+            type: 'object',
+        },
+        ReverseInspectResult: {
+            description:
+                'Inspection captures immutable evidence; its text is read separately through the existing paged API.',
+            properties: {
+                record: {
+                    $ref: '#/definitions/ReverseEvidenceRecord',
+                },
+                runId: {
+                    type: 'string',
+                },
+                sha256: {
+                    type: 'string',
+                },
+            },
+            required: ['record', 'runId', 'sha256'],
+            type: 'object',
+        },
+        ReverseInspection: {
+            description:
+                'Read-only browser operations supported by an existing native analyzer lease.\nOne bounded native inspection operation.',
+            enum: ['decompile', 'disassemble', 'graph', 'xrefs'],
+            type: 'string',
         },
         ReversePlanStep: {
             description:
@@ -11971,6 +12156,12 @@ export const schema: Schema = {
         reverseEvidence: {
             $ref: '#/definitions/ReverseEvidencePage',
         },
+        reverseFunctions: {
+            $ref: '#/definitions/ReverseFunctionsPage',
+        },
+        reverseInspection: {
+            $ref: '#/definitions/ReverseInspectResult',
+        },
         reverseSnapshot: {
             $ref: '#/definitions/ReverseRunSnapshot',
         },
@@ -12004,6 +12195,8 @@ export const schema: Schema = {
         'native',
         'reverseCatalog',
         'reverseEvidence',
+        'reverseFunctions',
+        'reverseInspection',
         'reverseSnapshot',
         'sessionHistory',
         'sessionMessage',
