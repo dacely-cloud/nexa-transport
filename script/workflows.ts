@@ -7,6 +7,12 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 const files: readonly string[] = [
     'ConversionComponents',
     'ScalarConversion',
+    'ListComponents',
+    'lists/ListTypes',
+    'lists/ListPlan',
+    'lists/ListValues',
+    'lists/ListAggregate',
+    'lists/ListTransform',
     'MappingComponents',
     'mapping/MappingTypes',
     'mapping/MappingCodec',
@@ -99,6 +105,7 @@ const files: readonly string[] = [
 ];
 const destination: URL = new URL('../src/workflows/', import.meta.url);
 await mkdir(destination, { recursive: true });
+await mkdir(new URL('lists/', destination), { recursive: true });
 await mkdir(new URL('mapping/', destination), { recursive: true });
 await mkdir(new URL('runtime/', destination), { recursive: true });
 await mkdir(new URL('schedule/', destination), { recursive: true });

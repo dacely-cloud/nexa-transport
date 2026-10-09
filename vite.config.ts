@@ -4,6 +4,9 @@ const config: UserConfig = {
         target: 'es2023',
         lib: {
             entry: {
+                'workflow-list-types': 'src/workflows/lists/ListTypes.ts',
+                'workflow-list-plan': 'src/workflows/lists/ListPlan.ts',
+                'workflow-list-transform': 'src/workflows/lists/ListTransform.ts',
                 'workflow-scalar-conversion': 'src/workflows/ScalarConversion.ts',
                 'workflow-mapping-types': 'src/workflows/mapping/MappingTypes.ts',
                 'workflow-mapping-codec': 'src/workflows/mapping/MappingCodec.ts',

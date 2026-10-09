@@ -1,3 +1,4 @@
+import { ListPlans } from './lists/ListPlan.js';
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -176,6 +177,24 @@ export class WorkflowGraphValidation {
                     entry.node.id,
                     null,
                     'schedule',
+                );
+            }
+        }
+        if (entry.definition.id === 'data.list') {
+            try {
+                ListPlans.parse(
+                    entry.node.configuration,
+                    Object.hasOwn(entry.node.configuration, 'context') ||
+                        (connections.incoming.get(GraphConnections.key(entry.node.id, 'context'))
+                            ?.length ?? 0) > 0,
+                );
+            } catch (caught: unknown) {
+                problems.add(
+                    GraphIssueCode.Configuration,
+                    caught instanceof Error ? caught.message : 'Invalid list settings',
+                    entry.node.id,
+                    null,
+                    'operation',
                 );
             }
         }

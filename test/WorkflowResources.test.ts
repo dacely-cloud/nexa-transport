@@ -12,6 +12,12 @@ describe('portable workflow resource contracts', (): void => {
     it.each([
         'ConversionComponents',
         'ScalarConversion',
+        'ListComponents',
+        'lists/ListTypes',
+        'lists/ListPlan',
+        'lists/ListValues',
+        'lists/ListAggregate',
+        'lists/ListTransform',
         'MappingComponents',
         'mapping/MappingTypes',
         'mapping/MappingCodec',
