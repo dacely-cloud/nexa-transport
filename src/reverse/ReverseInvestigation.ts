@@ -1,6 +1,7 @@
 import type {
     ReverseBrowserPage,
     BrowserStructurePage,
+    BrowserSourcesPage,
     ReverseGraphPage,
     ReverseRunSnapshot,
     ReverseTaskSnapshot,
@@ -13,6 +14,7 @@ import type {
     ReverseNetworkDetailPage,
 } from '../protocol/Protocol.js';
 import { BrowserStructureReceipt } from './BrowserStructureReceipt.js';
+import { BrowserSourcesReceipt } from './BrowserSourcesReceipt.js';
 import { BrowserReceipt } from './BrowserReceipt.js';
 import { reverseSnapshot } from '../protocol/Validators.js';
 import { GraphReceipt } from './GraphReceipt.js';
@@ -70,6 +72,16 @@ export class ReverseInvestigation {
             }
             BrowserStructureReceipt.snapshot(
                 input.browserStructure,
+                input.id,
+                input.archive?.sessionId,
+            );
+        }
+        if (input.browserSources !== undefined) {
+            if (input.kind !== 'browser') {
+                throw new TypeError('Browser sources require a browser target');
+            }
+            BrowserSourcesReceipt.snapshot(
+                input.browserSources,
                 input.id,
                 input.archive?.sessionId,
             );
@@ -174,6 +186,10 @@ export class ReverseInvestigation {
     /** Validates one bounded saved DOM/AX or attribute directory over the session-owned gateway. */
     public static structure(input: unknown): BrowserStructurePage {
         return BrowserStructureReceipt.read(input);
+    }
+    /** Validates script/resource directories or independently selected immutable source text pages. */
+    public static sources(input: unknown): BrowserSourcesPage {
+        return BrowserSourcesReceipt.read(input);
     }
 
     /** Validates full catalog pages returned by the session-owned archive RPC. */

@@ -1147,6 +1147,410 @@
             ],
             "type": "object"
         },
+        "BrowserScriptSourceMap": {
+            "description": "A source-map declaration is retained independently of fetched or decoded map coverage.",
+            "properties": {
+                "declarationLength": {
+                    "type": "string"
+                },
+                "declarationSha256": {
+                    "type": "string"
+                },
+                "inline": {
+                    "type": "boolean"
+                },
+                "url": {
+                    "type": ["null", "string"]
+                }
+            },
+            "required": ["declarationLength", "declarationSha256", "inline", "url"],
+            "type": "object"
+        },
+        "BrowserScriptSourceState": {
+            "description": "Source coverage is separate from script inventory and resource presence.\nReasons for having or omitting Debugger source text.",
+            "enum": ["budget-exhausted", "captured", "non-javascript", "not-selected"],
+            "type": "string"
+        },
+        "BrowserSourceDirectoryRow": {
+            "anyOf": [
+                {
+                    "$ref": "#/definitions/BrowserSourceScriptRow"
+                },
+                {
+                    "$ref": "#/definitions/BrowserSourceResourceRow"
+                }
+            ],
+            "description": "Finite source directory rows are independently paged from text."
+        },
+        "BrowserSourceResourceRow": {
+            "description": "Resource metadata remains distinct from a script artifact or execution observation.",
+            "properties": {
+                "canceled": {
+                    "type": "boolean"
+                },
+                "contentSize": {
+                    "type": ["null", "string"]
+                },
+                "failed": {
+                    "type": "boolean"
+                },
+                "frameId": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "kind": {
+                    "const": "resource",
+                    "type": "string"
+                },
+                "mimeType": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "canceled",
+                "contentSize",
+                "failed",
+                "frameId",
+                "id",
+                "kind",
+                "mimeType",
+                "type",
+                "url"
+            ],
+            "type": "object"
+        },
+        "BrowserSourceScriptRow": {
+            "description": "A directory script row has source identity and coverage, without the source body.",
+            "properties": {
+                "cdpHash": {
+                    "type": ["null", "string"]
+                },
+                "endColumn": {
+                    "type": "number"
+                },
+                "endLine": {
+                    "type": "number"
+                },
+                "frameId": {
+                    "type": "string"
+                },
+                "hasSourceUrl": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "isModule": {
+                    "type": "boolean"
+                },
+                "kind": {
+                    "const": "script",
+                    "type": "string"
+                },
+                "language": {
+                    "type": "string"
+                },
+                "length": {
+                    "type": ["null", "string"]
+                },
+                "resourceIds": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "source": {
+                    "$ref": "#/definitions/Omit%3CBrowserScriptSource%2C%22text%22%3E"
+                },
+                "sourceMap": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/BrowserScriptSourceMap"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "sourceMapOmitted": {
+                    "type": "boolean"
+                },
+                "startColumn": {
+                    "type": "number"
+                },
+                "startLine": {
+                    "type": "number"
+                },
+                "url": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "cdpHash",
+                "endColumn",
+                "endLine",
+                "frameId",
+                "hasSourceUrl",
+                "id",
+                "isModule",
+                "kind",
+                "language",
+                "length",
+                "resourceIds",
+                "source",
+                "sourceMap",
+                "sourceMapOmitted",
+                "startColumn",
+                "startLine",
+                "url"
+            ],
+            "type": "object"
+        },
+        "BrowserSourcesCoverage": {
+            "description": "Coverage counters describe observations, including repeats rejected before identity retention.",
+            "properties": {
+                "capturedSources": {
+                    "type": "string"
+                },
+                "excludedFrames": {
+                    "type": "boolean"
+                },
+                "excludedResources": {
+                    "type": "string"
+                },
+                "excludedScriptObservations": {
+                    "type": "string"
+                },
+                "omittedScriptObservations": {
+                    "type": "string"
+                },
+                "partial": {
+                    "type": "boolean"
+                },
+                "sourceBytes": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "capturedSources",
+                "excludedFrames",
+                "excludedResources",
+                "excludedScriptObservations",
+                "omittedScriptObservations",
+                "partial",
+                "sourceBytes"
+            ],
+            "type": "object"
+        },
+        "BrowserSourcesPage": {
+            "description": "Source pages use exact UTF-16 offsets and retain the complete source's UTF-8 digest/byte count.",
+            "properties": {
+                "captureSha256": {
+                    "type": "string"
+                },
+                "cursor": {
+                    "type": "string"
+                },
+                "evidenceId": {
+                    "type": "string"
+                },
+                "metadata": {
+                    "$ref": "#/definitions/BrowserSourcesProjection"
+                },
+                "nextCursor": {
+                    "type": ["null", "string"]
+                },
+                "records": {
+                    "items": {
+                        "$ref": "#/definitions/BrowserSourceDirectoryRow"
+                    },
+                    "type": "array"
+                },
+                "runId": {
+                    "type": "string"
+                },
+                "selector": {
+                    "type": ["null", "string"]
+                },
+                "sha256": {
+                    "type": "string"
+                },
+                "sourceBytes": {
+                    "type": ["null", "string"]
+                },
+                "sourceSha256": {
+                    "type": ["null", "string"]
+                },
+                "text": {
+                    "type": ["null", "string"]
+                },
+                "total": {
+                    "type": "string"
+                },
+                "view": {
+                    "$ref": "#/definitions/BrowserSourcesView"
+                }
+            },
+            "required": [
+                "captureSha256",
+                "cursor",
+                "evidenceId",
+                "metadata",
+                "nextCursor",
+                "records",
+                "runId",
+                "selector",
+                "sha256",
+                "sourceBytes",
+                "sourceSha256",
+                "text",
+                "total",
+                "view"
+            ],
+            "type": "object"
+        },
+        "BrowserSourcesProjection": {
+            "description": "Source progress carries coverage and counts without code or full inventories.",
+            "properties": {
+                "capturedAt": {
+                    "type": "string"
+                },
+                "coverage": {
+                    "$ref": "#/definitions/BrowserSourcesCoverage"
+                },
+                "frameId": {
+                    "type": "string"
+                },
+                "includeSources": {
+                    "type": "boolean"
+                },
+                "origin": {
+                    "type": "string"
+                },
+                "priorActivityAvailable": {
+                    "const": false,
+                    "type": "boolean"
+                },
+                "provider": {
+                    "const": "cdp-passive",
+                    "type": "string"
+                },
+                "resourceCount": {
+                    "type": "string"
+                },
+                "scriptCount": {
+                    "type": "string"
+                },
+                "targetId": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "capturedAt",
+                "coverage",
+                "frameId",
+                "includeSources",
+                "origin",
+                "priorActivityAvailable",
+                "provider",
+                "resourceCount",
+                "scriptCount",
+                "targetId"
+            ],
+            "type": "object"
+        },
+        "BrowserSourcesQuery": {
+            "description": "Saved source selectors carry IDs and offsets, never sockets, capabilities or workspace paths.",
+            "properties": {
+                "cursor": {
+                    "type": "string"
+                },
+                "evidenceId": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "runId": {
+                    "type": "string"
+                },
+                "selector": {
+                    "type": "string"
+                },
+                "view": {
+                    "$ref": "#/definitions/BrowserSourcesView"
+                }
+            },
+            "required": ["evidenceId", "id", "runId", "view"],
+            "type": "object"
+        },
+        "BrowserSourcesSnapshot": {
+            "description": "A native source capture references one immutable owner-scoped archive.",
+            "properties": {
+                "capturedAt": {
+                    "type": "string"
+                },
+                "coverage": {
+                    "$ref": "#/definitions/BrowserSourcesCoverage"
+                },
+                "frameId": {
+                    "type": "string"
+                },
+                "includeSources": {
+                    "type": "boolean"
+                },
+                "origin": {
+                    "type": "string"
+                },
+                "priorActivityAvailable": {
+                    "const": false,
+                    "type": "boolean"
+                },
+                "provider": {
+                    "const": "cdp-passive",
+                    "type": "string"
+                },
+                "reference": {
+                    "$ref": "#/definitions/ReverseBrowserReference"
+                },
+                "resourceCount": {
+                    "type": "string"
+                },
+                "scriptCount": {
+                    "type": "string"
+                },
+                "targetId": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "capturedAt",
+                "coverage",
+                "frameId",
+                "includeSources",
+                "origin",
+                "priorActivityAvailable",
+                "provider",
+                "reference",
+                "resourceCount",
+                "scriptCount",
+                "targetId"
+            ],
+            "type": "object"
+        },
+        "BrowserSourcesView": {
+            "description": "Metadata and source content are selected independently, with distinct cursors.\nSaved capture views do not attach or execute page code.",
+            "enum": ["resources", "scripts", "source"],
+            "type": "string"
+        },
         "BrowserStructureCount": {
             "description": "Value-free DOM tag and accessibility role counts.",
             "properties": {
@@ -4198,6 +4602,18 @@
                     "required": ["params", "result"],
                     "type": "object"
                 },
+                "reverse.browser.sources": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/BrowserSourcesQuery"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/BrowserSourcesPage"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
                 "reverse.browser.structure": {
                     "properties": {
                         "params": {
@@ -5497,6 +5913,7 @@
                 "processes.resize",
                 "processes.stop",
                 "reverse.browser",
+                "reverse.browser.sources",
                 "reverse.browser.structure",
                 "reverse.catalog",
                 "reverse.evidence",
@@ -7795,6 +8212,21 @@
             "required": ["ok"],
             "type": "object"
         },
+        "Omit<BrowserScriptSource,\"text\">": {
+            "properties": {
+                "bytes": {
+                    "type": ["null", "string"]
+                },
+                "sha256": {
+                    "type": ["null", "string"]
+                },
+                "state": {
+                    "$ref": "#/definitions/BrowserScriptSourceState"
+                }
+            },
+            "required": ["bytes", "sha256", "state"],
+            "type": "object"
+        },
         "PendingApproval": {
             "description": "One approval waiting for a human.",
             "properties": {
@@ -9893,6 +10325,10 @@
                 "browser": {
                     "$ref": "#/definitions/ReverseBrowserSnapshot",
                     "description": "A live run carries capture metadata and an event count, never all event rows."
+                },
+                "browserSources": {
+                    "$ref": "#/definitions/BrowserSourcesSnapshot",
+                    "description": "A native source capture references one immutable owner-scoped archive."
                 },
                 "browserStructure": {
                     "$ref": "#/definitions/BrowserStructureSnapshot",
@@ -15204,6 +15640,9 @@
         "reverseBrowser": {
             "$ref": "#/definitions/ReverseBrowserPage"
         },
+        "reverseBrowserSources": {
+            "$ref": "#/definitions/BrowserSourcesPage"
+        },
         "reverseBrowserStructure": {
             "$ref": "#/definitions/BrowserStructurePage"
         },
@@ -15260,6 +15699,7 @@
         "methods",
         "native",
         "reverseBrowser",
+        "reverseBrowserSources",
         "reverseBrowserStructure",
         "reverseCatalog",
         "reverseEvidence",

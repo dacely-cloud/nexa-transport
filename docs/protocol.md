@@ -528,6 +528,192 @@ One passive structure inspection tied to a stable selected document.
 | `targetId`               | Yes      | `string`                                                             |             |
 | `url`                    | Yes      | `string`                                                             |             |
 
+## BrowserScriptSourceMap
+
+A source-map declaration is retained independently of fetched or decoded map coverage.
+
+| Field               | Required | Type          | Description |
+| ------------------- | -------- | ------------- | ----------- |
+| `declarationLength` | Yes      | `string`      |             |
+| `declarationSha256` | Yes      | `string`      |             |
+| `inline`            | Yes      | `boolean`     |             |
+| `url`               | Yes      | `null,string` |             |
+
+## BrowserScriptSourceState
+
+Source coverage is separate from script inventory and resource presence.
+
+Type: `"budget-exhausted"` / `"captured"` / `"non-javascript"` / `"not-selected"`.
+
+## BrowserSourceDirectoryRow
+
+Finite source directory rows are independently paged from text.
+
+Variant 1: [BrowserSourceScriptRow](protocol.md#browsersourcescriptrow)
+
+| Field              | Required | Type                                                                   | Description |
+| ------------------ | -------- | ---------------------------------------------------------------------- | ----------- |
+| `cdpHash`          | Yes      | `null,string`                                                          |             |
+| `endColumn`        | Yes      | `number`                                                               |             |
+| `endLine`          | Yes      | `number`                                                               |             |
+| `frameId`          | Yes      | `string`                                                               |             |
+| `hasSourceUrl`     | Yes      | `boolean`                                                              |             |
+| `id`               | Yes      | `string`                                                               |             |
+| `isModule`         | Yes      | `boolean`                                                              |             |
+| `kind`             | Yes      | `"script"`                                                             |             |
+| `language`         | Yes      | `string`                                                               |             |
+| `length`           | Yes      | `null,string`                                                          |             |
+| `resourceIds`      | Yes      | Array of `string`                                                      |             |
+| `source`           | Yes      | [OmitBrowserScriptSourcetext](protocol.md#omitbrowserscriptsourcetext) |             |
+| `sourceMap`        | Yes      | [BrowserScriptSourceMap](protocol.md#browserscriptsourcemap) / `null`  |             |
+| `sourceMapOmitted` | Yes      | `boolean`                                                              |             |
+| `startColumn`      | Yes      | `number`                                                               |             |
+| `startLine`        | Yes      | `number`                                                               |             |
+| `url`              | Yes      | `string`                                                               |             |
+
+Variant 2: [BrowserSourceResourceRow](protocol.md#browsersourceresourcerow)
+
+| Field         | Required | Type          | Description |
+| ------------- | -------- | ------------- | ----------- |
+| `canceled`    | Yes      | `boolean`     |             |
+| `contentSize` | Yes      | `null,string` |             |
+| `failed`      | Yes      | `boolean`     |             |
+| `frameId`     | Yes      | `string`      |             |
+| `id`          | Yes      | `string`      |             |
+| `kind`        | Yes      | `"resource"`  |             |
+| `mimeType`    | Yes      | `string`      |             |
+| `type`        | Yes      | `string`      |             |
+| `url`         | Yes      | `string`      |             |
+
+## BrowserSourceResourceRow
+
+Resource metadata remains distinct from a script artifact or execution observation.
+
+| Field         | Required | Type          | Description |
+| ------------- | -------- | ------------- | ----------- |
+| `canceled`    | Yes      | `boolean`     |             |
+| `contentSize` | Yes      | `null,string` |             |
+| `failed`      | Yes      | `boolean`     |             |
+| `frameId`     | Yes      | `string`      |             |
+| `id`          | Yes      | `string`      |             |
+| `kind`        | Yes      | `"resource"`  |             |
+| `mimeType`    | Yes      | `string`      |             |
+| `type`        | Yes      | `string`      |             |
+| `url`         | Yes      | `string`      |             |
+
+## BrowserSourceScriptRow
+
+A directory script row has source identity and coverage, without the source body.
+
+| Field              | Required | Type                                                                   | Description |
+| ------------------ | -------- | ---------------------------------------------------------------------- | ----------- |
+| `cdpHash`          | Yes      | `null,string`                                                          |             |
+| `endColumn`        | Yes      | `number`                                                               |             |
+| `endLine`          | Yes      | `number`                                                               |             |
+| `frameId`          | Yes      | `string`                                                               |             |
+| `hasSourceUrl`     | Yes      | `boolean`                                                              |             |
+| `id`               | Yes      | `string`                                                               |             |
+| `isModule`         | Yes      | `boolean`                                                              |             |
+| `kind`             | Yes      | `"script"`                                                             |             |
+| `language`         | Yes      | `string`                                                               |             |
+| `length`           | Yes      | `null,string`                                                          |             |
+| `resourceIds`      | Yes      | Array of `string`                                                      |             |
+| `source`           | Yes      | [OmitBrowserScriptSourcetext](protocol.md#omitbrowserscriptsourcetext) |             |
+| `sourceMap`        | Yes      | [BrowserScriptSourceMap](protocol.md#browserscriptsourcemap) / `null`  |             |
+| `sourceMapOmitted` | Yes      | `boolean`                                                              |             |
+| `startColumn`      | Yes      | `number`                                                               |             |
+| `startLine`        | Yes      | `number`                                                               |             |
+| `url`              | Yes      | `string`                                                               |             |
+
+## BrowserSourcesCoverage
+
+Coverage counters describe observations, including repeats rejected before identity retention.
+
+| Field                        | Required | Type      | Description |
+| ---------------------------- | -------- | --------- | ----------- |
+| `capturedSources`            | Yes      | `string`  |             |
+| `excludedFrames`             | Yes      | `boolean` |             |
+| `excludedResources`          | Yes      | `string`  |             |
+| `excludedScriptObservations` | Yes      | `string`  |             |
+| `omittedScriptObservations`  | Yes      | `string`  |             |
+| `partial`                    | Yes      | `boolean` |             |
+| `sourceBytes`                | Yes      | `string`  |             |
+
+## BrowserSourcesPage
+
+Source pages use exact UTF-16 offsets and retain the complete source's UTF-8 digest/byte count.
+
+| Field           | Required | Type                                                                        | Description |
+| --------------- | -------- | --------------------------------------------------------------------------- | ----------- |
+| `captureSha256` | Yes      | `string`                                                                    |             |
+| `cursor`        | Yes      | `string`                                                                    |             |
+| `evidenceId`    | Yes      | `string`                                                                    |             |
+| `metadata`      | Yes      | [BrowserSourcesProjection](protocol.md#browsersourcesprojection)            |             |
+| `nextCursor`    | Yes      | `null,string`                                                               |             |
+| `records`       | Yes      | Array of [BrowserSourceDirectoryRow](protocol.md#browsersourcedirectoryrow) |             |
+| `runId`         | Yes      | `string`                                                                    |             |
+| `selector`      | Yes      | `null,string`                                                               |             |
+| `sha256`        | Yes      | `string`                                                                    |             |
+| `sourceBytes`   | Yes      | `null,string`                                                               |             |
+| `sourceSha256`  | Yes      | `null,string`                                                               |             |
+| `text`          | Yes      | `null,string`                                                               |             |
+| `total`         | Yes      | `string`                                                                    |             |
+| `view`          | Yes      | [BrowserSourcesView](protocol.md#browsersourcesview)                        |             |
+
+## BrowserSourcesProjection
+
+Source progress carries coverage and counts without code or full inventories.
+
+| Field                    | Required | Type                                                         | Description |
+| ------------------------ | -------- | ------------------------------------------------------------ | ----------- |
+| `capturedAt`             | Yes      | `string`                                                     |             |
+| `coverage`               | Yes      | [BrowserSourcesCoverage](protocol.md#browsersourcescoverage) |             |
+| `frameId`                | Yes      | `string`                                                     |             |
+| `includeSources`         | Yes      | `boolean`                                                    |             |
+| `origin`                 | Yes      | `string`                                                     |             |
+| `priorActivityAvailable` | Yes      | `false`                                                      |             |
+| `provider`               | Yes      | `"cdp-passive"`                                              |             |
+| `resourceCount`          | Yes      | `string`                                                     |             |
+| `scriptCount`            | Yes      | `string`                                                     |             |
+| `targetId`               | Yes      | `string`                                                     |             |
+
+## BrowserSourcesQuery
+
+Saved source selectors carry IDs and offsets, never sockets, capabilities or workspace paths.
+
+| Field        | Required | Type                                                 | Description |
+| ------------ | -------- | ---------------------------------------------------- | ----------- |
+| `cursor`     | No       | `string`                                             |             |
+| `evidenceId` | Yes      | `string`                                             |             |
+| `id`         | Yes      | `string`                                             |             |
+| `runId`      | Yes      | `string`                                             |             |
+| `selector`   | No       | `string`                                             |             |
+| `view`       | Yes      | [BrowserSourcesView](protocol.md#browsersourcesview) |             |
+
+## BrowserSourcesSnapshot
+
+A native source capture references one immutable owner-scoped archive.
+
+| Field                    | Required | Type                                                           | Description |
+| ------------------------ | -------- | -------------------------------------------------------------- | ----------- |
+| `capturedAt`             | Yes      | `string`                                                       |             |
+| `coverage`               | Yes      | [BrowserSourcesCoverage](protocol.md#browsersourcescoverage)   |             |
+| `frameId`                | Yes      | `string`                                                       |             |
+| `includeSources`         | Yes      | `boolean`                                                      |             |
+| `origin`                 | Yes      | `string`                                                       |             |
+| `priorActivityAvailable` | Yes      | `false`                                                        |             |
+| `provider`               | Yes      | `"cdp-passive"`                                                |             |
+| `reference`              | Yes      | [ReverseBrowserReference](protocol.md#reversebrowserreference) |             |
+| `resourceCount`          | Yes      | `string`                                                       |             |
+| `scriptCount`            | Yes      | `string`                                                       |             |
+| `targetId`               | Yes      | `string`                                                       |             |
+
+## BrowserSourcesView
+
+Metadata and source content are selected independently, with distinct cursors.
+
+Type: `"resources"` / `"scripts"` / `"source"`.
+
 ## BrowserStructureCount
 
 Value-free DOM tag and accessibility role counts.
@@ -1570,6 +1756,7 @@ Configurable bounds on gateway-owned work and memory.
 | `processes.resize`                  | Yes      | Object (fields below) |                                                                                            |
 | `processes.stop`                    | Yes      | Object (fields below) |                                                                                            |
 | `reverse.browser`                   | Yes      | Object (fields below) |                                                                                            |
+| `reverse.browser.sources`           | Yes      | Object (fields below) |                                                                                            |
 | `reverse.browser.structure`         | Yes      | Object (fields below) |                                                                                            |
 | `reverse.catalog`                   | Yes      | Object (fields below) |                                                                                            |
 | `reverse.evidence`                  | Yes      | Object (fields below) |                                                                                            |
@@ -1659,6 +1846,10 @@ Configurable bounds on gateway-owned work and memory.
 | `workflows.runs.terminal.command`   | Yes      | Object (fields below) |                                                                                            |
 | `workflows.runs.terminal.read`      | Yes      | Object (fields below) |                                                                                            |
 | `workflows.save`                    | Yes      | Object (fields below) |                                                                                            |
+| `workflows.schedules.disable`       | Yes      | Object (fields below) |                                                                                            |
+| `workflows.schedules.enable`        | Yes      | Object (fields below) |                                                                                            |
+| `workflows.schedules.preview`       | Yes      | Object (fields below) |                                                                                            |
+| `workflows.schedules.read`          | Yes      | Object (fields below) |                                                                                            |
 | `workflows.validate`                | Yes      | Object (fields below) |                                                                                            |
 | `workspaces.create`                 | Yes      | Object (fields below) |                                                                                            |
 | `workspaces.describe`               | Yes      | Object (fields below) |                                                                                            |
@@ -2094,6 +2285,13 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ------------------------------------------------------ | ----------- |
 | `params` | Yes      | [ReverseBrowserQuery](protocol.md#reversebrowserquery) |             |
 | `result` | Yes      | [ReverseBrowserPage](protocol.md#reversebrowserpage)   |             |
+
+**reverse.browser.sources**
+
+| Field    | Required | Type                                                   | Description |
+| -------- | -------- | ------------------------------------------------------ | ----------- |
+| `params` | Yes      | [BrowserSourcesQuery](protocol.md#browsersourcesquery) |             |
+| `result` | Yes      | [BrowserSourcesPage](protocol.md#browsersourcespage)   |             |
 
 **reverse.browser.structure**
 
@@ -2717,6 +2915,34 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ------------------------------------------------------ | ----------- |
 | `params` | Yes      | [WorkflowSaveRequest](protocol.md#workflowsaverequest) |             |
 | `result` | Yes      | [WorkflowReceipt](protocol.md#workflowreceipt)         |             |
+
+**workflows.schedules.disable**
+
+| Field    | Required | Type                                                           | Description |
+| -------- | -------- | -------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [WorkflowScheduleCommand](protocol.md#workflowschedulecommand) |             |
+| `result` | Yes      | [WorkflowScheduleView](protocol.md#workflowscheduleview)       |             |
+
+**workflows.schedules.enable**
+
+| Field    | Required | Type                                                         | Description |
+| -------- | -------- | ------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [WorkflowScheduleEnable](protocol.md#workflowscheduleenable) |             |
+| `result` | Yes      | [WorkflowScheduleView](protocol.md#workflowscheduleview)     |             |
+
+**workflows.schedules.preview**
+
+| Field    | Required | Type                                                           | Description |
+| -------- | -------- | -------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [WorkflowSchedulePreview](protocol.md#workflowschedulepreview) |             |
+| `result` | Yes      | Array of `string`                                              |             |
+
+**workflows.schedules.read**
+
+| Field    | Required | Type                                                              | Description |
+| -------- | -------- | ----------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [WorkflowScheduleRead](protocol.md#workflowscheduleread)          |             |
+| `result` | Yes      | [WorkflowScheduleView](protocol.md#workflowscheduleview) / `null` |             |
 
 **workflows.validate**
 
@@ -3747,6 +3973,14 @@ The answer to a method that only reports success.
 | ----- | -------- | ------ | ----------- |
 | `ok`  | Yes      | `true` |             |
 
+## OmitBrowserScriptSourcetext
+
+| Field    | Required | Type                                                             | Description |
+| -------- | -------- | ---------------------------------------------------------------- | ----------- |
+| `bytes`  | Yes      | `null,string`                                                    |             |
+| `sha256` | Yes      | `null,string`                                                    |             |
+| `state`  | Yes      | [BrowserScriptSourceState](protocol.md#browserscriptsourcestate) |             |
+
 ## PendingApproval
 
 One approval waiting for a human.
@@ -4652,6 +4886,7 @@ Bounded, capability-free projection carried by live tool events and the final re
 | `application`      | No       | [ReverseApplicationSnapshot](protocol.md#reverseapplicationsnapshot) | Bounded projection for live Chat events; complete indexes are paged by the native query tool.   |
 | `archive`          | No       | [ReverseArchiveRef](protocol.md#reversearchiveref)                   | A session-owned archive, without query tokens or analyzer handles.                              |
 | `browser`          | No       | [ReverseBrowserSnapshot](protocol.md#reversebrowsersnapshot)         | A live run carries capture metadata and an event count, never all event rows.                   |
+| `browserSources`   | No       | [BrowserSourcesSnapshot](protocol.md#browsersourcessnapshot)         | A native source capture references one immutable owner-scoped archive.                          |
 | `browserStructure` | No       | [BrowserStructureSnapshot](protocol.md#browserstructuresnapshot)     | A progress receipt references structure without carrying complete trees.                        |
 | `cleanupErrors`    | Yes      | Array of `string`                                                    |                                                                                                 |
 | `evidence`         | Yes      | Array of [ReverseEvidenceRecord](protocol.md#reverseevidencerecord)  |                                                                                                 |
@@ -5852,6 +6087,34 @@ Bounded metadata query; the authenticated owner is not client input.
 | `category` | Yes      | [WorkflowAttentionCategory](protocol.md#workflowattentioncategory)      |             |
 | `limit`    | Yes      | `number`                                                                |             |
 
+## WorkflowCalendarFold
+
+A repeated local time always contributes at most one scheduled occurrence.
+
+Type: `"first"` / `"second"` / `"skip"`.
+
+## WorkflowCalendarGap
+
+Calendar times are resolved in the named zone instead of by adding elapsed milliseconds.
+
+Type: `"next-valid"` / `"skip"`.
+
+## WorkflowCalendarTiming
+
+Weekdays use ISO numbering: Monday 1 through Sunday 7; date bounds/exceptions are local dates.
+
+| Field         | Required | Type                                                     | Description |
+| ------------- | -------- | -------------------------------------------------------- | ----------- |
+| `endDate`     | Yes      | `null,string`                                            |             |
+| `exceptDates` | Yes      | Array of `string`                                        |             |
+| `fold`        | Yes      | [WorkflowCalendarFold](protocol.md#workflowcalendarfold) |             |
+| `gap`         | Yes      | [WorkflowCalendarGap](protocol.md#workflowcalendargap)   |             |
+| `kind`        | Yes      | `"calendar"`                                             |             |
+| `startDate`   | Yes      | `string`                                                 |             |
+| `time`        | Yes      | `string`                                                 |             |
+| `timeZone`    | Yes      | `string`                                                 |             |
+| `weekdays`    | Yes      | Array of `number`                                        |             |
+
 ## WorkflowCatalog
 
 Catalog format is separate from saved component versions and draft storage format.
@@ -6194,6 +6457,17 @@ An exact request, bounded before admission and independent of a text model bindi
 | `quality`      | Yes      | `string`                                                                       |                                                  |
 | `size`         | Yes      | `string`                                                                       |                                                  |
 
+## WorkflowIntervalTiming
+
+Millisecond strings preserve exact instants across transport and MongoDB.
+
+| Field        | Required | Type          | Description |
+| ------------ | -------- | ------------- | ----------- |
+| `endAtMs`    | Yes      | `null,string` |             |
+| `intervalMs` | Yes      | `string`      |             |
+| `kind`       | Yes      | `"interval"`  |             |
+| `startAtMs`  | Yes      | `string`      |             |
+
 ## WorkflowListCursor
 
 Cursor uses a timestamp plus stable identity to handle equal update times.
@@ -6390,6 +6664,15 @@ One node's immutable content and independently versioned layout.
 JSON configuration is data, not an executable plan or authorization.
 
 Type: Dictionary.
+
+## WorkflowOnceTiming
+
+A single UTC instant, displayed in the user's selected timezone by the client.
+
+| Field  | Required | Type     | Description |
+| ------ | -------- | -------- | ----------- |
+| `atMs` | Yes      | `string` |             |
+| `kind` | Yes      | `"once"` |             |
 
 ## WorkflowPatch
 
@@ -6768,6 +7051,7 @@ Reads bounded step metadata after an exclusive node ID.
 | `mode`             | Yes      | [WorkflowRunMode](protocol.md#workflowrunmode)                           |                                                                          |
 | `publication`      | No       | [WorkflowPublicationReference](protocol.md#workflowpublicationreference) | Immutable publication identity, distinct from its source draft revision. |
 | `runId`            | Yes      | `string`                                                                 |                                                                          |
+| `schedule`         | No       | [WorkflowScheduleSource](protocol.md#workflowschedulesource)             | Present only on scheduled published runs.                                |
 | `sequence`         | Yes      | `string`                                                                 |                                                                          |
 | `status`           | Yes      | [WorkflowRunStatus](protocol.md#workflowrunstatus)                       |                                                                          |
 | `updatedAtMs`      | Yes      | `string`                                                                 |                                                                          |
@@ -6784,6 +7068,141 @@ Command identity and expected revision serve different purposes.
 | `expectedRevision` | Yes      | `string`                                   |             |
 | `patch`            | Yes      | [WorkflowPatch](protocol.md#workflowpatch) |             |
 | `workflowId`       | Yes      | `string`                                   |             |
+
+## WorkflowScheduleCommand
+
+Configuration revision is independent of execution progress.
+
+| Field              | Required | Type     | Description |
+| ------------------ | -------- | -------- | ----------- |
+| `commandId`        | Yes      | `string` |             |
+| `expectedRevision` | Yes      | `string` |             |
+| `workflowId`       | Yes      | `string` |             |
+
+## WorkflowScheduleConfiguration
+
+Activation binds saved timing rules to one publication and its submitted input.
+
+| Field               | Required | Type                                                         | Description |
+| ------------------- | -------- | ------------------------------------------------------------ | ----------- |
+| `catchUpLimit`      | Yes      | `number`                                                     |             |
+| `input`             | Yes      | [WorkflowObject](protocol.md#workflowobject)                 |             |
+| `lateGraceMs`       | Yes      | `string`                                                     |             |
+| `maxConcurrentRuns` | Yes      | `number`                                                     |             |
+| `missed`            | Yes      | [WorkflowScheduleMissed](protocol.md#workflowschedulemissed) |             |
+| `publicationId`     | Yes      | `string`                                                     |             |
+| `timing`            | Yes      | [WorkflowScheduleTiming](protocol.md#workflowscheduletiming) |             |
+
+## WorkflowScheduleEnable
+
+Explicit enable or replace command containing the reviewed complete configuration.
+
+| Field              | Required | Type                                                                       | Description |
+| ------------------ | -------- | -------------------------------------------------------------------------- | ----------- |
+| `commandId`        | Yes      | `string`                                                                   |             |
+| `configuration`    | Yes      | [WorkflowScheduleConfiguration](protocol.md#workflowscheduleconfiguration) |             |
+| `expectedRevision` | Yes      | `string`                                                                   |             |
+| `workflowId`       | Yes      | `string`                                                                   |             |
+
+## WorkflowScheduleEvent
+
+Concise automation status evidence.
+
+| Field          | Required | Type                                     | Description |
+| -------------- | -------- | ---------------------------------------- | ----------- |
+| `atMs`         | Yes      | `string`                                 |             |
+| `message`      | Yes      | `null,string`                            |             |
+| `occurrenceMs` | Yes      | `string`                                 |             |
+| `outcome`      | Yes      | `"accepted"` / `"blocked"` / `"skipped"` |             |
+| `runId`        | Yes      | `null,string`                            |             |
+
+## WorkflowScheduleMissed
+
+Late occurrences are skipped, coalesced into the latest, or replayed up to a configured cap.
+
+Type: `"catch-up"` / `"latest"` / `"skip"`.
+
+## WorkflowSchedulePreview
+
+Preview performs no activation, storage mutation or run preparation.
+
+| Field     | Required | Type                                                         | Description |
+| --------- | -------- | ------------------------------------------------------------ | ----------- |
+| `afterMs` | Yes      | `string`                                                     |             |
+| `timing`  | Yes      | [WorkflowScheduleTiming](protocol.md#workflowscheduletiming) |             |
+
+## WorkflowScheduleRead
+
+Owner-scoped current automation state.
+
+| Field        | Required | Type     | Description |
+| ------------ | -------- | -------- | ----------- |
+| `workflowId` | Yes      | `string` |             |
+
+## WorkflowScheduleSource
+
+Immutable provenance included in both the execution snapshot and run metadata.
+
+| Field          | Required | Type     | Description |
+| -------------- | -------- | -------- | ----------- |
+| `occurrenceMs` | Yes      | `string` |             |
+| `revision`     | Yes      | `string` |             |
+
+## WorkflowScheduleStatus
+
+UI and runtime share these lifecycle meanings.
+
+Type: `"blocked"` / `"complete"` / `"disabled"` / `"enabled"`.
+
+## WorkflowScheduleTiming
+
+Supported timing forms, with inclusive start and end instants.
+
+Variant 1: [WorkflowCalendarTiming](protocol.md#workflowcalendartiming)
+
+| Field         | Required | Type                                                     | Description |
+| ------------- | -------- | -------------------------------------------------------- | ----------- |
+| `endDate`     | Yes      | `null,string`                                            |             |
+| `exceptDates` | Yes      | Array of `string`                                        |             |
+| `fold`        | Yes      | [WorkflowCalendarFold](protocol.md#workflowcalendarfold) |             |
+| `gap`         | Yes      | [WorkflowCalendarGap](protocol.md#workflowcalendargap)   |             |
+| `kind`        | Yes      | `"calendar"`                                             |             |
+| `startDate`   | Yes      | `string`                                                 |             |
+| `time`        | Yes      | `string`                                                 |             |
+| `timeZone`    | Yes      | `string`                                                 |             |
+| `weekdays`    | Yes      | Array of `number`                                        |             |
+
+Variant 2: [WorkflowIntervalTiming](protocol.md#workflowintervaltiming)
+
+| Field        | Required | Type          | Description |
+| ------------ | -------- | ------------- | ----------- |
+| `endAtMs`    | Yes      | `null,string` |             |
+| `intervalMs` | Yes      | `string`      |             |
+| `kind`       | Yes      | `"interval"`  |             |
+| `startAtMs`  | Yes      | `string`      |             |
+
+Variant 3: [WorkflowOnceTiming](protocol.md#workflowoncetiming)
+
+| Field  | Required | Type     | Description |
+| ------ | -------- | -------- | ----------- |
+| `atMs` | Yes      | `string` |             |
+| `kind` | Yes      | `"once"` |             |
+
+## WorkflowScheduleView
+
+No graph, outputs, credentials or unbounded event collections are embedded here.
+
+| Field                | Required | Type                                                                       | Description |
+| -------------------- | -------- | -------------------------------------------------------------------------- | ----------- |
+| `configuration`      | Yes      | [WorkflowScheduleConfiguration](protocol.md#workflowscheduleconfiguration) |             |
+| `last`               | Yes      | [WorkflowScheduleEvent](protocol.md#workflowscheduleevent) / `null`        |             |
+| `nextAtMs`           | Yes      | `null,string`                                                              |             |
+| `pendingCount`       | Yes      | `number`                                                                   |             |
+| `revision`           | Yes      | `string`                                                                   |             |
+| `skippedOccurrences` | Yes      | `string`                                                                   |             |
+| `status`             | Yes      | [WorkflowScheduleStatus](protocol.md#workflowschedulestatus)               |             |
+| `updatedAtMs`        | Yes      | `string`                                                                   |             |
+| `workflowId`         | Yes      | `string`                                                                   |             |
 
 ## WorkflowStepStatus
 
