@@ -54,6 +54,8 @@ All 54 protocol methods. `connect` is managed by `NexaClient.connect`; the remai
 - [processes.stop](#processes-stop)
 - [reverse.catalog](#reverse-catalog)
 - [reverse.evidence](#reverse-evidence)
+- [reverse.functions](#reverse-functions)
+- [reverse.inspect](#reverse-inspect)
 - [roblox.credentials.remove](#roblox-credentials-remove)
 - [roblox.credentials.set](#roblox-credentials-set)
 - [roblox.credentials.status](#roblox-credentials-status)
@@ -1245,6 +1247,67 @@ Parameters: [ReverseEvidenceQuery](protocol.md#reverseevidencequery).
 | `runId`          | Yes      | `string`                |                                                                  |
 
 Result: [ReverseEvidencePage](protocol.md#reverseevidencepage).
+
+## reverse.functions
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ReverseFunctions> = {
+    engine: 'ghidra',
+    id: 'YOUR_ID',
+    runId: 'YOUR_RUNID',
+};
+const result: ResultOf<typeof Method.ReverseFunctions> = await client.call(
+    Method.ReverseFunctions,
+    params,
+);
+```
+
+Parameters: [ReverseFunctionsQuery](protocol.md#reversefunctionsquery).
+
+| Field    | Required | Type                                       | Description                                                                  |
+| -------- | -------- | ------------------------------------------ | ---------------------------------------------------------------------------- |
+| `cursor` | No       | `string`                                   |                                                                              |
+| `engine` | Yes      | [ReverseEngine](protocol.md#reverseengine) |                                                                              |
+| `filter` | No       | `string`                                   | Literal case-insensitive name or address prefix, never a regular expression. |
+| `id`     | Yes      | `string`                                   |                                                                              |
+| `runId`  | Yes      | `string`                                   |                                                                              |
+
+Result: [ReverseFunctionsPage](protocol.md#reversefunctionspage).
+
+## reverse.inspect
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ReverseInspect> = {
+    engine: 'ghidra',
+    id: 'YOUR_ID',
+    operation: 'decompile',
+    runId: 'YOUR_RUNID',
+    selector: 'YOUR_SELECTOR',
+};
+const result: ResultOf<typeof Method.ReverseInspect> = await client.call(
+    Method.ReverseInspect,
+    params,
+);
+```
+
+Parameters: [ReverseInspectQuery](protocol.md#reverseinspectquery).
+
+| Field       | Required | Type                                               | Description                                                                  |
+| ----------- | -------- | -------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `cursor`    | No       | `string`                                           |                                                                              |
+| `engine`    | Yes      | [ReverseEngine](protocol.md#reverseengine)         |                                                                              |
+| `filter`    | No       | `string`                                           | Literal case-insensitive name or address prefix, never a regular expression. |
+| `id`        | Yes      | `string`                                           |                                                                              |
+| `offset`    | No       | `number`                                           |                                                                              |
+| `operation` | Yes      | [ReverseInspection](protocol.md#reverseinspection) |                                                                              |
+| `runId`     | Yes      | `string`                                           |                                                                              |
+| `selector`  | Yes      | `string`                                           |                                                                              |
+
+Result: [ReverseInspectResult](protocol.md#reverseinspectresult).
 
 ## roblox.credentials.remove
 

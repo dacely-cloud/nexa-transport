@@ -2337,6 +2337,22 @@ export interface GatewayMethodsreverse_evidenceShape {
     readonly result: ReverseEvidencePage;
 }
 
+/** GatewayMethodsreverse_functions wire fields. */
+export interface GatewayMethodsreverse_functionsShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ReverseFunctionsQuery;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ReverseFunctionsPage;
+}
+
+/** GatewayMethodsreverse_inspect wire fields. */
+export interface GatewayMethodsreverse_inspectShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ReverseInspectQuery;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ReverseInspectResult;
+}
+
 /** GatewayMethodsroblox_credentials_remove wire fields. */
 export interface GatewayMethodsroblox_credentials_removeShape {
     /** params as defined by the Nexa gateway. */
@@ -2955,6 +2971,10 @@ export interface GatewayMethodsShape {
     readonly 'reverse.catalog': GatewayMethodsreverse_catalogShape;
     /** reverse.evidence as defined by the Nexa gateway. */
     readonly 'reverse.evidence': GatewayMethodsreverse_evidenceShape;
+    /** reverse.functions as defined by the Nexa gateway. */
+    readonly 'reverse.functions': GatewayMethodsreverse_functionsShape;
+    /** reverse.inspect as defined by the Nexa gateway. */
+    readonly 'reverse.inspect': GatewayMethodsreverse_inspectShape;
     /** roblox.credentials.remove as defined by the Nexa gateway. */
     readonly 'roblox.credentials.remove': GatewayMethodsroblox_credentials_removeShape;
     /** roblox.credentials.set as defined by the Nexa gateway. */
@@ -5181,6 +5201,25 @@ export interface ReverseCatalogQueryShape {
 /** ReverseCatalogQuery from the Nexa wire protocol. */
 export type ReverseCatalogQuery = ReverseCatalogQueryShape;
 
+/** Allowed values for ReverseDirectoryState. */
+export const ReverseDirectoryStateValues = {
+    Value0: 'failed',
+    Value1: 'indexing',
+    Value2: 'partial',
+    Value3: 'ready',
+    Value4: 'unavailable',
+} as const;
+
+/** ReverseDirectoryState from the Nexa wire protocol. */
+export type ReverseDirectoryState =
+    (typeof ReverseDirectoryStateValues)[keyof typeof ReverseDirectoryStateValues];
+
+/** Allowed values for ReverseEngine. */
+export const ReverseEngineValues = { Value0: 'ghidra', Value1: 'ida' } as const;
+
+/** ReverseEngine from the Nexa wire protocol. */
+export type ReverseEngine = (typeof ReverseEngineValues)[keyof typeof ReverseEngineValues];
+
 /** Allowed values for ReverseEvidencePagerepresentation. */
 export const ReverseEvidencePagerepresentationValues = {
     Value0: 'code',
@@ -5261,6 +5300,109 @@ export interface ReverseEvidenceRecordShape {
 
 /** ReverseEvidenceRecord from the Nexa wire protocol. */
 export type ReverseEvidenceRecord = ReverseEvidenceRecordShape;
+
+/** ReverseFunction wire fields. */
+export interface ReverseFunctionShape {
+    /** address as defined by the Nexa gateway. */
+    readonly address: string;
+    /** bytes as defined by the Nexa gateway. */
+    readonly bytes: null | string;
+    /** name as defined by the Nexa gateway. */
+    readonly name: string;
+}
+
+/** ReverseFunction from the Nexa wire protocol. */
+export type ReverseFunction = ReverseFunctionShape;
+
+/** ReverseFunctionsPage wire fields. */
+export interface ReverseFunctionsPageShape {
+    /** cursor as defined by the Nexa gateway. */
+    readonly cursor: string;
+    /** engine as defined by the Nexa gateway. */
+    readonly engine: ReverseEngine;
+    /** error as defined by the Nexa gateway. */
+    readonly error: null | string;
+    /** functions as defined by the Nexa gateway. */
+    readonly functions: ReadonlyArray<ReverseFunction>;
+    /** nextCursor as defined by the Nexa gateway. */
+    readonly nextCursor: null | string;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+    /** sha256 as defined by the Nexa gateway. */
+    readonly sha256: string;
+    /** state as defined by the Nexa gateway. */
+    readonly state: ReverseDirectoryState;
+    /** total as defined by the Nexa gateway. */
+    readonly total: string;
+}
+
+/** ReverseFunctionsPage from the Nexa wire protocol. */
+export type ReverseFunctionsPage = ReverseFunctionsPageShape;
+
+/** ReverseFunctionsQuery wire fields. */
+export interface ReverseFunctionsQueryShape {
+    /** cursor as defined by the Nexa gateway. */
+    readonly cursor?: string;
+    /** engine as defined by the Nexa gateway. */
+    readonly engine: ReverseEngine;
+    /** filter as defined by the Nexa gateway. */
+    readonly filter?: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+}
+
+/** ReverseFunctionsQuery from the Nexa wire protocol. */
+export type ReverseFunctionsQuery = ReverseFunctionsQueryShape;
+
+/** ReverseInspectQuery wire fields. */
+export interface ReverseInspectQueryShape {
+    /** cursor as defined by the Nexa gateway. */
+    readonly cursor?: string;
+    /** engine as defined by the Nexa gateway. */
+    readonly engine: ReverseEngine;
+    /** filter as defined by the Nexa gateway. */
+    readonly filter?: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** offset as defined by the Nexa gateway. */
+    readonly offset?: number;
+    /** operation as defined by the Nexa gateway. */
+    readonly operation: ReverseInspection;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+    /** selector as defined by the Nexa gateway. */
+    readonly selector: string;
+}
+
+/** ReverseInspectQuery from the Nexa wire protocol. */
+export type ReverseInspectQuery = ReverseInspectQueryShape;
+
+/** ReverseInspectResult wire fields. */
+export interface ReverseInspectResultShape {
+    /** record as defined by the Nexa gateway. */
+    readonly record: ReverseEvidenceRecord;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+    /** sha256 as defined by the Nexa gateway. */
+    readonly sha256: string;
+}
+
+/** ReverseInspectResult from the Nexa wire protocol. */
+export type ReverseInspectResult = ReverseInspectResultShape;
+
+/** Allowed values for ReverseInspection. */
+export const ReverseInspectionValues = {
+    Value0: 'decompile',
+    Value1: 'disassemble',
+    Value2: 'graph',
+    Value3: 'xrefs',
+} as const;
+
+/** ReverseInspection from the Nexa wire protocol. */
+export type ReverseInspection =
+    (typeof ReverseInspectionValues)[keyof typeof ReverseInspectionValues];
 
 /** ReversePlanStep wire fields. */
 export interface ReversePlanStepShape {
@@ -7986,6 +8128,10 @@ export enum Method {
     ReverseCatalog = 'reverse.catalog',
     /** Calls reverse.evidence. */
     ReverseEvidence = 'reverse.evidence',
+    /** Calls reverse.functions. */
+    ReverseFunctions = 'reverse.functions',
+    /** Calls reverse.inspect. */
+    ReverseInspect = 'reverse.inspect',
     /** Calls roblox.credentials.remove. */
     RobloxCredentialsRemove = 'roblox.credentials.remove',
     /** Calls roblox.credentials.set. */
