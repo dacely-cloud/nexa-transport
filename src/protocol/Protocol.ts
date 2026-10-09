@@ -4217,6 +4217,14 @@ export interface GatewayMethodsworkflows_runs_listShape {
     readonly result: WorkflowRunListPage;
 }
 
+/** GatewayMethodsworkflows_runs_loopSpending wire fields. */
+export interface GatewayMethodsworkflows_runs_loopSpendingShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkflowLoopSpendingRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WorkflowLoopSpendingView;
+}
+
 /** GatewayMethodsworkflows_runs_output wire fields. */
 export interface GatewayMethodsworkflows_runs_outputShape {
     /** params as defined by the Nexa gateway. */
@@ -4637,6 +4645,8 @@ export interface GatewayMethodsShape {
     readonly 'workflows.runs.inputs': GatewayMethodsworkflows_runs_inputsShape;
     /** workflows.runs.list as defined by the Nexa gateway. */
     readonly 'workflows.runs.list': GatewayMethodsworkflows_runs_listShape;
+    /** workflows.runs.loopSpending as defined by the Nexa gateway. */
+    readonly 'workflows.runs.loopSpending': GatewayMethodsworkflows_runs_loopSpendingShape;
     /** workflows.runs.output as defined by the Nexa gateway. */
     readonly 'workflows.runs.output': GatewayMethodsworkflows_runs_outputShape;
     /** workflows.runs.question.answer as defined by the Nexa gateway. */
@@ -9800,6 +9810,50 @@ export interface WorkflowListRequestShape {
 /** WorkflowListRequest from the Nexa wire protocol. */
 export type WorkflowListRequest = WorkflowListRequestShape;
 
+/** WorkflowLoopSpendingRequest wire fields. */
+export interface WorkflowLoopSpendingRequestShape {
+    /** loopId as defined by the Nexa gateway. */
+    readonly loopId: string;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+}
+
+/** WorkflowLoopSpendingRequest from the Nexa wire protocol. */
+export type WorkflowLoopSpendingRequest = WorkflowLoopSpendingRequestShape;
+
+/** WorkflowLoopSpendingView wire fields. */
+export interface WorkflowLoopSpendingViewShape {
+    /** deadlineAtMs as defined by the Nexa gateway. */
+    readonly deadlineAtMs: null | string;
+    /** entries as defined by the Nexa gateway. */
+    readonly entries: string;
+    /** lastReportedAtMs as defined by the Nexa gateway. */
+    readonly lastReportedAtMs: null | string;
+    /** limitMicrocents as defined by the Nexa gateway. */
+    readonly limitMicrocents: null | string;
+    /** loopId as defined by the Nexa gateway. */
+    readonly loopId: string;
+    /** observedAtMs as defined by the Nexa gateway. */
+    readonly observedAtMs: string;
+    /** reportedMicrocents as defined by the Nexa gateway. */
+    readonly reportedMicrocents: null | string;
+    /** reservationCount as defined by the Nexa gateway. */
+    readonly reservationCount: number;
+    /** reservedMicrocents as defined by the Nexa gateway. */
+    readonly reservedMicrocents: string;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: string;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+    /** simulated as defined by the Nexa gateway. */
+    readonly simulated: boolean;
+    /** workflowId as defined by the Nexa gateway. */
+    readonly workflowId: string;
+}
+
+/** WorkflowLoopSpendingView from the Nexa wire protocol. */
+export type WorkflowLoopSpendingView = WorkflowLoopSpendingViewShape;
+
 /** WorkflowManifestPage wire fields. */
 export interface WorkflowManifestPageShape {
     /** details as defined by the Nexa gateway. */
@@ -11473,6 +11527,8 @@ export enum Method {
     WorkflowsRunsInputs = 'workflows.runs.inputs',
     /** Calls workflows.runs.list. */
     WorkflowsRunsList = 'workflows.runs.list',
+    /** Calls workflows.runs.loopSpending. */
+    WorkflowsRunsLoopSpending = 'workflows.runs.loopSpending',
     /** Calls workflows.runs.output. */
     WorkflowsRunsOutput = 'workflows.runs.output',
     /** Calls workflows.runs.question.answer. */

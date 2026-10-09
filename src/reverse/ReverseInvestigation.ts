@@ -87,8 +87,9 @@ export class ReverseInvestigation {
             );
         }
         if (input.browserComparison !== undefined) {
-            if (input.kind !== 'browser')
-                {throw new Error('Screenshot comparison requires a browser investigation');}
+            if (input.kind !== 'browser') {
+                throw new Error('Screenshot comparison requires a browser investigation');
+            }
             BrowserScreenshotComparisonReceipt.snapshot(
                 input.browserComparison,
                 input.id,

@@ -2213,6 +2213,7 @@ Configurable bounds on gateway-owned work and memory.
 | `workflows.runs.events`             | Yes      | Object (fields below) |                                                                                            |
 | `workflows.runs.inputs`             | Yes      | Object (fields below) |                                                                                            |
 | `workflows.runs.list`               | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.loopSpending`       | Yes      | Object (fields below) |                                                                                            |
 | `workflows.runs.output`             | Yes      | Object (fields below) |                                                                                            |
 | `workflows.runs.question.answer`    | Yes      | Object (fields below) |                                                                                            |
 | `workflows.runs.question.read`      | Yes      | Object (fields below) |                                                                                            |
@@ -3236,6 +3237,13 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ------------------------------------------------------------ | ----------- |
 | `params` | Yes      | [WorkflowRunListRequest](protocol.md#workflowrunlistrequest) |             |
 | `result` | Yes      | [WorkflowRunListPage](protocol.md#workflowrunlistpage)       |             |
+
+**workflows.runs.loopSpending**
+
+| Field    | Required | Type                                                                   | Description |
+| -------- | -------- | ---------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [WorkflowLoopSpendingRequest](protocol.md#workflowloopspendingrequest) |             |
+| `result` | Yes      | [WorkflowLoopSpendingView](protocol.md#workflowloopspendingview)       |             |
 
 **workflows.runs.output**
 
@@ -6900,6 +6908,35 @@ Metadata pagination carries no node payloads.
 | `cursor` | Yes      | [WorkflowListCursor](protocol.md#workflowlistcursor) / `null` |             |
 | `limit`  | Yes      | `number`                                                      |             |
 
+## WorkflowLoopSpendingRequest
+
+Select one authored loop in an owned immutable run.
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `loopId` | Yes      | `string` |             |
+| `runId`  | Yes      | `string` |             |
+
+## WorkflowLoopSpendingView
+
+The public projection adds run-pinned configuration and explicitly marks mocked execution.
+
+| Field                | Required | Type          | Description |
+| -------------------- | -------- | ------------- | ----------- |
+| `deadlineAtMs`       | Yes      | `null,string` |             |
+| `entries`            | Yes      | `string`      |             |
+| `lastReportedAtMs`   | Yes      | `null,string` |             |
+| `limitMicrocents`    | Yes      | `null,string` |             |
+| `loopId`             | Yes      | `string`      |             |
+| `observedAtMs`       | Yes      | `string`      |             |
+| `reportedMicrocents` | Yes      | `null,string` |             |
+| `reservationCount`   | Yes      | `number`      |             |
+| `reservedMicrocents` | Yes      | `string`      |             |
+| `revision`           | Yes      | `string`      |             |
+| `runId`              | Yes      | `string`      |             |
+| `simulated`          | Yes      | `boolean`     |             |
+| `workflowId`         | Yes      | `string`      |             |
+
 ## WorkflowManifestPage
 
 Bounded manifest page; offsets count references, never bytes or revisions.
@@ -7328,16 +7365,17 @@ Lists exact invocations for a node without including captured input/output bodie
 
 ## WorkflowRunEvent
 
-| Field          | Required | Type                                                                                                                                | Description |
-| -------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| `atMs`         | Yes      | `string`                                                                                                                            |             |
-| `invocationId` | Yes      | `null,string`                                                                                                                       |             |
-| `kind`         | Yes      | [WorkflowRunEventKind](protocol.md#workflowruneventkind)                                                                            |             |
-| `message`      | Yes      | `null,string`                                                                                                                       |             |
-| `nodeId`       | Yes      | `null,string`                                                                                                                       |             |
-| `runId`        | Yes      | `string`                                                                                                                            |             |
-| `sequence`     | Yes      | `string`                                                                                                                            |             |
-| `status`       | Yes      | `"cancelled"` / `"failed"` / `"interrupted"` / `"queued"` / `"running"` / `"skipped"` / `"succeeded"` / `"uncertain"` / `"waiting"` |             |
+| Field          | Required | Type                                                                                                                                | Description                                                                               |
+| -------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `atMs`         | Yes      | `string`                                                                                                                            |                                                                                           |
+| `invocationId` | Yes      | `null,string`                                                                                                                       |                                                                                           |
+| `kind`         | Yes      | [WorkflowRunEventKind](protocol.md#workflowruneventkind)                                                                            |                                                                                           |
+| `message`      | Yes      | `null,string`                                                                                                                       |                                                                                           |
+| `nodeId`       | Yes      | `null,string`                                                                                                                       |                                                                                           |
+| `origin`       | No       | [WorkflowStepOrigin](protocol.md#workflowsteporigin)                                                                                | An execution instance points back to the immutable authored card and its collection item. |
+| `runId`        | Yes      | `string`                                                                                                                            |                                                                                           |
+| `sequence`     | Yes      | `string`                                                                                                                            |                                                                                           |
+| `status`       | Yes      | `"cancelled"` / `"failed"` / `"interrupted"` / `"queued"` / `"running"` / `"skipped"` / `"succeeded"` / `"uncertain"` / `"waiting"` |                                                                                           |
 
 ## WorkflowRunEventKind
 
@@ -7618,6 +7656,16 @@ No graph, outputs, credentials or unbounded event collections are embedded here.
 | `updatedAtMs`        | Yes      | `string`                                                                   |             |
 | `workflowId`         | Yes      | `string`                                                                   |             |
 
+## WorkflowStepOrigin
+
+An execution instance points back to the immutable authored card and its collection item.
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `itemIndex` | Yes      | `number` |             |
+| `loopId`    | Yes      | `string` |             |
+| `nodeId`    | Yes      | `string` |             |
+
 ## WorkflowStepStatus
 
 Type: `"cancelled"` / `"failed"` / `"interrupted"` / `"running"` / `"skipped"` / `"succeeded"` / `"uncertain"` / `"waiting"`.
@@ -7626,19 +7674,20 @@ Type: `"cancelled"` / `"failed"` / `"interrupted"` / `"running"` / `"skipped"` /
 
 Exposes step metadata without embedding potentially large result payloads.
 
-| Field          | Required | Type                                                 | Description                                                                           |
-| -------------- | -------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| `attempt`      | Yes      | `number`                                             |                                                                                       |
-| `component`    | Yes      | `string`                                             |                                                                                       |
-| `finishedAtMs` | Yes      | `null,string`                                        |                                                                                       |
-| `hasResult`    | Yes      | `boolean`                                            |                                                                                       |
-| `invocationId` | Yes      | `string`                                             |                                                                                       |
-| `label`        | Yes      | `string`                                             |                                                                                       |
-| `message`      | Yes      | `null,string`                                        |                                                                                       |
-| `nodeId`       | Yes      | `string`                                             |                                                                                       |
-| `startedAtMs`  | Yes      | `string`                                             |                                                                                       |
-| `status`       | Yes      | [WorkflowStepStatus](protocol.md#workflowstepstatus) |                                                                                       |
-| `wakeAtMs`     | No       | `string`                                             | Persisted timer target; retained after completion or cancellation as timing evidence. |
+| Field          | Required | Type                                                 | Description                                                                              |
+| -------------- | -------- | ---------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `attempt`      | Yes      | `number`                                             |                                                                                          |
+| `component`    | Yes      | `string`                                             |                                                                                          |
+| `finishedAtMs` | Yes      | `null,string`                                        |                                                                                          |
+| `hasResult`    | Yes      | `boolean`                                            |                                                                                          |
+| `invocationId` | Yes      | `string`                                             |                                                                                          |
+| `label`        | Yes      | `string`                                             |                                                                                          |
+| `message`      | Yes      | `null,string`                                        |                                                                                          |
+| `nodeId`       | Yes      | `string`                                             |                                                                                          |
+| `origin`       | No       | [WorkflowStepOrigin](protocol.md#workflowsteporigin) | Only repeated instances carry this provenance; nodeId identifies the execution instance. |
+| `startedAtMs`  | Yes      | `string`                                             |                                                                                          |
+| `status`       | Yes      | [WorkflowStepStatus](protocol.md#workflowstepstatus) |                                                                                          |
+| `wakeAtMs`     | No       | `string`                                             | Persisted timer target; retained after completion or cancellation as timing evidence.    |
 
 ## WorkflowSummary
 
