@@ -1716,6 +1716,225 @@ export const schema: Schema = {
             ],
             type: 'object',
         },
+        BrowserScreenshotMetadata: {
+            description:
+                'Image-free historical receipt for one explicitly requested visible viewport.',
+            properties: {
+                bytes: {
+                    type: 'string',
+                },
+                capturedAt: {
+                    type: 'string',
+                },
+                coverage: {
+                    const: 'visible-viewport',
+                    type: 'string',
+                },
+                frameId: {
+                    type: 'string',
+                },
+                height: {
+                    type: 'number',
+                },
+                mimeType: {
+                    const: 'image/png',
+                    type: 'string',
+                },
+                origin: {
+                    type: 'string',
+                },
+                provider: {
+                    const: 'cdp-passive',
+                    type: 'string',
+                },
+                sha256: {
+                    type: 'string',
+                },
+                targetId: {
+                    type: 'string',
+                },
+                viewport: {
+                    $ref: '#/definitions/BrowserScreenshotViewport',
+                },
+                width: {
+                    type: 'number',
+                },
+            },
+            required: [
+                'bytes',
+                'capturedAt',
+                'coverage',
+                'frameId',
+                'height',
+                'mimeType',
+                'origin',
+                'provider',
+                'sha256',
+                'targetId',
+                'viewport',
+                'width',
+            ],
+            type: 'object',
+        },
+        BrowserScreenshotPage: {
+            description: 'Capture and PNG digests identify different immutable artifacts.',
+            properties: {
+                captureSha256: {
+                    type: 'string',
+                },
+                cursor: {
+                    type: 'string',
+                },
+                data: {
+                    type: ['null', 'string'],
+                },
+                evidenceId: {
+                    type: 'string',
+                },
+                metadata: {
+                    $ref: '#/definitions/BrowserScreenshotMetadata',
+                },
+                nextCursor: {
+                    type: ['null', 'string'],
+                },
+                runId: {
+                    type: 'string',
+                },
+                sha256: {
+                    type: 'string',
+                },
+                view: {
+                    $ref: '#/definitions/BrowserScreenshotView',
+                },
+            },
+            required: [
+                'captureSha256',
+                'cursor',
+                'data',
+                'evidenceId',
+                'metadata',
+                'nextCursor',
+                'runId',
+                'sha256',
+                'view',
+            ],
+            type: 'object',
+        },
+        BrowserScreenshotQuery: {
+            description:
+                'Saved image reads accept archive IDs and canonical byte offsets, never URLs or files.',
+            properties: {
+                cursor: {
+                    type: 'string',
+                },
+                evidenceId: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                runId: {
+                    type: 'string',
+                },
+                view: {
+                    $ref: '#/definitions/BrowserScreenshotView',
+                },
+            },
+            required: ['evidenceId', 'id', 'runId', 'view'],
+            type: 'object',
+        },
+        BrowserScreenshotSnapshot: {
+            description: 'Progress retains an owner-bound archive identity without any image data.',
+            properties: {
+                bytes: {
+                    type: 'string',
+                },
+                capturedAt: {
+                    type: 'string',
+                },
+                coverage: {
+                    const: 'visible-viewport',
+                    type: 'string',
+                },
+                frameId: {
+                    type: 'string',
+                },
+                height: {
+                    type: 'number',
+                },
+                mimeType: {
+                    const: 'image/png',
+                    type: 'string',
+                },
+                origin: {
+                    type: 'string',
+                },
+                provider: {
+                    const: 'cdp-passive',
+                    type: 'string',
+                },
+                reference: {
+                    $ref: '#/definitions/ReverseBrowserReference',
+                },
+                sha256: {
+                    type: 'string',
+                },
+                targetId: {
+                    type: 'string',
+                },
+                viewport: {
+                    $ref: '#/definitions/BrowserScreenshotViewport',
+                },
+                width: {
+                    type: 'number',
+                },
+            },
+            required: [
+                'bytes',
+                'capturedAt',
+                'coverage',
+                'frameId',
+                'height',
+                'mimeType',
+                'origin',
+                'provider',
+                'reference',
+                'sha256',
+                'targetId',
+                'viewport',
+                'width',
+            ],
+            type: 'object',
+        },
+        BrowserScreenshotView: {
+            description:
+                'Metadata reads contain no pixels; selected image pages contain at most 49152 decoded bytes.\nOne finite saved screenshot representation.',
+            enum: ['image', 'metadata'],
+            type: 'string',
+        },
+        BrowserScreenshotViewport: {
+            description:
+                "CSS viewport coordinates are separate from the PNG's physical pixel dimensions.",
+            properties: {
+                height: {
+                    type: 'number',
+                },
+                pageX: {
+                    type: 'number',
+                },
+                pageY: {
+                    type: 'number',
+                },
+                scale: {
+                    type: 'number',
+                },
+                width: {
+                    type: 'number',
+                },
+            },
+            required: ['height', 'pageX', 'pageY', 'scale', 'width'],
+            type: 'object',
+        },
         BrowserScriptSourceMap: {
             description:
                 'A source-map declaration is retained independently of fetched or decoded map coverage.',
@@ -5273,6 +5492,18 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'reverse.browser.screenshot': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/BrowserScreenshotQuery',
+                        },
+                        result: {
+                            $ref: '#/definitions/BrowserScreenshotPage',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'reverse.browser.sources': {
                     properties: {
                         params: {
@@ -6586,6 +6817,7 @@ export const schema: Schema = {
                 'processes.stop',
                 'reverse.browser',
                 'reverse.browser.modules',
+                'reverse.browser.screenshot',
                 'reverse.browser.sources',
                 'reverse.browser.structure',
                 'reverse.catalog',
@@ -11135,6 +11367,11 @@ export const schema: Schema = {
                     $ref: '#/definitions/BrowserAnalysisInput',
                     description:
                         'Body-free provenance links a derived shared analysis to the exact original browser capture.',
+                },
+                browserScreenshot: {
+                    $ref: '#/definitions/BrowserScreenshotSnapshot',
+                    description:
+                        'Progress retains an owner-bound archive identity without any image data.',
                 },
                 browserSources: {
                     $ref: '#/definitions/BrowserSourcesSnapshot',
@@ -16674,6 +16911,9 @@ export const schema: Schema = {
         reverseBrowserModules: {
             $ref: '#/definitions/BrowserModulePage',
         },
+        reverseBrowserScreenshot: {
+            $ref: '#/definitions/BrowserScreenshotPage',
+        },
         reverseBrowserSources: {
             $ref: '#/definitions/BrowserSourcesPage',
         },
@@ -16734,6 +16974,7 @@ export const schema: Schema = {
         'native',
         'reverseBrowser',
         'reverseBrowserModules',
+        'reverseBrowserScreenshot',
         'reverseBrowserSources',
         'reverseBrowserStructure',
         'reverseCatalog',

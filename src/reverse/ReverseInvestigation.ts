@@ -1,3 +1,5 @@
+import { BrowserScreenshotReceipt } from './BrowserScreenshotReceipt.js';
+import type { BrowserScreenshotPage } from '../protocol/Protocol.js';
 import type {
     ReverseBrowserPage,
     BrowserStructurePage,
@@ -79,6 +81,16 @@ export class ReverseInvestigation {
             }
             BrowserStructureReceipt.snapshot(
                 input.browserStructure,
+                input.id,
+                input.archive?.sessionId,
+            );
+        }
+        if (input.browserScreenshot !== undefined) {
+            if (input.kind !== 'browser') {
+                throw new TypeError('Screenshot requires a browser target');
+            }
+            BrowserScreenshotReceipt.snapshot(
+                input.browserScreenshot,
                 input.id,
                 input.archive?.sessionId,
             );
@@ -199,6 +211,10 @@ export class ReverseInvestigation {
     /** Validates one bounded saved DOM/AX or attribute directory over the session-owned gateway. */
     public static structure(input: unknown): BrowserStructurePage {
         return BrowserStructureReceipt.read(input);
+    }
+    /** Decodes a selected saved viewport metadata or bounded PNG byte page. */
+    public static screenshot(input: unknown): BrowserScreenshotPage {
+        return BrowserScreenshotReceipt.read(input);
     }
     /** Validates script/resource directories or independently selected immutable source text pages. */
     public static sources(input: unknown): BrowserSourcesPage {

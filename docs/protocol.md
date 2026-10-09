@@ -759,6 +759,91 @@ One passive structure inspection tied to a stable selected document.
 | `targetId`               | Yes      | `string`                                                             |             |
 | `url`                    | Yes      | `string`                                                             |             |
 
+## BrowserScreenshotMetadata
+
+Image-free historical receipt for one explicitly requested visible viewport.
+
+| Field        | Required | Type                                                               | Description |
+| ------------ | -------- | ------------------------------------------------------------------ | ----------- |
+| `bytes`      | Yes      | `string`                                                           |             |
+| `capturedAt` | Yes      | `string`                                                           |             |
+| `coverage`   | Yes      | `"visible-viewport"`                                               |             |
+| `frameId`    | Yes      | `string`                                                           |             |
+| `height`     | Yes      | `number`                                                           |             |
+| `mimeType`   | Yes      | `"image/png"`                                                      |             |
+| `origin`     | Yes      | `string`                                                           |             |
+| `provider`   | Yes      | `"cdp-passive"`                                                    |             |
+| `sha256`     | Yes      | `string`                                                           |             |
+| `targetId`   | Yes      | `string`                                                           |             |
+| `viewport`   | Yes      | [BrowserScreenshotViewport](protocol.md#browserscreenshotviewport) |             |
+| `width`      | Yes      | `number`                                                           |             |
+
+## BrowserScreenshotPage
+
+Capture and PNG digests identify different immutable artifacts.
+
+| Field           | Required | Type                                                               | Description |
+| --------------- | -------- | ------------------------------------------------------------------ | ----------- |
+| `captureSha256` | Yes      | `string`                                                           |             |
+| `cursor`        | Yes      | `string`                                                           |             |
+| `data`          | Yes      | `null,string`                                                      |             |
+| `evidenceId`    | Yes      | `string`                                                           |             |
+| `metadata`      | Yes      | [BrowserScreenshotMetadata](protocol.md#browserscreenshotmetadata) |             |
+| `nextCursor`    | Yes      | `null,string`                                                      |             |
+| `runId`         | Yes      | `string`                                                           |             |
+| `sha256`        | Yes      | `string`                                                           |             |
+| `view`          | Yes      | [BrowserScreenshotView](protocol.md#browserscreenshotview)         |             |
+
+## BrowserScreenshotQuery
+
+Saved image reads accept archive IDs and canonical byte offsets, never URLs or files.
+
+| Field        | Required | Type                                                       | Description |
+| ------------ | -------- | ---------------------------------------------------------- | ----------- |
+| `cursor`     | No       | `string`                                                   |             |
+| `evidenceId` | Yes      | `string`                                                   |             |
+| `id`         | Yes      | `string`                                                   |             |
+| `runId`      | Yes      | `string`                                                   |             |
+| `view`       | Yes      | [BrowserScreenshotView](protocol.md#browserscreenshotview) |             |
+
+## BrowserScreenshotSnapshot
+
+Progress retains an owner-bound archive identity without any image data.
+
+| Field        | Required | Type                                                               | Description |
+| ------------ | -------- | ------------------------------------------------------------------ | ----------- |
+| `bytes`      | Yes      | `string`                                                           |             |
+| `capturedAt` | Yes      | `string`                                                           |             |
+| `coverage`   | Yes      | `"visible-viewport"`                                               |             |
+| `frameId`    | Yes      | `string`                                                           |             |
+| `height`     | Yes      | `number`                                                           |             |
+| `mimeType`   | Yes      | `"image/png"`                                                      |             |
+| `origin`     | Yes      | `string`                                                           |             |
+| `provider`   | Yes      | `"cdp-passive"`                                                    |             |
+| `reference`  | Yes      | [ReverseBrowserReference](protocol.md#reversebrowserreference)     |             |
+| `sha256`     | Yes      | `string`                                                           |             |
+| `targetId`   | Yes      | `string`                                                           |             |
+| `viewport`   | Yes      | [BrowserScreenshotViewport](protocol.md#browserscreenshotviewport) |             |
+| `width`      | Yes      | `number`                                                           |             |
+
+## BrowserScreenshotView
+
+Metadata reads contain no pixels; selected image pages contain at most 49152 decoded bytes.
+
+Type: `"image"` / `"metadata"`.
+
+## BrowserScreenshotViewport
+
+CSS viewport coordinates are separate from the PNG's physical pixel dimensions.
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `height` | Yes      | `number` |             |
+| `pageX`  | Yes      | `number` |             |
+| `pageY`  | Yes      | `number` |             |
+| `scale`  | Yes      | `number` |             |
+| `width`  | Yes      | `number` |             |
+
 ## BrowserScriptSourceMap
 
 A source-map declaration is retained independently of fetched or decoded map coverage.
@@ -2524,6 +2609,13 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ---------------------------------------------------- | ----------- |
 | `params` | Yes      | [BrowserModuleQuery](protocol.md#browsermodulequery) |             |
 | `result` | Yes      | [BrowserModulePage](protocol.md#browsermodulepage)   |             |
+
+**reverse.browser.screenshot**
+
+| Field    | Required | Type                                                         | Description |
+| -------- | -------- | ------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [BrowserScreenshotQuery](protocol.md#browserscreenshotquery) |             |
+| `result` | Yes      | [BrowserScreenshotPage](protocol.md#browserscreenshotpage)   |             |
 
 **reverse.browser.sources**
 
@@ -5120,29 +5212,30 @@ An evidence-linked follow-up requested by a specialist and executed by the runti
 
 Bounded, capability-free projection carried by live tool events and the final receipt.
 
-| Field              | Required | Type                                                                 | Description                                                                                     |
-| ------------------ | -------- | -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `application`      | No       | [ReverseApplicationSnapshot](protocol.md#reverseapplicationsnapshot) | Bounded projection for live Chat events; complete indexes are paged by the native query tool.   |
-| `archive`          | No       | [ReverseArchiveRef](protocol.md#reversearchiveref)                   | A session-owned archive, without query tokens or analyzer handles.                              |
-| `browser`          | No       | [ReverseBrowserSnapshot](protocol.md#reversebrowsersnapshot)         | A live run carries capture metadata and an event count, never all event rows.                   |
-| `browserInput`     | No       | [BrowserAnalysisInput](protocol.md#browseranalysisinput)             | Body-free provenance links a derived shared analysis to the exact original browser capture.     |
-| `browserSources`   | No       | [BrowserSourcesSnapshot](protocol.md#browsersourcessnapshot)         | A native source capture references one immutable owner-scoped archive.                          |
-| `browserStructure` | No       | [BrowserStructureSnapshot](protocol.md#browserstructuresnapshot)     | A progress receipt references structure without carrying complete trees.                        |
-| `cleanupErrors`    | Yes      | Array of `string`                                                    |                                                                                                 |
-| `evidence`         | Yes      | Array of [ReverseEvidenceRecord](protocol.md#reverseevidencerecord)  |                                                                                                 |
-| `evidenceCount`    | Yes      | `number`                                                             |                                                                                                 |
-| `execution`        | No       | `number`                                                             | Explicit resumed execution epoch; absent means the original execution.                          |
-| `id`               | Yes      | `string`                                                             |                                                                                                 |
-| `inputName`        | Yes      | `string`                                                             |                                                                                                 |
-| `kind`             | No       | `"browser"` / `"javascript"` / `"native"` / `"network"` / `"source"` | The runtime selects a target adapter; callers may make the choice explicit for ambiguous files. |
-| `network`          | No       | [ReverseNetworkSnapshot](protocol.md#reversenetworksnapshot)         | Bounded capability-free projection; full entries and payloads require paged evidence queries.   |
-| `plan`             | No       | Array of [ReversePlanStep](protocol.md#reverseplanstep)              |                                                                                                 |
-| `question`         | Yes      | `string`                                                             |                                                                                                 |
-| `revision`         | Yes      | `string`                                                             |                                                                                                 |
-| `sha256`           | Yes      | `string`                                                             |                                                                                                 |
-| `state`            | Yes      | [ReverseState](protocol.md#reversestate)                             |                                                                                                 |
-| `tasks`            | Yes      | Array of [ReverseTaskSnapshot](protocol.md#reversetasksnapshot)      |                                                                                                 |
-| `version`          | Yes      | `1`                                                                  |                                                                                                 |
+| Field               | Required | Type                                                                 | Description                                                                                     |
+| ------------------- | -------- | -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `application`       | No       | [ReverseApplicationSnapshot](protocol.md#reverseapplicationsnapshot) | Bounded projection for live Chat events; complete indexes are paged by the native query tool.   |
+| `archive`           | No       | [ReverseArchiveRef](protocol.md#reversearchiveref)                   | A session-owned archive, without query tokens or analyzer handles.                              |
+| `browser`           | No       | [ReverseBrowserSnapshot](protocol.md#reversebrowsersnapshot)         | A live run carries capture metadata and an event count, never all event rows.                   |
+| `browserInput`      | No       | [BrowserAnalysisInput](protocol.md#browseranalysisinput)             | Body-free provenance links a derived shared analysis to the exact original browser capture.     |
+| `browserScreenshot` | No       | [BrowserScreenshotSnapshot](protocol.md#browserscreenshotsnapshot)   | Progress retains an owner-bound archive identity without any image data.                        |
+| `browserSources`    | No       | [BrowserSourcesSnapshot](protocol.md#browsersourcessnapshot)         | A native source capture references one immutable owner-scoped archive.                          |
+| `browserStructure`  | No       | [BrowserStructureSnapshot](protocol.md#browserstructuresnapshot)     | A progress receipt references structure without carrying complete trees.                        |
+| `cleanupErrors`     | Yes      | Array of `string`                                                    |                                                                                                 |
+| `evidence`          | Yes      | Array of [ReverseEvidenceRecord](protocol.md#reverseevidencerecord)  |                                                                                                 |
+| `evidenceCount`     | Yes      | `number`                                                             |                                                                                                 |
+| `execution`         | No       | `number`                                                             | Explicit resumed execution epoch; absent means the original execution.                          |
+| `id`                | Yes      | `string`                                                             |                                                                                                 |
+| `inputName`         | Yes      | `string`                                                             |                                                                                                 |
+| `kind`              | No       | `"browser"` / `"javascript"` / `"native"` / `"network"` / `"source"` | The runtime selects a target adapter; callers may make the choice explicit for ambiguous files. |
+| `network`           | No       | [ReverseNetworkSnapshot](protocol.md#reversenetworksnapshot)         | Bounded capability-free projection; full entries and payloads require paged evidence queries.   |
+| `plan`              | No       | Array of [ReversePlanStep](protocol.md#reverseplanstep)              |                                                                                                 |
+| `question`          | Yes      | `string`                                                             |                                                                                                 |
+| `revision`          | Yes      | `string`                                                             |                                                                                                 |
+| `sha256`            | Yes      | `string`                                                             |                                                                                                 |
+| `state`             | Yes      | [ReverseState](protocol.md#reversestate)                             |                                                                                                 |
+| `tasks`             | Yes      | Array of [ReverseTaskSnapshot](protocol.md#reversetasksnapshot)      |                                                                                                 |
+| `version`           | Yes      | `1`                                                                  |                                                                                                 |
 
 ## ReverseState
 

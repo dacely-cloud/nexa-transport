@@ -1,6 +1,6 @@
 # RPC reference
 
-All 151 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 150 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
+All 152 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 151 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
 
 - [accounts.create](#accounts-create)
 - [accounts.list](#accounts-list)
@@ -54,6 +54,7 @@ All 151 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [processes.stop](#processes-stop)
 - [reverse.browser](#reverse-browser)
 - [reverse.browser.modules](#reverse-browser-modules)
+- [reverse.browser.screenshot](#reverse-browser-screenshot)
 - [reverse.browser.sources](#reverse-browser-sources)
 - [reverse.browser.structure](#reverse-browser-structure)
 - [reverse.catalog](#reverse-catalog)
@@ -1285,6 +1286,35 @@ Parameters: [BrowserModuleQuery](protocol.md#browsermodulequery).
 | `view`       | Yes      | [BrowserModuleView](protocol.md#browsermoduleview)                                                                                         |                                                                     |
 
 Result: [BrowserModulePage](protocol.md#browsermodulepage).
+
+## reverse.browser.screenshot
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ReverseBrowserScreenshot> = {
+    evidenceId: 'YOUR_EVIDENCEID',
+    id: 'YOUR_ID',
+    runId: 'YOUR_RUNID',
+    view: 'image',
+};
+const result: ResultOf<typeof Method.ReverseBrowserScreenshot> = await client.call(
+    Method.ReverseBrowserScreenshot,
+    params,
+);
+```
+
+Parameters: [BrowserScreenshotQuery](protocol.md#browserscreenshotquery).
+
+| Field        | Required | Type                                                       | Description |
+| ------------ | -------- | ---------------------------------------------------------- | ----------- |
+| `cursor`     | No       | `string`                                                   |             |
+| `evidenceId` | Yes      | `string`                                                   |             |
+| `id`         | Yes      | `string`                                                   |             |
+| `runId`      | Yes      | `string`                                                   |             |
+| `view`       | Yes      | [BrowserScreenshotView](protocol.md#browserscreenshotview) |             |
+
+Result: [BrowserScreenshotPage](protocol.md#browserscreenshotpage).
 
 ## reverse.browser.sources
 

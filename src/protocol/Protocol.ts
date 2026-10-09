@@ -1078,6 +1078,136 @@ export interface BrowserPageProjectionShape {
 /** BrowserPageProjection from the Nexa wire protocol. */
 export type BrowserPageProjection = BrowserPageProjectionShape;
 
+/** BrowserScreenshotMetadata wire fields. */
+export interface BrowserScreenshotMetadataShape {
+    /** bytes as defined by the Nexa gateway. */
+    readonly bytes: string;
+    /** capturedAt as defined by the Nexa gateway. */
+    readonly capturedAt: string;
+    /** coverage as defined by the Nexa gateway. */
+    readonly coverage: 'visible-viewport';
+    /** frameId as defined by the Nexa gateway. */
+    readonly frameId: string;
+    /** height as defined by the Nexa gateway. */
+    readonly height: number;
+    /** mimeType as defined by the Nexa gateway. */
+    readonly mimeType: 'image/png';
+    /** origin as defined by the Nexa gateway. */
+    readonly origin: string;
+    /** provider as defined by the Nexa gateway. */
+    readonly provider: 'cdp-passive';
+    /** sha256 as defined by the Nexa gateway. */
+    readonly sha256: string;
+    /** targetId as defined by the Nexa gateway. */
+    readonly targetId: string;
+    /** viewport as defined by the Nexa gateway. */
+    readonly viewport: BrowserScreenshotViewport;
+    /** width as defined by the Nexa gateway. */
+    readonly width: number;
+}
+
+/** BrowserScreenshotMetadata from the Nexa wire protocol. */
+export type BrowserScreenshotMetadata = BrowserScreenshotMetadataShape;
+
+/** BrowserScreenshotPage wire fields. */
+export interface BrowserScreenshotPageShape {
+    /** captureSha256 as defined by the Nexa gateway. */
+    readonly captureSha256: string;
+    /** cursor as defined by the Nexa gateway. */
+    readonly cursor: string;
+    /** data as defined by the Nexa gateway. */
+    readonly data: null | string;
+    /** evidenceId as defined by the Nexa gateway. */
+    readonly evidenceId: string;
+    /** metadata as defined by the Nexa gateway. */
+    readonly metadata: BrowserScreenshotMetadata;
+    /** nextCursor as defined by the Nexa gateway. */
+    readonly nextCursor: null | string;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+    /** sha256 as defined by the Nexa gateway. */
+    readonly sha256: string;
+    /** view as defined by the Nexa gateway. */
+    readonly view: BrowserScreenshotView;
+}
+
+/** BrowserScreenshotPage from the Nexa wire protocol. */
+export type BrowserScreenshotPage = BrowserScreenshotPageShape;
+
+/** BrowserScreenshotQuery wire fields. */
+export interface BrowserScreenshotQueryShape {
+    /** cursor as defined by the Nexa gateway. */
+    readonly cursor?: string;
+    /** evidenceId as defined by the Nexa gateway. */
+    readonly evidenceId: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+    /** view as defined by the Nexa gateway. */
+    readonly view: BrowserScreenshotView;
+}
+
+/** BrowserScreenshotQuery from the Nexa wire protocol. */
+export type BrowserScreenshotQuery = BrowserScreenshotQueryShape;
+
+/** BrowserScreenshotSnapshot wire fields. */
+export interface BrowserScreenshotSnapshotShape {
+    /** bytes as defined by the Nexa gateway. */
+    readonly bytes: string;
+    /** capturedAt as defined by the Nexa gateway. */
+    readonly capturedAt: string;
+    /** coverage as defined by the Nexa gateway. */
+    readonly coverage: 'visible-viewport';
+    /** frameId as defined by the Nexa gateway. */
+    readonly frameId: string;
+    /** height as defined by the Nexa gateway. */
+    readonly height: number;
+    /** mimeType as defined by the Nexa gateway. */
+    readonly mimeType: 'image/png';
+    /** origin as defined by the Nexa gateway. */
+    readonly origin: string;
+    /** provider as defined by the Nexa gateway. */
+    readonly provider: 'cdp-passive';
+    /** reference as defined by the Nexa gateway. */
+    readonly reference: ReverseBrowserReference;
+    /** sha256 as defined by the Nexa gateway. */
+    readonly sha256: string;
+    /** targetId as defined by the Nexa gateway. */
+    readonly targetId: string;
+    /** viewport as defined by the Nexa gateway. */
+    readonly viewport: BrowserScreenshotViewport;
+    /** width as defined by the Nexa gateway. */
+    readonly width: number;
+}
+
+/** BrowserScreenshotSnapshot from the Nexa wire protocol. */
+export type BrowserScreenshotSnapshot = BrowserScreenshotSnapshotShape;
+
+/** Allowed values for BrowserScreenshotView. */
+export const BrowserScreenshotViewValues = { Value0: 'image', Value1: 'metadata' } as const;
+
+/** BrowserScreenshotView from the Nexa wire protocol. */
+export type BrowserScreenshotView =
+    (typeof BrowserScreenshotViewValues)[keyof typeof BrowserScreenshotViewValues];
+
+/** BrowserScreenshotViewport wire fields. */
+export interface BrowserScreenshotViewportShape {
+    /** height as defined by the Nexa gateway. */
+    readonly height: number;
+    /** pageX as defined by the Nexa gateway. */
+    readonly pageX: number;
+    /** pageY as defined by the Nexa gateway. */
+    readonly pageY: number;
+    /** scale as defined by the Nexa gateway. */
+    readonly scale: number;
+    /** width as defined by the Nexa gateway. */
+    readonly width: number;
+}
+
+/** BrowserScreenshotViewport from the Nexa wire protocol. */
+export type BrowserScreenshotViewport = BrowserScreenshotViewportShape;
+
 /** BrowserScriptSourceMap wire fields. */
 export interface BrowserScriptSourceMapShape {
     /** declarationLength as defined by the Nexa gateway. */
@@ -3349,6 +3479,14 @@ export interface GatewayMethodsreverse_browser_modulesShape {
     readonly result: BrowserModulePage;
 }
 
+/** GatewayMethodsreverse_browser_screenshot wire fields. */
+export interface GatewayMethodsreverse_browser_screenshotShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: BrowserScreenshotQuery;
+    /** result as defined by the Nexa gateway. */
+    readonly result: BrowserScreenshotPage;
+}
+
 /** GatewayMethodsreverse_browser_sources wire fields. */
 export interface GatewayMethodsreverse_browser_sourcesShape {
     /** params as defined by the Nexa gateway. */
@@ -4247,6 +4385,8 @@ export interface GatewayMethodsShape {
     readonly 'reverse.browser': GatewayMethodsreverse_browserShape;
     /** reverse.browser.modules as defined by the Nexa gateway. */
     readonly 'reverse.browser.modules': GatewayMethodsreverse_browser_modulesShape;
+    /** reverse.browser.screenshot as defined by the Nexa gateway. */
+    readonly 'reverse.browser.screenshot': GatewayMethodsreverse_browser_screenshotShape;
     /** reverse.browser.sources as defined by the Nexa gateway. */
     readonly 'reverse.browser.sources': GatewayMethodsreverse_browser_sourcesShape;
     /** reverse.browser.structure as defined by the Nexa gateway. */
@@ -7272,6 +7412,8 @@ export interface ReverseRunSnapshotShape {
     readonly browser?: ReverseBrowserSnapshot;
     /** browserInput as defined by the Nexa gateway. */
     readonly browserInput?: BrowserAnalysisInput;
+    /** browserScreenshot as defined by the Nexa gateway. */
+    readonly browserScreenshot?: BrowserScreenshotSnapshot;
     /** browserSources as defined by the Nexa gateway. */
     readonly browserSources?: BrowserSourcesSnapshot;
     /** browserStructure as defined by the Nexa gateway. */
@@ -11077,6 +11219,8 @@ export enum Method {
     ReverseBrowser = 'reverse.browser',
     /** Calls reverse.browser.modules. */
     ReverseBrowserModules = 'reverse.browser.modules',
+    /** Calls reverse.browser.screenshot. */
+    ReverseBrowserScreenshot = 'reverse.browser.screenshot',
     /** Calls reverse.browser.sources. */
     ReverseBrowserSources = 'reverse.browser.sources',
     /** Calls reverse.browser.structure. */
