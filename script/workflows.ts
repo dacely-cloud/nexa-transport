@@ -47,6 +47,9 @@ const files: readonly string[] = [
     'planning/PlanningEdits',
     'runtime/RunSpendingTypes',
     'runtime/RunSpendingCodec',
+    'runtime/RunUsageTypes',
+    'runtime/RunUsageCodec',
+    'runtime/RunUsageModelCodec',
     'runtime/RunTypes',
     'runtime/RunHumanTypes',
     'runtime/RunHumanCodec',
@@ -128,7 +131,9 @@ for (const file of files) {
 /** Pricing classification is shared by metering and the portable spending reader. */
 const creditDestination: URL = new URL('../src/credit/', import.meta.url);
 await mkdir(creditDestination, { recursive: true });
-await writeFile(
-    new URL('PricingBasis.ts', creditDestination),
-    await readFile(new URL('../../nexa/src/credit/PricingBasis.ts', import.meta.url), 'utf8'),
-);
+for (const file of ['PricingBasis', 'PricingTypes', 'PricingTariffCodec', 'ChargeKind']) {
+    await writeFile(
+        new URL(`${file}.ts`, creditDestination),
+        await readFile(new URL(`../../nexa/src/credit/${file}.ts`, import.meta.url), 'utf8'),
+    );
+}

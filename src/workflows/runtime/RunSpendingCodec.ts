@@ -65,9 +65,7 @@ export class WorkflowSpendingCodec {
             throw new Error('Invalid workflow reservation count');
         }
         const result: WorkflowLoopSpending = {
-            ...(Object.hasOwn(value, 'pricing')
-                ? { pricing: this.#pricing(value['pricing']) }
-                : {}),
+            ...(Object.hasOwn(value, 'pricing') ? { pricing: this.pricing(value['pricing']) } : {}),
             runId: WorkflowInput.id(value['runId']),
             loopId: WorkflowInput.id(value['loopId']),
             workflowId: WorkflowInput.id(value['workflowId']),
@@ -118,7 +116,8 @@ export class WorkflowSpendingCodec {
         }
         return result;
     }
-    static #pricing(raw: unknown): readonly WorkflowSpendingBucket[] {
+    /** Shared category validation for loop and whole-run reports. */
+    public static pricing(raw: unknown): readonly WorkflowSpendingBucket[] {
         const result: readonly WorkflowSpendingBucket[] = WorkflowInput.list(
             raw,
             8,
