@@ -1,6 +1,6 @@
 # RPC reference
 
-All 144 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 143 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
+All 145 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 144 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
 
 - [accounts.create](#accounts-create)
 - [accounts.list](#accounts-list)
@@ -53,6 +53,7 @@ All 144 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [processes.resize](#processes-resize)
 - [processes.stop](#processes-stop)
 - [reverse.browser](#reverse-browser)
+- [reverse.browser.structure](#reverse-browser-structure)
 - [reverse.catalog](#reverse-catalog)
 - [reverse.evidence](#reverse-evidence)
 - [reverse.functions](#reverse-functions)
@@ -1247,6 +1248,36 @@ Parameters: [ReverseBrowserQuery](protocol.md#reversebrowserquery).
 | `runId`      | Yes      | `string` |             |
 
 Result: [ReverseBrowserPage](protocol.md#reversebrowserpage).
+
+## reverse.browser.structure
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ReverseBrowserStructure> = {
+    evidenceId: 'YOUR_EVIDENCEID',
+    id: 'YOUR_ID',
+    runId: 'YOUR_RUNID',
+    view: 'accessibility',
+};
+const result: ResultOf<typeof Method.ReverseBrowserStructure> = await client.call(
+    Method.ReverseBrowserStructure,
+    params,
+);
+```
+
+Parameters: [BrowserStructureQuery](protocol.md#browserstructurequery).
+
+| Field        | Required | Type                                                     | Description |
+| ------------ | -------- | -------------------------------------------------------- | ----------- |
+| `cursor`     | No       | `string`                                                 |             |
+| `evidenceId` | Yes      | `string`                                                 |             |
+| `id`         | Yes      | `string`                                                 |             |
+| `runId`      | Yes      | `string`                                                 |             |
+| `selector`   | No       | `string`                                                 |             |
+| `view`       | Yes      | [BrowserStructureView](protocol.md#browserstructureview) |             |
+
+Result: [BrowserStructurePage](protocol.md#browserstructurepage).
 
 ## reverse.catalog
 
