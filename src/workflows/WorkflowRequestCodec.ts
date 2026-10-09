@@ -7,6 +7,7 @@ import { ResourceBindingCodec } from './ResourceBindingCodec.js';
 import type {
     WorkflowCreateRequest,
     WorkflowSaveRequest,
+    WorkflowDeleteRequest,
     WorkflowListRequest,
     WorkflowReadRequest,
     WorkflowRecordRequest,
@@ -57,6 +58,17 @@ export class WorkflowRequestCodec {
             commandId: WorkflowInput.id(input['commandId']),
             expectedRevision: ResourceBindingCodec.decimal(input['expectedRevision']),
             patch: WorkflowCodec.patch(input['patch']),
+        });
+    }
+    /** No owner override or unreviewed latest revision is accepted for deletion. */
+    public static delete(raw: unknown): WorkflowDeleteRequest {
+        const input: Readonly<Record<string, unknown>> = WorkflowInput.record(raw, [
+            'workflowId',
+            'expectedRevision',
+        ]);
+        return Object.freeze({
+            workflowId: WorkflowInput.id(input['workflowId']),
+            expectedRevision: ResourceBindingCodec.decimal(input['expectedRevision']),
         });
     }
     /** Enforces the metadata page limit and an exact cursor. */

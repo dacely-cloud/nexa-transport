@@ -44,6 +44,17 @@ export interface WorkflowSaveRequest {
     readonly expectedRevision: string;
     readonly patch: WorkflowPatch;
 }
+/** Deletion must name the saved revision the owner reviewed. */
+export interface WorkflowDeleteRequest {
+    readonly workflowId: string;
+    readonly expectedRevision: string;
+}
+/** An idempotent deletion receipt; immutable execution history is retained. */
+export interface WorkflowDeleteReceipt {
+    readonly workflowId: string;
+    readonly revision: string;
+    readonly deleted: true;
+}
 /** Metadata pagination carries no node payloads. */
 export interface WorkflowListRequest {
     readonly limit: number;
