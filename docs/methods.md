@@ -1,6 +1,6 @@
 # RPC reference
 
-All 157 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 156 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
+All 159 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 158 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
 
 - [accounts.create](#accounts-create)
 - [accounts.list](#accounts-list)
@@ -59,6 +59,7 @@ All 157 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [reverse.browser.storage](#reverse-browser-storage)
 - [reverse.browser.storage.comparison](#reverse-browser-storage-comparison)
 - [reverse.browser.structure](#reverse-browser-structure)
+- [reverse.browser.webmcp](#reverse-browser-webmcp)
 - [reverse.catalog](#reverse-catalog)
 - [reverse.evidence](#reverse-evidence)
 - [reverse.functions](#reverse-functions)
@@ -149,6 +150,7 @@ All 157 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [workflows.runs.terminal.command](#workflows-runs-terminal-command)
 - [workflows.runs.terminal.read](#workflows-runs-terminal-read)
 - [workflows.runs.usage](#workflows-runs-usage)
+- [workflows.runs.usageBreakdown](#workflows-runs-usageBreakdown)
 - [workflows.save](#workflows-save)
 - [workflows.schedules.disable](#workflows-schedules-disable)
 - [workflows.schedules.enable](#workflows-schedules-enable)
@@ -1436,6 +1438,35 @@ Parameters: [BrowserStructureQuery](protocol.md#browserstructurequery).
 | `view`       | Yes      | [BrowserStructureView](protocol.md#browserstructureview) |             |
 
 Result: [BrowserStructurePage](protocol.md#browserstructurepage).
+
+## reverse.browser.webmcp
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ReverseBrowserWebmcp> = {
+    evidenceId: 'YOUR_EVIDENCEID',
+    id: 'YOUR_ID',
+    runId: 'YOUR_RUNID',
+};
+const result: ResultOf<typeof Method.ReverseBrowserWebmcp> = await client.call(
+    Method.ReverseBrowserWebmcp,
+    params,
+);
+```
+
+Parameters: [BrowserWebMcpQuery](protocol.md#browserwebmcpquery).
+
+| Field        | Required | Type                                  | Description                                                                           |
+| ------------ | -------- | ------------------------------------- | ------------------------------------------------------------------------------------- |
+| `cursor`     | No       | `string`                              |                                                                                       |
+| `evidenceId` | Yes      | `string`                              |                                                                                       |
+| `id`         | Yes      | `string`                              |                                                                                       |
+| `runId`      | Yes      | `string`                              |                                                                                       |
+| `selector`   | No       | `string`                              |                                                                                       |
+| `view`       | No       | `"metadata"` / `"schema"` / `"tools"` | Metadata, declaration rows and one selected schema have independent transfer budgets. |
+
+Result: [BrowserWebMcpPage](protocol.md#browserwebmcppage).
 
 ## reverse.catalog
 
@@ -3734,6 +3765,32 @@ Parameters: [WorkflowRunUsageRequest](protocol.md#workflowrunusagerequest).
 | `runId`  | Yes      | `string` |             |
 
 Result: [WorkflowRunUsageView](protocol.md#workflowrunusageview).
+
+## workflows.runs.usageBreakdown
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsRunsUsageBreakdown> = {
+    dimension: 'agents',
+    offset: 'YOUR_OFFSET',
+    runId: 'YOUR_RUNID',
+};
+const result: ResultOf<typeof Method.WorkflowsRunsUsageBreakdown> = await client.call(
+    Method.WorkflowsRunsUsageBreakdown,
+    params,
+);
+```
+
+Parameters: [WorkflowRunBreakdownRequest](protocol.md#workflowrunbreakdownrequest).
+
+| Field       | Required | Type                                                         | Description |
+| ----------- | -------- | ------------------------------------------------------------ | ----------- |
+| `dimension` | Yes      | [WorkflowUsageDimension](protocol.md#workflowusagedimension) |             |
+| `offset`    | Yes      | `string`                                                     |             |
+| `runId`     | Yes      | `string`                                                     |             |
+
+Result: [WorkflowRunBreakdownView](protocol.md#workflowrunbreakdownview).
 
 ## workflows.save
 
