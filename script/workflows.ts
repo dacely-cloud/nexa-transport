@@ -44,6 +44,7 @@ const files: readonly string[] = [
     'ComponentTypes',
     'ComponentFactory',
     'CoreComponents',
+    'DataComponents',
     'AgentComponents',
     'InferenceComponents',
     'ImageComponents',
