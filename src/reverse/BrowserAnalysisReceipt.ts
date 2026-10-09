@@ -18,9 +18,13 @@ export class BrowserAnalysisReceipt {
             manifestSha256,
             manifestBytes,
             exportedFiles,
+            importMap,
             ...source
         }: BrowserAnalysisInput = value;
         BrowserSourcesReceipt.snapshot(source, source.reference.runId, sessionId);
+        if (importMap !== undefined) {
+            this.#map(importMap);
+        }
         if (
             source.reference.runId === childRunId ||
             !source.includeSources ||
@@ -33,6 +37,32 @@ export class BrowserAnalysisReceipt {
             exportedFiles === '0'
         ) {
             throw new RangeError('Invalid captured browser analysis provenance');
+        }
+    }
+    static #map(value: NonNullable<BrowserAnalysisInput['importMap']>): void {
+        if (
+            Object.keys(value).some(
+                (key: string): boolean => !['selector', 'baseUrl', 'sha256', 'bytes'].includes(key),
+            ) ||
+            !value.selector.startsWith('nexa-import-map-') ||
+            !value.selector.endsWith('.json') ||
+            !BrowserSourcesValues.uuid(value.selector.slice(16, -5)) ||
+            !BrowserSourcesValues.hash(value.sha256) ||
+            !BrowserSourcesValues.count(value.bytes, 4194304n) ||
+            value.bytes === '0' ||
+            value.baseUrl.length > 8192 ||
+            !value.baseUrl.isWellFormed()
+        ) {
+            throw new RangeError('Invalid selected analysis import map');
+        }
+        const base: URL = new URL(value.baseUrl);
+        if (
+            !['http:', 'https:'].includes(base.protocol) ||
+            base.username !== '' ||
+            base.password !== '' ||
+            base.href !== value.baseUrl
+        ) {
+            throw new RangeError('Invalid selected import map base URL');
         }
     }
 }

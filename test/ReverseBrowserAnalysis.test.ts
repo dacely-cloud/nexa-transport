@@ -58,6 +58,40 @@ describe('captured browser analysis provenance', (): void => {
             ReverseInvestigation.parse({ ...run, browserInput: { ...source, exportedFiles: '1' } }),
         ).toMatchObject({ browserInput: { exportedFiles: '1' } });
     });
+    it('retains a body-free immutable map selection and rejects paths, bodies and inconsistent identities', (): void => {
+        const importMap: NonNullable<BrowserAnalysisInput['importMap']> = {
+            selector: 'nexa-import-map-89107b32-0000-4000-8000-000000000004.json',
+            baseUrl: 'https://example.test/maps/',
+            sha256: 'e'.repeat(64),
+            bytes: '200',
+        };
+        expect(
+            ReverseInvestigation.parse({ ...run, browserInput: { ...source, importMap } }),
+        ).toMatchObject({ browserInput: { importMap } });
+        const invalid: readonly unknown[] = [
+            { ...importMap, path: '/host/import-map.json' },
+            { ...importMap, text: 'BODY_SECRET' },
+            { ...importMap, imports: { pkg: 'BODY_SECRET' } },
+            { ...importMap, selector: '../map.json' },
+            { ...importMap, selector: 'nexa-import-map-missing.json' },
+            { ...importMap, sha256: 'missing' },
+            { ...importMap, bytes: '0' },
+            { ...importMap, bytes: '4194305' },
+            { ...importMap, bytes: '01' },
+            { ...importMap, baseUrl: 'https://user:pass@example.test/' },
+            { ...importMap, baseUrl: 'file:///maps/' },
+            { ...importMap, baseUrl: 'https://example.test' },
+            null,
+        ];
+        for (const value of invalid) {
+            expect((): ReverseRunSnapshot =>
+                ReverseInvestigation.parse({
+                    ...run,
+                    browserInput: { ...source, importMap: value },
+                }),
+            ).toThrow();
+        }
+    });
     it('rejects cross-conversation references, source bodies and impossible export metadata', (): void => {
         for (const change of [
             { reference: { ...source.reference, sessionId: 'bob::main' } },

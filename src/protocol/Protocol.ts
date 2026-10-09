@@ -664,6 +664,8 @@ export interface BrowserAnalysisInputShape {
     readonly exportedFiles: string;
     /** frameId as defined by the Nexa gateway. */
     readonly frameId: string;
+    /** importMap as defined by the Nexa gateway. */
+    readonly importMap?: BrowserAnalysisMapInput;
     /** includeSources as defined by the Nexa gateway. */
     readonly includeSources: boolean;
     /** manifestBytes as defined by the Nexa gateway. */
@@ -690,6 +692,21 @@ export interface BrowserAnalysisInputShape {
 
 /** BrowserAnalysisInput from the Nexa wire protocol. */
 export type BrowserAnalysisInput = BrowserAnalysisInputShape;
+
+/** BrowserAnalysisMapInput wire fields. */
+export interface BrowserAnalysisMapInputShape {
+    /** baseUrl as defined by the Nexa gateway. */
+    readonly baseUrl: string;
+    /** bytes as defined by the Nexa gateway. */
+    readonly bytes: string;
+    /** selector as defined by the Nexa gateway. */
+    readonly selector: string;
+    /** sha256 as defined by the Nexa gateway. */
+    readonly sha256: string;
+}
+
+/** BrowserAnalysisMapInput from the Nexa wire protocol. */
+export type BrowserAnalysisMapInput = BrowserAnalysisMapInputShape;
 
 /** BrowserAttributeName wire fields. */
 export interface BrowserAttributeNameShape {

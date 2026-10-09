@@ -478,23 +478,35 @@ WebSocket payloads are reduced immediately to direction, opcode and byte count.
 
 Body-free provenance links a derived shared analysis to the exact original browser capture.
 
-| Field                    | Required | Type                                                           | Description |
-| ------------------------ | -------- | -------------------------------------------------------------- | ----------- |
-| `capturedAt`             | Yes      | `string`                                                       |             |
-| `coverage`               | Yes      | [BrowserSourcesCoverage](protocol.md#browsersourcescoverage)   |             |
-| `exportedFiles`          | Yes      | `string`                                                       |             |
-| `frameId`                | Yes      | `string`                                                       |             |
-| `includeSources`         | Yes      | `boolean`                                                      |             |
-| `manifestBytes`          | Yes      | `string`                                                       |             |
-| `manifestSha256`         | Yes      | `string`                                                       |             |
-| `origin`                 | Yes      | `string`                                                       |             |
-| `priorActivityAvailable` | Yes      | `false`                                                        |             |
-| `provider`               | Yes      | `"cdp-passive"`                                                |             |
-| `reference`              | Yes      | [ReverseBrowserReference](protocol.md#reversebrowserreference) |             |
-| `resourceCount`          | Yes      | `string`                                                       |             |
-| `scriptCount`            | Yes      | `string`                                                       |             |
-| `sourceRunSha256`        | Yes      | `string`                                                       |             |
-| `targetId`               | Yes      | `string`                                                       |             |
+| Field                    | Required | Type                                                           | Description                                                                   |
+| ------------------------ | -------- | -------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| `capturedAt`             | Yes      | `string`                                                       |                                                                               |
+| `coverage`               | Yes      | [BrowserSourcesCoverage](protocol.md#browsersourcescoverage)   |                                                                               |
+| `exportedFiles`          | Yes      | `string`                                                       |                                                                               |
+| `frameId`                | Yes      | `string`                                                       |                                                                               |
+| `importMap`              | No       | [BrowserAnalysisMapInput](protocol.md#browseranalysismapinput) | Body-free identity of an exact map member in the immutable analysis snapshot. |
+| `includeSources`         | Yes      | `boolean`                                                      |                                                                               |
+| `manifestBytes`          | Yes      | `string`                                                       |                                                                               |
+| `manifestSha256`         | Yes      | `string`                                                       |                                                                               |
+| `origin`                 | Yes      | `string`                                                       |                                                                               |
+| `priorActivityAvailable` | Yes      | `false`                                                        |                                                                               |
+| `provider`               | Yes      | `"cdp-passive"`                                                |                                                                               |
+| `reference`              | Yes      | [ReverseBrowserReference](protocol.md#reversebrowserreference) |                                                                               |
+| `resourceCount`          | Yes      | `string`                                                       |                                                                               |
+| `scriptCount`            | Yes      | `string`                                                       |                                                                               |
+| `sourceRunSha256`        | Yes      | `string`                                                       |                                                                               |
+| `targetId`               | Yes      | `string`                                                       |                                                                               |
+
+## BrowserAnalysisMapInput
+
+Body-free identity of an exact map member in the immutable analysis snapshot.
+
+| Field      | Required | Type     | Description |
+| ---------- | -------- | -------- | ----------- |
+| `baseUrl`  | Yes      | `string` |             |
+| `bytes`    | Yes      | `string` |             |
+| `selector` | Yes      | `string` |             |
+| `sha256`   | Yes      | `string` |             |
 
 ## BrowserAttributeName
 
