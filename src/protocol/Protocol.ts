@@ -2380,6 +2380,14 @@ export interface GatewayMethodsreverse_networkShape {
     readonly result: ReverseNetworkDirectoryPage;
 }
 
+/** GatewayMethodsreverse_network_detail wire fields. */
+export interface GatewayMethodsreverse_network_detailShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ReverseNetworkDetailQuery;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ReverseNetworkDetailPage;
+}
+
 /** GatewayMethodsroblox_credentials_remove wire fields. */
 export interface GatewayMethodsroblox_credentials_removeShape {
     /** params as defined by the Nexa gateway. */
@@ -3062,6 +3070,8 @@ export interface GatewayMethodsShape {
     readonly 'reverse.inspect': GatewayMethodsreverse_inspectShape;
     /** reverse.network as defined by the Nexa gateway. */
     readonly 'reverse.network': GatewayMethodsreverse_networkShape;
+    /** reverse.network.detail as defined by the Nexa gateway. */
+    readonly 'reverse.network.detail': GatewayMethodsreverse_network_detailShape;
     /** roblox.credentials.remove as defined by the Nexa gateway. */
     readonly 'roblox.credentials.remove': GatewayMethodsroblox_credentials_removeShape;
     /** roblox.credentials.set as defined by the Nexa gateway. */
@@ -4539,6 +4549,20 @@ export interface NetworkBodyShape {
 /** NetworkBody from the Nexa wire protocol. */
 export type NetworkBody = NetworkBodyShape;
 
+/** Allowed values for NetworkDetailView. */
+export const NetworkDetailViewValues = {
+    Value0: 'query',
+    Value1: 'request-body',
+    Value2: 'request-headers',
+    Value3: 'response-body',
+    Value4: 'response-headers',
+    Value5: 'timings',
+} as const;
+
+/** NetworkDetailView from the Nexa wire protocol. */
+export type NetworkDetailView =
+    (typeof NetworkDetailViewValues)[keyof typeof NetworkDetailViewValues];
+
 /** NetworkIssue wire fields. */
 export interface NetworkIssueShape {
     /** location as defined by the Nexa gateway. */
@@ -5668,6 +5692,54 @@ export const ReverseInspectionValues = {
 /** ReverseInspection from the Nexa wire protocol. */
 export type ReverseInspection =
     (typeof ReverseInspectionValues)[keyof typeof ReverseInspectionValues];
+
+/** ReverseNetworkDetailPage wire fields. */
+export interface ReverseNetworkDetailPageShape {
+    /** body as defined by the Nexa gateway. */
+    readonly body: NetworkBody | null;
+    /** captureSha256 as defined by the Nexa gateway. */
+    readonly captureSha256: string;
+    /** characters as defined by the Nexa gateway. */
+    readonly characters: string;
+    /** cursor as defined by the Nexa gateway. */
+    readonly cursor: string;
+    /** location as defined by the Nexa gateway. */
+    readonly location: string;
+    /** nextCursor as defined by the Nexa gateway. */
+    readonly nextCursor: null | string;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+    /** selector as defined by the Nexa gateway. */
+    readonly selector: string;
+    /** sha256 as defined by the Nexa gateway. */
+    readonly sha256: string;
+    /** text as defined by the Nexa gateway. */
+    readonly text: string;
+    /** unavailable as defined by the Nexa gateway. */
+    readonly unavailable: null | string;
+    /** view as defined by the Nexa gateway. */
+    readonly view: NetworkDetailView;
+}
+
+/** ReverseNetworkDetailPage from the Nexa wire protocol. */
+export type ReverseNetworkDetailPage = ReverseNetworkDetailPageShape;
+
+/** ReverseNetworkDetailQuery wire fields. */
+export interface ReverseNetworkDetailQueryShape {
+    /** cursor as defined by the Nexa gateway. */
+    readonly cursor?: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+    /** selector as defined by the Nexa gateway. */
+    readonly selector: string;
+    /** view as defined by the Nexa gateway. */
+    readonly view: NetworkDetailView;
+}
+
+/** ReverseNetworkDetailQuery from the Nexa wire protocol. */
+export type ReverseNetworkDetailQuery = ReverseNetworkDetailQueryShape;
 
 /** ReverseNetworkDirectoryPage wire fields. */
 export interface ReverseNetworkDirectoryPageShape {
@@ -8741,6 +8813,8 @@ export enum Method {
     ReverseInspect = 'reverse.inspect',
     /** Calls reverse.network. */
     ReverseNetwork = 'reverse.network',
+    /** Calls reverse.network.detail. */
+    ReverseNetworkDetail = 'reverse.network.detail',
     /** Calls roblox.credentials.remove. */
     RobloxCredentialsRemove = 'roblox.credentials.remove',
     /** Calls roblox.credentials.set. */
