@@ -2482,6 +2482,333 @@ export const schema: Schema = {
             enum: ['resources', 'scripts', 'source'],
             type: 'string',
         },
+        BrowserStorageCoverage: {
+            description: 'Omitted rows or observed mutations prevent completeness claims.',
+            properties: {
+                available: {
+                    type: 'boolean',
+                },
+                changedDuringCapture: {
+                    type: 'boolean',
+                },
+                complete: {
+                    type: 'boolean',
+                },
+                omitted: {
+                    type: 'string',
+                },
+                rows: {
+                    type: 'string',
+                },
+                selected: {
+                    type: 'boolean',
+                },
+            },
+            required: [
+                'available',
+                'changedDuringCapture',
+                'complete',
+                'omitted',
+                'rows',
+                'selected',
+            ],
+            type: 'object',
+        },
+        BrowserStorageGroup: {
+            description:
+                'Each storage authority has independently reported coverage.\nFinite storage authorities admitted by passive capture and saved row queries.',
+            enum: ['cache-storage', 'cookies', 'indexed-db', 'local-storage', 'session-storage'],
+            type: 'string',
+        },
+        BrowserStorageKind: {
+            description:
+                'A row distinguishes store existence, schema and record fingerprints.\nFinite row interpretations preserved by content identity.',
+            enum: ['cache-entry', 'name', 'record', 'schema', 'value'],
+            type: 'string',
+        },
+        BrowserStorageMetadata: {
+            description:
+                'Projected capture identity includes no key/value bodies or unselected names.',
+            properties: {
+                capturedAt: {
+                    type: 'string',
+                },
+                coverage: {
+                    $ref: '#/definitions/Record%3CBrowserStorageGroup%2CBrowserStorageCoverage%3E',
+                },
+                fingerprintAlgorithm: {
+                    const: 'sha256-canonical-json-v1',
+                    type: 'string',
+                },
+                fingerprintsComplete: {
+                    type: 'boolean',
+                },
+                frameId: {
+                    type: 'string',
+                },
+                includeFingerprints: {
+                    type: 'boolean',
+                },
+                includeNames: {
+                    type: 'boolean',
+                },
+                limitations: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                origin: {
+                    type: 'string',
+                },
+                provider: {
+                    const: 'cdp-passive',
+                    type: 'string',
+                },
+                quota: {
+                    $ref: '#/definitions/BrowserStorageQuota',
+                },
+                targetId: {
+                    type: 'string',
+                },
+                url: {
+                    type: 'string',
+                },
+                valuesRedacted: {
+                    const: true,
+                    type: 'boolean',
+                },
+            },
+            required: [
+                'capturedAt',
+                'coverage',
+                'fingerprintAlgorithm',
+                'fingerprintsComplete',
+                'frameId',
+                'includeFingerprints',
+                'includeNames',
+                'limitations',
+                'origin',
+                'provider',
+                'quota',
+                'targetId',
+                'url',
+                'valuesRedacted',
+            ],
+            type: 'object',
+        },
+        BrowserStoragePage: {
+            description:
+                'Metadata-only reads omit a group; selected groups contain at most twenty rows.',
+            properties: {
+                captureSha256: {
+                    type: 'string',
+                },
+                cursor: {
+                    type: 'string',
+                },
+                evidenceId: {
+                    type: 'string',
+                },
+                group: {
+                    anyOf: [
+                        {
+                            enum: [
+                                'cache-storage',
+                                'cookies',
+                                'indexed-db',
+                                'local-storage',
+                                'session-storage',
+                            ],
+                            type: 'string',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                metadata: {
+                    $ref: '#/definitions/BrowserStorageMetadata',
+                },
+                nextCursor: {
+                    type: ['null', 'string'],
+                },
+                rows: {
+                    items: {
+                        $ref: '#/definitions/BrowserStorageRow',
+                    },
+                    type: 'array',
+                },
+                runId: {
+                    type: 'string',
+                },
+                sha256: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'captureSha256',
+                'cursor',
+                'evidenceId',
+                'group',
+                'metadata',
+                'nextCursor',
+                'rows',
+                'runId',
+                'sha256',
+            ],
+            type: 'object',
+        },
+        BrowserStorageQuery: {
+            description: 'Saved rows select one storage group with independent ordinal paging.',
+            properties: {
+                cursor: {
+                    type: 'string',
+                },
+                evidenceId: {
+                    type: 'string',
+                },
+                group: {
+                    description:
+                        'Each storage authority has independently reported coverage.\nFinite storage authorities admitted by passive capture and saved row queries.',
+                    enum: [
+                        'cache-storage',
+                        'cookies',
+                        'indexed-db',
+                        'local-storage',
+                        'session-storage',
+                    ],
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                runId: {
+                    type: 'string',
+                },
+            },
+            required: ['evidenceId', 'id', 'runId'],
+            type: 'object',
+        },
+        BrowserStorageQuota: {
+            description: 'Quota byte counts retain exact validated integer representations.',
+            properties: {
+                available: {
+                    type: 'boolean',
+                },
+                quotaBytes: {
+                    type: ['null', 'string'],
+                },
+                usageBytes: {
+                    type: ['null', 'string'],
+                },
+            },
+            required: ['available', 'quotaBytes', 'usageBytes'],
+            type: 'object',
+        },
+        BrowserStorageRow: {
+            description:
+                'Names appear only when selected; hashes identify data without returning its values.',
+            properties: {
+                complete: {
+                    type: 'boolean',
+                },
+                group: {
+                    $ref: '#/definitions/BrowserStorageGroup',
+                },
+                id: {
+                    type: 'string',
+                },
+                identitySha256: {
+                    type: ['null', 'string'],
+                },
+                kind: {
+                    $ref: '#/definitions/BrowserStorageKind',
+                },
+                name: {
+                    type: ['null', 'string'],
+                },
+                valueSha256: {
+                    type: ['null', 'string'],
+                },
+            },
+            required: ['complete', 'group', 'id', 'identitySha256', 'kind', 'name', 'valueSha256'],
+            type: 'object',
+        },
+        BrowserStorageSnapshot: {
+            description: 'Progress identifies a saved redacted capture without embedding its rows.',
+            properties: {
+                capturedAt: {
+                    type: 'string',
+                },
+                coverage: {
+                    $ref: '#/definitions/Record%3CBrowserStorageGroup%2CBrowserStorageCoverage%3E',
+                },
+                fingerprintAlgorithm: {
+                    const: 'sha256-canonical-json-v1',
+                    type: 'string',
+                },
+                fingerprintsComplete: {
+                    type: 'boolean',
+                },
+                frameId: {
+                    type: 'string',
+                },
+                includeFingerprints: {
+                    type: 'boolean',
+                },
+                includeNames: {
+                    type: 'boolean',
+                },
+                limitations: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                origin: {
+                    type: 'string',
+                },
+                provider: {
+                    const: 'cdp-passive',
+                    type: 'string',
+                },
+                quota: {
+                    $ref: '#/definitions/BrowserStorageQuota',
+                },
+                reference: {
+                    $ref: '#/definitions/ReverseBrowserReference',
+                },
+                targetId: {
+                    type: 'string',
+                },
+                url: {
+                    type: 'string',
+                },
+                valuesRedacted: {
+                    const: true,
+                    type: 'boolean',
+                },
+            },
+            required: [
+                'capturedAt',
+                'coverage',
+                'fingerprintAlgorithm',
+                'fingerprintsComplete',
+                'frameId',
+                'includeFingerprints',
+                'includeNames',
+                'limitations',
+                'origin',
+                'provider',
+                'quota',
+                'reference',
+                'targetId',
+                'url',
+                'valuesRedacted',
+            ],
+            type: 'object',
+        },
         BrowserStructureCount: {
             description: 'Value-free DOM tag and accessibility role counts.',
             properties: {
@@ -5650,6 +5977,18 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'reverse.browser.storage': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/BrowserStorageQuery',
+                        },
+                        result: {
+                            $ref: '#/definitions/BrowserStoragePage',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'reverse.browser.structure': {
                     properties: {
                         params: {
@@ -6977,6 +7316,7 @@ export const schema: Schema = {
                 'reverse.browser.modules',
                 'reverse.browser.screenshot',
                 'reverse.browser.sources',
+                'reverse.browser.storage',
                 'reverse.browser.structure',
                 'reverse.catalog',
                 'reverse.evidence',
@@ -10095,6 +10435,33 @@ export const schema: Schema = {
             },
             type: 'object',
         },
+        'Record<BrowserStorageGroup,BrowserStorageCoverage>': {
+            properties: {
+                'cache-storage': {
+                    $ref: '#/definitions/BrowserStorageCoverage',
+                },
+                cookies: {
+                    $ref: '#/definitions/BrowserStorageCoverage',
+                },
+                'indexed-db': {
+                    $ref: '#/definitions/BrowserStorageCoverage',
+                },
+                'local-storage': {
+                    $ref: '#/definitions/BrowserStorageCoverage',
+                },
+                'session-storage': {
+                    $ref: '#/definitions/BrowserStorageCoverage',
+                },
+            },
+            required: [
+                'cache-storage',
+                'cookies',
+                'indexed-db',
+                'local-storage',
+                'session-storage',
+            ],
+            type: 'object',
+        },
         'Record<string,Scope>': {
             type: 'object',
             additionalProperties: {
@@ -11542,6 +11909,11 @@ export const schema: Schema = {
                     $ref: '#/definitions/BrowserSourcesSnapshot',
                     description:
                         'A native source capture references one immutable owner-scoped archive.',
+                },
+                browserStorage: {
+                    $ref: '#/definitions/BrowserStorageSnapshot',
+                    description:
+                        'Progress identifies a saved redacted capture without embedding its rows.',
                 },
                 browserStructure: {
                     $ref: '#/definitions/BrowserStructureSnapshot',
@@ -17195,6 +17567,9 @@ export const schema: Schema = {
         reverseBrowserSources: {
             $ref: '#/definitions/BrowserSourcesPage',
         },
+        reverseBrowserStorage: {
+            $ref: '#/definitions/BrowserStoragePage',
+        },
         reverseBrowserStructure: {
             $ref: '#/definitions/BrowserStructurePage',
         },
@@ -17254,6 +17629,7 @@ export const schema: Schema = {
         'reverseBrowserModules',
         'reverseBrowserScreenshot',
         'reverseBrowserSources',
+        'reverseBrowserStorage',
         'reverseBrowserStructure',
         'reverseCatalog',
         'reverseEvidence',

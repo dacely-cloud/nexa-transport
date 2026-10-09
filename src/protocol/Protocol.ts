@@ -1536,6 +1536,219 @@ export const BrowserSourcesViewValues = {
 export type BrowserSourcesView =
     (typeof BrowserSourcesViewValues)[keyof typeof BrowserSourcesViewValues];
 
+/** BrowserStorageCoverage wire fields. */
+export interface BrowserStorageCoverageShape {
+    /** available as defined by the Nexa gateway. */
+    readonly available: boolean;
+    /** changedDuringCapture as defined by the Nexa gateway. */
+    readonly changedDuringCapture: boolean;
+    /** complete as defined by the Nexa gateway. */
+    readonly complete: boolean;
+    /** omitted as defined by the Nexa gateway. */
+    readonly omitted: string;
+    /** rows as defined by the Nexa gateway. */
+    readonly rows: string;
+    /** selected as defined by the Nexa gateway. */
+    readonly selected: boolean;
+}
+
+/** BrowserStorageCoverage from the Nexa wire protocol. */
+export type BrowserStorageCoverage = BrowserStorageCoverageShape;
+
+/** Allowed values for BrowserStorageGroup. */
+export const BrowserStorageGroupValues = {
+    Value0: 'cache-storage',
+    Value1: 'cookies',
+    Value2: 'indexed-db',
+    Value3: 'local-storage',
+    Value4: 'session-storage',
+} as const;
+
+/** BrowserStorageGroup from the Nexa wire protocol. */
+export type BrowserStorageGroup =
+    (typeof BrowserStorageGroupValues)[keyof typeof BrowserStorageGroupValues];
+
+/** Allowed values for BrowserStorageKind. */
+export const BrowserStorageKindValues = {
+    Value0: 'cache-entry',
+    Value1: 'name',
+    Value2: 'record',
+    Value3: 'schema',
+    Value4: 'value',
+} as const;
+
+/** BrowserStorageKind from the Nexa wire protocol. */
+export type BrowserStorageKind =
+    (typeof BrowserStorageKindValues)[keyof typeof BrowserStorageKindValues];
+
+/** BrowserStorageMetadata wire fields. */
+export interface BrowserStorageMetadataShape {
+    /** capturedAt as defined by the Nexa gateway. */
+    readonly capturedAt: string;
+    /** coverage as defined by the Nexa gateway. */
+    readonly coverage: RecordBrowserStorageGroupBrowserStorageCoverage;
+    /** fingerprintAlgorithm as defined by the Nexa gateway. */
+    readonly fingerprintAlgorithm: 'sha256-canonical-json-v1';
+    /** fingerprintsComplete as defined by the Nexa gateway. */
+    readonly fingerprintsComplete: boolean;
+    /** frameId as defined by the Nexa gateway. */
+    readonly frameId: string;
+    /** includeFingerprints as defined by the Nexa gateway. */
+    readonly includeFingerprints: boolean;
+    /** includeNames as defined by the Nexa gateway. */
+    readonly includeNames: boolean;
+    /** limitations as defined by the Nexa gateway. */
+    readonly limitations: ReadonlyArray<string>;
+    /** origin as defined by the Nexa gateway. */
+    readonly origin: string;
+    /** provider as defined by the Nexa gateway. */
+    readonly provider: 'cdp-passive';
+    /** quota as defined by the Nexa gateway. */
+    readonly quota: BrowserStorageQuota;
+    /** targetId as defined by the Nexa gateway. */
+    readonly targetId: string;
+    /** url as defined by the Nexa gateway. */
+    readonly url: string;
+    /** valuesRedacted as defined by the Nexa gateway. */
+    readonly valuesRedacted: true;
+}
+
+/** BrowserStorageMetadata from the Nexa wire protocol. */
+export type BrowserStorageMetadata = BrowserStorageMetadataShape;
+
+/** Allowed values for BrowserStoragePagegroupVariant0. */
+export const BrowserStoragePagegroupVariant0Values = {
+    Value0: 'cache-storage',
+    Value1: 'cookies',
+    Value2: 'indexed-db',
+    Value3: 'local-storage',
+    Value4: 'session-storage',
+} as const;
+
+/** BrowserStoragePage wire fields. */
+export interface BrowserStoragePageShape {
+    /** captureSha256 as defined by the Nexa gateway. */
+    readonly captureSha256: string;
+    /** cursor as defined by the Nexa gateway. */
+    readonly cursor: string;
+    /** evidenceId as defined by the Nexa gateway. */
+    readonly evidenceId: string;
+    /** group as defined by the Nexa gateway. */
+    readonly group:
+        | (typeof BrowserStoragePagegroupVariant0Values)[keyof typeof BrowserStoragePagegroupVariant0Values]
+        | null;
+    /** metadata as defined by the Nexa gateway. */
+    readonly metadata: BrowserStorageMetadata;
+    /** nextCursor as defined by the Nexa gateway. */
+    readonly nextCursor: null | string;
+    /** rows as defined by the Nexa gateway. */
+    readonly rows: ReadonlyArray<BrowserStorageRow>;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+    /** sha256 as defined by the Nexa gateway. */
+    readonly sha256: string;
+}
+
+/** BrowserStoragePage from the Nexa wire protocol. */
+export type BrowserStoragePage = BrowserStoragePageShape;
+
+/** Allowed values for BrowserStorageQuerygroup. */
+export const BrowserStorageQuerygroupValues = {
+    Value0: 'cache-storage',
+    Value1: 'cookies',
+    Value2: 'indexed-db',
+    Value3: 'local-storage',
+    Value4: 'session-storage',
+} as const;
+
+/** BrowserStorageQuery wire fields. */
+export interface BrowserStorageQueryShape {
+    /** cursor as defined by the Nexa gateway. */
+    readonly cursor?: string;
+    /** evidenceId as defined by the Nexa gateway. */
+    readonly evidenceId: string;
+    /** group as defined by the Nexa gateway. */
+    readonly group?: (typeof BrowserStorageQuerygroupValues)[keyof typeof BrowserStorageQuerygroupValues];
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+}
+
+/** BrowserStorageQuery from the Nexa wire protocol. */
+export type BrowserStorageQuery = BrowserStorageQueryShape;
+
+/** BrowserStorageQuota wire fields. */
+export interface BrowserStorageQuotaShape {
+    /** available as defined by the Nexa gateway. */
+    readonly available: boolean;
+    /** quotaBytes as defined by the Nexa gateway. */
+    readonly quotaBytes: null | string;
+    /** usageBytes as defined by the Nexa gateway. */
+    readonly usageBytes: null | string;
+}
+
+/** BrowserStorageQuota from the Nexa wire protocol. */
+export type BrowserStorageQuota = BrowserStorageQuotaShape;
+
+/** BrowserStorageRow wire fields. */
+export interface BrowserStorageRowShape {
+    /** complete as defined by the Nexa gateway. */
+    readonly complete: boolean;
+    /** group as defined by the Nexa gateway. */
+    readonly group: BrowserStorageGroup;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** identitySha256 as defined by the Nexa gateway. */
+    readonly identitySha256: null | string;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: BrowserStorageKind;
+    /** name as defined by the Nexa gateway. */
+    readonly name: null | string;
+    /** valueSha256 as defined by the Nexa gateway. */
+    readonly valueSha256: null | string;
+}
+
+/** BrowserStorageRow from the Nexa wire protocol. */
+export type BrowserStorageRow = BrowserStorageRowShape;
+
+/** BrowserStorageSnapshot wire fields. */
+export interface BrowserStorageSnapshotShape {
+    /** capturedAt as defined by the Nexa gateway. */
+    readonly capturedAt: string;
+    /** coverage as defined by the Nexa gateway. */
+    readonly coverage: RecordBrowserStorageGroupBrowserStorageCoverage;
+    /** fingerprintAlgorithm as defined by the Nexa gateway. */
+    readonly fingerprintAlgorithm: 'sha256-canonical-json-v1';
+    /** fingerprintsComplete as defined by the Nexa gateway. */
+    readonly fingerprintsComplete: boolean;
+    /** frameId as defined by the Nexa gateway. */
+    readonly frameId: string;
+    /** includeFingerprints as defined by the Nexa gateway. */
+    readonly includeFingerprints: boolean;
+    /** includeNames as defined by the Nexa gateway. */
+    readonly includeNames: boolean;
+    /** limitations as defined by the Nexa gateway. */
+    readonly limitations: ReadonlyArray<string>;
+    /** origin as defined by the Nexa gateway. */
+    readonly origin: string;
+    /** provider as defined by the Nexa gateway. */
+    readonly provider: 'cdp-passive';
+    /** quota as defined by the Nexa gateway. */
+    readonly quota: BrowserStorageQuota;
+    /** reference as defined by the Nexa gateway. */
+    readonly reference: ReverseBrowserReference;
+    /** targetId as defined by the Nexa gateway. */
+    readonly targetId: string;
+    /** url as defined by the Nexa gateway. */
+    readonly url: string;
+    /** valuesRedacted as defined by the Nexa gateway. */
+    readonly valuesRedacted: true;
+}
+
+/** BrowserStorageSnapshot from the Nexa wire protocol. */
+export type BrowserStorageSnapshot = BrowserStorageSnapshotShape;
+
 /** BrowserStructureCount wire fields. */
 export interface BrowserStructureCountShape {
     /** count as defined by the Nexa gateway. */
@@ -3585,6 +3798,14 @@ export interface GatewayMethodsreverse_browser_sourcesShape {
     readonly result: BrowserSourcesPage;
 }
 
+/** GatewayMethodsreverse_browser_storage wire fields. */
+export interface GatewayMethodsreverse_browser_storageShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: BrowserStorageQuery;
+    /** result as defined by the Nexa gateway. */
+    readonly result: BrowserStoragePage;
+}
+
 /** GatewayMethodsreverse_browser_structure wire fields. */
 export interface GatewayMethodsreverse_browser_structureShape {
     /** params as defined by the Nexa gateway. */
@@ -4495,6 +4716,8 @@ export interface GatewayMethodsShape {
     readonly 'reverse.browser.screenshot': GatewayMethodsreverse_browser_screenshotShape;
     /** reverse.browser.sources as defined by the Nexa gateway. */
     readonly 'reverse.browser.sources': GatewayMethodsreverse_browser_sourcesShape;
+    /** reverse.browser.storage as defined by the Nexa gateway. */
+    readonly 'reverse.browser.storage': GatewayMethodsreverse_browser_storageShape;
     /** reverse.browser.structure as defined by the Nexa gateway. */
     readonly 'reverse.browser.structure': GatewayMethodsreverse_browser_structureShape;
     /** reverse.catalog as defined by the Nexa gateway. */
@@ -6615,6 +6838,24 @@ export interface ReasoningOptionsShape {
 /** ReasoningOptions from the Nexa wire protocol. */
 export type ReasoningOptions = ReasoningOptionsShape;
 
+/** RecordBrowserStorageGroupBrowserStorageCoverage wire fields. */
+export interface RecordBrowserStorageGroupBrowserStorageCoverageShape {
+    /** cache-storage as defined by the Nexa gateway. */
+    readonly 'cache-storage': BrowserStorageCoverage;
+    /** cookies as defined by the Nexa gateway. */
+    readonly cookies: BrowserStorageCoverage;
+    /** indexed-db as defined by the Nexa gateway. */
+    readonly 'indexed-db': BrowserStorageCoverage;
+    /** local-storage as defined by the Nexa gateway. */
+    readonly 'local-storage': BrowserStorageCoverage;
+    /** session-storage as defined by the Nexa gateway. */
+    readonly 'session-storage': BrowserStorageCoverage;
+}
+
+/** RecordBrowserStorageGroupBrowserStorageCoverage from the Nexa wire protocol. */
+export type RecordBrowserStorageGroupBrowserStorageCoverage =
+    RecordBrowserStorageGroupBrowserStorageCoverageShape;
+
 /** RecordstringScope from the Nexa wire protocol. */
 export interface RecordstringScope {
     readonly [key: string]: Scope;
@@ -7528,6 +7769,8 @@ export interface ReverseRunSnapshotShape {
     readonly browserScreenshot?: BrowserScreenshotSnapshot;
     /** browserSources as defined by the Nexa gateway. */
     readonly browserSources?: BrowserSourcesSnapshot;
+    /** browserStorage as defined by the Nexa gateway. */
+    readonly browserStorage?: BrowserStorageSnapshot;
     /** browserStructure as defined by the Nexa gateway. */
     readonly browserStructure?: BrowserStructureSnapshot;
     /** cleanupErrors as defined by the Nexa gateway. */
@@ -11410,6 +11653,8 @@ export enum Method {
     ReverseBrowserScreenshot = 'reverse.browser.screenshot',
     /** Calls reverse.browser.sources. */
     ReverseBrowserSources = 'reverse.browser.sources',
+    /** Calls reverse.browser.storage. */
+    ReverseBrowserStorage = 'reverse.browser.storage',
     /** Calls reverse.browser.structure. */
     ReverseBrowserStructure = 'reverse.browser.structure',
     /** Calls reverse.catalog. */

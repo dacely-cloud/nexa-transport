@@ -56,6 +56,7 @@ All 154 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [reverse.browser.modules](#reverse-browser-modules)
 - [reverse.browser.screenshot](#reverse-browser-screenshot)
 - [reverse.browser.sources](#reverse-browser-sources)
+- [reverse.browser.storage](#reverse-browser-storage)
 - [reverse.browser.structure](#reverse-browser-structure)
 - [reverse.catalog](#reverse-catalog)
 - [reverse.evidence](#reverse-evidence)
@@ -1347,6 +1348,34 @@ Parameters: [BrowserSourcesQuery](protocol.md#browsersourcesquery).
 | `view`       | Yes      | [BrowserSourcesView](protocol.md#browsersourcesview) |             |
 
 Result: [BrowserSourcesPage](protocol.md#browsersourcespage).
+
+## reverse.browser.storage
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ReverseBrowserStorage> = {
+    evidenceId: 'YOUR_EVIDENCEID',
+    id: 'YOUR_ID',
+    runId: 'YOUR_RUNID',
+};
+const result: ResultOf<typeof Method.ReverseBrowserStorage> = await client.call(
+    Method.ReverseBrowserStorage,
+    params,
+);
+```
+
+Parameters: [BrowserStorageQuery](protocol.md#browserstoragequery).
+
+| Field        | Required | Type                                                                                       | Description                                                 |
+| ------------ | -------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------- |
+| `cursor`     | No       | `string`                                                                                   |                                                             |
+| `evidenceId` | Yes      | `string`                                                                                   |                                                             |
+| `group`      | No       | `"cache-storage"` / `"cookies"` / `"indexed-db"` / `"local-storage"` / `"session-storage"` | Each storage authority has independently reported coverage. |
+| `id`         | Yes      | `string`                                                                                   |                                                             |
+| `runId`      | Yes      | `string`                                                                                   |                                                             |
+
+Result: [BrowserStoragePage](protocol.md#browserstoragepage).
 
 ## reverse.browser.structure
 
