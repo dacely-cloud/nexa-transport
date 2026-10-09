@@ -4,6 +4,14 @@ const config: UserConfig = {
         target: 'es2023',
         lib: {
             entry: {
+                'workflow-mapping-types': 'src/workflows/mapping/MappingTypes.ts',
+                'workflow-mapping-codec': 'src/workflows/mapping/MappingCodec.ts',
+                'workflow-mapping-evaluator': 'src/workflows/mapping/MappingEvaluator.ts',
+                'workflow-mapping-expressions': 'src/workflows/mapping/MappingExpressions.ts',
+                'workflow-mapping-paths': 'src/workflows/mapping/MappingPaths.ts',
+                'workflow-mapping-values': 'src/workflows/mapping/MappingValues.ts',
+                'workflow-mapping-literal': 'src/workflows/mapping/MappingLiteral.ts',
+                'workflow-mapping-validation': 'src/workflows/mapping/MappingValidation.ts',
                 'chat-graph': 'src/graphs/ChatGraph.ts',
                 'workflow-model-effort': 'src/workflows/ModelEffort.ts',
                 'workflow-application-models': 'src/workflows/terminal/ApplicationModels.ts',
