@@ -6,6 +6,7 @@ import { ComponentRegistry } from '../src/workflows/ComponentRegistry.js';
 import { WorkflowTemplateFields } from '../src/workflows/TemplateFields.js';
 import { WorkflowTemplateInputs } from '../src/workflows/TemplateInputs.js';
 import { WorkflowGraphValidation } from '../src/workflows/GraphValidation.js';
+import type { GraphIssue } from '../src/workflows/GraphTypes.js';
 import type { WorkflowTemplateGraph } from '../src/workflows/TemplateInputs.js';
 
 it('creates a runnable plain template and diagnoses missing custom values in the editor', (): void => {
@@ -24,12 +25,10 @@ it('creates a runnable plain template and diagnoses missing custom values in the
             edges: [],
         });
     expect(report.valid).toBe(false);
-    expect(report.issues).toContainEqual(
-        expect.objectContaining({
-            path: 'values',
-            message: expect.stringContaining('name. Provide it in Template values'),
-        }),
+    const missing: GraphIssue | undefined = report.issues.find(
+        (issue: GraphIssue): boolean => issue.path === 'values',
     );
+    expect(missing?.message).toContain('name. Provide it in Template values');
 });
 
 it('shares bounded safe paths and preserves zero, false, empty text and null', (): void => {
