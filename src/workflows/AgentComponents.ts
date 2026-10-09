@@ -18,6 +18,7 @@ import { Schemas } from './Schemas.js';
 
 /** Agent, prompt, persona and model roles are separately reusable configurations. */
 export class AgentComponents {
+    /** Task connections accept generated text; the runtime rejects empty task values. */
     public static definitions(): readonly ComponentDefinition[] {
         const families: readonly ResourceFamily[] = Object.values(ResourceFamily).filter(
             (family: ResourceFamily): boolean => family !== ResourceFamily.Compute,
@@ -77,7 +78,7 @@ export class AgentComponents {
             },
             ports: [
                 Ports.flow('in', PortDirection.Input),
-                Ports.input('task', 'Task', { ...Schemas.text, minLength: 1 }, true, 'task'),
+                Ports.input('task', 'Task', Schemas.text, true, 'task'),
                 Ports.input('context', 'Context', Schemas.json, false),
                 Ports.resource('agent', 'Agent', 'agent', PortDirection.Input),
                 {

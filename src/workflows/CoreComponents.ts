@@ -17,6 +17,7 @@ import type { ObjectSchema } from './SchemaTypes.js';
 
 /** Concrete authoring contracts for the first deterministic and organizing families. */
 export class CoreComponents {
+    /** Conditions accept selected JSON; runtime validation requires a boolean without coercion. */
     public static definitions(): readonly ComponentDefinition[] {
         const manual: ComponentDefinition = {
             id: 'trigger.manual',
@@ -78,7 +79,7 @@ export class CoreComponents {
             category: ComponentCategory.Conditions,
             display: this.display(
                 'Condition',
-                'Route a boolean decision without treating errors as false.',
+                'Validate a JSON boolean and route it. Other values fail instead of becoming false.',
                 'Continue only when the answer passes a check.',
                 ['if', 'branch', 'boolean'],
                 'condition',
@@ -88,7 +89,7 @@ export class CoreComponents {
             defaults: {},
             ports: [
                 Ports.flow('in', PortDirection.Input),
-                Ports.input('condition', 'Condition', Schemas.boolean, true, 'condition'),
+                Ports.input('condition', 'Condition', Schemas.json, true, 'condition'),
                 Ports.flow('matched', PortDirection.Output, 'Matched'),
                 Ports.flow('not-matched', PortDirection.Output, 'Not matched'),
             ],
