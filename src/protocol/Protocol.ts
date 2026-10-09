@@ -2746,6 +2746,14 @@ export interface GatewayMethodsworkflows_createShape {
     readonly result: WorkflowReceipt;
 }
 
+/** GatewayMethodsworkflows_delete wire fields. */
+export interface GatewayMethodsworkflows_deleteShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkflowDeleteRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WorkflowDeleteReceipt;
+}
+
 /** GatewayMethodsworkflows_list wire fields. */
 export interface GatewayMethodsworkflows_listShape {
     /** params as defined by the Nexa gateway. */
@@ -3224,6 +3232,8 @@ export interface GatewayMethodsShape {
     readonly 'workflows.catalog': GatewayMethodsworkflows_catalogShape;
     /** workflows.create as defined by the Nexa gateway. */
     readonly 'workflows.create': GatewayMethodsworkflows_createShape;
+    /** workflows.delete as defined by the Nexa gateway. */
+    readonly 'workflows.delete': GatewayMethodsworkflows_deleteShape;
     /** workflows.list as defined by the Nexa gateway. */
     readonly 'workflows.list': GatewayMethodsworkflows_listShape;
     /** workflows.models as defined by the Nexa gateway. */
@@ -7498,6 +7508,30 @@ export interface WorkflowCreateRequestShape {
 /** WorkflowCreateRequest from the Nexa wire protocol. */
 export type WorkflowCreateRequest = WorkflowCreateRequestShape;
 
+/** WorkflowDeleteReceipt wire fields. */
+export interface WorkflowDeleteReceiptShape {
+    /** deleted as defined by the Nexa gateway. */
+    readonly deleted: true;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: string;
+    /** workflowId as defined by the Nexa gateway. */
+    readonly workflowId: string;
+}
+
+/** WorkflowDeleteReceipt from the Nexa wire protocol. */
+export type WorkflowDeleteReceipt = WorkflowDeleteReceiptShape;
+
+/** WorkflowDeleteRequest wire fields. */
+export interface WorkflowDeleteRequestShape {
+    /** expectedRevision as defined by the Nexa gateway. */
+    readonly expectedRevision: string;
+    /** workflowId as defined by the Nexa gateway. */
+    readonly workflowId: string;
+}
+
+/** WorkflowDeleteRequest from the Nexa wire protocol. */
+export type WorkflowDeleteRequest = WorkflowDeleteRequestShape;
+
 /** WorkflowDetails wire fields. */
 export interface WorkflowDetailsShape {
     /** description as defined by the Nexa gateway. */
@@ -9029,6 +9063,8 @@ export enum Method {
     WorkflowsCatalog = 'workflows.catalog',
     /** Calls workflows.create. */
     WorkflowsCreate = 'workflows.create',
+    /** Calls workflows.delete. */
+    WorkflowsDelete = 'workflows.delete',
     /** Calls workflows.list. */
     WorkflowsList = 'workflows.list',
     /** Calls workflows.models. */

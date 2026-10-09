@@ -4222,6 +4222,18 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'workflows.delete': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/WorkflowDeleteRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/WorkflowDeleteReceipt',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'workflows.list': {
                     properties: {
                         params: {
@@ -4766,6 +4778,7 @@ export const schema: Schema = {
                 'voice.stop',
                 'workflows.catalog',
                 'workflows.create',
+                'workflows.delete',
                 'workflows.list',
                 'workflows.models',
                 'workflows.models.image.quote',
@@ -11258,6 +11271,36 @@ export const schema: Schema = {
                 },
             },
             required: ['commandId', 'details', 'workflowId'],
+            type: 'object',
+        },
+        WorkflowDeleteReceipt: {
+            description: 'An idempotent deletion receipt; immutable execution history is retained.',
+            properties: {
+                deleted: {
+                    const: true,
+                    type: 'boolean',
+                },
+                revision: {
+                    type: 'string',
+                },
+                workflowId: {
+                    type: 'string',
+                },
+            },
+            required: ['deleted', 'revision', 'workflowId'],
+            type: 'object',
+        },
+        WorkflowDeleteRequest: {
+            description: 'Deletion must name the saved revision the owner reviewed.',
+            properties: {
+                expectedRevision: {
+                    type: 'string',
+                },
+                workflowId: {
+                    type: 'string',
+                },
+            },
+            required: ['expectedRevision', 'workflowId'],
             type: 'object',
         },
         WorkflowDetails: {
