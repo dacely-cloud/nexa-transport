@@ -654,6 +654,43 @@ export interface BrowserActivitySocketShape {
 /** BrowserActivitySocket from the Nexa wire protocol. */
 export type BrowserActivitySocket = BrowserActivitySocketShape;
 
+/** BrowserAnalysisInput wire fields. */
+export interface BrowserAnalysisInputShape {
+    /** capturedAt as defined by the Nexa gateway. */
+    readonly capturedAt: string;
+    /** coverage as defined by the Nexa gateway. */
+    readonly coverage: BrowserSourcesCoverage;
+    /** exportedFiles as defined by the Nexa gateway. */
+    readonly exportedFiles: string;
+    /** frameId as defined by the Nexa gateway. */
+    readonly frameId: string;
+    /** includeSources as defined by the Nexa gateway. */
+    readonly includeSources: boolean;
+    /** manifestBytes as defined by the Nexa gateway. */
+    readonly manifestBytes: string;
+    /** manifestSha256 as defined by the Nexa gateway. */
+    readonly manifestSha256: string;
+    /** origin as defined by the Nexa gateway. */
+    readonly origin: string;
+    /** priorActivityAvailable as defined by the Nexa gateway. */
+    readonly priorActivityAvailable: false;
+    /** provider as defined by the Nexa gateway. */
+    readonly provider: 'cdp-passive';
+    /** reference as defined by the Nexa gateway. */
+    readonly reference: ReverseBrowserReference;
+    /** resourceCount as defined by the Nexa gateway. */
+    readonly resourceCount: string;
+    /** scriptCount as defined by the Nexa gateway. */
+    readonly scriptCount: string;
+    /** sourceRunSha256 as defined by the Nexa gateway. */
+    readonly sourceRunSha256: string;
+    /** targetId as defined by the Nexa gateway. */
+    readonly targetId: string;
+}
+
+/** BrowserAnalysisInput from the Nexa wire protocol. */
+export type BrowserAnalysisInput = BrowserAnalysisInputShape;
+
 /** BrowserAttributeName wire fields. */
 export interface BrowserAttributeNameShape {
     /** index as defined by the Nexa gateway. */
@@ -6926,6 +6963,8 @@ export interface ReverseRunSnapshotShape {
     readonly archive?: ReverseArchiveRef;
     /** browser as defined by the Nexa gateway. */
     readonly browser?: ReverseBrowserSnapshot;
+    /** browserInput as defined by the Nexa gateway. */
+    readonly browserInput?: BrowserAnalysisInput;
     /** browserSources as defined by the Nexa gateway. */
     readonly browserSources?: BrowserSourcesSnapshot;
     /** browserStructure as defined by the Nexa gateway. */

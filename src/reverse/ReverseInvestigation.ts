@@ -15,6 +15,7 @@ import type {
 } from '../protocol/Protocol.js';
 import { BrowserStructureReceipt } from './BrowserStructureReceipt.js';
 import { BrowserSourcesReceipt } from './BrowserSourcesReceipt.js';
+import { BrowserAnalysisReceipt } from './BrowserAnalysisReceipt.js';
 import { BrowserReceipt } from './BrowserReceipt.js';
 import { reverseSnapshot } from '../protocol/Validators.js';
 import { GraphReceipt } from './GraphReceipt.js';
@@ -85,6 +86,12 @@ export class ReverseInvestigation {
                 input.id,
                 input.archive?.sessionId,
             );
+        }
+        if (input.browserInput !== undefined) {
+            if (input.kind !== 'javascript') {
+                throw new RangeError('Captured browser source analysis requires a JavaScript run');
+            }
+            BrowserAnalysisReceipt.snapshot(input.browserInput, input.id, input.archive?.sessionId);
         }
         if (input.application !== undefined) {
             if (input.kind !== 'javascript' && input.kind !== 'source') {

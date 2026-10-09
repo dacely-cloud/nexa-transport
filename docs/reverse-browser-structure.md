@@ -31,5 +31,5 @@ page, selected-node details and explicitly opened attribute-name pages. Original
 JSON is fetched only through All evidence. The demo includes Browser structure.
 
 Script/resource directories and exports are covered in [saved browser sources](reverse-browser-sources.md).
-Screenshots, storage, WebMCP, browser specialist
-analysis/planning, scenarios, comparisons and full REA parity remain unfinished.
+Managed saved-source analysis and planning are covered by that source contract.
+Screenshots, storage, WebMCP, scenarios, comparisons and full REA parity remain unfinished.
