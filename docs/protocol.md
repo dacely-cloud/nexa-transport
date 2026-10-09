@@ -2213,6 +2213,7 @@ Configurable bounds on gateway-owned work and memory.
 | `workflows.runs.events`             | Yes      | Object (fields below) |                                                                                            |
 | `workflows.runs.inputs`             | Yes      | Object (fields below) |                                                                                            |
 | `workflows.runs.list`               | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.loopPricing`        | Yes      | Object (fields below) |                                                                                            |
 | `workflows.runs.loopSpending`       | Yes      | Object (fields below) |                                                                                            |
 | `workflows.runs.output`             | Yes      | Object (fields below) |                                                                                            |
 | `workflows.runs.question.answer`    | Yes      | Object (fields below) |                                                                                            |
@@ -3237,6 +3238,13 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ------------------------------------------------------------ | ----------- |
 | `params` | Yes      | [WorkflowRunListRequest](protocol.md#workflowrunlistrequest) |             |
 | `result` | Yes      | [WorkflowRunListPage](protocol.md#workflowrunlistpage)       |             |
+
+**workflows.runs.loopPricing**
+
+| Field    | Required | Type                                                                   | Description |
+| -------- | -------- | ---------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [WorkflowLoopSpendingRequest](protocol.md#workflowloopspendingrequest) |             |
+| `result` | Yes      | [WorkflowLoopSpendingView](protocol.md#workflowloopspendingview)       |             |
 
 **workflows.runs.loopSpending**
 
@@ -6921,21 +6929,22 @@ Select one authored loop in an owned immutable run.
 
 The public projection adds run-pinned configuration and explicitly marks mocked execution.
 
-| Field                | Required | Type          | Description |
-| -------------------- | -------- | ------------- | ----------- |
-| `deadlineAtMs`       | Yes      | `null,string` |             |
-| `entries`            | Yes      | `string`      |             |
-| `lastReportedAtMs`   | Yes      | `null,string` |             |
-| `limitMicrocents`    | Yes      | `null,string` |             |
-| `loopId`             | Yes      | `string`      |             |
-| `observedAtMs`       | Yes      | `string`      |             |
-| `reportedMicrocents` | Yes      | `null,string` |             |
-| `reservationCount`   | Yes      | `number`      |             |
-| `reservedMicrocents` | Yes      | `string`      |             |
-| `revision`           | Yes      | `string`      |             |
-| `runId`              | Yes      | `string`      |             |
-| `simulated`          | Yes      | `boolean`     |             |
-| `workflowId`         | Yes      | `string`      |             |
+| Field                | Required | Type                                                                  | Description                                              |
+| -------------------- | -------- | --------------------------------------------------------------------- | -------------------------------------------------------- |
+| `deadlineAtMs`       | Yes      | `null,string`                                                         |                                                          |
+| `entries`            | Yes      | `string`                                                              |                                                          |
+| `lastReportedAtMs`   | Yes      | `null,string`                                                         |                                                          |
+| `limitMicrocents`    | Yes      | `null,string`                                                         |                                                          |
+| `loopId`             | Yes      | `string`                                                              |                                                          |
+| `observedAtMs`       | Yes      | `string`                                                              |                                                          |
+| `pricing`            | No       | Array of [WorkflowSpendingBucket](protocol.md#workflowspendingbucket) | Present only on the negotiated classified-report method. |
+| `reportedMicrocents` | Yes      | `null,string`                                                         |                                                          |
+| `reservationCount`   | Yes      | `number`                                                              |                                                          |
+| `reservedMicrocents` | Yes      | `string`                                                              |                                                          |
+| `revision`           | Yes      | `string`                                                              |                                                          |
+| `runId`              | Yes      | `string`                                                              |                                                          |
+| `simulated`          | Yes      | `boolean`                                                             |                                                          |
+| `workflowId`         | Yes      | `string`                                                              |                                                          |
 
 ## WorkflowManifestPage
 
@@ -7655,6 +7664,22 @@ No graph, outputs, credentials or unbounded event collections are embedded here.
 | `status`             | Yes      | [WorkflowScheduleStatus](protocol.md#workflowschedulestatus)               |             |
 | `updatedAtMs`        | Yes      | `string`                                                                   |             |
 | `workflowId`         | Yes      | `string`                                                                   |             |
+
+## WorkflowSpendingBasis
+
+Legacy reporting never infers a pricing classification from its amount.
+
+Type: `"adjustment"` / `"estimate"` / `"included-estimate"` / `"included-unpriced"` / `"legacy"` / `"local"` / `"unpriced"` / `"wallet"`.
+
+## WorkflowSpendingBucket
+
+Exact subtotal and usage count; buckets partition the recorded amount, never add another charge.
+
+| Field        | Required | Type                                                       | Description |
+| ------------ | -------- | ---------------------------------------------------------- | ----------- |
+| `basis`      | Yes      | [WorkflowSpendingBasis](protocol.md#workflowspendingbasis) |             |
+| `entries`    | Yes      | `string`                                                   |             |
+| `microcents` | Yes      | `string`                                                   |             |
 
 ## WorkflowStepOrigin
 

@@ -4217,6 +4217,14 @@ export interface GatewayMethodsworkflows_runs_listShape {
     readonly result: WorkflowRunListPage;
 }
 
+/** GatewayMethodsworkflows_runs_loopPricing wire fields. */
+export interface GatewayMethodsworkflows_runs_loopPricingShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkflowLoopSpendingRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WorkflowLoopSpendingView;
+}
+
 /** GatewayMethodsworkflows_runs_loopSpending wire fields. */
 export interface GatewayMethodsworkflows_runs_loopSpendingShape {
     /** params as defined by the Nexa gateway. */
@@ -4645,6 +4653,8 @@ export interface GatewayMethodsShape {
     readonly 'workflows.runs.inputs': GatewayMethodsworkflows_runs_inputsShape;
     /** workflows.runs.list as defined by the Nexa gateway. */
     readonly 'workflows.runs.list': GatewayMethodsworkflows_runs_listShape;
+    /** workflows.runs.loopPricing as defined by the Nexa gateway. */
+    readonly 'workflows.runs.loopPricing': GatewayMethodsworkflows_runs_loopPricingShape;
     /** workflows.runs.loopSpending as defined by the Nexa gateway. */
     readonly 'workflows.runs.loopSpending': GatewayMethodsworkflows_runs_loopSpendingShape;
     /** workflows.runs.output as defined by the Nexa gateway. */
@@ -9835,6 +9845,8 @@ export interface WorkflowLoopSpendingViewShape {
     readonly loopId: string;
     /** observedAtMs as defined by the Nexa gateway. */
     readonly observedAtMs: string;
+    /** pricing as defined by the Nexa gateway. */
+    readonly pricing?: ReadonlyArray<WorkflowSpendingBucket>;
     /** reportedMicrocents as defined by the Nexa gateway. */
     readonly reportedMicrocents: null | string;
     /** reservationCount as defined by the Nexa gateway. */
@@ -10890,6 +10902,35 @@ export interface WorkflowScheduleViewShape {
 /** WorkflowScheduleView from the Nexa wire protocol. */
 export type WorkflowScheduleView = WorkflowScheduleViewShape;
 
+/** Allowed values for WorkflowSpendingBasis. */
+export const WorkflowSpendingBasisValues = {
+    Value0: 'adjustment',
+    Value1: 'estimate',
+    Value2: 'included-estimate',
+    Value3: 'included-unpriced',
+    Value4: 'legacy',
+    Value5: 'local',
+    Value6: 'unpriced',
+    Value7: 'wallet',
+} as const;
+
+/** WorkflowSpendingBasis from the Nexa wire protocol. */
+export type WorkflowSpendingBasis =
+    (typeof WorkflowSpendingBasisValues)[keyof typeof WorkflowSpendingBasisValues];
+
+/** WorkflowSpendingBucket wire fields. */
+export interface WorkflowSpendingBucketShape {
+    /** basis as defined by the Nexa gateway. */
+    readonly basis: WorkflowSpendingBasis;
+    /** entries as defined by the Nexa gateway. */
+    readonly entries: string;
+    /** microcents as defined by the Nexa gateway. */
+    readonly microcents: string;
+}
+
+/** WorkflowSpendingBucket from the Nexa wire protocol. */
+export type WorkflowSpendingBucket = WorkflowSpendingBucketShape;
+
 /** WorkflowStepOrigin wire fields. */
 export interface WorkflowStepOriginShape {
     /** itemIndex as defined by the Nexa gateway. */
@@ -11527,6 +11568,8 @@ export enum Method {
     WorkflowsRunsInputs = 'workflows.runs.inputs',
     /** Calls workflows.runs.list. */
     WorkflowsRunsList = 'workflows.runs.list',
+    /** Calls workflows.runs.loopPricing. */
+    WorkflowsRunsLoopPricing = 'workflows.runs.loopPricing',
     /** Calls workflows.runs.loopSpending. */
     WorkflowsRunsLoopSpending = 'workflows.runs.loopSpending',
     /** Calls workflows.runs.output. */
