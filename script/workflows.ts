@@ -94,6 +94,8 @@ const files: readonly string[] = [
     'ComponentTypes',
     'ComponentFactory',
     'CoreComponents',
+    'TemplateFields',
+    'TemplateInputs',
     'DataComponents',
     'HumanComponents',
     'ApprovalComponents',

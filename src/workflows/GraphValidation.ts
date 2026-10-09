@@ -25,7 +25,9 @@ import { GraphConnections } from './GraphConnections.js';
 import { GraphResources } from './GraphResources.js';
 import { GraphEach } from './GraphEach.js';
 import { GraphOrder } from './GraphOrder.js';
-import type { WorkflowEdge, WorkflowValue } from './WorkflowTypes.js';
+import { WorkflowTemplateFields } from './TemplateFields.js';
+import { WorkflowJson } from './WorkflowJson.js';
+import type { WorkflowEdge, WorkflowValue, WorkflowObject } from './WorkflowTypes.js';
 
 /** Structural validation is pure and never activates a trigger, model, connector or tool. */
 export class WorkflowGraphValidation {
@@ -176,6 +178,33 @@ export class WorkflowGraphValidation {
         connections: GraphConnectionsResult,
         problems: GraphProblems,
     ): void {
+        if (entry.definition.id === 'text.template') {
+            const template: WorkflowValue | undefined = entry.node.configuration['template'];
+            if (typeof template === 'string') {
+                try {
+                    const paths: readonly string[] = WorkflowTemplateFields.paths(template);
+                    if (
+                        (connections.incoming.get(GraphConnections.key(entry.node.id, 'values'))
+                            ?.length ?? 0) === 0
+                    ) {
+                        const values: WorkflowObject = WorkflowJson.object(
+                            entry.node.configuration['values'] ?? {},
+                        );
+                        for (const path of paths) {
+                            WorkflowTemplateFields.value(values, path);
+                        }
+                    }
+                } catch (caught: unknown) {
+                    problems.add(
+                        GraphIssueCode.Configuration,
+                        caught instanceof Error ? caught.message : 'Review template values',
+                        entry.node.id,
+                        null,
+                        'values',
+                    );
+                }
+            }
+        }
         if (entry.node.component === WorkflowTimedTrigger.component) {
             try {
                 WorkflowTimedTrigger.read(entry.node);

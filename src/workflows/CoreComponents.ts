@@ -61,7 +61,7 @@ export class CoreComponents {
                 Schemas.field('template', Schemas.text),
                 Schemas.field('values', Schemas.object([], true), false),
             ]),
-            defaults: { template: 'Hello {{name}}' },
+            defaults: { template: 'Hello' },
             ports: [
                 Ports.flow('in', PortDirection.Input),
                 Ports.input('values', 'Template values', Schemas.object([], true), false, 'values'),
