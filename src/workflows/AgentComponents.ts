@@ -15,6 +15,7 @@ import { ResourceComponents } from './ResourceComponents.js';
 import { CoreComponents } from './CoreComponents.js';
 import { ComponentFactory as Ports } from './ComponentFactory.js';
 import { Schemas } from './Schemas.js';
+import { WorkflowModelEffort } from './ModelEffort.js';
 import { WorkflowInput } from './WorkflowInput.js';
 
 /** Agent, prompt, persona and model roles are separately reusable configurations. */
@@ -131,7 +132,14 @@ export class AgentComponents {
                     'model',
                     ['provider', 'capability', 'selection'],
                 ),
-                inspectorFields: ['provider', 'capability', 'selection', 'modelId', 'options'],
+                inspectorFields: [
+                    'provider',
+                    'capability',
+                    'selection',
+                    'modelId',
+                    'effort',
+                    'options',
+                ],
             },
             configuration: Schemas.object([
                 Schemas.field('provider', { ...Schemas.text, nullable: true }),
@@ -150,6 +158,11 @@ export class AgentComponents {
                 ),
                 Schemas.field('selection', Schemas.choice(['exact', 'latest-compatible'])),
                 Schemas.field('modelId', { ...Schemas.text, nullable: true }),
+                Schemas.field(
+                    'effort',
+                    { ...Schemas.choice(Object.values(WorkflowModelEffort)), nullable: true },
+                    false,
+                ),
                 Schemas.field('options', Schemas.object([], true)),
                 Schemas.field(
                     'imagePolicy',

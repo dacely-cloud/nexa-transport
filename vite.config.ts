@@ -5,6 +5,8 @@ const config: UserConfig = {
         lib: {
             entry: {
                 'chat-graph': 'src/graphs/ChatGraph.ts',
+                'workflow-model-effort': 'src/workflows/ModelEffort.ts',
+                'workflow-application-models': 'src/workflows/terminal/ApplicationModels.ts',
                 'workflow-applications': 'src/workflows/terminal/Applications.ts',
                 'workflow-terminal-types': 'src/workflows/terminal/TerminalTypes.ts',
                 'reverse-investigation': 'src/reverse/ReverseInvestigation.ts',

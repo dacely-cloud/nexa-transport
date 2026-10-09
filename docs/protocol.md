@@ -5694,6 +5694,13 @@ Public model metadata only: no endpoints, keys, account names, or adapter option
 | `reasoning`        | Yes      | `null,boolean`                                                     |                                                                                         |
 | `source`           | Yes      | `string`                                                           |                                                                                         |
 | `status`           | Yes      | `string`                                                           |                                                                                         |
+| `efforts`          | No       | Array of [WorkflowModelEffort](protocol.md#workflowmodeleffort)    | Available effort overrides for this model; absent means metadata is unavailable.        |
+
+## WorkflowModelEffort
+
+Saved reasoning levels shared by workflows and provider requests; null uses the service default.
+
+Type: `"high"` / `"low"` / `"max"` / `"medium"` / `"minimal"` / `"off"` / `"xhigh"`.
 
 ## WorkflowModelFeature
 

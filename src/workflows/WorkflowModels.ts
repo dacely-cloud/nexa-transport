@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
+import type { WorkflowModelEffort } from './ModelEffort.js';
 import { WorkflowInput } from './WorkflowInput.js';
 
 /** Operations available through the workflow model picker. */
@@ -50,6 +51,8 @@ export interface WorkflowModelChoice {
     readonly provider: string;
     readonly input: readonly string[];
     readonly reasoning: boolean | null;
+    /** Available effort overrides for this model; absent means metadata is unavailable. */
+    readonly efforts?: readonly WorkflowModelEffort[];
     readonly source: string;
     readonly status: string;
     readonly compatible: boolean;

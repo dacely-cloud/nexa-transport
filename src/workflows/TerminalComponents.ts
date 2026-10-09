@@ -9,6 +9,7 @@ import {
 import { ComponentFactory as Ports } from './ComponentFactory.js';
 import { CoreComponents } from './CoreComponents.js';
 import { Schemas } from './Schemas.js';
+import { WorkflowModelEffort } from './ModelEffort.js';
 import { WorkflowInput } from './WorkflowInput.js';
 import {
     WorkflowApplications,
@@ -33,12 +34,22 @@ export class TerminalComponents {
                         'terminal',
                         ['task'],
                     ),
-                    inspectorFields: ['task', 'maxTurns'],
+                    inspectorFields: ['task', 'modelId', 'effort', 'maxTurns'],
                 },
                 configuration: Schemas.object([
                     Schemas.field(
                         'task',
                         { ...Schemas.text, minLength: 1, maxLength: WorkflowInput.taskCharacters },
+                        false,
+                    ),
+                    Schemas.field(
+                        'modelId',
+                        { ...Schemas.text, nullable: true, minLength: 1, maxLength: 256 },
+                        false,
+                    ),
+                    Schemas.field(
+                        'effort',
+                        { ...Schemas.choice(Object.values(WorkflowModelEffort)), nullable: true },
                         false,
                     ),
                     Schemas.field('maxTurns', {

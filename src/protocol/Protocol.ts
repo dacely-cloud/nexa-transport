@@ -8186,10 +8186,27 @@ export interface WorkflowModelChoiceShape {
     readonly source: string;
     /** status as defined by the Nexa gateway. */
     readonly status: string;
+    /** efforts as defined by the Nexa gateway. */
+    readonly efforts?: ReadonlyArray<WorkflowModelEffort>;
 }
 
 /** WorkflowModelChoice from the Nexa wire protocol. */
 export type WorkflowModelChoice = WorkflowModelChoiceShape;
+
+/** Allowed values for WorkflowModelEffort. */
+export const WorkflowModelEffortValues = {
+    Value0: 'high',
+    Value1: 'low',
+    Value2: 'max',
+    Value3: 'medium',
+    Value4: 'minimal',
+    Value5: 'off',
+    Value6: 'xhigh',
+} as const;
+
+/** WorkflowModelEffort from the Nexa wire protocol. */
+export type WorkflowModelEffort =
+    (typeof WorkflowModelEffortValues)[keyof typeof WorkflowModelEffortValues];
 
 /** Allowed values for WorkflowModelFeature. */
 export const WorkflowModelFeatureValues = {

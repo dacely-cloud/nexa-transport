@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { WorkflowModelPolicyEvidence } from '../ModelPolicy.js';
+import type { WorkflowModelEffort } from '../ModelEffort.js';
 import type { WorkflowRunSnapshot } from './RunTypes.js';
 
 /** Resolution uses the selected provider only; policies require their own verified resolver. */
@@ -20,6 +21,8 @@ export interface WorkflowResolvedModel {
     readonly policy?: WorkflowModelPolicyEvidence;
     readonly capability: WorkflowTextCapability;
     readonly maxOutputTokens: number;
+    /** Selected effort pinned with this model; absent means the provider default. */
+    readonly effort?: WorkflowModelEffort;
     /** Digest of the existing ledger rate card; null means unpriced. */
     readonly pricingReference: string | null;
 }

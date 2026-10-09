@@ -2,6 +2,7 @@
 
 import { WorkflowModelPolicies, type WorkflowModelPolicyEvidence } from '../ModelPolicy.js';
 import { WorkflowModelsCodec } from '../WorkflowModels.js';
+import { WorkflowModelEfforts, type WorkflowModelEffort } from '../ModelEffort.js';
 import { WorkflowInput } from '../WorkflowInput.js';
 import {
     WorkflowModelSelection,
@@ -35,7 +36,9 @@ export class WorkflowRunModelCodec {
             'maxOutputTokens',
             'pricingReference',
             ...(latest ? ['policy'] : []),
+            ...(fields['effort'] === undefined ? [] : ['effort']),
         ]);
+        const effort: WorkflowModelEffort | null = WorkflowModelEfforts.parse(value['effort']);
         const capability: unknown = value['capability'];
         const maxOutputTokens: unknown = value['maxOutputTokens'];
         if (
@@ -65,6 +68,7 @@ export class WorkflowRunModelCodec {
             ...(policy === undefined ? {} : { policy }),
             capability,
             maxOutputTokens,
+            ...(effort === null ? {} : { effort }),
             pricingReference: price,
         });
     }
