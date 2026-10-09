@@ -6134,6 +6134,17 @@ An observation time is not a release date, freshness guarantee, or permission gr
 | `refreshAvailable` | Yes      | `boolean`     |             |
 | `refreshFailed`    | Yes      | `boolean`     |             |
 
+## WorkflowCompletionTiming
+
+One run at a time, followed by a delay from its persisted terminal transition.
+
+| Field        | Required | Type                 | Description |
+| ------------ | -------- | -------------------- | ----------- |
+| `endAtMs`    | Yes      | `null,string`        |             |
+| `intervalMs` | Yes      | `string`             |             |
+| `kind`       | Yes      | `"after-completion"` |             |
+| `startAtMs`  | Yes      | `string`             |             |
+
 ## WorkflowCreateRequest
 
 Client-chosen identities make an unacknowledged create safe to retry.
@@ -7187,6 +7198,15 @@ Variant 3: [WorkflowOnceTiming](protocol.md#workflowoncetiming)
 | ------ | -------- | -------- | ----------- |
 | `atMs` | Yes      | `string` |             |
 | `kind` | Yes      | `"once"` |             |
+
+Variant 4: [WorkflowCompletionTiming](protocol.md#workflowcompletiontiming)
+
+| Field        | Required | Type                 | Description |
+| ------------ | -------- | -------------------- | ----------- |
+| `endAtMs`    | Yes      | `null,string`        |             |
+| `intervalMs` | Yes      | `string`             |             |
+| `kind`       | Yes      | `"after-completion"` |             |
+| `startAtMs`  | Yes      | `string`             |             |
 
 ## WorkflowScheduleView
 
