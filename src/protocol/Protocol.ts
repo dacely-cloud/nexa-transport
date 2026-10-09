@@ -392,6 +392,8 @@ export interface AskResultShape {
     readonly conversationId: null | string;
     /** finishReason as defined by the Nexa gateway. */
     readonly finishReason: FinishReason;
+    /** incompleteReason as defined by the Nexa gateway. */
+    readonly incompleteReason?: string;
     /** iterations as defined by the Nexa gateway. */
     readonly iterations: number;
     /** reasoning as defined by the Nexa gateway. */
