@@ -6,6 +6,7 @@ import {
     ComponentEffect,
     ComponentRole,
     PortDirection,
+    IncomingPolicy,
     type ComponentDefinition,
     type ComponentPort,
 } from './ComponentTypes.js';
@@ -29,6 +30,22 @@ interface DataComponentSeed {
 export class DataComponents {
     public static definitions(): readonly ComponentDefinition[] {
         const seeds: readonly DataComponentSeed[] = [
+            {
+                id: 'data.collect',
+                title: 'Collect results',
+                description:
+                    'Wait for every connected result and collect values with their source labels.',
+                configuration: Schemas.object([]),
+                defaults: {},
+                inputs: [
+                    {
+                        ...ComponentFactory.input('items', 'Results', Schemas.json),
+                        incoming: IncomingPolicy.Collect,
+                        maxConnections: 32,
+                    },
+                ],
+                output: ComponentFactory.output('value', 'Collected results', Schemas.json),
+            },
             {
                 id: 'data.parse-json',
                 title: 'Parse JSON',

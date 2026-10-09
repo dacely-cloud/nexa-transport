@@ -78,6 +78,7 @@ export class AgentComponents {
             ports: [
                 Ports.flow('in', PortDirection.Input),
                 Ports.input('task', 'Task', { ...Schemas.text, minLength: 1 }, true, 'task'),
+                Ports.input('context', 'Context', Schemas.json, false),
                 Ports.resource('agent', 'Agent', 'agent', PortDirection.Input),
                 {
                     ...Ports.resource('reasoning', 'Reasoning model', 'model', PortDirection.Input),
