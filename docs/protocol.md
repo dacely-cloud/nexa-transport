@@ -1089,6 +1089,126 @@ Metadata and source content are selected independently, with distinct cursors.
 
 Type: `"resources"` / `"scripts"` / `"source"`.
 
+## BrowserStorageCoverage
+
+Omitted rows or observed mutations prevent completeness claims.
+
+| Field                  | Required | Type      | Description |
+| ---------------------- | -------- | --------- | ----------- |
+| `available`            | Yes      | `boolean` |             |
+| `changedDuringCapture` | Yes      | `boolean` |             |
+| `complete`             | Yes      | `boolean` |             |
+| `omitted`              | Yes      | `string`  |             |
+| `rows`                 | Yes      | `string`  |             |
+| `selected`             | Yes      | `boolean` |             |
+
+## BrowserStorageGroup
+
+Each storage authority has independently reported coverage.
+
+Type: `"cache-storage"` / `"cookies"` / `"indexed-db"` / `"local-storage"` / `"session-storage"`.
+
+## BrowserStorageKind
+
+A row distinguishes store existence, schema and record fingerprints.
+
+Type: `"cache-entry"` / `"name"` / `"record"` / `"schema"` / `"value"`.
+
+## BrowserStorageMetadata
+
+Projected capture identity includes no key/value bodies or unselected names.
+
+| Field                  | Required | Type                                                                                                           | Description |
+| ---------------------- | -------- | -------------------------------------------------------------------------------------------------------------- | ----------- |
+| `capturedAt`           | Yes      | `string`                                                                                                       |             |
+| `coverage`             | Yes      | [RecordBrowserStorageGroupBrowserStorageCoverage](protocol.md#recordbrowserstoragegroupbrowserstoragecoverage) |             |
+| `fingerprintAlgorithm` | Yes      | `"sha256-canonical-json-v1"`                                                                                   |             |
+| `fingerprintsComplete` | Yes      | `boolean`                                                                                                      |             |
+| `frameId`              | Yes      | `string`                                                                                                       |             |
+| `includeFingerprints`  | Yes      | `boolean`                                                                                                      |             |
+| `includeNames`         | Yes      | `boolean`                                                                                                      |             |
+| `limitations`          | Yes      | Array of `string`                                                                                              |             |
+| `origin`               | Yes      | `string`                                                                                                       |             |
+| `provider`             | Yes      | `"cdp-passive"`                                                                                                |             |
+| `quota`                | Yes      | [BrowserStorageQuota](protocol.md#browserstoragequota)                                                         |             |
+| `targetId`             | Yes      | `string`                                                                                                       |             |
+| `url`                  | Yes      | `string`                                                                                                       |             |
+| `valuesRedacted`       | Yes      | `true`                                                                                                         |             |
+
+## BrowserStoragePage
+
+Metadata-only reads omit a group; selected groups contain at most twenty rows.
+
+| Field           | Required | Type                                                                                                | Description |
+| --------------- | -------- | --------------------------------------------------------------------------------------------------- | ----------- |
+| `captureSha256` | Yes      | `string`                                                                                            |             |
+| `cursor`        | Yes      | `string`                                                                                            |             |
+| `evidenceId`    | Yes      | `string`                                                                                            |             |
+| `group`         | Yes      | `"cache-storage"` / `"cookies"` / `"indexed-db"` / `"local-storage"` / `"session-storage"` / `null` |             |
+| `metadata`      | Yes      | [BrowserStorageMetadata](protocol.md#browserstoragemetadata)                                        |             |
+| `nextCursor`    | Yes      | `null,string`                                                                                       |             |
+| `rows`          | Yes      | Array of [BrowserStorageRow](protocol.md#browserstoragerow)                                         |             |
+| `runId`         | Yes      | `string`                                                                                            |             |
+| `sha256`        | Yes      | `string`                                                                                            |             |
+
+## BrowserStorageQuery
+
+Saved rows select one storage group with independent ordinal paging.
+
+| Field        | Required | Type                                                                                       | Description                                                 |
+| ------------ | -------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------- |
+| `cursor`     | No       | `string`                                                                                   |                                                             |
+| `evidenceId` | Yes      | `string`                                                                                   |                                                             |
+| `group`      | No       | `"cache-storage"` / `"cookies"` / `"indexed-db"` / `"local-storage"` / `"session-storage"` | Each storage authority has independently reported coverage. |
+| `id`         | Yes      | `string`                                                                                   |                                                             |
+| `runId`      | Yes      | `string`                                                                                   |                                                             |
+
+## BrowserStorageQuota
+
+Quota byte counts retain exact validated integer representations.
+
+| Field        | Required | Type          | Description |
+| ------------ | -------- | ------------- | ----------- |
+| `available`  | Yes      | `boolean`     |             |
+| `quotaBytes` | Yes      | `null,string` |             |
+| `usageBytes` | Yes      | `null,string` |             |
+
+## BrowserStorageRow
+
+Names appear only when selected; hashes identify data without returning its values.
+
+| Field            | Required | Type                                                   | Description |
+| ---------------- | -------- | ------------------------------------------------------ | ----------- |
+| `complete`       | Yes      | `boolean`                                              |             |
+| `group`          | Yes      | [BrowserStorageGroup](protocol.md#browserstoragegroup) |             |
+| `id`             | Yes      | `string`                                               |             |
+| `identitySha256` | Yes      | `null,string`                                          |             |
+| `kind`           | Yes      | [BrowserStorageKind](protocol.md#browserstoragekind)   |             |
+| `name`           | Yes      | `null,string`                                          |             |
+| `valueSha256`    | Yes      | `null,string`                                          |             |
+
+## BrowserStorageSnapshot
+
+Progress identifies a saved redacted capture without embedding its rows.
+
+| Field                  | Required | Type                                                                                                           | Description |
+| ---------------------- | -------- | -------------------------------------------------------------------------------------------------------------- | ----------- |
+| `capturedAt`           | Yes      | `string`                                                                                                       |             |
+| `coverage`             | Yes      | [RecordBrowserStorageGroupBrowserStorageCoverage](protocol.md#recordbrowserstoragegroupbrowserstoragecoverage) |             |
+| `fingerprintAlgorithm` | Yes      | `"sha256-canonical-json-v1"`                                                                                   |             |
+| `fingerprintsComplete` | Yes      | `boolean`                                                                                                      |             |
+| `frameId`              | Yes      | `string`                                                                                                       |             |
+| `includeFingerprints`  | Yes      | `boolean`                                                                                                      |             |
+| `includeNames`         | Yes      | `boolean`                                                                                                      |             |
+| `limitations`          | Yes      | Array of `string`                                                                                              |             |
+| `origin`               | Yes      | `string`                                                                                                       |             |
+| `provider`             | Yes      | `"cdp-passive"`                                                                                                |             |
+| `quota`                | Yes      | [BrowserStorageQuota](protocol.md#browserstoragequota)                                                         |             |
+| `reference`            | Yes      | [ReverseBrowserReference](protocol.md#reversebrowserreference)                                                 |             |
+| `targetId`             | Yes      | `string`                                                                                                       |             |
+| `url`                  | Yes      | `string`                                                                                                       |             |
+| `valuesRedacted`       | Yes      | `true`                                                                                                         |             |
+
 ## BrowserStructureCount
 
 Value-free DOM tag and accessibility role counts.
@@ -2134,6 +2254,7 @@ Configurable bounds on gateway-owned work and memory.
 | `reverse.browser.modules`           | Yes      | Object (fields below) |                                                                                            |
 | `reverse.browser.screenshot`        | Yes      | Object (fields below) |                                                                                            |
 | `reverse.browser.sources`           | Yes      | Object (fields below) |                                                                                            |
+| `reverse.browser.storage`           | Yes      | Object (fields below) |                                                                                            |
 | `reverse.browser.structure`         | Yes      | Object (fields below) |                                                                                            |
 | `reverse.catalog`                   | Yes      | Object (fields below) |                                                                                            |
 | `reverse.evidence`                  | Yes      | Object (fields below) |                                                                                            |
@@ -2685,6 +2806,13 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ------------------------------------------------------ | ----------- |
 | `params` | Yes      | [BrowserSourcesQuery](protocol.md#browsersourcesquery) |             |
 | `result` | Yes      | [BrowserSourcesPage](protocol.md#browsersourcespage)   |             |
+
+**reverse.browser.storage**
+
+| Field    | Required | Type                                                   | Description |
+| -------- | -------- | ------------------------------------------------------ | ----------- |
+| `params` | Yes      | [BrowserStorageQuery](protocol.md#browserstoragequery) |             |
+| `result` | Yes      | [BrowserStoragePage](protocol.md#browserstoragepage)   |             |
 
 **reverse.browser.structure**
 
@@ -4696,6 +4824,16 @@ Reasoning configuration for a request.
 | `include`   | No       | `boolean`                                                                     | Whether the reasoning trace should be streamed back at all.                  |
 | `maxTokens` | No       | `number`                                                                      | A hard token budget for the reasoning trace, where the provider accepts one. |
 
+## RecordBrowserStorageGroupBrowserStorageCoverage
+
+| Field             | Required | Type                                                         | Description |
+| ----------------- | -------- | ------------------------------------------------------------ | ----------- |
+| `cache-storage`   | Yes      | [BrowserStorageCoverage](protocol.md#browserstoragecoverage) |             |
+| `cookies`         | Yes      | [BrowserStorageCoverage](protocol.md#browserstoragecoverage) |             |
+| `indexed-db`      | Yes      | [BrowserStorageCoverage](protocol.md#browserstoragecoverage) |             |
+| `local-storage`   | Yes      | [BrowserStorageCoverage](protocol.md#browserstoragecoverage) |             |
+| `session-storage` | Yes      | [BrowserStorageCoverage](protocol.md#browserstoragecoverage) |             |
+
 ## RecordstringScope
 
 Type: Dictionary.
@@ -5297,6 +5435,7 @@ Bounded, capability-free projection carried by live tool events and the final re
 | `browserInput`      | No       | [BrowserAnalysisInput](protocol.md#browseranalysisinput)                               | Body-free provenance links a derived shared analysis to the exact original browser capture.     |
 | `browserScreenshot` | No       | [BrowserScreenshotSnapshot](protocol.md#browserscreenshotsnapshot)                     | Progress retains an owner-bound archive identity without any image data.                        |
 | `browserSources`    | No       | [BrowserSourcesSnapshot](protocol.md#browsersourcessnapshot)                           | A native source capture references one immutable owner-scoped archive.                          |
+| `browserStorage`    | No       | [BrowserStorageSnapshot](protocol.md#browserstoragesnapshot)                           | Progress identifies a saved redacted capture without embedding its rows.                        |
 | `browserStructure`  | No       | [BrowserStructureSnapshot](protocol.md#browserstructuresnapshot)                       | A progress receipt references structure without carrying complete trees.                        |
 | `cleanupErrors`     | Yes      | Array of `string`                                                                      |                                                                                                 |
 | `evidence`          | Yes      | Array of [ReverseEvidenceRecord](protocol.md#reverseevidencerecord)                    |                                                                                                 |
