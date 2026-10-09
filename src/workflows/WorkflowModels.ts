@@ -82,7 +82,7 @@ export interface WorkflowModelsPage {
 export class WorkflowModelsCodec {
     /** Model IDs are provider-owned, unlike workflow record IDs, and may contain @ or +. */
     public static identity(raw: unknown): string {
-        const value: string = WorkflowInput.text(raw);
+        const value: string = WorkflowInput.text(raw, 256, false, 'Model ID');
         if (/[\s\p{Cc}]/u.test(value)) {
             throw new Error('Model identities cannot contain whitespace or control characters');
         }

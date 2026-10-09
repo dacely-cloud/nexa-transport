@@ -15,6 +15,7 @@ import { ResourceComponents } from './ResourceComponents.js';
 import { CoreComponents } from './CoreComponents.js';
 import { ComponentFactory as Ports } from './ComponentFactory.js';
 import { Schemas } from './Schemas.js';
+import { WorkflowInput } from './WorkflowInput.js';
 
 /** Agent, prompt, persona and model roles are separately reusable configurations. */
 export class AgentComponents {
@@ -57,7 +58,11 @@ export class AgentComponents {
                 ],
             },
             configuration: Schemas.object([
-                Schemas.field('task', { ...Schemas.text, minLength: 1 }, false),
+                Schemas.field(
+                    'task',
+                    { ...Schemas.text, minLength: 1, maxLength: WorkflowInput.taskCharacters },
+                    false,
+                ),
                 Schemas.field('agentId', { ...Schemas.text, nullable: true }),
                 Schemas.field('agentVersion', { ...Schemas.text, nullable: true }),
                 Schemas.field('modelRoles', Schemas.object([], true)),

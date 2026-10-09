@@ -37,10 +37,18 @@ export class WorkflowCodec {
         );
         WorkflowInput.unique(tags);
         return Object.freeze({
-            name: WorkflowInput.text(value['name'], 160),
-            description: WorkflowInput.text(value['description'], 2000, true),
+            name: WorkflowInput.text(value['name'], 160, false, 'Workflow name'),
+            description: WorkflowInput.text(
+                value['description'],
+                2000,
+                true,
+                'Workflow description',
+            ),
             tags,
-            folder: value['folder'] === null ? null : WorkflowInput.id(value['folder']),
+            folder:
+                value['folder'] === null
+                    ? null
+                    : WorkflowInput.id(value['folder'], 'Workflow folder ID'),
         });
     }
     /** Typed resource bindings are preserved even when their selection is unresolved. */
@@ -60,10 +68,10 @@ export class WorkflowCodec {
         );
         WorkflowInput.unique(resources.map((entry: ResourceBinding): string => entry.id));
         return Object.freeze({
-            id: WorkflowInput.id(value['id']),
-            component: WorkflowInput.id(value['component']),
-            componentVersion: WorkflowInput.id(value['componentVersion']),
-            label: WorkflowInput.text(value['label'], 160),
+            id: WorkflowInput.id(value['id'], 'Node ID'),
+            component: WorkflowInput.id(value['component'], 'Component ID'),
+            componentVersion: WorkflowInput.id(value['componentVersion'], 'Component version'),
+            label: WorkflowInput.text(value['label'], 160, false, 'Node label'),
             configuration: WorkflowJson.object(value['configuration']),
             resources,
         });

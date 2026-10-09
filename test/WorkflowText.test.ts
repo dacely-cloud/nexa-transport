@@ -7,31 +7,41 @@ import { Method } from '../src/protocol/Protocol.js';
 import { WorkflowCodec } from '../src/workflows/WorkflowCodec.js';
 import { WorkflowModelsCodec } from '../src/workflows/WorkflowModels.js';
 import { WorkflowInput } from '../src/workflows/WorkflowInput.js';
+import { WorkflowRequestCodec } from '../src/workflows/WorkflowRequestCodec.js';
 import type { WorkflowCreateRequest } from '../src/workflows/WorkflowRequests.js';
 import type { WorkflowNode } from '../src/workflows/WorkflowTypes.js';
 
-it('accepts long workflow and node identities through the actual RPC validators', (): void => {
-    const id: string = 'workflow-'.repeat(100);
+it('keeps IDs short through the actual RPC validators while retaining full task instructions', (): void => {
+    const id: string = 'workflow';
     const request: WorkflowCreateRequest = {
         workflowId: id,
         commandId: id,
         details: { name: 'Reports', description: '', tags: [], folder: id },
     };
     expect(methodValidators[Method.WorkflowsCreate].params(request)).toBe(true);
-    const prompt: string = 'Instructions for the whole workflow. '.repeat(500);
+    const task: string = 't'.repeat(256_000);
     const node: WorkflowNode = {
         id,
         component: 'agent.turn',
         componentVersion: '1',
         label: 'Reports',
-        configuration: { prompt },
+        configuration: { task },
         resources: [],
     };
     expect(WorkflowCodec.node(node)).toEqual(node);
+    expect((): WorkflowCreateRequest =>
+        WorkflowRequestCodec.create({
+            ...request,
+            workflowId: 'w'.repeat(257),
+        }),
+    ).toThrow('exceeds 256 characters');
+    expect((): WorkflowNode => WorkflowCodec.node({ ...node, id: 'n'.repeat(257) })).toThrow(
+        'Node ID exceeds 256 characters',
+    );
 });
 
-it('accepts provider model identities beyond 256 characters and reports malformed values accurately', (): void => {
-    const id: string = `provider/${'model-'.repeat(100)}@stable+variant`;
+it('caps model identities at 256 characters and reports malformed values accurately', (): void => {
+    const id: string = `provider/${'model-'.repeat(30)}@stable+variant`;
     expect(WorkflowModelsCodec.identity(id)).toBe(id);
     expect(
         methodValidators[Method.WorkflowsModels].params({
@@ -45,5 +55,8 @@ it('accepts provider model identities beyond 256 characters and reports malforme
         }),
     ).toBe(true);
     expect((): string => WorkflowInput.id('')).toThrow('Invalid workflow identity');
+    expect((): string => WorkflowModelsCodec.identity('m'.repeat(257))).toThrow(
+        'Model ID exceeds 256 characters',
+    );
     expect((): string => WorkflowInput.text(42, 256)).toThrow('Expected workflow text');
 });

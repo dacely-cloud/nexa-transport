@@ -3,6 +3,20 @@
 
 /** Small shared parsers for workflow JSON trust boundaries. */
 export class WorkflowInput {
+    /** Full task instructions have their own bound, independent of IDs and attached context. */
+    public static readonly taskCharacters: number = 256_000;
+    /** Workflow turns can use this many context tokens when the selected model supports them. */
+    public static readonly contextTokens: number = 1_000_000;
+    /** Shared task validation is also consumed by component schemas and terminal invocations. */
+    public static task(raw: unknown): string {
+        return this.text(raw, this.taskCharacters, false, 'Task');
+    }
+    /** Simulations preview large input without turning it into an oversized generated output. */
+    public static simulatedTask(task: string): string {
+        return task.length <= 64_000
+            ? task
+            : `${task.slice(0, 64_000)}\n[Simulation preview of ${task.length} characters]`;
+    }
     /** Rejects class instances and accessors before reading values. */
     public static object(raw: unknown): Readonly<Record<string, unknown>> {
         if (
@@ -28,9 +42,12 @@ export class WorkflowInput {
         return value;
     }
     /** Only stable opaque references are accepted as record and command identities. */
-    public static id(raw: unknown): string {
+    public static id(raw: unknown, field: string = 'ID'): string {
+        if (typeof raw === 'string' && raw.length > 256) {
+            throw new Error(`${field} exceeds 256 characters`);
+        }
         if (typeof raw !== 'string' || !/^[A-Za-z0-9][A-Za-z0-9._:/-]*$/u.test(raw)) {
-            throw new Error('Invalid workflow identity');
+            throw new Error(`Invalid workflow identity: ${field}`);
         }
         return raw;
     }
@@ -39,21 +56,22 @@ export class WorkflowInput {
         raw: unknown,
         maximum: number | null = null,
         empty: boolean = false,
+        field: string = 'Workflow text',
     ): string {
         if (typeof raw !== 'string') {
-            throw new Error('Expected workflow text');
+            throw new Error(`Expected ${field.toLowerCase()}`);
         }
         if (!empty && raw.trim().length === 0) {
-            throw new Error('Workflow text cannot be blank');
+            throw new Error(`${field} cannot be blank`);
         }
         if (raw.includes('\0')) {
-            throw new Error('Workflow text contains a null character');
+            throw new Error(`${field} contains a null character`);
         }
         if (!raw.isWellFormed()) {
-            throw new Error('Workflow text contains malformed Unicode');
+            throw new Error(`${field} contains malformed Unicode`);
         }
         if (maximum !== null && raw.length > maximum) {
-            throw new Error(`Text exceeds ${maximum} characters`);
+            throw new Error(`${field} exceeds ${maximum} characters`);
         }
         return raw;
     }
