@@ -26,11 +26,13 @@ import type {
 } from '../../nexa/src/reverse/NavigationTypes';
 import type { BrowserStructurePage } from '../../nexa/src/reverse/BrowserStructureTypes';
 import type { BrowserSourcesPage } from '../../nexa/src/reverse/BrowserSourcesDirectoryTypes';
+import type { BrowserModulePage } from '../../nexa/src/reverse/BrowserModuleDirectoryTypes';
 /** All protocol contracts reachable from the public transport. */
 export interface Contract {
     readonly reverseBrowser: ReverseBrowserPage;
     readonly reverseBrowserStructure: BrowserStructurePage;
     readonly reverseBrowserSources: BrowserSourcesPage;
+    readonly reverseBrowserModules: BrowserModulePage;
     readonly reverseNetworkDetail: ReverseNetworkDetailPage;
     readonly reverseNetworkDirectory: ReverseNetworkDirectoryPage;
     readonly reverseGraph: ReverseGraphPage;

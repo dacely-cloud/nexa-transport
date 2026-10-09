@@ -754,6 +754,286 @@ export const BrowserDomRelationValues = {
 export type BrowserDomRelation =
     (typeof BrowserDomRelationValues)[keyof typeof BrowserDomRelationValues];
 
+/** BrowserModuleCandidateRow wire fields. */
+export interface BrowserModuleCandidateRowShape {
+    /** frameId as defined by the Nexa gateway. */
+    readonly frameId: string;
+    /** hasSourceUrl as defined by the Nexa gateway. */
+    readonly hasSourceUrl: boolean;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** isModule as defined by the Nexa gateway. */
+    readonly isModule: boolean;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: 'candidate';
+    /** match as defined by the Nexa gateway. */
+    readonly match: BrowserModuleMatch;
+    /** sourceBytes as defined by the Nexa gateway. */
+    readonly sourceBytes: null | string;
+    /** sourceSha256 as defined by the Nexa gateway. */
+    readonly sourceSha256: null | string;
+    /** startColumn as defined by the Nexa gateway. */
+    readonly startColumn: number;
+    /** startLine as defined by the Nexa gateway. */
+    readonly startLine: number;
+    /** state as defined by the Nexa gateway. */
+    readonly state: BrowserScriptSourceState;
+    /** url as defined by the Nexa gateway. */
+    readonly url: string;
+    /** urlCharacters as defined by the Nexa gateway. */
+    readonly urlCharacters: string;
+}
+
+/** BrowserModuleCandidateRow from the Nexa wire protocol. */
+export type BrowserModuleCandidateRow = BrowserModuleCandidateRowShape;
+
+/** Allowed values for BrowserModuleContext. */
+export const BrowserModuleContextValues = {
+    Value0: 'explicit-importer-url',
+    Value1: 'reported-source-url',
+} as const;
+
+/** BrowserModuleContext from the Nexa wire protocol. */
+export type BrowserModuleContext =
+    (typeof BrowserModuleContextValues)[keyof typeof BrowserModuleContextValues];
+
+/** BrowserModuleDirectoryRow from the Nexa wire protocol. */
+export type BrowserModuleDirectoryRow = BrowserModuleImportRow | BrowserModuleCandidateRow;
+
+/** BrowserModuleImportRow wire fields. */
+export interface BrowserModuleImportRowShape {
+    /** candidateCount as defined by the Nexa gateway. */
+    readonly candidateCount: number;
+    /** errorCharacters as defined by the Nexa gateway. */
+    readonly errorCharacters: null | string;
+    /** errorMessage as defined by the Nexa gateway. */
+    readonly errorMessage: null | string;
+    /** errorName as defined by the Nexa gateway. */
+    readonly errorName: null | string;
+    /** execution as defined by the Nexa gateway. */
+    readonly execution: 'unknown';
+    /** expression as defined by the Nexa gateway. */
+    readonly expression: null | string;
+    /** expressionCharacters as defined by the Nexa gateway. */
+    readonly expressionCharacters: null | string;
+    /** expressionTruncated as defined by the Nexa gateway. */
+    readonly expressionTruncated: boolean;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: 'import';
+    /** location as defined by the Nexa gateway. */
+    readonly location: BrowserModulePosition;
+    /** specifier as defined by the Nexa gateway. */
+    readonly specifier: null | string;
+    /** specifierCharacters as defined by the Nexa gateway. */
+    readonly specifierCharacters: null | string;
+    /** status as defined by the Nexa gateway. */
+    readonly status: BrowserModuleTraceStatus;
+    /** syntax as defined by the Nexa gateway. */
+    readonly syntax: string;
+    /** url as defined by the Nexa gateway. */
+    readonly url: null | string;
+    /** urlCharacters as defined by the Nexa gateway. */
+    readonly urlCharacters: null | string;
+}
+
+/** BrowserModuleImportRow from the Nexa wire protocol. */
+export type BrowserModuleImportRow = BrowserModuleImportRowShape;
+
+/** Allowed values for BrowserModuleMatch. */
+export const BrowserModuleMatchValues = {
+    Value0: 'exact-reported-url',
+    Value1: 'response-url-without-fragment',
+} as const;
+
+/** BrowserModuleMatch from the Nexa wire protocol. */
+export type BrowserModuleMatch =
+    (typeof BrowserModuleMatchValues)[keyof typeof BrowserModuleMatchValues];
+
+/** BrowserModuleMetadata wire fields. */
+export interface BrowserModuleMetadataShape {
+    /** context as defined by the Nexa gateway. */
+    readonly context: BrowserModuleContext;
+    /** engine as defined by the Nexa gateway. */
+    readonly engine: 'chromium-import-meta-resolve';
+    /** engineVersion as defined by the Nexa gateway. */
+    readonly engineVersion: null | string;
+    /** excludedNonEs as defined by the Nexa gateway. */
+    readonly excludedNonEs: string;
+    /** excludedTypeOnly as defined by the Nexa gateway. */
+    readonly excludedTypeOnly: string;
+    /** importCount as defined by the Nexa gateway. */
+    readonly importCount: string;
+    /** importMapBaseCharacters as defined by the Nexa gateway. */
+    readonly importMapBaseCharacters: null | string;
+    /** importMapBaseUrl as defined by the Nexa gateway. */
+    readonly importMapBaseUrl: null | string;
+    /** importMapBytes as defined by the Nexa gateway. */
+    readonly importMapBytes: null | string;
+    /** importMapSha256 as defined by the Nexa gateway. */
+    readonly importMapSha256: null | string;
+    /** importerCharacters as defined by the Nexa gateway. */
+    readonly importerCharacters: string;
+    /** importerUrl as defined by the Nexa gateway. */
+    readonly importerUrl: string;
+    /** module as defined by the Nexa gateway. */
+    readonly module: string;
+    /** moduleCharacters as defined by the Nexa gateway. */
+    readonly moduleCharacters: string;
+    /** parseError as defined by the Nexa gateway. */
+    readonly parseError: null | string;
+    /** parseErrorCharacters as defined by the Nexa gateway. */
+    readonly parseErrorCharacters: null | string;
+    /** sourceBytes as defined by the Nexa gateway. */
+    readonly sourceBytes: string;
+    /** sourceCapture as defined by the Nexa gateway. */
+    readonly sourceCapture: BrowserModuleSourceCapture | null;
+    /** sourceSha256 as defined by the Nexa gateway. */
+    readonly sourceSha256: string;
+}
+
+/** BrowserModuleMetadata from the Nexa wire protocol. */
+export type BrowserModuleMetadata = BrowserModuleMetadataShape;
+
+/** Allowed values for BrowserModulePagefieldVariant0. */
+export const BrowserModulePagefieldVariant0Values = {
+    Value0: 'error-message',
+    Value1: 'expression',
+    Value2: 'importer-url',
+    Value3: 'map-base-url',
+    Value4: 'module',
+    Value5: 'parse-error',
+    Value6: 'resolved-url',
+    Value7: 'specifier',
+} as const;
+
+/** BrowserModulePage wire fields. */
+export interface BrowserModulePageShape {
+    /** cursor as defined by the Nexa gateway. */
+    readonly cursor: string;
+    /** evidenceId as defined by the Nexa gateway. */
+    readonly evidenceId: string;
+    /** field as defined by the Nexa gateway. */
+    readonly field:
+        | (typeof BrowserModulePagefieldVariant0Values)[keyof typeof BrowserModulePagefieldVariant0Values]
+        | null;
+    /** metadata as defined by the Nexa gateway. */
+    readonly metadata: BrowserModuleMetadata;
+    /** nextCursor as defined by the Nexa gateway. */
+    readonly nextCursor: null | string;
+    /** records as defined by the Nexa gateway. */
+    readonly records: ReadonlyArray<BrowserModuleDirectoryRow>;
+    /** reportSha256 as defined by the Nexa gateway. */
+    readonly reportSha256: string;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+    /** selector as defined by the Nexa gateway. */
+    readonly selector: null | string;
+    /** sha256 as defined by the Nexa gateway. */
+    readonly sha256: string;
+    /** text as defined by the Nexa gateway. */
+    readonly text: null | string;
+    /** textSha256 as defined by the Nexa gateway. */
+    readonly textSha256: null | string;
+    /** total as defined by the Nexa gateway. */
+    readonly total: string;
+    /** view as defined by the Nexa gateway. */
+    readonly view: BrowserModuleView;
+}
+
+/** BrowserModulePage from the Nexa wire protocol. */
+export type BrowserModulePage = BrowserModulePageShape;
+
+/** BrowserModulePosition wire fields. */
+export interface BrowserModulePositionShape {
+    /** column as defined by the Nexa gateway. */
+    readonly column: number;
+    /** end as defined by the Nexa gateway. */
+    readonly end: number;
+    /** endColumn as defined by the Nexa gateway. */
+    readonly endColumn: number;
+    /** endLine as defined by the Nexa gateway. */
+    readonly endLine: number;
+    /** line as defined by the Nexa gateway. */
+    readonly line: number;
+    /** start as defined by the Nexa gateway. */
+    readonly start: number;
+}
+
+/** BrowserModulePosition from the Nexa wire protocol. */
+export type BrowserModulePosition = BrowserModulePositionShape;
+
+/** Allowed values for BrowserModuleQueryfield. */
+export const BrowserModuleQueryfieldValues = {
+    Value0: 'error-message',
+    Value1: 'expression',
+    Value2: 'importer-url',
+    Value3: 'map-base-url',
+    Value4: 'module',
+    Value5: 'parse-error',
+    Value6: 'resolved-url',
+    Value7: 'specifier',
+} as const;
+
+/** BrowserModuleQuery wire fields. */
+export interface BrowserModuleQueryShape {
+    /** cursor as defined by the Nexa gateway. */
+    readonly cursor?: string;
+    /** evidenceId as defined by the Nexa gateway. */
+    readonly evidenceId: string;
+    /** field as defined by the Nexa gateway. */
+    readonly field?: (typeof BrowserModuleQueryfieldValues)[keyof typeof BrowserModuleQueryfieldValues];
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+    /** selector as defined by the Nexa gateway. */
+    readonly selector?: string;
+    /** view as defined by the Nexa gateway. */
+    readonly view: BrowserModuleView;
+}
+
+/** BrowserModuleQuery from the Nexa wire protocol. */
+export type BrowserModuleQuery = BrowserModuleQueryShape;
+
+/** BrowserModuleSourceCapture wire fields. */
+export interface BrowserModuleSourceCaptureShape {
+    /** captureSha256 as defined by the Nexa gateway. */
+    readonly captureSha256: string;
+    /** evidenceId as defined by the Nexa gateway. */
+    readonly evidenceId: string;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+    /** sha256 as defined by the Nexa gateway. */
+    readonly sha256: string;
+}
+
+/** BrowserModuleSourceCapture from the Nexa wire protocol. */
+export type BrowserModuleSourceCapture = BrowserModuleSourceCaptureShape;
+
+/** Allowed values for BrowserModuleTraceStatus. */
+export const BrowserModuleTraceStatusValues = {
+    Value0: 'computed-specifier',
+    Value1: 'native-resolution',
+    Value2: 'unsupported-literal',
+} as const;
+
+/** BrowserModuleTraceStatus from the Nexa wire protocol. */
+export type BrowserModuleTraceStatus =
+    (typeof BrowserModuleTraceStatusValues)[keyof typeof BrowserModuleTraceStatusValues];
+
+/** Allowed values for BrowserModuleView. */
+export const BrowserModuleViewValues = {
+    Value0: 'candidates',
+    Value1: 'imports',
+    Value2: 'text',
+} as const;
+
+/** BrowserModuleView from the Nexa wire protocol. */
+export type BrowserModuleView =
+    (typeof BrowserModuleViewValues)[keyof typeof BrowserModuleViewValues];
+
 /** BrowserPageProjection wire fields. */
 export interface BrowserPageProjectionShape {
     /** accessibility as defined by the Nexa gateway. */
@@ -3044,6 +3324,14 @@ export interface GatewayMethodsreverse_browserShape {
     readonly result: ReverseBrowserPage;
 }
 
+/** GatewayMethodsreverse_browser_modules wire fields. */
+export interface GatewayMethodsreverse_browser_modulesShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: BrowserModuleQuery;
+    /** result as defined by the Nexa gateway. */
+    readonly result: BrowserModulePage;
+}
+
 /** GatewayMethodsreverse_browser_sources wire fields. */
 export interface GatewayMethodsreverse_browser_sourcesShape {
     /** params as defined by the Nexa gateway. */
@@ -3940,6 +4228,8 @@ export interface GatewayMethodsShape {
     readonly 'processes.stop': GatewayMethodsprocesses_stopShape;
     /** reverse.browser as defined by the Nexa gateway. */
     readonly 'reverse.browser': GatewayMethodsreverse_browserShape;
+    /** reverse.browser.modules as defined by the Nexa gateway. */
+    readonly 'reverse.browser.modules': GatewayMethodsreverse_browser_modulesShape;
     /** reverse.browser.sources as defined by the Nexa gateway. */
     readonly 'reverse.browser.sources': GatewayMethodsreverse_browser_sourcesShape;
     /** reverse.browser.structure as defined by the Nexa gateway. */
@@ -10751,6 +11041,8 @@ export enum Method {
     ProcessesStop = 'processes.stop',
     /** Calls reverse.browser. */
     ReverseBrowser = 'reverse.browser',
+    /** Calls reverse.browser.modules. */
+    ReverseBrowserModules = 'reverse.browser.modules',
     /** Calls reverse.browser.sources. */
     ReverseBrowserSources = 'reverse.browser.sources',
     /** Calls reverse.browser.structure. */

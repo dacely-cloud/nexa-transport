@@ -1198,6 +1198,446 @@ export const schema: Schema = {
             ],
             type: 'string',
         },
+        BrowserModuleCandidateRow: {
+            description:
+                'Candidate metadata points to original source pages and never carries captured code.',
+            properties: {
+                frameId: {
+                    type: 'string',
+                },
+                hasSourceUrl: {
+                    type: 'boolean',
+                },
+                id: {
+                    type: 'string',
+                },
+                isModule: {
+                    type: 'boolean',
+                },
+                kind: {
+                    const: 'candidate',
+                    type: 'string',
+                },
+                match: {
+                    $ref: '#/definitions/BrowserModuleMatch',
+                },
+                sourceBytes: {
+                    type: ['null', 'string'],
+                },
+                sourceSha256: {
+                    type: ['null', 'string'],
+                },
+                startColumn: {
+                    type: 'number',
+                },
+                startLine: {
+                    type: 'number',
+                },
+                state: {
+                    $ref: '#/definitions/BrowserScriptSourceState',
+                },
+                url: {
+                    type: 'string',
+                },
+                urlCharacters: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'frameId',
+                'hasSourceUrl',
+                'id',
+                'isModule',
+                'kind',
+                'match',
+                'sourceBytes',
+                'sourceSha256',
+                'startColumn',
+                'startLine',
+                'state',
+                'url',
+                'urlCharacters',
+            ],
+            type: 'object',
+        },
+        BrowserModuleContext: {
+            description:
+                'Importer selection provenance never claims an observed installed runtime base.\nSelected source URL context provenance.',
+            enum: ['explicit-importer-url', 'reported-source-url'],
+            type: 'string',
+        },
+        BrowserModuleDirectoryRow: {
+            anyOf: [
+                {
+                    $ref: '#/definitions/BrowserModuleImportRow',
+                },
+                {
+                    $ref: '#/definitions/BrowserModuleCandidateRow',
+                },
+            ],
+            description: 'One finite row in the selected saved directory.',
+        },
+        BrowserModuleImportRow: {
+            description:
+                'Literal identity and native errors are previews; exact fields are independently paged.',
+            properties: {
+                candidateCount: {
+                    type: 'number',
+                },
+                errorCharacters: {
+                    type: ['null', 'string'],
+                },
+                errorMessage: {
+                    type: ['null', 'string'],
+                },
+                errorName: {
+                    type: ['null', 'string'],
+                },
+                execution: {
+                    const: 'unknown',
+                    type: 'string',
+                },
+                expression: {
+                    type: ['null', 'string'],
+                },
+                expressionCharacters: {
+                    type: ['null', 'string'],
+                },
+                expressionTruncated: {
+                    type: 'boolean',
+                },
+                id: {
+                    type: 'string',
+                },
+                kind: {
+                    const: 'import',
+                    type: 'string',
+                },
+                location: {
+                    $ref: '#/definitions/BrowserModulePosition',
+                },
+                specifier: {
+                    type: ['null', 'string'],
+                },
+                specifierCharacters: {
+                    type: ['null', 'string'],
+                },
+                status: {
+                    $ref: '#/definitions/BrowserModuleTraceStatus',
+                },
+                syntax: {
+                    type: 'string',
+                },
+                url: {
+                    type: ['null', 'string'],
+                },
+                urlCharacters: {
+                    type: ['null', 'string'],
+                },
+            },
+            required: [
+                'candidateCount',
+                'errorCharacters',
+                'errorMessage',
+                'errorName',
+                'execution',
+                'expression',
+                'expressionCharacters',
+                'expressionTruncated',
+                'id',
+                'kind',
+                'location',
+                'specifier',
+                'specifierCharacters',
+                'status',
+                'syntax',
+                'url',
+                'urlCharacters',
+            ],
+            type: 'object',
+        },
+        BrowserModuleMatch: {
+            description:
+                'Captured URL match strength is independent of execution and content identity.\nBrowser URL candidate matching provenance.',
+            enum: ['exact-reported-url', 'response-url-without-fragment'],
+            type: 'string',
+        },
+        BrowserModuleMetadata: {
+            description:
+                'Compact context previews identify exact text available through the text representation.',
+            properties: {
+                context: {
+                    $ref: '#/definitions/BrowserModuleContext',
+                },
+                engine: {
+                    const: 'chromium-import-meta-resolve',
+                    type: 'string',
+                },
+                engineVersion: {
+                    type: ['null', 'string'],
+                },
+                excludedNonEs: {
+                    type: 'string',
+                },
+                excludedTypeOnly: {
+                    type: 'string',
+                },
+                importCount: {
+                    type: 'string',
+                },
+                importMapBaseCharacters: {
+                    type: ['null', 'string'],
+                },
+                importMapBaseUrl: {
+                    type: ['null', 'string'],
+                },
+                importMapBytes: {
+                    type: ['null', 'string'],
+                },
+                importMapSha256: {
+                    type: ['null', 'string'],
+                },
+                importerCharacters: {
+                    type: 'string',
+                },
+                importerUrl: {
+                    type: 'string',
+                },
+                module: {
+                    type: 'string',
+                },
+                moduleCharacters: {
+                    type: 'string',
+                },
+                parseError: {
+                    type: ['null', 'string'],
+                },
+                parseErrorCharacters: {
+                    type: ['null', 'string'],
+                },
+                sourceBytes: {
+                    type: 'string',
+                },
+                sourceCapture: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/BrowserModuleSourceCapture',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                sourceSha256: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'context',
+                'engine',
+                'engineVersion',
+                'excludedNonEs',
+                'excludedTypeOnly',
+                'importCount',
+                'importMapBaseCharacters',
+                'importMapBaseUrl',
+                'importMapBytes',
+                'importMapSha256',
+                'importerCharacters',
+                'importerUrl',
+                'module',
+                'moduleCharacters',
+                'parseError',
+                'parseErrorCharacters',
+                'sourceBytes',
+                'sourceCapture',
+                'sourceSha256',
+            ],
+            type: 'object',
+        },
+        BrowserModulePage: {
+            description:
+                'At most twenty previews or one bounded UTF-16 range, with immutable provenance.',
+            properties: {
+                cursor: {
+                    type: 'string',
+                },
+                evidenceId: {
+                    type: 'string',
+                },
+                field: {
+                    anyOf: [
+                        {
+                            enum: [
+                                'error-message',
+                                'expression',
+                                'importer-url',
+                                'map-base-url',
+                                'module',
+                                'parse-error',
+                                'resolved-url',
+                                'specifier',
+                            ],
+                            type: 'string',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                metadata: {
+                    $ref: '#/definitions/BrowserModuleMetadata',
+                },
+                nextCursor: {
+                    type: ['null', 'string'],
+                },
+                records: {
+                    items: {
+                        $ref: '#/definitions/BrowserModuleDirectoryRow',
+                    },
+                    type: 'array',
+                },
+                reportSha256: {
+                    type: 'string',
+                },
+                runId: {
+                    type: 'string',
+                },
+                selector: {
+                    type: ['null', 'string'],
+                },
+                sha256: {
+                    type: 'string',
+                },
+                text: {
+                    type: ['null', 'string'],
+                },
+                textSha256: {
+                    type: ['null', 'string'],
+                },
+                total: {
+                    type: 'string',
+                },
+                view: {
+                    $ref: '#/definitions/BrowserModuleView',
+                },
+            },
+            required: [
+                'cursor',
+                'evidenceId',
+                'field',
+                'metadata',
+                'nextCursor',
+                'records',
+                'reportSha256',
+                'runId',
+                'selector',
+                'sha256',
+                'text',
+                'textSha256',
+                'total',
+                'view',
+            ],
+            type: 'object',
+        },
+        BrowserModulePosition: {
+            description:
+                'Coordinates identify the exact selected source without repeating a long path in every row.',
+            properties: {
+                column: {
+                    type: 'number',
+                },
+                end: {
+                    type: 'number',
+                },
+                endColumn: {
+                    type: 'number',
+                },
+                endLine: {
+                    type: 'number',
+                },
+                line: {
+                    type: 'number',
+                },
+                start: {
+                    type: 'number',
+                },
+            },
+            required: ['column', 'end', 'endColumn', 'endLine', 'line', 'start'],
+            type: 'object',
+        },
+        BrowserModuleQuery: {
+            description: 'Requests contain archive IDs, never workspace paths or URLs to fetch.',
+            properties: {
+                cursor: {
+                    type: 'string',
+                },
+                evidenceId: {
+                    type: 'string',
+                },
+                field: {
+                    description:
+                        'Full fields are read only after selecting an import or its context.\nExact field text selector, independent of source bodies.',
+                    enum: [
+                        'error-message',
+                        'expression',
+                        'importer-url',
+                        'map-base-url',
+                        'module',
+                        'parse-error',
+                        'resolved-url',
+                        'specifier',
+                    ],
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                runId: {
+                    type: 'string',
+                },
+                selector: {
+                    type: 'string',
+                },
+                view: {
+                    $ref: '#/definitions/BrowserModuleView',
+                },
+            },
+            required: ['evidenceId', 'id', 'runId', 'view'],
+            type: 'object',
+        },
+        BrowserModuleSourceCapture: {
+            description:
+                'Original capture identity remains separate from derived analysis and report identities.',
+            properties: {
+                captureSha256: {
+                    type: 'string',
+                },
+                evidenceId: {
+                    type: 'string',
+                },
+                runId: {
+                    type: 'string',
+                },
+                sha256: {
+                    type: 'string',
+                },
+            },
+            required: ['captureSha256', 'evidenceId', 'runId', 'sha256'],
+            type: 'object',
+        },
+        BrowserModuleTraceStatus: {
+            description:
+                'Native URL evidence is distinct from computed syntax and runtime execution.\nResolution state for one outgoing ES module relationship.',
+            enum: ['computed-specifier', 'native-resolution', 'unsupported-literal'],
+            type: 'string',
+        },
+        BrowserModuleView: {
+            description:
+                'Metadata directories and exact text have independent bounded cursors.\nSaved browser module representation.',
+            enum: ['candidates', 'imports', 'text'],
+            type: 'string',
+        },
         BrowserPageProjection: {
             description: 'One passive structure inspection tied to a stable selected document.',
             properties: {
@@ -4796,6 +5236,18 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'reverse.browser.modules': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/BrowserModuleQuery',
+                        },
+                        result: {
+                            $ref: '#/definitions/BrowserModulePage',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'reverse.browser.sources': {
                     properties: {
                         params: {
@@ -6108,6 +6560,7 @@ export const schema: Schema = {
                 'processes.resize',
                 'processes.stop',
                 'reverse.browser',
+                'reverse.browser.modules',
                 'reverse.browser.sources',
                 'reverse.browser.structure',
                 'reverse.catalog',
@@ -16166,6 +16619,9 @@ export const schema: Schema = {
         reverseBrowser: {
             $ref: '#/definitions/ReverseBrowserPage',
         },
+        reverseBrowserModules: {
+            $ref: '#/definitions/BrowserModulePage',
+        },
         reverseBrowserSources: {
             $ref: '#/definitions/BrowserSourcesPage',
         },
@@ -16225,6 +16681,7 @@ export const schema: Schema = {
         'methods',
         'native',
         'reverseBrowser',
+        'reverseBrowserModules',
         'reverseBrowserSources',
         'reverseBrowserStructure',
         'reverseCatalog',

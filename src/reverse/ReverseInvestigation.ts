@@ -15,6 +15,8 @@ import type {
 } from '../protocol/Protocol.js';
 import { BrowserStructureReceipt } from './BrowserStructureReceipt.js';
 import { BrowserSourcesReceipt } from './BrowserSourcesReceipt.js';
+import { BrowserModuleReceipt } from './BrowserModuleReceipt.js';
+import type { BrowserModulePage } from '../protocol/Protocol.js';
 import { BrowserAnalysisReceipt } from './BrowserAnalysisReceipt.js';
 import { BrowserReceipt } from './BrowserReceipt.js';
 import { reverseSnapshot } from '../protocol/Validators.js';
@@ -34,6 +36,10 @@ export type {
 
 /** Portable investigation receipt decoding and monotonic replay for multi-agent consumers. */
 export class ReverseInvestigation {
+    /** Validates independently paged saved module relationships, captured versions and exact context fields. */
+    public static modules(input: unknown): BrowserModulePage {
+        return BrowserModuleReceipt.read(input);
+    }
     /** Validates one immutable request representation without loading other fields or bodies. */
     public static networkDetail(input: unknown): ReverseNetworkDetailPage {
         return NetworkDetailReceipt.read(input);
