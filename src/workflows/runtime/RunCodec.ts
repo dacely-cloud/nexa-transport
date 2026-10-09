@@ -1,3 +1,4 @@
+import { WorkflowTimeLimits } from '../TimeLimits.js';
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -100,10 +101,7 @@ export class WorkflowRunCodec {
         ) {
             throw new Error('Workflow concurrency must be between 1 and 32');
         }
-        const timeoutMs: string = ResourceBindingCodec.decimal(value['timeoutMs']);
-        if (BigInt(timeoutMs) < 1_000n || BigInt(timeoutMs) > 86_400_000n) {
-            throw new Error('Workflow run timeout must be between one second and one day');
-        }
+        const timeoutMs: string = WorkflowTimeLimits.timeout(value['timeoutMs'], 'Workflow run');
         const revision: string = ResourceBindingCodec.decimal(graph['revision']);
         if (revision === '0') {
             throw new Error('Workflow run requires a saved revision');

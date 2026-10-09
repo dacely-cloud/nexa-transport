@@ -1,9 +1,9 @@
+import { WorkflowTimeLimits } from '../TimeLimits.js';
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import { WorkflowApprovalCodec } from './RunApprovalCodec.js';
 import { WorkflowInput } from '../WorkflowInput.js';
-import { ResourceBindingCodec } from '../ResourceBindingCodec.js';
 import {
     WorkflowAnswerType,
     type WorkflowHumanQuestion,
@@ -42,10 +42,7 @@ export class WorkflowHumanCodec {
         ) {
             throw new Error('A choice question needs distinct nonempty choices');
         }
-        const timeoutMs: string = ResourceBindingCodec.decimal(value['timeoutMs']);
-        if (BigInt(timeoutMs) < 1000n || BigInt(timeoutMs) > 86400000n) {
-            throw new Error('Question timeout must be between one second and one day');
-        }
+        const timeoutMs: string = WorkflowTimeLimits.timeout(value['timeoutMs'], 'Question');
         const question: string = WorkflowInput.text(value['question'], 8000);
         if (question.trim() === '') {
             throw new Error('Question text is required');

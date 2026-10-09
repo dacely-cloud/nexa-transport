@@ -1,3 +1,4 @@
+import { WorkflowTimeLimits } from './TimeLimits.js';
 import { WorkflowInput } from './WorkflowInput.js';
 import { WorkflowJson } from './WorkflowJson.js';
 import { ResourceBindingCodec } from './ResourceBindingCodec.js';
@@ -35,10 +36,7 @@ export class WorkflowPublicationCodec {
         ) {
             throw new Error('Publication concurrency must be between 1 and 32');
         }
-        const timeoutMs: string = ResourceBindingCodec.decimal(value['timeoutMs']);
-        if (BigInt(timeoutMs) < 1000n || BigInt(timeoutMs) > 86400000n) {
-            throw new Error('Publication timeout must be between one second and one day');
-        }
+        const timeoutMs: string = WorkflowTimeLimits.timeout(value['timeoutMs'], 'Publication');
         return {
             triggerNodeId: WorkflowInput.id(value['triggerNodeId']),
             maxConcurrency,

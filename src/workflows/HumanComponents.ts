@@ -37,7 +37,7 @@ export class HumanComponents {
                         'choices',
                         Schemas.list({ ...Schemas.text, minLength: 1, maxLength: 160 }, 20),
                     ),
-                    Schemas.field('timeoutMs', { ...Schemas.text, minLength: 4, maxLength: 8 }),
+                    Schemas.field('timeoutMs', { ...Schemas.text, minLength: 4, maxLength: 10 }),
                 ]),
                 defaults: {
                     question: 'What would you like to do next?',

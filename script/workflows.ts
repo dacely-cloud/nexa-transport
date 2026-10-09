@@ -5,6 +5,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 
 /** Server-only build script. Nexa is the canonical owner of portable workflow contracts. */
 const files: readonly string[] = [
+    'TimeLimits',
     'TimeComponents',
     'WaitCodec',
     'TimedComponents',

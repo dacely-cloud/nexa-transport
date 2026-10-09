@@ -29,6 +29,7 @@ describe('portable workflow resource contracts', (): void => {
         'AgentComponents',
         'ResourceComponents',
         'ComponentRegistry',
+        'TimeLimits',
         'TimeComponents',
         'WaitCodec',
         'GraphTypes',

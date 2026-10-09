@@ -1,10 +1,10 @@
+import { WorkflowTimeLimits } from '../TimeLimits.js';
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import { WorkflowInput } from '../WorkflowInput.js';
 import { WorkflowJson } from '../WorkflowJson.js';
 import type { WorkflowObject } from '../WorkflowTypes.js';
-import { ResourceBindingCodec } from '../ResourceBindingCodec.js';
 import {
     WorkflowApprovalChoice,
     type WorkflowApprovalConfiguration,
@@ -52,10 +52,7 @@ export class WorkflowApprovalCodec {
         if (value['reviewer'] !== 'owner' || value['notification'] !== 'in-app') {
             throw new Error('This approval requires the run owner and in-app notification');
         }
-        const timeoutMs: string = ResourceBindingCodec.decimal(value['timeoutMs']);
-        if (BigInt(timeoutMs) < 1000n || BigInt(timeoutMs) > 86400000n) {
-            throw new Error('Approval timeout must be between one second and one day');
-        }
+        const timeoutMs: string = WorkflowTimeLimits.timeout(value['timeoutMs'], 'Approval');
         return {
             ...this.content({
                 action: value['action'],

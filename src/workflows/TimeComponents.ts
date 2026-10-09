@@ -11,6 +11,7 @@ import {
 } from './ComponentTypes.js';
 import { ComponentFactory as Ports } from './ComponentFactory.js';
 import { CoreComponents } from './CoreComponents.js';
+import { WorkflowTimeLimits } from './TimeLimits.js';
 import { Schemas } from './Schemas.js';
 import type { ValueSchema } from './SchemaTypes.js';
 
@@ -24,7 +25,7 @@ export class TimeComponents {
         const field: string = until ? 'atMs' : 'durationMs';
         const schema: ValueSchema = until
             ? Schemas.timestamp
-            : { ...Schemas.count, minimum: 1, maximum: 86400000 };
+            : { ...Schemas.count, minimum: 1, maximum: Number(WorkflowTimeLimits.maximumMs) };
         return {
             id: until ? 'time.until' : 'time.delay',
             version: '1',

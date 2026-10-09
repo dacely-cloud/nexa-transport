@@ -44,7 +44,7 @@ export class ApprovalComponents {
                     Schemas.field('content', Schemas.json, false),
                     Schemas.field('reviewer', Schemas.choice(['owner'])),
                     Schemas.field('notification', Schemas.choice(['in-app'])),
-                    Schemas.field('timeoutMs', { ...Schemas.text, minLength: 4, maxLength: 8 }),
+                    Schemas.field('timeoutMs', { ...Schemas.text, minLength: 4, maxLength: 10 }),
                 ]),
                 defaults: {
                     action: 'Review proposed result',

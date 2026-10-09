@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { WorkflowTimeLimits } from './TimeLimits.js';
 import { WorkflowScheduleCodec } from './schedule/ScheduleCodec.js';
 import type { WorkflowObject } from './WorkflowTypes.js';
 import type { WorkflowStepResult } from './runtime/RunTypes.js';
@@ -14,10 +15,7 @@ export interface WorkflowWaitRequest {
 export class WorkflowWaitCodec {
     /** Accepts exact decimal milliseconds, never floating point durations. */
     public static duration(raw: unknown): string {
-        if (typeof raw !== 'string' || !/^[1-9]\d{0,7}$/u.test(raw) || BigInt(raw) > 86400000n) {
-            throw new Error('Choose a wait from 1 millisecond to 24 hours.');
-        }
-        return raw;
+        return WorkflowTimeLimits.delay(raw);
     }
     /** Normalizes an exact timestamp within the supported date range. */
     public static instant(raw: unknown): string {
