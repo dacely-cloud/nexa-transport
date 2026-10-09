@@ -5438,6 +5438,64 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'workflows.schedules.disable': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/WorkflowScheduleCommand',
+                        },
+                        result: {
+                            $ref: '#/definitions/WorkflowScheduleView',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'workflows.schedules.enable': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/WorkflowScheduleEnable',
+                        },
+                        result: {
+                            $ref: '#/definitions/WorkflowScheduleView',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'workflows.schedules.preview': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/WorkflowSchedulePreview',
+                        },
+                        result: {
+                            items: {
+                                type: 'string',
+                            },
+                            type: 'array',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'workflows.schedules.read': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/WorkflowScheduleRead',
+                        },
+                        result: {
+                            anyOf: [
+                                {
+                                    $ref: '#/definitions/WorkflowScheduleView',
+                                },
+                                {
+                                    type: 'null',
+                                },
+                            ],
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'workflows.validate': {
                     properties: {
                         params: {
@@ -5643,6 +5701,10 @@ export const schema: Schema = {
                 'workflows.runs.terminal.command',
                 'workflows.runs.terminal.read',
                 'workflows.save',
+                'workflows.schedules.disable',
+                'workflows.schedules.enable',
+                'workflows.schedules.preview',
+                'workflows.schedules.read',
                 'workflows.validate',
                 'workspaces.create',
                 'workspaces.describe',
@@ -13304,6 +13366,27 @@ export const schema: Schema = {
             required: ['count', 'options', 'outputFormat', 'quality', 'size'],
             type: 'object',
         },
+        WorkflowIntervalTiming: {
+            description:
+                'Millisecond strings preserve exact instants across transport and MongoDB.',
+            properties: {
+                endAtMs: {
+                    type: ['null', 'string'],
+                },
+                intervalMs: {
+                    type: 'string',
+                },
+                kind: {
+                    const: 'interval',
+                    type: 'string',
+                },
+                startAtMs: {
+                    type: 'string',
+                },
+            },
+            required: ['endAtMs', 'intervalMs', 'kind', 'startAtMs'],
+            type: 'object',
+        },
         WorkflowListCursor: {
             description:
                 'Cursor uses a timestamp plus stable identity to handle equal update times.',
@@ -13807,6 +13890,21 @@ export const schema: Schema = {
                 $ref: '#/definitions/WorkflowValue',
             },
             description: 'JSON configuration is data, not an executable plan or authorization.',
+            type: 'object',
+        },
+        WorkflowOnceTiming: {
+            description:
+                "A single UTC instant, displayed in the user's selected timezone by the client.",
+            properties: {
+                atMs: {
+                    type: 'string',
+                },
+                kind: {
+                    const: 'once',
+                    type: 'string',
+                },
+            },
+            required: ['atMs', 'kind'],
             type: 'object',
         },
         WorkflowPatch: {
@@ -14614,6 +14712,10 @@ export const schema: Schema = {
                 runId: {
                     type: 'string',
                 },
+                schedule: {
+                    $ref: '#/definitions/WorkflowScheduleSource',
+                    description: 'Present only on scheduled published runs.',
+                },
                 sequence: {
                     type: 'string',
                 },
@@ -14660,6 +14762,213 @@ export const schema: Schema = {
                 },
             },
             required: ['commandId', 'expectedRevision', 'patch', 'workflowId'],
+            type: 'object',
+        },
+        WorkflowScheduleCommand: {
+            description: 'Configuration revision is independent of execution progress.',
+            properties: {
+                commandId: {
+                    type: 'string',
+                },
+                expectedRevision: {
+                    type: 'string',
+                },
+                workflowId: {
+                    type: 'string',
+                },
+            },
+            required: ['commandId', 'expectedRevision', 'workflowId'],
+            type: 'object',
+        },
+        WorkflowScheduleConfiguration: {
+            description: 'Activation never follows a mutable published pointer or changes a draft.',
+            properties: {
+                catchUpLimit: {
+                    type: 'number',
+                },
+                input: {
+                    $ref: '#/definitions/WorkflowObject',
+                },
+                lateGraceMs: {
+                    type: 'string',
+                },
+                maxConcurrentRuns: {
+                    type: 'number',
+                },
+                missed: {
+                    $ref: '#/definitions/WorkflowScheduleMissed',
+                },
+                publicationId: {
+                    type: 'string',
+                },
+                timing: {
+                    $ref: '#/definitions/WorkflowScheduleTiming',
+                },
+            },
+            required: [
+                'catchUpLimit',
+                'input',
+                'lateGraceMs',
+                'maxConcurrentRuns',
+                'missed',
+                'publicationId',
+                'timing',
+            ],
+            type: 'object',
+        },
+        WorkflowScheduleEnable: {
+            description:
+                'Explicit enable or replace command containing the reviewed complete configuration.',
+            properties: {
+                commandId: {
+                    type: 'string',
+                },
+                configuration: {
+                    $ref: '#/definitions/WorkflowScheduleConfiguration',
+                },
+                expectedRevision: {
+                    type: 'string',
+                },
+                workflowId: {
+                    type: 'string',
+                },
+            },
+            required: ['commandId', 'configuration', 'expectedRevision', 'workflowId'],
+            type: 'object',
+        },
+        WorkflowScheduleEvent: {
+            description: 'Concise automation status evidence.',
+            properties: {
+                atMs: {
+                    type: 'string',
+                },
+                message: {
+                    type: ['null', 'string'],
+                },
+                occurrenceMs: {
+                    type: 'string',
+                },
+                outcome: {
+                    enum: ['accepted', 'blocked', 'skipped'],
+                    type: 'string',
+                },
+                runId: {
+                    type: ['null', 'string'],
+                },
+            },
+            required: ['atMs', 'message', 'occurrenceMs', 'outcome', 'runId'],
+            type: 'object',
+        },
+        WorkflowScheduleMissed: {
+            description:
+                'Late occurrences are skipped, coalesced into the latest, or replayed up to a configured cap.\nExplicit outage handling policy.',
+            enum: ['catch-up', 'latest', 'skip'],
+            type: 'string',
+        },
+        WorkflowSchedulePreview: {
+            description: 'Preview performs no activation, storage mutation or run preparation.',
+            properties: {
+                afterMs: {
+                    type: 'string',
+                },
+                timing: {
+                    $ref: '#/definitions/WorkflowScheduleTiming',
+                },
+            },
+            required: ['afterMs', 'timing'],
+            type: 'object',
+        },
+        WorkflowScheduleRead: {
+            description: 'Owner-scoped current automation state.',
+            properties: {
+                workflowId: {
+                    type: 'string',
+                },
+            },
+            required: ['workflowId'],
+            type: 'object',
+        },
+        WorkflowScheduleSource: {
+            description:
+                'Immutable provenance included in both the execution snapshot and run metadata.',
+            properties: {
+                occurrenceMs: {
+                    type: 'string',
+                },
+                revision: {
+                    type: 'string',
+                },
+            },
+            required: ['occurrenceMs', 'revision'],
+            type: 'object',
+        },
+        WorkflowScheduleStatus: {
+            description:
+                'UI and runtime share these lifecycle meanings.\nDurable activation state, separate from run status.',
+            enum: ['blocked', 'complete', 'disabled', 'enabled'],
+            type: 'string',
+        },
+        WorkflowScheduleTiming: {
+            anyOf: [
+                {
+                    $ref: '#/definitions/WorkflowIntervalTiming',
+                },
+                {
+                    $ref: '#/definitions/WorkflowOnceTiming',
+                },
+            ],
+            description: 'Supported timing forms, with inclusive start and end instants.',
+        },
+        WorkflowScheduleView: {
+            description:
+                'No graph, outputs, credentials or unbounded event collections are embedded here.',
+            properties: {
+                configuration: {
+                    $ref: '#/definitions/WorkflowScheduleConfiguration',
+                },
+                last: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/WorkflowScheduleEvent',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                nextAtMs: {
+                    type: ['null', 'string'],
+                },
+                pendingCount: {
+                    type: 'number',
+                },
+                revision: {
+                    type: 'string',
+                },
+                skippedOccurrences: {
+                    type: 'string',
+                },
+                status: {
+                    $ref: '#/definitions/WorkflowScheduleStatus',
+                },
+                updatedAtMs: {
+                    type: 'string',
+                },
+                workflowId: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'configuration',
+                'last',
+                'nextAtMs',
+                'pendingCount',
+                'revision',
+                'skippedOccurrences',
+                'status',
+                'updatedAtMs',
+                'workflowId',
+            ],
             type: 'object',
         },
         WorkflowStepStatus: {
