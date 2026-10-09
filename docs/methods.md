@@ -1,6 +1,6 @@
 # RPC reference
 
-All 150 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 149 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
+All 151 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 150 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
 
 - [accounts.create](#accounts-create)
 - [accounts.list](#accounts-list)
@@ -53,6 +53,7 @@ All 150 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [processes.resize](#processes-resize)
 - [processes.stop](#processes-stop)
 - [reverse.browser](#reverse-browser)
+- [reverse.browser.modules](#reverse-browser-modules)
 - [reverse.browser.sources](#reverse-browser-sources)
 - [reverse.browser.structure](#reverse-browser-structure)
 - [reverse.catalog](#reverse-catalog)
@@ -1253,6 +1254,37 @@ Parameters: [ReverseBrowserQuery](protocol.md#reversebrowserquery).
 | `runId`      | Yes      | `string` |             |
 
 Result: [ReverseBrowserPage](protocol.md#reversebrowserpage).
+
+## reverse.browser.modules
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ReverseBrowserModules> = {
+    evidenceId: 'YOUR_EVIDENCEID',
+    id: 'YOUR_ID',
+    runId: 'YOUR_RUNID',
+    view: 'candidates',
+};
+const result: ResultOf<typeof Method.ReverseBrowserModules> = await client.call(
+    Method.ReverseBrowserModules,
+    params,
+);
+```
+
+Parameters: [BrowserModuleQuery](protocol.md#browsermodulequery).
+
+| Field        | Required | Type                                                                                                                                       | Description                                                         |
+| ------------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------- |
+| `cursor`     | No       | `string`                                                                                                                                   |                                                                     |
+| `evidenceId` | Yes      | `string`                                                                                                                                   |                                                                     |
+| `field`      | No       | `"error-message"` / `"expression"` / `"importer-url"` / `"map-base-url"` / `"module"` / `"parse-error"` / `"resolved-url"` / `"specifier"` | Full fields are read only after selecting an import or its context. |
+| `id`         | Yes      | `string`                                                                                                                                   |                                                                     |
+| `runId`      | Yes      | `string`                                                                                                                                   |                                                                     |
+| `selector`   | No       | `string`                                                                                                                                   |                                                                     |
+| `view`       | Yes      | [BrowserModuleView](protocol.md#browsermoduleview)                                                                                         |                                                                     |
+
+Result: [BrowserModulePage](protocol.md#browsermodulepage).
 
 ## reverse.browser.sources
 

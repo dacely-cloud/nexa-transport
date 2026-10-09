@@ -533,6 +533,203 @@ The containment relation preserves the difference between light DOM, shadow and 
 
 Type: `"child"` / `"content-document"` / `"document"` / `"imported-document"` / `"pseudo-element"` / `"shadow-root"` / `"template-content"`.
 
+## BrowserModuleCandidateRow
+
+Candidate metadata points to original source pages and never carries captured code.
+
+| Field           | Required | Type                                                             | Description |
+| --------------- | -------- | ---------------------------------------------------------------- | ----------- |
+| `frameId`       | Yes      | `string`                                                         |             |
+| `hasSourceUrl`  | Yes      | `boolean`                                                        |             |
+| `id`            | Yes      | `string`                                                         |             |
+| `isModule`      | Yes      | `boolean`                                                        |             |
+| `kind`          | Yes      | `"candidate"`                                                    |             |
+| `match`         | Yes      | [BrowserModuleMatch](protocol.md#browsermodulematch)             |             |
+| `sourceBytes`   | Yes      | `null,string`                                                    |             |
+| `sourceSha256`  | Yes      | `null,string`                                                    |             |
+| `startColumn`   | Yes      | `number`                                                         |             |
+| `startLine`     | Yes      | `number`                                                         |             |
+| `state`         | Yes      | [BrowserScriptSourceState](protocol.md#browserscriptsourcestate) |             |
+| `url`           | Yes      | `string`                                                         |             |
+| `urlCharacters` | Yes      | `string`                                                         |             |
+
+## BrowserModuleContext
+
+Importer selection provenance never claims an observed installed runtime base.
+
+Type: `"explicit-importer-url"` / `"reported-source-url"`.
+
+## BrowserModuleDirectoryRow
+
+One finite row in the selected saved directory.
+
+Variant 1: [BrowserModuleImportRow](protocol.md#browsermoduleimportrow)
+
+| Field                  | Required | Type                                                             | Description |
+| ---------------------- | -------- | ---------------------------------------------------------------- | ----------- |
+| `candidateCount`       | Yes      | `number`                                                         |             |
+| `errorCharacters`      | Yes      | `null,string`                                                    |             |
+| `errorMessage`         | Yes      | `null,string`                                                    |             |
+| `errorName`            | Yes      | `null,string`                                                    |             |
+| `execution`            | Yes      | `"unknown"`                                                      |             |
+| `expression`           | Yes      | `null,string`                                                    |             |
+| `expressionCharacters` | Yes      | `null,string`                                                    |             |
+| `expressionTruncated`  | Yes      | `boolean`                                                        |             |
+| `id`                   | Yes      | `string`                                                         |             |
+| `kind`                 | Yes      | `"import"`                                                       |             |
+| `location`             | Yes      | [BrowserModulePosition](protocol.md#browsermoduleposition)       |             |
+| `specifier`            | Yes      | `null,string`                                                    |             |
+| `specifierCharacters`  | Yes      | `null,string`                                                    |             |
+| `status`               | Yes      | [BrowserModuleTraceStatus](protocol.md#browsermoduletracestatus) |             |
+| `syntax`               | Yes      | `string`                                                         |             |
+| `url`                  | Yes      | `null,string`                                                    |             |
+| `urlCharacters`        | Yes      | `null,string`                                                    |             |
+
+Variant 2: [BrowserModuleCandidateRow](protocol.md#browsermodulecandidaterow)
+
+| Field           | Required | Type                                                             | Description |
+| --------------- | -------- | ---------------------------------------------------------------- | ----------- |
+| `frameId`       | Yes      | `string`                                                         |             |
+| `hasSourceUrl`  | Yes      | `boolean`                                                        |             |
+| `id`            | Yes      | `string`                                                         |             |
+| `isModule`      | Yes      | `boolean`                                                        |             |
+| `kind`          | Yes      | `"candidate"`                                                    |             |
+| `match`         | Yes      | [BrowserModuleMatch](protocol.md#browsermodulematch)             |             |
+| `sourceBytes`   | Yes      | `null,string`                                                    |             |
+| `sourceSha256`  | Yes      | `null,string`                                                    |             |
+| `startColumn`   | Yes      | `number`                                                         |             |
+| `startLine`     | Yes      | `number`                                                         |             |
+| `state`         | Yes      | [BrowserScriptSourceState](protocol.md#browserscriptsourcestate) |             |
+| `url`           | Yes      | `string`                                                         |             |
+| `urlCharacters` | Yes      | `string`                                                         |             |
+
+## BrowserModuleImportRow
+
+Literal identity and native errors are previews; exact fields are independently paged.
+
+| Field                  | Required | Type                                                             | Description |
+| ---------------------- | -------- | ---------------------------------------------------------------- | ----------- |
+| `candidateCount`       | Yes      | `number`                                                         |             |
+| `errorCharacters`      | Yes      | `null,string`                                                    |             |
+| `errorMessage`         | Yes      | `null,string`                                                    |             |
+| `errorName`            | Yes      | `null,string`                                                    |             |
+| `execution`            | Yes      | `"unknown"`                                                      |             |
+| `expression`           | Yes      | `null,string`                                                    |             |
+| `expressionCharacters` | Yes      | `null,string`                                                    |             |
+| `expressionTruncated`  | Yes      | `boolean`                                                        |             |
+| `id`                   | Yes      | `string`                                                         |             |
+| `kind`                 | Yes      | `"import"`                                                       |             |
+| `location`             | Yes      | [BrowserModulePosition](protocol.md#browsermoduleposition)       |             |
+| `specifier`            | Yes      | `null,string`                                                    |             |
+| `specifierCharacters`  | Yes      | `null,string`                                                    |             |
+| `status`               | Yes      | [BrowserModuleTraceStatus](protocol.md#browsermoduletracestatus) |             |
+| `syntax`               | Yes      | `string`                                                         |             |
+| `url`                  | Yes      | `null,string`                                                    |             |
+| `urlCharacters`        | Yes      | `null,string`                                                    |             |
+
+## BrowserModuleMatch
+
+Captured URL match strength is independent of execution and content identity.
+
+Type: `"exact-reported-url"` / `"response-url-without-fragment"`.
+
+## BrowserModuleMetadata
+
+Compact context previews identify exact text available through the text representation.
+
+| Field                     | Required | Type                                                                          | Description |
+| ------------------------- | -------- | ----------------------------------------------------------------------------- | ----------- |
+| `context`                 | Yes      | [BrowserModuleContext](protocol.md#browsermodulecontext)                      |             |
+| `engine`                  | Yes      | `"chromium-import-meta-resolve"`                                              |             |
+| `engineVersion`           | Yes      | `null,string`                                                                 |             |
+| `excludedNonEs`           | Yes      | `string`                                                                      |             |
+| `excludedTypeOnly`        | Yes      | `string`                                                                      |             |
+| `importCount`             | Yes      | `string`                                                                      |             |
+| `importMapBaseCharacters` | Yes      | `null,string`                                                                 |             |
+| `importMapBaseUrl`        | Yes      | `null,string`                                                                 |             |
+| `importMapBytes`          | Yes      | `null,string`                                                                 |             |
+| `importMapSha256`         | Yes      | `null,string`                                                                 |             |
+| `importerCharacters`      | Yes      | `string`                                                                      |             |
+| `importerUrl`             | Yes      | `string`                                                                      |             |
+| `module`                  | Yes      | `string`                                                                      |             |
+| `moduleCharacters`        | Yes      | `string`                                                                      |             |
+| `parseError`              | Yes      | `null,string`                                                                 |             |
+| `parseErrorCharacters`    | Yes      | `null,string`                                                                 |             |
+| `sourceBytes`             | Yes      | `string`                                                                      |             |
+| `sourceCapture`           | Yes      | [BrowserModuleSourceCapture](protocol.md#browsermodulesourcecapture) / `null` |             |
+| `sourceSha256`            | Yes      | `string`                                                                      |             |
+
+## BrowserModulePage
+
+At most twenty previews or one bounded UTF-16 range, with immutable provenance.
+
+| Field          | Required | Type                                                                                                                                                | Description |
+| -------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `cursor`       | Yes      | `string`                                                                                                                                            |             |
+| `evidenceId`   | Yes      | `string`                                                                                                                                            |             |
+| `field`        | Yes      | `"error-message"` / `"expression"` / `"importer-url"` / `"map-base-url"` / `"module"` / `"parse-error"` / `"resolved-url"` / `"specifier"` / `null` |             |
+| `metadata`     | Yes      | [BrowserModuleMetadata](protocol.md#browsermodulemetadata)                                                                                          |             |
+| `nextCursor`   | Yes      | `null,string`                                                                                                                                       |             |
+| `records`      | Yes      | Array of [BrowserModuleDirectoryRow](protocol.md#browsermoduledirectoryrow)                                                                         |             |
+| `reportSha256` | Yes      | `string`                                                                                                                                            |             |
+| `runId`        | Yes      | `string`                                                                                                                                            |             |
+| `selector`     | Yes      | `null,string`                                                                                                                                       |             |
+| `sha256`       | Yes      | `string`                                                                                                                                            |             |
+| `text`         | Yes      | `null,string`                                                                                                                                       |             |
+| `textSha256`   | Yes      | `null,string`                                                                                                                                       |             |
+| `total`        | Yes      | `string`                                                                                                                                            |             |
+| `view`         | Yes      | [BrowserModuleView](protocol.md#browsermoduleview)                                                                                                  |             |
+
+## BrowserModulePosition
+
+Coordinates identify the exact selected source without repeating a long path in every row.
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `column`    | Yes      | `number` |             |
+| `end`       | Yes      | `number` |             |
+| `endColumn` | Yes      | `number` |             |
+| `endLine`   | Yes      | `number` |             |
+| `line`      | Yes      | `number` |             |
+| `start`     | Yes      | `number` |             |
+
+## BrowserModuleQuery
+
+Requests contain archive IDs, never workspace paths or URLs to fetch.
+
+| Field        | Required | Type                                                                                                                                       | Description                                                         |
+| ------------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------- |
+| `cursor`     | No       | `string`                                                                                                                                   |                                                                     |
+| `evidenceId` | Yes      | `string`                                                                                                                                   |                                                                     |
+| `field`      | No       | `"error-message"` / `"expression"` / `"importer-url"` / `"map-base-url"` / `"module"` / `"parse-error"` / `"resolved-url"` / `"specifier"` | Full fields are read only after selecting an import or its context. |
+| `id`         | Yes      | `string`                                                                                                                                   |                                                                     |
+| `runId`      | Yes      | `string`                                                                                                                                   |                                                                     |
+| `selector`   | No       | `string`                                                                                                                                   |                                                                     |
+| `view`       | Yes      | [BrowserModuleView](protocol.md#browsermoduleview)                                                                                         |                                                                     |
+
+## BrowserModuleSourceCapture
+
+Original capture identity remains separate from derived analysis and report identities.
+
+| Field           | Required | Type     | Description |
+| --------------- | -------- | -------- | ----------- |
+| `captureSha256` | Yes      | `string` |             |
+| `evidenceId`    | Yes      | `string` |             |
+| `runId`         | Yes      | `string` |             |
+| `sha256`        | Yes      | `string` |             |
+
+## BrowserModuleTraceStatus
+
+Native URL evidence is distinct from computed syntax and runtime execution.
+
+Type: `"computed-specifier"` / `"native-resolution"` / `"unsupported-literal"`.
+
+## BrowserModuleView
+
+Metadata directories and exact text have independent bounded cursors.
+
+Type: `"candidates"` / `"imports"` / `"text"`.
+
 ## BrowserPageProjection
 
 One passive structure inspection tied to a stable selected document.
@@ -1778,6 +1975,7 @@ Configurable bounds on gateway-owned work and memory.
 | `processes.resize`                  | Yes      | Object (fields below) |                                                                                            |
 | `processes.stop`                    | Yes      | Object (fields below) |                                                                                            |
 | `reverse.browser`                   | Yes      | Object (fields below) |                                                                                            |
+| `reverse.browser.modules`           | Yes      | Object (fields below) |                                                                                            |
 | `reverse.browser.sources`           | Yes      | Object (fields below) |                                                                                            |
 | `reverse.browser.structure`         | Yes      | Object (fields below) |                                                                                            |
 | `reverse.catalog`                   | Yes      | Object (fields below) |                                                                                            |
@@ -2307,6 +2505,13 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ------------------------------------------------------ | ----------- |
 | `params` | Yes      | [ReverseBrowserQuery](protocol.md#reversebrowserquery) |             |
 | `result` | Yes      | [ReverseBrowserPage](protocol.md#reversebrowserpage)   |             |
+
+**reverse.browser.modules**
+
+| Field    | Required | Type                                                 | Description |
+| -------- | -------- | ---------------------------------------------------- | ----------- |
+| `params` | Yes      | [BrowserModuleQuery](protocol.md#browsermodulequery) |             |
+| `result` | Yes      | [BrowserModulePage](protocol.md#browsermodulepage)   |             |
 
 **reverse.browser.sources**
 
