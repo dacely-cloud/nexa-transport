@@ -10,6 +10,15 @@ import type { ResourceBinding } from '../src/workflows/ResourceTypes.js';
 
 describe('portable workflow resource contracts', (): void => {
     it.each([
+        'MappingComponents',
+        'mapping/MappingTypes',
+        'mapping/MappingCodec',
+        'mapping/MappingEvaluator',
+        'mapping/MappingExpressions',
+        'mapping/MappingPaths',
+        'mapping/MappingValues',
+        'mapping/MappingLiteral',
+        'mapping/MappingValidation',
         'ResourceTypes',
         'ResourceBindingCodec',
         'ResourceReadiness',

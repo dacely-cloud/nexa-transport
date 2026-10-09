@@ -11,6 +11,7 @@ import {
 } from './ComponentTypes.js';
 import { ApprovalComponents } from './ApprovalComponents.js';
 import { HumanComponents } from './HumanComponents.js';
+import { MappingComponents } from './MappingComponents.js';
 import { DataComponents } from './DataComponents.js';
 import { TimeComponents } from './TimeComponents.js';
 import { TimedComponents } from './TimedComponents.js';
@@ -53,6 +54,7 @@ export class ComponentRegistry {
             ...HumanComponents.definitions(),
             ...ApprovalComponents.definitions(),
             ...DataComponents.definitions(),
+            MappingComponents.definition(),
             ...AgentComponents.definitions(),
             ...TerminalComponents.definitions(),
             ...InferenceComponents.definitions(),

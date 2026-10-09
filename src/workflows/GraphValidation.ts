@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { MappingValidation } from './mapping/MappingValidation.js';
 import { WorkflowTimedTrigger } from './TimedTrigger.js';
 import { ComponentRegistry } from './ComponentRegistry.js';
 import {
@@ -175,6 +176,27 @@ export class WorkflowGraphValidation {
                     entry.node.id,
                     null,
                     'schedule',
+                );
+            }
+        }
+        if (entry.definition.id === 'data.mapping') {
+            const available: Set<string> = new Set(
+                ['source', 'context'].filter(
+                    (slot: string): boolean =>
+                        Object.hasOwn(entry.node.configuration, slot) ||
+                        (connections.incoming.get(GraphConnections.key(entry.node.id, slot))
+                            ?.length ?? 0) > 0,
+                ),
+            );
+            try {
+                MappingValidation.parse(entry.node.configuration['mapping_plan'], available);
+            } catch (caught: unknown) {
+                problems.add(
+                    GraphIssueCode.Configuration,
+                    caught instanceof Error ? caught.message : 'Invalid mapping plan',
+                    entry.node.id,
+                    null,
+                    'mapping_plan',
                 );
             }
         }

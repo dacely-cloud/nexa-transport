@@ -270,6 +270,38 @@
         "./workflow-time-limits": {
             "types": "./dist/workflows/TimeLimits.d.ts",
             "import": "./dist/workflow-time-limits.js"
+        },
+        "./workflow-mapping-types": {
+            "types": "./dist/workflows/mapping/MappingTypes.d.ts",
+            "import": "./dist/workflow-mapping-types.js"
+        },
+        "./workflow-mapping-codec": {
+            "types": "./dist/workflows/mapping/MappingCodec.d.ts",
+            "import": "./dist/workflow-mapping-codec.js"
+        },
+        "./workflow-mapping-evaluator": {
+            "types": "./dist/workflows/mapping/MappingEvaluator.d.ts",
+            "import": "./dist/workflow-mapping-evaluator.js"
+        },
+        "./workflow-mapping-expressions": {
+            "types": "./dist/workflows/mapping/MappingExpressions.d.ts",
+            "import": "./dist/workflow-mapping-expressions.js"
+        },
+        "./workflow-mapping-paths": {
+            "types": "./dist/workflows/mapping/MappingPaths.d.ts",
+            "import": "./dist/workflow-mapping-paths.js"
+        },
+        "./workflow-mapping-values": {
+            "types": "./dist/workflows/mapping/MappingValues.d.ts",
+            "import": "./dist/workflow-mapping-values.js"
+        },
+        "./workflow-mapping-literal": {
+            "types": "./dist/workflows/mapping/MappingLiteral.d.ts",
+            "import": "./dist/workflow-mapping-literal.js"
+        },
+        "./workflow-mapping-validation": {
+            "types": "./dist/workflows/mapping/MappingValidation.d.ts",
+            "import": "./dist/workflow-mapping-validation.js"
         }
     },
     "scripts": {
