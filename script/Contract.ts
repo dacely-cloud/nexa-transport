@@ -14,6 +14,7 @@ import type {
 } from '../../nexa/src/gateway/Protocol';
 import type { NcapDelta } from '../../nexa/src/protocol/ncap/Delta';
 import type { VoiceCallEvent } from '../../nexa/src/voice/VoiceCall';
+import type { ReverseNetworkDirectoryPage } from '../../nexa/src/reverse/NetworkDirectoryTypes';
 import type { ReverseGraphPage } from '../../nexa/src/reverse/GraphTypes';
 import type { ReverseRunSnapshot } from '../../nexa/src/reverse/ProgressTypes';
 import type { ReverseCatalogPage, ReverseEvidencePage } from '../../nexa/src/reverse/ArchiveTypes';
@@ -23,6 +24,7 @@ import type {
 } from '../../nexa/src/reverse/NavigationTypes';
 /** All protocol contracts reachable from the public transport. */
 export interface Contract {
+    readonly reverseNetworkDirectory: ReverseNetworkDirectoryPage;
     readonly reverseGraph: ReverseGraphPage;
     readonly reverseSnapshot: ReverseRunSnapshot;
     readonly reverseCatalog: ReverseCatalogPage;

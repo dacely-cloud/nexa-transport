@@ -1198,6 +1198,7 @@ Configurable bounds on gateway-owned work and memory.
 | `reverse.functions`                 | Yes      | Object (fields below) |                                                                                            |
 | `reverse.graph`                     | Yes      | Object (fields below) |                                                                                            |
 | `reverse.inspect`                   | Yes      | Object (fields below) |                                                                                            |
+| `reverse.network`                   | Yes      | Object (fields below) |                                                                                            |
 | `roblox.credentials.remove`         | Yes      | Object (fields below) |                                                                                            |
 | `roblox.credentials.set`            | Yes      | Object (fields below) |                                                                                            |
 | `roblox.credentials.status`         | Yes      | Object (fields below) |                                                                                            |
@@ -1727,6 +1728,13 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | -------------------------------------------------------- | ----------- |
 | `params` | Yes      | [ReverseInspectQuery](protocol.md#reverseinspectquery)   |             |
 | `result` | Yes      | [ReverseInspectResult](protocol.md#reverseinspectresult) |             |
+
+**reverse.network**
+
+| Field    | Required | Type                                                                     | Description |
+| -------- | -------- | ------------------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [ReverseNetworkDirectoryQuery](protocol.md#reversenetworkdirectoryquery) |             |
+| `result` | Yes      | [ReverseNetworkDirectoryPage](protocol.md#reversenetworkdirectorypage)   |             |
 
 **roblox.credentials.remove**
 
@@ -3902,6 +3910,55 @@ Inspection captures immutable evidence; its text is read separately through the 
 Read-only browser operations supported by an existing native analyzer lease.
 
 Type: `"decompile"` / `"disassemble"` / `"graph"` / `"xrefs"`.
+
+## ReverseNetworkDirectoryPage
+
+Source-ordered metadata pages hold at most twenty rows and 12,000 serialized characters.
+
+| Field           | Required | Type                                                                          | Description |
+| --------------- | -------- | ----------------------------------------------------------------------------- | ----------- |
+| `cursor`        | Yes      | `string`                                                                      |             |
+| `error`         | Yes      | `null,string`                                                                 |             |
+| `nextCursor`    | Yes      | `null,string`                                                                 |             |
+| `requests`      | Yes      | Array of [ReverseNetworkDirectoryRow](protocol.md#reversenetworkdirectoryrow) |             |
+| `runId`         | Yes      | `string`                                                                      |             |
+| `sha256`        | Yes      | `string`                                                                      |             |
+| `sourceEntries` | Yes      | `string`                                                                      |             |
+| `state`         | Yes      | [ReverseDirectoryState](protocol.md#reversedirectorystate)                    |             |
+| `total`         | Yes      | `string`                                                                      |             |
+
+## ReverseNetworkDirectoryQuery
+
+Metadata navigation never accepts a file path or analyzer capability.
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `cursor` | No       | `string` |             |
+| `filter` | No       | `string` |             |
+| `id`     | Yes      | `string` |             |
+| `method` | No       | `string` |             |
+| `runId`  | Yes      | `string` |             |
+| `status` | No       | `number` |             |
+
+## ReverseNetworkDirectoryRow
+
+A request retains metadata even when no agent has captured either payload.
+
+| Field                | Required | Type                                   | Description |
+| -------------------- | -------- | -------------------------------------- | ----------- |
+| `durationMs`         | Yes      | `number`                               |             |
+| `id`                 | Yes      | `string`                               |             |
+| `location`           | Yes      | `string`                               |             |
+| `method`             | Yes      | `string`                               |             |
+| `mimeType`           | Yes      | `string`                               |             |
+| `requestBody`        | Yes      | [NetworkBody](protocol.md#networkbody) |             |
+| `requestEvidenceId`  | Yes      | `null,string`                          |             |
+| `responseBody`       | Yes      | [NetworkBody](protocol.md#networkbody) |             |
+| `responseEvidenceId` | Yes      | `null,string`                          |             |
+| `startedDateTime`    | Yes      | `string`                               |             |
+| `status`             | Yes      | `number`                               |             |
+| `url`                | Yes      | `string`                               |             |
+| `urlTruncated`       | Yes      | `boolean`                              |             |
 
 ## ReverseNetworkSnapshot
 

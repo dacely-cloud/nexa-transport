@@ -7,10 +7,12 @@ import type {
     ReverseEvidencePage,
     ReverseFunctionsPage,
     ReverseInspectResult,
+    ReverseNetworkDirectoryPage,
 } from '../protocol/Protocol.js';
 import { reverseSnapshot } from '../protocol/Validators.js';
 import { GraphReceipt } from './GraphReceipt.js';
 import { ApplicationReceipt } from './ApplicationReceipt.js';
+import { NetworkDirectoryReceipt } from './NetworkDirectoryReceipt.js';
 import { NetworkReceipt } from './NetworkReceipt.js';
 import { ArchiveReceipt } from './ArchiveReceipt.js';
 import { NavigationReceipt } from './NavigationReceipt.js';
@@ -23,6 +25,10 @@ export type {
 
 /** Portable investigation receipt decoding and monotonic replay for multi-agent consumers. */
 export class ReverseInvestigation {
+    /** Validates source-ordered redacted network metadata without materializing payloads. */
+    public static network(input: unknown): ReverseNetworkDirectoryPage {
+        return NetworkDirectoryReceipt.read(input);
+    }
     /** Validates a bounded immutable graph or selected-block instruction page. */
     public static graph(input: unknown): ReverseGraphPage {
         return GraphReceipt.read(input);
