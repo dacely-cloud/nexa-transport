@@ -4508,6 +4508,67 @@ export interface NcapUsageShape {
 /** NcapUsage from the Nexa wire protocol. */
 export type NcapUsage = NcapUsageShape;
 
+/** NetworkBody wire fields. */
+export interface NetworkBodyShape {
+    /** binary as defined by the Nexa gateway. */
+    readonly binary: boolean;
+    /** bytes as defined by the Nexa gateway. */
+    readonly bytes: null | string;
+    /** captured as defined by the Nexa gateway. */
+    readonly captured: boolean;
+    /** characters as defined by the Nexa gateway. */
+    readonly characters: number;
+    /** mimeType as defined by the Nexa gateway. */
+    readonly mimeType: string;
+    /** redacted as defined by the Nexa gateway. */
+    readonly redacted: boolean;
+    /** sha256 as defined by the Nexa gateway. */
+    readonly sha256: null | string;
+}
+
+/** NetworkBody from the Nexa wire protocol. */
+export type NetworkBody = NetworkBodyShape;
+
+/** NetworkIssue wire fields. */
+export interface NetworkIssueShape {
+    /** location as defined by the Nexa gateway. */
+    readonly location: string;
+    /** message as defined by the Nexa gateway. */
+    readonly message: string;
+}
+
+/** NetworkIssue from the Nexa wire protocol. */
+export type NetworkIssue = NetworkIssueShape;
+
+/** NetworkRequest wire fields. */
+export interface NetworkRequestShape {
+    /** durationMs as defined by the Nexa gateway. */
+    readonly durationMs: number;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** location as defined by the Nexa gateway. */
+    readonly location: string;
+    /** method as defined by the Nexa gateway. */
+    readonly method: string;
+    /** mimeType as defined by the Nexa gateway. */
+    readonly mimeType: string;
+    /** requestBody as defined by the Nexa gateway. */
+    readonly requestBody: NetworkBody;
+    /** responseBody as defined by the Nexa gateway. */
+    readonly responseBody: NetworkBody;
+    /** startedDateTime as defined by the Nexa gateway. */
+    readonly startedDateTime: string;
+    /** status as defined by the Nexa gateway. */
+    readonly status: number;
+    /** url as defined by the Nexa gateway. */
+    readonly url: string;
+    /** urlTruncated as defined by the Nexa gateway. */
+    readonly urlTruncated: boolean;
+}
+
+/** NetworkRequest from the Nexa wire protocol. */
+export type NetworkRequest = NetworkRequestShape;
+
 /** ObjectSchema wire fields. */
 export interface ObjectSchemaShape {
     /** additional as defined by the Nexa gateway. */
@@ -5598,6 +5659,29 @@ export const ReverseInspectionValues = {
 export type ReverseInspection =
     (typeof ReverseInspectionValues)[keyof typeof ReverseInspectionValues];
 
+/** ReverseNetworkSnapshot wire fields. */
+export interface ReverseNetworkSnapshotShape {
+    /** entryCount as defined by the Nexa gateway. */
+    readonly entryCount: number;
+    /** format as defined by the Nexa gateway. */
+    readonly format: 'har';
+    /** issueCount as defined by the Nexa gateway. */
+    readonly issueCount: number;
+    /** issues as defined by the Nexa gateway. */
+    readonly issues: ReadonlyArray<NetworkIssue>;
+    /** missingBodies as defined by the Nexa gateway. */
+    readonly missingBodies: number;
+    /** redactedBodies as defined by the Nexa gateway. */
+    readonly redactedBodies: number;
+    /** requests as defined by the Nexa gateway. */
+    readonly requests: ReadonlyArray<NetworkRequest>;
+    /** version as defined by the Nexa gateway. */
+    readonly version: string;
+}
+
+/** ReverseNetworkSnapshot from the Nexa wire protocol. */
+export type ReverseNetworkSnapshot = ReverseNetworkSnapshotShape;
+
 /** ReversePlanStep wire fields. */
 export interface ReversePlanStepShape {
     /** attempts as defined by the Nexa gateway. */
@@ -5635,7 +5719,8 @@ export type ReversePlanStep = ReversePlanStepShape;
 export const ReverseRunSnapshotkindValues = {
     Value0: 'javascript',
     Value1: 'native',
-    Value2: 'source',
+    Value2: 'network',
+    Value3: 'source',
 } as const;
 
 /** ReverseRunSnapshot wire fields. */
@@ -5658,6 +5743,8 @@ export interface ReverseRunSnapshotShape {
     readonly inputName: string;
     /** kind as defined by the Nexa gateway. */
     readonly kind?: (typeof ReverseRunSnapshotkindValues)[keyof typeof ReverseRunSnapshotkindValues];
+    /** network as defined by the Nexa gateway. */
+    readonly network?: ReverseNetworkSnapshot;
     /** plan as defined by the Nexa gateway. */
     readonly plan?: ReadonlyArray<ReversePlanStep>;
     /** question as defined by the Nexa gateway. */

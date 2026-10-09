@@ -3133,6 +3133,47 @@ Live, non-terminal token usage for the whole turn.
 | `maxTokens`        | Yes      | `number` | The max-token ceiling; `0` means uncapped.                 |
 | `promptTokens`     | Yes      | `number` |                                                            |
 
+## NetworkBody
+
+Metadata for an observed payload, independently of whether its text is available.
+
+| Field        | Required | Type          | Description |
+| ------------ | -------- | ------------- | ----------- |
+| `binary`     | Yes      | `boolean`     |             |
+| `bytes`      | Yes      | `null,string` |             |
+| `captured`   | Yes      | `boolean`     |             |
+| `characters` | Yes      | `number`      |             |
+| `mimeType`   | Yes      | `string`      |             |
+| `redacted`   | Yes      | `boolean`     |             |
+| `sha256`     | Yes      | `null,string` |             |
+
+## NetworkIssue
+
+Explicit missing or rejected capture coverage.
+
+| Field      | Required | Type     | Description |
+| ---------- | -------- | -------- | ----------- |
+| `location` | Yes      | `string` |             |
+| `message`  | Yes      | `string` |             |
+
+## NetworkRequest
+
+Compact request directory row with an immutable HAR JSON pointer.
+
+| Field             | Required | Type                                   | Description |
+| ----------------- | -------- | -------------------------------------- | ----------- |
+| `durationMs`      | Yes      | `number`                               |             |
+| `id`              | Yes      | `string`                               |             |
+| `location`        | Yes      | `string`                               |             |
+| `method`          | Yes      | `string`                               |             |
+| `mimeType`        | Yes      | `string`                               |             |
+| `requestBody`     | Yes      | [NetworkBody](protocol.md#networkbody) |             |
+| `responseBody`    | Yes      | [NetworkBody](protocol.md#networkbody) |             |
+| `startedDateTime` | Yes      | `string`                               |             |
+| `status`          | Yes      | `number`                               |             |
+| `url`             | Yes      | `string`                               |             |
+| `urlTruncated`    | Yes      | `boolean`                              |             |
+
 ## ObjectSchema
 
 Closed objects reject accidental fields, while open objects retain extension data.
@@ -3862,6 +3903,21 @@ Read-only browser operations supported by an existing native analyzer lease.
 
 Type: `"decompile"` / `"disassemble"` / `"graph"` / `"xrefs"`.
 
+## ReverseNetworkSnapshot
+
+Bounded capability-free projection; full entries and payloads require paged evidence queries.
+
+| Field            | Required | Type                                                  | Description |
+| ---------------- | -------- | ----------------------------------------------------- | ----------- |
+| `entryCount`     | Yes      | `number`                                              |             |
+| `format`         | Yes      | `"har"`                                               |             |
+| `issueCount`     | Yes      | `number`                                              |             |
+| `issues`         | Yes      | Array of [NetworkIssue](protocol.md#networkissue)     |             |
+| `missingBodies`  | Yes      | `number`                                              |             |
+| `redactedBodies` | Yes      | `number`                                              |             |
+| `requests`       | Yes      | Array of [NetworkRequest](protocol.md#networkrequest) |             |
+| `version`        | Yes      | `string`                                              |             |
+
 ## ReversePlanStep
 
 An evidence-linked follow-up requested by a specialist and executed by the runtime.
@@ -3893,9 +3949,11 @@ Bounded, capability-free projection carried by live tool events and the final re
 | `cleanupErrors` | Yes      | Array of `string`                                                    |                                                                                                 |
 | `evidence`      | Yes      | Array of [ReverseEvidenceRecord](protocol.md#reverseevidencerecord)  |                                                                                                 |
 | `evidenceCount` | Yes      | `number`                                                             |                                                                                                 |
+| `execution`     | No       | `number`                                                             | Explicit resumed execution epoch; absent means the original execution.                          |
 | `id`            | Yes      | `string`                                                             |                                                                                                 |
 | `inputName`     | Yes      | `string`                                                             |                                                                                                 |
-| `kind`          | No       | `"javascript"` / `"native"` / `"source"`                             | The runtime selects a target adapter; callers may make the choice explicit for ambiguous files. |
+| `kind`          | No       | `"javascript"` / `"native"` / `"network"` / `"source"`               | The runtime selects a target adapter; callers may make the choice explicit for ambiguous files. |
+| `network`       | No       | [ReverseNetworkSnapshot](protocol.md#reversenetworksnapshot)         | Bounded capability-free projection; full entries and payloads require paged evidence queries.   |
 | `plan`          | No       | Array of [ReversePlanStep](protocol.md#reverseplanstep)              |                                                                                                 |
 | `question`      | Yes      | `string`                                                             |                                                                                                 |
 | `revision`      | Yes      | `string`                                                             |                                                                                                 |
@@ -5857,23 +5915,3 @@ What a workspace currently holds, and when that was last measured against the di
 | `bytes`        | Yes      | `number` |                                                                                          |
 | `files`        | Yes      | `number` |                                                                                          |
 | `reconciledAt` | Yes      | `number` | When a full walk last corrected these numbers. `0` means never — the counters are then a |
-
-Investigation receipts optionally include `execution`, an integer from zero to
-three. An absent value means the original execution. `reverse_resume` is an agent
-tool that retries an unfinished run under the current caller's permissions;
-there is no browser RPC that bypasses that tool policy. Resumes retain the run id,
-input digest and original archive ownership, increase revisions, and preserve
-completed reports. `ReverseInvestigation.advance` accepts an explicit newer
-execution after partial/failure/cancellation and rejects late prior-execution
-updates. Attempts are cumulative, bounded by two per execution and six overall.
-Chat history can contain separate investigation and resume tool calls for one run.
-
-Investigation receipts optionally include `execution`, an integer from zero to
-three. An absent value means the original execution. `reverse_resume` is an agent
-tool that retries an unfinished run under the current caller's permissions;
-there is no browser RPC that bypasses that tool policy. Resumes retain the run id,
-input digest and original archive ownership, increase revisions, and preserve
-completed reports. `ReverseInvestigation.advance` accepts an explicit newer
-execution after partial/failure/cancellation and rejects late prior-execution
-updates. Attempts are cumulative, bounded by two per execution and six overall.
-Chat history can contain separate investigation and resume tool calls for one run.

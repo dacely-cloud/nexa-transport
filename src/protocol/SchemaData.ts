@@ -6762,6 +6762,108 @@ export const schema: Schema = {
             required: ['cachedTokens', 'completionTokens', 'maxTokens', 'promptTokens'],
             type: 'object',
         },
+        NetworkBody: {
+            description:
+                'Metadata for an observed payload, independently of whether its text is available.',
+            properties: {
+                binary: {
+                    type: 'boolean',
+                },
+                bytes: {
+                    type: ['null', 'string'],
+                },
+                captured: {
+                    type: 'boolean',
+                },
+                characters: {
+                    type: 'number',
+                },
+                mimeType: {
+                    type: 'string',
+                },
+                redacted: {
+                    type: 'boolean',
+                },
+                sha256: {
+                    type: ['null', 'string'],
+                },
+            },
+            required: [
+                'binary',
+                'bytes',
+                'captured',
+                'characters',
+                'mimeType',
+                'redacted',
+                'sha256',
+            ],
+            type: 'object',
+        },
+        NetworkIssue: {
+            description: 'Explicit missing or rejected capture coverage.',
+            properties: {
+                location: {
+                    type: 'string',
+                },
+                message: {
+                    type: 'string',
+                },
+            },
+            required: ['location', 'message'],
+            type: 'object',
+        },
+        NetworkRequest: {
+            description: 'Compact request directory row with an immutable HAR JSON pointer.',
+            properties: {
+                durationMs: {
+                    type: 'number',
+                },
+                id: {
+                    type: 'string',
+                },
+                location: {
+                    type: 'string',
+                },
+                method: {
+                    type: 'string',
+                },
+                mimeType: {
+                    type: 'string',
+                },
+                requestBody: {
+                    $ref: '#/definitions/NetworkBody',
+                },
+                responseBody: {
+                    $ref: '#/definitions/NetworkBody',
+                },
+                startedDateTime: {
+                    type: 'string',
+                },
+                status: {
+                    type: 'number',
+                },
+                url: {
+                    type: 'string',
+                },
+                urlTruncated: {
+                    type: 'boolean',
+                },
+            },
+            required: [
+                'durationMs',
+                'id',
+                'location',
+                'method',
+                'mimeType',
+                'requestBody',
+                'responseBody',
+                'startedDateTime',
+                'status',
+                'url',
+                'urlTruncated',
+            ],
+            type: 'object',
+        },
         ObjectSchema: {
             description:
                 'Closed objects reject accidental fields, while open objects retain extension data.',
@@ -8408,6 +8510,54 @@ export const schema: Schema = {
             enum: ['decompile', 'disassemble', 'graph', 'xrefs'],
             type: 'string',
         },
+        ReverseNetworkSnapshot: {
+            description:
+                'Bounded capability-free projection; full entries and payloads require paged evidence queries.',
+            properties: {
+                entryCount: {
+                    type: 'number',
+                },
+                format: {
+                    const: 'har',
+                    type: 'string',
+                },
+                issueCount: {
+                    type: 'number',
+                },
+                issues: {
+                    items: {
+                        $ref: '#/definitions/NetworkIssue',
+                    },
+                    type: 'array',
+                },
+                missingBodies: {
+                    type: 'number',
+                },
+                redactedBodies: {
+                    type: 'number',
+                },
+                requests: {
+                    items: {
+                        $ref: '#/definitions/NetworkRequest',
+                    },
+                    type: 'array',
+                },
+                version: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'entryCount',
+                'format',
+                'issueCount',
+                'issues',
+                'missingBodies',
+                'redactedBodies',
+                'requests',
+                'version',
+            ],
+            type: 'object',
+        },
         ReversePlanStep: {
             description:
                 'An evidence-linked follow-up requested by a specialist and executed by the runtime.',
@@ -8518,8 +8668,13 @@ export const schema: Schema = {
                 kind: {
                     description:
                         'The runtime selects a target adapter; callers may make the choice explicit for ambiguous files.',
-                    enum: ['javascript', 'native', 'source'],
+                    enum: ['javascript', 'native', 'network', 'source'],
                     type: 'string',
+                },
+                network: {
+                    $ref: '#/definitions/ReverseNetworkSnapshot',
+                    description:
+                        'Bounded capability-free projection; full entries and payloads require paged evidence queries.',
                 },
                 plan: {
                     items: {

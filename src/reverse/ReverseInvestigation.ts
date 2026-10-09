@@ -11,6 +11,7 @@ import type {
 import { reverseSnapshot } from '../protocol/Validators.js';
 import { GraphReceipt } from './GraphReceipt.js';
 import { ApplicationReceipt } from './ApplicationReceipt.js';
+import { NetworkReceipt } from './NetworkReceipt.js';
 import { ArchiveReceipt } from './ArchiveReceipt.js';
 import { NavigationReceipt } from './NavigationReceipt.js';
 import { ReverseControlFlow, type ReverseControlFlowPage } from './ControlFlow.js';
@@ -34,6 +35,12 @@ export class ReverseInvestigation {
     public static parse(input: unknown): ReverseRunSnapshot {
         if (!reverseSnapshot(input)) {
             throw new TypeError('Invalid investigation receipt');
+        }
+        if (input.network !== undefined) {
+            if (input.kind !== 'network') {
+                throw new TypeError('Network projection requires a network target');
+            }
+            NetworkReceipt.validate(input.network);
         }
         if (input.application !== undefined) {
             if (input.kind !== 'javascript' && input.kind !== 'source') {
