@@ -16,6 +16,14 @@
         "docs"
     ],
     "exports": {
+        "./workflow-template-fields": {
+            "types": "./dist/workflows/TemplateFields.d.ts",
+            "import": "./dist/workflow-template-fields.js"
+        },
+        "./workflow-template-inputs": {
+            "types": "./dist/workflows/TemplateInputs.d.ts",
+            "import": "./dist/workflow-template-inputs.js"
+        },
         "./chat-graph": {
             "types": "./dist/graphs/ChatGraph.d.ts",
             "import": "./dist/chat-graph.js"
