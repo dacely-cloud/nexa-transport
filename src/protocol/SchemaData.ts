@@ -4642,6 +4642,73 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'workflows.publications.check': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/WorkflowPublicationCheckRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/WorkflowPublicationCheck',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'workflows.publications.list': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/WorkflowPublicationListRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/WorkflowPublicationPage',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'workflows.publications.publish': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/WorkflowPublishRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/WorkflowPublishResult',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'workflows.publications.read': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/WorkflowPublicationReadRequest',
+                        },
+                        result: {
+                            anyOf: [
+                                {
+                                    $ref: '#/definitions/WorkflowPublication',
+                                },
+                                {
+                                    type: 'null',
+                                },
+                            ],
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'workflows.publications.run': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/WorkflowPublishedRunRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/WorkflowRunSummary',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'workflows.read': {
                     properties: {
                         params: {
@@ -5140,6 +5207,11 @@ export const schema: Schema = {
                 'workflows.planning.read',
                 'workflows.planning.send',
                 'workflows.planning.sources',
+                'workflows.publications.check',
+                'workflows.publications.list',
+                'workflows.publications.publish',
+                'workflows.publications.read',
+                'workflows.publications.run',
                 'workflows.read',
                 'workflows.record',
                 'workflows.records',
@@ -13405,6 +13477,233 @@ export const schema: Schema = {
             required: ['id', 'x', 'y'],
             type: 'object',
         },
+        WorkflowPublication: {
+            description:
+                'A complete immutable manifest points to retained graph records, never a mutable draft.',
+            properties: {
+                format: {
+                    const: 1,
+                    type: 'number',
+                },
+                name: {
+                    type: 'string',
+                },
+                policy: {
+                    $ref: '#/definitions/WorkflowPublicationPolicy',
+                },
+                publicationId: {
+                    type: 'string',
+                },
+                publishedAtMs: {
+                    type: 'string',
+                },
+                revision: {
+                    type: 'string',
+                },
+                version: {
+                    type: 'string',
+                },
+                workflowId: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'format',
+                'name',
+                'policy',
+                'publicationId',
+                'publishedAtMs',
+                'revision',
+                'version',
+                'workflowId',
+            ],
+            type: 'object',
+        },
+        WorkflowPublicationCheck: {
+            description:
+                'Validation is an observation; publishing and execution each recheck current access.',
+            properties: {
+                checkedAtMs: {
+                    type: 'string',
+                },
+                issues: {
+                    items: {
+                        $ref: '#/definitions/GraphIssue',
+                    },
+                    type: 'array',
+                },
+                revision: {
+                    type: 'string',
+                },
+                valid: {
+                    type: 'boolean',
+                },
+                workflowId: {
+                    type: 'string',
+                },
+            },
+            required: ['checkedAtMs', 'issues', 'revision', 'valid', 'workflowId'],
+            type: 'object',
+        },
+        WorkflowPublicationCheckRequest: {
+            properties: {
+                policy: {
+                    $ref: '#/definitions/WorkflowPublicationPolicy',
+                },
+                revision: {
+                    type: 'string',
+                },
+                workflowId: {
+                    type: 'string',
+                },
+            },
+            required: ['policy', 'revision', 'workflowId'],
+            type: 'object',
+        },
+        WorkflowPublicationListRequest: {
+            properties: {
+                afterVersion: {
+                    type: ['null', 'string'],
+                },
+                limit: {
+                    type: 'number',
+                },
+                workflowId: {
+                    type: 'string',
+                },
+            },
+            required: ['afterVersion', 'limit', 'workflowId'],
+            type: 'object',
+        },
+        WorkflowPublicationPage: {
+            properties: {
+                items: {
+                    items: {
+                        $ref: '#/definitions/WorkflowPublication',
+                    },
+                    type: 'array',
+                },
+                next: {
+                    type: ['null', 'string'],
+                },
+            },
+            required: ['items', 'next'],
+            type: 'object',
+        },
+        WorkflowPublicationPolicy: {
+            description: 'Limits reviewed before publication; run callers cannot override them.',
+            properties: {
+                maxConcurrency: {
+                    type: 'number',
+                },
+                timeoutMs: {
+                    type: 'string',
+                },
+                triggerNodeId: {
+                    type: 'string',
+                },
+            },
+            required: ['maxConcurrency', 'timeoutMs', 'triggerNodeId'],
+            type: 'object',
+        },
+        WorkflowPublicationReadRequest: {
+            properties: {
+                publicationId: {
+                    type: ['null', 'string'],
+                },
+                workflowId: {
+                    type: 'string',
+                },
+            },
+            required: ['publicationId', 'workflowId'],
+            type: 'object',
+        },
+        WorkflowPublicationReference: {
+            description: 'Immutable publication identity, distinct from its source draft revision.',
+            properties: {
+                publicationId: {
+                    type: 'string',
+                },
+                revision: {
+                    type: 'string',
+                },
+                version: {
+                    type: 'string',
+                },
+            },
+            required: ['publicationId', 'revision', 'version'],
+            type: 'object',
+        },
+        WorkflowPublishRequest: {
+            properties: {
+                commandId: {
+                    type: 'string',
+                },
+                expectedDraftRevision: {
+                    type: 'string',
+                },
+                expectedPublicationId: {
+                    type: ['null', 'string'],
+                },
+                policy: {
+                    $ref: '#/definitions/WorkflowPublicationPolicy',
+                },
+                revision: {
+                    type: 'string',
+                },
+                workflowId: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'commandId',
+                'expectedDraftRevision',
+                'expectedPublicationId',
+                'policy',
+                'revision',
+                'workflowId',
+            ],
+            type: 'object',
+        },
+        WorkflowPublishResult: {
+            properties: {
+                check: {
+                    $ref: '#/definitions/WorkflowPublicationCheck',
+                },
+                publication: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/WorkflowPublication',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+            },
+            required: ['check', 'publication'],
+            type: 'object',
+        },
+        WorkflowPublishedRunRequest: {
+            description:
+                'Explicitly selected immutable version, with server-owned execution limits.',
+            properties: {
+                input: {
+                    $ref: '#/definitions/WorkflowObject',
+                },
+                publicationId: {
+                    type: 'string',
+                },
+                runId: {
+                    type: 'string',
+                },
+                workflowId: {
+                    type: 'string',
+                },
+            },
+            required: ['input', 'publicationId', 'runId', 'workflowId'],
+            type: 'object',
+        },
         WorkflowReadRequest: {
             description:
                 'Null resolves the current revision only for the first page. Subsequent pages pin it.',
@@ -13742,7 +14041,7 @@ export const schema: Schema = {
             type: 'object',
         },
         WorkflowRunMode: {
-            enum: ['live-test', 'mock-test'],
+            enum: ['live-test', 'mock-test', 'published'],
             type: 'string',
         },
         WorkflowRunOutputPage: {
@@ -13897,6 +14196,11 @@ export const schema: Schema = {
                 mode: {
                     $ref: '#/definitions/WorkflowRunMode',
                 },
+                publication: {
+                    $ref: '#/definitions/WorkflowPublicationReference',
+                    description:
+                        'Immutable publication identity, distinct from its source draft revision.',
+                },
                 runId: {
                     type: 'string',
                 },
@@ -14025,6 +14329,11 @@ export const schema: Schema = {
                 },
                 nodeCount: {
                     type: 'number',
+                },
+                publication: {
+                    $ref: '#/definitions/WorkflowPublicationReference',
+                    description:
+                        'Immutable publication identity, distinct from its source draft revision.',
                 },
                 revision: {
                     type: 'string',

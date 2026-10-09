@@ -16,6 +16,7 @@ const config: UserConfig = {
                 'workflow-planning-codec': 'src/workflows/planning/PlanningCodec.ts',
                 'workflow-planning-edits': 'src/workflows/planning/PlanningEdits.ts',
                 'workflow-artifacts': 'src/workflows/runtime/ArtifactDownload.ts',
+                'workflow-publication-codec': 'src/workflows/PublicationCodec.ts',
                 'workflow-run-types': 'src/workflows/runtime/RunTypes.ts',
                 'workflow-run-requests': 'src/workflows/runtime/RunRequests.ts',
                 'workflow-run-codec': 'src/workflows/runtime/RunCodec.ts',
