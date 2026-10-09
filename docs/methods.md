@@ -1,6 +1,6 @@
 # RPC reference
 
-All 154 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 153 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
+All 157 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 156 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
 
 - [accounts.create](#accounts-create)
 - [accounts.list](#accounts-list)
@@ -57,6 +57,7 @@ All 154 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [reverse.browser.screenshot](#reverse-browser-screenshot)
 - [reverse.browser.sources](#reverse-browser-sources)
 - [reverse.browser.storage](#reverse-browser-storage)
+- [reverse.browser.storage.comparison](#reverse-browser-storage-comparison)
 - [reverse.browser.structure](#reverse-browser-structure)
 - [reverse.catalog](#reverse-catalog)
 - [reverse.evidence](#reverse-evidence)
@@ -147,6 +148,7 @@ All 154 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [workflows.runs.steps](#workflows-runs-steps)
 - [workflows.runs.terminal.command](#workflows-runs-terminal-command)
 - [workflows.runs.terminal.read](#workflows-runs-terminal-read)
+- [workflows.runs.usage](#workflows-runs-usage)
 - [workflows.save](#workflows-save)
 - [workflows.schedules.disable](#workflows-schedules-disable)
 - [workflows.schedules.enable](#workflows-schedules-enable)
@@ -1376,6 +1378,34 @@ Parameters: [BrowserStorageQuery](protocol.md#browserstoragequery).
 | `runId`      | Yes      | `string`                                                                                   |                                                             |
 
 Result: [BrowserStoragePage](protocol.md#browserstoragepage).
+
+## reverse.browser.storage.comparison
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ReverseBrowserStorageComparison> = {
+    evidenceId: 'YOUR_EVIDENCEID',
+    id: 'YOUR_ID',
+    runId: 'YOUR_RUNID',
+};
+const result: ResultOf<typeof Method.ReverseBrowserStorageComparison> = await client.call(
+    Method.ReverseBrowserStorageComparison,
+    params,
+);
+```
+
+Parameters: [BrowserStorageComparisonQuery](protocol.md#browserstoragecomparisonquery).
+
+| Field        | Required | Type                                                                                       | Description                                                 |
+| ------------ | -------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------- |
+| `cursor`     | No       | `string`                                                                                   |                                                             |
+| `evidenceId` | Yes      | `string`                                                                                   |                                                             |
+| `group`      | No       | `"cache-storage"` / `"cookies"` / `"indexed-db"` / `"local-storage"` / `"session-storage"` | Each storage authority has independently reported coverage. |
+| `id`         | Yes      | `string`                                                                                   |                                                             |
+| `runId`      | Yes      | `string`                                                                                   |                                                             |
+
+Result: [BrowserStorageComparisonPage](protocol.md#browserstoragecomparisonpage).
 
 ## reverse.browser.structure
 
@@ -3680,6 +3710,30 @@ Parameters: [WorkflowTerminalRequest](protocol.md#workflowterminalrequest).
 | `sessionId` | Yes      | `string` |             |
 
 Result: [WorkflowTerminalSnapshot](protocol.md#workflowterminalsnapshot).
+
+## workflows.runs.usage
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsRunsUsage> = {
+    offset: 'YOUR_OFFSET',
+    runId: 'YOUR_RUNID',
+};
+const result: ResultOf<typeof Method.WorkflowsRunsUsage> = await client.call(
+    Method.WorkflowsRunsUsage,
+    params,
+);
+```
+
+Parameters: [WorkflowRunUsageRequest](protocol.md#workflowrunusagerequest).
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `offset` | Yes      | `string` |             |
+| `runId`  | Yes      | `string` |             |
+
+Result: [WorkflowRunUsageView](protocol.md#workflowrunusageview).
 
 ## workflows.save
 

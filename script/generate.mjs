@@ -64,6 +64,99 @@ writeFileSync(
     ),
 );
 
+/** Comparison validators share native portable source; generated wire types contain no complete capture bodies. */
+const comparisonTypes = readFileSync(
+    '../nexa/src/reverse/BrowserStorageComparisonTypes.ts',
+    'utf8',
+);
+const comparisonEnums = [
+    'BrowserStorageCompareStatus',
+    'BrowserStorageCompareMode',
+    'BrowserStorageChangeKind',
+]
+    .map((name) => {
+        const declaration = comparisonTypes.match(
+            new RegExp('export const ' + name + ' = [\\s\\S]*?as const;', 'u'),
+        )?.[0];
+        if (declaration === undefined)
+            throw new Error('Native comparison enumeration is missing: ' + name);
+        return (
+            '/** Native comparison enumeration. */\n' +
+            declaration +
+            '\n/** Native comparison selection type. */\nexport type ' +
+            name +
+            ' = (typeof ' +
+            name +
+            ')[keyof typeof ' +
+            name +
+            '];'
+        );
+    })
+    .join('\n\n');
+writeFileSync(
+    'src/reverse/BrowserStorageComparisonDefinitions.ts',
+    "// SPDX-FileCopyrightText: 2026 Nexa contributors\n// SPDX-License-Identifier: Apache-2.0\n\nimport type { BrowserStorageComparison, BrowserStorageChange } from '../protocol/Protocol.js';\n\n" +
+        comparisonEnums +
+        '\n\n/** Complete host reports stay separate from paged wire contracts. */\nexport interface BrowserStorageComparisonCapture { readonly comparison: BrowserStorageComparison; readonly changes: readonly BrowserStorageChange[]; }\n',
+);
+/** Native imports are partitioned without adding unused generated bindings. */
+function portableComparisonImport(typeOnly, members, valuesModule) {
+    const values = [];
+    const types = [];
+    const captures = [];
+    for (const member of members
+        .split(',')
+        .map((item) => item.trim())
+        .filter(Boolean)) {
+        const isType = typeOnly !== undefined || member.startsWith('type ');
+        const binding = member.replace(/^type /u, '');
+        if (binding === 'BrowserStorageComparisonCapture') captures.push(binding);
+        else if (isType) types.push(binding);
+        else values.push(binding);
+    }
+    return [
+        values.length ? 'import { ' + values.join(', ') + " } from '" + valuesModule + "';" : '',
+        types.length
+            ? 'import type { ' + types.join(', ') + " } from '../protocol/Protocol.js';"
+            : '',
+        captures.length
+            ? 'import type { ' +
+              captures.join(', ') +
+              " } from './BrowserStorageComparisonDefinitions.js';"
+            : '',
+    ]
+        .filter(Boolean)
+        .join('\n');
+}
+for (const name of [
+    'BrowserStorageComparisonValues',
+    'BrowserStorageComparisonPolicy',
+    'BrowserStorageComparisonReceipt',
+    'BrowserStorageChangeReceipt',
+]) {
+    let source = readFileSync('../nexa/src/reverse/' + name + '.ts', 'utf8');
+    source = source.replace(
+        /import (type )?\{([^}]*)\} from '\.\/BrowserCaptureTypes';/gu,
+        (_match, typeOnly, members) =>
+            portableComparisonImport(typeOnly, members, '../protocol/Protocol.js'),
+    );
+    source = source.replace(
+        /import (type )?\{([^}]*)\} from '\.\/BrowserStorageTypes';/gu,
+        (_match, typeOnly, members) =>
+            portableComparisonImport(typeOnly, members, './BrowserStorageReceipt.js'),
+    );
+    source = source.replace(
+        /import (type )?\{([^}]*)\} from '\.\/BrowserStorageComparisonTypes';/gu,
+        (_match, typeOnly, members) =>
+            portableComparisonImport(typeOnly, members, './BrowserStorageComparisonDefinitions.js'),
+    );
+    source = source.replace(
+        /from '(\.\/[^']+)'/gu,
+        (_match, path) => "from '" + (path.endsWith('.js') ? path : path + '.js') + "'",
+    );
+    writeFileSync('src/reverse/' + name + '.ts', source);
+}
+
 const temporary = mkdtempSync(join(tmpdir(), 'nexa-contract-'));
 let schema;
 try {

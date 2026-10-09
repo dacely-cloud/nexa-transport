@@ -2,6 +2,12 @@ import { BrowserScreenshotComparisonReceipt } from './BrowserScreenshotCompariso
 import { BrowserScreenshotReceipt } from './BrowserScreenshotReceipt.js';
 import { BrowserStorageGatewayReceipt } from './BrowserStorageGatewayReceipt.js';
 import { BrowserStorageReceipt } from './BrowserStorageReceipt.js';
+import { BrowserStorageChangeReceipt } from './BrowserStorageChangeReceipt.js';
+import { BrowserStorageComparisonReceipt } from './BrowserStorageComparisonReceipt.js';
+import type {
+    BrowserStorageComparison,
+    BrowserStorageComparisonPage,
+} from '../protocol/Protocol.js';
 import type { BrowserStorageMetadata } from '../protocol/Protocol.js';
 import type { BrowserStoragePage } from '../protocol/Protocol.js';
 import type { BrowserScreenshotPage } from '../protocol/Protocol.js';
@@ -116,6 +122,16 @@ export class ReverseInvestigation {
             }
             BrowserStorageGatewayReceipt.snapshot(
                 input.browserStorage,
+                input.id,
+                input.archive?.sessionId,
+            );
+        }
+        if (input.browserStorageComparison !== undefined) {
+            if (input.kind !== 'browser') {
+                throw new TypeError('Storage comparison requires a browser investigation');
+            }
+            BrowserStorageComparisonReceipt.snapshot(
+                input.browserStorageComparison,
                 input.id,
                 input.archive?.sessionId,
             );
@@ -248,6 +264,14 @@ export class ReverseInvestigation {
     /** Pins storage header provenance and selection independently of JSON field insertion order. */
     public static storageIdentity(metadata: BrowserStorageMetadata): string {
         return BrowserStorageReceipt.identity(metadata);
+    }
+    /** Validates metadata-only and bounded selected storage differences before application rendering. */
+    public static storageComparison(input: unknown): BrowserStorageComparisonPage {
+        return BrowserStorageChangeReceipt.page(input);
+    }
+    /** Pins every source, mode, coverage and report counter independently from JSON insertion order. */
+    public static storageComparisonIdentity(value: BrowserStorageComparison): string {
+        return BrowserStorageComparisonReceipt.identity(value);
     }
     /** Validates script/resource directories or independently selected immutable source text pages. */
     public static sources(input: unknown): BrowserSourcesPage {

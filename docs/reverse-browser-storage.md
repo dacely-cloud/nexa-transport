@@ -30,3 +30,21 @@ remain owner/conversation scoped after browser shutdown or archive restart.
 See the [native contract](https://github.com/dacely-cloud/nexa/blob/main/docs/reverse-browser-storage.md)
 for capture authority, command bounds and runtime evidence. Storage comparison
 and full browser/REA parity remain unfinished.
+
+## Saved storage comparisons
+
+`ReverseRunSnapshot.browserStorageComparison` retains the two source captures,
+per-store counts and the comparison report reference. It carries no change array.
+Use `Method.ReverseBrowserStorageComparison` with the original conversation,
+report run/evidence IDs and an optional group. Omitting the group reads only the
+header; selecting a group returns at most 20 changes and 96,000 serialized
+characters. Long names reduce the page length. Follow `nextCursor` and replace
+the current page rather than accumulating report bodies.
+
+`ReverseInvestigation.storageComparison` validates the response's exact shape,
+quota arithmetic, coverage-derived status and consecutive selected ordinals.
+`storageComparisonIdentity` pins the full source/header provenance independent
+from object insertion order. Compare response identity to the streamed header
+and also pin the report digest, run, evidence, group and requested cursor.
+Partial captures cannot prove missing records or value equality. Names-only
+comparisons never prove value equality. Storage values remain excluded.

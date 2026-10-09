@@ -1089,6 +1089,107 @@ Metadata and source content are selected independently, with distinct cursors.
 
 Type: `"resources"` / `"scripts"` / `"source"`.
 
+## BrowserStorageChange
+
+Stable comparison ordinals refer to the original saved rows without returning their values.
+
+| Field    | Required | Type                                                             | Description |
+| -------- | -------- | ---------------------------------------------------------------- | ----------- |
+| `after`  | Yes      | [BrowserStorageRow](protocol.md#browserstoragerow) / `null`      |             |
+| `before` | Yes      | [BrowserStorageRow](protocol.md#browserstoragerow) / `null`      |             |
+| `change` | Yes      | [BrowserStorageChangeKind](protocol.md#browserstoragechangekind) |             |
+| `group`  | Yes      | [BrowserStorageGroup](protocol.md#browserstoragegroup)           |             |
+| `id`     | Yes      | `string`                                                         |             |
+
+## BrowserStorageChangeKind
+
+Absence becomes a change only when both inventories are complete.
+
+Type: `"added"` / `"modified"` / `"removed"`.
+
+## BrowserStorageCompareMode
+
+Independent opt-ins determine whether content or only a name inventory can be compared.
+
+Type: `"fingerprints"` / `"names"` / `"unavailable"`.
+
+## BrowserStorageCompareStatus
+
+Matching observations prove equality only within their declared complete coverage.
+
+Type: `"changed"` / `"unchanged"` / `"unknown"`.
+
+## BrowserStorageComparison
+
+Progress includes counters and provenance while changes stay in independently paged evidence.
+
+| Field             | Required | Type                                                                                                                         | Description |
+| ----------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `after`           | Yes      | [BrowserStorageComparisonSource](protocol.md#browserstoragecomparisonsource)                                                 |             |
+| `algorithm`       | Yes      | `"storage-observations-v1"`                                                                                                  |             |
+| `before`          | Yes      | [BrowserStorageComparisonSource](protocol.md#browserstoragecomparisonsource)                                                 |             |
+| `complete`        | Yes      | `boolean`                                                                                                                    |             |
+| `detailsComplete` | Yes      | `boolean`                                                                                                                    |             |
+| `groups`          | Yes      | [RecordBrowserStorageGroupBrowserStorageGroupComparison](protocol.md#recordbrowserstoragegroupbrowserstoragegroupcomparison) |             |
+| `limitations`     | Yes      | Array of `string`                                                                                                            |             |
+| `quota`           | Yes      | [BrowserStorageQuotaComparison](protocol.md#browserstoragequotacomparison)                                                   |             |
+| `status`          | Yes      | [BrowserStorageCompareStatus](protocol.md#browserstoragecomparestatus)                                                       |             |
+
+## BrowserStorageComparisonPage
+
+Header reads contain no changes; store reads return at most twenty directly indexed differences.
+
+| Field           | Required | Type                                                                                                | Description |
+| --------------- | -------- | --------------------------------------------------------------------------------------------------- | ----------- |
+| `captureSha256` | Yes      | `string`                                                                                            |             |
+| `changes`       | Yes      | Array of [BrowserStorageChange](protocol.md#browserstoragechange)                                   |             |
+| `comparison`    | Yes      | [BrowserStorageComparison](protocol.md#browserstoragecomparison)                                    |             |
+| `cursor`        | Yes      | `string`                                                                                            |             |
+| `evidenceId`    | Yes      | `string`                                                                                            |             |
+| `group`         | Yes      | `"cache-storage"` / `"cookies"` / `"indexed-db"` / `"local-storage"` / `"session-storage"` / `null` |             |
+| `nextCursor`    | Yes      | `null,string`                                                                                       |             |
+| `runId`         | Yes      | `string`                                                                                            |             |
+| `sha256`        | Yes      | `string`                                                                                            |             |
+
+## BrowserStorageComparisonQuery
+
+A comparison directory selects one store and a retained-change ordinal, independently from text offsets.
+
+| Field        | Required | Type                                                                                       | Description                                                 |
+| ------------ | -------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------- |
+| `cursor`     | No       | `string`                                                                                   |                                                             |
+| `evidenceId` | Yes      | `string`                                                                                   |                                                             |
+| `group`      | No       | `"cache-storage"` / `"cookies"` / `"indexed-db"` / `"local-storage"` / `"session-storage"` | Each storage authority has independently reported coverage. |
+| `id`         | Yes      | `string`                                                                                   |                                                             |
+| `runId`      | Yes      | `string`                                                                                   |                                                             |
+
+## BrowserStorageComparisonSnapshot
+
+Archived progress binds the report itself independently of its two source captures.
+
+| Field             | Required | Type                                                                                                                         | Description |
+| ----------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `after`           | Yes      | [BrowserStorageComparisonSource](protocol.md#browserstoragecomparisonsource)                                                 |             |
+| `algorithm`       | Yes      | `"storage-observations-v1"`                                                                                                  |             |
+| `before`          | Yes      | [BrowserStorageComparisonSource](protocol.md#browserstoragecomparisonsource)                                                 |             |
+| `complete`        | Yes      | `boolean`                                                                                                                    |             |
+| `detailsComplete` | Yes      | `boolean`                                                                                                                    |             |
+| `groups`          | Yes      | [RecordBrowserStorageGroupBrowserStorageGroupComparison](protocol.md#recordbrowserstoragegroupbrowserstoragegroupcomparison) |             |
+| `limitations`     | Yes      | Array of `string`                                                                                                            |             |
+| `quota`           | Yes      | [BrowserStorageQuotaComparison](protocol.md#browserstoragequotacomparison)                                                   |             |
+| `reference`       | Yes      | [ReverseBrowserReference](protocol.md#reversebrowserreference)                                                               |             |
+| `status`          | Yes      | [BrowserStorageCompareStatus](protocol.md#browserstoragecomparestatus)                                                       |             |
+
+## BrowserStorageComparisonSource
+
+Body-free source provenance retains the independent run and original capture hashes.
+
+| Field       | Required | Type                                                           | Description |
+| ----------- | -------- | -------------------------------------------------------------- | ----------- |
+| `metadata`  | Yes      | [BrowserStorageMetadata](protocol.md#browserstoragemetadata)   |             |
+| `reference` | Yes      | [ReverseBrowserReference](protocol.md#reversebrowserreference) |             |
+| `sha256`    | Yes      | `string`                                                       |             |
+
 ## BrowserStorageCoverage
 
 Omitted rows or observed mutations prevent completeness claims.
@@ -1107,6 +1208,25 @@ Omitted rows or observed mutations prevent completeness claims.
 Each storage authority has independently reported coverage.
 
 Type: `"cache-storage"` / `"cookies"` / `"indexed-db"` / `"local-storage"` / `"session-storage"`.
+
+## BrowserStorageGroupComparison
+
+Decimal counts cover all proven differences even if the bounded detail inventory is truncated.
+
+| Field                 | Required | Type                                                                   | Description |
+| --------------------- | -------- | ---------------------------------------------------------------------- | ----------- |
+| `added`               | Yes      | `string`                                                               |             |
+| `ambiguousIdentities` | Yes      | `string`                                                               |             |
+| `complete`            | Yes      | `boolean`                                                              |             |
+| `mode`                | Yes      | [BrowserStorageCompareMode](protocol.md#browserstoragecomparemode)     |             |
+| `modified`            | Yes      | `string`                                                               |             |
+| `omittedChanges`      | Yes      | `string`                                                               |             |
+| `reason`              | Yes      | `null,string`                                                          |             |
+| `removed`             | Yes      | `string`                                                               |             |
+| `retainedChanges`     | Yes      | `string`                                                               |             |
+| `status`              | Yes      | [BrowserStorageCompareStatus](protocol.md#browserstoragecomparestatus) |             |
+| `totalChanges`        | Yes      | `string`                                                               |             |
+| `unchanged`           | Yes      | `string`                                                               |             |
 
 ## BrowserStorageKind
 
@@ -1172,6 +1292,16 @@ Quota byte counts retain exact validated integer representations.
 | `available`  | Yes      | `boolean`     |             |
 | `quotaBytes` | Yes      | `null,string` |             |
 | `usageBytes` | Yes      | `null,string` |             |
+
+## BrowserStorageQuotaComparison
+
+Byte deltas are exact signed integers and are available only for the same reported origin.
+
+| Field             | Required | Type                                                                   | Description |
+| ----------------- | -------- | ---------------------------------------------------------------------- | ----------- |
+| `quotaDeltaBytes` | Yes      | `null,string`                                                          |             |
+| `status`          | Yes      | [BrowserStorageCompareStatus](protocol.md#browserstoragecomparestatus) |             |
+| `usageDeltaBytes` | Yes      | `null,string`                                                          |             |
 
 ## BrowserStorageRow
 
@@ -1396,6 +1526,10 @@ A channel's live health, as its own adapter reports it.
 | --------- | -------- | -------- | ----------- |
 | `kind`    | Yes      | `string` |             |
 | `message` | Yes      | `string` |             |
+
+## ChargeKind
+
+Type: `"adjustment"` / `"completion"` / `"embedding"` / `"media"` / `"speech"` / `"tool"` / `"transcription"`.
 
 ## ChatGraph
 
@@ -2198,163 +2332,165 @@ Configurable bounds on gateway-owned work and memory.
 
 ## GatewayMethods
 
-| Field                               | Required | Type                  | Description                                                                                |
-| ----------------------------------- | -------- | --------------------- | ------------------------------------------------------------------------------------------ |
-| `accounts.create`                   | Yes      | Object (fields below) |                                                                                            |
-| `accounts.list`                     | Yes      | Object (fields below) |                                                                                            |
-| `accounts.remove`                   | Yes      | Object (fields below) |                                                                                            |
-| `accounts.usage`                    | Yes      | Object (fields below) |                                                                                            |
-| `agent.ask`                         | Yes      | Object (fields below) |                                                                                            |
-| `agent.steer`                       | Yes      | Object (fields below) |                                                                                            |
-| `agent.stream`                      | Yes      | Object (fields below) |                                                                                            |
-| `agents.define`                     | Yes      | Object (fields below) |                                                                                            |
-| `agents.list`                       | Yes      | Object (fields below) |                                                                                            |
-| `agents.personal.list`              | Yes      | Object (fields below) |                                                                                            |
-| `agents.personal.remove`            | Yes      | Object (fields below) |                                                                                            |
-| `agents.personal.save`              | Yes      | Object (fields below) |                                                                                            |
-| `approvals.list`                    | Yes      | Object (fields below) |                                                                                            |
-| `approvals.resolve`                 | Yes      | Object (fields below) |                                                                                            |
-| `channels.deadLetters.list`         | Yes      | Object (fields below) |                                                                                            |
-| `channels.list`                     | Yes      | Object (fields below) |                                                                                            |
-| `channels.status`                   | Yes      | Object (fields below) |                                                                                            |
-| `config.get`                        | Yes      | Object (fields below) |                                                                                            |
-| `config.set`                        | Yes      | Object (fields below) |                                                                                            |
-| `config.unset`                      | Yes      | Object (fields below) |                                                                                            |
-| `connect`                           | Yes      | Object (fields below) |                                                                                            |
-| `credit.budgets`                    | Yes      | Object (fields below) |                                                                                            |
-| `credit.removeBudget`               | Yes      | Object (fields below) |                                                                                            |
-| `credit.resetAllowance`             | Yes      | Object (fields below) |                                                                                            |
-| `credit.resetHistory`               | Yes      | Object (fields below) |                                                                                            |
-| `credit.resets`                     | Yes      | Object (fields below) |                                                                                            |
-| `credit.setBudget`                  | Yes      | Object (fields below) |                                                                                            |
-| `credit.summary`                    | Yes      | Object (fields below) |                                                                                            |
-| `credit.wallet`                     | Yes      | Object (fields below) |                                                                                            |
-| `credit.walletHistory`              | Yes      | Object (fields below) |                                                                                            |
-| `data.upload.cancel`                | Yes      | Object (fields below) |                                                                                            |
-| `data.upload.chunk`                 | Yes      | Object (fields below) |                                                                                            |
-| `data.upload.finish`                | Yes      | Object (fields below) |                                                                                            |
-| `data.upload.start`                 | Yes      | Object (fields below) |                                                                                            |
-| `devices.approve`                   | Yes      | Object (fields below) |                                                                                            |
-| `devices.list`                      | Yes      | Object (fields below) |                                                                                            |
-| `devices.reject`                    | Yes      | Object (fields below) |                                                                                            |
-| `devices.revoke`                    | Yes      | Object (fields below) |                                                                                            |
-| `health`                            | Yes      | Object (fields below) |                                                                                            |
-| `jobs.add`                          | Yes      | Object (fields below) |                                                                                            |
-| `jobs.list`                         | Yes      | Object (fields below) |                                                                                            |
-| `jobs.remove`                       | Yes      | Object (fields below) |                                                                                            |
-| `logs.tail`                         | Yes      | Object (fields below) |                                                                                            |
-| `media.acknowledge`                 | Yes      | Object (fields below) |                                                                                            |
-| `office.ownerProof`                 | Yes      | Object (fields below) | Bind an invitation to the authenticated socket's office, using a short-lived signed proof. |
-| `processes.input`                   | Yes      | Object (fields below) |                                                                                            |
-| `processes.list`                    | Yes      | Object (fields below) |                                                                                            |
-| `processes.log`                     | Yes      | Object (fields below) |                                                                                            |
-| `processes.resize`                  | Yes      | Object (fields below) |                                                                                            |
-| `processes.stop`                    | Yes      | Object (fields below) |                                                                                            |
-| `reverse.browser`                   | Yes      | Object (fields below) |                                                                                            |
-| `reverse.browser.modules`           | Yes      | Object (fields below) |                                                                                            |
-| `reverse.browser.screenshot`        | Yes      | Object (fields below) |                                                                                            |
-| `reverse.browser.sources`           | Yes      | Object (fields below) |                                                                                            |
-| `reverse.browser.storage`           | Yes      | Object (fields below) |                                                                                            |
-| `reverse.browser.structure`         | Yes      | Object (fields below) |                                                                                            |
-| `reverse.catalog`                   | Yes      | Object (fields below) |                                                                                            |
-| `reverse.evidence`                  | Yes      | Object (fields below) |                                                                                            |
-| `reverse.functions`                 | Yes      | Object (fields below) |                                                                                            |
-| `reverse.graph`                     | Yes      | Object (fields below) |                                                                                            |
-| `reverse.inspect`                   | Yes      | Object (fields below) |                                                                                            |
-| `reverse.network`                   | Yes      | Object (fields below) |                                                                                            |
-| `reverse.network.detail`            | Yes      | Object (fields below) |                                                                                            |
-| `roblox.credentials.remove`         | Yes      | Object (fields below) |                                                                                            |
-| `roblox.credentials.set`            | Yes      | Object (fields below) |                                                                                            |
-| `roblox.credentials.status`         | Yes      | Object (fields below) |                                                                                            |
-| `roblox.telemetry.funnel`           | Yes      | Object (fields below) |                                                                                            |
-| `roblox.telemetry.performance`      | Yes      | Object (fields below) |                                                                                            |
-| `roblox.telemetry.projects`         | Yes      | Object (fields below) |                                                                                            |
-| `sessions.delete`                   | Yes      | Object (fields below) |                                                                                            |
-| `sessions.download`                 | Yes      | Object (fields below) |                                                                                            |
-| `sessions.files`                    | Yes      | Object (fields below) |                                                                                            |
-| `sessions.get`                      | Yes      | Object (fields below) |                                                                                            |
-| `sessions.input`                    | Yes      | Object (fields below) |                                                                                            |
-| `sessions.list`                     | Yes      | Object (fields below) |                                                                                            |
-| `sessions.messages`                 | Yes      | Object (fields below) |                                                                                            |
-| `sessions.pin`                      | Yes      | Object (fields below) |                                                                                            |
-| `sessions.pins`                     | Yes      | Object (fields below) |                                                                                            |
-| `sessions.rename`                   | Yes      | Object (fields below) |                                                                                            |
-| `sessions.retry`                    | Yes      | Object (fields below) |                                                                                            |
-| `sessions.subscribe`                | Yes      | Object (fields below) |                                                                                            |
-| `sessions.transcript`               | Yes      | Object (fields below) | Compact transcript blocks with original journal byte cursors.                              |
-| `sessions.unpin`                    | Yes      | Object (fields below) |                                                                                            |
-| `sessions.unsubscribe`              | Yes      | Object (fields below) |                                                                                            |
-| `shares.create`                     | Yes      | Object (fields below) |                                                                                            |
-| `shares.list`                       | Yes      | Object (fields below) |                                                                                            |
-| `shares.remove`                     | Yes      | Object (fields below) |                                                                                            |
-| `shares.setMember`                  | Yes      | Object (fields below) |                                                                                            |
-| `tasks.cancel`                      | Yes      | Object (fields below) |                                                                                            |
-| `tasks.get`                         | Yes      | Object (fields below) |                                                                                            |
-| `tasks.list`                        | Yes      | Object (fields below) |                                                                                            |
-| `teams.create`                      | Yes      | Object (fields below) |                                                                                            |
-| `teams.list`                        | Yes      | Object (fields below) |                                                                                            |
-| `teams.remove`                      | Yes      | Object (fields below) |                                                                                            |
-| `teams.setMember`                   | Yes      | Object (fields below) |                                                                                            |
-| `voice.audio`                       | Yes      | Object (fields below) |                                                                                            |
-| `voice.start`                       | Yes      | Object (fields below) |                                                                                            |
-| `voice.stop`                        | Yes      | Object (fields below) |                                                                                            |
-| `workflows.attention.list`          | Yes      | Object (fields below) |                                                                                            |
-| `workflows.catalog`                 | Yes      | Object (fields below) |                                                                                            |
-| `workflows.create`                  | Yes      | Object (fields below) |                                                                                            |
-| `workflows.delete`                  | Yes      | Object (fields below) |                                                                                            |
-| `workflows.list`                    | Yes      | Object (fields below) |                                                                                            |
-| `workflows.models`                  | Yes      | Object (fields below) |                                                                                            |
-| `workflows.models.image.quote`      | Yes      | Object (fields below) |                                                                                            |
-| `workflows.models.image.resolve`    | Yes      | Object (fields below) |                                                                                            |
-| `workflows.models.refresh`          | Yes      | Object (fields below) |                                                                                            |
-| `workflows.models.resolve`          | Yes      | Object (fields below) |                                                                                            |
-| `workflows.planning.cancel`         | Yes      | Object (fields below) |                                                                                            |
-| `workflows.planning.history`        | Yes      | Object (fields below) |                                                                                            |
-| `workflows.planning.read`           | Yes      | Object (fields below) |                                                                                            |
-| `workflows.planning.send`           | Yes      | Object (fields below) |                                                                                            |
-| `workflows.planning.sources`        | Yes      | Object (fields below) |                                                                                            |
-| `workflows.publications.check`      | Yes      | Object (fields below) |                                                                                            |
-| `workflows.publications.list`       | Yes      | Object (fields below) |                                                                                            |
-| `workflows.publications.publish`    | Yes      | Object (fields below) |                                                                                            |
-| `workflows.publications.read`       | Yes      | Object (fields below) |                                                                                            |
-| `workflows.publications.run`        | Yes      | Object (fields below) |                                                                                            |
-| `workflows.read`                    | Yes      | Object (fields below) |                                                                                            |
-| `workflows.record`                  | Yes      | Object (fields below) |                                                                                            |
-| `workflows.records`                 | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.agent.control`      | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.agent.input`        | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.agent.read`         | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.applications.check` | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.applications.setup` | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.approval.decide`    | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.artifact`           | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.artifacts`          | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.attempts`           | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.cancel`             | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.events`             | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.inputs`             | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.list`               | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.loopPricing`        | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.loopSpending`       | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.output`             | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.question.answer`    | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.question.read`      | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.questions`          | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.read`               | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.start`              | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.steps`              | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.terminal.command`   | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.terminal.read`      | Yes      | Object (fields below) |                                                                                            |
-| `workflows.save`                    | Yes      | Object (fields below) |                                                                                            |
-| `workflows.schedules.disable`       | Yes      | Object (fields below) |                                                                                            |
-| `workflows.schedules.enable`        | Yes      | Object (fields below) |                                                                                            |
-| `workflows.schedules.preview`       | Yes      | Object (fields below) |                                                                                            |
-| `workflows.schedules.read`          | Yes      | Object (fields below) |                                                                                            |
-| `workflows.validate`                | Yes      | Object (fields below) |                                                                                            |
-| `workspaces.create`                 | Yes      | Object (fields below) |                                                                                            |
-| `workspaces.describe`               | Yes      | Object (fields below) |                                                                                            |
-| `workspaces.destroy`                | Yes      | Object (fields below) |                                                                                            |
-| `workspaces.list`                   | Yes      | Object (fields below) |                                                                                            |
+| Field                                | Required | Type                  | Description                                                                                |
+| ------------------------------------ | -------- | --------------------- | ------------------------------------------------------------------------------------------ |
+| `accounts.create`                    | Yes      | Object (fields below) |                                                                                            |
+| `accounts.list`                      | Yes      | Object (fields below) |                                                                                            |
+| `accounts.remove`                    | Yes      | Object (fields below) |                                                                                            |
+| `accounts.usage`                     | Yes      | Object (fields below) |                                                                                            |
+| `agent.ask`                          | Yes      | Object (fields below) |                                                                                            |
+| `agent.steer`                        | Yes      | Object (fields below) |                                                                                            |
+| `agent.stream`                       | Yes      | Object (fields below) |                                                                                            |
+| `agents.define`                      | Yes      | Object (fields below) |                                                                                            |
+| `agents.list`                        | Yes      | Object (fields below) |                                                                                            |
+| `agents.personal.list`               | Yes      | Object (fields below) |                                                                                            |
+| `agents.personal.remove`             | Yes      | Object (fields below) |                                                                                            |
+| `agents.personal.save`               | Yes      | Object (fields below) |                                                                                            |
+| `approvals.list`                     | Yes      | Object (fields below) |                                                                                            |
+| `approvals.resolve`                  | Yes      | Object (fields below) |                                                                                            |
+| `channels.deadLetters.list`          | Yes      | Object (fields below) |                                                                                            |
+| `channels.list`                      | Yes      | Object (fields below) |                                                                                            |
+| `channels.status`                    | Yes      | Object (fields below) |                                                                                            |
+| `config.get`                         | Yes      | Object (fields below) |                                                                                            |
+| `config.set`                         | Yes      | Object (fields below) |                                                                                            |
+| `config.unset`                       | Yes      | Object (fields below) |                                                                                            |
+| `connect`                            | Yes      | Object (fields below) |                                                                                            |
+| `credit.budgets`                     | Yes      | Object (fields below) |                                                                                            |
+| `credit.removeBudget`                | Yes      | Object (fields below) |                                                                                            |
+| `credit.resetAllowance`              | Yes      | Object (fields below) |                                                                                            |
+| `credit.resetHistory`                | Yes      | Object (fields below) |                                                                                            |
+| `credit.resets`                      | Yes      | Object (fields below) |                                                                                            |
+| `credit.setBudget`                   | Yes      | Object (fields below) |                                                                                            |
+| `credit.summary`                     | Yes      | Object (fields below) |                                                                                            |
+| `credit.wallet`                      | Yes      | Object (fields below) |                                                                                            |
+| `credit.walletHistory`               | Yes      | Object (fields below) |                                                                                            |
+| `data.upload.cancel`                 | Yes      | Object (fields below) |                                                                                            |
+| `data.upload.chunk`                  | Yes      | Object (fields below) |                                                                                            |
+| `data.upload.finish`                 | Yes      | Object (fields below) |                                                                                            |
+| `data.upload.start`                  | Yes      | Object (fields below) |                                                                                            |
+| `devices.approve`                    | Yes      | Object (fields below) |                                                                                            |
+| `devices.list`                       | Yes      | Object (fields below) |                                                                                            |
+| `devices.reject`                     | Yes      | Object (fields below) |                                                                                            |
+| `devices.revoke`                     | Yes      | Object (fields below) |                                                                                            |
+| `health`                             | Yes      | Object (fields below) |                                                                                            |
+| `jobs.add`                           | Yes      | Object (fields below) |                                                                                            |
+| `jobs.list`                          | Yes      | Object (fields below) |                                                                                            |
+| `jobs.remove`                        | Yes      | Object (fields below) |                                                                                            |
+| `logs.tail`                          | Yes      | Object (fields below) |                                                                                            |
+| `media.acknowledge`                  | Yes      | Object (fields below) |                                                                                            |
+| `office.ownerProof`                  | Yes      | Object (fields below) | Bind an invitation to the authenticated socket's office, using a short-lived signed proof. |
+| `processes.input`                    | Yes      | Object (fields below) |                                                                                            |
+| `processes.list`                     | Yes      | Object (fields below) |                                                                                            |
+| `processes.log`                      | Yes      | Object (fields below) |                                                                                            |
+| `processes.resize`                   | Yes      | Object (fields below) |                                                                                            |
+| `processes.stop`                     | Yes      | Object (fields below) |                                                                                            |
+| `reverse.browser`                    | Yes      | Object (fields below) |                                                                                            |
+| `reverse.browser.modules`            | Yes      | Object (fields below) |                                                                                            |
+| `reverse.browser.screenshot`         | Yes      | Object (fields below) |                                                                                            |
+| `reverse.browser.sources`            | Yes      | Object (fields below) |                                                                                            |
+| `reverse.browser.storage`            | Yes      | Object (fields below) |                                                                                            |
+| `reverse.browser.storage.comparison` | Yes      | Object (fields below) |                                                                                            |
+| `reverse.browser.structure`          | Yes      | Object (fields below) |                                                                                            |
+| `reverse.catalog`                    | Yes      | Object (fields below) |                                                                                            |
+| `reverse.evidence`                   | Yes      | Object (fields below) |                                                                                            |
+| `reverse.functions`                  | Yes      | Object (fields below) |                                                                                            |
+| `reverse.graph`                      | Yes      | Object (fields below) |                                                                                            |
+| `reverse.inspect`                    | Yes      | Object (fields below) |                                                                                            |
+| `reverse.network`                    | Yes      | Object (fields below) |                                                                                            |
+| `reverse.network.detail`             | Yes      | Object (fields below) |                                                                                            |
+| `roblox.credentials.remove`          | Yes      | Object (fields below) |                                                                                            |
+| `roblox.credentials.set`             | Yes      | Object (fields below) |                                                                                            |
+| `roblox.credentials.status`          | Yes      | Object (fields below) |                                                                                            |
+| `roblox.telemetry.funnel`            | Yes      | Object (fields below) |                                                                                            |
+| `roblox.telemetry.performance`       | Yes      | Object (fields below) |                                                                                            |
+| `roblox.telemetry.projects`          | Yes      | Object (fields below) |                                                                                            |
+| `sessions.delete`                    | Yes      | Object (fields below) |                                                                                            |
+| `sessions.download`                  | Yes      | Object (fields below) |                                                                                            |
+| `sessions.files`                     | Yes      | Object (fields below) |                                                                                            |
+| `sessions.get`                       | Yes      | Object (fields below) |                                                                                            |
+| `sessions.input`                     | Yes      | Object (fields below) |                                                                                            |
+| `sessions.list`                      | Yes      | Object (fields below) |                                                                                            |
+| `sessions.messages`                  | Yes      | Object (fields below) |                                                                                            |
+| `sessions.pin`                       | Yes      | Object (fields below) |                                                                                            |
+| `sessions.pins`                      | Yes      | Object (fields below) |                                                                                            |
+| `sessions.rename`                    | Yes      | Object (fields below) |                                                                                            |
+| `sessions.retry`                     | Yes      | Object (fields below) |                                                                                            |
+| `sessions.subscribe`                 | Yes      | Object (fields below) |                                                                                            |
+| `sessions.transcript`                | Yes      | Object (fields below) | Compact transcript blocks with original journal byte cursors.                              |
+| `sessions.unpin`                     | Yes      | Object (fields below) |                                                                                            |
+| `sessions.unsubscribe`               | Yes      | Object (fields below) |                                                                                            |
+| `shares.create`                      | Yes      | Object (fields below) |                                                                                            |
+| `shares.list`                        | Yes      | Object (fields below) |                                                                                            |
+| `shares.remove`                      | Yes      | Object (fields below) |                                                                                            |
+| `shares.setMember`                   | Yes      | Object (fields below) |                                                                                            |
+| `tasks.cancel`                       | Yes      | Object (fields below) |                                                                                            |
+| `tasks.get`                          | Yes      | Object (fields below) |                                                                                            |
+| `tasks.list`                         | Yes      | Object (fields below) |                                                                                            |
+| `teams.create`                       | Yes      | Object (fields below) |                                                                                            |
+| `teams.list`                         | Yes      | Object (fields below) |                                                                                            |
+| `teams.remove`                       | Yes      | Object (fields below) |                                                                                            |
+| `teams.setMember`                    | Yes      | Object (fields below) |                                                                                            |
+| `voice.audio`                        | Yes      | Object (fields below) |                                                                                            |
+| `voice.start`                        | Yes      | Object (fields below) |                                                                                            |
+| `voice.stop`                         | Yes      | Object (fields below) |                                                                                            |
+| `workflows.attention.list`           | Yes      | Object (fields below) |                                                                                            |
+| `workflows.catalog`                  | Yes      | Object (fields below) |                                                                                            |
+| `workflows.create`                   | Yes      | Object (fields below) |                                                                                            |
+| `workflows.delete`                   | Yes      | Object (fields below) |                                                                                            |
+| `workflows.list`                     | Yes      | Object (fields below) |                                                                                            |
+| `workflows.models`                   | Yes      | Object (fields below) |                                                                                            |
+| `workflows.models.image.quote`       | Yes      | Object (fields below) |                                                                                            |
+| `workflows.models.image.resolve`     | Yes      | Object (fields below) |                                                                                            |
+| `workflows.models.refresh`           | Yes      | Object (fields below) |                                                                                            |
+| `workflows.models.resolve`           | Yes      | Object (fields below) |                                                                                            |
+| `workflows.planning.cancel`          | Yes      | Object (fields below) |                                                                                            |
+| `workflows.planning.history`         | Yes      | Object (fields below) |                                                                                            |
+| `workflows.planning.read`            | Yes      | Object (fields below) |                                                                                            |
+| `workflows.planning.send`            | Yes      | Object (fields below) |                                                                                            |
+| `workflows.planning.sources`         | Yes      | Object (fields below) |                                                                                            |
+| `workflows.publications.check`       | Yes      | Object (fields below) |                                                                                            |
+| `workflows.publications.list`        | Yes      | Object (fields below) |                                                                                            |
+| `workflows.publications.publish`     | Yes      | Object (fields below) |                                                                                            |
+| `workflows.publications.read`        | Yes      | Object (fields below) |                                                                                            |
+| `workflows.publications.run`         | Yes      | Object (fields below) |                                                                                            |
+| `workflows.read`                     | Yes      | Object (fields below) |                                                                                            |
+| `workflows.record`                   | Yes      | Object (fields below) |                                                                                            |
+| `workflows.records`                  | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.agent.control`       | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.agent.input`         | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.agent.read`          | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.applications.check`  | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.applications.setup`  | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.approval.decide`     | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.artifact`            | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.artifacts`           | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.attempts`            | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.cancel`              | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.events`              | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.inputs`              | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.list`                | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.loopPricing`         | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.loopSpending`        | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.output`              | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.question.answer`     | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.question.read`       | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.questions`           | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.read`                | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.start`               | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.steps`               | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.terminal.command`    | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.terminal.read`       | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.usage`               | Yes      | Object (fields below) |                                                                                            |
+| `workflows.save`                     | Yes      | Object (fields below) |                                                                                            |
+| `workflows.schedules.disable`        | Yes      | Object (fields below) |                                                                                            |
+| `workflows.schedules.enable`         | Yes      | Object (fields below) |                                                                                            |
+| `workflows.schedules.preview`        | Yes      | Object (fields below) |                                                                                            |
+| `workflows.schedules.read`           | Yes      | Object (fields below) |                                                                                            |
+| `workflows.validate`                 | Yes      | Object (fields below) |                                                                                            |
+| `workspaces.create`                  | Yes      | Object (fields below) |                                                                                            |
+| `workspaces.describe`                | Yes      | Object (fields below) |                                                                                            |
+| `workspaces.destroy`                 | Yes      | Object (fields below) |                                                                                            |
+| `workspaces.list`                    | Yes      | Object (fields below) |                                                                                            |
 
 **accounts.create**
 
@@ -2813,6 +2949,13 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ------------------------------------------------------ | ----------- |
 | `params` | Yes      | [BrowserStorageQuery](protocol.md#browserstoragequery) |             |
 | `result` | Yes      | [BrowserStoragePage](protocol.md#browserstoragepage)   |             |
+
+**reverse.browser.storage.comparison**
+
+| Field    | Required | Type                                                                       | Description |
+| -------- | -------- | -------------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [BrowserStorageComparisonQuery](protocol.md#browserstoragecomparisonquery) |             |
+| `result` | Yes      | [BrowserStorageComparisonPage](protocol.md#browserstoragecomparisonpage)   |             |
 
 **reverse.browser.structure**
 
@@ -3443,6 +3586,13 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ---------------------------------------------------------------- | ----------- |
 | `params` | Yes      | [WorkflowTerminalRequest](protocol.md#workflowterminalrequest)   |             |
 | `result` | Yes      | [WorkflowTerminalSnapshot](protocol.md#workflowterminalsnapshot) |             |
+
+**workflows.runs.usage**
+
+| Field    | Required | Type                                                           | Description |
+| -------- | -------- | -------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [WorkflowRunUsageRequest](protocol.md#workflowrunusagerequest) |             |
+| `result` | Yes      | [WorkflowRunUsageView](protocol.md#workflowrunusageview)       |             |
 
 **workflows.save**
 
@@ -4783,6 +4933,26 @@ Type: `"item"` / `"list"` / `"stream"`.
 
 Type: `"input"` / `"output"`.
 
+## PricingCalculation
+
+Versions describe existing calculations, including their rounding behavior.
+
+Type: `"report-tokens-v1"` / `"report-units-v1"` / `"wallet-tokens-v1"`.
+
+## PricingTariff
+
+Original decimal USD rates; absence retains the calculation's existing fallback semantics.
+
+| Field                   | Required | Type                                                 | Description |
+| ----------------------- | -------- | ---------------------------------------------------- | ----------- |
+| `cacheWritePerMillion`  | No       | `string`                                             |             |
+| `cachedInputPerMillion` | No       | `string`                                             |             |
+| `calculation`           | Yes      | [PricingCalculation](protocol.md#pricingcalculation) |             |
+| `inputPerMillion`       | No       | `string`                                             |             |
+| `outputPerMillion`      | No       | `string`                                             |             |
+| `perCall`               | No       | `string`                                             |             |
+| `perThousandUnits`      | No       | `string`                                             |             |
+
 ## ProcessInput
 
 Keystrokes are bounded and addressed through the owning session.
@@ -4833,6 +5003,16 @@ Reasoning configuration for a request.
 | `indexed-db`      | Yes      | [BrowserStorageCoverage](protocol.md#browserstoragecoverage) |             |
 | `local-storage`   | Yes      | [BrowserStorageCoverage](protocol.md#browserstoragecoverage) |             |
 | `session-storage` | Yes      | [BrowserStorageCoverage](protocol.md#browserstoragecoverage) |             |
+
+## RecordBrowserStorageGroupBrowserStorageGroupComparison
+
+| Field             | Required | Type                                                                       | Description |
+| ----------------- | -------- | -------------------------------------------------------------------------- | ----------- |
+| `cache-storage`   | Yes      | [BrowserStorageGroupComparison](protocol.md#browserstoragegroupcomparison) |             |
+| `cookies`         | Yes      | [BrowserStorageGroupComparison](protocol.md#browserstoragegroupcomparison) |             |
+| `indexed-db`      | Yes      | [BrowserStorageGroupComparison](protocol.md#browserstoragegroupcomparison) |             |
+| `local-storage`   | Yes      | [BrowserStorageGroupComparison](protocol.md#browserstoragegroupcomparison) |             |
+| `session-storage` | Yes      | [BrowserStorageGroupComparison](protocol.md#browserstoragegroupcomparison) |             |
 
 ## RecordstringScope
 
@@ -5426,32 +5606,33 @@ An evidence-linked follow-up requested by a specialist and executed by the runti
 
 Bounded, capability-free projection carried by live tool events and the final receipt.
 
-| Field               | Required | Type                                                                                   | Description                                                                                     |
-| ------------------- | -------- | -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `application`       | No       | [ReverseApplicationSnapshot](protocol.md#reverseapplicationsnapshot)                   | Bounded projection for live Chat events; complete indexes are paged by the native query tool.   |
-| `archive`           | No       | [ReverseArchiveRef](protocol.md#reversearchiveref)                                     | A session-owned archive, without query tokens or analyzer handles.                              |
-| `browser`           | No       | [ReverseBrowserSnapshot](protocol.md#reversebrowsersnapshot)                           | A live run carries capture metadata and an event count, never all event rows.                   |
-| `browserComparison` | No       | [BrowserScreenshotComparisonSnapshot](protocol.md#browserscreenshotcomparisonsnapshot) | Body-free progress also identifies the archived comparison report.                              |
-| `browserInput`      | No       | [BrowserAnalysisInput](protocol.md#browseranalysisinput)                               | Body-free provenance links a derived shared analysis to the exact original browser capture.     |
-| `browserScreenshot` | No       | [BrowserScreenshotSnapshot](protocol.md#browserscreenshotsnapshot)                     | Progress retains an owner-bound archive identity without any image data.                        |
-| `browserSources`    | No       | [BrowserSourcesSnapshot](protocol.md#browsersourcessnapshot)                           | A native source capture references one immutable owner-scoped archive.                          |
-| `browserStorage`    | No       | [BrowserStorageSnapshot](protocol.md#browserstoragesnapshot)                           | Progress identifies a saved redacted capture without embedding its rows.                        |
-| `browserStructure`  | No       | [BrowserStructureSnapshot](protocol.md#browserstructuresnapshot)                       | A progress receipt references structure without carrying complete trees.                        |
-| `cleanupErrors`     | Yes      | Array of `string`                                                                      |                                                                                                 |
-| `evidence`          | Yes      | Array of [ReverseEvidenceRecord](protocol.md#reverseevidencerecord)                    |                                                                                                 |
-| `evidenceCount`     | Yes      | `number`                                                                               |                                                                                                 |
-| `execution`         | No       | `number`                                                                               | Explicit resumed execution epoch; absent means the original execution.                          |
-| `id`                | Yes      | `string`                                                                               |                                                                                                 |
-| `inputName`         | Yes      | `string`                                                                               |                                                                                                 |
-| `kind`              | No       | `"browser"` / `"javascript"` / `"native"` / `"network"` / `"source"`                   | The runtime selects a target adapter; callers may make the choice explicit for ambiguous files. |
-| `network`           | No       | [ReverseNetworkSnapshot](protocol.md#reversenetworksnapshot)                           | Bounded capability-free projection; full entries and payloads require paged evidence queries.   |
-| `plan`              | No       | Array of [ReversePlanStep](protocol.md#reverseplanstep)                                |                                                                                                 |
-| `question`          | Yes      | `string`                                                                               |                                                                                                 |
-| `revision`          | Yes      | `string`                                                                               |                                                                                                 |
-| `sha256`            | Yes      | `string`                                                                               |                                                                                                 |
-| `state`             | Yes      | [ReverseState](protocol.md#reversestate)                                               |                                                                                                 |
-| `tasks`             | Yes      | Array of [ReverseTaskSnapshot](protocol.md#reversetasksnapshot)                        |                                                                                                 |
-| `version`           | Yes      | `1`                                                                                    |                                                                                                 |
+| Field                      | Required | Type                                                                                   | Description                                                                                     |
+| -------------------------- | -------- | -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `application`              | No       | [ReverseApplicationSnapshot](protocol.md#reverseapplicationsnapshot)                   | Bounded projection for live Chat events; complete indexes are paged by the native query tool.   |
+| `archive`                  | No       | [ReverseArchiveRef](protocol.md#reversearchiveref)                                     | A session-owned archive, without query tokens or analyzer handles.                              |
+| `browser`                  | No       | [ReverseBrowserSnapshot](protocol.md#reversebrowsersnapshot)                           | A live run carries capture metadata and an event count, never all event rows.                   |
+| `browserComparison`        | No       | [BrowserScreenshotComparisonSnapshot](protocol.md#browserscreenshotcomparisonsnapshot) | Body-free progress also identifies the archived comparison report.                              |
+| `browserInput`             | No       | [BrowserAnalysisInput](protocol.md#browseranalysisinput)                               | Body-free provenance links a derived shared analysis to the exact original browser capture.     |
+| `browserScreenshot`        | No       | [BrowserScreenshotSnapshot](protocol.md#browserscreenshotsnapshot)                     | Progress retains an owner-bound archive identity without any image data.                        |
+| `browserSources`           | No       | [BrowserSourcesSnapshot](protocol.md#browsersourcessnapshot)                           | A native source capture references one immutable owner-scoped archive.                          |
+| `browserStorage`           | No       | [BrowserStorageSnapshot](protocol.md#browserstoragesnapshot)                           | Progress identifies a saved redacted capture without embedding its rows.                        |
+| `browserStorageComparison` | No       | [BrowserStorageComparisonSnapshot](protocol.md#browserstoragecomparisonsnapshot)       | Archived progress binds the report itself independently of its two source captures.             |
+| `browserStructure`         | No       | [BrowserStructureSnapshot](protocol.md#browserstructuresnapshot)                       | A progress receipt references structure without carrying complete trees.                        |
+| `cleanupErrors`            | Yes      | Array of `string`                                                                      |                                                                                                 |
+| `evidence`                 | Yes      | Array of [ReverseEvidenceRecord](protocol.md#reverseevidencerecord)                    |                                                                                                 |
+| `evidenceCount`            | Yes      | `number`                                                                               |                                                                                                 |
+| `execution`                | No       | `number`                                                                               | Explicit resumed execution epoch; absent means the original execution.                          |
+| `id`                       | Yes      | `string`                                                                               |                                                                                                 |
+| `inputName`                | Yes      | `string`                                                                               |                                                                                                 |
+| `kind`                     | No       | `"browser"` / `"javascript"` / `"native"` / `"network"` / `"source"`                   | The runtime selects a target adapter; callers may make the choice explicit for ambiguous files. |
+| `network`                  | No       | [ReverseNetworkSnapshot](protocol.md#reversenetworksnapshot)                           | Bounded capability-free projection; full entries and payloads require paged evidence queries.   |
+| `plan`                     | No       | Array of [ReversePlanStep](protocol.md#reverseplanstep)                                |                                                                                                 |
+| `question`                 | Yes      | `string`                                                                               |                                                                                                 |
+| `revision`                 | Yes      | `string`                                                                               |                                                                                                 |
+| `sha256`                   | Yes      | `string`                                                                               |                                                                                                 |
+| `state`                    | Yes      | [ReverseState](protocol.md#reversestate)                                               |                                                                                                 |
+| `tasks`                    | Yes      | Array of [ReverseTaskSnapshot](protocol.md#reversetasksnapshot)                        |                                                                                                 |
+| `version`                  | Yes      | `1`                                                                                    |                                                                                                 |
 
 ## ReverseState
 
@@ -7200,6 +7381,28 @@ Owner-authorized policy preview; never saves a draft or performs inference.
 | `provider`        | Yes      | `string`                                               |             |
 | `workflowId`      | Yes      | `string`                                               |             |
 
+## WorkflowModelUsage
+
+Actual executed identity and original tariff, never current catalog prices.
+
+| Field              | Required | Type                                                           | Description |
+| ------------------ | -------- | -------------------------------------------------------------- | ----------- |
+| `basis`            | Yes      | [WorkflowSpendingBasis](protocol.md#workflowspendingbasis)     |             |
+| `entries`          | Yes      | `string`                                                       |             |
+| `expiresAtMs`      | Yes      | `string`                                                       |             |
+| `id`               | Yes      | `string`                                                       |             |
+| `kind`             | Yes      | [ChargeKind](protocol.md#chargekind)                           |             |
+| `lastReportedAtMs` | Yes      | `string`                                                       |             |
+| `microcents`       | Yes      | `string`                                                       |             |
+| `model`            | Yes      | `null,string`                                                  |             |
+| `provider`         | Yes      | `null,string`                                                  |             |
+| `tariff`           | Yes      | [PricingTariff](protocol.md#pricingtariff) / `null`            |             |
+| `unitEntries`      | Yes      | `string`                                                       |             |
+| `unitLabel`        | Yes      | `null,string`                                                  |             |
+| `units`            | Yes      | `null,string`                                                  |             |
+| `usage`            | Yes      | [WorkflowUsageDimensions](protocol.md#workflowusagedimensions) |             |
+| `usageEntries`     | Yes      | [WorkflowUsageDimensions](protocol.md#workflowusagedimensions) |             |
+
 ## WorkflowModelsPage
 
 Registered providers and a bounded page from the selected provider's maintained catalog.
@@ -7649,6 +7852,37 @@ Reads bounded step metadata after an exclusive node ID.
 | `workflowId`       | Yes      | `string`                                                                 |                                                                          |
 | `workflowRevision` | Yes      | `string`                                                                 |                                                                          |
 
+## WorkflowRunUsageRequest
+
+Only the owned run and a bounded page may be selected by a client.
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `offset` | Yes      | `string` |             |
+| `runId`  | Yes      | `string` |             |
+
+## WorkflowRunUsageView
+
+Mock executions cannot supply live metering evidence.
+
+| Field                | Required | Type                                                                  | Description |
+| -------------------- | -------- | --------------------------------------------------------------------- | ----------- |
+| `entries`            | Yes      | `string`                                                              |             |
+| `expiresAtMs`        | Yes      | `null,string`                                                         |             |
+| `lastReportedAtMs`   | Yes      | `null,string`                                                         |             |
+| `modelCount`         | Yes      | `string`                                                              |             |
+| `models`             | Yes      | Array of [WorkflowModelUsage](protocol.md#workflowmodelusage)         |             |
+| `next`               | Yes      | `null,string`                                                         |             |
+| `observedAtMs`       | Yes      | `string`                                                              |             |
+| `offset`             | Yes      | `string`                                                              |             |
+| `pricing`            | Yes      | Array of [WorkflowSpendingBucket](protocol.md#workflowspendingbucket) |             |
+| `reportedMicrocents` | Yes      | `null,string`                                                         |             |
+| `retainedFromMs`     | Yes      | `null,string`                                                         |             |
+| `revision`           | Yes      | `string`                                                              |             |
+| `runId`              | Yes      | `string`                                                              |             |
+| `simulated`          | Yes      | `boolean`                                                             |             |
+| `workflowId`         | Yes      | `string`                                                              |             |
+
 ## WorkflowSaveRequest
 
 Command identity and expected revision serve different purposes.
@@ -7901,6 +8135,17 @@ Small management projection; contains no graph, prompts, or run histories.
 | `sessionId`       | Yes      | `string`                                               |             |
 | `setup`           | Yes      | `boolean`                                              |             |
 | `status`          | Yes      | [TerminalStatus](protocol.md#terminalstatus)           |             |
+
+## WorkflowUsageDimensions
+
+Exact counters; missing dimensions were not reported.
+
+| Field               | Required | Type     | Description |
+| ------------------- | -------- | -------- | ----------- |
+| `cachedInputTokens` | No       | `string` |             |
+| `inputTokens`       | No       | `string` |             |
+| `outputTokens`      | No       | `string` |             |
+| `reasoningTokens`   | No       | `string` |             |
 
 ## WorkflowValidateRequest
 
