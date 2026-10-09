@@ -104,6 +104,8 @@ export class AgentComponents {
             })),
             execution: {
                 ...Ports.execution(ComponentEffect.Inference, ['agent.execute']),
+                // The owner-selected run deadline bounds agents, up to the API's one-day maximum.
+                timeoutMs: '86400000',
                 streaming: true,
             },
             resourceRole: null,
