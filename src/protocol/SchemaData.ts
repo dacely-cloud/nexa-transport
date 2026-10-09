@@ -12306,6 +12306,14 @@ export const schema: Schema = {
                 status: {
                     type: 'string',
                 },
+                efforts: {
+                    description:
+                        'Available effort overrides for this model; absent means metadata is unavailable.',
+                    items: {
+                        $ref: '#/definitions/WorkflowModelEffort',
+                    },
+                    type: 'array',
+                },
             },
             required: [
                 'compatible',
@@ -12322,6 +12330,12 @@ export const schema: Schema = {
                 'status',
             ],
             type: 'object',
+        },
+        WorkflowModelEffort: {
+            description:
+                'Saved reasoning levels shared by workflows and provider requests; null uses the service default.\nOne explicit effort level, independent of model-selection policy.',
+            enum: ['high', 'low', 'max', 'medium', 'minimal', 'off', 'xhigh'],
+            type: 'string',
         },
         WorkflowModelFeature: {
             description: 'Features that integrations can explicitly verify for model selection.',
