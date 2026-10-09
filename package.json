@@ -234,6 +234,18 @@
         "./workflow-publication-codec": {
             "types": "./dist/workflows/PublicationCodec.d.ts",
             "import": "./dist/workflow-publication-codec.js"
+        },
+        "./workflow-schedule-types": {
+            "types": "./dist/workflows/schedule/ScheduleTypes.d.ts",
+            "import": "./dist/workflow-schedule-types.js"
+        },
+        "./workflow-schedule-codec": {
+            "types": "./dist/workflows/schedule/ScheduleCodec.d.ts",
+            "import": "./dist/workflow-schedule-codec.js"
+        },
+        "./workflow-schedule-times": {
+            "types": "./dist/workflows/schedule/ScheduleTiming.d.ts",
+            "import": "./dist/workflow-schedule-times.js"
         }
     },
     "scripts": {

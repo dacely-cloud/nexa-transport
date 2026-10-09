@@ -5,6 +5,9 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 
 /** Server-only build script. Nexa is the canonical owner of portable workflow contracts. */
 const files: readonly string[] = [
+    'schedule/ScheduleTypes',
+    'schedule/ScheduleCodec',
+    'schedule/ScheduleTiming',
     'PublicationTypes',
     'PublicationCodec',
     'planning/PlanningTypes',
@@ -77,6 +80,7 @@ const files: readonly string[] = [
 const destination: URL = new URL('../src/workflows/', import.meta.url);
 await mkdir(destination, { recursive: true });
 await mkdir(new URL('runtime/', destination), { recursive: true });
+await mkdir(new URL('schedule/', destination), { recursive: true });
 await mkdir(new URL('planning/', destination), { recursive: true });
 await mkdir(new URL('terminal/', destination), { recursive: true });
 for (const file of files) {

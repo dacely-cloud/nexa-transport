@@ -3481,6 +3481,38 @@ export interface GatewayMethodsworkflows_saveShape {
     readonly result: WorkflowReceipt;
 }
 
+/** GatewayMethodsworkflows_schedules_disable wire fields. */
+export interface GatewayMethodsworkflows_schedules_disableShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkflowScheduleCommand;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WorkflowScheduleView;
+}
+
+/** GatewayMethodsworkflows_schedules_enable wire fields. */
+export interface GatewayMethodsworkflows_schedules_enableShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkflowScheduleEnable;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WorkflowScheduleView;
+}
+
+/** GatewayMethodsworkflows_schedules_preview wire fields. */
+export interface GatewayMethodsworkflows_schedules_previewShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkflowSchedulePreview;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ReadonlyArray<string>;
+}
+
+/** GatewayMethodsworkflows_schedules_read wire fields. */
+export interface GatewayMethodsworkflows_schedules_readShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkflowScheduleRead;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WorkflowScheduleView | null;
+}
+
 /** GatewayMethodsworkflows_validate wire fields. */
 export interface GatewayMethodsworkflows_validateShape {
     /** params as defined by the Nexa gateway. */
@@ -3803,6 +3835,14 @@ export interface GatewayMethodsShape {
     readonly 'workflows.runs.terminal.read': GatewayMethodsworkflows_runs_terminal_readShape;
     /** workflows.save as defined by the Nexa gateway. */
     readonly 'workflows.save': GatewayMethodsworkflows_saveShape;
+    /** workflows.schedules.disable as defined by the Nexa gateway. */
+    readonly 'workflows.schedules.disable': GatewayMethodsworkflows_schedules_disableShape;
+    /** workflows.schedules.enable as defined by the Nexa gateway. */
+    readonly 'workflows.schedules.enable': GatewayMethodsworkflows_schedules_enableShape;
+    /** workflows.schedules.preview as defined by the Nexa gateway. */
+    readonly 'workflows.schedules.preview': GatewayMethodsworkflows_schedules_previewShape;
+    /** workflows.schedules.read as defined by the Nexa gateway. */
+    readonly 'workflows.schedules.read': GatewayMethodsworkflows_schedules_readShape;
     /** workflows.validate as defined by the Nexa gateway. */
     readonly 'workflows.validate': GatewayMethodsworkflows_validateShape;
     /** workspaces.create as defined by the Nexa gateway. */
@@ -8811,6 +8851,21 @@ export interface WorkflowImageSettingsShape {
 /** WorkflowImageSettings from the Nexa wire protocol. */
 export type WorkflowImageSettings = WorkflowImageSettingsShape;
 
+/** WorkflowIntervalTiming wire fields. */
+export interface WorkflowIntervalTimingShape {
+    /** endAtMs as defined by the Nexa gateway. */
+    readonly endAtMs: null | string;
+    /** intervalMs as defined by the Nexa gateway. */
+    readonly intervalMs: string;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: 'interval';
+    /** startAtMs as defined by the Nexa gateway. */
+    readonly startAtMs: string;
+}
+
+/** WorkflowIntervalTiming from the Nexa wire protocol. */
+export type WorkflowIntervalTiming = WorkflowIntervalTimingShape;
+
 /** WorkflowListCursor wire fields. */
 export interface WorkflowListCursorShape {
     /** updatedAtMs as defined by the Nexa gateway. */
@@ -9106,6 +9161,17 @@ export type WorkflowNodeReference = WorkflowNodeReferenceShape;
 export interface WorkflowObject {
     readonly [key: string]: WorkflowValue;
 }
+
+/** WorkflowOnceTiming wire fields. */
+export interface WorkflowOnceTimingShape {
+    /** atMs as defined by the Nexa gateway. */
+    readonly atMs: string;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: 'once';
+}
+
+/** WorkflowOnceTiming from the Nexa wire protocol. */
+export type WorkflowOnceTiming = WorkflowOnceTimingShape;
 
 /** WorkflowPatch wire fields. */
 export interface WorkflowPatchShape {
@@ -9679,6 +9745,8 @@ export interface WorkflowRunSummaryShape {
     readonly publication?: WorkflowPublicationReference;
     /** runId as defined by the Nexa gateway. */
     readonly runId: string;
+    /** schedule as defined by the Nexa gateway. */
+    readonly schedule?: WorkflowScheduleSource;
     /** sequence as defined by the Nexa gateway. */
     readonly sequence: string;
     /** status as defined by the Nexa gateway. */
@@ -9708,6 +9776,161 @@ export interface WorkflowSaveRequestShape {
 
 /** WorkflowSaveRequest from the Nexa wire protocol. */
 export type WorkflowSaveRequest = WorkflowSaveRequestShape;
+
+/** WorkflowScheduleCommand wire fields. */
+export interface WorkflowScheduleCommandShape {
+    /** commandId as defined by the Nexa gateway. */
+    readonly commandId: string;
+    /** expectedRevision as defined by the Nexa gateway. */
+    readonly expectedRevision: string;
+    /** workflowId as defined by the Nexa gateway. */
+    readonly workflowId: string;
+}
+
+/** WorkflowScheduleCommand from the Nexa wire protocol. */
+export type WorkflowScheduleCommand = WorkflowScheduleCommandShape;
+
+/** WorkflowScheduleConfiguration wire fields. */
+export interface WorkflowScheduleConfigurationShape {
+    /** catchUpLimit as defined by the Nexa gateway. */
+    readonly catchUpLimit: number;
+    /** input as defined by the Nexa gateway. */
+    readonly input: WorkflowObject;
+    /** lateGraceMs as defined by the Nexa gateway. */
+    readonly lateGraceMs: string;
+    /** maxConcurrentRuns as defined by the Nexa gateway. */
+    readonly maxConcurrentRuns: number;
+    /** missed as defined by the Nexa gateway. */
+    readonly missed: WorkflowScheduleMissed;
+    /** publicationId as defined by the Nexa gateway. */
+    readonly publicationId: string;
+    /** timing as defined by the Nexa gateway. */
+    readonly timing: WorkflowScheduleTiming;
+}
+
+/** WorkflowScheduleConfiguration from the Nexa wire protocol. */
+export type WorkflowScheduleConfiguration = WorkflowScheduleConfigurationShape;
+
+/** WorkflowScheduleEnable wire fields. */
+export interface WorkflowScheduleEnableShape {
+    /** commandId as defined by the Nexa gateway. */
+    readonly commandId: string;
+    /** configuration as defined by the Nexa gateway. */
+    readonly configuration: WorkflowScheduleConfiguration;
+    /** expectedRevision as defined by the Nexa gateway. */
+    readonly expectedRevision: string;
+    /** workflowId as defined by the Nexa gateway. */
+    readonly workflowId: string;
+}
+
+/** WorkflowScheduleEnable from the Nexa wire protocol. */
+export type WorkflowScheduleEnable = WorkflowScheduleEnableShape;
+
+/** Allowed values for WorkflowScheduleEventoutcome. */
+export const WorkflowScheduleEventoutcomeValues = {
+    Value0: 'accepted',
+    Value1: 'blocked',
+    Value2: 'skipped',
+} as const;
+
+/** WorkflowScheduleEvent wire fields. */
+export interface WorkflowScheduleEventShape {
+    /** atMs as defined by the Nexa gateway. */
+    readonly atMs: string;
+    /** message as defined by the Nexa gateway. */
+    readonly message: null | string;
+    /** occurrenceMs as defined by the Nexa gateway. */
+    readonly occurrenceMs: string;
+    /** outcome as defined by the Nexa gateway. */
+    readonly outcome: (typeof WorkflowScheduleEventoutcomeValues)[keyof typeof WorkflowScheduleEventoutcomeValues];
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: null | string;
+}
+
+/** WorkflowScheduleEvent from the Nexa wire protocol. */
+export type WorkflowScheduleEvent = WorkflowScheduleEventShape;
+
+/** Allowed values for WorkflowScheduleMissed. */
+export const WorkflowScheduleMissedValues = {
+    Value0: 'catch-up',
+    Value1: 'latest',
+    Value2: 'skip',
+} as const;
+
+/** WorkflowScheduleMissed from the Nexa wire protocol. */
+export type WorkflowScheduleMissed =
+    (typeof WorkflowScheduleMissedValues)[keyof typeof WorkflowScheduleMissedValues];
+
+/** WorkflowSchedulePreview wire fields. */
+export interface WorkflowSchedulePreviewShape {
+    /** afterMs as defined by the Nexa gateway. */
+    readonly afterMs: string;
+    /** timing as defined by the Nexa gateway. */
+    readonly timing: WorkflowScheduleTiming;
+}
+
+/** WorkflowSchedulePreview from the Nexa wire protocol. */
+export type WorkflowSchedulePreview = WorkflowSchedulePreviewShape;
+
+/** WorkflowScheduleRead wire fields. */
+export interface WorkflowScheduleReadShape {
+    /** workflowId as defined by the Nexa gateway. */
+    readonly workflowId: string;
+}
+
+/** WorkflowScheduleRead from the Nexa wire protocol. */
+export type WorkflowScheduleRead = WorkflowScheduleReadShape;
+
+/** WorkflowScheduleSource wire fields. */
+export interface WorkflowScheduleSourceShape {
+    /** occurrenceMs as defined by the Nexa gateway. */
+    readonly occurrenceMs: string;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: string;
+}
+
+/** WorkflowScheduleSource from the Nexa wire protocol. */
+export type WorkflowScheduleSource = WorkflowScheduleSourceShape;
+
+/** Allowed values for WorkflowScheduleStatus. */
+export const WorkflowScheduleStatusValues = {
+    Value0: 'blocked',
+    Value1: 'complete',
+    Value2: 'disabled',
+    Value3: 'enabled',
+} as const;
+
+/** WorkflowScheduleStatus from the Nexa wire protocol. */
+export type WorkflowScheduleStatus =
+    (typeof WorkflowScheduleStatusValues)[keyof typeof WorkflowScheduleStatusValues];
+
+/** WorkflowScheduleTiming from the Nexa wire protocol. */
+export type WorkflowScheduleTiming = WorkflowIntervalTiming | WorkflowOnceTiming;
+
+/** WorkflowScheduleView wire fields. */
+export interface WorkflowScheduleViewShape {
+    /** configuration as defined by the Nexa gateway. */
+    readonly configuration: WorkflowScheduleConfiguration;
+    /** last as defined by the Nexa gateway. */
+    readonly last: WorkflowScheduleEvent | null;
+    /** nextAtMs as defined by the Nexa gateway. */
+    readonly nextAtMs: null | string;
+    /** pendingCount as defined by the Nexa gateway. */
+    readonly pendingCount: number;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: string;
+    /** skippedOccurrences as defined by the Nexa gateway. */
+    readonly skippedOccurrences: string;
+    /** status as defined by the Nexa gateway. */
+    readonly status: WorkflowScheduleStatus;
+    /** updatedAtMs as defined by the Nexa gateway. */
+    readonly updatedAtMs: string;
+    /** workflowId as defined by the Nexa gateway. */
+    readonly workflowId: string;
+}
+
+/** WorkflowScheduleView from the Nexa wire protocol. */
+export type WorkflowScheduleView = WorkflowScheduleViewShape;
 
 /** Allowed values for WorkflowStepStatus. */
 export const WorkflowStepStatusValues = {
@@ -10343,6 +10566,14 @@ export enum Method {
     WorkflowsRunsTerminalRead = 'workflows.runs.terminal.read',
     /** Calls workflows.save. */
     WorkflowsSave = 'workflows.save',
+    /** Calls workflows.schedules.disable. */
+    WorkflowsSchedulesDisable = 'workflows.schedules.disable',
+    /** Calls workflows.schedules.enable. */
+    WorkflowsSchedulesEnable = 'workflows.schedules.enable',
+    /** Calls workflows.schedules.preview. */
+    WorkflowsSchedulesPreview = 'workflows.schedules.preview',
+    /** Calls workflows.schedules.read. */
+    WorkflowsSchedulesRead = 'workflows.schedules.read',
     /** Calls workflows.validate. */
     WorkflowsValidate = 'workflows.validate',
     /** Calls workspaces.create. */

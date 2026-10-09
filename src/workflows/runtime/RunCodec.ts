@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { WorkflowScheduleCodec } from '../schedule/ScheduleCodec.js';
+import type { WorkflowScheduleSource } from '../schedule/ScheduleTypes.js';
 import { WorkflowPublicationCodec } from '../PublicationCodec.js';
 import type { WorkflowPublicationReference } from '../PublicationTypes.js';
 import type { WorkflowInvocationInputs } from './RunRequests.js';
@@ -40,6 +42,9 @@ export class WorkflowRunCodec {
     }
     public static snapshot(raw: unknown): WorkflowRunSnapshot {
         const value: Readonly<Record<string, unknown>> = WorkflowInput.record(raw, [
+            ...(raw !== null && typeof raw === 'object' && Object.hasOwn(raw, 'schedule')
+                ? ['schedule']
+                : []),
             ...(raw !== null && typeof raw === 'object' && Object.hasOwn(raw, 'publication')
                 ? ['publication']
                 : []),
@@ -113,8 +118,16 @@ export class WorkflowRunCodec {
         ) {
             throw new Error('Published execution requires its matching immutable publication');
         }
+        const schedule: WorkflowScheduleSource | undefined =
+            value['schedule'] === undefined
+                ? undefined
+                : WorkflowScheduleCodec.source(value['schedule']);
+        if (schedule !== undefined && mode !== WorkflowRunMode.Published) {
+            throw new Error('Scheduled execution requires a published version');
+        }
         const input: WorkflowObject = WorkflowJson.object(value['input']);
         return Object.freeze({
+            ...(schedule === undefined ? {} : { schedule }),
             ...(publication === undefined ? {} : { publication }),
             ...(value['imageModels'] === undefined
                 ? {}

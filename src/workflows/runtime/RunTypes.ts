@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { WorkflowScheduleSource } from '../schedule/ScheduleTypes.js';
 import type { WorkflowPublicationReference } from '../PublicationTypes.js';
 import type { WorkflowResolvedModel } from './RunModelTypes.js';
 import type { WorkflowResolvedImage } from './RunImageTypes.js';
@@ -54,6 +55,8 @@ export type WorkflowRunEventKind = (typeof WorkflowRunEventKind)[keyof typeof Wo
 
 /** Immutable semantic snapshot; no canvas layout, credentials, or mutable draft pointer. */
 export interface WorkflowRunSnapshot {
+    /** Present only on scheduled published runs. */
+    readonly schedule?: WorkflowScheduleSource;
     readonly publication?: WorkflowPublicationReference;
     /** Image settings and prices resolved by the host before acceptance. */
     readonly imageModels?: readonly WorkflowResolvedImage[];
@@ -113,6 +116,8 @@ export interface WorkflowRunLease {
     readonly epoch: string;
 }
 export interface WorkflowRunSummary {
+    /** Present only on scheduled published runs. */
+    readonly schedule?: WorkflowScheduleSource;
     readonly publication?: WorkflowPublicationReference;
     readonly runId: string;
     readonly workflowId: string;
