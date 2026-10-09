@@ -2914,6 +2914,14 @@ export interface GatewayMethodsworkflows_runs_eventsShape {
     readonly result: ReadonlyArray<WorkflowRunEvent>;
 }
 
+/** GatewayMethodsworkflows_runs_inputs wire fields. */
+export interface GatewayMethodsworkflows_runs_inputsShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkflowRunOutputRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WorkflowRunOutputPage | null;
+}
+
 /** GatewayMethodsworkflows_runs_list wire fields. */
 export interface GatewayMethodsworkflows_runs_listShape {
     /** params as defined by the Nexa gateway. */
@@ -3250,6 +3258,8 @@ export interface GatewayMethodsShape {
     readonly 'workflows.runs.cancel': GatewayMethodsworkflows_runs_cancelShape;
     /** workflows.runs.events as defined by the Nexa gateway. */
     readonly 'workflows.runs.events': GatewayMethodsworkflows_runs_eventsShape;
+    /** workflows.runs.inputs as defined by the Nexa gateway. */
+    readonly 'workflows.runs.inputs': GatewayMethodsworkflows_runs_inputsShape;
     /** workflows.runs.list as defined by the Nexa gateway. */
     readonly 'workflows.runs.list': GatewayMethodsworkflows_runs_listShape;
     /** workflows.runs.output as defined by the Nexa gateway. */
@@ -4614,16 +4624,23 @@ export type NetworkBody = NetworkBodyShape;
 /** Allowed values for NetworkDetailView. */
 export const NetworkDetailViewValues = {
     Value0: 'query',
-    Value1: 'request-body',
-    Value2: 'request-headers',
-    Value3: 'response-body',
-    Value4: 'response-headers',
-    Value5: 'timings',
+    Value1: 'reported',
+    Value2: 'request-body',
+    Value3: 'request-headers',
+    Value4: 'response-body',
+    Value5: 'response-headers',
+    Value6: 'timings',
 } as const;
 
 /** NetworkDetailView from the Nexa wire protocol. */
 export type NetworkDetailView =
     (typeof NetworkDetailViewValues)[keyof typeof NetworkDetailViewValues];
+
+/** Allowed values for NetworkFormat. */
+export const NetworkFormatValues = { Value0: 'har', Value1: 'mitmproxy' } as const;
+
+/** NetworkFormat from the Nexa wire protocol. */
+export type NetworkFormat = (typeof NetworkFormatValues)[keyof typeof NetworkFormatValues];
 
 /** NetworkIssue wire fields. */
 export interface NetworkIssueShape {
@@ -4636,28 +4653,49 @@ export interface NetworkIssueShape {
 /** NetworkIssue from the Nexa wire protocol. */
 export type NetworkIssue = NetworkIssueShape;
 
+/** NetworkNativeSource wire fields. */
+export interface NetworkNativeSourceShape {
+    /** end as defined by the Nexa gateway. */
+    readonly end: string;
+    /** flowId as defined by the Nexa gateway. */
+    readonly flowId: null | string;
+    /** flowType as defined by the Nexa gateway. */
+    readonly flowType: null | string;
+    /** ordinal as defined by the Nexa gateway. */
+    readonly ordinal: string;
+    /** start as defined by the Nexa gateway. */
+    readonly start: string;
+    /** stateVersion as defined by the Nexa gateway. */
+    readonly stateVersion: null | string;
+}
+
+/** NetworkNativeSource from the Nexa wire protocol. */
+export type NetworkNativeSource = NetworkNativeSourceShape;
+
 /** NetworkRequest wire fields. */
 export interface NetworkRequestShape {
     /** durationMs as defined by the Nexa gateway. */
-    readonly durationMs: number;
+    readonly durationMs: null | number;
     /** id as defined by the Nexa gateway. */
     readonly id: string;
     /** location as defined by the Nexa gateway. */
     readonly location: string;
     /** method as defined by the Nexa gateway. */
-    readonly method: string;
+    readonly method: null | string;
     /** mimeType as defined by the Nexa gateway. */
     readonly mimeType: string;
+    /** native as defined by the Nexa gateway. */
+    readonly native?: NetworkNativeSource;
     /** requestBody as defined by the Nexa gateway. */
     readonly requestBody: NetworkBody;
     /** responseBody as defined by the Nexa gateway. */
     readonly responseBody: NetworkBody;
     /** startedDateTime as defined by the Nexa gateway. */
-    readonly startedDateTime: string;
+    readonly startedDateTime: null | string;
     /** status as defined by the Nexa gateway. */
-    readonly status: number;
+    readonly status: null | number;
     /** url as defined by the Nexa gateway. */
-    readonly url: string;
+    readonly url: null | string;
     /** urlTruncated as defined by the Nexa gateway. */
     readonly urlTruncated: boolean;
 }
@@ -5850,15 +5888,17 @@ export type ReverseNetworkDirectoryQuery = ReverseNetworkDirectoryQueryShape;
 /** ReverseNetworkDirectoryRow wire fields. */
 export interface ReverseNetworkDirectoryRowShape {
     /** durationMs as defined by the Nexa gateway. */
-    readonly durationMs: number;
+    readonly durationMs: null | number;
     /** id as defined by the Nexa gateway. */
     readonly id: string;
     /** location as defined by the Nexa gateway. */
     readonly location: string;
     /** method as defined by the Nexa gateway. */
-    readonly method: string;
+    readonly method: null | string;
     /** mimeType as defined by the Nexa gateway. */
     readonly mimeType: string;
+    /** native as defined by the Nexa gateway. */
+    readonly native?: NetworkNativeSource;
     /** requestBody as defined by the Nexa gateway. */
     readonly requestBody: NetworkBody;
     /** requestEvidenceId as defined by the Nexa gateway. */
@@ -5868,11 +5908,11 @@ export interface ReverseNetworkDirectoryRowShape {
     /** responseEvidenceId as defined by the Nexa gateway. */
     readonly responseEvidenceId: null | string;
     /** startedDateTime as defined by the Nexa gateway. */
-    readonly startedDateTime: string;
+    readonly startedDateTime: null | string;
     /** status as defined by the Nexa gateway. */
-    readonly status: number;
+    readonly status: null | number;
     /** url as defined by the Nexa gateway. */
-    readonly url: string;
+    readonly url: null | string;
     /** urlTruncated as defined by the Nexa gateway. */
     readonly urlTruncated: boolean;
 }
@@ -5885,7 +5925,7 @@ export interface ReverseNetworkSnapshotShape {
     /** entryCount as defined by the Nexa gateway. */
     readonly entryCount: number;
     /** format as defined by the Nexa gateway. */
-    readonly format: 'har';
+    readonly format: NetworkFormat;
     /** issueCount as defined by the Nexa gateway. */
     readonly issueCount: number;
     /** issues as defined by the Nexa gateway. */
@@ -8995,6 +9035,8 @@ export enum Method {
     WorkflowsRunsCancel = 'workflows.runs.cancel',
     /** Calls workflows.runs.events. */
     WorkflowsRunsEvents = 'workflows.runs.events',
+    /** Calls workflows.runs.inputs. */
+    WorkflowsRunsInputs = 'workflows.runs.inputs',
     /** Calls workflows.runs.list. */
     WorkflowsRunsList = 'workflows.runs.list',
     /** Calls workflows.runs.output. */
