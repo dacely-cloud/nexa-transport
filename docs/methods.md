@@ -58,6 +58,7 @@ All 54 protocol methods. `connect` is managed by `NexaClient.connect`; the remai
 - [reverse.graph](#reverse-graph)
 - [reverse.inspect](#reverse-inspect)
 - [reverse.network](#reverse-network)
+- [reverse.network.detail](#reverse-network-detail)
 - [roblox.credentials.remove](#roblox-credentials-remove)
 - [roblox.credentials.set](#roblox-credentials-set)
 - [roblox.credentials.status](#roblox-credentials-status)
@@ -1370,6 +1371,35 @@ Parameters: [ReverseNetworkDirectoryQuery](protocol.md#reversenetworkdirectoryqu
 | `status` | No       | `number` |             |
 
 Result: [ReverseNetworkDirectoryPage](protocol.md#reversenetworkdirectorypage).
+
+## reverse.network.detail
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ReverseNetworkDetail> = {
+    id: 'YOUR_ID',
+    runId: 'YOUR_RUNID',
+    selector: 'YOUR_SELECTOR',
+    view: 'query',
+};
+const result: ResultOf<typeof Method.ReverseNetworkDetail> = await client.call(
+    Method.ReverseNetworkDetail,
+    params,
+);
+```
+
+Parameters: [ReverseNetworkDetailQuery](protocol.md#reversenetworkdetailquery).
+
+| Field      | Required | Type                                               | Description |
+| ---------- | -------- | -------------------------------------------------- | ----------- |
+| `cursor`   | No       | `string`                                           |             |
+| `id`       | Yes      | `string`                                           |             |
+| `runId`    | Yes      | `string`                                           |             |
+| `selector` | Yes      | `string`                                           |             |
+| `view`     | Yes      | [NetworkDetailView](protocol.md#networkdetailview) |             |
+
+Result: [ReverseNetworkDetailPage](protocol.md#reversenetworkdetailpage).
 
 ## roblox.credentials.remove
 

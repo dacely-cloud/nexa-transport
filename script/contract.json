@@ -3550,6 +3550,18 @@
                     "required": ["params", "result"],
                     "type": "object"
                 },
+                "reverse.network.detail": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/ReverseNetworkDetailQuery"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/ReverseNetworkDetailPage"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
                 "roblox.credentials.remove": {
                     "properties": {
                         "params": {
@@ -4506,6 +4518,7 @@
                 "reverse.graph",
                 "reverse.inspect",
                 "reverse.network",
+                "reverse.network.detail",
                 "roblox.credentials.remove",
                 "roblox.credentials.set",
                 "roblox.credentials.status",
@@ -6631,6 +6644,18 @@
             ],
             "type": "object"
         },
+        "NetworkDetailView": {
+            "description": "Request detail views share stable source pointers and independently paged text.\nOne saved request representation.",
+            "enum": [
+                "query",
+                "request-body",
+                "request-headers",
+                "response-body",
+                "response-headers",
+                "timings"
+            ],
+            "type": "string"
+        },
         "NetworkIssue": {
             "description": "Explicit missing or rejected capture coverage.",
             "properties": {
@@ -8305,6 +8330,91 @@
             "description": "Read-only browser operations supported by an existing native analyzer lease.\nOne bounded native inspection operation.",
             "enum": ["decompile", "disassemble", "graph", "xrefs"],
             "type": "string"
+        },
+        "ReverseNetworkDetailPage": {
+            "description": "A complete saved projection digest, independent of the original body and source HAR digests.",
+            "properties": {
+                "body": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/NetworkBody"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "captureSha256": {
+                    "type": "string"
+                },
+                "characters": {
+                    "type": "string"
+                },
+                "cursor": {
+                    "type": "string"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "nextCursor": {
+                    "type": ["null", "string"]
+                },
+                "runId": {
+                    "type": "string"
+                },
+                "selector": {
+                    "type": "string"
+                },
+                "sha256": {
+                    "type": "string"
+                },
+                "text": {
+                    "type": "string"
+                },
+                "unavailable": {
+                    "type": ["null", "string"]
+                },
+                "view": {
+                    "$ref": "#/definitions/NetworkDetailView"
+                }
+            },
+            "required": [
+                "body",
+                "captureSha256",
+                "characters",
+                "cursor",
+                "location",
+                "nextCursor",
+                "runId",
+                "selector",
+                "sha256",
+                "text",
+                "unavailable",
+                "view"
+            ],
+            "type": "object"
+        },
+        "ReverseNetworkDetailQuery": {
+            "description": "Selects only archive-owned entries; no path, capability or executable request crosses RPC.",
+            "properties": {
+                "cursor": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "runId": {
+                    "type": "string"
+                },
+                "selector": {
+                    "type": "string"
+                },
+                "view": {
+                    "$ref": "#/definitions/NetworkDetailView"
+                }
+            },
+            "required": ["id", "runId", "selector", "view"],
+            "type": "object"
         },
         "ReverseNetworkDirectoryPage": {
             "description": "Source-ordered metadata pages hold at most twenty rows and 12,000 serialized characters.",
@@ -12717,6 +12827,9 @@
         "reverseInspection": {
             "$ref": "#/definitions/ReverseInspectResult"
         },
+        "reverseNetworkDetail": {
+            "$ref": "#/definitions/ReverseNetworkDetailPage"
+        },
         "reverseNetworkDirectory": {
             "$ref": "#/definitions/ReverseNetworkDirectoryPage"
         },
@@ -12756,6 +12869,7 @@
         "reverseFunctions",
         "reverseGraph",
         "reverseInspection",
+        "reverseNetworkDetail",
         "reverseNetworkDirectory",
         "reverseSnapshot",
         "sessionHistory",

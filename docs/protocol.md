@@ -1199,6 +1199,7 @@ Configurable bounds on gateway-owned work and memory.
 | `reverse.graph`                     | Yes      | Object (fields below) |                                                                                            |
 | `reverse.inspect`                   | Yes      | Object (fields below) |                                                                                            |
 | `reverse.network`                   | Yes      | Object (fields below) |                                                                                            |
+| `reverse.network.detail`            | Yes      | Object (fields below) |                                                                                            |
 | `roblox.credentials.remove`         | Yes      | Object (fields below) |                                                                                            |
 | `roblox.credentials.set`            | Yes      | Object (fields below) |                                                                                            |
 | `roblox.credentials.status`         | Yes      | Object (fields below) |                                                                                            |
@@ -1735,6 +1736,13 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ------------------------------------------------------------------------ | ----------- |
 | `params` | Yes      | [ReverseNetworkDirectoryQuery](protocol.md#reversenetworkdirectoryquery) |             |
 | `result` | Yes      | [ReverseNetworkDirectoryPage](protocol.md#reversenetworkdirectorypage)   |             |
+
+**reverse.network.detail**
+
+| Field    | Required | Type                                                               | Description |
+| -------- | -------- | ------------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [ReverseNetworkDetailQuery](protocol.md#reversenetworkdetailquery) |             |
+| `result` | Yes      | [ReverseNetworkDetailPage](protocol.md#reversenetworkdetailpage)   |             |
 
 **roblox.credentials.remove**
 
@@ -3155,6 +3163,12 @@ Metadata for an observed payload, independently of whether its text is available
 | `redacted`   | Yes      | `boolean`     |             |
 | `sha256`     | Yes      | `null,string` |             |
 
+## NetworkDetailView
+
+Request detail views share stable source pointers and independently paged text.
+
+Type: `"query"` / `"request-body"` / `"request-headers"` / `"response-body"` / `"response-headers"` / `"timings"`.
+
 ## NetworkIssue
 
 Explicit missing or rejected capture coverage.
@@ -3910,6 +3924,37 @@ Inspection captures immutable evidence; its text is read separately through the 
 Read-only browser operations supported by an existing native analyzer lease.
 
 Type: `"decompile"` / `"disassemble"` / `"graph"` / `"xrefs"`.
+
+## ReverseNetworkDetailPage
+
+A complete saved projection digest, independent of the original body and source HAR digests.
+
+| Field           | Required | Type                                               | Description |
+| --------------- | -------- | -------------------------------------------------- | ----------- |
+| `body`          | Yes      | [NetworkBody](protocol.md#networkbody) / `null`    |             |
+| `captureSha256` | Yes      | `string`                                           |             |
+| `characters`    | Yes      | `string`                                           |             |
+| `cursor`        | Yes      | `string`                                           |             |
+| `location`      | Yes      | `string`                                           |             |
+| `nextCursor`    | Yes      | `null,string`                                      |             |
+| `runId`         | Yes      | `string`                                           |             |
+| `selector`      | Yes      | `string`                                           |             |
+| `sha256`        | Yes      | `string`                                           |             |
+| `text`          | Yes      | `string`                                           |             |
+| `unavailable`   | Yes      | `null,string`                                      |             |
+| `view`          | Yes      | [NetworkDetailView](protocol.md#networkdetailview) |             |
+
+## ReverseNetworkDetailQuery
+
+Selects only archive-owned entries; no path, capability or executable request crosses RPC.
+
+| Field      | Required | Type                                               | Description |
+| ---------- | -------- | -------------------------------------------------- | ----------- |
+| `cursor`   | No       | `string`                                           |             |
+| `id`       | Yes      | `string`                                           |             |
+| `runId`    | Yes      | `string`                                           |             |
+| `selector` | Yes      | `string`                                           |             |
+| `view`     | Yes      | [NetworkDetailView](protocol.md#networkdetailview) |             |
 
 ## ReverseNetworkDirectoryPage
 

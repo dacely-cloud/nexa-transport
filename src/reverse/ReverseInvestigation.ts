@@ -8,10 +8,12 @@ import type {
     ReverseFunctionsPage,
     ReverseInspectResult,
     ReverseNetworkDirectoryPage,
+    ReverseNetworkDetailPage,
 } from '../protocol/Protocol.js';
 import { reverseSnapshot } from '../protocol/Validators.js';
 import { GraphReceipt } from './GraphReceipt.js';
 import { ApplicationReceipt } from './ApplicationReceipt.js';
+import { NetworkDetailReceipt } from './NetworkDetailReceipt.js';
 import { NetworkDirectoryReceipt } from './NetworkDirectoryReceipt.js';
 import { NetworkReceipt } from './NetworkReceipt.js';
 import { ArchiveReceipt } from './ArchiveReceipt.js';
@@ -25,6 +27,10 @@ export type {
 
 /** Portable investigation receipt decoding and monotonic replay for multi-agent consumers. */
 export class ReverseInvestigation {
+    /** Validates one immutable request representation without loading other fields or bodies. */
+    public static networkDetail(input: unknown): ReverseNetworkDetailPage {
+        return NetworkDetailReceipt.read(input);
+    }
     /** Validates source-ordered redacted network metadata without materializing payloads. */
     public static network(input: unknown): ReverseNetworkDirectoryPage {
         return NetworkDirectoryReceipt.read(input);

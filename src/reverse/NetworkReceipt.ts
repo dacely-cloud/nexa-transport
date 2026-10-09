@@ -82,10 +82,11 @@ export class NetworkReceipt {
         ) {
             throw new RangeError('Invalid HAR request provenance');
         }
-        this.#body(request.requestBody);
-        this.#body(request.responseBody);
+        this.body(request.requestBody);
+        this.body(request.responseBody);
     }
-    static #body(body: NetworkBody): void {
+    /** Validates payload observation metadata without requiring its text in progress events. */
+    public static body(body: NetworkBody): void {
         if (
             Object.keys(body).some(
                 (key: string): boolean =>
