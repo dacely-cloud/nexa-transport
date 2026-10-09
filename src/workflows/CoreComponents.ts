@@ -11,6 +11,7 @@ import {
     type ComponentDisplay,
 } from './ComponentTypes.js';
 import { ComponentFactory as Ports } from './ComponentFactory.js';
+import { WorkflowOutputView } from './runtime/RunTypes.js';
 import { Schemas } from './Schemas.js';
 import type { WorkflowObject } from './WorkflowTypes.js';
 import type { ObjectSchema } from './SchemaTypes.js';
@@ -153,10 +154,15 @@ export class CoreComponents {
                 'Return a study guide or generated report.',
                 ['output', 'result', 'return'],
                 'output',
-                ['name'],
+                ['name', 'view'],
             ),
             configuration: Schemas.object([
                 Schemas.field('name', { ...Schemas.text, minLength: 1, maxLength: 160 }),
+                Schemas.field(
+                    'view',
+                    { ...Schemas.text, choices: Object.values(WorkflowOutputView) },
+                    false,
+                ),
                 Schemas.field('value', Schemas.json, false),
             ]),
             defaults: { name: 'Result' },

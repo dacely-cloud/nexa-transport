@@ -66,7 +66,16 @@ export interface WorkflowExecutionPlan {
     readonly snapshot: WorkflowRunSnapshot;
     readonly steps: readonly WorkflowPlanStep[];
 }
+/** Optional presentation is captured with the result, independently of later draft edits. */
+export const WorkflowOutputView = {
+    Automatic: 'auto',
+    Text: 'text',
+    Table: 'table',
+    Data: 'data',
+} as const;
+export type WorkflowOutputView = (typeof WorkflowOutputView)[keyof typeof WorkflowOutputView];
 export interface WorkflowNamedResult {
+    readonly view?: WorkflowOutputView;
     readonly name: string;
     readonly value: WorkflowValue;
 }

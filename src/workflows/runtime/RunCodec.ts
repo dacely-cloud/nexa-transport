@@ -16,6 +16,7 @@ import type {
 } from '../WorkflowTypes.js';
 import {
     WorkflowRunMode,
+    WorkflowOutputView,
     type WorkflowRunSnapshot,
     type WorkflowStepResult,
     type WorkflowNamedResult,
@@ -115,6 +116,18 @@ export class WorkflowRunCodec {
             timeoutMs,
         });
     }
+    /** Validates author-selected presentation without enabling arbitrary renderers or markup. */
+    public static outputView(raw: unknown): WorkflowOutputView {
+        switch (raw) {
+            case WorkflowOutputView.Automatic:
+            case WorkflowOutputView.Text:
+            case WorkflowOutputView.Table:
+            case WorkflowOutputView.Data:
+                return raw;
+            default:
+                throw new Error('Unsupported workflow output view');
+        }
+    }
     public static result(raw: unknown): WorkflowStepResult {
         const value: Readonly<Record<string, unknown>> = WorkflowInput.record(raw, [
             'outputs',
@@ -129,7 +142,13 @@ export class WorkflowRunCodec {
         WorkflowInput.unique(routes);
         let result: WorkflowNamedResult | null = null;
         if (value['result'] !== null) {
-            const named: Readonly<Record<string, unknown>> = WorkflowInput.record(value['result'], [
+            const rawNamed: unknown = value['result'];
+            const named: Readonly<Record<string, unknown>> = WorkflowInput.record(rawNamed, [
+                ...(rawNamed !== null &&
+                typeof rawNamed === 'object' &&
+                Object.hasOwn(rawNamed, 'view')
+                    ? ['view']
+                    : []),
                 'name',
                 'value',
             ]);
@@ -138,7 +157,11 @@ export class WorkflowRunCodec {
             if (output === undefined) {
                 throw new Error('Named workflow result is missing');
             }
-            result = Object.freeze({ name: WorkflowInput.text(named['name'], 160), value: output });
+            result = Object.freeze({
+                ...(named['view'] === undefined ? {} : { view: this.outputView(named['view']) }),
+                name: WorkflowInput.text(named['name'], 160),
+                value: output,
+            });
         }
         return Object.freeze({ outputs: WorkflowJson.object(value['outputs']), routes, result });
     }

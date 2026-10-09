@@ -46,8 +46,9 @@ export class WorkflowRunRequestCodec {
             !/^(0|[1-9][0-9]*)$/.test(revision) ||
             BigInt(revision) >= 9223372036854775807n ||
             typeof value['paused'] !== 'boolean'
-        )
+        ) {
             throw new Error('Invalid agent control');
+        }
         return {
             ...this.agent({
                 runId: value['runId'],

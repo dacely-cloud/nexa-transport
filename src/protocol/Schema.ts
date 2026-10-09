@@ -38,7 +38,9 @@ export class SchemaValidator {
         return schema !== undefined && this.#check(schema, value, 0);
     }
     #resolve(path: string): Schema | undefined {
-        if (this.#resolved.has(path)) return this.#resolved.get(path);
+        if (this.#resolved.has(path)) {
+            return this.#resolved.get(path);
+        }
         const parts: string[] = path.replace(/^.*#\//, '').split('/');
         let schema: Schema | undefined = this.#root;
         for (let i: number = 0; i < parts.length; i += 2) {
@@ -57,24 +59,32 @@ export class SchemaValidator {
                 return undefined;
             }
         }
-        if (schema !== undefined && this.#resolved.size < 4096) this.#resolved.set(path, schema);
+        if (schema !== undefined && this.#resolved.size < 4096) {
+            this.#resolved.set(path, schema);
+        }
         return schema;
     }
 
     /** Index only branches whose required, distinct constants prove all other branches impossible. */
     #discriminator(schema: Schema): DiscriminatedSchema | null {
         const cached: DiscriminatedSchema | null | undefined = this.#unions.get(schema);
-        if (cached !== undefined) return cached;
+        if (cached !== undefined) {
+            return cached;
+        }
         this.#unions.set(schema, null);
         const alternatives: readonly Schema[] | undefined = schema.anyOf;
-        if (alternatives === undefined || alternatives.length < 2) return null;
+        if (alternatives === undefined || alternatives.length < 2) {
+            return null;
+        }
         const resolved: Schema[] = [];
         for (const alternative of alternatives) {
             let branch: Schema | undefined = alternative;
             for (let depth: number = 0; branch?.$ref !== undefined && depth <= 256; depth++) {
                 branch = this.#resolve(branch.$ref);
             }
-            if (branch === undefined || branch.$ref !== undefined) return null;
+            if (branch === undefined || branch.$ref !== undefined) {
+                return null;
+            }
             resolved.push(branch);
         }
         const first: Schema | undefined = resolved[0];
@@ -89,8 +99,9 @@ export class SchemaValidator {
                     typeof tag?.const !== 'string' ||
                     branches.has(tag.const) ||
                     original === undefined
-                )
+                ) {
                     break;
+                }
                 branches.set(tag.const, original);
             }
             if (branches.size === alternatives.length) {
@@ -127,7 +138,9 @@ export class SchemaValidator {
                 const tag: unknown = value[discriminator.key];
                 const branch: Schema | undefined =
                     typeof tag === 'string' ? discriminator.branches.get(tag) : undefined;
-                if (branch === undefined || !this.#check(branch, value, depth + 1)) return false;
+                if (branch === undefined || !this.#check(branch, value, depth + 1)) {
+                    return false;
+                }
             } else if (
                 !schema.anyOf.some((item: Schema): boolean => this.#check(item, value, depth + 1))
             ) {
