@@ -48,6 +48,7 @@ const config: UserConfig = {
                 'workflow-run-codec': 'src/workflows/runtime/RunCodec.ts',
                 'workflow-run-request-codec': 'src/workflows/runtime/RunRequestCodec.ts',
                 'workflow-models': 'src/workflows/WorkflowModels.ts',
+                'workflow-public-models': 'src/workflows/PublicModels.ts',
                 'workflow-image-quote': 'src/workflows/WorkflowImageQuote.ts',
                 'workflow-image-resolution': 'src/workflows/ImageResolution.ts',
                 'workflow-image-policy': 'src/workflows/ImageModelPolicy.ts',

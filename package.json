@@ -199,6 +199,10 @@
             "types": "./dist/workflows/ModelResolution.d.ts",
             "import": "./dist/workflow-model-policy.js"
         },
+        "./workflow-public-models": {
+            "types": "./dist/workflows/PublicModels.d.ts",
+            "import": "./dist/workflow-public-models.js"
+        },
         "./workflow-models": {
             "types": "./dist/workflows/WorkflowModels.d.ts",
             "import": "./dist/workflow-models.js"
