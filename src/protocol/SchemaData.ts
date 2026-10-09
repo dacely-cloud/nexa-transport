@@ -3145,6 +3145,18 @@ export const schema: Schema = {
             required: ['configured', 'connected', 'id', 'issues', 'lifecycle'],
             type: 'object',
         },
+        ChargeKind: {
+            enum: [
+                'adjustment',
+                'completion',
+                'embedding',
+                'media',
+                'speech',
+                'tool',
+                'transcription',
+            ],
+            type: 'string',
+        },
         ChatGraph: {
             description: 'A non-executable graph delivered directly into a conversation.',
             properties: {
@@ -7127,6 +7139,18 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'workflows.runs.usage': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/WorkflowRunUsageRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/WorkflowRunUsageView',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'workflows.save': {
                     properties: {
                         params: {
@@ -7407,6 +7431,7 @@ export const schema: Schema = {
                 'workflows.runs.steps',
                 'workflows.runs.terminal.command',
                 'workflows.runs.terminal.read',
+                'workflows.runs.usage',
                 'workflows.save',
                 'workflows.schedules.disable',
                 'workflows.schedules.enable',
@@ -10361,6 +10386,41 @@ export const schema: Schema = {
         PortDirection: {
             enum: ['input', 'output'],
             type: 'string',
+        },
+        PricingCalculation: {
+            description:
+                'Versions describe existing calculations, including their rounding behavior.\nStable calculation identity, independent of a mutable model name or configuration.',
+            enum: ['report-tokens-v1', 'report-units-v1', 'wallet-tokens-v1'],
+            type: 'string',
+        },
+        PricingTariff: {
+            description:
+                "Original decimal USD rates; absence retains the calculation's existing fallback semantics.",
+            properties: {
+                cacheWritePerMillion: {
+                    type: 'string',
+                },
+                cachedInputPerMillion: {
+                    type: 'string',
+                },
+                calculation: {
+                    $ref: '#/definitions/PricingCalculation',
+                },
+                inputPerMillion: {
+                    type: 'string',
+                },
+                outputPerMillion: {
+                    type: 'string',
+                },
+                perCall: {
+                    type: 'string',
+                },
+                perThousandUnits: {
+                    type: 'string',
+                },
+            },
+            required: ['calculation'],
+            type: 'object',
         },
         ProcessInput: {
             description: 'Keystrokes are bounded and addressed through the owning session.',
@@ -15692,6 +15752,82 @@ export const schema: Schema = {
             required: ['capability', 'maxOutputTokens', 'policy', 'provider', 'workflowId'],
             type: 'object',
         },
+        WorkflowModelUsage: {
+            description:
+                'Actual executed identity and original tariff, never current catalog prices.',
+            properties: {
+                basis: {
+                    $ref: '#/definitions/WorkflowSpendingBasis',
+                },
+                entries: {
+                    type: 'string',
+                },
+                expiresAtMs: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                kind: {
+                    $ref: '#/definitions/ChargeKind',
+                },
+                lastReportedAtMs: {
+                    type: 'string',
+                },
+                microcents: {
+                    type: 'string',
+                },
+                model: {
+                    type: ['null', 'string'],
+                },
+                provider: {
+                    type: ['null', 'string'],
+                },
+                tariff: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/PricingTariff',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                unitEntries: {
+                    type: 'string',
+                },
+                unitLabel: {
+                    type: ['null', 'string'],
+                },
+                units: {
+                    type: ['null', 'string'],
+                },
+                usage: {
+                    $ref: '#/definitions/WorkflowUsageDimensions',
+                },
+                usageEntries: {
+                    $ref: '#/definitions/WorkflowUsageDimensions',
+                },
+            },
+            required: [
+                'basis',
+                'entries',
+                'expiresAtMs',
+                'id',
+                'kind',
+                'lastReportedAtMs',
+                'microcents',
+                'model',
+                'provider',
+                'tariff',
+                'unitEntries',
+                'unitLabel',
+                'units',
+                'usage',
+                'usageEntries',
+            ],
+            type: 'object',
+        },
         WorkflowModelsPage: {
             description:
                 "Registered providers and a bounded page from the selected provider's maintained catalog.",
@@ -16690,6 +16826,93 @@ export const schema: Schema = {
             ],
             type: 'object',
         },
+        WorkflowRunUsageRequest: {
+            description: 'Only the owned run and a bounded page may be selected by a client.',
+            properties: {
+                offset: {
+                    type: 'string',
+                },
+                runId: {
+                    type: 'string',
+                },
+            },
+            required: ['offset', 'runId'],
+            type: 'object',
+        },
+        WorkflowRunUsageView: {
+            description: 'Mock executions cannot supply live metering evidence.',
+            properties: {
+                entries: {
+                    type: 'string',
+                },
+                expiresAtMs: {
+                    type: ['null', 'string'],
+                },
+                lastReportedAtMs: {
+                    type: ['null', 'string'],
+                },
+                modelCount: {
+                    type: 'string',
+                },
+                models: {
+                    items: {
+                        $ref: '#/definitions/WorkflowModelUsage',
+                    },
+                    type: 'array',
+                },
+                next: {
+                    type: ['null', 'string'],
+                },
+                observedAtMs: {
+                    type: 'string',
+                },
+                offset: {
+                    type: 'string',
+                },
+                pricing: {
+                    items: {
+                        $ref: '#/definitions/WorkflowSpendingBucket',
+                    },
+                    type: 'array',
+                },
+                reportedMicrocents: {
+                    type: ['null', 'string'],
+                },
+                retainedFromMs: {
+                    type: ['null', 'string'],
+                },
+                revision: {
+                    type: 'string',
+                },
+                runId: {
+                    type: 'string',
+                },
+                simulated: {
+                    type: 'boolean',
+                },
+                workflowId: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'entries',
+                'expiresAtMs',
+                'lastReportedAtMs',
+                'modelCount',
+                'models',
+                'next',
+                'observedAtMs',
+                'offset',
+                'pricing',
+                'reportedMicrocents',
+                'retainedFromMs',
+                'revision',
+                'runId',
+                'simulated',
+                'workflowId',
+            ],
+            type: 'object',
+        },
         WorkflowSaveRequest: {
             description: 'Command identity and expected revision serve different purposes.',
             properties: {
@@ -17179,6 +17402,24 @@ export const schema: Schema = {
                 'setup',
                 'status',
             ],
+            type: 'object',
+        },
+        WorkflowUsageDimensions: {
+            description: 'Exact counters; missing dimensions were not reported.',
+            properties: {
+                cachedInputTokens: {
+                    type: 'string',
+                },
+                inputTokens: {
+                    type: 'string',
+                },
+                outputTokens: {
+                    type: 'string',
+                },
+                reasoningTokens: {
+                    type: 'string',
+                },
+            },
             type: 'object',
         },
         WorkflowValidateRequest: {

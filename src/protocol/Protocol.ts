@@ -1976,6 +1976,20 @@ export interface ChannelStatusResultShape {
 /** ChannelStatusResult from the Nexa wire protocol. */
 export type ChannelStatusResult = ChannelStatusResultShape;
 
+/** Allowed values for ChargeKind. */
+export const ChargeKindValues = {
+    Value0: 'adjustment',
+    Value1: 'completion',
+    Value2: 'embedding',
+    Value3: 'media',
+    Value4: 'speech',
+    Value5: 'tool',
+    Value6: 'transcription',
+} as const;
+
+/** ChargeKind from the Nexa wire protocol. */
+export type ChargeKind = (typeof ChargeKindValues)[keyof typeof ChargeKindValues];
+
 /** ChatGraph wire fields. */
 export interface ChatGraphShape {
     /** description as defined by the Nexa gateway. */
@@ -4526,6 +4540,14 @@ export interface GatewayMethodsworkflows_runs_terminal_readShape {
     readonly result: WorkflowTerminalSnapshot;
 }
 
+/** GatewayMethodsworkflows_runs_usage wire fields. */
+export interface GatewayMethodsworkflows_runs_usageShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkflowRunUsageRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WorkflowRunUsageView;
+}
+
 /** GatewayMethodsworkflows_save wire fields. */
 export interface GatewayMethodsworkflows_saveShape {
     /** params as defined by the Nexa gateway. */
@@ -4898,6 +4920,8 @@ export interface GatewayMethodsShape {
     readonly 'workflows.runs.terminal.command': GatewayMethodsworkflows_runs_terminal_commandShape;
     /** workflows.runs.terminal.read as defined by the Nexa gateway. */
     readonly 'workflows.runs.terminal.read': GatewayMethodsworkflows_runs_terminal_readShape;
+    /** workflows.runs.usage as defined by the Nexa gateway. */
+    readonly 'workflows.runs.usage': GatewayMethodsworkflows_runs_usageShape;
     /** workflows.save as defined by the Nexa gateway. */
     readonly 'workflows.save': GatewayMethodsworkflows_saveShape;
     /** workflows.schedules.disable as defined by the Nexa gateway. */
@@ -6772,6 +6796,38 @@ export const PortDirectionValues = { Value0: 'input', Value1: 'output' } as cons
 
 /** PortDirection from the Nexa wire protocol. */
 export type PortDirection = (typeof PortDirectionValues)[keyof typeof PortDirectionValues];
+
+/** Allowed values for PricingCalculation. */
+export const PricingCalculationValues = {
+    Value0: 'report-tokens-v1',
+    Value1: 'report-units-v1',
+    Value2: 'wallet-tokens-v1',
+} as const;
+
+/** PricingCalculation from the Nexa wire protocol. */
+export type PricingCalculation =
+    (typeof PricingCalculationValues)[keyof typeof PricingCalculationValues];
+
+/** PricingTariff wire fields. */
+export interface PricingTariffShape {
+    /** cacheWritePerMillion as defined by the Nexa gateway. */
+    readonly cacheWritePerMillion?: string;
+    /** cachedInputPerMillion as defined by the Nexa gateway. */
+    readonly cachedInputPerMillion?: string;
+    /** calculation as defined by the Nexa gateway. */
+    readonly calculation: PricingCalculation;
+    /** inputPerMillion as defined by the Nexa gateway. */
+    readonly inputPerMillion?: string;
+    /** outputPerMillion as defined by the Nexa gateway. */
+    readonly outputPerMillion?: string;
+    /** perCall as defined by the Nexa gateway. */
+    readonly perCall?: string;
+    /** perThousandUnits as defined by the Nexa gateway. */
+    readonly perThousandUnits?: string;
+}
+
+/** PricingTariff from the Nexa wire protocol. */
+export type PricingTariff = PricingTariffShape;
 
 /** ProcessInput wire fields. */
 export interface ProcessInputShape {
@@ -10297,6 +10353,43 @@ export interface WorkflowModelResolutionRequestShape {
 /** WorkflowModelResolutionRequest from the Nexa wire protocol. */
 export type WorkflowModelResolutionRequest = WorkflowModelResolutionRequestShape;
 
+/** WorkflowModelUsage wire fields. */
+export interface WorkflowModelUsageShape {
+    /** basis as defined by the Nexa gateway. */
+    readonly basis: WorkflowSpendingBasis;
+    /** entries as defined by the Nexa gateway. */
+    readonly entries: string;
+    /** expiresAtMs as defined by the Nexa gateway. */
+    readonly expiresAtMs: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: ChargeKind;
+    /** lastReportedAtMs as defined by the Nexa gateway. */
+    readonly lastReportedAtMs: string;
+    /** microcents as defined by the Nexa gateway. */
+    readonly microcents: string;
+    /** model as defined by the Nexa gateway. */
+    readonly model: null | string;
+    /** provider as defined by the Nexa gateway. */
+    readonly provider: null | string;
+    /** tariff as defined by the Nexa gateway. */
+    readonly tariff: PricingTariff | null;
+    /** unitEntries as defined by the Nexa gateway. */
+    readonly unitEntries: string;
+    /** unitLabel as defined by the Nexa gateway. */
+    readonly unitLabel: null | string;
+    /** units as defined by the Nexa gateway. */
+    readonly units: null | string;
+    /** usage as defined by the Nexa gateway. */
+    readonly usage: WorkflowUsageDimensions;
+    /** usageEntries as defined by the Nexa gateway. */
+    readonly usageEntries: WorkflowUsageDimensions;
+}
+
+/** WorkflowModelUsage from the Nexa wire protocol. */
+export type WorkflowModelUsage = WorkflowModelUsageShape;
+
 /** WorkflowModelsPage wire fields. */
 export interface WorkflowModelsPageShape {
     /** freshness as defined by the Nexa gateway. */
@@ -10974,6 +11067,54 @@ export interface WorkflowRunSummaryShape {
 /** WorkflowRunSummary from the Nexa wire protocol. */
 export type WorkflowRunSummary = WorkflowRunSummaryShape;
 
+/** WorkflowRunUsageRequest wire fields. */
+export interface WorkflowRunUsageRequestShape {
+    /** offset as defined by the Nexa gateway. */
+    readonly offset: string;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+}
+
+/** WorkflowRunUsageRequest from the Nexa wire protocol. */
+export type WorkflowRunUsageRequest = WorkflowRunUsageRequestShape;
+
+/** WorkflowRunUsageView wire fields. */
+export interface WorkflowRunUsageViewShape {
+    /** entries as defined by the Nexa gateway. */
+    readonly entries: string;
+    /** expiresAtMs as defined by the Nexa gateway. */
+    readonly expiresAtMs: null | string;
+    /** lastReportedAtMs as defined by the Nexa gateway. */
+    readonly lastReportedAtMs: null | string;
+    /** modelCount as defined by the Nexa gateway. */
+    readonly modelCount: string;
+    /** models as defined by the Nexa gateway. */
+    readonly models: ReadonlyArray<WorkflowModelUsage>;
+    /** next as defined by the Nexa gateway. */
+    readonly next: null | string;
+    /** observedAtMs as defined by the Nexa gateway. */
+    readonly observedAtMs: string;
+    /** offset as defined by the Nexa gateway. */
+    readonly offset: string;
+    /** pricing as defined by the Nexa gateway. */
+    readonly pricing: ReadonlyArray<WorkflowSpendingBucket>;
+    /** reportedMicrocents as defined by the Nexa gateway. */
+    readonly reportedMicrocents: null | string;
+    /** retainedFromMs as defined by the Nexa gateway. */
+    readonly retainedFromMs: null | string;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: string;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+    /** simulated as defined by the Nexa gateway. */
+    readonly simulated: boolean;
+    /** workflowId as defined by the Nexa gateway. */
+    readonly workflowId: string;
+}
+
+/** WorkflowRunUsageView from the Nexa wire protocol. */
+export type WorkflowRunUsageView = WorkflowRunUsageViewShape;
+
 /** WorkflowSaveRequest wire fields. */
 export interface WorkflowSaveRequestShape {
     /** commandId as defined by the Nexa gateway. */
@@ -11315,6 +11456,21 @@ export interface WorkflowTerminalSnapshotShape {
 
 /** WorkflowTerminalSnapshot from the Nexa wire protocol. */
 export type WorkflowTerminalSnapshot = WorkflowTerminalSnapshotShape;
+
+/** WorkflowUsageDimensions wire fields. */
+export interface WorkflowUsageDimensionsShape {
+    /** cachedInputTokens as defined by the Nexa gateway. */
+    readonly cachedInputTokens?: string;
+    /** inputTokens as defined by the Nexa gateway. */
+    readonly inputTokens?: string;
+    /** outputTokens as defined by the Nexa gateway. */
+    readonly outputTokens?: string;
+    /** reasoningTokens as defined by the Nexa gateway. */
+    readonly reasoningTokens?: string;
+}
+
+/** WorkflowUsageDimensions from the Nexa wire protocol. */
+export type WorkflowUsageDimensions = WorkflowUsageDimensionsShape;
 
 /** WorkflowValidateRequest wire fields. */
 export interface WorkflowValidateRequestShape {
@@ -11835,6 +11991,8 @@ export enum Method {
     WorkflowsRunsTerminalCommand = 'workflows.runs.terminal.command',
     /** Calls workflows.runs.terminal.read. */
     WorkflowsRunsTerminalRead = 'workflows.runs.terminal.read',
+    /** Calls workflows.runs.usage. */
+    WorkflowsRunsUsage = 'workflows.runs.usage',
     /** Calls workflows.save. */
     WorkflowsSave = 'workflows.save',
     /** Calls workflows.schedules.disable. */
