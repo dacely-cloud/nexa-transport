@@ -29,22 +29,31 @@ export class WorkflowInput {
     }
     /** Only stable opaque references are accepted as record and command identities. */
     public static id(raw: unknown): string {
-        const value: string = WorkflowInput.text(raw, 256);
-        if (!/^[A-Za-z0-9][A-Za-z0-9._:/-]*$/u.test(value)) {
+        if (typeof raw !== 'string' || !/^[A-Za-z0-9][A-Za-z0-9._:/-]*$/u.test(raw)) {
             throw new Error('Invalid workflow identity');
         }
-        return value;
+        return raw;
     }
-    /** Bounded strings, with empty text allowed only for descriptive fields. */
-    public static text(raw: unknown, maximum: number, empty: boolean = false): string {
-        if (
-            typeof raw !== 'string' ||
-            raw.length > maximum ||
-            (!empty && raw.trim().length === 0) ||
-            raw.includes('\0') ||
-            !raw.isWellFormed()
-        ) {
-            throw new Error(`Workflow text must fit ${maximum} characters`);
+    /** Valid text with an optional field-specific bound; malformed values report their actual cause. */
+    public static text(
+        raw: unknown,
+        maximum: number | null = null,
+        empty: boolean = false,
+    ): string {
+        if (typeof raw !== 'string') {
+            throw new Error('Expected workflow text');
+        }
+        if (!empty && raw.trim().length === 0) {
+            throw new Error('Workflow text cannot be blank');
+        }
+        if (raw.includes('\0')) {
+            throw new Error('Workflow text contains a null character');
+        }
+        if (!raw.isWellFormed()) {
+            throw new Error('Workflow text contains malformed Unicode');
+        }
+        if (maximum !== null && raw.length > maximum) {
+            throw new Error(`Text exceeds ${maximum} characters`);
         }
         return raw;
     }

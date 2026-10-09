@@ -3,6 +3,7 @@
 
 import { ResourceFamily, ResourceUse } from './ResourceTypes.js';
 import type { ResourceBinding, ResourceLimits, ResourceSelection } from './ResourceTypes.js';
+import { WorkflowInput } from './WorkflowInput.js';
 
 /** Portable boundary validation shared by import, save, and transport consumers. */
 export class ResourceBindingCodec {
@@ -112,11 +113,7 @@ export class ResourceBindingCodec {
     }
 
     static #id(raw: unknown): string {
-        const value: string = this.#text(raw, 256);
-        if (!/^[A-Za-z0-9][A-Za-z0-9._:/-]*$/u.test(value)) {
-            throw new Error('Resource references require stable identifiers');
-        }
-        return value;
+        return WorkflowInput.id(raw);
     }
 
     static #text(raw: unknown, limit: number): string {
