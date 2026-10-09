@@ -2970,6 +2970,30 @@ export interface GatewayMethodsworkflows_runs_outputShape {
     readonly result: WorkflowRunOutputPage;
 }
 
+/** GatewayMethodsworkflows_runs_question_answer wire fields. */
+export interface GatewayMethodsworkflows_runs_question_answerShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkflowHumanAnswer;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WorkflowHumanRequest;
+}
+
+/** GatewayMethodsworkflows_runs_question_read wire fields. */
+export interface GatewayMethodsworkflows_runs_question_readShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkflowHumanIdentity;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WorkflowHumanRequest;
+}
+
+/** GatewayMethodsworkflows_runs_questions wire fields. */
+export interface GatewayMethodsworkflows_runs_questionsShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkflowRunRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WorkflowHumanPage;
+}
+
 /** GatewayMethodsworkflows_runs_read wire fields. */
 export interface GatewayMethodsworkflows_runs_readShape {
     /** params as defined by the Nexa gateway. */
@@ -3304,6 +3328,12 @@ export interface GatewayMethodsShape {
     readonly 'workflows.runs.list': GatewayMethodsworkflows_runs_listShape;
     /** workflows.runs.output as defined by the Nexa gateway. */
     readonly 'workflows.runs.output': GatewayMethodsworkflows_runs_outputShape;
+    /** workflows.runs.question.answer as defined by the Nexa gateway. */
+    readonly 'workflows.runs.question.answer': GatewayMethodsworkflows_runs_question_answerShape;
+    /** workflows.runs.question.read as defined by the Nexa gateway. */
+    readonly 'workflows.runs.question.read': GatewayMethodsworkflows_runs_question_readShape;
+    /** workflows.runs.questions as defined by the Nexa gateway. */
+    readonly 'workflows.runs.questions': GatewayMethodsworkflows_runs_questionsShape;
     /** workflows.runs.read as defined by the Nexa gateway. */
     readonly 'workflows.runs.read': GatewayMethodsworkflows_runs_readShape;
     /** workflows.runs.start as defined by the Nexa gateway. */
@@ -7440,6 +7470,17 @@ export interface WorkflowAgentSessionRequestShape {
 /** WorkflowAgentSessionRequest from the Nexa wire protocol. */
 export type WorkflowAgentSessionRequest = WorkflowAgentSessionRequestShape;
 
+/** Allowed values for WorkflowAnswerType. */
+export const WorkflowAnswerTypeValues = {
+    Value0: 'boolean',
+    Value1: 'choice',
+    Value2: 'text',
+} as const;
+
+/** WorkflowAnswerType from the Nexa wire protocol. */
+export type WorkflowAnswerType =
+    (typeof WorkflowAnswerTypeValues)[keyof typeof WorkflowAnswerTypeValues];
+
 /** Allowed values for WorkflowApplication. */
 export const WorkflowApplicationValues = {
     Value0: 'claude-code',
@@ -7540,6 +7581,7 @@ export const WorkflowArtifactPublicationstatusVariant0Values = {
     Value4: 'skipped',
     Value5: 'succeeded',
     Value6: 'uncertain',
+    Value7: 'waiting',
 } as const;
 
 /** WorkflowArtifactPublication wire fields. */
@@ -7736,6 +7778,120 @@ export interface WorkflowGroupReferenceShape {
 
 /** WorkflowGroupReference from the Nexa wire protocol. */
 export type WorkflowGroupReference = WorkflowGroupReferenceShape;
+
+/** WorkflowHumanAnswer wire fields. */
+export interface WorkflowHumanAnswerShape {
+    /** answer as defined by the Nexa gateway. */
+    readonly answer: string | boolean;
+    /** commandId as defined by the Nexa gateway. */
+    readonly commandId: string;
+    /** invocationId as defined by the Nexa gateway. */
+    readonly invocationId: string;
+    /** nodeId as defined by the Nexa gateway. */
+    readonly nodeId: string;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+}
+
+/** WorkflowHumanAnswer from the Nexa wire protocol. */
+export type WorkflowHumanAnswer = WorkflowHumanAnswerShape;
+
+/** WorkflowHumanIdentity wire fields. */
+export interface WorkflowHumanIdentityShape {
+    /** invocationId as defined by the Nexa gateway. */
+    readonly invocationId: string;
+    /** nodeId as defined by the Nexa gateway. */
+    readonly nodeId: string;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+}
+
+/** WorkflowHumanIdentity from the Nexa wire protocol. */
+export type WorkflowHumanIdentity = WorkflowHumanIdentityShape;
+
+/** Allowed values for WorkflowHumanOutcome. */
+export const WorkflowHumanOutcomeValues = { Value0: 'answered', Value1: 'expired' } as const;
+
+/** WorkflowHumanOutcome from the Nexa wire protocol. */
+export type WorkflowHumanOutcome =
+    (typeof WorkflowHumanOutcomeValues)[keyof typeof WorkflowHumanOutcomeValues];
+
+/** WorkflowHumanPage wire fields. */
+export interface WorkflowHumanPageShape {
+    /** items as defined by the Nexa gateway. */
+    readonly items: ReadonlyArray<WorkflowHumanRequest>;
+    /** observedAtMs as defined by the Nexa gateway. */
+    readonly observedAtMs: string;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+}
+
+/** WorkflowHumanPage from the Nexa wire protocol. */
+export type WorkflowHumanPage = WorkflowHumanPageShape;
+
+/** WorkflowHumanRequest wire fields. */
+export interface WorkflowHumanRequestShape {
+    /** answerType as defined by the Nexa gateway. */
+    readonly answerType: WorkflowAnswerType;
+    /** canAnswer as defined by the Nexa gateway. */
+    readonly canAnswer: boolean;
+    /** choices as defined by the Nexa gateway. */
+    readonly choices: ReadonlyArray<string>;
+    /** createdAtMs as defined by the Nexa gateway. */
+    readonly createdAtMs: string;
+    /** expiresAtMs as defined by the Nexa gateway. */
+    readonly expiresAtMs: string;
+    /** invocationId as defined by the Nexa gateway. */
+    readonly invocationId: string;
+    /** label as defined by the Nexa gateway. */
+    readonly label: string;
+    /** nodeId as defined by the Nexa gateway. */
+    readonly nodeId: string;
+    /** question as defined by the Nexa gateway. */
+    readonly question: string;
+    /** recipient as defined by the Nexa gateway. */
+    readonly recipient: string;
+    /** response as defined by the Nexa gateway. */
+    readonly response: WorkflowHumanResponse | null;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+    /** status as defined by the Nexa gateway. */
+    readonly status: WorkflowHumanStatus;
+    /** timeoutMs as defined by the Nexa gateway. */
+    readonly timeoutMs: string;
+}
+
+/** WorkflowHumanRequest from the Nexa wire protocol. */
+export type WorkflowHumanRequest = WorkflowHumanRequestShape;
+
+/** WorkflowHumanResponse wire fields. */
+export interface WorkflowHumanResponseShape {
+    /** actor as defined by the Nexa gateway. */
+    readonly actor: null | string;
+    /** answer as defined by the Nexa gateway. */
+    readonly answer: null | string | boolean;
+    /** atMs as defined by the Nexa gateway. */
+    readonly atMs: string;
+    /** commandId as defined by the Nexa gateway. */
+    readonly commandId: null | string;
+    /** outcome as defined by the Nexa gateway. */
+    readonly outcome: WorkflowHumanOutcome;
+}
+
+/** WorkflowHumanResponse from the Nexa wire protocol. */
+export type WorkflowHumanResponse = WorkflowHumanResponseShape;
+
+/** Allowed values for WorkflowHumanStatus. */
+export const WorkflowHumanStatusValues = {
+    Value0: 'answered',
+    Value1: 'cancelled',
+    Value2: 'expired',
+    Value3: 'pending',
+} as const;
+
+/** WorkflowHumanStatus from the Nexa wire protocol. */
+export type WorkflowHumanStatus =
+    (typeof WorkflowHumanStatusValues)[keyof typeof WorkflowHumanStatusValues];
 
 /** WorkflowImageCandidate wire fields. */
 export interface WorkflowImageCandidateShape {
@@ -8413,6 +8569,7 @@ export const WorkflowRunEventstatusValues = {
     Value5: 'skipped',
     Value6: 'succeeded',
     Value7: 'uncertain',
+    Value8: 'waiting',
 } as const;
 
 /** WorkflowRunEvent wire fields. */
@@ -8444,8 +8601,11 @@ export const WorkflowRunEventKindValues = {
     Value1: 'cancelled',
     Value2: 'claimed',
     Value3: 'finished',
-    Value4: 'step-finished',
-    Value5: 'step-started',
+    Value4: 'resumed',
+    Value5: 'step-finished',
+    Value6: 'step-started',
+    Value7: 'step-waiting',
+    Value8: 'suspended',
 } as const;
 
 /** WorkflowRunEventKind from the Nexa wire protocol. */
@@ -8570,6 +8730,7 @@ export const WorkflowRunStatusValues = {
     Value2: 'queued',
     Value3: 'running',
     Value4: 'succeeded',
+    Value5: 'waiting',
 } as const;
 
 /** WorkflowRunStatus from the Nexa wire protocol. */
@@ -8649,6 +8810,7 @@ export const WorkflowStepStatusValues = {
     Value4: 'skipped',
     Value5: 'succeeded',
     Value6: 'uncertain',
+    Value7: 'waiting',
 } as const;
 
 /** WorkflowStepStatus from the Nexa wire protocol. */
@@ -9235,6 +9397,12 @@ export enum Method {
     WorkflowsRunsList = 'workflows.runs.list',
     /** Calls workflows.runs.output. */
     WorkflowsRunsOutput = 'workflows.runs.output',
+    /** Calls workflows.runs.question.answer. */
+    WorkflowsRunsQuestionAnswer = 'workflows.runs.question.answer',
+    /** Calls workflows.runs.question.read. */
+    WorkflowsRunsQuestionRead = 'workflows.runs.question.read',
+    /** Calls workflows.runs.questions. */
+    WorkflowsRunsQuestions = 'workflows.runs.questions',
     /** Calls workflows.runs.read. */
     WorkflowsRunsRead = 'workflows.runs.read',
     /** Calls workflows.runs.start. */

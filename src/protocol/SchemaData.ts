@@ -4571,6 +4571,42 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'workflows.runs.question.answer': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/WorkflowHumanAnswer',
+                        },
+                        result: {
+                            $ref: '#/definitions/WorkflowHumanRequest',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'workflows.runs.question.read': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/WorkflowHumanIdentity',
+                        },
+                        result: {
+                            $ref: '#/definitions/WorkflowHumanRequest',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'workflows.runs.questions': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/WorkflowRunRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/WorkflowHumanPage',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'workflows.runs.read': {
                     properties: {
                         params: {
@@ -4830,6 +4866,9 @@ export const schema: Schema = {
                 'workflows.runs.inputs',
                 'workflows.runs.list',
                 'workflows.runs.output',
+                'workflows.runs.question.answer',
+                'workflows.runs.question.read',
+                'workflows.runs.questions',
                 'workflows.runs.read',
                 'workflows.runs.start',
                 'workflows.runs.steps',
@@ -11199,6 +11238,11 @@ export const schema: Schema = {
             required: ['invocationId', 'nodeId', 'runId'],
             type: 'object',
         },
+        WorkflowAnswerType: {
+            description: 'Supported answer shapes for the initial owner question component.',
+            enum: ['boolean', 'choice', 'text'],
+            type: 'string',
+        },
         WorkflowApplication: {
             enum: ['claude-code', 'codex', 'grok-build', 'mistral-vibe', 'nerva-code'],
             type: 'string',
@@ -11351,6 +11395,7 @@ export const schema: Schema = {
                                 'skipped',
                                 'succeeded',
                                 'uncertain',
+                                'waiting',
                             ],
                             type: 'string',
                         },
@@ -11597,6 +11642,172 @@ export const schema: Schema = {
             },
             required: ['content', 'id'],
             type: 'object',
+        },
+        WorkflowHumanAnswer: {
+            description: 'An idempotent explicit answer command.',
+            properties: {
+                answer: {
+                    type: ['string', 'boolean'],
+                },
+                commandId: {
+                    type: 'string',
+                },
+                invocationId: {
+                    type: 'string',
+                },
+                nodeId: {
+                    type: 'string',
+                },
+                runId: {
+                    type: 'string',
+                },
+            },
+            required: ['answer', 'commandId', 'invocationId', 'nodeId', 'runId'],
+            type: 'object',
+        },
+        WorkflowHumanIdentity: {
+            description:
+                'Exact invocation identity; the authenticated principal is never supplied by clients.',
+            properties: {
+                invocationId: {
+                    type: 'string',
+                },
+                nodeId: {
+                    type: 'string',
+                },
+                runId: {
+                    type: 'string',
+                },
+            },
+            required: ['invocationId', 'nodeId', 'runId'],
+            type: 'object',
+        },
+        WorkflowHumanOutcome: {
+            description: 'Terminal outcomes never infer an answer from silence.',
+            enum: ['answered', 'expired'],
+            type: 'string',
+        },
+        WorkflowHumanPage: {
+            description:
+                'Pending questions are capped per run and returned without completed output bodies.',
+            properties: {
+                items: {
+                    items: {
+                        $ref: '#/definitions/WorkflowHumanRequest',
+                    },
+                    type: 'array',
+                },
+                observedAtMs: {
+                    type: 'string',
+                },
+                runId: {
+                    type: 'string',
+                },
+            },
+            required: ['items', 'observedAtMs', 'runId'],
+            type: 'object',
+        },
+        WorkflowHumanRequest: {
+            description:
+                'Public owner-scoped read, shared by pending-run views and future inbox navigation.',
+            properties: {
+                answerType: {
+                    $ref: '#/definitions/WorkflowAnswerType',
+                },
+                canAnswer: {
+                    type: 'boolean',
+                },
+                choices: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                createdAtMs: {
+                    type: 'string',
+                },
+                expiresAtMs: {
+                    type: 'string',
+                },
+                invocationId: {
+                    type: 'string',
+                },
+                label: {
+                    type: 'string',
+                },
+                nodeId: {
+                    type: 'string',
+                },
+                question: {
+                    type: 'string',
+                },
+                recipient: {
+                    type: 'string',
+                },
+                response: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/WorkflowHumanResponse',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                runId: {
+                    type: 'string',
+                },
+                status: {
+                    $ref: '#/definitions/WorkflowHumanStatus',
+                },
+                timeoutMs: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'answerType',
+                'canAnswer',
+                'choices',
+                'createdAtMs',
+                'expiresAtMs',
+                'invocationId',
+                'label',
+                'nodeId',
+                'question',
+                'recipient',
+                'response',
+                'runId',
+                'status',
+                'timeoutMs',
+            ],
+            type: 'object',
+        },
+        WorkflowHumanResponse: {
+            description: 'Recorded response evidence; expiry contains no actor or answer.',
+            properties: {
+                actor: {
+                    type: ['null', 'string'],
+                },
+                answer: {
+                    type: ['null', 'string', 'boolean'],
+                },
+                atMs: {
+                    type: 'string',
+                },
+                commandId: {
+                    type: ['null', 'string'],
+                },
+                outcome: {
+                    $ref: '#/definitions/WorkflowHumanOutcome',
+                },
+            },
+            required: ['actor', 'answer', 'atMs', 'commandId', 'outcome'],
+            type: 'object',
+        },
+        WorkflowHumanStatus: {
+            description: 'Request presentation state also reflects whole-run cancellation.',
+            enum: ['answered', 'cancelled', 'expired', 'pending'],
+            type: 'string',
         },
         WorkflowImageCandidate: {
             description:
@@ -12742,6 +12953,7 @@ export const schema: Schema = {
                         'skipped',
                         'succeeded',
                         'uncertain',
+                        'waiting',
                     ],
                     type: 'string',
                 },
@@ -12759,7 +12971,17 @@ export const schema: Schema = {
             type: 'object',
         },
         WorkflowRunEventKind: {
-            enum: ['accepted', 'cancelled', 'claimed', 'finished', 'step-finished', 'step-started'],
+            enum: [
+                'accepted',
+                'cancelled',
+                'claimed',
+                'finished',
+                'resumed',
+                'step-finished',
+                'step-started',
+                'step-waiting',
+                'suspended',
+            ],
             type: 'string',
         },
         WorkflowRunEventsRequest: {
@@ -12920,7 +13142,7 @@ export const schema: Schema = {
             type: 'object',
         },
         WorkflowRunStatus: {
-            enum: ['cancelled', 'failed', 'queued', 'running', 'succeeded'],
+            enum: ['cancelled', 'failed', 'queued', 'running', 'succeeded', 'waiting'],
             type: 'string',
         },
         WorkflowRunStepsPage: {
@@ -13026,6 +13248,7 @@ export const schema: Schema = {
                 'skipped',
                 'succeeded',
                 'uncertain',
+                'waiting',
             ],
             type: 'string',
         },

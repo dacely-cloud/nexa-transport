@@ -1,6 +1,6 @@
 # RPC reference
 
-All 133 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 132 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
+All 136 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 135 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
 
 - [accounts.create](#accounts-create)
 - [accounts.list](#accounts-list)
@@ -124,6 +124,9 @@ All 133 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [workflows.runs.inputs](#workflows-runs-inputs)
 - [workflows.runs.list](#workflows-runs-list)
 - [workflows.runs.output](#workflows-runs-output)
+- [workflows.runs.question.answer](#workflows-runs-question-answer)
+- [workflows.runs.question.read](#workflows-runs-question-read)
+- [workflows.runs.questions](#workflows-runs-questions)
 - [workflows.runs.read](#workflows-runs-read)
 - [workflows.runs.start](#workflows-runs-start)
 - [workflows.runs.steps](#workflows-runs-steps)
@@ -3010,6 +3013,84 @@ Parameters: [WorkflowRunOutputRequest](protocol.md#workflowrunoutputrequest).
 | `runId`        | Yes      | `string` |             |
 
 Result: [WorkflowRunOutputPage](protocol.md#workflowrunoutputpage).
+
+## workflows.runs.question.answer
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsRunsQuestionAnswer> = {
+    answer: 'YOUR_ANSWER',
+    commandId: 'YOUR_COMMANDID',
+    invocationId: 'YOUR_INVOCATIONID',
+    nodeId: 'YOUR_NODEID',
+    runId: 'YOUR_RUNID',
+};
+const result: ResultOf<typeof Method.WorkflowsRunsQuestionAnswer> = await client.call(
+    Method.WorkflowsRunsQuestionAnswer,
+    params,
+);
+```
+
+Parameters: [WorkflowHumanAnswer](protocol.md#workflowhumananswer).
+
+| Field          | Required | Type             | Description |
+| -------------- | -------- | ---------------- | ----------- |
+| `answer`       | Yes      | `string,boolean` |             |
+| `commandId`    | Yes      | `string`         |             |
+| `invocationId` | Yes      | `string`         |             |
+| `nodeId`       | Yes      | `string`         |             |
+| `runId`        | Yes      | `string`         |             |
+
+Result: [WorkflowHumanRequest](protocol.md#workflowhumanrequest).
+
+## workflows.runs.question.read
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsRunsQuestionRead> = {
+    invocationId: 'YOUR_INVOCATIONID',
+    nodeId: 'YOUR_NODEID',
+    runId: 'YOUR_RUNID',
+};
+const result: ResultOf<typeof Method.WorkflowsRunsQuestionRead> = await client.call(
+    Method.WorkflowsRunsQuestionRead,
+    params,
+);
+```
+
+Parameters: [WorkflowHumanIdentity](protocol.md#workflowhumanidentity).
+
+| Field          | Required | Type     | Description |
+| -------------- | -------- | -------- | ----------- |
+| `invocationId` | Yes      | `string` |             |
+| `nodeId`       | Yes      | `string` |             |
+| `runId`        | Yes      | `string` |             |
+
+Result: [WorkflowHumanRequest](protocol.md#workflowhumanrequest).
+
+## workflows.runs.questions
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkflowsRunsQuestions> = {
+    runId: 'YOUR_RUNID',
+};
+const result: ResultOf<typeof Method.WorkflowsRunsQuestions> = await client.call(
+    Method.WorkflowsRunsQuestions,
+    params,
+);
+```
+
+Parameters: [WorkflowRunRequest](protocol.md#workflowrunrequest).
+
+| Field   | Required | Type     | Description |
+| ------- | -------- | -------- | ----------- |
+| `runId` | Yes      | `string` |             |
+
+Result: [WorkflowHumanPage](protocol.md#workflowhumanpage).
 
 ## workflows.runs.read
 

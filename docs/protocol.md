@@ -1306,6 +1306,9 @@ Configurable bounds on gateway-owned work and memory.
 | `workflows.runs.inputs`             | Yes      | Object (fields below) |                                                                                            |
 | `workflows.runs.list`               | Yes      | Object (fields below) |                                                                                            |
 | `workflows.runs.output`             | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.question.answer`    | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.question.read`      | Yes      | Object (fields below) |                                                                                            |
+| `workflows.runs.questions`          | Yes      | Object (fields below) |                                                                                            |
 | `workflows.runs.read`               | Yes      | Object (fields below) |                                                                                            |
 | `workflows.runs.start`              | Yes      | Object (fields below) |                                                                                            |
 | `workflows.runs.steps`              | Yes      | Object (fields below) |                                                                                            |
@@ -2244,6 +2247,27 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ---------------------------------------------------------------- | ----------- |
 | `params` | Yes      | [WorkflowRunOutputRequest](protocol.md#workflowrunoutputrequest) |             |
 | `result` | Yes      | [WorkflowRunOutputPage](protocol.md#workflowrunoutputpage)       |             |
+
+**workflows.runs.question.answer**
+
+| Field    | Required | Type                                                     | Description |
+| -------- | -------- | -------------------------------------------------------- | ----------- |
+| `params` | Yes      | [WorkflowHumanAnswer](protocol.md#workflowhumananswer)   |             |
+| `result` | Yes      | [WorkflowHumanRequest](protocol.md#workflowhumanrequest) |             |
+
+**workflows.runs.question.read**
+
+| Field    | Required | Type                                                       | Description |
+| -------- | -------- | ---------------------------------------------------------- | ----------- |
+| `params` | Yes      | [WorkflowHumanIdentity](protocol.md#workflowhumanidentity) |             |
+| `result` | Yes      | [WorkflowHumanRequest](protocol.md#workflowhumanrequest)   |             |
+
+**workflows.runs.questions**
+
+| Field    | Required | Type                                                 | Description |
+| -------- | -------- | ---------------------------------------------------- | ----------- |
+| `params` | Yes      | [WorkflowRunRequest](protocol.md#workflowrunrequest) |             |
+| `result` | Yes      | [WorkflowHumanPage](protocol.md#workflowhumanpage)   |             |
 
 **workflows.runs.read**
 
@@ -5183,6 +5207,12 @@ One exact agent invocation; identities are never retargeted to a newer attempt.
 | `nodeId`       | Yes      | `string` |             |
 | `runId`        | Yes      | `string` |             |
 
+## WorkflowAnswerType
+
+Supported answer shapes for the initial owner question component.
+
+Type: `"boolean"` / `"choice"` / `"text"`.
+
 ## WorkflowApplication
 
 Type: `"claude-code"` / `"codex"` / `"grok-build"` / `"mistral-vibe"` / `"nerva-code"`.
@@ -5245,15 +5275,15 @@ Lists metadata only, with at most six publications of at most 32 files each.
 
 Recorded producing identity and public file metadata, without storage identifiers.
 
-| Field          | Required | Type                                                                                                              | Description |
-| -------------- | -------- | ----------------------------------------------------------------------------------------------------------------- | ----------- |
-| `artifacts`    | Yes      | Array of [WorkflowRunArtifact](protocol.md#workflowrunartifact)                                                   |             |
-| `attempt`      | Yes      | `null,number`                                                                                                     |             |
-| `createdAtMs`  | Yes      | `null,string`                                                                                                     |             |
-| `invocationId` | Yes      | `string`                                                                                                          |             |
-| `label`        | Yes      | `string`                                                                                                          |             |
-| `nodeId`       | Yes      | `string`                                                                                                          |             |
-| `status`       | Yes      | `"cancelled"` / `"failed"` / `"interrupted"` / `"running"` / `"skipped"` / `"succeeded"` / `"uncertain"` / `null` |             |
+| Field          | Required | Type                                                                                                                            | Description |
+| -------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `artifacts`    | Yes      | Array of [WorkflowRunArtifact](protocol.md#workflowrunartifact)                                                                 |             |
+| `attempt`      | Yes      | `null,number`                                                                                                                   |             |
+| `createdAtMs`  | Yes      | `null,string`                                                                                                                   |             |
+| `invocationId` | Yes      | `string`                                                                                                                        |             |
+| `label`        | Yes      | `string`                                                                                                                        |             |
+| `nodeId`       | Yes      | `string`                                                                                                                        |             |
+| `status`       | Yes      | `"cancelled"` / `"failed"` / `"interrupted"` / `"running"` / `"skipped"` / `"succeeded"` / `"uncertain"` / `"waiting"` / `null` |             |
 
 ## WorkflowCatalog
 
@@ -5383,6 +5413,83 @@ Each revision references an immutable group body independently from executable n
 | --------- | -------- | -------- | ----------- |
 | `content` | Yes      | `string` |             |
 | `id`      | Yes      | `string` |             |
+
+## WorkflowHumanAnswer
+
+An idempotent explicit answer command.
+
+| Field          | Required | Type             | Description |
+| -------------- | -------- | ---------------- | ----------- |
+| `answer`       | Yes      | `string,boolean` |             |
+| `commandId`    | Yes      | `string`         |             |
+| `invocationId` | Yes      | `string`         |             |
+| `nodeId`       | Yes      | `string`         |             |
+| `runId`        | Yes      | `string`         |             |
+
+## WorkflowHumanIdentity
+
+Exact invocation identity; the authenticated principal is never supplied by clients.
+
+| Field          | Required | Type     | Description |
+| -------------- | -------- | -------- | ----------- |
+| `invocationId` | Yes      | `string` |             |
+| `nodeId`       | Yes      | `string` |             |
+| `runId`        | Yes      | `string` |             |
+
+## WorkflowHumanOutcome
+
+Terminal outcomes never infer an answer from silence.
+
+Type: `"answered"` / `"expired"`.
+
+## WorkflowHumanPage
+
+Pending questions are capped per run and returned without completed output bodies.
+
+| Field          | Required | Type                                                              | Description |
+| -------------- | -------- | ----------------------------------------------------------------- | ----------- |
+| `items`        | Yes      | Array of [WorkflowHumanRequest](protocol.md#workflowhumanrequest) |             |
+| `observedAtMs` | Yes      | `string`                                                          |             |
+| `runId`        | Yes      | `string`                                                          |             |
+
+## WorkflowHumanRequest
+
+Public owner-scoped read, shared by pending-run views and future inbox navigation.
+
+| Field          | Required | Type                                                                | Description |
+| -------------- | -------- | ------------------------------------------------------------------- | ----------- |
+| `answerType`   | Yes      | [WorkflowAnswerType](protocol.md#workflowanswertype)                |             |
+| `canAnswer`    | Yes      | `boolean`                                                           |             |
+| `choices`      | Yes      | Array of `string`                                                   |             |
+| `createdAtMs`  | Yes      | `string`                                                            |             |
+| `expiresAtMs`  | Yes      | `string`                                                            |             |
+| `invocationId` | Yes      | `string`                                                            |             |
+| `label`        | Yes      | `string`                                                            |             |
+| `nodeId`       | Yes      | `string`                                                            |             |
+| `question`     | Yes      | `string`                                                            |             |
+| `recipient`    | Yes      | `string`                                                            |             |
+| `response`     | Yes      | [WorkflowHumanResponse](protocol.md#workflowhumanresponse) / `null` |             |
+| `runId`        | Yes      | `string`                                                            |             |
+| `status`       | Yes      | [WorkflowHumanStatus](protocol.md#workflowhumanstatus)              |             |
+| `timeoutMs`    | Yes      | `string`                                                            |             |
+
+## WorkflowHumanResponse
+
+Recorded response evidence; expiry contains no actor or answer.
+
+| Field       | Required | Type                                                     | Description |
+| ----------- | -------- | -------------------------------------------------------- | ----------- |
+| `actor`     | Yes      | `null,string`                                            |             |
+| `answer`    | Yes      | `null,string,boolean`                                    |             |
+| `atMs`      | Yes      | `string`                                                 |             |
+| `commandId` | Yes      | `null,string`                                            |             |
+| `outcome`   | Yes      | [WorkflowHumanOutcome](protocol.md#workflowhumanoutcome) |             |
+
+## WorkflowHumanStatus
+
+Request presentation state also reflects whole-run cancellation.
+
+Type: `"answered"` / `"cancelled"` / `"expired"` / `"pending"`.
 
 ## WorkflowImageCandidate
 
@@ -5850,20 +5957,20 @@ Lists exact invocations for a node without including captured input/output bodie
 
 ## WorkflowRunEvent
 
-| Field          | Required | Type                                                                                                                  | Description |
-| -------------- | -------- | --------------------------------------------------------------------------------------------------------------------- | ----------- |
-| `atMs`         | Yes      | `string`                                                                                                              |             |
-| `invocationId` | Yes      | `null,string`                                                                                                         |             |
-| `kind`         | Yes      | [WorkflowRunEventKind](protocol.md#workflowruneventkind)                                                              |             |
-| `message`      | Yes      | `null,string`                                                                                                         |             |
-| `nodeId`       | Yes      | `null,string`                                                                                                         |             |
-| `runId`        | Yes      | `string`                                                                                                              |             |
-| `sequence`     | Yes      | `string`                                                                                                              |             |
-| `status`       | Yes      | `"cancelled"` / `"failed"` / `"interrupted"` / `"queued"` / `"running"` / `"skipped"` / `"succeeded"` / `"uncertain"` |             |
+| Field          | Required | Type                                                                                                                                | Description |
+| -------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `atMs`         | Yes      | `string`                                                                                                                            |             |
+| `invocationId` | Yes      | `null,string`                                                                                                                       |             |
+| `kind`         | Yes      | [WorkflowRunEventKind](protocol.md#workflowruneventkind)                                                                            |             |
+| `message`      | Yes      | `null,string`                                                                                                                       |             |
+| `nodeId`       | Yes      | `null,string`                                                                                                                       |             |
+| `runId`        | Yes      | `string`                                                                                                                            |             |
+| `sequence`     | Yes      | `string`                                                                                                                            |             |
+| `status`       | Yes      | `"cancelled"` / `"failed"` / `"interrupted"` / `"queued"` / `"running"` / `"skipped"` / `"succeeded"` / `"uncertain"` / `"waiting"` |             |
 
 ## WorkflowRunEventKind
 
-Type: `"accepted"` / `"cancelled"` / `"claimed"` / `"finished"` / `"step-finished"` / `"step-started"`.
+Type: `"accepted"` / `"cancelled"` / `"claimed"` / `"finished"` / `"resumed"` / `"step-finished"` / `"step-started"` / `"step-waiting"` / `"suspended"`.
 
 ## WorkflowRunEventsRequest
 
@@ -5948,7 +6055,7 @@ Starts one idempotent run of an owned saved revision.
 
 ## WorkflowRunStatus
 
-Type: `"cancelled"` / `"failed"` / `"queued"` / `"running"` / `"succeeded"`.
+Type: `"cancelled"` / `"failed"` / `"queued"` / `"running"` / `"succeeded"` / `"waiting"`.
 
 ## WorkflowRunStepsPage
 
@@ -5996,7 +6103,7 @@ Command identity and expected revision serve different purposes.
 
 ## WorkflowStepStatus
 
-Type: `"cancelled"` / `"failed"` / `"interrupted"` / `"running"` / `"skipped"` / `"succeeded"` / `"uncertain"`.
+Type: `"cancelled"` / `"failed"` / `"interrupted"` / `"running"` / `"skipped"` / `"succeeded"` / `"uncertain"` / `"waiting"`.
 
 ## WorkflowStepView
 
