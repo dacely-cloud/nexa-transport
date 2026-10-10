@@ -67,7 +67,11 @@ export class WorkflowHttpInputs {
         const headers: Record<string, string> = this.headers(inputs['headers'] ?? {});
         const value: WorkflowValue | undefined = inputs['body'];
         const body: string | null =
-            value === undefined ? null : typeof value === 'string' ? value : JSON.stringify(value);
+            value === undefined || (value === null && (method === 'GET' || method === 'HEAD'))
+                ? null
+                : typeof value === 'string'
+                  ? value
+                  : JSON.stringify(value);
         if (body !== null && (method === 'GET' || method === 'HEAD')) {
             throw new Error('GET and HEAD requests cannot have a request body');
         }
