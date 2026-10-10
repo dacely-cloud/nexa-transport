@@ -16,6 +16,66 @@
         "docs"
     ],
     "exports": {
+        "./design-types": {
+            "types": "./dist/design/DesignTypes.d.ts",
+            "import": "./dist/design-types.js"
+        },
+        "./design-defaults": {
+            "types": "./dist/design/DesignDefaults.d.ts",
+            "import": "./dist/design-defaults.js"
+        },
+        "./design-codec": {
+            "types": "./dist/design/DesignCodec.d.ts",
+            "import": "./dist/design-codec.js"
+        },
+        "./design-edits": {
+            "types": "./dist/design/DesignEdits.d.ts",
+            "import": "./dist/design-edits.js"
+        },
+        "./design-operation-types": {
+            "types": "./dist/design/DesignOperationTypes.d.ts",
+            "import": "./dist/design-operation-types.js"
+        },
+        "./design-operation-codec": {
+            "types": "./dist/design/DesignOperationCodec.d.ts",
+            "import": "./dist/design-operation-codec.js"
+        },
+        "./design-scene": {
+            "types": "./dist/design/DesignScene.d.ts",
+            "import": "./dist/design-scene.js"
+        },
+        "./design-layout": {
+            "types": "./dist/design/DesignLayout.d.ts",
+            "import": "./dist/design-layout.js"
+        },
+        "./design-layout-types": {
+            "types": "./dist/design/DesignLayoutTypes.d.ts",
+            "import": "./dist/design-layout-types.js"
+        },
+        "./design-requests": {
+            "types": "./dist/design/DesignRequests.d.ts",
+            "import": "./dist/design-requests.js"
+        },
+        "./design-record-codec": {
+            "types": "./dist/design/DesignRecordCodec.d.ts",
+            "import": "./dist/design-record-codec.js"
+        },
+        "./design-records": {
+            "types": "./dist/design/DesignRecords.d.ts",
+            "import": "./dist/design-records.js"
+        },
+        "./design-request-codec": {
+            "types": "./dist/design/DesignRequestCodec.d.ts",
+            "import": "./dist/design-request-codec.js"
+        },
+        "./design-change-codec": {
+            "types": "./dist/design/DesignChangeCodec.d.ts",
+            "import": "./dist/design-change-codec.js"
+        },
+        "./design-paging": {
+            "types": "./dist/design/DesignPaging.d.ts",
+            "import": "./dist/design-paging.js"
+        },
         "./workflow-template-fields": {
             "types": "./dist/workflows/TemplateFields.d.ts",
             "import": "./dist/workflow-template-fields.js"
