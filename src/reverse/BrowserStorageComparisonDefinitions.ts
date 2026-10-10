@@ -10,8 +10,7 @@ export const BrowserStorageCompareStatus = {
     Unknown: 'unknown',
 } as const;
 /** Native comparison selection type. */
-export type BrowserStorageCompareStatus =
-    (typeof BrowserStorageCompareStatus)[keyof typeof BrowserStorageCompareStatus];
+export type BrowserStorageCompareStatus = (typeof BrowserStorageCompareStatus)[keyof typeof BrowserStorageCompareStatus];
 
 /** Native comparison enumeration. */
 export const BrowserStorageCompareMode = {
@@ -20,8 +19,7 @@ export const BrowserStorageCompareMode = {
     Unavailable: 'unavailable',
 } as const;
 /** Native comparison selection type. */
-export type BrowserStorageCompareMode =
-    (typeof BrowserStorageCompareMode)[keyof typeof BrowserStorageCompareMode];
+export type BrowserStorageCompareMode = (typeof BrowserStorageCompareMode)[keyof typeof BrowserStorageCompareMode];
 
 /** Native comparison enumeration. */
 export const BrowserStorageChangeKind = {
@@ -30,11 +28,7 @@ export const BrowserStorageChangeKind = {
     Modified: 'modified',
 } as const;
 /** Native comparison selection type. */
-export type BrowserStorageChangeKind =
-    (typeof BrowserStorageChangeKind)[keyof typeof BrowserStorageChangeKind];
+export type BrowserStorageChangeKind = (typeof BrowserStorageChangeKind)[keyof typeof BrowserStorageChangeKind];
 
 /** Complete host reports stay separate from paged wire contracts. */
-export interface BrowserStorageComparisonCapture {
-    readonly comparison: BrowserStorageComparison;
-    readonly changes: readonly BrowserStorageChange[];
-}
+export interface BrowserStorageComparisonCapture { readonly comparison: BrowserStorageComparison; readonly changes: readonly BrowserStorageChange[]; }

@@ -39,6 +39,8 @@ export interface WorkflowAgentInput {
 }
 /** Bounded live text is a preview; completed graph outputs remain authoritative. */
 export interface WorkflowAgentSession extends WorkflowAgentSessionRequest {
+    /** Owner-scoped Nexa conversation with the ordinary paged Chat event journal. */
+    readonly sessionKey?: string;
     readonly controlId: string;
     readonly controlRevision: string;
     readonly pauseRequested: boolean;

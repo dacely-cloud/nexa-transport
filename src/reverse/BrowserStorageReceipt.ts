@@ -1,13 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type {
-    BrowserStorageMetadata,
-    BrowserStorageCoverage,
-    BrowserStorageQuota,
-    BrowserStorageRow,
-    BrowserStoragePage,
-} from '../protocol/Protocol.js';
+import type { BrowserStorageMetadata, BrowserStorageCoverage, BrowserStorageQuota, BrowserStorageRow, BrowserStoragePage } from '../protocol/Protocol.js';
 
 /** Native storage enumeration. */
 export const BrowserStorageGroup = {
@@ -32,10 +26,7 @@ export const BrowserStorageKind = {
 export type BrowserStorageKind = (typeof BrowserStorageKind)[keyof typeof BrowserStorageKind];
 
 /** Host captures remain separate from paged wire responses. */
-export interface BrowserStorageCapture {
-    readonly metadata: BrowserStorageMetadata;
-    readonly rows: readonly BrowserStorageRow[];
-}
+export interface BrowserStorageCapture { readonly metadata: BrowserStorageMetadata; readonly rows: readonly BrowserStorageRow[]; }
 
 /** Portable validation keeps saved storage receipts value-free and coverage claims internally consistent. */
 export class BrowserStorageReceipt {

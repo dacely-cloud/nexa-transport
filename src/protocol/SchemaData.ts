@@ -16934,6 +16934,11 @@ export const schema: Schema = {
                 runId: {
                     type: 'string',
                 },
+                sessionKey: {
+                    description:
+                        'Owner-scoped Nexa conversation with the ordinary paged Chat event journal.',
+                    type: 'string',
+                },
                 status: {
                     $ref: '#/definitions/WorkflowStepStatus',
                 },

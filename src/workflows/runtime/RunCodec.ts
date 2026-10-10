@@ -1,6 +1,7 @@
-import { WorkflowTimeLimits } from '../TimeLimits.js';
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { WorkflowTimeLimits } from '../TimeLimits.js';
 
 import { WorkflowScheduleCodec } from '../schedule/ScheduleCodec.js';
 import type { WorkflowScheduleSource } from '../schedule/ScheduleTypes.js';
@@ -43,6 +44,11 @@ export class WorkflowRunCodec {
     }
     public static snapshot(raw: unknown): WorkflowRunSnapshot {
         const value: Readonly<Record<string, unknown>> = WorkflowInput.record(raw, [
+            ...(raw !== null &&
+            typeof raw === 'object' &&
+            Object.hasOwn(raw, 'accountAuthorization')
+                ? ['accountAuthorization']
+                : []),
             ...(raw !== null && typeof raw === 'object' && Object.hasOwn(raw, 'schedule')
                 ? ['schedule']
                 : []),
@@ -63,6 +69,9 @@ export class WorkflowRunCodec {
             'maxConcurrency',
             'timeoutMs',
         ]);
+        if (value['accountAuthorization'] !== undefined && value['accountAuthorization'] !== true) {
+            throw new Error('Invalid workflow account authorization');
+        }
         if (value['format'] !== 1) {
             throw new Error('Unsupported workflow run snapshot format');
         }
@@ -125,6 +134,9 @@ export class WorkflowRunCodec {
         }
         const input: WorkflowObject = WorkflowJson.object(value['input']);
         return Object.freeze({
+            ...(value['accountAuthorization'] === true
+                ? { accountAuthorization: true as const }
+                : {}),
             ...(schedule === undefined ? {} : { schedule }),
             ...(publication === undefined ? {} : { publication }),
             ...(value['imageModels'] === undefined

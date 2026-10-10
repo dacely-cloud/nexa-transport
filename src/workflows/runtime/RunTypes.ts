@@ -55,6 +55,8 @@ export type WorkflowRunEventKind = (typeof WorkflowRunEventKind)[keyof typeof Wo
 
 /** Immutable semantic snapshot; no canvas layout, credentials, or mutable draft pointer. */
 export interface WorkflowRunSnapshot {
+    /** The submitting account approved unattended execution of this exact immutable snapshot. */
+    readonly accountAuthorization?: true;
     /** Present only on scheduled published runs. */
     readonly schedule?: WorkflowScheduleSource;
     readonly publication?: WorkflowPublicationReference;

@@ -6,17 +6,8 @@ import { BrowserStorageComparisonValues as Value } from './BrowserStorageCompari
 import { BrowserStorageComparisonPolicy as Policy } from './BrowserStorageComparisonPolicy.js';
 import { BrowserStorageGroup } from './BrowserStorageReceipt.js';
 import type { BrowserStorageMetadata } from '../protocol/Protocol.js';
-import {
-    BrowserStorageCompareMode as Mode,
-    BrowserStorageCompareStatus as Status,
-} from './BrowserStorageComparisonDefinitions.js';
-import type {
-    BrowserStorageComparison,
-    BrowserStorageComparisonSource,
-    BrowserStorageGroupComparison,
-    BrowserStorageQuotaComparison,
-    BrowserStorageComparisonSnapshot,
-} from '../protocol/Protocol.js';
+import { BrowserStorageCompareMode as Mode, BrowserStorageCompareStatus as Status } from './BrowserStorageComparisonDefinitions.js';
+import type { BrowserStorageComparison, BrowserStorageComparisonSource, BrowserStorageGroupComparison, BrowserStorageQuotaComparison, BrowserStorageComparisonSnapshot } from '../protocol/Protocol.js';
 import type { ReverseBrowserReference } from '../protocol/Protocol.js';
 
 /** Portable comparison headers reject fabricated equality, counters, quota deltas and cross-conversation sources. */
