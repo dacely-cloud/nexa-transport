@@ -3999,7 +3999,6 @@
                 "models",
                 "observability",
                 "output",
-                "personas",
                 "planning",
                 "policy",
                 "programs",
@@ -6278,6 +6277,9 @@
                     "$ref": "#/definitions/DesignUpdate"
                 },
                 {
+                    "$ref": "#/definitions/DesignTextOperation"
+                },
+                {
                     "$ref": "#/definitions/DesignMove"
                 },
                 {
@@ -6843,6 +6845,23 @@
                 "size",
                 "weight"
             ],
+            "type": "object"
+        },
+        "DesignTextOperation": {
+            "description": "Replace text content while preserving typography and clipping existing rich-text ranges.",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "op": {
+                    "const": "text",
+                    "type": "string"
+                }
+            },
+            "required": ["content", "id", "op"],
             "type": "object"
         },
         "DesignTextRun": {

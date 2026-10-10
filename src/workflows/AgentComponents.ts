@@ -18,7 +18,7 @@ import { Schemas } from './Schemas.js';
 import { WorkflowModelEffort } from './ModelEffort.js';
 import { WorkflowInput } from './WorkflowInput.js';
 
-/** Agent, prompt, persona and model roles are separately reusable configurations. */
+/** Agent, prompt and model roles are separately reusable configurations. */
 export class AgentComponents {
     /** Task connections accept generated text; the runtime rejects empty task values. */
     public static definitions(): readonly ComponentDefinition[] {
@@ -97,7 +97,6 @@ export class AgentComponents {
                     maxConnections: 1,
                     modelCapabilities: ['image'],
                 },
-                Ports.resource('persona', 'Personas', 'persona', PortDirection.Input),
                 Ports.resource('prompt', 'Prompt', 'prompt', PortDirection.Input),
                 ...external,
                 Ports.flow('out', PortDirection.Output),
@@ -219,36 +218,6 @@ export class AgentComponents {
             resourceRole: 'model',
             migratesFrom: [],
         };
-        const persona: ComponentDefinition = {
-            id: 'persona.instructions',
-            version: '1',
-            role: ComponentRole.Resource,
-            category: ComponentCategory.Personas,
-            display: CoreComponents.display(
-                'Persona',
-                'Provide instructions and tone without granting tools or permissions.',
-                'Attach an editor persona to a writing agent.',
-                ['expert', 'persona', 'tone'],
-                'persona',
-                ['purpose'],
-            ),
-            configuration: Schemas.object([
-                Schemas.field('purpose', Schemas.text),
-                Schemas.field('instructions', Schemas.text),
-                Schemas.field('priority', {
-                    ...Schemas.number,
-                    whole: true,
-                    minimum: 0,
-                    maximum: 100,
-                }),
-            ]),
-            defaults: { purpose: '', instructions: '', priority: 0 },
-            ports: [Ports.resource('persona', 'Persona', 'persona', PortDirection.Output)],
-            resources: [],
-            execution: null,
-            resourceRole: 'persona',
-            migratesFrom: [],
-        };
         const prompt: ComponentDefinition = {
             id: 'prompt.template',
             version: '1',
@@ -294,6 +263,6 @@ export class AgentComponents {
             resourceRole: 'agent',
             migratesFrom: [],
         };
-        return [agent, model, persona, prompt, reference];
+        return [agent, model, prompt, reference];
     }
 }

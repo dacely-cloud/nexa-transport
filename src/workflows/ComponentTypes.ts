@@ -24,7 +24,6 @@ export const ComponentCategory = {
     Time: 'time',
     Agents: 'agents',
     Prompts: 'prompts',
-    Personas: 'personas',
     Models: 'models',
     Context: 'context',
     Research: 'research',

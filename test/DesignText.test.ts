@@ -5,6 +5,28 @@ import { DesignDefaults } from '../src/design/DesignDefaults.js';
 import { DesignEdits } from '../src/design/DesignEdits.js';
 import { DesignKind, type DesignDocument, type DesignNode } from '../src/design/DesignTypes.js';
 import type { DesignEditResult } from '../src/design/DesignOperationTypes.js';
+import { SchemaValidator } from '../src/protocol/Schema.js';
+import { schema } from '../src/protocol/SchemaData.js';
+
+it('admits content-only text edits at the gateway boundary and rejects malformed content', (): void => {
+    const validator: SchemaValidator = new SchemaValidator(schema);
+    expect(
+        validator.validate('#/definitions/DesignSaveRequest', {
+            id: 'canvas',
+            expectedRevision: '0',
+            commandId: 'text-edit',
+            operations: [{ op: 'text', id: 'heading', content: 'Updated heading' }],
+        }),
+    ).toBe(true);
+    expect(
+        validator.validate('#/definitions/DesignSaveRequest', {
+            id: 'canvas',
+            expectedRevision: '0',
+            commandId: 'text-edit',
+            operations: [{ op: 'text', id: 'heading', content: 42 }],
+        }),
+    ).toBe(false);
+});
 
 function document(content: string = 'Orbit Studio'): DesignDocument {
     const template: DesignNode = DesignDefaults.node('heading', DesignKind.Text);
