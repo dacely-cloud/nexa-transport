@@ -13,7 +13,8 @@
         "README.md",
         "LICENSE",
         "NOTICE",
-        "docs"
+        "docs",
+        "licenses"
     ],
     "exports": {
         "./design-image-geometry": {
@@ -466,6 +467,18 @@
         "./design-component-types": {
             "types": "./dist/design/DesignComponentTypes.d.ts",
             "import": "./dist/design-component-types.js"
+        },
+        "./design-boolean-edits": {
+            "types": "./dist/design/DesignBooleanEdits.d.ts",
+            "import": "./dist/design-boolean-edits.js"
+        },
+        "./design-boolean-types": {
+            "types": "./dist/design/DesignBooleanTypes.d.ts",
+            "import": "./dist/design-boolean-types.js"
+        },
+        "./design-boolean-kernel": {
+            "types": "./dist/design/DesignBooleanKernel.d.ts",
+            "import": "./dist/design-boolean-kernel.js"
         }
     },
     "scripts": {
@@ -514,6 +527,7 @@
     ],
     "dependencies": {
         "@js-temporal/polyfill": "0.5.1",
-        "meshoptimizer": "^1.2.0"
+        "meshoptimizer": "^1.2.0",
+        "pathkit-wasm": "1.0.0"
     }
 }
