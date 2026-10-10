@@ -20,6 +20,7 @@ import type {
     DesignPage,
     DesignInteraction,
     DesignComment,
+    DesignTextRun,
 } from './DesignTypes.js';
 
 interface Identified {
@@ -52,7 +53,7 @@ export class DesignEdits {
                     }
                     if (operation.node.parentId !== null || operation.node.children.length > 0) {
                         throw new Error(
-                            'Insert standalone layers, then build the tree with insert or move',
+                            'Insert templates require node.parentId:null and node.children:[]; specify the parent in operation.parentId',
                         );
                     }
                     nodes.set(operation.node.id, {
@@ -72,6 +73,37 @@ export class DesignEdits {
                 case DesignOperationKind.Update: {
                     const node: DesignNode = Tree.node(nodes, operation.id);
                     nodes.set(node.id, DesignPaths.resize(node, operation.changes));
+                    break;
+                }
+                case DesignOperationKind.Text: {
+                    const node: DesignNode = Tree.node(nodes, operation.id);
+                    if (node.text === null) {
+                        throw new Error(`Layer has no editable text: ${node.id}`);
+                    }
+                    const content: string = operation.content;
+                    const runs: DesignTextRun[] = [];
+                    for (const run of node.text.runs) {
+                        let start: number = Math.min(run.start, content.length);
+                        let end: number = Math.min(run.end, content.length);
+                        if (
+                            start < end &&
+                            !content.slice(start, start + 1).isWellFormed() &&
+                            content.charCodeAt(start) >= 0xdc00
+                        ) {
+                            start++;
+                        }
+                        if (
+                            start < end &&
+                            !content.slice(end - 1, end).isWellFormed() &&
+                            content.charCodeAt(end - 1) <= 0xdbff
+                        ) {
+                            end--;
+                        }
+                        if (start < end) {
+                            runs.push({ ...run, start, end });
+                        }
+                    }
+                    nodes.set(node.id, { ...node, text: { ...node.text, content, runs } });
                     break;
                 }
                 case DesignOperationKind.Move: {

@@ -29,6 +29,7 @@ export class DesignOperationCodec {
                     'index',
                     'id',
                     'changes',
+                    'content',
                     'name',
                     'background',
                     'tokens',
@@ -65,6 +66,18 @@ export class DesignOperationCodec {
                     const id: string = V.id(value['id']);
                     const changes: DesignNodeChanges = this.#changes(value['changes']);
                     return { op, id, changes };
+                }
+                case Kind.Text: {
+                    const value: Readonly<Record<string, unknown>> = V.record(entry, [
+                        'op',
+                        'id',
+                        'content',
+                    ]);
+                    return {
+                        op,
+                        id: V.id(value['id']),
+                        content: V.text(value['content'], 100000, true),
+                    };
                 }
                 case Kind.Move: {
                     const value: Readonly<Record<string, unknown>> = V.record(entry, [

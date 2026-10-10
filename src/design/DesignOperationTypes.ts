@@ -22,6 +22,7 @@ import type {
 export const DesignOperationKind = {
     Insert: 'insert',
     Update: 'update',
+    Text: 'text',
     Move: 'move',
     Remove: 'remove',
     Page: 'page',
@@ -62,6 +63,12 @@ export interface DesignUpdate {
     readonly id: string;
     readonly changes: DesignNodeChanges;
 }
+/** Replace text content while preserving typography and clipping existing rich-text ranges. */
+export interface DesignTextOperation {
+    readonly op: typeof DesignOperationKind.Text;
+    readonly id: string;
+    readonly content: string;
+}
 /** Reparent or reorder without breaking both sides of the tree. */
 export interface DesignMove {
     readonly op: typeof DesignOperationKind.Move;
@@ -92,7 +99,13 @@ export interface DesignMetadata {
 }
 /** A transaction can contain different operation types. */
 export type DesignOperation =
-    DesignInsert | DesignUpdate | DesignMove | DesignRemove | DesignPageOperation | DesignMetadata;
+    | DesignInsert
+    | DesignUpdate
+    | DesignTextOperation
+    | DesignMove
+    | DesignRemove
+    | DesignPageOperation
+    | DesignMetadata;
 /** Before and after images provide conflict-safe undo and bounded deltas. */
 export interface DesignEntityChange<T> {
     readonly id: string;
