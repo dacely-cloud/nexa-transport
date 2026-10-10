@@ -133,7 +133,7 @@ export class DesignSvg {
                     clipName = paints.identity('clip');
                     clips.set(clipId, clipName);
                     paints.definitions.push(
-                        `<clipPath id="${clipName}" clipPathUnits="userSpaceOnUse"><g transform="translate(${clip.x} ${clip.y}) rotate(${clip.rotation} ${clip.width / 2} ${clip.height / 2})">${Geometry.shape(clipNode, clip, '')}</g></clipPath>`,
+                        `<clipPath id="${clipName}" clipPathUnits="userSpaceOnUse" transform="translate(${clip.x} ${clip.y}) rotate(${clip.rotation} ${clip.width / 2} ${clip.height / 2})">${Geometry.shape(clipNode, clip, '')}</clipPath>`,
                     );
                 }
                 element = `<g clip-path="url(#${clipName})">${element}</g>`;
