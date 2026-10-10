@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignBooleanMode } from './DesignBooleanTypes.js';
+
 import {
     DesignKind,
     DesignFlow,
@@ -67,6 +69,7 @@ export class DesignDefaults {
         return {
             id,
             kind,
+            ...(kind === DesignKind.Boolean ? { booleanMode: DesignBooleanMode.Union } : {}),
             name,
             parentId: null,
             children: [],

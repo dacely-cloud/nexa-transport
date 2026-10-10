@@ -7,6 +7,7 @@ import { DesignStyleCodec } from './DesignStyleCodec.js';
 import { DesignLayoutCodec } from './DesignLayoutCodec.js';
 import { DesignKind, type DesignPathCommand, type DesignOverride } from './DesignTypes.js';
 import { DesignNodeCodec } from './DesignNodeCodec.js';
+import { DesignBooleanMode } from './DesignBooleanTypes.js';
 import {
     DesignOperationKind as Kind,
     type DesignOperation,
@@ -18,7 +19,7 @@ import type { DesignNode, DesignToken, DesignInteraction, DesignComment } from '
 export class DesignOperationCodec {
     /** Parses detached transaction values; complete layer and tree invariants are checked after atomic application. */
     public static operations(raw: unknown): readonly DesignOperation[] {
-        return V.list(raw, 256, (entry: unknown): DesignOperation => {
+        return V.list(raw, 512, (entry: unknown): DesignOperation => {
             const tag: Readonly<Record<string, unknown>> = V.fields(
                 entry,
                 [
@@ -164,6 +165,14 @@ export class DesignOperationCodec {
         }
         return {
             ...(Object.hasOwn(value, 'name') ? { name: V.text(value['name']) } : {}),
+            ...(Object.hasOwn(value, 'booleanMode')
+                ? {
+                      booleanMode:
+                          value['booleanMode'] === null
+                              ? null
+                              : V.choice(value['booleanMode'], Object.values(DesignBooleanMode)),
+                  }
+                : {}),
             ...(Object.hasOwn(value, 'kind')
                 ? { kind: V.choice(value['kind'], Object.values(DesignKind)) }
                 : {}),
@@ -217,6 +226,7 @@ export class DesignOperationCodec {
     }
 }
 const KEYS: readonly string[] = [
+    'booleanMode',
     'name',
     'kind',
     'x',

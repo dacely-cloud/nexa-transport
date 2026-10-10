@@ -1,7 +1,12 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { DesignPathVerb as Verb, type DesignPathCommand, type DesignNode } from './DesignTypes.js';
+import {
+    DesignKind,
+    DesignPathVerb as Verb,
+    type DesignPathCommand,
+    type DesignNode,
+} from './DesignTypes.js';
 import type { DesignNodeChanges } from './DesignOperationTypes.js';
 import { DesignValues as V } from './DesignValues.js';
 
@@ -27,7 +32,16 @@ export interface DesignPathGeometry {
 export class DesignPaths {
     /** Width and height edits resize vector coordinates unless the command supplies an explicit replacement path. */
     public static resize(node: DesignNode, changes: DesignNodeChanges): DesignNode {
-        const next: DesignNode = { ...node, ...changes };
+        const { booleanMode: previousMode, ...base } = node;
+        const { booleanMode: changedMode, ...properties } = changes;
+        const kind: DesignNode['kind'] = properties.kind ?? node.kind;
+        const mode: DesignNode['booleanMode'] =
+            changedMode === null ? undefined : (changedMode ?? previousMode);
+        const next: DesignNode = {
+            ...base,
+            ...properties,
+            ...(kind === DesignKind.Boolean && mode !== undefined ? { booleanMode: mode } : {}),
+        };
         if (
             node.path.length === 0 ||
             changes.path !== undefined ||

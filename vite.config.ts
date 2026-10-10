@@ -4,6 +4,9 @@ const config: UserConfig = {
         target: 'es2023',
         lib: {
             entry: {
+                'design-boolean-edits': 'src/design/DesignBooleanEdits.ts',
+                'design-boolean-types': 'src/design/DesignBooleanTypes.ts',
+                'design-boolean-kernel': 'src/design/DesignBooleanKernel.ts',
                 'design-svg': 'src/design/DesignSvg.ts',
                 'design-image-geometry': 'src/design/DesignImageGeometry.ts',
                 'design-svg-geometry': 'src/design/DesignSvgGeometry.ts',
@@ -117,6 +120,7 @@ const config: UserConfig = {
             },
             formats: ['es'],
         },
+        rollupOptions: {external: ['pathkit-wasm']},
         sourcemap: true,
     },
 };

@@ -216,15 +216,16 @@ export class DesignSelectionTree {
         const selection: string[] = [];
         const ordered: Map<string | null, string[]> = new Map();
         for (const group of context.roots) {
-            if (group.kind !== DesignKind.Group) {
+            if (group.kind !== DesignKind.Group && group.kind !== DesignKind.Boolean) {
                 throw new Error('Select groups to ungroup.');
             }
             if (
-                group.layout.clip ||
-                group.style.fills.length > 0 ||
-                group.style.stroke !== null ||
-                group.style.shadows.length > 0 ||
-                group.style.blur !== 0
+                group.kind !== DesignKind.Boolean &&
+                (group.layout.clip ||
+                    group.style.fills.length > 0 ||
+                    group.style.stroke !== null ||
+                    group.style.shadows.length > 0 ||
+                    group.style.blur !== 0)
             ) {
                 throw new Error(
                     'Remove the group’s fill, stroke, effects and clipping before ungrouping.',

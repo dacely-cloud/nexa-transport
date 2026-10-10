@@ -65,6 +65,9 @@ export class DesignTree {
             tokens.set(token.id, token.category);
         }
         for (const node of nodes.values()) {
+            if (node.kind === DesignKind.Boolean && node.children.length > 128) {
+                throw new Error('A Boolean group accepts at most 128 direct sources');
+            }
             for (const paint of [
                 ...node.style.fills,
                 ...(node.style.stroke === null ? [] : [node.style.stroke.paint]),

@@ -1,10 +1,13 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { DesignBooleanMode } from './DesignBooleanTypes.js';
+
 /** Editable scene primitives, including reusable component definitions and instances. */
 export const DesignKind = {
     Frame: 'frame',
     Group: 'group',
+    Boolean: 'boolean',
     Rectangle: 'rectangle',
     Ellipse: 'ellipse',
     Line: 'line',
@@ -239,6 +242,8 @@ export interface DesignNode {
     readonly image: DesignImage | null;
     readonly componentId: string | null;
     readonly overrides: readonly DesignOverride[];
+    /** Omitted on ordinary layers, preserving existing document and retry identities. */
+    readonly booleanMode?: DesignBooleanMode;
 }
 /** Instance overrides target a source layer without modifying its component definition. */
 export interface DesignOverride {

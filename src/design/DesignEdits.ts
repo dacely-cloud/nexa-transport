@@ -14,6 +14,7 @@ import {
     type DesignMetadataState,
     type DesignEditResult,
 } from './DesignOperationTypes.js';
+import { DesignKind } from './DesignTypes.js';
 import type {
     DesignDocument,
     DesignNode,
@@ -34,8 +35,8 @@ export class DesignEdits {
         source: DesignDocument,
         operations: readonly DesignOperation[],
     ): DesignEditResult {
-        if (operations.length < 1 || operations.length > 256) {
-            throw new Error('A design transaction requires 1 to 256 operations');
+        if (operations.length < 1 || operations.length > 512) {
+            throw new Error('A design transaction requires 1 to 512 operations');
         }
         const document: DesignDocument = DesignCodec.document(source);
         const nodes: Map<string, DesignNode> = new Map(
@@ -72,6 +73,15 @@ export class DesignEdits {
                 }
                 case DesignOperationKind.Update: {
                     const node: DesignNode = Tree.node(nodes, operation.id);
+                    if (
+                        node.kind === DesignKind.Boolean &&
+                        operation.changes.path !== undefined &&
+                        operation.changes.kind !== DesignKind.Path
+                    ) {
+                        throw new Error(
+                            'Boolean outlines are derived. Edit the source layers or flatten the group first.',
+                        );
+                    }
                     nodes.set(node.id, DesignPaths.resize(node, operation.changes));
                     break;
                 }

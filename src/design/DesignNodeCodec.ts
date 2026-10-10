@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignBooleanMode } from './DesignBooleanTypes.js';
+import { DesignFlow } from './DesignTypes.js';
 import { DesignValues as V } from './DesignValues.js';
 import { DesignStyleCodec } from './DesignStyleCodec.js';
 import { DesignImageFramingCodec } from './DesignImageFramingCodec.js';
@@ -19,34 +21,19 @@ import {
 export class DesignNodeCodec {
     /** Parses and detaches one layer with bounded text, effects and geometry. */
     public static node(raw: unknown): DesignNode {
-        const value: Readonly<Record<string, unknown>> = V.record(raw, [
-            'id',
-            'name',
-            'kind',
-            'parentId',
-            'children',
-            'x',
-            'y',
-            'width',
-            'height',
-            'rotation',
-            'opacity',
-            'visible',
-            'locked',
-            'style',
-            'layout',
-            'placement',
-            'text',
-            'path',
-            'image',
-            'componentId',
-            'overrides',
-        ]);
+        const value: Readonly<Record<string, unknown>> = V.fields(
+            raw,
+            [...KEYS, 'booleanMode'],
+            KEYS,
+        );
         const kind: DesignKind = V.choice(value['kind'], Object.values(DesignKind));
         const node: DesignNode = {
             id: V.id(value['id']),
             name: V.text(value['name']),
             kind,
+            ...(kind === DesignKind.Boolean
+                ? { booleanMode: V.choice(value['booleanMode'], Object.values(DesignBooleanMode)) }
+                : {}),
             parentId: V.optionalId(value['parentId']),
             children: V.list(value['children'], 10000, (entry: unknown): string => V.id(entry)),
             x: V.number(value['x']),
@@ -78,7 +65,7 @@ export class DesignNodeCodec {
         }
         if (
             node.children.length > 0 &&
-            ![DesignKind.Frame, DesignKind.Group, DesignKind.Component].some(
+            ![DesignKind.Frame, DesignKind.Group, DesignKind.Component, DesignKind.Boolean].some(
                 (entry: DesignKind): boolean => entry === kind,
             )
         ) {
@@ -95,9 +82,13 @@ export class DesignNodeCodec {
         }
         if (
             node.path.length > 0 &&
-            ![DesignKind.Path, DesignKind.Polygon, DesignKind.Line].some(
-                (entry: DesignKind): boolean => entry === kind,
-            )
+            ![
+                DesignKind.Path,
+                DesignKind.Polygon,
+                DesignKind.Line,
+                DesignKind.Boolean,
+                DesignKind.Group,
+            ].some((entry: DesignKind): boolean => entry === kind)
         ) {
             throw new Error('Only vector layers accept path geometry');
         }
@@ -106,6 +97,17 @@ export class DesignNodeCodec {
         }
         if (node.image !== null && kind !== DesignKind.Image) {
             throw new Error('Only image layers accept an image reference');
+        }
+        if (kind !== DesignKind.Boolean && Object.hasOwn(value, 'booleanMode')) {
+            throw new Error('Only Boolean groups accept an operation mode');
+        }
+        if (
+            kind === DesignKind.Boolean &&
+            (node.layout.flow !== DesignFlow.Absolute ||
+                node.layout.clip ||
+                Object.values(node.layout.padding).some((value: number): boolean => value !== 0))
+        ) {
+            throw new Error('Boolean sources use an unclipped absolute container');
         }
         return DesignFreeze.node(node);
     }
@@ -159,3 +161,27 @@ export class DesignNodeCodec {
         };
     }
 }
+
+const KEYS: readonly string[] = [
+    'id',
+    'name',
+    'kind',
+    'parentId',
+    'children',
+    'x',
+    'y',
+    'width',
+    'height',
+    'rotation',
+    'opacity',
+    'visible',
+    'locked',
+    'style',
+    'layout',
+    'placement',
+    'text',
+    'path',
+    'image',
+    'componentId',
+    'overrides',
+];

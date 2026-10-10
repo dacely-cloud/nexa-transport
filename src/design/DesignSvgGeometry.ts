@@ -36,6 +36,19 @@ export class DesignSvgGeometry {
             scene.boxes.map((box: DesignBox): readonly [string, DesignBox] => [box.id, box]),
         );
         const selected: ReadonlySet<string> = new Set(selection);
+        const includes: (id: string) => boolean = (id: string): boolean => {
+            if (selected.size === 0) {
+                return true;
+            }
+            let current: string | null = id;
+            while (current !== null) {
+                if (selected.has(current)) {
+                    return true;
+                }
+                current = nodes.get(current)?.parentId ?? null;
+            }
+            return false;
+        };
         if (selection.some((id: string): boolean => !source.has(id))) {
             throw new Error('Show the selected layers before exporting.');
         }
@@ -48,6 +61,9 @@ export class DesignSvgGeometry {
         for (const box of scene.boxes) {
             const node: DesignSceneNode | undefined = nodes.get(box.id);
             if (node === undefined) {
+                continue;
+            }
+            if (node.booleanOwner !== undefined && includes(node.booleanOwner)) {
                 continue;
             }
             let included: boolean = selected.size === 0 || selected.has(box.id);
@@ -133,6 +149,9 @@ export class DesignSvgGeometry {
     }
     /** Resolved path coordinates fit paints to layout bounds and retain authored stroke widths and dashes. */
     public static shape(node: DesignSceneNode, box: DesignBox, attributes: string): string {
+        if (node.kind === DesignKind.Boolean && node.path.length === 0) {
+            return '';
+        }
         if (node.kind === DesignKind.Ellipse) {
             return `<ellipse cx="${box.width / 2}" cy="${box.height / 2}" rx="${box.width / 2}" ry="${box.height / 2}" ${attributes}/>`;
         }

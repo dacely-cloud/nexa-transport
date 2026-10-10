@@ -16,6 +16,8 @@ import {
 export interface DesignSceneNode extends DesignNode {
     readonly sourceId: string;
     readonly instanceId: string | null;
+    /** Source boxes remain editable while only their owning Boolean silhouette is painted. */
+    readonly booleanOwner?: string;
 }
 /** A page-local expanded scene is disposable; component instances remain compact in storage. */
 export interface DesignScenePage {
@@ -148,7 +150,29 @@ export class DesignScene {
         for (const root of page.roots) {
             expand(root, root, null, null, [], 0);
         }
+        const expanded: Map<string, DesignSceneNode> = new Map();
+        for (let index: number = 0; index < nodes.length; index++) {
+            const node: DesignSceneNode | undefined = nodes[index];
+            if (node === undefined) {
+                continue;
+            }
+            const parent: DesignSceneNode | undefined =
+                node.parentId === null ? undefined : expanded.get(node.parentId);
+            const owner: string | undefined =
+                parent?.kind === DesignKind.Boolean ? parent.id : parent?.booleanOwner;
+            const resolved: DesignSceneNode =
+                owner === undefined ? node : { ...node, booleanOwner: owner };
+            nodes[index] = resolved;
+            expanded.set(node.id, resolved);
+        }
         return { page, nodes };
+    }
+    /** Derived empty silhouettes and retained operands do not allocate paint, image or effect work. */
+    public static paints(node: DesignSceneNode): boolean {
+        return (
+            node.booleanOwner === undefined &&
+            (node.kind !== DesignKind.Boolean || node.path.length > 0)
+        );
     }
     static #override(node: DesignNode, override: DesignOverride | undefined): DesignNode {
         if (override === undefined) {

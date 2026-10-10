@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { DesignBooleanMode } from './DesignBooleanTypes.js';
+
 import type {
     DesignNode,
     DesignPage,
@@ -30,6 +32,8 @@ export const DesignOperationKind = {
 } as const;
 /** Editable properties exclude identity and tree links, which have dedicated operations. */
 export interface DesignNodeChanges {
+    /** A null value clears the operation when explicitly flattening a Boolean group. */
+    readonly booleanMode?: DesignBooleanMode | null;
     readonly name?: string;
     readonly kind?: DesignKind;
     readonly x?: number;

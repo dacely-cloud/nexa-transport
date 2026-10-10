@@ -120,7 +120,11 @@ export class DesignSvg {
             if (node === undefined || box === undefined) {
                 return '';
             }
-            let element: string = `<g opacity="${node.opacity}"${paints.effects(node.style, box)}>${elements.get(id) ?? ''}${node.children.map(tree).join('')}</g>`;
+            const children: string =
+                node.kind === DesignKind.Boolean && elements.has(id)
+                    ? ''
+                    : node.children.map(tree).join('');
+            let element: string = `<g opacity="${node.opacity}"${paints.effects(node.style, box)}>${elements.get(id) ?? ''}${children}</g>`;
             let clipId: string | null = box.clipId;
             while (clipId !== null) {
                 const clip: DesignBox | undefined = boxes.get(clipId);

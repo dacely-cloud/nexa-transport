@@ -3946,17 +3946,18 @@ export type DesignInteractionRecord = DesignInteractionRecordShape;
 
 /** Allowed values for DesignKind. */
 export const DesignKindValues = {
-    Value0: 'component',
-    Value1: 'ellipse',
-    Value2: 'frame',
-    Value3: 'group',
-    Value4: 'image',
-    Value5: 'instance',
-    Value6: 'line',
-    Value7: 'path',
-    Value8: 'polygon',
-    Value9: 'rectangle',
-    Value10: 'text',
+    Value0: 'boolean',
+    Value1: 'component',
+    Value2: 'ellipse',
+    Value3: 'frame',
+    Value4: 'group',
+    Value5: 'image',
+    Value6: 'instance',
+    Value7: 'line',
+    Value8: 'path',
+    Value9: 'polygon',
+    Value10: 'rectangle',
+    Value11: 'text',
 } as const;
 
 /** DesignKind from the Nexa wire protocol. */
@@ -4097,6 +4098,8 @@ export type DesignMove = DesignMoveShape;
 
 /** DesignNode wire fields. */
 export interface DesignNodeShape {
+    /** booleanMode as defined by the Nexa gateway. */
+    readonly booleanMode?: (typeof DesignNodebooleanModeValues)[keyof typeof DesignNodebooleanModeValues];
     /** children as defined by the Nexa gateway. */
     readonly children: ReadonlyArray<string>;
     /** componentId as defined by the Nexa gateway. */
@@ -4146,21 +4149,26 @@ export type DesignNode = DesignNodeShape;
 
 /** Allowed values for DesignNodeChangeskind. */
 export const DesignNodeChangeskindValues = {
-    Value0: 'component',
-    Value1: 'ellipse',
-    Value2: 'frame',
-    Value3: 'group',
-    Value4: 'image',
-    Value5: 'instance',
-    Value6: 'line',
-    Value7: 'path',
-    Value8: 'polygon',
-    Value9: 'rectangle',
-    Value10: 'text',
+    Value0: 'boolean',
+    Value1: 'component',
+    Value2: 'ellipse',
+    Value3: 'frame',
+    Value4: 'group',
+    Value5: 'image',
+    Value6: 'instance',
+    Value7: 'line',
+    Value8: 'path',
+    Value9: 'polygon',
+    Value10: 'rectangle',
+    Value11: 'text',
 } as const;
 
 /** DesignNodeChanges wire fields. */
 export interface DesignNodeChangesShape {
+    /** booleanMode as defined by the Nexa gateway. */
+    readonly booleanMode?:
+        | (typeof DesignNodeChangesbooleanModeVariant0Values)[keyof typeof DesignNodeChangesbooleanModeVariant0Values]
+        | null;
     /** componentId as defined by the Nexa gateway. */
     readonly componentId?: null | string;
     /** height as defined by the Nexa gateway. */
@@ -4293,6 +4301,8 @@ export interface DesignPaintShape {
     readonly assetId: null | string;
     /** color as defined by the Nexa gateway. */
     readonly color: string;
+    /** framing as defined by the Nexa gateway. */
+    readonly framing?: DesignImageFraming;
     /** kind as defined by the Nexa gateway. */
     readonly kind: DesignPaintKind;
     /** opacity as defined by the Nexa gateway. */
@@ -14176,3 +14186,34 @@ export enum Method {
     /** Calls workspaces.list. */
     WorkspacesList = 'workspaces.list',
 }
+
+/** DesignImageFraming wire fields. */
+export interface DesignImageFramingShape {
+    /** cropX as defined by the Nexa gateway. */
+    readonly cropX: number;
+    /** cropY as defined by the Nexa gateway. */
+    readonly cropY: number;
+    /** fit as defined by the Nexa gateway. */
+    readonly fit: DesignImageFit;
+    /** scale as defined by the Nexa gateway. */
+    readonly scale: number;
+}
+
+/** DesignImageFraming from the Nexa wire protocol. */
+export type DesignImageFraming = DesignImageFramingShape;
+
+/** Allowed values for DesignNodebooleanMode. */
+export const DesignNodebooleanModeValues = {
+    Value0: 'exclude',
+    Value1: 'intersect',
+    Value2: 'subtract',
+    Value3: 'union',
+} as const;
+
+/** Allowed values for DesignNodeChangesbooleanModeVariant0. */
+export const DesignNodeChangesbooleanModeVariant0Values = {
+    Value0: 'exclude',
+    Value1: 'intersect',
+    Value2: 'subtract',
+    Value3: 'union',
+} as const;

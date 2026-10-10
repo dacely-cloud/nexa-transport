@@ -14,6 +14,7 @@ import {
     type DesignArrangeRequest,
 } from './DesignSelectionTypes.js';
 import { DesignValues as V } from './DesignValues.js';
+import { DesignBooleanSelection } from './DesignBooleanSelection.js';
 
 interface PositionedLayer {
     readonly node: DesignNode;
@@ -58,6 +59,15 @@ export class DesignSelection {
             plan = Tree.group(context, identify('group'));
         } else if (action === Action.Ungroup) {
             plan = Tree.ungroup(context);
+        } else if (
+            action === Action.Union ||
+            action === Action.Subtract ||
+            action === Action.Intersect ||
+            action === Action.Exclude
+        ) {
+            plan = DesignBooleanSelection.plan(context, action, identify('boolean'));
+        } else if (action === Action.Flatten) {
+            plan = DesignBooleanSelection.flatten(context);
         } else if (action === Action.Front || action === Action.Back) {
             plan = this.#order(context, action === Action.Front);
         } else {
