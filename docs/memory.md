@@ -33,12 +33,12 @@ The Chrome test opens two actual tabs. Each tab completes 660 turns, including e
 
 The default client allows 64 pending RPCs and 64 active turns. Each turn buffers at most 256 unread events and 8 MiB of serialized event data. These are protocol-buffer bounds, not a measurement of JavaScript heap overhead. Binary uploads share a 101 MiB retained-payload budget. Outstanding attachment deliveries share a 101 MiB budget and a 64-delivery limit. Each client and browser tab has separate limits. Temporary media encoding allocations and application-owned data are additional to these budgets.
 
-Consume turn events as they arrive. Normal completion preserves unread events for subsequent iteration; breaking iteration or calling `turn.cancel()` discards unread events. Use `client.call(Method.AgentAsk, ...)` if only the final answer is needed. Stored result promises retain their result or error by design.
+Consume turn events as they arrive. Normal completion preserves unread events for subsequent iteration; breaking iteration or calling `turn.cancel()` discards unread events. `turn.detach()` also discards the local buffer and releases listeners without cancelling accepted server work. Use `client.call(Method.AgentAsk, ...)` if only the final answer is needed. Stored result promises retain their result or error by design.
 
 Call returned unsubscribe functions when a view no longer needs events, unsubscribe from sessions when no longer observing them, and close clients when disposing their owner. A completed turn, saved SDK error, or cleanup handle no longer keeps a disposed client alive. Stalled attachment handlers may still retain data in their own application closures, but the SDK does not keep the client or payload alive solely to await their completion.
 
 ## Checking which build is running
 
-These tests exercise the current checkout/build. Installing from Git uses the remote commit resolved into the consuming application's lockfile; uncommitted or unpushed changes are not included. Compare the `nexa-transport` resolved Git SHA in that lockfile with the commit containing the fixes. Restart the application after updating its dependency.
+These tests exercise the current checkout/build. For a local tarball dependency, check the lockfile's resolved archive path and integrity and keep the archive in the repository at that path. Replacing an archive in place without updating the lockfile can produce integrity/corrupted-tarball errors; use a new archive filename and update both package.json and the lockfile. Git dependencies instead pin a resolved remote commit; uncommitted or unpushed changes are absent. Restart the application after updating its dependency.
 
 If an OOM remains, capture the exact error, the failing process (browser, frontend build server, or Nexa server), the resolved SDK commit, and whether the chats used media. That is necessary to distinguish a remaining SDK retention path from application or server memory use.

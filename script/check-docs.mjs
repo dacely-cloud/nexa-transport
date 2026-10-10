@@ -1,6 +1,6 @@
-import { readFileSync, mkdtempSync, writeFileSync, rmSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, mkdtempSync, writeFileSync, rmSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
-import { resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
 
 // Shared setup and application-owned inputs described by the usage guide.
 const setup = new Map([
@@ -20,15 +20,58 @@ const setup = new Map([
 const sources = new Map();
 const labels = new Map();
 const failures = [];
+const anchors = new Map();
+const packageExports = JSON.parse(readFileSync('package.json', 'utf8')).exports;
+const exportIndex = readFileSync('docs/exports.md', 'utf8');
+for (const key of Object.keys(packageExports)) {
+    const specifier = key === '.' ? 'nexa-transport' : `nexa-transport${key.slice(1)}`;
+    if (!exportIndex.includes(`\`${specifier}\``)) {
+        failures.push(`docs/exports.md: missing public entry point ${specifier}`);
+    }
+}
 for (const file of [
     'README.md',
-    'docs/guide.md',
-    'docs/client.md',
-    'docs/methods.md',
-    'docs/protocol.md',
+    ...readdirSync('docs')
+        .filter((name) => name.endsWith('.md'))
+        .sort()
+        .map((name) => `docs/${name}`),
 ]) {
     let index = 0;
-    for (const match of readFileSync(file, 'utf8').matchAll(/```ts\n([\s\S]*?)```/g)) {
+    const markdown = readFileSync(file, 'utf8');
+    for (const match of markdown.matchAll(/\]\(([^)]+)\)/g)) {
+        const target = match[1];
+        if (target.includes(':')) continue;
+        const [relativePath, anchor] = target.split('#');
+        const path = relativePath ? resolve(dirname(file), relativePath) : resolve(file);
+        if (!existsSync(path)) {
+            failures.push(`${file}: missing link target ${target}`);
+            continue;
+        }
+        if (!anchor || !path.endsWith('.md')) continue;
+        if (!anchors.has(path)) {
+            const counts = new Map();
+            const ids = new Set();
+            for (const heading of readFileSync(path, 'utf8').matchAll(/^#{1,6}\s+(.+)$/gm)) {
+                const base = heading[1]
+                    .toLowerCase()
+                    .replace(/[^\p{L}\p{N}_ -]/gu, '')
+                    .replaceAll(' ', '-');
+                const count = counts.get(base) ?? 0;
+                ids.add(count === 0 ? base : `${base}-${count}`);
+                counts.set(base, count + 1);
+            }
+            anchors.set(path, ids);
+        }
+        if (!anchors.get(path).has(anchor)) {
+            failures.push(`${file}: missing heading link ${target}`);
+        }
+    }
+    for (const match of markdown.matchAll(/\bnexa-transport\/([a-z][a-z0-9-]*)/g)) {
+        if (!Object.hasOwn(packageExports, `./${match[1]}`)) {
+            failures.push(`${file}: undeclared package import ${match[0]}`);
+        }
+    }
+    for (const match of markdown.matchAll(/```(?:ts|typescript)\n([\s\S]*?)```/g)) {
         index++;
         const code = match[1];
         const path = resolve(`.doc-example-${sources.size}.ts`);
@@ -67,18 +110,14 @@ try {
                 noUnusedParameters: false,
                 noEmit: true,
                 paths: Object.fromEntries(
-                    Object.entries(JSON.parse(readFileSync('package.json', 'utf8')).exports).map(
-                        ([key, entry]) => [
-                            key === '.' ? 'nexa-transport' : `nexa-transport${key.slice(1)}`,
-                            [
-                                resolve(
-                                    entry.types
-                                        .replace('./dist/', './src/')
-                                        .replace(/\.d\.ts$/, '.ts'),
-                                ),
-                            ],
+                    Object.entries(packageExports).map(([key, entry]) => [
+                        key === '.' ? 'nexa-transport' : `nexa-transport${key.slice(1)}`,
+                        [
+                            resolve(
+                                entry.types.replace('./dist/', './src/').replace(/\.d\.ts$/, '.ts'),
+                            ),
                         ],
-                    ),
+                    ]),
                 ),
             },
             include: ['./*.ts'],

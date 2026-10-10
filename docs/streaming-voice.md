@@ -3,12 +3,18 @@
 Nexa Transport carries microphone PCM and ASR transcripts through the authenticated Nexa gateway. Configure Nexa's `voice.transcriptionProvider` as `nerva` and enable the checkpoint on Nerva with `--asr-model PATH`. Browsers do not connect directly to Nerva or receive its credentials.
 
 ```ts
-const unsubscribe = client.onTranscript((event) => {
+import type { ReceivedTranscript } from 'nexa-transport';
+import type { ResultOf } from 'nexa-transport/protocol';
+
+declare function renderTranscript(callId: string, text: string, final: boolean): void;
+declare const frame: Uint8Array<ArrayBuffer>;
+
+const unsubscribe: () => void = client.onTranscript((event: ReceivedTranscript): void => {
     // Replace the current hypothesis when final is false.
     // Append the settled utterance and clear the hypothesis when final is true.
     renderTranscript(event.callId, event.text, event.final);
 });
-const call = await client.startVoice();
+const call: ResultOf<typeof Method.VoiceStart> = await client.startVoice();
 // Capture/downmix/resample microphone audio to call.sampleRate mono PCM16.
 await client.sendAudio(call.callId, frame);
 await client.stopVoice(call.callId);

@@ -5,8 +5,10 @@ It waits for the stream acknowledgement and addresses the server's run ID, so a
 correction cannot accidentally target another stream or a later conversation.
 
 ```ts
-const turn = client.stream({ message: 'Design a landing page' });
-const accepted = await turn.steer('Use a blue background');
+import type { TurnStream } from 'nexa-transport/stream';
+
+const turn: TurnStream = client.stream({ message: 'Design a landing page' });
+const accepted: boolean = await turn.steer('Use a blue background');
 ```
 
 `true` means the active run accepted the correction for its next model checkpoint.

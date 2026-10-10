@@ -15,6 +15,8 @@ Import `NexaClient` from `nexa-transport`, `Method` and protocol types from `nex
 | `client.onEvent(listener)`                   | Registers a raw gateway-envelope listener, including future event names; returns unsubscribe.                                                                |
 | `client.onSequenceGap(listener)`             | Reports `{ expected: bigint, received: bigint }`; returns unsubscribe. Refresh state when a gap matters.                                                     |
 | `client.onClose(listener)`                   | Reports the connection-ending error; returns unsubscribe. A listener registered after failure is called immediately.                                         |
+| `client.reconnecting`                        | Whether an interrupted connection is waiting for or performing another handshake.                                                                            |
+| `client.onReconnect(listener)`               | Reports restored authentication/subscriptions; returns unsubscribe. Refresh saved state here.                                                                |
 | `client.close()`                             | Idempotent close; rejects pending requests and terminates active stream consumers.                                                                           |
 
 `client.onAttachment(listener)` delivers `ReceivedAttachment` records with `Uint8Array<ArrayBuffer>` data, filename, MIME type, delivery ID, and optional stream/session IDs. Subscribe before starting a request; the returned function unsubscribes. Binary files are separate from JSON events and are not retained by the client. A handler may return `Promise<void>`; the SDK acknowledges receipt only after handlers complete. Throw or reject on handling failure. Missing handlers send a failure acknowledgment. Receipt does not confirm that a human viewed the file.
@@ -25,15 +27,13 @@ Import `NexaClient` from `nexa-transport`, `Method` and protocol types from `nex
 
 `client.company(command)` reads or changes the owner's durable company over the existing binary NCO2 channel. See Persistent company below for commands, revision checks, and department permissions.
 
-`CompanyOp.Construction` saves up to 128 office pieces using NCMP v4. It requires `officeConstruction`. Each piece has a numeric ID, a fixed catalog kind, a floor (0–5), half-metre grid coordinates (−128–128), and a quarter-turn rotation (0–3). Save the full list with the current company revision and retain the command ID for uncertain retries. The server sends public geometry in NGOP v5 snapshots on the same connection, including to visitors; visitor credentials still cannot modify it. Older clients negotiate their previous NCMP/NGOP versions and do not receive construction fields.
+For owner-only construction edits use `client.officeLayout({ revision, pieces })`. Public live geometry and player movement use `subscribeOffice` and `moveOffice`; see [Office and company APIs](office-company.md). Company staffing commands use `CompanyOp` from `nexa-transport/company-types`.
 
-When `companyTeamAreas` is advertised, NCMP v6 adds private department assignments to the construction command: `teams: [{ departmentId, placementId }]`. Each department and each saved piece of kind `team` may appear once. Assignments and construction save atomically at the company revision. Omit `teams` to preserve assignments whose team pieces still exist, or send `[]` to clear them. Snapshots include `department.area` (including placement zero); older snapshot versions omit it. Department names, membership, and assignment IDs never enter visitor game packets. These designations do not move desks or alter running work.
+`client.project(projectId, command?)` reads a private project snapshot or submits an owner decision: plan, approve, request a correction, or accept a delivery. It returns durable work history and the current spending allowance. Money uses integer USD microcents (`100000000n` equals $1), and revisions use `bigint`. Retain the exact command, including its ID and revision, when retrying after a timeout or disconnect; the server deduplicates it. The client does not automatically replay spending decisions. Project commands and file requests require `hello.features.officeProjects` and travel as binary NCP2 frames over the existing Chat socket.
 
-`client.project(projectId, command?)` reads a private project snapshot or submits an owner decision: plan, approve, request a correction, or accept a delivery. It returns durable work history and the current spending allowance. Money uses integer USD microcents (`100000000n` equals $1), and revisions use `bigint`. Retain the exact command, including its ID and revision, when retrying after a timeout or disconnect; the server deduplicates it. The client does not automatically replay spending decisions. Project commands and file requests require the negotiated `companyProjects` capability and travel as binary NCPW frames over the existing Chat socket.
+`client.projectFile(projectId, attemptId, path)` returns `Promise<Uint8Array<ArrayBuffer>>` for one captured delivery in the owner's project history. It reassembles contiguous chunks of at most 128 KiB into a file bounded to 4 MiB, rejecting inconsistent totals or offsets. The method accepts neither a cursor nor an arbitrary workspace path and does not return a digest. The server resolves the saved delivery from the owned attempt. Protocol types are available from `nexa-transport/project-types`, the binary codec from `nexa-transport/projects`, and work/decision types from `nexa-transport/work-types`.
 
-`client.projectArtifact(projectId, attemptId, path, offset?)` reads a captured delivery referenced in the owner's project history. Each response contains at most 64 KiB, with `offset`, `total`, and a SHA-256 `digest`. Continue from `offset + bytes.length` until `total` is reached; verify the assembled file against the digest before using it. The server resolves the file from the authenticated account's recorded attempt, never from an arbitrary filesystem path. Treat downloaded HTML as untrusted content when building previews. Protocol types are available from `nexa-transport/projects`; work and command types are available from `nexa-transport/company-work`.
-
-`client.subscribeProject(projectId, onSnapshot, onError)` requires `companyProjectLive`. It delivers an initial private snapshot followed by changed work or spending over the same socket. Call the returned release function when closing the project view. A disconnect ends the subscription and calls `onError`; reconnect with backoff and subscribe again to receive current authoritative state. At most eight project subscriptions may be open on one connection. Closing a subscription does not cancel approved work.
+`client.subscribeProject(projectId, onSnapshot, onError)` requires `hello.features.officeProjects`. It delivers an initial private snapshot followed by changed work or spending over the same socket. Call the returned release function when closing the project view. A disconnect calls `onError`; automatic reconnect restores this read watch and receives current authoritative state without replaying decisions. Release the watch when the view closes; a rejected watch requires explicitly subscribing again. At most eight project subscriptions may be open on one connection. Closing a subscription does not cancel approved work.
 
 There is no `client.ask()` convenience method. Use `client.call(Method.AgentAsk, ...)`.
 
@@ -50,6 +50,8 @@ The provider cannot be combined with API keys, pairing or device credentials.
 | -------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------ |
 | `url`                | `string`                 | Required WebSocket URL. `http:`/`https:` are converted to `ws:`/`wss:`. Userinfo and fragments are rejected. |
 | `apiKey`             | `string`                 | Personal key, operator token, or paired-device credential. Cannot be empty when provided.                    |
+| `tokenProvider`      | `() => Promise<string>`  | Fresh single-use ticket per connection attempt, including reconnects.                                        |
+| `reconnect`          | `boolean`                | Retry established connections with bounded backoff; true by default.                                         |
 | `deviceId`           | `string`                 | Stable installation identifier for device authentication.                                                    |
 | `deviceName`         | `string`                 | Display name during pairing.                                                                                 |
 | `pairingCode`        | `string`                 | Operator-issued one-time pairing code.                                                                       |
@@ -63,18 +65,23 @@ The provider cannot be combined with API keys, pairing or device credentials.
 | `maxActiveStreams`   | `number`                 | Active streaming-turn ceiling, including acknowledged turns; 64.                                             |
 | `signal`             | `AbortSignal`            | Cancels connection establishment. Use call/stream signals for subsequent operations.                         |
 
+`ClientIdentity` also accepts `metadataOnlyAttachments?: boolean`. Setting it to true requests metadata-only live file delivery on supporting gateways; use `downloadSessionFile` for the original bytes. It does not enable automatic previews or downloads.
+
 `CallOptions` has `timeoutMs` and `signal`. Pass it as the third argument of `call`. It controls local waiting, not transactional rollback on the server.
 
 ## TurnStream
 
 Import `TurnStream` as a type from `nexa-transport/stream` and `StreamOptions` from `nexa-transport/stream-options`.
 
-| Member                            | Behavior                                                                               |
-| --------------------------------- | -------------------------------------------------------------------------------------- |
-| `streamId`                        | Client-chosen stream identifier.                                                       |
-| `result`                          | `Promise<AskResult>` settled by the terminal event, or rejected on error/cancellation. |
-| `for await (const event of turn)` | Consumes validated `WireTurnEvent` values with bounded buffering.                      |
-| `cancel()`                        | Requests cancellation using the server run ID and closes the local stream.             |
+| Member                            | Behavior                                                                                             |
+| --------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `streamId`                        | Client-chosen stream identifier.                                                                     |
+| `result`                          | `Promise<AskResult>` settled by the terminal event, or rejected on error/cancellation.               |
+| `for await (const event of turn)` | Consumes validated `WireTurnEvent` values with bounded buffering.                                    |
+| `accepted`                        | `Promise<StreamAccepted>` with the server run ID and optional resolved session ID before completion. |
+| `steer(message)`                  | `Promise<boolean>` for a correction to this exact active run; see [steering](steering.md).           |
+| `detach()`                        | Releases the local iterator/result and listeners without cancelling accepted server work.            |
+| `cancel()`                        | Requests cancellation using the server run ID and closes the local stream.                           |
 
 Breaking out of the iterator cancels unfinished work. Consume the iterator and await `result` inside your application's error handling. A completed iterator does not replace checking the terminal result.
 
@@ -99,9 +106,18 @@ Breaking out of the iterator cancels unfinished work. Consume the iterator and a
 | `nativeEvent(event)`       | `WireTurnEvent`                                        | Validated `NcapDelta`, or `null` for non-NCAP events. Reconstructs voice/video chunk bytes; throws on invalid payloads. |
 | `bytes(value)`             | Protocol `JsonValue` containing contiguous byte values | `Uint8Array<ArrayBuffer>`; rejects invalid or oversized binary JSON.                                                    |
 | `base64(bytes)`            | `Uint8Array`                                           | Base64 string.                                                                                                          |
+| `model3d(blob, title?)`    | GLB/PLY `Blob`                                         | `Promise<InboundAttachment>` using the document carrier after header validation.                                        |
+| `geometryFormat(file)`     | `{ data, mimeType }`                                   | `glb`, `ply`, or null; invalid declared GLB version/length throws.                                                      |
+| `geometryBlob(file)`       | Validated GLB/PLY bytes and MIME type                  | `Blob`; throws for unsupported media.                                                                                   |
 | `fromBase64(value)`        | Base64 string                                          | `Uint8Array<ArrayBuffer>`.                                                                                              |
 
-Blob encoders require a non-empty MIME type and a size from 1 byte through 100 MiB. They encode bytes without validating codecs, extracting archive contents, or transcoding. Browser `File` objects work because they extend `Blob`.
+Image, video, and frame encoders require a non-empty MIME type. `document` uses `File.name` (or an explicit title) to infer common document/data MIME types when `Blob.type` is empty, with `application/octet-stream` as the fallback. Inline size remains 1 byte through 100 MiB. They encode bytes without validating codecs, extracting archive contents, or transcoding. Browser `File` objects work because they extend `Blob`.
+
+`NexaGeometry` and `MeshoptDecoder` are exported from the same media entry point. `NexaGeometry.text(prompt, options?)` returns agent-mediated `StreamParams`; `NexaGeometry.image(blob, options?)` returns `Promise<StreamParams>` for a PNG/JPEG reference bounded to 16 MiB. `GeometryOptions` accepts an unsigned 32-bit seed and 1–100 steps; `ImageGeometryOptions` additionally accepts resolution 512 or 1024. These helpers request tool execution and preserve normal tool policy. Rendering, archive extraction, and model-provider access remain application/host responsibilities.
+
+## Voice helpers
+
+`startVoice(params?, options?)` returns the typed `VoiceStart` result. `stopVoice(callId, options?)` returns the typed `VoiceStop` result. `sendAudio(callId, bytes, options?)` sends mono PCM16 with the negotiated binary carrier and base64 fallback. `onAudio` reports `ReceivedAudio`; `onTranscript` reports `ReceivedTranscript { callId, text, final }`. Subscribe before starting voice. A non-final transcript replaces the current hypothesis; a final transcript settles one utterance. The helpers do not acquire microphones, resample, or play sound. See [streaming voice](streaming-voice.md).
 
 ## Events
 
@@ -146,7 +162,9 @@ Established connections reconnect automatically with jittered exponential delays
 
 `connected` becomes false during interruption. `reconnecting` indicates scheduled or active retries. `onClose(listener)` reports each interruption; `onReconnect(listener)` runs after authentication and session subscription restoration. Both return unsubscribe functions. Existing event and attachment listeners survive reconnect. In-flight calls and streams reject, and no mutation is automatically repeated.
 
-`resumeSession(sessionId)` subscribes to the owned session and returns a typed `SessionSnapshot` containing `messages`, active `tasks`, and saved `files`. Use it after reconnect or a page reload, with the session key saved by your application. The `files` array contains metadata only: resuming never downloads saved attachment bytes. Render file cards from that metadata and call `Method.SessionsDownload` only when the user requests a file; bytes then arrive through `onAttachment`. Keep ZIPs, PDFs and other documents lazy. Image/video previews may be requested explicitly by the UI.
+`resumeSession(sessionId)` subscribes to the owned session and returns a typed `SessionSnapshot` containing `messages`, active `tasks`, and saved `files`, plus optional complete presentation `history` when `supportsSessionHistory` is true. Use it after reconnect or a page reload, with the session key saved by your application. The `files` array contains metadata only: resuming never downloads saved attachment bytes. Render file cards from that metadata and call `Method.SessionsDownload` only when the user requests a file; bytes then arrive through `onAttachment`. Keep ZIPs, PDFs and other documents lazy. Image/video previews may be requested explicitly by the UI.
+
+`readHistory(sessionId)` returns validated journal records. `readHistorySnapshot(sessionId, cursor?, endCursor?)` returns `{ records, endCursor }`; pass the previous complete `endCursor` as `cursor` for an incremental read. The optional third argument pins a fixed snapshot boundary. Cursors count bytes and stay decimal strings. `supportsSessionHistoryUpdates` gates durable append notifications for subscribed sessions. `downloadSessionFile(sessionId, attachmentId, signal?)` returns matching original `ReceivedAttachment` bytes through authenticated binary delivery. See [session recovery](sessions.md) for reconciliation and download ownership.
 
 ### Memory ownership
 
@@ -218,6 +236,16 @@ showroom decisions locally before sending.
 
 Both methods also accept `targetTimeSeconds`, an integer from 1 through 172800 (two days). The gateway gives the model a soft time target for planning, reasoning, verification, and refinement, shared across tool hops. The model can finish early or continue necessary work after the target. This field does not cancel the task or change transport timeouts. An explicit `reasoningEffort` takes precedence over the target's suggested effort; omitting the target preserves the existing behavior.
 
+## Private employee and workspace reports
+
+`supportsEmployeeResults` gates `employeeResults(employeeId)` and `subscribeEmployeeResults(employeeId, listener, onError)`. `supportsExecutionHosts` gates `executionHost()` and `subscribeExecutionHost(listener, onError)`. These reads do not dispatch work, change budgets, or provision machines. See [private reports](office-company.md#budgets-and-passive-reports) for ownership and cleanup.
+
 `hello.features.officeEmployeeCosts` negotiates NCE1 version 3 for private employee portfolios. Each project can carry exact `bigint` costs: `spent` (settled USD microcents), `reserved` (maximum outstanding liability), `charges` (metered requests including cancellations), and `unresolved`. Attribution uses the original execution employee, including failed work and later receipts. Legacy gateways omit `cost`; absence does not mean free work. One USD is 100,000,000 microcents. Reads do not approve, dispatch, or settle work.
 
 `hello.features.officeEmployeeDevelopment` negotiates NCE1 version 4, retaining verification and costs and adding optional `singleRunAcceptedTasks`. This credits accepted implementation with exactly one saved attempt across all employees. Plans and reviews do not count as implementation; reassignment, interruptions and requested corrections prevent single-run credit. Absence means the older report has no classified delivery history, not zero successful deliveries. The SDK restores only read watches on reconnect and downgrades to the older negotiated formats when necessary. Visitors receive neither the capability nor private results.
+
+## Workflow capabilities
+
+`supportsWorkflowDrafts`, `supportsWorkflowGraph`, `supportsWorkflowGroups`, `supportsWorkflowPlanning`, `supportsWorkflowPlanningSources`, and `supportsWorkflowRuns` check the connected gateway's advertised versions and required methods. They do not grant account access. Additive methods such as deletion, publications, schedules, model resolution, terminal controls, and usage must also appear in `client.hello.features.methods` before use. Call them with `client.call(Method.Workflows…, params)` and the generated `ParamsOf`/`ResultOf` types. See the [workflow guide](workflows.md) for examples and portable entry points.
+
+For the complete package import map, see [entry points](exports.md). For live office movement, project baselines, tool permissions, employee reports, and execution-host reports, see [Office and company APIs](office-company.md).

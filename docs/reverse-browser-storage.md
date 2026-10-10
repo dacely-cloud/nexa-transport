@@ -28,8 +28,8 @@ matching partial hashes cannot prove equality of entire storage. Saved pages
 remain owner/conversation scoped after browser shutdown or archive restart.
 
 See the [native contract](https://github.com/dacely-cloud/nexa/blob/main/docs/reverse-browser-storage.md)
-for capture authority, command bounds and runtime evidence. Storage comparison
-and full browser/REA parity remain unfinished.
+for capture authority, command bounds and runtime evidence. Saved storage comparisons are described below. These observations do not
+establish complete browser/REA parity.
 
 ## Saved storage comparisons
 
