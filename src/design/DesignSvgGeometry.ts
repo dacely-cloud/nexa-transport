@@ -6,6 +6,7 @@ import type { DesignSceneNode } from './DesignScene.js';
 import type { DesignLayoutResult } from './DesignLayoutTypes.js';
 import type { DesignSelectionBounds } from './DesignSelectionTypes.js';
 import type { DesignSvgSelection } from './DesignSvgTypes.js';
+import { DesignPaths } from './DesignPaths.js';
 import { DesignSelectionContext } from './DesignSelectionContext.js';
 
 /** Selection, clipping and rounded shapes use resolved world geometry rather than authored positions. */
@@ -130,16 +131,20 @@ export class DesignSvgGeometry {
         const d: number = Math.min(maximum, corners.bottomLeft);
         return `M${a} 0 H${width - b} ${b > 0 ? `A${b} ${b} 0 0 1 ${width} ${b}` : `L${width} 0`} V${height - c} ${c > 0 ? `A${c} ${c} 0 0 1 ${width - c} ${height}` : `L${width} ${height}`} H${d} ${d > 0 ? `A${d} ${d} 0 0 1 0 ${height - d}` : `L0 ${height}`} V${a} ${a > 0 ? `A${a} ${a} 0 0 1 ${a} 0` : 'L0 0'} Z`;
     }
-    /** Paint-independent geometry is reused for fills, masks and the single final stroke. */
+    /** Resolved path coordinates fit paints to layout bounds and retain authored stroke widths and dashes. */
     public static shape(node: DesignSceneNode, box: DesignBox, attributes: string): string {
         if (node.kind === DesignKind.Ellipse) {
             return `<ellipse cx="${box.width / 2}" cy="${box.height / 2}" rx="${box.width / 2}" ry="${box.height / 2}" ${attributes}/>`;
         }
         if (node.path.length > 0) {
-            const path: string = node.path
+            const path: string = DesignPaths.scale(
+                node.path,
+                box.width / node.width,
+                box.height / node.height,
+            )
                 .map((command): string => command.verb + command.values.join(' '))
                 .join(' ');
-            return `<path d="${path}" transform="scale(${box.width / node.width} ${box.height / node.height})" ${attributes}/>`;
+            return `<path d="${path}" ${attributes}/>`;
         }
         return `<path d="${this.rounded(box.width, box.height, node.style.corners)}" ${attributes}/>`;
     }
