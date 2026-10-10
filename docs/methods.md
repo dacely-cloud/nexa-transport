@@ -1,6 +1,6 @@
 # RPC reference
 
-All 159 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 158 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
+All 172 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 171 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
 
 - [accounts.create](#accountscreate)
 - [accounts.list](#accountslist)
@@ -11,9 +11,6 @@ All 159 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [agent.stream](#agentstream)
 - [agents.define](#agentsdefine)
 - [agents.list](#agentslist)
-- [agents.personal.list](#agentspersonallist)
-- [agents.personal.remove](#agentspersonalremove)
-- [agents.personal.save](#agentspersonalsave)
 - [approvals.list](#approvalslist)
 - [approvals.resolve](#approvalsresolve)
 - [channels.deadLetters.list](#channelsdeadletterslist)
@@ -36,6 +33,22 @@ All 159 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [data.upload.chunk](#datauploadchunk)
 - [data.upload.finish](#datauploadfinish)
 - [data.upload.start](#datauploadstart)
+- [design.asset.cancel](#designassetcancel)
+- [design.asset.chunk](#designassetchunk)
+- [design.asset.finish](#designassetfinish)
+- [design.asset.list](#designassetlist)
+- [design.asset.read](#designassetread)
+- [design.asset.remove](#designassetremove)
+- [design.asset.start](#designassetstart)
+- [design.changes](#designchanges)
+- [design.create](#designcreate)
+- [design.delete](#designdelete)
+- [design.events](#designevents)
+- [design.layout](#designlayout)
+- [design.list](#designlist)
+- [design.read](#designread)
+- [design.save](#designsave)
+- [design.undo](#designundo)
 - [devices.approve](#devicesapprove)
 - [devices.list](#deviceslist)
 - [devices.reject](#devicesreject)
@@ -363,72 +376,6 @@ Parameters: [Recordstringnever](protocol.md#recordstringnever).
 Type: Dictionary.
 
 Result: Array of [AgentDefinition](protocol.md#agentdefinition).
-
-## agents.personal.list
-
-```ts
-import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
-
-const params: ParamsOf<typeof Method.AgentsPersonalList> = {};
-const result: ResultOf<typeof Method.AgentsPersonalList> = await client.call(
-    Method.AgentsPersonalList,
-    params,
-);
-```
-
-Parameters: [Recordstringnever](protocol.md#recordstringnever).
-
-Type: Dictionary.
-
-Result: Array of [PersonalAgent](protocol.md#personalagent).
-
-## agents.personal.remove
-
-```ts
-import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
-
-const params: ParamsOf<typeof Method.AgentsPersonalRemove> = {
-    id: 'YOUR_ID',
-};
-const result: ResultOf<typeof Method.AgentsPersonalRemove> = await client.call(
-    Method.AgentsPersonalRemove,
-    params,
-);
-```
-
-Parameters: [IdParams](protocol.md#idparams).
-
-| Field | Required | Type     | Description |
-| ----- | -------- | -------- | ----------- |
-| `id`  | Yes      | `string` |             |
-
-Result: [OkResult](protocol.md#okresult).
-
-## agents.personal.save
-
-```ts
-import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
-
-const params: ParamsOf<typeof Method.AgentsPersonalSave> = {
-    id: 'YOUR_ID',
-    instructions: 'YOUR_INSTRUCTIONS',
-    name: 'YOUR_NAME',
-};
-const result: ResultOf<typeof Method.AgentsPersonalSave> = await client.call(
-    Method.AgentsPersonalSave,
-    params,
-);
-```
-
-Parameters: [PersonalAgentInput](protocol.md#personalagentinput).
-
-| Field          | Required | Type     | Description |
-| -------------- | -------- | -------- | ----------- |
-| `id`           | Yes      | `string` |             |
-| `instructions` | Yes      | `string` |             |
-| `name`         | Yes      | `string` |             |
-
-Result: [PersonalAgent](protocol.md#personalagent).
 
 ## approvals.list
 
@@ -887,6 +834,400 @@ Parameters: [DataUploadStartParams](protocol.md#datauploadstartparams).
 | `filename`   | Yes      | `string` |             |
 
 Result: [DataUpload](protocol.md#dataupload).
+
+## design.asset.cancel
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DesignAssetCancel> = {
+    id: 'YOUR_ID',
+};
+const result: ResultOf<typeof Method.DesignAssetCancel> = await client.call(
+    Method.DesignAssetCancel,
+    params,
+);
+```
+
+Parameters: [DesignAssetIdRequest](protocol.md#designassetidrequest).
+
+| Field | Required | Type     | Description |
+| ----- | -------- | -------- | ----------- |
+| `id`  | Yes      | `string` |             |
+
+Result: `null`.
+
+## design.asset.chunk
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DesignAssetChunk> = {
+    data: 'YOUR_DATA',
+    id: 'YOUR_ID',
+    offset: 'YOUR_OFFSET',
+};
+const result: ResultOf<typeof Method.DesignAssetChunk> = await client.call(
+    Method.DesignAssetChunk,
+    params,
+);
+```
+
+Parameters: [DesignAssetChunkRequest](protocol.md#designassetchunkrequest).
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `data`   | Yes      | `string` |             |
+| `id`     | Yes      | `string` |             |
+| `offset` | Yes      | `string` |             |
+
+Result: [DesignAssetPosition](protocol.md#designassetposition).
+
+## design.asset.finish
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DesignAssetFinish> = {
+    id: 'YOUR_ID',
+};
+const result: ResultOf<typeof Method.DesignAssetFinish> = await client.call(
+    Method.DesignAssetFinish,
+    params,
+);
+```
+
+Parameters: [DesignAssetIdRequest](protocol.md#designassetidrequest).
+
+| Field | Required | Type     | Description |
+| ----- | -------- | -------- | ----------- |
+| `id`  | Yes      | `string` |             |
+
+Result: [DesignAsset](protocol.md#designasset).
+
+## design.asset.list
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DesignAssetList> = {
+    after: null,
+    limit: 1,
+};
+const result: ResultOf<typeof Method.DesignAssetList> = await client.call(
+    Method.DesignAssetList,
+    params,
+);
+```
+
+Parameters: [DesignAssetListRequest](protocol.md#designassetlistrequest).
+
+| Field   | Required | Type          | Description |
+| ------- | -------- | ------------- | ----------- |
+| `after` | Yes      | `null,string` |             |
+| `limit` | Yes      | `number`      |             |
+
+Result: [DesignAssetListPage](protocol.md#designassetlistpage).
+
+## design.asset.read
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DesignAssetRead> = {
+    id: 'YOUR_ID',
+    offset: 'YOUR_OFFSET',
+};
+const result: ResultOf<typeof Method.DesignAssetRead> = await client.call(
+    Method.DesignAssetRead,
+    params,
+);
+```
+
+Parameters: [DesignAssetReadRequest](protocol.md#designassetreadrequest).
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `id`     | Yes      | `string` |             |
+| `offset` | Yes      | `string` |             |
+
+Result: [DesignAssetSlice](protocol.md#designassetslice).
+
+## design.asset.remove
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DesignAssetRemove> = {
+    id: 'YOUR_ID',
+};
+const result: ResultOf<typeof Method.DesignAssetRemove> = await client.call(
+    Method.DesignAssetRemove,
+    params,
+);
+```
+
+Parameters: [DesignAssetIdRequest](protocol.md#designassetidrequest).
+
+| Field | Required | Type     | Description |
+| ----- | -------- | -------- | ----------- |
+| `id`  | Yes      | `string` |             |
+
+Result: `null`.
+
+## design.asset.start
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DesignAssetStart> = {
+    byteLength: 'YOUR_BYTELENGTH',
+    id: 'YOUR_ID',
+    name: 'YOUR_NAME',
+    sha256: 'YOUR_SHA256',
+};
+const result: ResultOf<typeof Method.DesignAssetStart> = await client.call(
+    Method.DesignAssetStart,
+    params,
+);
+```
+
+Parameters: [DesignAssetStartRequest](protocol.md#designassetstartrequest).
+
+| Field        | Required | Type     | Description |
+| ------------ | -------- | -------- | ----------- |
+| `byteLength` | Yes      | `string` |             |
+| `id`         | Yes      | `string` |             |
+| `name`       | Yes      | `string` |             |
+| `sha256`     | Yes      | `string` |             |
+
+Result: [DesignAssetPosition](protocol.md#designassetposition).
+
+## design.changes
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DesignChanges> = {
+    commandId: 'YOUR_COMMANDID',
+    cursor: {
+        character: 1,
+        record: 1,
+    },
+    id: 'YOUR_ID',
+    limit: 1,
+};
+const result: ResultOf<typeof Method.DesignChanges> = await client.call(
+    Method.DesignChanges,
+    params,
+);
+```
+
+Parameters: [DesignChangesRequest](protocol.md#designchangesrequest).
+
+| Field       | Required | Type                                              | Description |
+| ----------- | -------- | ------------------------------------------------- | ----------- |
+| `commandId` | Yes      | `string`                                          |             |
+| `cursor`    | Yes      | [DesignCursor](protocol.md#designcursor) / `null` |             |
+| `id`        | Yes      | `string`                                          |             |
+| `limit`     | Yes      | `number`                                          |             |
+
+Result: [DesignRecordPage](protocol.md#designrecordpage).
+
+## design.create
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DesignCreate> = {
+    commandId: 'YOUR_COMMANDID',
+    id: 'YOUR_ID',
+    name: 'YOUR_NAME',
+};
+const result: ResultOf<typeof Method.DesignCreate> = await client.call(Method.DesignCreate, params);
+```
+
+Parameters: [DesignCreateRequest](protocol.md#designcreaterequest).
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `commandId` | Yes      | `string` |             |
+| `id`        | Yes      | `string` |             |
+| `name`      | Yes      | `string` |             |
+
+Result: [DesignReceipt](protocol.md#designreceipt).
+
+## design.delete
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DesignDelete> = {
+    commandId: 'YOUR_COMMANDID',
+    expectedRevision: 'YOUR_EXPECTEDREVISION',
+    id: 'YOUR_ID',
+};
+const result: ResultOf<typeof Method.DesignDelete> = await client.call(Method.DesignDelete, params);
+```
+
+Parameters: [DesignDeleteRequest](protocol.md#designdeleterequest).
+
+| Field              | Required | Type     | Description |
+| ------------------ | -------- | -------- | ----------- |
+| `commandId`        | Yes      | `string` |             |
+| `expectedRevision` | Yes      | `string` |             |
+| `id`               | Yes      | `string` |             |
+
+Result: [DesignDeleteReceipt](protocol.md#designdeletereceipt).
+
+## design.events
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DesignEvents> = {
+    afterRevision: 'YOUR_AFTERREVISION',
+    id: 'YOUR_ID',
+    limit: 1,
+};
+const result: ResultOf<typeof Method.DesignEvents> = await client.call(Method.DesignEvents, params);
+```
+
+Parameters: [DesignEventsRequest](protocol.md#designeventsrequest).
+
+| Field           | Required | Type     | Description |
+| --------------- | -------- | -------- | ----------- |
+| `afterRevision` | Yes      | `string` |             |
+| `id`            | Yes      | `string` |             |
+| `limit`         | Yes      | `number` |             |
+
+Result: [DesignEventsPage](protocol.md#designeventspage).
+
+## design.layout
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DesignLayout> = {
+    id: 'YOUR_ID',
+    limit: 1,
+    offset: 1,
+    pageId: 'YOUR_PAGEID',
+    revision: 'YOUR_REVISION',
+};
+const result: ResultOf<typeof Method.DesignLayout> = await client.call(Method.DesignLayout, params);
+```
+
+Parameters: [DesignLayoutRequest](protocol.md#designlayoutrequest).
+
+| Field      | Required | Type     | Description |
+| ---------- | -------- | -------- | ----------- |
+| `id`       | Yes      | `string` |             |
+| `limit`    | Yes      | `number` |             |
+| `offset`   | Yes      | `number` |             |
+| `pageId`   | Yes      | `string` |             |
+| `revision` | Yes      | `string` |             |
+
+Result: [DesignLayoutPage](protocol.md#designlayoutpage).
+
+## design.list
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DesignList> = {
+    after: null,
+    limit: 1,
+};
+const result: ResultOf<typeof Method.DesignList> = await client.call(Method.DesignList, params);
+```
+
+Parameters: [DesignListRequest](protocol.md#designlistrequest).
+
+| Field   | Required | Type          | Description |
+| ------- | -------- | ------------- | ----------- |
+| `after` | Yes      | `null,string` |             |
+| `limit` | Yes      | `number`      |             |
+
+Result: [DesignListPage](protocol.md#designlistpage).
+
+## design.read
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DesignRead> = {
+    cursor: {
+        character: 1,
+        record: 1,
+    },
+    id: 'YOUR_ID',
+    limit: 1,
+    revision: null,
+};
+const result: ResultOf<typeof Method.DesignRead> = await client.call(Method.DesignRead, params);
+```
+
+Parameters: [DesignReadRequest](protocol.md#designreadrequest).
+
+| Field      | Required | Type                                              | Description |
+| ---------- | -------- | ------------------------------------------------- | ----------- |
+| `cursor`   | Yes      | [DesignCursor](protocol.md#designcursor) / `null` |             |
+| `id`       | Yes      | `string`                                          |             |
+| `limit`    | Yes      | `number`                                          |             |
+| `revision` | Yes      | `null,string`                                     |             |
+
+Result: [DesignRecordPage](protocol.md#designrecordpage).
+
+## design.save
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DesignSave> = {
+    commandId: 'YOUR_COMMANDID',
+    expectedRevision: 'YOUR_EXPECTEDREVISION',
+    id: 'YOUR_ID',
+    operations: [],
+};
+const result: ResultOf<typeof Method.DesignSave> = await client.call(Method.DesignSave, params);
+```
+
+Parameters: [DesignSaveRequest](protocol.md#designsaverequest).
+
+| Field              | Required | Type                                                    | Description |
+| ------------------ | -------- | ------------------------------------------------------- | ----------- |
+| `commandId`        | Yes      | `string`                                                |             |
+| `expectedRevision` | Yes      | `string`                                                |             |
+| `id`               | Yes      | `string`                                                |             |
+| `operations`       | Yes      | Array of [DesignOperation](protocol.md#designoperation) |             |
+
+Result: [DesignReceipt](protocol.md#designreceipt).
+
+## design.undo
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DesignUndo> = {
+    commandId: 'YOUR_COMMANDID',
+    expectedRevision: 'YOUR_EXPECTEDREVISION',
+    id: 'YOUR_ID',
+    targetCommandId: 'YOUR_TARGETCOMMANDID',
+};
+const result: ResultOf<typeof Method.DesignUndo> = await client.call(Method.DesignUndo, params);
+```
+
+Parameters: [DesignUndoRequest](protocol.md#designundorequest).
+
+| Field              | Required | Type     | Description |
+| ------------------ | -------- | -------- | ----------- |
+| `commandId`        | Yes      | `string` |             |
+| `expectedRevision` | Yes      | `string` |             |
+| `id`               | Yes      | `string` |             |
+| `targetCommandId`  | Yes      | `string` |             |
+
+Result: [DesignReceipt](protocol.md#designreceipt).
 
 ## devices.approve
 

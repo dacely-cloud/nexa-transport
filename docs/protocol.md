@@ -2259,6 +2259,1014 @@ Host receipt for the exact bytes submitted to an acknowledged channel send.
 | `toolCallId`     | Yes      | `string`                                               |             |
 | `turnId`         | Yes      | `null,string`                                          |             |
 
+## DesignAction
+
+Prototype actions.
+
+Type: `"back"` / `"navigate"` / `"overlay"`.
+
+## DesignAlign
+
+Alignment within the available layout space.
+
+Type: `"between"` / `"center"` / `"end"` / `"start"` / `"stretch"`.
+
+## DesignAsset
+
+Published assets are immutable, and all byte counts remain decimal strings.
+
+| Field        | Required | Type                                           | Description |
+| ------------ | -------- | ---------------------------------------------- | ----------- |
+| `byteLength` | Yes      | `string`                                       |             |
+| `height`     | Yes      | `number`                                       |             |
+| `id`         | Yes      | `string`                                       |             |
+| `mime`       | Yes      | [DesignAssetMime](protocol.md#designassetmime) |             |
+| `name`       | Yes      | `string`                                       |             |
+| `sha256`     | Yes      | `string`                                       |             |
+| `width`      | Yes      | `number`                                       |             |
+
+## DesignAssetCancelMethod
+
+| Field    | Required | Type                                                     | Description |
+| -------- | -------- | -------------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignAssetIdRequest](protocol.md#designassetidrequest) |             |
+| `result` | Yes      | `null`                                                   |             |
+
+## DesignAssetChunkMethod
+
+| Field    | Required | Type                                                           | Description |
+| -------- | -------- | -------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignAssetChunkRequest](protocol.md#designassetchunkrequest) |             |
+| `result` | Yes      | [DesignAssetPosition](protocol.md#designassetposition)         |             |
+
+## DesignAssetChunkRequest
+
+One canonical base64 slice, addressed by exact byte position.
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `data`   | Yes      | `string` |             |
+| `id`     | Yes      | `string` |             |
+| `offset` | Yes      | `string` |             |
+
+## DesignAssetFinishMethod
+
+| Field    | Required | Type                                                     | Description |
+| -------- | -------- | -------------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignAssetIdRequest](protocol.md#designassetidrequest) |             |
+| `result` | Yes      | [DesignAsset](protocol.md#designasset)                   |             |
+
+## DesignAssetIdRequest
+
+Asset addressing is independent of document ownership; both are authorized by the server.
+
+| Field | Required | Type     | Description |
+| ----- | -------- | -------- | ----------- |
+| `id`  | Yes      | `string` |             |
+
+## DesignAssetListMethod
+
+| Field    | Required | Type                                                         | Description |
+| -------- | -------- | ------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [DesignAssetListRequest](protocol.md#designassetlistrequest) |             |
+| `result` | Yes      | [DesignAssetListPage](protocol.md#designassetlistpage)       |             |
+
+## DesignAssetListPage
+
+| Field       | Required | Type                                            | Description |
+| ----------- | -------- | ----------------------------------------------- | ----------- |
+| `items`     | Yes      | Array of [DesignAsset](protocol.md#designasset) |             |
+| `nextAfter` | Yes      | `null,string`                                   |             |
+
+## DesignAssetListRequest
+
+Library projections are metadata only.
+
+| Field   | Required | Type          | Description |
+| ------- | -------- | ------------- | ----------- |
+| `after` | Yes      | `null,string` |             |
+| `limit` | Yes      | `number`      |             |
+
+## DesignAssetMime
+
+Raster formats are identified from bytes before becoming usable design assets.
+
+Type: `"image/gif"` / `"image/jpeg"` / `"image/png"` / `"image/webp"`.
+
+## DesignAssetPosition
+
+Receipts carry progress without echoing source bytes.
+
+| Field        | Required | Type     | Description |
+| ------------ | -------- | -------- | ----------- |
+| `byteLength` | Yes      | `string` |             |
+| `id`         | Yes      | `string` |             |
+| `offset`     | Yes      | `string` |             |
+
+## DesignAssetReadMethod
+
+| Field    | Required | Type                                                         | Description |
+| -------- | -------- | ------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [DesignAssetReadRequest](protocol.md#designassetreadrequest) |             |
+| `result` | Yes      | [DesignAssetSlice](protocol.md#designassetslice)             |             |
+
+## DesignAssetReadRequest
+
+Reads transfer only a bounded slice of a completed immutable image.
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `id`     | Yes      | `string` |             |
+| `offset` | Yes      | `string` |             |
+
+## DesignAssetRemoveMethod
+
+| Field    | Required | Type                                                     | Description |
+| -------- | -------- | -------------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignAssetIdRequest](protocol.md#designassetidrequest) |             |
+| `result` | Yes      | `null`                                                   |             |
+
+## DesignAssetSlice
+
+The browser pins the metadata identity while assembling slices.
+
+| Field        | Required | Type                                   | Description |
+| ------------ | -------- | -------------------------------------- | ----------- |
+| `asset`      | Yes      | [DesignAsset](protocol.md#designasset) |             |
+| `data`       | Yes      | `string`                               |             |
+| `nextOffset` | Yes      | `null,string`                          |             |
+| `offset`     | Yes      | `string`                               |             |
+
+## DesignAssetStartMethod
+
+| Field    | Required | Type                                                           | Description |
+| -------- | -------- | -------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignAssetStartRequest](protocol.md#designassetstartrequest) |             |
+| `result` | Yes      | [DesignAssetPosition](protocol.md#designassetposition)         |             |
+
+## DesignAssetStartRequest
+
+Retried admission uses the same client-chosen identity. Ownership comes from the host.
+
+| Field        | Required | Type     | Description |
+| ------------ | -------- | -------- | ----------- |
+| `byteLength` | Yes      | `string` |             |
+| `id`         | Yes      | `string` |             |
+| `name`       | Yes      | `string` |             |
+| `sha256`     | Yes      | `string` |             |
+
+## DesignBox
+
+Resolved layout boxes are separate from authored values and never written back implicitly.
+
+| Field      | Required | Type          | Description |
+| ---------- | -------- | ------------- | ----------- |
+| `clipId`   | Yes      | `null,string` |             |
+| `depth`    | Yes      | `number`      |             |
+| `height`   | Yes      | `number`      |             |
+| `id`       | Yes      | `string`      |             |
+| `rotation` | Yes      | `number`      |             |
+| `width`    | Yes      | `number`      |             |
+| `x`        | Yes      | `number`      |             |
+| `y`        | Yes      | `number`      |             |
+
+## DesignChangesMethod
+
+Forward delta RPC contract.
+
+| Field    | Required | Type                                                     | Description |
+| -------- | -------- | -------------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignChangesRequest](protocol.md#designchangesrequest) |             |
+| `result` | Yes      | [DesignRecordPage](protocol.md#designrecordpage)         |             |
+
+## DesignChangesRequest
+
+Changed entities exclude undo preimages.
+
+| Field       | Required | Type                                              | Description |
+| ----------- | -------- | ------------------------------------------------- | ----------- |
+| `commandId` | Yes      | `string`                                          |             |
+| `cursor`    | Yes      | [DesignCursor](protocol.md#designcursor) / `null` |             |
+| `id`        | Yes      | `string`                                          |             |
+| `limit`     | Yes      | `number`                                          |             |
+
+## DesignComment
+
+Anchored comments can refer to exact layers or canvas coordinates.
+
+| Field      | Required | Type          | Description |
+| ---------- | -------- | ------------- | ----------- |
+| `author`   | Yes      | `string`      |             |
+| `id`       | Yes      | `string`      |             |
+| `nodeId`   | Yes      | `null,string` |             |
+| `resolved` | Yes      | `boolean`     |             |
+| `text`     | Yes      | `string`      |             |
+| `x`        | Yes      | `number`      |             |
+| `y`        | Yes      | `number`      |             |
+
+## DesignCommentRecord
+
+Comment record.
+
+| Field   | Required | Type                                                | Description |
+| ------- | -------- | --------------------------------------------------- | ----------- |
+| `id`    | Yes      | `string`                                            |             |
+| `kind`  | Yes      | `"comment"`                                         |             |
+| `value` | Yes      | [DesignComment](protocol.md#designcomment) / `null` |             |
+
+## DesignConstraint
+
+Absolute children retain a chosen relation to a resized parent.
+
+Type: `"center"` / `"end"` / `"scale"` / `"start"` / `"stretch"`.
+
+## DesignCorners
+
+Four independent corner radii, in clockwise order.
+
+| Field         | Required | Type     | Description |
+| ------------- | -------- | -------- | ----------- |
+| `bottomLeft`  | Yes      | `number` |             |
+| `bottomRight` | Yes      | `number` |             |
+| `topLeft`     | Yes      | `number` |             |
+| `topRight`    | Yes      | `number` |             |
+
+## DesignCreateMethod
+
+Create-document RPC contract.
+
+| Field    | Required | Type                                                   | Description |
+| -------- | -------- | ------------------------------------------------------ | ----------- |
+| `params` | Yes      | [DesignCreateRequest](protocol.md#designcreaterequest) |             |
+| `result` | Yes      | [DesignReceipt](protocol.md#designreceipt)             |             |
+
+## DesignCreateRequest
+
+Empty document creation is durable and idempotent.
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `commandId` | Yes      | `string` |             |
+| `id`        | Yes      | `string` |             |
+| `name`      | Yes      | `string` |             |
+
+## DesignCursor
+
+Record and UTF-16 character offsets allow large entities to remain bounded on the wire.
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `character` | Yes      | `number` |             |
+| `record`    | Yes      | `number` |             |
+
+## DesignDeleteMethod
+
+Owner-scoped revision-safe document deletion.
+
+| Field    | Required | Type                                                   | Description |
+| -------- | -------- | ------------------------------------------------------ | ----------- |
+| `params` | Yes      | [DesignDeleteRequest](protocol.md#designdeleterequest) |             |
+| `result` | Yes      | [DesignDeleteReceipt](protocol.md#designdeletereceipt) |             |
+
+## DesignDeleteReceipt
+
+Host confirmation that the exact document revision was removed.
+
+| Field      | Required | Type     | Description |
+| ---------- | -------- | -------- | ----------- |
+| `deleted`  | Yes      | `true`   |             |
+| `id`       | Yes      | `string` |             |
+| `revision` | Yes      | `string` |             |
+
+## DesignDeleteRequest
+
+Revision-fenced document removal with an exact retry identity.
+
+| Field              | Required | Type     | Description |
+| ------------------ | -------- | -------- | ----------- |
+| `commandId`        | Yes      | `string` |             |
+| `expectedRevision` | Yes      | `string` |             |
+| `id`               | Yes      | `string` |             |
+
+## DesignEventsMethod
+
+Revision-journal RPC contract.
+
+| Field    | Required | Type                                                   | Description |
+| -------- | -------- | ------------------------------------------------------ | ----------- |
+| `params` | Yes      | [DesignEventsRequest](protocol.md#designeventsrequest) |             |
+| `result` | Yes      | [DesignEventsPage](protocol.md#designeventspage)       |             |
+
+## DesignEventsPage
+
+A missed retained revision requires a fresh paged snapshot.
+
+| Field     | Required | Type                                                | Description |
+| --------- | -------- | --------------------------------------------------- | ----------- |
+| `commits` | Yes      | Array of [DesignReceipt](protocol.md#designreceipt) |             |
+| `reset`   | Yes      | `boolean`                                           |             |
+| `summary` | Yes      | [DesignSummary](protocol.md#designsummary)          |             |
+
+## DesignEventsRequest
+
+Users and agents consume the same durable revision journal.
+
+| Field           | Required | Type     | Description |
+| --------------- | -------- | -------- | ----------- |
+| `afterRevision` | Yes      | `string` |             |
+| `id`            | Yes      | `string` |             |
+| `limit`         | Yes      | `number` |             |
+
+## DesignFlow
+
+Free positioning and responsive container layouts.
+
+Type: `"absolute"` / `"column"` / `"grid"` / `"row"`.
+
+## DesignGradientStop
+
+Color stop in a normalized gradient.
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `color`  | Yes      | `string` |             |
+| `offset` | Yes      | `number` |             |
+
+## DesignImage
+
+Workspace image reference and crop transform.
+
+| Field     | Required | Type                                         | Description |
+| --------- | -------- | -------------------------------------------- | ----------- |
+| `assetId` | Yes      | `string`                                     |             |
+| `cropX`   | Yes      | `number`                                     |             |
+| `cropY`   | Yes      | `number`                                     |             |
+| `fit`     | Yes      | [DesignImageFit](protocol.md#designimagefit) |             |
+| `scale`   | Yes      | `number`                                     |             |
+
+## DesignImageFit
+
+Image scaling mode.
+
+Type: `"contain"` / `"cover"`.
+
+## DesignInsert
+
+Insert a standalone node at a precise location in a page or container.
+
+| Field      | Required | Type                                 | Description |
+| ---------- | -------- | ------------------------------------ | ----------- |
+| `index`    | Yes      | `number`                             |             |
+| `node`     | Yes      | [DesignNode](protocol.md#designnode) |             |
+| `op`       | Yes      | `"insert"`                           |             |
+| `pageId`   | Yes      | `string`                             |             |
+| `parentId` | Yes      | `null,string`                        |             |
+
+## DesignInsets
+
+Box padding.
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `bottom` | Yes      | `number` |             |
+| `left`   | Yes      | `number` |             |
+| `right`  | Yes      | `number` |             |
+| `top`    | Yes      | `number` |             |
+
+## DesignInteraction
+
+Click, hover and timed prototype links are independent of editable layout.
+
+| Field        | Required | Type                                             | Description |
+| ------------ | -------- | ------------------------------------------------ | ----------- |
+| `action`     | Yes      | [DesignAction](protocol.md#designaction)         |             |
+| `durationMs` | Yes      | `number`                                         |             |
+| `id`         | Yes      | `string`                                         |             |
+| `nodeId`     | Yes      | `string`                                         |             |
+| `targetId`   | Yes      | `string`                                         |             |
+| `transition` | Yes      | [DesignTransition](protocol.md#designtransition) |             |
+| `trigger`    | Yes      | [DesignTrigger](protocol.md#designtrigger)       |             |
+
+## DesignInteractionRecord
+
+Prototype record.
+
+| Field   | Required | Type                                                        | Description |
+| ------- | -------- | ----------------------------------------------------------- | ----------- |
+| `id`    | Yes      | `string`                                                    |             |
+| `kind`  | Yes      | `"interaction"`                                             |             |
+| `value` | Yes      | [DesignInteraction](protocol.md#designinteraction) / `null` |             |
+
+## DesignKind
+
+Editable scene primitives, including reusable component definitions and instances.
+
+Type: `"component"` / `"ellipse"` / `"frame"` / `"group"` / `"image"` / `"instance"` / `"line"` / `"path"` / `"polygon"` / `"rectangle"` / `"text"`.
+
+## DesignLayout
+
+Container layout, including wrapping, grid tracks and content alignment.
+
+| Field     | Required | Type                                     | Description |
+| --------- | -------- | ---------------------------------------- | ----------- |
+| `align`   | Yes      | [DesignAlign](protocol.md#designalign)   |             |
+| `clip`    | Yes      | `boolean`                                |             |
+| `columns` | Yes      | `number`                                 |             |
+| `flow`    | Yes      | [DesignFlow](protocol.md#designflow)     |             |
+| `gap`     | Yes      | `number`                                 |             |
+| `justify` | Yes      | [DesignAlign](protocol.md#designalign)   |             |
+| `padding` | Yes      | [DesignInsets](protocol.md#designinsets) |             |
+| `rowGap`  | Yes      | `number`                                 |             |
+| `wrap`    | Yes      | `boolean`                                |             |
+
+## DesignLayoutMethod
+
+Computed-geometry RPC contract.
+
+| Field    | Required | Type                                                   | Description |
+| -------- | -------- | ------------------------------------------------------ | ----------- |
+| `params` | Yes      | [DesignLayoutRequest](protocol.md#designlayoutrequest) |             |
+| `result` | Yes      | [DesignLayoutPage](protocol.md#designlayoutpage)       |             |
+
+## DesignLayoutPage
+
+Native geometry uses the same layout engine as the canvas.
+
+| Field        | Required | Type                                        | Description |
+| ------------ | -------- | ------------------------------------------- | ----------- |
+| `boxes`      | Yes      | Array of [DesignBox](protocol.md#designbox) |             |
+| `nextOffset` | Yes      | `null,number`                               |             |
+| `summary`    | Yes      | [DesignSummary](protocol.md#designsummary)  |             |
+
+## DesignLayoutRequest
+
+Agent geometry inspection is revision-pinned and separately paged.
+
+| Field      | Required | Type     | Description |
+| ---------- | -------- | -------- | ----------- |
+| `id`       | Yes      | `string` |             |
+| `limit`    | Yes      | `number` |             |
+| `offset`   | Yes      | `number` |             |
+| `pageId`   | Yes      | `string` |             |
+| `revision` | Yes      | `string` |             |
+
+## DesignListMethod
+
+Owner-scoped library RPC contract.
+
+| Field    | Required | Type                                               | Description |
+| -------- | -------- | -------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignListRequest](protocol.md#designlistrequest) |             |
+| `result` | Yes      | [DesignListPage](protocol.md#designlistpage)       |             |
+
+## DesignListPage
+
+Bounded library page.
+
+| Field       | Required | Type                                                | Description |
+| ----------- | -------- | --------------------------------------------------- | ----------- |
+| `items`     | Yes      | Array of [DesignSummary](protocol.md#designsummary) |             |
+| `nextAfter` | Yes      | `null,string`                                       |             |
+
+## DesignListRequest
+
+Owner-scoped document listing.
+
+| Field   | Required | Type          | Description |
+| ------- | -------- | ------------- | ----------- |
+| `after` | Yes      | `null,string` |             |
+| `limit` | Yes      | `number`      |             |
+
+## DesignMetadata
+
+Document properties and supporting design-system or collaboration records.
+
+| Field          | Required | Type                                                        | Description |
+| -------------- | -------- | ----------------------------------------------------------- | ----------- |
+| `comments`     | No       | Array of [DesignComment](protocol.md#designcomment)         |             |
+| `interactions` | No       | Array of [DesignInteraction](protocol.md#designinteraction) |             |
+| `name`         | No       | `string`                                                    |             |
+| `op`           | Yes      | `"metadata"`                                                |             |
+| `tokens`       | No       | Array of [DesignToken](protocol.md#designtoken)             |             |
+
+## DesignMove
+
+Reparent or reorder without breaking both sides of the tree.
+
+| Field      | Required | Type          | Description |
+| ---------- | -------- | ------------- | ----------- |
+| `id`       | Yes      | `string`      |             |
+| `index`    | Yes      | `number`      |             |
+| `op`       | Yes      | `"move"`      |             |
+| `pageId`   | Yes      | `string`      |             |
+| `parentId` | Yes      | `null,string` |             |
+
+## DesignNode
+
+All layer state is explicit and editable; no generated markup is the source of truth.
+
+| Field         | Required | Type                                                        | Description |
+| ------------- | -------- | ----------------------------------------------------------- | ----------- |
+| `children`    | Yes      | Array of `string`                                           |             |
+| `componentId` | Yes      | `null,string`                                               |             |
+| `height`      | Yes      | `number`                                                    |             |
+| `id`          | Yes      | `string`                                                    |             |
+| `image`       | Yes      | [DesignImage](protocol.md#designimage) / `null`             |             |
+| `kind`        | Yes      | [DesignKind](protocol.md#designkind)                        |             |
+| `layout`      | Yes      | [DesignLayout](protocol.md#designlayout)                    |             |
+| `locked`      | Yes      | `boolean`                                                   |             |
+| `name`        | Yes      | `string`                                                    |             |
+| `opacity`     | Yes      | `number`                                                    |             |
+| `overrides`   | Yes      | Array of [DesignOverride](protocol.md#designoverride)       |             |
+| `parentId`    | Yes      | `null,string`                                               |             |
+| `path`        | Yes      | Array of [DesignPathCommand](protocol.md#designpathcommand) |             |
+| `placement`   | Yes      | [DesignPlacement](protocol.md#designplacement)              |             |
+| `rotation`    | Yes      | `number`                                                    |             |
+| `style`       | Yes      | [DesignStyle](protocol.md#designstyle)                      |             |
+| `text`        | Yes      | [DesignText](protocol.md#designtext) / `null`               |             |
+| `visible`     | Yes      | `boolean`                                                   |             |
+| `width`       | Yes      | `number`                                                    |             |
+| `x`           | Yes      | `number`                                                    |             |
+| `y`           | Yes      | `number`                                                    |             |
+
+## DesignNodeChanges
+
+Editable properties exclude identity and tree links, which have dedicated operations.
+
+| Field         | Required | Type                                                                                                                                          | Description                                                                        |
+| ------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `componentId` | No       | `null,string`                                                                                                                                 |                                                                                    |
+| `height`      | No       | `number`                                                                                                                                      |                                                                                    |
+| `image`       | No       | [DesignImage](protocol.md#designimage) / `null`                                                                                               |                                                                                    |
+| `kind`        | No       | `"component"` / `"ellipse"` / `"frame"` / `"group"` / `"image"` / `"instance"` / `"line"` / `"path"` / `"polygon"` / `"rectangle"` / `"text"` | Editable scene primitives, including reusable component definitions and instances. |
+| `layout`      | No       | [DesignLayout](protocol.md#designlayout)                                                                                                      | Container layout, including wrapping, grid tracks and content alignment.           |
+| `locked`      | No       | `boolean`                                                                                                                                     |                                                                                    |
+| `name`        | No       | `string`                                                                                                                                      |                                                                                    |
+| `opacity`     | No       | `number`                                                                                                                                      |                                                                                    |
+| `overrides`   | No       | Array of [DesignOverride](protocol.md#designoverride)                                                                                         |                                                                                    |
+| `path`        | No       | Array of [DesignPathCommand](protocol.md#designpathcommand)                                                                                   |                                                                                    |
+| `placement`   | No       | [DesignPlacement](protocol.md#designplacement)                                                                                                | Child sizing and positioning relative to its parent.                               |
+| `rotation`    | No       | `number`                                                                                                                                      |                                                                                    |
+| `style`       | No       | [DesignStyle](protocol.md#designstyle)                                                                                                        | Style can be shared across arbitrary primitives.                                   |
+| `text`        | No       | [DesignText](protocol.md#designtext) / `null`                                                                                                 |                                                                                    |
+| `visible`     | No       | `boolean`                                                                                                                                     |                                                                                    |
+| `width`       | No       | `number`                                                                                                                                      |                                                                                    |
+| `x`           | No       | `number`                                                                                                                                      |                                                                                    |
+| `y`           | No       | `number`                                                                                                                                      |                                                                                    |
+
+## DesignNodeRecord
+
+Layer record.
+
+| Field   | Required | Type                                          | Description |
+| ------- | -------- | --------------------------------------------- | ----------- |
+| `id`    | Yes      | `string`                                      |             |
+| `kind`  | Yes      | `"node"`                                      |             |
+| `value` | Yes      | [DesignNode](protocol.md#designnode) / `null` |             |
+
+## DesignOperation
+
+A transaction can contain different operation types.
+
+Variant 1: [DesignInsert](protocol.md#designinsert)
+
+| Field      | Required | Type                                 | Description |
+| ---------- | -------- | ------------------------------------ | ----------- |
+| `index`    | Yes      | `number`                             |             |
+| `node`     | Yes      | [DesignNode](protocol.md#designnode) |             |
+| `op`       | Yes      | `"insert"`                           |             |
+| `pageId`   | Yes      | `string`                             |             |
+| `parentId` | Yes      | `null,string`                        |             |
+
+Variant 2: [DesignUpdate](protocol.md#designupdate)
+
+| Field     | Required | Type                                               | Description |
+| --------- | -------- | -------------------------------------------------- | ----------- |
+| `changes` | Yes      | [DesignNodeChanges](protocol.md#designnodechanges) |             |
+| `id`      | Yes      | `string`                                           |             |
+| `op`      | Yes      | `"update"`                                         |             |
+
+Variant 3: [DesignMove](protocol.md#designmove)
+
+| Field      | Required | Type          | Description |
+| ---------- | -------- | ------------- | ----------- |
+| `id`       | Yes      | `string`      |             |
+| `index`    | Yes      | `number`      |             |
+| `op`       | Yes      | `"move"`      |             |
+| `pageId`   | Yes      | `string`      |             |
+| `parentId` | Yes      | `null,string` |             |
+
+Variant 4: [DesignRemove](protocol.md#designremove)
+
+| Field | Required | Type       | Description |
+| ----- | -------- | ---------- | ----------- |
+| `id`  | Yes      | `string`   |             |
+| `op`  | Yes      | `"remove"` |             |
+
+Variant 5: [DesignPageOperation](protocol.md#designpageoperation)
+
+| Field        | Required | Type          | Description |
+| ------------ | -------- | ------------- | ----------- |
+| `background` | Yes      | `string`      |             |
+| `id`         | Yes      | `string`      |             |
+| `name`       | Yes      | `null,string` |             |
+| `op`         | Yes      | `"page"`      |             |
+
+Variant 6: [DesignMetadata](protocol.md#designmetadata)
+
+| Field          | Required | Type                                                        | Description |
+| -------------- | -------- | ----------------------------------------------------------- | ----------- |
+| `comments`     | No       | Array of [DesignComment](protocol.md#designcomment)         |             |
+| `interactions` | No       | Array of [DesignInteraction](protocol.md#designinteraction) |             |
+| `name`         | No       | `string`                                                    |             |
+| `op`           | Yes      | `"metadata"`                                                |             |
+| `tokens`       | No       | Array of [DesignToken](protocol.md#designtoken)             |             |
+
+## DesignOverride
+
+Instance overrides target a source layer without modifying its component definition.
+
+| Field     | Required | Type                                            | Description |
+| --------- | -------- | ----------------------------------------------- | ----------- |
+| `name`    | Yes      | `null,string`                                   |             |
+| `nodeId`  | Yes      | `string`                                        |             |
+| `style`   | Yes      | [DesignStyle](protocol.md#designstyle) / `null` |             |
+| `text`    | Yes      | `null,string`                                   |             |
+| `visible` | Yes      | `null,boolean`                                  |             |
+
+## DesignPage
+
+A page has its own root layers and viewport.
+
+| Field        | Required | Type              | Description |
+| ------------ | -------- | ----------------- | ----------- |
+| `background` | Yes      | `string`          |             |
+| `id`         | Yes      | `string`          |             |
+| `name`       | Yes      | `string`          |             |
+| `roots`      | Yes      | Array of `string` |             |
+
+## DesignPageOperation
+
+Create, rename or remove a page. Root lists are managed by tree operations.
+
+| Field        | Required | Type          | Description |
+| ------------ | -------- | ------------- | ----------- |
+| `background` | Yes      | `string`      |             |
+| `id`         | Yes      | `string`      |             |
+| `name`       | Yes      | `null,string` |             |
+| `op`         | Yes      | `"page"`      |             |
+
+## DesignPageRecord
+
+Page record.
+
+| Field   | Required | Type                                          | Description |
+| ------- | -------- | --------------------------------------------- | ----------- |
+| `id`    | Yes      | `string`                                      |             |
+| `kind`  | Yes      | `"page"`                                      |             |
+| `value` | Yes      | [DesignPage](protocol.md#designpage) / `null` |             |
+
+## DesignPaint
+
+Layer paint. Colors are validated hex values, never arbitrary CSS.
+
+| Field     | Required | Type                                                          | Description |
+| --------- | -------- | ------------------------------------------------------------- | ----------- |
+| `angle`   | Yes      | `number`                                                      |             |
+| `assetId` | Yes      | `null,string`                                                 |             |
+| `color`   | Yes      | `string`                                                      |             |
+| `kind`    | Yes      | [DesignPaintKind](protocol.md#designpaintkind)                |             |
+| `opacity` | Yes      | `number`                                                      |             |
+| `stops`   | Yes      | Array of [DesignGradientStop](protocol.md#designgradientstop) |             |
+| `tokenId` | Yes      | `null,string`                                                 |             |
+
+## DesignPaintKind
+
+Supported paint sources. Image assets use workspace references.
+
+Type: `"image"` / `"linear"` / `"radial"` / `"solid"`.
+
+## DesignPathCommand
+
+A vector instruction in layer-local coordinates.
+
+| Field    | Required | Type                                         | Description |
+| -------- | -------- | -------------------------------------------- | ----------- |
+| `values` | Yes      | Array of `number`                            |             |
+| `verb`   | Yes      | [DesignPathVerb](protocol.md#designpathverb) |             |
+
+## DesignPathVerb
+
+Path verbs use explicit coordinates; cubic curves are preserved as editable geometry.
+
+Type: `"C"` / `"L"` / `"M"` / `"Q"` / `"Z"`.
+
+## DesignPlacement
+
+Child sizing and positioning relative to its parent.
+
+| Field        | Required | Type                                             | Description |
+| ------------ | -------- | ------------------------------------------------ | ----------- |
+| `absolute`   | Yes      | `boolean`                                        |             |
+| `columnSpan` | Yes      | `number`                                         |             |
+| `height`     | Yes      | [DesignSizing](protocol.md#designsizing)         |             |
+| `horizontal` | Yes      | [DesignConstraint](protocol.md#designconstraint) |             |
+| `maxHeight`  | Yes      | `number`                                         |             |
+| `maxWidth`   | Yes      | `number`                                         |             |
+| `minHeight`  | Yes      | `number`                                         |             |
+| `minWidth`   | Yes      | `number`                                         |             |
+| `rowSpan`    | Yes      | `number`                                         |             |
+| `vertical`   | Yes      | [DesignConstraint](protocol.md#designconstraint) |             |
+| `width`      | Yes      | [DesignSizing](protocol.md#designsizing)         |             |
+
+## DesignReadMethod
+
+Bounded snapshot RPC contract.
+
+| Field    | Required | Type                                               | Description |
+| -------- | -------- | -------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignReadRequest](protocol.md#designreadrequest) |             |
+| `result` | Yes      | [DesignRecordPage](protocol.md#designrecordpage)   |             |
+
+## DesignReadRequest
+
+Strictly revision-pinned pagination prevents merging chunks from different documents.
+
+| Field      | Required | Type                                              | Description |
+| ---------- | -------- | ------------------------------------------------- | ----------- |
+| `cursor`   | Yes      | [DesignCursor](protocol.md#designcursor) / `null` |             |
+| `id`       | Yes      | `string`                                          |             |
+| `limit`    | Yes      | `number`                                          |             |
+| `revision` | Yes      | `null,string`                                     |             |
+
+## DesignReceipt
+
+Commit acknowledgements contain no large text or scene snapshot.
+
+| Field              | Required | Type                                       | Description |
+| ------------------ | -------- | ------------------------------------------ | ----------- |
+| `actor`            | Yes      | `string`                                   |             |
+| `commandId`        | Yes      | `string`                                   |             |
+| `previousRevision` | Yes      | `null,string`                              |             |
+| `summary`          | Yes      | [DesignSummary](protocol.md#designsummary) |             |
+| `undoable`         | Yes      | `boolean`                                  |             |
+
+## DesignRecord
+
+One complete entity, or a tombstone in a delta page.
+
+Variant 1: [DesignNodeRecord](protocol.md#designnoderecord)
+
+| Field   | Required | Type                                          | Description |
+| ------- | -------- | --------------------------------------------- | ----------- |
+| `id`    | Yes      | `string`                                      |             |
+| `kind`  | Yes      | `"node"`                                      |             |
+| `value` | Yes      | [DesignNode](protocol.md#designnode) / `null` |             |
+
+Variant 2: [DesignPageRecord](protocol.md#designpagerecord)
+
+| Field   | Required | Type                                          | Description |
+| ------- | -------- | --------------------------------------------- | ----------- |
+| `id`    | Yes      | `string`                                      |             |
+| `kind`  | Yes      | `"page"`                                      |             |
+| `value` | Yes      | [DesignPage](protocol.md#designpage) / `null` |             |
+
+Variant 3: [DesignTokenRecord](protocol.md#designtokenrecord)
+
+| Field   | Required | Type                                            | Description |
+| ------- | -------- | ----------------------------------------------- | ----------- |
+| `id`    | Yes      | `string`                                        |             |
+| `kind`  | Yes      | `"token"`                                       |             |
+| `value` | Yes      | [DesignToken](protocol.md#designtoken) / `null` |             |
+
+Variant 4: [DesignInteractionRecord](protocol.md#designinteractionrecord)
+
+| Field   | Required | Type                                                        | Description |
+| ------- | -------- | ----------------------------------------------------------- | ----------- |
+| `id`    | Yes      | `string`                                                    |             |
+| `kind`  | Yes      | `"interaction"`                                             |             |
+| `value` | Yes      | [DesignInteraction](protocol.md#designinteraction) / `null` |             |
+
+Variant 5: [DesignCommentRecord](protocol.md#designcommentrecord)
+
+| Field   | Required | Type                                                | Description |
+| ------- | -------- | --------------------------------------------------- | ----------- |
+| `id`    | Yes      | `string`                                            |             |
+| `kind`  | Yes      | `"comment"`                                         |             |
+| `value` | Yes      | [DesignComment](protocol.md#designcomment) / `null` |             |
+
+## DesignRecordFragment
+
+Large records use contiguous fragments, decoded only after complete assembly.
+
+| Field    | Required | Type                                             | Description |
+| -------- | -------- | ------------------------------------------------ | ----------- |
+| `id`     | Yes      | `string`                                         |             |
+| `kind`   | Yes      | [DesignRecordKind](protocol.md#designrecordkind) |             |
+| `offset` | Yes      | `number`                                         |             |
+| `text`   | Yes      | `string`                                         |             |
+| `total`  | Yes      | `number`                                         |             |
+
+## DesignRecordKind
+
+Scene entities have independent transport identities.
+
+Type: `"comment"` / `"interaction"` / `"node"` / `"page"` / `"token"`.
+
+## DesignRecordPage
+
+Independently bounded entity page with at most one partial record.
+
+| Field        | Required | Type                                                              | Description |
+| ------------ | -------- | ----------------------------------------------------------------- | ----------- |
+| `fragment`   | Yes      | [DesignRecordFragment](protocol.md#designrecordfragment) / `null` |             |
+| `nextCursor` | Yes      | [DesignCursor](protocol.md#designcursor) / `null`                 |             |
+| `records`    | Yes      | Array of [DesignRecord](protocol.md#designrecord)                 |             |
+| `summary`    | Yes      | [DesignSummary](protocol.md#designsummary)                        |             |
+
+## DesignRemove
+
+Delete a subtree and its anchored comments and prototype links.
+
+| Field | Required | Type       | Description |
+| ----- | -------- | ---------- | ----------- |
+| `id`  | Yes      | `string`   |             |
+| `op`  | Yes      | `"remove"` |             |
+
+## DesignSaveMethod
+
+Atomic editing RPC contract.
+
+| Field    | Required | Type                                               | Description |
+| -------- | -------- | -------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignSaveRequest](protocol.md#designsaverequest) |             |
+| `result` | Yes      | [DesignReceipt](protocol.md#designreceipt)         |             |
+
+## DesignSaveRequest
+
+Patch uses optimistic concurrency and a durable retry identity.
+
+| Field              | Required | Type                                                    | Description |
+| ------------------ | -------- | ------------------------------------------------------- | ----------- |
+| `commandId`        | Yes      | `string`                                                |             |
+| `expectedRevision` | Yes      | `string`                                                |             |
+| `id`               | Yes      | `string`                                                |             |
+| `operations`       | Yes      | Array of [DesignOperation](protocol.md#designoperation) |             |
+
+## DesignShadow
+
+Drop or inner shadow.
+
+| Field    | Required | Type      | Description |
+| -------- | -------- | --------- | ----------- |
+| `blur`   | Yes      | `number`  |             |
+| `color`  | Yes      | `string`  |             |
+| `inner`  | Yes      | `boolean` |             |
+| `spread` | Yes      | `number`  |             |
+| `x`      | Yes      | `number`  |             |
+| `y`      | Yes      | `number`  |             |
+
+## DesignSizing
+
+Sizing relative to the parent and content.
+
+Type: `"fill"` / `"fixed"` / `"hug"`.
+
+## DesignStroke
+
+Outline properties.
+
+| Field   | Required | Type                                   | Description |
+| ------- | -------- | -------------------------------------- | ----------- |
+| `dash`  | Yes      | Array of `number`                      |             |
+| `paint` | Yes      | [DesignPaint](protocol.md#designpaint) |             |
+| `width` | Yes      | `number`                               |             |
+
+## DesignStyle
+
+Style can be shared across arbitrary primitives.
+
+| Field     | Required | Type                                              | Description |
+| --------- | -------- | ------------------------------------------------- | ----------- |
+| `blur`    | Yes      | `number`                                          |             |
+| `corners` | Yes      | [DesignCorners](protocol.md#designcorners)        |             |
+| `fills`   | Yes      | Array of [DesignPaint](protocol.md#designpaint)   |             |
+| `shadows` | Yes      | Array of [DesignShadow](protocol.md#designshadow) |             |
+| `stroke`  | Yes      | [DesignStroke](protocol.md#designstroke) / `null` |             |
+
+## DesignSummary
+
+Tiny management projection. Timestamps and revisions retain full integer precision.
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `id`        | Yes      | `string` |             |
+| `name`      | Yes      | `string` |             |
+| `nodeCount` | Yes      | `number` |             |
+| `pageCount` | Yes      | `number` |             |
+| `revision`  | Yes      | `string` |             |
+| `updatedAt` | Yes      | `string` |             |
+
+## DesignText
+
+Text layout is shared by the canvas, tools and exported designs.
+
+| Field           | Required | Type                                                | Description |
+| --------------- | -------- | --------------------------------------------------- | ----------- |
+| `align`         | Yes      | [DesignAlign](protocol.md#designalign)              |             |
+| `content`       | Yes      | `string`                                            |             |
+| `family`        | Yes      | `string`                                            |             |
+| `italic`        | Yes      | `boolean`                                           |             |
+| `letterSpacing` | Yes      | `number`                                            |             |
+| `lineHeight`    | Yes      | `number`                                            |             |
+| `runs`          | Yes      | Array of [DesignTextRun](protocol.md#designtextrun) |             |
+| `size`          | Yes      | `number`                                            |             |
+| `weight`        | Yes      | `number`                                            |             |
+
+## DesignTextRun
+
+Rich text range. Offsets are UTF-16 indices into the layer's text.
+
+| Field       | Required | Type      | Description |
+| ----------- | -------- | --------- | ----------- |
+| `color`     | Yes      | `string`  |             |
+| `end`       | Yes      | `number`  |             |
+| `family`    | Yes      | `string`  |             |
+| `italic`    | Yes      | `boolean` |             |
+| `size`      | Yes      | `number`  |             |
+| `start`     | Yes      | `number`  |             |
+| `underline` | Yes      | `boolean` |             |
+| `weight`    | Yes      | `number`  |             |
+
+## DesignToken
+
+Named design-system values.
+
+| Field      | Required | Type                                                   | Description |
+| ---------- | -------- | ------------------------------------------------------ | ----------- |
+| `category` | Yes      | [DesignTokenCategory](protocol.md#designtokencategory) |             |
+| `id`       | Yes      | `string`                                               |             |
+| `name`     | Yes      | `string`                                               |             |
+| `value`    | Yes      | `string`                                               |             |
+
+## DesignTokenCategory
+
+Token families.
+
+Type: `"color"` / `"spacing"` / `"typography"`.
+
+## DesignTokenRecord
+
+Token record.
+
+| Field   | Required | Type                                            | Description |
+| ------- | -------- | ----------------------------------------------- | ----------- |
+| `id`    | Yes      | `string`                                        |             |
+| `kind`  | Yes      | `"token"`                                       |             |
+| `value` | Yes      | [DesignToken](protocol.md#designtoken) / `null` |             |
+
+## DesignTransition
+
+Prototype transitions.
+
+Type: `"dissolve"` / `"instant"` / `"slide"`.
+
+## DesignTrigger
+
+Prototype triggers.
+
+Type: `"after"` / `"click"` / `"hover"`.
+
+## DesignUndoMethod
+
+Conflict-safe undo RPC contract.
+
+| Field    | Required | Type                                               | Description |
+| -------- | -------- | -------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignUndoRequest](protocol.md#designundorequest) |             |
+| `result` | Yes      | [DesignReceipt](protocol.md#designreceipt)         |             |
+
+## DesignUndoRequest
+
+Undo names the committed transaction rather than accepting an untrusted state snapshot.
+
+| Field              | Required | Type     | Description |
+| ------------------ | -------- | -------- | ----------- |
+| `commandId`        | Yes      | `string` |             |
+| `expectedRevision` | Yes      | `string` |             |
+| `id`               | Yes      | `string` |             |
+| `targetCommandId`  | Yes      | `string` |             |
+
+## DesignUpdate
+
+Update only chosen properties, preserving unrelated edits.
+
+| Field     | Required | Type                                               | Description |
+| --------- | -------- | -------------------------------------------------- | ----------- |
+| `changes` | Yes      | [DesignNodeChanges](protocol.md#designnodechanges) |             |
+| `id`      | Yes      | `string`                                           |             |
+| `op`      | Yes      | `"update"`                                         |             |
+
 ## DeviceApproveParams
 
 Approving a device, optionally overriding the scopes it asked for.
@@ -2506,9 +3514,6 @@ Configurable bounds on gateway-owned work and memory.
 | `agent.stream`                       | Yes      | Object (fields below) |                                                                                            |
 | `agents.define`                      | Yes      | Object (fields below) |                                                                                            |
 | `agents.list`                        | Yes      | Object (fields below) |                                                                                            |
-| `agents.personal.list`               | Yes      | Object (fields below) |                                                                                            |
-| `agents.personal.remove`             | Yes      | Object (fields below) |                                                                                            |
-| `agents.personal.save`               | Yes      | Object (fields below) |                                                                                            |
 | `approvals.list`                     | Yes      | Object (fields below) |                                                                                            |
 | `approvals.resolve`                  | Yes      | Object (fields below) |                                                                                            |
 | `channels.deadLetters.list`          | Yes      | Object (fields below) |                                                                                            |
@@ -2531,6 +3536,22 @@ Configurable bounds on gateway-owned work and memory.
 | `data.upload.chunk`                  | Yes      | Object (fields below) |                                                                                            |
 | `data.upload.finish`                 | Yes      | Object (fields below) |                                                                                            |
 | `data.upload.start`                  | Yes      | Object (fields below) |                                                                                            |
+| `design.asset.cancel`                | Yes      | Object (fields below) |                                                                                            |
+| `design.asset.chunk`                 | Yes      | Object (fields below) |                                                                                            |
+| `design.asset.finish`                | Yes      | Object (fields below) |                                                                                            |
+| `design.asset.list`                  | Yes      | Object (fields below) |                                                                                            |
+| `design.asset.read`                  | Yes      | Object (fields below) |                                                                                            |
+| `design.asset.remove`                | Yes      | Object (fields below) |                                                                                            |
+| `design.asset.start`                 | Yes      | Object (fields below) |                                                                                            |
+| `design.changes`                     | Yes      | Object (fields below) | Forward delta RPC contract.                                                                |
+| `design.create`                      | Yes      | Object (fields below) | Create-document RPC contract.                                                              |
+| `design.delete`                      | Yes      | Object (fields below) | Owner-scoped revision-safe document deletion.                                              |
+| `design.events`                      | Yes      | Object (fields below) | Revision-journal RPC contract.                                                             |
+| `design.layout`                      | Yes      | Object (fields below) | Computed-geometry RPC contract.                                                            |
+| `design.list`                        | Yes      | Object (fields below) | Owner-scoped library RPC contract.                                                         |
+| `design.read`                        | Yes      | Object (fields below) | Bounded snapshot RPC contract.                                                             |
+| `design.save`                        | Yes      | Object (fields below) | Atomic editing RPC contract.                                                               |
+| `design.undo`                        | Yes      | Object (fields below) | Conflict-safe undo RPC contract.                                                           |
 | `devices.approve`                    | Yes      | Object (fields below) |                                                                                            |
 | `devices.list`                       | Yes      | Object (fields below) |                                                                                            |
 | `devices.reject`                     | Yes      | Object (fields below) |                                                                                            |
@@ -2725,27 +3746,6 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ------------------------------------------------------- | ----------- |
 | `params` | Yes      | [Recordstringnever](protocol.md#recordstringnever)      |             |
 | `result` | Yes      | Array of [AgentDefinition](protocol.md#agentdefinition) |             |
-
-**agents.personal.list**
-
-| Field    | Required | Type                                                | Description |
-| -------- | -------- | --------------------------------------------------- | ----------- |
-| `params` | Yes      | [Recordstringnever](protocol.md#recordstringnever)  |             |
-| `result` | Yes      | Array of [PersonalAgent](protocol.md#personalagent) |             |
-
-**agents.personal.remove**
-
-| Field    | Required | Type                             | Description |
-| -------- | -------- | -------------------------------- | ----------- |
-| `params` | Yes      | [IdParams](protocol.md#idparams) |             |
-| `result` | Yes      | [OkResult](protocol.md#okresult) |             |
-
-**agents.personal.save**
-
-| Field    | Required | Type                                                 | Description |
-| -------- | -------- | ---------------------------------------------------- | ----------- |
-| `params` | Yes      | [PersonalAgentInput](protocol.md#personalagentinput) |             |
-| `result` | Yes      | [PersonalAgent](protocol.md#personalagent)           |             |
 
 **approvals.list**
 
@@ -2955,6 +3955,118 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ---------------------------------------------------------- | ----------- |
 | `params` | Yes      | [DataUploadStartParams](protocol.md#datauploadstartparams) |             |
 | `result` | Yes      | [DataUpload](protocol.md#dataupload)                       |             |
+
+**design.asset.cancel**
+
+| Field    | Required | Type                                                     | Description |
+| -------- | -------- | -------------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignAssetIdRequest](protocol.md#designassetidrequest) |             |
+| `result` | Yes      | `null`                                                   |             |
+
+**design.asset.chunk**
+
+| Field    | Required | Type                                                           | Description |
+| -------- | -------- | -------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignAssetChunkRequest](protocol.md#designassetchunkrequest) |             |
+| `result` | Yes      | [DesignAssetPosition](protocol.md#designassetposition)         |             |
+
+**design.asset.finish**
+
+| Field    | Required | Type                                                     | Description |
+| -------- | -------- | -------------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignAssetIdRequest](protocol.md#designassetidrequest) |             |
+| `result` | Yes      | [DesignAsset](protocol.md#designasset)                   |             |
+
+**design.asset.list**
+
+| Field    | Required | Type                                                         | Description |
+| -------- | -------- | ------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [DesignAssetListRequest](protocol.md#designassetlistrequest) |             |
+| `result` | Yes      | [DesignAssetListPage](protocol.md#designassetlistpage)       |             |
+
+**design.asset.read**
+
+| Field    | Required | Type                                                         | Description |
+| -------- | -------- | ------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [DesignAssetReadRequest](protocol.md#designassetreadrequest) |             |
+| `result` | Yes      | [DesignAssetSlice](protocol.md#designassetslice)             |             |
+
+**design.asset.remove**
+
+| Field    | Required | Type                                                     | Description |
+| -------- | -------- | -------------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignAssetIdRequest](protocol.md#designassetidrequest) |             |
+| `result` | Yes      | `null`                                                   |             |
+
+**design.asset.start**
+
+| Field    | Required | Type                                                           | Description |
+| -------- | -------- | -------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignAssetStartRequest](protocol.md#designassetstartrequest) |             |
+| `result` | Yes      | [DesignAssetPosition](protocol.md#designassetposition)         |             |
+
+**design.changes**
+
+| Field    | Required | Type                                                     | Description |
+| -------- | -------- | -------------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignChangesRequest](protocol.md#designchangesrequest) |             |
+| `result` | Yes      | [DesignRecordPage](protocol.md#designrecordpage)         |             |
+
+**design.create**
+
+| Field    | Required | Type                                                   | Description |
+| -------- | -------- | ------------------------------------------------------ | ----------- |
+| `params` | Yes      | [DesignCreateRequest](protocol.md#designcreaterequest) |             |
+| `result` | Yes      | [DesignReceipt](protocol.md#designreceipt)             |             |
+
+**design.delete**
+
+| Field    | Required | Type                                                   | Description |
+| -------- | -------- | ------------------------------------------------------ | ----------- |
+| `params` | Yes      | [DesignDeleteRequest](protocol.md#designdeleterequest) |             |
+| `result` | Yes      | [DesignDeleteReceipt](protocol.md#designdeletereceipt) |             |
+
+**design.events**
+
+| Field    | Required | Type                                                   | Description |
+| -------- | -------- | ------------------------------------------------------ | ----------- |
+| `params` | Yes      | [DesignEventsRequest](protocol.md#designeventsrequest) |             |
+| `result` | Yes      | [DesignEventsPage](protocol.md#designeventspage)       |             |
+
+**design.layout**
+
+| Field    | Required | Type                                                   | Description |
+| -------- | -------- | ------------------------------------------------------ | ----------- |
+| `params` | Yes      | [DesignLayoutRequest](protocol.md#designlayoutrequest) |             |
+| `result` | Yes      | [DesignLayoutPage](protocol.md#designlayoutpage)       |             |
+
+**design.list**
+
+| Field    | Required | Type                                               | Description |
+| -------- | -------- | -------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignListRequest](protocol.md#designlistrequest) |             |
+| `result` | Yes      | [DesignListPage](protocol.md#designlistpage)       |             |
+
+**design.read**
+
+| Field    | Required | Type                                               | Description |
+| -------- | -------- | -------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignReadRequest](protocol.md#designreadrequest) |             |
+| `result` | Yes      | [DesignRecordPage](protocol.md#designrecordpage)   |             |
+
+**design.save**
+
+| Field    | Required | Type                                               | Description |
+| -------- | -------- | -------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignSaveRequest](protocol.md#designsaverequest) |             |
+| `result` | Yes      | [DesignReceipt](protocol.md#designreceipt)         |             |
+
+**design.undo**
+
+| Field    | Required | Type                                               | Description |
+| -------- | -------- | -------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignUndoRequest](protocol.md#designundorequest) |             |
+| `result` | Yes      | [DesignReceipt](protocol.md#designreceipt)         |             |
 
 **devices.approve**
 
@@ -4915,26 +6027,6 @@ Complete bounded selection with quality counts and collection diagnostics.
 | `invalidSamples`       | Yes      | `number`                                                  |                                                                                                |
 | `latestSampleMs`       | Yes      | `null,string`                                             |                                                                                                |
 | `query`                | Yes      | [PerformanceQuery](protocol.md#performancequery)          |                                                                                                |
-
-## PersonalAgent
-
-A user's own agent instructions; execution permissions always come from the deployment default.
-
-| Field          | Required | Type     | Description |
-| -------------- | -------- | -------- | ----------- |
-| `id`           | Yes      | `string` |             |
-| `instructions` | Yes      | `string` |             |
-| `name`         | Yes      | `string` |             |
-
-## PersonalAgentInput
-
-Create with an empty id, or update an existing owned agent.
-
-| Field          | Required | Type     | Description |
-| -------------- | -------- | -------- | ----------- |
-| `id`           | Yes      | `string` |             |
-| `instructions` | Yes      | `string` |             |
-| `name`         | Yes      | `string` |             |
 
 ## PlanningAlignmentAnchor
 

@@ -5715,6 +5715,52 @@ export const schema: Schema = {
             required: ['character', 'record'],
             type: 'object',
         },
+        DesignDeleteMethod: {
+            description: 'Owner-scoped revision-safe document deletion.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/DesignDeleteRequest',
+                },
+                result: {
+                    $ref: '#/definitions/DesignDeleteReceipt',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        DesignDeleteReceipt: {
+            description: 'Host confirmation that the exact document revision was removed.',
+            properties: {
+                deleted: {
+                    const: true,
+                    type: 'boolean',
+                },
+                id: {
+                    type: 'string',
+                },
+                revision: {
+                    type: 'string',
+                },
+            },
+            required: ['deleted', 'id', 'revision'],
+            type: 'object',
+        },
+        DesignDeleteRequest: {
+            description: 'Revision-fenced document removal with an exact retry identity.',
+            properties: {
+                commandId: {
+                    type: 'string',
+                },
+                expectedRevision: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+            },
+            required: ['commandId', 'expectedRevision', 'id'],
+            type: 'object',
+        },
         DesignEventsMethod: {
             description: 'Revision-journal RPC contract.',
             properties: {
@@ -7925,45 +7971,6 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
-                'agents.personal.list': {
-                    properties: {
-                        params: {
-                            $ref: '#/definitions/Record%3Cstring%2Cnever%3E',
-                        },
-                        result: {
-                            items: {
-                                $ref: '#/definitions/PersonalAgent',
-                            },
-                            type: 'array',
-                        },
-                    },
-                    required: ['params', 'result'],
-                    type: 'object',
-                },
-                'agents.personal.remove': {
-                    properties: {
-                        params: {
-                            $ref: '#/definitions/IdParams',
-                        },
-                        result: {
-                            $ref: '#/definitions/OkResult',
-                        },
-                    },
-                    required: ['params', 'result'],
-                    type: 'object',
-                },
-                'agents.personal.save': {
-                    properties: {
-                        params: {
-                            $ref: '#/definitions/PersonalAgentInput',
-                        },
-                        result: {
-                            $ref: '#/definitions/PersonalAgent',
-                        },
-                    },
-                    required: ['params', 'result'],
-                    type: 'object',
-                },
                 'approvals.list': {
                     properties: {
                         params: {
@@ -8431,6 +8438,19 @@ export const schema: Schema = {
                         },
                         result: {
                             $ref: '#/definitions/DesignReceipt',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'design.delete': {
+                    description: 'Owner-scoped revision-safe document deletion.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/DesignDeleteRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/DesignDeleteReceipt',
                         },
                     },
                     required: ['params', 'result'],
@@ -10119,9 +10139,6 @@ export const schema: Schema = {
                 'agent.stream',
                 'agents.define',
                 'agents.list',
-                'agents.personal.list',
-                'agents.personal.remove',
-                'agents.personal.save',
                 'approvals.list',
                 'approvals.resolve',
                 'channels.deadLetters.list',
@@ -10153,6 +10170,7 @@ export const schema: Schema = {
                 'design.asset.start',
                 'design.changes',
                 'design.create',
+                'design.delete',
                 'design.events',
                 'design.layout',
                 'design.list',
@@ -12774,39 +12792,6 @@ export const schema: Schema = {
                 'latestSampleMs',
                 'query',
             ],
-            type: 'object',
-        },
-        PersonalAgent: {
-            description:
-                "A user's own agent instructions; execution permissions always come from the deployment default.",
-            properties: {
-                id: {
-                    type: 'string',
-                },
-                instructions: {
-                    type: 'string',
-                },
-                name: {
-                    type: 'string',
-                },
-            },
-            required: ['id', 'instructions', 'name'],
-            type: 'object',
-        },
-        PersonalAgentInput: {
-            description: 'Create with an empty id, or update an existing owned agent.',
-            properties: {
-                id: {
-                    type: 'string',
-                },
-                instructions: {
-                    type: 'string',
-                },
-                name: {
-                    type: 'string',
-                },
-            },
-            required: ['id', 'instructions', 'name'],
             type: 'object',
         },
         PlanningAlignmentAnchor: {

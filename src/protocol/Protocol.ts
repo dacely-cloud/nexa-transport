@@ -3760,6 +3760,43 @@ export interface DesignCursorShape {
 /** DesignCursor from the Nexa wire protocol. */
 export type DesignCursor = DesignCursorShape;
 
+/** DesignDeleteMethod wire fields. */
+export interface DesignDeleteMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignDeleteRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignDeleteReceipt;
+}
+
+/** DesignDeleteMethod from the Nexa wire protocol. */
+export type DesignDeleteMethod = DesignDeleteMethodShape;
+
+/** DesignDeleteReceipt wire fields. */
+export interface DesignDeleteReceiptShape {
+    /** deleted as defined by the Nexa gateway. */
+    readonly deleted: true;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: string;
+}
+
+/** DesignDeleteReceipt from the Nexa wire protocol. */
+export type DesignDeleteReceipt = DesignDeleteReceiptShape;
+
+/** DesignDeleteRequest wire fields. */
+export interface DesignDeleteRequestShape {
+    /** commandId as defined by the Nexa gateway. */
+    readonly commandId: string;
+    /** expectedRevision as defined by the Nexa gateway. */
+    readonly expectedRevision: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+}
+
+/** DesignDeleteRequest from the Nexa wire protocol. */
+export type DesignDeleteRequest = DesignDeleteRequestShape;
+
 /** DesignEventsMethod wire fields. */
 export interface DesignEventsMethodShape {
     /** params as defined by the Nexa gateway. */
@@ -5157,30 +5194,6 @@ export interface GatewayMethodsagents_listShape {
     readonly result: ReadonlyArray<AgentDefinition>;
 }
 
-/** GatewayMethodsagents_personal_list wire fields. */
-export interface GatewayMethodsagents_personal_listShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: Recordstringnever;
-    /** result as defined by the Nexa gateway. */
-    readonly result: ReadonlyArray<PersonalAgent>;
-}
-
-/** GatewayMethodsagents_personal_remove wire fields. */
-export interface GatewayMethodsagents_personal_removeShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: IdParams;
-    /** result as defined by the Nexa gateway. */
-    readonly result: OkResult;
-}
-
-/** GatewayMethodsagents_personal_save wire fields. */
-export interface GatewayMethodsagents_personal_saveShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: PersonalAgentInput;
-    /** result as defined by the Nexa gateway. */
-    readonly result: PersonalAgent;
-}
-
 /** GatewayMethodsapprovals_list wire fields. */
 export interface GatewayMethodsapprovals_listShape {
     /** params as defined by the Nexa gateway. */
@@ -5489,6 +5502,14 @@ export interface GatewayMethodsdesign_createShape {
     readonly params: DesignCreateRequest;
     /** result as defined by the Nexa gateway. */
     readonly result: DesignReceipt;
+}
+
+/** GatewayMethodsdesign_delete wire fields. */
+export interface GatewayMethodsdesign_deleteShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignDeleteRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignDeleteReceipt;
 }
 
 /** GatewayMethodsdesign_events wire fields. */
@@ -6571,12 +6592,6 @@ export interface GatewayMethodsShape {
     readonly 'agents.define': GatewayMethodsagents_defineShape;
     /** agents.list as defined by the Nexa gateway. */
     readonly 'agents.list': GatewayMethodsagents_listShape;
-    /** agents.personal.list as defined by the Nexa gateway. */
-    readonly 'agents.personal.list': GatewayMethodsagents_personal_listShape;
-    /** agents.personal.remove as defined by the Nexa gateway. */
-    readonly 'agents.personal.remove': GatewayMethodsagents_personal_removeShape;
-    /** agents.personal.save as defined by the Nexa gateway. */
-    readonly 'agents.personal.save': GatewayMethodsagents_personal_saveShape;
     /** approvals.list as defined by the Nexa gateway. */
     readonly 'approvals.list': GatewayMethodsapprovals_listShape;
     /** approvals.resolve as defined by the Nexa gateway. */
@@ -6639,6 +6654,8 @@ export interface GatewayMethodsShape {
     readonly 'design.changes': GatewayMethodsdesign_changesShape;
     /** design.create as defined by the Nexa gateway. */
     readonly 'design.create': GatewayMethodsdesign_createShape;
+    /** design.delete as defined by the Nexa gateway. */
+    readonly 'design.delete': GatewayMethodsdesign_deleteShape;
     /** design.events as defined by the Nexa gateway. */
     readonly 'design.events': GatewayMethodsdesign_eventsShape;
     /** design.layout as defined by the Nexa gateway. */
@@ -8461,32 +8478,6 @@ export interface PerformanceReportShape {
 
 /** PerformanceReport from the Nexa wire protocol. */
 export type PerformanceReport = PerformanceReportShape;
-
-/** PersonalAgent wire fields. */
-export interface PersonalAgentShape {
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** instructions as defined by the Nexa gateway. */
-    readonly instructions: string;
-    /** name as defined by the Nexa gateway. */
-    readonly name: string;
-}
-
-/** PersonalAgent from the Nexa wire protocol. */
-export type PersonalAgent = PersonalAgentShape;
-
-/** PersonalAgentInput wire fields. */
-export interface PersonalAgentInputShape {
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** instructions as defined by the Nexa gateway. */
-    readonly instructions: string;
-    /** name as defined by the Nexa gateway. */
-    readonly name: string;
-}
-
-/** PersonalAgentInput from the Nexa wire protocol. */
-export type PersonalAgentInput = PersonalAgentInputShape;
 
 /** PlanningAlignmentAnchor wire fields. */
 export interface PlanningAlignmentAnchorShape {
@@ -13836,12 +13827,6 @@ export enum Method {
     AgentsDefine = 'agents.define',
     /** Calls agents.list. */
     AgentsList = 'agents.list',
-    /** Calls agents.personal.list. */
-    AgentsPersonalList = 'agents.personal.list',
-    /** Calls agents.personal.remove. */
-    AgentsPersonalRemove = 'agents.personal.remove',
-    /** Calls agents.personal.save. */
-    AgentsPersonalSave = 'agents.personal.save',
     /** Calls approvals.list. */
     ApprovalsList = 'approvals.list',
     /** Calls approvals.resolve. */
@@ -13904,6 +13889,8 @@ export enum Method {
     DesignChanges = 'design.changes',
     /** Calls design.create. */
     DesignCreate = 'design.create',
+    /** Calls design.delete. */
+    DesignDelete = 'design.delete',
     /** Calls design.events. */
     DesignEvents = 'design.events',
     /** Calls design.layout. */
