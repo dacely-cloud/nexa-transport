@@ -326,6 +326,19 @@ export interface ApprovalRequestedDataShape {
 /** ApprovalRequestedData from the Nexa wire protocol. */
 export type ApprovalRequestedData = ApprovalRequestedDataShape;
 
+/** ApprovalResolveParams wire fields. */
+export interface ApprovalResolveParamsShape {
+    /** approvalId as defined by the Nexa gateway. */
+    readonly approvalId: string;
+    /** approved as defined by the Nexa gateway. */
+    readonly approved: boolean;
+    /** reason as defined by the Nexa gateway. */
+    readonly reason?: string;
+}
+
+/** ApprovalResolveParams from the Nexa wire protocol. */
+export type ApprovalResolveParams = ApprovalResolveParamsShape;
+
 /** Allowed values for ApprovalResolvedDataoutcome. */
 export const ApprovalResolvedDataoutcomeValues = {
     Value0: 'answered',
@@ -347,19 +360,6 @@ export interface ApprovalResolvedDataShape {
 
 /** ApprovalResolvedData from the Nexa wire protocol. */
 export type ApprovalResolvedData = ApprovalResolvedDataShape;
-
-/** ApprovalResolveParams wire fields. */
-export interface ApprovalResolveParamsShape {
-    /** approvalId as defined by the Nexa gateway. */
-    readonly approvalId: string;
-    /** approved as defined by the Nexa gateway. */
-    readonly approved: boolean;
-    /** reason as defined by the Nexa gateway. */
-    readonly reason?: string;
-}
-
-/** ApprovalResolveParams from the Nexa wire protocol. */
-export type ApprovalResolveParams = ApprovalResolveParamsShape;
 
 /** Allowed values for AskParamsreasoningEffort. */
 export const AskParamsreasoningEffortValues = {
@@ -1399,27 +1399,6 @@ export interface BrowserSourceResourceRowShape {
 /** BrowserSourceResourceRow from the Nexa wire protocol. */
 export type BrowserSourceResourceRow = BrowserSourceResourceRowShape;
 
-/** BrowserSourcesCoverage wire fields. */
-export interface BrowserSourcesCoverageShape {
-    /** capturedSources as defined by the Nexa gateway. */
-    readonly capturedSources: string;
-    /** excludedFrames as defined by the Nexa gateway. */
-    readonly excludedFrames: boolean;
-    /** excludedResources as defined by the Nexa gateway. */
-    readonly excludedResources: string;
-    /** excludedScriptObservations as defined by the Nexa gateway. */
-    readonly excludedScriptObservations: string;
-    /** omittedScriptObservations as defined by the Nexa gateway. */
-    readonly omittedScriptObservations: string;
-    /** partial as defined by the Nexa gateway. */
-    readonly partial: boolean;
-    /** sourceBytes as defined by the Nexa gateway. */
-    readonly sourceBytes: string;
-}
-
-/** BrowserSourcesCoverage from the Nexa wire protocol. */
-export type BrowserSourcesCoverage = BrowserSourcesCoverageShape;
-
 /** BrowserSourceScriptRow wire fields. */
 export interface BrowserSourceScriptRowShape {
     /** cdpHash as defined by the Nexa gateway. */
@@ -1460,6 +1439,27 @@ export interface BrowserSourceScriptRowShape {
 
 /** BrowserSourceScriptRow from the Nexa wire protocol. */
 export type BrowserSourceScriptRow = BrowserSourceScriptRowShape;
+
+/** BrowserSourcesCoverage wire fields. */
+export interface BrowserSourcesCoverageShape {
+    /** capturedSources as defined by the Nexa gateway. */
+    readonly capturedSources: string;
+    /** excludedFrames as defined by the Nexa gateway. */
+    readonly excludedFrames: boolean;
+    /** excludedResources as defined by the Nexa gateway. */
+    readonly excludedResources: string;
+    /** excludedScriptObservations as defined by the Nexa gateway. */
+    readonly excludedScriptObservations: string;
+    /** omittedScriptObservations as defined by the Nexa gateway. */
+    readonly omittedScriptObservations: string;
+    /** partial as defined by the Nexa gateway. */
+    readonly partial: boolean;
+    /** sourceBytes as defined by the Nexa gateway. */
+    readonly sourceBytes: string;
+}
+
+/** BrowserSourcesCoverage from the Nexa wire protocol. */
+export type BrowserSourcesCoverage = BrowserSourcesCoverageShape;
 
 /** BrowserSourcesPage wire fields. */
 export interface BrowserSourcesPageShape {
@@ -8386,6 +8386,16 @@ export interface PlanningSourceShape {
 /** PlanningSource from the Nexa wire protocol. */
 export type PlanningSource = PlanningSourceShape;
 
+/** Allowed values for PlanningSourceState. */
+export const PlanningSourceStateValues = {
+    Value0: 'needs-adapter',
+    Value1: 'unavailable',
+} as const;
+
+/** PlanningSourceState from the Nexa wire protocol. */
+export type PlanningSourceState =
+    (typeof PlanningSourceStateValues)[keyof typeof PlanningSourceStateValues];
+
 /** PlanningSourcesPage wire fields. */
 export interface PlanningSourcesPageShape {
     /** available as defined by the Nexa gateway. */
@@ -8409,16 +8419,6 @@ export interface PlanningSourcesRequestShape {
 
 /** PlanningSourcesRequest from the Nexa wire protocol. */
 export type PlanningSourcesRequest = PlanningSourcesRequestShape;
-
-/** Allowed values for PlanningSourceState. */
-export const PlanningSourceStateValues = {
-    Value0: 'needs-adapter',
-    Value1: 'unavailable',
-} as const;
-
-/** PlanningSourceState from the Nexa wire protocol. */
-export type PlanningSourceState =
-    (typeof PlanningSourceStateValues)[keyof typeof PlanningSourceStateValues];
 
 /** Allowed values for PlanningStatus. */
 export const PlanningStatusValues = {
@@ -8612,17 +8612,17 @@ export interface RecordBrowserStorageGroupBrowserStorageGroupComparisonShape {
 export type RecordBrowserStorageGroupBrowserStorageGroupComparison =
     RecordBrowserStorageGroupBrowserStorageGroupComparisonShape;
 
+/** RecordstringScope from the Nexa wire protocol. */
+export interface RecordstringScope {
+    readonly [key: string]: Scope;
+}
+
 /** Recordstringnever from the Nexa wire protocol. */
 export type Recordstringnever = Record<string, never>;
 
 /** Recordstringnumber from the Nexa wire protocol. */
 export interface Recordstringnumber {
     readonly [key: string]: number;
-}
-
-/** RecordstringScope from the Nexa wire protocol. */
-export interface RecordstringScope {
-    readonly [key: string]: Scope;
 }
 
 /** Recordstringstring from the Nexa wire protocol. */
@@ -9269,18 +9269,6 @@ export interface ReverseGraphQueryShape {
 /** ReverseGraphQuery from the Nexa wire protocol. */
 export type ReverseGraphQuery = ReverseGraphQueryShape;
 
-/** Allowed values for ReverseInspection. */
-export const ReverseInspectionValues = {
-    Value0: 'decompile',
-    Value1: 'disassemble',
-    Value2: 'graph',
-    Value3: 'xrefs',
-} as const;
-
-/** ReverseInspection from the Nexa wire protocol. */
-export type ReverseInspection =
-    (typeof ReverseInspectionValues)[keyof typeof ReverseInspectionValues];
-
 /** ReverseInspectQuery wire fields. */
 export interface ReverseInspectQueryShape {
     /** cursor as defined by the Nexa gateway. */
@@ -9316,6 +9304,18 @@ export interface ReverseInspectResultShape {
 
 /** ReverseInspectResult from the Nexa wire protocol. */
 export type ReverseInspectResult = ReverseInspectResultShape;
+
+/** Allowed values for ReverseInspection. */
+export const ReverseInspectionValues = {
+    Value0: 'decompile',
+    Value1: 'disassemble',
+    Value2: 'graph',
+    Value3: 'xrefs',
+} as const;
+
+/** ReverseInspection from the Nexa wire protocol. */
+export type ReverseInspection =
+    (typeof ReverseInspectionValues)[keyof typeof ReverseInspectionValues];
 
 /** ReverseNetworkDetailPage wire fields. */
 export interface ReverseNetworkDetailPageShape {
@@ -10519,6 +10519,15 @@ export interface VoiceInterimEventShape {
 /** VoiceInterimEvent from the Nexa wire protocol. */
 export type VoiceInterimEvent = VoiceInterimEventShape;
 
+/** VoiceStartParams wire fields. */
+export interface VoiceStartParamsShape {
+    /** conversationId as defined by the Nexa gateway. */
+    readonly conversationId?: string;
+}
+
+/** VoiceStartParams from the Nexa wire protocol. */
+export type VoiceStartParams = VoiceStartParamsShape;
+
 /** VoiceStarted wire fields. */
 export interface VoiceStartedShape {
     /** callId as defined by the Nexa gateway. */
@@ -10531,15 +10540,6 @@ export interface VoiceStartedShape {
 
 /** VoiceStarted from the Nexa wire protocol. */
 export type VoiceStarted = VoiceStartedShape;
-
-/** VoiceStartParams wire fields. */
-export interface VoiceStartParamsShape {
-    /** conversationId as defined by the Nexa gateway. */
-    readonly conversationId?: string;
-}
-
-/** VoiceStartParams from the Nexa wire protocol. */
-export type VoiceStartParams = VoiceStartParamsShape;
 
 /** VoiceStopParams wire fields. */
 export interface VoiceStopParamsShape {
@@ -12068,6 +12068,43 @@ export interface WorkflowModelResolutionRequestShape {
 /** WorkflowModelResolutionRequest from the Nexa wire protocol. */
 export type WorkflowModelResolutionRequest = WorkflowModelResolutionRequestShape;
 
+/** WorkflowModelUsage wire fields. */
+export interface WorkflowModelUsageShape {
+    /** basis as defined by the Nexa gateway. */
+    readonly basis: WorkflowSpendingBasis;
+    /** entries as defined by the Nexa gateway. */
+    readonly entries: string;
+    /** expiresAtMs as defined by the Nexa gateway. */
+    readonly expiresAtMs: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: ChargeKind;
+    /** lastReportedAtMs as defined by the Nexa gateway. */
+    readonly lastReportedAtMs: string;
+    /** microcents as defined by the Nexa gateway. */
+    readonly microcents: string;
+    /** model as defined by the Nexa gateway. */
+    readonly model: null | string;
+    /** provider as defined by the Nexa gateway. */
+    readonly provider: null | string;
+    /** tariff as defined by the Nexa gateway. */
+    readonly tariff: PricingTariff | null;
+    /** unitEntries as defined by the Nexa gateway. */
+    readonly unitEntries: string;
+    /** unitLabel as defined by the Nexa gateway. */
+    readonly unitLabel: null | string;
+    /** units as defined by the Nexa gateway. */
+    readonly units: null | string;
+    /** usage as defined by the Nexa gateway. */
+    readonly usage: WorkflowUsageDimensions;
+    /** usageEntries as defined by the Nexa gateway. */
+    readonly usageEntries: WorkflowUsageDimensions;
+}
+
+/** WorkflowModelUsage from the Nexa wire protocol. */
+export type WorkflowModelUsage = WorkflowModelUsageShape;
+
 /** WorkflowModelsPage wire fields. */
 export interface WorkflowModelsPageShape {
     /** freshness as defined by the Nexa gateway. */
@@ -12105,43 +12142,6 @@ export interface WorkflowModelsRequestShape {
 
 /** WorkflowModelsRequest from the Nexa wire protocol. */
 export type WorkflowModelsRequest = WorkflowModelsRequestShape;
-
-/** WorkflowModelUsage wire fields. */
-export interface WorkflowModelUsageShape {
-    /** basis as defined by the Nexa gateway. */
-    readonly basis: WorkflowSpendingBasis;
-    /** entries as defined by the Nexa gateway. */
-    readonly entries: string;
-    /** expiresAtMs as defined by the Nexa gateway. */
-    readonly expiresAtMs: string;
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** kind as defined by the Nexa gateway. */
-    readonly kind: ChargeKind;
-    /** lastReportedAtMs as defined by the Nexa gateway. */
-    readonly lastReportedAtMs: string;
-    /** microcents as defined by the Nexa gateway. */
-    readonly microcents: string;
-    /** model as defined by the Nexa gateway. */
-    readonly model: null | string;
-    /** provider as defined by the Nexa gateway. */
-    readonly provider: null | string;
-    /** tariff as defined by the Nexa gateway. */
-    readonly tariff: PricingTariff | null;
-    /** unitEntries as defined by the Nexa gateway. */
-    readonly unitEntries: string;
-    /** unitLabel as defined by the Nexa gateway. */
-    readonly unitLabel: null | string;
-    /** units as defined by the Nexa gateway. */
-    readonly units: null | string;
-    /** usage as defined by the Nexa gateway. */
-    readonly usage: WorkflowUsageDimensions;
-    /** usageEntries as defined by the Nexa gateway. */
-    readonly usageEntries: WorkflowUsageDimensions;
-}
-
-/** WorkflowModelUsage from the Nexa wire protocol. */
-export type WorkflowModelUsage = WorkflowModelUsageShape;
 
 /** WorkflowNode wire fields. */
 export interface WorkflowNodeShape {
@@ -12341,21 +12341,6 @@ export interface WorkflowPublicationReferenceShape {
 /** WorkflowPublicationReference from the Nexa wire protocol. */
 export type WorkflowPublicationReference = WorkflowPublicationReferenceShape;
 
-/** WorkflowPublishedRunRequest wire fields. */
-export interface WorkflowPublishedRunRequestShape {
-    /** input as defined by the Nexa gateway. */
-    readonly input: WorkflowObject;
-    /** publicationId as defined by the Nexa gateway. */
-    readonly publicationId: string;
-    /** runId as defined by the Nexa gateway. */
-    readonly runId: string;
-    /** workflowId as defined by the Nexa gateway. */
-    readonly workflowId: string;
-}
-
-/** WorkflowPublishedRunRequest from the Nexa wire protocol. */
-export type WorkflowPublishedRunRequest = WorkflowPublishedRunRequestShape;
-
 /** WorkflowPublishRequest wire fields. */
 export interface WorkflowPublishRequestShape {
     /** commandId as defined by the Nexa gateway. */
@@ -12385,6 +12370,21 @@ export interface WorkflowPublishResultShape {
 
 /** WorkflowPublishResult from the Nexa wire protocol. */
 export type WorkflowPublishResult = WorkflowPublishResultShape;
+
+/** WorkflowPublishedRunRequest wire fields. */
+export interface WorkflowPublishedRunRequestShape {
+    /** input as defined by the Nexa gateway. */
+    readonly input: WorkflowObject;
+    /** publicationId as defined by the Nexa gateway. */
+    readonly publicationId: string;
+    /** runId as defined by the Nexa gateway. */
+    readonly runId: string;
+    /** workflowId as defined by the Nexa gateway. */
+    readonly workflowId: string;
+}
+
+/** WorkflowPublishedRunRequest from the Nexa wire protocol. */
+export type WorkflowPublishedRunRequest = WorkflowPublishedRunRequestShape;
 
 /** WorkflowReadRequest wire fields. */
 export interface WorkflowReadRequestShape {
