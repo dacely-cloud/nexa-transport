@@ -8,6 +8,8 @@ const config: UserConfig = {
                 'design-svg-geometry': 'src/design/DesignSvgGeometry.ts',
                 'design-svg-types': 'src/design/DesignSvgTypes.ts',
                 'design-text-layout': 'src/design/DesignTextLayout.ts',
+                'design-components': 'src/design/DesignComponents.ts',
+                'design-component-types': 'src/design/DesignComponentTypes.ts',
                 'design-paths': 'src/design/DesignPaths.ts',
                 'design-asset-types': 'src/design/DesignAssetTypes.ts',
                 'design-asset-codec': 'src/design/DesignAssetCodec.ts',

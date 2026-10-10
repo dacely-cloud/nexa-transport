@@ -454,6 +454,14 @@
         "./design-paths": {
             "types": "./dist/design/DesignPaths.d.ts",
             "import": "./dist/design-paths.js"
+        },
+        "./design-components": {
+            "types": "./dist/design/DesignComponents.d.ts",
+            "import": "./dist/design-components.js"
+        },
+        "./design-component-types": {
+            "types": "./dist/design/DesignComponentTypes.d.ts",
+            "import": "./dist/design-component-types.js"
         }
     },
     "scripts": {
