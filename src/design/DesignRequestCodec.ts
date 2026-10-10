@@ -5,6 +5,7 @@ import { DesignValues as V } from './DesignValues.js';
 import { DesignOperationCodec } from './DesignOperationCodec.js';
 import type {
     DesignCreateRequest,
+    DesignDeleteRequest,
     DesignReadRequest,
     DesignSaveRequest,
     DesignUndoRequest,
@@ -23,6 +24,19 @@ export class DesignRequestCodec {
         return {
             id: V.id(value['id']),
             name: V.text(value['name']),
+            commandId: V.id(value['commandId']),
+        };
+    }
+    /** Only an explicit revision and stable retry identity can remove a saved document. */
+    public static delete(raw: unknown): DesignDeleteRequest {
+        const value: Readonly<Record<string, unknown>> = V.record(raw, [
+            'id',
+            'expectedRevision',
+            'commandId',
+        ]);
+        return {
+            id: V.id(value['id']),
+            expectedRevision: V.revision(value['expectedRevision']),
             commandId: V.id(value['commandId']),
         };
     }

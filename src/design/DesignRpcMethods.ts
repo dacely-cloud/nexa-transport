@@ -57,3 +57,9 @@ export interface DesignLayoutMethod {
     readonly params: DesignLayoutRequest;
     readonly result: DesignLayoutPage;
 }
+
+/** Owner-scoped revision-safe document deletion. */
+export interface DesignDeleteMethod {
+    readonly params: import('./DesignRequests.js').DesignDeleteRequest;
+    readonly result: import('./DesignRequests.js').DesignDeleteReceipt;
+}

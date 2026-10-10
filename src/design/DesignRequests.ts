@@ -165,3 +165,16 @@ export interface DesignLayoutPage {
     readonly boxes: readonly DesignBox[];
     readonly nextOffset: number | null;
 }
+
+/** Revision-fenced document removal with an exact retry identity. */
+export interface DesignDeleteRequest {
+    readonly id: string;
+    readonly expectedRevision: string;
+    readonly commandId: string;
+}
+/** Host confirmation that the exact document revision was removed. */
+export interface DesignDeleteReceipt {
+    readonly id: string;
+    readonly revision: string;
+    readonly deleted: true;
+}
