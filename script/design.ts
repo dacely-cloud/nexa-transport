@@ -9,6 +9,8 @@ const files: readonly string[] = [
     'DesignSvgTypes',
     'DesignSvgGeometry',
     'DesignSvgPaints',
+    'DesignImageFramingCodec',
+    'DesignImageGeometry',
     'DesignTextLayout',
     'DesignPaths',
     'DesignComponentTypes',

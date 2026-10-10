@@ -9,6 +9,8 @@ import {
     DesignConstraint,
     DesignPaintKind,
     DesignPathVerb,
+    DesignImageFit,
+    type DesignImageFraming,
     type DesignNode,
     type DesignPaint,
     type DesignStyle,
@@ -17,6 +19,10 @@ import {
 
 /** Complete defaults make tool-created and hand-created layers identical. */
 export class DesignDefaults {
+    /** Centered cover is the default for both image layers and legacy image paints. */
+    public static framing(): DesignImageFraming {
+        return { fit: DesignImageFit.Cover, cropX: 0, cropY: 0, scale: 1 };
+    }
     /** One solid paint. */
     public static paint(color: string = '#8B7CF6'): DesignPaint {
         return {

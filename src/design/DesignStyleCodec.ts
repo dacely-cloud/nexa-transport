@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { DesignValues as V } from './DesignValues.js';
+import { DesignImageFramingCodec } from './DesignImageFramingCodec.js';
 import {
     DesignPaintKind,
     DesignAlign,
@@ -17,15 +18,11 @@ import {
 export class DesignStyleCodec {
     /** Canonical paint. */
     public static paint(raw: unknown): DesignPaint {
-        const value: Readonly<Record<string, unknown>> = V.record(raw, [
-            'kind',
-            'color',
-            'opacity',
-            'angle',
-            'stops',
-            'assetId',
-            'tokenId',
-        ]);
+        const value: Readonly<Record<string, unknown>> = V.fields(
+            raw,
+            ['framing', 'kind', 'color', 'opacity', 'angle', 'stops', 'assetId', 'tokenId'],
+            ['kind', 'color', 'opacity', 'angle', 'stops', 'assetId', 'tokenId'],
+        );
         const kind: DesignPaintKind = V.choice(value['kind'], Object.values(DesignPaintKind));
         const stops: readonly DesignGradientStop[] = V.list(
             value['stops'],
@@ -60,6 +57,9 @@ export class DesignStyleCodec {
             stops,
             assetId,
             tokenId: V.optionalId(value['tokenId']),
+            ...(Object.hasOwn(value, 'framing')
+                ? { framing: DesignImageFramingCodec.parse(value['framing']) }
+                : {}),
         };
     }
     /** Canonical bounded style. */

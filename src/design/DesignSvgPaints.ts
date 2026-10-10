@@ -3,7 +3,6 @@
 
 import {
     DesignPaintKind,
-    DesignImageFit,
     type DesignPaint,
     type DesignBox,
     type DesignImage,
@@ -12,6 +11,8 @@ import {
 import type { DesignAsset } from './DesignAssetTypes.js';
 import type { DesignSvgImage } from './DesignSvgTypes.js';
 import { DesignAssetCodec } from './DesignAssetCodec.js';
+import { DesignImageGeometry, type DesignImagePlacement } from './DesignImageGeometry.js';
+import { DesignDefaults } from './DesignDefaults.js';
 import { DesignSelectionContext } from './DesignSelectionContext.js';
 import type { DesignSelectionBounds } from './DesignSelectionTypes.js';
 import { DesignSvgGeometry as Geometry } from './DesignSvgGeometry.js';
@@ -32,7 +33,7 @@ export class DesignSvgPaints {
         const id: string = this.identity('paint');
         if (paint.kind === DesignPaintKind.Image && paint.assetId !== null) {
             this.definitions.push(
-                `<pattern id="${id}" patternUnits="userSpaceOnUse" width="${box.width}" height="${box.height}">${this.image({ assetId: paint.assetId, fit: DesignImageFit.Cover, scale: 1, cropX: 0, cropY: 0 }, box)}</pattern>`,
+                `<pattern id="${id}" patternUnits="userSpaceOnUse" width="${box.width}" height="${box.height}">${this.image({ assetId: paint.assetId, ...(paint.framing ?? DesignDefaults.framing()) }, box)}</pattern>`,
             );
         } else {
             const stops: string = paint.stops
@@ -71,22 +72,12 @@ export class DesignSvgPaints {
                 `<image id="${id}" href="data:${asset.mime};base64,${data.base64}" width="${asset.width}" height="${asset.height}" preserveAspectRatio="none"/>`,
             );
         }
-        const scale: number =
-            image.fit === DesignImageFit.Contain
-                ? Math.min(box.width / asset.width, box.height / asset.height)
-                : Math.max(box.width / asset.width, box.height / asset.height) * image.scale;
-        const width: number = asset.width * scale;
-        const height: number = asset.height * scale;
-        const x: number =
-            (box.width - width) / 2 -
-            (image.fit === DesignImageFit.Contain
-                ? 0
-                : (image.cropX * Math.max(0, width - box.width)) / 2);
-        const y: number =
-            (box.height - height) / 2 -
-            (image.fit === DesignImageFit.Contain
-                ? 0
-                : (image.cropY * Math.max(0, height - box.height)) / 2);
+        const { x, y, width, height }: DesignImagePlacement = DesignImageGeometry.place(
+            image,
+            box,
+            asset.width,
+            asset.height,
+        );
         return `<use href="#${id}" transform="translate(${x} ${y}) scale(${width / asset.width} ${height / asset.height})"/>`;
     }
     /** Every mask has a unique identifier, even when the same image or clip is reused. */

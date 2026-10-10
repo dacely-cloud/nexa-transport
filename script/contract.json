@@ -6415,6 +6415,10 @@
                 },
                 "tokenId": {
                     "type": ["null", "string"]
+                },
+                "framing": {
+                    "$ref": "#/definitions/DesignImageFraming",
+                    "description": "Omitted framing retains the original centered-cover behavior of existing image paints."
                 }
             },
             "required": ["angle", "assetId", "color", "kind", "opacity", "stops", "tokenId"],
@@ -20400,6 +20404,25 @@
                 }
             },
             "required": ["bytes", "files", "reconciledAt"],
+            "type": "object"
+        },
+        "DesignImageFraming": {
+            "description": "Workspace image reference and crop transform.",
+            "properties": {
+                "cropX": {
+                    "type": "number"
+                },
+                "cropY": {
+                    "type": "number"
+                },
+                "fit": {
+                    "$ref": "#/definitions/DesignImageFit"
+                },
+                "scale": {
+                    "type": "number"
+                }
+            },
+            "required": ["cropX", "cropY", "fit", "scale"],
             "type": "object"
         }
     },

@@ -3,12 +3,12 @@
 
 import { DesignValues as V } from './DesignValues.js';
 import { DesignStyleCodec } from './DesignStyleCodec.js';
+import { DesignImageFramingCodec } from './DesignImageFramingCodec.js';
 import { DesignFreeze } from './DesignFreeze.js';
 import { DesignLayoutCodec } from './DesignLayoutCodec.js';
 import {
     DesignKind,
     DesignPathVerb,
-    DesignImageFit,
     type DesignNode,
     type DesignImage,
     type DesignPathCommand,
@@ -133,10 +133,12 @@ export class DesignNodeCodec {
         ]);
         return {
             assetId: V.id(value['assetId']),
-            fit: V.choice(value['fit'], Object.values(DesignImageFit)),
-            cropX: V.number(value['cropX'], -1, 1),
-            cropY: V.number(value['cropY'], -1, 1),
-            scale: V.number(value['scale'], 0.01, 100),
+            ...DesignImageFramingCodec.parse({
+                fit: value['fit'],
+                cropX: value['cropX'],
+                cropY: value['cropY'],
+                scale: value['scale'],
+            }),
         };
     }
     /** Validates one bounded layer override value. */

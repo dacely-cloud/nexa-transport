@@ -16,6 +16,10 @@
         "docs"
     ],
     "exports": {
+        "./design-image-geometry": {
+            "types": "./dist/design/DesignImageGeometry.d.ts",
+            "import": "./dist/design-image-geometry.js"
+        },
         "./design-asset-types": {
             "types": "./dist/design/DesignAssetTypes.d.ts",
             "import": "./dist/design-asset-types.js"

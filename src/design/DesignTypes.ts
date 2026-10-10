@@ -73,6 +73,8 @@ export interface DesignPaint {
     readonly stops: readonly DesignGradientStop[];
     readonly assetId: string | null;
     readonly tokenId: string | null;
+    /** Omitted framing retains the original centered-cover behavior of existing image paints. */
+    readonly framing?: DesignImageFraming;
 }
 /** Four independent corner radii, in clockwise order. */
 export interface DesignCorners {
@@ -204,12 +206,15 @@ export const DesignTransition = {
 /** Prototype transition. */
 export type DesignTransition = (typeof DesignTransition)[keyof typeof DesignTransition];
 /** Workspace image reference and crop transform. */
-export interface DesignImage {
-    readonly assetId: string;
+export interface DesignImageFraming {
     readonly fit: DesignImageFit;
     readonly cropX: number;
     readonly cropY: number;
     readonly scale: number;
+}
+/** A durable workspace image and its authored framing. */
+export interface DesignImage extends DesignImageFraming {
+    readonly assetId: string;
 }
 /** All layer state is explicit and editable; no generated markup is the source of truth. */
 export interface DesignNode {

@@ -5,6 +5,7 @@ const config: UserConfig = {
         lib: {
             entry: {
                 'design-svg': 'src/design/DesignSvg.ts',
+                'design-image-geometry': 'src/design/DesignImageGeometry.ts',
                 'design-svg-geometry': 'src/design/DesignSvgGeometry.ts',
                 'design-svg-types': 'src/design/DesignSvgTypes.ts',
                 'design-text-layout': 'src/design/DesignTextLayout.ts',
