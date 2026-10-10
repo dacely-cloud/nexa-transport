@@ -2585,21 +2585,20 @@ export const ComponentCategoryValues = {
     Value15: 'models',
     Value16: 'observability',
     Value17: 'output',
-    Value18: 'personas',
-    Value19: 'planning',
-    Value20: 'policy',
-    Value21: 'programs',
-    Value22: 'prompts',
-    Value23: 'quality',
-    Value24: 'research',
-    Value25: 'resources',
-    Value26: 'storage',
-    Value27: 'teams',
-    Value28: 'time',
-    Value29: 'tools',
-    Value30: 'transform',
-    Value31: 'triggers',
-    Value32: 'utilities',
+    Value18: 'planning',
+    Value19: 'policy',
+    Value20: 'programs',
+    Value21: 'prompts',
+    Value22: 'quality',
+    Value23: 'research',
+    Value24: 'resources',
+    Value25: 'storage',
+    Value26: 'teams',
+    Value27: 'time',
+    Value28: 'tools',
+    Value29: 'transform',
+    Value30: 'triggers',
+    Value31: 'utilities',
 } as const;
 
 /** ComponentCategory from the Nexa wire protocol. */
@@ -4218,7 +4217,13 @@ export type DesignNodeRecord = DesignNodeRecordShape;
 
 /** DesignOperation from the Nexa wire protocol. */
 export type DesignOperation =
-    DesignInsert | DesignUpdate | DesignMove | DesignRemove | DesignPageOperation | DesignMetadata;
+    | DesignInsert
+    | DesignUpdate
+    | DesignTextOperation
+    | DesignMove
+    | DesignRemove
+    | DesignPageOperation
+    | DesignMetadata;
 
 /** DesignOverride wire fields. */
 export interface DesignOverrideShape {
@@ -4594,6 +4599,19 @@ export interface DesignTextShape {
 
 /** DesignText from the Nexa wire protocol. */
 export type DesignText = DesignTextShape;
+
+/** DesignTextOperation wire fields. */
+export interface DesignTextOperationShape {
+    /** content as defined by the Nexa gateway. */
+    readonly content: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** op as defined by the Nexa gateway. */
+    readonly op: 'text';
+}
+
+/** DesignTextOperation from the Nexa wire protocol. */
+export type DesignTextOperation = DesignTextOperationShape;
 
 /** DesignTextRun wire fields. */
 export interface DesignTextRunShape {

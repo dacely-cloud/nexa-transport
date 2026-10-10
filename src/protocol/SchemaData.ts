@@ -4090,7 +4090,6 @@ export const schema: Schema = {
                 'models',
                 'observability',
                 'output',
-                'personas',
                 'planning',
                 'policy',
                 'programs',
@@ -6412,6 +6411,9 @@ export const schema: Schema = {
                     $ref: '#/definitions/DesignUpdate',
                 },
                 {
+                    $ref: '#/definitions/DesignTextOperation',
+                },
+                {
                     $ref: '#/definitions/DesignMove',
                 },
                 {
@@ -6984,6 +6986,24 @@ export const schema: Schema = {
                 'size',
                 'weight',
             ],
+            type: 'object',
+        },
+        DesignTextOperation: {
+            description:
+                'Replace text content while preserving typography and clipping existing rich-text ranges.',
+            properties: {
+                content: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                op: {
+                    const: 'text',
+                    type: 'string',
+                },
+            },
+            required: ['content', 'id', 'op'],
             type: 'object',
         },
         DesignTextRun: {

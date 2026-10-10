@@ -1754,7 +1754,7 @@ Host-produced command termination evidence, separate from model-visible output.
 
 Catalog grouping retains all requested capability areas without declaring runtime support.
 
-Type: `"agents"` / `"api"` / `"browser"` / `"cache"` / `"collection"` / `"conditions"` / `"connections"` / `"context"` / `"documents"` / `"entities"` / `"experiments"` / `"flow"` / `"human"` / `"media"` / `"messaging"` / `"models"` / `"observability"` / `"output"` / `"personas"` / `"planning"` / `"policy"` / `"programs"` / `"prompts"` / `"quality"` / `"research"` / `"resources"` / `"storage"` / `"teams"` / `"time"` / `"tools"` / `"transform"` / `"triggers"` / `"utilities"`.
+Type: `"agents"` / `"api"` / `"browser"` / `"cache"` / `"collection"` / `"conditions"` / `"connections"` / `"context"` / `"documents"` / `"entities"` / `"experiments"` / `"flow"` / `"human"` / `"media"` / `"messaging"` / `"models"` / `"observability"` / `"output"` / `"planning"` / `"policy"` / `"programs"` / `"prompts"` / `"quality"` / `"research"` / `"resources"` / `"storage"` / `"teams"` / `"time"` / `"tools"` / `"transform"` / `"triggers"` / `"utilities"`.
 
 ## ComponentDefinition
 
@@ -2846,7 +2846,15 @@ Variant 2: [DesignUpdate](protocol.md#designupdate)
 | `id`      | Yes      | `string`                                           |             |
 | `op`      | Yes      | `"update"`                                         |             |
 
-Variant 3: [DesignMove](protocol.md#designmove)
+Variant 3: [DesignTextOperation](protocol.md#designtextoperation)
+
+| Field     | Required | Type     | Description |
+| --------- | -------- | -------- | ----------- |
+| `content` | Yes      | `string` |             |
+| `id`      | Yes      | `string` |             |
+| `op`      | Yes      | `"text"` |             |
+
+Variant 4: [DesignMove](protocol.md#designmove)
 
 | Field      | Required | Type          | Description |
 | ---------- | -------- | ------------- | ----------- |
@@ -2856,14 +2864,14 @@ Variant 3: [DesignMove](protocol.md#designmove)
 | `pageId`   | Yes      | `string`      |             |
 | `parentId` | Yes      | `null,string` |             |
 
-Variant 4: [DesignRemove](protocol.md#designremove)
+Variant 5: [DesignRemove](protocol.md#designremove)
 
 | Field | Required | Type       | Description |
 | ----- | -------- | ---------- | ----------- |
 | `id`  | Yes      | `string`   |             |
 | `op`  | Yes      | `"remove"` |             |
 
-Variant 5: [DesignPageOperation](protocol.md#designpageoperation)
+Variant 6: [DesignPageOperation](protocol.md#designpageoperation)
 
 | Field        | Required | Type          | Description |
 | ------------ | -------- | ------------- | ----------- |
@@ -2872,7 +2880,7 @@ Variant 5: [DesignPageOperation](protocol.md#designpageoperation)
 | `name`       | Yes      | `null,string` |             |
 | `op`         | Yes      | `"page"`      |             |
 
-Variant 6: [DesignMetadata](protocol.md#designmetadata)
+Variant 7: [DesignMetadata](protocol.md#designmetadata)
 
 | Field          | Required | Type                                                        | Description |
 | -------------- | -------- | ----------------------------------------------------------- | ----------- |
@@ -3182,6 +3190,16 @@ Text layout is shared by the canvas, tools and exported designs.
 | `runs`          | Yes      | Array of [DesignTextRun](protocol.md#designtextrun) |             |
 | `size`          | Yes      | `number`                                            |             |
 | `weight`        | Yes      | `number`                                            |             |
+
+## DesignTextOperation
+
+Replace text content while preserving typography and clipping existing rich-text ranges.
+
+| Field     | Required | Type     | Description |
+| --------- | -------- | -------- | ----------- |
+| `content` | Yes      | `string` |             |
+| `id`      | Yes      | `string` |             |
+| `op`      | Yes      | `"text"` |             |
 
 ## DesignTextRun
 
