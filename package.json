@@ -426,6 +426,14 @@
         "./workflow-http": {
             "types": "./dist/workflows/HttpInputs.d.ts",
             "import": "./dist/workflow-http.js"
+        },
+        "./design-selection": {
+            "types": "./dist/design/DesignSelection.d.ts",
+            "import": "./dist/design-selection.js"
+        },
+        "./design-selection-types": {
+            "types": "./dist/design/DesignSelectionTypes.d.ts",
+            "import": "./dist/design-selection-types.js"
         }
     },
     "scripts": {

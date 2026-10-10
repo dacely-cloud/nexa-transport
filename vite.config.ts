@@ -7,6 +7,8 @@ const config: UserConfig = {
                 'design-asset-types': 'src/design/DesignAssetTypes.ts',
                 'design-asset-codec': 'src/design/DesignAssetCodec.ts',
                 'design-asset-references': 'src/design/DesignAssetReferences.ts',
+                'design-selection': 'src/design/DesignSelection.ts',
+                'design-selection-types': 'src/design/DesignSelectionTypes.ts',
                 'design-types': 'src/design/DesignTypes.ts',
                 'design-defaults': 'src/design/DesignDefaults.ts',
                 'design-codec': 'src/design/DesignCodec.ts',
