@@ -11207,6 +11207,8 @@ export interface WorkflowAgentSessionShape {
     readonly provider: string;
     /** runId as defined by the Nexa gateway. */
     readonly runId: string;
+    /** sessionKey as defined by the Nexa gateway. */
+    readonly sessionKey?: string;
     /** status as defined by the Nexa gateway. */
     readonly status: WorkflowStepStatus;
     /** task as defined by the Nexa gateway. */
