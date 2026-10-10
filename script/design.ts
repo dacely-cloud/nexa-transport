@@ -36,6 +36,7 @@ const files: readonly string[] = [
     'DesignPaths',
     'DesignComponentTypes',
     'DesignComponentTargets',
+    'DesignComponentSwap',
     'DesignComponentDetach',
     'DesignComponents',
 
@@ -79,11 +80,15 @@ const files: readonly string[] = [
 await mkdir('src/design', { recursive: true });
 for (const file of files) {
     const source: string = await readFile('../nexa/src/design/' + file + '.ts', 'utf8');
-    if (/from ['"](?:node:|mongodb|\.\.\/)/u.test(source))
+    if (/from ['"](?:node:|mongodb|\.\.\/)/u.test(source)) {
         throw new Error('Design SDK source contains a server-only import: ' + file);
+    }
     await writeFile('src/design/' + file + '.ts', source);
 }
 
-await writeFile('src/design/PathKitWasm.d.ts', await readFile('../nexa/src/design/PathKitWasm.d.ts', 'utf8'));
-await mkdir('licenses', {recursive: true});
+await writeFile(
+    'src/design/PathKitWasm.d.ts',
+    await readFile('../nexa/src/design/PathKitWasm.d.ts', 'utf8'),
+);
+await mkdir('licenses', { recursive: true });
 await writeFile('licenses/PathKit.txt', await readFile('../nexa/licenses/PathKit.txt', 'utf8'));

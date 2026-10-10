@@ -7,6 +7,7 @@ import type { DesignStyle } from './DesignTypes.js';
 export const DesignComponentAction = {
     Create: 'create',
     Place: 'place',
+    Swap: 'swap',
     Detach: 'detach',
     Override: 'override',
     Reset: 'reset',
@@ -24,6 +25,12 @@ export interface DesignComponentPlace {
     readonly componentId: string;
     readonly x: number;
     readonly y: number;
+}
+/** Changes a linked definition while retaining instance geometry and unambiguous layer overrides. */
+export interface DesignComponentSwap {
+    readonly action: typeof DesignComponentAction.Swap;
+    readonly instanceId: string;
+    readonly componentId: string;
 }
 /** Bakes rendered overrides and nested instances into editable authored layers. */
 export interface DesignComponentDetach {
@@ -53,6 +60,7 @@ export interface DesignComponentReset {
 export type DesignComponentCommand =
     | DesignComponentCreate
     | DesignComponentPlace
+    | DesignComponentSwap
     | DesignComponentDetach
     | DesignComponentOverride
     | DesignComponentReset;

@@ -7,6 +7,8 @@ import { DesignComponents } from '../src/design/DesignComponents.js';
 import { DesignComponentAction as Action } from '../src/design/DesignComponentTypes.js';
 import { DesignDefaults } from '../src/design/DesignDefaults.js';
 import { DesignEdits } from '../src/design/DesignEdits.js';
+import { methodValidators } from '../src/protocol/MethodValidators.js';
+import { Method } from '../src/protocol/Protocol.js';
 import { DesignScene } from '../src/design/DesignScene.js';
 import { DesignKind, type DesignDocument, type DesignNode } from '../src/design/DesignTypes.js';
 import type { DesignSelectionPlan } from '../src/design/DesignSelectionTypes.js';
@@ -16,6 +18,7 @@ it('component planning and expansion remain identical to the native model', asyn
         'DesignComponents',
         'DesignComponentTypes',
         'DesignComponentTargets',
+        'DesignComponentSwap',
         'DesignComponentDetach',
         'DesignScene',
         'DesignTree',
@@ -34,7 +37,9 @@ it('browser component edits preserve ownership, overrides and exact undo', (): v
         children: ['label'],
     };
     const text: DesignNode = DesignDefaults.node('label', DesignKind.Text, 'Label');
-    if (text.text === null) {throw new Error('Missing text defaults.');}
+    if (text.text === null) {
+        throw new Error('Missing text defaults.');
+    }
     const label: DesignNode = {
         ...text,
         parentId: frame.id,
@@ -97,4 +102,62 @@ it('browser component edits preserve ownership, overrides and exact undo', (): v
     expect(DesignEdits.restore(result.document, result.changes).document.nodes).toEqual(
         customized.nodes,
     );
+});
+
+it('portable swap produces typed save operations accepted by the existing websocket contract', (): void => {
+    const component: DesignNode = DesignDefaults.node('first', DesignKind.Component);
+    const replacement: DesignNode = DesignDefaults.node('next', DesignKind.Component);
+    const instance: DesignNode = {
+        ...DesignDefaults.node('instance', DesignKind.Instance),
+        componentId: component.id,
+        width: 230,
+        height: 54,
+        overrides: [
+            { nodeId: component.id, name: 'Personalized', text: null, style: null, visible: true },
+        ],
+    };
+    const template: DesignDocument = DesignDefaults.document('swap');
+    const document: DesignDocument = {
+        ...template,
+        pages: template.pages.map((page) => ({
+            ...page,
+            roots: [component.id, replacement.id, instance.id],
+        })),
+        nodes: [component, replacement, instance],
+    };
+    const plan: DesignSelectionPlan = DesignComponents.plan(
+        document,
+        'page-1',
+        { action: Action.Swap, instanceId: instance.id, componentId: replacement.id },
+        (): string => 'unused',
+    );
+    expect(
+        methodValidators[Method.DesignSave].params({
+            id: document.id,
+            expectedRevision: document.revision,
+            commandId: 'swap',
+            operations: plan.operations,
+        }),
+    ).toBe(true);
+    const result: ReturnType<typeof DesignEdits.apply> = DesignEdits.apply(
+        document,
+        plan.operations,
+    );
+    expect(
+        result.document.nodes.find((node: DesignNode): boolean => node.id === instance.id),
+    ).toEqual({
+        ...instance,
+        componentId: replacement.id,
+        overrides: [
+            {
+                ...instance.overrides[0],
+                nodeId: replacement.id,
+                name: 'Personalized',
+                text: null,
+                style: null,
+                visible: true,
+            },
+        ],
+    });
+    expect(DesignEdits.restore(result.document, result.changes).document).toEqual(document);
 });
