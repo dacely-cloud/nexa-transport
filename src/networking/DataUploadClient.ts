@@ -33,17 +33,10 @@ export class DataUploadClient {
                 const bytes: Uint8Array = new Uint8Array(
                     await source.slice(offset, offset + 192 * 1024).arrayBuffer(),
                 );
-                let binary: string = '';
-                for (let index: number = 0; index < bytes.length; index += 8192) {
-                    binary += String.fromCharCode(...bytes.subarray(index, index + 8192));
-                }
-                const position: DataUploadPosition = await client.call(
-                    Method.DataUploadChunk,
-                    {
-                        id: upload.id,
-                        offset: String(offset),
-                        data: btoa(binary),
-                    },
+                const position: DataUploadPosition = await client.uploadChunk(
+                    upload.id,
+                    String(offset),
+                    bytes,
                     options.signal === undefined ? {} : { signal: options.signal },
                 );
                 offset += bytes.length;
