@@ -6154,6 +6154,7 @@ export const schema: Schema = {
         "image",
         "instance",
         "line",
+        "mask",
         "path",
         "polygon",
         "rectangle",
@@ -6332,6 +6333,34 @@ export const schema: Schema = {
     ],
     "type": "object"
 },
+        DesignMask: {
+    "description": "The source is an immediate child, referenced by identity rather than painter order.",
+    "properties": {
+        "mode": {
+            "$ref": "#/definitions/DesignMaskMode"
+        },
+        "sourceId": {
+            "type": [
+                "null",
+                "string"
+            ]
+        }
+    },
+    "required": [
+        "mode",
+        "sourceId"
+    ],
+    "type": "object"
+},
+        DesignMaskMode: {
+    "description": "How a retained source layer controls the visibility of its sibling artwork.\nStable mask rendering mode shared by tooling and the editor.",
+    "enum": [
+        "alpha",
+        "luminance",
+        "vector"
+    ],
+    "type": "string"
+},
         DesignMetadata: {
     "description": "Document properties and supporting design-system or collaboration records.",
     "properties": {
@@ -6447,6 +6476,10 @@ export const schema: Schema = {
         },
         "locked": {
             "type": "boolean"
+        },
+        "mask": {
+            "$ref": "#/definitions/DesignMask",
+            "description": "Retained source identity and coverage mode; omitted on ordinary layers."
         },
         "name": {
             "type": "string"
@@ -6579,6 +6612,7 @@ export const schema: Schema = {
                 "image",
                 "instance",
                 "line",
+                "mask",
                 "path",
                 "polygon",
                 "rectangle",
@@ -6592,6 +6626,17 @@ export const schema: Schema = {
         },
         "locked": {
             "type": "boolean"
+        },
+        "mask": {
+            "anyOf": [
+                {
+                    "$ref": "#/definitions/DesignMask"
+                },
+                {
+                    "type": "null"
+                }
+            ],
+            "description": "Null clears masking when converting the container into an ordinary group."
         },
         "name": {
             "type": "string"

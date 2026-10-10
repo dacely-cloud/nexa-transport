@@ -479,6 +479,14 @@
         "./design-boolean-kernel": {
             "types": "./dist/design/DesignBooleanKernel.d.ts",
             "import": "./dist/design-boolean-kernel.js"
+        },
+        "./design-mask-types": {
+            "types": "./dist/design/DesignMaskTypes.d.ts",
+            "import": "./dist/design-mask-types.js"
+        },
+        "./design-mask-geometry": {
+            "types": "./dist/design/DesignMaskGeometry.d.ts",
+            "import": "./dist/design-mask-geometry.js"
         }
     },
     "scripts": {

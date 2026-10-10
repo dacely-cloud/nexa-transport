@@ -3954,10 +3954,11 @@ export const DesignKindValues = {
     Value5: 'image',
     Value6: 'instance',
     Value7: 'line',
-    Value8: 'path',
-    Value9: 'polygon',
-    Value10: 'rectangle',
-    Value11: 'text',
+    Value8: 'mask',
+    Value9: 'path',
+    Value10: 'polygon',
+    Value11: 'rectangle',
+    Value12: 'text',
 } as const;
 
 /** DesignKind from the Nexa wire protocol. */
@@ -4062,6 +4063,27 @@ export interface DesignListRequestShape {
 /** DesignListRequest from the Nexa wire protocol. */
 export type DesignListRequest = DesignListRequestShape;
 
+/** DesignMask wire fields. */
+export interface DesignMaskShape {
+    /** mode as defined by the Nexa gateway. */
+    readonly mode: DesignMaskMode;
+    /** sourceId as defined by the Nexa gateway. */
+    readonly sourceId: null | string;
+}
+
+/** DesignMask from the Nexa wire protocol. */
+export type DesignMask = DesignMaskShape;
+
+/** Allowed values for DesignMaskMode. */
+export const DesignMaskModeValues = {
+    Value0: 'alpha',
+    Value1: 'luminance',
+    Value2: 'vector',
+} as const;
+
+/** DesignMaskMode from the Nexa wire protocol. */
+export type DesignMaskMode = (typeof DesignMaskModeValues)[keyof typeof DesignMaskModeValues];
+
 /** DesignMetadata wire fields. */
 export interface DesignMetadataShape {
     /** comments as defined by the Nexa gateway. */
@@ -4116,6 +4138,8 @@ export interface DesignNodeShape {
     readonly layout: DesignLayout;
     /** locked as defined by the Nexa gateway. */
     readonly locked: boolean;
+    /** mask as defined by the Nexa gateway. */
+    readonly mask?: DesignMask;
     /** name as defined by the Nexa gateway. */
     readonly name: string;
     /** opacity as defined by the Nexa gateway. */
@@ -4157,10 +4181,11 @@ export const DesignNodeChangeskindValues = {
     Value5: 'image',
     Value6: 'instance',
     Value7: 'line',
-    Value8: 'path',
-    Value9: 'polygon',
-    Value10: 'rectangle',
-    Value11: 'text',
+    Value8: 'mask',
+    Value9: 'path',
+    Value10: 'polygon',
+    Value11: 'rectangle',
+    Value12: 'text',
 } as const;
 
 /** DesignNodeChanges wire fields. */
@@ -4181,6 +4206,8 @@ export interface DesignNodeChangesShape {
     readonly layout?: DesignLayout;
     /** locked as defined by the Nexa gateway. */
     readonly locked?: boolean;
+    /** mask as defined by the Nexa gateway. */
+    readonly mask?: DesignMask | null;
     /** name as defined by the Nexa gateway. */
     readonly name?: string;
     /** opacity as defined by the Nexa gateway. */
