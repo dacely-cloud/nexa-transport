@@ -6525,32 +6525,34 @@ export const schema: Schema = {
             required: ['id', 'kind', 'value'],
             type: 'object',
         },
+        DesignImageFraming: {
+            description: 'Workspace image reference and crop transform.',
+            properties: {
+                cropX: { type: 'number' },
+                cropY: { type: 'number' },
+                fit: { $ref: '#/definitions/DesignImageFit' },
+                scale: { type: 'number' },
+            },
+            required: ['cropX', 'cropY', 'fit', 'scale'],
+            type: 'object',
+        },
         DesignPaint: {
             description: 'Layer paint. Colors are validated hex values, never arbitrary CSS.',
             properties: {
-                angle: {
-                    type: 'number',
-                },
-                assetId: {
-                    type: ['null', 'string'],
-                },
-                color: {
-                    type: 'string',
-                },
-                kind: {
-                    $ref: '#/definitions/DesignPaintKind',
-                },
-                opacity: {
-                    type: 'number',
-                },
+                angle: { type: 'number' },
+                assetId: { type: ['null', 'string'] },
+                color: { type: 'string' },
+                kind: { $ref: '#/definitions/DesignPaintKind' },
+                opacity: { type: 'number' },
                 stops: {
-                    items: {
-                        $ref: '#/definitions/DesignGradientStop',
-                    },
+                    items: { $ref: '#/definitions/DesignGradientStop' },
                     type: 'array',
                 },
-                tokenId: {
-                    type: ['null', 'string'],
+                tokenId: { type: ['null', 'string'] },
+                framing: {
+                    $ref: '#/definitions/DesignImageFraming',
+                    description:
+                        'Omitted framing retains the original centered-cover behavior of existing image paints.',
                 },
             },
             required: ['angle', 'assetId', 'color', 'kind', 'opacity', 'stops', 'tokenId'],
