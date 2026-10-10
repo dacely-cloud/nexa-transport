@@ -72,7 +72,7 @@ export class DesignSvgGeometry {
             }
             const bounds: DesignSelectionBounds = DesignSelectionContext.bounds(box);
             const margin: number = Math.max(
-                node.style.stroke?.width ?? 0,
+                (node.style.stroke?.width ?? 0) / 2,
                 node.style.blur * 3,
                 ...node.style.shadows.map(
                     (shadow): number =>

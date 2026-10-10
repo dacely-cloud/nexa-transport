@@ -90,10 +90,19 @@ export class DesignSvg {
             }
             if (node.style.stroke !== null) {
                 const stroke: DesignStroke = node.style.stroke;
-                const attributes: string = `fill="none" stroke="${paints.paint(stroke.paint, box)}" stroke-opacity="${stroke.paint.opacity}" stroke-width="${stroke.width}" stroke-dasharray="${stroke.dash.join(' ')}" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"`;
-                body += node.text === null
-                    ? Geometry.shape(node, box, attributes)
-                    : this.#text(node.text, stroke.paint, box, paints, measure, attributes, false);
+                const attributes: string = `fill="none" stroke="${paints.paint(stroke.paint, box)}" stroke-opacity="${stroke.paint.opacity}" stroke-width="${stroke.width}" stroke-dasharray="${stroke.dash.join(' ')}" stroke-linejoin="round" stroke-linecap="round"`;
+                body +=
+                    node.text === null
+                        ? Geometry.shape(node, box, attributes)
+                        : this.#text(
+                              node.text,
+                              stroke.paint,
+                              box,
+                              paints,
+                              measure,
+                              attributes,
+                              false,
+                          );
             }
             const element: string = `<g transform="translate(${box.x} ${box.y}) rotate(${box.rotation} ${box.width / 2} ${box.height / 2})"><title>${Geometry.escape(node.name)}</title>${body}</g>`;
             characters += element.length;
