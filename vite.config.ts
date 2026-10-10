@@ -4,6 +4,22 @@ const config: UserConfig = {
         target: 'es2023',
         lib: {
             entry: {
+                'design-types': 'src/design/DesignTypes.ts',
+                'design-defaults': 'src/design/DesignDefaults.ts',
+                'design-codec': 'src/design/DesignCodec.ts',
+                'design-edits': 'src/design/DesignEdits.ts',
+                'design-operation-types': 'src/design/DesignOperationTypes.ts',
+                'design-operation-codec': 'src/design/DesignOperationCodec.ts',
+                'design-scene': 'src/design/DesignScene.ts',
+                'design-layout': 'src/design/DesignLayout.ts',
+                'design-layout-types': 'src/design/DesignLayoutTypes.ts',
+                'design-requests': 'src/design/DesignRequests.ts',
+                'design-record-codec': 'src/design/DesignRecordCodec.ts',
+                'design-records': 'src/design/DesignRecords.ts',
+                'design-request-codec': 'src/design/DesignRequestCodec.ts',
+                'design-change-codec': 'src/design/DesignChangeCodec.ts',
+                'design-paging': 'src/design/DesignPaging.ts',
+
                 'workflow-http': 'src/workflows/HttpInputs.ts',
                 'workflow-template-fields': 'src/workflows/TemplateFields.ts',
                 'workflow-template-inputs': 'src/workflows/TemplateInputs.ts',

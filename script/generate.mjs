@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import { readFileSync, writeFileSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 
 execFileSync(process.execPath, ['script/workflows.ts'], { stdio: 'inherit' });
+execFileSync(process.execPath, ['script/design.ts'], { stdio: 'inherit' });
 mkdirSync('src/graphs', { recursive: true });
 writeFileSync('src/graphs/ChatGraph.ts', readFileSync('../nexa/src/graphs/ChatGraph.ts', 'utf8'));
 // Native capture validation is portable and owned by Nexa.
@@ -236,6 +237,21 @@ try {
 } finally {
     rmSync(temporary, { recursive: true, force: true });
 }
+/** Named method interfaces retain the same validator paths as inline method declarations. */
+for (const [name, method] of Object.entries(schema.definitions.GatewayMethods.properties)) {
+    let contract = method;
+    const visited = new Set();
+    while (contract.$ref !== undefined) {
+        if (visited.has(contract.$ref)) throw new Error('Cyclic gateway method declaration: ' + name);
+        visited.add(contract.$ref);
+        const definition = contract.$ref.replace('#/definitions/', '').replaceAll('~1', '/').replaceAll('~0', '~');
+        contract = schema.definitions[definition];
+        if (contract === undefined) throw new Error('Missing gateway method declaration: ' + name);
+    }
+    if (contract.properties?.params === undefined || contract.properties?.result === undefined) throw new Error('Incomplete gateway method declaration: ' + name);
+    schema.definitions.GatewayMethods.properties[name] = contract;
+}
+
 /** Keep arbitrary JSON fields fully typed and structurally validated. */
 schema.definitions.JsonValue = {
     anyOf: [
