@@ -483,6 +483,22 @@ export const schema: Schema = {
             ],
             type: 'object',
         },
+        ApprovalResolveParams: {
+            description: "An operator's answer to one approval.",
+            properties: {
+                approvalId: {
+                    type: 'string',
+                },
+                approved: {
+                    type: 'boolean',
+                },
+                reason: {
+                    type: 'string',
+                },
+            },
+            required: ['approvalId', 'approved'],
+            type: 'object',
+        },
         ApprovalResolvedData: {
             description: 'The payload of a {@link GATEWAY_EVENTS.ApprovalResolved} event.',
             properties: {
@@ -503,22 +519,6 @@ export const schema: Schema = {
                 },
             },
             required: ['approvalId', 'approved', 'by', 'outcome'],
-            type: 'object',
-        },
-        ApprovalResolveParams: {
-            description: "An operator's answer to one approval.",
-            properties: {
-                approvalId: {
-                    type: 'string',
-                },
-                approved: {
-                    type: 'boolean',
-                },
-                reason: {
-                    type: 'string',
-                },
-            },
-            required: ['approvalId', 'approved'],
             type: 'object',
         },
         AskParams: {
@@ -2204,43 +2204,6 @@ export const schema: Schema = {
             ],
             type: 'object',
         },
-        BrowserSourcesCoverage: {
-            description:
-                'Coverage counters describe observations, including repeats rejected before identity retention.',
-            properties: {
-                capturedSources: {
-                    type: 'string',
-                },
-                excludedFrames: {
-                    type: 'boolean',
-                },
-                excludedResources: {
-                    type: 'string',
-                },
-                excludedScriptObservations: {
-                    type: 'string',
-                },
-                omittedScriptObservations: {
-                    type: 'string',
-                },
-                partial: {
-                    type: 'boolean',
-                },
-                sourceBytes: {
-                    type: 'string',
-                },
-            },
-            required: [
-                'capturedSources',
-                'excludedFrames',
-                'excludedResources',
-                'excludedScriptObservations',
-                'omittedScriptObservations',
-                'partial',
-                'sourceBytes',
-            ],
-            type: 'object',
-        },
         BrowserSourceScriptRow: {
             description:
                 'A directory script row has source identity and coverage, without the source body.',
@@ -2326,6 +2289,43 @@ export const schema: Schema = {
                 'startColumn',
                 'startLine',
                 'url',
+            ],
+            type: 'object',
+        },
+        BrowserSourcesCoverage: {
+            description:
+                'Coverage counters describe observations, including repeats rejected before identity retention.',
+            properties: {
+                capturedSources: {
+                    type: 'string',
+                },
+                excludedFrames: {
+                    type: 'boolean',
+                },
+                excludedResources: {
+                    type: 'string',
+                },
+                excludedScriptObservations: {
+                    type: 'string',
+                },
+                omittedScriptObservations: {
+                    type: 'string',
+                },
+                partial: {
+                    type: 'boolean',
+                },
+                sourceBytes: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'capturedSources',
+                'excludedFrames',
+                'excludedResources',
+                'excludedScriptObservations',
+                'omittedScriptObservations',
+                'partial',
+                'sourceBytes',
             ],
             type: 'object',
         },
@@ -12779,6 +12779,12 @@ export const schema: Schema = {
             required: ['id', 'name', 'reason', 'state'],
             type: 'object',
         },
+        PlanningSourceState: {
+            description:
+                'Discovery of a registered source is not a grant or an executable resource binding.',
+            enum: ['needs-adapter', 'unavailable'],
+            type: 'string',
+        },
         PlanningSourcesPage: {
             properties: {
                 available: {
@@ -12810,12 +12816,6 @@ export const schema: Schema = {
             },
             required: ['after', 'workflowId'],
             type: 'object',
-        },
-        PlanningSourceState: {
-            description:
-                'Discovery of a registered source is not a grant or an executable resource binding.',
-            enum: ['needs-adapter', 'unavailable'],
-            type: 'string',
         },
         PlanningStatus: {
             enum: ['canceled', 'complete', 'failed', 'working'],
@@ -13058,6 +13058,12 @@ export const schema: Schema = {
             ],
             type: 'object',
         },
+        'Record<string,Scope>': {
+            type: 'object',
+            additionalProperties: {
+                $ref: '#/definitions/Scope',
+            },
+        },
         'Record<string,never>': {
             type: 'object',
             additionalProperties: false,
@@ -13066,12 +13072,6 @@ export const schema: Schema = {
             type: 'object',
             additionalProperties: {
                 type: 'number',
-            },
-        },
-        'Record<string,Scope>': {
-            type: 'object',
-            additionalProperties: {
-                $ref: '#/definitions/Scope',
             },
         },
         'Record<string,string>': {
@@ -14070,12 +14070,6 @@ export const schema: Schema = {
             required: ['evidenceId', 'id', 'runId'],
             type: 'object',
         },
-        ReverseInspection: {
-            description:
-                'Read-only browser operations supported by an existing native analyzer lease.\nOne bounded native inspection operation.',
-            enum: ['decompile', 'disassemble', 'graph', 'xrefs'],
-            type: 'string',
-        },
         ReverseInspectQuery: {
             description:
                 'Operates only on a still-live, owner-scoped analyzer. No database id or query token crosses the wire.',
@@ -14126,6 +14120,12 @@ export const schema: Schema = {
             },
             required: ['record', 'runId', 'sha256'],
             type: 'object',
+        },
+        ReverseInspection: {
+            description:
+                'Read-only browser operations supported by an existing native analyzer lease.\nOne bounded native inspection operation.',
+            enum: ['decompile', 'disassemble', 'graph', 'xrefs'],
+            type: 'string',
         },
         ReverseNetworkDetailPage: {
             description:
@@ -16023,6 +16023,16 @@ export const schema: Schema = {
             required: ['kind', 'text'],
             type: 'object',
         },
+        VoiceStartParams: {
+            description:
+                "Opens a spoken call. The conversation is the agent's, so a call can continue a typed thread.",
+            properties: {
+                conversationId: {
+                    type: 'string',
+                },
+            },
+            type: 'object',
+        },
         VoiceStarted: {
             properties: {
                 callId: {
@@ -16040,16 +16050,6 @@ export const schema: Schema = {
                 },
             },
             required: ['callId', 'frameBytes', 'sampleRate'],
-            type: 'object',
-        },
-        VoiceStartParams: {
-            description:
-                "Opens a spoken call. The conversation is the agent's, so a call can continue a typed thread.",
-            properties: {
-                conversationId: {
-                    type: 'string',
-                },
-            },
             type: 'object',
         },
         VoiceStopParams: {
@@ -18310,6 +18310,82 @@ export const schema: Schema = {
             required: ['capability', 'maxOutputTokens', 'policy', 'provider', 'workflowId'],
             type: 'object',
         },
+        WorkflowModelUsage: {
+            description:
+                'Actual executed identity and original tariff, never current catalog prices.',
+            properties: {
+                basis: {
+                    $ref: '#/definitions/WorkflowSpendingBasis',
+                },
+                entries: {
+                    type: 'string',
+                },
+                expiresAtMs: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                kind: {
+                    $ref: '#/definitions/ChargeKind',
+                },
+                lastReportedAtMs: {
+                    type: 'string',
+                },
+                microcents: {
+                    type: 'string',
+                },
+                model: {
+                    type: ['null', 'string'],
+                },
+                provider: {
+                    type: ['null', 'string'],
+                },
+                tariff: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/PricingTariff',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                unitEntries: {
+                    type: 'string',
+                },
+                unitLabel: {
+                    type: ['null', 'string'],
+                },
+                units: {
+                    type: ['null', 'string'],
+                },
+                usage: {
+                    $ref: '#/definitions/WorkflowUsageDimensions',
+                },
+                usageEntries: {
+                    $ref: '#/definitions/WorkflowUsageDimensions',
+                },
+            },
+            required: [
+                'basis',
+                'entries',
+                'expiresAtMs',
+                'id',
+                'kind',
+                'lastReportedAtMs',
+                'microcents',
+                'model',
+                'provider',
+                'tariff',
+                'unitEntries',
+                'unitLabel',
+                'units',
+                'usage',
+                'usageEntries',
+            ],
+            type: 'object',
+        },
         WorkflowModelsPage: {
             description:
                 "Registered providers and a bounded page from the selected provider's maintained catalog.",
@@ -18388,82 +18464,6 @@ export const schema: Schema = {
                 'provider',
                 'query',
                 'workflowId',
-            ],
-            type: 'object',
-        },
-        WorkflowModelUsage: {
-            description:
-                'Actual executed identity and original tariff, never current catalog prices.',
-            properties: {
-                basis: {
-                    $ref: '#/definitions/WorkflowSpendingBasis',
-                },
-                entries: {
-                    type: 'string',
-                },
-                expiresAtMs: {
-                    type: 'string',
-                },
-                id: {
-                    type: 'string',
-                },
-                kind: {
-                    $ref: '#/definitions/ChargeKind',
-                },
-                lastReportedAtMs: {
-                    type: 'string',
-                },
-                microcents: {
-                    type: 'string',
-                },
-                model: {
-                    type: ['null', 'string'],
-                },
-                provider: {
-                    type: ['null', 'string'],
-                },
-                tariff: {
-                    anyOf: [
-                        {
-                            $ref: '#/definitions/PricingTariff',
-                        },
-                        {
-                            type: 'null',
-                        },
-                    ],
-                },
-                unitEntries: {
-                    type: 'string',
-                },
-                unitLabel: {
-                    type: ['null', 'string'],
-                },
-                units: {
-                    type: ['null', 'string'],
-                },
-                usage: {
-                    $ref: '#/definitions/WorkflowUsageDimensions',
-                },
-                usageEntries: {
-                    $ref: '#/definitions/WorkflowUsageDimensions',
-                },
-            },
-            required: [
-                'basis',
-                'entries',
-                'expiresAtMs',
-                'id',
-                'kind',
-                'lastReportedAtMs',
-                'microcents',
-                'model',
-                'provider',
-                'tariff',
-                'unitEntries',
-                'unitLabel',
-                'units',
-                'usage',
-                'usageEntries',
             ],
             type: 'object',
         },
@@ -18776,26 +18776,6 @@ export const schema: Schema = {
             required: ['publicationId', 'revision', 'version'],
             type: 'object',
         },
-        WorkflowPublishedRunRequest: {
-            description:
-                'Explicitly selected immutable version, with server-owned execution limits.',
-            properties: {
-                input: {
-                    $ref: '#/definitions/WorkflowObject',
-                },
-                publicationId: {
-                    type: 'string',
-                },
-                runId: {
-                    type: 'string',
-                },
-                workflowId: {
-                    type: 'string',
-                },
-            },
-            required: ['input', 'publicationId', 'runId', 'workflowId'],
-            type: 'object',
-        },
         WorkflowPublishRequest: {
             properties: {
                 commandId: {
@@ -18844,6 +18824,26 @@ export const schema: Schema = {
                 },
             },
             required: ['check', 'publication'],
+            type: 'object',
+        },
+        WorkflowPublishedRunRequest: {
+            description:
+                'Explicitly selected immutable version, with server-owned execution limits.',
+            properties: {
+                input: {
+                    $ref: '#/definitions/WorkflowObject',
+                },
+                publicationId: {
+                    type: 'string',
+                },
+                runId: {
+                    type: 'string',
+                },
+                workflowId: {
+                    type: 'string',
+                },
+            },
+            required: ['input', 'publicationId', 'runId', 'workflowId'],
             type: 'object',
         },
         WorkflowReadRequest: {
