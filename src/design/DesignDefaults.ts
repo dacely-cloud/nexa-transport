@@ -8,6 +8,7 @@ import {
     DesignAlign,
     DesignConstraint,
     DesignPaintKind,
+    DesignPathVerb,
     type DesignNode,
     type DesignPaint,
     type DesignStyle,
@@ -32,7 +33,9 @@ export class DesignDefaults {
     public static style(kind: DesignKind): DesignStyle {
         return {
             fills:
-                kind === DesignKind.Group || kind === DesignKind.Instance
+                kind === DesignKind.Group ||
+                kind === DesignKind.Instance ||
+                kind === DesignKind.Line
                     ? []
                     : [
                           this.paint(
@@ -43,7 +46,7 @@ export class DesignDefaults {
                                     : '#8B7CF6',
                           ),
                       ],
-            stroke: null,
+            stroke: kind === DesignKind.Line ? { paint: this.paint(), width: 2, dash: [] } : null,
             corners: { topLeft: 0, topRight: 0, bottomRight: 0, bottomLeft: 0 },
             shadows: [],
             blur: 0,
@@ -108,7 +111,20 @@ export class DesignDefaults {
                           runs: [],
                       }
                     : null,
-            path: [],
+            path:
+                kind === DesignKind.Line
+                    ? [
+                          { verb: DesignPathVerb.Move, values: [0, 0] },
+                          { verb: DesignPathVerb.Line, values: [160, 120] },
+                      ]
+                    : kind === DesignKind.Polygon
+                      ? [
+                            { verb: DesignPathVerb.Move, values: [80, 0] },
+                            { verb: DesignPathVerb.Line, values: [160, 120] },
+                            { verb: DesignPathVerb.Line, values: [0, 120] },
+                            { verb: DesignPathVerb.Close, values: [] },
+                        ]
+                      : [],
             image: null,
             componentId: null,
             overrides: [],

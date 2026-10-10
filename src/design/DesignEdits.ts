@@ -4,6 +4,7 @@
 import { DesignOperationCodec } from './DesignOperationCodec.js';
 import { DesignTreeEdits as Tree } from './DesignTreeEdits.js';
 import { DesignEntityChanges as Entity } from './DesignEntityChanges.js';
+import { DesignPaths } from './DesignPaths.js';
 import { DesignCodec } from './DesignCodec.js';
 import {
     DesignOperationKind,
@@ -70,7 +71,7 @@ export class DesignEdits {
                 }
                 case DesignOperationKind.Update: {
                     const node: DesignNode = Tree.node(nodes, operation.id);
-                    nodes.set(node.id, { ...node, ...operation.changes });
+                    nodes.set(node.id, DesignPaths.resize(node, operation.changes));
                     break;
                 }
                 case DesignOperationKind.Move: {
