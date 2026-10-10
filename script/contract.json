@@ -5154,6 +5154,244 @@
             "enum": ["between", "center", "end", "start", "stretch"],
             "type": "string"
         },
+        "DesignAsset": {
+            "description": "Published assets are immutable, and all byte counts remain decimal strings.",
+            "properties": {
+                "byteLength": {
+                    "type": "string"
+                },
+                "height": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "mime": {
+                    "$ref": "#/definitions/DesignAssetMime"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "sha256": {
+                    "type": "string"
+                },
+                "width": {
+                    "type": "number"
+                }
+            },
+            "required": ["byteLength", "height", "id", "mime", "name", "sha256", "width"],
+            "type": "object"
+        },
+        "DesignAssetCancelMethod": {
+            "properties": {
+                "params": {
+                    "$ref": "#/definitions/DesignAssetIdRequest"
+                },
+                "result": {
+                    "type": "null"
+                }
+            },
+            "required": ["params", "result"],
+            "type": "object"
+        },
+        "DesignAssetChunkMethod": {
+            "properties": {
+                "params": {
+                    "$ref": "#/definitions/DesignAssetChunkRequest"
+                },
+                "result": {
+                    "$ref": "#/definitions/DesignAssetPosition"
+                }
+            },
+            "required": ["params", "result"],
+            "type": "object"
+        },
+        "DesignAssetChunkRequest": {
+            "description": "One canonical base64 slice, addressed by exact byte position.",
+            "properties": {
+                "data": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "offset": {
+                    "type": "string"
+                }
+            },
+            "required": ["data", "id", "offset"],
+            "type": "object"
+        },
+        "DesignAssetFinishMethod": {
+            "properties": {
+                "params": {
+                    "$ref": "#/definitions/DesignAssetIdRequest"
+                },
+                "result": {
+                    "$ref": "#/definitions/DesignAsset"
+                }
+            },
+            "required": ["params", "result"],
+            "type": "object"
+        },
+        "DesignAssetIdRequest": {
+            "description": "Asset addressing is independent of document ownership; both are authorized by the server.",
+            "properties": {
+                "id": {
+                    "type": "string"
+                }
+            },
+            "required": ["id"],
+            "type": "object"
+        },
+        "DesignAssetListMethod": {
+            "properties": {
+                "params": {
+                    "$ref": "#/definitions/DesignAssetListRequest"
+                },
+                "result": {
+                    "$ref": "#/definitions/DesignAssetListPage"
+                }
+            },
+            "required": ["params", "result"],
+            "type": "object"
+        },
+        "DesignAssetListPage": {
+            "properties": {
+                "items": {
+                    "items": {
+                        "$ref": "#/definitions/DesignAsset"
+                    },
+                    "type": "array"
+                },
+                "nextAfter": {
+                    "type": ["null", "string"]
+                }
+            },
+            "required": ["items", "nextAfter"],
+            "type": "object"
+        },
+        "DesignAssetListRequest": {
+            "description": "Library projections are metadata only.",
+            "properties": {
+                "after": {
+                    "type": ["null", "string"]
+                },
+                "limit": {
+                    "type": "number"
+                }
+            },
+            "required": ["after", "limit"],
+            "type": "object"
+        },
+        "DesignAssetMime": {
+            "description": "Raster formats are identified from bytes before becoming usable design assets.",
+            "enum": ["image/gif", "image/jpeg", "image/png", "image/webp"],
+            "type": "string"
+        },
+        "DesignAssetPosition": {
+            "description": "Receipts carry progress without echoing source bytes.",
+            "properties": {
+                "byteLength": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "offset": {
+                    "type": "string"
+                }
+            },
+            "required": ["byteLength", "id", "offset"],
+            "type": "object"
+        },
+        "DesignAssetReadMethod": {
+            "properties": {
+                "params": {
+                    "$ref": "#/definitions/DesignAssetReadRequest"
+                },
+                "result": {
+                    "$ref": "#/definitions/DesignAssetSlice"
+                }
+            },
+            "required": ["params", "result"],
+            "type": "object"
+        },
+        "DesignAssetReadRequest": {
+            "description": "Reads transfer only a bounded slice of a completed immutable image.",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "offset": {
+                    "type": "string"
+                }
+            },
+            "required": ["id", "offset"],
+            "type": "object"
+        },
+        "DesignAssetRemoveMethod": {
+            "properties": {
+                "params": {
+                    "$ref": "#/definitions/DesignAssetIdRequest"
+                },
+                "result": {
+                    "type": "null"
+                }
+            },
+            "required": ["params", "result"],
+            "type": "object"
+        },
+        "DesignAssetSlice": {
+            "description": "The browser pins the metadata identity while assembling slices.",
+            "properties": {
+                "asset": {
+                    "$ref": "#/definitions/DesignAsset"
+                },
+                "data": {
+                    "type": "string"
+                },
+                "nextOffset": {
+                    "type": ["null", "string"]
+                },
+                "offset": {
+                    "type": "string"
+                }
+            },
+            "required": ["asset", "data", "nextOffset", "offset"],
+            "type": "object"
+        },
+        "DesignAssetStartMethod": {
+            "properties": {
+                "params": {
+                    "$ref": "#/definitions/DesignAssetStartRequest"
+                },
+                "result": {
+                    "$ref": "#/definitions/DesignAssetPosition"
+                }
+            },
+            "required": ["params", "result"],
+            "type": "object"
+        },
+        "DesignAssetStartRequest": {
+            "description": "Retried admission uses the same client-chosen identity. Ownership comes from the host.",
+            "properties": {
+                "byteLength": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "sha256": {
+                    "type": "string"
+                }
+            },
+            "required": ["byteLength", "id", "name", "sha256"],
+            "type": "object"
+        },
         "DesignBox": {
             "description": "Resolved layout boxes are separate from authored values and never written back implicitly.",
             "properties": {
@@ -7923,6 +8161,90 @@
                     "required": ["params", "result"],
                     "type": "object"
                 },
+                "design.asset.cancel": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/DesignAssetIdRequest"
+                        },
+                        "result": {
+                            "type": "null"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "design.asset.chunk": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/DesignAssetChunkRequest"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/DesignAssetPosition"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "design.asset.finish": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/DesignAssetIdRequest"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/DesignAsset"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "design.asset.list": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/DesignAssetListRequest"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/DesignAssetListPage"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "design.asset.read": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/DesignAssetReadRequest"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/DesignAssetSlice"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "design.asset.remove": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/DesignAssetIdRequest"
+                        },
+                        "result": {
+                            "type": "null"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "design.asset.start": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/DesignAssetStartRequest"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/DesignAssetPosition"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
                 "design.changes": {
                     "description": "Forward delta RPC contract.",
                     "properties": {
@@ -9655,6 +9977,13 @@
                 "data.upload.chunk",
                 "data.upload.finish",
                 "data.upload.start",
+                "design.asset.cancel",
+                "design.asset.chunk",
+                "design.asset.finish",
+                "design.asset.list",
+                "design.asset.read",
+                "design.asset.remove",
+                "design.asset.start",
                 "design.changes",
                 "design.create",
                 "design.events",

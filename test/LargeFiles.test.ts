@@ -4,7 +4,7 @@ import { BinaryChunks } from '../src/media/BinaryChunks.js';
 import { BinaryMedia, type ReceivedAttachment } from '../src/media/BinaryMedia.js';
 import { NexaMedia } from '../src/media/NexaMedia.js';
 import { NexaClient } from '../src/networking/NexaClient.js';
-import { Method, type InboundAttachment } from '../src/protocol/Protocol.js';
+import { Method, type InboundAttachment, type HelloOk } from '../src/protocol/Protocol.js';
 import { hello, result, TestGateway, type Request } from './Support.js';
 
 let gateway: TestGateway | undefined;
@@ -20,7 +20,16 @@ afterEach(async (): Promise<void> => {
 it.each([false, true])(
     'receives a complete 100 MiB video independently of JSON limits (chunked=%s)',
     async (chunked: boolean): Promise<void> => {
-        gateway = new TestGateway({ ...hello, features: { ...hello.features, binaryMedia: true } });
+        const greeting: HelloOk = {
+            ...hello,
+            features: {
+                ...hello.features,
+                binaryMedia: true,
+                methods: [Method.SessionsFiles, Method.MediaAcknowledge],
+            },
+        };
+        expect(JSON.stringify(greeting).length).toBeLessThan(4096);
+        gateway = new TestGateway(greeting);
         client = await NexaClient.connect({
             url: await gateway.url(),
             maxMessageBytes: 4096,
