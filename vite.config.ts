@@ -4,6 +4,9 @@ const config: UserConfig = {
         target: 'es2023',
         lib: {
             entry: {
+                'design-asset-types': 'src/design/DesignAssetTypes.ts',
+                'design-asset-codec': 'src/design/DesignAssetCodec.ts',
+                'design-asset-references': 'src/design/DesignAssetReferences.ts',
                 'design-types': 'src/design/DesignTypes.ts',
                 'design-defaults': 'src/design/DesignDefaults.ts',
                 'design-codec': 'src/design/DesignCodec.ts',

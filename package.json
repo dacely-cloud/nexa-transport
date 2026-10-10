@@ -16,6 +16,18 @@
         "docs"
     ],
     "exports": {
+        "./design-asset-types": {
+            "types": "./dist/design/DesignAssetTypes.d.ts",
+            "import": "./dist/design-asset-types.js"
+        },
+        "./design-asset-codec": {
+            "types": "./dist/design/DesignAssetCodec.d.ts",
+            "import": "./dist/design-asset-codec.js"
+        },
+        "./design-asset-references": {
+            "types": "./dist/design/DesignAssetReferences.d.ts",
+            "import": "./dist/design-asset-references.js"
+        },
         "./design-types": {
             "types": "./dist/design/DesignTypes.d.ts",
             "import": "./dist/design-types.js"

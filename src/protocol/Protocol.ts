@@ -3408,6 +3408,213 @@ export const DesignAlignValues = {
 /** DesignAlign from the Nexa wire protocol. */
 export type DesignAlign = (typeof DesignAlignValues)[keyof typeof DesignAlignValues];
 
+/** DesignAsset wire fields. */
+export interface DesignAssetShape {
+    /** byteLength as defined by the Nexa gateway. */
+    readonly byteLength: string;
+    /** height as defined by the Nexa gateway. */
+    readonly height: number;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** mime as defined by the Nexa gateway. */
+    readonly mime: DesignAssetMime;
+    /** name as defined by the Nexa gateway. */
+    readonly name: string;
+    /** sha256 as defined by the Nexa gateway. */
+    readonly sha256: string;
+    /** width as defined by the Nexa gateway. */
+    readonly width: number;
+}
+
+/** DesignAsset from the Nexa wire protocol. */
+export type DesignAsset = DesignAssetShape;
+
+/** DesignAssetCancelMethod wire fields. */
+export interface DesignAssetCancelMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignAssetIdRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: null;
+}
+
+/** DesignAssetCancelMethod from the Nexa wire protocol. */
+export type DesignAssetCancelMethod = DesignAssetCancelMethodShape;
+
+/** DesignAssetChunkMethod wire fields. */
+export interface DesignAssetChunkMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignAssetChunkRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignAssetPosition;
+}
+
+/** DesignAssetChunkMethod from the Nexa wire protocol. */
+export type DesignAssetChunkMethod = DesignAssetChunkMethodShape;
+
+/** DesignAssetChunkRequest wire fields. */
+export interface DesignAssetChunkRequestShape {
+    /** data as defined by the Nexa gateway. */
+    readonly data: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** offset as defined by the Nexa gateway. */
+    readonly offset: string;
+}
+
+/** DesignAssetChunkRequest from the Nexa wire protocol. */
+export type DesignAssetChunkRequest = DesignAssetChunkRequestShape;
+
+/** DesignAssetFinishMethod wire fields. */
+export interface DesignAssetFinishMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignAssetIdRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignAsset;
+}
+
+/** DesignAssetFinishMethod from the Nexa wire protocol. */
+export type DesignAssetFinishMethod = DesignAssetFinishMethodShape;
+
+/** DesignAssetIdRequest wire fields. */
+export interface DesignAssetIdRequestShape {
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+}
+
+/** DesignAssetIdRequest from the Nexa wire protocol. */
+export type DesignAssetIdRequest = DesignAssetIdRequestShape;
+
+/** DesignAssetListMethod wire fields. */
+export interface DesignAssetListMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignAssetListRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignAssetListPage;
+}
+
+/** DesignAssetListMethod from the Nexa wire protocol. */
+export type DesignAssetListMethod = DesignAssetListMethodShape;
+
+/** DesignAssetListPage wire fields. */
+export interface DesignAssetListPageShape {
+    /** items as defined by the Nexa gateway. */
+    readonly items: ReadonlyArray<DesignAsset>;
+    /** nextAfter as defined by the Nexa gateway. */
+    readonly nextAfter: null | string;
+}
+
+/** DesignAssetListPage from the Nexa wire protocol. */
+export type DesignAssetListPage = DesignAssetListPageShape;
+
+/** DesignAssetListRequest wire fields. */
+export interface DesignAssetListRequestShape {
+    /** after as defined by the Nexa gateway. */
+    readonly after: null | string;
+    /** limit as defined by the Nexa gateway. */
+    readonly limit: number;
+}
+
+/** DesignAssetListRequest from the Nexa wire protocol. */
+export type DesignAssetListRequest = DesignAssetListRequestShape;
+
+/** Allowed values for DesignAssetMime. */
+export const DesignAssetMimeValues = {
+    Value0: 'image/gif',
+    Value1: 'image/jpeg',
+    Value2: 'image/png',
+    Value3: 'image/webp',
+} as const;
+
+/** DesignAssetMime from the Nexa wire protocol. */
+export type DesignAssetMime = (typeof DesignAssetMimeValues)[keyof typeof DesignAssetMimeValues];
+
+/** DesignAssetPosition wire fields. */
+export interface DesignAssetPositionShape {
+    /** byteLength as defined by the Nexa gateway. */
+    readonly byteLength: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** offset as defined by the Nexa gateway. */
+    readonly offset: string;
+}
+
+/** DesignAssetPosition from the Nexa wire protocol. */
+export type DesignAssetPosition = DesignAssetPositionShape;
+
+/** DesignAssetReadMethod wire fields. */
+export interface DesignAssetReadMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignAssetReadRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignAssetSlice;
+}
+
+/** DesignAssetReadMethod from the Nexa wire protocol. */
+export type DesignAssetReadMethod = DesignAssetReadMethodShape;
+
+/** DesignAssetReadRequest wire fields. */
+export interface DesignAssetReadRequestShape {
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** offset as defined by the Nexa gateway. */
+    readonly offset: string;
+}
+
+/** DesignAssetReadRequest from the Nexa wire protocol. */
+export type DesignAssetReadRequest = DesignAssetReadRequestShape;
+
+/** DesignAssetRemoveMethod wire fields. */
+export interface DesignAssetRemoveMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignAssetIdRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: null;
+}
+
+/** DesignAssetRemoveMethod from the Nexa wire protocol. */
+export type DesignAssetRemoveMethod = DesignAssetRemoveMethodShape;
+
+/** DesignAssetSlice wire fields. */
+export interface DesignAssetSliceShape {
+    /** asset as defined by the Nexa gateway. */
+    readonly asset: DesignAsset;
+    /** data as defined by the Nexa gateway. */
+    readonly data: string;
+    /** nextOffset as defined by the Nexa gateway. */
+    readonly nextOffset: null | string;
+    /** offset as defined by the Nexa gateway. */
+    readonly offset: string;
+}
+
+/** DesignAssetSlice from the Nexa wire protocol. */
+export type DesignAssetSlice = DesignAssetSliceShape;
+
+/** DesignAssetStartMethod wire fields. */
+export interface DesignAssetStartMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignAssetStartRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignAssetPosition;
+}
+
+/** DesignAssetStartMethod from the Nexa wire protocol. */
+export type DesignAssetStartMethod = DesignAssetStartMethodShape;
+
+/** DesignAssetStartRequest wire fields. */
+export interface DesignAssetStartRequestShape {
+    /** byteLength as defined by the Nexa gateway. */
+    readonly byteLength: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** name as defined by the Nexa gateway. */
+    readonly name: string;
+    /** sha256 as defined by the Nexa gateway. */
+    readonly sha256: string;
+}
+
+/** DesignAssetStartRequest from the Nexa wire protocol. */
+export type DesignAssetStartRequest = DesignAssetStartRequestShape;
+
 /** DesignBox wire fields. */
 export interface DesignBoxShape {
     /** clipId as defined by the Nexa gateway. */
@@ -5212,6 +5419,62 @@ export interface GatewayMethodsdata_upload_startShape {
     readonly result: DataUpload;
 }
 
+/** GatewayMethodsdesign_asset_cancel wire fields. */
+export interface GatewayMethodsdesign_asset_cancelShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignAssetIdRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: null;
+}
+
+/** GatewayMethodsdesign_asset_chunk wire fields. */
+export interface GatewayMethodsdesign_asset_chunkShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignAssetChunkRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignAssetPosition;
+}
+
+/** GatewayMethodsdesign_asset_finish wire fields. */
+export interface GatewayMethodsdesign_asset_finishShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignAssetIdRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignAsset;
+}
+
+/** GatewayMethodsdesign_asset_list wire fields. */
+export interface GatewayMethodsdesign_asset_listShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignAssetListRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignAssetListPage;
+}
+
+/** GatewayMethodsdesign_asset_read wire fields. */
+export interface GatewayMethodsdesign_asset_readShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignAssetReadRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignAssetSlice;
+}
+
+/** GatewayMethodsdesign_asset_remove wire fields. */
+export interface GatewayMethodsdesign_asset_removeShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignAssetIdRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: null;
+}
+
+/** GatewayMethodsdesign_asset_start wire fields. */
+export interface GatewayMethodsdesign_asset_startShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignAssetStartRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignAssetPosition;
+}
+
 /** GatewayMethodsdesign_changes wire fields. */
 export interface GatewayMethodsdesign_changesShape {
     /** params as defined by the Nexa gateway. */
@@ -6358,6 +6621,20 @@ export interface GatewayMethodsShape {
     readonly 'data.upload.finish': GatewayMethodsdata_upload_finishShape;
     /** data.upload.start as defined by the Nexa gateway. */
     readonly 'data.upload.start': GatewayMethodsdata_upload_startShape;
+    /** design.asset.cancel as defined by the Nexa gateway. */
+    readonly 'design.asset.cancel': GatewayMethodsdesign_asset_cancelShape;
+    /** design.asset.chunk as defined by the Nexa gateway. */
+    readonly 'design.asset.chunk': GatewayMethodsdesign_asset_chunkShape;
+    /** design.asset.finish as defined by the Nexa gateway. */
+    readonly 'design.asset.finish': GatewayMethodsdesign_asset_finishShape;
+    /** design.asset.list as defined by the Nexa gateway. */
+    readonly 'design.asset.list': GatewayMethodsdesign_asset_listShape;
+    /** design.asset.read as defined by the Nexa gateway. */
+    readonly 'design.asset.read': GatewayMethodsdesign_asset_readShape;
+    /** design.asset.remove as defined by the Nexa gateway. */
+    readonly 'design.asset.remove': GatewayMethodsdesign_asset_removeShape;
+    /** design.asset.start as defined by the Nexa gateway. */
+    readonly 'design.asset.start': GatewayMethodsdesign_asset_startShape;
     /** design.changes as defined by the Nexa gateway. */
     readonly 'design.changes': GatewayMethodsdesign_changesShape;
     /** design.create as defined by the Nexa gateway. */
@@ -13609,6 +13886,20 @@ export enum Method {
     DataUploadFinish = 'data.upload.finish',
     /** Calls data.upload.start. */
     DataUploadStart = 'data.upload.start',
+    /** Calls design.asset.cancel. */
+    DesignAssetCancel = 'design.asset.cancel',
+    /** Calls design.asset.chunk. */
+    DesignAssetChunk = 'design.asset.chunk',
+    /** Calls design.asset.finish. */
+    DesignAssetFinish = 'design.asset.finish',
+    /** Calls design.asset.list. */
+    DesignAssetList = 'design.asset.list',
+    /** Calls design.asset.read. */
+    DesignAssetRead = 'design.asset.read',
+    /** Calls design.asset.remove. */
+    DesignAssetRemove = 'design.asset.remove',
+    /** Calls design.asset.start. */
+    DesignAssetStart = 'design.asset.start',
     /** Calls design.changes. */
     DesignChanges = 'design.changes',
     /** Calls design.create. */
