@@ -72,10 +72,18 @@ export class DesignScene {
                 if (component?.kind !== DesignKind.Component) {
                     throw new Error('Instance has no component definition');
                 }
-                const rootOverride: DesignOverride | undefined = edited.overrides.find(
+                const combined: readonly DesignOverride[] = this.#inherited(
+                    edited.overrides,
+                    overrides,
+                );
+                const rootOverride: DesignOverride | undefined = combined.find(
                     (entry: DesignOverride): boolean => entry.nodeId === component.id,
                 );
-                const template: DesignNode = this.#override(component, rootOverride);
+                const template: DesignNode = this.#override(
+                    this.#override(component, rootOverride),
+                    override,
+                );
+                const ownerId: string = instanceId ?? id;
                 const children: readonly string[] = template.children.map(
                     (child: string): string =>
                         `${id.startsWith('@') ? id : '@' + encodeURIComponent(id)}/${encodeURIComponent(child)}`,
@@ -84,7 +92,7 @@ export class DesignScene {
                     ...template,
                     id,
                     sourceId,
-                    instanceId: id,
+                    instanceId: ownerId,
                     parentId,
                     children,
                     kind: DesignKind.Frame,
@@ -107,8 +115,8 @@ export class DesignScene {
                         child,
                         `${id.startsWith('@') ? id : '@' + encodeURIComponent(id)}/${encodeURIComponent(child)}`,
                         id,
-                        id,
-                        edited.overrides,
+                        ownerId,
+                        combined,
                         depth + 1,
                     );
                 }
@@ -156,6 +164,28 @@ export class DesignScene {
                     ? node.text
                     : { ...node.text, content: override.text, runs: [] },
         };
+    }
+    static #inherited(
+        local: readonly DesignOverride[],
+        inherited: readonly DesignOverride[],
+    ): readonly DesignOverride[] {
+        const values: Map<string, DesignOverride> = new Map(
+            local.map((entry: DesignOverride): readonly [string, DesignOverride] => [
+                entry.nodeId,
+                entry,
+            ]),
+        );
+        for (const entry of inherited) {
+            const before: DesignOverride | undefined = values.get(entry.nodeId);
+            values.set(entry.nodeId, {
+                nodeId: entry.nodeId,
+                name: entry.name ?? before?.name ?? null,
+                text: entry.text ?? before?.text ?? null,
+                style: entry.style ?? before?.style ?? null,
+                visible: entry.visible ?? before?.visible ?? null,
+            });
+        }
+        return [...values.values()];
     }
     static #style(style: DesignStyle, tokens: ReadonlyMap<string, string>): DesignStyle {
         const paint: (entry: DesignPaint) => DesignPaint = (entry: DesignPaint): DesignPaint =>

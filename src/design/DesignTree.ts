@@ -7,6 +7,7 @@ import {
     type DesignDocument,
     type DesignNode,
 } from './DesignTypes.js';
+import { DesignComponentTargets } from './DesignComponentTargets.js';
 
 /** Explicit topology keeps layer edits, reusable components and prototype references coherent. */
 export class DesignTree {
@@ -82,16 +83,10 @@ export class DesignTree {
             if (component?.kind !== DesignKind.Component) {
                 throw new Error('Instance component is missing or invalid');
             }
-            const descendants: Set<string> = new Set([component.id]);
-            const pending: string[] = [...component.children];
-            while (pending.length > 0) {
-                const id: string | undefined = pending.pop();
-                if (id === undefined) {
-                    break;
-                }
-                descendants.add(id);
-                pending.push(...(nodes.get(id)?.children ?? []));
-            }
+            const descendants: ReadonlySet<string> = DesignComponentTargets.ids(
+                nodes,
+                component.id,
+            );
             const overridden: Set<string> = new Set();
             for (const override of node.overrides) {
                 if (overridden.has(override.nodeId)) {
