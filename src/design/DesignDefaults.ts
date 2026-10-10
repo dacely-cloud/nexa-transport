@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignMaskMode } from './DesignMaskTypes.js';
 import { DesignBooleanMode } from './DesignBooleanTypes.js';
 
 import {
@@ -42,6 +43,7 @@ export class DesignDefaults {
         return {
             fills:
                 kind === DesignKind.Group ||
+                kind === DesignKind.Mask ||
                 kind === DesignKind.Instance ||
                 kind === DesignKind.Line
                     ? []
@@ -70,6 +72,9 @@ export class DesignDefaults {
             id,
             kind,
             ...(kind === DesignKind.Boolean ? { booleanMode: DesignBooleanMode.Union } : {}),
+            ...(kind === DesignKind.Mask
+                ? { mask: { mode: DesignMaskMode.Alpha, sourceId: null } }
+                : {}),
             name,
             parentId: null,
             children: [],

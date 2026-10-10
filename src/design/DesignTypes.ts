@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { DesignMask } from './DesignMaskTypes.js';
 import type { DesignBooleanMode } from './DesignBooleanTypes.js';
 
 /** Editable scene primitives, including reusable component definitions and instances. */
@@ -8,6 +9,7 @@ export const DesignKind = {
     Frame: 'frame',
     Group: 'group',
     Boolean: 'boolean',
+    Mask: 'mask',
     Rectangle: 'rectangle',
     Ellipse: 'ellipse',
     Line: 'line',
@@ -244,6 +246,8 @@ export interface DesignNode {
     readonly overrides: readonly DesignOverride[];
     /** Omitted on ordinary layers, preserving existing document and retry identities. */
     readonly booleanMode?: DesignBooleanMode;
+    /** Retained source identity and coverage mode; omitted on ordinary layers. */
+    readonly mask?: DesignMask;
 }
 /** Instance overrides target a source layer without modifying its component definition. */
 export interface DesignOverride {

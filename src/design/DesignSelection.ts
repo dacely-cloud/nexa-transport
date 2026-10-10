@@ -14,6 +14,7 @@ import {
     type DesignArrangeRequest,
 } from './DesignSelectionTypes.js';
 import { DesignValues as V } from './DesignValues.js';
+import { DesignMaskSelection } from './DesignMaskSelection.js';
 import { DesignBooleanSelection } from './DesignBooleanSelection.js';
 
 interface PositionedLayer {
@@ -57,6 +58,10 @@ export class DesignSelection {
             plan = Tree.duplicate(context, identify);
         } else if (action === Action.Group) {
             plan = Tree.group(context, identify('group'));
+        } else if (action === Action.Mask) {
+            plan = DesignMaskSelection.create(context, identify('mask'));
+        } else if (action === Action.ReleaseMask) {
+            plan = DesignMaskSelection.release(context);
         } else if (action === Action.Ungroup) {
             plan = Tree.ungroup(context);
         } else if (

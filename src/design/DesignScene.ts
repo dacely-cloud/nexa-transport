@@ -18,6 +18,8 @@ export interface DesignSceneNode extends DesignNode {
     readonly instanceId: string | null;
     /** Source boxes remain editable while only their owning Boolean silhouette is painted. */
     readonly booleanOwner?: string;
+    /** Hidden source forests are painted only into their owning mask surface. */
+    readonly maskOwner?: string;
 }
 /** A page-local expanded scene is disposable; component instances remain compact in storage. */
 export interface DesignScenePage {
@@ -135,6 +137,19 @@ export class DesignScene {
                     instanceId,
                     parentId,
                     children,
+                    ...(edited.mask === undefined
+                        ? {}
+                        : {
+                              mask: {
+                                  ...edited.mask,
+                                  sourceId:
+                                      edited.mask.sourceId === null
+                                          ? null
+                                          : (children[
+                                                edited.children.indexOf(edited.mask.sourceId)
+                                            ] ?? null),
+                              },
+                          }),
                     style: this.#style(edited.style, tokens),
                 });
                 for (let index: number = 0; index < edited.children.length; index++) {
@@ -160,16 +175,22 @@ export class DesignScene {
                 node.parentId === null ? undefined : expanded.get(node.parentId);
             const owner: string | undefined =
                 parent?.kind === DesignKind.Boolean ? parent.id : parent?.booleanOwner;
-            const resolved: DesignSceneNode =
-                owner === undefined ? node : { ...node, booleanOwner: owner };
+            const maskOwner: string | undefined =
+                parent?.mask?.sourceId === node.id ? parent.id : parent?.maskOwner;
+            const resolved: DesignSceneNode = {
+                ...node,
+                ...(owner === undefined ? {} : { booleanOwner: owner }),
+                ...(maskOwner === undefined ? {} : { maskOwner }),
+            };
             nodes[index] = resolved;
             expanded.set(node.id, resolved);
         }
         return { page, nodes };
     }
     /** Derived empty silhouettes and retained operands do not allocate paint, image or effect work. */
-    public static paints(node: DesignSceneNode): boolean {
+    public static paints(node: DesignSceneNode, maskOwner: string | null = null): boolean {
         return (
+            (node.maskOwner ?? null) === maskOwner &&
             node.booleanOwner === undefined &&
             (node.kind !== DesignKind.Boolean || node.path.length > 0)
         );

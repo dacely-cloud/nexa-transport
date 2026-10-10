@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignMaskCodec } from './DesignMaskCodec.js';
 import { DesignBooleanMode } from './DesignBooleanTypes.js';
 import { DesignFlow } from './DesignTypes.js';
 import { DesignValues as V } from './DesignValues.js';
@@ -23,7 +24,7 @@ export class DesignNodeCodec {
     public static node(raw: unknown): DesignNode {
         const value: Readonly<Record<string, unknown>> = V.fields(
             raw,
-            [...KEYS, 'booleanMode'],
+            [...KEYS, 'booleanMode', 'mask'],
             KEYS,
         );
         const kind: DesignKind = V.choice(value['kind'], Object.values(DesignKind));
@@ -34,6 +35,7 @@ export class DesignNodeCodec {
             ...(kind === DesignKind.Boolean
                 ? { booleanMode: V.choice(value['booleanMode'], Object.values(DesignBooleanMode)) }
                 : {}),
+            ...(kind === DesignKind.Mask ? { mask: DesignMaskCodec.parse(value['mask']) } : {}),
             parentId: V.optionalId(value['parentId']),
             children: V.list(value['children'], 10000, (entry: unknown): string => V.id(entry)),
             x: V.number(value['x']),
@@ -65,9 +67,13 @@ export class DesignNodeCodec {
         }
         if (
             node.children.length > 0 &&
-            ![DesignKind.Frame, DesignKind.Group, DesignKind.Component, DesignKind.Boolean].some(
-                (entry: DesignKind): boolean => entry === kind,
-            )
+            ![
+                DesignKind.Frame,
+                DesignKind.Group,
+                DesignKind.Component,
+                DesignKind.Boolean,
+                DesignKind.Mask,
+            ].some((entry: DesignKind): boolean => entry === kind)
         ) {
             throw new Error('Only containers accept child layers');
         }
@@ -98,11 +104,14 @@ export class DesignNodeCodec {
         if (node.image !== null && kind !== DesignKind.Image) {
             throw new Error('Only image layers accept an image reference');
         }
+        if (kind !== DesignKind.Mask && Object.hasOwn(value, 'mask')) {
+            throw new Error('Only mask groups accept a mask source and mode');
+        }
         if (kind !== DesignKind.Boolean && Object.hasOwn(value, 'booleanMode')) {
             throw new Error('Only Boolean groups accept an operation mode');
         }
         if (
-            kind === DesignKind.Boolean &&
+            (kind === DesignKind.Boolean || kind === DesignKind.Mask) &&
             (node.layout.flow !== DesignFlow.Absolute ||
                 node.layout.clip ||
                 Object.values(node.layout.padding).some((value: number): boolean => value !== 0))

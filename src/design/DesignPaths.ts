@@ -32,14 +32,26 @@ export interface DesignPathGeometry {
 export class DesignPaths {
     /** Width and height edits resize vector coordinates unless the command supplies an explicit replacement path. */
     public static resize(node: DesignNode, changes: DesignNodeChanges): DesignNode {
-        const { booleanMode: previousMode, ...base } = node;
-        const { booleanMode: changedMode, ...properties } = changes;
+        const { booleanMode: previousMode, mask: previousMask, ...base }: DesignNode = node;
+        const {
+            booleanMode: changedMode,
+            mask: changedMask,
+            ...properties
+        }: DesignNodeChanges = changes;
         const kind: DesignNode['kind'] = properties.kind ?? node.kind;
+        if (changedMask !== undefined && changedMask !== null && kind !== DesignKind.Mask) {
+            throw new Error('Only mask groups accept a mask source and mode');
+        }
         const mode: DesignNode['booleanMode'] =
             changedMode === null ? undefined : (changedMode ?? previousMode);
         const next: DesignNode = {
             ...base,
             ...properties,
+            ...(kind === DesignKind.Mask &&
+            changedMask !== null &&
+            (changedMask ?? previousMask) !== undefined
+                ? { mask: changedMask ?? previousMask }
+                : {}),
             ...(kind === DesignKind.Boolean && mode !== undefined ? { booleanMode: mode } : {}),
         };
         if (

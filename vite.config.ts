@@ -26,6 +26,8 @@ const config: UserConfig = {
                 'design-edits': 'src/design/DesignEdits.ts',
                 'design-operation-types': 'src/design/DesignOperationTypes.ts',
                 'design-operation-codec': 'src/design/DesignOperationCodec.ts',
+                'design-mask-types': 'src/design/DesignMaskTypes.ts',
+                'design-mask-geometry': 'src/design/DesignMaskGeometry.ts',
                 'design-scene': 'src/design/DesignScene.ts',
                 'design-layout': 'src/design/DesignLayout.ts',
                 'design-layout-types': 'src/design/DesignLayoutTypes.ts',

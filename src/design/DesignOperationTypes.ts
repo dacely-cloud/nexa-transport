@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { DesignMask } from './DesignMaskTypes.js';
 import type { DesignBooleanMode } from './DesignBooleanTypes.js';
 
 import type {
@@ -34,6 +35,8 @@ export const DesignOperationKind = {
 export interface DesignNodeChanges {
     /** A null value clears the operation when explicitly flattening a Boolean group. */
     readonly booleanMode?: DesignBooleanMode | null;
+    /** Null clears masking when converting the container into an ordinary group. */
+    readonly mask?: DesignMask | null;
     readonly name?: string;
     readonly kind?: DesignKind;
     readonly x?: number;

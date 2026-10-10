@@ -33,6 +33,9 @@ export class DesignFreeze {
     /** Freezes one detached node and each of its nested editable records. */
     public static node(node: DesignNode): DesignNode {
         this.#style(node.style);
+        if (node.mask !== undefined) {
+            Object.freeze(node.mask);
+        }
         Object.freeze(node.layout.padding);
         Object.freeze(node.layout);
         Object.freeze(node.placement);

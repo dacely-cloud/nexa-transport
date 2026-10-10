@@ -9,6 +9,8 @@ import {
     type DesignStroke,
 } from './DesignTypes.js';
 import type { DesignSceneNode } from './DesignScene.js';
+import { DesignMaskMode } from './DesignMaskTypes.js';
+import { DesignMaskGeometry } from './DesignMaskGeometry.js';
 import { DesignSvgGeometry as Geometry } from './DesignSvgGeometry.js';
 import { DesignSvgPaints } from './DesignSvgPaints.js';
 import {
@@ -63,7 +65,12 @@ export class DesignSvg {
         const needed: Set<string> = new Set();
         let characters: number = 0;
         for (const box of selection.boxes) {
-            const node: DesignSceneNode | undefined = nodes.get(box.id);
+            const original: DesignSceneNode | undefined = nodes.get(box.id);
+            const node: DesignSceneNode | undefined =
+                original?.maskOwner !== undefined &&
+                nodes.get(original.maskOwner)?.mask?.mode === DesignMaskMode.Vector
+                    ? DesignMaskGeometry.vector(original)
+                    : original;
             if (node === undefined) {
                 continue;
             }
@@ -115,7 +122,12 @@ export class DesignSvg {
             if (!needed.has(id)) {
                 return '';
             }
-            const node: DesignSceneNode | undefined = nodes.get(id);
+            const original: DesignSceneNode | undefined = nodes.get(id);
+            const node: DesignSceneNode | undefined =
+                original?.maskOwner !== undefined &&
+                nodes.get(original.maskOwner)?.mask?.mode === DesignMaskMode.Vector
+                    ? DesignMaskGeometry.vector(original)
+                    : original;
             const box: DesignBox | undefined = boxes.get(id);
             if (node === undefined || box === undefined) {
                 return '';
@@ -123,8 +135,25 @@ export class DesignSvg {
             const children: string =
                 node.kind === DesignKind.Boolean && elements.has(id)
                     ? ''
-                    : node.children.map(tree).join('');
-            let element: string = `<g opacity="${node.opacity}"${paints.effects(node.style, box)}>${elements.get(id) ?? ''}${children}</g>`;
+                    : node.children
+                          .filter((child: string): boolean => child !== node.mask?.sourceId)
+                          .map(tree)
+                          .join('');
+            let content: string = `${elements.get(id) ?? ''}${children}`;
+            if (node.kind === DesignKind.Mask) {
+                const maskId: string = paints.identity('mask');
+                const source: string =
+                    node.mask?.sourceId === null || node.mask?.sourceId === undefined
+                        ? ''
+                        : tree(node.mask.sourceId);
+                const mode: string =
+                    node.mask?.mode === DesignMaskMode.Luminance ? 'luminance' : 'alpha';
+                paints.definitions.push(
+                    `<mask id="${maskId}" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse" x="${selection.x}" y="${selection.y}" width="${selection.width}" height="${selection.height}" style="mask-type:${mode};color-interpolation:sRGB">${source}</mask>`,
+                );
+                content = `<g mask="url(#${maskId})">${content}</g>`;
+            }
+            let element: string = `<g opacity="${node.opacity}"${paints.effects(node.style, box)}>${content}</g>`;
             let clipId: string | null = box.clipId;
             while (clipId !== null) {
                 const clip: DesignBox | undefined = boxes.get(clipId);

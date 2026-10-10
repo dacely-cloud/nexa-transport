@@ -75,6 +75,17 @@ export class DesignSelectionTree {
             }
             const copy: DesignNode = {
                 ...node,
+                ...(node.mask === undefined
+                    ? {}
+                    : {
+                          mask: {
+                              ...node.mask,
+                              sourceId:
+                                  node.mask.sourceId === null
+                                      ? null
+                                      : (remap.get(node.mask.sourceId) ?? node.mask.sourceId),
+                          },
+                      }),
                 id,
                 name: root ? (node.name.slice(0, 154) + ' copy').toWellFormed() : node.name,
                 parentId: null,

@@ -57,7 +57,7 @@ export class DesignComponentDetach {
                         : identify(instance.id + ':detach:' + node.id),
                 ]),
             );
-            const baked: DesignNode = this.#node(root, instance.id);
+            const baked: DesignNode = this.#node(root, instance.id, remap);
             operations.push({
                 op: Op.Update,
                 id: instance.id,
@@ -85,7 +85,7 @@ export class DesignComponentDetach {
                     nodes.get(node.parentId ?? '')?.children.indexOf(node.id) ?? -1;
                 operations.push({
                     op: Op.Insert,
-                    node: this.#node(node, id),
+                    node: this.#node(node, id, remap),
                     parentId,
                     pageId: context.pageId,
                     index,
@@ -140,9 +140,25 @@ export class DesignComponentDetach {
         }
         return count;
     }
-    static #node(node: DesignSceneNode, id: string): DesignNode {
+    static #node(
+        node: DesignSceneNode,
+        id: string,
+        remap: ReadonlyMap<string, string>,
+    ): DesignNode {
         return {
             id,
+            ...(node.booleanMode === undefined ? {} : { booleanMode: node.booleanMode }),
+            ...(node.mask === undefined
+                ? {}
+                : {
+                      mask: {
+                          ...node.mask,
+                          sourceId:
+                              node.mask.sourceId === null
+                                  ? null
+                                  : (remap.get(node.mask.sourceId) ?? null),
+                      },
+                  }),
             name: node.name,
             kind: node.kind === DesignKind.Component ? DesignKind.Frame : node.kind,
             parentId: null,

@@ -52,6 +52,35 @@ export class DesignSvgGeometry {
         if (selection.some((id: string): boolean => !source.has(id))) {
             throw new Error('Show the selected layers before exporting.');
         }
+        const requiredMasks: Set<string> = new Set();
+        for (const node of scene.nodes) {
+            if (!includes(node.id)) {
+                continue;
+            }
+            let current: DesignSceneNode | undefined = node;
+            while (current !== undefined) {
+                if (current.kind === DesignKind.Mask) {
+                    requiredMasks.add(current.id);
+                }
+                current = current.parentId === null ? undefined : nodes.get(current.parentId);
+            }
+        }
+        const maskSources: Set<string> = new Set();
+        const addSource: (id: string) => void = (id: string): void => {
+            if (maskSources.has(id)) {
+                return;
+            }
+            maskSources.add(id);
+            for (const child of nodes.get(id)?.children ?? []) {
+                addSource(child);
+            }
+        };
+        for (const id of requiredMasks) {
+            const sourceId: string | null | undefined = nodes.get(id)?.mask?.sourceId;
+            if (sourceId !== undefined && sourceId !== null) {
+                addSource(sourceId);
+            }
+        }
         const boxes: DesignBox[] = [];
         const assets: Set<string> = new Set();
         let left: number = Infinity;
@@ -63,10 +92,14 @@ export class DesignSvgGeometry {
             if (node === undefined) {
                 continue;
             }
-            if (node.booleanOwner !== undefined && includes(node.booleanOwner)) {
+            if (
+                node.booleanOwner !== undefined &&
+                (includes(node.booleanOwner) || maskSources.has(node.booleanOwner))
+            ) {
                 continue;
             }
-            let included: boolean = selected.size === 0 || selected.has(box.id);
+            let included: boolean =
+                selected.size === 0 || selected.has(box.id) || maskSources.has(box.id);
             let parent: string | null = node.parentId;
             while (!included && parent !== null) {
                 included = selected.has(parent);

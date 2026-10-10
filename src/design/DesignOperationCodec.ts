@@ -7,6 +7,7 @@ import { DesignStyleCodec } from './DesignStyleCodec.js';
 import { DesignLayoutCodec } from './DesignLayoutCodec.js';
 import { DesignKind, type DesignPathCommand, type DesignOverride } from './DesignTypes.js';
 import { DesignNodeCodec } from './DesignNodeCodec.js';
+import { DesignMaskCodec } from './DesignMaskCodec.js';
 import { DesignBooleanMode } from './DesignBooleanTypes.js';
 import {
     DesignOperationKind as Kind,
@@ -173,6 +174,9 @@ export class DesignOperationCodec {
                               : V.choice(value['booleanMode'], Object.values(DesignBooleanMode)),
                   }
                 : {}),
+            ...(Object.hasOwn(value, 'mask')
+                ? { mask: value['mask'] === null ? null : DesignMaskCodec.parse(value['mask']) }
+                : {}),
             ...(Object.hasOwn(value, 'kind')
                 ? { kind: V.choice(value['kind'], Object.values(DesignKind)) }
                 : {}),
@@ -227,6 +231,7 @@ export class DesignOperationCodec {
 }
 const KEYS: readonly string[] = [
     'booleanMode',
+    'mask',
     'name',
     'kind',
     'x',
