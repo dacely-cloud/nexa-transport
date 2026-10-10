@@ -1003,6 +1003,38 @@ export class NexaClient {
     public onSequenceGap(listener: (gap: SequenceGap) => void): () => void {
         return this.#disposed ? (): void => {} : subscribe(this.#gaps, listener);
     }
+    /** Sends a bounded disk upload chunk as raw bytes, preserving RPC acknowledgements and cancellation. */
+    public async uploadChunk(
+        uploadId: string,
+        offset: string,
+        bytes: Uint8Array,
+        options: CallOptions = {},
+    ): Promise<ResultOf<typeof Method.DataUploadChunk>> {
+        if (!this.connected) {
+            throw new TransportError(TransportErrorCode.Closed, 'Client is not connected');
+        }
+        if (
+            this.hello.features.binaryDataUploads !== true ||
+            !this.hello.features.methods.includes(Method.DataUploadChunk)
+        ) {
+            throw new TransportError(
+                TransportErrorCode.Protocol,
+                'Raw file uploads require an updated NEXA gateway',
+            );
+        }
+        try {
+            return await this.#call(
+                Method.DataUploadChunk,
+                { id: uploadId, offset, data: '' },
+                options,
+                (requestId: string): Uint8Array<ArrayBuffer> =>
+                    BinaryEnvelope.encodeUploadChunk(requestId, uploadId, offset, bytes),
+            );
+        } catch (error: unknown) {
+            rethrow(error);
+        }
+    }
+
     /** Uploads a large File/Blob to disk; pass its returned path to the agent for analysis. */
     public uploadData(
         source: Blob,
@@ -1124,6 +1156,7 @@ export class NexaClient {
         method: M,
         params: ParamsOf<M>,
         options: CallOptions,
+        encodeBinary?: (requestId: string) => Uint8Array<ArrayBuffer>,
     ): Promise<ResultOf<M>> {
         if (!Object.hasOwn(methodValidators, method) || !methodValidators[method].params(params)) {
             throw materializeError(new TypeError('Invalid RPC parameters'));
@@ -1157,7 +1190,11 @@ export class NexaClient {
             try {
                 const text: string = JSON.stringify({ v: 1, id, method, params });
                 const binary: Uint8Array<ArrayBuffer> | null =
-                    this.#hello?.features.binaryMedia === true ? BinaryEnvelope.encode(text) : null;
+                    encodeBinary !== undefined
+                        ? encodeBinary(id)
+                        : this.#hello?.features.binaryMedia === true
+                          ? BinaryEnvelope.encode(text)
+                          : null;
                 const payload: string | Uint8Array<ArrayBuffer> = binary ?? text;
                 const payloadBytes: number =
                     binary?.byteLength ?? new TextEncoder().encode(text).length;

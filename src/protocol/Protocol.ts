@@ -5010,6 +5010,8 @@ export type FunnelReport = FunnelReportShape;
 export interface GatewayFeaturesShape {
     /** attachments as defined by the Nexa gateway. */
     readonly attachments?: true;
+    /** binaryDataUploads as defined by the Nexa gateway. */
+    readonly binaryDataUploads?: true;
     /** binaryMedia as defined by the Nexa gateway. */
     readonly binaryMedia?: true;
     /** events as defined by the Nexa gateway. */

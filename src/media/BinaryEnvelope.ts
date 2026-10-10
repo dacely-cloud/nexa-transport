@@ -2,10 +2,11 @@
 interface BinaryJsonObject {
     [key: string]: JsonValue;
 }
-type JsonValue = null | boolean | number | string | JsonValue[] | BinaryJsonObject;
+type JsonValue =
+    null | boolean | number | string | Uint8Array<ArrayBuffer> | JsonValue[] | BinaryJsonObject;
 
 /** Encoding retained by the JSON-facing protocol after wire bytes are restored. */
-const BinaryEncoding = { Base64: 'base64', Array: 'array' } as const;
+const BinaryEncoding = { Base64: 'base64', Array: 'array', Bytes: 'bytes' } as const;
 type BinaryEncoding = (typeof BinaryEncoding)[keyof typeof BinaryEncoding];
 interface BinaryPart {
     readonly path: readonly string[];
@@ -49,6 +50,50 @@ export class BinaryEnvelope {
         return frame;
     }
 
+    /** Encodes one disk upload chunk without converting its bytes to a string. */
+    public static encodeUploadChunk(
+        requestId: string,
+        uploadId: string,
+        offset: string,
+        bytes: Uint8Array,
+    ): Uint8Array<ArrayBuffer> {
+        if (
+            bytes.byteLength < 1 ||
+            bytes.byteLength > 192 * 1024 ||
+            requestId.length > 128 ||
+            uploadId.length > 128 ||
+            !/^(0|[1-9][0-9]{0,11})$/u.test(offset)
+        ) {
+            throw new RangeError('Invalid raw upload chunk');
+        }
+        const header: Uint8Array<ArrayBuffer> = new TextEncoder().encode(
+            JSON.stringify({
+                json: {
+                    v: 1,
+                    id: requestId,
+                    method: 'data.upload.chunk',
+                    params: { id: uploadId, offset, data: null },
+                },
+                parts: [
+                    {
+                        path: ['params', 'data'],
+                        length: bytes.byteLength,
+                        encoding: BinaryEncoding.Bytes,
+                    },
+                ],
+            }),
+        );
+        const frame: Uint8Array<ArrayBuffer> = new Uint8Array(
+            8 + header.byteLength + bytes.byteLength,
+        );
+        const view: DataView = new DataView(frame.buffer);
+        view.setUint32(0, 0x4e584246);
+        view.setUint32(4, header.byteLength);
+        frame.set(header, 8);
+        frame.set(bytes, 8 + header.byteLength);
+        return frame;
+    }
+
     /** Restores fields within the wire limit and a bounded base64 expansion budget, or an explicit JSON cap. */
     public static decode(
         buffer: ArrayBuffer,
@@ -88,6 +133,19 @@ export class BinaryEnvelope {
             if (!BinaryEnvelope.#part(part) || part.length > buffer.byteLength - offset) {
                 throw new TypeError('Invalid binary envelope part');
             }
+            if (
+                part.encoding === BinaryEncoding.Bytes &&
+                (!BinaryEnvelope.#record(json) ||
+                    json['method'] !== 'data.upload.chunk' ||
+                    part.path.length !== 2 ||
+                    part.path[0] !== 'params' ||
+                    part.path[1] !== 'data' ||
+                    part.length < 1 ||
+                    part.length > 192 * 1024 ||
+                    header['parts'].length !== 1)
+            ) {
+                throw new TypeError('Raw bytes are restricted to bounded disk upload chunks');
+            }
             const bytes: Uint8Array<ArrayBuffer> = new Uint8Array(buffer, offset, part.length);
             offset += part.length;
             let target: JsonValue = json;
@@ -100,6 +158,7 @@ export class BinaryEnvelope {
                     key === 'prototype' ||
                     typeof target !== 'object' ||
                     target === null ||
+                    target instanceof Uint8Array ||
                     !Object.hasOwn(target, key)
                 ) {
                     throw new TypeError('Invalid binary field path');
@@ -115,7 +174,10 @@ export class BinaryEnvelope {
                         throw new TypeError('Binary field must reference an unused placeholder');
                     }
                     // Check expansion before allocating a number array or base64 string.
-                    let replacementBytes: number = 2 + Math.ceil(bytes.length / 3) * 4;
+                    let replacementBytes: number =
+                        part.encoding === BinaryEncoding.Bytes
+                            ? bytes.length
+                            : 2 + Math.ceil(bytes.length / 3) * 4;
                     if (part.encoding === BinaryEncoding.Array) {
                         replacementBytes = 2 + Math.max(0, bytes.length - 1);
                         for (const byte of bytes) {
@@ -127,9 +189,11 @@ export class BinaryEnvelope {
                         throw new RangeError('Decoded binary JSON exceeds limit');
                     }
                     const replacement: JsonValue =
-                        part.encoding === BinaryEncoding.Array
-                            ? Array.from(bytes)
-                            : BinaryEnvelope.#base64(bytes);
+                        part.encoding === BinaryEncoding.Bytes
+                            ? bytes
+                            : part.encoding === BinaryEncoding.Array
+                              ? Array.from(bytes)
+                              : BinaryEnvelope.#base64(bytes);
                     if (Array.isArray(target)) {
                         target[Number(key)] = replacement;
                     } else {
@@ -163,7 +227,7 @@ export class BinaryEnvelope {
         if (depth > 24) {
             throw new RangeError('Binary JSON nesting limit exceeded');
         }
-        if (typeof value !== 'object' || value === null) {
+        if (typeof value !== 'object' || value === null || value instanceof Uint8Array) {
             return;
         }
         for (const [key, child] of Object.entries(value)) {
@@ -250,7 +314,8 @@ export class BinaryEnvelope {
             Number.isSafeInteger(value['length']) &&
             value['length'] >= 0 &&
             (value['encoding'] === BinaryEncoding.Base64 ||
-                value['encoding'] === BinaryEncoding.Array)
+                value['encoding'] === BinaryEncoding.Array ||
+                value['encoding'] === BinaryEncoding.Bytes)
         );
     }
     static #json(value: unknown, depth: number = 0): value is JsonValue {

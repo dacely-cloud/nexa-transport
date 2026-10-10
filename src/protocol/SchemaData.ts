@@ -7579,6 +7579,12 @@ export const schema: Schema = {
                     description: 'User media attachments are validated and forwarded to the agent.',
                     type: 'boolean',
                 },
+                binaryDataUploads: {
+                    const: true,
+                    description:
+                        'Disk upload chunks retain raw bytes from the wire through durable storage.',
+                    type: 'boolean',
+                },
                 binaryMedia: {
                     const: true,
                     description:

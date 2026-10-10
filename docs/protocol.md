@@ -3446,6 +3446,7 @@ Methods, events, and additive capabilities supported by this gateway.
 | Field                       | Required | Type                                               | Description                                                                                    |
 | --------------------------- | -------- | -------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
 | `attachments`               | No       | `true`                                             | User media attachments are validated and forwarded to the agent.                               |
+| `binaryDataUploads`         | No       | `true`                                             | Disk upload chunks retain raw bytes from the wire through durable storage.                     |
 | `binaryMedia`               | No       | `true`                                             | NXMD frames carry outbound file bytes; JSON results contain matching metadata.                 |
 | `events`                    | Yes      | Array of `string`                                  |                                                                                                |
 | `methodScopes`              | Yes      | [RecordstringScope](protocol.md#recordstringscope) | The scope each method requires.                                                                |
