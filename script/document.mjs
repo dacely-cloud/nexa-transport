@@ -103,7 +103,7 @@ const enumName = (method) =>
 let reference = `# RPC reference\n\nAll ${Object.keys(methods).length} protocol methods. \`connect\` is managed by \`NexaClient.connect\`; the remaining ${Object.keys(methods).length - 1} use \`client.call(Method.Name, params)\`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.\n\n`;
 reference +=
     Object.keys(methods)
-        .map((name) => `- [${name}](#${name.replaceAll('.', '-')})`)
+        .map((name) => `- [${name}](#${name.replaceAll('.', '').toLowerCase()})`)
         .join('\n') + '\n\n';
 for (const [name, entry] of Object.entries(methods)) {
     const { params, result } = entry.properties;

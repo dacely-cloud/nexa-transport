@@ -49,3 +49,19 @@ ordinary triangle-mesh PLY loader. PNG previews work without any 3D renderer.
 `NexaMedia.nativeEvent` preserves typed geometry acceptance, progress, preview,
 chunk and completion events, including binary byte normalization. Generated
 asset files use binary attachment delivery; they are not embedded in chat text.
+
+## Metadata-only and saved-file reads
+
+Live delivery normally provides raw bytes through `onAttachment`. Supporting
+gateways accept `ClientOptions.client.metadataOnlyAttachments: true` to send live
+file metadata while keeping originals in the owned session. Session file listing
+and `resumeSession` are always metadata reads; they do not prefetch file contents.
+Call `downloadSessionFile(sessionId, attachmentId, signal?)` for a selected file,
+or use `Method.SessionsDownload` with the ordinary attachment listener. The SDK
+matches the session and attachment identity before returning the original bytes.
+See [session recovery](sessions.md) for reconciliation and callback ownership.
+
+These binary media frames use big-endian integers. Office/company channels on the
+same socket have their own magic/version/endianness and dedicated codecs; they
+are not NXMD/NXBF payloads. Use [Office/company helpers](office-company.md) rather
+than applying this frame layout to every binary WebSocket message.

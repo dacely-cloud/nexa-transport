@@ -32,4 +32,7 @@ JSON is fetched only through All evidence. The demo includes Browser structure.
 
 Script/resource directories and exports are covered in [saved browser sources](reverse-browser-sources.md).
 Managed saved-source analysis and planning are covered by that source contract.
-Screenshots, storage, WebMCP, scenarios, comparisons and full REA parity remain unfinished.
+Saved [screenshots and pixel comparisons](reverse-browser-screenshots.md),
+[storage and storage comparisons](reverse-browser-storage.md), and passive
+[WebMCP declarations](reverse-browser-webmcp.md) have separate bounded contracts.
+These additions do not establish complete REA parity or scenario execution.

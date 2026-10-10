@@ -6,7 +6,8 @@ contains coverage, counts and an immutable reference to the original conversatio
 run, evidence ID and capture SHA-256. It never embeds code or full inventories.
 
 Use `Method.ReverseBrowserSources` through the authenticated Nexa WebSocket with
-the reference's `sessionId`, `runId` and `evidenceId`. Select `view: "scripts"` or
+`id: reference.sessionId`, `runId: reference.runId`, and
+`evidenceId: reference.evidenceId`. Select `view: "scripts"` or
 `"resources"` for metadata only. Select `view: "source"` with the exact captured
 script's `id` as `selector` to retrieve code. Follow `nextCursor` for that view;
 directory and source cursors are independent. `ReverseInvestigation.sources`
@@ -46,5 +47,9 @@ against `browserInput.sourceRunSha256`, not the derived run's hash. Static evide
 and agent progress use the child run. Chat preserves both views and RE Demo
 includes Browser analysis. No target code runs during saved-source analysis.
 
-Import maps, specialized bundle extraction, runtime reachability, larger captures,
-screenshots, storage, WebMCP, scenarios and comparisons remain unfinished.
+Saved [module-import reports](reverse-browser-modules.md),
+[screenshots and pixel comparisons](reverse-browser-screenshots.md),
+[storage and storage comparisons](reverse-browser-storage.md), and passive
+[WebMCP declarations](reverse-browser-webmcp.md) use separate contracts. Selecting
+a workspace import map for a new saved-source analysis remains unfinished, as do
+specialized bundle extraction, runtime reachability, larger captures, and scenarios.

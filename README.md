@@ -38,10 +38,19 @@ Chat, tools, media, artifacts, and voice through the Nexa gateway.
 
 - [Complete usage guide](./docs/guide.md): conversations, running work, tools, skills, audio, images, GIFs, video, generation, documents, artifacts, and ZIP workflows.
 - [Memory testing and ownership](./docs/memory.md): cleanup guarantees, regression tests, and browser stress tests.
-- [Client API](./docs/client.md): every client method, helper, option, event, and error.
-- [RPC reference](./docs/methods.md): all 54 methods with call templates, parameters, and results.
+- [Client API](./docs/client.md): client methods, helpers, options, events, and errors.
+- [Package entry points](./docs/exports.md): every public runtime/type import and its contract.
+- [Session recovery](./docs/sessions.md): stream acceptance, cancellation/detachment, durable history, and lazy saved-file downloads.
+- [Office and company APIs](./docs/office-company.md): movement, geometry, private staffing, project decisions/files, budgets, and passive reports.
+- [Reverse-engineering APIs](./docs/reverse-investigation.md): live receipts, replay, and each saved-evidence query family.
+- [Runtime controls and integrations](./docs/operations.md): processes, scheduled jobs, wallets, Roblox, and administration.
+- [RPC reference](./docs/methods.md): every bundled method with call templates, parameters, and results.
 - [Binary media protocol](./docs/binary-media.md): raw bytes, chunking, limits, and file delivery.
 - [Protocol types](./docs/protocol.md): every payload field and union variant.
+- [Workflows](./docs/workflows.md): capability checks, drafts, deletion, runs, models, templates, HTTP requests, terminal agents, and usage.
+- [Workflow resources](./docs/workflow-resources.md) and [schedules](./docs/workflow-schedules.md): bindings, groups, immutable publications, and timed execution.
+- [Saved browser evidence](./docs/reverse-browser-webmcp.md): passive WebMCP declarations and links to source, module, storage, structure, and screenshot reads.
+- [Steering](./docs/steering.md) and [streaming voice](./docs/streaming-voice.md): active-turn corrections and microphone transcripts.
 
 ## Features
 
@@ -60,7 +69,7 @@ Chat, tools, media, artifacts, and voice through the Nexa gateway.
 
 Requires Node.js 22+ or a modern browser. Distributed as ESM with TypeScript declarations.
 
-Build a package from source:
+Build a package from source (`npm pack` runs the full check/build hooks):
 
 ```bash
 git clone git@github.com:dacely-cloud/nexa-transport.git
@@ -74,6 +83,8 @@ Install the resulting archive in your application:
 ```bash
 npm install /path/to/nexa-transport-0.1.0.tgz
 ```
+
+For a checked-in `file:vendor/…tgz` dependency, retain the archive at that relative path and commit the matching package.json/lockfile integrity. Give rebuilt archives a new filename and reinstall that file; changing bytes under an existing filename can leave stale integrity metadata. The package is ESM: use ES imports and `import type` for [type-only entry points](./docs/exports.md).
 
 ## Quick start
 
@@ -149,7 +160,7 @@ Nexa retains conversation history server-side. Save the `sessionKey` to resume a
 `await client.readHistorySnapshot(sessionKey)` reads the complete presentation journal,
 including reasoning and tools. Pass a previous snapshot's `endCursor` to read only
 new records. Large snapshots overlap up to 16 page requests, reserving half the
-client's pending RPC capacity and at most 4 MiB of raw page lookahead. Pages are
+client's pending RPC capacity and at most 16 MiB of raw page lookahead. Pages are
 decoded in journal order against one fixed snapshot boundary; every record is
 validated, and failed reads cancel outstanding lookahead. The stored history is
 preserved in full.
@@ -365,23 +376,29 @@ Explicit API-key and device authentication use query parameters on the WebSocket
 
 ## API
 
-| Method family                                        | Operations                                          |
-| ---------------------------------------------------- | --------------------------------------------------- |
-| `Method.Agent*`                                      | Run turns, stream, list agents, define agents       |
-| `Method.Sessions*`                                   | List, get, messages, delete, subscribe, unsubscribe |
-| `Method.Tasks*`                                      | List, get, cancel                                   |
-| `Method.Approvals*`                                  | List, resolve                                       |
-| `Method.Jobs*`                                       | List, add, remove                                   |
-| `Method.Credit*`                                     | Budgets, set budget, remove budget, summary         |
-| `Method.Channels*`                                   | List, status, dead letters                          |
-| `Method.Workspaces*`                                 | List, describe, create, destroy                     |
-| `Method.Devices*`                                    | List, approve, reject, revoke                       |
-| `Method.Accounts*`                                   | List, create, remove, usage                         |
-| `Method.Teams*`, `Method.Shares*`                    | List, create, set member, remove                    |
-| `Method.Config*`, `Method.LogsTail`, `Method.Health` | Configuration, logs, health                         |
-| `Method.Voice*`                                      | Start, audio, stop                                  |
+| Method family                                        | Operations                                                                 |
+| ---------------------------------------------------- | -------------------------------------------------------------------------- |
+| `Method.Agent*`                                      | Run turns, stream, steer, list/define agents                               |
+| `Method.Sessions*`                                   | List/read/rename/delete, history, files, pins, input, retry, subscriptions |
+| `Method.Tasks*`                                      | List, get, cancel                                                          |
+| `Method.Approvals*`                                  | List, resolve                                                              |
+| `Method.Jobs*`                                       | List, add, remove                                                          |
+| `Method.Credit*`                                     | Budgets, summary, wallet and transaction history                           |
+| `Method.Channels*`                                   | List, status, dead letters                                                 |
+| `Method.Workspaces*`                                 | List, describe, create, destroy                                            |
+| `Method.Devices*`                                    | List, approve, reject, revoke                                              |
+| `Method.Accounts*`                                   | List, create, remove, usage                                                |
+| `Method.Teams*`, `Method.Shares*`                    | List, create, set member, remove                                           |
+| `Method.Config*`, `Method.LogsTail`, `Method.Health` | Configuration, logs, health                                                |
+| `Method.DataUpload*`                                 | Stream large files into the account workspace                              |
+| `Method.Processes*`                                  | List/log/input/resize/stop session-owned processes                         |
+| `Method.Reverse*`                                    | Saved investigations and owner-scoped evidence reads                       |
+| `Method.Roblox*`                                     | Account connections and owned telemetry queries                            |
+| `Method.Workflows*`                                  | Drafts, planning, runs, models, publications, schedules, usage             |
+| `Method.OfficeOwnerProof`, `Method.MediaAcknowledge` | Backend owner proof and SDK-managed delivery receipt                       |
+| `Method.Voice*`                                      | Start, audio, stop                                                         |
 
-For voice, `Method.VoiceStart` returns the call ID, sample rate, and frame size. Send base64 PCM16 through `Method.VoiceAudio`, receive audio and transcripts through `EventName.VoiceAudio` and `EventName.VoiceEvent`, and finish with `Method.VoiceStop`.
+For voice, `client.startVoice()` returns the call ID, sample rate, and frame size. Send mono PCM16 bytes with `client.sendAudio(callId, bytes)`, receive bytes through `onAudio` and caller transcripts through `onTranscript`, then finish with `client.stopVoice(callId)`. Binary-capable gateways use raw frames; the helpers retain the base64 RPC fallback for older gateways.
 
 | Import                          | Exports                                |
 | ------------------------------- | -------------------------------------- |
@@ -411,7 +428,7 @@ Connection options are passed to `NexaClient.connect()`. Per-call `signal` and `
 
 Blob helpers accept up to 100 MiB per attachment, with a combined upload limit of 100 MiB per request. Binary transfers use chunks of up to 256 KiB within the gateway's frame limits. Streams exceeding their buffer limits are cancelled. Active and queued binary uploads share a 101 MiB budget per client; excess uploads are rejected with a limit error. Queued uploads are released on cancellation, timeout, or disconnect. Outstanding attachment callbacks and acknowledgements are limited to 64 deliveries and 101 MiB per client; exceeding either limit closes the connection.
 
-RPC cancellation stops local waiting; a server-side mutation may already have executed. Requests are not retried automatically. Reconnect with `NexaClient.connect()`, restore subscriptions, and reload session state. `TransportError.remote` preserves server error codes, retry information, and details.
+RPC cancellation stops local waiting; a server-side mutation may already have executed. Requests are not retried automatically. Established connections reconnect automatically unless `reconnect: false` is set. Successful session subscriptions and supported binary read watches are restored; refresh history and tasks in `onReconnect`. After a page reload, create a client and call `resumeSession(sessionKey)`. `close()` permanently stops reconnects. `TransportError.remote` preserves server error codes, retry information, and details.
 
 ## Gateway compatibility
 
@@ -428,21 +445,24 @@ npm ci
 npm run check
 ```
 
-| Command                       | Purpose                                                   |
-| ----------------------------- | --------------------------------------------------------- |
-| `npm run build`               | Build ESM bundles and declarations                        |
-| `npm run typecheck`           | Check TypeScript contracts                                |
-| `npm run lint`                | Run type-aware Oxc checks                                 |
-| `npm run format`              | Format source and documentation                           |
-| `npm test`                    | Run library tests                                         |
-| `npm run test:memory`         | Build and run forced-GC retention and memory stress tests |
-| `npm run test:memory:browser` | Run the two-tab Chrome memory stress test                 |
-| `npm run test:gateway`        | Run Nexa gateway and Chrome integration tests             |
-| `npm run generate`            | Regenerate protocol types and schemas                     |
-| `npm pack`                    | Build and package a release                               |
-| `npm run test:package`        | Verify the packed package in an isolated consumer         |
+| Command                       | Purpose                                                         |
+| ----------------------------- | --------------------------------------------------------------- |
+| `npm run build`               | Build ESM bundles and declarations                              |
+| `npm run typecheck`           | Check TypeScript contracts                                      |
+| `npm run lint`                | Run type-aware Oxc checks                                       |
+| `npm run format`              | Format source and documentation                                 |
+| `npm test`                    | Run library tests                                               |
+| `npm run test:memory`         | Build and run forced-GC retention and memory stress tests       |
+| `npm run test:memory:browser` | Run the two-tab Chrome memory stress test                       |
+| `npm run test:gateway`        | Run Nexa gateway and Chrome integration tests                   |
+| `npm run generate`            | Regenerate protocol types, schemas, and workflow contracts      |
+| `npm run generate:workflows`  | Copy portable workflow contracts from the sibling Nexa checkout |
+| `npm run docs`                | Regenerate RPC/type references and format documentation         |
+| `npm run docs:check`          | Compile TypeScript examples across README and documentation     |
+| `npm pack`                    | Build and package a release                                     |
+| `npm run test:package`        | Verify the packed package in an isolated consumer               |
 
-Protocol generation requires a sibling `nexa` checkout. Gateway tests additionally require the transport integration fixtures in that checkout and Google Chrome. Package verification requires a generated tarball.
+`npm run docs:check` also checks package import names against the export map and requires every public entry point in the index. Protocol generation requires a sibling `nexa` checkout. Gateway tests additionally require the transport integration fixtures in that checkout and Google Chrome. Package verification requires a generated tarball.
 
 See [Chat.ts](./examples/Chat.ts) and [Node.ts](./examples/Node.ts) for application examples.
 
@@ -502,12 +522,17 @@ are separate operations. See `examples/Geometry.ts` for subscription cleanup.
 
 Use `uploadData` for large documents or datasets. It sends acknowledged 192 KiB slices to the user's workspace instead of creating a whole-file base64 attachment:
 
-```typescript
-const uploaded = await client.uploadData(file, file.name, {
+```ts
+import type { DataFile } from 'nexa-transport/protocol';
+import type { TurnStream } from 'nexa-transport/stream';
+
+declare const file: File;
+const controller: AbortController = new AbortController();
+const uploaded: DataFile = await client.uploadData(file, file.name, {
     signal: controller.signal,
-    onProgress: (bytes, total) => console.log(bytes, total),
+    onProgress: (bytes: bigint, total: bigint): void => console.log(bytes, total),
 });
-const turn = client.stream({
+const turn: TurnStream = client.stream({
     message: `Analyze the entire dataset at ${JSON.stringify(uploaded.path)} using import_dataset and query_dataset.`,
 });
 ```
@@ -568,8 +593,6 @@ Results retain exact microcent strings, request settings, pricing/capability ref
 `workflows.models.image.resolve` is an authenticated read-only preview for a configured image provider, an image policy and the settings of every connected render. The `workflow-image-policy` entry point exposes strict policy/evidence validation; `workflow-image-resolution` exposes request/result codecs. Image limits use a decimal-integer microcent ceiling per complete render, independently of text-token rates. Negotiate the method through the server hello before calling it. Previewing does not save a graph, generate an image or reserve credits.
 
 Latest image run snapshots retain their exact provider/model, original policy evidence, supported settings and pricing reference. The portable run codec accepts these records while preserving existing exact image snapshots. Failed or ambiguous resolution returns an explicit reason. A model listing is not a successful generation or billing check.
-
-Validation for this addition: 179 SDK tests, 12 memory checks, 143 documentation examples, strict types/lint and the packed Node/NodeNext consumer passed. Editor policy controls and live mixed-provider verification remain outside this completed transport increment.
 
 Investigation receipts may include an adaptive `plan` with evidence-linked
 follow-ups, scope owners, dependency step ids and runtime states. Missing `plan`

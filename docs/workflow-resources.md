@@ -1,6 +1,6 @@
 # Workflow resource contracts
 
-The workflow foundation has these portable package entry points:
+See the [workflow guide](workflows.md) for current execution, model, template, HTTP, terminal and usage APIs. The resource and draft foundation has these portable package entry points:
 
 | Import                                       | Purpose                                                                             |
 | -------------------------------------------- | ----------------------------------------------------------------------------------- |
@@ -43,14 +43,15 @@ locally before sending. `supportsWorkflowGraph` separately checks
 Validation names an immutable saved revision and returns structural diagnostics;
 it never grants permission to run or claims handlers are installed.
 Create/save carry durable command IDs; save also requires
-the expected revision. The SDK does not automatically replay mutations.
+the expected revision. The SDK does not automatically replay mutations. `Method.WorkflowsDelete` is additive: check that it is advertised and submit `{ workflowId, expectedRevision }`. Deletion retains immutable execution history; see the [deletion example](workflows.md#drafts-and-deletion).
 
 Direct patches are limited to 1 MiB encoded UTF-8 JSON. Read returns bounded
 manifest reference pages; subsequent pages must pin the first page's revision.
 Record returns bounded JSON text chunks to concatenate before parsing. Large
-uploads still require a future staged-upload capability. Planning, execution and
-UI integration remain under development. No new operational workspace connector
-is implemented. Syntax validation is not graph validation or permission to publish.
+uploads still require a separate staged-upload capability. Planning, durable runs,
+publications and timed activation have separately negotiated APIs; draft support
+alone does not imply they are available. Resource descriptors do not install
+operational adapters. Syntax validation is not graph validation or permission to publish.
 
 ## Nested workflow groups
 

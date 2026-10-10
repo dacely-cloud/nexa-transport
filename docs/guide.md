@@ -11,9 +11,15 @@
 - [Audio and live voice](#audio-and-live-voice)
 - [Tools, skills, and approvals](#tools-skills-and-approvals)
 - [Events and synchronization](#events-and-synchronization)
+- [Workflows](workflows.md)
 - [Administration](#administration)
 - [Errors and limits](#errors-and-limits)
 - [Complete reference](#complete-reference)
+- [Session recovery](sessions.md)
+- [Office and company APIs](office-company.md)
+- [Reverse-engineering APIs](reverse-investigation.md)
+- [Runtime controls and integrations](operations.md)
+- [Package entry points](exports.md)
 
 ## Connection and identity
 
@@ -63,7 +69,7 @@ if (deviceToken !== undefined) {
 }
 ```
 
-Pairing requires gateway support and an operator-issued code. Shared operator tokens and device credentials have different authority from personal keys. `hello.features.methods` describes the gateway catalog; it does not guarantee your key may call every listed method. Scope checks and per-user policy both apply. Personal keys currently cover chat, health, agent listing, and permitted session/task/workspace methods; subscriptions and administrative calls may require a device or operator credential. Personal keys can use live voice when it is configured on the server.
+Pairing requires gateway support and an operator-issued code. Shared operator tokens and device credentials have different authority from personal keys. `hello.features.methods` describes the gateway catalog; it does not guarantee your key may call every listed method. Scope checks and per-user policy both apply. Personal keys can use permitted chat, voice, session subscriptions, task and workspace methods under their account. Administrative calls may require a device or operator credential; always use the negotiated catalog and server authorization rather than assuming authority from the credential type. Personal keys can use live voice when it is configured on the server.
 
 Connection options also include `scopes`, `client: { id, version, platform }`, `signal`, `onListenerError`, and resource limits. `scopes` requests a subset of authority; it cannot grant additional privileges. See [client options](client.md).
 
@@ -173,7 +179,7 @@ Task IDs, stream IDs, and session IDs are distinct. A task record is not guarant
 
 ## Images, GIFs, video, and documents
 
-Check `client.hello.features.attachments` before relying on attachments. Supported inbound block types are `image`, `video`, `video-frame`, and `document`. Each accepts an inline source or a URL source. When `hello.features.binaryMedia` is true, the SDK sends inline image, video, frame, and document bytes in binary WebSocket frames. Existing base64-shaped protocol objects remain compatible; their payload strings are removed from the JSON header and transported as raw bytes. There is no arbitrary filesystem upload RPC.
+Check `client.hello.features.attachments` before relying on attachments. Supported inbound block types are `image`, `video`, `video-frame`, and `document`. Each accepts an inline source or a URL source. When `hello.features.binaryMedia` is true, the SDK sends inline image, video, frame, and document bytes in binary WebSocket frames. Existing base64-shaped protocol objects remain compatible; their payload strings are removed from the JSON header and transported as raw bytes. For large files, `client.uploadData` uses the account workspace data-upload methods and returns a server-chosen path; it does not accept an arbitrary destination path.
 
 Browser `File` objects are `Blob` objects and work directly:
 
@@ -432,23 +438,29 @@ Native events preserve the NCAP fields for content, reasoning, status, usage, to
 
 All method families are documented individually in the [RPC reference](methods.md):
 
-| Family          | Operations                                          |
-| --------------- | --------------------------------------------------- |
-| Agent           | Ask, stream, list and define agents                 |
-| Sessions        | List, get, messages, delete, subscribe, unsubscribe |
-| Tasks           | List, get, cancel                                   |
-| Workspaces      | List, describe, create, destroy                     |
-| Approvals       | List and resolve                                    |
-| Jobs            | List, add and remove scheduled jobs                 |
-| Credit          | Summary, budgets, set and remove budget             |
-| Channels        | List, status, dead letters                          |
-| Devices         | List, approve, reject and revoke pairing            |
-| Accounts        | List, create, remove and usage                      |
-| Teams           | List, create, set member and remove                 |
-| Shares          | List, create and remove                             |
-| Config          | Get, set and unset                                  |
-| Logs and health | Log tail and health check                           |
-| Voice           | Start, audio and stop                               |
+| Family           | Operations                                                            |
+| ---------------- | --------------------------------------------------------------------- |
+| Agent            | Ask, stream, steer, list and define agents                            |
+| Sessions         | History, files, pins, rename, input/retry, subscriptions and deletion |
+| Tasks            | List, get, cancel                                                     |
+| Workspaces       | List, describe, create, destroy                                       |
+| Approvals        | List and resolve                                                      |
+| Jobs             | List, add and remove scheduled jobs                                   |
+| Credit           | Summary, budgets, wallet and transaction history                      |
+| Channels         | List, status, dead letters                                            |
+| Devices          | List, approve, reject and revoke pairing                              |
+| Accounts         | List, create, remove and usage                                        |
+| Teams            | List, create, set member and remove                                   |
+| Shares           | List, create and remove                                               |
+| Config           | Get, set and unset                                                    |
+| Logs and health  | Log tail and health check                                             |
+| Data uploads     | Start, chunk, finish, cancel (normally managed by uploadData)         |
+| Processes        | List, log, input, resize, stop                                        |
+| Reverse          | Saved investigations and evidence pages                               |
+| Roblox           | Credentials and owned telemetry                                       |
+| Workflows        | Editing, planning, execution, models, publication and schedules       |
+| Office and media | Owner proof and delivery acknowledgment                               |
+| Voice            | Start, audio and stop                                                 |
 
 The server's `hello.features.methodScopes` gives the baseline scope for each method. Per-user authorization can be narrower. Administrative methods are not an alternative way around user isolation.
 
@@ -484,16 +496,24 @@ Transport error categories are `closed`, `timeout`, `aborted`, `protocol`, `limi
 
 On gateways advertising `binaryMedia`, upload payloads travel as raw chunks, so a 100 MiB file does not require a 100 MiB WebSocket message. JSON metadata and each wire frame remain bounded. Older gateways use the base64 JSON representation and its smaller frame limits. Server limits in `hello` may be stricter. Raise a per-call `timeoutMs` for a long `AgentAsk`, or use streaming and consume events promptly. A stream exceeding its buffer limits is cancelled. `close()` is idempotent, closes the socket, and rejects pending operations.
 
-No automatic retry is performed. Retrying a timed-out mutating call can duplicate work. Reconcile the session/task state first. The SDK does not persist credentials, retry mutations, play media, transcode codecs, or render artifacts for you.
+RPC mutations are never automatically retried. Connection retries and read-subscription restoration are separate. Retrying a timed-out mutating call can duplicate work. Reconcile the session/task state first. The SDK does not persist credentials, retry mutations, play media, transcode codecs, or render artifacts for you.
 
 ## Complete reference
+
+- [Runtime controls, jobs, wallets, and Roblox](operations.md)
+
+- [Package entry points](exports.md)
+- [Session recovery and saved attachments](sessions.md)
+- [Office, company, projects, and private reports](office-company.md)
+- [Reverse-engineering APIs](reverse-investigation.md)
+- [Workflows](workflows.md)
 
 - [Client, stream, media helpers, and options](client.md)
 - [Every RPC method with parameters, results, and a call template](methods.md)
 - [All protocol type fields and variants](protocol.md)
 - [Typed source examples](../examples)
 
-The method/type pages are generated from the package's bundled contract with `npm run docs`. After updating the server protocol, run `npm run generate` before regenerating documentation, and run the normal package checks. `npm run docs:check` compiles all TypeScript code blocks against the SDK and checks variable annotations. Snippets share the connection setup above; file and microphone inputs are supplied by the application. Stream loop bindings are inferred from the explicitly typed `TurnStream` because TypeScript forbids type annotations on `for...of` bindings.
+The method/type pages are generated from the package's bundled contract with `npm run docs`. After updating the server protocol, run `npm run generate` before regenerating documentation, and run the normal package checks. `npm run docs:check` compiles `ts` and `typescript` code blocks across README and every documentation page against the SDK and checks variable annotations. Snippets share the connection setup above; file and microphone inputs are supplied by the application. Stream loop bindings are inferred from the explicitly typed `TurnStream` because TypeScript forbids type annotations on `for...of` bindings.
 
 ## Recover after a reload or disconnect
 
