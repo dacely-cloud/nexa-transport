@@ -434,6 +434,26 @@
         "./design-selection-types": {
             "types": "./dist/design/DesignSelectionTypes.d.ts",
             "import": "./dist/design-selection-types.js"
+        },
+        "./design-svg": {
+            "types": "./dist/design/DesignSvg.d.ts",
+            "import": "./dist/design-svg.js"
+        },
+        "./design-svg-geometry": {
+            "types": "./dist/design/DesignSvgGeometry.d.ts",
+            "import": "./dist/design-svg-geometry.js"
+        },
+        "./design-svg-types": {
+            "types": "./dist/design/DesignSvgTypes.d.ts",
+            "import": "./dist/design-svg-types.js"
+        },
+        "./design-text-layout": {
+            "types": "./dist/design/DesignTextLayout.d.ts",
+            "import": "./dist/design-text-layout.js"
+        },
+        "./design-paths": {
+            "types": "./dist/design/DesignPaths.d.ts",
+            "import": "./dist/design-paths.js"
         }
     },
     "scripts": {

@@ -4,6 +4,11 @@ const config: UserConfig = {
         target: 'es2023',
         lib: {
             entry: {
+                'design-svg': 'src/design/DesignSvg.ts',
+                'design-svg-geometry': 'src/design/DesignSvgGeometry.ts',
+                'design-svg-types': 'src/design/DesignSvgTypes.ts',
+                'design-text-layout': 'src/design/DesignTextLayout.ts',
+                'design-paths': 'src/design/DesignPaths.ts',
                 'design-asset-types': 'src/design/DesignAssetTypes.ts',
                 'design-asset-codec': 'src/design/DesignAssetCodec.ts',
                 'design-asset-references': 'src/design/DesignAssetReferences.ts',
