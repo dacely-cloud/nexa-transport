@@ -6693,6 +6693,9 @@ export const schema: Schema = {
                     $ref: '#/definitions/DesignResizeOperation',
                 },
                 {
+                    $ref: '#/definitions/DesignPositionOperation',
+                },
+                {
                     $ref: '#/definitions/DesignMove',
                 },
                 {
@@ -6877,6 +6880,14 @@ export const schema: Schema = {
                 columnSpan: {
                     type: 'number',
                 },
+                contentReferenceHeight: {
+                    type: 'number',
+                },
+                contentReferenceWidth: {
+                    description:
+                        'Normalized frame geometry retains the original implicit basis of its absolute content and instances.',
+                    type: 'number',
+                },
                 height: {
                     $ref: '#/definitions/DesignSizing',
                 },
@@ -6926,6 +6937,47 @@ export const schema: Schema = {
                 'vertical',
                 'width',
             ],
+            type: 'object',
+        },
+        DesignPositionOperation: {
+            description:
+                'One layer has one coordinate space; batch positions share the save transaction and undo.',
+            properties: {
+                absolute: {
+                    description:
+                        "Explicitly leave or rejoin an auto-layout parent's flowing children.",
+                    type: 'boolean',
+                },
+                horizontal: {
+                    description:
+                        'Absolute children retain a chosen relation to a resized parent.\nConstraint choice.',
+                    enum: ['center', 'end', 'scale', 'start', 'stretch'],
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                op: {
+                    const: 'position',
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+                vertical: {
+                    description:
+                        'Absolute children retain a chosen relation to a resized parent.\nConstraint choice.',
+                    enum: ['center', 'end', 'scale', 'start', 'stretch'],
+                    type: 'string',
+                },
+                x: {
+                    type: 'number',
+                },
+                y: {
+                    type: 'number',
+                },
+            },
+            required: ['id', 'op', 'pageId'],
             type: 'object',
         },
         DesignReadMethod: {

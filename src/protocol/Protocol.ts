@@ -4419,6 +4419,7 @@ export type DesignOperation =
     | DesignUpdate
     | DesignTextOperation
     | DesignResizeOperation
+    | DesignPositionOperation
     | DesignMove
     | DesignRemove
     | DesignPageOperation
@@ -4547,6 +4548,10 @@ export interface DesignPlacementShape {
     readonly absolute: boolean;
     /** columnSpan as defined by the Nexa gateway. */
     readonly columnSpan: number;
+    /** contentReferenceHeight as defined by the Nexa gateway. */
+    readonly contentReferenceHeight?: number;
+    /** contentReferenceWidth as defined by the Nexa gateway. */
+    readonly contentReferenceWidth?: number;
     /** height as defined by the Nexa gateway. */
     readonly height: DesignSizing;
     /** horizontal as defined by the Nexa gateway. */
@@ -4573,6 +4578,47 @@ export interface DesignPlacementShape {
 
 /** DesignPlacement from the Nexa wire protocol. */
 export type DesignPlacement = DesignPlacementShape;
+
+/** Allowed values for DesignPositionOperationhorizontal. */
+export const DesignPositionOperationhorizontalValues = {
+    Value0: 'center',
+    Value1: 'end',
+    Value2: 'scale',
+    Value3: 'start',
+    Value4: 'stretch',
+} as const;
+
+/** Allowed values for DesignPositionOperationvertical. */
+export const DesignPositionOperationverticalValues = {
+    Value0: 'center',
+    Value1: 'end',
+    Value2: 'scale',
+    Value3: 'start',
+    Value4: 'stretch',
+} as const;
+
+/** DesignPositionOperation wire fields. */
+export interface DesignPositionOperationShape {
+    /** absolute as defined by the Nexa gateway. */
+    readonly absolute?: boolean;
+    /** horizontal as defined by the Nexa gateway. */
+    readonly horizontal?: (typeof DesignPositionOperationhorizontalValues)[keyof typeof DesignPositionOperationhorizontalValues];
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** op as defined by the Nexa gateway. */
+    readonly op: 'position';
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+    /** vertical as defined by the Nexa gateway. */
+    readonly vertical?: (typeof DesignPositionOperationverticalValues)[keyof typeof DesignPositionOperationverticalValues];
+    /** x as defined by the Nexa gateway. */
+    readonly x?: number;
+    /** y as defined by the Nexa gateway. */
+    readonly y?: number;
+}
+
+/** DesignPositionOperation from the Nexa wire protocol. */
+export type DesignPositionOperation = DesignPositionOperationShape;
 
 /** DesignReadMethod wire fields. */
 export interface DesignReadMethodShape {
