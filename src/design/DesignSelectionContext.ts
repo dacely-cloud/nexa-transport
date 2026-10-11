@@ -4,7 +4,7 @@
 import type { DesignDocument, DesignNode, DesignBox } from './DesignTypes.js';
 import { DesignLayoutEngine } from './DesignLayout.js';
 import type { DesignSelectionGeometry, DesignSelectionBounds } from './DesignSelectionTypes.js';
-import type { DesignTextMeasurer, DesignSize } from './DesignLayoutTypes.js';
+import type { DesignTextMeasurer, DesignSize, DesignLocalBox } from './DesignLayoutTypes.js';
 import { DesignTextMetrics } from './DesignTextMetrics.js';
 import { DesignValues as V } from './DesignValues.js';
 
@@ -102,6 +102,10 @@ export class DesignSelectionContext {
     /** The existing solver cache also measures hidden text and component content. */
     public measure(id: string): DesignSize {
         return this.#layout.measure(id);
+    }
+    /** Reading local geometry also works for hidden layers without allocating a second solver. */
+    public position(id: string): DesignLocalBox {
+        return this.#layout.position(id);
     }
     /** Hidden layers have no rendered geometry; duplication and ordering can still handle them. */
     public box(id: string): DesignBox {

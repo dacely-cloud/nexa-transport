@@ -177,10 +177,20 @@ export class DesignResizeEdits {
                     placement: {
                         ...child.placement,
                         ...(editWidth
-                            ? { referenceWidth: child.placement.referenceWidth ?? before.width }
+                            ? {
+                                  referenceWidth:
+                                      child.placement.referenceWidth ??
+                                      before.placement.contentReferenceWidth ??
+                                      before.width,
+                              }
                             : {}),
                         ...(editHeight
-                            ? { referenceHeight: child.placement.referenceHeight ?? before.height }
+                            ? {
+                                  referenceHeight:
+                                      child.placement.referenceHeight ??
+                                      before.placement.contentReferenceHeight ??
+                                      before.height,
+                              }
                             : {}),
                     },
                 });
@@ -193,11 +203,15 @@ export class DesignResizeEdits {
                 width:
                     shown && parentBox.width > 0
                         ? parentBox.width
-                        : (child.placement.referenceWidth ?? before.width),
+                        : (child.placement.referenceWidth ??
+                          before.placement.contentReferenceWidth ??
+                          before.width),
                 height:
                     shown && parentBox.height > 0
                         ? parentBox.height
-                        : (child.placement.referenceHeight ?? before.height),
+                        : (child.placement.referenceHeight ??
+                          before.placement.contentReferenceHeight ??
+                          before.height),
             };
             const target: DesignLocalBox = DesignConstraints.box(
                 {
@@ -245,14 +259,18 @@ export class DesignResizeEdits {
                     ...(editWidth
                         ? {
                               referenceWidth: collapsedWidth
-                                  ? (child.placement.referenceWidth ?? before.width)
+                                  ? (child.placement.referenceWidth ??
+                                    before.placement.contentReferenceWidth ??
+                                    before.width)
                                   : after.width,
                           }
                         : {}),
                     ...(editHeight
                         ? {
                               referenceHeight: collapsedHeight
-                                  ? (child.placement.referenceHeight ?? before.height)
+                                  ? (child.placement.referenceHeight ??
+                                    before.placement.contentReferenceHeight ??
+                                    before.height)
                                   : after.height,
                           }
                         : {}),

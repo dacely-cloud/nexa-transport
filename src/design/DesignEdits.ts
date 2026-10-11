@@ -16,6 +16,7 @@ import {
 } from './DesignOperationTypes.js';
 import { DesignKind } from './DesignTypes.js';
 import { DesignResizeEdits } from './DesignResizeEdits.js';
+import { DesignPositionEdits } from './DesignPositionEdits.js';
 import { DesignSelectionContext } from './DesignSelectionContext.js';
 import type { DesignTextMeasurer } from './DesignLayoutTypes.js';
 import { DesignTextMetrics } from './DesignTextMetrics.js';
@@ -135,6 +136,24 @@ export class DesignEdits {
                         measurer,
                     );
                     for (const node of new DesignResizeEdits(context).apply(operation)) {
+                        nodes.set(node.id, node);
+                    }
+                    break;
+                }
+                case DesignOperationKind.Position: {
+                    const current: DesignDocument = {
+                        ...document,
+                        ...metadata,
+                        nodes: [...nodes.values()],
+                        pages: [...pages.values()],
+                    };
+                    const context: DesignSelectionContext = new DesignSelectionContext(
+                        current,
+                        operation.pageId,
+                        [operation.id],
+                        measurer,
+                    );
+                    for (const node of new DesignPositionEdits(context).apply(operation)) {
                         nodes.set(node.id, node);
                     }
                     break;

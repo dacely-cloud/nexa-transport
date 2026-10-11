@@ -67,6 +67,8 @@ export class DesignLayoutCodec {
                 'rowSpan',
                 'referenceWidth',
                 'referenceHeight',
+                'contentReferenceWidth',
+                'contentReferenceHeight',
             ],
             [
                 'width',
@@ -108,6 +110,20 @@ export class DesignLayoutCodec {
             ...(value['referenceHeight'] === undefined
                 ? {}
                 : { referenceHeight: V.number(value['referenceHeight'], 0.01, 100000) }),
+            ...(value['contentReferenceWidth'] === undefined
+                ? {}
+                : {
+                      contentReferenceWidth: V.number(value['contentReferenceWidth'], 0.01, 100000),
+                  }),
+            ...(value['contentReferenceHeight'] === undefined
+                ? {}
+                : {
+                      contentReferenceHeight: V.number(
+                          value['contentReferenceHeight'],
+                          0.01,
+                          100000,
+                      ),
+                  }),
         };
         if (result.minWidth > result.maxWidth || result.minHeight > result.maxHeight) {
             throw new Error('Minimum layer size exceeds its maximum');

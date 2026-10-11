@@ -25,6 +25,8 @@ import type {
 export class DesignLayoutEngine {
     readonly #nodes: ReadonlyMap<string, DesignSceneNode>;
     readonly #sizes: Map<string, DesignSize> = new Map();
+    readonly #positions: Map<string, DesignLocalBox> = new Map();
+    #solved: boolean = false;
     readonly #measurer: DesignTextMeasurer;
     readonly #scene: DesignScenePage;
 
@@ -45,6 +47,8 @@ export class DesignLayoutEngine {
     }
     /** Resolves visible layers in painter order, preserving nested rotation and clipping identity. */
     public solve(): DesignLayoutResult {
+        this.#positions.clear();
+        this.#solved = true;
         const boxes: DesignBox[] = [];
         for (const id of this.#scene.page.roots) {
             const node: DesignSceneNode = this.#node(id);
@@ -56,6 +60,48 @@ export class DesignLayoutEngine {
     /** Hidden layers still have natural font and container dimensions for authored constraint edits. */
     public measure(id: string): DesignSize {
         return this.#measure(this.#node(id));
+    }
+    /** Includes expanded instances and hidden authored layers on this page. */
+    public has(id: string): boolean {
+        return this.#nodes.has(id);
+    }
+    /** Parent-local positions share the actual flow solver; hidden absolute layers retain their constraints. */
+    public position(id: string): DesignLocalBox {
+        if (!this.#solved) {
+            this.solve();
+        }
+        const cached: DesignLocalBox | undefined = this.#positions.get(id);
+        if (cached !== undefined) {
+            return cached;
+        }
+        const node: DesignSceneNode = this.#node(id);
+        const size: DesignSize = this.#measure(node);
+        const parent: DesignSceneNode | null =
+            node.parentId === null ? null : this.#node(node.parentId);
+        const frame: DesignLocalBox | null = parent === null ? null : this.position(parent.id);
+        if (
+            node.visible &&
+            parent !== null &&
+            frame !== null &&
+            parent.layout.flow !== DesignFlow.Absolute &&
+            !node.placement.absolute
+        ) {
+            for (const child of this.#children(parent, frame.width, frame.height)) {
+                this.#positions.set(child.id, child);
+            }
+            const arranged: DesignLocalBox | undefined = this.#positions.get(id);
+            if (arranged !== undefined) {
+                return arranged;
+            }
+        }
+        const position: DesignLocalBox =
+            parent !== null &&
+            frame !== null &&
+            (parent.layout.flow === DesignFlow.Absolute || node.placement.absolute)
+                ? DesignConstraints.box(node, parent, frame.width, frame.height, size)
+                : { id, x: node.x, y: node.y, ...size };
+        this.#positions.set(id, position);
+        return position;
     }
     #node(id: string): DesignSceneNode {
         const node: DesignSceneNode | undefined = this.#nodes.get(id);
@@ -250,6 +296,7 @@ export class DesignLayoutEngine {
         if (!node.visible) {
             return;
         }
+        this.#positions.set(node.id, local);
         let centerX: number = local.x + local.width / 2;
         let centerY: number = local.y + local.height / 2;
         if (parent !== null) {

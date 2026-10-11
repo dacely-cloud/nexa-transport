@@ -5,7 +5,12 @@ import { DesignValues as V } from './DesignValues.js';
 import { DesignCodec } from './DesignCodec.js';
 import { DesignStyleCodec } from './DesignStyleCodec.js';
 import { DesignLayoutCodec } from './DesignLayoutCodec.js';
-import { DesignKind, type DesignPathCommand, type DesignOverride } from './DesignTypes.js';
+import {
+    DesignKind,
+    DesignConstraint,
+    type DesignPathCommand,
+    type DesignOverride,
+} from './DesignTypes.js';
 import { DesignNodeCodec } from './DesignNodeCodec.js';
 import { DesignVariantCodec } from './DesignVariantCodec.js';
 import { DesignMaskCodec } from './DesignMaskCodec.js';
@@ -43,6 +48,9 @@ export class DesignOperationCodec {
                     'height',
                     'x',
                     'y',
+                    'horizontal',
+                    'vertical',
+                    'absolute',
                 ],
                 ['op'],
             );
@@ -90,6 +98,52 @@ export class DesignOperationCodec {
                         op,
                         id: V.id(value['id']),
                         content: V.text(value['content'], 100000, true),
+                    };
+                }
+                case Kind.Position: {
+                    const value: Readonly<Record<string, unknown>> = V.fields(
+                        entry,
+                        ['op', 'id', 'pageId', 'x', 'y', 'horizontal', 'vertical', 'absolute'],
+                        ['op', 'id', 'pageId'],
+                    );
+                    if (
+                        ['x', 'y', 'horizontal', 'vertical', 'absolute'].every(
+                            (key: string): boolean => value[key] === undefined,
+                        )
+                    ) {
+                        throw new Error(
+                            'Position requires a coordinate, pin or absolute placement change.',
+                        );
+                    }
+                    return {
+                        op,
+                        id: V.id(value['id']),
+                        pageId: V.id(value['pageId']),
+                        ...(value['x'] === undefined
+                            ? {}
+                            : { x: V.number(value['x'], -100000, 100000) }),
+                        ...(value['y'] === undefined
+                            ? {}
+                            : { y: V.number(value['y'], -100000, 100000) }),
+                        ...(value['horizontal'] === undefined
+                            ? {}
+                            : {
+                                  horizontal: V.choice(
+                                      value['horizontal'],
+                                      Object.values(DesignConstraint),
+                                  ),
+                              }),
+                        ...(value['vertical'] === undefined
+                            ? {}
+                            : {
+                                  vertical: V.choice(
+                                      value['vertical'],
+                                      Object.values(DesignConstraint),
+                                  ),
+                              }),
+                        ...(value['absolute'] === undefined
+                            ? {}
+                            : { absolute: V.boolean(value['absolute']) }),
                     };
                 }
                 case Kind.Resize: {

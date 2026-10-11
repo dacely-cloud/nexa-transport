@@ -22,7 +22,7 @@ export class DesignConstraints {
         const x: Axis = this.#axis(
             node.x,
             size.width,
-            node.placement.referenceWidth ?? parent.width,
+            node.placement.referenceWidth ?? parent.placement.contentReferenceWidth ?? parent.width,
             width,
             node.placement.horizontal,
             node.placement.minWidth,
@@ -31,7 +31,9 @@ export class DesignConstraints {
         const y: Axis = this.#axis(
             node.y,
             size.height,
-            node.placement.referenceHeight ?? parent.height,
+            node.placement.referenceHeight ??
+                parent.placement.contentReferenceHeight ??
+                parent.height,
             height,
             node.placement.vertical,
             node.placement.minHeight,

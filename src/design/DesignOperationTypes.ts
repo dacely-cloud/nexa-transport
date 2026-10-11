@@ -6,6 +6,7 @@ import type { DesignMask } from './DesignMaskTypes.js';
 import type { DesignBooleanMode } from './DesignBooleanTypes.js';
 
 import type {
+    DesignConstraint,
     DesignNode,
     DesignPage,
     DesignStyle,
@@ -27,6 +28,7 @@ export const DesignOperationKind = {
     Insert: 'insert',
     Update: 'update',
     Resize: 'resize',
+    Position: 'position',
     Text: 'text',
     Move: 'move',
     Remove: 'remove',
@@ -93,6 +95,21 @@ export interface DesignResizeOperation {
     readonly x?: number;
     readonly y?: number;
 }
+/** Visible parent-local coordinates and pin changes preserve the layer's resolved size. */
+export interface DesignPositionChanges {
+    readonly x?: number;
+    readonly y?: number;
+    readonly horizontal?: DesignConstraint;
+    readonly vertical?: DesignConstraint;
+    /** Explicitly leave or rejoin an auto-layout parent's flowing children. */
+    readonly absolute?: boolean;
+}
+/** One layer has one coordinate space; batch positions share the save transaction and undo. */
+export interface DesignPositionOperation extends DesignPositionChanges {
+    readonly op: typeof DesignOperationKind.Position;
+    readonly id: string;
+    readonly pageId: string;
+}
 /** Reparent or reorder without breaking both sides of the tree. */
 export interface DesignMove {
     readonly op: typeof DesignOperationKind.Move;
@@ -126,6 +143,7 @@ export type DesignOperation =
     | DesignInsert
     | DesignUpdate
     | DesignResizeOperation
+    | DesignPositionOperation
     | DesignTextOperation
     | DesignMove
     | DesignRemove
