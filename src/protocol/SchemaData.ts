@@ -6144,24 +6144,25 @@ export const schema: Schema = {
     "type": "object"
 },
         DesignKind: {
-    "description": "Editable scene primitives, including reusable component definitions and instances.\nPrimitive identity.",
-    "enum": [
-        "boolean",
-        "component",
-        "ellipse",
-        "frame",
-        "group",
-        "image",
-        "instance",
-        "line",
-        "mask",
-        "path",
-        "polygon",
-        "rectangle",
-        "text"
-    ],
-    "type": "string"
-},
+            "description": "Editable scene primitives, including reusable component definitions and instances.\nPrimitive identity.",
+            "enum": [
+                "boolean",
+                "component",
+                "component-set",
+                "ellipse",
+                "frame",
+                "group",
+                "image",
+                "instance",
+                "line",
+                "mask",
+                "path",
+                "polygon",
+                "rectangle",
+                "text"
+            ],
+            "type": "string"
+        },
         DesignLayout: {
     "description": "Container layout, including wrapping, grid tracks and content alignment.",
     "properties": {
@@ -6428,146 +6429,10 @@ export const schema: Schema = {
     "type": "object"
 },
         DesignNode: {
-    "description": "All layer state is explicit and editable; no generated markup is the source of truth.",
-    "properties": {
-        "booleanMode": {
-            "description": "Omitted on ordinary layers, preserving existing document and retry identities.",
-            "enum": [
-                "exclude",
-                "intersect",
-                "subtract",
-                "union"
-            ],
-            "type": "string"
-        },
-        "children": {
-            "items": {
-                "type": "string"
-            },
-            "type": "array"
-        },
-        "componentId": {
-            "type": [
-                "null",
-                "string"
-            ]
-        },
-        "height": {
-            "type": "number"
-        },
-        "id": {
-            "type": "string"
-        },
-        "image": {
-            "anyOf": [
-                {
-                    "$ref": "#/definitions/DesignImage"
-                },
-                {
-                    "type": "null"
-                }
-            ]
-        },
-        "kind": {
-            "$ref": "#/definitions/DesignKind"
-        },
-        "layout": {
-            "$ref": "#/definitions/DesignLayout"
-        },
-        "locked": {
-            "type": "boolean"
-        },
-        "mask": {
-            "$ref": "#/definitions/DesignMask",
-            "description": "Retained source identity and coverage mode; omitted on ordinary layers."
-        },
-        "name": {
-            "type": "string"
-        },
-        "opacity": {
-            "type": "number"
-        },
-        "overrides": {
-            "items": {
-                "$ref": "#/definitions/DesignOverride"
-            },
-            "type": "array"
-        },
-        "parentId": {
-            "type": [
-                "null",
-                "string"
-            ]
-        },
-        "path": {
-            "items": {
-                "$ref": "#/definitions/DesignPathCommand"
-            },
-            "type": "array"
-        },
-        "placement": {
-            "$ref": "#/definitions/DesignPlacement"
-        },
-        "rotation": {
-            "type": "number"
-        },
-        "style": {
-            "$ref": "#/definitions/DesignStyle"
-        },
-        "text": {
-            "anyOf": [
-                {
-                    "$ref": "#/definitions/DesignText"
-                },
-                {
-                    "type": "null"
-                }
-            ]
-        },
-        "visible": {
-            "type": "boolean"
-        },
-        "width": {
-            "type": "number"
-        },
-        "x": {
-            "type": "number"
-        },
-        "y": {
-            "type": "number"
-        }
-    },
-    "required": [
-        "children",
-        "componentId",
-        "height",
-        "id",
-        "image",
-        "kind",
-        "layout",
-        "locked",
-        "name",
-        "opacity",
-        "overrides",
-        "parentId",
-        "path",
-        "placement",
-        "rotation",
-        "style",
-        "text",
-        "visible",
-        "width",
-        "x",
-        "y"
-    ],
-    "type": "object"
-},
-        DesignNodeChanges: {
-    "description": "Editable properties exclude identity and tree links, which have dedicated operations.",
-    "properties": {
-        "booleanMode": {
-            "anyOf": [
-                {
+            "description": "All layer state is explicit and editable; no generated markup is the source of truth.",
+            "properties": {
+                "booleanMode": {
+                    "description": "Omitted on ordinary layers, preserving existing document and retry identities.",
                     "enum": [
                         "exclude",
                         "intersect",
@@ -6576,122 +6441,295 @@ export const schema: Schema = {
                     ],
                     "type": "string"
                 },
-                {
-                    "type": "null"
-                }
-            ],
-            "description": "A null value clears the operation when explicitly flattening a Boolean group."
-        },
-        "componentId": {
-            "type": [
-                "null",
-                "string"
-            ]
-        },
-        "height": {
-            "type": "number"
-        },
-        "image": {
-            "anyOf": [
-                {
-                    "$ref": "#/definitions/DesignImage"
+                "children": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
                 },
-                {
-                    "type": "null"
+                "componentId": {
+                    "type": [
+                        "null",
+                        "string"
+                    ]
+                },
+                "height": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "image": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/DesignImage"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "kind": {
+                    "$ref": "#/definitions/DesignKind"
+                },
+                "layout": {
+                    "$ref": "#/definitions/DesignLayout"
+                },
+                "locked": {
+                    "type": "boolean"
+                },
+                "mask": {
+                    "$ref": "#/definitions/DesignMask",
+                    "description": "Retained source identity and coverage mode; omitted on ordinary layers."
+                },
+                "name": {
+                    "type": "string"
+                },
+                "opacity": {
+                    "type": "number"
+                },
+                "overrides": {
+                    "items": {
+                        "$ref": "#/definitions/DesignOverride"
+                    },
+                    "type": "array"
+                },
+                "parentId": {
+                    "type": [
+                        "null",
+                        "string"
+                    ]
+                },
+                "path": {
+                    "items": {
+                        "$ref": "#/definitions/DesignPathCommand"
+                    },
+                    "type": "array"
+                },
+                "placement": {
+                    "$ref": "#/definitions/DesignPlacement"
+                },
+                "rotation": {
+                    "type": "number"
+                },
+                "style": {
+                    "$ref": "#/definitions/DesignStyle"
+                },
+                "text": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/DesignText"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "variant": {
+                    "description": "Named values on an immediate component definition inside a variant set.",
+                    "items": {
+                        "$ref": "#/definitions/DesignVariantValue"
+                    },
+                    "type": "array"
+                },
+                "variants": {
+                    "$ref": "#/definitions/DesignVariantSet",
+                    "description": "Reusable variant set metadata; only component-set containers accept it."
+                },
+                "visible": {
+                    "type": "boolean"
+                },
+                "width": {
+                    "type": "number"
+                },
+                "x": {
+                    "type": "number"
+                },
+                "y": {
+                    "type": "number"
                 }
-            ]
-        },
-        "kind": {
-            "description": "Editable scene primitives, including reusable component definitions and instances.\nPrimitive identity.",
-            "enum": [
-                "boolean",
-                "component",
-                "ellipse",
-                "frame",
-                "group",
+            },
+            "required": [
+                "children",
+                "componentId",
+                "height",
+                "id",
                 "image",
-                "instance",
-                "line",
-                "mask",
+                "kind",
+                "layout",
+                "locked",
+                "name",
+                "opacity",
+                "overrides",
+                "parentId",
                 "path",
-                "polygon",
-                "rectangle",
-                "text"
+                "placement",
+                "rotation",
+                "style",
+                "text",
+                "visible",
+                "width",
+                "x",
+                "y"
             ],
-            "type": "string"
+            "type": "object"
         },
-        "layout": {
-            "$ref": "#/definitions/DesignLayout",
-            "description": "Container layout, including wrapping, grid tracks and content alignment."
-        },
-        "locked": {
-            "type": "boolean"
-        },
-        "mask": {
-            "anyOf": [
-                {
-                    "$ref": "#/definitions/DesignMask"
+        DesignNodeChanges: {
+            "description": "Editable properties exclude identity and tree links, which have dedicated operations.",
+            "properties": {
+                "booleanMode": {
+                    "anyOf": [
+                        {
+                            "enum": [
+                                "exclude",
+                                "intersect",
+                                "subtract",
+                                "union"
+                            ],
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "A null value clears the operation when explicitly flattening a Boolean group."
                 },
-                {
-                    "type": "null"
-                }
-            ],
-            "description": "Null clears masking when converting the container into an ordinary group."
-        },
-        "name": {
-            "type": "string"
-        },
-        "opacity": {
-            "type": "number"
-        },
-        "overrides": {
-            "items": {
-                "$ref": "#/definitions/DesignOverride"
-            },
-            "type": "array"
-        },
-        "path": {
-            "items": {
-                "$ref": "#/definitions/DesignPathCommand"
-            },
-            "type": "array"
-        },
-        "placement": {
-            "$ref": "#/definitions/DesignPlacement",
-            "description": "Child sizing and positioning relative to its parent."
-        },
-        "rotation": {
-            "type": "number"
-        },
-        "style": {
-            "$ref": "#/definitions/DesignStyle",
-            "description": "Style can be shared across arbitrary primitives."
-        },
-        "text": {
-            "anyOf": [
-                {
-                    "$ref": "#/definitions/DesignText"
+                "componentId": {
+                    "type": [
+                        "null",
+                        "string"
+                    ]
                 },
-                {
-                    "type": "null"
+                "height": {
+                    "type": "number"
+                },
+                "image": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/DesignImage"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "kind": {
+                    "description": "Editable scene primitives, including reusable component definitions and instances.\nPrimitive identity.",
+                    "enum": [
+                        "boolean",
+                        "component",
+                        "component-set",
+                        "ellipse",
+                        "frame",
+                        "group",
+                        "image",
+                        "instance",
+                        "line",
+                        "mask",
+                        "path",
+                        "polygon",
+                        "rectangle",
+                        "text"
+                    ],
+                    "type": "string"
+                },
+                "layout": {
+                    "$ref": "#/definitions/DesignLayout",
+                    "description": "Container layout, including wrapping, grid tracks and content alignment."
+                },
+                "locked": {
+                    "type": "boolean"
+                },
+                "mask": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/DesignMask"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "Null clears masking when converting the container into an ordinary group."
+                },
+                "name": {
+                    "type": "string"
+                },
+                "opacity": {
+                    "type": "number"
+                },
+                "overrides": {
+                    "items": {
+                        "$ref": "#/definitions/DesignOverride"
+                    },
+                    "type": "array"
+                },
+                "path": {
+                    "items": {
+                        "$ref": "#/definitions/DesignPathCommand"
+                    },
+                    "type": "array"
+                },
+                "placement": {
+                    "$ref": "#/definitions/DesignPlacement",
+                    "description": "Child sizing and positioning relative to its parent."
+                },
+                "rotation": {
+                    "type": "number"
+                },
+                "style": {
+                    "$ref": "#/definitions/DesignStyle",
+                    "description": "Style can be shared across arbitrary primitives."
+                },
+                "text": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/DesignText"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "variant": {
+                    "anyOf": [
+                        {
+                            "items": {
+                                "$ref": "#/definitions/DesignVariantValue"
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "Null releases a definition from its set."
+                },
+                "variants": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/DesignVariantSet"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "Null releases component-set metadata when converting its container."
+                },
+                "visible": {
+                    "type": "boolean"
+                },
+                "width": {
+                    "type": "number"
+                },
+                "x": {
+                    "type": "number"
+                },
+                "y": {
+                    "type": "number"
                 }
-            ]
+            },
+            "type": "object"
         },
-        "visible": {
-            "type": "boolean"
-        },
-        "width": {
-            "type": "number"
-        },
-        "x": {
-            "type": "number"
-        },
-        "y": {
-            "type": "number"
-        }
-    },
-    "type": "object"
-},
         DesignNodeRecord: {
     "description": "Layer record.",
     "properties": {
@@ -7664,6 +7702,44 @@ export const schema: Schema = {
     ],
     "type": "object"
 },
+        DesignVariantSet: {
+            "description": "Ordered dimensions and the identity used when placing this reusable set.",
+            "properties": {
+                "defaultId": {
+                    "type": [
+                        "null",
+                        "string"
+                    ]
+                },
+                "properties": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": [
+                "defaultId",
+                "properties"
+            ],
+            "type": "object"
+        },
+        DesignVariantValue: {
+            "description": "A named dimension and one retained definition's authored value.",
+            "properties": {
+                "property": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "property",
+                "value"
+            ],
+            "type": "object"
+        },
         DeviceApproveParams: {
             description: 'Approving a device, optionally overriding the scopes it asked for.',
             properties: {
