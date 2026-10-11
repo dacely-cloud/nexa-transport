@@ -13,6 +13,7 @@ import {
     type DesignSelectionGeometry,
     type DesignArrangeRequest,
 } from './DesignSelectionTypes.js';
+import type { DesignTextMeasurer } from './DesignLayoutTypes.js';
 import { DesignValues as V } from './DesignValues.js';
 import { DesignMaskSelection } from './DesignMaskSelection.js';
 import { DesignBooleanSelection } from './DesignBooleanSelection.js';
@@ -51,8 +52,9 @@ export class DesignSelection {
         selection: readonly string[],
         action: Action,
         identify: (sourceId: string) => string,
+        measurer?: DesignTextMeasurer,
     ): DesignSelectionPlan {
-        const context: Context = new Context(document, pageId, selection);
+        const context: Context = new Context(document, pageId, selection, measurer);
         let plan: DesignSelectionPlan;
         if (action === Action.Duplicate) {
             plan = Tree.duplicate(context, identify);
@@ -90,10 +92,11 @@ export class DesignSelection {
         selection: readonly string[],
         parentId: string | null,
         index: number,
+        measurer?: DesignTextMeasurer,
     ): DesignSelectionPlan {
         V.number(index, 0, 10000, true);
         const plan: DesignSelectionPlan = Tree.move(
-            new Context(document, pageId, selection),
+            new Context(document, pageId, selection, measurer),
             parentId,
             index,
         );

@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { DesignTextMeasurer } from './DesignLayoutTypes.js';
+import { DesignTextMetrics } from './DesignTextMetrics.js';
 import { DesignBooleanResize } from './DesignBooleanResize.js';
 import { DesignSelectionTree } from './DesignSelectionTree.js';
 import { DesignBooleanLayout } from './DesignBooleanLayout.js';
@@ -32,7 +34,11 @@ export class DesignBooleanEdits {
     readonly #boxes: Map<string, DesignBox>;
 
     /** Owns one derivation's working records; neither input document is mutated. */
-    public constructor(before: DesignDocument, edited: DesignDocument) {
+    public constructor(
+        before: DesignDocument,
+        edited: DesignDocument,
+        public readonly measurer: DesignTextMeasurer = new DesignTextMetrics(),
+    ) {
         this.#before = before;
         this.#edited = edited;
         this.#nodes = new Map(
@@ -48,11 +54,12 @@ export class DesignBooleanEdits {
     public static async derive(
         before: DesignDocument,
         edited: DesignDocument,
+        measurer?: DesignTextMeasurer,
     ): Promise<DesignEditResult> {
         if (!edited.nodes.some((node: DesignNode): boolean => node.kind === DesignKind.Boolean)) {
             return { document: edited, changes: DesignEdits.diff(before, edited) };
         }
-        return new DesignBooleanEdits(before, edited).#derive();
+        return new DesignBooleanEdits(before, edited, measurer).#derive();
     }
 
     async #derive(): Promise<DesignEditResult> {
@@ -147,7 +154,7 @@ export class DesignBooleanEdits {
     }
 
     #layout(document: DesignDocument): Map<string, DesignBox> {
-        return new DesignBooleanLayout(document).resolve();
+        return new DesignBooleanLayout(document, this.measurer).resolve();
     }
 
     #depth(node: DesignNode, nodes: ReadonlyMap<string, DesignNode>): number {

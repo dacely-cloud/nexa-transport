@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { DesignDocument, DesignNode, DesignBox } from './DesignTypes.js';
+import type { DesignTextMeasurer } from './DesignLayoutTypes.js';
+import { DesignTextMetrics } from './DesignTextMetrics.js';
 import type { DesignLayoutResult } from './DesignLayoutTypes.js';
 import { DesignLayoutEngine } from './DesignLayout.js';
 import { DesignBooleanTransforms } from './DesignBooleanTransforms.js';
@@ -13,7 +15,10 @@ export class DesignBooleanLayout {
     readonly #boxes: Map<string, DesignBox> = new Map();
 
     /** Indexes an immutable saved document for visible and hidden source layout. */
-    public constructor(document: DesignDocument) {
+    public constructor(
+        document: DesignDocument,
+        public readonly measurer: DesignTextMeasurer = new DesignTextMetrics(),
+    ) {
         this.#document = document;
         this.#nodes = new Map(
             document.nodes.map((node: DesignNode): readonly [string, DesignNode] => [
@@ -29,6 +34,7 @@ export class DesignBooleanLayout {
             const scene: DesignLayoutResult = new DesignLayoutEngine(
                 this.#document,
                 page.id,
+                this.measurer,
             ).solve();
             for (const box of scene.boxes) {
                 this.#boxes.set(box.id, box);
@@ -69,7 +75,11 @@ export class DesignBooleanLayout {
                     : entry,
             ),
         };
-        const scene: DesignLayoutResult = new DesignLayoutEngine(isolated, pageId).solve();
+        const scene: DesignLayoutResult = new DesignLayoutEngine(
+            isolated,
+            pageId,
+            this.measurer,
+        ).solve();
         const root: DesignBox | undefined = scene.boxes.find(
             (box: DesignBox): boolean => box.id === id,
         );

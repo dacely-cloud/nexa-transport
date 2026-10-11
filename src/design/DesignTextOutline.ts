@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignShapedTextMetrics } from './DesignShapedTextMetrics.js';
+import type { DesignTextMeasurer } from './DesignLayoutTypes.js';
 import { DesignDefaults } from './DesignDefaults.js';
 import { DesignSelectionContext } from './DesignSelectionContext.js';
 import type { DesignSelectionPlan, DesignSelectionGeometry } from './DesignSelectionTypes.js';
@@ -33,11 +35,18 @@ export class DesignTextOutline {
         selection: readonly string[],
         fonts: DesignFontEngine,
         id: (source: string) => string,
+        measurer: DesignTextMeasurer = new DesignShapedTextMetrics(
+            (style: DesignTextSpanStyle, content: string): number =>
+                fonts.supports(style)
+                    ? fonts.measure(style, content)
+                    : DesignTextLayout.estimate(style, content),
+        ),
     ): DesignSelectionPlan {
         const context: DesignSelectionContext = new DesignSelectionContext(
             document,
             pageId,
             selection,
+            measurer,
         );
         const operations: DesignOperation[] = [];
         for (const node of context.roots) {

@@ -18,6 +18,7 @@ import type {
 } from './DesignSelectionTypes.js';
 import { DesignSelectionContext as Context } from './DesignSelectionContext.js';
 import { DesignSelectionTree } from './DesignSelectionTree.js';
+import type { DesignTextMeasurer } from './DesignLayoutTypes.js';
 import { DesignVariants } from './DesignVariants.js';
 import { DesignComponentSwap } from './DesignComponentSwap.js';
 import { DesignVariantGeometry } from './DesignVariantGeometry.js';
@@ -30,10 +31,11 @@ export class DesignVariantEdits {
         pageId: string,
         command: DesignVariantCommand,
         identify: (sourceId: string) => string,
+        measurer?: DesignTextMeasurer,
     ): DesignSelectionPlan {
         if (command.action === Action.CombineVariants) {
             return this.#combine(
-                new Context(document, pageId, command.selection),
+                new Context(document, pageId, command.selection, measurer),
                 command,
                 identify,
             );
@@ -44,7 +46,7 @@ export class DesignVariantEdits {
                 : command.action === Action.EditVariant
                   ? command.componentId
                   : command.componentSetId;
-        const context: Context = new Context(document, pageId, [id]);
+        const context: Context = new Context(document, pageId, [id], measurer);
         const node: DesignNode = context.node(id);
         if (command.action === Action.SetVariant) {
             if (node.kind !== DesignKind.Instance || node.componentId === null) {
@@ -195,7 +197,12 @@ export class DesignVariantEdits {
         if (sourceId === null || !set.children.includes(sourceId)) {
             throw new Error('Copy an immediate variant from this component set.');
         }
-        const sourceContext: Context = new Context(context.document, context.pageId, [sourceId]);
+        const sourceContext: Context = new Context(
+            context.document,
+            context.pageId,
+            [sourceId],
+            context.measurer,
+        );
         const copy: DesignSelectionPlan = DesignSelectionTree.duplicate(sourceContext, identify);
         if (set.layout.flow !== DesignFlow.Absolute) {
             return copy;

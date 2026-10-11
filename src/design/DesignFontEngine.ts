@@ -154,14 +154,28 @@ export class DesignFontEngine {
         return output;
     }
 
-    #face(style: DesignTextSpanStyle): Font {
-        const entry: RegisteredFont | undefined = this.#fonts.find(
+    /** Allows layout to estimate unrelated font families while outline conversion still requires a matching face. */
+    public supports(style: DesignTextSpanStyle): boolean {
+        const entry: RegisteredFont | undefined = this.#entry(style);
+        if (entry === undefined) {
+            return false;
+        }
+        const axis: Font['variationAxes'][string] = entry.face.variationAxes['wght'];
+        return axis === undefined || (style.weight >= axis.min && style.weight <= axis.max);
+    }
+
+    #entry(style: DesignTextSpanStyle): RegisteredFont | undefined {
+        return this.#fonts.find(
             (item: RegisteredFont): boolean =>
                 item.source.family.toLowerCase() === style.family.toLowerCase() &&
                 item.source.italic === style.italic &&
                 (item.face.variationAxes['wght'] !== undefined ||
                     item.source.weight === style.weight),
         );
+    }
+
+    #face(style: DesignTextSpanStyle): Font {
+        const entry: RegisteredFont | undefined = this.#entry(style);
         if (entry === undefined) {
             throw new Error(
                 `No matching ${style.family} font at weight ${style.weight}${style.italic ? ' italic' : ''}. Supply a matching workspace font.`,

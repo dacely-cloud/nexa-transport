@@ -4,6 +4,8 @@
 import type { DesignDocument, DesignNode, DesignBox } from './DesignTypes.js';
 import { DesignLayoutEngine } from './DesignLayout.js';
 import type { DesignSelectionGeometry, DesignSelectionBounds } from './DesignSelectionTypes.js';
+import type { DesignTextMeasurer } from './DesignLayoutTypes.js';
+import { DesignTextMetrics } from './DesignTextMetrics.js';
 import { DesignValues as V } from './DesignValues.js';
 
 /** Indexed, page-local selection ownership and center-based geometric conversions. */
@@ -19,6 +21,7 @@ export class DesignSelectionContext {
         public readonly document: DesignDocument,
         public readonly pageId: string,
         selection: readonly string[],
+        public readonly measurer: DesignTextMeasurer = new DesignTextMetrics(),
     ) {
         V.id(pageId);
         if (
@@ -81,7 +84,7 @@ export class DesignSelectionContext {
                 (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0),
         );
         this.boxes = new Map(
-            new DesignLayoutEngine(document, pageId)
+            new DesignLayoutEngine(document, pageId, measurer)
                 .solve()
                 .boxes.map((box: DesignBox): readonly [string, DesignBox] => [box.id, box]),
         );

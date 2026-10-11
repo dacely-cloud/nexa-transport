@@ -28,7 +28,7 @@ export class DesignVariantGeometry {
             context.document,
             plan.operations,
         ).document;
-        const after: Context = new Context(resized, context.pageId, [set.id]);
+        const after: Context = new Context(resized, context.pageId, [set.id], context.measurer);
         const beforeSource: DesignSelectionGeometry = context.local(context.box(sourceId), set.id);
         const correctedSource: DesignSelectionGeometry = after.local(context.box(sourceId), set.id);
         const dx: number = correctedSource.x - beforeSource.x;

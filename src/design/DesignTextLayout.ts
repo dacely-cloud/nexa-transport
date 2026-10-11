@@ -27,19 +27,18 @@ export interface DesignTextLine {
     readonly width: number;
     readonly segments: readonly DesignTextSegment[];
 }
-interface Glyph {
-    readonly text: string;
-    readonly style: DesignTextSpanStyle;
-    readonly width: number;
-}
 interface Span {
-    text: string;
+    readonly text: string;
     readonly style: DesignTextSpanStyle;
 }
 
-/** Portable word wrapping accepts an accurate browser font measurer or a deterministic native fallback. */
+/** Complete shaped spans determine word wrapping; oversized words break only at Unicode grapheme boundaries. */
 export class DesignTextLayout {
-    /** Sorted, validated UTF-16 run ranges are traversed once, including supplementary Unicode characters. */
+    static readonly #graphemes: Intl.Segmenter = new Intl.Segmenter(undefined, {
+        granularity: 'grapheme',
+    });
+
+    /** Validated UTF-16 rich ranges retain their styles across word wraps and explicit blank lines. */
     public static lines(
         text: DesignText,
         color: string,
@@ -71,28 +70,19 @@ export class DesignTextLayout {
             }),
         );
         const lines: DesignTextLine[] = [];
-        let glyphs: Glyph[] = [];
-        let used: number = 0;
+        let spans: readonly Span[] = [];
         let y: number = 0;
-        let offset: number = 0;
         let runIndex: number = 0;
+        const measured: (parts: readonly Span[]) => number = (parts: readonly Span[]): number =>
+            this.#widths(parts, text.letterSpacing, measure).reduce(
+                (sum: number, advance: number): number => sum + advance,
+                0,
+            ) +
+            Math.max(0, parts.length - 1) * text.letterSpacing;
+        const fits: (parts: readonly Span[]) => boolean = (parts: readonly Span[]): boolean =>
+            measured(parts) <= width + 0.001;
         const flush: () => void = (): void => {
-            const spans: Span[] = [];
-            for (const glyph of glyphs) {
-                const last: Span | undefined = spans.at(-1);
-                if (last?.style === glyph.style) {
-                    last.text += glyph.text;
-                } else {
-                    spans.push({ text: glyph.text, style: glyph.style });
-                }
-            }
-            const widths: number[] = spans.map((span: Span): number =>
-                Math.max(
-                    0,
-                    measure(span.style, span.text) +
-                        Math.max(0, Array.from(span.text).length - 1) * text.letterSpacing,
-                ),
-            );
+            const widths: readonly number[] = this.#widths(spans, text.letterSpacing, measure);
             const lineWidth: number =
                 widths.reduce((sum: number, value: number): number => sum + value, 0) +
                 Math.max(0, spans.length - 1) * text.letterSpacing;
@@ -105,72 +95,204 @@ export class DesignTextLayout {
                     : text.align === 'end'
                       ? width - lineWidth
                       : 0;
-            const segments: DesignTextSegment[] = spans.map(
+            const segments: readonly DesignTextSegment[] = spans.map(
                 (span: Span, index: number): DesignTextSegment => {
-                    const measured: number = widths[index] ?? 0;
+                    const advance: number = widths[index] ?? 0;
                     const segment: DesignTextSegment = {
                         text: span.text,
                         style: span.style,
                         x,
-                        width: measured,
+                        width: advance,
                     };
-                    x += measured + text.letterSpacing;
+                    x += advance + text.letterSpacing;
                     return segment;
                 },
             );
-            lines.push({ y, height: lineHeight, width: lineWidth, segments });
+            lines.push({ y, height: lineHeight, width: Math.max(0, lineWidth), segments });
             y += lineHeight;
-            glyphs = [];
-            used = 0;
+            spans = [];
         };
-        for (const character of text.content) {
-            while (text.runs[runIndex] !== undefined && (text.runs[runIndex]?.end ?? 0) <= offset) {
-                runIndex++;
+        if (
+            height > 0 &&
+            (height === Infinity || text.content.length <= 4096) &&
+            !/[\r\n]/u.test(text.content)
+        ) {
+            const complete: Span[] = [];
+            let offset: number = 0;
+            for (let index: number = 0; index < text.runs.length; index++) {
+                const run: DesignTextRun | undefined = text.runs[index];
+                const style: DesignTextSpanStyle | undefined = styles[index];
+                if (run === undefined || style === undefined) {
+                    break;
+                }
+                if (run.start > offset) {
+                    complete.push({ text: text.content.slice(offset, run.start), style: base });
+                }
+                complete.push({ text: text.content.slice(run.start, run.end), style });
+                offset = run.end;
             }
-            const run: DesignTextRun | undefined = text.runs[runIndex];
-            const style: DesignTextSpanStyle =
-                run !== undefined && run.start <= offset ? (styles[runIndex] ?? base) : base;
-            offset += character.length;
-            if (character === '\n') {
+            if (offset < text.content.length) {
+                complete.push({ text: text.content.slice(offset), style: base });
+            }
+            if (fits(complete)) {
+                spans = complete;
+                flush();
+                return lines;
+            }
+        }
+        for (const token of text.content.matchAll(/\r\n|[\r\n]|[^\S\r\n]+|[^\s]+/gu)) {
+            if (y >= height) {
+                break;
+            }
+            const content: string = token[0];
+            if (content === '\n' || content === '\r' || content === '\r\n') {
+                flush();
+                continue;
+            }
+            const parts: Span[] = [];
+            let offset: number = token.index;
+            const end: number = offset + content.length;
+            while (offset < end) {
+                while ((text.runs[runIndex]?.end ?? Infinity) <= offset) {
+                    runIndex++;
+                }
+                const run: DesignTextRun | undefined = text.runs[runIndex];
+                const active: boolean = run !== undefined && run.start <= offset;
+                const next: number = Math.min(
+                    end,
+                    active ? (run?.end ?? end) : (run?.start ?? end),
+                );
+                parts.push({
+                    text: text.content.slice(offset, next),
+                    style: active ? (styles[runIndex] ?? base) : base,
+                });
+                offset = next;
+            }
+            const candidate: readonly Span[] = this.#append(spans, parts);
+            if (/^\s+$/u.test(content) || fits(candidate)) {
+                spans = candidate;
+                continue;
+            }
+            if (spans.length > 0) {
+                spans = this.#trim(spans);
                 flush();
                 if (y >= height) {
                     break;
                 }
+            }
+            if (fits(parts)) {
+                spans = parts;
                 continue;
             }
-            const advance: number = Math.max(0, measure(style, character) + text.letterSpacing);
-            while (glyphs.length > 0 && used + advance > width) {
-                const breakAt: number = glyphs.findLastIndex((glyph: Glyph): boolean =>
-                    /\s/u.test(glyph.text),
-                );
-                if (breakAt >= 0 && breakAt < glyphs.length - 1) {
-                    const remainder: Glyph[] = glyphs.slice(breakAt + 1);
-                    glyphs = glyphs.slice(0, breakAt);
-                    flush();
-                    glyphs = remainder;
-                    used = remainder.reduce(
-                        (sum: number, glyph: Glyph): number => sum + glyph.width,
-                        0,
-                    );
+            const boundaries: number[] = Array.from(
+                this.#graphemes.segment(content),
+                (segment: Intl.SegmentData): number => segment.index,
+            );
+            boundaries.push(content.length);
+            let first: number = 0;
+            while (first < boundaries.length - 1 && y < height) {
+                const start: number = boundaries[first] ?? 0;
+                let low: number = 1;
+                let high: number = 1;
+                const remaining: number = boundaries.length - 1 - first;
+                const prefix: (count: number) => readonly Span[] = (
+                    count: number,
+                ): readonly Span[] =>
+                    this.#slice(parts, start, boundaries[first + count] ?? content.length);
+                while (high < remaining && fits(prefix(high))) {
+                    low = high;
+                    high = Math.min(remaining, high * 2);
+                }
+                if (fits(prefix(high))) {
+                    low = high;
                 } else {
+                    while (low + 1 < high) {
+                        const middle: number = Math.floor((low + high) / 2);
+                        if (fits(prefix(middle))) {
+                            low = middle;
+                        } else {
+                            high = middle;
+                        }
+                    }
+                }
+                spans = prefix(low);
+                first += low;
+                if (first < boundaries.length - 1) {
                     flush();
                 }
-                if (y >= height) {
-                    break;
-                }
             }
-            if (y >= height) {
-                break;
-            }
-            glyphs.push({ text: character, style, width: advance });
-            used += advance;
         }
         if (y < height) {
             flush();
         }
         return lines;
     }
-    /** Native fallback matches the model's portable font-width assumptions; the browser supplies actual metrics. */
+
+    static #append(before: readonly Span[], after: readonly Span[]): readonly Span[] {
+        const result: Span[] = [...before];
+        for (const span of after) {
+            const last: Span | undefined = result.at(-1);
+            if (last?.style === span.style) {
+                result[result.length - 1] = { style: last.style, text: last.text + span.text };
+            } else {
+                result.push(span);
+            }
+        }
+        return result;
+    }
+
+    static #slice(spans: readonly Span[], start: number, end: number): readonly Span[] {
+        const result: Span[] = [];
+        let offset: number = 0;
+        for (const span of spans) {
+            const stop: number = offset + span.text.length;
+            if (stop > start && offset < end) {
+                result.push({
+                    style: span.style,
+                    text: span.text.slice(Math.max(0, start - offset), end - offset),
+                });
+            }
+            offset = stop;
+            if (offset >= end) {
+                break;
+            }
+        }
+        return result;
+    }
+
+    static #trim(spans: readonly Span[]): readonly Span[] {
+        const result: Span[] = [...spans];
+        while (result.length > 0) {
+            const last: Span | undefined = result.at(-1);
+            if (last === undefined) {
+                break;
+            }
+            const text: string = last.text.trimEnd();
+            if (text.length > 0) {
+                result[result.length - 1] = { ...last, text };
+                break;
+            }
+            result.pop();
+        }
+        return result;
+    }
+
+    static #widths(
+        spans: readonly Span[],
+        tracking: number,
+        measure: (style: DesignTextSpanStyle, content: string) => number,
+    ): readonly number[] {
+        return spans.map((span: Span): number =>
+            Math.max(
+                0,
+                measure(span.style, span.text) +
+                    Math.max(0, Array.from(this.#graphemes.segment(span.text)).length - 1) *
+                        tracking,
+            ),
+        );
+    }
+
+    /** Explicit estimate for fonts without a loaded platform face. */
     public static estimate(style: DesignTextSpanStyle, content: string): number {
         let width: number = 0;
         for (const character of content) {

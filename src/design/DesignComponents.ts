@@ -29,6 +29,7 @@ import { DesignComponentSwap } from './DesignComponentSwap.js';
 import { DesignDefaults } from './DesignDefaults.js';
 import { DesignLayoutEngine } from './DesignLayout.js';
 import { DesignNodeCodec } from './DesignNodeCodec.js';
+import type { DesignTextMeasurer } from './DesignLayoutTypes.js';
 import { DesignValues as V } from './DesignValues.js';
 
 /** Components and instances use the same atomic operation planner in every runtime. */
@@ -181,6 +182,7 @@ export class DesignComponents {
         id: string,
         x: number,
         y: number,
+        measurer?: DesignTextMeasurer,
     ): DesignNode {
         const nodes: ReadonlyMap<string, DesignNode> = new Map(
             document.nodes.map((node: DesignNode): readonly [string, DesignNode] => [
@@ -203,7 +205,7 @@ export class DesignComponents {
         if (sourcePage === undefined) {
             throw new Error('Component belongs to no page.');
         }
-        const box: DesignBox | undefined = new DesignLayoutEngine(document, sourcePage)
+        const box: DesignBox | undefined = new DesignLayoutEngine(document, sourcePage, measurer)
             .solve()
             .boxes.find((candidate: DesignBox): boolean => candidate.id === component.id);
         return {
@@ -226,6 +228,7 @@ export class DesignComponents {
         pageId: string,
         input: DesignComponentCommand,
         identify: (sourceId: string) => string,
+        measurer?: DesignTextMeasurer,
     ): DesignSelectionPlan {
         const command: DesignComponentCommand = this.command(input);
         const page: DesignPage | undefined = document.pages.find(
@@ -236,7 +239,7 @@ export class DesignComponents {
         }
         let plan: DesignSelectionPlan;
         if (DesignVariantCommands.is(command)) {
-            plan = DesignVariantEdits.plan(document, pageId, command, identify);
+            plan = DesignVariantEdits.plan(document, pageId, command, identify, measurer);
         } else if (command.action === Action.Place) {
             const node: DesignNode = this.instance(
                 document,
@@ -244,6 +247,7 @@ export class DesignComponents {
                 identify('instance'),
                 command.x,
                 command.y,
+                measurer,
             );
             plan = {
                 operations: [
@@ -252,7 +256,7 @@ export class DesignComponents {
                 selection: [node.id],
             };
         } else if (command.action === Action.Create) {
-            const context: Context = new Context(document, pageId, command.selection);
+            const context: Context = new Context(document, pageId, command.selection, measurer);
             const node: DesignNode | undefined = context.roots[0];
             if (context.roots.length === 1 && node?.kind === DesignKind.Component) {
                 throw new Error('This layer is already a component.');
@@ -290,11 +294,11 @@ export class DesignComponents {
             }
         } else if (command.action === Action.Detach) {
             plan = DesignComponentDetach.plan(
-                new Context(document, pageId, command.selection),
+                new Context(document, pageId, command.selection, measurer),
                 identify,
             );
         } else if (command.action === Action.Swap) {
-            const context: Context = new Context(document, pageId, [command.instanceId]);
+            const context: Context = new Context(document, pageId, [command.instanceId], measurer);
             const node: DesignNode = context.node(command.instanceId);
             if (node.kind !== DesignKind.Instance || node.componentId === null) {
                 throw new Error('Choose a linked instance.');
@@ -322,7 +326,7 @@ export class DesignComponents {
                 selection: [node.id],
             };
         } else {
-            const context: Context = new Context(document, pageId, [command.instanceId]);
+            const context: Context = new Context(document, pageId, [command.instanceId], measurer);
             const node: DesignNode = context.node(command.instanceId);
             if (node.kind !== DesignKind.Instance || node.componentId === null) {
                 throw new Error('Choose a linked instance.');
