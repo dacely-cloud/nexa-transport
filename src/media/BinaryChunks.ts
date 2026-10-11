@@ -63,7 +63,10 @@ export class BinaryChunks {
     }
 
     /** Returns the complete frame, null while receiving, or the original unchunked frame. */
-    public accept(buffer: ArrayBuffer): ArrayBuffer | null {
+    public accept(
+        buffer: ArrayBuffer,
+        progress?: (prefix: Uint8Array<ArrayBuffer>, total: number) => void,
+    ): ArrayBuffer | null {
         if (!BinaryChunks.isChunk(buffer)) {
             return buffer;
         }
@@ -119,6 +122,7 @@ export class BinaryChunks {
             }
             this.#incoming.data.set(new Uint8Array(buffer, 28), offset);
             this.#incoming.offset += buffer.byteLength - 28;
+            progress?.(this.#incoming.data.subarray(0, this.#incoming.offset), total);
             clearTimeout(this.#incoming.timer);
             if (this.#incoming.offset === total) {
                 const result: ArrayBuffer = this.#incoming.data.buffer;

@@ -30,7 +30,11 @@ import { materializeError, rethrow } from './ErrorStack.js';
 import { BinaryChunks } from '../media/BinaryChunks.js';
 import { NexaMedia } from '../media/NexaMedia.js';
 import { BinaryEnvelope } from '../media/BinaryEnvelope.js';
-import { BinaryMedia, type ReceivedAttachment } from '../media/BinaryMedia.js';
+import {
+    BinaryMedia,
+    type ReceivedAttachment,
+    type AttachmentProgress,
+} from '../media/BinaryMedia.js';
 export type { ReceivedAttachment } from '../media/BinaryMedia.js';
 import {
     EventName,
@@ -141,8 +145,9 @@ export class NexaClient {
         id: string,
         attachmentId: string,
         signal?: AbortSignal,
+        progress?: (receivedBytes: number, totalBytes: number) => void,
     ): Promise<ReceivedAttachment> {
-        return SessionHistoryReader.download(this, id, attachmentId, signal);
+        return SessionHistoryReader.download(this, id, attachmentId, signal, progress);
     }
 
     readonly #company = new CompanyChannel(CompanyFormats.staffing);
@@ -414,6 +419,7 @@ export class NexaClient {
     readonly #options: ClientOptions;
     readonly #attachments: Set<(attachment: ReceivedAttachment) => void | Promise<void>> =
         new Set();
+    readonly #attachmentProgress: Set<(progress: AttachmentProgress) => void> = new Set();
     readonly #events: Set<(event: GatewayEvent) => void> = new Set();
     readonly #closeListeners: Set<(error: Error) => void> = new Set();
     readonly #gaps: Set<(gap: SequenceGap) => void> = new Set();
@@ -1008,6 +1014,10 @@ export class NexaClient {
     ): () => void {
         return this.#disposed ? (): void => {} : subscribe(this.#attachments, listener);
     }
+    /** Observes validated attachment content byte counts without retaining file content. */
+    public onAttachmentProgress(listener: (progress: AttachmentProgress) => void): () => void {
+        return this.#disposed ? (): void => {} : subscribe(this.#attachmentProgress, listener);
+    }
     /** Observes all events, including session mirrors and native tool progress. */
     public onEvent(listener: (event: GatewayEvent) => void): () => void {
         return this.#disposed ? (): void => {} : subscribe(this.#events, listener);
@@ -1361,7 +1371,17 @@ export class NexaClient {
             if (this.#hello === null) {
                 throw materializeError(new Error('Binary media arrived before authentication'));
             }
-            const complete: ArrayBuffer | null = this.#binaryChunks.accept(raw);
+            const complete: ArrayBuffer | null = this.#binaryChunks.accept(
+                raw,
+                (prefix, total): void => {
+                    const progress: AttachmentProgress | null = BinaryMedia.progress(prefix, total);
+                    if (progress) {
+                        for (const listener of this.#attachmentProgress) {
+                            this.#notify((): void => listener(progress));
+                        }
+                    }
+                },
+            );
             if (complete === null) {
                 return;
             }
@@ -1650,6 +1670,7 @@ export class NexaClient {
         this.#closeListeners.clear();
         this.#events.clear();
         this.#attachments.clear();
+        this.#attachmentProgress.clear();
         this.#gaps.clear();
         this.#reconnectListeners.clear();
     }

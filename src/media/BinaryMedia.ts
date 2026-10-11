@@ -10,8 +10,56 @@ export interface ReceivedAttachment extends DeliveredAttachment {
     readonly sessionId?: string;
 }
 
+/** Validated identity and content byte counts while an attachment is arriving. */
+export interface AttachmentProgress {
+    readonly id: string;
+    readonly sessionId?: string;
+    readonly streamId?: string;
+    readonly receivedBytes: number;
+    readonly totalBytes: number;
+}
+
 /** Platform-neutral NXMD binary attachment framing. */
 export class BinaryMedia {
+    /** Reads only an available NXMD header; framing bytes do not count as file progress. */
+    public static progress(
+        prefix: Uint8Array<ArrayBuffer>,
+        total: number,
+    ): AttachmentProgress | null {
+        if (prefix.byteLength < 8) {
+            return null;
+        }
+        const view: DataView = new DataView(prefix.buffer, prefix.byteOffset, prefix.byteLength);
+        if (view.getUint32(0) !== 0x4e584d44) {
+            return null;
+        }
+        const length: number = view.getUint32(4);
+        if (length > 16_384 || length > total - 8) {
+            throw new TypeError('Invalid binary media header');
+        }
+        if (prefix.byteLength < 8 + length) {
+            return null;
+        }
+        const raw: unknown = JSON.parse(
+            new TextDecoder('utf-8', { fatal: true }).decode(prefix.subarray(8, 8 + length)),
+        );
+        if (
+            !BinaryMedia.#record(raw) ||
+            !BinaryMedia.#metadata(raw['attachment']) ||
+            raw['attachment'].byteLength !== total - 8 - length ||
+            (raw['sessionId'] !== undefined && typeof raw['sessionId'] !== 'string') ||
+            (raw['streamId'] !== undefined && typeof raw['streamId'] !== 'string')
+        ) {
+            throw new TypeError('Invalid binary media metadata');
+        }
+        return {
+            id: raw['attachment'].id,
+            receivedBytes: prefix.byteLength - 8 - length,
+            totalBytes: raw['attachment'].byteLength,
+            ...(typeof raw['sessionId'] === 'string' ? { sessionId: raw['sessionId'] } : {}),
+            ...(typeof raw['streamId'] === 'string' ? { streamId: raw['streamId'] } : {}),
+        };
+    }
     public static encode(
         attachment: DeliveredAttachment,
         bytes: Uint8Array,
