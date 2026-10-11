@@ -176,12 +176,33 @@ export class SessionHistoryReader {
         id: string,
         attachmentId: string,
         signal?: AbortSignal,
+        progress?: (receivedBytes: number, totalBytes: number) => void,
     ): Promise<ReceivedAttachment> {
         signal?.throwIfAborted();
+        const controller: AbortController = new AbortController();
+        const requestSignal: AbortSignal =
+            signal === undefined ? controller.signal : AbortSignal.any([signal, controller.signal]);
         const delivery: PromiseWithResolvers<ReceivedAttachment> =
             Promise.withResolvers<ReceivedAttachment>();
+        const stalledDelivery: PromiseWithResolvers<never> = Promise.withResolvers<never>();
+        const stalled: () => void = (): void =>
+            stalledDelivery.reject(new Error('Download stalled. Please try again.'));
+        let idle: ReturnType<typeof setTimeout> = setTimeout(stalled, 60_000);
+        const stopProgress: () => void = client.onAttachmentProgress((update): void => {
+            if (
+                update.sessionId !== id ||
+                update.id !== attachmentId ||
+                update.streamId !== undefined
+            ) {
+                return;
+            }
+            clearTimeout(idle);
+            idle = setTimeout(stalled, 60_000);
+            progress?.(update.receivedBytes, update.totalBytes);
+        });
         const stop: () => void = client.onAttachment((file): void => {
             if (file.sessionId === id && file.id === attachmentId && file.streamId === undefined) {
+                progress?.(file.byteLength, file.byteLength);
                 delivery.resolve(file);
             }
         });
@@ -192,18 +213,24 @@ export class SessionHistoryReader {
             delivery.reject(new Error('Saved file delivery timed out'));
         }, 600_000);
         try {
-            const [, file] = await Promise.all([
-                client.call(
-                    Method.SessionsDownload,
-                    { id, attachmentId },
-                    { timeoutMs: 600_000, ...(signal === undefined ? {} : { signal }) },
-                ),
-                delivery.promise,
+            const [, file] = await Promise.race([
+                Promise.all([
+                    client.call(
+                        Method.SessionsDownload,
+                        { id, attachmentId },
+                        { timeoutMs: 600_000, signal: requestSignal },
+                    ),
+                    delivery.promise,
+                ]),
+                stalledDelivery.promise,
             ]);
             return file;
         } finally {
+            controller.abort();
             signal?.removeEventListener('abort', abort);
             clearTimeout(timeout);
+            clearTimeout(idle);
+            stopProgress();
             stop();
             stopClose();
         }
