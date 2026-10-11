@@ -6690,6 +6690,9 @@ export const schema: Schema = {
                     $ref: '#/definitions/DesignTextOperation',
                 },
                 {
+                    $ref: '#/definitions/DesignResizeOperation',
+                },
+                {
                     $ref: '#/definitions/DesignMove',
                 },
                 {
@@ -6892,6 +6895,14 @@ export const schema: Schema = {
                 minWidth: {
                     type: 'number',
                 },
+                referenceHeight: {
+                    type: 'number',
+                },
+                referenceWidth: {
+                    description:
+                        "Optional per-layer constraint baselines; legacy documents inherit the parent's authored dimensions.",
+                    type: 'number',
+                },
                 rowSpan: {
                     type: 'number',
                 },
@@ -7075,6 +7086,41 @@ export const schema: Schema = {
                 },
             },
             required: ['id', 'op'],
+            type: 'object',
+        },
+        DesignResizeOperation: {
+            description:
+                'Explicit geometry edits fix requested axes and preserve absolute child constraints atomically.',
+            properties: {
+                height: {
+                    type: 'number',
+                },
+                op: {
+                    const: 'resize',
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+                selection: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                width: {
+                    type: 'number',
+                },
+                x: {
+                    description:
+                        'Position edits accompany a single dragged layer and use its resolved parent coordinates.',
+                    type: 'number',
+                },
+                y: {
+                    type: 'number',
+                },
+            },
+            required: ['op', 'pageId', 'selection'],
             type: 'object',
         },
         DesignSaveMethod: {
