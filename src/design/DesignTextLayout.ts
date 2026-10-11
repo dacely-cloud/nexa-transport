@@ -38,6 +38,12 @@ interface Span {
 
 /** Complete shaped spans determine word wrapping; oversized words break only at Unicode grapheme boundaries. */
 export class DesignTextLayout {
+    /** Centers the em box in its line spacing; canvas, SVG and outlines share this baseline. */
+    public static baseline(line: DesignTextLine, lineHeight: number): number {
+        const size: number = line.height / lineHeight;
+        return line.y + (line.height - size) / 2 + size * 0.82;
+    }
+
     static readonly #graphemes: Intl.Segmenter = new Intl.Segmenter(undefined, {
         granularity: 'grapheme',
     });

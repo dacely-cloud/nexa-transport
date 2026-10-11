@@ -97,7 +97,7 @@ export class DesignTextOutline {
             );
             let index: number = 0;
             for (const line of lines) {
-                const baseline: number = line.y + (line.height / text.lineHeight) * 0.82;
+                const baseline: number = DesignTextLayout.baseline(line, text.lineHeight);
                 for (const segment of line.segments) {
                     const path: readonly DesignPathCommand[] = fonts.outline(
                         segment.style,
