@@ -3853,6 +3853,17 @@ export const DesignFlowValues = {
 /** DesignFlow from the Nexa wire protocol. */
 export type DesignFlow = (typeof DesignFlowValues)[keyof typeof DesignFlowValues];
 
+/** DesignFlowReorder wire fields. */
+export interface DesignFlowReorderShape {
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** index as defined by the Nexa gateway. */
+    readonly index: number;
+}
+
+/** DesignFlowReorder from the Nexa wire protocol. */
+export type DesignFlowReorder = DesignFlowReorderShape;
+
 /** DesignFontAsset wire fields. */
 export interface DesignFontAssetShape {
     /** byteLength as defined by the Nexa gateway. */
@@ -4972,6 +4983,8 @@ export interface DesignTranslateOperationShape {
     readonly op: 'translate';
     /** pageId as defined by the Nexa gateway. */
     readonly pageId: string;
+    /** reorders as defined by the Nexa gateway. */
+    readonly reorders?: ReadonlyArray<DesignFlowReorder>;
     /** selection as defined by the Nexa gateway. */
     readonly selection: ReadonlyArray<string>;
 }

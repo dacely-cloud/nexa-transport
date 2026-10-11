@@ -111,13 +111,19 @@ export interface DesignPositionOperation extends DesignPositionChanges {
     readonly id: string;
     readonly pageId: string;
 }
-/** Move a selection by a world-space delta while retaining its resolved geometry and constraints. */
+/** A selected flowing child changes its sibling slot without leaving automatic layout. */
+export interface DesignFlowReorder {
+    readonly id: string;
+    readonly index: number;
+}
+/** Move a selection from one original scene, optionally reordering selected flow children in the same edit. */
 export interface DesignTranslateOperation {
     readonly op: typeof DesignOperationKind.Translate;
     readonly pageId: string;
     readonly selection: readonly string[];
     readonly dx: number;
     readonly dy: number;
+    readonly reorders?: readonly DesignFlowReorder[];
 }
 /** Reparent or reorder without breaking both sides of the tree. */
 export interface DesignMove {

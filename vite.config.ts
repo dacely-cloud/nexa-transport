@@ -32,6 +32,7 @@ const config: UserConfig = {
                 'design-asset-codec': 'src/design/DesignAssetCodec.ts',
                 'design-asset-references': 'src/design/DesignAssetReferences.ts',
                 'design-selection': 'src/design/DesignSelection.ts',
+                'design-flow-ordering': 'src/design/DesignFlowOrdering.ts',
                 'design-selection-types': 'src/design/DesignSelectionTypes.ts',
                 'design-types': 'src/design/DesignTypes.ts',
                 'design-defaults': 'src/design/DesignDefaults.ts',

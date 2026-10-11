@@ -19,6 +19,7 @@ import {
     DesignOperationKind as Kind,
     type DesignOperation,
     type DesignNodeChanges,
+    type DesignFlowReorder,
 } from './DesignOperationTypes.js';
 import type { DesignNode, DesignToken, DesignInteraction, DesignComment } from './DesignTypes.js';
 
@@ -53,6 +54,7 @@ export class DesignOperationCodec {
                     'absolute',
                     'dx',
                     'dy',
+                    'reorders',
                 ],
                 ['op'],
             );
@@ -103,13 +105,11 @@ export class DesignOperationCodec {
                     };
                 }
                 case Kind.Translate: {
-                    const value: Readonly<Record<string, unknown>> = V.record(entry, [
-                        'op',
-                        'pageId',
-                        'selection',
-                        'dx',
-                        'dy',
-                    ]);
+                    const value: Readonly<Record<string, unknown>> = V.fields(
+                        entry,
+                        ['op', 'pageId', 'selection', 'dx', 'dy', 'reorders'],
+                        ['op', 'pageId', 'selection', 'dx', 'dy'],
+                    );
                     const selection: readonly string[] = V.list(
                         value['selection'],
                         128,
@@ -124,6 +124,22 @@ export class DesignOperationCodec {
                         selection,
                         dx: V.number(value['dx'], -100000, 100000),
                         dy: V.number(value['dy'], -100000, 100000),
+                        ...(Object.hasOwn(value, 'reorders')
+                            ? {
+                                  reorders: V.list(
+                                      value['reorders'],
+                                      128,
+                                      (raw: unknown): DesignFlowReorder => {
+                                          const reorder: Readonly<Record<string, unknown>> =
+                                              V.record(raw, ['id', 'index']);
+                                          return {
+                                              id: V.id(reorder['id']),
+                                              index: V.number(reorder['index'], 0, 10000, true),
+                                          };
+                                      },
+                                  ),
+                              }
+                            : {}),
                     };
                 }
                 case Kind.Position: {

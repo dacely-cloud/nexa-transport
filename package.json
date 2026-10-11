@@ -432,6 +432,10 @@
             "types": "./dist/workflows/HttpInputs.d.ts",
             "import": "./dist/workflow-http.js"
         },
+        "./design-flow-ordering": {
+            "types": "./dist/design/DesignFlowOrdering.d.ts",
+            "import": "./dist/design-flow-ordering.js"
+        },
         "./design-selection": {
             "types": "./dist/design/DesignSelection.d.ts",
             "import": "./dist/design-selection.js"

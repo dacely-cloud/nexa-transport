@@ -39,6 +39,7 @@ export class DesignWorldPositions {
         public readonly context: DesignSelectionContext,
         targets: readonly DesignBox[],
         captured: ReadonlyMap<string, DesignNode> = new Map(),
+        captureContext: DesignSelectionContext | null = null,
     ) {
         this.#nodes = new Map(context.nodes);
         for (const [id, node] of captured) {
@@ -55,15 +56,16 @@ export class DesignWorldPositions {
                       context.roots.map((node: DesignNode): string => node.id),
                       context.measurer,
                   );
-        const capture: DesignPositionEdits = new DesignPositionEdits(working);
+        const measurements: DesignSelectionContext = captureContext ?? working;
+        const capture: DesignPositionEdits = new DesignPositionEdits(measurements);
         this.#targets = targets.map((box: DesignBox): Target => {
-            const node: DesignNode = working.node(box.id);
+            const node: DesignNode = measurements.node(box.id);
             if (working.flowing(node.id)) {
                 throw new Error(
                     'Auto layout controls this position. Enable absolute positioning before manually arranging these layers.',
                 );
             }
-            const local: DesignSelectionGeometry = working.local(box, node.parentId);
+            const local: DesignSelectionGeometry = measurements.local(box, node.parentId);
             return {
                 node,
                 box,

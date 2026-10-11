@@ -86,6 +86,7 @@ const files: readonly string[] = [
     'DesignResizeAnchors',
     'DesignPositionEdits',
     'DesignTranslateEdits',
+    'DesignFlowOrdering',
     'DesignPositionReferences',
     'DesignWorldPositions',
     'DesignScene',

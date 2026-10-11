@@ -10,23 +10,33 @@ import {
 import { DesignSelectionContext } from './DesignSelectionContext.js';
 import { DesignWorldPositions } from './DesignWorldPositions.js';
 import { DesignPaths } from './DesignPaths.js';
+import { DesignFlowOrdering } from './DesignFlowOrdering.js';
 
 /** The native canvas and agent translation share one original world scene and one atomic result. */
 export class DesignTranslateEdits {
     /** Selection ownership, locks, roots and exact text measurements are resolved before translation. */
     public constructor(public readonly context: DesignSelectionContext) {}
 
-    /** Nested selections move once; flowing layers require an explicit departure from automatic layout. */
+    /** Flow ordering and free movement share the original scene instead of translating already reflowed artwork. */
     public apply(operation: DesignTranslateOperation): readonly DesignNode[] {
-        const targets: readonly DesignBox[] = this.context.roots.map(
-            (node: DesignNode): DesignBox => {
+        const captured: ReadonlyMap<string, DesignNode> =
+            operation.reorders === undefined
+                ? new Map()
+                : DesignFlowOrdering.capture(this.context, operation.reorders);
+        const targets: readonly DesignBox[] = this.context.roots
+            .filter(
+                (node: DesignNode): boolean =>
+                    operation.reorders === undefined || !this.context.flowing(node.id),
+            )
+            .map((node: DesignNode): DesignBox => {
                 const box: DesignBox = this.context.box(node.id);
                 return { ...box, x: box.x + operation.dx, y: box.y + operation.dy };
-            },
-        );
+            });
         const operations: readonly DesignOperation[] = new DesignWorldPositions(
             this.context,
             targets,
+            captured,
+            this.context,
         ).operations();
         if (operations.length > 512) {
             throw new Error(
@@ -37,7 +47,10 @@ export class DesignTranslateEdits {
             if (edit.op !== DesignOperationKind.Update) {
                 throw new Error('World translation requires captured layer updates.');
             }
-            return DesignPaths.resize(this.context.node(edit.id), edit.changes);
+            return DesignPaths.resize(
+                captured.get(edit.id) ?? this.context.node(edit.id),
+                edit.changes,
+            );
         });
     }
 }
