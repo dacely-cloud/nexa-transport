@@ -508,6 +508,10 @@
             "types": "./dist/design/DesignInterBytes.d.ts",
             "import": "./dist/design-inter-bytes.js"
         },
+        "./design-inter-outline-bytes": {
+            "types": "./dist/design/DesignInterOutlineBytes.d.ts",
+            "import": "./dist/design-inter-outline-bytes.js"
+        },
         "./design-text-outline": {
             "types": "./dist/design/DesignTextOutline.d.ts",
             "import": "./dist/design-text-outline.js"
