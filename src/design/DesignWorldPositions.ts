@@ -34,21 +34,36 @@ export class DesignWorldPositions {
     readonly #anchors: readonly Anchor[];
     readonly #changed: Set<string> = new Set();
 
-    /** Captures every original selected layer and its freely positioned ancestors before reflow. */
+    /** Captured resize records seed the new geometry while freely positioned ancestor origins come from the original scene. */
     public constructor(
         public readonly context: DesignSelectionContext,
         targets: readonly DesignBox[],
+        captured: ReadonlyMap<string, DesignNode> = new Map(),
     ) {
         this.#nodes = new Map(context.nodes);
-        const capture: DesignPositionEdits = new DesignPositionEdits(context);
+        for (const [id, node] of captured) {
+            context.node(id);
+            this.#nodes.set(id, node);
+            this.#changed.add(id);
+        }
+        const working: DesignSelectionContext =
+            captured.size === 0
+                ? context
+                : new DesignSelectionContext(
+                      { ...context.document, nodes: [...this.#nodes.values()] },
+                      context.pageId,
+                      context.roots.map((node: DesignNode): string => node.id),
+                      context.measurer,
+                  );
+        const capture: DesignPositionEdits = new DesignPositionEdits(working);
         this.#targets = targets.map((box: DesignBox): Target => {
-            const node: DesignNode = context.node(box.id);
-            if (context.flowing(node.id)) {
+            const node: DesignNode = working.node(box.id);
+            if (working.flowing(node.id)) {
                 throw new Error(
                     'Auto layout controls this position. Enable absolute positioning before manually arranging these layers.',
                 );
             }
-            const local: DesignSelectionGeometry = context.local(box, node.parentId);
+            const local: DesignSelectionGeometry = working.local(box, node.parentId);
             return {
                 node,
                 box,
@@ -62,8 +77,8 @@ export class DesignWorldPositions {
             };
         });
         const ancestors: Set<string> = new Set();
-        for (const target of this.#targets) {
-            let id: string | null = target.node.parentId;
+        for (const root of context.roots) {
+            let id: string | null = root.parentId;
             while (id !== null) {
                 ancestors.add(id);
                 id = context.node(id).parentId;
@@ -71,7 +86,10 @@ export class DesignWorldPositions {
         }
         this.#anchors = [...ancestors]
             .map((id: string): DesignNode => context.node(id))
-            .filter((node: DesignNode): boolean => !context.flowing(node.id))
+            .filter(
+                (node: DesignNode): boolean =>
+                    !context.flowing(node.id) && context.boxes.has(node.id),
+            )
             .map((node: DesignNode): Anchor => ({
                 node,
                 corner: DesignSelectionContext.corner(context.box(node.id)),

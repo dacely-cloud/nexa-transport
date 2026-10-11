@@ -16,6 +16,7 @@ import { DesignSelectionContext } from './DesignSelectionContext.js';
 import { DesignConstraints } from './DesignConstraints.js';
 import { DesignPaths } from './DesignPaths.js';
 import { DesignLayoutEngine } from './DesignLayout.js';
+import { DesignResizeAnchors } from './DesignResizeAnchors.js';
 
 interface ResizeAxes {
     readonly width: boolean;
@@ -25,6 +26,7 @@ interface ResizeAxes {
 /** Explicit resizes rebase constraints into the new authored dimensions; ordinary updates keep their meaning. */
 export class DesignResizeEdits {
     readonly #changes: Map<string, DesignNode> = new Map();
+    /** Shares page ownership, locked ancestry and measured source geometry with the original selection. */
     public constructor(public readonly context: DesignSelectionContext) {}
 
     /** Selected descendants are pruned, so a subtree is never resized twice by a common property edit. */
@@ -100,7 +102,6 @@ export class DesignResizeEdits {
         if (this.#changes.size === 0) {
             return [];
         }
-        // Parent content sizing may change when a child is resized. Its final baseline must match the new geometry.
         const boxes: ReadonlyMap<string, DesignBox> = new Map(
             new DesignLayoutEngine(
                 {
@@ -140,7 +141,7 @@ export class DesignResizeEdits {
             this.#changes.set(after.id, after);
             this.#children(before, after, axes, boxes);
         }
-        return [...this.#changes.values()];
+        return new DesignResizeAnchors(this.context, this.#changes).apply(operation);
     }
 
     #children(
