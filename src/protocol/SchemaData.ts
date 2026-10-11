@@ -15410,6 +15410,10 @@ export const schema: Schema = {
             description:
                 'Bounded, capability-free projection carried by live tool events and the final receipt.',
             properties: {
+                workspace: {
+                    $ref: '#/definitions/ReverseWorkspaceState',
+                    description: 'Persisted agent presentation is independent from execution progress.',
+                },
                 application: {
                     $ref: '#/definitions/ReverseApplicationSnapshot',
                     description:
@@ -15595,6 +15599,66 @@ export const schema: Schema = {
                 'state',
             ],
             type: 'object',
+        },
+        ReverseWorkspaceState: {
+            description:
+                'Independent presentation revisions never interfere with execution checkpoint revisions.',
+            properties: {
+                dock: {
+                    anyOf: [
+                        {
+                            enum: ['Agents', 'Output', 'References'],
+                            type: 'string',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                evidenceId: {
+                    type: ['null', 'string'],
+                },
+                follow: {
+                    type: 'boolean',
+                },
+                graph: {
+                    type: 'boolean',
+                },
+                navigation: {
+                    type: 'boolean',
+                },
+                revision: {
+                    type: 'string',
+                },
+                view: {
+                    $ref: '#/definitions/ReverseWorkspaceView',
+                },
+            },
+            required: ['dock', 'evidenceId', 'follow', 'graph', 'navigation', 'revision', 'view'],
+            type: 'object',
+        },
+        ReverseWorkspaceView: {
+            description:
+                "Native working views shared by model tools and Chat's RE panel.\nOne native RE representation.",
+            enum: [
+                'Accessibility',
+                'All evidence',
+                'Assembly',
+                'Browser activity',
+                'Comparison',
+                'DOM',
+                'Graph',
+                'Hex / bytes',
+                'Imports',
+                'Pseudocode',
+                'Resources',
+                'Screenshot',
+                'Scripts',
+                'Storage',
+                'Storage changes',
+                'WebMCP',
+            ],
+            type: 'string',
         },
         RiskLevel: {
             description: 'How dangerous an action is.',
