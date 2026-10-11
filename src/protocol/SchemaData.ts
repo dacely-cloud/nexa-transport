@@ -4998,6 +4998,10 @@ export const schema: Schema = {
         DataFile: {
             description: 'A complete source file the agent can process directly in its workspace.',
             properties: {
+                chunkBytes: {
+                    description: 'Maximum binary chunk size supported by this upload host; absent on older gateways.',
+                    type: 'string',
+                },
                 byteLength: {
                     type: 'string',
                 },
@@ -5017,6 +5021,10 @@ export const schema: Schema = {
         DataUpload: {
             description: 'A disk-backed upload; byte counts use decimal strings on the wire.',
             properties: {
+                chunkBytes: {
+                    description: 'Maximum binary chunk size supported by this upload host; absent on older gateways.',
+                    type: 'string',
+                },
                 byteLength: {
                     type: 'string',
                 },

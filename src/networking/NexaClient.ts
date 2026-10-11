@@ -1289,8 +1289,12 @@ export class NexaClient {
                 Math.floor((this.#hello?.policy.maxBufferedBytes ?? 65536) / 2),
                 (this.#options.maxMessageBytes ?? 16 * 1024 * 1024) - 28,
             );
+            const windowBytes: number = Math.min(
+                4 * 1024 * 1024,
+                this.#hello?.policy.maxBufferedBytes ?? 65536,
+            );
             for (const chunk of BinaryChunks.split(payload, chunkBytes)) {
-                while (socket.bufferedAmount > chunkBytes) {
+                while (socket.bufferedAmount + chunk.byteLength > windowBytes) {
                     if (
                         socket !== this.#socket ||
                         socket.readyState !== WebSocket.OPEN ||

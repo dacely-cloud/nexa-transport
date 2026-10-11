@@ -3198,6 +3198,8 @@ export type CreditSummaryParams = CreditSummaryParamsShape;
 
 /** DataFile wire fields. */
 export interface DataFileShape {
+    /** chunkBytes as defined by the Nexa gateway. */
+    readonly chunkBytes?: string;
     /** byteLength as defined by the Nexa gateway. */
     readonly byteLength: string;
     /** filename as defined by the Nexa gateway. */
@@ -3213,6 +3215,8 @@ export type DataFile = DataFileShape;
 
 /** DataUpload wire fields. */
 export interface DataUploadShape {
+    /** chunkBytes as defined by the Nexa gateway. */
+    readonly chunkBytes?: string;
     /** byteLength as defined by the Nexa gateway. */
     readonly byteLength: string;
     /** filename as defined by the Nexa gateway. */
