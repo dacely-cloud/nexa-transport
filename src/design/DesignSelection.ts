@@ -18,6 +18,8 @@ import { DesignValues as V } from './DesignValues.js';
 import { DesignMaskSelection } from './DesignMaskSelection.js';
 import { DesignBooleanSelection } from './DesignBooleanSelection.js';
 
+export { DesignSelectionContext } from './DesignSelectionContext.js';
+
 interface PositionedLayer {
     readonly node: DesignNode;
     readonly box: DesignBox;
