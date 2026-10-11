@@ -229,3 +229,34 @@ it('returns a complete cursor and reads only records after a prior snapshot', as
     });
     expect(gateway?.requests[1]?.params['cursor']).toBe(Buffer.byteLength(prefix).toString());
 });
+
+it('cancels queued history pages and can reopen the same conversation on the same connection', async (): Promise<void> => {
+    const record: SessionHistoryRecord = {
+        id: 'cancelled',
+        at: 1000,
+        kind: 'event',
+        data: { streamId: 'stream', event: { type: 'text', text: 'Café'.repeat(100) } },
+    };
+    const connected: NexaClient = await connect(JSON.stringify(record) + '\n', 31, 4);
+    if (gateway === undefined) {
+        throw new Error('Missing gateway');
+    }
+    const reply: typeof gateway.handler = gateway.handler;
+    const prefetched: PromiseWithResolvers<boolean> = Promise.withResolvers<boolean>();
+    gateway.handler = (socket: WebSocket, request: Request): void => {
+        if (request.params['cursor'] === '0') {
+            reply(socket, request);
+        } else {
+            prefetched.resolve(true);
+        }
+    };
+    const controller: AbortController = new AbortController();
+    const read: Promise<import('../src/networking/NexaClient.js').SavedHistorySnapshot> =
+        connected.readHistorySnapshot('saved', undefined, undefined, controller.signal);
+    const rejected: Promise<void> = expect(read).rejects.toThrow('Request aborted');
+    await prefetched.promise;
+    controller.abort(new Error('Changed chat'));
+    await rejected;
+    gateway.handler = reply;
+    expect(await connected.readHistory('saved')).toEqual([record]);
+});

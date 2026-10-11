@@ -22,6 +22,7 @@ class HistoryPageWindow {
         private readonly client: NexaClient,
         private readonly id: string,
         private readonly concurrency: number,
+        private readonly signal?: AbortSignal,
     ) {}
 
     public async read(cursor: string, endCursor?: string): Promise<SessionHistoryPage> {
@@ -82,7 +83,12 @@ class HistoryPageWindow {
                         pageBytes: 1024 * 1024,
                         ...(endCursor === undefined ? {} : { endCursor }),
                     },
-                    { signal: controller.signal },
+                    {
+                        signal:
+                            this.signal === undefined
+                                ? controller.signal
+                                : AbortSignal.any([controller.signal, this.signal]),
+                    },
                 )
                 .then(
                     (value: SessionHistoryPage): PromiseFulfilledResult<SessionHistoryPage> => ({
@@ -106,14 +112,17 @@ export class SessionHistoryReader {
         cursor: string = '0',
         endCursor?: string,
         concurrency: number = 16,
+        signal?: AbortSignal,
     ): Promise<SavedHistorySnapshot> {
+        signal?.throwIfAborted();
         const records: SessionHistoryRecord[] = [];
         const decoder: TextDecoder = new TextDecoder('utf-8', { fatal: true });
         const seen: Set<string> = new Set();
         let pending: string = '';
-        const pages: HistoryPageWindow = new HistoryPageWindow(client, id, concurrency);
+        const pages: HistoryPageWindow = new HistoryPageWindow(client, id, concurrency, signal);
         try {
             for (;;) {
+                signal?.throwIfAborted();
                 const page: SessionHistoryPage = await pages.read(cursor, endCursor);
                 if (
                     page.format !== 1 ||

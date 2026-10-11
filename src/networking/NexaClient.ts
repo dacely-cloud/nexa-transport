@@ -131,6 +131,7 @@ export class NexaClient {
         id: string,
         cursor?: string,
         endCursor?: string,
+        signal?: AbortSignal,
     ): Promise<SavedHistorySnapshot> {
         return SessionHistoryReader.snapshot(
             this,
@@ -138,6 +139,7 @@ export class NexaClient {
             cursor,
             endCursor,
             Math.max(1, Math.min(16, Math.floor(this.#pending.limit / 2))),
+            signal,
         );
     }
     /** Restores original archived bytes through the account-scoped gateway. */
