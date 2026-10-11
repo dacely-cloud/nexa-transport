@@ -4420,6 +4420,7 @@ export type DesignOperation =
     | DesignTextOperation
     | DesignResizeOperation
     | DesignPositionOperation
+    | DesignTranslateOperation
     | DesignMove
     | DesignRemove
     | DesignPageOperation
@@ -4960,6 +4961,23 @@ export const DesignTransitionValues = {
 
 /** DesignTransition from the Nexa wire protocol. */
 export type DesignTransition = (typeof DesignTransitionValues)[keyof typeof DesignTransitionValues];
+
+/** DesignTranslateOperation wire fields. */
+export interface DesignTranslateOperationShape {
+    /** dx as defined by the Nexa gateway. */
+    readonly dx: number;
+    /** dy as defined by the Nexa gateway. */
+    readonly dy: number;
+    /** op as defined by the Nexa gateway. */
+    readonly op: 'translate';
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+    /** selection as defined by the Nexa gateway. */
+    readonly selection: ReadonlyArray<string>;
+}
+
+/** DesignTranslateOperation from the Nexa wire protocol. */
+export type DesignTranslateOperation = DesignTranslateOperationShape;
 
 /** Allowed values for DesignTrigger. */
 export const DesignTriggerValues = { Value0: 'after', Value1: 'click', Value2: 'hover' } as const;

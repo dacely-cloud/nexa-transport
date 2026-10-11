@@ -6696,6 +6696,9 @@ export const schema: Schema = {
                     $ref: '#/definitions/DesignPositionOperation',
                 },
                 {
+                    $ref: '#/definitions/DesignTranslateOperation',
+                },
+                {
                     $ref: '#/definitions/DesignMove',
                 },
                 {
@@ -7492,6 +7495,33 @@ export const schema: Schema = {
             description: 'Prototype transitions.\nPrototype transition.',
             enum: ['dissolve', 'instant', 'slide'],
             type: 'string',
+        },
+        DesignTranslateOperation: {
+            description:
+                'Move a selection by a world-space delta while retaining its resolved geometry and constraints.',
+            properties: {
+                dx: {
+                    type: 'number',
+                },
+                dy: {
+                    type: 'number',
+                },
+                op: {
+                    const: 'translate',
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+                selection: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+            },
+            required: ['dx', 'dy', 'op', 'pageId', 'selection'],
+            type: 'object',
         },
         DesignTrigger: {
             description: 'Prototype triggers.\nPrototype trigger.',

@@ -51,6 +51,8 @@ export class DesignOperationCodec {
                     'horizontal',
                     'vertical',
                     'absolute',
+                    'dx',
+                    'dy',
                 ],
                 ['op'],
             );
@@ -98,6 +100,30 @@ export class DesignOperationCodec {
                         op,
                         id: V.id(value['id']),
                         content: V.text(value['content'], 100000, true),
+                    };
+                }
+                case Kind.Translate: {
+                    const value: Readonly<Record<string, unknown>> = V.record(entry, [
+                        'op',
+                        'pageId',
+                        'selection',
+                        'dx',
+                        'dy',
+                    ]);
+                    const selection: readonly string[] = V.list(
+                        value['selection'],
+                        128,
+                        (id: unknown): string => V.id(id),
+                    );
+                    if (selection.length === 0 || new Set(selection).size !== selection.length) {
+                        throw new Error('Translate requires 1 to 128 distinct selected layers.');
+                    }
+                    return {
+                        op,
+                        pageId: V.id(value['pageId']),
+                        selection,
+                        dx: V.number(value['dx'], -100000, 100000),
+                        dy: V.number(value['dy'], -100000, 100000),
                     };
                 }
                 case Kind.Position: {

@@ -29,6 +29,7 @@ export const DesignOperationKind = {
     Update: 'update',
     Resize: 'resize',
     Position: 'position',
+    Translate: 'translate',
     Text: 'text',
     Move: 'move',
     Remove: 'remove',
@@ -110,6 +111,14 @@ export interface DesignPositionOperation extends DesignPositionChanges {
     readonly id: string;
     readonly pageId: string;
 }
+/** Move a selection by a world-space delta while retaining its resolved geometry and constraints. */
+export interface DesignTranslateOperation {
+    readonly op: typeof DesignOperationKind.Translate;
+    readonly pageId: string;
+    readonly selection: readonly string[];
+    readonly dx: number;
+    readonly dy: number;
+}
 /** Reparent or reorder without breaking both sides of the tree. */
 export interface DesignMove {
     readonly op: typeof DesignOperationKind.Move;
@@ -144,6 +153,7 @@ export type DesignOperation =
     | DesignUpdate
     | DesignResizeOperation
     | DesignPositionOperation
+    | DesignTranslateOperation
     | DesignTextOperation
     | DesignMove
     | DesignRemove

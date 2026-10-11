@@ -84,6 +84,7 @@ const files: readonly string[] = [
     'DesignEdits',
     'DesignResizeEdits',
     'DesignPositionEdits',
+    'DesignTranslateEdits',
     'DesignPositionReferences',
     'DesignWorldPositions',
     'DesignScene',

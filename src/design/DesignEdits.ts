@@ -17,6 +17,7 @@ import {
 import { DesignKind } from './DesignTypes.js';
 import { DesignResizeEdits } from './DesignResizeEdits.js';
 import { DesignPositionEdits } from './DesignPositionEdits.js';
+import { DesignTranslateEdits } from './DesignTranslateEdits.js';
 import { DesignSelectionContext } from './DesignSelectionContext.js';
 import type { DesignTextMeasurer } from './DesignLayoutTypes.js';
 import { DesignTextMetrics } from './DesignTextMetrics.js';
@@ -122,7 +123,9 @@ export class DesignEdits {
                     nodes.set(node.id, { ...node, text: { ...node.text, content, runs } });
                     break;
                 }
-                case DesignOperationKind.Resize: {
+                case DesignOperationKind.Resize:
+                case DesignOperationKind.Position:
+                case DesignOperationKind.Translate: {
                     const current: DesignDocument = {
                         ...document,
                         ...metadata,
@@ -132,28 +135,18 @@ export class DesignEdits {
                     const context: DesignSelectionContext = new DesignSelectionContext(
                         current,
                         operation.pageId,
-                        operation.selection,
+                        operation.op === DesignOperationKind.Position
+                            ? [operation.id]
+                            : operation.selection,
                         measurer,
                     );
-                    for (const node of new DesignResizeEdits(context).apply(operation)) {
-                        nodes.set(node.id, node);
-                    }
-                    break;
-                }
-                case DesignOperationKind.Position: {
-                    const current: DesignDocument = {
-                        ...document,
-                        ...metadata,
-                        nodes: [...nodes.values()],
-                        pages: [...pages.values()],
-                    };
-                    const context: DesignSelectionContext = new DesignSelectionContext(
-                        current,
-                        operation.pageId,
-                        [operation.id],
-                        measurer,
-                    );
-                    for (const node of new DesignPositionEdits(context).apply(operation)) {
+                    const changed: readonly DesignNode[] =
+                        operation.op === DesignOperationKind.Resize
+                            ? new DesignResizeEdits(context).apply(operation)
+                            : operation.op === DesignOperationKind.Position
+                              ? new DesignPositionEdits(context).apply(operation)
+                              : new DesignTranslateEdits(context).apply(operation);
+                    for (const node of changed) {
                         nodes.set(node.id, node);
                     }
                     break;

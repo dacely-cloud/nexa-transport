@@ -2,6 +2,7 @@
 
 import {
     DesignConstraint,
+    DesignKind,
     type DesignBox,
     type DesignDocument,
     type DesignNode,
@@ -109,7 +110,7 @@ export class DesignWorldPositions {
                             width: node.width,
                             height: node.height,
                             placement: node.placement,
-                            path: node.path,
+                            ...(node.kind === DesignKind.Boolean ? {} : { path: node.path }),
                         },
                     };
                 });
