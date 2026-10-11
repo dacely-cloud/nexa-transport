@@ -5829,6 +5829,20 @@ export const schema: Schema = {
             enum: ['absolute', 'column', 'grid', 'row'],
             type: 'string',
         },
+        DesignFlowReorder: {
+            description:
+                'A selected flowing child changes its sibling slot without leaving automatic layout.',
+            properties: {
+                id: {
+                    type: 'string',
+                },
+                index: {
+                    type: 'number',
+                },
+            },
+            required: ['id', 'index'],
+            type: 'object',
+        },
         DesignFontAsset: {
             description:
                 'Immutable font identity and a declared family/style binding; source bytes are never model output.',
@@ -7498,7 +7512,7 @@ export const schema: Schema = {
         },
         DesignTranslateOperation: {
             description:
-                'Move a selection by a world-space delta while retaining its resolved geometry and constraints.',
+                'Move a selection from one original scene, optionally reordering selected flow children in the same edit.',
             properties: {
                 dx: {
                     type: 'number',
@@ -7512,6 +7526,12 @@ export const schema: Schema = {
                 },
                 pageId: {
                     type: 'string',
+                },
+                reorders: {
+                    items: {
+                        $ref: '#/definitions/DesignFlowReorder',
+                    },
+                    type: 'array',
                 },
                 selection: {
                     items: {
