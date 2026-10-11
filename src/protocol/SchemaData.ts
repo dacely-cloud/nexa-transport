@@ -7627,6 +7627,109 @@ export const schema: Schema = {
             required: ['property', 'value'],
             type: 'object',
         },
+        DesignViewMethod: {
+            description:
+                'The gateway advertises view support independently of the legacy complete-record read.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/DesignViewRequest',
+                },
+                result: {
+                    $ref: '#/definitions/DesignViewPage',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        DesignViewPage: {
+            description:
+                'Deferred records are valid identity projections, never complete editable copies of their original bodies.',
+            properties: {
+                deferredIds: {
+                    description:
+                        'Only deferred node identities carried in this bounded record page or fragment.',
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                fragment: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignRecordFragment',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                nextCursor: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignCursor',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                pageId: {
+                    description: 'The resolved primary page is stable across all continuations.',
+                    type: 'string',
+                },
+                records: {
+                    items: {
+                        $ref: '#/definitions/DesignRecord',
+                    },
+                    type: 'array',
+                },
+                summary: {
+                    $ref: '#/definitions/DesignSummary',
+                },
+            },
+            required: ['deferredIds', 'fragment', 'nextCursor', 'pageId', 'records', 'summary'],
+            type: 'object',
+        },
+        DesignViewRequest: {
+            description:
+                'A revision-pinned page view retains topology while deferring inactive text and vector bodies.',
+            properties: {
+                cursor: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignCursor',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                id: {
+                    type: 'string',
+                },
+                includeIds: {
+                    description:
+                        'Additional existing layers and their dependencies; removed identities are ignored during shared refresh.',
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                limit: {
+                    type: 'number',
+                },
+                pageId: {
+                    description:
+                        "Null or a removed preferred page selects the document's first page.",
+                    type: ['null', 'string'],
+                },
+                revision: {
+                    type: ['null', 'string'],
+                },
+            },
+            required: ['cursor', 'id', 'includeIds', 'limit', 'pageId', 'revision'],
+            type: 'object',
+        },
         DeviceApproveParams: {
             description: 'Approving a device, optionally overriding the scopes it asked for.',
             properties: {
@@ -9070,6 +9173,20 @@ export const schema: Schema = {
                         },
                         result: {
                             $ref: '#/definitions/DesignReceipt',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'design.view': {
+                    description:
+                        'The gateway advertises view support independently of the legacy complete-record read.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/DesignViewRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/DesignViewPage',
                         },
                     },
                     required: ['params', 'result'],
@@ -10720,6 +10837,7 @@ export const schema: Schema = {
                 'design.read',
                 'design.save',
                 'design.undo',
+                'design.view',
                 'devices.approve',
                 'devices.list',
                 'devices.reject',
