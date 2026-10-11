@@ -94,9 +94,9 @@ describe('shared vector authoring and durable resize', (): void => {
             resized.document.nodes.find((layer: DesignNode): boolean => layer.id === 'vector')
                 ?.path[1]?.values,
         ).toEqual([80, 10, 240, 40, 320, 60]);
-        expect(
-            DesignEdits.restore(resized.document, resized.changes, true).document.nodes,
-        ).toEqual(source.nodes);
+        expect(DesignEdits.restore(resized.document, resized.changes, true).document.nodes).toEqual(
+            source.nodes,
+        );
         const explicit: DesignNode = DesignPaths.resize(node, {
             width: 320,
             path: [{ verb: Verb.Move, values: [5, 6] }],

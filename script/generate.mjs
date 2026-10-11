@@ -242,13 +242,18 @@ for (const [name, method] of Object.entries(schema.definitions.GatewayMethods.pr
     let contract = method;
     const visited = new Set();
     while (contract.$ref !== undefined) {
-        if (visited.has(contract.$ref)) throw new Error('Cyclic gateway method declaration: ' + name);
+        if (visited.has(contract.$ref))
+            throw new Error('Cyclic gateway method declaration: ' + name);
         visited.add(contract.$ref);
-        const definition = contract.$ref.replace('#/definitions/', '').replaceAll('~1', '/').replaceAll('~0', '~');
+        const definition = contract.$ref
+            .replace('#/definitions/', '')
+            .replaceAll('~1', '/')
+            .replaceAll('~0', '~');
         contract = schema.definitions[definition];
         if (contract === undefined) throw new Error('Missing gateway method declaration: ' + name);
     }
-    if (contract.properties?.params === undefined || contract.properties?.result === undefined) throw new Error('Incomplete gateway method declaration: ' + name);
+    if (contract.properties?.params === undefined || contract.properties?.result === undefined)
+        throw new Error('Incomplete gateway method declaration: ' + name);
     schema.definitions.GatewayMethods.properties[name] = contract;
 }
 

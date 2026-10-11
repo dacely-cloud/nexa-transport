@@ -1,7 +1,11 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { BrowserWebMcpMetadata, BrowserWebMcpDescriptor, BrowserSchemaProperty } from '../protocol/Protocol.js';
+import type {
+    BrowserWebMcpMetadata,
+    BrowserWebMcpDescriptor,
+    BrowserSchemaProperty,
+} from '../protocol/Protocol.js';
 
 /** Native passive WebMCP enumeration. */
 export const BrowserSchemaType = {
@@ -21,7 +25,8 @@ export const BrowserWebMcpDeclaration = {
     Imperative: 'imperative',
 } as const;
 /** Native passive WebMCP selection type. */
-export type BrowserWebMcpDeclaration = (typeof BrowserWebMcpDeclaration)[keyof typeof BrowserWebMcpDeclaration];
+export type BrowserWebMcpDeclaration =
+    (typeof BrowserWebMcpDeclaration)[keyof typeof BrowserWebMcpDeclaration];
 
 /** Native passive WebMCP enumeration. */
 export const BrowserWebMcpView = {
@@ -33,7 +38,12 @@ export const BrowserWebMcpView = {
 export type BrowserWebMcpView = (typeof BrowserWebMcpView)[keyof typeof BrowserWebMcpView];
 
 /** Host-only originals are separate from bounded wire pages. */
-export interface BrowserWebMcpTool extends BrowserWebMcpDescriptor { readonly properties: readonly BrowserSchemaProperty[]; }
+export interface BrowserWebMcpTool extends BrowserWebMcpDescriptor {
+    readonly properties: readonly BrowserSchemaProperty[];
+}
 
 /** Complete captures are validated without publishing their arrays in progress. */
-export interface BrowserWebMcpCapture { readonly metadata: BrowserWebMcpMetadata; readonly tools: readonly BrowserWebMcpTool[]; }
+export interface BrowserWebMcpCapture {
+    readonly metadata: BrowserWebMcpMetadata;
+    readonly tools: readonly BrowserWebMcpTool[];
+}

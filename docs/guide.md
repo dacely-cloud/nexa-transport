@@ -158,6 +158,8 @@ const result: AskResult = await turn.result;
 
 The iterator includes turn/iteration lifecycle, status, reasoning, usage, tools, native events, and finish events. Use the discriminator and [WireTurnEvent variants](protocol.md#wireturnevent) to render all supported cases. `turn.streamId` identifies the local stream; `turn.result` resolves only with its terminal answer. Starting a stream returns immediately; a pending model turn is not itself a connection failure.
 
+For a JSON final answer, pass `responseFormat: 'json'` in the turn parameters. Native tools remain available; intermediate reasoning and tool events still stream. Final text is withheld until the entire response parses as JSON and required completion checks pass. Invalid formatting receives bounded correction attempts. This requires `client.hello.features.jsonReplies === true`; older gateways are rejected before the turn starts. Check `incompleteReason` and validate your application schema separately.
+
 For a work UI, show the last status/tool progress while waiting for text, keep the cancellation control available, and distinguish terminal completion, failure, and interruption. Native agent/backlog/graph events can describe delegated work independently of the visible answer.
 
 ```ts

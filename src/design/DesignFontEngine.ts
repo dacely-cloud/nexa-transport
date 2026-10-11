@@ -12,14 +12,21 @@ import {
 } from 'fontkit';
 import { DesignFontContainer } from './DesignFontContainer.js';
 import type { DesignTextSpanStyle } from './DesignTextLayout.js';
+import type { DesignFontBinding } from './DesignFontTypes.js';
 import { DesignPathVerb, type DesignPathCommand } from './DesignTypes.js';
 
 /** A caller supplies authorized font bytes, never a process-global filesystem path. */
 export interface DesignFontSource {
+    readonly binding?: DesignFontBinding;
     readonly family: string;
     readonly italic: boolean;
     readonly weight: number;
     readonly bytes: Uint8Array;
+}
+/** The actual face range supplies the same weight contract to shaping and browser registration. */
+export interface DesignFontWeightRange {
+    readonly minimum: number;
+    readonly maximum: number;
 }
 interface RegisteredFont {
     readonly source: DesignFontSource;
@@ -57,12 +64,46 @@ export class DesignFontEngine {
                 (item: RegisteredFont): boolean =>
                     item.source.family.toLowerCase() === source.family.toLowerCase() &&
                     item.source.italic === source.italic &&
-                    item.source.weight === source.weight,
+                    item.source.weight === source.weight &&
+                    this.#sameBinding(item.source.binding, source.binding),
             )
         ) {
             throw new Error('Duplicate font family, weight and italic binding.');
         }
         this.#fonts.push({ source, face: parsed });
+    }
+
+    /** Private faces extend a fresh engine without modifying the public bundled-font cache. */
+    public with(sources: readonly DesignFontSource[]): DesignFontEngine {
+        const result: DesignFontEngine = new DesignFontEngine();
+        for (const entry of this.#fonts) {
+            result.#fonts.push(entry);
+        }
+        for (const source of sources) {
+            result.add(source);
+        }
+        return result;
+    }
+
+    /** Reports the validated static weight or variable wght range for one exact style binding. */
+    public weightRange(style: DesignTextSpanStyle): DesignFontWeightRange {
+        const entry: RegisteredFont | undefined = this.#entry(style);
+        if (entry === undefined) {
+            throw new Error('No matching font binding.');
+        }
+        const axis: Font['variationAxes'][string] = entry.face.variationAxes['wght'];
+        const minimum: number = axis?.min ?? entry.source.weight;
+        const maximum: number = axis?.max ?? entry.source.weight;
+        if (
+            !Number.isFinite(minimum) ||
+            !Number.isFinite(maximum) ||
+            minimum < 1 ||
+            maximum > 1000 ||
+            minimum > maximum
+        ) {
+            throw new Error('Font has an invalid weight range.');
+        }
+        return { minimum, maximum };
     }
 
     /** Measures complete shaped strings including kerning and ligatures; layout applies tracking. */
@@ -169,9 +210,19 @@ export class DesignFontEngine {
             (item: RegisteredFont): boolean =>
                 item.source.family.toLowerCase() === style.family.toLowerCase() &&
                 item.source.italic === style.italic &&
+                this.#sameBinding(item.source.binding, style.font) &&
                 (item.face.variationAxes['wght'] !== undefined ||
                     item.source.weight === style.weight),
         );
+    }
+
+    #sameBinding(
+        left: DesignFontBinding | null | undefined,
+        right: DesignFontBinding | null | undefined,
+    ): boolean {
+        return left == null
+            ? right == null
+            : right != null && left.id === right.id && left.sha256 === right.sha256;
     }
 
     #face(style: DesignTextSpanStyle): Font {

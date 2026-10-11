@@ -13,6 +13,7 @@ import { DesignMaskMode } from './DesignMaskTypes.js';
 import { DesignMaskGeometry } from './DesignMaskGeometry.js';
 import { DesignSvgGeometry as Geometry } from './DesignSvgGeometry.js';
 import { DesignSvgPaints } from './DesignSvgPaints.js';
+import { DesignFontBindings } from './DesignFontBindings.js';
 import {
     DesignSvgLimits,
     type DesignSvgImage,
@@ -207,6 +208,6 @@ export class DesignSvg {
         paints.definitions.push(
             `<clipPath id="${id}"><rect width="${box.width}" height="${box.height}"/></clipPath>`,
         );
-        return `<g clip-path="url(#${id})"><text xml:space="preserve" letter-spacing="${text.letterSpacing}" ${attributes}>${lines.map((line: DesignTextLine): string => line.segments.map((segment: DesignTextSegment): string => `<tspan x="${segment.x}" y="${line.y + (line.height / text.lineHeight) * 0.82}" ${segment.style.rich && richFill ? `fill="${segment.style.color}"` : ''} font-family="${Geometry.escape(segment.style.family)}" font-size="${segment.style.size}" font-weight="${segment.style.weight}" font-style="${segment.style.italic ? 'italic' : 'normal'}" text-decoration="${segment.style.underline ? 'underline' : 'none'}">${Geometry.escape(segment.text)}</tspan>`).join('')).join('')}</text></g>`;
+        return `<g clip-path="url(#${id})"><text xml:space="preserve" letter-spacing="${text.letterSpacing}" ${attributes}>${lines.map((line: DesignTextLine): string => line.segments.map((segment: DesignTextSegment): string => `<tspan x="${segment.x}" y="${line.y + (line.height / text.lineHeight) * 0.82}" ${segment.style.rich && richFill ? `fill="${segment.style.color}"` : ''} font-family="${Geometry.escape(DesignFontBindings.family(segment.style.family, segment.style.font))}" font-size="${segment.style.size}" font-weight="${segment.style.weight}" font-style="${segment.style.italic ? 'italic' : 'normal'}" text-decoration="${segment.style.underline ? 'underline' : 'none'}">${Geometry.escape(segment.text)}</tspan>`).join('')).join('')}</text></g>`;
     }
 }

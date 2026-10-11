@@ -372,6 +372,9 @@ export const AskParamsreasoningEffortValues = {
     Value6: 'xhigh',
 } as const;
 
+/** Allowed values for AskParamsresponseFormat. */
+export const AskParamsresponseFormatValues = { Value0: 'json', Value1: 'text' } as const;
+
 /** AskParams wire fields. */
 export interface AskParamsShape {
     /** agentId as defined by the Nexa gateway. */
@@ -386,6 +389,8 @@ export interface AskParamsShape {
     readonly message: string;
     /** reasoningEffort as defined by the Nexa gateway. */
     readonly reasoningEffort?: (typeof AskParamsreasoningEffortValues)[keyof typeof AskParamsreasoningEffortValues];
+    /** responseFormat as defined by the Nexa gateway. */
+    readonly responseFormat?: (typeof AskParamsresponseFormatValues)[keyof typeof AskParamsresponseFormatValues];
     /** targetTimeSeconds as defined by the Nexa gateway. */
     readonly targetTimeSeconds?: number;
     /** userId as defined by the Nexa gateway. */
@@ -3198,10 +3203,10 @@ export type CreditSummaryParams = CreditSummaryParamsShape;
 
 /** DataFile wire fields. */
 export interface DataFileShape {
-    /** chunkBytes as defined by the Nexa gateway. */
-    readonly chunkBytes?: string;
     /** byteLength as defined by the Nexa gateway. */
     readonly byteLength: string;
+    /** chunkBytes as defined by the Nexa gateway. */
+    readonly chunkBytes?: string;
     /** filename as defined by the Nexa gateway. */
     readonly filename: string;
     /** id as defined by the Nexa gateway. */
@@ -3215,10 +3220,10 @@ export type DataFile = DataFileShape;
 
 /** DataUpload wire fields. */
 export interface DataUploadShape {
-    /** chunkBytes as defined by the Nexa gateway. */
-    readonly chunkBytes?: string;
     /** byteLength as defined by the Nexa gateway. */
     readonly byteLength: string;
+    /** chunkBytes as defined by the Nexa gateway. */
+    readonly chunkBytes?: string;
     /** filename as defined by the Nexa gateway. */
     readonly filename: string;
     /** id as defined by the Nexa gateway. */
@@ -3848,6 +3853,119 @@ export const DesignFlowValues = {
 /** DesignFlow from the Nexa wire protocol. */
 export type DesignFlow = (typeof DesignFlowValues)[keyof typeof DesignFlowValues];
 
+/** DesignFontAsset wire fields. */
+export interface DesignFontAssetShape {
+    /** byteLength as defined by the Nexa gateway. */
+    readonly byteLength: string;
+    /** family as defined by the Nexa gateway. */
+    readonly family: string;
+    /** format as defined by the Nexa gateway. */
+    readonly format: DesignFontFormat;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** italic as defined by the Nexa gateway. */
+    readonly italic: boolean;
+    /** sha256 as defined by the Nexa gateway. */
+    readonly sha256: string;
+    /** weight as defined by the Nexa gateway. */
+    readonly weight: number;
+}
+
+/** DesignFontAsset from the Nexa wire protocol. */
+export type DesignFontAsset = DesignFontAssetShape;
+
+/** DesignFontBinding wire fields. */
+export interface DesignFontBindingShape {
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** sha256 as defined by the Nexa gateway. */
+    readonly sha256: string;
+}
+
+/** DesignFontBinding from the Nexa wire protocol. */
+export type DesignFontBinding = DesignFontBindingShape;
+
+/** Allowed values for DesignFontFormat. */
+export const DesignFontFormatValues = {
+    Value0: 'otf',
+    Value1: 'ttf',
+    Value2: 'woff',
+    Value3: 'woff2',
+} as const;
+
+/** DesignFontFormat from the Nexa wire protocol. */
+export type DesignFontFormat = (typeof DesignFontFormatValues)[keyof typeof DesignFontFormatValues];
+
+/** DesignFontListMethod wire fields. */
+export interface DesignFontListMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignFontListRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignFontListPage;
+}
+
+/** DesignFontListMethod from the Nexa wire protocol. */
+export type DesignFontListMethod = DesignFontListMethodShape;
+
+/** DesignFontListPage wire fields. */
+export interface DesignFontListPageShape {
+    /** items as defined by the Nexa gateway. */
+    readonly items: ReadonlyArray<DesignFontAsset>;
+    /** nextAfter as defined by the Nexa gateway. */
+    readonly nextAfter: null | string;
+}
+
+/** DesignFontListPage from the Nexa wire protocol. */
+export type DesignFontListPage = DesignFontListPageShape;
+
+/** DesignFontListRequest wire fields. */
+export interface DesignFontListRequestShape {
+    /** after as defined by the Nexa gateway. */
+    readonly after: null | string;
+    /** limit as defined by the Nexa gateway. */
+    readonly limit: number;
+}
+
+/** DesignFontListRequest from the Nexa wire protocol. */
+export type DesignFontListRequest = DesignFontListRequestShape;
+
+/** DesignFontReadMethod wire fields. */
+export interface DesignFontReadMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignFontReadRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignFontSlice;
+}
+
+/** DesignFontReadMethod from the Nexa wire protocol. */
+export type DesignFontReadMethod = DesignFontReadMethodShape;
+
+/** DesignFontReadRequest wire fields. */
+export interface DesignFontReadRequestShape {
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** offset as defined by the Nexa gateway. */
+    readonly offset: string;
+}
+
+/** DesignFontReadRequest from the Nexa wire protocol. */
+export type DesignFontReadRequest = DesignFontReadRequestShape;
+
+/** DesignFontSlice wire fields. */
+export interface DesignFontSliceShape {
+    /** data as defined by the Nexa gateway. */
+    readonly data: string;
+    /** font as defined by the Nexa gateway. */
+    readonly font: DesignFontAsset;
+    /** nextOffset as defined by the Nexa gateway. */
+    readonly nextOffset: null | string;
+    /** offset as defined by the Nexa gateway. */
+    readonly offset: string;
+}
+
+/** DesignFontSlice from the Nexa wire protocol. */
+export type DesignFontSlice = DesignFontSliceShape;
+
 /** DesignGradientStop wire fields. */
 export interface DesignGradientStopShape {
     /** color as defined by the Nexa gateway. */
@@ -3881,6 +3999,21 @@ export const DesignImageFitValues = { Value0: 'contain', Value1: 'cover' } as co
 
 /** DesignImageFit from the Nexa wire protocol. */
 export type DesignImageFit = (typeof DesignImageFitValues)[keyof typeof DesignImageFitValues];
+
+/** DesignImageFraming wire fields. */
+export interface DesignImageFramingShape {
+    /** cropX as defined by the Nexa gateway. */
+    readonly cropX: number;
+    /** cropY as defined by the Nexa gateway. */
+    readonly cropY: number;
+    /** fit as defined by the Nexa gateway. */
+    readonly fit: DesignImageFit;
+    /** scale as defined by the Nexa gateway. */
+    readonly scale: number;
+}
+
+/** DesignImageFraming from the Nexa wire protocol. */
+export type DesignImageFraming = DesignImageFramingShape;
 
 /** DesignInsert wire fields. */
 export interface DesignInsertShape {
@@ -3952,17 +4085,18 @@ export type DesignInteractionRecord = DesignInteractionRecordShape;
 export const DesignKindValues = {
     Value0: 'boolean',
     Value1: 'component',
-    Value2: 'ellipse',
-    Value3: 'frame',
-    Value4: 'group',
-    Value5: 'image',
-    Value6: 'instance',
-    Value7: 'line',
-    Value8: 'mask',
-    Value9: 'path',
-    Value10: 'polygon',
-    Value11: 'rectangle',
-    Value12: 'text',
+    Value2: 'component-set',
+    Value3: 'ellipse',
+    Value4: 'frame',
+    Value5: 'group',
+    Value6: 'image',
+    Value7: 'instance',
+    Value8: 'line',
+    Value9: 'mask',
+    Value10: 'path',
+    Value11: 'polygon',
+    Value12: 'rectangle',
+    Value13: 'text',
 } as const;
 
 /** DesignKind from the Nexa wire protocol. */
@@ -4122,12 +4256,16 @@ export interface DesignMoveShape {
 /** DesignMove from the Nexa wire protocol. */
 export type DesignMove = DesignMoveShape;
 
+/** Allowed values for DesignNodebooleanMode. */
+export const DesignNodebooleanModeValues = {
+    Value0: 'exclude',
+    Value1: 'intersect',
+    Value2: 'subtract',
+    Value3: 'union',
+} as const;
+
 /** DesignNode wire fields. */
 export interface DesignNodeShape {
-    /** variants as defined by the Nexa gateway. */
-    readonly variants?: DesignVariantSet;
-    /** variant as defined by the Nexa gateway. */
-    readonly variant?: ReadonlyArray<DesignVariantValue>;
     /** booleanMode as defined by the Nexa gateway. */
     readonly booleanMode?: (typeof DesignNodebooleanModeValues)[keyof typeof DesignNodebooleanModeValues];
     /** children as defined by the Nexa gateway. */
@@ -4166,6 +4304,10 @@ export interface DesignNodeShape {
     readonly style: DesignStyle;
     /** text as defined by the Nexa gateway. */
     readonly text: DesignText | null;
+    /** variant as defined by the Nexa gateway. */
+    readonly variant?: ReadonlyArray<DesignVariantValue>;
+    /** variants as defined by the Nexa gateway. */
+    readonly variants?: DesignVariantSet;
     /** visible as defined by the Nexa gateway. */
     readonly visible: boolean;
     /** width as defined by the Nexa gateway. */
@@ -4179,29 +4321,34 @@ export interface DesignNodeShape {
 /** DesignNode from the Nexa wire protocol. */
 export type DesignNode = DesignNodeShape;
 
+/** Allowed values for DesignNodeChangesbooleanModeVariant0. */
+export const DesignNodeChangesbooleanModeVariant0Values = {
+    Value0: 'exclude',
+    Value1: 'intersect',
+    Value2: 'subtract',
+    Value3: 'union',
+} as const;
+
 /** Allowed values for DesignNodeChangeskind. */
 export const DesignNodeChangeskindValues = {
     Value0: 'boolean',
     Value1: 'component',
-    Value2: 'ellipse',
-    Value3: 'frame',
-    Value4: 'group',
-    Value5: 'image',
-    Value6: 'instance',
-    Value7: 'line',
-    Value8: 'mask',
-    Value9: 'path',
-    Value10: 'polygon',
-    Value11: 'rectangle',
-    Value12: 'text',
+    Value2: 'component-set',
+    Value3: 'ellipse',
+    Value4: 'frame',
+    Value5: 'group',
+    Value6: 'image',
+    Value7: 'instance',
+    Value8: 'line',
+    Value9: 'mask',
+    Value10: 'path',
+    Value11: 'polygon',
+    Value12: 'rectangle',
+    Value13: 'text',
 } as const;
 
 /** DesignNodeChanges wire fields. */
 export interface DesignNodeChangesShape {
-    /** variants as defined by the Nexa gateway. */
-    readonly variants?: DesignVariantSet | null;
-    /** variant as defined by the Nexa gateway. */
-    readonly variant?: ReadonlyArray<DesignVariantValue> | null;
     /** booleanMode as defined by the Nexa gateway. */
     readonly booleanMode?:
         | (typeof DesignNodeChangesbooleanModeVariant0Values)[keyof typeof DesignNodeChangesbooleanModeVariant0Values]
@@ -4236,6 +4383,10 @@ export interface DesignNodeChangesShape {
     readonly style?: DesignStyle;
     /** text as defined by the Nexa gateway. */
     readonly text?: DesignText | null;
+    /** variant as defined by the Nexa gateway. */
+    readonly variant?: ReadonlyArray<DesignVariantValue> | null;
+    /** variants as defined by the Nexa gateway. */
+    readonly variants?: DesignVariantSet | null;
     /** visible as defined by the Nexa gateway. */
     readonly visible?: boolean;
     /** width as defined by the Nexa gateway. */
@@ -4632,6 +4783,8 @@ export interface DesignTextShape {
     readonly content: string;
     /** family as defined by the Nexa gateway. */
     readonly family: string;
+    /** font as defined by the Nexa gateway. */
+    readonly font?: DesignFontBinding | null;
     /** italic as defined by the Nexa gateway. */
     readonly italic: boolean;
     /** letterSpacing as defined by the Nexa gateway. */
@@ -4670,6 +4823,8 @@ export interface DesignTextRunShape {
     readonly end: number;
     /** family as defined by the Nexa gateway. */
     readonly family: string;
+    /** font as defined by the Nexa gateway. */
+    readonly font?: DesignFontBinding | null;
     /** italic as defined by the Nexa gateway. */
     readonly italic: boolean;
     /** size as defined by the Nexa gateway. */
@@ -4778,6 +4933,28 @@ export interface DesignUpdateShape {
 
 /** DesignUpdate from the Nexa wire protocol. */
 export type DesignUpdate = DesignUpdateShape;
+
+/** DesignVariantSet wire fields. */
+export interface DesignVariantSetShape {
+    /** defaultId as defined by the Nexa gateway. */
+    readonly defaultId: null | string;
+    /** properties as defined by the Nexa gateway. */
+    readonly properties: ReadonlyArray<string>;
+}
+
+/** DesignVariantSet from the Nexa wire protocol. */
+export type DesignVariantSet = DesignVariantSetShape;
+
+/** DesignVariantValue wire fields. */
+export interface DesignVariantValueShape {
+    /** property as defined by the Nexa gateway. */
+    readonly property: string;
+    /** value as defined by the Nexa gateway. */
+    readonly value: string;
+}
+
+/** DesignVariantValue from the Nexa wire protocol. */
+export type DesignVariantValue = DesignVariantValueShape;
 
 /** DeviceApproveParams wire fields. */
 export interface DeviceApproveParamsShape {
@@ -5083,6 +5260,8 @@ export interface GatewayFeaturesShape {
     readonly binaryMedia?: true;
     /** events as defined by the Nexa gateway. */
     readonly events: ReadonlyArray<string>;
+    /** jsonReplies as defined by the Nexa gateway. */
+    readonly jsonReplies?: true;
     /** methodScopes as defined by the Nexa gateway. */
     readonly methodScopes: RecordstringScope;
     /** methods as defined by the Nexa gateway. */
@@ -5587,6 +5766,22 @@ export interface GatewayMethodsdesign_eventsShape {
     readonly params: DesignEventsRequest;
     /** result as defined by the Nexa gateway. */
     readonly result: DesignEventsPage;
+}
+
+/** GatewayMethodsdesign_font_list wire fields. */
+export interface GatewayMethodsdesign_font_listShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignFontListRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignFontListPage;
+}
+
+/** GatewayMethodsdesign_font_read wire fields. */
+export interface GatewayMethodsdesign_font_readShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignFontReadRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignFontSlice;
 }
 
 /** GatewayMethodsdesign_layout wire fields. */
@@ -6727,6 +6922,10 @@ export interface GatewayMethodsShape {
     readonly 'design.delete': GatewayMethodsdesign_deleteShape;
     /** design.events as defined by the Nexa gateway. */
     readonly 'design.events': GatewayMethodsdesign_eventsShape;
+    /** design.font.list as defined by the Nexa gateway. */
+    readonly 'design.font.list': GatewayMethodsdesign_font_listShape;
+    /** design.font.read as defined by the Nexa gateway. */
+    readonly 'design.font.read': GatewayMethodsdesign_font_readShape;
     /** design.layout as defined by the Nexa gateway. */
     readonly 'design.layout': GatewayMethodsdesign_layoutShape;
     /** design.list as defined by the Nexa gateway. */
@@ -10309,6 +10508,9 @@ export const StreamParamsreasoningEffortValues = {
     Value6: 'xhigh',
 } as const;
 
+/** Allowed values for StreamParamsresponseFormat. */
+export const StreamParamsresponseFormatValues = { Value0: 'json', Value1: 'text' } as const;
+
 /** StreamParams wire fields. */
 export interface StreamParamsShape {
     /** agentId as defined by the Nexa gateway. */
@@ -10323,6 +10525,8 @@ export interface StreamParamsShape {
     readonly message: string;
     /** reasoningEffort as defined by the Nexa gateway. */
     readonly reasoningEffort?: (typeof StreamParamsreasoningEffortValues)[keyof typeof StreamParamsreasoningEffortValues];
+    /** responseFormat as defined by the Nexa gateway. */
+    readonly responseFormat?: (typeof StreamParamsresponseFormatValues)[keyof typeof StreamParamsresponseFormatValues];
     /** streamId as defined by the Nexa gateway. */
     readonly streamId?: string;
     /** targetTimeSeconds as defined by the Nexa gateway. */
@@ -13768,6 +13972,8 @@ export interface WorkspaceShape {
     readonly root: string;
     /** state as defined by the Nexa gateway. */
     readonly state?: (typeof WorkspacestateValues)[keyof typeof WorkspacestateValues];
+    /** storage as defined by the Nexa gateway. */
+    readonly storage?: WorkspaceStorageIdentity;
     /** tags as defined by the Nexa gateway. */
     readonly tags?: ReadonlyArray<string>;
     /** updatedAt as defined by the Nexa gateway. */
@@ -13830,6 +14036,8 @@ export interface WorkspaceDescriptionShape {
     readonly root: string;
     /** state as defined by the Nexa gateway. */
     readonly state: WorkspaceState;
+    /** storage as defined by the Nexa gateway. */
+    readonly storage?: WorkspaceStorageIdentity;
     /** tags as defined by the Nexa gateway. */
     readonly tags?: ReadonlyArray<string>;
     /** updatedAt as defined by the Nexa gateway. */
@@ -13913,6 +14121,17 @@ export const WorkspaceStateValues = {
 
 /** WorkspaceState from the Nexa wire protocol. */
 export type WorkspaceState = (typeof WorkspaceStateValues)[keyof typeof WorkspaceStateValues];
+
+/** WorkspaceStorageIdentity wire fields. */
+export interface WorkspaceStorageIdentityShape {
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** root as defined by the Nexa gateway. */
+    readonly root: string;
+}
+
+/** WorkspaceStorageIdentity from the Nexa wire protocol. */
+export type WorkspaceStorageIdentity = WorkspaceStorageIdentityShape;
 
 /** WorkspaceUsage wire fields. */
 export interface WorkspaceUsageShape {
@@ -14020,6 +14239,10 @@ export enum Method {
     DesignDelete = 'design.delete',
     /** Calls design.events. */
     DesignEvents = 'design.events',
+    /** Calls design.font.list. */
+    DesignFontList = 'design.font.list',
+    /** Calls design.font.read. */
+    DesignFontRead = 'design.font.read',
     /** Calls design.layout. */
     DesignLayout = 'design.layout',
     /** Calls design.list. */
@@ -14280,56 +14503,4 @@ export enum Method {
     WorkspacesDestroy = 'workspaces.destroy',
     /** Calls workspaces.list. */
     WorkspacesList = 'workspaces.list',
-}
-
-/** DesignImageFraming wire fields. */
-export interface DesignImageFramingShape {
-    /** cropX as defined by the Nexa gateway. */
-    readonly cropX: number;
-    /** cropY as defined by the Nexa gateway. */
-    readonly cropY: number;
-    /** fit as defined by the Nexa gateway. */
-    readonly fit: DesignImageFit;
-    /** scale as defined by the Nexa gateway. */
-    readonly scale: number;
-}
-
-/** DesignImageFraming from the Nexa wire protocol. */
-export type DesignImageFraming = DesignImageFramingShape;
-
-/** Allowed values for DesignNodebooleanMode. */
-export const DesignNodebooleanModeValues = {
-    Value0: 'exclude',
-    Value1: 'intersect',
-    Value2: 'subtract',
-    Value3: 'union',
-} as const;
-
-/** Allowed values for DesignNodeChangesbooleanModeVariant0. */
-export const DesignNodeChangesbooleanModeVariant0Values = {
-    Value0: 'exclude',
-    Value1: 'intersect',
-    Value2: 'subtract',
-    Value3: 'union',
-} as const;
-
-/** DesignVariantSet from the Nexa wire protocol. */
-export type DesignVariantSet = DesignVariantSetShape;
-
-/** DesignVariantValue from the Nexa wire protocol. */
-export type DesignVariantValue = DesignVariantValueShape;
-
-/** DesignVariantSet wire fields. */
-export interface DesignVariantSetShape {
-    /** properties as defined by the Nexa gateway. */
-    readonly properties: ReadonlyArray<string>;
-    /** defaultId as defined by the Nexa gateway. */
-    readonly defaultId: string | null;
-}
-/** DesignVariantValue wire fields. */
-export interface DesignVariantValueShape {
-    /** property as defined by the Nexa gateway. */
-    readonly property: string;
-    /** value as defined by the Nexa gateway. */
-    readonly value: string;
 }

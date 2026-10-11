@@ -21,7 +21,7 @@ import type { DesignNode, DesignToken, DesignInteraction, DesignComment } from '
 export class DesignOperationCodec {
     /** Parses detached transaction values; complete layer and tree invariants are checked after atomic application. */
     public static operations(raw: unknown): readonly DesignOperation[] {
-        return V.list(raw, 512, (entry: unknown): DesignOperation => {
+        const parse: (entry: unknown) => DesignOperation = (entry: unknown): DesignOperation => {
             const tag: Readonly<Record<string, unknown>> = V.fields(
                 entry,
                 [
@@ -51,7 +51,9 @@ export class DesignOperationCodec {
                         'pageId',
                         'index',
                     ]);
-                    const node: DesignNode = DesignNodeCodec.node(value['node']);
+                    const node: DesignNode = V.context('insert.node', (): DesignNode =>
+                        DesignNodeCodec.node(value['node']),
+                    );
                     return {
                         op,
                         node,
@@ -67,7 +69,10 @@ export class DesignOperationCodec {
                         'changes',
                     ]);
                     const id: string = V.id(value['id']);
-                    const changes: DesignNodeChanges = this.#changes(value['changes']);
+                    const changes: DesignNodeChanges = V.context(
+                        'update.changes',
+                        (): DesignNodeChanges => this.#changes(value['changes']),
+                    );
                     return { op, id, changes };
                 }
                 case Kind.Text: {
@@ -158,7 +163,11 @@ export class DesignOperationCodec {
                 default:
                     throw new Error('Unsupported design operation');
             }
-        });
+        };
+        let index: number = 0;
+        return V.list(raw, 512, (entry: unknown): DesignOperation =>
+            V.context('operations[' + String(index++) + ']', (): DesignOperation => parse(entry)),
+        );
     }
     static #changes(raw: unknown): DesignNodeChanges {
         const value: Readonly<Record<string, unknown>> = V.fields(raw, KEYS, []);

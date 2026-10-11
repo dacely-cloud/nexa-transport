@@ -28,7 +28,7 @@ export class DesignNodeCodec {
             [...KEYS, 'booleanMode', 'mask', 'variants', 'variant'],
             KEYS,
         );
-        const kind: DesignKind = V.choice(value['kind'], Object.values(DesignKind));
+        const kind: DesignKind = V.choice(value['kind'], Object.values(DesignKind), 'node.kind');
         if (
             (Object.hasOwn(value, 'variants') && kind !== DesignKind.ComponentSet) ||
             (Object.hasOwn(value, 'variant') && kind !== DesignKind.Component)
@@ -59,9 +59,15 @@ export class DesignNodeCodec {
             opacity: V.number(value['opacity'], 0, 1),
             visible: V.boolean(value['visible']),
             locked: V.boolean(value['locked']),
-            style: DesignStyleCodec.style(value['style']),
-            layout: DesignLayoutCodec.layout(value['layout']),
-            placement: DesignLayoutCodec.placement(value['placement']),
+            style: V.context('node.style', (): DesignNode['style'] =>
+                DesignStyleCodec.style(value['style']),
+            ),
+            layout: V.context('node.layout', (): DesignNode['layout'] =>
+                DesignLayoutCodec.layout(value['layout']),
+            ),
+            placement: V.context('node.placement', (): DesignNode['placement'] =>
+                DesignLayoutCodec.placement(value['placement']),
+            ),
             text: value['text'] === null ? null : DesignStyleCodec.text(value['text']),
             path: V.list(value['path'], 10000, (entry: unknown): DesignPathCommand =>
                 this.path(entry),

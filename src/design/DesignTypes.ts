@@ -4,6 +4,7 @@
 import type { DesignVariantSet, DesignVariantValue } from './DesignVariantTypes.js';
 import type { DesignMask } from './DesignMaskTypes.js';
 import type { DesignBooleanMode } from './DesignBooleanTypes.js';
+import type { DesignFontBinding } from './DesignFontTypes.js';
 
 /** Editable scene primitives, including reusable component definitions and instances. */
 export const DesignKind = {
@@ -148,6 +149,8 @@ export interface DesignPlacement {
 }
 /** Rich text range. Offsets are UTF-16 indices into the layer's text. */
 export interface DesignTextRun {
+    /** Omission inherits a compatible base face; null explicitly chooses an unbound family. */
+    readonly font?: DesignFontBinding | null;
     readonly start: number;
     readonly end: number;
     readonly family: string;
@@ -159,6 +162,8 @@ export interface DesignTextRun {
 }
 /** Text layout is shared by the canvas, tools and exported designs. */
 export interface DesignText {
+    /** Exact private font bytes remain in the owner's library, independently of the saved scene. */
+    readonly font?: DesignFontBinding | null;
     readonly content: string;
     readonly family: string;
     readonly size: number;

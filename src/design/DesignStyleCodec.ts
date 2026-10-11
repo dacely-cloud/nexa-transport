@@ -3,6 +3,7 @@
 
 import { DesignValues as V } from './DesignValues.js';
 import { DesignImageFramingCodec } from './DesignImageFramingCodec.js';
+import { DesignFontCodec } from './DesignFontCodec.js';
 import {
     DesignPaintKind,
     DesignAlign,
@@ -128,33 +129,56 @@ export class DesignStyleCodec {
     }
     /** Rich text offsets must refer to non-overlapping, well-formed Unicode ranges. */
     public static text(raw: unknown): DesignText {
-        const value: Readonly<Record<string, unknown>> = V.record(raw, [
-            'content',
-            'family',
-            'size',
-            'weight',
-            'italic',
-            'lineHeight',
-            'letterSpacing',
-            'align',
-            'runs',
-        ]);
+        const value: Readonly<Record<string, unknown>> = V.fields(
+            raw,
+            [
+                'font',
+                'content',
+                'family',
+                'size',
+                'weight',
+                'italic',
+                'lineHeight',
+                'letterSpacing',
+                'align',
+                'runs',
+            ],
+            [
+                'content',
+                'family',
+                'size',
+                'weight',
+                'italic',
+                'lineHeight',
+                'letterSpacing',
+                'align',
+                'runs',
+            ],
+        );
         const content: string = V.text(value['content'], 100000, true);
         const runs: readonly DesignTextRun[] = V.list(
             value['runs'],
             1024,
             (entry: unknown): DesignTextRun => {
-                const run: Readonly<Record<string, unknown>> = V.record(entry, [
-                    'start',
-                    'end',
-                    'family',
-                    'size',
-                    'weight',
-                    'italic',
-                    'color',
-                    'underline',
-                ]);
+                const run: Readonly<Record<string, unknown>> = V.fields(
+                    entry,
+                    [
+                        'font',
+                        'start',
+                        'end',
+                        'family',
+                        'size',
+                        'weight',
+                        'italic',
+                        'color',
+                        'underline',
+                    ],
+                    ['start', 'end', 'family', 'size', 'weight', 'italic', 'color', 'underline'],
+                );
                 return {
+                    ...(Object.hasOwn(run, 'font')
+                        ? { font: DesignFontCodec.binding(run['font']) }
+                        : {}),
                     start: V.number(run['start'], 0, content.length, true),
                     end: V.number(run['end'], 0, content.length, true),
                     family: this.family(run['family']),
@@ -177,6 +201,9 @@ export class DesignStyleCodec {
             throw new Error('Invalid rich text ranges');
         }
         return {
+            ...(Object.hasOwn(value, 'font')
+                ? { font: DesignFontCodec.binding(value['font']) }
+                : {}),
             content,
             family: this.family(value['family']),
             size: V.number(value['size'], 1, 1000),

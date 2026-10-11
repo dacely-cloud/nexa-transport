@@ -519,6 +519,18 @@
         "./design-shaped-text-metrics": {
             "types": "./dist/design/DesignShapedTextMetrics.d.ts",
             "import": "./dist/design-shaped-text-metrics.js"
+        },
+        "./design-font-types": {
+            "types": "./dist/design/DesignFontTypes.d.ts",
+            "import": "./dist/design-font-types.js"
+        },
+        "./design-font-codec": {
+            "types": "./dist/design/DesignFontCodec.d.ts",
+            "import": "./dist/design-font-codec.js"
+        },
+        "./design-font-bindings": {
+            "types": "./dist/design/DesignFontBindings.d.ts",
+            "import": "./dist/design-font-bindings.js"
         }
     },
     "scripts": {

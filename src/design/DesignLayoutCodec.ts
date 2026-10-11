@@ -33,7 +33,7 @@ export class DesignLayoutCodec {
             'left',
         ]);
         return {
-            flow: V.choice(value['flow'], Object.values(DesignFlow)),
+            flow: V.choice(value['flow'], Object.values(DesignFlow), 'layout.flow'),
             wrap: V.boolean(value['wrap']),
             gap: V.number(value['gap'], 0, 10000),
             rowGap: V.number(value['rowGap'], 0, 10000),
@@ -43,8 +43,8 @@ export class DesignLayoutCodec {
                 bottom: V.number(padding['bottom'], 0, 10000),
                 left: V.number(padding['left'], 0, 10000),
             },
-            align: V.choice(value['align'], Object.values(DesignAlign)),
-            justify: V.choice(value['justify'], Object.values(DesignAlign)),
+            align: V.choice(value['align'], Object.values(DesignAlign), 'layout.align'),
+            justify: V.choice(value['justify'], Object.values(DesignAlign), 'layout.justify'),
             columns: V.number(value['columns'], 1, 256, true),
             clip: V.boolean(value['clip']),
         };
@@ -65,11 +65,19 @@ export class DesignLayoutCodec {
             'rowSpan',
         ]);
         const result: DesignPlacement = {
-            width: V.choice(value['width'], Object.values(DesignSizing)),
-            height: V.choice(value['height'], Object.values(DesignSizing)),
+            width: V.choice(value['width'], Object.values(DesignSizing), 'placement.width'),
+            height: V.choice(value['height'], Object.values(DesignSizing), 'placement.height'),
             absolute: V.boolean(value['absolute']),
-            horizontal: V.choice(value['horizontal'], Object.values(DesignConstraint)),
-            vertical: V.choice(value['vertical'], Object.values(DesignConstraint)),
+            horizontal: V.choice(
+                value['horizontal'],
+                Object.values(DesignConstraint),
+                'placement.horizontal',
+            ),
+            vertical: V.choice(
+                value['vertical'],
+                Object.values(DesignConstraint),
+                'placement.vertical',
+            ),
             minWidth: V.number(value['minWidth'], 0),
             maxWidth: V.number(value['maxWidth'], 0),
             minHeight: V.number(value['minHeight'], 0),

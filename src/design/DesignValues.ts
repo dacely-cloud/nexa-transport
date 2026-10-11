@@ -119,13 +119,38 @@ export class DesignValues {
         return raw;
     }
     /** Literal choices narrow through their runtime source of truth. */
-    public static choice<T extends string>(raw: unknown, choices: readonly T[]): T {
+    public static choice<T extends string>(
+        raw: unknown,
+        choices: readonly T[],
+        field: string = 'value',
+    ): T {
         for (const choice of choices) {
             if (raw === choice) {
                 return choice;
             }
         }
-        throw new Error('Unsupported design choice');
+        const supplied: string =
+            typeof raw === 'string' ? JSON.stringify(raw.slice(0, 80)) : typeof raw;
+        throw new Error(
+            'Unsupported design choice at ' +
+                field +
+                ': ' +
+                supplied +
+                '. Expected one of: ' +
+                choices.map((choice: T): string => JSON.stringify(choice)).join(', ') +
+                '.',
+        );
+    }
+    /** Adds a trusted field path to a codec failure so agents can repair one concrete input. */
+    public static context<T>(path: string, read: () => T): T {
+        try {
+            return read();
+        } catch (error: unknown) {
+            throw new Error(
+                path + ': ' + (error instanceof Error ? error.message : 'Invalid design data.'),
+                { cause: error },
+            );
+        }
     }
     /** Dense bounded arrays are copied before use. */
     public static list<T>(

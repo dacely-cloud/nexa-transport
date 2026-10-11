@@ -29,6 +29,7 @@ export class DesignBuiltinFonts {
                 !sources.some(
                     (source: DesignFontSource): boolean =>
                         source.family.toLowerCase() === 'inter' &&
+                        source.binding === undefined &&
                         source.italic === italic &&
                         source.weight === 400,
                 )

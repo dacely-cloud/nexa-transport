@@ -1,6 +1,6 @@
 # RPC reference
 
-All 172 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 171 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
+All 174 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 173 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
 
 - [accounts.create](#accountscreate)
 - [accounts.list](#accountslist)
@@ -44,6 +44,8 @@ All 172 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [design.create](#designcreate)
 - [design.delete](#designdelete)
 - [design.events](#designevents)
+- [design.font.list](#designfontlist)
+- [design.font.read](#designfontread)
 - [design.layout](#designlayout)
 - [design.list](#designlist)
 - [design.read](#designread)
@@ -283,6 +285,7 @@ Parameters: [AskParams](protocol.md#askparams).
 | `cwd`               | No       | `string`                                                                      | Where tools operate.                                                        |
 | `message`           | Yes      | `string`                                                                      | User text; may be blank when at least one attachment contains content.      |
 | `reasoningEffort`   | No       | `"high"` / `"low"` / `"max"` / `"medium"` / `"minimal"` / `"off"` / `"xhigh"` | Per-turn reasoning preference; never changes the saved agent configuration. |
+| `responseFormat`    | No       | `"json"` / `"text"`                                                           | Final answer format; JSON mode does not disable tools or verification.      |
 | `targetTimeSeconds` | No       | `integer`                                                                     | Soft task time target in seconds; never a cancellation deadline.            |
 | `userId`            | No       | `string`                                                                      | The principal the turn is billed and authorized as.                         |
 
@@ -332,6 +335,7 @@ Parameters: [StreamParams](protocol.md#streamparams).
 | `cwd`               | No       | `string`                                                                      | Where tools operate.                                                        |
 | `message`           | Yes      | `string`                                                                      | User text; may be blank when at least one attachment contains content.      |
 | `reasoningEffort`   | No       | `"high"` / `"low"` / `"max"` / `"medium"` / `"minimal"` / `"off"` / `"xhigh"` | Per-turn reasoning preference; never changes the saved agent configuration. |
+| `responseFormat`    | No       | `"json"` / `"text"`                                                           | Final answer format; JSON mode does not disable tools or verification.      |
 | `streamId`          | No       | `string`                                                                      | The stream's id, chosen by the CLIENT.                                      |
 | `targetTimeSeconds` | No       | `integer`                                                                     | Soft task time target in seconds; never a cancellation deadline.            |
 | `userId`            | No       | `string`                                                                      | The principal the turn is billed and authorized as.                         |
@@ -1102,6 +1106,54 @@ Parameters: [DesignEventsRequest](protocol.md#designeventsrequest).
 | `limit`         | Yes      | `number` |             |
 
 Result: [DesignEventsPage](protocol.md#designeventspage).
+
+## design.font.list
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DesignFontList> = {
+    after: null,
+    limit: 1,
+};
+const result: ResultOf<typeof Method.DesignFontList> = await client.call(
+    Method.DesignFontList,
+    params,
+);
+```
+
+Parameters: [DesignFontListRequest](protocol.md#designfontlistrequest).
+
+| Field   | Required | Type          | Description |
+| ------- | -------- | ------------- | ----------- |
+| `after` | Yes      | `null,string` |             |
+| `limit` | Yes      | `number`      |             |
+
+Result: [DesignFontListPage](protocol.md#designfontlistpage).
+
+## design.font.read
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DesignFontRead> = {
+    id: 'YOUR_ID',
+    offset: 'YOUR_OFFSET',
+};
+const result: ResultOf<typeof Method.DesignFontRead> = await client.call(
+    Method.DesignFontRead,
+    params,
+);
+```
+
+Parameters: [DesignFontReadRequest](protocol.md#designfontreadrequest).
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `id`     | Yes      | `string` |             |
+| `offset` | Yes      | `string` |             |
+
+Result: [DesignFontSlice](protocol.md#designfontslice).
 
 ## design.layout
 

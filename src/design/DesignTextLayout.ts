@@ -2,9 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { DesignText, DesignTextRun } from './DesignTypes.js';
+import type { DesignFontBinding } from './DesignFontTypes.js';
+import { DesignFontBindings } from './DesignFontBindings.js';
 
 /** Resolved style of a contiguous rich-text range. */
 export interface DesignTextSpanStyle {
+    /** A bound style selects exactly the saved face instead of an available system family. */
+    readonly font?: DesignFontBinding | null;
     readonly rich: boolean;
     readonly family: string;
     readonly size: number;
@@ -49,25 +53,9 @@ export class DesignTextLayout {
             content: string,
         ): number => DesignTextLayout.estimate(style, content),
     ): readonly DesignTextLine[] {
-        const base: DesignTextSpanStyle = {
-            rich: false,
-            family: text.family,
-            size: text.size,
-            weight: text.weight,
-            italic: text.italic,
-            color,
-            underline: false,
-        };
+        const base: DesignTextSpanStyle = DesignFontBindings.base(text, color);
         const styles: readonly DesignTextSpanStyle[] = text.runs.map(
-            (run: DesignTextRun): DesignTextSpanStyle => ({
-                rich: true,
-                family: run.family,
-                size: run.size,
-                weight: run.weight,
-                italic: run.italic,
-                color: run.color,
-                underline: run.underline,
-            }),
+            (run: DesignTextRun): DesignTextSpanStyle => DesignFontBindings.run(text, run),
         );
         const lines: DesignTextLine[] = [];
         let spans: readonly Span[] = [];

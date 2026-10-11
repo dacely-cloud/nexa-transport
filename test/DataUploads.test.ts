@@ -170,7 +170,11 @@ it.each(['0', '-1', '4194305', '4e6', '004194304'])(
 
 it('fits negotiated binary slices inside a smaller advertised gateway frame budget', async (): Promise<void> => {
     const budget: number = 1024 * 1024;
-    gateway = new TestGateway({ ...hello, features: { ...hello.features, binaryDataUploads: true }, policy: { ...hello.policy, maxPayloadBytes: budget } });
+    gateway = new TestGateway({
+        ...hello,
+        features: { ...hello.features, binaryDataUploads: true },
+        policy: { ...hello.policy, maxPayloadBytes: budget },
+    });
     client = await NexaClient.connect({ url: await gateway.url(), reconnect: false });
     let offset: number = 0;
     let count: number = 0;
@@ -186,7 +190,13 @@ it('fits negotiated binary slices inside a smaller advertised gateway frame budg
             count += 1;
             result = { id: 'bounded', offset: String(offset) };
         } else {
-            result = { id: 'bounded', filename: 'file.bin', byteLength: String(2 * budget), path: '/workspace/file.bin', chunkBytes: String(4 * budget) };
+            result = {
+                id: 'bounded',
+                filename: 'file.bin',
+                byteLength: String(2 * budget),
+                path: '/workspace/file.bin',
+                chunkBytes: String(4 * budget),
+            };
         }
         socket.send(JSON.stringify({ id: request.id, ok: true, result }));
     };
