@@ -4418,6 +4418,7 @@ export type DesignOperation =
     | DesignInsert
     | DesignUpdate
     | DesignTextOperation
+    | DesignResizeOperation
     | DesignMove
     | DesignRemove
     | DesignPageOperation
@@ -4558,6 +4559,10 @@ export interface DesignPlacementShape {
     readonly minHeight: number;
     /** minWidth as defined by the Nexa gateway. */
     readonly minWidth: number;
+    /** referenceHeight as defined by the Nexa gateway. */
+    readonly referenceHeight?: number;
+    /** referenceWidth as defined by the Nexa gateway. */
+    readonly referenceWidth?: number;
     /** rowSpan as defined by the Nexa gateway. */
     readonly rowSpan: number;
     /** vertical as defined by the Nexa gateway. */
@@ -4674,6 +4679,27 @@ export interface DesignRemoveShape {
 
 /** DesignRemove from the Nexa wire protocol. */
 export type DesignRemove = DesignRemoveShape;
+
+/** DesignResizeOperation wire fields. */
+export interface DesignResizeOperationShape {
+    /** height as defined by the Nexa gateway. */
+    readonly height?: number;
+    /** op as defined by the Nexa gateway. */
+    readonly op: 'resize';
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+    /** selection as defined by the Nexa gateway. */
+    readonly selection: ReadonlyArray<string>;
+    /** width as defined by the Nexa gateway. */
+    readonly width?: number;
+    /** x as defined by the Nexa gateway. */
+    readonly x?: number;
+    /** y as defined by the Nexa gateway. */
+    readonly y?: number;
+}
+
+/** DesignResizeOperation from the Nexa wire protocol. */
+export type DesignResizeOperation = DesignResizeOperationShape;
 
 /** DesignSaveMethod wire fields. */
 export interface DesignSaveMethodShape {

@@ -51,19 +51,37 @@ export class DesignLayoutCodec {
     }
     /** Child placement and resizing constraints. */
     public static placement(raw: unknown): DesignPlacement {
-        const value: Readonly<Record<string, unknown>> = V.record(raw, [
-            'width',
-            'height',
-            'absolute',
-            'horizontal',
-            'vertical',
-            'minWidth',
-            'maxWidth',
-            'minHeight',
-            'maxHeight',
-            'columnSpan',
-            'rowSpan',
-        ]);
+        const value: Readonly<Record<string, unknown>> = V.fields(
+            raw,
+            [
+                'width',
+                'height',
+                'absolute',
+                'horizontal',
+                'vertical',
+                'minWidth',
+                'maxWidth',
+                'minHeight',
+                'maxHeight',
+                'columnSpan',
+                'rowSpan',
+                'referenceWidth',
+                'referenceHeight',
+            ],
+            [
+                'width',
+                'height',
+                'absolute',
+                'horizontal',
+                'vertical',
+                'minWidth',
+                'maxWidth',
+                'minHeight',
+                'maxHeight',
+                'columnSpan',
+                'rowSpan',
+            ],
+        );
         const result: DesignPlacement = {
             width: V.choice(value['width'], Object.values(DesignSizing), 'placement.width'),
             height: V.choice(value['height'], Object.values(DesignSizing), 'placement.height'),
@@ -84,6 +102,12 @@ export class DesignLayoutCodec {
             maxHeight: V.number(value['maxHeight'], 0),
             columnSpan: V.number(value['columnSpan'], 1, 256, true),
             rowSpan: V.number(value['rowSpan'], 1, 256, true),
+            ...(value['referenceWidth'] === undefined
+                ? {}
+                : { referenceWidth: V.number(value['referenceWidth'], 0.01, 100000) }),
+            ...(value['referenceHeight'] === undefined
+                ? {}
+                : { referenceHeight: V.number(value['referenceHeight'], 0.01, 100000) }),
         };
         if (result.minWidth > result.maxWidth || result.minHeight > result.maxHeight) {
             throw new Error('Minimum layer size exceeds its maximum');

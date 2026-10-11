@@ -53,6 +53,10 @@ export class DesignLayoutEngine {
         }
         return { nodes: this.#scene.nodes, boxes };
     }
+    /** Hidden layers still have natural font and container dimensions for authored constraint edits. */
+    public measure(id: string): DesignSize {
+        return this.#measure(this.#node(id));
+    }
     #node(id: string): DesignSceneNode {
         const node: DesignSceneNode | undefined = this.#nodes.get(id);
         if (node === undefined) {

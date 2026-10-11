@@ -4,7 +4,7 @@
 import type { DesignDocument, DesignNode, DesignBox } from './DesignTypes.js';
 import { DesignLayoutEngine } from './DesignLayout.js';
 import type { DesignSelectionGeometry, DesignSelectionBounds } from './DesignSelectionTypes.js';
-import type { DesignTextMeasurer } from './DesignLayoutTypes.js';
+import type { DesignTextMeasurer, DesignSize } from './DesignLayoutTypes.js';
 import { DesignTextMetrics } from './DesignTextMetrics.js';
 import { DesignValues as V } from './DesignValues.js';
 
@@ -16,6 +16,7 @@ export class DesignSelectionContext {
     public readonly roots: readonly DesignNode[];
     /** Resolved boxes include auto layout and all ancestor rotations. */
     public readonly boxes: ReadonlyMap<string, DesignBox>;
+    readonly #layout: DesignLayoutEngine;
     /** Requires real page ownership and rejects locked ancestry before generating any edits. */
     public constructor(
         public readonly document: DesignDocument,
@@ -83,8 +84,9 @@ export class DesignSelectionContext {
             (a: DesignNode, b: DesignNode): number =>
                 (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0),
         );
+        this.#layout = new DesignLayoutEngine(document, pageId, measurer);
         this.boxes = new Map(
-            new DesignLayoutEngine(document, pageId, measurer)
+            this.#layout
                 .solve()
                 .boxes.map((box: DesignBox): readonly [string, DesignBox] => [box.id, box]),
         );
@@ -96,6 +98,10 @@ export class DesignSelectionContext {
             throw new Error('Design layer not found: ' + id);
         }
         return node;
+    }
+    /** The existing solver cache also measures hidden text and component content. */
+    public measure(id: string): DesignSize {
+        return this.#layout.measure(id);
     }
     /** Hidden layers have no rendered geometry; duplication and ordering can still handle them. */
     public box(id: string): DesignBox {

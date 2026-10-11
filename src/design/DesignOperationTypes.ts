@@ -26,6 +26,7 @@ import type {
 export const DesignOperationKind = {
     Insert: 'insert',
     Update: 'update',
+    Resize: 'resize',
     Text: 'text',
     Move: 'move',
     Remove: 'remove',
@@ -81,6 +82,17 @@ export interface DesignTextOperation {
     readonly id: string;
     readonly content: string;
 }
+/** Explicit geometry edits fix requested axes and preserve absolute child constraints atomically. */
+export interface DesignResizeOperation {
+    readonly op: typeof DesignOperationKind.Resize;
+    readonly pageId: string;
+    readonly selection: readonly string[];
+    readonly width?: number;
+    readonly height?: number;
+    /** Position edits accompany a single dragged layer and use its resolved parent coordinates. */
+    readonly x?: number;
+    readonly y?: number;
+}
 /** Reparent or reorder without breaking both sides of the tree. */
 export interface DesignMove {
     readonly op: typeof DesignOperationKind.Move;
@@ -113,6 +125,7 @@ export interface DesignMetadata {
 export type DesignOperation =
     | DesignInsert
     | DesignUpdate
+    | DesignResizeOperation
     | DesignTextOperation
     | DesignMove
     | DesignRemove

@@ -15,6 +15,10 @@ import {
     type DesignEditResult,
 } from './DesignOperationTypes.js';
 import { DesignKind } from './DesignTypes.js';
+import { DesignResizeEdits } from './DesignResizeEdits.js';
+import { DesignSelectionContext } from './DesignSelectionContext.js';
+import type { DesignTextMeasurer } from './DesignLayoutTypes.js';
+import { DesignTextMetrics } from './DesignTextMetrics.js';
 import type {
     DesignDocument,
     DesignNode,
@@ -34,6 +38,7 @@ export class DesignEdits {
     public static apply(
         source: DesignDocument,
         operations: readonly DesignOperation[],
+        measurer: DesignTextMeasurer = new DesignTextMetrics(),
     ): DesignEditResult {
         if (operations.length < 1 || operations.length > 512) {
             throw new Error('A design transaction requires 1 to 512 operations');
@@ -114,6 +119,24 @@ export class DesignEdits {
                         }
                     }
                     nodes.set(node.id, { ...node, text: { ...node.text, content, runs } });
+                    break;
+                }
+                case DesignOperationKind.Resize: {
+                    const current: DesignDocument = {
+                        ...document,
+                        ...metadata,
+                        nodes: [...nodes.values()],
+                        pages: [...pages.values()],
+                    };
+                    const context: DesignSelectionContext = new DesignSelectionContext(
+                        current,
+                        operation.pageId,
+                        operation.selection,
+                        measurer,
+                    );
+                    for (const node of new DesignResizeEdits(context).apply(operation)) {
+                        nodes.set(node.id, node);
+                    }
                     break;
                 }
                 case DesignOperationKind.Move: {

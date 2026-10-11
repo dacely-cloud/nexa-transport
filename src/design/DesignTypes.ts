@@ -146,6 +146,9 @@ export interface DesignPlacement {
     readonly maxHeight: number;
     readonly columnSpan: number;
     readonly rowSpan: number;
+    /** Optional per-layer constraint baselines; legacy documents inherit the parent's authored dimensions. */
+    readonly referenceWidth?: number;
+    readonly referenceHeight?: number;
 }
 /** Rich text range. Offsets are UTF-16 indices into the layer's text. */
 export interface DesignTextRun {

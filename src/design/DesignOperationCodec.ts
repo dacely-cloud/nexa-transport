@@ -38,6 +38,11 @@ export class DesignOperationCodec {
                     'tokens',
                     'interactions',
                     'comments',
+                    'selection',
+                    'width',
+                    'height',
+                    'x',
+                    'y',
                 ],
                 ['op'],
             );
@@ -85,6 +90,53 @@ export class DesignOperationCodec {
                         op,
                         id: V.id(value['id']),
                         content: V.text(value['content'], 100000, true),
+                    };
+                }
+                case Kind.Resize: {
+                    const value: Readonly<Record<string, unknown>> = V.fields(
+                        entry,
+                        ['op', 'pageId', 'selection', 'width', 'height', 'x', 'y'],
+                        ['op', 'pageId', 'selection'],
+                    );
+                    const selection: readonly string[] = V.list(
+                        value['selection'],
+                        128,
+                        (id: unknown): string => V.id(id),
+                    );
+                    if (selection.length === 0 || new Set(selection).size !== selection.length) {
+                        throw new Error('Resize requires 1 to 128 distinct selected layers.');
+                    }
+                    if (value['width'] === undefined && value['height'] === undefined) {
+                        throw new Error('Resize requires width or height.');
+                    }
+                    if (
+                        (value['x'] !== undefined && value['width'] === undefined) ||
+                        (value['y'] !== undefined && value['height'] === undefined)
+                    ) {
+                        throw new Error('Resize x requires width; resize y requires height.');
+                    }
+                    if (
+                        selection.length !== 1 &&
+                        (value['x'] !== undefined || value['y'] !== undefined)
+                    ) {
+                        throw new Error('Resize position edits require one selected layer.');
+                    }
+                    return {
+                        op,
+                        pageId: V.id(value['pageId']),
+                        selection,
+                        ...(value['width'] === undefined
+                            ? {}
+                            : { width: V.number(value['width'], 0.01, 100000) }),
+                        ...(value['height'] === undefined
+                            ? {}
+                            : { height: V.number(value['height'], 0.01, 100000) }),
+                        ...(value['x'] === undefined
+                            ? {}
+                            : { x: V.number(value['x'], -100000, 100000) }),
+                        ...(value['y'] === undefined
+                            ? {}
+                            : { y: V.number(value['y'], -100000, 100000) }),
                     };
                 }
                 case Kind.Move: {
