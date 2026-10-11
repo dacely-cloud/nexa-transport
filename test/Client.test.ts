@@ -26,6 +26,123 @@ async function connect(): Promise<NexaClient> {
     return client;
 }
 describe('Nexa websocket lifetimes', (): void => {
+    it.each([false, true])(
+        'requires JSON reply capability before issuing a formatted request (stream=%s)',
+        async (streaming: boolean): Promise<void> => {
+            const connected = await connect();
+            const count = gateway?.requests.length;
+            const reply = streaming
+                ? connected.stream({ message: 'Solve', responseFormat: 'json' }).result
+                : connected.call(Method.AgentAsk, { message: 'Solve', responseFormat: 'json' });
+            await expect(reply).rejects.toThrow('JSON replies require an updated NEXA gateway');
+            expect(gateway?.requests.length).toBe(count);
+        },
+    );
+
+    it.each([false, true])(
+        'sends final JSON format without disabling tools when advertised (stream=%s)',
+        async (streaming: boolean): Promise<void> => {
+            gateway = new TestGateway({
+                ...hello,
+                features: { ...hello.features, jsonReplies: true },
+            });
+            client = await NexaClient.connect({ url: await gateway.url(), reconnect: false });
+            gateway.handler = (socket: WebSocket, request: Request): void => {
+                expect(request.params['responseFormat']).toBe('json');
+                expect(request.params).not.toHaveProperty('structuredReply');
+                expect(request.params).not.toHaveProperty('allowedTools');
+                const answer = { ...result, text: '{"code":"print(20)"}' };
+                if (streaming) {
+                    socket.send(
+                        JSON.stringify({
+                            id: request.id,
+                            ok: true,
+                            result: { streamId: request.params['streamId'], runId: 'json-run' },
+                        }),
+                    );
+                    socket.send(
+                        JSON.stringify({
+                            event: 'turn.end',
+                            seq: 2,
+                            data: {
+                                streamId: request.params['streamId'],
+                                ok: true,
+                                result: answer,
+                            },
+                        }),
+                    );
+                } else {
+                    socket.send(JSON.stringify({ id: request.id, ok: true, result: answer }));
+                }
+            };
+            const reply = streaming
+                ? await client.stream({ message: 'Solve', responseFormat: 'json' }).result
+                : await client.call(Method.AgentAsk, { message: 'Solve', responseFormat: 'json' });
+            expect(reply.text).toBe('{"code":"print(20)"}');
+        },
+    );
+    it.each([false, true])(
+        'preserves completed submissions and specific unfinished-task reasons (stream=%s)',
+        async (streaming: boolean): Promise<void> => {
+            const connected: NexaClient = await connect();
+            if (gateway === undefined) {
+                throw new Error('No peer');
+            }
+            const submission: string = JSON.stringify({
+                script: 'python analyze.py',
+                files: [{ path: 'analyze.py', content: 'print(20)' }],
+            });
+            let sequence: number = 2;
+            for (const incompleteReason of [
+                undefined,
+                'The requested deployment is blocked by missing credentials.',
+            ]) {
+                const completed: AskResult = {
+                    ...result,
+                    text: submission,
+                    finishReason: 'stop',
+                    ...(incompleteReason === undefined ? {} : { incompleteReason }),
+                };
+                gateway.handler = (socket: WebSocket, request: Request): void => {
+                    if (streaming) {
+                        socket.send(
+                            JSON.stringify({
+                                id: request.id,
+                                ok: true,
+                                result: {
+                                    streamId: request.params['streamId'],
+                                    runId: 'server-run',
+                                },
+                            }),
+                        );
+                        socket.send(
+                            JSON.stringify({
+                                event: 'turn.end',
+                                seq: sequence++,
+                                data: {
+                                    streamId: request.params['streamId'],
+                                    ok: true,
+                                    result: completed,
+                                },
+                            }),
+                        );
+                    } else {
+                        socket.send(
+                            JSON.stringify({ id: request.id, ok: true, result: completed }),
+                        );
+                    }
+                };
+                const received: AskResult = streaming
+                    ? await connected.stream({ message: 'Prepare the tested submission' }).result
+                    : await connected.call(Method.AgentAsk, {
+                          message: 'Prepare the tested submission',
+                      });
+                expect(received.text).toBe(submission);
+                expect(received.incompleteReason).toBe(incompleteReason);
+                expect(received).toEqual(completed);
+            }
+        },
+    );
     it('keeps ordinary planning compatible while refusing selections on an older gateway', async (): Promise<void> => {
         gateway = new TestGateway({
             ...hello,

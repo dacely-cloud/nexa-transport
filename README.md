@@ -198,6 +198,10 @@ const result: AskResult = await turn.result;
 
 Pass `conversationId` to continue an existing session. `turn.result` resolves with the final answer and session key.
 
+Set `responseFormat: 'json'` on `agent.ask` or `client.stream()` to require a JSON final answer while retaining NEXA's tools and task verification. The gateway validates the entire response and repairs malformed drafts before releasing final text. The SDK requires the gateway's `jsonReplies` capability; it refuses older gateways that would silently ignore this setting. JSON validity does not replace task completion or application schema validation.
+
+`finishReason: "stop"` means generation stopped normally. Check `incompleteReason` separately to determine whether NEXA verified task completion. The SDK preserves the final text and this reason for both `agent.ask` and streams. A requested text, code or package submission can complete its assigned task; execution assigned to another system is assessed by that system. An unfinished task retains a reason even when the response contains valid JSON.
+
 Cancel with `await turn.cancel()`, an `AbortSignal`, or by breaking out of the iterator. Cancellation targets the server's run ID. Disconnecting rejects outstanding requests and ends active streams.
 
 ```ts

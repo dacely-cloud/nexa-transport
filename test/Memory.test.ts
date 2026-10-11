@@ -56,7 +56,7 @@ describe('memory ownership', (): void => {
         gateway.handler = answer;
         const buffer = vi
             .spyOn(WebSocket.prototype, 'bufferedAmount', 'get')
-            .mockReturnValue(1_000_000);
+            .mockReturnValue(hello.policy.maxBufferedBytes);
         const encoder = vi.spyOn(BinaryEnvelope, 'encode');
         const first = client.call(Method.AgentAsk, media());
         for (let index: number = 0; index < 80; index += 1) {
@@ -82,7 +82,7 @@ describe('memory ownership', (): void => {
         gateway.handler = answer;
         const buffer = vi
             .spyOn(WebSocket.prototype, 'bufferedAmount', 'get')
-            .mockReturnValue(1_000_000);
+            .mockReturnValue(hello.policy.maxBufferedBytes);
         const first = client.call(Method.AgentAsk, media());
         for (let index: number = 0; index < 80; index += 1) {
             const controller: AbortController = new AbortController();
@@ -125,7 +125,7 @@ describe('memory ownership', (): void => {
         gateway.handler = answer;
         const buffer = vi
             .spyOn(WebSocket.prototype, 'bufferedAmount', 'get')
-            .mockReturnValue(1_000_000);
+            .mockReturnValue(hello.policy.maxBufferedBytes);
         const encoder = vi
             .spyOn(BinaryEnvelope, 'encode')
             .mockImplementation((): Uint8Array<ArrayBuffer> => new Uint8Array(60 * 1024 * 1024));
@@ -151,7 +151,7 @@ describe('memory ownership', (): void => {
         gateway.handler = answer;
         const buffer = vi
             .spyOn(WebSocket.prototype, 'bufferedAmount', 'get')
-            .mockReturnValue(1_000_000);
+            .mockReturnValue(hello.policy.maxBufferedBytes);
         const first = client.call(Method.AgentAsk, media());
         await expect(
             client.call(Method.AgentAsk, media(), { timeoutMs: 10 }),

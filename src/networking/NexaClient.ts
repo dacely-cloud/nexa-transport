@@ -820,6 +820,19 @@ export class NexaClient {
             throw new TransportError(TransportErrorCode.Closed, 'Client is not connected');
         }
         if (
+            (method === Method.AgentAsk || method === Method.AgentStream) &&
+            params !== null &&
+            typeof params === 'object' &&
+            'responseFormat' in params &&
+            params.responseFormat === 'json' &&
+            this.#hello?.features.jsonReplies !== true
+        ) {
+            throw new TransportError(
+                TransportErrorCode.Protocol,
+                'JSON replies require an updated NEXA gateway',
+            );
+        }
+        if (
             (method === Method.WorkflowsPlanningSources ||
                 (method === Method.WorkflowsPlanningSend && Object.hasOwn(params, 'sourceIds'))) &&
             !this.supportsWorkflowPlanningSources

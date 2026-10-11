@@ -240,6 +240,7 @@ What one turn is asked for.
 | `cwd`               | No       | `string`                                                                      | Where tools operate.                                                        |
 | `message`           | Yes      | `string`                                                                      | User text; may be blank when at least one attachment contains content.      |
 | `reasoningEffort`   | No       | `"high"` / `"low"` / `"max"` / `"medium"` / `"minimal"` / `"off"` / `"xhigh"` | Per-turn reasoning preference; never changes the saved agent configuration. |
+| `responseFormat`    | No       | `"json"` / `"text"`                                                           | Final answer format; JSON mode does not disable tools or verification.      |
 | `targetTimeSeconds` | No       | `integer`                                                                     | Soft task time target in seconds; never a cancellation deadline.            |
 | `userId`            | No       | `string`                                                                      | The principal the turn is billed and authorized as.                         |
 
@@ -2133,22 +2134,24 @@ A spend query.
 
 A complete source file the agent can process directly in its workspace.
 
-| Field        | Required | Type     | Description |
-| ------------ | -------- | -------- | ----------- |
-| `byteLength` | Yes      | `string` |             |
-| `filename`   | Yes      | `string` |             |
-| `id`         | Yes      | `string` |             |
-| `path`       | Yes      | `string` |             |
+| Field        | Required | Type     | Description                                                                        |
+| ------------ | -------- | -------- | ---------------------------------------------------------------------------------- |
+| `byteLength` | Yes      | `string` |                                                                                    |
+| `chunkBytes` | No       | `string` | Maximum binary chunk size supported by this upload host; absent on older gateways. |
+| `filename`   | Yes      | `string` |                                                                                    |
+| `id`         | Yes      | `string` |                                                                                    |
+| `path`       | Yes      | `string` |                                                                                    |
 
 ## DataUpload
 
 A disk-backed upload; byte counts use decimal strings on the wire.
 
-| Field        | Required | Type     | Description |
-| ------------ | -------- | -------- | ----------- |
-| `byteLength` | Yes      | `string` |             |
-| `filename`   | Yes      | `string` |             |
-| `id`         | Yes      | `string` |             |
+| Field        | Required | Type     | Description                                                                        |
+| ------------ | -------- | -------- | ---------------------------------------------------------------------------------- |
+| `byteLength` | Yes      | `string` |                                                                                    |
+| `chunkBytes` | No       | `string` | Maximum binary chunk size supported by this upload host; absent on older gateways. |
+| `filename`   | Yes      | `string` |                                                                                    |
+| `id`         | Yes      | `string` |                                                                                    |
 
 ## DataUploadChunkParams
 
@@ -2583,6 +2586,91 @@ Free positioning and responsive container layouts.
 
 Type: `"absolute"` / `"column"` / `"grid"` / `"row"`.
 
+## DesignFontAsset
+
+Immutable font identity and a declared family/style binding; source bytes are never model output.
+
+| Field        | Required | Type                                             | Description |
+| ------------ | -------- | ------------------------------------------------ | ----------- |
+| `byteLength` | Yes      | `string`                                         |             |
+| `family`     | Yes      | `string`                                         |             |
+| `format`     | Yes      | [DesignFontFormat](protocol.md#designfontformat) |             |
+| `id`         | Yes      | `string`                                         |             |
+| `italic`     | Yes      | `boolean`                                        |             |
+| `sha256`     | Yes      | `string`                                         |             |
+| `weight`     | Yes      | `number`                                         |             |
+
+## DesignFontBinding
+
+Saved text pins one immutable owner-scoped font identity and its exact original bytes.
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `id`     | Yes      | `string` |             |
+| `sha256` | Yes      | `string` |             |
+
+## DesignFontFormat
+
+Font containers are identified from validated bytes rather than a filename extension.
+
+Type: `"otf"` / `"ttf"` / `"woff"` / `"woff2"`.
+
+## DesignFontListMethod
+
+Authenticated metadata discovery does not carry font bodies.
+
+| Field    | Required | Type                                                       | Description |
+| -------- | -------- | ---------------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignFontListRequest](protocol.md#designfontlistrequest) |             |
+| `result` | Yes      | [DesignFontListPage](protocol.md#designfontlistpage)       |             |
+
+## DesignFontListPage
+
+Published fonts are reusable across the current owner's agents and reopened workspaces.
+
+| Field       | Required | Type                                                    | Description |
+| ----------- | -------- | ------------------------------------------------------- | ----------- |
+| `items`     | Yes      | Array of [DesignFontAsset](protocol.md#designfontasset) |             |
+| `nextAfter` | Yes      | `null,string`                                           |             |
+
+## DesignFontListRequest
+
+Library browsing carries metadata, with a stable lexicographic cursor.
+
+| Field   | Required | Type          | Description |
+| ------- | -------- | ------------- | ----------- |
+| `after` | Yes      | `null,string` |             |
+| `limit` | Yes      | `number`      |             |
+
+## DesignFontReadMethod
+
+Each authenticated WebSocket read transfers one independently bounded immutable slice.
+
+| Field    | Required | Type                                                       | Description |
+| -------- | -------- | ---------------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignFontReadRequest](protocol.md#designfontreadrequest) |             |
+| `result` | Yes      | [DesignFontSlice](protocol.md#designfontslice)             |             |
+
+## DesignFontReadRequest
+
+Font byte reads address one exact, bounded slice of an immutable identity.
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `id`     | Yes      | `string` |             |
+| `offset` | Yes      | `string` |             |
+
+## DesignFontSlice
+
+Byte transport is separate from metadata discovery and never included in an agent receipt.
+
+| Field        | Required | Type                                           | Description |
+| ------------ | -------- | ---------------------------------------------- | ----------- |
+| `data`       | Yes      | `string`                                       |             |
+| `font`       | Yes      | [DesignFontAsset](protocol.md#designfontasset) |             |
+| `nextOffset` | Yes      | `null,string`                                  |             |
+| `offset`     | Yes      | `string`                                       |             |
+
 ## DesignGradientStop
 
 Color stop in a normalized gradient.
@@ -2594,7 +2682,7 @@ Color stop in a normalized gradient.
 
 ## DesignImage
 
-Workspace image reference and crop transform.
+A durable workspace image and its authored framing.
 
 | Field     | Required | Type                                         | Description |
 | --------- | -------- | -------------------------------------------- | ----------- |
@@ -2609,6 +2697,17 @@ Workspace image reference and crop transform.
 Image scaling mode.
 
 Type: `"contain"` / `"cover"`.
+
+## DesignImageFraming
+
+Workspace image reference and crop transform.
+
+| Field   | Required | Type                                         | Description |
+| ------- | -------- | -------------------------------------------- | ----------- |
+| `cropX` | Yes      | `number`                                     |             |
+| `cropY` | Yes      | `number`                                     |             |
+| `fit`   | Yes      | [DesignImageFit](protocol.md#designimagefit) |             |
+| `scale` | Yes      | `number`                                     |             |
 
 ## DesignInsert
 
@@ -2661,7 +2760,7 @@ Prototype record.
 
 Editable scene primitives, including reusable component definitions and instances.
 
-Type: `"component"` / `"ellipse"` / `"frame"` / `"group"` / `"image"` / `"instance"` / `"line"` / `"path"` / `"polygon"` / `"rectangle"` / `"text"`.
+Type: `"boolean"` / `"component"` / `"component-set"` / `"ellipse"` / `"frame"` / `"group"` / `"image"` / `"instance"` / `"line"` / `"mask"` / `"path"` / `"polygon"` / `"rectangle"` / `"text"`.
 
 ## DesignLayout
 
@@ -2737,6 +2836,21 @@ Owner-scoped document listing.
 | `after` | Yes      | `null,string` |             |
 | `limit` | Yes      | `number`      |             |
 
+## DesignMask
+
+The source is an immediate child, referenced by identity rather than painter order.
+
+| Field      | Required | Type                                         | Description |
+| ---------- | -------- | -------------------------------------------- | ----------- |
+| `mode`     | Yes      | [DesignMaskMode](protocol.md#designmaskmode) |             |
+| `sourceId` | Yes      | `null,string`                                |             |
+
+## DesignMaskMode
+
+How a retained source layer controls the visibility of its sibling artwork.
+
+Type: `"alpha"` / `"luminance"` / `"vector"`.
+
 ## DesignMetadata
 
 Document properties and supporting design-system or collaboration records.
@@ -2765,54 +2879,62 @@ Reparent or reorder without breaking both sides of the tree.
 
 All layer state is explicit and editable; no generated markup is the source of truth.
 
-| Field         | Required | Type                                                        | Description |
-| ------------- | -------- | ----------------------------------------------------------- | ----------- |
-| `children`    | Yes      | Array of `string`                                           |             |
-| `componentId` | Yes      | `null,string`                                               |             |
-| `height`      | Yes      | `number`                                                    |             |
-| `id`          | Yes      | `string`                                                    |             |
-| `image`       | Yes      | [DesignImage](protocol.md#designimage) / `null`             |             |
-| `kind`        | Yes      | [DesignKind](protocol.md#designkind)                        |             |
-| `layout`      | Yes      | [DesignLayout](protocol.md#designlayout)                    |             |
-| `locked`      | Yes      | `boolean`                                                   |             |
-| `name`        | Yes      | `string`                                                    |             |
-| `opacity`     | Yes      | `number`                                                    |             |
-| `overrides`   | Yes      | Array of [DesignOverride](protocol.md#designoverride)       |             |
-| `parentId`    | Yes      | `null,string`                                               |             |
-| `path`        | Yes      | Array of [DesignPathCommand](protocol.md#designpathcommand) |             |
-| `placement`   | Yes      | [DesignPlacement](protocol.md#designplacement)              |             |
-| `rotation`    | Yes      | `number`                                                    |             |
-| `style`       | Yes      | [DesignStyle](protocol.md#designstyle)                      |             |
-| `text`        | Yes      | [DesignText](protocol.md#designtext) / `null`               |             |
-| `visible`     | Yes      | `boolean`                                                   |             |
-| `width`       | Yes      | `number`                                                    |             |
-| `x`           | Yes      | `number`                                                    |             |
-| `y`           | Yes      | `number`                                                    |             |
+| Field         | Required | Type                                                          | Description                                                                    |
+| ------------- | -------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| `booleanMode` | No       | `"exclude"` / `"intersect"` / `"subtract"` / `"union"`        | Omitted on ordinary layers, preserving existing document and retry identities. |
+| `children`    | Yes      | Array of `string`                                             |                                                                                |
+| `componentId` | Yes      | `null,string`                                                 |                                                                                |
+| `height`      | Yes      | `number`                                                      |                                                                                |
+| `id`          | Yes      | `string`                                                      |                                                                                |
+| `image`       | Yes      | [DesignImage](protocol.md#designimage) / `null`               |                                                                                |
+| `kind`        | Yes      | [DesignKind](protocol.md#designkind)                          |                                                                                |
+| `layout`      | Yes      | [DesignLayout](protocol.md#designlayout)                      |                                                                                |
+| `locked`      | Yes      | `boolean`                                                     |                                                                                |
+| `mask`        | No       | [DesignMask](protocol.md#designmask)                          | Retained source identity and coverage mode; omitted on ordinary layers.        |
+| `name`        | Yes      | `string`                                                      |                                                                                |
+| `opacity`     | Yes      | `number`                                                      |                                                                                |
+| `overrides`   | Yes      | Array of [DesignOverride](protocol.md#designoverride)         |                                                                                |
+| `parentId`    | Yes      | `null,string`                                                 |                                                                                |
+| `path`        | Yes      | Array of [DesignPathCommand](protocol.md#designpathcommand)   |                                                                                |
+| `placement`   | Yes      | [DesignPlacement](protocol.md#designplacement)                |                                                                                |
+| `rotation`    | Yes      | `number`                                                      |                                                                                |
+| `style`       | Yes      | [DesignStyle](protocol.md#designstyle)                        |                                                                                |
+| `text`        | Yes      | [DesignText](protocol.md#designtext) / `null`                 |                                                                                |
+| `variant`     | No       | Array of [DesignVariantValue](protocol.md#designvariantvalue) | Named values on an immediate component definition inside a variant set.        |
+| `variants`    | No       | [DesignVariantSet](protocol.md#designvariantset)              | Reusable variant set metadata; only component-set containers accept it.        |
+| `visible`     | Yes      | `boolean`                                                     |                                                                                |
+| `width`       | Yes      | `number`                                                      |                                                                                |
+| `x`           | Yes      | `number`                                                      |                                                                                |
+| `y`           | Yes      | `number`                                                      |                                                                                |
 
 ## DesignNodeChanges
 
 Editable properties exclude identity and tree links, which have dedicated operations.
 
-| Field         | Required | Type                                                                                                                                          | Description                                                                        |
-| ------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| `componentId` | No       | `null,string`                                                                                                                                 |                                                                                    |
-| `height`      | No       | `number`                                                                                                                                      |                                                                                    |
-| `image`       | No       | [DesignImage](protocol.md#designimage) / `null`                                                                                               |                                                                                    |
-| `kind`        | No       | `"component"` / `"ellipse"` / `"frame"` / `"group"` / `"image"` / `"instance"` / `"line"` / `"path"` / `"polygon"` / `"rectangle"` / `"text"` | Editable scene primitives, including reusable component definitions and instances. |
-| `layout`      | No       | [DesignLayout](protocol.md#designlayout)                                                                                                      | Container layout, including wrapping, grid tracks and content alignment.           |
-| `locked`      | No       | `boolean`                                                                                                                                     |                                                                                    |
-| `name`        | No       | `string`                                                                                                                                      |                                                                                    |
-| `opacity`     | No       | `number`                                                                                                                                      |                                                                                    |
-| `overrides`   | No       | Array of [DesignOverride](protocol.md#designoverride)                                                                                         |                                                                                    |
-| `path`        | No       | Array of [DesignPathCommand](protocol.md#designpathcommand)                                                                                   |                                                                                    |
-| `placement`   | No       | [DesignPlacement](protocol.md#designplacement)                                                                                                | Child sizing and positioning relative to its parent.                               |
-| `rotation`    | No       | `number`                                                                                                                                      |                                                                                    |
-| `style`       | No       | [DesignStyle](protocol.md#designstyle)                                                                                                        | Style can be shared across arbitrary primitives.                                   |
-| `text`        | No       | [DesignText](protocol.md#designtext) / `null`                                                                                                 |                                                                                    |
-| `visible`     | No       | `boolean`                                                                                                                                     |                                                                                    |
-| `width`       | No       | `number`                                                                                                                                      |                                                                                    |
-| `x`           | No       | `number`                                                                                                                                      |                                                                                    |
-| `y`           | No       | `number`                                                                                                                                      |                                                                                    |
+| Field         | Required | Type                                                                                                                                                                                       | Description                                                                        |
+| ------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
+| `booleanMode` | No       | `"exclude"` / `"intersect"` / `"subtract"` / `"union"` / `null`                                                                                                                            | A null value clears the operation when explicitly flattening a Boolean group.      |
+| `componentId` | No       | `null,string`                                                                                                                                                                              |                                                                                    |
+| `height`      | No       | `number`                                                                                                                                                                                   |                                                                                    |
+| `image`       | No       | [DesignImage](protocol.md#designimage) / `null`                                                                                                                                            |                                                                                    |
+| `kind`        | No       | `"boolean"` / `"component"` / `"component-set"` / `"ellipse"` / `"frame"` / `"group"` / `"image"` / `"instance"` / `"line"` / `"mask"` / `"path"` / `"polygon"` / `"rectangle"` / `"text"` | Editable scene primitives, including reusable component definitions and instances. |
+| `layout`      | No       | [DesignLayout](protocol.md#designlayout)                                                                                                                                                   | Container layout, including wrapping, grid tracks and content alignment.           |
+| `locked`      | No       | `boolean`                                                                                                                                                                                  |                                                                                    |
+| `mask`        | No       | [DesignMask](protocol.md#designmask) / `null`                                                                                                                                              | Null clears masking when converting the container into an ordinary group.          |
+| `name`        | No       | `string`                                                                                                                                                                                   |                                                                                    |
+| `opacity`     | No       | `number`                                                                                                                                                                                   |                                                                                    |
+| `overrides`   | No       | Array of [DesignOverride](protocol.md#designoverride)                                                                                                                                      |                                                                                    |
+| `path`        | No       | Array of [DesignPathCommand](protocol.md#designpathcommand)                                                                                                                                |                                                                                    |
+| `placement`   | No       | [DesignPlacement](protocol.md#designplacement)                                                                                                                                             | Child sizing and positioning relative to its parent.                               |
+| `rotation`    | No       | `number`                                                                                                                                                                                   |                                                                                    |
+| `style`       | No       | [DesignStyle](protocol.md#designstyle)                                                                                                                                                     | Style can be shared across arbitrary primitives.                                   |
+| `text`        | No       | [DesignText](protocol.md#designtext) / `null`                                                                                                                                              |                                                                                    |
+| `variant`     | No       | Array of [DesignVariantValue](protocol.md#designvariantvalue) / `null`                                                                                                                     | Null releases a definition from its set.                                           |
+| `variants`    | No       | [DesignVariantSet](protocol.md#designvariantset) / `null`                                                                                                                                  | Null releases component-set metadata when converting its container.                |
+| `visible`     | No       | `boolean`                                                                                                                                                                                  |                                                                                    |
+| `width`       | No       | `number`                                                                                                                                                                                   |                                                                                    |
+| `x`           | No       | `number`                                                                                                                                                                                   |                                                                                    |
+| `y`           | No       | `number`                                                                                                                                                                                   |                                                                                    |
 
 ## DesignNodeRecord
 
@@ -2938,15 +3060,16 @@ Page record.
 
 Layer paint. Colors are validated hex values, never arbitrary CSS.
 
-| Field     | Required | Type                                                          | Description |
-| --------- | -------- | ------------------------------------------------------------- | ----------- |
-| `angle`   | Yes      | `number`                                                      |             |
-| `assetId` | Yes      | `null,string`                                                 |             |
-| `color`   | Yes      | `string`                                                      |             |
-| `kind`    | Yes      | [DesignPaintKind](protocol.md#designpaintkind)                |             |
-| `opacity` | Yes      | `number`                                                      |             |
-| `stops`   | Yes      | Array of [DesignGradientStop](protocol.md#designgradientstop) |             |
-| `tokenId` | Yes      | `null,string`                                                 |             |
+| Field     | Required | Type                                                          | Description                                                                            |
+| --------- | -------- | ------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `angle`   | Yes      | `number`                                                      |                                                                                        |
+| `assetId` | Yes      | `null,string`                                                 |                                                                                        |
+| `color`   | Yes      | `string`                                                      |                                                                                        |
+| `framing` | No       | [DesignImageFraming](protocol.md#designimageframing)          | Omitted framing retains the original centered-cover behavior of existing image paints. |
+| `kind`    | Yes      | [DesignPaintKind](protocol.md#designpaintkind)                |                                                                                        |
+| `opacity` | Yes      | `number`                                                      |                                                                                        |
+| `stops`   | Yes      | Array of [DesignGradientStop](protocol.md#designgradientstop) |                                                                                        |
+| `tokenId` | Yes      | `null,string`                                                 |                                                                                        |
 
 ## DesignPaintKind
 
@@ -3179,17 +3302,18 @@ Tiny management projection. Timestamps and revisions retain full integer precisi
 
 Text layout is shared by the canvas, tools and exported designs.
 
-| Field           | Required | Type                                                | Description |
-| --------------- | -------- | --------------------------------------------------- | ----------- |
-| `align`         | Yes      | [DesignAlign](protocol.md#designalign)              |             |
-| `content`       | Yes      | `string`                                            |             |
-| `family`        | Yes      | `string`                                            |             |
-| `italic`        | Yes      | `boolean`                                           |             |
-| `letterSpacing` | Yes      | `number`                                            |             |
-| `lineHeight`    | Yes      | `number`                                            |             |
-| `runs`          | Yes      | Array of [DesignTextRun](protocol.md#designtextrun) |             |
-| `size`          | Yes      | `number`                                            |             |
-| `weight`        | Yes      | `number`                                            |             |
+| Field           | Required | Type                                                        | Description                                                                               |
+| --------------- | -------- | ----------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `align`         | Yes      | [DesignAlign](protocol.md#designalign)                      |                                                                                           |
+| `content`       | Yes      | `string`                                                    |                                                                                           |
+| `family`        | Yes      | `string`                                                    |                                                                                           |
+| `font`          | No       | [DesignFontBinding](protocol.md#designfontbinding) / `null` | Exact private font bytes remain in the owner's library, independently of the saved scene. |
+| `italic`        | Yes      | `boolean`                                                   |                                                                                           |
+| `letterSpacing` | Yes      | `number`                                                    |                                                                                           |
+| `lineHeight`    | Yes      | `number`                                                    |                                                                                           |
+| `runs`          | Yes      | Array of [DesignTextRun](protocol.md#designtextrun)         |                                                                                           |
+| `size`          | Yes      | `number`                                                    |                                                                                           |
+| `weight`        | Yes      | `number`                                                    |                                                                                           |
 
 ## DesignTextOperation
 
@@ -3205,16 +3329,17 @@ Replace text content while preserving typography and clipping existing rich-text
 
 Rich text range. Offsets are UTF-16 indices into the layer's text.
 
-| Field       | Required | Type      | Description |
-| ----------- | -------- | --------- | ----------- |
-| `color`     | Yes      | `string`  |             |
-| `end`       | Yes      | `number`  |             |
-| `family`    | Yes      | `string`  |             |
-| `italic`    | Yes      | `boolean` |             |
-| `size`      | Yes      | `number`  |             |
-| `start`     | Yes      | `number`  |             |
-| `underline` | Yes      | `boolean` |             |
-| `weight`    | Yes      | `number`  |             |
+| Field       | Required | Type                                                        | Description                                                                          |
+| ----------- | -------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `color`     | Yes      | `string`                                                    |                                                                                      |
+| `end`       | Yes      | `number`                                                    |                                                                                      |
+| `family`    | Yes      | `string`                                                    |                                                                                      |
+| `font`      | No       | [DesignFontBinding](protocol.md#designfontbinding) / `null` | Omission inherits a compatible base face; null explicitly chooses an unbound family. |
+| `italic`    | Yes      | `boolean`                                                   |                                                                                      |
+| `size`      | Yes      | `number`                                                    |                                                                                      |
+| `start`     | Yes      | `number`                                                    |                                                                                      |
+| `underline` | Yes      | `boolean`                                                   |                                                                                      |
+| `weight`    | Yes      | `number`                                                    |                                                                                      |
 
 ## DesignToken
 
@@ -3284,6 +3409,24 @@ Update only chosen properties, preserving unrelated edits.
 | `changes` | Yes      | [DesignNodeChanges](protocol.md#designnodechanges) |             |
 | `id`      | Yes      | `string`                                           |             |
 | `op`      | Yes      | `"update"`                                         |             |
+
+## DesignVariantSet
+
+Ordered dimensions and the identity used when placing this reusable set.
+
+| Field        | Required | Type              | Description |
+| ------------ | -------- | ----------------- | ----------- |
+| `defaultId`  | Yes      | `null,string`     |             |
+| `properties` | Yes      | Array of `string` |             |
+
+## DesignVariantValue
+
+A named dimension and one retained definition's authored value.
+
+| Field      | Required | Type     | Description |
+| ---------- | -------- | -------- | ----------- |
+| `property` | Yes      | `string` |             |
+| `value`    | Yes      | `string` |             |
 
 ## DeviceApproveParams
 
@@ -3467,6 +3610,7 @@ Methods, events, and additive capabilities supported by this gateway.
 | `binaryDataUploads`         | No       | `true`                                             | Disk upload chunks retain raw bytes from the wire through durable storage.                     |
 | `binaryMedia`               | No       | `true`                                             | NXMD frames carry outbound file bytes; JSON results contain matching metadata.                 |
 | `events`                    | Yes      | Array of `string`                                  |                                                                                                |
+| `jsonReplies`               | No       | `true`                                             | Host validation of JSON final answers while native tools remain available.                     |
 | `methodScopes`              | Yes      | [RecordstringScope](protocol.md#recordstringscope) | The scope each method requires.                                                                |
 | `methods`                   | Yes      | Array of `string`                                  |                                                                                                |
 | `officeAppearance`          | No       | `true`                                             | Stable employee cosmetics in NGOP v7.                                                          |
@@ -3566,6 +3710,8 @@ Configurable bounds on gateway-owned work and memory.
 | `design.create`                      | Yes      | Object (fields below) | Create-document RPC contract.                                                              |
 | `design.delete`                      | Yes      | Object (fields below) | Owner-scoped revision-safe document deletion.                                              |
 | `design.events`                      | Yes      | Object (fields below) | Revision-journal RPC contract.                                                             |
+| `design.font.list`                   | Yes      | Object (fields below) | Authenticated metadata discovery does not carry font bodies.                               |
+| `design.font.read`                   | Yes      | Object (fields below) | Each authenticated WebSocket read transfers one independently bounded immutable slice.     |
 | `design.layout`                      | Yes      | Object (fields below) | Computed-geometry RPC contract.                                                            |
 | `design.list`                        | Yes      | Object (fields below) | Owner-scoped library RPC contract.                                                         |
 | `design.read`                        | Yes      | Object (fields below) | Bounded snapshot RPC contract.                                                             |
@@ -4051,6 +4197,20 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ------------------------------------------------------ | ----------- |
 | `params` | Yes      | [DesignEventsRequest](protocol.md#designeventsrequest) |             |
 | `result` | Yes      | [DesignEventsPage](protocol.md#designeventspage)       |             |
+
+**design.font.list**
+
+| Field    | Required | Type                                                       | Description |
+| -------- | -------- | ---------------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignFontListRequest](protocol.md#designfontlistrequest) |             |
+| `result` | Yes      | [DesignFontListPage](protocol.md#designfontlistpage)       |             |
+
+**design.font.read**
+
+| Field    | Required | Type                                                       | Description |
+| -------- | -------- | ---------------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignFontReadRequest](protocol.md#designfontreadrequest) |             |
+| `result` | Yes      | [DesignFontSlice](protocol.md#designfontslice)             |             |
 
 **design.layout**
 
@@ -6924,6 +7084,7 @@ Bounded, capability-free projection carried by live tool events and the final re
 | `state`                    | Yes      | [ReverseState](protocol.md#reversestate)                                               |                                                                                                 |
 | `tasks`                    | Yes      | Array of [ReverseTaskSnapshot](protocol.md#reversetasksnapshot)                        |                                                                                                 |
 | `version`                  | Yes      | `1`                                                                                    |                                                                                                 |
+| `workspace`                | No       | [ReverseWorkspaceState](protocol.md#reverseworkspacestate)                             | Persisted agent presentation is independent from execution progress.                            |
 
 ## ReverseState
 
@@ -6945,6 +7106,26 @@ A runtime-owned step in the shared investigation plan. Reports remain unverified
 | `report`       | Yes      | `null,string`                            |             |
 | `startedAtMs`  | Yes      | `null,string`                            |             |
 | `state`        | Yes      | [ReverseState](protocol.md#reversestate) |             |
+
+## ReverseWorkspaceState
+
+Independent presentation revisions never interfere with execution checkpoint revisions.
+
+| Field        | Required | Type                                                     | Description |
+| ------------ | -------- | -------------------------------------------------------- | ----------- |
+| `dock`       | Yes      | `"Agents"` / `"Output"` / `"References"` / `null`        |             |
+| `evidenceId` | Yes      | `null,string`                                            |             |
+| `follow`     | Yes      | `boolean`                                                |             |
+| `graph`      | Yes      | `boolean`                                                |             |
+| `navigation` | Yes      | `boolean`                                                |             |
+| `revision`   | Yes      | `string`                                                 |             |
+| `view`       | Yes      | [ReverseWorkspaceView](protocol.md#reverseworkspaceview) |             |
+
+## ReverseWorkspaceView
+
+Native working views shared by model tools and Chat's RE panel.
+
+Type: `"Accessibility"` / `"All evidence"` / `"Assembly"` / `"Browser activity"` / `"Comparison"` / `"DOM"` / `"Graph"` / `"Hex / bytes"` / `"Imports"` / `"Pseudocode"` / `"Resources"` / `"Screenshot"` / `"Scripts"` / `"Storage"` / `"Storage changes"` / `"WebMCP"`.
 
 ## RiskLevel
 
@@ -7226,6 +7407,7 @@ What one turn is asked for, when the client wants its events streamed.
 | `cwd`               | No       | `string`                                                                      | Where tools operate.                                                        |
 | `message`           | Yes      | `string`                                                                      | User text; may be blank when at least one attachment contains content.      |
 | `reasoningEffort`   | No       | `"high"` / `"low"` / `"max"` / `"medium"` / `"minimal"` / `"off"` / `"xhigh"` | Per-turn reasoning preference; never changes the saved agent configuration. |
+| `responseFormat`    | No       | `"json"` / `"text"`                                                           | Final answer format; JSON mode does not disable tools or verification.      |
 | `streamId`          | No       | `string`                                                                      | The stream's id, chosen by the CLIENT.                                      |
 | `targetTimeSeconds` | No       | `integer`                                                                     | Soft task time target in seconds; never a cancellation deadline.            |
 | `userId`            | No       | `string`                                                                      | The principal the turn is billed and authorized as.                         |
@@ -7915,22 +8097,23 @@ Type: `"accepted"` / `"queued"` / `"rejected"`.
 
 Bounded live text is a preview; completed graph outputs remain authoritative.
 
-| Field             | Required | Type                                                          | Description |
-| ----------------- | -------- | ------------------------------------------------------------- | ----------- |
-| `activity`        | Yes      | `string`                                                      |             |
-| `controlId`       | Yes      | `string`                                                      |             |
-| `controlRevision` | Yes      | `string`                                                      |             |
-| `inputs`          | Yes      | Array of [WorkflowAgentInput](protocol.md#workflowagentinput) |             |
-| `invocationId`    | Yes      | `string`                                                      |             |
-| `model`           | Yes      | `string`                                                      |             |
-| `nodeId`          | Yes      | `string`                                                      |             |
-| `pauseRequested`  | Yes      | `boolean`                                                     |             |
-| `paused`          | Yes      | `boolean`                                                     |             |
-| `provider`        | Yes      | `string`                                                      |             |
-| `runId`           | Yes      | `string`                                                      |             |
-| `status`          | Yes      | [WorkflowStepStatus](protocol.md#workflowstepstatus)          |             |
-| `task`            | Yes      | `string`                                                      |             |
-| `text`            | Yes      | `string`                                                      |             |
+| Field             | Required | Type                                                          | Description                                                                |
+| ----------------- | -------- | ------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| `activity`        | Yes      | `string`                                                      |                                                                            |
+| `controlId`       | Yes      | `string`                                                      |                                                                            |
+| `controlRevision` | Yes      | `string`                                                      |                                                                            |
+| `inputs`          | Yes      | Array of [WorkflowAgentInput](protocol.md#workflowagentinput) |                                                                            |
+| `invocationId`    | Yes      | `string`                                                      |                                                                            |
+| `model`           | Yes      | `string`                                                      |                                                                            |
+| `nodeId`          | Yes      | `string`                                                      |                                                                            |
+| `pauseRequested`  | Yes      | `boolean`                                                     |                                                                            |
+| `paused`          | Yes      | `boolean`                                                     |                                                                            |
+| `provider`        | Yes      | `string`                                                      |                                                                            |
+| `runId`           | Yes      | `string`                                                      |                                                                            |
+| `sessionKey`      | No       | `string`                                                      | Owner-scoped Nexa conversation with the ordinary paged Chat event journal. |
+| `status`          | Yes      | [WorkflowStepStatus](protocol.md#workflowstepstatus)          |                                                                            |
+| `task`            | Yes      | `string`                                                      |                                                                            |
+| `text`            | Yes      | `string`                                                      |                                                                            |
 
 ## WorkflowAgentSessionRequest
 
@@ -9564,6 +9747,7 @@ An isolated place an agent works.
 | `quota`       | No       | [WorkspaceQuota](protocol.md#workspacequota)                                            | Ceilings for this workspace's contents. Absent means unbounded — see {@link WorkspaceQuota}.  |
 | `root`        | Yes      | `string`                                                                                | The absolute root. Every tool bound to this workspace is confined here.                       |
 | `state`       | No       | `"active"` / `"creating"` / `"destroyed"` / `"destroying"` / `"draining"` / `"expired"` | Where it is in its lifecycle.                                                                 |
+| `storage`     | No       | [WorkspaceStorageIdentity](protocol.md#workspacestorageidentity)                        | Present for assigned-host projects; legacy/native records cannot silently adopt a VM.         |
 | `tags`        | No       | Array of `string`                                                                       | Free-form labels.                                                                             |
 | `updatedAt`   | Yes      | `number`                                                                                |                                                                                               |
 | `usage`       | No       | [WorkspaceUsage](protocol.md#workspaceusage)                                            | Last known contents. Read through {@link usageOf}, which defaults a legacy record to zero.    |
@@ -9605,6 +9789,7 @@ A workspace plus the lifecycle facts a caller has to see to make a decision abou
 | `quota`       | No       | [WorkspaceQuota](protocol.md#workspacequota)                      | Ceilings for this workspace's contents. Absent means unbounded — see {@link WorkspaceQuota}.  |
 | `root`        | Yes      | `string`                                                          | The absolute root. Every tool bound to this workspace is confined here.                       |
 | `state`       | Yes      | [WorkspaceState](protocol.md#workspacestate)                      | Where it is in its lifecycle.                                                                 |
+| `storage`     | No       | [WorkspaceStorageIdentity](protocol.md#workspacestorageidentity)  | Present for assigned-host projects; legacy/native records cannot silently adopt a VM.         |
 | `tags`        | No       | Array of `string`                                                 | Free-form labels.                                                                             |
 | `updatedAt`   | Yes      | `number`                                                          |                                                                                               |
 | `usage`       | Yes      | [WorkspaceUsage](protocol.md#workspaceusage)                      | Last known contents. Read through {@link usageOf}, which defaults a legacy record to zero.    |
@@ -9667,6 +9852,15 @@ The ceilings a workspace's contents may not pass.
 Where a workspace is in its life.
 
 Type: `"active"` / `"creating"` / `"destroyed"` / `"destroying"` / `"draining"` / `"expired"`.
+
+## WorkspaceStorageIdentity
+
+Persisted assignment binding contains no transport credentials or controller filesystem paths.
+
+| Field  | Required | Type     | Description                                                     |
+| ------ | -------- | -------- | --------------------------------------------------------------- |
+| `id`   | Yes      | `string` | Opaque stable identity of the assigned host and workspace base. |
+| `root` | Yes      | `string` |                                                                 |
 
 ## WorkspaceUsage
 

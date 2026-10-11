@@ -554,6 +554,12 @@ export const schema: Schema = {
                     enum: ['high', 'low', 'max', 'medium', 'minimal', 'off', 'xhigh'],
                     type: 'string',
                 },
+                responseFormat: {
+                    description:
+                        'Final answer format; JSON mode does not disable tools or verification.',
+                    enum: ['json', 'text'],
+                    type: 'string',
+                },
                 targetTimeSeconds: {
                     description: 'Soft task time target in seconds; never a cancellation deadline.',
                     maximum: 172800,
@@ -4998,11 +5004,12 @@ export const schema: Schema = {
         DataFile: {
             description: 'A complete source file the agent can process directly in its workspace.',
             properties: {
-                chunkBytes: {
-                    description: 'Maximum binary chunk size supported by this upload host; absent on older gateways.',
+                byteLength: {
                     type: 'string',
                 },
-                byteLength: {
+                chunkBytes: {
+                    description:
+                        'Maximum binary chunk size supported by this upload host; absent on older gateways.',
                     type: 'string',
                 },
                 filename: {
@@ -5021,11 +5028,12 @@ export const schema: Schema = {
         DataUpload: {
             description: 'A disk-backed upload; byte counts use decimal strings on the wire.',
             properties: {
-                chunkBytes: {
-                    description: 'Maximum binary chunk size supported by this upload host; absent on older gateways.',
+                byteLength: {
                     type: 'string',
                 },
-                byteLength: {
+                chunkBytes: {
+                    description:
+                        'Maximum binary chunk size supported by this upload host; absent on older gateways.',
                     type: 'string',
                 },
                 filename: {
@@ -5280,2473 +5288,2196 @@ export const schema: Schema = {
             type: 'object',
         },
         DesignAction: {
-    "description": "Prototype actions.\nPrototype action.",
-    "enum": [
-        "back",
-        "navigate",
-        "overlay"
-    ],
-    "type": "string"
-},
+            description: 'Prototype actions.\nPrototype action.',
+            enum: ['back', 'navigate', 'overlay'],
+            type: 'string',
+        },
         DesignAlign: {
-    "description": "Alignment within the available layout space.\nAlignment choice.",
-    "enum": [
-        "between",
-        "center",
-        "end",
-        "start",
-        "stretch"
-    ],
-    "type": "string"
-},
+            description: 'Alignment within the available layout space.\nAlignment choice.',
+            enum: ['between', 'center', 'end', 'start', 'stretch'],
+            type: 'string',
+        },
         DesignAsset: {
-    "description": "Published assets are immutable, and all byte counts remain decimal strings.",
-    "properties": {
-        "byteLength": {
-            "type": "string"
+            description:
+                'Published assets are immutable, and all byte counts remain decimal strings.',
+            properties: {
+                byteLength: {
+                    type: 'string',
+                },
+                height: {
+                    type: 'number',
+                },
+                id: {
+                    type: 'string',
+                },
+                mime: {
+                    $ref: '#/definitions/DesignAssetMime',
+                },
+                name: {
+                    type: 'string',
+                },
+                sha256: {
+                    type: 'string',
+                },
+                width: {
+                    type: 'number',
+                },
+            },
+            required: ['byteLength', 'height', 'id', 'mime', 'name', 'sha256', 'width'],
+            type: 'object',
         },
-        "height": {
-            "type": "number"
-        },
-        "id": {
-            "type": "string"
-        },
-        "mime": {
-            "$ref": "#/definitions/DesignAssetMime"
-        },
-        "name": {
-            "type": "string"
-        },
-        "sha256": {
-            "type": "string"
-        },
-        "width": {
-            "type": "number"
-        }
-    },
-    "required": [
-        "byteLength",
-        "height",
-        "id",
-        "mime",
-        "name",
-        "sha256",
-        "width"
-    ],
-    "type": "object"
-},
         DesignAssetCancelMethod: {
-    "properties": {
-        "params": {
-            "$ref": "#/definitions/DesignAssetIdRequest"
+            properties: {
+                params: {
+                    $ref: '#/definitions/DesignAssetIdRequest',
+                },
+                result: {
+                    type: 'null',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
         },
-        "result": {
-            "type": "null"
-        }
-    },
-    "required": [
-        "params",
-        "result"
-    ],
-    "type": "object"
-},
         DesignAssetChunkMethod: {
-    "properties": {
-        "params": {
-            "$ref": "#/definitions/DesignAssetChunkRequest"
+            properties: {
+                params: {
+                    $ref: '#/definitions/DesignAssetChunkRequest',
+                },
+                result: {
+                    $ref: '#/definitions/DesignAssetPosition',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
         },
-        "result": {
-            "$ref": "#/definitions/DesignAssetPosition"
-        }
-    },
-    "required": [
-        "params",
-        "result"
-    ],
-    "type": "object"
-},
         DesignAssetChunkRequest: {
-    "description": "One canonical base64 slice, addressed by exact byte position.",
-    "properties": {
-        "data": {
-            "type": "string"
+            description: 'One canonical base64 slice, addressed by exact byte position.',
+            properties: {
+                data: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                offset: {
+                    type: 'string',
+                },
+            },
+            required: ['data', 'id', 'offset'],
+            type: 'object',
         },
-        "id": {
-            "type": "string"
-        },
-        "offset": {
-            "type": "string"
-        }
-    },
-    "required": [
-        "data",
-        "id",
-        "offset"
-    ],
-    "type": "object"
-},
         DesignAssetFinishMethod: {
-    "properties": {
-        "params": {
-            "$ref": "#/definitions/DesignAssetIdRequest"
+            properties: {
+                params: {
+                    $ref: '#/definitions/DesignAssetIdRequest',
+                },
+                result: {
+                    $ref: '#/definitions/DesignAsset',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
         },
-        "result": {
-            "$ref": "#/definitions/DesignAsset"
-        }
-    },
-    "required": [
-        "params",
-        "result"
-    ],
-    "type": "object"
-},
         DesignAssetIdRequest: {
-    "description": "Asset addressing is independent of document ownership; both are authorized by the server.",
-    "properties": {
-        "id": {
-            "type": "string"
-        }
-    },
-    "required": [
-        "id"
-    ],
-    "type": "object"
-},
+            description:
+                'Asset addressing is independent of document ownership; both are authorized by the server.',
+            properties: {
+                id: {
+                    type: 'string',
+                },
+            },
+            required: ['id'],
+            type: 'object',
+        },
         DesignAssetListMethod: {
-    "properties": {
-        "params": {
-            "$ref": "#/definitions/DesignAssetListRequest"
+            properties: {
+                params: {
+                    $ref: '#/definitions/DesignAssetListRequest',
+                },
+                result: {
+                    $ref: '#/definitions/DesignAssetListPage',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
         },
-        "result": {
-            "$ref": "#/definitions/DesignAssetListPage"
-        }
-    },
-    "required": [
-        "params",
-        "result"
-    ],
-    "type": "object"
-},
         DesignAssetListPage: {
-    "properties": {
-        "items": {
-            "items": {
-                "$ref": "#/definitions/DesignAsset"
+            properties: {
+                items: {
+                    items: {
+                        $ref: '#/definitions/DesignAsset',
+                    },
+                    type: 'array',
+                },
+                nextAfter: {
+                    type: ['null', 'string'],
+                },
             },
-            "type": "array"
+            required: ['items', 'nextAfter'],
+            type: 'object',
         },
-        "nextAfter": {
-            "type": [
-                "null",
-                "string"
-            ]
-        }
-    },
-    "required": [
-        "items",
-        "nextAfter"
-    ],
-    "type": "object"
-},
         DesignAssetListRequest: {
-    "description": "Library projections are metadata only.",
-    "properties": {
-        "after": {
-            "type": [
-                "null",
-                "string"
-            ]
-        },
-        "limit": {
-            "type": "number"
-        }
-    },
-    "required": [
-        "after",
-        "limit"
-    ],
-    "type": "object"
-},
-        DesignAssetMime: {
-    "description": "Raster formats are identified from bytes before becoming usable design assets.",
-    "enum": [
-        "image/gif",
-        "image/jpeg",
-        "image/png",
-        "image/webp"
-    ],
-    "type": "string"
-},
-        DesignAssetPosition: {
-    "description": "Receipts carry progress without echoing source bytes.",
-    "properties": {
-        "byteLength": {
-            "type": "string"
-        },
-        "id": {
-            "type": "string"
-        },
-        "offset": {
-            "type": "string"
-        }
-    },
-    "required": [
-        "byteLength",
-        "id",
-        "offset"
-    ],
-    "type": "object"
-},
-        DesignAssetReadMethod: {
-    "properties": {
-        "params": {
-            "$ref": "#/definitions/DesignAssetReadRequest"
-        },
-        "result": {
-            "$ref": "#/definitions/DesignAssetSlice"
-        }
-    },
-    "required": [
-        "params",
-        "result"
-    ],
-    "type": "object"
-},
-        DesignAssetReadRequest: {
-    "description": "Reads transfer only a bounded slice of a completed immutable image.",
-    "properties": {
-        "id": {
-            "type": "string"
-        },
-        "offset": {
-            "type": "string"
-        }
-    },
-    "required": [
-        "id",
-        "offset"
-    ],
-    "type": "object"
-},
-        DesignAssetRemoveMethod: {
-    "properties": {
-        "params": {
-            "$ref": "#/definitions/DesignAssetIdRequest"
-        },
-        "result": {
-            "type": "null"
-        }
-    },
-    "required": [
-        "params",
-        "result"
-    ],
-    "type": "object"
-},
-        DesignAssetSlice: {
-    "description": "The browser pins the metadata identity while assembling slices.",
-    "properties": {
-        "asset": {
-            "$ref": "#/definitions/DesignAsset"
-        },
-        "data": {
-            "type": "string"
-        },
-        "nextOffset": {
-            "type": [
-                "null",
-                "string"
-            ]
-        },
-        "offset": {
-            "type": "string"
-        }
-    },
-    "required": [
-        "asset",
-        "data",
-        "nextOffset",
-        "offset"
-    ],
-    "type": "object"
-},
-        DesignAssetStartMethod: {
-    "properties": {
-        "params": {
-            "$ref": "#/definitions/DesignAssetStartRequest"
-        },
-        "result": {
-            "$ref": "#/definitions/DesignAssetPosition"
-        }
-    },
-    "required": [
-        "params",
-        "result"
-    ],
-    "type": "object"
-},
-        DesignAssetStartRequest: {
-    "description": "Retried admission uses the same client-chosen identity. Ownership comes from the host.",
-    "properties": {
-        "byteLength": {
-            "type": "string"
-        },
-        "id": {
-            "type": "string"
-        },
-        "name": {
-            "type": "string"
-        },
-        "sha256": {
-            "type": "string"
-        }
-    },
-    "required": [
-        "byteLength",
-        "id",
-        "name",
-        "sha256"
-    ],
-    "type": "object"
-},
-        DesignBox: {
-    "description": "Resolved layout boxes are separate from authored values and never written back implicitly.",
-    "properties": {
-        "clipId": {
-            "type": [
-                "null",
-                "string"
-            ]
-        },
-        "depth": {
-            "type": "number"
-        },
-        "height": {
-            "type": "number"
-        },
-        "id": {
-            "type": "string"
-        },
-        "rotation": {
-            "type": "number"
-        },
-        "width": {
-            "type": "number"
-        },
-        "x": {
-            "type": "number"
-        },
-        "y": {
-            "type": "number"
-        }
-    },
-    "required": [
-        "clipId",
-        "depth",
-        "height",
-        "id",
-        "rotation",
-        "width",
-        "x",
-        "y"
-    ],
-    "type": "object"
-},
-        DesignChangesMethod: {
-    "description": "Forward delta RPC contract.",
-    "properties": {
-        "params": {
-            "$ref": "#/definitions/DesignChangesRequest"
-        },
-        "result": {
-            "$ref": "#/definitions/DesignRecordPage"
-        }
-    },
-    "required": [
-        "params",
-        "result"
-    ],
-    "type": "object"
-},
-        DesignChangesRequest: {
-    "description": "Changed entities exclude undo preimages.",
-    "properties": {
-        "commandId": {
-            "type": "string"
-        },
-        "cursor": {
-            "anyOf": [
-                {
-                    "$ref": "#/definitions/DesignCursor"
+            description: 'Library projections are metadata only.',
+            properties: {
+                after: {
+                    type: ['null', 'string'],
                 },
-                {
-                    "type": "null"
-                }
-            ]
-        },
-        "id": {
-            "type": "string"
-        },
-        "limit": {
-            "type": "number"
-        }
-    },
-    "required": [
-        "commandId",
-        "cursor",
-        "id",
-        "limit"
-    ],
-    "type": "object"
-},
-        DesignComment: {
-    "description": "Anchored comments can refer to exact layers or canvas coordinates.",
-    "properties": {
-        "author": {
-            "type": "string"
-        },
-        "id": {
-            "type": "string"
-        },
-        "nodeId": {
-            "type": [
-                "null",
-                "string"
-            ]
-        },
-        "resolved": {
-            "type": "boolean"
-        },
-        "text": {
-            "type": "string"
-        },
-        "x": {
-            "type": "number"
-        },
-        "y": {
-            "type": "number"
-        }
-    },
-    "required": [
-        "author",
-        "id",
-        "nodeId",
-        "resolved",
-        "text",
-        "x",
-        "y"
-    ],
-    "type": "object"
-},
-        DesignCommentRecord: {
-    "description": "Comment record.",
-    "properties": {
-        "id": {
-            "type": "string"
-        },
-        "kind": {
-            "const": "comment",
-            "type": "string"
-        },
-        "value": {
-            "anyOf": [
-                {
-                    "$ref": "#/definitions/DesignComment"
+                limit: {
+                    type: 'number',
                 },
-                {
-                    "type": "null"
-                }
-            ]
-        }
-    },
-    "required": [
-        "id",
-        "kind",
-        "value"
-    ],
-    "type": "object"
-},
-        DesignConstraint: {
-    "description": "Absolute children retain a chosen relation to a resized parent.\nConstraint choice.",
-    "enum": [
-        "center",
-        "end",
-        "scale",
-        "start",
-        "stretch"
-    ],
-    "type": "string"
-},
-        DesignCorners: {
-    "description": "Four independent corner radii, in clockwise order.",
-    "properties": {
-        "bottomLeft": {
-            "type": "number"
-        },
-        "bottomRight": {
-            "type": "number"
-        },
-        "topLeft": {
-            "type": "number"
-        },
-        "topRight": {
-            "type": "number"
-        }
-    },
-    "required": [
-        "bottomLeft",
-        "bottomRight",
-        "topLeft",
-        "topRight"
-    ],
-    "type": "object"
-},
-        DesignCreateMethod: {
-    "description": "Create-document RPC contract.",
-    "properties": {
-        "params": {
-            "$ref": "#/definitions/DesignCreateRequest"
-        },
-        "result": {
-            "$ref": "#/definitions/DesignReceipt"
-        }
-    },
-    "required": [
-        "params",
-        "result"
-    ],
-    "type": "object"
-},
-        DesignCreateRequest: {
-    "description": "Empty document creation is durable and idempotent.",
-    "properties": {
-        "commandId": {
-            "type": "string"
-        },
-        "id": {
-            "type": "string"
-        },
-        "name": {
-            "type": "string"
-        }
-    },
-    "required": [
-        "commandId",
-        "id",
-        "name"
-    ],
-    "type": "object"
-},
-        DesignCursor: {
-    "description": "Record and UTF-16 character offsets allow large entities to remain bounded on the wire.",
-    "properties": {
-        "character": {
-            "type": "number"
-        },
-        "record": {
-            "type": "number"
-        }
-    },
-    "required": [
-        "character",
-        "record"
-    ],
-    "type": "object"
-},
-        DesignDeleteMethod: {
-    "description": "Owner-scoped revision-safe document deletion.",
-    "properties": {
-        "params": {
-            "$ref": "#/definitions/DesignDeleteRequest"
-        },
-        "result": {
-            "$ref": "#/definitions/DesignDeleteReceipt"
-        }
-    },
-    "required": [
-        "params",
-        "result"
-    ],
-    "type": "object"
-},
-        DesignDeleteReceipt: {
-    "description": "Host confirmation that the exact document revision was removed.",
-    "properties": {
-        "deleted": {
-            "const": true,
-            "type": "boolean"
-        },
-        "id": {
-            "type": "string"
-        },
-        "revision": {
-            "type": "string"
-        }
-    },
-    "required": [
-        "deleted",
-        "id",
-        "revision"
-    ],
-    "type": "object"
-},
-        DesignDeleteRequest: {
-    "description": "Revision-fenced document removal with an exact retry identity.",
-    "properties": {
-        "commandId": {
-            "type": "string"
-        },
-        "expectedRevision": {
-            "type": "string"
-        },
-        "id": {
-            "type": "string"
-        }
-    },
-    "required": [
-        "commandId",
-        "expectedRevision",
-        "id"
-    ],
-    "type": "object"
-},
-        DesignEventsMethod: {
-    "description": "Revision-journal RPC contract.",
-    "properties": {
-        "params": {
-            "$ref": "#/definitions/DesignEventsRequest"
-        },
-        "result": {
-            "$ref": "#/definitions/DesignEventsPage"
-        }
-    },
-    "required": [
-        "params",
-        "result"
-    ],
-    "type": "object"
-},
-        DesignEventsPage: {
-    "description": "A missed retained revision requires a fresh paged snapshot.",
-    "properties": {
-        "commits": {
-            "items": {
-                "$ref": "#/definitions/DesignReceipt"
             },
-            "type": "array"
+            required: ['after', 'limit'],
+            type: 'object',
         },
-        "reset": {
-            "type": "boolean"
+        DesignAssetMime: {
+            description:
+                'Raster formats are identified from bytes before becoming usable design assets.',
+            enum: ['image/gif', 'image/jpeg', 'image/png', 'image/webp'],
+            type: 'string',
         },
-        "summary": {
-            "$ref": "#/definitions/DesignSummary"
-        }
-    },
-    "required": [
-        "commits",
-        "reset",
-        "summary"
-    ],
-    "type": "object"
-},
-        DesignEventsRequest: {
-    "description": "Users and agents consume the same durable revision journal.",
-    "properties": {
-        "afterRevision": {
-            "type": "string"
-        },
-        "id": {
-            "type": "string"
-        },
-        "limit": {
-            "type": "number"
-        }
-    },
-    "required": [
-        "afterRevision",
-        "id",
-        "limit"
-    ],
-    "type": "object"
-},
-        DesignFlow: {
-    "description": "Free positioning and responsive container layouts.\nLayout direction.",
-    "enum": [
-        "absolute",
-        "column",
-        "grid",
-        "row"
-    ],
-    "type": "string"
-},
-        DesignGradientStop: {
-    "description": "Color stop in a normalized gradient.",
-    "properties": {
-        "color": {
-            "type": "string"
-        },
-        "offset": {
-            "type": "number"
-        }
-    },
-    "required": [
-        "color",
-        "offset"
-    ],
-    "type": "object"
-},
-        DesignImage: {
-    "description": "A durable workspace image and its authored framing.",
-    "properties": {
-        "assetId": {
-            "type": "string"
-        },
-        "cropX": {
-            "type": "number"
-        },
-        "cropY": {
-            "type": "number"
-        },
-        "fit": {
-            "$ref": "#/definitions/DesignImageFit"
-        },
-        "scale": {
-            "type": "number"
-        }
-    },
-    "required": [
-        "assetId",
-        "cropX",
-        "cropY",
-        "fit",
-        "scale"
-    ],
-    "type": "object"
-},
-        DesignImageFit: {
-    "description": "Image scaling mode.",
-    "enum": [
-        "contain",
-        "cover"
-    ],
-    "type": "string"
-},
-        DesignInsert: {
-    "description": "Insert a standalone node at a precise location in a page or container.",
-    "properties": {
-        "index": {
-            "type": "number"
-        },
-        "node": {
-            "$ref": "#/definitions/DesignNode"
-        },
-        "op": {
-            "const": "insert",
-            "type": "string"
-        },
-        "pageId": {
-            "type": "string"
-        },
-        "parentId": {
-            "type": [
-                "null",
-                "string"
-            ]
-        }
-    },
-    "required": [
-        "index",
-        "node",
-        "op",
-        "pageId",
-        "parentId"
-    ],
-    "type": "object"
-},
-        DesignInsets: {
-    "description": "Box padding.",
-    "properties": {
-        "bottom": {
-            "type": "number"
-        },
-        "left": {
-            "type": "number"
-        },
-        "right": {
-            "type": "number"
-        },
-        "top": {
-            "type": "number"
-        }
-    },
-    "required": [
-        "bottom",
-        "left",
-        "right",
-        "top"
-    ],
-    "type": "object"
-},
-        DesignInteraction: {
-    "description": "Click, hover and timed prototype links are independent of editable layout.",
-    "properties": {
-        "action": {
-            "$ref": "#/definitions/DesignAction"
-        },
-        "durationMs": {
-            "type": "number"
-        },
-        "id": {
-            "type": "string"
-        },
-        "nodeId": {
-            "type": "string"
-        },
-        "targetId": {
-            "type": "string"
-        },
-        "transition": {
-            "$ref": "#/definitions/DesignTransition"
-        },
-        "trigger": {
-            "$ref": "#/definitions/DesignTrigger"
-        }
-    },
-    "required": [
-        "action",
-        "durationMs",
-        "id",
-        "nodeId",
-        "targetId",
-        "transition",
-        "trigger"
-    ],
-    "type": "object"
-},
-        DesignInteractionRecord: {
-    "description": "Prototype record.",
-    "properties": {
-        "id": {
-            "type": "string"
-        },
-        "kind": {
-            "const": "interaction",
-            "type": "string"
-        },
-        "value": {
-            "anyOf": [
-                {
-                    "$ref": "#/definitions/DesignInteraction"
+        DesignAssetPosition: {
+            description: 'Receipts carry progress without echoing source bytes.',
+            properties: {
+                byteLength: {
+                    type: 'string',
                 },
-                {
-                    "type": "null"
-                }
-            ]
-        }
-    },
-    "required": [
-        "id",
-        "kind",
-        "value"
-    ],
-    "type": "object"
-},
+                id: {
+                    type: 'string',
+                },
+                offset: {
+                    type: 'string',
+                },
+            },
+            required: ['byteLength', 'id', 'offset'],
+            type: 'object',
+        },
+        DesignAssetReadMethod: {
+            properties: {
+                params: {
+                    $ref: '#/definitions/DesignAssetReadRequest',
+                },
+                result: {
+                    $ref: '#/definitions/DesignAssetSlice',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        DesignAssetReadRequest: {
+            description: 'Reads transfer only a bounded slice of a completed immutable image.',
+            properties: {
+                id: {
+                    type: 'string',
+                },
+                offset: {
+                    type: 'string',
+                },
+            },
+            required: ['id', 'offset'],
+            type: 'object',
+        },
+        DesignAssetRemoveMethod: {
+            properties: {
+                params: {
+                    $ref: '#/definitions/DesignAssetIdRequest',
+                },
+                result: {
+                    type: 'null',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        DesignAssetSlice: {
+            description: 'The browser pins the metadata identity while assembling slices.',
+            properties: {
+                asset: {
+                    $ref: '#/definitions/DesignAsset',
+                },
+                data: {
+                    type: 'string',
+                },
+                nextOffset: {
+                    type: ['null', 'string'],
+                },
+                offset: {
+                    type: 'string',
+                },
+            },
+            required: ['asset', 'data', 'nextOffset', 'offset'],
+            type: 'object',
+        },
+        DesignAssetStartMethod: {
+            properties: {
+                params: {
+                    $ref: '#/definitions/DesignAssetStartRequest',
+                },
+                result: {
+                    $ref: '#/definitions/DesignAssetPosition',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        DesignAssetStartRequest: {
+            description:
+                'Retried admission uses the same client-chosen identity. Ownership comes from the host.',
+            properties: {
+                byteLength: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                name: {
+                    type: 'string',
+                },
+                sha256: {
+                    type: 'string',
+                },
+            },
+            required: ['byteLength', 'id', 'name', 'sha256'],
+            type: 'object',
+        },
+        DesignBox: {
+            description:
+                'Resolved layout boxes are separate from authored values and never written back implicitly.',
+            properties: {
+                clipId: {
+                    type: ['null', 'string'],
+                },
+                depth: {
+                    type: 'number',
+                },
+                height: {
+                    type: 'number',
+                },
+                id: {
+                    type: 'string',
+                },
+                rotation: {
+                    type: 'number',
+                },
+                width: {
+                    type: 'number',
+                },
+                x: {
+                    type: 'number',
+                },
+                y: {
+                    type: 'number',
+                },
+            },
+            required: ['clipId', 'depth', 'height', 'id', 'rotation', 'width', 'x', 'y'],
+            type: 'object',
+        },
+        DesignChangesMethod: {
+            description: 'Forward delta RPC contract.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/DesignChangesRequest',
+                },
+                result: {
+                    $ref: '#/definitions/DesignRecordPage',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        DesignChangesRequest: {
+            description: 'Changed entities exclude undo preimages.',
+            properties: {
+                commandId: {
+                    type: 'string',
+                },
+                cursor: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignCursor',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                id: {
+                    type: 'string',
+                },
+                limit: {
+                    type: 'number',
+                },
+            },
+            required: ['commandId', 'cursor', 'id', 'limit'],
+            type: 'object',
+        },
+        DesignComment: {
+            description: 'Anchored comments can refer to exact layers or canvas coordinates.',
+            properties: {
+                author: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                nodeId: {
+                    type: ['null', 'string'],
+                },
+                resolved: {
+                    type: 'boolean',
+                },
+                text: {
+                    type: 'string',
+                },
+                x: {
+                    type: 'number',
+                },
+                y: {
+                    type: 'number',
+                },
+            },
+            required: ['author', 'id', 'nodeId', 'resolved', 'text', 'x', 'y'],
+            type: 'object',
+        },
+        DesignCommentRecord: {
+            description: 'Comment record.',
+            properties: {
+                id: {
+                    type: 'string',
+                },
+                kind: {
+                    const: 'comment',
+                    type: 'string',
+                },
+                value: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignComment',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+            },
+            required: ['id', 'kind', 'value'],
+            type: 'object',
+        },
+        DesignConstraint: {
+            description:
+                'Absolute children retain a chosen relation to a resized parent.\nConstraint choice.',
+            enum: ['center', 'end', 'scale', 'start', 'stretch'],
+            type: 'string',
+        },
+        DesignCorners: {
+            description: 'Four independent corner radii, in clockwise order.',
+            properties: {
+                bottomLeft: {
+                    type: 'number',
+                },
+                bottomRight: {
+                    type: 'number',
+                },
+                topLeft: {
+                    type: 'number',
+                },
+                topRight: {
+                    type: 'number',
+                },
+            },
+            required: ['bottomLeft', 'bottomRight', 'topLeft', 'topRight'],
+            type: 'object',
+        },
+        DesignCreateMethod: {
+            description: 'Create-document RPC contract.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/DesignCreateRequest',
+                },
+                result: {
+                    $ref: '#/definitions/DesignReceipt',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        DesignCreateRequest: {
+            description: 'Empty document creation is durable and idempotent.',
+            properties: {
+                commandId: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                name: {
+                    type: 'string',
+                },
+            },
+            required: ['commandId', 'id', 'name'],
+            type: 'object',
+        },
+        DesignCursor: {
+            description:
+                'Record and UTF-16 character offsets allow large entities to remain bounded on the wire.',
+            properties: {
+                character: {
+                    type: 'number',
+                },
+                record: {
+                    type: 'number',
+                },
+            },
+            required: ['character', 'record'],
+            type: 'object',
+        },
+        DesignDeleteMethod: {
+            description: 'Owner-scoped revision-safe document deletion.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/DesignDeleteRequest',
+                },
+                result: {
+                    $ref: '#/definitions/DesignDeleteReceipt',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        DesignDeleteReceipt: {
+            description: 'Host confirmation that the exact document revision was removed.',
+            properties: {
+                deleted: {
+                    const: true,
+                    type: 'boolean',
+                },
+                id: {
+                    type: 'string',
+                },
+                revision: {
+                    type: 'string',
+                },
+            },
+            required: ['deleted', 'id', 'revision'],
+            type: 'object',
+        },
+        DesignDeleteRequest: {
+            description: 'Revision-fenced document removal with an exact retry identity.',
+            properties: {
+                commandId: {
+                    type: 'string',
+                },
+                expectedRevision: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+            },
+            required: ['commandId', 'expectedRevision', 'id'],
+            type: 'object',
+        },
+        DesignEventsMethod: {
+            description: 'Revision-journal RPC contract.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/DesignEventsRequest',
+                },
+                result: {
+                    $ref: '#/definitions/DesignEventsPage',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        DesignEventsPage: {
+            description: 'A missed retained revision requires a fresh paged snapshot.',
+            properties: {
+                commits: {
+                    items: {
+                        $ref: '#/definitions/DesignReceipt',
+                    },
+                    type: 'array',
+                },
+                reset: {
+                    type: 'boolean',
+                },
+                summary: {
+                    $ref: '#/definitions/DesignSummary',
+                },
+            },
+            required: ['commits', 'reset', 'summary'],
+            type: 'object',
+        },
+        DesignEventsRequest: {
+            description: 'Users and agents consume the same durable revision journal.',
+            properties: {
+                afterRevision: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                limit: {
+                    type: 'number',
+                },
+            },
+            required: ['afterRevision', 'id', 'limit'],
+            type: 'object',
+        },
+        DesignFlow: {
+            description: 'Free positioning and responsive container layouts.\nLayout direction.',
+            enum: ['absolute', 'column', 'grid', 'row'],
+            type: 'string',
+        },
+        DesignFontAsset: {
+            description:
+                'Immutable font identity and a declared family/style binding; source bytes are never model output.',
+            properties: {
+                byteLength: {
+                    type: 'string',
+                },
+                family: {
+                    type: 'string',
+                },
+                format: {
+                    $ref: '#/definitions/DesignFontFormat',
+                },
+                id: {
+                    type: 'string',
+                },
+                italic: {
+                    type: 'boolean',
+                },
+                sha256: {
+                    type: 'string',
+                },
+                weight: {
+                    type: 'number',
+                },
+            },
+            required: ['byteLength', 'family', 'format', 'id', 'italic', 'sha256', 'weight'],
+            type: 'object',
+        },
+        DesignFontBinding: {
+            description:
+                'Saved text pins one immutable owner-scoped font identity and its exact original bytes.',
+            properties: {
+                id: {
+                    type: 'string',
+                },
+                sha256: {
+                    type: 'string',
+                },
+            },
+            required: ['id', 'sha256'],
+            type: 'object',
+        },
+        DesignFontFormat: {
+            description:
+                'Font containers are identified from validated bytes rather than a filename extension.\nSupported standalone font container.',
+            enum: ['otf', 'ttf', 'woff', 'woff2'],
+            type: 'string',
+        },
+        DesignFontListMethod: {
+            description: 'Authenticated metadata discovery does not carry font bodies.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/DesignFontListRequest',
+                },
+                result: {
+                    $ref: '#/definitions/DesignFontListPage',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        DesignFontListPage: {
+            description:
+                "Published fonts are reusable across the current owner's agents and reopened workspaces.",
+            properties: {
+                items: {
+                    items: {
+                        $ref: '#/definitions/DesignFontAsset',
+                    },
+                    type: 'array',
+                },
+                nextAfter: {
+                    type: ['null', 'string'],
+                },
+            },
+            required: ['items', 'nextAfter'],
+            type: 'object',
+        },
+        DesignFontListRequest: {
+            description: 'Library browsing carries metadata, with a stable lexicographic cursor.',
+            properties: {
+                after: {
+                    type: ['null', 'string'],
+                },
+                limit: {
+                    type: 'number',
+                },
+            },
+            required: ['after', 'limit'],
+            type: 'object',
+        },
+        DesignFontReadMethod: {
+            description:
+                'Each authenticated WebSocket read transfers one independently bounded immutable slice.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/DesignFontReadRequest',
+                },
+                result: {
+                    $ref: '#/definitions/DesignFontSlice',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        DesignFontReadRequest: {
+            description:
+                'Font byte reads address one exact, bounded slice of an immutable identity.',
+            properties: {
+                id: {
+                    type: 'string',
+                },
+                offset: {
+                    type: 'string',
+                },
+            },
+            required: ['id', 'offset'],
+            type: 'object',
+        },
+        DesignFontSlice: {
+            description:
+                'Byte transport is separate from metadata discovery and never included in an agent receipt.',
+            properties: {
+                data: {
+                    type: 'string',
+                },
+                font: {
+                    $ref: '#/definitions/DesignFontAsset',
+                },
+                nextOffset: {
+                    type: ['null', 'string'],
+                },
+                offset: {
+                    type: 'string',
+                },
+            },
+            required: ['data', 'font', 'nextOffset', 'offset'],
+            type: 'object',
+        },
+        DesignGradientStop: {
+            description: 'Color stop in a normalized gradient.',
+            properties: {
+                color: {
+                    type: 'string',
+                },
+                offset: {
+                    type: 'number',
+                },
+            },
+            required: ['color', 'offset'],
+            type: 'object',
+        },
+        DesignImage: {
+            description: 'A durable workspace image and its authored framing.',
+            properties: {
+                assetId: {
+                    type: 'string',
+                },
+                cropX: {
+                    type: 'number',
+                },
+                cropY: {
+                    type: 'number',
+                },
+                fit: {
+                    $ref: '#/definitions/DesignImageFit',
+                },
+                scale: {
+                    type: 'number',
+                },
+            },
+            required: ['assetId', 'cropX', 'cropY', 'fit', 'scale'],
+            type: 'object',
+        },
+        DesignImageFit: {
+            description: 'Image scaling mode.',
+            enum: ['contain', 'cover'],
+            type: 'string',
+        },
+        DesignImageFraming: {
+            description: 'Workspace image reference and crop transform.',
+            properties: {
+                cropX: {
+                    type: 'number',
+                },
+                cropY: {
+                    type: 'number',
+                },
+                fit: {
+                    $ref: '#/definitions/DesignImageFit',
+                },
+                scale: {
+                    type: 'number',
+                },
+            },
+            required: ['cropX', 'cropY', 'fit', 'scale'],
+            type: 'object',
+        },
+        DesignInsert: {
+            description: 'Insert a standalone node at a precise location in a page or container.',
+            properties: {
+                index: {
+                    type: 'number',
+                },
+                node: {
+                    $ref: '#/definitions/DesignNode',
+                },
+                op: {
+                    const: 'insert',
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+                parentId: {
+                    type: ['null', 'string'],
+                },
+            },
+            required: ['index', 'node', 'op', 'pageId', 'parentId'],
+            type: 'object',
+        },
+        DesignInsets: {
+            description: 'Box padding.',
+            properties: {
+                bottom: {
+                    type: 'number',
+                },
+                left: {
+                    type: 'number',
+                },
+                right: {
+                    type: 'number',
+                },
+                top: {
+                    type: 'number',
+                },
+            },
+            required: ['bottom', 'left', 'right', 'top'],
+            type: 'object',
+        },
+        DesignInteraction: {
+            description:
+                'Click, hover and timed prototype links are independent of editable layout.',
+            properties: {
+                action: {
+                    $ref: '#/definitions/DesignAction',
+                },
+                durationMs: {
+                    type: 'number',
+                },
+                id: {
+                    type: 'string',
+                },
+                nodeId: {
+                    type: 'string',
+                },
+                targetId: {
+                    type: 'string',
+                },
+                transition: {
+                    $ref: '#/definitions/DesignTransition',
+                },
+                trigger: {
+                    $ref: '#/definitions/DesignTrigger',
+                },
+            },
+            required: ['action', 'durationMs', 'id', 'nodeId', 'targetId', 'transition', 'trigger'],
+            type: 'object',
+        },
+        DesignInteractionRecord: {
+            description: 'Prototype record.',
+            properties: {
+                id: {
+                    type: 'string',
+                },
+                kind: {
+                    const: 'interaction',
+                    type: 'string',
+                },
+                value: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignInteraction',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+            },
+            required: ['id', 'kind', 'value'],
+            type: 'object',
+        },
         DesignKind: {
-            "description": "Editable scene primitives, including reusable component definitions and instances.\nPrimitive identity.",
-            "enum": [
-                "boolean",
-                "component",
-                "component-set",
-                "ellipse",
-                "frame",
-                "group",
-                "image",
-                "instance",
-                "line",
-                "mask",
-                "path",
-                "polygon",
-                "rectangle",
-                "text"
+            description:
+                'Editable scene primitives, including reusable component definitions and instances.\nPrimitive identity.',
+            enum: [
+                'boolean',
+                'component',
+                'component-set',
+                'ellipse',
+                'frame',
+                'group',
+                'image',
+                'instance',
+                'line',
+                'mask',
+                'path',
+                'polygon',
+                'rectangle',
+                'text',
             ],
-            "type": "string"
+            type: 'string',
         },
         DesignLayout: {
-    "description": "Container layout, including wrapping, grid tracks and content alignment.",
-    "properties": {
-        "align": {
-            "$ref": "#/definitions/DesignAlign"
-        },
-        "clip": {
-            "type": "boolean"
-        },
-        "columns": {
-            "type": "number"
-        },
-        "flow": {
-            "$ref": "#/definitions/DesignFlow"
-        },
-        "gap": {
-            "type": "number"
-        },
-        "justify": {
-            "$ref": "#/definitions/DesignAlign"
-        },
-        "padding": {
-            "$ref": "#/definitions/DesignInsets"
-        },
-        "rowGap": {
-            "type": "number"
-        },
-        "wrap": {
-            "type": "boolean"
-        }
-    },
-    "required": [
-        "align",
-        "clip",
-        "columns",
-        "flow",
-        "gap",
-        "justify",
-        "padding",
-        "rowGap",
-        "wrap"
-    ],
-    "type": "object"
-},
-        DesignLayoutMethod: {
-    "description": "Computed-geometry RPC contract.",
-    "properties": {
-        "params": {
-            "$ref": "#/definitions/DesignLayoutRequest"
-        },
-        "result": {
-            "$ref": "#/definitions/DesignLayoutPage"
-        }
-    },
-    "required": [
-        "params",
-        "result"
-    ],
-    "type": "object"
-},
-        DesignLayoutPage: {
-    "description": "Native geometry uses the same layout engine as the canvas.",
-    "properties": {
-        "boxes": {
-            "items": {
-                "$ref": "#/definitions/DesignBox"
+            description: 'Container layout, including wrapping, grid tracks and content alignment.',
+            properties: {
+                align: {
+                    $ref: '#/definitions/DesignAlign',
+                },
+                clip: {
+                    type: 'boolean',
+                },
+                columns: {
+                    type: 'number',
+                },
+                flow: {
+                    $ref: '#/definitions/DesignFlow',
+                },
+                gap: {
+                    type: 'number',
+                },
+                justify: {
+                    $ref: '#/definitions/DesignAlign',
+                },
+                padding: {
+                    $ref: '#/definitions/DesignInsets',
+                },
+                rowGap: {
+                    type: 'number',
+                },
+                wrap: {
+                    type: 'boolean',
+                },
             },
-            "type": "array"
-        },
-        "nextOffset": {
-            "type": [
-                "null",
-                "number"
-            ]
-        },
-        "summary": {
-            "$ref": "#/definitions/DesignSummary"
-        }
-    },
-    "required": [
-        "boxes",
-        "nextOffset",
-        "summary"
-    ],
-    "type": "object"
-},
-        DesignLayoutRequest: {
-    "description": "Agent geometry inspection is revision-pinned and separately paged.",
-    "properties": {
-        "id": {
-            "type": "string"
-        },
-        "limit": {
-            "type": "number"
-        },
-        "offset": {
-            "type": "number"
-        },
-        "pageId": {
-            "type": "string"
-        },
-        "revision": {
-            "type": "string"
-        }
-    },
-    "required": [
-        "id",
-        "limit",
-        "offset",
-        "pageId",
-        "revision"
-    ],
-    "type": "object"
-},
-        DesignListMethod: {
-    "description": "Owner-scoped library RPC contract.",
-    "properties": {
-        "params": {
-            "$ref": "#/definitions/DesignListRequest"
-        },
-        "result": {
-            "$ref": "#/definitions/DesignListPage"
-        }
-    },
-    "required": [
-        "params",
-        "result"
-    ],
-    "type": "object"
-},
-        DesignListPage: {
-    "description": "Bounded library page.",
-    "properties": {
-        "items": {
-            "items": {
-                "$ref": "#/definitions/DesignSummary"
-            },
-            "type": "array"
-        },
-        "nextAfter": {
-            "type": [
-                "null",
-                "string"
-            ]
-        }
-    },
-    "required": [
-        "items",
-        "nextAfter"
-    ],
-    "type": "object"
-},
-        DesignListRequest: {
-    "description": "Owner-scoped document listing.",
-    "properties": {
-        "after": {
-            "type": [
-                "null",
-                "string"
-            ]
-        },
-        "limit": {
-            "type": "number"
-        }
-    },
-    "required": [
-        "after",
-        "limit"
-    ],
-    "type": "object"
-},
-        DesignMask: {
-    "description": "The source is an immediate child, referenced by identity rather than painter order.",
-    "properties": {
-        "mode": {
-            "$ref": "#/definitions/DesignMaskMode"
-        },
-        "sourceId": {
-            "type": [
-                "null",
-                "string"
-            ]
-        }
-    },
-    "required": [
-        "mode",
-        "sourceId"
-    ],
-    "type": "object"
-},
-        DesignMaskMode: {
-    "description": "How a retained source layer controls the visibility of its sibling artwork.\nStable mask rendering mode shared by tooling and the editor.",
-    "enum": [
-        "alpha",
-        "luminance",
-        "vector"
-    ],
-    "type": "string"
-},
-        DesignMetadata: {
-    "description": "Document properties and supporting design-system or collaboration records.",
-    "properties": {
-        "comments": {
-            "items": {
-                "$ref": "#/definitions/DesignComment"
-            },
-            "type": "array"
-        },
-        "interactions": {
-            "items": {
-                "$ref": "#/definitions/DesignInteraction"
-            },
-            "type": "array"
-        },
-        "name": {
-            "type": "string"
-        },
-        "op": {
-            "const": "metadata",
-            "type": "string"
-        },
-        "tokens": {
-            "items": {
-                "$ref": "#/definitions/DesignToken"
-            },
-            "type": "array"
-        }
-    },
-    "required": [
-        "op"
-    ],
-    "type": "object"
-},
-        DesignMove: {
-    "description": "Reparent or reorder without breaking both sides of the tree.",
-    "properties": {
-        "id": {
-            "type": "string"
-        },
-        "index": {
-            "type": "number"
-        },
-        "op": {
-            "const": "move",
-            "type": "string"
-        },
-        "pageId": {
-            "type": "string"
-        },
-        "parentId": {
-            "type": [
-                "null",
-                "string"
-            ]
-        }
-    },
-    "required": [
-        "id",
-        "index",
-        "op",
-        "pageId",
-        "parentId"
-    ],
-    "type": "object"
-},
-        DesignNode: {
-            "description": "All layer state is explicit and editable; no generated markup is the source of truth.",
-            "properties": {
-                "booleanMode": {
-                    "description": "Omitted on ordinary layers, preserving existing document and retry identities.",
-                    "enum": [
-                        "exclude",
-                        "intersect",
-                        "subtract",
-                        "union"
-                    ],
-                    "type": "string"
-                },
-                "children": {
-                    "items": {
-                        "type": "string"
-                    },
-                    "type": "array"
-                },
-                "componentId": {
-                    "type": [
-                        "null",
-                        "string"
-                    ]
-                },
-                "height": {
-                    "type": "number"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "image": {
-                    "anyOf": [
-                        {
-                            "$ref": "#/definitions/DesignImage"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ]
-                },
-                "kind": {
-                    "$ref": "#/definitions/DesignKind"
-                },
-                "layout": {
-                    "$ref": "#/definitions/DesignLayout"
-                },
-                "locked": {
-                    "type": "boolean"
-                },
-                "mask": {
-                    "$ref": "#/definitions/DesignMask",
-                    "description": "Retained source identity and coverage mode; omitted on ordinary layers."
-                },
-                "name": {
-                    "type": "string"
-                },
-                "opacity": {
-                    "type": "number"
-                },
-                "overrides": {
-                    "items": {
-                        "$ref": "#/definitions/DesignOverride"
-                    },
-                    "type": "array"
-                },
-                "parentId": {
-                    "type": [
-                        "null",
-                        "string"
-                    ]
-                },
-                "path": {
-                    "items": {
-                        "$ref": "#/definitions/DesignPathCommand"
-                    },
-                    "type": "array"
-                },
-                "placement": {
-                    "$ref": "#/definitions/DesignPlacement"
-                },
-                "rotation": {
-                    "type": "number"
-                },
-                "style": {
-                    "$ref": "#/definitions/DesignStyle"
-                },
-                "text": {
-                    "anyOf": [
-                        {
-                            "$ref": "#/definitions/DesignText"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ]
-                },
-                "variant": {
-                    "description": "Named values on an immediate component definition inside a variant set.",
-                    "items": {
-                        "$ref": "#/definitions/DesignVariantValue"
-                    },
-                    "type": "array"
-                },
-                "variants": {
-                    "$ref": "#/definitions/DesignVariantSet",
-                    "description": "Reusable variant set metadata; only component-set containers accept it."
-                },
-                "visible": {
-                    "type": "boolean"
-                },
-                "width": {
-                    "type": "number"
-                },
-                "x": {
-                    "type": "number"
-                },
-                "y": {
-                    "type": "number"
-                }
-            },
-            "required": [
-                "children",
-                "componentId",
-                "height",
-                "id",
-                "image",
-                "kind",
-                "layout",
-                "locked",
-                "name",
-                "opacity",
-                "overrides",
-                "parentId",
-                "path",
-                "placement",
-                "rotation",
-                "style",
-                "text",
-                "visible",
-                "width",
-                "x",
-                "y"
+            required: [
+                'align',
+                'clip',
+                'columns',
+                'flow',
+                'gap',
+                'justify',
+                'padding',
+                'rowGap',
+                'wrap',
             ],
-            "type": "object"
+            type: 'object',
+        },
+        DesignLayoutMethod: {
+            description: 'Computed-geometry RPC contract.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/DesignLayoutRequest',
+                },
+                result: {
+                    $ref: '#/definitions/DesignLayoutPage',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        DesignLayoutPage: {
+            description: 'Native geometry uses the same layout engine as the canvas.',
+            properties: {
+                boxes: {
+                    items: {
+                        $ref: '#/definitions/DesignBox',
+                    },
+                    type: 'array',
+                },
+                nextOffset: {
+                    type: ['null', 'number'],
+                },
+                summary: {
+                    $ref: '#/definitions/DesignSummary',
+                },
+            },
+            required: ['boxes', 'nextOffset', 'summary'],
+            type: 'object',
+        },
+        DesignLayoutRequest: {
+            description: 'Agent geometry inspection is revision-pinned and separately paged.',
+            properties: {
+                id: {
+                    type: 'string',
+                },
+                limit: {
+                    type: 'number',
+                },
+                offset: {
+                    type: 'number',
+                },
+                pageId: {
+                    type: 'string',
+                },
+                revision: {
+                    type: 'string',
+                },
+            },
+            required: ['id', 'limit', 'offset', 'pageId', 'revision'],
+            type: 'object',
+        },
+        DesignListMethod: {
+            description: 'Owner-scoped library RPC contract.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/DesignListRequest',
+                },
+                result: {
+                    $ref: '#/definitions/DesignListPage',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        DesignListPage: {
+            description: 'Bounded library page.',
+            properties: {
+                items: {
+                    items: {
+                        $ref: '#/definitions/DesignSummary',
+                    },
+                    type: 'array',
+                },
+                nextAfter: {
+                    type: ['null', 'string'],
+                },
+            },
+            required: ['items', 'nextAfter'],
+            type: 'object',
+        },
+        DesignListRequest: {
+            description: 'Owner-scoped document listing.',
+            properties: {
+                after: {
+                    type: ['null', 'string'],
+                },
+                limit: {
+                    type: 'number',
+                },
+            },
+            required: ['after', 'limit'],
+            type: 'object',
+        },
+        DesignMask: {
+            description:
+                'The source is an immediate child, referenced by identity rather than painter order.',
+            properties: {
+                mode: {
+                    $ref: '#/definitions/DesignMaskMode',
+                },
+                sourceId: {
+                    type: ['null', 'string'],
+                },
+            },
+            required: ['mode', 'sourceId'],
+            type: 'object',
+        },
+        DesignMaskMode: {
+            description:
+                'How a retained source layer controls the visibility of its sibling artwork.\nStable mask rendering mode shared by tooling and the editor.',
+            enum: ['alpha', 'luminance', 'vector'],
+            type: 'string',
+        },
+        DesignMetadata: {
+            description:
+                'Document properties and supporting design-system or collaboration records.',
+            properties: {
+                comments: {
+                    items: {
+                        $ref: '#/definitions/DesignComment',
+                    },
+                    type: 'array',
+                },
+                interactions: {
+                    items: {
+                        $ref: '#/definitions/DesignInteraction',
+                    },
+                    type: 'array',
+                },
+                name: {
+                    type: 'string',
+                },
+                op: {
+                    const: 'metadata',
+                    type: 'string',
+                },
+                tokens: {
+                    items: {
+                        $ref: '#/definitions/DesignToken',
+                    },
+                    type: 'array',
+                },
+            },
+            required: ['op'],
+            type: 'object',
+        },
+        DesignMove: {
+            description: 'Reparent or reorder without breaking both sides of the tree.',
+            properties: {
+                id: {
+                    type: 'string',
+                },
+                index: {
+                    type: 'number',
+                },
+                op: {
+                    const: 'move',
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+                parentId: {
+                    type: ['null', 'string'],
+                },
+            },
+            required: ['id', 'index', 'op', 'pageId', 'parentId'],
+            type: 'object',
+        },
+        DesignNode: {
+            description:
+                'All layer state is explicit and editable; no generated markup is the source of truth.',
+            properties: {
+                booleanMode: {
+                    description:
+                        'Omitted on ordinary layers, preserving existing document and retry identities.',
+                    enum: ['exclude', 'intersect', 'subtract', 'union'],
+                    type: 'string',
+                },
+                children: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                componentId: {
+                    type: ['null', 'string'],
+                },
+                height: {
+                    type: 'number',
+                },
+                id: {
+                    type: 'string',
+                },
+                image: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignImage',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                kind: {
+                    $ref: '#/definitions/DesignKind',
+                },
+                layout: {
+                    $ref: '#/definitions/DesignLayout',
+                },
+                locked: {
+                    type: 'boolean',
+                },
+                mask: {
+                    $ref: '#/definitions/DesignMask',
+                    description:
+                        'Retained source identity and coverage mode; omitted on ordinary layers.',
+                },
+                name: {
+                    type: 'string',
+                },
+                opacity: {
+                    type: 'number',
+                },
+                overrides: {
+                    items: {
+                        $ref: '#/definitions/DesignOverride',
+                    },
+                    type: 'array',
+                },
+                parentId: {
+                    type: ['null', 'string'],
+                },
+                path: {
+                    items: {
+                        $ref: '#/definitions/DesignPathCommand',
+                    },
+                    type: 'array',
+                },
+                placement: {
+                    $ref: '#/definitions/DesignPlacement',
+                },
+                rotation: {
+                    type: 'number',
+                },
+                style: {
+                    $ref: '#/definitions/DesignStyle',
+                },
+                text: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignText',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                variant: {
+                    description:
+                        'Named values on an immediate component definition inside a variant set.',
+                    items: {
+                        $ref: '#/definitions/DesignVariantValue',
+                    },
+                    type: 'array',
+                },
+                variants: {
+                    $ref: '#/definitions/DesignVariantSet',
+                    description:
+                        'Reusable variant set metadata; only component-set containers accept it.',
+                },
+                visible: {
+                    type: 'boolean',
+                },
+                width: {
+                    type: 'number',
+                },
+                x: {
+                    type: 'number',
+                },
+                y: {
+                    type: 'number',
+                },
+            },
+            required: [
+                'children',
+                'componentId',
+                'height',
+                'id',
+                'image',
+                'kind',
+                'layout',
+                'locked',
+                'name',
+                'opacity',
+                'overrides',
+                'parentId',
+                'path',
+                'placement',
+                'rotation',
+                'style',
+                'text',
+                'visible',
+                'width',
+                'x',
+                'y',
+            ],
+            type: 'object',
         },
         DesignNodeChanges: {
-            "description": "Editable properties exclude identity and tree links, which have dedicated operations.",
-            "properties": {
-                "booleanMode": {
-                    "anyOf": [
+            description:
+                'Editable properties exclude identity and tree links, which have dedicated operations.',
+            properties: {
+                booleanMode: {
+                    anyOf: [
                         {
-                            "enum": [
-                                "exclude",
-                                "intersect",
-                                "subtract",
-                                "union"
-                            ],
-                            "type": "string"
+                            enum: ['exclude', 'intersect', 'subtract', 'union'],
+                            type: 'string',
                         },
                         {
-                            "type": "null"
-                        }
+                            type: 'null',
+                        },
                     ],
-                    "description": "A null value clears the operation when explicitly flattening a Boolean group."
+                    description:
+                        'A null value clears the operation when explicitly flattening a Boolean group.',
                 },
-                "componentId": {
-                    "type": [
-                        "null",
-                        "string"
-                    ]
+                componentId: {
+                    type: ['null', 'string'],
                 },
-                "height": {
-                    "type": "number"
+                height: {
+                    type: 'number',
                 },
-                "image": {
-                    "anyOf": [
+                image: {
+                    anyOf: [
                         {
-                            "$ref": "#/definitions/DesignImage"
+                            $ref: '#/definitions/DesignImage',
                         },
                         {
-                            "type": "null"
-                        }
-                    ]
-                },
-                "kind": {
-                    "description": "Editable scene primitives, including reusable component definitions and instances.\nPrimitive identity.",
-                    "enum": [
-                        "boolean",
-                        "component",
-                        "component-set",
-                        "ellipse",
-                        "frame",
-                        "group",
-                        "image",
-                        "instance",
-                        "line",
-                        "mask",
-                        "path",
-                        "polygon",
-                        "rectangle",
-                        "text"
+                            type: 'null',
+                        },
                     ],
-                    "type": "string"
                 },
-                "layout": {
-                    "$ref": "#/definitions/DesignLayout",
-                    "description": "Container layout, including wrapping, grid tracks and content alignment."
+                kind: {
+                    description:
+                        'Editable scene primitives, including reusable component definitions and instances.\nPrimitive identity.',
+                    enum: [
+                        'boolean',
+                        'component',
+                        'component-set',
+                        'ellipse',
+                        'frame',
+                        'group',
+                        'image',
+                        'instance',
+                        'line',
+                        'mask',
+                        'path',
+                        'polygon',
+                        'rectangle',
+                        'text',
+                    ],
+                    type: 'string',
                 },
-                "locked": {
-                    "type": "boolean"
+                layout: {
+                    $ref: '#/definitions/DesignLayout',
+                    description:
+                        'Container layout, including wrapping, grid tracks and content alignment.',
                 },
-                "mask": {
-                    "anyOf": [
+                locked: {
+                    type: 'boolean',
+                },
+                mask: {
+                    anyOf: [
                         {
-                            "$ref": "#/definitions/DesignMask"
+                            $ref: '#/definitions/DesignMask',
                         },
                         {
-                            "type": "null"
-                        }
+                            type: 'null',
+                        },
                     ],
-                    "description": "Null clears masking when converting the container into an ordinary group."
+                    description:
+                        'Null clears masking when converting the container into an ordinary group.',
                 },
-                "name": {
-                    "type": "string"
+                name: {
+                    type: 'string',
                 },
-                "opacity": {
-                    "type": "number"
+                opacity: {
+                    type: 'number',
                 },
-                "overrides": {
-                    "items": {
-                        "$ref": "#/definitions/DesignOverride"
+                overrides: {
+                    items: {
+                        $ref: '#/definitions/DesignOverride',
                     },
-                    "type": "array"
+                    type: 'array',
                 },
-                "path": {
-                    "items": {
-                        "$ref": "#/definitions/DesignPathCommand"
+                path: {
+                    items: {
+                        $ref: '#/definitions/DesignPathCommand',
                     },
-                    "type": "array"
+                    type: 'array',
                 },
-                "placement": {
-                    "$ref": "#/definitions/DesignPlacement",
-                    "description": "Child sizing and positioning relative to its parent."
+                placement: {
+                    $ref: '#/definitions/DesignPlacement',
+                    description: 'Child sizing and positioning relative to its parent.',
                 },
-                "rotation": {
-                    "type": "number"
+                rotation: {
+                    type: 'number',
                 },
-                "style": {
-                    "$ref": "#/definitions/DesignStyle",
-                    "description": "Style can be shared across arbitrary primitives."
+                style: {
+                    $ref: '#/definitions/DesignStyle',
+                    description: 'Style can be shared across arbitrary primitives.',
                 },
-                "text": {
-                    "anyOf": [
+                text: {
+                    anyOf: [
                         {
-                            "$ref": "#/definitions/DesignText"
+                            $ref: '#/definitions/DesignText',
                         },
                         {
-                            "type": "null"
-                        }
-                    ]
+                            type: 'null',
+                        },
+                    ],
                 },
-                "variant": {
-                    "anyOf": [
+                variant: {
+                    anyOf: [
                         {
-                            "items": {
-                                "$ref": "#/definitions/DesignVariantValue"
+                            items: {
+                                $ref: '#/definitions/DesignVariantValue',
                             },
-                            "type": "array"
+                            type: 'array',
                         },
                         {
-                            "type": "null"
-                        }
+                            type: 'null',
+                        },
                     ],
-                    "description": "Null releases a definition from its set."
+                    description: 'Null releases a definition from its set.',
                 },
-                "variants": {
-                    "anyOf": [
+                variants: {
+                    anyOf: [
                         {
-                            "$ref": "#/definitions/DesignVariantSet"
+                            $ref: '#/definitions/DesignVariantSet',
                         },
                         {
-                            "type": "null"
-                        }
+                            type: 'null',
+                        },
                     ],
-                    "description": "Null releases component-set metadata when converting its container."
+                    description:
+                        'Null releases component-set metadata when converting its container.',
                 },
-                "visible": {
-                    "type": "boolean"
+                visible: {
+                    type: 'boolean',
                 },
-                "width": {
-                    "type": "number"
+                width: {
+                    type: 'number',
                 },
-                "x": {
-                    "type": "number"
+                x: {
+                    type: 'number',
                 },
-                "y": {
-                    "type": "number"
-                }
+                y: {
+                    type: 'number',
+                },
             },
-            "type": "object"
+            type: 'object',
         },
         DesignNodeRecord: {
-    "description": "Layer record.",
-    "properties": {
-        "id": {
-            "type": "string"
-        },
-        "kind": {
-            "const": "node",
-            "type": "string"
-        },
-        "value": {
-            "anyOf": [
-                {
-                    "$ref": "#/definitions/DesignNode"
+            description: 'Layer record.',
+            properties: {
+                id: {
+                    type: 'string',
                 },
-                {
-                    "type": "null"
-                }
-            ]
-        }
-    },
-    "required": [
-        "id",
-        "kind",
-        "value"
-    ],
-    "type": "object"
-},
+                kind: {
+                    const: 'node',
+                    type: 'string',
+                },
+                value: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignNode',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+            },
+            required: ['id', 'kind', 'value'],
+            type: 'object',
+        },
         DesignOperation: {
-    "anyOf": [
-        {
-            "$ref": "#/definitions/DesignInsert"
-        },
-        {
-            "$ref": "#/definitions/DesignUpdate"
-        },
-        {
-            "$ref": "#/definitions/DesignTextOperation"
-        },
-        {
-            "$ref": "#/definitions/DesignMove"
-        },
-        {
-            "$ref": "#/definitions/DesignRemove"
-        },
-        {
-            "$ref": "#/definitions/DesignPageOperation"
-        },
-        {
-            "$ref": "#/definitions/DesignMetadata"
-        }
-    ],
-    "description": "A transaction can contain different operation types."
-},
-        DesignOverride: {
-    "description": "Instance overrides target a source layer without modifying its component definition.",
-    "properties": {
-        "name": {
-            "type": [
-                "null",
-                "string"
-            ]
-        },
-        "nodeId": {
-            "type": "string"
-        },
-        "style": {
-            "anyOf": [
+            anyOf: [
                 {
-                    "$ref": "#/definitions/DesignStyle"
+                    $ref: '#/definitions/DesignInsert',
                 },
                 {
-                    "type": "null"
-                }
-            ]
-        },
-        "text": {
-            "type": [
-                "null",
-                "string"
-            ]
-        },
-        "visible": {
-            "type": [
-                "null",
-                "boolean"
-            ]
-        }
-    },
-    "required": [
-        "name",
-        "nodeId",
-        "style",
-        "text",
-        "visible"
-    ],
-    "type": "object"
-},
-        DesignPage: {
-    "description": "A page has its own root layers and viewport.",
-    "properties": {
-        "background": {
-            "type": "string"
-        },
-        "id": {
-            "type": "string"
-        },
-        "name": {
-            "type": "string"
-        },
-        "roots": {
-            "items": {
-                "type": "string"
-            },
-            "type": "array"
-        }
-    },
-    "required": [
-        "background",
-        "id",
-        "name",
-        "roots"
-    ],
-    "type": "object"
-},
-        DesignPageOperation: {
-    "description": "Create, rename or remove a page. Root lists are managed by tree operations.",
-    "properties": {
-        "background": {
-            "type": "string"
-        },
-        "id": {
-            "type": "string"
-        },
-        "name": {
-            "type": [
-                "null",
-                "string"
-            ]
-        },
-        "op": {
-            "const": "page",
-            "type": "string"
-        }
-    },
-    "required": [
-        "background",
-        "id",
-        "name",
-        "op"
-    ],
-    "type": "object"
-},
-        DesignPageRecord: {
-    "description": "Page record.",
-    "properties": {
-        "id": {
-            "type": "string"
-        },
-        "kind": {
-            "const": "page",
-            "type": "string"
-        },
-        "value": {
-            "anyOf": [
-                {
-                    "$ref": "#/definitions/DesignPage"
+                    $ref: '#/definitions/DesignUpdate',
                 },
                 {
-                    "type": "null"
-                }
-            ]
-        }
-    },
-    "required": [
-        "id",
-        "kind",
-        "value"
-    ],
-    "type": "object"
-},
-        DesignImageFraming: {
-    "description": "Workspace image reference and crop transform.",
-    "properties": {
-        "cropX": {
-            "type": "number"
-        },
-        "cropY": {
-            "type": "number"
-        },
-        "fit": {
-            "$ref": "#/definitions/DesignImageFit"
-        },
-        "scale": {
-            "type": "number"
-        }
-    },
-    "required": [
-        "cropX",
-        "cropY",
-        "fit",
-        "scale"
-    ],
-    "type": "object"
-},
-        DesignPaint: {
-    "description": "Layer paint. Colors are validated hex values, never arbitrary CSS.",
-    "properties": {
-        "angle": {
-            "type": "number"
-        },
-        "assetId": {
-            "type": [
-                "null",
-                "string"
-            ]
-        },
-        "color": {
-            "type": "string"
-        },
-        "framing": {
-            "$ref": "#/definitions/DesignImageFraming",
-            "description": "Omitted framing retains the original centered-cover behavior of existing image paints."
-        },
-        "kind": {
-            "$ref": "#/definitions/DesignPaintKind"
-        },
-        "opacity": {
-            "type": "number"
-        },
-        "stops": {
-            "items": {
-                "$ref": "#/definitions/DesignGradientStop"
-            },
-            "type": "array"
-        },
-        "tokenId": {
-            "type": [
-                "null",
-                "string"
-            ]
-        }
-    },
-    "required": [
-        "angle",
-        "assetId",
-        "color",
-        "kind",
-        "opacity",
-        "stops",
-        "tokenId"
-    ],
-    "type": "object"
-},
-        DesignPaintKind: {
-    "description": "Supported paint sources. Image assets use workspace references.\nPaint kind.",
-    "enum": [
-        "image",
-        "linear",
-        "radial",
-        "solid"
-    ],
-    "type": "string"
-},
-        DesignPathCommand: {
-    "description": "A vector instruction in layer-local coordinates.",
-    "properties": {
-        "values": {
-            "items": {
-                "type": "number"
-            },
-            "type": "array"
-        },
-        "verb": {
-            "$ref": "#/definitions/DesignPathVerb"
-        }
-    },
-    "required": [
-        "values",
-        "verb"
-    ],
-    "type": "object"
-},
-        DesignPathVerb: {
-    "description": "Path verbs use explicit coordinates; cubic curves are preserved as editable geometry.\nVector path verb.",
-    "enum": [
-        "C",
-        "L",
-        "M",
-        "Q",
-        "Z"
-    ],
-    "type": "string"
-},
-        DesignPlacement: {
-    "description": "Child sizing and positioning relative to its parent.",
-    "properties": {
-        "absolute": {
-            "type": "boolean"
-        },
-        "columnSpan": {
-            "type": "number"
-        },
-        "height": {
-            "$ref": "#/definitions/DesignSizing"
-        },
-        "horizontal": {
-            "$ref": "#/definitions/DesignConstraint"
-        },
-        "maxHeight": {
-            "type": "number"
-        },
-        "maxWidth": {
-            "type": "number"
-        },
-        "minHeight": {
-            "type": "number"
-        },
-        "minWidth": {
-            "type": "number"
-        },
-        "rowSpan": {
-            "type": "number"
-        },
-        "vertical": {
-            "$ref": "#/definitions/DesignConstraint"
-        },
-        "width": {
-            "$ref": "#/definitions/DesignSizing"
-        }
-    },
-    "required": [
-        "absolute",
-        "columnSpan",
-        "height",
-        "horizontal",
-        "maxHeight",
-        "maxWidth",
-        "minHeight",
-        "minWidth",
-        "rowSpan",
-        "vertical",
-        "width"
-    ],
-    "type": "object"
-},
-        DesignReadMethod: {
-    "description": "Bounded snapshot RPC contract.",
-    "properties": {
-        "params": {
-            "$ref": "#/definitions/DesignReadRequest"
-        },
-        "result": {
-            "$ref": "#/definitions/DesignRecordPage"
-        }
-    },
-    "required": [
-        "params",
-        "result"
-    ],
-    "type": "object"
-},
-        DesignReadRequest: {
-    "description": "Strictly revision-pinned pagination prevents merging chunks from different documents.",
-    "properties": {
-        "cursor": {
-            "anyOf": [
-                {
-                    "$ref": "#/definitions/DesignCursor"
+                    $ref: '#/definitions/DesignTextOperation',
                 },
                 {
-                    "type": "null"
-                }
-            ]
-        },
-        "id": {
-            "type": "string"
-        },
-        "limit": {
-            "type": "number"
-        },
-        "revision": {
-            "type": [
-                "null",
-                "string"
-            ]
-        }
-    },
-    "required": [
-        "cursor",
-        "id",
-        "limit",
-        "revision"
-    ],
-    "type": "object"
-},
-        DesignReceipt: {
-    "description": "Commit acknowledgements contain no large text or scene snapshot.",
-    "properties": {
-        "actor": {
-            "type": "string"
-        },
-        "commandId": {
-            "type": "string"
-        },
-        "previousRevision": {
-            "type": [
-                "null",
-                "string"
-            ]
-        },
-        "summary": {
-            "$ref": "#/definitions/DesignSummary"
-        },
-        "undoable": {
-            "type": "boolean"
-        }
-    },
-    "required": [
-        "actor",
-        "commandId",
-        "previousRevision",
-        "summary",
-        "undoable"
-    ],
-    "type": "object"
-},
-        DesignRecord: {
-    "anyOf": [
-        {
-            "$ref": "#/definitions/DesignNodeRecord"
-        },
-        {
-            "$ref": "#/definitions/DesignPageRecord"
-        },
-        {
-            "$ref": "#/definitions/DesignTokenRecord"
-        },
-        {
-            "$ref": "#/definitions/DesignInteractionRecord"
-        },
-        {
-            "$ref": "#/definitions/DesignCommentRecord"
-        }
-    ],
-    "description": "One complete entity, or a tombstone in a delta page."
-},
-        DesignRecordFragment: {
-    "description": "Large records use contiguous fragments, decoded only after complete assembly.",
-    "properties": {
-        "id": {
-            "type": "string"
-        },
-        "kind": {
-            "$ref": "#/definitions/DesignRecordKind"
-        },
-        "offset": {
-            "type": "number"
-        },
-        "text": {
-            "type": "string"
-        },
-        "total": {
-            "type": "number"
-        }
-    },
-    "required": [
-        "id",
-        "kind",
-        "offset",
-        "text",
-        "total"
-    ],
-    "type": "object"
-},
-        DesignRecordKind: {
-    "description": "Scene entities have independent transport identities.\nEntity family.",
-    "enum": [
-        "comment",
-        "interaction",
-        "node",
-        "page",
-        "token"
-    ],
-    "type": "string"
-},
-        DesignRecordPage: {
-    "description": "Independently bounded entity page with at most one partial record.",
-    "properties": {
-        "fragment": {
-            "anyOf": [
-                {
-                    "$ref": "#/definitions/DesignRecordFragment"
+                    $ref: '#/definitions/DesignMove',
                 },
                 {
-                    "type": "null"
-                }
-            ]
-        },
-        "nextCursor": {
-            "anyOf": [
-                {
-                    "$ref": "#/definitions/DesignCursor"
+                    $ref: '#/definitions/DesignRemove',
                 },
                 {
-                    "type": "null"
-                }
-            ]
-        },
-        "records": {
-            "items": {
-                "$ref": "#/definitions/DesignRecord"
-            },
-            "type": "array"
-        },
-        "summary": {
-            "$ref": "#/definitions/DesignSummary"
-        }
-    },
-    "required": [
-        "fragment",
-        "nextCursor",
-        "records",
-        "summary"
-    ],
-    "type": "object"
-},
-        DesignRemove: {
-    "description": "Delete a subtree and its anchored comments and prototype links.",
-    "properties": {
-        "id": {
-            "type": "string"
-        },
-        "op": {
-            "const": "remove",
-            "type": "string"
-        }
-    },
-    "required": [
-        "id",
-        "op"
-    ],
-    "type": "object"
-},
-        DesignSaveMethod: {
-    "description": "Atomic editing RPC contract.",
-    "properties": {
-        "params": {
-            "$ref": "#/definitions/DesignSaveRequest"
-        },
-        "result": {
-            "$ref": "#/definitions/DesignReceipt"
-        }
-    },
-    "required": [
-        "params",
-        "result"
-    ],
-    "type": "object"
-},
-        DesignSaveRequest: {
-    "description": "Patch uses optimistic concurrency and a durable retry identity.",
-    "properties": {
-        "commandId": {
-            "type": "string"
-        },
-        "expectedRevision": {
-            "type": "string"
-        },
-        "id": {
-            "type": "string"
-        },
-        "operations": {
-            "items": {
-                "$ref": "#/definitions/DesignOperation"
-            },
-            "type": "array"
-        }
-    },
-    "required": [
-        "commandId",
-        "expectedRevision",
-        "id",
-        "operations"
-    ],
-    "type": "object"
-},
-        DesignShadow: {
-    "description": "Drop or inner shadow.",
-    "properties": {
-        "blur": {
-            "type": "number"
-        },
-        "color": {
-            "type": "string"
-        },
-        "inner": {
-            "type": "boolean"
-        },
-        "spread": {
-            "type": "number"
-        },
-        "x": {
-            "type": "number"
-        },
-        "y": {
-            "type": "number"
-        }
-    },
-    "required": [
-        "blur",
-        "color",
-        "inner",
-        "spread",
-        "x",
-        "y"
-    ],
-    "type": "object"
-},
-        DesignSizing: {
-    "description": "Sizing relative to the parent and content.\nSizing choice.",
-    "enum": [
-        "fill",
-        "fixed",
-        "hug"
-    ],
-    "type": "string"
-},
-        DesignStroke: {
-    "description": "Outline properties.",
-    "properties": {
-        "dash": {
-            "items": {
-                "type": "number"
-            },
-            "type": "array"
-        },
-        "paint": {
-            "$ref": "#/definitions/DesignPaint"
-        },
-        "width": {
-            "type": "number"
-        }
-    },
-    "required": [
-        "dash",
-        "paint",
-        "width"
-    ],
-    "type": "object"
-},
-        DesignStyle: {
-    "description": "Style can be shared across arbitrary primitives.",
-    "properties": {
-        "blur": {
-            "type": "number"
-        },
-        "corners": {
-            "$ref": "#/definitions/DesignCorners"
-        },
-        "fills": {
-            "items": {
-                "$ref": "#/definitions/DesignPaint"
-            },
-            "type": "array"
-        },
-        "shadows": {
-            "items": {
-                "$ref": "#/definitions/DesignShadow"
-            },
-            "type": "array"
-        },
-        "stroke": {
-            "anyOf": [
-                {
-                    "$ref": "#/definitions/DesignStroke"
+                    $ref: '#/definitions/DesignPageOperation',
                 },
                 {
-                    "type": "null"
-                }
-            ]
-        }
-    },
-    "required": [
-        "blur",
-        "corners",
-        "fills",
-        "shadows",
-        "stroke"
-    ],
-    "type": "object"
-},
-        DesignSummary: {
-    "description": "Tiny management projection. Timestamps and revisions retain full integer precision.",
-    "properties": {
-        "id": {
-            "type": "string"
-        },
-        "name": {
-            "type": "string"
-        },
-        "nodeCount": {
-            "type": "number"
-        },
-        "pageCount": {
-            "type": "number"
-        },
-        "revision": {
-            "type": "string"
-        },
-        "updatedAt": {
-            "type": "string"
-        }
-    },
-    "required": [
-        "id",
-        "name",
-        "nodeCount",
-        "pageCount",
-        "revision",
-        "updatedAt"
-    ],
-    "type": "object"
-},
-        DesignText: {
-    "description": "Text layout is shared by the canvas, tools and exported designs.",
-    "properties": {
-        "align": {
-            "$ref": "#/definitions/DesignAlign"
-        },
-        "content": {
-            "type": "string"
-        },
-        "family": {
-            "type": "string"
-        },
-        "italic": {
-            "type": "boolean"
-        },
-        "letterSpacing": {
-            "type": "number"
-        },
-        "lineHeight": {
-            "type": "number"
-        },
-        "runs": {
-            "items": {
-                "$ref": "#/definitions/DesignTextRun"
-            },
-            "type": "array"
-        },
-        "size": {
-            "type": "number"
-        },
-        "weight": {
-            "type": "number"
-        }
-    },
-    "required": [
-        "align",
-        "content",
-        "family",
-        "italic",
-        "letterSpacing",
-        "lineHeight",
-        "runs",
-        "size",
-        "weight"
-    ],
-    "type": "object"
-},
-        DesignTextOperation: {
-    "description": "Replace text content while preserving typography and clipping existing rich-text ranges.",
-    "properties": {
-        "content": {
-            "type": "string"
-        },
-        "id": {
-            "type": "string"
-        },
-        "op": {
-            "const": "text",
-            "type": "string"
-        }
-    },
-    "required": [
-        "content",
-        "id",
-        "op"
-    ],
-    "type": "object"
-},
-        DesignTextRun: {
-    "description": "Rich text range. Offsets are UTF-16 indices into the layer's text.",
-    "properties": {
-        "color": {
-            "type": "string"
-        },
-        "end": {
-            "type": "number"
-        },
-        "family": {
-            "type": "string"
-        },
-        "italic": {
-            "type": "boolean"
-        },
-        "size": {
-            "type": "number"
-        },
-        "start": {
-            "type": "number"
-        },
-        "underline": {
-            "type": "boolean"
-        },
-        "weight": {
-            "type": "number"
-        }
-    },
-    "required": [
-        "color",
-        "end",
-        "family",
-        "italic",
-        "size",
-        "start",
-        "underline",
-        "weight"
-    ],
-    "type": "object"
-},
-        DesignToken: {
-    "description": "Named design-system values.",
-    "properties": {
-        "category": {
-            "$ref": "#/definitions/DesignTokenCategory"
-        },
-        "id": {
-            "type": "string"
-        },
-        "name": {
-            "type": "string"
-        },
-        "value": {
-            "type": "string"
-        }
-    },
-    "required": [
-        "category",
-        "id",
-        "name",
-        "value"
-    ],
-    "type": "object"
-},
-        DesignTokenCategory: {
-    "description": "Token families.\nToken family.",
-    "enum": [
-        "color",
-        "spacing",
-        "typography"
-    ],
-    "type": "string"
-},
-        DesignTokenRecord: {
-    "description": "Token record.",
-    "properties": {
-        "id": {
-            "type": "string"
-        },
-        "kind": {
-            "const": "token",
-            "type": "string"
-        },
-        "value": {
-            "anyOf": [
-                {
-                    "$ref": "#/definitions/DesignToken"
+                    $ref: '#/definitions/DesignMetadata',
                 },
-                {
-                    "type": "null"
-                }
-            ]
-        }
-    },
-    "required": [
-        "id",
-        "kind",
-        "value"
-    ],
-    "type": "object"
-},
-        DesignTransition: {
-    "description": "Prototype transitions.\nPrototype transition.",
-    "enum": [
-        "dissolve",
-        "instant",
-        "slide"
-    ],
-    "type": "string"
-},
-        DesignTrigger: {
-    "description": "Prototype triggers.\nPrototype trigger.",
-    "enum": [
-        "after",
-        "click",
-        "hover"
-    ],
-    "type": "string"
-},
-        DesignUndoMethod: {
-    "description": "Conflict-safe undo RPC contract.",
-    "properties": {
-        "params": {
-            "$ref": "#/definitions/DesignUndoRequest"
-        },
-        "result": {
-            "$ref": "#/definitions/DesignReceipt"
-        }
-    },
-    "required": [
-        "params",
-        "result"
-    ],
-    "type": "object"
-},
-        DesignUndoRequest: {
-    "description": "Undo names the committed transaction rather than accepting an untrusted state snapshot.",
-    "properties": {
-        "commandId": {
-            "type": "string"
-        },
-        "expectedRevision": {
-            "type": "string"
-        },
-        "id": {
-            "type": "string"
-        },
-        "targetCommandId": {
-            "type": "string"
-        }
-    },
-    "required": [
-        "commandId",
-        "expectedRevision",
-        "id",
-        "targetCommandId"
-    ],
-    "type": "object"
-},
-        DesignUpdate: {
-    "description": "Update only chosen properties, preserving unrelated edits.",
-    "properties": {
-        "changes": {
-            "$ref": "#/definitions/DesignNodeChanges"
-        },
-        "id": {
-            "type": "string"
-        },
-        "op": {
-            "const": "update",
-            "type": "string"
-        }
-    },
-    "required": [
-        "changes",
-        "id",
-        "op"
-    ],
-    "type": "object"
-},
-        DesignVariantSet: {
-            "description": "Ordered dimensions and the identity used when placing this reusable set.",
-            "properties": {
-                "defaultId": {
-                    "type": [
-                        "null",
-                        "string"
-                    ]
-                },
-                "properties": {
-                    "items": {
-                        "type": "string"
-                    },
-                    "type": "array"
-                }
-            },
-            "required": [
-                "defaultId",
-                "properties"
             ],
-            "type": "object"
+            description: 'A transaction can contain different operation types.',
+        },
+        DesignOverride: {
+            description:
+                'Instance overrides target a source layer without modifying its component definition.',
+            properties: {
+                name: {
+                    type: ['null', 'string'],
+                },
+                nodeId: {
+                    type: 'string',
+                },
+                style: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignStyle',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                text: {
+                    type: ['null', 'string'],
+                },
+                visible: {
+                    type: ['null', 'boolean'],
+                },
+            },
+            required: ['name', 'nodeId', 'style', 'text', 'visible'],
+            type: 'object',
+        },
+        DesignPage: {
+            description: 'A page has its own root layers and viewport.',
+            properties: {
+                background: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                name: {
+                    type: 'string',
+                },
+                roots: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+            },
+            required: ['background', 'id', 'name', 'roots'],
+            type: 'object',
+        },
+        DesignPageOperation: {
+            description:
+                'Create, rename or remove a page. Root lists are managed by tree operations.',
+            properties: {
+                background: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                name: {
+                    type: ['null', 'string'],
+                },
+                op: {
+                    const: 'page',
+                    type: 'string',
+                },
+            },
+            required: ['background', 'id', 'name', 'op'],
+            type: 'object',
+        },
+        DesignPageRecord: {
+            description: 'Page record.',
+            properties: {
+                id: {
+                    type: 'string',
+                },
+                kind: {
+                    const: 'page',
+                    type: 'string',
+                },
+                value: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignPage',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+            },
+            required: ['id', 'kind', 'value'],
+            type: 'object',
+        },
+        DesignPaint: {
+            description: 'Layer paint. Colors are validated hex values, never arbitrary CSS.',
+            properties: {
+                angle: {
+                    type: 'number',
+                },
+                assetId: {
+                    type: ['null', 'string'],
+                },
+                color: {
+                    type: 'string',
+                },
+                framing: {
+                    $ref: '#/definitions/DesignImageFraming',
+                    description:
+                        'Omitted framing retains the original centered-cover behavior of existing image paints.',
+                },
+                kind: {
+                    $ref: '#/definitions/DesignPaintKind',
+                },
+                opacity: {
+                    type: 'number',
+                },
+                stops: {
+                    items: {
+                        $ref: '#/definitions/DesignGradientStop',
+                    },
+                    type: 'array',
+                },
+                tokenId: {
+                    type: ['null', 'string'],
+                },
+            },
+            required: ['angle', 'assetId', 'color', 'kind', 'opacity', 'stops', 'tokenId'],
+            type: 'object',
+        },
+        DesignPaintKind: {
+            description:
+                'Supported paint sources. Image assets use workspace references.\nPaint kind.',
+            enum: ['image', 'linear', 'radial', 'solid'],
+            type: 'string',
+        },
+        DesignPathCommand: {
+            description: 'A vector instruction in layer-local coordinates.',
+            properties: {
+                values: {
+                    items: {
+                        type: 'number',
+                    },
+                    type: 'array',
+                },
+                verb: {
+                    $ref: '#/definitions/DesignPathVerb',
+                },
+            },
+            required: ['values', 'verb'],
+            type: 'object',
+        },
+        DesignPathVerb: {
+            description:
+                'Path verbs use explicit coordinates; cubic curves are preserved as editable geometry.\nVector path verb.',
+            enum: ['C', 'L', 'M', 'Q', 'Z'],
+            type: 'string',
+        },
+        DesignPlacement: {
+            description: 'Child sizing and positioning relative to its parent.',
+            properties: {
+                absolute: {
+                    type: 'boolean',
+                },
+                columnSpan: {
+                    type: 'number',
+                },
+                height: {
+                    $ref: '#/definitions/DesignSizing',
+                },
+                horizontal: {
+                    $ref: '#/definitions/DesignConstraint',
+                },
+                maxHeight: {
+                    type: 'number',
+                },
+                maxWidth: {
+                    type: 'number',
+                },
+                minHeight: {
+                    type: 'number',
+                },
+                minWidth: {
+                    type: 'number',
+                },
+                rowSpan: {
+                    type: 'number',
+                },
+                vertical: {
+                    $ref: '#/definitions/DesignConstraint',
+                },
+                width: {
+                    $ref: '#/definitions/DesignSizing',
+                },
+            },
+            required: [
+                'absolute',
+                'columnSpan',
+                'height',
+                'horizontal',
+                'maxHeight',
+                'maxWidth',
+                'minHeight',
+                'minWidth',
+                'rowSpan',
+                'vertical',
+                'width',
+            ],
+            type: 'object',
+        },
+        DesignReadMethod: {
+            description: 'Bounded snapshot RPC contract.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/DesignReadRequest',
+                },
+                result: {
+                    $ref: '#/definitions/DesignRecordPage',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        DesignReadRequest: {
+            description:
+                'Strictly revision-pinned pagination prevents merging chunks from different documents.',
+            properties: {
+                cursor: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignCursor',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                id: {
+                    type: 'string',
+                },
+                limit: {
+                    type: 'number',
+                },
+                revision: {
+                    type: ['null', 'string'],
+                },
+            },
+            required: ['cursor', 'id', 'limit', 'revision'],
+            type: 'object',
+        },
+        DesignReceipt: {
+            description: 'Commit acknowledgements contain no large text or scene snapshot.',
+            properties: {
+                actor: {
+                    type: 'string',
+                },
+                commandId: {
+                    type: 'string',
+                },
+                previousRevision: {
+                    type: ['null', 'string'],
+                },
+                summary: {
+                    $ref: '#/definitions/DesignSummary',
+                },
+                undoable: {
+                    type: 'boolean',
+                },
+            },
+            required: ['actor', 'commandId', 'previousRevision', 'summary', 'undoable'],
+            type: 'object',
+        },
+        DesignRecord: {
+            anyOf: [
+                {
+                    $ref: '#/definitions/DesignNodeRecord',
+                },
+                {
+                    $ref: '#/definitions/DesignPageRecord',
+                },
+                {
+                    $ref: '#/definitions/DesignTokenRecord',
+                },
+                {
+                    $ref: '#/definitions/DesignInteractionRecord',
+                },
+                {
+                    $ref: '#/definitions/DesignCommentRecord',
+                },
+            ],
+            description: 'One complete entity, or a tombstone in a delta page.',
+        },
+        DesignRecordFragment: {
+            description:
+                'Large records use contiguous fragments, decoded only after complete assembly.',
+            properties: {
+                id: {
+                    type: 'string',
+                },
+                kind: {
+                    $ref: '#/definitions/DesignRecordKind',
+                },
+                offset: {
+                    type: 'number',
+                },
+                text: {
+                    type: 'string',
+                },
+                total: {
+                    type: 'number',
+                },
+            },
+            required: ['id', 'kind', 'offset', 'text', 'total'],
+            type: 'object',
+        },
+        DesignRecordKind: {
+            description: 'Scene entities have independent transport identities.\nEntity family.',
+            enum: ['comment', 'interaction', 'node', 'page', 'token'],
+            type: 'string',
+        },
+        DesignRecordPage: {
+            description: 'Independently bounded entity page with at most one partial record.',
+            properties: {
+                fragment: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignRecordFragment',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                nextCursor: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignCursor',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                records: {
+                    items: {
+                        $ref: '#/definitions/DesignRecord',
+                    },
+                    type: 'array',
+                },
+                summary: {
+                    $ref: '#/definitions/DesignSummary',
+                },
+            },
+            required: ['fragment', 'nextCursor', 'records', 'summary'],
+            type: 'object',
+        },
+        DesignRemove: {
+            description: 'Delete a subtree and its anchored comments and prototype links.',
+            properties: {
+                id: {
+                    type: 'string',
+                },
+                op: {
+                    const: 'remove',
+                    type: 'string',
+                },
+            },
+            required: ['id', 'op'],
+            type: 'object',
+        },
+        DesignSaveMethod: {
+            description: 'Atomic editing RPC contract.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/DesignSaveRequest',
+                },
+                result: {
+                    $ref: '#/definitions/DesignReceipt',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        DesignSaveRequest: {
+            description: 'Patch uses optimistic concurrency and a durable retry identity.',
+            properties: {
+                commandId: {
+                    type: 'string',
+                },
+                expectedRevision: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                operations: {
+                    items: {
+                        $ref: '#/definitions/DesignOperation',
+                    },
+                    type: 'array',
+                },
+            },
+            required: ['commandId', 'expectedRevision', 'id', 'operations'],
+            type: 'object',
+        },
+        DesignShadow: {
+            description: 'Drop or inner shadow.',
+            properties: {
+                blur: {
+                    type: 'number',
+                },
+                color: {
+                    type: 'string',
+                },
+                inner: {
+                    type: 'boolean',
+                },
+                spread: {
+                    type: 'number',
+                },
+                x: {
+                    type: 'number',
+                },
+                y: {
+                    type: 'number',
+                },
+            },
+            required: ['blur', 'color', 'inner', 'spread', 'x', 'y'],
+            type: 'object',
+        },
+        DesignSizing: {
+            description: 'Sizing relative to the parent and content.\nSizing choice.',
+            enum: ['fill', 'fixed', 'hug'],
+            type: 'string',
+        },
+        DesignStroke: {
+            description: 'Outline properties.',
+            properties: {
+                dash: {
+                    items: {
+                        type: 'number',
+                    },
+                    type: 'array',
+                },
+                paint: {
+                    $ref: '#/definitions/DesignPaint',
+                },
+                width: {
+                    type: 'number',
+                },
+            },
+            required: ['dash', 'paint', 'width'],
+            type: 'object',
+        },
+        DesignStyle: {
+            description: 'Style can be shared across arbitrary primitives.',
+            properties: {
+                blur: {
+                    type: 'number',
+                },
+                corners: {
+                    $ref: '#/definitions/DesignCorners',
+                },
+                fills: {
+                    items: {
+                        $ref: '#/definitions/DesignPaint',
+                    },
+                    type: 'array',
+                },
+                shadows: {
+                    items: {
+                        $ref: '#/definitions/DesignShadow',
+                    },
+                    type: 'array',
+                },
+                stroke: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignStroke',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+            },
+            required: ['blur', 'corners', 'fills', 'shadows', 'stroke'],
+            type: 'object',
+        },
+        DesignSummary: {
+            description:
+                'Tiny management projection. Timestamps and revisions retain full integer precision.',
+            properties: {
+                id: {
+                    type: 'string',
+                },
+                name: {
+                    type: 'string',
+                },
+                nodeCount: {
+                    type: 'number',
+                },
+                pageCount: {
+                    type: 'number',
+                },
+                revision: {
+                    type: 'string',
+                },
+                updatedAt: {
+                    type: 'string',
+                },
+            },
+            required: ['id', 'name', 'nodeCount', 'pageCount', 'revision', 'updatedAt'],
+            type: 'object',
+        },
+        DesignText: {
+            description: 'Text layout is shared by the canvas, tools and exported designs.',
+            properties: {
+                align: {
+                    $ref: '#/definitions/DesignAlign',
+                },
+                content: {
+                    type: 'string',
+                },
+                family: {
+                    type: 'string',
+                },
+                font: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignFontBinding',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                    description:
+                        "Exact private font bytes remain in the owner's library, independently of the saved scene.",
+                },
+                italic: {
+                    type: 'boolean',
+                },
+                letterSpacing: {
+                    type: 'number',
+                },
+                lineHeight: {
+                    type: 'number',
+                },
+                runs: {
+                    items: {
+                        $ref: '#/definitions/DesignTextRun',
+                    },
+                    type: 'array',
+                },
+                size: {
+                    type: 'number',
+                },
+                weight: {
+                    type: 'number',
+                },
+            },
+            required: [
+                'align',
+                'content',
+                'family',
+                'italic',
+                'letterSpacing',
+                'lineHeight',
+                'runs',
+                'size',
+                'weight',
+            ],
+            type: 'object',
+        },
+        DesignTextOperation: {
+            description:
+                'Replace text content while preserving typography and clipping existing rich-text ranges.',
+            properties: {
+                content: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                op: {
+                    const: 'text',
+                    type: 'string',
+                },
+            },
+            required: ['content', 'id', 'op'],
+            type: 'object',
+        },
+        DesignTextRun: {
+            description: "Rich text range. Offsets are UTF-16 indices into the layer's text.",
+            properties: {
+                color: {
+                    type: 'string',
+                },
+                end: {
+                    type: 'number',
+                },
+                family: {
+                    type: 'string',
+                },
+                font: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignFontBinding',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                    description:
+                        'Omission inherits a compatible base face; null explicitly chooses an unbound family.',
+                },
+                italic: {
+                    type: 'boolean',
+                },
+                size: {
+                    type: 'number',
+                },
+                start: {
+                    type: 'number',
+                },
+                underline: {
+                    type: 'boolean',
+                },
+                weight: {
+                    type: 'number',
+                },
+            },
+            required: ['color', 'end', 'family', 'italic', 'size', 'start', 'underline', 'weight'],
+            type: 'object',
+        },
+        DesignToken: {
+            description: 'Named design-system values.',
+            properties: {
+                category: {
+                    $ref: '#/definitions/DesignTokenCategory',
+                },
+                id: {
+                    type: 'string',
+                },
+                name: {
+                    type: 'string',
+                },
+                value: {
+                    type: 'string',
+                },
+            },
+            required: ['category', 'id', 'name', 'value'],
+            type: 'object',
+        },
+        DesignTokenCategory: {
+            description: 'Token families.\nToken family.',
+            enum: ['color', 'spacing', 'typography'],
+            type: 'string',
+        },
+        DesignTokenRecord: {
+            description: 'Token record.',
+            properties: {
+                id: {
+                    type: 'string',
+                },
+                kind: {
+                    const: 'token',
+                    type: 'string',
+                },
+                value: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignToken',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+            },
+            required: ['id', 'kind', 'value'],
+            type: 'object',
+        },
+        DesignTransition: {
+            description: 'Prototype transitions.\nPrototype transition.',
+            enum: ['dissolve', 'instant', 'slide'],
+            type: 'string',
+        },
+        DesignTrigger: {
+            description: 'Prototype triggers.\nPrototype trigger.',
+            enum: ['after', 'click', 'hover'],
+            type: 'string',
+        },
+        DesignUndoMethod: {
+            description: 'Conflict-safe undo RPC contract.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/DesignUndoRequest',
+                },
+                result: {
+                    $ref: '#/definitions/DesignReceipt',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        DesignUndoRequest: {
+            description:
+                'Undo names the committed transaction rather than accepting an untrusted state snapshot.',
+            properties: {
+                commandId: {
+                    type: 'string',
+                },
+                expectedRevision: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                targetCommandId: {
+                    type: 'string',
+                },
+            },
+            required: ['commandId', 'expectedRevision', 'id', 'targetCommandId'],
+            type: 'object',
+        },
+        DesignUpdate: {
+            description: 'Update only chosen properties, preserving unrelated edits.',
+            properties: {
+                changes: {
+                    $ref: '#/definitions/DesignNodeChanges',
+                },
+                id: {
+                    type: 'string',
+                },
+                op: {
+                    const: 'update',
+                    type: 'string',
+                },
+            },
+            required: ['changes', 'id', 'op'],
+            type: 'object',
+        },
+        DesignVariantSet: {
+            description: 'Ordered dimensions and the identity used when placing this reusable set.',
+            properties: {
+                defaultId: {
+                    type: ['null', 'string'],
+                },
+                properties: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+            },
+            required: ['defaultId', 'properties'],
+            type: 'object',
         },
         DesignVariantValue: {
-            "description": "A named dimension and one retained definition's authored value.",
-            "properties": {
-                "property": {
-                    "type": "string"
+            description: "A named dimension and one retained definition's authored value.",
+            properties: {
+                property: {
+                    type: 'string',
                 },
-                "value": {
-                    "type": "string"
-                }
+                value: {
+                    type: 'string',
+                },
             },
-            "required": [
-                "property",
-                "value"
-            ],
-            "type": "object"
+            required: ['property', 'value'],
+            type: 'object',
         },
         DeviceApproveParams: {
             description: 'Approving a device, optionally overriding the scopes it asked for.',
@@ -8219,6 +7950,12 @@ export const schema: Schema = {
                         type: 'string',
                     },
                     type: 'array',
+                },
+                jsonReplies: {
+                    const: true,
+                    description:
+                        'Host validation of JSON final answers while native tools remain available.',
+                    type: 'boolean',
                 },
                 methodScopes: {
                     $ref: '#/definitions/Record%3Cstring%2CScope%3E',
@@ -9093,6 +8830,33 @@ export const schema: Schema = {
                         },
                         result: {
                             $ref: '#/definitions/DesignEventsPage',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'design.font.list': {
+                    description: 'Authenticated metadata discovery does not carry font bodies.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/DesignFontListRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/DesignFontListPage',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'design.font.read': {
+                    description:
+                        'Each authenticated WebSocket read transfers one independently bounded immutable slice.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/DesignFontReadRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/DesignFontSlice',
                         },
                     },
                     required: ['params', 'result'],
@@ -10801,6 +10565,8 @@ export const schema: Schema = {
                 'design.create',
                 'design.delete',
                 'design.events',
+                'design.font.list',
+                'design.font.read',
                 'design.layout',
                 'design.list',
                 'design.read',
@@ -15418,10 +15184,6 @@ export const schema: Schema = {
             description:
                 'Bounded, capability-free projection carried by live tool events and the final receipt.',
             properties: {
-                workspace: {
-                    $ref: '#/definitions/ReverseWorkspaceState',
-                    description: 'Persisted agent presentation is independent from execution progress.',
-                },
                 application: {
                     $ref: '#/definitions/ReverseApplicationSnapshot',
                     description:
@@ -15541,6 +15303,11 @@ export const schema: Schema = {
                 version: {
                     const: 1,
                     type: 'number',
+                },
+                workspace: {
+                    $ref: '#/definitions/ReverseWorkspaceState',
+                    description:
+                        'Persisted agent presentation is independent from execution progress.',
                 },
             },
             required: [
@@ -16093,6 +15860,12 @@ export const schema: Schema = {
                     description:
                         'Per-turn reasoning preference; never changes the saved agent configuration.',
                     enum: ['high', 'low', 'max', 'medium', 'minimal', 'off', 'xhigh'],
+                    type: 'string',
+                },
+                responseFormat: {
+                    description:
+                        'Final answer format; JSON mode does not disable tools or verification.',
+                    enum: ['json', 'text'],
                     type: 'string',
                 },
                 streamId: {
@@ -21297,6 +21070,11 @@ export const schema: Schema = {
                     enum: ['active', 'creating', 'destroyed', 'destroying', 'draining', 'expired'],
                     type: 'string',
                 },
+                storage: {
+                    $ref: '#/definitions/WorkspaceStorageIdentity',
+                    description:
+                        'Present for assigned-host projects; legacy/native records cannot silently adopt a VM.',
+                },
                 tags: {
                     description: 'Free-form labels.',
                     items: {
@@ -21413,6 +21191,11 @@ export const schema: Schema = {
                     $ref: '#/definitions/WorkspaceState',
                     description:
                         'Where it is in its lifecycle.\n\nOptional because records written before the lifecycle existed do not carry it, and those\nrecords are on disk in every install that already made a workspace. Read it through\n{@link stateOf}, which supplies the only truthful default for such a record: it was created\nand it was never being destroyed, because the old destroy path deleted the row outright.',
+                },
+                storage: {
+                    $ref: '#/definitions/WorkspaceStorageIdentity',
+                    description:
+                        'Present for assigned-host projects; legacy/native records cannot silently adopt a VM.',
                 },
                 tags: {
                     description: 'Free-form labels.',
@@ -21533,6 +21316,21 @@ export const schema: Schema = {
                 'Where a workspace is in its life.\n\nThe states exist because destruction is not instantaneous and must not be silent. A workspace\nholds the user\'s work, so "delete it" has to pass through a phase where a run that is still\nwriting can stop it (`draining`), and a phase that survives a crash so the next start can finish\nthe job instead of finding a half-emptied tree behind a record that still says `active`\n(`destroying`). `expired` is the grace state: a user who comes back a week after a task\nworkspace\'s TTL sees "this expired, here is how to keep it" rather than a vanished directory.',
             enum: ['active', 'creating', 'destroyed', 'destroying', 'draining', 'expired'],
             type: 'string',
+        },
+        WorkspaceStorageIdentity: {
+            description:
+                'Persisted assignment binding contains no transport credentials or controller filesystem paths.',
+            properties: {
+                id: {
+                    description: 'Opaque stable identity of the assigned host and workspace base.',
+                    type: 'string',
+                },
+                root: {
+                    type: 'string',
+                },
+            },
+            required: ['id', 'root'],
+            type: 'object',
         },
         WorkspaceUsage: {
             description:
