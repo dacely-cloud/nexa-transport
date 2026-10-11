@@ -9896,6 +9896,8 @@ export interface ReverseRunSnapshotShape {
     readonly tasks: ReadonlyArray<ReverseTaskSnapshot>;
     /** version as defined by the Nexa gateway. */
     readonly version: 1;
+    /** workspace as defined by the Nexa gateway. */
+    readonly workspace?: ReverseWorkspaceState;
 }
 
 /** ReverseRunSnapshot from the Nexa wire protocol. */
@@ -9936,6 +9938,60 @@ export interface ReverseTaskSnapshotShape {
 
 /** ReverseTaskSnapshot from the Nexa wire protocol. */
 export type ReverseTaskSnapshot = ReverseTaskSnapshotShape;
+
+/** Allowed values for ReverseWorkspaceStatedockVariant0. */
+export const ReverseWorkspaceStatedockVariant0Values = {
+    Value0: 'Agents',
+    Value1: 'Output',
+    Value2: 'References',
+} as const;
+
+/** ReverseWorkspaceState wire fields. */
+export interface ReverseWorkspaceStateShape {
+    /** dock as defined by the Nexa gateway. */
+    readonly dock:
+        | (typeof ReverseWorkspaceStatedockVariant0Values)[keyof typeof ReverseWorkspaceStatedockVariant0Values]
+        | null;
+    /** evidenceId as defined by the Nexa gateway. */
+    readonly evidenceId: null | string;
+    /** follow as defined by the Nexa gateway. */
+    readonly follow: boolean;
+    /** graph as defined by the Nexa gateway. */
+    readonly graph: boolean;
+    /** navigation as defined by the Nexa gateway. */
+    readonly navigation: boolean;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: string;
+    /** view as defined by the Nexa gateway. */
+    readonly view: ReverseWorkspaceView;
+}
+
+/** ReverseWorkspaceState from the Nexa wire protocol. */
+export type ReverseWorkspaceState = ReverseWorkspaceStateShape;
+
+/** Allowed values for ReverseWorkspaceView. */
+export const ReverseWorkspaceViewValues = {
+    Value0: 'Accessibility',
+    Value1: 'All evidence',
+    Value2: 'Assembly',
+    Value3: 'Browser activity',
+    Value4: 'Comparison',
+    Value5: 'DOM',
+    Value6: 'Graph',
+    Value7: 'Hex / bytes',
+    Value8: 'Imports',
+    Value9: 'Pseudocode',
+    Value10: 'Resources',
+    Value11: 'Screenshot',
+    Value12: 'Scripts',
+    Value13: 'Storage',
+    Value14: 'Storage changes',
+    Value15: 'WebMCP',
+} as const;
+
+/** ReverseWorkspaceView from the Nexa wire protocol. */
+export type ReverseWorkspaceView =
+    (typeof ReverseWorkspaceViewValues)[keyof typeof ReverseWorkspaceViewValues];
 
 /** Allowed values for RiskLevel. */
 export const RiskLevelValues = {

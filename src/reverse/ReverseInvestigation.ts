@@ -85,6 +85,15 @@ export class ReverseInvestigation {
         if (!reverseSnapshot(input)) {
             throw new TypeError('Invalid investigation receipt');
         }
+        if (
+            input.workspace !== undefined &&
+            (!/^(?:0|[1-9]\d{0,18})$/u.test(input.workspace.revision) ||
+                BigInt(input.workspace.revision) > 9_223_372_036_854_775_807n ||
+                (input.workspace.evidenceId !== null &&
+                    !/^[0-9a-fA-F-]{36}$/u.test(input.workspace.evidenceId)))
+        ) {
+            throw new RangeError('Invalid RE workspace presentation');
+        }
         if (input.network !== undefined) {
             if (input.kind !== 'network') {
                 throw new TypeError('Network projection requires a network target');
@@ -379,13 +388,23 @@ export class ReverseInvestigation {
         ) {
             throw new Error('Investigation archive identity changed within a tool call');
         }
+        const workspace: ReverseRunSnapshot['workspace'] =
+            BigInt(next.workspace?.revision ?? '0') > BigInt(previous.workspace?.revision ?? '0')
+                ? next.workspace
+                : previous.workspace;
+        const merge: (chosen: ReverseRunSnapshot) => ReverseRunSnapshot = (
+            chosen: ReverseRunSnapshot,
+        ): ReverseRunSnapshot =>
+            workspace === chosen.workspace
+                ? chosen
+                : { ...chosen, ...(workspace === undefined ? {} : { workspace }) };
         if (BigInt(next.revision) <= BigInt(previous.revision)) {
-            return previous;
+            return merge(previous);
         }
         const previousExecution: number = previous.execution ?? 0;
         const nextExecution: number = next.execution ?? 0;
         if (nextExecution < previousExecution) {
-            return previous;
+            return merge(previous);
         }
         if (nextExecution > previousExecution && previous.state === 'done') {
             throw new Error('Completed investigation cannot resume execution');
@@ -395,8 +414,8 @@ export class ReverseInvestigation {
             previous.state !== 'pending' &&
             previous.state !== 'running'
         ) {
-            return previous;
+            return merge(previous);
         }
-        return next;
+        return merge(next);
     }
 }

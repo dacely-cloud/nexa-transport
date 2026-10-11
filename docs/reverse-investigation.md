@@ -13,6 +13,14 @@ from a `WireTurnEvent`. `parse(raw)` validates external receipts and their bound
 run/hash/archive identity or reviving a terminal execution. Revisions remain
 decimal strings, compared as bigint.
 
+An optional `workspace` carries the agent-selected evidence, view, navigation and
+graph panes, bottom dock and following state. Its `revision` is independent from
+execution. `advance` merges newer presentation revisions even when the execution
+receipt is unchanged or terminal, while retaining newer execution and workspace
+state when events arrive out of order. The model uses `reverse_workspace` to read
+and present an owner-scoped run; the SDK does not fabricate captures or reopen
+analyzers when applying presentation changes.
+
 ```ts
 import { ReverseInvestigation } from 'nexa-transport/reverse-investigation';
 import type { ReverseRunSnapshot } from 'nexa-transport/protocol';

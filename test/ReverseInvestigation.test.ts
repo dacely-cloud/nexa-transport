@@ -3,6 +3,7 @@ import type { WebSocket } from 'ws';
 import { NexaClient } from '../src/networking/NexaClient.js';
 import { ReverseInvestigation } from '../src/reverse/ReverseInvestigation.js';
 import type {
+    ReverseWorkspaceState,
     ReversePlanStep,
     ReverseApplicationSnapshot,
     ReverseRunSnapshot,
@@ -86,6 +87,44 @@ function followUp(): ReversePlanStep {
 }
 
 describe('native investigation transport', (): void => {
+    it('merges presentation independently of executor revisions without reviving terminal runs', (): void => {
+        const workspace: ReverseWorkspaceState = {
+            revision: '1',
+            evidenceId: null,
+            view: 'Pseudocode',
+            navigation: true,
+            graph: false,
+            dock: 'Agents',
+            follow: true,
+        };
+        const running: ReverseRunSnapshot = { ...snapshot('10'), workspace };
+        const terminal: ReverseRunSnapshot = { ...running, state: 'done' };
+        const presented: ReverseRunSnapshot = {
+            ...snapshot('9'),
+            workspace: { ...workspace, revision: '2', dock: 'Output', follow: false },
+        };
+        const merged: ReverseRunSnapshot = ReverseInvestigation.advance(terminal, presented);
+        expect(merged.state).toBe('done');
+        expect(merged.revision).toBe('10');
+        expect(merged.workspace?.dock).toBe('Output');
+        expect(ReverseInvestigation.advance(merged, terminal)).toBe(merged);
+        expect(
+            ReverseInvestigation.advance(running, { ...presented, revision: '10' }).workspace
+                ?.revision,
+        ).toBe('2');
+        for (const revision of ['01', '-1', '9223372036854775808']) {
+            expect((): ReverseRunSnapshot =>
+                ReverseInvestigation.parse({ ...running, workspace: { ...workspace, revision } }),
+            ).toThrow();
+        }
+        expect((): ReverseRunSnapshot =>
+            ReverseInvestigation.parse({
+                ...running,
+                workspace: { ...workspace, evidenceId: 'foreign' },
+            }),
+        ).toThrow();
+    });
+
     it('validates static application provenance, count limits and compatibility independently of model prose', (): void => {
         const application: ReverseApplicationSnapshot = {
             moduleCount: 1,
