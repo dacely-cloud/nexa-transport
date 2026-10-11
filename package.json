@@ -515,6 +515,10 @@
         "./design-svg-fonts": {
             "types": "./dist/design/DesignSvgFonts.d.ts",
             "import": "./dist/design-svg-fonts.js"
+        },
+        "./design-shaped-text-metrics": {
+            "types": "./dist/design/DesignShapedTextMetrics.d.ts",
+            "import": "./dist/design-shaped-text-metrics.js"
         }
     },
     "scripts": {
