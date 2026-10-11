@@ -7,3 +7,7 @@ standalone JSON validation and portable browser/Node.js consumption.
 
 Design Boolean geometry uses Skia PathKit, copyright 2011 Google Inc.,
 under the BSD-3-Clause license. The original license is in licenses/PathKit.txt.
+
+Design typography uses Fontkit and its portable dependencies. Copyright and
+license notices are in licenses/DesignFontEngine.txt. Built-in Inter fonts by
+Rasmus Andersson use SIL OFL 1.1; see licenses/Inter-OFL.txt.

@@ -495,6 +495,26 @@
         "./design-variant-types": {
             "types": "./dist/design/DesignVariantTypes.d.ts",
             "import": "./dist/design-variant-types.js"
+        },
+        "./design-font-engine": {
+            "types": "./dist/design/DesignFontEngine.d.ts",
+            "import": "./dist/design-font-engine.js"
+        },
+        "./design-builtin-fonts": {
+            "types": "./dist/design/DesignBuiltinFonts.d.ts",
+            "import": "./dist/design-builtin-fonts.js"
+        },
+        "./design-inter-bytes": {
+            "types": "./dist/design/DesignInterBytes.d.ts",
+            "import": "./dist/design-inter-bytes.js"
+        },
+        "./design-text-outline": {
+            "types": "./dist/design/DesignTextOutline.d.ts",
+            "import": "./dist/design-text-outline.js"
+        },
+        "./design-svg-fonts": {
+            "types": "./dist/design/DesignSvgFonts.d.ts",
+            "import": "./dist/design-svg-fonts.js"
         }
     },
     "scripts": {
@@ -526,7 +546,8 @@
         "typescript-json-schema": "^0.68.0",
         "vite": "^8.3.0",
         "vitest": "^5.0.0",
-        "ws": "^8.21.3"
+        "ws": "^8.21.3",
+        "@types/fontkit": "2.0.9"
     },
     "publishConfig": {
         "access": "public"
@@ -544,6 +565,7 @@
     "dependencies": {
         "@js-temporal/polyfill": "0.5.1",
         "meshoptimizer": "^1.2.0",
-        "pathkit-wasm": "1.0.0"
+        "pathkit-wasm": "1.0.0",
+        "fontkit": "2.0.4"
     }
 }

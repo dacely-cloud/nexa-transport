@@ -5,6 +5,15 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 
 /** Server-only generation script. Nexa owns the portable design model and layout implementation. */
 const files: readonly string[] = [
+    'DesignFontEngine',
+    'DesignFontContainer',
+    'DesignBuiltinFonts',
+    'DesignInterBytes',
+    'DesignInterLicense',
+    'DesignSvgFonts',
+    'DesignInterOutlineBytes',
+    'DesignTextOutline',
+
     'DesignVariantTypes',
     'DesignVariantCodec',
     'DesignVariants',
@@ -99,3 +108,10 @@ await writeFile(
 );
 await mkdir('licenses', { recursive: true });
 await writeFile('licenses/PathKit.txt', await readFile('../nexa/licenses/PathKit.txt', 'utf8'));
+
+await writeFile(
+    new URL('../src/design/DesignFontKit.d.ts', import.meta.url),
+    await readFile(new URL('../../nexa/src/design/DesignFontKit.d.ts', import.meta.url), 'utf8'),
+    'utf8',
+);
+await writeFile('licenses/Inter-OFL.txt', await readFile('../nexa/licenses/Inter-OFL.txt', 'utf8'));

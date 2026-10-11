@@ -4,6 +4,12 @@ const config: UserConfig = {
         target: 'es2023',
         lib: {
             entry: {
+                'design-svg-fonts': 'src/design/DesignSvgFonts.ts',
+                'design-font-engine': 'src/design/DesignFontEngine.ts',
+                'design-builtin-fonts': 'src/design/DesignBuiltinFonts.ts',
+                'design-inter-bytes': 'src/design/DesignInterBytes.ts',
+                'design-text-outline': 'src/design/DesignTextOutline.ts',
+
                 'design-boolean-edits': 'src/design/DesignBooleanEdits.ts',
                 'design-boolean-types': 'src/design/DesignBooleanTypes.ts',
                 'design-boolean-kernel': 'src/design/DesignBooleanKernel.ts',
@@ -124,7 +130,7 @@ const config: UserConfig = {
             },
             formats: ['es'],
         },
-        rollupOptions: { external: ['pathkit-wasm'] },
+        rolldownOptions: { external: ['pathkit-wasm'] },
         sourcemap: true,
     },
 };

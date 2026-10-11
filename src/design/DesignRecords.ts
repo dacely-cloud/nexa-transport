@@ -28,7 +28,7 @@ import { DesignValues } from './DesignValues.js';
 
 /** Deterministic record ordering and transport pages are portable across gateway and client. */
 export class DesignRecords {
-    /** Projects authored content into independently addressable entities. */
+    /** Keeps node cursors stable across writer cache eviction and database reload, without changing page or tree order. */
     public static document(document: DesignDocument): readonly DesignRecord[] {
         return [
             ...document.pages.map((value: DesignPage): DesignRecord => ({
@@ -36,11 +36,15 @@ export class DesignRecords {
                 id: value.id,
                 value,
             })),
-            ...document.nodes.map((value: DesignNode): DesignRecord => ({
-                kind: Kind.Node,
-                id: value.id,
-                value,
-            })),
+            ...document.nodes
+                .toSorted((left: DesignNode, right: DesignNode): number =>
+                    left.id < right.id ? -1 : left.id > right.id ? 1 : 0,
+                )
+                .map((value: DesignNode): DesignRecord => ({
+                    kind: Kind.Node,
+                    id: value.id,
+                    value,
+                })),
             ...document.tokens.map((value: DesignToken): DesignRecord => ({
                 kind: Kind.Token,
                 id: value.id,
@@ -114,7 +118,8 @@ export class DesignRecords {
         DesignValues.number(limit, 1, 128, true);
         const output: DesignRecord[] = [];
         let bytes: number = 4096;
-        for (let index: number = start; index < records.length && output.length < limit; index++) {
+        let index: number = start;
+        for (; index < records.length && output.length < limit; index++) {
             const record: DesignRecord | undefined = records[index];
             if (record === undefined) {
                 throw new Error('Invalid design page position');
@@ -123,8 +128,11 @@ export class DesignRecords {
             const size: number = new TextEncoder().encode(encoded).byteLength;
             const offset: number = index === start ? character : 0;
             if (size + 4096 > limits.recordBudget || offset > 0) {
-                if (offset >= encoded.length) {
+                if (offset > encoded.length) {
                     throw new Error('Design fragment cursor is outside its record');
+                }
+                if (offset === encoded.length) {
+                    continue;
                 }
                 let end: number = Math.min(encoded.length, offset + limits.fragmentCharacters);
                 const last: number = encoded.charCodeAt(end - 1);
@@ -164,7 +172,7 @@ export class DesignRecords {
         if (start === records.length && character !== 0) {
             throw new Error('Unexpected design fragment cursor');
         }
-        const next: number = start + output.length;
+        const next: number = index;
         return {
             summary,
             records: output,
