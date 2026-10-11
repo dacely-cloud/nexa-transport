@@ -111,7 +111,7 @@ Breaking out of the iterator cancels unfinished work. Consume the iterator and a
 | `geometryBlob(file)`       | Validated GLB/PLY bytes and MIME type                  | `Blob`; throws for unsupported media.                                                                                   |
 | `fromBase64(value)`        | Base64 string                                          | `Uint8Array<ArrayBuffer>`.                                                                                              |
 
-Image, video, and frame encoders require a non-empty MIME type. `document` uses `File.name` (or an explicit title) to infer common document/data MIME types when `Blob.type` is empty, with `application/octet-stream` as the fallback. Inline size remains 1 byte through 100 MiB. They encode bytes without validating codecs, extracting archive contents, or transcoding. Browser `File` objects work because they extend `Blob`.
+Image, video, and frame encoders require a non-empty MIME type. `document` uses `File.name` (or an explicit title) to infer common document/data MIME types when `Blob.type` is empty, with `application/octet-stream` as the fallback. Inline size remains 1 byte through 300 MiB. They encode bytes without validating codecs, extracting archive contents, or transcoding. Browser `File` objects work because they extend `Blob`.
 
 `NexaGeometry` and `MeshoptDecoder` are exported from the same media entry point. `NexaGeometry.text(prompt, options?)` returns agent-mediated `StreamParams`; `NexaGeometry.image(blob, options?)` returns `Promise<StreamParams>` for a PNG/JPEG reference bounded to 16 MiB. `GeometryOptions` accepts an unsigned 32-bit seed and 1–100 steps; `ImageGeometryOptions` additionally accepts resolution 512 or 1024. These helpers request tool execution and preserve normal tool policy. Rendering, archive extraction, and model-provider access remain application/host responsibilities.
 
@@ -170,9 +170,9 @@ Established connections reconnect automatically with jittered exponential delays
 
 Consume a turn's events as they arrive. Breaking out of iteration drops unread events and cancels a running turn; `await turn.cancel()` also drops buffered events after a turn has completed. Normal completion preserves unread events until they are consumed, explicitly cancelled, or the turn becomes unreachable. Use `client.call(Method.AgentAsk, ...)` when only the final result is needed.
 
-Pending RPCs and active streaming turns have separate limits. Binary uploads share a 101 MiB budget per client; rejected requests are not encoded or queued, and queued payloads are removed when their requests settle. This budget covers retained encoded payloads, not temporary encoding allocations or application-owned media.
+Pending RPCs and active streaming turns have separate limits. Binary uploads share a 301 MiB budget per client; rejected requests are not encoded or queued, and queued payloads are removed when their requests settle. This budget covers retained encoded payloads, not temporary encoding allocations or application-owned media.
 
-Attachment handlers may run concurrently. Outstanding deliveries, including acknowledgements, are limited to 64 and 101 MiB per client. Exceeding either limit closes the connection with a limit error. Finish handlers promptly and release application-owned file data when no longer needed. Call listener unsubscribe functions when removing a view and `client.close()` when disposing its client. Each browser tab owns its own client and memory budgets.
+Attachment handlers may run concurrently. Outstanding deliveries, including acknowledgements, are limited to 64 and 301 MiB per client. Exceeding either limit closes the connection with a limit error. Finish handlers promptly and release application-owned file data when no longer needed. Call listener unsubscribe functions when removing a view and `client.close()` when disposing its client. Each browser tab owns its own client and memory budgets.
 
 ## Office layout
 

@@ -1201,16 +1201,19 @@ export class NexaClient {
         // Rejected or already aborted requests must not allocate or queue upload payloads.
         if (this.#pending.has(id)) {
             try {
-                const text: string = JSON.stringify({ v: 1, id, method, params });
                 const binary: Uint8Array<ArrayBuffer> | null =
                     encodeBinary !== undefined
                         ? encodeBinary(id)
                         : this.#hello?.features.binaryMedia === true
-                          ? BinaryEnvelope.encode(text)
+                          ? BinaryEnvelope.encodeValue({ v: 1, id, method, params })
                           : null;
-                const payload: string | Uint8Array<ArrayBuffer> = binary ?? text;
+                const payload: string | Uint8Array<ArrayBuffer> =
+                    binary ?? JSON.stringify({ v: 1, id, method, params });
                 const payloadBytes: number =
-                    binary?.byteLength ?? new TextEncoder().encode(text).length;
+                    binary?.byteLength ??
+                    (typeof payload === 'string'
+                        ? new TextEncoder().encode(payload).length
+                        : payload.byteLength);
                 const maxBytes: number = Math.min(
                     this.#options.maxMessageBytes ?? 16 * 1024 * 1024,
                     this.#hello?.policy.maxPayloadBytes ?? 64 * 1024,
@@ -1562,6 +1565,10 @@ export class NexaClient {
         if (client === undefined) {
             return;
         }
+        // Consumers released the original before the receipt goes on the wire. The gateway
+        // may send the next file as soon as it sees that receipt, ahead of its RPC reply.
+        client.#deliveries -= 1;
+        client.#deliveryBytes -= bytes;
         try {
             if (socket.deref() !== client.#socket || !client.connected) {
                 return;
@@ -1582,9 +1589,6 @@ export class NexaClient {
             client.#notify((): void => {
                 throw error;
             });
-        } finally {
-            client.#deliveries -= 1;
-            client.#deliveryBytes -= bytes;
         }
     }
 

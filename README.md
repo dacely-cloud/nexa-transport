@@ -289,7 +289,7 @@ const stopFiles: () => void = client.onAttachment((file: ReceivedAttachment): vo
 });
 ```
 
-With `hello.features.binaryMedia`, files up to 100 MiB use 256 KiB binary chunks. Inline uploads and live PCM audio also use binary WebSocket frames. Use `sendAudio(callId, bytes)` and `onAudio(listener)` for live audio. Register listeners before starting work; result attachment IDs match the received files.
+With `hello.features.binaryMedia`, files up to 300 MiB use 256 KiB binary chunks. Inline uploads and live PCM audio also use binary WebSocket frames. Use `sendAudio(callId, bytes)` and `onAudio(listener)` for live audio. Register listeners before starting work; result attachment IDs match the received files.
 
 Read native artifacts and video output from the event stream:
 
@@ -430,7 +430,7 @@ For voice, `client.startVoice()` returns the call ID, sample rate, and frame siz
 
 Connection options are passed to `NexaClient.connect()`. Per-call `signal` and `timeoutMs` are passed as the third argument to `client.call()`. Stream options are passed as the second argument to `client.stream()`.
 
-Blob helpers accept up to 100 MiB per attachment, with a combined upload limit of 100 MiB per request. Binary transfers use chunks of up to 256 KiB within the gateway's frame limits. Streams exceeding their buffer limits are cancelled. Active and queued binary uploads share a 101 MiB budget per client; excess uploads are rejected with a limit error. Queued uploads are released on cancellation, timeout, or disconnect. Outstanding attachment callbacks and acknowledgements are limited to 64 deliveries and 101 MiB per client; exceeding either limit closes the connection.
+Blob helpers accept up to 300 MiB per attachment, with a combined upload limit of 300 MiB per request. Binary transfers use chunks of up to 256 KiB within the gateway's frame limits. Streams exceeding their buffer limits are cancelled. Active and queued binary uploads share a 301 MiB budget per client; excess uploads are rejected with a limit error. Queued uploads are released on cancellation, timeout, or disconnect. Outstanding attachment attachment callbacks are limited to 64 deliveries and 301 MiB per client; exceeding either limit closes the connection.
 
 RPC cancellation stops local waiting; a server-side mutation may already have executed. Requests are not retried automatically. Established connections reconnect automatically unless `reconnect: false` is set. Successful session subscriptions and supported binary read watches are restored; refresh history and tasks in `onReconnect`. After a page reload, create a client and call `resumeSession(sessionKey)`. `close()` permanently stops reconnects. `TransportError.remote` preserves server error codes, retry information, and details.
 

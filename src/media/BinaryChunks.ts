@@ -14,8 +14,8 @@ interface IncomingTransfer {
 
 /** Ordered, bounded assembly of NXCH frames; JSON and PCM frames may pass between chunks. */
 export class BinaryChunks {
-    public static readonly MAX_FILE_BYTES: number = 100 * 1024 * 1024;
-    public static readonly MAX_TRANSFER_BYTES: number = 101 * 1024 * 1024;
+    public static readonly MAX_FILE_BYTES: number = 300 * 1024 * 1024;
+    public static readonly MAX_TRANSFER_BYTES: number = BinaryChunks.MAX_FILE_BYTES + 1024 * 1024;
     public static readonly CHUNK_BYTES: number = 256 * 1024;
     static #retained: number = 0;
     #incoming: IncomingTransfer | null = null;
@@ -32,7 +32,7 @@ export class BinaryChunks {
         chunkBytes: number = BinaryChunks.CHUNK_BYTES,
     ): Generator<Uint8Array<ArrayBuffer>, void> {
         if (bytes.byteLength === 0 || bytes.byteLength > BinaryChunks.MAX_TRANSFER_BYTES) {
-            throw new RangeError('Binary transfer exceeds 100 MiB plus framing');
+            throw new RangeError('Binary transfer exceeds 300 MiB plus framing');
         }
         if (
             !Number.isSafeInteger(chunkBytes) ||
@@ -145,7 +145,7 @@ export class BinaryChunks {
         if (this.budget !== undefined) {
             return this.budget.reserve(bytes);
         }
-        if (BinaryChunks.#retained + bytes > 256 * 1024 * 1024) {
+        if (BinaryChunks.#retained + bytes > 2 * BinaryChunks.MAX_TRANSFER_BYTES) {
             return false;
         }
         BinaryChunks.#retained += bytes;

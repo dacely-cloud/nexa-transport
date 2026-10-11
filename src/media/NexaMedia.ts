@@ -1,3 +1,4 @@
+import { BinaryChunks } from './BinaryChunks.js';
 export { NexaGeometry } from './NexaGeometry.js';
 export type { GeometryOptions, ImageGeometryOptions } from './NexaGeometry.js';
 import type { ReceivedAttachment } from './BinaryMedia.js';
@@ -17,8 +18,8 @@ export class NexaMedia {
         blob: Blob,
         title: string | undefined = NexaMedia.#filename(blob),
     ): Promise<InboundAttachment> {
-        if (blob.size === 0 || blob.size > 100 * 1024 * 1024) {
-            throw new RangeError('3D media must be between 1 byte and 100 MiB');
+        if (blob.size === 0 || blob.size > BinaryChunks.MAX_FILE_BYTES) {
+            throw new RangeError('3D media must be between 1 byte and 300 MiB');
         }
         const bytes = new Uint8Array(await blob.arrayBuffer());
         const format = NexaMedia.geometryFormat({ data: bytes, mimeType: blob.type });
@@ -206,8 +207,8 @@ export class NexaMedia {
     }
 
     static async #source(blob: Blob, mediaType: string = blob.type): Promise<BinarySource> {
-        if (blob.size === 0 || blob.size > 100 * 1024 * 1024) {
-            throw new RangeError('Inline media must be between 1 byte and 100 MiB');
+        if (blob.size === 0 || blob.size > BinaryChunks.MAX_FILE_BYTES) {
+            throw new RangeError('Inline media must be between 1 byte and 300 MiB');
         }
         if (mediaType.length === 0) {
             throw new TypeError('Media Blob needs a MIME type');

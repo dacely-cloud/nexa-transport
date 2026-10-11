@@ -1,4 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
+
+import { BinaryChunks } from './BinaryChunks.js';
 import type { DeliveredAttachment } from '../protocol/Protocol.js';
 
 /** Original bytes and metadata received together in one binary frame. */
@@ -89,7 +91,7 @@ export class BinaryMedia {
             typeof value['byteLength'] === 'number' &&
             Number.isSafeInteger(value['byteLength']) &&
             value['byteLength'] >= 0 &&
-            value['byteLength'] <= 100 * 1024 * 1024 &&
+            value['byteLength'] <= BinaryChunks.MAX_FILE_BYTES &&
             (value['description'] === undefined ||
                 (typeof value['description'] === 'string' &&
                     value['description'].length <= 4096)) &&

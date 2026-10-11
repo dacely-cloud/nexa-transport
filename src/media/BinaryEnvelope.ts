@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: Apache-2.0
+
+import { Base64 } from './Base64.js';
+import { BinaryChunks } from './BinaryChunks.js';
 interface BinaryJsonObject {
-    [key: string]: JsonValue;
+    [key: string]: JsonValue | undefined;
 }
 type JsonValue =
     null | boolean | number | string | Uint8Array<ArrayBuffer> | JsonValue[] | BinaryJsonObject;
@@ -18,23 +21,31 @@ interface BinaryPart {
 export class BinaryEnvelope {
     public static encode(text: string): Uint8Array<ArrayBuffer> | null {
         const raw: unknown = JSON.parse(text);
+        return BinaryEnvelope.encodeValue(raw);
+    }
+
+    /** Extracts carriers before JSON serialization, so large files never create giant JSON frames. */
+    public static encodeValue(raw: unknown): Uint8Array<ArrayBuffer> | null {
         if (!BinaryEnvelope.#json(raw)) {
             throw new TypeError('Invalid binary JSON envelope');
         }
+        const json: JsonValue = BinaryEnvelope.#copy(raw);
         const parts: BinaryPart[] = [];
         const payloads: Uint8Array[] = [];
-        BinaryEnvelope.#extract(raw, [], parts, payloads, 0, { remaining: 100 * 1024 * 1024 });
+        BinaryEnvelope.#extract(json, [], parts, payloads, 0, {
+            remaining: BinaryChunks.MAX_FILE_BYTES,
+        });
         if (parts.length === 0) {
             return null;
         }
         const header: Uint8Array<ArrayBuffer> = new TextEncoder().encode(
-            JSON.stringify({ json: raw, parts }),
+            JSON.stringify({ json, parts }),
         );
         const length: number = payloads.reduce(
             (total: number, bytes: Uint8Array): number => total + bytes.byteLength,
             0,
         );
-        if (header.byteLength > 1024 * 1024 || length > 100 * 1024 * 1024) {
+        if (header.byteLength > 1024 * 1024 || length > BinaryChunks.MAX_FILE_BYTES) {
             throw new RangeError('Binary envelope exceeds limits');
         }
         const frame: Uint8Array<ArrayBuffer> = new Uint8Array(8 + header.byteLength + length);
@@ -231,12 +242,15 @@ export class BinaryEnvelope {
             return;
         }
         for (const [key, child] of Object.entries(value)) {
+            if (child === undefined) {
+                continue;
+            }
             const base64: boolean =
                 (key === 'pcm' ||
                     (key === 'data' && !Array.isArray(value) && value['kind'] === 'base64')) &&
                 typeof child === 'string' &&
                 child.length % 4 === 0 &&
-                /^[A-Za-z0-9+/]*={0,2}$/.test(child);
+                Base64.valid(child);
             const rawArray: boolean =
                 key === 'voice' || (key === 'data' && path.at(-1) === 'video');
             let bytes: Uint8Array | null = null;
@@ -251,10 +265,10 @@ export class BinaryEnvelope {
                     bytes[index] = decoded.charCodeAt(index);
                 }
             } else if (rawArray && typeof child === 'object' && child !== null) {
-                const values: JsonValue[] = Object.values(child);
+                const values: (JsonValue | undefined)[] = Object.values(child);
                 if (
                     values.every(
-                        (entry: JsonValue): entry is number =>
+                        (entry: JsonValue | undefined): entry is number =>
                             typeof entry === 'number' &&
                             Number.isInteger(entry) &&
                             entry >= 0 &&
@@ -303,6 +317,27 @@ export class BinaryEnvelope {
     static #record(value: unknown): value is Record<string, unknown> {
         return typeof value === 'object' && value !== null && !Array.isArray(value);
     }
+    static #copy(value: JsonValue): JsonValue {
+        if (value === null || typeof value !== 'object' || value instanceof Uint8Array) {
+            return value;
+        }
+        if (Array.isArray(value)) {
+            return value.map((child: JsonValue): JsonValue => BinaryEnvelope.#copy(child));
+        }
+        const result: BinaryJsonObject = {};
+        for (const [key, child] of Object.entries(value)) {
+            if (child === undefined) {
+                continue;
+            }
+            Object.defineProperty(result, key, {
+                enumerable: true,
+                configurable: true,
+                writable: true,
+                value: BinaryEnvelope.#copy(child),
+            });
+        }
+        return result;
+    }
     static #part(value: unknown): value is BinaryPart {
         return (
             BinaryEnvelope.#record(value) &&
@@ -334,7 +369,7 @@ export class BinaryEnvelope {
         return (
             BinaryEnvelope.#record(value) &&
             Object.values(value).every((entry: unknown): boolean =>
-                BinaryEnvelope.#json(entry, depth + 1),
+                entry === undefined || BinaryEnvelope.#json(entry, depth + 1),
             )
         );
     }
