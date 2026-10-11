@@ -7,6 +7,7 @@ import {
     type DesignDocument,
     type DesignNode,
 } from './DesignTypes.js';
+import { DesignVariantTree } from './DesignVariantTree.js';
 import { DesignComponentTargets } from './DesignComponentTargets.js';
 
 /** Explicit topology keeps layer edits, reusable components and prototype references coherent. */
@@ -57,6 +58,7 @@ export class DesignTree {
         if (placed.size !== nodes.size) {
             throw new Error('Design contains orphan layers');
         }
+        DesignVariantTree.validate(nodes);
         const tokens: Map<string, DesignTokenCategory> = new Map();
         for (const token of document.tokens) {
             if (tokens.has(token.id)) {

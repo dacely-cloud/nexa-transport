@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { DesignVariantSet, DesignVariantValue } from './DesignVariantTypes.js';
 import type { DesignMask } from './DesignMaskTypes.js';
 import type { DesignBooleanMode } from './DesignBooleanTypes.js';
 
@@ -18,6 +19,7 @@ export const DesignKind = {
     Text: 'text',
     Image: 'image',
     Component: 'component',
+    ComponentSet: 'component-set',
     Instance: 'instance',
 } as const;
 /** Primitive identity. */
@@ -248,6 +250,10 @@ export interface DesignNode {
     readonly booleanMode?: DesignBooleanMode;
     /** Retained source identity and coverage mode; omitted on ordinary layers. */
     readonly mask?: DesignMask;
+    /** Reusable variant set metadata; only component-set containers accept it. */
+    readonly variants?: DesignVariantSet;
+    /** Named values on an immediate component definition inside a variant set. */
+    readonly variant?: readonly DesignVariantValue[];
 }
 /** Instance overrides target a source layer without modifying its component definition. */
 export interface DesignOverride {

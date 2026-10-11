@@ -43,6 +43,7 @@ export class DesignDefaults {
         return {
             fills:
                 kind === DesignKind.Group ||
+                kind === DesignKind.ComponentSet ||
                 kind === DesignKind.Mask ||
                 kind === DesignKind.Instance ||
                 kind === DesignKind.Line
@@ -74,6 +75,9 @@ export class DesignDefaults {
             ...(kind === DesignKind.Boolean ? { booleanMode: DesignBooleanMode.Union } : {}),
             ...(kind === DesignKind.Mask
                 ? { mask: { mode: DesignMaskMode.Alpha, sourceId: null } }
+                : {}),
+            ...(kind === DesignKind.ComponentSet
+                ? { variants: { properties: ['State'], defaultId: null } }
                 : {}),
             name,
             parentId: null,

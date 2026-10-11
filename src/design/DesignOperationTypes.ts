@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { DesignVariantSet, DesignVariantValue } from './DesignVariantTypes.js';
 import type { DesignMask } from './DesignMaskTypes.js';
 import type { DesignBooleanMode } from './DesignBooleanTypes.js';
 
@@ -37,6 +38,10 @@ export interface DesignNodeChanges {
     readonly booleanMode?: DesignBooleanMode | null;
     /** Null clears masking when converting the container into an ordinary group. */
     readonly mask?: DesignMask | null;
+    /** Null releases component-set metadata when converting its container. */
+    readonly variants?: DesignVariantSet | null;
+    /** Null releases a definition from its set. */
+    readonly variant?: readonly DesignVariantValue[] | null;
     readonly name?: string;
     readonly kind?: DesignKind;
     readonly x?: number;

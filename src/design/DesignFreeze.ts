@@ -36,6 +36,16 @@ export class DesignFreeze {
         if (node.mask !== undefined) {
             Object.freeze(node.mask);
         }
+        if (node.variants !== undefined) {
+            Object.freeze(node.variants.properties);
+            Object.freeze(node.variants);
+        }
+        if (node.variant !== undefined) {
+            for (const value of node.variant) {
+                Object.freeze(value);
+            }
+            Object.freeze(node.variant);
+        }
         Object.freeze(node.layout.padding);
         Object.freeze(node.layout);
         Object.freeze(node.placement);

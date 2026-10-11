@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignVariantCodec } from './DesignVariantCodec.js';
 import { DesignMaskCodec } from './DesignMaskCodec.js';
 import { DesignBooleanMode } from './DesignBooleanTypes.js';
 import { DesignFlow } from './DesignTypes.js';
@@ -24,10 +25,16 @@ export class DesignNodeCodec {
     public static node(raw: unknown): DesignNode {
         const value: Readonly<Record<string, unknown>> = V.fields(
             raw,
-            [...KEYS, 'booleanMode', 'mask'],
+            [...KEYS, 'booleanMode', 'mask', 'variants', 'variant'],
             KEYS,
         );
         const kind: DesignKind = V.choice(value['kind'], Object.values(DesignKind));
+        if (
+            (Object.hasOwn(value, 'variants') && kind !== DesignKind.ComponentSet) ||
+            (Object.hasOwn(value, 'variant') && kind !== DesignKind.Component)
+        ) {
+            throw new Error('Variant metadata requires a component set or variant definition.');
+        }
         const node: DesignNode = {
             id: V.id(value['id']),
             name: V.text(value['name']),
@@ -36,6 +43,12 @@ export class DesignNodeCodec {
                 ? { booleanMode: V.choice(value['booleanMode'], Object.values(DesignBooleanMode)) }
                 : {}),
             ...(kind === DesignKind.Mask ? { mask: DesignMaskCodec.parse(value['mask']) } : {}),
+            ...(kind === DesignKind.ComponentSet
+                ? { variants: DesignVariantCodec.set(value['variants']) }
+                : {}),
+            ...(Object.hasOwn(value, 'variant')
+                ? { variant: DesignVariantCodec.values(value['variant']) }
+                : {}),
             parentId: V.optionalId(value['parentId']),
             children: V.list(value['children'], 10000, (entry: unknown): string => V.id(entry)),
             x: V.number(value['x']),
@@ -71,6 +84,7 @@ export class DesignNodeCodec {
                 DesignKind.Frame,
                 DesignKind.Group,
                 DesignKind.Component,
+                DesignKind.ComponentSet,
                 DesignKind.Boolean,
                 DesignKind.Mask,
             ].some((entry: DesignKind): boolean => entry === kind)

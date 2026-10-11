@@ -12,6 +12,8 @@ const config: UserConfig = {
                 'design-svg-geometry': 'src/design/DesignSvgGeometry.ts',
                 'design-svg-types': 'src/design/DesignSvgTypes.ts',
                 'design-text-layout': 'src/design/DesignTextLayout.ts',
+                'design-variants': 'src/design/DesignVariants.ts',
+                'design-variant-types': 'src/design/DesignVariantTypes.ts',
                 'design-components': 'src/design/DesignComponents.ts',
                 'design-component-types': 'src/design/DesignComponentTypes.ts',
                 'design-paths': 'src/design/DesignPaths.ts',
@@ -122,7 +124,7 @@ const config: UserConfig = {
             },
             formats: ['es'],
         },
-        rollupOptions: {external: ['pathkit-wasm']},
+        rollupOptions: { external: ['pathkit-wasm'] },
         sourcemap: true,
     },
 };

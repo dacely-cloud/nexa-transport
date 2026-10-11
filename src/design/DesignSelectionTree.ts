@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignVariants } from './DesignVariants.js';
+import type { DesignVariantValue } from './DesignVariantTypes.js';
 import { DesignDefaults } from './DesignDefaults.js';
 import { DesignSelectionContext as Context } from './DesignSelectionContext.js';
 import {
@@ -52,6 +54,7 @@ export class DesignSelectionTree {
         );
         const ordered: Map<string | null, string[]> = new Map();
         const operations: DesignOperation[] = [];
+        const claimed: Map<string, Set<string>> = new Map();
         for (const node of source) {
             const id: string | undefined = remap.get(node.id);
             if (id === undefined) {
@@ -73,8 +76,37 @@ export class DesignSelectionTree {
                 siblings.push(id);
                 ordered.set(parentId, siblings);
             }
+            let variant: readonly DesignVariantValue[] | undefined = node.variant;
+            const parent: DesignNode | undefined = context.nodes.get(node.parentId ?? '');
+            if (root && variant !== undefined && parent?.kind === DesignKind.ComponentSet) {
+                const used: Set<string> =
+                    claimed.get(parent.id) ??
+                    new Set(
+                        parent.children.flatMap((child: string): string[] => {
+                            const values: readonly DesignVariantValue[] | undefined =
+                                context.nodes.get(child)?.variant;
+                            return values === undefined ? [] : [DesignVariants.key(values)];
+                        }),
+                    );
+                variant = DesignVariants.copyValues(variant, used);
+                used.add(DesignVariants.key(variant));
+                claimed.set(parent.id, used);
+            }
             const copy: DesignNode = {
                 ...node,
+                ...(variant === undefined ? {} : { variant }),
+                ...(node.variants === undefined
+                    ? {}
+                    : {
+                          variants: {
+                              ...node.variants,
+                              defaultId:
+                                  node.variants.defaultId === null
+                                      ? null
+                                      : (remap.get(node.variants.defaultId) ??
+                                        node.variants.defaultId),
+                          },
+                      }),
                 ...(node.mask === undefined
                     ? {}
                     : {
@@ -288,9 +320,18 @@ export class DesignSelectionTree {
             target !== null &&
             target.kind !== DesignKind.Frame &&
             target.kind !== DesignKind.Group &&
-            target.kind !== DesignKind.Component
+            target.kind !== DesignKind.Component &&
+            target.kind !== DesignKind.ComponentSet
         ) {
             throw new Error('Drop layers into a frame, group or component.');
+        }
+        if (
+            target?.kind === DesignKind.ComponentSet &&
+            context.roots.some((node: DesignNode): boolean => node.parentId !== target.id)
+        ) {
+            throw new Error(
+                'Reorder existing variants here; combine standalone definitions to create a set.',
+            );
         }
         let parent: DesignNode | null = target;
         const selected: ReadonlySet<string> = new Set(

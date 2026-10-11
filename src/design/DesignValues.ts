@@ -24,19 +24,49 @@ export class DesignValues {
         const values: Readonly<Record<string, unknown>> = raw as Readonly<Record<string, unknown>>;
         const names: readonly (string | symbol)[] = Reflect.ownKeys(values);
         if (
-            required.some((key: string): boolean => !Object.hasOwn(values, key)) ||
-            names.some(
-                (key: string | symbol): boolean =>
-                    typeof key !== 'string' || !allowed.includes(key),
-            ) ||
             Object.values(Object.getOwnPropertyDescriptors(values)).some(
                 (descriptor: PropertyDescriptor): boolean =>
                     descriptor.get !== undefined || descriptor.set !== undefined,
             )
         ) {
-            throw new Error('Unexpected or missing design fields');
+            throw new Error('Design fields must be data properties');
+        }
+        if (
+            required.some((key: string): boolean => !Object.hasOwn(values, key)) ||
+            names.some(
+                (key: string | symbol): boolean =>
+                    typeof key !== 'string' || !allowed.includes(key),
+            )
+        ) {
+            const missing: readonly string[] = required.filter(
+                (key: string): boolean => !Object.hasOwn(values, key),
+            );
+            const unexpected: readonly (string | symbol)[] = names.filter(
+                (key: string | symbol): boolean =>
+                    typeof key !== 'string' || !allowed.includes(key),
+            );
+            const details: string[] = [];
+            if (missing.length > 0) {
+                details.push('Missing: ' + this.#fieldNames(missing));
+            }
+            if (unexpected.length > 0) {
+                details.push('Unexpected: ' + this.#fieldNames(unexpected));
+            }
+            throw new Error('Invalid design fields. ' + details.join('. ') + '.');
         }
         return values;
+    }
+    /** Bounds diagnostics and quotes external keys without reading or echoing their values. */
+    static #fieldNames(keys: readonly (string | symbol)[]): string {
+        const labels: string[] = keys
+            .slice(0, 8)
+            .map((key: string | symbol): string =>
+                typeof key === 'string' ? JSON.stringify(key.slice(0, 48)) : '<symbol>',
+            );
+        if (keys.length > 8) {
+            labels.push('…');
+        }
+        return labels.join(', ');
     }
     /** Bounded and well-formed text. */
     public static text(raw: unknown, maximum: number = 160, empty: boolean = false): string {

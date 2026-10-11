@@ -6867,6 +6867,7 @@
             "enum": [
                 "boolean",
                 "component",
+                "component-set",
                 "ellipse",
                 "frame",
                 "group",
@@ -7243,6 +7244,17 @@
                         }
                     ]
                 },
+                "variant": {
+                    "description": "Named values on an immediate component definition inside a variant set.",
+                    "items": {
+                        "$ref": "#/definitions/DesignVariantValue"
+                    },
+                    "type": "array"
+                },
+                "variants": {
+                    "$ref": "#/definitions/DesignVariantSet",
+                    "description": "Reusable variant set metadata; only component-set containers accept it."
+                },
                 "visible": {
                     "type": "boolean"
                 },
@@ -7325,6 +7337,7 @@
                     "enum": [
                         "boolean",
                         "component",
+                        "component-set",
                         "ellipse",
                         "frame",
                         "group",
@@ -7395,6 +7408,31 @@
                             "type": "null"
                         }
                     ]
+                },
+                "variant": {
+                    "anyOf": [
+                        {
+                            "items": {
+                                "$ref": "#/definitions/DesignVariantValue"
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "Null releases a definition from its set."
+                },
+                "variants": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/DesignVariantSet"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "Null releases component-set metadata when converting its container."
                 },
                 "visible": {
                     "type": "boolean"
@@ -8356,6 +8394,44 @@
                 "changes",
                 "id",
                 "op"
+            ],
+            "type": "object"
+        },
+        "DesignVariantSet": {
+            "description": "Ordered dimensions and the identity used when placing this reusable set.",
+            "properties": {
+                "defaultId": {
+                    "type": [
+                        "null",
+                        "string"
+                    ]
+                },
+                "properties": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": [
+                "defaultId",
+                "properties"
+            ],
+            "type": "object"
+        },
+        "DesignVariantValue": {
+            "description": "A named dimension and one retained definition's authored value.",
+            "properties": {
+                "property": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "property",
+                "value"
             ],
             "type": "object"
         },

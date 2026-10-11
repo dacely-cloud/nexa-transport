@@ -7,6 +7,7 @@ import { DesignStyleCodec } from './DesignStyleCodec.js';
 import { DesignLayoutCodec } from './DesignLayoutCodec.js';
 import { DesignKind, type DesignPathCommand, type DesignOverride } from './DesignTypes.js';
 import { DesignNodeCodec } from './DesignNodeCodec.js';
+import { DesignVariantCodec } from './DesignVariantCodec.js';
 import { DesignMaskCodec } from './DesignMaskCodec.js';
 import { DesignBooleanMode } from './DesignBooleanTypes.js';
 import {
@@ -165,6 +166,22 @@ export class DesignOperationCodec {
             throw new Error('Layer update requires at least one property');
         }
         return {
+            ...(Object.hasOwn(value, 'variants')
+                ? {
+                      variants:
+                          value['variants'] === null
+                              ? null
+                              : DesignVariantCodec.set(value['variants']),
+                  }
+                : {}),
+            ...(Object.hasOwn(value, 'variant')
+                ? {
+                      variant:
+                          value['variant'] === null
+                              ? null
+                              : DesignVariantCodec.values(value['variant']),
+                  }
+                : {}),
             ...(Object.hasOwn(value, 'name') ? { name: V.text(value['name']) } : {}),
             ...(Object.hasOwn(value, 'booleanMode')
                 ? {
@@ -232,6 +249,8 @@ export class DesignOperationCodec {
 const KEYS: readonly string[] = [
     'booleanMode',
     'mask',
+    'variants',
+    'variant',
     'name',
     'kind',
     'x',

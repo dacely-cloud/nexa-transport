@@ -32,21 +32,47 @@ export interface DesignPathGeometry {
 export class DesignPaths {
     /** Width and height edits resize vector coordinates unless the command supplies an explicit replacement path. */
     public static resize(node: DesignNode, changes: DesignNodeChanges): DesignNode {
-        const { booleanMode: previousMode, mask: previousMask, ...base }: DesignNode = node;
+        const {
+            booleanMode: previousMode,
+            mask: previousMask,
+            variants: previousSet,
+            variant: previousVariant,
+            ...base
+        }: DesignNode = node;
         const {
             booleanMode: changedMode,
             mask: changedMask,
+            variants: changedSet,
+            variant: changedVariant,
             ...properties
         }: DesignNodeChanges = changes;
         const kind: DesignNode['kind'] = properties.kind ?? node.kind;
         if (changedMask !== undefined && changedMask !== null && kind !== DesignKind.Mask) {
             throw new Error('Only mask groups accept a mask source and mode');
         }
+        if (
+            (changedSet !== undefined && changedSet !== null && kind !== DesignKind.ComponentSet) ||
+            (changedVariant !== undefined &&
+                changedVariant !== null &&
+                kind !== DesignKind.Component)
+        ) {
+            throw new Error('Variant metadata requires a component set or variant definition.');
+        }
         const mode: DesignNode['booleanMode'] =
             changedMode === null ? undefined : (changedMode ?? previousMode);
         const next: DesignNode = {
             ...base,
             ...properties,
+            ...(kind === DesignKind.ComponentSet &&
+            changedSet !== null &&
+            (changedSet ?? previousSet) !== undefined
+                ? { variants: changedSet ?? previousSet }
+                : {}),
+            ...(kind === DesignKind.Component &&
+            changedVariant !== null &&
+            (changedVariant ?? previousVariant) !== undefined
+                ? { variant: changedVariant ?? previousVariant }
+                : {}),
             ...(kind === DesignKind.Mask &&
             changedMask !== null &&
             (changedMask ?? previousMask) !== undefined

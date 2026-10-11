@@ -487,6 +487,14 @@
         "./design-mask-geometry": {
             "types": "./dist/design/DesignMaskGeometry.d.ts",
             "import": "./dist/design-mask-geometry.js"
+        },
+        "./design-variants": {
+            "types": "./dist/design/DesignVariants.d.ts",
+            "import": "./dist/design-variants.js"
+        },
+        "./design-variant-types": {
+            "types": "./dist/design/DesignVariantTypes.d.ts",
+            "import": "./dist/design-variant-types.js"
         }
     },
     "scripts": {

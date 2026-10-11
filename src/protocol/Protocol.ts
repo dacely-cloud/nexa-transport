@@ -4120,6 +4120,10 @@ export type DesignMove = DesignMoveShape;
 
 /** DesignNode wire fields. */
 export interface DesignNodeShape {
+    /** variants as defined by the Nexa gateway. */
+    readonly variants?: DesignVariantSet;
+    /** variant as defined by the Nexa gateway. */
+    readonly variant?: ReadonlyArray<DesignVariantValue>;
     /** booleanMode as defined by the Nexa gateway. */
     readonly booleanMode?: (typeof DesignNodebooleanModeValues)[keyof typeof DesignNodebooleanModeValues];
     /** children as defined by the Nexa gateway. */
@@ -4190,6 +4194,10 @@ export const DesignNodeChangeskindValues = {
 
 /** DesignNodeChanges wire fields. */
 export interface DesignNodeChangesShape {
+    /** variants as defined by the Nexa gateway. */
+    readonly variants?: DesignVariantSet | null;
+    /** variant as defined by the Nexa gateway. */
+    readonly variant?: ReadonlyArray<DesignVariantValue> | null;
     /** booleanMode as defined by the Nexa gateway. */
     readonly booleanMode?:
         | (typeof DesignNodeChangesbooleanModeVariant0Values)[keyof typeof DesignNodeChangesbooleanModeVariant0Values]
@@ -14244,3 +14252,24 @@ export const DesignNodeChangesbooleanModeVariant0Values = {
     Value2: 'subtract',
     Value3: 'union',
 } as const;
+
+/** DesignVariantSet from the Nexa wire protocol. */
+export type DesignVariantSet = DesignVariantSetShape;
+
+/** DesignVariantValue from the Nexa wire protocol. */
+export type DesignVariantValue = DesignVariantValueShape;
+
+/** DesignVariantSet wire fields. */
+export interface DesignVariantSetShape {
+    /** properties as defined by the Nexa gateway. */
+    readonly properties: ReadonlyArray<string>;
+    /** defaultId as defined by the Nexa gateway. */
+    readonly defaultId: string | null;
+}
+/** DesignVariantValue wire fields. */
+export interface DesignVariantValueShape {
+    /** property as defined by the Nexa gateway. */
+    readonly property: string;
+    /** value as defined by the Nexa gateway. */
+    readonly value: string;
+}

@@ -22,6 +22,9 @@ import { DesignSelectionContext as Context } from './DesignSelectionContext.js';
 import { DesignSelectionTree } from './DesignSelectionTree.js';
 import { DesignComponentDetach } from './DesignComponentDetach.js';
 import { DesignComponentTargets } from './DesignComponentTargets.js';
+import { DesignVariants } from './DesignVariants.js';
+import { DesignVariantCommands } from './DesignVariantCommands.js';
+import { DesignVariantEdits } from './DesignVariantEdits.js';
 import { DesignComponentSwap } from './DesignComponentSwap.js';
 import { DesignDefaults } from './DesignDefaults.js';
 import { DesignLayoutEngine } from './DesignLayout.js';
@@ -53,10 +56,27 @@ export class DesignComponents {
     public static command(raw: unknown): DesignComponentCommand {
         const header: Readonly<Record<string, unknown>> = V.fields(
             raw,
-            ['action', 'selection', 'componentId', 'x', 'y', 'instanceId', 'targetId', 'changes'],
+            [
+                'action',
+                'selection',
+                'componentId',
+                'x',
+                'y',
+                'instanceId',
+                'targetId',
+                'changes',
+                'componentSetId',
+                'name',
+                'property',
+                'values',
+                'properties',
+            ],
             ['action'],
         );
         const action: Action = V.choice(header['action'], Object.values(Action));
+        if (DesignVariantCommands.action(action)) {
+            return DesignVariantCommands.parse(raw);
+        }
         if (action === Action.Create || action === Action.Detach) {
             const value: Readonly<Record<string, unknown>> = V.record(raw, ['action', 'selection']);
             return {
@@ -168,10 +188,7 @@ export class DesignComponents {
                 node,
             ]),
         );
-        const component: DesignNode | undefined = nodes.get(componentId);
-        if (component?.kind !== DesignKind.Component) {
-            throw new Error('Choose a component definition.');
-        }
+        const component: DesignNode = DesignVariants.definition(nodes, componentId);
         let root: DesignNode = component;
         while (root.parentId !== null) {
             const parent: DesignNode | undefined = nodes.get(root.parentId);
@@ -190,8 +207,12 @@ export class DesignComponents {
             .solve()
             .boxes.find((candidate: DesignBox): boolean => candidate.id === component.id);
         return {
-            ...DesignDefaults.node(V.id(id), DesignKind.Instance, component.name),
-            componentId,
+            ...DesignDefaults.node(
+                V.id(id),
+                DesignKind.Instance,
+                nodes.get(componentId)?.name ?? component.name,
+            ),
+            componentId: component.id,
             x: V.number(x),
             y: V.number(y),
             width: box?.width ?? component.width,
@@ -214,7 +235,9 @@ export class DesignComponents {
             throw new Error('Design page not found.');
         }
         let plan: DesignSelectionPlan;
-        if (command.action === Action.Place) {
+        if (DesignVariantCommands.is(command)) {
+            plan = DesignVariantEdits.plan(document, pageId, command, identify);
+        } else if (command.action === Action.Place) {
             const node: DesignNode = this.instance(
                 document,
                 command.componentId,
@@ -276,20 +299,21 @@ export class DesignComponents {
             if (node.kind !== DesignKind.Instance || node.componentId === null) {
                 throw new Error('Choose a linked instance.');
             }
-            if (context.nodes.get(command.componentId)?.kind !== DesignKind.Component) {
-                throw new Error('Choose a component definition.');
-            }
+            const replacement: DesignNode = DesignVariants.definition(
+                context.nodes,
+                command.componentId,
+            );
             plan = {
                 operations: [
                     {
                         op: Op.Update,
                         id: node.id,
                         changes: {
-                            componentId: command.componentId,
+                            componentId: replacement.id,
                             overrides: DesignComponentSwap.overrides(
                                 context.nodes,
                                 node.componentId,
-                                command.componentId,
+                                replacement.id,
                                 node.overrides,
                             ),
                         },
