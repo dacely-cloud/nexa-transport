@@ -7,7 +7,7 @@ import {
 } from '../protocol/Protocol.js';
 import type { DataUploadOptions } from '../interface/DataUploadOptions.js';
 
-/** Browser/Node bulk upload with one bounded slice in flight and acknowledged backpressure. */
+/** Browser/Node bulk upload with negotiated slices and acknowledged backpressure. */
 export class DataUploadClient {
     /** Uploads a Blob or File without reading the whole source into memory. */
     public static async upload(
@@ -26,12 +26,19 @@ export class DataUploadClient {
             options.signal === undefined ? {} : { signal: options.signal },
         );
         try {
+            const chunkBytes: number = Math.min(
+                DataUploadClient.#chunkBytes(upload.chunkBytes),
+                Math.floor(client.hello.policy.maxPayloadBytes) - 1024,
+            );
+            if (chunkBytes < 1) {
+                throw new Error('Gateway upload budget is too small');
+            }
             let offset: number = 0;
             options.onProgress?.(0n, BigInt(source.size));
             while (offset < source.size) {
                 options.signal?.throwIfAborted();
                 const bytes: Uint8Array = new Uint8Array(
-                    await source.slice(offset, offset + 192 * 1024).arrayBuffer(),
+                    await source.slice(offset, offset + chunkBytes).arrayBuffer(),
                 );
                 const position: DataUploadPosition = await client.uploadChunk(
                     upload.id,
@@ -58,5 +65,20 @@ export class DataUploadClient {
             }
             throw error;
         }
+    }
+
+    /** Older gateways retain their 192 KB limit; untrusted advertisements remain bounded. */
+    static #chunkBytes(value: string | undefined): number {
+        if (value === undefined) {
+            return 192 * 1024;
+        }
+        if (!/^[1-9][0-9]{0,6}$/u.test(value)) {
+            throw new Error('Gateway advertised an invalid upload chunk size');
+        }
+        const bytes: number = Number(value);
+        if (bytes > 4 * 1024 * 1024) {
+            throw new Error('Gateway advertised an invalid upload chunk size');
+        }
+        return bytes;
     }
 }

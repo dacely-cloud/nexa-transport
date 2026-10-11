@@ -59,7 +59,7 @@ export class BinaryEnvelope {
     ): Uint8Array<ArrayBuffer> {
         if (
             bytes.byteLength < 1 ||
-            bytes.byteLength > 192 * 1024 ||
+            bytes.byteLength > 4 * 1024 * 1024 ||
             requestId.length > 128 ||
             uploadId.length > 128 ||
             !/^(0|[1-9][0-9]{0,11})$/u.test(offset)
@@ -141,7 +141,7 @@ export class BinaryEnvelope {
                     part.path[0] !== 'params' ||
                     part.path[1] !== 'data' ||
                     part.length < 1 ||
-                    part.length > 192 * 1024 ||
+                    part.length > 4 * 1024 * 1024 ||
                     header['parts'].length !== 1)
             ) {
                 throw new TypeError('Raw bytes are restricted to bounded disk upload chunks');

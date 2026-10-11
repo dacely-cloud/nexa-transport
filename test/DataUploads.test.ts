@@ -92,6 +92,109 @@ it('cancels a partial upload after an invalid acknowledgement and leaves the con
     expect(client.connected).toBe(true);
 });
 
+it('negotiates 4 MB slices and transfers 80 MB in twenty acknowledged chunks', async (): Promise<void> => {
+    gateway = new TestGateway({
+        ...hello,
+        features: { ...hello.features, binaryDataUploads: true },
+    });
+    client = await NexaClient.connect({ url: await gateway.url(), reconnect: false });
+    const total: number = 80 * 1024 * 1024;
+    const bytes: Uint8Array<ArrayBuffer> = new Uint8Array(total).fill(237);
+    const progress: bigint[] = [];
+    let offset: number = 0;
+    let count: number = 0;
+    gateway.handler = (socket: WebSocket, request: Request): void => {
+        let result: DataUploadPosition | DataFile;
+        if (request.method === 'data.upload.chunk') {
+            const chunk: unknown = request.params['data'];
+            if (!(chunk instanceof Uint8Array)) {
+                throw new Error('Upload was not binary');
+            }
+            expect(request.params['offset']).toBe(String(offset));
+            expect(chunk.byteLength).toBe(4 * 1024 * 1024);
+            expect(chunk.every((value: number): boolean => value === 237)).toBe(true);
+            offset += chunk.byteLength;
+            count += 1;
+            result = { id: 'large', offset: String(offset) };
+        } else {
+            result = {
+                id: 'large',
+                filename: 'large.bin',
+                byteLength: String(total),
+                path: '/workspace/large.bin',
+                chunkBytes: String(4 * 1024 * 1024),
+            };
+        }
+        socket.send(JSON.stringify({ id: request.id, ok: true, result }));
+    };
+    await client.uploadData(new Blob([bytes]), 'large.bin', {
+        onProgress: (loaded: bigint): void => {
+            progress.push(loaded);
+        },
+    });
+    expect(offset).toBe(total);
+    expect(count).toBe(20);
+    expect(progress).toHaveLength(21);
+    expect(progress[0]).toBe(0n);
+    expect(progress.at(-1)).toBe(BigInt(total));
+});
+
+it.each(['0', '-1', '4194305', '4e6', '004194304'])(
+    'refuses invalid chunk advertisement %s and cancels the upload',
+    async (chunkBytes: string): Promise<void> => {
+        gateway = new TestGateway({
+            ...hello,
+            features: { ...hello.features, binaryDataUploads: true },
+        });
+        client = await NexaClient.connect({ url: await gateway.url(), reconnect: false });
+        gateway.handler = (socket: WebSocket, request: Request): void => {
+            socket.send(
+                JSON.stringify({
+                    id: request.id,
+                    ok: true,
+                    result: { id: 'bad-limit', filename: 'file.bin', byteLength: '1', chunkBytes },
+                }),
+            );
+        };
+        await expect(client.uploadData(new Blob([new Uint8Array(1)]), 'file.bin')).rejects.toThrow(
+            'invalid upload chunk size',
+        );
+        expect(gateway.requests.at(-1)?.method).toBe(Method.DataUploadCancel);
+        expect(
+            gateway.requests.some(
+                (request: Request): boolean => request.method === 'data.upload.chunk',
+            ),
+        ).toBe(false);
+    },
+);
+
+it('fits negotiated binary slices inside a smaller advertised gateway frame budget', async (): Promise<void> => {
+    const budget: number = 1024 * 1024;
+    gateway = new TestGateway({ ...hello, features: { ...hello.features, binaryDataUploads: true }, policy: { ...hello.policy, maxPayloadBytes: budget } });
+    client = await NexaClient.connect({ url: await gateway.url(), reconnect: false });
+    let offset: number = 0;
+    let count: number = 0;
+    gateway.handler = (socket: WebSocket, request: Request): void => {
+        let result: DataUploadPosition | DataFile;
+        if (request.method === 'data.upload.chunk') {
+            const bytes: unknown = request.params['data'];
+            if (!(bytes instanceof Uint8Array)) {
+                throw new Error('Upload was not binary');
+            }
+            expect(bytes.length).toBeLessThanOrEqual(budget - 1024);
+            offset += bytes.length;
+            count += 1;
+            result = { id: 'bounded', offset: String(offset) };
+        } else {
+            result = { id: 'bounded', filename: 'file.bin', byteLength: String(2 * budget), path: '/workspace/file.bin', chunkBytes: String(4 * budget) };
+        }
+        socket.send(JSON.stringify({ id: request.id, ok: true, result }));
+    };
+    await client.uploadData(new Blob([new Uint8Array(2 * budget)]), 'file.bin');
+    expect(count).toBe(3);
+    expect(offset).toBe(2 * budget);
+});
+
 it('refuses raw uploads on an old gateway and cleans up the started upload', async (): Promise<void> => {
     gateway = new TestGateway();
     client = await NexaClient.connect({ url: await gateway.url(), reconnect: false });
