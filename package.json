@@ -539,6 +539,14 @@
         "./design-font-bindings": {
             "types": "./dist/design/DesignFontBindings.d.ts",
             "import": "./dist/design-font-bindings.js"
+        },
+        "./design-view-types": {
+            "types": "./dist/design/DesignViewTypes.d.ts",
+            "import": "./dist/design-view-types.js"
+        },
+        "./design-view-codec": {
+            "types": "./dist/design/DesignViewCodec.d.ts",
+            "import": "./dist/design-view-codec.js"
         }
     },
     "scripts": {

@@ -97,6 +97,8 @@ const files: readonly string[] = [
     'DesignTextMetrics',
     'DesignLayout',
     'DesignRequests',
+    'DesignViewTypes',
+    'DesignViewCodec',
     'DesignRecordCodec',
     'DesignRecords',
     'DesignRequestCodec',

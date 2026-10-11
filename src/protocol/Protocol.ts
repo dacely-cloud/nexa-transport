@@ -5059,6 +5059,55 @@ export interface DesignVariantValueShape {
 /** DesignVariantValue from the Nexa wire protocol. */
 export type DesignVariantValue = DesignVariantValueShape;
 
+/** DesignViewMethod wire fields. */
+export interface DesignViewMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignViewRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignViewPage;
+}
+
+/** DesignViewMethod from the Nexa wire protocol. */
+export type DesignViewMethod = DesignViewMethodShape;
+
+/** DesignViewPage wire fields. */
+export interface DesignViewPageShape {
+    /** deferredIds as defined by the Nexa gateway. */
+    readonly deferredIds: ReadonlyArray<string>;
+    /** fragment as defined by the Nexa gateway. */
+    readonly fragment: DesignRecordFragment | null;
+    /** nextCursor as defined by the Nexa gateway. */
+    readonly nextCursor: DesignCursor | null;
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+    /** records as defined by the Nexa gateway. */
+    readonly records: ReadonlyArray<DesignRecord>;
+    /** summary as defined by the Nexa gateway. */
+    readonly summary: DesignSummary;
+}
+
+/** DesignViewPage from the Nexa wire protocol. */
+export type DesignViewPage = DesignViewPageShape;
+
+/** DesignViewRequest wire fields. */
+export interface DesignViewRequestShape {
+    /** cursor as defined by the Nexa gateway. */
+    readonly cursor: DesignCursor | null;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** includeIds as defined by the Nexa gateway. */
+    readonly includeIds: ReadonlyArray<string>;
+    /** limit as defined by the Nexa gateway. */
+    readonly limit: number;
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: null | string;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: null | string;
+}
+
+/** DesignViewRequest from the Nexa wire protocol. */
+export type DesignViewRequest = DesignViewRequestShape;
+
 /** DeviceApproveParams wire fields. */
 export interface DeviceApproveParamsShape {
     /** requestId as defined by the Nexa gateway. */
@@ -5925,6 +5974,14 @@ export interface GatewayMethodsdesign_undoShape {
     readonly params: DesignUndoRequest;
     /** result as defined by the Nexa gateway. */
     readonly result: DesignReceipt;
+}
+
+/** GatewayMethodsdesign_view wire fields. */
+export interface GatewayMethodsdesign_viewShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignViewRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignViewPage;
 }
 
 /** GatewayMethodsdevices_approve wire fields. */
@@ -7039,6 +7096,8 @@ export interface GatewayMethodsShape {
     readonly 'design.save': GatewayMethodsdesign_saveShape;
     /** design.undo as defined by the Nexa gateway. */
     readonly 'design.undo': GatewayMethodsdesign_undoShape;
+    /** design.view as defined by the Nexa gateway. */
+    readonly 'design.view': GatewayMethodsdesign_viewShape;
     /** devices.approve as defined by the Nexa gateway. */
     readonly 'devices.approve': GatewayMethodsdevices_approveShape;
     /** devices.list as defined by the Nexa gateway. */
@@ -14356,6 +14415,8 @@ export enum Method {
     DesignSave = 'design.save',
     /** Calls design.undo. */
     DesignUndo = 'design.undo',
+    /** Calls design.view. */
+    DesignView = 'design.view',
     /** Calls devices.approve. */
     DevicesApprove = 'devices.approve',
     /** Calls devices.list. */
