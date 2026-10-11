@@ -166,6 +166,8 @@ Established connections reconnect automatically with jittered exponential delays
 
 `readHistory(sessionId)` returns validated journal records. `readHistorySnapshot(sessionId, cursor?, endCursor?)` returns `{ records, endCursor }`; pass the previous complete `endCursor` as `cursor` for an incremental read. The optional third argument pins a fixed snapshot boundary. Cursors count bytes and stay decimal strings. `supportsSessionHistoryUpdates` gates durable append notifications for subscribed sessions. `downloadSessionFile(sessionId, attachmentId, signal?, progress?)` returns matching original `ReceivedAttachment` bytes through authenticated binary delivery. The optional progress callback receives `(receivedBytes, totalBytes)` for that saved file, excluding transport framing. Chunked transfers report incremental progress; unchunked transfers report completion. Downloads reject after 60 seconds without progress, release their local request, and can be retried. The overall deadline remains ten minutes. See [session recovery](sessions.md) for reconciliation and download ownership.
 
+`readHistorySnapshot(sessionId, cursor?, endCursor?, signal?)` accepts an abort signal. Cancelling a view stops its queued and in-flight history pages and releases their request capacity without closing the shared connection.
+
 ### Memory ownership
 
 Consume a turn's events as they arrive. Breaking out of iteration drops unread events and cancels a running turn; `await turn.cancel()` also drops buffered events after a turn has completed. Normal completion preserves unread events until they are consumed, explicitly cancelled, or the turn becomes unreachable. Use `client.call(Method.AgentAsk, ...)` when only the final result is needed.
