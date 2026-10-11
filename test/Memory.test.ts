@@ -4,6 +4,7 @@ import { NexaClient } from '../src/networking/NexaClient.js';
 import { EventStream } from '../src/networking/EventStream.js';
 import { BinaryEnvelope } from '../src/media/BinaryEnvelope.js';
 import { BinaryMedia } from '../src/media/BinaryMedia.js';
+import { BinaryChunks } from '../src/media/BinaryChunks.js';
 import { Method, type AskParams } from '../src/protocol/Protocol.js';
 import { TransportErrorCode } from '../src/networking/TransportError.js';
 import { hello, result, TestGateway, type Request } from './Support.js';
@@ -57,7 +58,7 @@ describe('memory ownership', (): void => {
         const buffer = vi
             .spyOn(WebSocket.prototype, 'bufferedAmount', 'get')
             .mockReturnValue(hello.policy.maxBufferedBytes);
-        const encoder = vi.spyOn(BinaryEnvelope, 'encode');
+        const encoder = vi.spyOn(BinaryEnvelope, 'encodeValue');
         const first = client.call(Method.AgentAsk, media());
         for (let index: number = 0; index < 80; index += 1) {
             await expect(client.call(Method.AgentAsk, media())).rejects.toMatchObject({
@@ -105,7 +106,7 @@ describe('memory ownership', (): void => {
             throw new Error('Missing peer');
         }
         gateway.handler = answer;
-        const encoder = vi.spyOn(BinaryEnvelope, 'encode');
+        const encoder = vi.spyOn(BinaryEnvelope, 'encodeValue');
         await expect(
             client.call(Method.AgentAsk, media(), { signal: AbortSignal.abort() }),
         ).rejects.toMatchObject({ code: TransportErrorCode.Aborted });
@@ -127,8 +128,11 @@ describe('memory ownership', (): void => {
             .spyOn(WebSocket.prototype, 'bufferedAmount', 'get')
             .mockReturnValue(hello.policy.maxBufferedBytes);
         const encoder = vi
-            .spyOn(BinaryEnvelope, 'encode')
-            .mockImplementation((): Uint8Array<ArrayBuffer> => new Uint8Array(60 * 1024 * 1024));
+            .spyOn(BinaryEnvelope, 'encodeValue')
+            .mockImplementation(
+                (): Uint8Array<ArrayBuffer> =>
+                    new Uint8Array(Math.ceil(BinaryChunks.MAX_TRANSFER_BYTES * 0.6)),
+            );
         const controller: AbortController = new AbortController();
         const first = client.call(Method.AgentAsk, media(), { signal: controller.signal });
         await expect(client.call(Method.AgentAsk, media())).rejects.toMatchObject({

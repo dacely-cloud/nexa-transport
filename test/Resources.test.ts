@@ -5,10 +5,30 @@ import { EventStream } from '../src/networking/EventStream.js';
 import { BinaryChunks, type BinaryChunkBudget } from '../src/media/BinaryChunks.js';
 import { BinaryEnvelope } from '../src/media/BinaryEnvelope.js';
 import { NexaMedia } from '../src/media/NexaMedia.js';
+import type { AskParams, BinarySource } from '../src/protocol/Protocol.js';
 
 afterEach((): void => {
     vi.useRealTimers();
     vi.restoreAllMocks();
+});
+
+it('extracts binary carriers before serialization without changing caller-owned inputs', (): void => {
+    const source: BinarySource = {
+        kind: 'base64',
+        mediaType: 'application/octet-stream',
+        data: 'AQID',
+    };
+    const request: AskParams = { message: 'Read', attachments: [{ type: 'document', source }] };
+    const frame: Uint8Array<ArrayBuffer> | null = BinaryEnvelope.encodeValue({
+        ...request,
+        provider: undefined,
+    });
+    if (frame === null) {
+        throw new Error('Expected a binary carrier');
+    }
+    expect(BinaryEnvelope.decode(frame.buffer, BinaryChunks.MAX_TRANSFER_BYTES)).toEqual(request);
+    expect(request.attachments?.[0]).toMatchObject({ source });
+    expect(source.data).toBe('AQID');
 });
 
 describe('RPC resource cleanup', (): void => {

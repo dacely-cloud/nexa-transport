@@ -2,7 +2,7 @@
 
 The gateway advertises `hello.features.binaryMedia`. Images, audio, video, documents, and archives delivered by `send_media` travel as raw bytes. The SDK also packs inline upload sources, PCM audio, and native voice/video payloads into binary envelopes. JSON-facing protocol fields remain compatible with existing callers; base64 fields are restored only after transport decoding.
 
-Files are limited to 100 MiB each. Uploads allow 100 MiB of combined media per request. Transfers use chunks of at most 256 KiB; negotiated request frame limits may reduce upload chunk size. Receivers reject invalid sizes, duplicate or out-of-order chunks, and interleaved transfers. Incomplete transfers release their reservations on cancellation, disconnect, or 30 seconds without progress. Upload cancellation closes the client connection to discard incomplete server state. Senders serialize file transfers on each socket and wait for outbound buffers to drain.
+Files are limited to 300 MiB each. Uploads allow 300 MiB of combined media per request. Transfers use chunks of at most 256 KiB; negotiated request frame limits may reduce upload chunk size. Receivers reject invalid sizes, duplicate or out-of-order chunks, and interleaved transfers. Incomplete transfers release their reservations on cancellation, disconnect, or 30 seconds without progress. Upload cancellation closes the client connection to discard incomplete server state. Senders serialize file transfers on each socket and wait for outbound buffers to drain.
 
 ## Wire formats
 
@@ -18,7 +18,7 @@ All integers are unsigned, big-endian. WebSocket messages use the binary opcode.
 
 `NXBF` headers contain `json` and `parts`. Binary fields in `json` are null placeholders. Each part specifies a property `path`, byte `length`, and restored JSON `encoding` (`base64` or `array`). Parts are contiguous in listed order. Paths must refer to existing placeholders and cannot contain prototype keys. PCM and inline sources are transported as bytes even when the compatibility API represents them as strings.
 
-`NXCH` wraps a complete `NXMD` or `NXBF` frame. Offsets begin at zero and advance by the exact payload length. A matching transfer ID with zero total length, zero offset, and no payload cancels an incomplete transfer. Framing allows up to 101 MiB including metadata; the file limit remains 100 MiB.
+`NXCH` wraps a complete `NXMD` or `NXBF` frame. Offsets begin at zero and advance by the exact payload length. A matching transfer ID with zero total length, zero offset, and no payload cancels an incomplete transfer. Framing allows up to 301 MiB including metadata; the file limit remains 300 MiB.
 
 ## Library API
 
@@ -37,7 +37,7 @@ optional Gaussian PLY (`application/x-ply`). Nexa also delivers PNG views throug
 the same attachment callback. Use `NexaMedia.geometryFormat(file)` to identify a
 validated GLB/PLY header and `NexaMedia.geometryBlob(file)` to create a Blob for
 saving or viewing. Upload models with `await NexaMedia.model3d(blob, filename)`.
-The existing 100 MiB transport limit applies to each file.
+The existing 300 MiB transport limit applies to each file.
 
 Nexa optimizes GLB with lossless `EXT_meshopt_compression`. This SDK exports
 `MeshoptDecoder` from `nexa-transport/media`. Pass it to a compatible glTF loader

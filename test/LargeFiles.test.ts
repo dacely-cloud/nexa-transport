@@ -18,7 +18,7 @@ afterEach(async (): Promise<void> => {
 });
 
 it.each([false, true])(
-    'receives a complete 100 MiB video independently of JSON limits (chunked=%s)',
+    'receives complete video bytes up to 300 MiB independently of JSON limits (chunked=%s)',
     async (chunked: boolean): Promise<void> => {
         const greeting: HelloOk = {
             ...hello,
@@ -40,7 +40,9 @@ it.each([false, true])(
         client.onAttachment((file: ReceivedAttachment): void => {
             delivered.resolve(file);
         });
-        const bytes: Uint8Array<ArrayBuffer> = new Uint8Array(BinaryChunks.MAX_FILE_BYTES);
+        const bytes: Uint8Array<ArrayBuffer> = new Uint8Array(
+            chunked ? BinaryChunks.MAX_FILE_BYTES : 100 * 1024 * 1024,
+        );
         bytes[0] = 17;
         bytes[bytes.length - 1] = 241;
         const frame: Uint8Array<ArrayBuffer> = BinaryMedia.encode(
@@ -69,7 +71,7 @@ it.each([false, true])(
         };
         await client.call(Method.SessionsFiles, { id: 'session' });
         const file: ReceivedAttachment = await delivered.promise;
-        expect(file.byteLength).toBe(BinaryChunks.MAX_FILE_BYTES);
+        expect(file.byteLength).toBe(bytes.byteLength);
         expect(file.mimeType).toBe('video/mp4');
         expect(file.data.length).toBe(bytes.length);
         expect(Buffer.compare(file.data, bytes)).toBe(0);
@@ -77,7 +79,7 @@ it.each([false, true])(
     20_000,
 );
 
-it('uploads an exact-limit 100 MiB video through bounded binary chunks', async (): Promise<void> => {
+it('uploads an exact-limit 300 MiB video through bounded binary chunks', async (): Promise<void> => {
     gateway = new TestGateway({ ...hello, features: { ...hello.features, binaryMedia: true } });
     client = await NexaClient.connect({ url: await gateway.url(), requestTimeoutMs: 20_000 });
     const bytes: Uint8Array<ArrayBuffer> = new Uint8Array(BinaryChunks.MAX_FILE_BYTES);

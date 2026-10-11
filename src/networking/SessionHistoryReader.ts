@@ -190,13 +190,13 @@ export class SessionHistoryReader {
         signal?.addEventListener('abort', abort, { once: true });
         const timeout: ReturnType<typeof setTimeout> = setTimeout((): void => {
             delivery.reject(new Error('Saved file delivery timed out'));
-        }, 120_000);
+        }, 600_000);
         try {
             const [, file] = await Promise.all([
                 client.call(
                     Method.SessionsDownload,
                     { id, attachmentId },
-                    { timeoutMs: 120_000, ...(signal === undefined ? {} : { signal }) },
+                    { timeoutMs: 600_000, ...(signal === undefined ? {} : { signal }) },
                 ),
                 delivery.promise,
             ]);
