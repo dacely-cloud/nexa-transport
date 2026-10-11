@@ -10,13 +10,13 @@ import {
     DesignSelectionAction as Action,
     type DesignSelectionPlan,
     type DesignSelectionBounds,
-    type DesignSelectionGeometry,
     type DesignArrangeRequest,
 } from './DesignSelectionTypes.js';
 import type { DesignTextMeasurer } from './DesignLayoutTypes.js';
 import { DesignValues as V } from './DesignValues.js';
 import { DesignMaskSelection } from './DesignMaskSelection.js';
 import { DesignBooleanSelection } from './DesignBooleanSelection.js';
+import { DesignWorldPositions } from './DesignWorldPositions.js';
 
 export { DesignSelectionContext } from './DesignSelectionContext.js';
 
@@ -159,7 +159,7 @@ export class DesignSelection {
             horizontal ? entry.bounds.right : entry.bounds.bottom;
         const start: number = Math.min(...positioned.map(lower));
         const end: number = Math.max(...positioned.map(upper));
-        const operations: DesignOperation[] = [];
+        const targets: DesignBox[] = [];
         if (distribute) {
             positioned.sort(
                 (a: PositionedLayer, b: PositionedLayer): number => lower(a) - lower(b),
@@ -196,23 +196,24 @@ export class DesignSelection {
             if (Math.abs(delta) < 0.000001) {
                 continue;
             }
-            const box: DesignSelectionGeometry = context.local(
-                {
-                    ...entry.box,
-                    x: entry.box.x + (horizontal ? delta : 0),
-                    y: entry.box.y + (horizontal ? 0 : delta),
-                },
-                entry.node.parentId,
-            );
-            operations.push({
-                op: Op.Update,
-                id: entry.node.id,
-                changes: { ...box, placement: Tree.fixed(entry.node, true) },
+            targets.push({
+                ...entry.box,
+                x: entry.box.x + (horizontal ? delta : 0),
+                y: entry.box.y + (horizontal ? 0 : delta),
             });
         }
-        if (operations.length === 0) {
+        if (targets.length === 0) {
             throw new Error('The selected layers are already arranged.');
         }
+        const desired: ReadonlyMap<string, DesignBox> = new Map(
+            targets.map((box: DesignBox): readonly [string, DesignBox] => [box.id, box]),
+        );
+        const operations: readonly DesignOperation[] = new DesignWorldPositions(
+            context,
+            positioned.map(
+                (entry: PositionedLayer): DesignBox => desired.get(entry.node.id) ?? entry.box,
+            ),
+        ).operations();
         return { operations, selection: context.roots.map((node: DesignNode): string => node.id) };
     }
 }

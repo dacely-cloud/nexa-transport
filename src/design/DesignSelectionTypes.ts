@@ -58,3 +58,8 @@ export interface DesignSelectionBounds {
     readonly right: number;
     readonly bottom: number;
 }
+/** A transformed origin stays stable while a content-sized frame changes dimensions. */
+export interface DesignSelectionPoint {
+    readonly x: number;
+    readonly y: number;
+}

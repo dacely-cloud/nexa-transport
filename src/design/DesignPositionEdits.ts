@@ -14,6 +14,7 @@ import type { DesignSize } from './DesignLayoutTypes.js';
 import { DesignSelectionContext } from './DesignSelectionContext.js';
 import { DesignLayoutEngine } from './DesignLayout.js';
 import { DesignPaths } from './DesignPaths.js';
+import { DesignPositionReferences } from './DesignPositionReferences.js';
 
 /** Visible coordinate edits capture constraint baselines without changing descendant geometry. */
 export class DesignPositionEdits {
@@ -21,6 +22,19 @@ export class DesignPositionEdits {
     public constructor(public readonly context: DesignSelectionContext) {}
 
     public apply(operation: DesignPositionOperation): readonly DesignNode[] {
+        return this.#apply(operation, false);
+    }
+
+    /** Batch world arrangement captures the original geometry before any sibling changes layout. */
+    public capture(operation: DesignPositionOperation): DesignNode {
+        const result: DesignNode | undefined = this.#apply(operation, true)[0];
+        if (result === undefined) {
+            throw new Error('Cannot capture a flowing layer for manual arrangement.');
+        }
+        return result;
+    }
+
+    #apply(operation: DesignPositionOperation, capture: boolean): readonly DesignNode[] {
         this.#changes.clear();
         const node: DesignNode = this.context.node(operation.id);
         const geometry: DesignSelectionGeometry = this.#geometry(node);
@@ -55,6 +69,7 @@ export class DesignPositionEdits {
         const horizontal: DesignConstraint = operation.horizontal ?? node.placement.horizontal;
         const vertical: DesignConstraint = operation.vertical ?? node.placement.vertical;
         if (
+            !capture &&
             Math.abs(x - geometry.x) < 0.000001 &&
             Math.abs(y - geometry.y) < 0.000001 &&
             horizontal === node.placement.horizontal &&
@@ -87,12 +102,13 @@ export class DesignPositionEdits {
                         node.placement.height === DesignSizing.Fill))
                     ? DesignSizing.Fixed
                     : node.placement.height,
-            ...(parentGeometry !== null && parentGeometry.width > 0
-                ? { referenceWidth: parentGeometry.width }
-                : {}),
-            ...(parentGeometry !== null && parentGeometry.height > 0
-                ? { referenceHeight: parentGeometry.height }
-                : {}),
+            ...DesignPositionReferences.capture(
+                node,
+                parent,
+                parentGeometry,
+                parentGeometry,
+                geometry,
+            ),
         };
         this.#collapsed(
             geometry.width,
@@ -162,8 +178,13 @@ export class DesignPositionEdits {
                 ...next,
                 placement: {
                     ...next.placement,
-                    ...(parentSize.width > 0 ? { referenceWidth: parentSize.width } : {}),
-                    ...(parentSize.height > 0 ? { referenceHeight: parentSize.height } : {}),
+                    ...DesignPositionReferences.capture(
+                        node,
+                        parent,
+                        parentGeometry,
+                        parentSize,
+                        geometry,
+                    ),
                 },
             };
             this.#changes.set(node.id, next);

@@ -1,9 +1,13 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { DesignDocument, DesignNode, DesignBox } from './DesignTypes.js';
+import { DesignFlow, type DesignDocument, type DesignNode, type DesignBox } from './DesignTypes.js';
 import { DesignLayoutEngine } from './DesignLayout.js';
-import type { DesignSelectionGeometry, DesignSelectionBounds } from './DesignSelectionTypes.js';
+import type {
+    DesignSelectionGeometry,
+    DesignSelectionBounds,
+    DesignSelectionPoint,
+} from './DesignSelectionTypes.js';
 import type { DesignTextMeasurer, DesignSize, DesignLocalBox } from './DesignLayoutTypes.js';
 import { DesignTextMetrics } from './DesignTextMetrics.js';
 import { DesignValues as V } from './DesignValues.js';
@@ -107,6 +111,16 @@ export class DesignSelectionContext {
     public position(id: string): DesignLocalBox {
         return this.#layout.position(id);
     }
+    /** Flow placement belongs to the container's layout and sibling ordering. */
+    public flowing(id: string): boolean {
+        const node: DesignNode = this.node(id);
+        const parent: DesignNode | null = node.parentId === null ? null : this.node(node.parentId);
+        return (
+            parent !== null &&
+            parent.layout.flow !== DesignFlow.Absolute &&
+            !node.placement.absolute
+        );
+    }
     /** Hidden layers have no rendered geometry; duplication and ordering can still handle them. */
     public box(id: string): DesignBox {
         const box: DesignBox | undefined = this.boxes.get(id);
@@ -123,7 +137,11 @@ export class DesignSelectionContext {
     }
     /** Inverts the parent's rotation around its center, matching the shared layout engine. */
     public local(box: DesignBox, parentId: string | null): DesignSelectionGeometry {
-        if (parentId === null) {
+        return DesignSelectionContext.relative(box, parentId === null ? null : this.box(parentId));
+    }
+    /** Inverts the same center transform against a proposed parent box as well as a saved one. */
+    public static relative(box: DesignBox, parent: DesignBox | null): DesignSelectionGeometry {
+        if (parent === null) {
             return {
                 x: box.x,
                 y: box.y,
@@ -132,7 +150,6 @@ export class DesignSelectionContext {
                 rotation: box.rotation,
             };
         }
-        const parent: DesignBox = this.box(parentId);
         const angle: number = (-parent.rotation * Math.PI) / 180;
         const dx: number = box.x + box.width / 2 - parent.x - parent.width / 2;
         const dy: number = box.y + box.height / 2 - parent.y - parent.height / 2;
@@ -142,6 +159,39 @@ export class DesignSelectionContext {
             width: box.width,
             height: box.height,
             rotation: box.rotation - parent.rotation,
+        };
+    }
+    /** World-space transformed top-left corner. */
+    public static corner(box: DesignBox): DesignSelectionPoint {
+        const angle: number = (box.rotation * Math.PI) / 180;
+        return {
+            x:
+                box.x +
+                box.width / 2 -
+                (box.width / 2) * Math.cos(angle) +
+                (box.height / 2) * Math.sin(angle),
+            y:
+                box.y +
+                box.height / 2 -
+                (box.width / 2) * Math.sin(angle) -
+                (box.height / 2) * Math.cos(angle),
+        };
+    }
+    /** A reflowed frame retains its transformed corner instead of rotating content around a moving center. */
+    public static atCorner(box: DesignBox, corner: DesignSelectionPoint): DesignBox {
+        const angle: number = (box.rotation * Math.PI) / 180;
+        return {
+            ...box,
+            x:
+                corner.x +
+                (box.width / 2) * Math.cos(angle) -
+                (box.height / 2) * Math.sin(angle) -
+                box.width / 2,
+            y:
+                corner.y +
+                (box.width / 2) * Math.sin(angle) +
+                (box.height / 2) * Math.cos(angle) -
+                box.height / 2,
         };
     }
     /** Measures all four rotated corners without allocating a point array. */
