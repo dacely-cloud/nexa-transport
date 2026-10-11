@@ -9,6 +9,7 @@ const config: UserConfig = {
                 'design-font-engine': 'src/design/DesignFontEngine.ts',
                 'design-builtin-fonts': 'src/design/DesignBuiltinFonts.ts',
                 'design-inter-bytes': 'src/design/DesignInterBytes.ts',
+                'design-inter-outline-bytes': 'src/design/DesignInterOutlineBytes.ts',
                 'design-text-outline': 'src/design/DesignTextOutline.ts',
 
                 'design-boolean-edits': 'src/design/DesignBooleanEdits.ts',
