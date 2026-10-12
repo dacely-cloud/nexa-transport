@@ -6974,6 +6974,9 @@ export const schema: Schema = {
                 {
                     $ref: '#/definitions/DesignPaintGradientOperation',
                 },
+                {
+                    $ref: '#/definitions/DesignStrokeOperation',
+                },
             ],
             description: 'A transaction can contain different operation types.',
         },
@@ -7548,6 +7551,20 @@ export const schema: Schema = {
                     $ref: '#/definitions/DesignPaint',
                 },
                 width: {
+                    type: 'number',
+                },
+                cap: {
+                    description: 'Omission retains the original round-cap behavior.',
+                    enum: ['butt', 'round', 'square'],
+                    type: 'string',
+                },
+                join: {
+                    description: 'Omission retains the original round-join behavior.',
+                    enum: ['bevel', 'miter', 'round'],
+                    type: 'string',
+                },
+                miterLimit: {
+                    description: 'A finite ratio bounds miter corners; omission uses four.',
                     type: 'number',
                 },
             },
@@ -23277,6 +23294,65 @@ export const schema: Schema = {
                 },
             },
             required: ['changes', 'id', 'index', 'op', 'pageId', 'target'],
+            type: 'object',
+        },
+        DesignStrokeChanges: {
+            description:
+                'Omitted border properties retain their current values, including the paint.',
+            properties: {
+                cap: {
+                    description:
+                        'Endpoint shapes match the centered SVG stroke model.\nSupported endpoint shape.',
+                    enum: ['butt', 'round', 'square'],
+                    type: 'string',
+                },
+                dash: {
+                    items: {
+                        type: 'number',
+                    },
+                    type: 'array',
+                },
+                join: {
+                    description:
+                        'Corners may retain a round sector, bevel or bounded miter.\nSupported corner shape.',
+                    enum: ['bevel', 'miter', 'round'],
+                    type: 'string',
+                },
+                miterLimit: {
+                    type: 'number',
+                },
+                width: {
+                    type: 'number',
+                },
+            },
+            type: 'object',
+        },
+        DesignStrokeOperation: {
+            description:
+                "Null removes a border; nonempty changes create or edit one authored layer's border.",
+            properties: {
+                changes: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignStrokeChanges',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                id: {
+                    type: 'string',
+                },
+                op: {
+                    const: 'stroke',
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+            },
+            required: ['changes', 'id', 'op', 'pageId'],
             type: 'object',
         },
     },

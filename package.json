@@ -598,6 +598,14 @@
         "./design-paint-gradient": {
             "types": "./dist/design/DesignPaintGradientEdits.d.ts",
             "import": "./dist/design-paint-gradient.js"
+        },
+        "./design-stroke-types": {
+            "types": "./dist/design/DesignStrokeTypes.d.ts",
+            "import": "./dist/design-stroke-types.js"
+        },
+        "./design-stroke-geometry": {
+            "types": "./dist/design/DesignStrokeGeometry.d.ts",
+            "import": "./dist/design-stroke-geometry.js"
         }
     },
     "scripts": {

@@ -3249,6 +3249,15 @@ Variant 21: [DesignPaintGradientOperation](protocol.md#designpaintgradientoperat
 | `pageId`  | Yes      | `string`                                                             |             |
 | `target`  | Yes      | [DesignPaintColorTarget](protocol.md#designpaintcolortarget)         |             |
 
+Variant 22: [DesignStrokeOperation](protocol.md#designstrokeoperation)
+
+| Field     | Required | Type                                                            | Description |
+| --------- | -------- | --------------------------------------------------------------- | ----------- |
+| `changes` | Yes      | [DesignStrokeChanges](protocol.md#designstrokechanges) / `null` |             |
+| `id`      | Yes      | `string`                                                        |             |
+| `op`      | Yes      | `"stroke"`                                                      |             |
+| `pageId`  | Yes      | `string`                                                        |             |
+
 ## DesignOverride
 
 Instance overrides target a source layer without modifying its component definition.
@@ -3540,11 +3549,14 @@ Type: `"fill"` / `"fixed"` / `"hug"`.
 
 Outline properties.
 
-| Field   | Required | Type                                   | Description |
-| ------- | -------- | -------------------------------------- | ----------- |
-| `dash`  | Yes      | Array of `number`                      |             |
-| `paint` | Yes      | [DesignPaint](protocol.md#designpaint) |             |
-| `width` | Yes      | `number`                               |             |
+| Field        | Required | Type                                   | Description                                              |
+| ------------ | -------- | -------------------------------------- | -------------------------------------------------------- |
+| `dash`       | Yes      | Array of `number`                      |                                                          |
+| `paint`      | Yes      | [DesignPaint](protocol.md#designpaint) |                                                          |
+| `width`      | Yes      | `number`                               |                                                          |
+| `cap`        | No       | `"butt"` / `"round"` / `"square"`      | Omission retains the original round-cap behavior.        |
+| `join`       | No       | `"bevel"` / `"miter"` / `"round"`      | Omission retains the original round-join behavior.       |
+| `miterLimit` | No       | `number`                               | A finite ratio bounds miter corners; omission uses four. |
 
 ## DesignStyle
 
@@ -10879,3 +10891,26 @@ Page-scoped native editing of one fill or stroke gradient.
 | `op`      | Yes      | `"paint-gradient"`                                                   |             |
 | `pageId`  | Yes      | `string`                                                             |             |
 | `target`  | Yes      | [DesignPaintColorTarget](protocol.md#designpaintcolortarget)         |             |
+
+## DesignStrokeChanges
+
+Omitted border properties retain their current values, including the paint.
+
+| Field        | Required | Type                              | Description                                                |
+| ------------ | -------- | --------------------------------- | ---------------------------------------------------------- |
+| `cap`        | No       | `"butt"` / `"round"` / `"square"` | Endpoint shapes match the centered SVG stroke model.       |
+| `dash`       | No       | Array of `number`                 |                                                            |
+| `join`       | No       | `"bevel"` / `"miter"` / `"round"` | Corners may retain a round sector, bevel or bounded miter. |
+| `miterLimit` | No       | `number`                          |                                                            |
+| `width`      | No       | `number`                          |                                                            |
+
+## DesignStrokeOperation
+
+Null removes a border; nonempty changes create or edit one authored layer's border.
+
+| Field     | Required | Type                                                            | Description |
+| --------- | -------- | --------------------------------------------------------------- | ----------- |
+| `changes` | Yes      | [DesignStrokeChanges](protocol.md#designstrokechanges) / `null` |             |
+| `id`      | Yes      | `string`                                                        |             |
+| `op`      | Yes      | `"stroke"`                                                      |             |
+| `pageId`  | Yes      | `string`                                                        |             |

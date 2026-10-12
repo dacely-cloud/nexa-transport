@@ -138,9 +138,9 @@ backend, or a provider-key vault.
 | `nexa-transport/design-codec`               | ESM + types | Design codec.                                                             |
 | `nexa-transport/design-edits`               | ESM + types | Design edits.                                                             |
 | `nexa-transport/design-text-styles`         | ESM + types | Unicode-safe partial rich-range formatting and selected-style inspection. |
-| `nexa-transport/design-transfer-types`      | Types only | Revision-pinned references for native copying between saved layouts. |
-| `nexa-transport/design-transfer-codec`      | ESM + types | Strict reference-only copy request validation. |
-| `nexa-transport/design-token-edits` | ESM + types | Individual token editing, color detachment and authored link counts. |
+| `nexa-transport/design-transfer-types`      | Types only  | Revision-pinned references for native copying between saved layouts.      |
+| `nexa-transport/design-transfer-codec`      | ESM + types | Strict reference-only copy request validation.                            |
+| `nexa-transport/design-token-edits`         | ESM + types | Individual token editing, color detachment and authored link counts.      |
 | `nexa-transport/design-operation-types`     | ESM + types | Design operation types.                                                   |
 | `nexa-transport/design-operation-codec`     | ESM + types | Design operation codec.                                                   |
 | `nexa-transport/design-scene`               | ESM + types | Design scene.                                                             |
@@ -195,3 +195,5 @@ backend, or a provider-key vault.
 `nexa-transport/design-typography-styles` exposes strict saved typography definitions, overrides and link validation. Use compact token and typography-style operations through design.save.
 
 Gradient geometry and compact edits are available through `nexa-transport/design-gradient-types` (types), `nexa-transport/design-gradient-geometry` and `nexa-transport/design-paint-gradient`.
+
+Stroke cap and join choices are available through `nexa-transport/design-stroke-types`; conservative painted bounds use `nexa-transport/design-stroke-geometry`.
