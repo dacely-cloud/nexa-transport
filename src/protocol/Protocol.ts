@@ -4561,7 +4561,9 @@ export type DesignOperation =
     | DesignRemove
     | DesignPageOperation
     | DesignGuideOperation
-    | DesignMetadata;
+    | DesignMetadata
+    | DesignTokenOperation
+    | DesignPaintColorOperation;
 
 /** DesignOverride wire fields. */
 export interface DesignOverrideShape {
@@ -15175,6 +15177,78 @@ export interface DesignTransferRequestShape {
 
 /** DesignTransferRequest from the Nexa wire protocol. */
 export type DesignTransferRequest = DesignTransferRequestShape;
+
+/** DesignPaintColorOperation wire fields. */
+export interface DesignPaintColorOperationShape {
+    /** changes as defined by the Nexa gateway. */
+    readonly changes: DesignPaintColorChanges;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** index as defined by the Nexa gateway. */
+    readonly index: number;
+    /** op as defined by the Nexa gateway. */
+    readonly op: 'paint-color';
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+    /** target as defined by the Nexa gateway. */
+    readonly target: DesignPaintColorTarget;
+}
+
+/** DesignPaintColorOperation from the Nexa wire protocol. */
+export type DesignPaintColorOperation = DesignPaintColorOperationShape;
+
+/** Allowed values for DesignPaintColorTarget. */
+export const DesignPaintColorTargetValues = { Value0: 'fill', Value1: 'stroke' } as const;
+
+/** DesignPaintColorTarget from the Nexa wire protocol. */
+export type DesignPaintColorTarget =
+    (typeof DesignPaintColorTargetValues)[keyof typeof DesignPaintColorTargetValues];
+
+/** DesignPaintColorChanges wire fields. */
+export interface DesignPaintColorChangesShape {
+    /** color as defined by the Nexa gateway. */
+    readonly color?: string;
+    /** opacity as defined by the Nexa gateway. */
+    readonly opacity?: number;
+    /** tokenId as defined by the Nexa gateway. */
+    readonly tokenId?: null | string;
+}
+
+/** DesignPaintColorChanges from the Nexa wire protocol. */
+export type DesignPaintColorChanges = DesignPaintColorChangesShape;
+
+/** DesignTokenOperation wire fields. */
+export interface DesignTokenOperationShape {
+    /** changes as defined by the Nexa gateway. */
+    readonly changes: DesignTokenChanges | null;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** op as defined by the Nexa gateway. */
+    readonly op: 'token';
+}
+
+/** DesignTokenOperation from the Nexa wire protocol. */
+export type DesignTokenOperation = DesignTokenOperationShape;
+
+/** Allowed values for DesignTokenChangescategory. */
+export const DesignTokenChangescategoryValues = {
+    Value0: 'color',
+    Value1: 'spacing',
+    Value2: 'typography',
+} as const;
+
+/** DesignTokenChanges wire fields. */
+export interface DesignTokenChangesShape {
+    /** category as defined by the Nexa gateway. */
+    readonly category?: (typeof DesignTokenChangescategoryValues)[keyof typeof DesignTokenChangescategoryValues];
+    /** name as defined by the Nexa gateway. */
+    readonly name?: string;
+    /** value as defined by the Nexa gateway. */
+    readonly value?: string;
+}
+
+/** DesignTokenChanges from the Nexa wire protocol. */
+export type DesignTokenChanges = DesignTokenChangesShape;
 
 /** Supported RPC names. */
 export type MethodName = keyof GatewayMethods;

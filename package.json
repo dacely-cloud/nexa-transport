@@ -579,6 +579,10 @@
         "./design-transfer-codec": {
             "types": "./dist/design/DesignTransferCodec.d.ts",
             "import": "./dist/design-transfer-codec.js"
+        },
+        "./design-token-edits": {
+            "types": "./dist/design/DesignTokenEdits.d.ts",
+            "import": "./dist/design-token-edits.js"
         }
     },
     "scripts": {

@@ -3210,6 +3210,25 @@ Variant 17: [DesignMetadata](protocol.md#designmetadata)
 | `op`           | Yes      | `"metadata"`                                                |             |
 | `tokens`       | No       | Array of [DesignToken](protocol.md#designtoken)             |             |
 
+Variant 18: [DesignTokenOperation](protocol.md#designtokenoperation)
+
+| Field     | Required | Type                                                          | Description |
+| --------- | -------- | ------------------------------------------------------------- | ----------- |
+| `changes` | Yes      | [DesignTokenChanges](protocol.md#designtokenchanges) / `null` |             |
+| `id`      | Yes      | `string`                                                      |             |
+| `op`      | Yes      | `"token"`                                                     |             |
+
+Variant 19: [DesignPaintColorOperation](protocol.md#designpaintcoloroperation)
+
+| Field     | Required | Type                                                           | Description |
+| --------- | -------- | -------------------------------------------------------------- | ----------- |
+| `changes` | Yes      | [DesignPaintColorChanges](protocol.md#designpaintcolorchanges) |             |
+| `id`      | Yes      | `string`                                                       |             |
+| `index`   | Yes      | `number`                                                       |             |
+| `op`      | Yes      | `"paint-color"`                                                |             |
+| `pageId`  | Yes      | `string`                                                       |             |
+| `target`  | Yes      | [DesignPaintColorTarget](protocol.md#designpaintcolortarget)   |             |
+
 ## DesignOverride
 
 Instance overrides target a source layer without modifying its component definition.
@@ -10687,3 +10706,52 @@ Cross-document copies carry references only; source layers stay inside the authe
 | `sourceRevision`   | Yes      | `string`          |             |
 | `x`                | Yes      | `number`          |             |
 | `y`                | Yes      | `number`          |             |
+
+## DesignPaintColorOperation
+
+Fill index zero may create a first paint; stroke edits require an existing stroke and index zero.
+
+| Field     | Required | Type                                                           | Description |
+| --------- | -------- | -------------------------------------------------------------- | ----------- |
+| `changes` | Yes      | [DesignPaintColorChanges](protocol.md#designpaintcolorchanges) |             |
+| `id`      | Yes      | `string`                                                       |             |
+| `index`   | Yes      | `number`                                                       |             |
+| `op`      | Yes      | `"paint-color"`                                                |             |
+| `pageId`  | Yes      | `string`                                                       |             |
+| `target`  | Yes      | [DesignPaintColorTarget](protocol.md#designpaintcolortarget)   |             |
+
+## DesignPaintColorTarget
+
+Existing fill and stroke colors share one compact native edit.
+
+Type: `"fill"` / `"stroke"`.
+
+## DesignPaintColorChanges
+
+Omitted color properties retain the original paint; tokenId:null alone preserves its resolved color.
+
+| Field     | Required | Type          | Description |
+| --------- | -------- | ------------- | ----------- |
+| `color`   | No       | `string`      |             |
+| `opacity` | No       | `number`      |             |
+| `tokenId` | No       | `null,string` |             |
+
+## DesignTokenOperation
+
+Create or edit one token; null detaches its paints and deletes it without changing their appearance.
+
+| Field     | Required | Type                                                          | Description |
+| --------- | -------- | ------------------------------------------------------------- | ----------- |
+| `changes` | Yes      | [DesignTokenChanges](protocol.md#designtokenchanges) / `null` |             |
+| `id`      | Yes      | `string`                                                      |             |
+| `op`      | Yes      | `"token"`                                                     |             |
+
+## DesignTokenChanges
+
+Omitted token properties keep their saved values.
+
+| Field      | Required | Type                                     | Description     |
+| ---------- | -------- | ---------------------------------------- | --------------- |
+| `category` | No       | `"color"` / `"spacing"` / `"typography"` | Token families. |
+| `name`     | No       | `string`                                 |                 |
+| `value`    | No       | `string`                                 |                 |

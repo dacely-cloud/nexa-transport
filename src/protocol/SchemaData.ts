@@ -6962,6 +6962,12 @@ export const schema: Schema = {
                 {
                     $ref: '#/definitions/DesignMetadata',
                 },
+                {
+                    $ref: '#/definitions/DesignTokenOperation',
+                },
+                {
+                    $ref: '#/definitions/DesignPaintColorOperation',
+                },
             ],
             description: 'A transaction can contain different operation types.',
         },
@@ -22903,6 +22909,97 @@ export const schema: Schema = {
                 'x',
                 'y',
             ],
+            type: 'object',
+        },
+        DesignPaintColorOperation: {
+            description:
+                'Fill index zero may create a first paint; stroke edits require an existing stroke and index zero.',
+            properties: {
+                changes: {
+                    $ref: '#/definitions/DesignPaintColorChanges',
+                },
+                id: {
+                    type: 'string',
+                },
+                index: {
+                    type: 'number',
+                },
+                op: {
+                    const: 'paint-color',
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+                target: {
+                    $ref: '#/definitions/DesignPaintColorTarget',
+                },
+            },
+            required: ['changes', 'id', 'index', 'op', 'pageId', 'target'],
+            type: 'object',
+        },
+        DesignPaintColorTarget: {
+            description:
+                'Existing fill and stroke colors share one compact native edit.\nPaint location.',
+            enum: ['fill', 'stroke'],
+            type: 'string',
+        },
+        DesignPaintColorChanges: {
+            description:
+                'Omitted color properties retain the original paint; tokenId:null alone preserves its resolved color.',
+            properties: {
+                color: {
+                    type: 'string',
+                },
+                opacity: {
+                    type: 'number',
+                },
+                tokenId: {
+                    type: ['null', 'string'],
+                },
+            },
+            type: 'object',
+        },
+        DesignTokenOperation: {
+            description:
+                'Create or edit one token; null detaches its paints and deletes it without changing their appearance.',
+            properties: {
+                changes: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignTokenChanges',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                id: {
+                    type: 'string',
+                },
+                op: {
+                    const: 'token',
+                    type: 'string',
+                },
+            },
+            required: ['changes', 'id', 'op'],
+            type: 'object',
+        },
+        DesignTokenChanges: {
+            description: 'Omitted token properties keep their saved values.',
+            properties: {
+                category: {
+                    description: 'Token families.\nToken family.',
+                    enum: ['color', 'spacing', 'typography'],
+                    type: 'string',
+                },
+                name: {
+                    type: 'string',
+                },
+                value: {
+                    type: 'string',
+                },
+            },
             type: 'object',
         },
     },
