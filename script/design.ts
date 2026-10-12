@@ -5,6 +5,23 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 
 /** Server-only generation script. Nexa owns the portable design model and layout implementation. */
 const files: readonly string[] = [
+    'DesignSvgXml',
+    'DesignSvgNumbers',
+    'DesignSvgPathData',
+    'DesignSvgTransforms',
+    'DesignSvgShapePaths',
+    'DesignSvgColors',
+    'DesignSvgCss',
+    'DesignSvgImportGeometry',
+    'DesignSvgImportPaints',
+    'DesignSvgImportAppearance',
+    'DesignSvgImportTree',
+    'DesignSvgImportLayers',
+    'DesignSvgImportShape',
+    'DesignSvgImportTypes',
+    'DesignSvgImportCodec',
+    'DesignSvgImport',
+
     'DesignStrokeTypes',
     'DesignStrokeGeometry',
     'DesignStrokeChangesCodec',

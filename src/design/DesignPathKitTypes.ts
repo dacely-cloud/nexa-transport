@@ -24,6 +24,8 @@ export interface DesignPathKitPath {
     setFillType(type: DesignPathKitEnum): void;
     /** Native command arrays cross an FFI trust boundary. */
     toCmds(): unknown;
+    /** True curve extrema determine SVG object bounding-box paint coordinates, including degenerate axes. */
+    computeTightBounds(): unknown;
     /** Expands a centered stroke in place; null signals failure. */
     stroke(settings: DesignPathKitStroke): DesignPathKitPath | null;
     /** Applies a single repeating dash pair in place. */
@@ -45,6 +47,7 @@ export interface DesignPathKitOperations {
 /** Filled contours use the same nonzero winding rule as SVG and the canvas. */
 export interface DesignPathKitFills {
     readonly WINDING: DesignPathKitEnum;
+    readonly EVENODD: DesignPathKitEnum;
 }
 /** Authored corner shapes map directly to the native stroke kernel. */
 export interface DesignPathKitJoins {

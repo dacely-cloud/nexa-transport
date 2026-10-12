@@ -4722,3 +4722,43 @@ Parameters: [DesignTransferRequest](protocol.md#designtransferrequest).
 | `y`                | Yes      | `number`          |             |
 
 Result: [DesignReceipt](protocol.md#designreceipt).
+
+## design.svg.import
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DesignSvgImport> = {
+    commandId: 'YOUR_COMMANDID',
+    expectedRevision: 'YOUR_EXPECTEDREVISION',
+    id: 'YOUR_ID',
+    index: null,
+    name: 'YOUR_NAME',
+    pageId: 'YOUR_PAGEID',
+    parentId: null,
+    source: 'YOUR_SOURCE',
+    x: 1,
+    y: 1,
+};
+const result: ResultOf<typeof Method.DesignSvgImport> = await client.call(
+    Method.DesignSvgImport,
+    params,
+);
+```
+
+Parameters: [DesignSvgImportRequest](protocol.md#designsvgimportrequest).
+
+| Field              | Required | Type          | Description |
+| ------------------ | -------- | ------------- | ----------- |
+| `commandId`        | Yes      | `string`      |             |
+| `expectedRevision` | Yes      | `string`      |             |
+| `id`               | Yes      | `string`      |             |
+| `index`            | Yes      | `null,number` |             |
+| `name`             | Yes      | `string`      |             |
+| `pageId`           | Yes      | `string`      |             |
+| `parentId`         | Yes      | `null,string` |             |
+| `source`           | Yes      | `string`      |             |
+| `x`                | Yes      | `number`      |             |
+| `y`                | Yes      | `number`      |             |
+
+Result: [DesignReceipt](protocol.md#designreceipt).

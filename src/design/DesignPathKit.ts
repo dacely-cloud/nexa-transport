@@ -86,6 +86,8 @@ export class DesignPathKit {
             (typeof fills === 'function' || (typeof fills === 'object' && fills !== null)) &&
             'WINDING' in fills &&
             this.#enum(fills.WINDING) &&
+            'EVENODD' in fills &&
+            this.#enum(fills.EVENODD) &&
             (typeof joins === 'function' || (typeof joins === 'object' && joins !== null)) &&
             'ROUND' in joins &&
             this.#enum(joins.ROUND) &&

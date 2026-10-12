@@ -2662,3 +2662,17 @@ export function result180(value: unknown): boolean {
         value,
     );
 }
+/** Validates params181. */
+export function params181(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/design.svg.import/properties/params',
+        value,
+    );
+}
+/** Validates result181. */
+export function result181(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/design.svg.import/properties/result',
+        value,
+    );
+}

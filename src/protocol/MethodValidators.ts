@@ -213,4 +213,5 @@ export const methodValidators: Readonly<Record<MethodName, MethodValidation>> = 
     'design.arrange': { params: validators.params178, result: validators.result178 },
     'design.layout.preview': { params: validators.params179, result: validators.result179 },
     'design.transfer': { params: validators.params180, result: validators.result180 },
+    'design.svg.import': { params: validators.params181, result: validators.result181 },
 };
