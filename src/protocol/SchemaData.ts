@@ -6921,6 +6921,9 @@ export const schema: Schema = {
                     $ref: '#/definitions/DesignLayoutOperation',
                 },
                 {
+                    $ref: '#/definitions/DesignSizingOperation',
+                },
+                {
                     $ref: '#/definitions/DesignTextOperation',
                 },
                 {
@@ -22634,6 +22637,55 @@ export const schema: Schema = {
                 },
             },
             required: ['action', 'key', 'page'],
+            type: 'object',
+        },
+        DesignSizingChanges: {
+            description: 'Native sizing changes preserve every omitted saved placement field.',
+            properties: {
+                height: {
+                    description: 'Sizing relative to the parent and content.\nSizing choice.',
+                    enum: ['fill', 'fixed', 'hug'],
+                    type: 'string',
+                },
+                maxHeight: {
+                    type: 'number',
+                },
+                maxWidth: {
+                    type: 'number',
+                },
+                minHeight: {
+                    type: 'number',
+                },
+                minWidth: {
+                    type: 'number',
+                },
+                width: {
+                    description: 'Sizing relative to the parent and content.\nSizing choice.',
+                    enum: ['fill', 'fixed', 'hug'],
+                    type: 'string',
+                },
+            },
+            type: 'object',
+        },
+        DesignSizingOperation: {
+            description:
+                'Limits and sizing modes resolve against complete native sources without transferring their bodies.',
+            properties: {
+                changes: {
+                    $ref: '#/definitions/DesignSizingChanges',
+                },
+                id: {
+                    type: 'string',
+                },
+                op: {
+                    const: 'sizing',
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+            },
+            required: ['changes', 'id', 'op', 'pageId'],
             type: 'object',
         },
     },
