@@ -1,6 +1,9 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignLayerAuthority } from './DesignLayerAuthority.js';
+import { DesignPaintColorEdits } from './DesignPaintColorEdits.js';
+import { DesignTokenEdits } from './DesignTokenEdits.js';
 import { DesignOperationCodec } from './DesignOperationCodec.js';
 import { DesignTreeEdits as Tree } from './DesignTreeEdits.js';
 import { DesignEntityChanges as Entity } from './DesignEntityChanges.js';
@@ -275,6 +278,31 @@ export class DesignEdits {
                     }
                     break;
                 }
+                case DesignOperationKind.PaintColor: {
+                    const node: DesignNode = DesignPaintColorEdits.apply(
+                        new DesignLayerAuthority(nodes, pages),
+                        metadata.tokens,
+                        operation,
+                    );
+                    nodes.set(node.id, node);
+                    break;
+                }
+                case DesignOperationKind.Token: {
+                    const edited: DesignDocument = DesignTokenEdits.apply(
+                        {
+                            ...document,
+                            ...metadata,
+                            nodes: [...nodes.values()],
+                            pages: [...pages.values()],
+                        },
+                        operation,
+                    );
+                    metadata = this.#metadata(edited);
+                    for (const node of edited.nodes) {
+                        nodes.set(node.id, node);
+                    }
+                    break;
+                }
                 case DesignOperationKind.Metadata: {
                     metadata = {
                         ...metadata,
@@ -329,10 +357,23 @@ export class DesignEdits {
             const next: DesignMetadataState | null = reverse
                 ? changes.metadata.before
                 : changes.metadata.after;
-            if (!Entity.equal(metadata, expected) || next === null) {
+            if (expected === null || next === null) {
                 throw new Error('Document metadata changed since this edit');
             }
-            metadata = next;
+            metadata = {
+                name: this.#restoreValue(metadata.name, expected.name, next.name),
+                tokens: this.#restoreMetadataEntries(metadata.tokens, expected.tokens, next.tokens),
+                interactions: this.#restoreMetadataEntries(
+                    metadata.interactions,
+                    expected.interactions,
+                    next.interactions,
+                ),
+                comments: this.#restoreMetadataEntries(
+                    metadata.comments,
+                    expected.comments,
+                    next.comments,
+                ),
+            };
         }
         const next: DesignDocument = DesignCodec.document({
             ...document,
@@ -343,6 +384,59 @@ export class DesignEdits {
         return { document: next, changes: this.diff(document, next) };
     }
 
+    static #restoreMetadataEntries<T extends Identified>(
+        source: readonly T[],
+        expected: readonly T[],
+        next: readonly T[],
+    ): readonly T[] {
+        if (Entity.equal(source, expected)) {
+            return next;
+        }
+        const restored: readonly T[] = this.#restore(source, Entity.diff(expected, next), false);
+        const original: ReadonlySet<string> = new Set(expected.map((entry: T): string => entry.id));
+        const added: ReadonlySet<string> = new Set(
+            next
+                .filter((entry: T): boolean => !original.has(entry.id))
+                .map((entry: T): string => entry.id),
+        );
+        if (added.size === 0) {
+            return restored;
+        }
+        const values: ReadonlyMap<string, T> = new Map(
+            restored.map((entry: T): [string, T] => [entry.id, entry]),
+        );
+        const ordered: T[] = restored.filter((entry: T): boolean => !added.has(entry.id));
+        for (let index: number = 0; index < next.length; index++) {
+            const item: T | undefined = next[index];
+            if (item === undefined || !added.has(item.id)) {
+                continue;
+            }
+            const value: T | undefined = values.get(item.id);
+            if (value === undefined) {
+                throw new Error('Missing restored metadata identity');
+            }
+            const anchor: T | undefined = next
+                .slice(index + 1)
+                .find((entry: T): boolean =>
+                    ordered.some((current: T): boolean => current.id === entry.id),
+                );
+            const position: number =
+                anchor === undefined
+                    ? ordered.length
+                    : ordered.findIndex((entry: T): boolean => entry.id === anchor.id);
+            ordered.splice(position, 0, value);
+        }
+        return ordered;
+    }
+    static #restoreValue<T>(current: T, expected: T, next: T): T {
+        if (Entity.equal(expected, next)) {
+            return current;
+        }
+        if (!Entity.equal(current, expected)) {
+            throw new Error('Document metadata changed since this edit');
+        }
+        return next;
+    }
     static #metadata(document: DesignDocument): DesignMetadataState {
         return {
             name: document.name,

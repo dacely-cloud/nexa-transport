@@ -1,6 +1,9 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignPaintColorChangesCodec } from './DesignPaintColorChangesCodec.js';
+import { DesignPaintColorTarget } from './DesignOperationTypes.js';
+import { DesignTokenChangesCodec } from './DesignTokenChangesCodec.js';
 import { DesignValues as V } from './DesignValues.js';
 import { DesignFrameGridCodec } from './DesignFrameGridCodec.js';
 import { DesignRulerCodec } from './DesignRulerCodec.js';
@@ -44,6 +47,7 @@ export class DesignOperationCodec {
                     'index',
                     'id',
                     'changes',
+                    'target',
                     'content',
                     'start',
                     'end',
@@ -90,6 +94,39 @@ export class DesignOperationCodec {
                         parentId: V.optionalId(value['parentId']),
                         pageId: V.id(value['pageId']),
                         index: V.number(value['index'], 0, 10000, true),
+                    };
+                }
+                case Kind.PaintColor: {
+                    const value: Readonly<Record<string, unknown>> = V.record(entry, [
+                        'op',
+                        'id',
+                        'pageId',
+                        'target',
+                        'index',
+                        'changes',
+                    ]);
+                    return {
+                        op,
+                        id: V.id(value['id']),
+                        pageId: V.id(value['pageId']),
+                        target: V.choice(value['target'], Object.values(DesignPaintColorTarget)),
+                        index: V.number(value['index'], 0, 7, true),
+                        changes: DesignPaintColorChangesCodec.changes(value['changes']),
+                    };
+                }
+                case Kind.Token: {
+                    const value: Readonly<Record<string, unknown>> = V.record(entry, [
+                        'op',
+                        'id',
+                        'changes',
+                    ]);
+                    return {
+                        op,
+                        id: V.id(value['id']),
+                        changes:
+                            value['changes'] === null
+                                ? null
+                                : DesignTokenChangesCodec.changes(value['changes']),
                     };
                 }
                 case Kind.Update: {

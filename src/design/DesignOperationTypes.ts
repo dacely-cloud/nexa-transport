@@ -24,6 +24,7 @@ import type {
     DesignOverride,
     DesignKind,
     DesignToken,
+    DesignTokenCategory,
     DesignInteraction,
     DesignComment,
     DesignDocument,
@@ -48,6 +49,8 @@ export const DesignOperationKind = {
     Page: 'page',
     Guide: 'guide',
     Metadata: 'metadata',
+    Token: 'token',
+    PaintColor: 'paint-color',
 } as const;
 /** Editable properties exclude identity and tree links, which have dedicated operations. */
 export interface DesignNodeChanges {
@@ -275,6 +278,38 @@ export interface DesignMetadata {
     readonly interactions?: readonly DesignInteraction[];
     readonly comments?: readonly DesignComment[];
 }
+/** Omitted token properties keep their saved values. */
+export interface DesignTokenChanges {
+    readonly name?: string;
+    readonly value?: string;
+    readonly category?: DesignTokenCategory;
+}
+/** Create or edit one token; null detaches its paints and deletes it without changing their appearance. */
+export interface DesignTokenOperation {
+    readonly op: typeof DesignOperationKind.Token;
+    readonly id: string;
+    readonly changes: DesignTokenChanges | null;
+}
+/** Existing fill and stroke colors share one compact native edit. */
+export const DesignPaintColorTarget = { Fill: 'fill', Stroke: 'stroke' } as const;
+/** Paint location. */
+export type DesignPaintColorTarget =
+    (typeof DesignPaintColorTarget)[keyof typeof DesignPaintColorTarget];
+/** Omitted color properties retain the original paint; tokenId:null alone preserves its resolved color. */
+export interface DesignPaintColorChanges {
+    readonly color?: string;
+    readonly tokenId?: string | null;
+    readonly opacity?: number;
+}
+/** Fill index zero may create a first paint; stroke edits require an existing stroke and index zero. */
+export interface DesignPaintColorOperation {
+    readonly op: typeof DesignOperationKind.PaintColor;
+    readonly id: string;
+    readonly pageId: string;
+    readonly target: DesignPaintColorTarget;
+    readonly index: number;
+    readonly changes: DesignPaintColorChanges;
+}
 /** A transaction can contain different operation types. */
 export type DesignOperation =
     | DesignInsert
@@ -293,7 +328,9 @@ export type DesignOperation =
     | DesignRemove
     | DesignGuideOperation
     | DesignPageOperation
-    | DesignMetadata;
+    | DesignMetadata
+    | DesignTokenOperation
+    | DesignPaintColorOperation;
 /** Before and after images provide conflict-safe undo and bounded deltas. */
 export interface DesignEntityChange<T> {
     readonly id: string;
