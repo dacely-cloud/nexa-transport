@@ -6897,6 +6897,9 @@ export const schema: Schema = {
                     $ref: '#/definitions/DesignPositionOperation',
                 },
                 {
+                    $ref: '#/definitions/DesignRotateOperation',
+                },
+                {
                     $ref: '#/definitions/DesignTranslateOperation',
                 },
                 {
@@ -22054,6 +22057,36 @@ export const schema: Schema = {
                 },
             },
             required: ['bytes', 'files', 'reconciledAt'],
+            type: 'object',
+        },
+        DesignRotateOperation: {
+            description:
+                'Rotates topmost selected layers together around a world pivot; omitted pivots use their combined bounds.',
+            properties: {
+                angle: {
+                    type: 'number',
+                },
+                op: {
+                    const: 'rotate',
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+                pivotX: {
+                    type: 'number',
+                },
+                pivotY: {
+                    type: 'number',
+                },
+                selection: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+            },
+            required: ['angle', 'op', 'pageId', 'selection'],
             type: 'object',
         },
     },

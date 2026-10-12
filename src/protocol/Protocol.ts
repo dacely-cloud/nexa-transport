@@ -4542,6 +4542,7 @@ export type DesignOperation =
     | DesignTextOperation
     | DesignResizeOperation
     | DesignPositionOperation
+    | DesignRotateOperation
     | DesignTranslateOperation
     | DesignMove
     | DesignRemove
@@ -14569,6 +14570,25 @@ export interface WorkspaceUsageShape {
 
 /** WorkspaceUsage from the Nexa wire protocol. */
 export type WorkspaceUsage = WorkspaceUsageShape;
+
+/** DesignRotateOperation wire fields. */
+export interface DesignRotateOperationShape {
+    /** angle as defined by the Nexa gateway. */
+    readonly angle: number;
+    /** op as defined by the Nexa gateway. */
+    readonly op: 'rotate';
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+    /** pivotX as defined by the Nexa gateway. */
+    readonly pivotX?: number;
+    /** pivotY as defined by the Nexa gateway. */
+    readonly pivotY?: number;
+    /** selection as defined by the Nexa gateway. */
+    readonly selection: ReadonlyArray<string>;
+}
+
+/** DesignRotateOperation from the Nexa wire protocol. */
+export type DesignRotateOperation = DesignRotateOperationShape;
 
 /** Supported RPC names. */
 export type MethodName = keyof GatewayMethods;
