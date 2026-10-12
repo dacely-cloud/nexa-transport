@@ -4563,7 +4563,8 @@ export type DesignOperation =
     | DesignGuideOperation
     | DesignMetadata
     | DesignTokenOperation
-    | DesignPaintColorOperation;
+    | DesignPaintColorOperation
+    | DesignTypographyStyleOperation;
 
 /** DesignOverride wire fields. */
 export interface DesignOverrideShape {
@@ -5013,6 +5014,8 @@ export interface DesignTextShape {
     readonly size: number;
     /** weight as defined by the Nexa gateway. */
     readonly weight: number;
+    /** typographyStyle as defined by the Nexa gateway. */
+    readonly typographyStyle?: DesignTypographyLink | null;
 }
 
 /** DesignText from the Nexa wire protocol. */
@@ -5187,6 +5190,8 @@ export interface DesignTokenShape {
     readonly name: string;
     /** value as defined by the Nexa gateway. */
     readonly value: string;
+    /** typography as defined by the Nexa gateway. */
+    readonly typography?: DesignTypographyValues;
 }
 
 /** DesignToken from the Nexa wire protocol. */
@@ -15245,10 +15250,98 @@ export interface DesignTokenChangesShape {
     readonly name?: string;
     /** value as defined by the Nexa gateway. */
     readonly value?: string;
+    /** typography as defined by the Nexa gateway. */
+    readonly typography?: DesignTypographyOverrides | null;
 }
 
 /** DesignTokenChanges from the Nexa wire protocol. */
 export type DesignTokenChanges = DesignTokenChangesShape;
+
+/** DesignTypographyStyleOperation wire fields. */
+export interface DesignTypographyStyleOperationShape {
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** op as defined by the Nexa gateway. */
+    readonly op: 'typography-style';
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+    /** tokenId as defined by the Nexa gateway. */
+    readonly tokenId: null | string;
+}
+
+/** DesignTypographyStyleOperation from the Nexa wire protocol. */
+export type DesignTypographyStyleOperation = DesignTypographyStyleOperationShape;
+
+/** Allowed values for DesignTypographyOverridesalign. */
+export const DesignTypographyOverridesalignValues = {
+    Value0: 'center',
+    Value1: 'end',
+    Value2: 'start',
+} as const;
+
+/** DesignTypographyOverrides wire fields. */
+export interface DesignTypographyOverridesShape {
+    /** align as defined by the Nexa gateway. */
+    readonly align?: (typeof DesignTypographyOverridesalignValues)[keyof typeof DesignTypographyOverridesalignValues];
+    /** family as defined by the Nexa gateway. */
+    readonly family?: string;
+    /** font as defined by the Nexa gateway. */
+    readonly font?: DesignFontBinding | null;
+    /** italic as defined by the Nexa gateway. */
+    readonly italic?: boolean;
+    /** letterSpacing as defined by the Nexa gateway. */
+    readonly letterSpacing?: number;
+    /** lineHeight as defined by the Nexa gateway. */
+    readonly lineHeight?: number;
+    /** size as defined by the Nexa gateway. */
+    readonly size?: number;
+    /** weight as defined by the Nexa gateway. */
+    readonly weight?: number;
+}
+
+/** DesignTypographyOverrides from the Nexa wire protocol. */
+export type DesignTypographyOverrides = DesignTypographyOverridesShape;
+
+/** Allowed values for DesignTypographyValuesalign. */
+export const DesignTypographyValuesalignValues = {
+    Value0: 'center',
+    Value1: 'end',
+    Value2: 'start',
+} as const;
+
+/** DesignTypographyValues wire fields. */
+export interface DesignTypographyValuesShape {
+    /** align as defined by the Nexa gateway. */
+    readonly align: (typeof DesignTypographyValuesalignValues)[keyof typeof DesignTypographyValuesalignValues];
+    /** family as defined by the Nexa gateway. */
+    readonly family: string;
+    /** font as defined by the Nexa gateway. */
+    readonly font: DesignFontBinding | null;
+    /** italic as defined by the Nexa gateway. */
+    readonly italic: boolean;
+    /** letterSpacing as defined by the Nexa gateway. */
+    readonly letterSpacing: number;
+    /** lineHeight as defined by the Nexa gateway. */
+    readonly lineHeight: number;
+    /** size as defined by the Nexa gateway. */
+    readonly size: number;
+    /** weight as defined by the Nexa gateway. */
+    readonly weight: number;
+}
+
+/** DesignTypographyValues from the Nexa wire protocol. */
+export type DesignTypographyValues = DesignTypographyValuesShape;
+
+/** DesignTypographyLink wire fields. */
+export interface DesignTypographyLinkShape {
+    /** overrides as defined by the Nexa gateway. */
+    readonly overrides?: DesignTypographyOverrides;
+    /** tokenId as defined by the Nexa gateway. */
+    readonly tokenId: string;
+}
+
+/** DesignTypographyLink from the Nexa wire protocol. */
+export type DesignTypographyLink = DesignTypographyLinkShape;
 
 /** Supported RPC names. */
 export type MethodName = keyof GatewayMethods;

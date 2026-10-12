@@ -38,6 +38,7 @@ const config: UserConfig = {
                 'design-defaults': 'src/design/DesignDefaults.ts',
                 'design-codec': 'src/design/DesignCodec.ts',
                 'design-edits': 'src/design/DesignEdits.ts',
+                'design-typography-styles': 'src/design/DesignTypographyStyleCodec.ts',
                 'design-token-edits': 'src/design/DesignTokenEdits.ts',
                 'design-transfer-types': 'src/design/DesignTransferTypes.ts',
                 'design-transfer-codec': 'src/design/DesignTransferCodec.ts',

@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { DesignTypographyOverrides } from './DesignTypographyStyleTypes.js';
+
 import type { DesignFontBinding } from './DesignFontTypes.js';
 import type { DesignVariantSet, DesignVariantValue } from './DesignVariantTypes.js';
 import type { DesignMask } from './DesignMaskTypes.js';
@@ -42,6 +44,7 @@ export const DesignOperationKind = {
     Layout: 'layout',
     Sizing: 'sizing',
     Typography: 'typography',
+    TypographyStyle: 'typography-style',
     TextStyle: 'text-style',
     Text: 'text',
     Move: 'move',
@@ -152,6 +155,13 @@ export interface DesignTypographyChanges {
     readonly letterSpacing?: number;
     readonly align?: typeof DesignAlign.Start | typeof DesignAlign.Center | typeof DesignAlign.End;
     readonly font?: DesignFontBinding | null;
+}
+/** Link one text layer to a typed saved style, reset its overrides or detach at its current appearance. */
+export interface DesignTypographyStyleOperation {
+    readonly op: typeof DesignOperationKind.TypographyStyle;
+    readonly id: string;
+    readonly pageId: string;
+    readonly tokenId: string | null;
 }
 /** The native source remains authoritative while the website sends only changed font properties. */
 export interface DesignTypographyOperation {
@@ -280,6 +290,7 @@ export interface DesignMetadata {
 }
 /** Omitted token properties keep their saved values. */
 export interface DesignTokenChanges {
+    readonly typography?: DesignTypographyOverrides | null;
     readonly name?: string;
     readonly value?: string;
     readonly category?: DesignTokenCategory;
@@ -321,6 +332,7 @@ export type DesignOperation =
     | DesignScaleOperation
     | DesignLayoutOperation
     | DesignSizingOperation
+    | DesignTypographyStyleOperation
     | DesignTypographyOperation
     | DesignTextStyleOperation
     | DesignTextOperation

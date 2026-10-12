@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignTypographyStyleCodec } from './DesignTypographyStyleCodec.js';
+
 import { DesignValues as V } from './DesignValues.js';
 import { DesignNodeCodec } from './DesignNodeCodec.js';
 import { DesignFreeze } from './DesignFreeze.js';
@@ -87,12 +89,11 @@ export class DesignCodec {
     }
     /** Validates one bounded token record. */
     public static token(raw: unknown): DesignToken {
-        const value: Readonly<Record<string, unknown>> = V.record(raw, [
-            'id',
-            'name',
-            'value',
-            'category',
-        ]);
+        const value: Readonly<Record<string, unknown>> = V.fields(
+            raw,
+            ['id', 'name', 'value', 'category', 'typography'],
+            ['id', 'name', 'value', 'category'],
+        );
         const category: DesignTokenCategory = V.choice(
             value['category'],
             Object.values(DesignTokenCategory),
@@ -101,7 +102,18 @@ export class DesignCodec {
         if (category === DesignTokenCategory.Color) {
             V.color(text);
         }
-        return { id: V.id(value['id']), name: V.text(value['name']), value: text, category };
+        if (value['typography'] !== undefined && category !== DesignTokenCategory.Typography) {
+            throw new Error('Typography values require a typography token.');
+        }
+        return {
+            id: V.id(value['id']),
+            name: V.text(value['name']),
+            value: text,
+            category,
+            ...(value['typography'] === undefined
+                ? {}
+                : { typography: DesignTypographyStyleCodec.values(value['typography']) }),
+        };
     }
     /** Validates one bounded interaction record. */
     public static interaction(raw: unknown): DesignInteraction {

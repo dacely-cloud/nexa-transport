@@ -72,6 +72,7 @@ export class DesignOperationCodec {
                     'pivotX',
                     'pivotY',
                     'factor',
+                    'tokenId',
                 ],
                 ['op'],
             );
@@ -112,6 +113,20 @@ export class DesignOperationCodec {
                         target: V.choice(value['target'], Object.values(DesignPaintColorTarget)),
                         index: V.number(value['index'], 0, 7, true),
                         changes: DesignPaintColorChangesCodec.changes(value['changes']),
+                    };
+                }
+                case Kind.TypographyStyle: {
+                    const value: Readonly<Record<string, unknown>> = V.record(entry, [
+                        'op',
+                        'id',
+                        'pageId',
+                        'tokenId',
+                    ]);
+                    return {
+                        op,
+                        id: V.id(value['id']),
+                        pageId: V.id(value['pageId']),
+                        tokenId: V.optionalId(value['tokenId']),
                     };
                 }
                 case Kind.Token: {

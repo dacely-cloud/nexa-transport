@@ -6968,6 +6968,9 @@ export const schema: Schema = {
                 {
                     $ref: '#/definitions/DesignPaintColorOperation',
                 },
+                {
+                    $ref: '#/definitions/DesignTypographyStyleOperation',
+                },
             ],
             description: 'A transaction can contain different operation types.',
         },
@@ -7642,6 +7645,18 @@ export const schema: Schema = {
                 weight: {
                     type: 'number',
                 },
+                typographyStyle: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignTypographyLink',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                    description:
+                        'Saved typography remains linked while local overrides and rich spans stay editable.',
+                },
             },
             required: [
                 'align',
@@ -7938,6 +7953,11 @@ export const schema: Schema = {
                 },
                 value: {
                     type: 'string',
+                },
+                typography: {
+                    $ref: '#/definitions/DesignTypographyValues',
+                    description:
+                        'Legacy typography values remain readable; typed styles are explicit and independently validated.',
                 },
             },
             required: ['category', 'id', 'name', 'value'],
@@ -22999,7 +23019,142 @@ export const schema: Schema = {
                 value: {
                     type: 'string',
                 },
+                typography: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignTypographyOverrides',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
             },
+            type: 'object',
+        },
+        DesignTypographyStyleOperation: {
+            description:
+                'Link one text layer to a typed saved style, reset its overrides or detach at its current appearance.',
+            properties: {
+                id: {
+                    type: 'string',
+                },
+                op: {
+                    const: 'typography-style',
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+                tokenId: {
+                    type: ['null', 'string'],
+                },
+            },
+            required: ['id', 'op', 'pageId', 'tokenId'],
+            type: 'object',
+        },
+        DesignTypographyOverrides: {
+            description:
+                'Local properties override their saved style while other fields remain linked.',
+            properties: {
+                align: {
+                    enum: ['center', 'end', 'start'],
+                    type: 'string',
+                },
+                family: {
+                    type: 'string',
+                },
+                font: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignFontBinding',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                italic: {
+                    type: 'boolean',
+                },
+                letterSpacing: {
+                    type: 'number',
+                },
+                lineHeight: {
+                    type: 'number',
+                },
+                size: {
+                    type: 'number',
+                },
+                weight: {
+                    type: 'number',
+                },
+            },
+            type: 'object',
+        },
+        DesignTypographyValues: {
+            description:
+                'A saved text style contains typography only; content and rich ranges remain on each layer.',
+            properties: {
+                align: {
+                    enum: ['center', 'end', 'start'],
+                    type: 'string',
+                },
+                family: {
+                    type: 'string',
+                },
+                font: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignFontBinding',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                italic: {
+                    type: 'boolean',
+                },
+                letterSpacing: {
+                    type: 'number',
+                },
+                lineHeight: {
+                    type: 'number',
+                },
+                size: {
+                    type: 'number',
+                },
+                weight: {
+                    type: 'number',
+                },
+            },
+            required: [
+                'align',
+                'family',
+                'font',
+                'italic',
+                'letterSpacing',
+                'lineHeight',
+                'size',
+                'weight',
+            ],
+            type: 'object',
+        },
+        DesignTypographyLink: {
+            description:
+                'A text layer links to a typed typography token and may override individual properties.',
+            properties: {
+                overrides: {
+                    $ref: '#/definitions/DesignTypographyOverrides',
+                    description:
+                        'Local properties override their saved style while other fields remain linked.',
+                },
+                tokenId: {
+                    type: 'string',
+                },
+            },
+            required: ['tokenId'],
             type: 'object',
         },
     },

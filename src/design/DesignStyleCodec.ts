@@ -1,6 +1,9 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignFontFamilyCodec } from './DesignFontFamilyCodec.js';
+import { DesignTypographyStyleCodec } from './DesignTypographyStyleCodec.js';
+
 import { DesignValues as V } from './DesignValues.js';
 import { DesignImageFramingCodec } from './DesignImageFramingCodec.js';
 import { DesignFontCodec } from './DesignFontCodec.js';
@@ -121,11 +124,7 @@ export class DesignStyleCodec {
     }
     /** Font names are values rather than an arbitrary CSS font expression. */
     public static family(raw: unknown): string {
-        const family: string = V.text(raw, 96);
-        if (!/^[\p{L}\p{N} ._-]+$/u.test(family)) {
-            throw new Error('Invalid design font family');
-        }
-        return family;
+        return DesignFontFamilyCodec.family(raw);
     }
     /** Rich text offsets must refer to non-overlapping, well-formed Unicode ranges. */
     public static text(raw: unknown): DesignText {
@@ -133,6 +132,7 @@ export class DesignStyleCodec {
             raw,
             [
                 'font',
+                'typographyStyle',
                 'content',
                 'family',
                 'size',
@@ -201,6 +201,9 @@ export class DesignStyleCodec {
             throw new Error('Invalid rich text ranges');
         }
         return {
+            ...(Object.hasOwn(value, 'typographyStyle')
+                ? { typographyStyle: DesignTypographyStyleCodec.link(value['typographyStyle']) }
+                : {}),
             ...(Object.hasOwn(value, 'font')
                 ? { font: DesignFontCodec.binding(value['font']) }
                 : {}),

@@ -1,10 +1,15 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignTypographyLinks } from './DesignTypographyLinks.js';
+import { DesignTypographyStyleCodec } from './DesignTypographyStyleCodec.js';
+import type { DesignTypographyValues } from './DesignTypographyStyleTypes.js';
+
 import { DesignCodec } from './DesignCodec.js';
 import type { DesignTokenOperation } from './DesignOperationTypes.js';
 import type {
     DesignDocument,
+    DesignText,
     DesignToken,
     DesignNode,
     DesignPaint,
@@ -37,23 +42,52 @@ export class DesignTokenEdits {
             before === undefined &&
             (operation.changes.name === undefined ||
                 operation.changes.category === undefined ||
-                operation.changes.value === undefined)
+                (operation.changes.value === undefined && operation.changes.typography == null))
         ) {
             throw new Error('A new token requires name, category and value.');
         }
-        const token: DesignToken = DesignCodec.token({
-            ...before,
+        const { typography: original, ...rest }: DesignToken = before ?? {
             id: operation.id,
-            ...operation.changes,
+            name: '',
+            category: 'typography',
+            value: '',
+        };
+        let typography: DesignTypographyValues | undefined = original;
+        if (operation.changes.typography === null) {
+            typography = undefined;
+        } else if (operation.changes.typography !== undefined) {
+            const base: DesignTypographyValues = original ?? DesignTypographyStyleCodec.defaults();
+            const changed: boolean =
+                (operation.changes.typography.family !== undefined &&
+                    operation.changes.typography.family !== base.family) ||
+                (operation.changes.typography.italic !== undefined &&
+                    operation.changes.typography.italic !== base.italic);
+            typography = DesignTypographyStyleCodec.values({
+                ...base,
+                ...operation.changes.typography,
+                ...(changed && operation.changes.typography.font === undefined
+                    ? { font: null }
+                    : {}),
+            });
+        }
+        const { typography: _patch, ...changes }: typeof operation.changes = operation.changes;
+        const token: DesignToken = DesignCodec.token({
+            ...rest,
+            ...changes,
+            id: operation.id,
+            value: operation.changes.value ?? before?.value ?? operation.changes.name,
+            ...(typography === undefined ? {} : { typography }),
         });
+        const tokens: readonly DesignToken[] =
+            before === undefined
+                ? [...document.tokens, token]
+                : document.tokens.map((entry: DesignToken): DesignToken =>
+                      entry.id === token.id ? token : entry,
+                  );
         return {
             ...document,
-            tokens:
-                before === undefined
-                    ? [...document.tokens, token]
-                    : document.tokens.map((entry: DesignToken): DesignToken =>
-                          entry.id === token.id ? token : entry,
-                      ),
+            tokens,
+            nodes: DesignTypographyLinks.resolve(document.nodes, tokens),
         };
     }
     /** Counts authored paint links, including instance overrides, without expanding instance artwork. */
@@ -102,7 +136,11 @@ export class DesignTokenEdits {
                 return { ...override, style: next };
             },
         );
-        return changed ? { ...node, style, overrides } : node;
+        const text: DesignText | null =
+            node.text?.typographyStyle?.tokenId === token.id
+                ? { ...node.text, typographyStyle: null }
+                : node.text;
+        return changed || text !== node.text ? { ...node, style, overrides, text } : node;
     }
     static #style(style: DesignStyle, token: DesignToken): DesignStyle {
         let changed: boolean = false;

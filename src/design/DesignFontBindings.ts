@@ -1,10 +1,16 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignTypographyStyleCodec } from './DesignTypographyStyleCodec.js';
+
 import type { DesignDocument, DesignText, DesignTextRun } from './DesignTypes.js';
 import type { DesignFontBinding } from './DesignFontTypes.js';
 import type { DesignTextSpanStyle } from './DesignTextLayout.js';
 import { DesignOperationKind, type DesignOperation } from './DesignOperationTypes.js';
+import type {
+    DesignTypographyValues,
+    DesignTypographyOverrides,
+} from './DesignTypographyStyleTypes.js';
 
 /** The same saved face resolution applies to native shaping, browser pixels and export. */
 export class DesignFontBindings {
@@ -12,6 +18,7 @@ export class DesignFontBindings {
     public static styles(
         documents: readonly DesignDocument[],
         operations: readonly DesignOperation[] = [],
+        includeLibrary: boolean = true,
     ): readonly DesignTextSpanStyle[] {
         const result: DesignTextSpanStyle[] = [];
         const append: (text: DesignText | null | undefined) => void = (
@@ -25,12 +32,59 @@ export class DesignFontBindings {
                 result.push(this.run(text, run));
             }
         };
+        const library: Map<string, DesignTypographyValues> = new Map();
+        const saved: (values: DesignTypographyValues) => void = (
+            values: DesignTypographyValues,
+        ): void => {
+            result.push({
+                rich: false,
+                family: values.family,
+                size: values.size,
+                weight: values.weight,
+                italic: values.italic,
+                color: '#000000',
+                underline: false,
+                font: values.font,
+            });
+        };
         for (const document of documents) {
+            for (const token of document.tokens) {
+                if (token.typography !== undefined) {
+                    library.set(token.id, token.typography);
+                    if (includeLibrary) {
+                        saved(token.typography);
+                    }
+                }
+            }
             for (const node of document.nodes) {
                 append(node.text);
             }
         }
         for (const operation of operations) {
+            if (
+                operation.op === DesignOperationKind.Token &&
+                (operation.changes === null || operation.changes.typography === null)
+            ) {
+                library.delete(operation.id);
+            }
+            if (
+                operation.op === DesignOperationKind.Token &&
+                operation.changes?.typography != null
+            ) {
+                const base: DesignTypographyValues =
+                    library.get(operation.id) ?? DesignTypographyStyleCodec.defaults();
+                const changes: DesignTypographyOverrides = operation.changes.typography;
+                const faceChanged: boolean =
+                    (changes.family !== undefined && changes.family !== base.family) ||
+                    (changes.italic !== undefined && changes.italic !== base.italic);
+                const next: DesignTypographyValues = DesignTypographyStyleCodec.values({
+                    ...base,
+                    ...changes,
+                    ...(faceChanged && changes.font === undefined ? { font: null } : {}),
+                });
+                library.set(operation.id, next);
+                saved(next);
+            }
             if (operation.op === DesignOperationKind.Insert) {
                 append(operation.node.text);
             } else if (operation.op === DesignOperationKind.Update) {

@@ -26,6 +26,12 @@ export class DesignFreeze {
             Object.freeze(page);
         }
         for (const token of document.tokens) {
+            if (token.typography !== undefined) {
+                if (token.typography.font !== null) {
+                    Object.freeze(token.typography.font);
+                }
+                Object.freeze(token.typography);
+            }
             Object.freeze(token);
         }
         for (const interaction of document.interactions) {
@@ -99,6 +105,15 @@ export class DesignFreeze {
         Object.freeze(style);
     }
     static #text(text: DesignText): void {
+        if (text.typographyStyle != null) {
+            if (text.typographyStyle.overrides !== undefined) {
+                if (text.typographyStyle.overrides.font != null) {
+                    Object.freeze(text.typographyStyle.overrides.font);
+                }
+                Object.freeze(text.typographyStyle.overrides);
+            }
+            Object.freeze(text.typographyStyle);
+        }
         for (const run of text.runs) {
             Object.freeze(run);
         }

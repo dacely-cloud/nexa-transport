@@ -67,6 +67,18 @@ export class DesignTree {
             tokens.set(token.id, token.category);
         }
         for (const node of nodes.values()) {
+            if (node.text?.typographyStyle != null) {
+                const token: import('./DesignTypes.js').DesignToken | undefined =
+                    document.tokens.find(
+                        (entry): boolean => entry.id === node.text?.typographyStyle?.tokenId,
+                    );
+                if (
+                    token?.category !== DesignTokenCategory.Typography ||
+                    token.typography === undefined
+                ) {
+                    throw new Error('Text requires an existing typed typography style');
+                }
+            }
             if (
                 node.mask?.sourceId !== null &&
                 node.mask?.sourceId !== undefined &&

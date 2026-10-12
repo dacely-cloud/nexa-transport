@@ -1,6 +1,9 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignTypographyLinks } from './DesignTypographyLinks.js';
+import { DesignTypographyStyleEdits } from './DesignTypographyStyleEdits.js';
+
 import { DesignLayerAuthority } from './DesignLayerAuthority.js';
 import { DesignPaintColorEdits } from './DesignPaintColorEdits.js';
 import { DesignTokenEdits } from './DesignTokenEdits.js';
@@ -287,6 +290,15 @@ export class DesignEdits {
                     nodes.set(node.id, node);
                     break;
                 }
+                case DesignOperationKind.TypographyStyle: {
+                    const node: DesignNode = DesignTypographyStyleEdits.apply(
+                        new DesignLayerAuthority(nodes, pages),
+                        metadata.tokens,
+                        operation,
+                    );
+                    nodes.set(node.id, node);
+                    break;
+                }
                 case DesignOperationKind.Token: {
                     const edited: DesignDocument = DesignTokenEdits.apply(
                         {
@@ -322,7 +334,7 @@ export class DesignEdits {
         const next: DesignDocument = DesignCodec.document({
             ...document,
             ...metadata,
-            nodes: [...nodes.values()],
+            nodes: DesignTypographyLinks.resolve([...nodes.values()], metadata.tokens),
             pages: [...pages.values()],
         });
         return { document: next, changes: this.diff(document, next) };

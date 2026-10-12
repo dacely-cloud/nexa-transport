@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { DesignTypographyValues, DesignTypographyLink } from './DesignTypographyStyleTypes.js';
+
 import type { DesignVariantSet, DesignVariantValue } from './DesignVariantTypes.js';
 import type { DesignMask } from './DesignMaskTypes.js';
 import type { DesignBooleanMode } from './DesignBooleanTypes.js';
@@ -168,6 +170,8 @@ export interface DesignTextRun {
 }
 /** Text layout is shared by the canvas, tools and exported designs. */
 export interface DesignText {
+    /** Saved typography remains linked while local overrides and rich spans stay editable. */
+    readonly typographyStyle?: DesignTypographyLink | null;
     /** Exact private font bytes remain in the owner's library, independently of the saved scene. */
     readonly font?: DesignFontBinding | null;
     readonly content: string;
@@ -329,6 +333,8 @@ export interface DesignPage {
 }
 /** Named design-system values. */
 export interface DesignToken {
+    /** Legacy typography values remain readable; typed styles are explicit and independently validated. */
+    readonly typography?: DesignTypographyValues;
     readonly id: string;
     readonly name: string;
     readonly value: string;

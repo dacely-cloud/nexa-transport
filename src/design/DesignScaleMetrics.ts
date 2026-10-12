@@ -30,6 +30,18 @@ export class DesignScaleMetrics {
     public static text(text: DesignText, factor: number): DesignText {
         return {
             ...text,
+            ...(text.typographyStyle == null
+                ? {}
+                : {
+                      typographyStyle: {
+                          ...text.typographyStyle,
+                          overrides: {
+                              ...text.typographyStyle.overrides,
+                              size: text.size * factor,
+                              letterSpacing: text.letterSpacing * factor,
+                          },
+                      },
+                  }),
             size: text.size * factor,
             letterSpacing: text.letterSpacing * factor,
             runs: text.runs.map((run: DesignTextRun): DesignTextRun => ({

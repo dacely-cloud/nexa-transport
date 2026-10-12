@@ -232,7 +232,7 @@
       "description": "One agent's configuration.",
       "properties": {
         "advertisedTools": {
-          "description": "The subset of `tools` whose DEFINITIONS are sent to the model.\n\nA rendering choice, never a permission — the deferred-tool catalog uses it to keep a thousand\nschemas out of the context window while leaving the tools reachable through `tool_call` and\nthrough a name the model remembers. `tools` and `excludeTools` are what decide whether a call\nruns; conflating the two is how \"the model was not shown it\" gets mistaken for \"the model\ncannot use it\", which is only true of a model that is not being steered by anybody.",
+          "description": "The subset of `tools` whose DEFINITIONS are sent to the model.\n\nA rendering choice, never a permission \u2014 the deferred-tool catalog uses it to keep a thousand\nschemas out of the context window while leaving the tools reachable through `tool_call` and\nthrough a name the model remembers. `tools` and `excludeTools` are what decide whether a call\nruns; conflating the two is how \"the model was not shown it\" gets mistaken for \"the model\ncannot use it\", which is only true of a model that is not being steered by anybody.",
           "items": {
             "type": "string"
           },
@@ -284,7 +284,7 @@
           "description": "Reasoning configuration for a request."
         },
         "systemPrompt": {
-          "description": "The agent's own system prompt, replacing the default persona entirely when set.\n\nPer-agent rather than global because a deployment runs several agents with genuinely different\njobs — a code reviewer and a support responder should not share a persona.",
+          "description": "The agent's own system prompt, replacing the default persona entirely when set.\n\nPer-agent rather than global because a deployment runs several agents with genuinely different\njobs \u2014 a code reviewer and a support responder should not share a persona.",
           "type": "string"
         },
         "systemPromptSuffix": {
@@ -686,7 +686,7 @@
           "type": "string"
         },
         "sessionKey": {
-          "description": "The session id this turn was filed under — `sessions.get`'s id, not the provider's.\n\nThe one field a client needs to mirror its own conversation. `conversationId` is null for\nevery provider that does not hold history itself, and even when it is not, the gateway's\nsession key is namespaced by principal: a client that subscribed to what it typed named\n`main` while the record was `alice::main`, so `sessions.subscribe` refused it and the second\ndevice watched nothing. Passing this straight back as the next turn's `conversationId`\nresumes the same conversation, so a client never has to reconstruct the namespacing itself.\n\nAbsent from a gateway older than this field. Every reader here treats a missing value as\n\"this server cannot tell me\" rather than declaring it optional, because it is never optional\non the server that produced it.",
+          "description": "The session id this turn was filed under \u2014 `sessions.get`'s id, not the provider's.\n\nThe one field a client needs to mirror its own conversation. `conversationId` is null for\nevery provider that does not hold history itself, and even when it is not, the gateway's\nsession key is namespaced by principal: a client that subscribed to what it typed named\n`main` while the record was `alice::main`, so `sessions.subscribe` refused it and the second\ndevice watched nothing. Passing this straight back as the next turn's `conversationId`\nresumes the same conversation, so a client never has to reconstruct the namespacing itself.\n\nAbsent from a gateway older than this field. Every reader here treats a missing value as\n\"this server cannot tell me\" rather than declaring it optional, because it is never optional\non the server that produced it.",
           "type": "string"
         },
         "text": {
@@ -4281,7 +4281,7 @@
         },
         "enforcement": {
           "$ref": "#/definitions/BudgetEnforcement",
-          "description": "What happens at the cap.\n\n`block` refuses further spend; `warn` records and allows it. The default is `warn`, because a\nbudget that silently halts an enterprise agent mid-task is a worse failure than an overrun\nsomebody can see — blocking must be chosen deliberately."
+          "description": "What happens at the cap.\n\n`block` refuses further spend; `warn` records and allows it. The default is `warn`, because a\nbudget that silently halts an enterprise agent mid-task is a worse failure than an overrun\nsomebody can see \u2014 blocking must be chosen deliberately."
         },
         "id": {
           "type": "string"
@@ -4298,7 +4298,7 @@
           "$ref": "#/definitions/CreditScope"
         },
         "scopeId": {
-          "description": "The scope's id (a user id, an agent id…). Ignored for `global`.",
+          "description": "The scope's id (a user id, an agent id\u2026). Ignored for `global`.",
           "type": "string"
         },
         "updatedAt": {
@@ -4944,7 +4944,7 @@
       "properties": {
         "config": {
           "$ref": "#/definitions/Record%3Cstring%2Cunknown%3E",
-          "description": "The merged config as JSON. Redacted — see `redactConfig` in the server."
+          "description": "The merged config as JSON. Redacted \u2014 see `redactConfig` in the server."
         },
         "defaults": {
           "$ref": "#/definitions/Record%3Cstring%2Cunknown%3E",
@@ -5245,7 +5245,7 @@
               "type": "string"
             },
             "signature": {
-              "description": "An integrity token some providers attach to a tool call made while reasoning.\n\nOpaque, and round-tripped verbatim on the next turn. Gemini rejects a replayed function\ncall whose thought signature is missing or altered, so this must travel WITH the block\nrather than in a side table — a cache keyed by call id does not survive a session being\nreloaded from disk, which is exactly when the replay happens.",
+              "description": "An integrity token some providers attach to a tool call made while reasoning.\n\nOpaque, and round-tripped verbatim on the next turn. Gemini rejects a replayed function\ncall whose thought signature is missing or altered, so this must travel WITH the block\nrather than in a side table \u2014 a cache keyed by call id does not survive a session being\nreloaded from disk, which is exactly when the replay happens.",
               "type": "string"
             },
             "type": {
@@ -7993,6 +7993,9 @@
         },
         {
           "$ref": "#/definitions/DesignPaintColorOperation"
+        },
+        {
+          "$ref": "#/definitions/DesignTypographyStyleOperation"
         }
       ],
       "description": "A transaction can contain different operation types."
@@ -8804,6 +8807,17 @@
         },
         "weight": {
           "type": "number"
+        },
+        "typographyStyle": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/DesignTypographyLink"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Saved typography remains linked while local overrides and rich spans stay editable."
         }
       },
       "required": [
@@ -9142,6 +9156,10 @@
         },
         "value": {
           "type": "string"
+        },
+        "typography": {
+          "$ref": "#/definitions/DesignTypographyValues",
+          "description": "Legacy typography values remain readable; typed styles are explicit and independently validated."
         }
       },
       "required": [
@@ -9471,7 +9489,7 @@
           "type": "string"
         },
         "scopes": {
-          "description": "Absent grants exactly what the device requested. A list here REPLACES that, and may widen it.\n\nStated plainly because the previous wording (\"may only NARROW it\") was false of every\nimplementation: `MemoryPairingStore.approve` does `grant(..., scopes ?? requestedScopes)` and\nnever compares the two. Widening is the intended behaviour and not an oversight — a device\nthat sends no `x-nexa-scopes` header is recorded as requesting `read`, which is every client\nthat has not been told otherwise, so a narrow-only rule would make it impossible to pair your\nown laptop as an admin without first re-pairing it with a hand-set header.\n\nIt is not a privilege escalation BY the device: `devices.approve` requires `admin`, so the\nonly party that can widen a grant is one that already holds everything it is granting.",
+          "description": "Absent grants exactly what the device requested. A list here REPLACES that, and may widen it.\n\nStated plainly because the previous wording (\"may only NARROW it\") was false of every\nimplementation: `MemoryPairingStore.approve` does `grant(..., scopes ?? requestedScopes)` and\nnever compares the two. Widening is the intended behaviour and not an oversight \u2014 a device\nthat sends no `x-nexa-scopes` header is recorded as requesting `read`, which is every client\nthat has not been told otherwise, so a narrow-only rule would make it impossible to pair your\nown laptop as an admin without first re-pairing it with a hand-set header.\n\nIt is not a privilege escalation BY the device: `devices.approve` requires `admin`, so the\nonly party that can widen a grant is one that already holds everything it is granting.",
           "items": {
             "$ref": "#/definitions/Scope"
           },
@@ -9530,7 +9548,7 @@
       "type": "object"
     },
     "DeviceListResult": {
-      "description": "The device roster: what is paired and what is asking to be.\n\nOne method for both halves because they are one screen and one decision — an operator looking at\na pending request needs to see whether that device is already paired under another name, and two\nround trips to find out is two chances for the two lists to be read from different moments.",
+      "description": "The device roster: what is paired and what is asking to be.\n\nOne method for both halves because they are one screen and one decision \u2014 an operator looking at\na pending request needs to see whether that device is already paired under another name, and two\nround trips to find out is two chances for the two lists to be read from different moments.",
       "properties": {
         "approved": {
           "items": {
@@ -9667,7 +9685,7 @@
       "type": "string"
     },
     "Flatten<{readonlytitle:string|null;readonlyid:string;readonlyagentId:string;readonlycreatedAt:number;readonlyupdatedAt:number;readonlyconversationId:string|null;readonlyparticipants:readonlystring[];readonlymessageCount:number;readonlyusage:TokenUsage;}&{readonlytitleEdited?:boolean|undefined;readonlyretrySourceId?:string|undefined;readonlyretryRequestId?:string|undefined;readonlyretryState?:string|undefined;readonlyretryFingerprint?:string|undefined;readonlyactiveToolFamilies?:readonlystring[]|undefined;readonlyprojectId?:string|undefined;readonlyuserId?:string|undefined;readonlyworkspaceId?:string|undefined;readonlyturnOpen?:boolean|undefined;}>": {
-      "description": "Collapses the required/optional intersection into one object type.\n\nHomomorphic (`in keyof T` over a naked type parameter), so `readonly` and `?` are carried through\nrather than flattened away — without it every derived type would lose its modifiers and a caller\ncould assign to a field the store treats as immutable.",
+      "description": "Collapses the required/optional intersection into one object type.\n\nHomomorphic (`in keyof T` over a naked type parameter), so `readonly` and `?` are carried through\nrather than flattened away \u2014 without it every derived type would lose its modifiers and a caller\ncould assign to a field the store treats as immutable.",
       "properties": {
         "activeToolFamilies": {
           "items": {
@@ -11779,7 +11797,7 @@
               "anyOf": [
                 {
                   "$ref": "#/definitions/Flatten%3C%7Breadonlytitle%3Astring%7Cnull%3Breadonlyid%3Astring%3BreadonlyagentId%3Astring%3BreadonlycreatedAt%3Anumber%3BreadonlyupdatedAt%3Anumber%3BreadonlyconversationId%3Astring%7Cnull%3Breadonlyparticipants%3Areadonlystring%5B%5D%3BreadonlymessageCount%3Anumber%3Breadonlyusage%3ATokenUsage%3B%7D%26%7BreadonlytitleEdited%3F%3Aboolean%7Cundefined%3BreadonlyretrySourceId%3F%3Astring%7Cundefined%3BreadonlyretryRequestId%3F%3Astring%7Cundefined%3BreadonlyretryState%3F%3Astring%7Cundefined%3BreadonlyretryFingerprint%3F%3Astring%7Cundefined%3BreadonlyactiveToolFamilies%3F%3Areadonlystring%5B%5D%7Cundefined%3BreadonlyprojectId%3F%3Astring%7Cundefined%3BreadonlyuserId%3F%3Astring%7Cundefined%3BreadonlyworkspaceId%3F%3Astring%7Cundefined%3BreadonlyturnOpen%3F%3Aboolean%7Cundefined%3B%7D%3E",
-                  "description": "Collapses the required/optional intersection into one object type.\n\nHomomorphic (`in keyof T` over a naked type parameter), so `readonly` and `?` are carried through\nrather than flattened away — without it every derived type would lose its modifiers and a caller\ncould assign to a field the store treats as immutable."
+                  "description": "Collapses the required/optional intersection into one object type.\n\nHomomorphic (`in keyof T` over a naked type parameter), so `readonly` and `?` are carried through\nrather than flattened away \u2014 without it every derived type would lose its modifiers and a caller\ncould assign to a field the store treats as immutable."
                 },
                 {
                   "type": "null"
@@ -13916,7 +13934,7 @@
           "$ref": "#/definitions/JobAction"
         },
         "allowConcurrent": {
-          "description": "Whether a new run may start while a previous one is still going.\n\nDefault false. An every-minute job whose run takes 90 seconds will otherwise pile up runs\nuntil the process dies — the classic naive-scheduler failure.",
+          "description": "Whether a new run may start while a previous one is still going.\n\nDefault false. An every-minute job whose run takes 90 seconds will otherwise pile up runs\nuntil the process dies \u2014 the classic naive-scheduler failure.",
           "type": "boolean"
         },
         "createdAt": {
@@ -14029,7 +14047,7 @@
         {
           "properties": {
             "allowSelfLifecycle": {
-              "description": "Allow a command that stops or restarts Nexa itself.\n\nRefused by default because scheduling one from inside the scheduler is a loop rather\nthan a task — see `assertNotLifecycleCommand`. A nightly restart is a legitimate thing\nto want, and this is how to say so.",
+              "description": "Allow a command that stops or restarts Nexa itself.\n\nRefused by default because scheduling one from inside the scheduler is a loop rather\nthan a task \u2014 see `assertNotLifecycleCommand`. A nightly restart is a legitimate thing\nto want, and this is how to say so.",
               "type": "boolean"
             },
             "command": {
@@ -14039,7 +14057,7 @@
               "type": "string"
             },
             "elevation": {
-              "description": "Run this command outside the sandbox, if the policy allows it.\n\nThe operator's own decision about their own machine, which is why it lives on a job\nthey wrote and not on an argument a model fills in. Authorized against the policy at\nthe moment of the spawn: `sandbox.required` refuses it outright, and anything stronger\nthan `sandbox.elevation` is refused as exceeding it.\n\nA backup script that has to read outside the workspace roots is the case this exists\nfor — before it, the elevation axis was declared, defaulted to `off`, and unreachable.",
+              "description": "Run this command outside the sandbox, if the policy allows it.\n\nThe operator's own decision about their own machine, which is why it lives on a job\nthey wrote and not on an argument a model fills in. Authorized against the policy at\nthe moment of the spawn: `sandbox.required` refuses it outright, and anything stronger\nthan `sandbox.elevation` is refused as exceeding it.\n\nA backup script that has to read outside the workspace roots is the case this exists\nfor \u2014 before it, the elevation axis was declared, defaulted to `off`, and unreachable.",
               "enum": [
                 "ask",
                 "full",
@@ -14108,7 +14126,7 @@
           "properties": {
             "kind": {
               "const": "maintenance",
-              "description": "Housekeeping: expired media, expired workspaces, memories past their TTL.\n\nA kind rather than a `shell` job because the work is in-process — it needs the media\nstore, the workspace manager and the memory store this deployment constructed, not a\ncommand line — and because a deployment should not have to write a cron entry to stop\naccumulating every screenshot anybody ever sent it.",
+              "description": "Housekeeping: expired media, expired workspaces, memories past their TTL.\n\nA kind rather than a `shell` job because the work is in-process \u2014 it needs the media\nstore, the workspace manager and the memory store this deployment constructed, not a\ncommand line \u2014 and because a deployment should not have to write a cron entry to stop\naccumulating every screenshot anybody ever sent it.",
               "type": "string"
             }
           },
@@ -14138,7 +14156,7 @@
           "type": "string"
         },
         "deliverTo": {
-          "description": "Where the answer goes, as `channel:conversation` — `telegram:12345`.\n\nAbsent leaves the answer in the run record, which is what a job that exists to do something\nrather than to say something wants. A reminder wants the opposite.",
+          "description": "Where the answer goes, as `channel:conversation` \u2014 `telegram:12345`.\n\nAbsent leaves the answer in the run record, which is what a job that exists to do something\nrather than to say something wants. A reminder wants the opposite.",
           "type": "string"
         },
         "enabled": {
@@ -14168,7 +14186,7 @@
       "type": "object"
     },
     "JobOwner": {
-      "description": "Who a job belongs to — the four scopes credit is tracked against.",
+      "description": "Who a job belongs to \u2014 the four scopes credit is tracked against.",
       "properties": {
         "agentId": {
           "type": "string"
@@ -14303,7 +14321,7 @@
       "type": "object"
     },
     "LogLevel": {
-      "description": "Log severity, least → most severe.",
+      "description": "Log severity, least \u2192 most severe.",
       "enum": [
         "debug",
         "error",
@@ -14537,7 +14555,7 @@
       "type": "object"
     },
     "NcapArtifactDelta": {
-      "description": "One item's DELIVERABLE, as it closes — the counterpart to a finding for work that MAKES rather\nthan checks.",
+      "description": "One item's DELIVERABLE, as it closes \u2014 the counterpart to a finding for work that MAKES rather\nthan checks.",
       "properties": {
         "artifact": {
           "type": "string"
@@ -15552,7 +15570,7 @@
           "type": "number"
         },
         "checkable": {
-          "description": "Whether it carries a `requires:`/`forbids:` clause the engine can CHECK rather than only\ninject — the difference between a directive that is enforced and one merely offered.",
+          "description": "Whether it carries a `requires:`/`forbids:` clause the engine can CHECK rather than only\ninject \u2014 the difference between a directive that is enforced and one merely offered.",
           "type": "boolean"
         },
         "description": {
@@ -15572,7 +15590,7 @@
           "type": "string"
         },
         "source": {
-          "description": "`project` | `claude` | `user` — where it was found, which is also its precedence.",
+          "description": "`project` | `claude` | `user` \u2014 where it was found, which is also its precedence.",
           "type": "string"
         },
         "state": {
@@ -16748,7 +16766,7 @@
       "description": "Reasoning configuration for a request.",
       "properties": {
         "effort": {
-          "description": "How hard the model should think before answering.\n\nSix tiers rather than four because the ends of the range are real and providers price them apart.\n`Minimal` is a distinct setting on current OpenAI models — nearly no reasoning, but not none —\nand `XHigh` is the recommended tier for agentic coding on several of them. A five-tier ladder\nmakes both unreachable, which means a caller cannot request the setting the provider itself\nrecommends. A provider without a given tier ladders DOWN to its nearest supported one.",
+          "description": "How hard the model should think before answering.\n\nSix tiers rather than four because the ends of the range are real and providers price them apart.\n`Minimal` is a distinct setting on current OpenAI models \u2014 nearly no reasoning, but not none \u2014\nand `XHigh` is the recommended tier for agentic coding on several of them. A five-tier ladder\nmakes both unreachable, which means a caller cannot request the setting the provider itself\nrecommends. A provider without a given tier ladders DOWN to its nearest supported one.",
           "enum": [
             "high",
             "low",
@@ -19140,7 +19158,7 @@
           "type": "string"
         },
         "runId": {
-          "description": "The SERVER's name for the run, which is the one `tasks.*` uses.\n\nDistinct from `streamId` because the stream id is chosen by the client — deliberately, so the\naccept response cannot race the first events — and two clients therefore pick the same one\nroutinely. A `tasks.cancel` keyed on the client's id would abort somebody else's run by\ncoincidence; keyed on this one it cannot.",
+          "description": "The SERVER's name for the run, which is the one `tasks.*` uses.\n\nDistinct from `streamId` because the stream id is chosen by the client \u2014 deliberately, so the\naccept response cannot race the first events \u2014 and two clients therefore pick the same one\nroutinely. A `tasks.cancel` keyed on the client's id would abort somebody else's run by\ncoincidence; keyed on this one it cannot.",
           "type": "string"
         },
         "sessionKey": {
@@ -19224,7 +19242,7 @@
       "type": "object"
     },
     "TaskRecord": {
-      "description": "One streaming run, as an operator or a second client sees it.\n\nReported from the gateway's own registry rather than from the agent, because the gateway is the\nonly place that knows which CONNECTION owns a run — and \"cancel the run my phone started from my\nlaptop\" is the reason this family exists at all.",
+      "description": "One streaming run, as an operator or a second client sees it.\n\nReported from the gateway's own registry rather than from the agent, because the gateway is the\nonly place that knows which CONNECTION owns a run \u2014 and \"cancel the run my phone started from my\nlaptop\" is the reason this family exists at all.",
       "properties": {
         "agentId": {
           "type": [
@@ -19628,7 +19646,7 @@
           "type": "number"
         },
         "contextTokens": {
-          "description": "How much of the model's context window the conversation currently OCCUPIES.\n\nDistinct from `inputTokens`, and the distinction is load-bearing for compaction. `inputTokens`\nis a billing figure that accumulates across a turn's several round-trips; occupancy is the\nsize of the prompt right now. A compaction trigger that watched the billing figure would fire\nearly on every tool-heavy turn — after five round-trips the cumulative input exceeds the\nwindow while the actual prompt is nowhere near it.",
+          "description": "How much of the model's context window the conversation currently OCCUPIES.\n\nDistinct from `inputTokens`, and the distinction is load-bearing for compaction. `inputTokens`\nis a billing figure that accumulates across a turn's several round-trips; occupancy is the\nsize of the prompt right now. A compaction trigger that watched the billing figure would fire\nearly on every tool-heavy turn \u2014 after five round-trips the cumulative input exceeds the\nwindow while the actual prompt is nowhere near it.",
           "type": "number"
         },
         "inputTokens": {
@@ -19703,7 +19721,7 @@
           "description": "Shared investigation plan and evidence provenance, without live query capabilities."
         },
         "status": {
-          "description": "A one-line status, e.g. `running tests…`.",
+          "description": "A one-line status, e.g. `running tests\u2026`.",
           "type": "string"
         },
         "terminal": {
@@ -19862,7 +19880,7 @@
               ]
             }
           ],
-          "description": "Structured data for a UI that renders this tool specially (a diff view, a file tree).\nNever sent to the model — that is what `content` is for."
+          "description": "Structured data for a UI that renders this tool specially (a diff view, a file tree).\nNever sent to the model \u2014 that is what `content` is for."
         },
         "inspectedMediaSha256": {
           "description": "Original image digests successfully inspected by a vision route.",
@@ -19910,7 +19928,7 @@
         },
         "truncation": {
           "$ref": "#/definitions/TruncationRecord",
-          "description": "What the registry's backstop removed, when it removed anything.\n\nSet on the way OUT, never by the tool. It exists because the marker in `content` is prose for\nthe model and a UI cannot parse prose: without this, a transcript view has no way to render\n\"this result was cut\" as anything but a wall of text, and no way to offer the spill file as a\nlink. `undefined` means the result was returned whole.\n\nIt is PLUMBING, not a delivered feature: no UI in this repo reads it. It rides out to\nembedders on `toolOutcomes`, which is a legitimate public API, but the transcript view that\nwould render a cut is not built and neither is the spill link — see `tools/output/Spill.ts`,\nwhose store the composition root does not construct."
+          "description": "What the registry's backstop removed, when it removed anything.\n\nSet on the way OUT, never by the tool. It exists because the marker in `content` is prose for\nthe model and a UI cannot parse prose: without this, a transcript view has no way to render\n\"this result was cut\" as anything but a wall of text, and no way to offer the spill file as a\nlink. `undefined` means the result was returned whole.\n\nIt is PLUMBING, not a delivered feature: no UI in this repo reads it. It rides out to\nembedders on `toolOutcomes`, which is a legitimate public API, but the transcript view that\nwould render a cut is not built and neither is the spill link \u2014 see `tools/output/Spill.ts`,\nwhose store the composition root does not construct."
         },
         "verifiedCodePaths": {
           "description": "Absolute source paths accepted by a native engineering workflow, never model-supplied.",
@@ -20002,7 +20020,7 @@
           "type": "string"
         },
         "lastLinePartial": {
-          "description": "Whether a cut fell mid-line, so one of the shown lines is a fragment.\n\n`read` propagates this so `edit` never anchors a replacement on a fragment — an anchor that\nmatches half a line matches the wrong place in the file. For `tail` the fragment is the first\nshown line rather than the last; it is one flag because one flag is all a consumer acts on.",
+          "description": "Whether a cut fell mid-line, so one of the shown lines is a fragment.\n\n`read` propagates this so `edit` never anchors a replacement on a fragment \u2014 an anchor that\nmatches half a line matches the wrong place in the file. For `tail` the fragment is the first\nshown line rather than the last; it is one flag because one flag is all a consumer acts on.",
           "type": "boolean"
         },
         "shownChars": {
@@ -20704,7 +20722,7 @@
           "type": "object"
         }
       ],
-      "description": "A turn event as it travels.\n\nIdentical to {@link TurnEvent} except for the error variant: `Error` does not survive\n`JSON.stringify` — it serializes to `{}` — so a failing turn would arrive as an empty object and\na client would report \"something went wrong\" with nothing else, forever."
+      "description": "A turn event as it travels.\n\nIdentical to {@link TurnEvent} except for the error variant: `Error` does not survive\n`JSON.stringify` \u2014 it serializes to `{}` \u2014 so a failing turn would arrive as an empty object and\na client would report \"something went wrong\" with nothing else, forever."
     },
     "WorkerState": {
       "description": "Lifecycle states for Nexa's delegated workers.",
@@ -25197,7 +25215,7 @@
         },
         "quota": {
           "$ref": "#/definitions/WorkspaceQuota",
-          "description": "Ceilings for this workspace's contents. Absent means unbounded — see {@link WorkspaceQuota}."
+          "description": "Ceilings for this workspace's contents. Absent means unbounded \u2014 see {@link WorkspaceQuota}."
         },
         "root": {
           "description": "The absolute root. Every tool bound to this workspace is confined here.",
@@ -25264,7 +25282,7 @@
       "type": "object"
     },
     "WorkspaceCreateParams": {
-      "description": "What `workspaces.create` is asked for. Narrower than `CreateWorkspaceInput` — see the handler.",
+      "description": "What `workspaces.create` is asked for. Narrower than `CreateWorkspaceInput` \u2014 see the handler.",
       "properties": {
         "name": {
           "type": "string"
@@ -25328,7 +25346,7 @@
         },
         "quota": {
           "$ref": "#/definitions/WorkspaceQuota",
-          "description": "Ceilings for this workspace's contents. Absent means unbounded — see {@link WorkspaceQuota}."
+          "description": "Ceilings for this workspace's contents. Absent means unbounded \u2014 see {@link WorkspaceQuota}."
         },
         "root": {
           "description": "The absolute root. Every tool bound to this workspace is confined here.",
@@ -25415,7 +25433,7 @@
       "type": "string"
     },
     "WorkspaceLeaseRecord": {
-      "description": "One run's claim on a workspace, as stored in the record.\n\nDurable rather than in-process, because the process holding the lease and the process asked to\ndestroy the workspace are routinely different ones — a gateway serving a conversation and a CLI\nrunning `nexa workspace destroy`. An in-memory lease would be invisible to exactly the caller it\nhas to stop. `expiresAt` is what keeps a crashed run from pinning a workspace forever: a lease\nnobody heartbeats stops counting on its own.",
+      "description": "One run's claim on a workspace, as stored in the record.\n\nDurable rather than in-process, because the process holding the lease and the process asked to\ndestroy the workspace are routinely different ones \u2014 a gateway serving a conversation and a CLI\nrunning `nexa workspace destroy`. An in-memory lease would be invisible to exactly the caller it\nhas to stop. `expiresAt` is what keeps a crashed run from pinning a workspace forever: a lease\nnobody heartbeats stops counting on its own.",
       "properties": {
         "acquiredAt": {
           "type": "number"
@@ -25450,14 +25468,14 @@
       "type": "object"
     },
     "WorkspaceQuota": {
-      "description": "The ceilings a workspace's contents may not pass.\n\nBoth are OPTIONAL and both default to absent, which means unbounded. That is deliberate and it is\nthe opposite of what the plan's \"2 GiB by default\" says: a user who tells the agent to clone a\n10 GB monorepo into a workspace has asked for exactly that, and a default ceiling would refuse\nthe user's own instruction with an error about a limit they never chose. A quota here is a\nrunaway guard an operator sets on a shared deployment, or a bound a caller puts on one specific\nworkspace — never a product limit that arrives by omission.",
+      "description": "The ceilings a workspace's contents may not pass.\n\nBoth are OPTIONAL and both default to absent, which means unbounded. That is deliberate and it is\nthe opposite of what the plan's \"2 GiB by default\" says: a user who tells the agent to clone a\n10 GB monorepo into a workspace has asked for exactly that, and a default ceiling would refuse\nthe user's own instruction with an error about a limit they never chose. A quota here is a\nrunaway guard an operator sets on a shared deployment, or a bound a caller puts on one specific\nworkspace \u2014 never a product limit that arrives by omission.",
       "properties": {
         "maxBytes": {
           "description": "Byte ceiling for the tree. Absent means unbounded.",
           "type": "number"
         },
         "maxFiles": {
-          "description": "File-count ceiling. Absent means unbounded — a million tiny files is invisible to a byte quota.",
+          "description": "File-count ceiling. Absent means unbounded \u2014 a million tiny files is invisible to a byte quota.",
           "type": "number"
         }
       },
@@ -25502,7 +25520,7 @@
           "type": "number"
         },
         "reconciledAt": {
-          "description": "When a full walk last corrected these numbers. `0` means never — the counters are then a\nlower bound built from writes this process saw, which is honest but not authoritative.",
+          "description": "When a full walk last corrected these numbers. `0` means never \u2014 the counters are then a\nlower bound built from writes this process saw, which is honest but not authoritative.",
           "type": "number"
         }
       },
@@ -26472,8 +26490,156 @@
         },
         "value": {
           "type": "string"
+        },
+        "typography": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/DesignTypographyOverrides"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
+      "type": "object"
+    },
+    "DesignTypographyStyleOperation": {
+      "description": "Link one text layer to a typed saved style, reset its overrides or detach at its current appearance.",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "op": {
+          "const": "typography-style",
+          "type": "string"
+        },
+        "pageId": {
+          "type": "string"
+        },
+        "tokenId": {
+          "type": [
+            "null",
+            "string"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "op",
+        "pageId",
+        "tokenId"
+      ],
+      "type": "object"
+    },
+    "DesignTypographyOverrides": {
+      "description": "Local properties override their saved style while other fields remain linked.",
+      "properties": {
+        "align": {
+          "enum": [
+            "center",
+            "end",
+            "start"
+          ],
+          "type": "string"
+        },
+        "family": {
+          "type": "string"
+        },
+        "font": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/DesignFontBinding"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "italic": {
+          "type": "boolean"
+        },
+        "letterSpacing": {
+          "type": "number"
+        },
+        "lineHeight": {
+          "type": "number"
+        },
+        "size": {
+          "type": "number"
+        },
+        "weight": {
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "DesignTypographyValues": {
+      "description": "A saved text style contains typography only; content and rich ranges remain on each layer.",
+      "properties": {
+        "align": {
+          "enum": [
+            "center",
+            "end",
+            "start"
+          ],
+          "type": "string"
+        },
+        "family": {
+          "type": "string"
+        },
+        "font": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/DesignFontBinding"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "italic": {
+          "type": "boolean"
+        },
+        "letterSpacing": {
+          "type": "number"
+        },
+        "lineHeight": {
+          "type": "number"
+        },
+        "size": {
+          "type": "number"
+        },
+        "weight": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "align",
+        "family",
+        "font",
+        "italic",
+        "letterSpacing",
+        "lineHeight",
+        "size",
+        "weight"
+      ],
+      "type": "object"
+    },
+    "DesignTypographyLink": {
+      "description": "A text layer links to a typed typography token and may override individual properties.",
+      "properties": {
+        "overrides": {
+          "$ref": "#/definitions/DesignTypographyOverrides",
+          "description": "Local properties override their saved style while other fields remain linked."
+        },
+        "tokenId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "tokenId"
+      ],
       "type": "object"
     }
   },

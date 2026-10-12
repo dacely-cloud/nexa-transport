@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignTypographyStyleCodec } from './DesignTypographyStyleCodec.js';
+
 import { DesignValues as V } from './DesignValues.js';
 import { DesignTokenCategory } from './DesignTypes.js';
 import type { DesignTokenChanges } from './DesignOperationTypes.js';
@@ -11,13 +13,21 @@ export class DesignTokenChangesCodec {
     public static changes(raw: unknown): DesignTokenChanges {
         const value: Readonly<Record<string, unknown>> = V.fields(
             raw,
-            ['name', 'value', 'category'],
+            ['name', 'value', 'category', 'typography'],
             [],
         );
         if (Object.keys(value).length === 0) {
             throw new Error('Supply at least one token property.');
         }
         return {
+            ...(value['typography'] === undefined
+                ? {}
+                : {
+                      typography:
+                          value['typography'] === null
+                              ? null
+                              : DesignTypographyStyleCodec.changes(value['typography']),
+                  }),
             ...(value['name'] === undefined ? {} : { name: V.text(value['name']) }),
             ...(value['value'] === undefined ? {} : { value: V.text(value['value'], 256) }),
             ...(value['category'] === undefined
