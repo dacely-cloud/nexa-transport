@@ -22357,6 +22357,7 @@ export const schema: Schema = {
             description:
                 "Selection commands share one implementation between agent tools and browser editors.\nA command's stable action identity.",
             enum: [
+                'auto-layout',
                 'back',
                 'bottom',
                 'center',
