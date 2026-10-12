@@ -1,14 +1,36 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { DesignPathGeometry } from './DesignPaths.js';
 import type { DesignNode } from './DesignTypes.js';
 
 /** Imported hierarchy is indexed once; normalizing nested groups does not scan unrelated layers. */
 export class DesignSvgImportTree {
     #nodes: DesignNode[] = [];
     #indices: Map<string, number> = new Map();
+    #excludedBounds: Set<string> = new Set();
+    #geometry: Map<string, DesignPathGeometry> = new Map();
     public get nodes(): readonly DesignNode[] {
         return this.#nodes;
+    }
+    public node(id: string): DesignNode {
+        const node: DesignNode | undefined = this.#nodes[this.#indices.get(id) ?? -1];
+        if (node === undefined) {
+            throw new Error('Missing imported SVG layer.');
+        }
+        return node;
+    }
+    public sourceGeometry(id: string): DesignPathGeometry | undefined {
+        return this.#geometry.get(id);
+    }
+    public recordGeometry(id: string, geometry: DesignPathGeometry): void {
+        this.#geometry.set(id, geometry);
+    }
+    public excludeBounds(id: string): void {
+        this.#excludedBounds.add(id);
+    }
+    public contributesBounds(id: string): boolean {
+        return !this.#excludedBounds.has(id);
     }
     public append(node: DesignNode): void {
         if (this.#nodes.length >= 10000) {

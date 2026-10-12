@@ -184,6 +184,21 @@ export class DesignSvgTransforms {
         }
         return x;
     }
+    /** Removes an inherited affine map when object bounds are needed in the element's own user space. */
+    public static inverse(matrix: DesignSvgMatrix): DesignSvgMatrix {
+        const determinant: number = matrix.a * matrix.d - matrix.b * matrix.c;
+        if (Math.abs(determinant) < 1e-20) {
+            throw new Error('SVG transform is singular.');
+        }
+        return {
+            a: matrix.d / determinant,
+            b: -matrix.b / determinant,
+            c: -matrix.c / determinant,
+            d: matrix.a / determinant,
+            e: (matrix.c * matrix.f - matrix.d * matrix.e) / determinant,
+            f: (matrix.b * matrix.e - matrix.a * matrix.f) / determinant,
+        };
+    }
     /** The native curve kernel consumes a row-major homogeneous matrix. */
     public static kernel(matrix: DesignSvgMatrix): readonly number[] {
         return [matrix.a, matrix.c, matrix.e, matrix.b, matrix.d, matrix.f, 0, 0, 1];

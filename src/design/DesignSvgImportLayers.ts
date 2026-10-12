@@ -1,7 +1,14 @@
-import { DesignSvgImportShape } from './DesignSvgImportShape.js';
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignSvgImportMasks } from './DesignSvgImportMasks.js';
+import { DesignSvgImportStyles } from './DesignSvgImportStyles.js';
+import type { DesignSvgLayerContext } from './DesignSvgImportContext.js';
+import { DesignSvgImportUse } from './DesignSvgImportUse.js';
+import { DesignSvgImportViewport, type DesignSvgViewportPlan } from './DesignSvgImportViewport.js';
+import { DesignSvgImportClipPaths } from './DesignSvgImportClipPaths.js';
+import { DesignSvgImportMask } from './DesignSvgImportMask.js';
+import { DesignSvgImportShape } from './DesignSvgImportShape.js';
 import { DesignSvgImportTree } from './DesignSvgImportTree.js';
 import { DesignSvgImportAppearance } from './DesignSvgImportAppearance.js';
 import { DesignSvgXml, type DesignSvgElement } from './DesignSvgXml.js';
@@ -13,14 +20,6 @@ import { DesignDefaults } from './DesignDefaults.js';
 import { DesignCodec } from './DesignCodec.js';
 import type { DesignNode } from './DesignTypes.js';
 
-interface SvgLayerContext {
-    readonly parentId: string;
-    readonly matrix: DesignSvgMatrix;
-    readonly width: number;
-    readonly height: number;
-    readonly style: Readonly<Record<string, string>>;
-    readonly ancestors: readonly DesignSvgElement[];
-}
 /** One imported artboard and its editable layer forest, without any original markup embedded in nodes. */
 export interface DesignSvgLayerImport {
     readonly rootId: string;
@@ -34,6 +33,9 @@ export class DesignSvgImportLayers {
     #ancestors: Map<DesignSvgElement, readonly DesignSvgElement[]> = new Map();
     #sequence: number = 0;
     #shape: DesignSvgImportShape;
+    #clips: DesignSvgImportClipPaths;
+    #viewports: DesignSvgImportViewport;
+    #masks: DesignSvgImportMasks;
     #css: DesignSvgCss;
     #paints: DesignSvgImportPaints;
     public constructor(
@@ -62,6 +64,25 @@ export class DesignSvgImportLayers {
         this.#css = new DesignSvgCss(root);
         this.#paints = new DesignSvgImportPaints(this.#elements, this.#css, this.#ancestors);
         this.#shape = new DesignSvgImportShape(this.#paints, this.#tree, this.identify);
+        const masks: DesignSvgImportMask = new DesignSvgImportMask(this.#tree, this.identify);
+        this.#viewports = new DesignSvgImportViewport(this.#tree, masks, this.identify);
+        this.#clips = new DesignSvgImportClipPaths(
+            this.#elements,
+            this.#css,
+            this.#ancestors,
+            this.#tree,
+            masks,
+            this.identify,
+        );
+        this.#masks = new DesignSvgImportMasks(
+            this.#elements,
+            new DesignSvgImportStyles(this.#css, this.#ancestors),
+            this.#tree,
+            masks,
+            this.#viewports,
+            (element: DesignSvgElement, context: DesignSvgLayerContext): Promise<string | null> =>
+                this.#visit(element, context, true),
+        );
     }
     public static async parse(
         source: string,
@@ -113,13 +134,14 @@ export class DesignSvgImportLayers {
             style: { ...base.style, fills: [] },
             layout: { ...base.layout, clip: style['overflow'] !== 'visible' },
         });
-        const context: SvgLayerContext = {
+        const context: DesignSvgLayerContext = {
             parentId: rootId,
             matrix,
             width: box[2] ?? width,
             height: box[3] ?? height,
             style,
             ancestors: [this.root],
+            references: [],
         };
         for (const child of this.root.children) {
             if (typeof child !== 'string') {
@@ -130,6 +152,12 @@ export class DesignSvgImportLayers {
             }
         }
         this.#tree.replace(rootId, (node: DesignNode): DesignNode => ({ ...node, children }));
+        if (style['clip-path'] !== undefined) {
+            await this.#clips.apply(rootId, style['clip-path'], context);
+        }
+        if (style['mask'] !== undefined) {
+            await this.#masks.apply(rootId, style['mask'], context);
+        }
         const document: ReturnType<typeof DesignDefaults.document> = DesignCodec.document({
             ...DesignDefaults.document('svg-import'),
             pages: [{ id: 'page-1', name: 'SVG', background: '#FFFFFF', roots: [rootId] }],
@@ -137,7 +165,11 @@ export class DesignSvgImportLayers {
         });
         return { rootId, nodes: document.nodes };
     }
-    async #visit(element: DesignSvgElement, context: SvgLayerContext): Promise<string | null> {
+    async #visit(
+        element: DesignSvgElement,
+        context: DesignSvgLayerContext,
+        referenced: boolean = false,
+    ): Promise<string | null> {
         if (
             [
                 'defs',
@@ -148,11 +180,15 @@ export class DesignSvgImportLayers {
                 'linearGradient',
                 'radialGradient',
                 'clipPath',
-                'mask',
-                'symbol',
             ].includes(element.name)
         ) {
             return null;
+        }
+        if ((element.name === 'symbol' || element.name === 'mask') && !referenced) {
+            return null;
+        }
+        if (context.ancestors.length + context.references.length > 64) {
+            throw new Error('SVG hierarchy is too deep.');
         }
         if (
             element.attributes['xmlns'] !== undefined &&
@@ -171,6 +207,9 @@ export class DesignSvgImportLayers {
             T.parse(style['transform'] ?? element.attributes['transform'] ?? ''),
         );
         const id: string = this.identify('element:' + (++this.#sequence).toString());
+        if (style['display'] === 'none') {
+            this.#tree.excludeBounds(id);
+        }
         const title: DesignSvgElement | undefined = element.children.find(
             (child): child is DesignSvgElement =>
                 typeof child !== 'string' && child.name === 'title',
@@ -182,7 +221,7 @@ export class DesignSvgImportLayers {
                 .filter((child): child is string => typeof child === 'string')
                 .join('') ??
             element.name;
-        if (element.name === 'g' || element.name === 'a') {
+        if (['g', 'a', 'use', 'svg', 'symbol', 'mask'].includes(element.name)) {
             const base: DesignNode = DesignDefaults.node(id, 'group', name);
             this.#tree.append({
                 ...base,
@@ -193,22 +232,64 @@ export class DesignSvgImportLayers {
                 visible: style['display'] !== 'none',
             });
             const children: string[] = [];
-            for (const child of element.children) {
-                if (typeof child !== 'string') {
-                    const childId: string | null = await this.#visit(child, {
-                        ...context,
-                        parentId: id,
-                        matrix,
-                        style,
-                        ancestors: [...context.ancestors, element],
-                    });
-                    if (childId !== null) {
-                        children.push(childId);
+            let childContext: DesignSvgLayerContext = {
+                ...context,
+                parentId: id,
+                matrix,
+                style,
+                ancestors: [...context.ancestors, element],
+            };
+            let viewport: DesignSvgViewportPlan | null = null;
+            if (element.name === 'svg' || element.name === 'symbol') {
+                viewport = this.#viewports.plan(element, childContext);
+                if (viewport === null) {
+                    this.#tree.replace(id, (node: DesignNode): DesignNode => ({
+                        ...node,
+                        visible: false,
+                    }));
+                    return id;
+                }
+                childContext = viewport.context;
+            }
+            if (element.name === 'use') {
+                const plan: ReturnType<typeof DesignSvgImportUse.plan> = DesignSvgImportUse.plan(
+                    element,
+                    childContext,
+                    this.#elements,
+                );
+                childContext = plan.context;
+                const childId: string | null = await this.#visit(plan.element, plan.context, true);
+                if (childId !== null) {
+                    children.push(childId);
+                }
+            } else {
+                for (const child of element.children) {
+                    if (typeof child !== 'string') {
+                        const childId: string | null = await this.#visit(child, childContext);
+                        if (childId !== null) {
+                            children.push(childId);
+                        }
                     }
                 }
             }
             this.#tree.replace(id, (node: DesignNode): DesignNode => ({ ...node, children }));
             this.#tree.tighten(id);
+            if (viewport !== null) {
+                await this.#viewports.clip(id, viewport);
+            }
+            if (style['clip-path'] !== undefined) {
+                await this.#clips.apply(id, style['clip-path'], {
+                    matrix: childContext.matrix,
+                    width: childContext.width,
+                    height: childContext.height,
+                });
+            }
+            if (style['mask'] !== undefined) {
+                await this.#masks.apply(id, style['mask'], {
+                    ...childContext,
+                    matrix: childContext.matrix,
+                });
+            }
             return id;
         }
         if (
@@ -218,7 +299,7 @@ export class DesignSvgImportLayers {
         ) {
             throw new Error('Unsupported SVG element ' + element.name);
         }
-        return this.#shape.build(element, {
+        const shape: string | null = await this.#shape.build(element, {
             id,
             parentId: context.parentId,
             name,
@@ -227,5 +308,16 @@ export class DesignSvgImportLayers {
             height: context.height,
             style,
         });
+        if (shape !== null && style['clip-path'] !== undefined) {
+            await this.#clips.apply(shape, style['clip-path'], {
+                matrix,
+                width: context.width,
+                height: context.height,
+            });
+        }
+        if (shape !== null && style['mask'] !== undefined) {
+            await this.#masks.apply(shape, style['mask'], { ...context, matrix, style });
+        }
+        return shape;
     }
 }

@@ -87,6 +87,40 @@ export class DesignSvgImportGeometry {
             scope.close();
         }
     }
+    /** True transformed curve bounds are measured without allocating a converted command array. */
+    public static async bounds(
+        data: string,
+        matrix: DesignSvgMatrix,
+    ): Promise<DesignSvgSourceBounds | null> {
+        if (data.trim() === '') {
+            return null;
+        }
+        DesignSvgPathData.validate(data);
+        const library: DesignPathKitLibrary = await DesignPathKit.load();
+        const scope: DesignPathKitScope = new DesignPathKitScope();
+        try {
+            const path: DesignPathKitPath = scope.own(library.FromSVGString(data));
+            if (path.transform(T.kernel(matrix)) === null) {
+                throw new Error('Could not measure SVG geometry.');
+            }
+            const value: Readonly<Record<string, unknown>> = V.record(path.computeTightBounds(), [
+                'fLeft',
+                'fTop',
+                'fRight',
+                'fBottom',
+            ]);
+            const x: number = V.number(value['fLeft']);
+            const y: number = V.number(value['fTop']);
+            return {
+                x,
+                y,
+                width: V.number(value['fRight']) - x,
+                height: V.number(value['fBottom']) - y,
+            };
+        } finally {
+            scope.close();
+        }
+    }
     /** Nonuniform transforms bake the exact expanded border into a separate editable filled vector. */
     public static async outline(
         data: string,

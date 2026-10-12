@@ -56,6 +56,8 @@ export class DesignSvgCss {
         'transform',
         'clip-path',
         'mask',
+        'mask-type',
+        'mask-mode',
         'filter',
         'stop-color',
         'stop-opacity',

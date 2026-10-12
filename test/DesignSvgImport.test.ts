@@ -9,7 +9,7 @@ import { DesignSvgImport } from '../src/design/DesignSvgImport.js';
 import { DesignSvgImportCodec } from '../src/design/DesignSvgImportCodec.js';
 import { DesignEdits } from '../src/design/DesignEdits.js';
 import type { DesignSvgImportRequest } from '../src/design/DesignSvgImportTypes.js';
-import type { DesignDocument } from '../src/design/DesignTypes.js';
+import type { DesignDocument, DesignNode } from '../src/design/DesignTypes.js';
 import type { DesignEditResult } from '../src/design/DesignOperationTypes.js';
 
 const request: DesignSvgImportRequest = {
@@ -51,5 +51,29 @@ it('portable imports preserve their source document and undo the complete editab
     });
     expect(result.document.nodes[1]?.style.fills[0]?.color).toBe('#663399');
     expect(result.selection).toEqual(['svg-root']);
+    expect(DesignEdits.restore(result.document, result.changes).document).toEqual(before);
+});
+it('portable mask and symbol imports keep independent editable sources and undo as one forest', async (): Promise<void> => {
+    const before: DesignDocument = DesignDefaults.document('svg');
+    const result: DesignEditResult = await DesignSvgImport.apply(
+        before,
+        {
+            ...request,
+            source: '<svg width="200" height="100"><defs><clipPath id="cut"><circle cx="50" cy="50" r="30"/></clipPath><mask id="fade" mask-type="alpha"><rect width="200" height="100" fill="white"/></mask><symbol id="tile" viewBox="0 0 10 10"><rect width="10" height="10"/></symbol></defs><rect width="100" height="100" clip-path="url(#cut)" mask="url(#fade)"/><use href="#tile" x="110" width="30" height="30"/><use href="#tile" x="150" width="30" height="30"/></svg>',
+        },
+        (key: string): string => 'svg-' + key.replaceAll(':', '-'),
+    );
+    const masks: readonly DesignNode[] = result.document.nodes.filter(
+        (node: DesignNode): boolean => node.kind === 'mask',
+    );
+    expect(masks).toHaveLength(5);
+    for (const mask of masks) {
+        expect(mask.children).toContain(mask.mask?.sourceId);
+    }
+    const tiles: readonly DesignNode[] = result.document.nodes.filter(
+        (node: DesignNode): boolean => node.name === 'tile',
+    );
+    expect(tiles).toHaveLength(2);
+    expect(tiles[0]?.id).not.toBe(tiles[1]?.id);
     expect(DesignEdits.restore(result.document, result.changes).document).toEqual(before);
 });

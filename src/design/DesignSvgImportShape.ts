@@ -52,6 +52,10 @@ export class DesignSvgImportShape {
         if (original === null) {
             return null;
         }
+        this.tree.recordGeometry(context.id, original.target);
+        if (style['display'] === 'none') {
+            this.tree.excludeBounds(context.id);
+        }
         const evenOdd: boolean = (style['fill-rule'] ?? 'nonzero') === 'evenodd';
         if (
             style['fill-rule'] !== undefined &&

@@ -5,6 +5,15 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 
 /** Server-only generation script. Nexa owns the portable design model and layout implementation. */
 const files: readonly string[] = [
+    'DesignSvgImportMasks',
+    'DesignSvgImportBounds',
+    'DesignSvgImportClipPaths',
+    'DesignSvgImportContext',
+    'DesignSvgImportMask',
+    'DesignSvgImportStyles',
+    'DesignSvgImportUse',
+    'DesignSvgImportViewport',
+    'DesignSvgReferences',
     'DesignSvgXml',
     'DesignSvgNumbers',
     'DesignSvgPathData',
@@ -21,20 +30,17 @@ const files: readonly string[] = [
     'DesignSvgImportTypes',
     'DesignSvgImportCodec',
     'DesignSvgImport',
-
     'DesignStrokeTypes',
     'DesignStrokeGeometry',
     'DesignStrokeChangesCodec',
     'DesignStrokeEdits',
     'DesignLayerStyleEdit',
-
     'DesignGradientTypes',
     'DesignGradientCodec',
     'DesignGradientGeometry',
     'DesignPaintLayerEdit',
     'DesignPaintGradientChangesCodec',
     'DesignPaintGradientEdits',
-
     'DesignTypographyStyleTypes',
     'DesignTypographyStyleCodec',
     'DesignFontFamilyCodec',
@@ -70,7 +76,6 @@ const files: readonly string[] = [
     'DesignSvgFonts',
     'DesignInterOutlineBytes',
     'DesignTextOutline',
-
     'DesignVariantTypes',
     'DesignVariantCodec',
     'DesignVariants',
@@ -112,7 +117,6 @@ const files: readonly string[] = [
     'DesignComponentSwap',
     'DesignComponentDetach',
     'DesignComponents',
-
     'DesignSelectionTypes',
     'DesignAutoLayout',
     'DesignSelectionContext',

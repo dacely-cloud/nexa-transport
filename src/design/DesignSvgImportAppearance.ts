@@ -22,7 +22,7 @@ export class DesignSvgImportAppearance {
         return source;
     }
     public static validate(style: Readonly<Record<string, string>>): void {
-        for (const property of ['clip-path', 'mask', 'filter']) {
+        for (const property of ['filter']) {
             if (style[property] !== undefined && style[property] !== 'none') {
                 throw new Error('SVG ' + property + ' requires native import conversion.');
             }
