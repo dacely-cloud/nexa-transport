@@ -583,6 +583,10 @@
         "./design-token-edits": {
             "types": "./dist/design/DesignTokenEdits.d.ts",
             "import": "./dist/design-token-edits.js"
+        },
+        "./design-typography-styles": {
+            "types": "./dist/design/DesignTypographyStyleCodec.d.ts",
+            "import": "./dist/design-typography-styles.js"
         }
     },
     "scripts": {

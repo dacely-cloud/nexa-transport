@@ -3229,6 +3229,15 @@ Variant 19: [DesignPaintColorOperation](protocol.md#designpaintcoloroperation)
 | `pageId`  | Yes      | `string`                                                       |             |
 | `target`  | Yes      | [DesignPaintColorTarget](protocol.md#designpaintcolortarget)   |             |
 
+Variant 20: [DesignTypographyStyleOperation](protocol.md#designtypographystyleoperation)
+
+| Field     | Required | Type                 | Description |
+| --------- | -------- | -------------------- | ----------- |
+| `id`      | Yes      | `string`             |             |
+| `op`      | Yes      | `"typography-style"` |             |
+| `pageId`  | Yes      | `string`             |             |
+| `tokenId` | Yes      | `null,string`        |             |
+
 ## DesignOverride
 
 Instance overrides target a source layer without modifying its component definition.
@@ -3554,18 +3563,19 @@ Tiny management projection. Timestamps and revisions retain full integer precisi
 
 Text layout is shared by the canvas, tools and exported designs.
 
-| Field           | Required | Type                                                        | Description                                                                               |
-| --------------- | -------- | ----------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| `align`         | Yes      | [DesignAlign](protocol.md#designalign)                      |                                                                                           |
-| `content`       | Yes      | `string`                                                    |                                                                                           |
-| `family`        | Yes      | `string`                                                    |                                                                                           |
-| `font`          | No       | [DesignFontBinding](protocol.md#designfontbinding) / `null` | Exact private font bytes remain in the owner's library, independently of the saved scene. |
-| `italic`        | Yes      | `boolean`                                                   |                                                                                           |
-| `letterSpacing` | Yes      | `number`                                                    |                                                                                           |
-| `lineHeight`    | Yes      | `number`                                                    |                                                                                           |
-| `runs`          | Yes      | Array of [DesignTextRun](protocol.md#designtextrun)         |                                                                                           |
-| `size`          | Yes      | `number`                                                    |                                                                                           |
-| `weight`        | Yes      | `number`                                                    |                                                                                           |
+| Field             | Required | Type                                                              | Description                                                                               |
+| ----------------- | -------- | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `align`           | Yes      | [DesignAlign](protocol.md#designalign)                            |                                                                                           |
+| `content`         | Yes      | `string`                                                          |                                                                                           |
+| `family`          | Yes      | `string`                                                          |                                                                                           |
+| `font`            | No       | [DesignFontBinding](protocol.md#designfontbinding) / `null`       | Exact private font bytes remain in the owner's library, independently of the saved scene. |
+| `italic`          | Yes      | `boolean`                                                         |                                                                                           |
+| `letterSpacing`   | Yes      | `number`                                                          |                                                                                           |
+| `lineHeight`      | Yes      | `number`                                                          |                                                                                           |
+| `runs`            | Yes      | Array of [DesignTextRun](protocol.md#designtextrun)               |                                                                                           |
+| `size`            | Yes      | `number`                                                          |                                                                                           |
+| `weight`          | Yes      | `number`                                                          |                                                                                           |
+| `typographyStyle` | No       | [DesignTypographyLink](protocol.md#designtypographylink) / `null` | Saved typography remains linked while local overrides and rich spans stay editable.       |
 
 ## DesignTextOperation
 
@@ -3682,12 +3692,13 @@ Each page groups positions by shaped span and preserves rich style and underline
 
 Named design-system values.
 
-| Field      | Required | Type                                                   | Description |
-| ---------- | -------- | ------------------------------------------------------ | ----------- |
-| `category` | Yes      | [DesignTokenCategory](protocol.md#designtokencategory) |             |
-| `id`       | Yes      | `string`                                               |             |
-| `name`     | Yes      | `string`                                               |             |
-| `value`    | Yes      | `string`                                               |             |
+| Field        | Required | Type                                                         | Description                                                                                      |
+| ------------ | -------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ |
+| `category`   | Yes      | [DesignTokenCategory](protocol.md#designtokencategory)       |                                                                                                  |
+| `id`         | Yes      | `string`                                                     |                                                                                                  |
+| `name`       | Yes      | `string`                                                     |                                                                                                  |
+| `value`      | Yes      | `string`                                                     |                                                                                                  |
+| `typography` | No       | [DesignTypographyValues](protocol.md#designtypographyvalues) | Legacy typography values remain readable; typed styles are explicit and independently validated. |
 
 ## DesignTokenCategory
 
@@ -10750,8 +10761,59 @@ Create or edit one token; null detaches its paints and deletes it without changi
 
 Omitted token properties keep their saved values.
 
-| Field      | Required | Type                                     | Description     |
-| ---------- | -------- | ---------------------------------------- | --------------- |
-| `category` | No       | `"color"` / `"spacing"` / `"typography"` | Token families. |
-| `name`     | No       | `string`                                 |                 |
-| `value`    | No       | `string`                                 |                 |
+| Field        | Required | Type                                                                        | Description     |
+| ------------ | -------- | --------------------------------------------------------------------------- | --------------- |
+| `category`   | No       | `"color"` / `"spacing"` / `"typography"`                                    | Token families. |
+| `name`       | No       | `string`                                                                    |                 |
+| `value`      | No       | `string`                                                                    |                 |
+| `typography` | No       | [DesignTypographyOverrides](protocol.md#designtypographyoverrides) / `null` |                 |
+
+## DesignTypographyStyleOperation
+
+Link one text layer to a typed saved style, reset its overrides or detach at its current appearance.
+
+| Field     | Required | Type                 | Description |
+| --------- | -------- | -------------------- | ----------- |
+| `id`      | Yes      | `string`             |             |
+| `op`      | Yes      | `"typography-style"` |             |
+| `pageId`  | Yes      | `string`             |             |
+| `tokenId` | Yes      | `null,string`        |             |
+
+## DesignTypographyOverrides
+
+Local properties override their saved style while other fields remain linked.
+
+| Field           | Required | Type                                                        | Description |
+| --------------- | -------- | ----------------------------------------------------------- | ----------- |
+| `align`         | No       | `"center"` / `"end"` / `"start"`                            |             |
+| `family`        | No       | `string`                                                    |             |
+| `font`          | No       | [DesignFontBinding](protocol.md#designfontbinding) / `null` |             |
+| `italic`        | No       | `boolean`                                                   |             |
+| `letterSpacing` | No       | `number`                                                    |             |
+| `lineHeight`    | No       | `number`                                                    |             |
+| `size`          | No       | `number`                                                    |             |
+| `weight`        | No       | `number`                                                    |             |
+
+## DesignTypographyValues
+
+A saved text style contains typography only; content and rich ranges remain on each layer.
+
+| Field           | Required | Type                                                        | Description |
+| --------------- | -------- | ----------------------------------------------------------- | ----------- |
+| `align`         | Yes      | `"center"` / `"end"` / `"start"`                            |             |
+| `family`        | Yes      | `string`                                                    |             |
+| `font`          | Yes      | [DesignFontBinding](protocol.md#designfontbinding) / `null` |             |
+| `italic`        | Yes      | `boolean`                                                   |             |
+| `letterSpacing` | Yes      | `number`                                                    |             |
+| `lineHeight`    | Yes      | `number`                                                    |             |
+| `size`          | Yes      | `number`                                                    |             |
+| `weight`        | Yes      | `number`                                                    |             |
+
+## DesignTypographyLink
+
+A text layer links to a typed typography token and may override individual properties.
+
+| Field       | Required | Type                                                               | Description                                                                   |
+| ----------- | -------- | ------------------------------------------------------------------ | ----------------------------------------------------------------------------- |
+| `overrides` | No       | [DesignTypographyOverrides](protocol.md#designtypographyoverrides) | Local properties override their saved style while other fields remain linked. |
+| `tokenId`   | Yes      | `string`                                                           |                                                                               |

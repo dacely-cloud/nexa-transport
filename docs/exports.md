@@ -191,3 +191,5 @@ backend, or a provider-key vault.
 | `nexa-transport/design-text-window-codec` | ESM + types  | Strict text-window request and page validation                        |
 | `nexa-transport/design-canvas-types`      | ESM + types  | Canvas projections with deferred text and intrinsic metrics           |
 | `nexa-transport/design-canvas-codec`      | ESM + types  | Strict paged canvas-metric request validation                         |
+
+`nexa-transport/design-typography-styles` exposes strict saved typography definitions, overrides and link validation. Use compact token and typography-style operations through design.save.
