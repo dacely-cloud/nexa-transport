@@ -5193,6 +5193,11 @@ export const schema: Schema = {
                 mimeType: {
                     type: 'string',
                 },
+                website: {
+                    description:
+                        'The server verified that the bounded ZIP contains a website entry page.',
+                    type: 'boolean',
+                },
             },
             required: ['byteLength', 'filename', 'id', 'mimeType'],
             type: 'object',
@@ -7471,6 +7476,36 @@ export const schema: Schema = {
                 },
             },
             required: ['op', 'pageId', 'selection'],
+            type: 'object',
+        },
+        DesignRotateOperation: {
+            description:
+                'Rotates topmost selected layers together around a world pivot; omitted pivots use their combined bounds.',
+            properties: {
+                angle: {
+                    type: 'number',
+                },
+                op: {
+                    const: 'rotate',
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+                pivotX: {
+                    type: 'number',
+                },
+                pivotY: {
+                    type: 'number',
+                },
+                selection: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+            },
+            required: ['angle', 'op', 'pageId', 'selection'],
             type: 'object',
         },
         DesignSaveMethod: {
@@ -10184,6 +10219,54 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'roblox.live.close': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/RobloxLiveHandleRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/RobloxLiveClosed',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'roblox.live.export': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/RobloxLiveHandleRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/RobloxLiveExport',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'roblox.live.start': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/RobloxLiveStartRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/RobloxLiveFrame',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'roblox.live.step': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/RobloxLiveStepRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/RobloxLiveFrame',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'roblox.telemetry.funnel': {
                     properties: {
                         params: {
@@ -11491,6 +11574,10 @@ export const schema: Schema = {
                 'roblox.credentials.remove',
                 'roblox.credentials.set',
                 'roblox.credentials.status',
+                'roblox.live.close',
+                'roblox.live.export',
+                'roblox.live.start',
+                'roblox.live.step',
                 'roblox.telemetry.funnel',
                 'roblox.telemetry.performance',
                 'roblox.telemetry.projects',
@@ -15674,7 +15761,7 @@ export const schema: Schema = {
         },
         ReverseInspectQuery: {
             description:
-                'Operates only on a still-live, owner-scoped analyzer. No database id or query token crosses the wire.',
+                'Selects an owner-scoped live or saved target; database ids and query tokens never cross the wire.',
             properties: {
                 cursor: {
                     type: 'string',
@@ -15725,7 +15812,7 @@ export const schema: Schema = {
         },
         ReverseInspection: {
             description:
-                'Read-only browser operations supported by an existing native analyzer lease.\nOne bounded native inspection operation.',
+                'Read-only browser operations supported by live or reopened native analyzers.\nOne bounded native inspection operation.',
             enum: ['decompile', 'disassemble', 'graph', 'xrefs'],
             type: 'string',
         },
@@ -16353,6 +16440,133 @@ export const schema: Schema = {
             required: ['connected', 'validated'],
             type: 'object',
         },
+        RobloxLiveActivation: {
+            description: "A logical activation on the retained VM's current clock.",
+            properties: {
+                clickCount: {
+                    type: 'number',
+                },
+                device: {
+                    enum: ['Gamepad', 'Mouse', 'Touch'],
+                    type: 'string',
+                },
+                event: {
+                    description:
+                        'Logical input events whose callbacks run in the native VM. Pointer hit testing is separate.',
+                    enum: ['Activated', 'MouseButton1Click'],
+                    type: 'string',
+                },
+                nodeId: {
+                    type: 'string',
+                },
+                x: {
+                    type: 'number',
+                },
+                y: {
+                    type: 'number',
+                },
+            },
+            required: ['nodeId'],
+            type: 'object',
+        },
+        RobloxLiveClosed: {
+            description: 'A completed lifecycle release.',
+            properties: {
+                closed: {
+                    type: 'boolean',
+                },
+            },
+            required: ['closed'],
+            type: 'object',
+        },
+        RobloxLiveExport: {
+            description: 'Current native model bytes are returned only on an explicit export.',
+            properties: {
+                modelXml: {
+                    type: 'string',
+                },
+                scene: {
+                    type: 'string',
+                },
+            },
+            required: ['modelXml', 'scene'],
+            type: 'object',
+        },
+        RobloxLiveFrame: {
+            description: 'Bounded JSON state has its own portable native-value codec.',
+            properties: {
+                elapsedUs: {
+                    type: 'string',
+                },
+                handle: {
+                    type: 'string',
+                },
+                memoryBytes: {
+                    type: 'string',
+                },
+                output: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                state: {
+                    type: 'string',
+                },
+            },
+            required: ['elapsedUs', 'handle', 'memoryBytes', 'output', 'state'],
+            type: 'object',
+        },
+        RobloxLiveHandleRequest: {
+            description: 'Every handle action is bound to its conversation and transport consumer.',
+            properties: {
+                handle: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+            },
+            required: ['handle', 'id'],
+            type: 'object',
+        },
+        RobloxLiveStartRequest: {
+            description:
+                'Start identifies an existing conversation attachment, never a server path or account.',
+            properties: {
+                attachmentId: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                previewId: {
+                    type: 'string',
+                },
+            },
+            required: ['attachmentId', 'id', 'previewId'],
+            type: 'object',
+        },
+        RobloxLiveStepRequest: {
+            description: 'One serialized native step and optional logical activation.',
+            properties: {
+                handle: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                input: {
+                    $ref: '#/definitions/RobloxLiveActivation',
+                    description: "A logical activation on the retained VM's current clock.",
+                },
+                seconds: {
+                    type: 'number',
+                },
+            },
+            required: ['handle', 'id', 'seconds'],
+            type: 'object',
+        },
         ScalarSchema: {
             description:
                 'Primitive or named envelope type. Number values must be finite and safely represented.',
@@ -16472,6 +16686,11 @@ export const schema: Schema = {
                 nextCursor: {
                     type: 'string',
                 },
+                sourceEndCursor: {
+                    description:
+                        'Original byte cursor for live catch-up after replaying a canonical view.',
+                    type: 'string',
+                },
             },
             required: ['chunk', 'endCursor', 'format'],
             type: 'object',
@@ -16479,6 +16698,11 @@ export const schema: Schema = {
         SessionHistoryParams: {
             description: 'Byte cursors are decimal strings so large journals retain exact offsets.',
             properties: {
+                compact: {
+                    description:
+                        'Canonical display view; the original append-only journal remains available.',
+                    type: 'boolean',
+                },
                 cursor: {
                     type: 'string',
                 },
@@ -16491,6 +16715,11 @@ export const schema: Schema = {
                 pageBytes: {
                     description: 'Optional bounded read window, up to 1 MiB.',
                     type: 'number',
+                },
+                sourceEndCursor: {
+                    description:
+                        'Pins a canonical view to an original journal boundary across all of its pages.',
+                    type: 'string',
                 },
             },
             required: ['id'],
@@ -22240,36 +22469,6 @@ export const schema: Schema = {
             required: ['bytes', 'files', 'reconciledAt'],
             type: 'object',
         },
-        DesignRotateOperation: {
-            description:
-                'Rotates topmost selected layers together around a world pivot; omitted pivots use their combined bounds.',
-            properties: {
-                angle: {
-                    type: 'number',
-                },
-                op: {
-                    const: 'rotate',
-                    type: 'string',
-                },
-                pageId: {
-                    type: 'string',
-                },
-                pivotX: {
-                    type: 'number',
-                },
-                pivotY: {
-                    type: 'number',
-                },
-                selection: {
-                    items: {
-                        type: 'string',
-                    },
-                    type: 'array',
-                },
-            },
-            required: ['angle', 'op', 'pageId', 'selection'],
-            type: 'object',
-        },
         DesignScaleOperation: {
             description:
                 'Uniform artwork scaling preserves text and effect metrics, unlike resizing a container.',
@@ -22978,51 +23177,29 @@ export const schema: Schema = {
             ],
             type: 'object',
         },
-        DesignPaintColorOperation: {
-            description:
-                'Fill index zero may create a first paint; stroke edits require an existing stroke and index zero.',
+        DesignTokenChanges: {
+            description: 'Omitted token properties keep their saved values.',
             properties: {
-                changes: {
-                    $ref: '#/definitions/DesignPaintColorChanges',
-                },
-                id: {
+                category: {
+                    description: 'Token families.\nToken family.',
+                    enum: ['color', 'spacing', 'typography'],
                     type: 'string',
                 },
-                index: {
-                    type: 'number',
-                },
-                op: {
-                    const: 'paint-color',
+                name: {
                     type: 'string',
                 },
-                pageId: {
+                value: {
                     type: 'string',
                 },
-                target: {
-                    $ref: '#/definitions/DesignPaintColorTarget',
-                },
-            },
-            required: ['changes', 'id', 'index', 'op', 'pageId', 'target'],
-            type: 'object',
-        },
-        DesignPaintColorTarget: {
-            description:
-                'Existing fill and stroke colors share one compact native edit.\nPaint location.',
-            enum: ['fill', 'stroke'],
-            type: 'string',
-        },
-        DesignPaintColorChanges: {
-            description:
-                'Omitted color properties retain the original paint; tokenId:null alone preserves its resolved color.',
-            properties: {
-                color: {
-                    type: 'string',
-                },
-                opacity: {
-                    type: 'number',
-                },
-                tokenId: {
-                    type: ['null', 'string'],
+                typography: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignTypographyOverrides',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
                 },
             },
             type: 'object',
@@ -23052,31 +23229,53 @@ export const schema: Schema = {
             required: ['changes', 'id', 'op'],
             type: 'object',
         },
-        DesignTokenChanges: {
-            description: 'Omitted token properties keep their saved values.',
+        DesignPaintColorChanges: {
+            description:
+                'Omitted color properties retain the original paint; tokenId:null alone preserves its resolved color.',
             properties: {
-                category: {
-                    description: 'Token families.\nToken family.',
-                    enum: ['color', 'spacing', 'typography'],
+                color: {
                     type: 'string',
                 },
-                name: {
-                    type: 'string',
+                opacity: {
+                    type: 'number',
                 },
-                value: {
-                    type: 'string',
-                },
-                typography: {
-                    anyOf: [
-                        {
-                            $ref: '#/definitions/DesignTypographyOverrides',
-                        },
-                        {
-                            type: 'null',
-                        },
-                    ],
+                tokenId: {
+                    type: ['null', 'string'],
                 },
             },
+            type: 'object',
+        },
+        DesignPaintColorTarget: {
+            description:
+                'Existing fill and stroke colors share one compact native edit.\nPaint location.',
+            enum: ['fill', 'stroke'],
+            type: 'string',
+        },
+        DesignPaintColorOperation: {
+            description:
+                'Fill index zero may create a first paint; stroke edits require an existing stroke and index zero.',
+            properties: {
+                changes: {
+                    $ref: '#/definitions/DesignPaintColorChanges',
+                },
+                id: {
+                    type: 'string',
+                },
+                index: {
+                    type: 'number',
+                },
+                op: {
+                    const: 'paint-color',
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+                target: {
+                    $ref: '#/definitions/DesignPaintColorTarget',
+                },
+            },
+            required: ['changes', 'id', 'index', 'op', 'pageId', 'target'],
             type: 'object',
         },
         DesignTypographyStyleOperation: {

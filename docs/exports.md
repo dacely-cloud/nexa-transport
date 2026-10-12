@@ -127,57 +127,57 @@ backend, or a provider-key vault.
 
 ## Design modules
 
-| Import                                      | Format      | Purpose                                                                   |
-| ------------------------------------------- | ----------- | ------------------------------------------------------------------------- |
-| `nexa-transport/design-image-geometry`      | ESM + types | Design image geometry.                                                    |
-| `nexa-transport/design-asset-types`         | ESM + types | Design asset types.                                                       |
-| `nexa-transport/design-asset-codec`         | ESM + types | Design asset codec.                                                       |
-| `nexa-transport/design-asset-references`    | ESM + types | Design asset references.                                                  |
-| `nexa-transport/design-types`               | ESM + types | Design types.                                                             |
-| `nexa-transport/design-defaults`            | ESM + types | Design defaults.                                                          |
-| `nexa-transport/design-codec`               | ESM + types | Design codec.                                                             |
-| `nexa-transport/design-edits`               | ESM + types | Design edits.                                                             |
-| `nexa-transport/design-text-styles`         | ESM + types | Unicode-safe partial rich-range formatting and selected-style inspection. |
-| `nexa-transport/design-transfer-types`      | Types only  | Revision-pinned references for native copying between saved layouts.      |
-| `nexa-transport/design-transfer-codec`      | ESM + types | Strict reference-only copy request validation.                            |
-| `nexa-transport/design-token-edits`         | ESM + types | Individual token editing, color detachment and authored link counts.      |
-| `nexa-transport/design-operation-types`     | ESM + types | Design operation types.                                                   |
-| `nexa-transport/design-operation-codec`     | ESM + types | Design operation codec.                                                   |
-| `nexa-transport/design-scene`               | ESM + types | Design scene.                                                             |
-| `nexa-transport/design-layout`              | ESM + types | Design layout.                                                            |
-| `nexa-transport/design-layout-types`        | ESM + types | Design layout types.                                                      |
-| `nexa-transport/design-requests`            | ESM + types | Design requests.                                                          |
-| `nexa-transport/design-record-codec`        | ESM + types | Design record codec.                                                      |
-| `nexa-transport/design-records`             | ESM + types | Design records.                                                           |
-| `nexa-transport/design-request-codec`       | ESM + types | Design request codec.                                                     |
-| `nexa-transport/design-change-codec`        | ESM + types | Design change codec.                                                      |
-| `nexa-transport/design-paging`              | ESM + types | Design paging.                                                            |
-| `nexa-transport/design-selection`           | ESM + types | Design selection.                                                         |
-| `nexa-transport/design-selection-types`     | ESM + types | Design selection types.                                                   |
-| `nexa-transport/design-svg`                 | ESM + types | Design svg.                                                               |
-| `nexa-transport/design-svg-geometry`        | ESM + types | Design svg geometry.                                                      |
-| `nexa-transport/design-svg-types`           | ESM + types | Design svg types.                                                         |
-| `nexa-transport/design-text-layout`         | ESM + types | Design text layout.                                                       |
-| `nexa-transport/design-paths`               | ESM + types | Design paths.                                                             |
-| `nexa-transport/design-components`          | ESM + types | Design components.                                                        |
-| `nexa-transport/design-component-types`     | ESM + types | Design component types.                                                   |
-| `nexa-transport/design-boolean-edits`       | ESM + types | Design boolean edits.                                                     |
-| `nexa-transport/design-boolean-types`       | ESM + types | Design boolean types.                                                     |
-| `nexa-transport/design-boolean-kernel`      | ESM + types | Design boolean kernel.                                                    |
-| `nexa-transport/design-mask-types`          | ESM + types | Design mask types.                                                        |
-| `nexa-transport/design-mask-geometry`       | ESM + types | Design mask geometry.                                                     |
-| `nexa-transport/design-variants`            | ESM + types | Design variants.                                                          |
-| `nexa-transport/design-variant-types`       | ESM + types | Design variant types.                                                     |
-| `nexa-transport/design-font-engine`         | ESM + types | Design font engine.                                                       |
-| `nexa-transport/design-builtin-fonts`       | ESM + types | Design builtin fonts.                                                     |
-| `nexa-transport/design-inter-bytes`         | ESM + types | Design inter bytes.                                                       |
-| `nexa-transport/design-inter-outline-bytes` | ESM + types | Original Inter sfnt bytes for font shaping and browser consumers.         |
-| `nexa-transport/design-text-outline`        | ESM + types | Design text outline.                                                      |
-| `nexa-transport/design-svg-fonts`           | ESM + types | Design svg fonts.                                                         |
-| `nexa-transport/design-shaped-text-metrics` | ESM + types | Design shaped text metrics.                                               |
-| `nexa-transport/design-font-types`          | ESM + types | Design font types.                                                        |
-| `nexa-transport/design-font-codec`          | ESM + types | Design font codec.                                                        |
-| `nexa-transport/design-font-bindings`       | ESM + types | Design font bindings.                                                     |
+| Import                                      | Format      | Purpose                                                                      |
+| ------------------------------------------- | ----------- | ---------------------------------------------------------------------------- |
+| `nexa-transport/design-image-geometry`      | ESM + types | Design image geometry.                                                       |
+| `nexa-transport/design-asset-types`         | ESM + types | Design asset types.                                                          |
+| `nexa-transport/design-asset-codec`         | ESM + types | Design asset codec.                                                          |
+| `nexa-transport/design-asset-references`    | ESM + types | Design asset references.                                                     |
+| `nexa-transport/design-types`               | ESM + types | Design types.                                                                |
+| `nexa-transport/design-defaults`            | ESM + types | Design defaults.                                                             |
+| `nexa-transport/design-codec`               | ESM + types | Design codec.                                                                |
+| `nexa-transport/design-edits`               | ESM + types | Design edits.                                                                |
+| `nexa-transport/design-text-styles`         | ESM + types | Unicode-safe partial rich-range formatting and selected-style inspection.    |
+| `nexa-transport/design-transfer-types`      | Types only  | Revision-pinned references for native copying between saved layouts.         |
+| `nexa-transport/design-transfer-codec`      | ESM + types | Strict reference-only copy request validation.                               |
+| `nexa-transport/design-token-edits`         | ESM + types | Individual token editing, color detachment and bounded authored link counts. |
+| `nexa-transport/design-operation-types`     | ESM + types | Design operation types.                                                      |
+| `nexa-transport/design-operation-codec`     | ESM + types | Design operation codec.                                                      |
+| `nexa-transport/design-scene`               | ESM + types | Design scene.                                                                |
+| `nexa-transport/design-layout`              | ESM + types | Design layout.                                                               |
+| `nexa-transport/design-layout-types`        | ESM + types | Design layout types.                                                         |
+| `nexa-transport/design-requests`            | ESM + types | Design requests.                                                             |
+| `nexa-transport/design-record-codec`        | ESM + types | Design record codec.                                                         |
+| `nexa-transport/design-records`             | ESM + types | Design records.                                                              |
+| `nexa-transport/design-request-codec`       | ESM + types | Design request codec.                                                        |
+| `nexa-transport/design-change-codec`        | ESM + types | Design change codec.                                                         |
+| `nexa-transport/design-paging`              | ESM + types | Design paging.                                                               |
+| `nexa-transport/design-selection`           | ESM + types | Design selection.                                                            |
+| `nexa-transport/design-selection-types`     | ESM + types | Design selection types.                                                      |
+| `nexa-transport/design-svg`                 | ESM + types | Design svg.                                                                  |
+| `nexa-transport/design-svg-geometry`        | ESM + types | Design svg geometry.                                                         |
+| `nexa-transport/design-svg-types`           | ESM + types | Design svg types.                                                            |
+| `nexa-transport/design-text-layout`         | ESM + types | Design text layout.                                                          |
+| `nexa-transport/design-paths`               | ESM + types | Design paths.                                                                |
+| `nexa-transport/design-components`          | ESM + types | Design components.                                                           |
+| `nexa-transport/design-component-types`     | ESM + types | Design component types.                                                      |
+| `nexa-transport/design-boolean-edits`       | ESM + types | Design boolean edits.                                                        |
+| `nexa-transport/design-boolean-types`       | ESM + types | Design boolean types.                                                        |
+| `nexa-transport/design-boolean-kernel`      | ESM + types | Design boolean kernel.                                                       |
+| `nexa-transport/design-mask-types`          | ESM + types | Design mask types.                                                           |
+| `nexa-transport/design-mask-geometry`       | ESM + types | Design mask geometry.                                                        |
+| `nexa-transport/design-variants`            | ESM + types | Design variants.                                                             |
+| `nexa-transport/design-variant-types`       | ESM + types | Design variant types.                                                        |
+| `nexa-transport/design-font-engine`         | ESM + types | Design font engine.                                                          |
+| `nexa-transport/design-builtin-fonts`       | ESM + types | Design builtin fonts.                                                        |
+| `nexa-transport/design-inter-bytes`         | ESM + types | Design inter bytes.                                                          |
+| `nexa-transport/design-inter-outline-bytes` | ESM + types | Original Inter sfnt bytes for font shaping and browser consumers.            |
+| `nexa-transport/design-text-outline`        | ESM + types | Design text outline.                                                         |
+| `nexa-transport/design-svg-fonts`           | ESM + types | Design svg fonts.                                                            |
+| `nexa-transport/design-shaped-text-metrics` | ESM + types | Design shaped text metrics.                                                  |
+| `nexa-transport/design-font-types`          | ESM + types | Design font types.                                                           |
+| `nexa-transport/design-font-codec`          | ESM + types | Design font codec.                                                           |
+| `nexa-transport/design-font-bindings`       | ESM + types | Design font bindings.                                                        |
 
 ## Windowed design canvases
 
@@ -192,6 +192,25 @@ backend, or a provider-key vault.
 | `nexa-transport/design-canvas-types`      | ESM + types  | Canvas projections with deferred text and intrinsic metrics           |
 | `nexa-transport/design-canvas-codec`      | ESM + types  | Strict paged canvas-metric request validation                         |
 
+## Integrated scene support
+
+| Import                                    | Availability | Contract                                  |
+| ----------------------------------------- | ------------ | ----------------------------------------- |
+| `nexa-transport/roblox-gui-layout`        | ESM + types  | Portable Roblox gui layout support        |
+| `nexa-transport/roblox-live-descriptor`   | ESM + types  | Portable Roblox live descriptor support   |
+| `nexa-transport/roblox-live-state`        | ESM + types  | Portable Roblox live state support        |
+| `nexa-transport/roblox-part-geometry`     | ESM + types  | Portable Roblox part geometry support     |
+| `nexa-transport/roblox-particles`         | ESM + types  | Portable Roblox particles support         |
+| `nexa-transport/roblox-scene-codec`       | ESM + types  | Portable Roblox scene codec support       |
+| `nexa-transport/roblox-scene-diagnostics` | ESM + types  | Portable Roblox scene diagnostics support |
+| `nexa-transport/roblox-scene-examples`    | ESM + types  | Portable Roblox scene examples support    |
+| `nexa-transport/roblox-scene-input`       | ESM + types  | Portable Roblox scene input support       |
+| `nexa-transport/roblox-scene-luau`        | ESM + types  | Portable Roblox scene luau support        |
+| `nexa-transport/roblox-scene-runtime`     | ESM + types  | Portable Roblox scene runtime support     |
+| `nexa-transport/roblox-scene-schema`      | ESM + types  | Portable Roblox scene schema support      |
+| `nexa-transport/roblox-scene-types`       | ESM + types  | Portable Roblox scene types support       |
+| `nexa-transport/roblox-scene-xml`         | ESM + types  | Portable Roblox scene xml support         |
+
 `nexa-transport/design-typography-styles` exposes strict saved typography definitions, overrides and link validation. Use compact token and typography-style operations through design.save.
 
 Gradient geometry and compact edits are available through `nexa-transport/design-gradient-types` (types), `nexa-transport/design-gradient-geometry` and `nexa-transport/design-paint-gradient`.
@@ -201,3 +220,5 @@ Stroke cap and join choices are available through `nexa-transport/design-stroke-
 Editable SVG import uses `nexa-transport/design-svg-import` for portable layer conversion and undo, `nexa-transport/design-svg-import-types` for requests and limits, and `nexa-transport/design-svg-import-codec` for strict boundary validation. Saved imports use `client.call(Method.DesignSvgImport, request)`.
 
 SVG imports retain local use/symbol references as independent editable copies, nested SVG viewport clips, clip paths and alpha/luminance masks. Mask regions and content coordinate systems remain independent; native source layers can be edited and undone through the usual document operations. External resources, SVG text, images and filters remain unsupported.
+
+Metadata-only page ownership, locked ancestry and topmost selection are available through `nexa-transport/design-selection-index`. See [selection indexing](design-selection-index.md).
