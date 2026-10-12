@@ -71,6 +71,7 @@ const files: readonly string[] = [
     'DesignComponents',
 
     'DesignSelectionTypes',
+    'DesignAutoLayout',
     'DesignSelectionContext',
     'DesignSelectionTree',
     'DesignSelection',

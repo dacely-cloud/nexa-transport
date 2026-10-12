@@ -17,6 +17,7 @@ import { DesignValues as V } from './DesignValues.js';
 import { DesignMaskSelection } from './DesignMaskSelection.js';
 import { DesignBooleanSelection } from './DesignBooleanSelection.js';
 import { DesignWorldPositions } from './DesignWorldPositions.js';
+import { DesignAutoLayout } from './DesignAutoLayout.js';
 
 export { DesignSelectionContext } from './DesignSelectionContext.js';
 
@@ -62,6 +63,8 @@ export class DesignSelection {
             plan = Tree.duplicate(context, identify);
         } else if (action === Action.Group) {
             plan = Tree.group(context, identify('group'));
+        } else if (action === Action.AutoLayout) {
+            plan = DesignAutoLayout.plan(context, identify('auto-layout'));
         } else if (action === Action.Mask) {
             plan = DesignMaskSelection.create(context, identify('mask'));
         } else if (action === Action.ReleaseMask) {

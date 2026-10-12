@@ -7,6 +7,7 @@ import type { DesignOperation } from './DesignOperationTypes.js';
 export const DesignSelectionAction = {
     Duplicate: 'duplicate',
     Group: 'group',
+    AutoLayout: 'auto-layout',
     Mask: 'mask',
     ReleaseMask: 'release-mask',
     Ungroup: 'ungroup',
