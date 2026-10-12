@@ -55,6 +55,9 @@ export class DesignOperationCodec {
                     'dx',
                     'dy',
                     'reorders',
+                    'angle',
+                    'pivotX',
+                    'pivotY',
                 ],
                 ['op'],
             );
@@ -102,6 +105,36 @@ export class DesignOperationCodec {
                         op,
                         id: V.id(value['id']),
                         content: V.text(value['content'], 100000, true),
+                    };
+                }
+                case Kind.Rotate: {
+                    const value: Readonly<Record<string, unknown>> = V.fields(
+                        entry,
+                        ['op', 'pageId', 'selection', 'angle', 'pivotX', 'pivotY'],
+                        ['op', 'pageId', 'selection', 'angle'],
+                    );
+                    const selection: readonly string[] = V.list(
+                        value['selection'],
+                        128,
+                        (id: unknown): string => V.id(id),
+                    );
+                    if (selection.length === 0 || new Set(selection).size !== selection.length) {
+                        throw new Error('Rotate requires 1 to 128 distinct selected layers.');
+                    }
+                    if ((value['pivotX'] === undefined) !== (value['pivotY'] === undefined)) {
+                        throw new Error('Rotation requires both pivot coordinates or neither.');
+                    }
+                    return {
+                        op,
+                        pageId: V.id(value['pageId']),
+                        selection,
+                        angle: V.number(value['angle'], -360, 360),
+                        ...(value['pivotX'] === undefined
+                            ? {}
+                            : {
+                                  pivotX: V.number(value['pivotX'], -100000, 100000),
+                                  pivotY: V.number(value['pivotY'], -100000, 100000),
+                              }),
                     };
                 }
                 case Kind.Translate: {

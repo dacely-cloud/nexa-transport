@@ -30,6 +30,7 @@ export const DesignOperationKind = {
     Resize: 'resize',
     Position: 'position',
     Translate: 'translate',
+    Rotate: 'rotate',
     Text: 'text',
     Move: 'move',
     Remove: 'remove',
@@ -116,6 +117,15 @@ export interface DesignFlowReorder {
     readonly id: string;
     readonly index: number;
 }
+/** Rotates topmost selected layers together around a world pivot; omitted pivots use their combined bounds. */
+export interface DesignRotateOperation {
+    readonly op: typeof DesignOperationKind.Rotate;
+    readonly pageId: string;
+    readonly selection: readonly string[];
+    readonly angle: number;
+    readonly pivotX?: number;
+    readonly pivotY?: number;
+}
 /** Move a selection from one original scene, optionally reordering selected flow children in the same edit. */
 export interface DesignTranslateOperation {
     readonly op: typeof DesignOperationKind.Translate;
@@ -160,6 +170,7 @@ export type DesignOperation =
     | DesignResizeOperation
     | DesignPositionOperation
     | DesignTranslateOperation
+    | DesignRotateOperation
     | DesignTextOperation
     | DesignMove
     | DesignRemove

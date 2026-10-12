@@ -69,13 +69,21 @@ export class DesignWorldPositions {
             return {
                 node,
                 box,
-                captured: capture.capture({
-                    op: DesignOperationKind.Position,
-                    id: node.id,
-                    pageId: context.pageId,
-                    x: local.x,
-                    y: local.y,
-                }),
+                captured: {
+                    ...capture.capture({
+                        op: DesignOperationKind.Position,
+                        id: node.id,
+                        pageId: context.pageId,
+                        x: local.x,
+                        y: local.y,
+                    }),
+                    rotation:
+                        DesignWorldPositions.#angle(
+                            box.rotation - context.box(node.id).rotation,
+                        ) === 0
+                            ? node.rotation
+                            : DesignWorldPositions.#angle(local.rotation),
+                },
             };
         });
         const ancestors: Set<string> = new Set();
@@ -129,6 +137,7 @@ export class DesignWorldPositions {
                             y: node.y,
                             width: node.width,
                             height: node.height,
+                            rotation: node.rotation,
                             placement: node.placement,
                             ...(node.kind === DesignKind.Boolean ? {} : { path: node.path }),
                         },
@@ -225,6 +234,14 @@ export class DesignWorldPositions {
                 const local: Point = DesignSelectionContext.relative(target.box, parent);
                 this.#nodes.set(target.node.id, {
                     ...target.captured,
+                    rotation:
+                        DesignWorldPositions.#angle(
+                            target.box.rotation - this.context.box(target.node.id).rotation,
+                        ) === 0
+                            ? target.node.rotation
+                            : DesignWorldPositions.#angle(
+                                  target.box.rotation - (parent?.rotation ?? 0),
+                              ),
                     x:
                         parent?.width === 0 &&
                         target.node.placement.horizontal === DesignConstraint.Scale
@@ -317,12 +334,15 @@ export class DesignWorldPositions {
     static #point(a: Point, b: Point): boolean {
         return Math.abs(a.x - b.x) < 0.00000001 && Math.abs(a.y - b.y) < 0.00000001;
     }
+    static #angle(angle: number): number {
+        return ((((angle + 180) % 360) + 360) % 360) - 180;
+    }
     static #same(a: DesignBox, b: DesignBox): boolean {
         return (
             this.#point(a, b) &&
             Math.abs(a.width - b.width) < 0.00000001 &&
             Math.abs(a.height - b.height) < 0.00000001 &&
-            Math.abs(a.rotation - b.rotation) < 0.00000001
+            Math.abs(this.#angle(a.rotation - b.rotation)) < 0.00000001
         );
     }
 }
