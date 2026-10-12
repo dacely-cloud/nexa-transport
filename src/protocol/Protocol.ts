@@ -3418,6 +3418,36 @@ export const DesignAlignValues = {
 /** DesignAlign from the Nexa wire protocol. */
 export type DesignAlign = (typeof DesignAlignValues)[keyof typeof DesignAlignValues];
 
+/** DesignArrangeMethod wire fields. */
+export interface DesignArrangeMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignArrangeRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignReceipt;
+}
+
+/** DesignArrangeMethod from the Nexa wire protocol. */
+export type DesignArrangeMethod = DesignArrangeMethodShape;
+
+/** DesignArrangeRequest wire fields. */
+export interface DesignArrangeRequestShape {
+    /** action as defined by the Nexa gateway. */
+    readonly action: DesignSelectionAction;
+    /** commandId as defined by the Nexa gateway. */
+    readonly commandId: string;
+    /** expectedRevision as defined by the Nexa gateway. */
+    readonly expectedRevision: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+    /** selection as defined by the Nexa gateway. */
+    readonly selection: ReadonlyArray<string>;
+}
+
+/** DesignArrangeRequest from the Nexa wire protocol. */
+export type DesignArrangeRequest = DesignArrangeRequestShape;
+
 /** DesignAsset wire fields. */
 export interface DesignAssetShape {
     /** byteLength as defined by the Nexa gateway. */
@@ -3804,6 +3834,222 @@ export interface DesignCommentRecordShape {
 /** DesignCommentRecord from the Nexa wire protocol. */
 export type DesignCommentRecord = DesignCommentRecordShape;
 
+/** DesignComponentAddVariant wire fields. */
+export interface DesignComponentAddVariantShape {
+    /** action as defined by the Nexa gateway. */
+    readonly action: 'add-variant';
+    /** componentId as defined by the Nexa gateway. */
+    readonly componentId: null | string;
+    /** componentSetId as defined by the Nexa gateway. */
+    readonly componentSetId: string;
+}
+
+/** DesignComponentAddVariant from the Nexa wire protocol. */
+export type DesignComponentAddVariant = DesignComponentAddVariantShape;
+
+/** DesignComponentCombineVariants wire fields. */
+export interface DesignComponentCombineVariantsShape {
+    /** action as defined by the Nexa gateway. */
+    readonly action: 'combine-variants';
+    /** name as defined by the Nexa gateway. */
+    readonly name: string;
+    /** property as defined by the Nexa gateway. */
+    readonly property: string;
+    /** selection as defined by the Nexa gateway. */
+    readonly selection: ReadonlyArray<string>;
+}
+
+/** DesignComponentCombineVariants from the Nexa wire protocol. */
+export type DesignComponentCombineVariants = DesignComponentCombineVariantsShape;
+
+/** DesignComponentCommand from the Nexa wire protocol. */
+export type DesignComponentCommand =
+    | DesignComponentCreate
+    | DesignComponentPlace
+    | DesignComponentSwap
+    | DesignComponentDetach
+    | DesignComponentOverride
+    | DesignComponentReset
+    | DesignComponentCombineVariants
+    | DesignComponentAddVariant
+    | DesignComponentSetVariant
+    | DesignComponentEditVariant
+    | DesignComponentVariantProperties
+    | DesignComponentReleaseVariants;
+
+/** DesignComponentCreate wire fields. */
+export interface DesignComponentCreateShape {
+    /** action as defined by the Nexa gateway. */
+    readonly action: 'create';
+    /** selection as defined by the Nexa gateway. */
+    readonly selection: ReadonlyArray<string>;
+}
+
+/** DesignComponentCreate from the Nexa wire protocol. */
+export type DesignComponentCreate = DesignComponentCreateShape;
+
+/** DesignComponentDetach wire fields. */
+export interface DesignComponentDetachShape {
+    /** action as defined by the Nexa gateway. */
+    readonly action: 'detach';
+    /** selection as defined by the Nexa gateway. */
+    readonly selection: ReadonlyArray<string>;
+}
+
+/** DesignComponentDetach from the Nexa wire protocol. */
+export type DesignComponentDetach = DesignComponentDetachShape;
+
+/** DesignComponentEditVariant wire fields. */
+export interface DesignComponentEditVariantShape {
+    /** action as defined by the Nexa gateway. */
+    readonly action: 'edit-variant';
+    /** componentId as defined by the Nexa gateway. */
+    readonly componentId: string;
+    /** values as defined by the Nexa gateway. */
+    readonly values: ReadonlyArray<DesignVariantValue>;
+}
+
+/** DesignComponentEditVariant from the Nexa wire protocol. */
+export type DesignComponentEditVariant = DesignComponentEditVariantShape;
+
+/** DesignComponentMethod wire fields. */
+export interface DesignComponentMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignComponentRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignReceipt;
+}
+
+/** DesignComponentMethod from the Nexa wire protocol. */
+export type DesignComponentMethod = DesignComponentMethodShape;
+
+/** DesignComponentOverride wire fields. */
+export interface DesignComponentOverrideShape {
+    /** action as defined by the Nexa gateway. */
+    readonly action: 'override';
+    /** changes as defined by the Nexa gateway. */
+    readonly changes: DesignComponentOverrideChanges;
+    /** instanceId as defined by the Nexa gateway. */
+    readonly instanceId: string;
+    /** targetId as defined by the Nexa gateway. */
+    readonly targetId: string;
+}
+
+/** DesignComponentOverride from the Nexa wire protocol. */
+export type DesignComponentOverride = DesignComponentOverrideShape;
+
+/** DesignComponentOverrideChanges wire fields. */
+export interface DesignComponentOverrideChangesShape {
+    /** name as defined by the Nexa gateway. */
+    readonly name?: null | string;
+    /** style as defined by the Nexa gateway. */
+    readonly style?: DesignStyle | null;
+    /** text as defined by the Nexa gateway. */
+    readonly text?: null | string;
+    /** visible as defined by the Nexa gateway. */
+    readonly visible?: null | boolean;
+}
+
+/** DesignComponentOverrideChanges from the Nexa wire protocol. */
+export type DesignComponentOverrideChanges = DesignComponentOverrideChangesShape;
+
+/** DesignComponentPlace wire fields. */
+export interface DesignComponentPlaceShape {
+    /** action as defined by the Nexa gateway. */
+    readonly action: 'place';
+    /** center as defined by the Nexa gateway. */
+    readonly center?: boolean;
+    /** componentId as defined by the Nexa gateway. */
+    readonly componentId: string;
+    /** x as defined by the Nexa gateway. */
+    readonly x: number;
+    /** y as defined by the Nexa gateway. */
+    readonly y: number;
+}
+
+/** DesignComponentPlace from the Nexa wire protocol. */
+export type DesignComponentPlace = DesignComponentPlaceShape;
+
+/** DesignComponentReleaseVariants wire fields. */
+export interface DesignComponentReleaseVariantsShape {
+    /** action as defined by the Nexa gateway. */
+    readonly action: 'release-variants';
+    /** componentSetId as defined by the Nexa gateway. */
+    readonly componentSetId: string;
+}
+
+/** DesignComponentReleaseVariants from the Nexa wire protocol. */
+export type DesignComponentReleaseVariants = DesignComponentReleaseVariantsShape;
+
+/** DesignComponentRequest wire fields. */
+export interface DesignComponentRequestShape {
+    /** command as defined by the Nexa gateway. */
+    readonly command: DesignComponentCommand;
+    /** commandId as defined by the Nexa gateway. */
+    readonly commandId: string;
+    /** expectedRevision as defined by the Nexa gateway. */
+    readonly expectedRevision: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+}
+
+/** DesignComponentRequest from the Nexa wire protocol. */
+export type DesignComponentRequest = DesignComponentRequestShape;
+
+/** DesignComponentReset wire fields. */
+export interface DesignComponentResetShape {
+    /** action as defined by the Nexa gateway. */
+    readonly action: 'reset';
+    /** instanceId as defined by the Nexa gateway. */
+    readonly instanceId: string;
+    /** targetId as defined by the Nexa gateway. */
+    readonly targetId: null | string;
+}
+
+/** DesignComponentReset from the Nexa wire protocol. */
+export type DesignComponentReset = DesignComponentResetShape;
+
+/** DesignComponentSetVariant wire fields. */
+export interface DesignComponentSetVariantShape {
+    /** action as defined by the Nexa gateway. */
+    readonly action: 'set-variant';
+    /** instanceId as defined by the Nexa gateway. */
+    readonly instanceId: string;
+    /** values as defined by the Nexa gateway. */
+    readonly values: ReadonlyArray<DesignVariantValue>;
+}
+
+/** DesignComponentSetVariant from the Nexa wire protocol. */
+export type DesignComponentSetVariant = DesignComponentSetVariantShape;
+
+/** DesignComponentSwap wire fields. */
+export interface DesignComponentSwapShape {
+    /** action as defined by the Nexa gateway. */
+    readonly action: 'swap';
+    /** componentId as defined by the Nexa gateway. */
+    readonly componentId: string;
+    /** instanceId as defined by the Nexa gateway. */
+    readonly instanceId: string;
+}
+
+/** DesignComponentSwap from the Nexa wire protocol. */
+export type DesignComponentSwap = DesignComponentSwapShape;
+
+/** DesignComponentVariantProperties wire fields. */
+export interface DesignComponentVariantPropertiesShape {
+    /** action as defined by the Nexa gateway. */
+    readonly action: 'variant-properties';
+    /** componentSetId as defined by the Nexa gateway. */
+    readonly componentSetId: string;
+    /** properties as defined by the Nexa gateway. */
+    readonly properties: ReadonlyArray<DesignVariantPropertyEdit>;
+}
+
+/** DesignComponentVariantProperties from the Nexa wire protocol. */
+export type DesignComponentVariantProperties = DesignComponentVariantPropertiesShape;
+
 /** Allowed values for DesignConstraint. */
 export const DesignConstraintValues = {
     Value0: 'center',
@@ -4075,6 +4321,56 @@ export interface DesignFontSliceShape {
 /** DesignFontSlice from the Nexa wire protocol. */
 export type DesignFontSlice = DesignFontSliceShape;
 
+/** DesignFrameGrid wire fields. */
+export interface DesignFrameGridShape {
+    /** color as defined by the Nexa gateway. */
+    readonly color: string;
+    /** count as defined by the Nexa gateway. */
+    readonly count: number;
+    /** distribution as defined by the Nexa gateway. */
+    readonly distribution: DesignFrameGridDistribution;
+    /** gutter as defined by the Nexa gateway. */
+    readonly gutter: number;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: DesignFrameGridKind;
+    /** margin as defined by the Nexa gateway. */
+    readonly margin: number;
+    /** offset as defined by the Nexa gateway. */
+    readonly offset: number;
+    /** size as defined by the Nexa gateway. */
+    readonly size: number;
+    /** visible as defined by the Nexa gateway. */
+    readonly visible: boolean;
+}
+
+/** DesignFrameGrid from the Nexa wire protocol. */
+export type DesignFrameGrid = DesignFrameGridShape;
+
+/** Allowed values for DesignFrameGridDistribution. */
+export const DesignFrameGridDistributionValues = {
+    Value0: 'center',
+    Value1: 'end',
+    Value2: 'start',
+    Value3: 'stretch',
+} as const;
+
+/** DesignFrameGridDistribution from the Nexa wire protocol. */
+export type DesignFrameGridDistribution =
+    (typeof DesignFrameGridDistributionValues)[keyof typeof DesignFrameGridDistributionValues];
+
+/** Allowed values for DesignFrameGridKind. */
+export const DesignFrameGridKindValues = {
+    Value0: 'columns',
+    Value1: 'rows',
+    Value2: 'square',
+} as const;
+
+/** DesignFrameGridKind from the Nexa wire protocol. */
+export type DesignFrameGridKind =
+    (typeof DesignFrameGridKindValues)[keyof typeof DesignFrameGridKindValues];
+
 /** DesignGlyphBounds wire fields. */
 export interface DesignGlyphBoundsShape {
     /** height as defined by the Nexa gateway. */
@@ -4100,6 +4396,70 @@ export interface DesignGradientStopShape {
 
 /** DesignGradientStop from the Nexa wire protocol. */
 export type DesignGradientStop = DesignGradientStopShape;
+
+/** DesignGradientTransform wire fields. */
+export interface DesignGradientTransformShape {
+    /** axisX as defined by the Nexa gateway. */
+    readonly axisX: number;
+    /** axisY as defined by the Nexa gateway. */
+    readonly axisY: number;
+    /** endX as defined by the Nexa gateway. */
+    readonly endX: number;
+    /** endY as defined by the Nexa gateway. */
+    readonly endY: number;
+    /** startX as defined by the Nexa gateway. */
+    readonly startX: number;
+    /** startY as defined by the Nexa gateway. */
+    readonly startY: number;
+}
+
+/** DesignGradientTransform from the Nexa wire protocol. */
+export type DesignGradientTransform = DesignGradientTransformShape;
+
+/** DesignGradientTransformChanges wire fields. */
+export interface DesignGradientTransformChangesShape {
+    /** axisX as defined by the Nexa gateway. */
+    readonly axisX?: number;
+    /** axisY as defined by the Nexa gateway. */
+    readonly axisY?: number;
+    /** endX as defined by the Nexa gateway. */
+    readonly endX?: number;
+    /** endY as defined by the Nexa gateway. */
+    readonly endY?: number;
+    /** startX as defined by the Nexa gateway. */
+    readonly startX?: number;
+    /** startY as defined by the Nexa gateway. */
+    readonly startY?: number;
+}
+
+/** DesignGradientTransformChanges from the Nexa wire protocol. */
+export type DesignGradientTransformChanges = DesignGradientTransformChangesShape;
+
+/** DesignGuideOperation wire fields. */
+export interface DesignGuideOperationShape {
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** op as defined by the Nexa gateway. */
+    readonly op: 'guide';
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+    /** value as defined by the Nexa gateway. */
+    readonly value: DesignGuideValue | null;
+}
+
+/** DesignGuideOperation from the Nexa wire protocol. */
+export type DesignGuideOperation = DesignGuideOperationShape;
+
+/** DesignGuideValue wire fields. */
+export interface DesignGuideValueShape {
+    /** axis as defined by the Nexa gateway. */
+    readonly axis: DesignRulerAxis;
+    /** position as defined by the Nexa gateway. */
+    readonly position: number;
+}
+
+/** DesignGuideValue from the Nexa wire protocol. */
+export type DesignGuideValue = DesignGuideValueShape;
 
 /** DesignImage wire fields. */
 export interface DesignImageShape {
@@ -4251,6 +4611,57 @@ export interface DesignLayoutShape {
 /** DesignLayout from the Nexa wire protocol. */
 export type DesignLayout = DesignLayoutShape;
 
+/** Allowed values for DesignLayoutChangesalign. */
+export const DesignLayoutChangesalignValues = {
+    Value0: 'between',
+    Value1: 'center',
+    Value2: 'end',
+    Value3: 'start',
+    Value4: 'stretch',
+} as const;
+
+/** Allowed values for DesignLayoutChangesflow. */
+export const DesignLayoutChangesflowValues = {
+    Value0: 'absolute',
+    Value1: 'column',
+    Value2: 'grid',
+    Value3: 'row',
+} as const;
+
+/** Allowed values for DesignLayoutChangesjustify. */
+export const DesignLayoutChangesjustifyValues = {
+    Value0: 'between',
+    Value1: 'center',
+    Value2: 'end',
+    Value3: 'start',
+    Value4: 'stretch',
+} as const;
+
+/** DesignLayoutChanges wire fields. */
+export interface DesignLayoutChangesShape {
+    /** align as defined by the Nexa gateway. */
+    readonly align?: (typeof DesignLayoutChangesalignValues)[keyof typeof DesignLayoutChangesalignValues];
+    /** clip as defined by the Nexa gateway. */
+    readonly clip?: boolean;
+    /** columns as defined by the Nexa gateway. */
+    readonly columns?: number;
+    /** flow as defined by the Nexa gateway. */
+    readonly flow?: (typeof DesignLayoutChangesflowValues)[keyof typeof DesignLayoutChangesflowValues];
+    /** gap as defined by the Nexa gateway. */
+    readonly gap?: number;
+    /** justify as defined by the Nexa gateway. */
+    readonly justify?: (typeof DesignLayoutChangesjustifyValues)[keyof typeof DesignLayoutChangesjustifyValues];
+    /** padding as defined by the Nexa gateway. */
+    readonly padding?: DesignPaddingChanges;
+    /** rowGap as defined by the Nexa gateway. */
+    readonly rowGap?: number;
+    /** wrap as defined by the Nexa gateway. */
+    readonly wrap?: boolean;
+}
+
+/** DesignLayoutChanges from the Nexa wire protocol. */
+export type DesignLayoutChanges = DesignLayoutChangesShape;
+
 /** DesignLayoutMethod wire fields. */
 export interface DesignLayoutMethodShape {
     /** params as defined by the Nexa gateway. */
@@ -4261,6 +4672,21 @@ export interface DesignLayoutMethodShape {
 
 /** DesignLayoutMethod from the Nexa wire protocol. */
 export type DesignLayoutMethod = DesignLayoutMethodShape;
+
+/** DesignLayoutOperation wire fields. */
+export interface DesignLayoutOperationShape {
+    /** changes as defined by the Nexa gateway. */
+    readonly changes: DesignLayoutChanges;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** op as defined by the Nexa gateway. */
+    readonly op: 'layout';
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+}
+
+/** DesignLayoutOperation from the Nexa wire protocol. */
+export type DesignLayoutOperation = DesignLayoutOperationShape;
 
 /** DesignLayoutPage wire fields. */
 export interface DesignLayoutPageShape {
@@ -4274,6 +4700,113 @@ export interface DesignLayoutPageShape {
 
 /** DesignLayoutPage from the Nexa wire protocol. */
 export type DesignLayoutPage = DesignLayoutPageShape;
+
+/** DesignLayoutPreviewCanvasRequest wire fields. */
+export interface DesignLayoutPreviewCanvasRequestShape {
+    /** action as defined by the Nexa gateway. */
+    readonly action: 'canvas';
+    /** key as defined by the Nexa gateway. */
+    readonly key: null | string;
+    /** operation as defined by the Nexa gateway. */
+    readonly operation: DesignLayoutOperation;
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignViewRequest;
+}
+
+/** DesignLayoutPreviewCanvasRequest from the Nexa wire protocol. */
+export type DesignLayoutPreviewCanvasRequest = DesignLayoutPreviewCanvasRequestShape;
+
+/** DesignLayoutPreviewCanvasResult wire fields. */
+export interface DesignLayoutPreviewCanvasResultShape {
+    /** action as defined by the Nexa gateway. */
+    readonly action: 'canvas';
+    /** key as defined by the Nexa gateway. */
+    readonly key: string;
+    /** page as defined by the Nexa gateway. */
+    readonly page: DesignCanvasPage;
+}
+
+/** DesignLayoutPreviewCanvasResult from the Nexa wire protocol. */
+export type DesignLayoutPreviewCanvasResult = DesignLayoutPreviewCanvasResultShape;
+
+/** DesignLayoutPreviewMethod wire fields. */
+export interface DesignLayoutPreviewMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignLayoutPreviewRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignLayoutPreviewResult;
+}
+
+/** DesignLayoutPreviewMethod from the Nexa wire protocol. */
+export type DesignLayoutPreviewMethod = DesignLayoutPreviewMethodShape;
+
+/** DesignLayoutPreviewMetricsRequest wire fields. */
+export interface DesignLayoutPreviewMetricsRequestShape {
+    /** action as defined by the Nexa gateway. */
+    readonly action: 'metrics';
+    /** key as defined by the Nexa gateway. */
+    readonly key: null | string;
+    /** operation as defined by the Nexa gateway. */
+    readonly operation: DesignLayoutOperation;
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignCanvasMetricsRequest;
+}
+
+/** DesignLayoutPreviewMetricsRequest from the Nexa wire protocol. */
+export type DesignLayoutPreviewMetricsRequest = DesignLayoutPreviewMetricsRequestShape;
+
+/** DesignLayoutPreviewMetricsResult wire fields. */
+export interface DesignLayoutPreviewMetricsResultShape {
+    /** action as defined by the Nexa gateway. */
+    readonly action: 'metrics';
+    /** key as defined by the Nexa gateway. */
+    readonly key: string;
+    /** page as defined by the Nexa gateway. */
+    readonly page: DesignCanvasMetricsPage;
+}
+
+/** DesignLayoutPreviewMetricsResult from the Nexa wire protocol. */
+export type DesignLayoutPreviewMetricsResult = DesignLayoutPreviewMetricsResultShape;
+
+/** DesignLayoutPreviewRequest from the Nexa wire protocol. */
+export type DesignLayoutPreviewRequest =
+    | DesignLayoutPreviewCanvasRequest
+    | DesignLayoutPreviewMetricsRequest
+    | DesignLayoutPreviewTextRequest;
+
+/** DesignLayoutPreviewResult from the Nexa wire protocol. */
+export type DesignLayoutPreviewResult =
+    | DesignLayoutPreviewCanvasResult
+    | DesignLayoutPreviewMetricsResult
+    | DesignLayoutPreviewTextResult;
+
+/** DesignLayoutPreviewTextRequest wire fields. */
+export interface DesignLayoutPreviewTextRequestShape {
+    /** action as defined by the Nexa gateway. */
+    readonly action: 'text';
+    /** key as defined by the Nexa gateway. */
+    readonly key: null | string;
+    /** operation as defined by the Nexa gateway. */
+    readonly operation: DesignLayoutOperation;
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignTextWindowRequest;
+}
+
+/** DesignLayoutPreviewTextRequest from the Nexa wire protocol. */
+export type DesignLayoutPreviewTextRequest = DesignLayoutPreviewTextRequestShape;
+
+/** DesignLayoutPreviewTextResult wire fields. */
+export interface DesignLayoutPreviewTextResultShape {
+    /** action as defined by the Nexa gateway. */
+    readonly action: 'text';
+    /** key as defined by the Nexa gateway. */
+    readonly key: string;
+    /** page as defined by the Nexa gateway. */
+    readonly page: DesignTextWindowPage;
+}
+
+/** DesignLayoutPreviewTextResult from the Nexa wire protocol. */
+export type DesignLayoutPreviewTextResult = DesignLayoutPreviewTextResultShape;
 
 /** DesignLayoutRequest wire fields. */
 export interface DesignLayoutRequestShape {
@@ -4551,6 +5084,7 @@ export type DesignOperation =
     | DesignUpdate
     | DesignLayoutOperation
     | DesignSizingOperation
+    | DesignTypographyStyleOperation
     | DesignTypographyOperation
     | DesignTextStyleOperation
     | DesignTextOperation
@@ -4566,7 +5100,6 @@ export type DesignOperation =
     | DesignMetadata
     | DesignTokenOperation
     | DesignPaintColorOperation
-    | DesignTypographyStyleOperation
     | DesignPaintGradientOperation
     | DesignStrokeOperation;
 
@@ -4586,6 +5119,21 @@ export interface DesignOverrideShape {
 
 /** DesignOverride from the Nexa wire protocol. */
 export type DesignOverride = DesignOverrideShape;
+
+/** DesignPaddingChanges wire fields. */
+export interface DesignPaddingChangesShape {
+    /** bottom as defined by the Nexa gateway. */
+    readonly bottom?: number;
+    /** left as defined by the Nexa gateway. */
+    readonly left?: number;
+    /** right as defined by the Nexa gateway. */
+    readonly right?: number;
+    /** top as defined by the Nexa gateway. */
+    readonly top?: number;
+}
+
+/** DesignPaddingChanges from the Nexa wire protocol. */
+export type DesignPaddingChanges = DesignPaddingChangesShape;
 
 /** DesignPage wire fields. */
 export interface DesignPageShape {
@@ -4642,6 +5190,8 @@ export interface DesignPaintShape {
     readonly color: string;
     /** framing as defined by the Nexa gateway. */
     readonly framing?: DesignImageFraming;
+    /** gradient as defined by the Nexa gateway. */
+    readonly gradient?: DesignGradientTransform | null;
     /** kind as defined by the Nexa gateway. */
     readonly kind: DesignPaintKind;
     /** opacity as defined by the Nexa gateway. */
@@ -4650,12 +5200,86 @@ export interface DesignPaintShape {
     readonly stops: ReadonlyArray<DesignGradientStop>;
     /** tokenId as defined by the Nexa gateway. */
     readonly tokenId: null | string;
-    /** gradient as defined by the Nexa gateway. */
-    readonly gradient?: DesignGradientTransform | null;
 }
 
 /** DesignPaint from the Nexa wire protocol. */
 export type DesignPaint = DesignPaintShape;
+
+/** DesignPaintColorChanges wire fields. */
+export interface DesignPaintColorChangesShape {
+    /** color as defined by the Nexa gateway. */
+    readonly color?: string;
+    /** opacity as defined by the Nexa gateway. */
+    readonly opacity?: number;
+    /** tokenId as defined by the Nexa gateway. */
+    readonly tokenId?: null | string;
+}
+
+/** DesignPaintColorChanges from the Nexa wire protocol. */
+export type DesignPaintColorChanges = DesignPaintColorChangesShape;
+
+/** DesignPaintColorOperation wire fields. */
+export interface DesignPaintColorOperationShape {
+    /** changes as defined by the Nexa gateway. */
+    readonly changes: DesignPaintColorChanges;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** index as defined by the Nexa gateway. */
+    readonly index: number;
+    /** op as defined by the Nexa gateway. */
+    readonly op: 'paint-color';
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+    /** target as defined by the Nexa gateway. */
+    readonly target: DesignPaintColorTarget;
+}
+
+/** DesignPaintColorOperation from the Nexa wire protocol. */
+export type DesignPaintColorOperation = DesignPaintColorOperationShape;
+
+/** Allowed values for DesignPaintColorTarget. */
+export const DesignPaintColorTargetValues = { Value0: 'fill', Value1: 'stroke' } as const;
+
+/** DesignPaintColorTarget from the Nexa wire protocol. */
+export type DesignPaintColorTarget =
+    (typeof DesignPaintColorTargetValues)[keyof typeof DesignPaintColorTargetValues];
+
+/** Allowed values for DesignPaintGradientChangeskind. */
+export const DesignPaintGradientChangeskindValues = { Value0: 'linear', Value1: 'radial' } as const;
+
+/** DesignPaintGradientChanges wire fields. */
+export interface DesignPaintGradientChangesShape {
+    /** angle as defined by the Nexa gateway. */
+    readonly angle?: number;
+    /** gradient as defined by the Nexa gateway. */
+    readonly gradient?: DesignGradientTransformChanges | null;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind?: (typeof DesignPaintGradientChangeskindValues)[keyof typeof DesignPaintGradientChangeskindValues];
+    /** stops as defined by the Nexa gateway. */
+    readonly stops?: ReadonlyArray<DesignGradientStop>;
+}
+
+/** DesignPaintGradientChanges from the Nexa wire protocol. */
+export type DesignPaintGradientChanges = DesignPaintGradientChangesShape;
+
+/** DesignPaintGradientOperation wire fields. */
+export interface DesignPaintGradientOperationShape {
+    /** changes as defined by the Nexa gateway. */
+    readonly changes: DesignPaintGradientChanges;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** index as defined by the Nexa gateway. */
+    readonly index: number;
+    /** op as defined by the Nexa gateway. */
+    readonly op: 'paint-gradient';
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+    /** target as defined by the Nexa gateway. */
+    readonly target: DesignPaintColorTarget;
+}
+
+/** DesignPaintGradientOperation from the Nexa wire protocol. */
+export type DesignPaintGradientOperation = DesignPaintGradientOperationShape;
 
 /** Allowed values for DesignPaintKind. */
 export const DesignPaintKindValues = {
@@ -4917,6 +5541,25 @@ export interface DesignRotateOperationShape {
 /** DesignRotateOperation from the Nexa wire protocol. */
 export type DesignRotateOperation = DesignRotateOperationShape;
 
+/** Allowed values for DesignRulerAxis. */
+export const DesignRulerAxisValues = { Value0: 'x', Value1: 'y' } as const;
+
+/** DesignRulerAxis from the Nexa wire protocol. */
+export type DesignRulerAxis = (typeof DesignRulerAxisValues)[keyof typeof DesignRulerAxisValues];
+
+/** DesignRulerGuide wire fields. */
+export interface DesignRulerGuideShape {
+    /** axis as defined by the Nexa gateway. */
+    readonly axis: DesignRulerAxis;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** position as defined by the Nexa gateway. */
+    readonly position: number;
+}
+
+/** DesignRulerGuide from the Nexa wire protocol. */
+export type DesignRulerGuide = DesignRulerGuideShape;
+
 /** DesignSaveMethod wire fields. */
 export interface DesignSaveMethodShape {
     /** params as defined by the Nexa gateway. */
@@ -4943,6 +5586,54 @@ export interface DesignSaveRequestShape {
 /** DesignSaveRequest from the Nexa wire protocol. */
 export type DesignSaveRequest = DesignSaveRequestShape;
 
+/** DesignScaleOperation wire fields. */
+export interface DesignScaleOperationShape {
+    /** factor as defined by the Nexa gateway. */
+    readonly factor: number;
+    /** op as defined by the Nexa gateway. */
+    readonly op: 'scale';
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+    /** pivotX as defined by the Nexa gateway. */
+    readonly pivotX?: number;
+    /** pivotY as defined by the Nexa gateway. */
+    readonly pivotY?: number;
+    /** selection as defined by the Nexa gateway. */
+    readonly selection: ReadonlyArray<string>;
+}
+
+/** DesignScaleOperation from the Nexa wire protocol. */
+export type DesignScaleOperation = DesignScaleOperationShape;
+
+/** Allowed values for DesignSelectionAction. */
+export const DesignSelectionActionValues = {
+    Value0: 'auto-layout',
+    Value1: 'back',
+    Value2: 'bottom',
+    Value3: 'center',
+    Value4: 'distribute-horizontal',
+    Value5: 'distribute-vertical',
+    Value6: 'duplicate',
+    Value7: 'exclude',
+    Value8: 'flatten',
+    Value9: 'front',
+    Value10: 'group',
+    Value11: 'intersect',
+    Value12: 'left',
+    Value13: 'mask',
+    Value14: 'middle',
+    Value15: 'release-mask',
+    Value16: 'right',
+    Value17: 'subtract',
+    Value18: 'top',
+    Value19: 'ungroup',
+    Value20: 'union',
+} as const;
+
+/** DesignSelectionAction from the Nexa wire protocol. */
+export type DesignSelectionAction =
+    (typeof DesignSelectionActionValues)[keyof typeof DesignSelectionActionValues];
+
 /** DesignShadow wire fields. */
 export interface DesignShadowShape {
     /** blur as defined by the Nexa gateway. */
@@ -4968,6 +5659,58 @@ export const DesignSizingValues = { Value0: 'fill', Value1: 'fixed', Value2: 'hu
 /** DesignSizing from the Nexa wire protocol. */
 export type DesignSizing = (typeof DesignSizingValues)[keyof typeof DesignSizingValues];
 
+/** Allowed values for DesignSizingChangesheight. */
+export const DesignSizingChangesheightValues = {
+    Value0: 'fill',
+    Value1: 'fixed',
+    Value2: 'hug',
+} as const;
+
+/** Allowed values for DesignSizingChangeswidth. */
+export const DesignSizingChangeswidthValues = {
+    Value0: 'fill',
+    Value1: 'fixed',
+    Value2: 'hug',
+} as const;
+
+/** DesignSizingChanges wire fields. */
+export interface DesignSizingChangesShape {
+    /** columnSpan as defined by the Nexa gateway. */
+    readonly columnSpan?: number;
+    /** height as defined by the Nexa gateway. */
+    readonly height?: (typeof DesignSizingChangesheightValues)[keyof typeof DesignSizingChangesheightValues];
+    /** maxHeight as defined by the Nexa gateway. */
+    readonly maxHeight?: number;
+    /** maxWidth as defined by the Nexa gateway. */
+    readonly maxWidth?: number;
+    /** minHeight as defined by the Nexa gateway. */
+    readonly minHeight?: number;
+    /** minWidth as defined by the Nexa gateway. */
+    readonly minWidth?: number;
+    /** rowSpan as defined by the Nexa gateway. */
+    readonly rowSpan?: number;
+    /** width as defined by the Nexa gateway. */
+    readonly width?: (typeof DesignSizingChangeswidthValues)[keyof typeof DesignSizingChangeswidthValues];
+}
+
+/** DesignSizingChanges from the Nexa wire protocol. */
+export type DesignSizingChanges = DesignSizingChangesShape;
+
+/** DesignSizingOperation wire fields. */
+export interface DesignSizingOperationShape {
+    /** changes as defined by the Nexa gateway. */
+    readonly changes: DesignSizingChanges;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** op as defined by the Nexa gateway. */
+    readonly op: 'sizing';
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+}
+
+/** DesignSizingOperation from the Nexa wire protocol. */
+export type DesignSizingOperation = DesignSizingOperationShape;
+
 /** Allowed values for DesignStrokecap. */
 export const DesignStrokecapValues = { Value0: 'butt', Value1: 'round', Value2: 'square' } as const;
 
@@ -4980,22 +5723,68 @@ export const DesignStrokejoinValues = {
 
 /** DesignStroke wire fields. */
 export interface DesignStrokeShape {
-    /** dash as defined by the Nexa gateway. */
-    readonly dash: ReadonlyArray<number>;
-    /** paint as defined by the Nexa gateway. */
-    readonly paint: DesignPaint;
-    /** width as defined by the Nexa gateway. */
-    readonly width: number;
     /** cap as defined by the Nexa gateway. */
     readonly cap?: (typeof DesignStrokecapValues)[keyof typeof DesignStrokecapValues];
+    /** dash as defined by the Nexa gateway. */
+    readonly dash: ReadonlyArray<number>;
     /** join as defined by the Nexa gateway. */
     readonly join?: (typeof DesignStrokejoinValues)[keyof typeof DesignStrokejoinValues];
     /** miterLimit as defined by the Nexa gateway. */
     readonly miterLimit?: number;
+    /** paint as defined by the Nexa gateway. */
+    readonly paint: DesignPaint;
+    /** width as defined by the Nexa gateway. */
+    readonly width: number;
 }
 
 /** DesignStroke from the Nexa wire protocol. */
 export type DesignStroke = DesignStrokeShape;
+
+/** Allowed values for DesignStrokeChangescap. */
+export const DesignStrokeChangescapValues = {
+    Value0: 'butt',
+    Value1: 'round',
+    Value2: 'square',
+} as const;
+
+/** Allowed values for DesignStrokeChangesjoin. */
+export const DesignStrokeChangesjoinValues = {
+    Value0: 'bevel',
+    Value1: 'miter',
+    Value2: 'round',
+} as const;
+
+/** DesignStrokeChanges wire fields. */
+export interface DesignStrokeChangesShape {
+    /** cap as defined by the Nexa gateway. */
+    readonly cap?: (typeof DesignStrokeChangescapValues)[keyof typeof DesignStrokeChangescapValues];
+    /** dash as defined by the Nexa gateway. */
+    readonly dash?: ReadonlyArray<number>;
+    /** join as defined by the Nexa gateway. */
+    readonly join?: (typeof DesignStrokeChangesjoinValues)[keyof typeof DesignStrokeChangesjoinValues];
+    /** miterLimit as defined by the Nexa gateway. */
+    readonly miterLimit?: number;
+    /** width as defined by the Nexa gateway. */
+    readonly width?: number;
+}
+
+/** DesignStrokeChanges from the Nexa wire protocol. */
+export type DesignStrokeChanges = DesignStrokeChangesShape;
+
+/** DesignStrokeOperation wire fields. */
+export interface DesignStrokeOperationShape {
+    /** changes as defined by the Nexa gateway. */
+    readonly changes: DesignStrokeChanges | null;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** op as defined by the Nexa gateway. */
+    readonly op: 'stroke';
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+}
+
+/** DesignStrokeOperation from the Nexa wire protocol. */
+export type DesignStrokeOperation = DesignStrokeOperationShape;
 
 /** DesignStyle wire fields. */
 export interface DesignStyleShape {
@@ -5033,6 +5822,44 @@ export interface DesignSummaryShape {
 /** DesignSummary from the Nexa wire protocol. */
 export type DesignSummary = DesignSummaryShape;
 
+/** DesignSvgImportMethod wire fields. */
+export interface DesignSvgImportMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignSvgImportRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignReceipt;
+}
+
+/** DesignSvgImportMethod from the Nexa wire protocol. */
+export type DesignSvgImportMethod = DesignSvgImportMethodShape;
+
+/** DesignSvgImportRequest wire fields. */
+export interface DesignSvgImportRequestShape {
+    /** commandId as defined by the Nexa gateway. */
+    readonly commandId: string;
+    /** expectedRevision as defined by the Nexa gateway. */
+    readonly expectedRevision: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** index as defined by the Nexa gateway. */
+    readonly index: null | number;
+    /** name as defined by the Nexa gateway. */
+    readonly name: string;
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+    /** parentId as defined by the Nexa gateway. */
+    readonly parentId: null | string;
+    /** source as defined by the Nexa gateway. */
+    readonly source: string;
+    /** x as defined by the Nexa gateway. */
+    readonly x: number;
+    /** y as defined by the Nexa gateway. */
+    readonly y: number;
+}
+
+/** DesignSvgImportRequest from the Nexa wire protocol. */
+export type DesignSvgImportRequest = DesignSvgImportRequestShape;
+
 /** DesignText wire fields. */
 export interface DesignTextShape {
     /** align as defined by the Nexa gateway. */
@@ -5053,10 +5880,10 @@ export interface DesignTextShape {
     readonly runs: ReadonlyArray<DesignTextRun>;
     /** size as defined by the Nexa gateway. */
     readonly size: number;
-    /** weight as defined by the Nexa gateway. */
-    readonly weight: number;
     /** typographyStyle as defined by the Nexa gateway. */
     readonly typographyStyle?: DesignTypographyLink | null;
+    /** weight as defined by the Nexa gateway. */
+    readonly weight: number;
 }
 
 /** DesignText from the Nexa wire protocol. */
@@ -5122,6 +5949,46 @@ export interface DesignTextSpanStyleShape {
 
 /** DesignTextSpanStyle from the Nexa wire protocol. */
 export type DesignTextSpanStyle = DesignTextSpanStyleShape;
+
+/** DesignTextStyleChanges wire fields. */
+export interface DesignTextStyleChangesShape {
+    /** color as defined by the Nexa gateway. */
+    readonly color?: string;
+    /** family as defined by the Nexa gateway. */
+    readonly family?: string;
+    /** font as defined by the Nexa gateway. */
+    readonly font?: DesignFontBinding | null;
+    /** italic as defined by the Nexa gateway. */
+    readonly italic?: boolean;
+    /** size as defined by the Nexa gateway. */
+    readonly size?: number;
+    /** underline as defined by the Nexa gateway. */
+    readonly underline?: boolean;
+    /** weight as defined by the Nexa gateway. */
+    readonly weight?: number;
+}
+
+/** DesignTextStyleChanges from the Nexa wire protocol. */
+export type DesignTextStyleChanges = DesignTextStyleChangesShape;
+
+/** DesignTextStyleOperation wire fields. */
+export interface DesignTextStyleOperationShape {
+    /** changes as defined by the Nexa gateway. */
+    readonly changes: DesignTextStyleChanges;
+    /** end as defined by the Nexa gateway. */
+    readonly end: number;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** op as defined by the Nexa gateway. */
+    readonly op: 'text-style';
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+    /** start as defined by the Nexa gateway. */
+    readonly start: number;
+}
+
+/** DesignTextStyleOperation from the Nexa wire protocol. */
+export type DesignTextStyleOperation = DesignTextStyleOperationShape;
 
 /** DesignTextWindowCursor wire fields. */
 export interface DesignTextWindowCursorShape {
@@ -5229,10 +6096,10 @@ export interface DesignTokenShape {
     readonly id: string;
     /** name as defined by the Nexa gateway. */
     readonly name: string;
-    /** value as defined by the Nexa gateway. */
-    readonly value: string;
     /** typography as defined by the Nexa gateway. */
     readonly typography?: DesignTypographyValues;
+    /** value as defined by the Nexa gateway. */
+    readonly value: string;
 }
 
 /** DesignToken from the Nexa wire protocol. */
@@ -5249,6 +6116,41 @@ export const DesignTokenCategoryValues = {
 export type DesignTokenCategory =
     (typeof DesignTokenCategoryValues)[keyof typeof DesignTokenCategoryValues];
 
+/** Allowed values for DesignTokenChangescategory. */
+export const DesignTokenChangescategoryValues = {
+    Value0: 'color',
+    Value1: 'spacing',
+    Value2: 'typography',
+} as const;
+
+/** DesignTokenChanges wire fields. */
+export interface DesignTokenChangesShape {
+    /** category as defined by the Nexa gateway. */
+    readonly category?: (typeof DesignTokenChangescategoryValues)[keyof typeof DesignTokenChangescategoryValues];
+    /** name as defined by the Nexa gateway. */
+    readonly name?: string;
+    /** typography as defined by the Nexa gateway. */
+    readonly typography?: DesignTypographyOverrides | null;
+    /** value as defined by the Nexa gateway. */
+    readonly value?: string;
+}
+
+/** DesignTokenChanges from the Nexa wire protocol. */
+export type DesignTokenChanges = DesignTokenChangesShape;
+
+/** DesignTokenOperation wire fields. */
+export interface DesignTokenOperationShape {
+    /** changes as defined by the Nexa gateway. */
+    readonly changes: DesignTokenChanges | null;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** op as defined by the Nexa gateway. */
+    readonly op: 'token';
+}
+
+/** DesignTokenOperation from the Nexa wire protocol. */
+export type DesignTokenOperation = DesignTokenOperationShape;
+
 /** DesignTokenRecord wire fields. */
 export interface DesignTokenRecordShape {
     /** id as defined by the Nexa gateway. */
@@ -5261,6 +6163,46 @@ export interface DesignTokenRecordShape {
 
 /** DesignTokenRecord from the Nexa wire protocol. */
 export type DesignTokenRecord = DesignTokenRecordShape;
+
+/** DesignTransferMethod wire fields. */
+export interface DesignTransferMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignTransferRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignReceipt;
+}
+
+/** DesignTransferMethod from the Nexa wire protocol. */
+export type DesignTransferMethod = DesignTransferMethodShape;
+
+/** DesignTransferRequest wire fields. */
+export interface DesignTransferRequestShape {
+    /** commandId as defined by the Nexa gateway. */
+    readonly commandId: string;
+    /** expectedRevision as defined by the Nexa gateway. */
+    readonly expectedRevision: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+    /** parentId as defined by the Nexa gateway. */
+    readonly parentId: null | string;
+    /** selection as defined by the Nexa gateway. */
+    readonly selection: ReadonlyArray<string>;
+    /** sourceId as defined by the Nexa gateway. */
+    readonly sourceId: string;
+    /** sourcePageId as defined by the Nexa gateway. */
+    readonly sourcePageId: string;
+    /** sourceRevision as defined by the Nexa gateway. */
+    readonly sourceRevision: string;
+    /** x as defined by the Nexa gateway. */
+    readonly x: number;
+    /** y as defined by the Nexa gateway. */
+    readonly y: number;
+}
+
+/** DesignTransferRequest from the Nexa wire protocol. */
+export type DesignTransferRequest = DesignTransferRequestShape;
 
 /** Allowed values for DesignTransition. */
 export const DesignTransitionValues = {
@@ -5296,6 +6238,137 @@ export const DesignTriggerValues = { Value0: 'after', Value1: 'click', Value2: '
 
 /** DesignTrigger from the Nexa wire protocol. */
 export type DesignTrigger = (typeof DesignTriggerValues)[keyof typeof DesignTriggerValues];
+
+/** Allowed values for DesignTypographyChangesalign. */
+export const DesignTypographyChangesalignValues = {
+    Value0: 'center',
+    Value1: 'end',
+    Value2: 'start',
+} as const;
+
+/** DesignTypographyChanges wire fields. */
+export interface DesignTypographyChangesShape {
+    /** align as defined by the Nexa gateway. */
+    readonly align?: (typeof DesignTypographyChangesalignValues)[keyof typeof DesignTypographyChangesalignValues];
+    /** family as defined by the Nexa gateway. */
+    readonly family?: string;
+    /** font as defined by the Nexa gateway. */
+    readonly font?: DesignFontBinding | null;
+    /** italic as defined by the Nexa gateway. */
+    readonly italic?: boolean;
+    /** letterSpacing as defined by the Nexa gateway. */
+    readonly letterSpacing?: number;
+    /** lineHeight as defined by the Nexa gateway. */
+    readonly lineHeight?: number;
+    /** size as defined by the Nexa gateway. */
+    readonly size?: number;
+    /** weight as defined by the Nexa gateway. */
+    readonly weight?: number;
+}
+
+/** DesignTypographyChanges from the Nexa wire protocol. */
+export type DesignTypographyChanges = DesignTypographyChangesShape;
+
+/** DesignTypographyLink wire fields. */
+export interface DesignTypographyLinkShape {
+    /** overrides as defined by the Nexa gateway. */
+    readonly overrides?: DesignTypographyOverrides;
+    /** tokenId as defined by the Nexa gateway. */
+    readonly tokenId: string;
+}
+
+/** DesignTypographyLink from the Nexa wire protocol. */
+export type DesignTypographyLink = DesignTypographyLinkShape;
+
+/** DesignTypographyOperation wire fields. */
+export interface DesignTypographyOperationShape {
+    /** changes as defined by the Nexa gateway. */
+    readonly changes: DesignTypographyChanges;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** op as defined by the Nexa gateway. */
+    readonly op: 'typography';
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+}
+
+/** DesignTypographyOperation from the Nexa wire protocol. */
+export type DesignTypographyOperation = DesignTypographyOperationShape;
+
+/** Allowed values for DesignTypographyOverridesalign. */
+export const DesignTypographyOverridesalignValues = {
+    Value0: 'center',
+    Value1: 'end',
+    Value2: 'start',
+} as const;
+
+/** DesignTypographyOverrides wire fields. */
+export interface DesignTypographyOverridesShape {
+    /** align as defined by the Nexa gateway. */
+    readonly align?: (typeof DesignTypographyOverridesalignValues)[keyof typeof DesignTypographyOverridesalignValues];
+    /** family as defined by the Nexa gateway. */
+    readonly family?: string;
+    /** font as defined by the Nexa gateway. */
+    readonly font?: DesignFontBinding | null;
+    /** italic as defined by the Nexa gateway. */
+    readonly italic?: boolean;
+    /** letterSpacing as defined by the Nexa gateway. */
+    readonly letterSpacing?: number;
+    /** lineHeight as defined by the Nexa gateway. */
+    readonly lineHeight?: number;
+    /** size as defined by the Nexa gateway. */
+    readonly size?: number;
+    /** weight as defined by the Nexa gateway. */
+    readonly weight?: number;
+}
+
+/** DesignTypographyOverrides from the Nexa wire protocol. */
+export type DesignTypographyOverrides = DesignTypographyOverridesShape;
+
+/** DesignTypographyStyleOperation wire fields. */
+export interface DesignTypographyStyleOperationShape {
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** op as defined by the Nexa gateway. */
+    readonly op: 'typography-style';
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+    /** tokenId as defined by the Nexa gateway. */
+    readonly tokenId: null | string;
+}
+
+/** DesignTypographyStyleOperation from the Nexa wire protocol. */
+export type DesignTypographyStyleOperation = DesignTypographyStyleOperationShape;
+
+/** Allowed values for DesignTypographyValuesalign. */
+export const DesignTypographyValuesalignValues = {
+    Value0: 'center',
+    Value1: 'end',
+    Value2: 'start',
+} as const;
+
+/** DesignTypographyValues wire fields. */
+export interface DesignTypographyValuesShape {
+    /** align as defined by the Nexa gateway. */
+    readonly align: (typeof DesignTypographyValuesalignValues)[keyof typeof DesignTypographyValuesalignValues];
+    /** family as defined by the Nexa gateway. */
+    readonly family: string;
+    /** font as defined by the Nexa gateway. */
+    readonly font: DesignFontBinding | null;
+    /** italic as defined by the Nexa gateway. */
+    readonly italic: boolean;
+    /** letterSpacing as defined by the Nexa gateway. */
+    readonly letterSpacing: number;
+    /** lineHeight as defined by the Nexa gateway. */
+    readonly lineHeight: number;
+    /** size as defined by the Nexa gateway. */
+    readonly size: number;
+    /** weight as defined by the Nexa gateway. */
+    readonly weight: number;
+}
+
+/** DesignTypographyValues from the Nexa wire protocol. */
+export type DesignTypographyValues = DesignTypographyValuesShape;
 
 /** DesignUndoMethod wire fields. */
 export interface DesignUndoMethodShape {
@@ -5335,6 +6408,17 @@ export interface DesignUpdateShape {
 
 /** DesignUpdate from the Nexa wire protocol. */
 export type DesignUpdate = DesignUpdateShape;
+
+/** DesignVariantPropertyEdit wire fields. */
+export interface DesignVariantPropertyEditShape {
+    /** from as defined by the Nexa gateway. */
+    readonly from: null | string;
+    /** name as defined by the Nexa gateway. */
+    readonly name: string;
+}
+
+/** DesignVariantPropertyEdit from the Nexa wire protocol. */
+export type DesignVariantPropertyEdit = DesignVariantPropertyEditShape;
 
 /** DesignVariantSet wire fields. */
 export interface DesignVariantSetShape {
@@ -6131,6 +7215,14 @@ export interface GatewayMethodsdata_upload_startShape {
     readonly result: DataUpload;
 }
 
+/** GatewayMethodsdesign_arrange wire fields. */
+export interface GatewayMethodsdesign_arrangeShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignArrangeRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignReceipt;
+}
+
 /** GatewayMethodsdesign_asset_cancel wire fields. */
 export interface GatewayMethodsdesign_asset_cancelShape {
     /** params as defined by the Nexa gateway. */
@@ -6211,6 +7303,14 @@ export interface GatewayMethodsdesign_changesShape {
     readonly result: DesignRecordPage;
 }
 
+/** GatewayMethodsdesign_component wire fields. */
+export interface GatewayMethodsdesign_componentShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignComponentRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignReceipt;
+}
+
 /** GatewayMethodsdesign_create wire fields. */
 export interface GatewayMethodsdesign_createShape {
     /** params as defined by the Nexa gateway. */
@@ -6259,6 +7359,14 @@ export interface GatewayMethodsdesign_layoutShape {
     readonly result: DesignLayoutPage;
 }
 
+/** GatewayMethodsdesign_layout_preview wire fields. */
+export interface GatewayMethodsdesign_layout_previewShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignLayoutPreviewRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignLayoutPreviewResult;
+}
+
 /** GatewayMethodsdesign_list wire fields. */
 export interface GatewayMethodsdesign_listShape {
     /** params as defined by the Nexa gateway. */
@@ -6283,12 +7391,28 @@ export interface GatewayMethodsdesign_saveShape {
     readonly result: DesignReceipt;
 }
 
+/** GatewayMethodsdesign_svg_import wire fields. */
+export interface GatewayMethodsdesign_svg_importShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignSvgImportRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignReceipt;
+}
+
 /** GatewayMethodsdesign_text_window wire fields. */
 export interface GatewayMethodsdesign_text_windowShape {
     /** params as defined by the Nexa gateway. */
     readonly params: DesignTextWindowRequest;
     /** result as defined by the Nexa gateway. */
     readonly result: DesignTextWindowPage;
+}
+
+/** GatewayMethodsdesign_transfer wire fields. */
+export interface GatewayMethodsdesign_transferShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignTransferRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignReceipt;
 }
 
 /** GatewayMethodsdesign_undo wire fields. */
@@ -7351,38 +8475,6 @@ export interface GatewayMethodsworkspaces_listShape {
     readonly result: ReadonlyArray<Workspace>;
 }
 
-/** GatewayMethodsdesign_arrange wire fields. */
-export interface GatewayMethodsdesign_arrangeShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: DesignArrangeRequest;
-    /** result as defined by the Nexa gateway. */
-    readonly result: DesignReceipt;
-}
-
-/** GatewayMethodsdesign_layout_preview wire fields. */
-export interface GatewayMethodsdesign_layout_previewShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: DesignLayoutPreviewRequest;
-    /** result as defined by the Nexa gateway. */
-    readonly result: DesignLayoutPreviewResult;
-}
-
-/** GatewayMethodsdesign_transfer wire fields. */
-export interface GatewayMethodsdesign_transferShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: DesignTransferRequest;
-    /** result as defined by the Nexa gateway. */
-    readonly result: DesignReceipt;
-}
-
-/** GatewayMethodsdesign_svg_import wire fields. */
-export interface GatewayMethodsdesign_svg_importShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: DesignSvgImportRequest;
-    /** result as defined by the Nexa gateway. */
-    readonly result: DesignReceipt;
-}
-
 /** GatewayMethods wire fields. */
 export interface GatewayMethodsShape {
     /** accounts.create as defined by the Nexa gateway. */
@@ -7447,6 +8539,8 @@ export interface GatewayMethodsShape {
     readonly 'data.upload.finish': GatewayMethodsdata_upload_finishShape;
     /** data.upload.start as defined by the Nexa gateway. */
     readonly 'data.upload.start': GatewayMethodsdata_upload_startShape;
+    /** design.arrange as defined by the Nexa gateway. */
+    readonly 'design.arrange': GatewayMethodsdesign_arrangeShape;
     /** design.asset.cancel as defined by the Nexa gateway. */
     readonly 'design.asset.cancel': GatewayMethodsdesign_asset_cancelShape;
     /** design.asset.chunk as defined by the Nexa gateway. */
@@ -7467,6 +8561,8 @@ export interface GatewayMethodsShape {
     readonly 'design.canvas.metrics': GatewayMethodsdesign_canvas_metricsShape;
     /** design.changes as defined by the Nexa gateway. */
     readonly 'design.changes': GatewayMethodsdesign_changesShape;
+    /** design.component as defined by the Nexa gateway. */
+    readonly 'design.component': GatewayMethodsdesign_componentShape;
     /** design.create as defined by the Nexa gateway. */
     readonly 'design.create': GatewayMethodsdesign_createShape;
     /** design.delete as defined by the Nexa gateway. */
@@ -7479,14 +8575,20 @@ export interface GatewayMethodsShape {
     readonly 'design.font.read': GatewayMethodsdesign_font_readShape;
     /** design.layout as defined by the Nexa gateway. */
     readonly 'design.layout': GatewayMethodsdesign_layoutShape;
+    /** design.layout.preview as defined by the Nexa gateway. */
+    readonly 'design.layout.preview': GatewayMethodsdesign_layout_previewShape;
     /** design.list as defined by the Nexa gateway. */
     readonly 'design.list': GatewayMethodsdesign_listShape;
     /** design.read as defined by the Nexa gateway. */
     readonly 'design.read': GatewayMethodsdesign_readShape;
     /** design.save as defined by the Nexa gateway. */
     readonly 'design.save': GatewayMethodsdesign_saveShape;
+    /** design.svg.import as defined by the Nexa gateway. */
+    readonly 'design.svg.import': GatewayMethodsdesign_svg_importShape;
     /** design.text.window as defined by the Nexa gateway. */
     readonly 'design.text.window': GatewayMethodsdesign_text_windowShape;
+    /** design.transfer as defined by the Nexa gateway. */
+    readonly 'design.transfer': GatewayMethodsdesign_transferShape;
     /** design.undo as defined by the Nexa gateway. */
     readonly 'design.undo': GatewayMethodsdesign_undoShape;
     /** design.view as defined by the Nexa gateway. */
@@ -7749,14 +8851,6 @@ export interface GatewayMethodsShape {
     readonly 'workspaces.destroy': GatewayMethodsworkspaces_destroyShape;
     /** workspaces.list as defined by the Nexa gateway. */
     readonly 'workspaces.list': GatewayMethodsworkspaces_listShape;
-    /** design.arrange as defined by the Nexa gateway. */
-    readonly 'design.arrange': GatewayMethodsdesign_arrangeShape;
-    /** design.layout.preview as defined by the Nexa gateway. */
-    readonly 'design.layout.preview': GatewayMethodsdesign_layout_previewShape;
-    /** design.transfer as defined by the Nexa gateway. */
-    readonly 'design.transfer': GatewayMethodsdesign_transferShape;
-    /** design.svg.import as defined by the Nexa gateway. */
-    readonly 'design.svg.import': GatewayMethodsdesign_svg_importShape;
 }
 
 /** GatewayMethods from the Nexa wire protocol. */
@@ -14831,852 +15925,6 @@ export interface WorkspaceUsageShape {
 /** WorkspaceUsage from the Nexa wire protocol. */
 export type WorkspaceUsage = WorkspaceUsageShape;
 
-/** DesignScaleOperation wire fields. */
-export interface DesignScaleOperationShape {
-    /** factor as defined by the Nexa gateway. */
-    readonly factor: number;
-    /** op as defined by the Nexa gateway. */
-    readonly op: 'scale';
-    /** pageId as defined by the Nexa gateway. */
-    readonly pageId: string;
-    /** pivotX as defined by the Nexa gateway. */
-    readonly pivotX?: number;
-    /** pivotY as defined by the Nexa gateway. */
-    readonly pivotY?: number;
-    /** selection as defined by the Nexa gateway. */
-    readonly selection: ReadonlyArray<string>;
-}
-
-/** DesignScaleOperation from the Nexa wire protocol. */
-export type DesignScaleOperation = DesignScaleOperationShape;
-
-/** DesignGuideValue wire fields. */
-export interface DesignGuideValueShape {
-    /** axis as defined by the Nexa gateway. */
-    readonly axis: DesignRulerAxis;
-    /** position as defined by the Nexa gateway. */
-    readonly position: number;
-}
-
-/** DesignGuideValue from the Nexa wire protocol. */
-export type DesignGuideValue = DesignGuideValueShape;
-
-/** DesignRulerGuide wire fields. */
-export interface DesignRulerGuideShape {
-    /** axis as defined by the Nexa gateway. */
-    readonly axis: DesignRulerAxis;
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** position as defined by the Nexa gateway. */
-    readonly position: number;
-}
-
-/** DesignRulerGuide from the Nexa wire protocol. */
-export type DesignRulerGuide = DesignRulerGuideShape;
-
-/** DesignGuideOperation wire fields. */
-export interface DesignGuideOperationShape {
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** op as defined by the Nexa gateway. */
-    readonly op: 'guide';
-    /** pageId as defined by the Nexa gateway. */
-    readonly pageId: string;
-    /** value as defined by the Nexa gateway. */
-    readonly value: DesignGuideValue | null;
-}
-
-/** DesignGuideOperation from the Nexa wire protocol. */
-export type DesignGuideOperation = DesignGuideOperationShape;
-
-/** Allowed values for DesignRulerAxis. */
-export const DesignRulerAxisValues = { Value0: 'x', Value1: 'y' } as const;
-
-/** DesignRulerAxis from the Nexa wire protocol. */
-export type DesignRulerAxis = (typeof DesignRulerAxisValues)[keyof typeof DesignRulerAxisValues];
-
-/** DesignFrameGrid wire fields. */
-export interface DesignFrameGridShape {
-    /** color as defined by the Nexa gateway. */
-    readonly color: string;
-    /** count as defined by the Nexa gateway. */
-    readonly count: number;
-    /** distribution as defined by the Nexa gateway. */
-    readonly distribution: DesignFrameGridDistribution;
-    /** gutter as defined by the Nexa gateway. */
-    readonly gutter: number;
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** kind as defined by the Nexa gateway. */
-    readonly kind: DesignFrameGridKind;
-    /** margin as defined by the Nexa gateway. */
-    readonly margin: number;
-    /** offset as defined by the Nexa gateway. */
-    readonly offset: number;
-    /** size as defined by the Nexa gateway. */
-    readonly size: number;
-    /** visible as defined by the Nexa gateway. */
-    readonly visible: boolean;
-}
-
-/** DesignFrameGrid from the Nexa wire protocol. */
-export type DesignFrameGrid = DesignFrameGridShape;
-
-/** Allowed values for DesignFrameGridKind. */
-export const DesignFrameGridKindValues = {
-    Value0: 'columns',
-    Value1: 'rows',
-    Value2: 'square',
-} as const;
-
-/** DesignFrameGridKind from the Nexa wire protocol. */
-export type DesignFrameGridKind =
-    (typeof DesignFrameGridKindValues)[keyof typeof DesignFrameGridKindValues];
-
-/** Allowed values for DesignFrameGridDistribution. */
-export const DesignFrameGridDistributionValues = {
-    Value0: 'center',
-    Value1: 'end',
-    Value2: 'start',
-    Value3: 'stretch',
-} as const;
-
-/** DesignFrameGridDistribution from the Nexa wire protocol. */
-export type DesignFrameGridDistribution =
-    (typeof DesignFrameGridDistributionValues)[keyof typeof DesignFrameGridDistributionValues];
-
-/** DesignArrangeMethod wire fields. */
-export interface DesignArrangeMethodShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: DesignArrangeRequest;
-    /** result as defined by the Nexa gateway. */
-    readonly result: DesignReceipt;
-}
-
-/** DesignArrangeMethod from the Nexa wire protocol. */
-export type DesignArrangeMethod = DesignArrangeMethodShape;
-
-/** DesignArrangeRequest wire fields. */
-export interface DesignArrangeRequestShape {
-    /** action as defined by the Nexa gateway. */
-    readonly action: DesignSelectionAction;
-    /** commandId as defined by the Nexa gateway. */
-    readonly commandId: string;
-    /** expectedRevision as defined by the Nexa gateway. */
-    readonly expectedRevision: string;
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** pageId as defined by the Nexa gateway. */
-    readonly pageId: string;
-    /** selection as defined by the Nexa gateway. */
-    readonly selection: ReadonlyArray<string>;
-}
-
-/** DesignArrangeRequest from the Nexa wire protocol. */
-export type DesignArrangeRequest = DesignArrangeRequestShape;
-
-/** Allowed values for DesignSelectionAction. */
-export const DesignSelectionActionValues = {
-    Value0: 'auto-layout',
-    Value1: 'back',
-    Value2: 'bottom',
-    Value3: 'center',
-    Value4: 'distribute-horizontal',
-    Value5: 'distribute-vertical',
-    Value6: 'duplicate',
-    Value7: 'exclude',
-    Value8: 'flatten',
-    Value9: 'front',
-    Value10: 'group',
-    Value11: 'intersect',
-    Value12: 'left',
-    Value13: 'mask',
-    Value14: 'middle',
-    Value15: 'release-mask',
-    Value16: 'right',
-    Value17: 'subtract',
-    Value18: 'top',
-    Value19: 'ungroup',
-    Value20: 'union',
-} as const;
-
-/** DesignSelectionAction from the Nexa wire protocol. */
-export type DesignSelectionAction =
-    (typeof DesignSelectionActionValues)[keyof typeof DesignSelectionActionValues];
-
-/** DesignLayoutOperation wire fields. */
-export interface DesignLayoutOperationShape {
-    /** changes as defined by the Nexa gateway. */
-    readonly changes: DesignLayoutChanges;
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** op as defined by the Nexa gateway. */
-    readonly op: 'layout';
-    /** pageId as defined by the Nexa gateway. */
-    readonly pageId: string;
-}
-
-/** DesignLayoutOperation from the Nexa wire protocol. */
-export type DesignLayoutOperation = DesignLayoutOperationShape;
-
-/** Allowed values for DesignLayoutChangesalign. */
-export const DesignLayoutChangesalignValues = {
-    Value0: 'between',
-    Value1: 'center',
-    Value2: 'end',
-    Value3: 'start',
-    Value4: 'stretch',
-} as const;
-
-/** Allowed values for DesignLayoutChangesflow. */
-export const DesignLayoutChangesflowValues = {
-    Value0: 'absolute',
-    Value1: 'column',
-    Value2: 'grid',
-    Value3: 'row',
-} as const;
-
-/** Allowed values for DesignLayoutChangesjustify. */
-export const DesignLayoutChangesjustifyValues = {
-    Value0: 'between',
-    Value1: 'center',
-    Value2: 'end',
-    Value3: 'start',
-    Value4: 'stretch',
-} as const;
-
-/** DesignLayoutChanges wire fields. */
-export interface DesignLayoutChangesShape {
-    /** align as defined by the Nexa gateway. */
-    readonly align?: (typeof DesignLayoutChangesalignValues)[keyof typeof DesignLayoutChangesalignValues];
-    /** clip as defined by the Nexa gateway. */
-    readonly clip?: boolean;
-    /** columns as defined by the Nexa gateway. */
-    readonly columns?: number;
-    /** flow as defined by the Nexa gateway. */
-    readonly flow?: (typeof DesignLayoutChangesflowValues)[keyof typeof DesignLayoutChangesflowValues];
-    /** gap as defined by the Nexa gateway. */
-    readonly gap?: number;
-    /** justify as defined by the Nexa gateway. */
-    readonly justify?: (typeof DesignLayoutChangesjustifyValues)[keyof typeof DesignLayoutChangesjustifyValues];
-    /** padding as defined by the Nexa gateway. */
-    readonly padding?: DesignPaddingChanges;
-    /** rowGap as defined by the Nexa gateway. */
-    readonly rowGap?: number;
-    /** wrap as defined by the Nexa gateway. */
-    readonly wrap?: boolean;
-}
-
-/** DesignLayoutChanges from the Nexa wire protocol. */
-export type DesignLayoutChanges = DesignLayoutChangesShape;
-
-/** DesignPaddingChanges wire fields. */
-export interface DesignPaddingChangesShape {
-    /** bottom as defined by the Nexa gateway. */
-    readonly bottom?: number;
-    /** left as defined by the Nexa gateway. */
-    readonly left?: number;
-    /** right as defined by the Nexa gateway. */
-    readonly right?: number;
-    /** top as defined by the Nexa gateway. */
-    readonly top?: number;
-}
-
-/** DesignPaddingChanges from the Nexa wire protocol. */
-export type DesignPaddingChanges = DesignPaddingChangesShape;
-
-/** DesignLayoutPreviewCanvasRequest wire fields. */
-export interface DesignLayoutPreviewCanvasRequestShape {
-    /** action as defined by the Nexa gateway. */
-    readonly action: 'canvas';
-    /** key as defined by the Nexa gateway. */
-    readonly key: null | string;
-    /** operation as defined by the Nexa gateway. */
-    readonly operation: DesignLayoutOperation;
-    /** params as defined by the Nexa gateway. */
-    readonly params: DesignViewRequest;
-}
-
-/** DesignLayoutPreviewCanvasRequest from the Nexa wire protocol. */
-export type DesignLayoutPreviewCanvasRequest = DesignLayoutPreviewCanvasRequestShape;
-
-/** DesignLayoutPreviewCanvasResult wire fields. */
-export interface DesignLayoutPreviewCanvasResultShape {
-    /** action as defined by the Nexa gateway. */
-    readonly action: 'canvas';
-    /** key as defined by the Nexa gateway. */
-    readonly key: string;
-    /** page as defined by the Nexa gateway. */
-    readonly page: DesignCanvasPage;
-}
-
-/** DesignLayoutPreviewCanvasResult from the Nexa wire protocol. */
-export type DesignLayoutPreviewCanvasResult = DesignLayoutPreviewCanvasResultShape;
-
-/** DesignLayoutPreviewMethod wire fields. */
-export interface DesignLayoutPreviewMethodShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: DesignLayoutPreviewRequest;
-    /** result as defined by the Nexa gateway. */
-    readonly result: DesignLayoutPreviewResult;
-}
-
-/** DesignLayoutPreviewMethod from the Nexa wire protocol. */
-export type DesignLayoutPreviewMethod = DesignLayoutPreviewMethodShape;
-
-/** DesignLayoutPreviewMetricsRequest wire fields. */
-export interface DesignLayoutPreviewMetricsRequestShape {
-    /** action as defined by the Nexa gateway. */
-    readonly action: 'metrics';
-    /** key as defined by the Nexa gateway. */
-    readonly key: null | string;
-    /** operation as defined by the Nexa gateway. */
-    readonly operation: DesignLayoutOperation;
-    /** params as defined by the Nexa gateway. */
-    readonly params: DesignCanvasMetricsRequest;
-}
-
-/** DesignLayoutPreviewMetricsRequest from the Nexa wire protocol. */
-export type DesignLayoutPreviewMetricsRequest = DesignLayoutPreviewMetricsRequestShape;
-
-/** DesignLayoutPreviewMetricsResult wire fields. */
-export interface DesignLayoutPreviewMetricsResultShape {
-    /** action as defined by the Nexa gateway. */
-    readonly action: 'metrics';
-    /** key as defined by the Nexa gateway. */
-    readonly key: string;
-    /** page as defined by the Nexa gateway. */
-    readonly page: DesignCanvasMetricsPage;
-}
-
-/** DesignLayoutPreviewMetricsResult from the Nexa wire protocol. */
-export type DesignLayoutPreviewMetricsResult = DesignLayoutPreviewMetricsResultShape;
-
-/** DesignLayoutPreviewRequest from the Nexa wire protocol. */
-export type DesignLayoutPreviewRequest =
-    | DesignLayoutPreviewCanvasRequest
-    | DesignLayoutPreviewMetricsRequest
-    | DesignLayoutPreviewTextRequest;
-
-/** DesignLayoutPreviewResult from the Nexa wire protocol. */
-export type DesignLayoutPreviewResult =
-    | DesignLayoutPreviewCanvasResult
-    | DesignLayoutPreviewMetricsResult
-    | DesignLayoutPreviewTextResult;
-
-/** DesignLayoutPreviewTextRequest wire fields. */
-export interface DesignLayoutPreviewTextRequestShape {
-    /** action as defined by the Nexa gateway. */
-    readonly action: 'text';
-    /** key as defined by the Nexa gateway. */
-    readonly key: null | string;
-    /** operation as defined by the Nexa gateway. */
-    readonly operation: DesignLayoutOperation;
-    /** params as defined by the Nexa gateway. */
-    readonly params: DesignTextWindowRequest;
-}
-
-/** DesignLayoutPreviewTextRequest from the Nexa wire protocol. */
-export type DesignLayoutPreviewTextRequest = DesignLayoutPreviewTextRequestShape;
-
-/** DesignLayoutPreviewTextResult wire fields. */
-export interface DesignLayoutPreviewTextResultShape {
-    /** action as defined by the Nexa gateway. */
-    readonly action: 'text';
-    /** key as defined by the Nexa gateway. */
-    readonly key: string;
-    /** page as defined by the Nexa gateway. */
-    readonly page: DesignTextWindowPage;
-}
-
-/** DesignLayoutPreviewTextResult from the Nexa wire protocol. */
-export type DesignLayoutPreviewTextResult = DesignLayoutPreviewTextResultShape;
-
-/** Allowed values for DesignSizingChangesheight. */
-export const DesignSizingChangesheightValues = {
-    Value0: 'fill',
-    Value1: 'fixed',
-    Value2: 'hug',
-} as const;
-
-/** Allowed values for DesignSizingChangeswidth. */
-export const DesignSizingChangeswidthValues = {
-    Value0: 'fill',
-    Value1: 'fixed',
-    Value2: 'hug',
-} as const;
-
-/** DesignSizingChanges wire fields. */
-export interface DesignSizingChangesShape {
-    /** columnSpan as defined by the Nexa gateway. */
-    readonly columnSpan?: number;
-    /** height as defined by the Nexa gateway. */
-    readonly height?: (typeof DesignSizingChangesheightValues)[keyof typeof DesignSizingChangesheightValues];
-    /** maxHeight as defined by the Nexa gateway. */
-    readonly maxHeight?: number;
-    /** maxWidth as defined by the Nexa gateway. */
-    readonly maxWidth?: number;
-    /** minHeight as defined by the Nexa gateway. */
-    readonly minHeight?: number;
-    /** minWidth as defined by the Nexa gateway. */
-    readonly minWidth?: number;
-    /** rowSpan as defined by the Nexa gateway. */
-    readonly rowSpan?: number;
-    /** width as defined by the Nexa gateway. */
-    readonly width?: (typeof DesignSizingChangeswidthValues)[keyof typeof DesignSizingChangeswidthValues];
-}
-
-/** DesignSizingChanges from the Nexa wire protocol. */
-export type DesignSizingChanges = DesignSizingChangesShape;
-
-/** DesignSizingOperation wire fields. */
-export interface DesignSizingOperationShape {
-    /** changes as defined by the Nexa gateway. */
-    readonly changes: DesignSizingChanges;
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** op as defined by the Nexa gateway. */
-    readonly op: 'sizing';
-    /** pageId as defined by the Nexa gateway. */
-    readonly pageId: string;
-}
-
-/** DesignSizingOperation from the Nexa wire protocol. */
-export type DesignSizingOperation = DesignSizingOperationShape;
-
-/** Allowed values for DesignTypographyChangesalign. */
-export const DesignTypographyChangesalignValues = {
-    Value0: 'center',
-    Value1: 'end',
-    Value2: 'start',
-} as const;
-
-/** DesignTypographyChanges wire fields. */
-export interface DesignTypographyChangesShape {
-    /** align as defined by the Nexa gateway. */
-    readonly align?: (typeof DesignTypographyChangesalignValues)[keyof typeof DesignTypographyChangesalignValues];
-    /** family as defined by the Nexa gateway. */
-    readonly family?: string;
-    /** font as defined by the Nexa gateway. */
-    readonly font?: DesignFontBinding | null;
-    /** italic as defined by the Nexa gateway. */
-    readonly italic?: boolean;
-    /** letterSpacing as defined by the Nexa gateway. */
-    readonly letterSpacing?: number;
-    /** lineHeight as defined by the Nexa gateway. */
-    readonly lineHeight?: number;
-    /** size as defined by the Nexa gateway. */
-    readonly size?: number;
-    /** weight as defined by the Nexa gateway. */
-    readonly weight?: number;
-}
-
-/** DesignTypographyChanges from the Nexa wire protocol. */
-export type DesignTypographyChanges = DesignTypographyChangesShape;
-
-/** DesignTypographyOperation wire fields. */
-export interface DesignTypographyOperationShape {
-    /** changes as defined by the Nexa gateway. */
-    readonly changes: DesignTypographyChanges;
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** op as defined by the Nexa gateway. */
-    readonly op: 'typography';
-    /** pageId as defined by the Nexa gateway. */
-    readonly pageId: string;
-}
-
-/** DesignTypographyOperation from the Nexa wire protocol. */
-export type DesignTypographyOperation = DesignTypographyOperationShape;
-
-/** DesignTextStyleChanges wire fields. */
-export interface DesignTextStyleChangesShape {
-    /** color as defined by the Nexa gateway. */
-    readonly color?: string;
-    /** family as defined by the Nexa gateway. */
-    readonly family?: string;
-    /** font as defined by the Nexa gateway. */
-    readonly font?: DesignFontBinding | null;
-    /** italic as defined by the Nexa gateway. */
-    readonly italic?: boolean;
-    /** size as defined by the Nexa gateway. */
-    readonly size?: number;
-    /** underline as defined by the Nexa gateway. */
-    readonly underline?: boolean;
-    /** weight as defined by the Nexa gateway. */
-    readonly weight?: number;
-}
-
-/** DesignTextStyleChanges from the Nexa wire protocol. */
-export type DesignTextStyleChanges = DesignTextStyleChangesShape;
-
-/** DesignTextStyleOperation wire fields. */
-export interface DesignTextStyleOperationShape {
-    /** changes as defined by the Nexa gateway. */
-    readonly changes: DesignTextStyleChanges;
-    /** end as defined by the Nexa gateway. */
-    readonly end: number;
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** op as defined by the Nexa gateway. */
-    readonly op: 'text-style';
-    /** pageId as defined by the Nexa gateway. */
-    readonly pageId: string;
-    /** start as defined by the Nexa gateway. */
-    readonly start: number;
-}
-
-/** DesignTextStyleOperation from the Nexa wire protocol. */
-export type DesignTextStyleOperation = DesignTextStyleOperationShape;
-
-/** DesignTransferMethod wire fields. */
-export interface DesignTransferMethodShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: DesignTransferRequest;
-    /** result as defined by the Nexa gateway. */
-    readonly result: DesignReceipt;
-}
-
-/** DesignTransferMethod from the Nexa wire protocol. */
-export type DesignTransferMethod = DesignTransferMethodShape;
-
-/** DesignTransferRequest wire fields. */
-export interface DesignTransferRequestShape {
-    /** commandId as defined by the Nexa gateway. */
-    readonly commandId: string;
-    /** expectedRevision as defined by the Nexa gateway. */
-    readonly expectedRevision: string;
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** pageId as defined by the Nexa gateway. */
-    readonly pageId: string;
-    /** parentId as defined by the Nexa gateway. */
-    readonly parentId: null | string;
-    /** selection as defined by the Nexa gateway. */
-    readonly selection: ReadonlyArray<string>;
-    /** sourceId as defined by the Nexa gateway. */
-    readonly sourceId: string;
-    /** sourcePageId as defined by the Nexa gateway. */
-    readonly sourcePageId: string;
-    /** sourceRevision as defined by the Nexa gateway. */
-    readonly sourceRevision: string;
-    /** x as defined by the Nexa gateway. */
-    readonly x: number;
-    /** y as defined by the Nexa gateway. */
-    readonly y: number;
-}
-
-/** DesignTransferRequest from the Nexa wire protocol. */
-export type DesignTransferRequest = DesignTransferRequestShape;
-
-/** Allowed values for DesignTokenChangescategory. */
-export const DesignTokenChangescategoryValues = {
-    Value0: 'color',
-    Value1: 'spacing',
-    Value2: 'typography',
-} as const;
-
-/** DesignTokenChanges wire fields. */
-export interface DesignTokenChangesShape {
-    /** category as defined by the Nexa gateway. */
-    readonly category?: (typeof DesignTokenChangescategoryValues)[keyof typeof DesignTokenChangescategoryValues];
-    /** name as defined by the Nexa gateway. */
-    readonly name?: string;
-    /** value as defined by the Nexa gateway. */
-    readonly value?: string;
-    /** typography as defined by the Nexa gateway. */
-    readonly typography?: DesignTypographyOverrides | null;
-}
-
-/** DesignTokenChanges from the Nexa wire protocol. */
-export type DesignTokenChanges = DesignTokenChangesShape;
-
-/** DesignTokenOperation wire fields. */
-export interface DesignTokenOperationShape {
-    /** changes as defined by the Nexa gateway. */
-    readonly changes: DesignTokenChanges | null;
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** op as defined by the Nexa gateway. */
-    readonly op: 'token';
-}
-
-/** DesignTokenOperation from the Nexa wire protocol. */
-export type DesignTokenOperation = DesignTokenOperationShape;
-
-/** DesignPaintColorChanges wire fields. */
-export interface DesignPaintColorChangesShape {
-    /** color as defined by the Nexa gateway. */
-    readonly color?: string;
-    /** opacity as defined by the Nexa gateway. */
-    readonly opacity?: number;
-    /** tokenId as defined by the Nexa gateway. */
-    readonly tokenId?: null | string;
-}
-
-/** DesignPaintColorChanges from the Nexa wire protocol. */
-export type DesignPaintColorChanges = DesignPaintColorChangesShape;
-
-/** Allowed values for DesignPaintColorTarget. */
-export const DesignPaintColorTargetValues = { Value0: 'fill', Value1: 'stroke' } as const;
-
-/** DesignPaintColorTarget from the Nexa wire protocol. */
-export type DesignPaintColorTarget =
-    (typeof DesignPaintColorTargetValues)[keyof typeof DesignPaintColorTargetValues];
-
-/** DesignPaintColorOperation wire fields. */
-export interface DesignPaintColorOperationShape {
-    /** changes as defined by the Nexa gateway. */
-    readonly changes: DesignPaintColorChanges;
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** index as defined by the Nexa gateway. */
-    readonly index: number;
-    /** op as defined by the Nexa gateway. */
-    readonly op: 'paint-color';
-    /** pageId as defined by the Nexa gateway. */
-    readonly pageId: string;
-    /** target as defined by the Nexa gateway. */
-    readonly target: DesignPaintColorTarget;
-}
-
-/** DesignPaintColorOperation from the Nexa wire protocol. */
-export type DesignPaintColorOperation = DesignPaintColorOperationShape;
-
-/** DesignTypographyStyleOperation wire fields. */
-export interface DesignTypographyStyleOperationShape {
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** op as defined by the Nexa gateway. */
-    readonly op: 'typography-style';
-    /** pageId as defined by the Nexa gateway. */
-    readonly pageId: string;
-    /** tokenId as defined by the Nexa gateway. */
-    readonly tokenId: null | string;
-}
-
-/** DesignTypographyStyleOperation from the Nexa wire protocol. */
-export type DesignTypographyStyleOperation = DesignTypographyStyleOperationShape;
-
-/** Allowed values for DesignTypographyOverridesalign. */
-export const DesignTypographyOverridesalignValues = {
-    Value0: 'center',
-    Value1: 'end',
-    Value2: 'start',
-} as const;
-
-/** DesignTypographyOverrides wire fields. */
-export interface DesignTypographyOverridesShape {
-    /** align as defined by the Nexa gateway. */
-    readonly align?: (typeof DesignTypographyOverridesalignValues)[keyof typeof DesignTypographyOverridesalignValues];
-    /** family as defined by the Nexa gateway. */
-    readonly family?: string;
-    /** font as defined by the Nexa gateway. */
-    readonly font?: DesignFontBinding | null;
-    /** italic as defined by the Nexa gateway. */
-    readonly italic?: boolean;
-    /** letterSpacing as defined by the Nexa gateway. */
-    readonly letterSpacing?: number;
-    /** lineHeight as defined by the Nexa gateway. */
-    readonly lineHeight?: number;
-    /** size as defined by the Nexa gateway. */
-    readonly size?: number;
-    /** weight as defined by the Nexa gateway. */
-    readonly weight?: number;
-}
-
-/** DesignTypographyOverrides from the Nexa wire protocol. */
-export type DesignTypographyOverrides = DesignTypographyOverridesShape;
-
-/** Allowed values for DesignTypographyValuesalign. */
-export const DesignTypographyValuesalignValues = {
-    Value0: 'center',
-    Value1: 'end',
-    Value2: 'start',
-} as const;
-
-/** DesignTypographyValues wire fields. */
-export interface DesignTypographyValuesShape {
-    /** align as defined by the Nexa gateway. */
-    readonly align: (typeof DesignTypographyValuesalignValues)[keyof typeof DesignTypographyValuesalignValues];
-    /** family as defined by the Nexa gateway. */
-    readonly family: string;
-    /** font as defined by the Nexa gateway. */
-    readonly font: DesignFontBinding | null;
-    /** italic as defined by the Nexa gateway. */
-    readonly italic: boolean;
-    /** letterSpacing as defined by the Nexa gateway. */
-    readonly letterSpacing: number;
-    /** lineHeight as defined by the Nexa gateway. */
-    readonly lineHeight: number;
-    /** size as defined by the Nexa gateway. */
-    readonly size: number;
-    /** weight as defined by the Nexa gateway. */
-    readonly weight: number;
-}
-
-/** DesignTypographyValues from the Nexa wire protocol. */
-export type DesignTypographyValues = DesignTypographyValuesShape;
-
-/** DesignTypographyLink wire fields. */
-export interface DesignTypographyLinkShape {
-    /** overrides as defined by the Nexa gateway. */
-    readonly overrides?: DesignTypographyOverrides;
-    /** tokenId as defined by the Nexa gateway. */
-    readonly tokenId: string;
-}
-
-/** DesignTypographyLink from the Nexa wire protocol. */
-export type DesignTypographyLink = DesignTypographyLinkShape;
-
-/** DesignGradientTransform wire fields. */
-export interface DesignGradientTransformShape {
-    /** axisX as defined by the Nexa gateway. */
-    readonly axisX: number;
-    /** axisY as defined by the Nexa gateway. */
-    readonly axisY: number;
-    /** endX as defined by the Nexa gateway. */
-    readonly endX: number;
-    /** endY as defined by the Nexa gateway. */
-    readonly endY: number;
-    /** startX as defined by the Nexa gateway. */
-    readonly startX: number;
-    /** startY as defined by the Nexa gateway. */
-    readonly startY: number;
-}
-
-/** DesignGradientTransform from the Nexa wire protocol. */
-export type DesignGradientTransform = DesignGradientTransformShape;
-
-/** DesignGradientTransformChanges wire fields. */
-export interface DesignGradientTransformChangesShape {
-    /** axisX as defined by the Nexa gateway. */
-    readonly axisX?: number;
-    /** axisY as defined by the Nexa gateway. */
-    readonly axisY?: number;
-    /** endX as defined by the Nexa gateway. */
-    readonly endX?: number;
-    /** endY as defined by the Nexa gateway. */
-    readonly endY?: number;
-    /** startX as defined by the Nexa gateway. */
-    readonly startX?: number;
-    /** startY as defined by the Nexa gateway. */
-    readonly startY?: number;
-}
-
-/** DesignGradientTransformChanges from the Nexa wire protocol. */
-export type DesignGradientTransformChanges = DesignGradientTransformChangesShape;
-
-/** Allowed values for DesignPaintGradientChangeskind. */
-export const DesignPaintGradientChangeskindValues = { Value0: 'linear', Value1: 'radial' } as const;
-
-/** DesignPaintGradientChanges wire fields. */
-export interface DesignPaintGradientChangesShape {
-    /** angle as defined by the Nexa gateway. */
-    readonly angle?: number;
-    /** gradient as defined by the Nexa gateway. */
-    readonly gradient?: DesignGradientTransformChanges | null;
-    /** kind as defined by the Nexa gateway. */
-    readonly kind?: (typeof DesignPaintGradientChangeskindValues)[keyof typeof DesignPaintGradientChangeskindValues];
-    /** stops as defined by the Nexa gateway. */
-    readonly stops?: ReadonlyArray<DesignGradientStop>;
-}
-
-/** DesignPaintGradientChanges from the Nexa wire protocol. */
-export type DesignPaintGradientChanges = DesignPaintGradientChangesShape;
-
-/** DesignPaintGradientOperation wire fields. */
-export interface DesignPaintGradientOperationShape {
-    /** changes as defined by the Nexa gateway. */
-    readonly changes: DesignPaintGradientChanges;
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** index as defined by the Nexa gateway. */
-    readonly index: number;
-    /** op as defined by the Nexa gateway. */
-    readonly op: 'paint-gradient';
-    /** pageId as defined by the Nexa gateway. */
-    readonly pageId: string;
-    /** target as defined by the Nexa gateway. */
-    readonly target: DesignPaintColorTarget;
-}
-
-/** DesignPaintGradientOperation from the Nexa wire protocol. */
-export type DesignPaintGradientOperation = DesignPaintGradientOperationShape;
-
-/** Allowed values for DesignStrokeChangescap. */
-export const DesignStrokeChangescapValues = {
-    Value0: 'butt',
-    Value1: 'round',
-    Value2: 'square',
-} as const;
-
-/** Allowed values for DesignStrokeChangesjoin. */
-export const DesignStrokeChangesjoinValues = {
-    Value0: 'bevel',
-    Value1: 'miter',
-    Value2: 'round',
-} as const;
-
-/** DesignStrokeChanges wire fields. */
-export interface DesignStrokeChangesShape {
-    /** cap as defined by the Nexa gateway. */
-    readonly cap?: (typeof DesignStrokeChangescapValues)[keyof typeof DesignStrokeChangescapValues];
-    /** dash as defined by the Nexa gateway. */
-    readonly dash?: ReadonlyArray<number>;
-    /** join as defined by the Nexa gateway. */
-    readonly join?: (typeof DesignStrokeChangesjoinValues)[keyof typeof DesignStrokeChangesjoinValues];
-    /** miterLimit as defined by the Nexa gateway. */
-    readonly miterLimit?: number;
-    /** width as defined by the Nexa gateway. */
-    readonly width?: number;
-}
-
-/** DesignStrokeChanges from the Nexa wire protocol. */
-export type DesignStrokeChanges = DesignStrokeChangesShape;
-
-/** DesignStrokeOperation wire fields. */
-export interface DesignStrokeOperationShape {
-    /** changes as defined by the Nexa gateway. */
-    readonly changes: DesignStrokeChanges | null;
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** op as defined by the Nexa gateway. */
-    readonly op: 'stroke';
-    /** pageId as defined by the Nexa gateway. */
-    readonly pageId: string;
-}
-
-/** DesignStrokeOperation from the Nexa wire protocol. */
-export type DesignStrokeOperation = DesignStrokeOperationShape;
-
-/** DesignSvgImportRequest wire fields. */
-export interface DesignSvgImportRequestShape {
-    /** commandId as defined by the Nexa gateway. */
-    readonly commandId: string;
-    /** expectedRevision as defined by the Nexa gateway. */
-    readonly expectedRevision: string;
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** index as defined by the Nexa gateway. */
-    readonly index: null | number;
-    /** name as defined by the Nexa gateway. */
-    readonly name: string;
-    /** pageId as defined by the Nexa gateway. */
-    readonly pageId: string;
-    /** parentId as defined by the Nexa gateway. */
-    readonly parentId: null | string;
-    /** source as defined by the Nexa gateway. */
-    readonly source: string;
-    /** x as defined by the Nexa gateway. */
-    readonly x: number;
-    /** y as defined by the Nexa gateway. */
-    readonly y: number;
-}
-
-/** DesignSvgImportRequest from the Nexa wire protocol. */
-export type DesignSvgImportRequest = DesignSvgImportRequestShape;
-
 /** Supported RPC names. */
 export type MethodName = keyof GatewayMethods;
 /** Parameters for a particular RPC. */
@@ -15748,6 +15996,8 @@ export enum Method {
     DataUploadFinish = 'data.upload.finish',
     /** Calls data.upload.start. */
     DataUploadStart = 'data.upload.start',
+    /** Calls design.arrange. */
+    DesignArrange = 'design.arrange',
     /** Calls design.asset.cancel. */
     DesignAssetCancel = 'design.asset.cancel',
     /** Calls design.asset.chunk. */
@@ -15768,6 +16018,8 @@ export enum Method {
     DesignCanvasMetrics = 'design.canvas.metrics',
     /** Calls design.changes. */
     DesignChanges = 'design.changes',
+    /** Calls design.component. */
+    DesignComponent = 'design.component',
     /** Calls design.create. */
     DesignCreate = 'design.create',
     /** Calls design.delete. */
@@ -15780,14 +16032,20 @@ export enum Method {
     DesignFontRead = 'design.font.read',
     /** Calls design.layout. */
     DesignLayout = 'design.layout',
+    /** Calls design.layout.preview. */
+    DesignLayoutPreview = 'design.layout.preview',
     /** Calls design.list. */
     DesignList = 'design.list',
     /** Calls design.read. */
     DesignRead = 'design.read',
     /** Calls design.save. */
     DesignSave = 'design.save',
+    /** Calls design.svg.import. */
+    DesignSvgImport = 'design.svg.import',
     /** Calls design.text.window. */
     DesignTextWindow = 'design.text.window',
+    /** Calls design.transfer. */
+    DesignTransfer = 'design.transfer',
     /** Calls design.undo. */
     DesignUndo = 'design.undo',
     /** Calls design.view. */
@@ -16050,12 +16308,4 @@ export enum Method {
     WorkspacesDestroy = 'workspaces.destroy',
     /** Calls workspaces.list. */
     WorkspacesList = 'workspaces.list',
-    /** Calls design.arrange. */
-    DesignArrange = 'design.arrange',
-    /** Calls design.layout.preview. */
-    DesignLayoutPreview = 'design.layout.preview',
-    /** Calls design.transfer. */
-    DesignTransfer = 'design.transfer',
-    /** Calls design.svg.import. */
-    DesignSvgImport = 'design.svg.import',
 }
