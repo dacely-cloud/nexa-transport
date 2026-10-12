@@ -7276,6 +7276,14 @@ export interface GatewayMethodsdesign_arrangeShape {
     readonly result: DesignReceipt;
 }
 
+/** GatewayMethodsdesign_layout_preview wire fields. */
+export interface GatewayMethodsdesign_layout_previewShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignLayoutPreviewRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignLayoutPreviewResult;
+}
+
 /** GatewayMethods wire fields. */
 export interface GatewayMethodsShape {
     /** accounts.create as defined by the Nexa gateway. */
@@ -7636,6 +7644,8 @@ export interface GatewayMethodsShape {
     readonly 'workspaces.list': GatewayMethodsworkspaces_listShape;
     /** design.arrange as defined by the Nexa gateway. */
     readonly 'design.arrange': GatewayMethodsdesign_arrangeShape;
+    /** design.layout.preview as defined by the Nexa gateway. */
+    readonly 'design.layout.preview': GatewayMethodsdesign_layout_previewShape;
 }
 
 /** GatewayMethods from the Nexa wire protocol. */
@@ -14869,6 +14879,113 @@ export interface DesignPaddingChangesShape {
 /** DesignPaddingChanges from the Nexa wire protocol. */
 export type DesignPaddingChanges = DesignPaddingChangesShape;
 
+/** DesignLayoutPreviewCanvasRequest wire fields. */
+export interface DesignLayoutPreviewCanvasRequestShape {
+    /** action as defined by the Nexa gateway. */
+    readonly action: 'canvas';
+    /** key as defined by the Nexa gateway. */
+    readonly key: null | string;
+    /** operation as defined by the Nexa gateway. */
+    readonly operation: DesignLayoutOperation;
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignViewRequest;
+}
+
+/** DesignLayoutPreviewCanvasRequest from the Nexa wire protocol. */
+export type DesignLayoutPreviewCanvasRequest = DesignLayoutPreviewCanvasRequestShape;
+
+/** DesignLayoutPreviewCanvasResult wire fields. */
+export interface DesignLayoutPreviewCanvasResultShape {
+    /** action as defined by the Nexa gateway. */
+    readonly action: 'canvas';
+    /** key as defined by the Nexa gateway. */
+    readonly key: string;
+    /** page as defined by the Nexa gateway. */
+    readonly page: DesignCanvasPage;
+}
+
+/** DesignLayoutPreviewCanvasResult from the Nexa wire protocol. */
+export type DesignLayoutPreviewCanvasResult = DesignLayoutPreviewCanvasResultShape;
+
+/** DesignLayoutPreviewMethod wire fields. */
+export interface DesignLayoutPreviewMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignLayoutPreviewRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignLayoutPreviewResult;
+}
+
+/** DesignLayoutPreviewMethod from the Nexa wire protocol. */
+export type DesignLayoutPreviewMethod = DesignLayoutPreviewMethodShape;
+
+/** DesignLayoutPreviewMetricsRequest wire fields. */
+export interface DesignLayoutPreviewMetricsRequestShape {
+    /** action as defined by the Nexa gateway. */
+    readonly action: 'metrics';
+    /** key as defined by the Nexa gateway. */
+    readonly key: null | string;
+    /** operation as defined by the Nexa gateway. */
+    readonly operation: DesignLayoutOperation;
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignCanvasMetricsRequest;
+}
+
+/** DesignLayoutPreviewMetricsRequest from the Nexa wire protocol. */
+export type DesignLayoutPreviewMetricsRequest = DesignLayoutPreviewMetricsRequestShape;
+
+/** DesignLayoutPreviewMetricsResult wire fields. */
+export interface DesignLayoutPreviewMetricsResultShape {
+    /** action as defined by the Nexa gateway. */
+    readonly action: 'metrics';
+    /** key as defined by the Nexa gateway. */
+    readonly key: string;
+    /** page as defined by the Nexa gateway. */
+    readonly page: DesignCanvasMetricsPage;
+}
+
+/** DesignLayoutPreviewMetricsResult from the Nexa wire protocol. */
+export type DesignLayoutPreviewMetricsResult = DesignLayoutPreviewMetricsResultShape;
+
+/** DesignLayoutPreviewRequest from the Nexa wire protocol. */
+export type DesignLayoutPreviewRequest =
+    | DesignLayoutPreviewCanvasRequest
+    | DesignLayoutPreviewMetricsRequest
+    | DesignLayoutPreviewTextRequest;
+
+/** DesignLayoutPreviewResult from the Nexa wire protocol. */
+export type DesignLayoutPreviewResult =
+    | DesignLayoutPreviewCanvasResult
+    | DesignLayoutPreviewMetricsResult
+    | DesignLayoutPreviewTextResult;
+
+/** DesignLayoutPreviewTextRequest wire fields. */
+export interface DesignLayoutPreviewTextRequestShape {
+    /** action as defined by the Nexa gateway. */
+    readonly action: 'text';
+    /** key as defined by the Nexa gateway. */
+    readonly key: null | string;
+    /** operation as defined by the Nexa gateway. */
+    readonly operation: DesignLayoutOperation;
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignTextWindowRequest;
+}
+
+/** DesignLayoutPreviewTextRequest from the Nexa wire protocol. */
+export type DesignLayoutPreviewTextRequest = DesignLayoutPreviewTextRequestShape;
+
+/** DesignLayoutPreviewTextResult wire fields. */
+export interface DesignLayoutPreviewTextResultShape {
+    /** action as defined by the Nexa gateway. */
+    readonly action: 'text';
+    /** key as defined by the Nexa gateway. */
+    readonly key: string;
+    /** page as defined by the Nexa gateway. */
+    readonly page: DesignTextWindowPage;
+}
+
+/** DesignLayoutPreviewTextResult from the Nexa wire protocol. */
+export type DesignLayoutPreviewTextResult = DesignLayoutPreviewTextResultShape;
+
 /** Supported RPC names. */
 export type MethodName = keyof GatewayMethods;
 /** Parameters for a particular RPC. */
@@ -15236,4 +15353,6 @@ export enum Method {
     WorkspacesList = 'workspaces.list',
     /** Calls design.arrange. */
     DesignArrange = 'design.arrange',
+    /** Calls design.layout.preview. */
+    DesignLayoutPreview = 'design.layout.preview',
 }
