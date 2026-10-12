@@ -24,7 +24,11 @@ export interface DesignGridResult {
 
 /** Bounded dense grid placement with independent row and column spans. */
 export class DesignGrid {
-    /** Places cells without overlaps, retaining authored size unless fill or stretch is selected. */
+    /**
+     * Places cells without overlaps, retaining authored size unless fill or stretch is selected.
+     * @remarks Failed candidates stay occupied. A cursor per shape backfills holes without
+     * rescanning uniform grids.
+     */
     public static arrange(
         items: readonly DesignFlowItem[],
         layout: DesignLayout,
@@ -35,11 +39,13 @@ export class DesignGrid {
         const columns: number = layout.columns;
         const occupied: Set<number> = new Set();
         const cells: GridCell[] = [];
-        let cursor: number = 0;
+        const cursors: Map<number, number> = new Map();
         let rows: number = 0;
         for (const item of items) {
             const span: number = Math.min(columns, item.node.placement.columnSpan);
             const rowSpan: number = item.node.placement.rowSpan;
+            const shape: number = rowSpan * 129 + span;
+            let cursor: number = cursors.get(shape) ?? 0;
             let placed: boolean = false;
             while (cursor < columns * 4096) {
                 const column: number = cursor % columns;
@@ -56,7 +62,7 @@ export class DesignGrid {
                     }
                     cells.push({ item, row, column, rows: rowSpan, columns: span });
                     rows = Math.max(rows, row + rowSpan);
-                    cursor++;
+                    cursors.set(shape, cursor + 1);
                     placed = true;
                     break;
                 }

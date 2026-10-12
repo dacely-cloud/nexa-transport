@@ -126,6 +126,8 @@ export interface DesignSizingChanges {
     readonly maxWidth?: number;
     readonly minHeight?: number;
     readonly maxHeight?: number;
+    readonly columnSpan?: number;
+    readonly rowSpan?: number;
 }
 /** Limits and sizing modes resolve against complete native sources without transferring their bodies. */
 export interface DesignSizingOperation {

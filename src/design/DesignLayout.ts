@@ -310,11 +310,17 @@ export class DesignLayoutEngine {
                         ? item
                         : {
                               ...item,
-                              height: this.#measurer.measure(
-                                  item.node.text,
-                                  widths.get(item.node.id) ?? item.width,
-                                  item.node.id,
-                              ).height,
+                              height: Math.max(
+                                  item.node.placement.minHeight,
+                                  Math.min(
+                                      item.node.placement.maxHeight,
+                                      this.#measurer.measure(
+                                          item.node.text,
+                                          widths.get(item.node.id) ?? item.width,
+                                          item.node.id,
+                                      ).height,
+                                  ),
+                              ),
                           },
             );
             arranged = DesignFlex.arrange(measured, node.layout, width, height);

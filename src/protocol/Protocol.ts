@@ -15003,6 +15003,8 @@ export const DesignSizingChangeswidthValues = {
 
 /** DesignSizingChanges wire fields. */
 export interface DesignSizingChangesShape {
+    /** columnSpan as defined by the Nexa gateway. */
+    readonly columnSpan?: number;
     /** height as defined by the Nexa gateway. */
     readonly height?: (typeof DesignSizingChangesheightValues)[keyof typeof DesignSizingChangesheightValues];
     /** maxHeight as defined by the Nexa gateway. */
@@ -15013,6 +15015,8 @@ export interface DesignSizingChangesShape {
     readonly minHeight?: number;
     /** minWidth as defined by the Nexa gateway. */
     readonly minWidth?: number;
+    /** rowSpan as defined by the Nexa gateway. */
+    readonly rowSpan?: number;
     /** width as defined by the Nexa gateway. */
     readonly width?: (typeof DesignSizingChangeswidthValues)[keyof typeof DesignSizingChangeswidthValues];
 }

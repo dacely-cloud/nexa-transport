@@ -11,7 +11,16 @@ export class DesignSizingChangesCodec {
     public static parse(raw: unknown): DesignSizingChanges {
         const value: Readonly<Record<string, unknown>> = V.fields(
             raw,
-            ['width', 'height', 'minWidth', 'maxWidth', 'minHeight', 'maxHeight'],
+            [
+                'width',
+                'height',
+                'minWidth',
+                'maxWidth',
+                'minHeight',
+                'maxHeight',
+                'columnSpan',
+                'rowSpan',
+            ],
             [],
         );
         if (Object.keys(value).length === 0) {
@@ -36,6 +45,12 @@ export class DesignSizingChangesCodec {
             ...(value['maxHeight'] === undefined
                 ? {}
                 : { maxHeight: V.number(value['maxHeight'], 0, 100000) }),
+            ...(value['columnSpan'] === undefined
+                ? {}
+                : { columnSpan: V.number(value['columnSpan'], 1, 256, true) }),
+            ...(value['rowSpan'] === undefined
+                ? {}
+                : { rowSpan: V.number(value['rowSpan'], 1, 256, true) }),
         };
     }
 }
