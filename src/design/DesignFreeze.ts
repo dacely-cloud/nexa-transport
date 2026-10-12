@@ -17,6 +17,12 @@ export class DesignFreeze {
             this.node(node);
         }
         for (const page of document.pages) {
+            if (page.guides !== undefined) {
+                for (const guide of page.guides) {
+                    Object.freeze(guide);
+                }
+                Object.freeze(page.guides);
+            }
             Object.freeze(page);
         }
         for (const token of document.tokens) {

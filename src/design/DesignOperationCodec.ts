@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { DesignValues as V } from './DesignValues.js';
+import { DesignRulerCodec } from './DesignRulerCodec.js';
 import { DesignCodec } from './DesignCodec.js';
 import { DesignStyleCodec } from './DesignStyleCodec.js';
 import { DesignLayoutCodec } from './DesignLayoutCodec.js';
@@ -41,6 +42,7 @@ export class DesignOperationCodec {
                     'content',
                     'name',
                     'background',
+                    'value',
                     'tokens',
                     'interactions',
                     'comments',
@@ -318,6 +320,21 @@ export class DesignOperationCodec {
                 case Kind.Remove: {
                     const value: Readonly<Record<string, unknown>> = V.record(entry, ['op', 'id']);
                     return { op, id: V.id(value['id']) };
+                }
+                case Kind.Guide: {
+                    const value: Readonly<Record<string, unknown>> = V.record(entry, [
+                        'op',
+                        'pageId',
+                        'id',
+                        'value',
+                    ]);
+                    return {
+                        op,
+                        pageId: V.id(value['pageId']),
+                        id: V.id(value['id']),
+                        value:
+                            value['value'] === null ? null : DesignRulerCodec.value(value['value']),
+                    };
                 }
                 case Kind.Page: {
                     const value: Readonly<Record<string, unknown>> = V.record(entry, [

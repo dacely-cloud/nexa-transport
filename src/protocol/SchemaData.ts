@@ -6923,6 +6923,9 @@ export const schema: Schema = {
                     $ref: '#/definitions/DesignPageOperation',
                 },
                 {
+                    $ref: '#/definitions/DesignGuideOperation',
+                },
+                {
                     $ref: '#/definitions/DesignMetadata',
                 },
             ],
@@ -6963,6 +6966,14 @@ export const schema: Schema = {
             properties: {
                 background: {
                     type: 'string',
+                },
+                guides: {
+                    description:
+                        'Omitted on legacy pages; ruler guides do not affect exported artwork.',
+                    items: {
+                        $ref: '#/definitions/DesignRulerGuide',
+                    },
+                    type: 'array',
                 },
                 id: {
                     type: 'string',
@@ -22129,6 +22140,69 @@ export const schema: Schema = {
             },
             required: ['factor', 'op', 'pageId', 'selection'],
             type: 'object',
+        },
+        DesignGuideValue: {
+            description: 'A guide edit carries only its axis and world position.',
+            properties: {
+                axis: {
+                    $ref: '#/definitions/DesignRulerAxis',
+                },
+                position: {
+                    type: 'number',
+                },
+            },
+            required: ['axis', 'position'],
+            type: 'object',
+        },
+        DesignRulerGuide: {
+            description:
+                "Stable guide identity allows independent edits without replacing other agents' guides.",
+            properties: {
+                axis: {
+                    $ref: '#/definitions/DesignRulerAxis',
+                },
+                id: {
+                    type: 'string',
+                },
+                position: {
+                    type: 'number',
+                },
+            },
+            required: ['axis', 'id', 'position'],
+            type: 'object',
+        },
+        DesignGuideOperation: {
+            description: 'Sets one page guide by identity, or removes it with value:null.',
+            properties: {
+                id: {
+                    type: 'string',
+                },
+                op: {
+                    const: 'guide',
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+                value: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignGuideValue',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+            },
+            required: ['id', 'op', 'pageId', 'value'],
+            type: 'object',
+        },
+        DesignRulerAxis: {
+            description:
+                'A saved ruler line uses a page-world coordinate on one canvas axis.\nAxis names are shared by native tooling, codecs and the canvas.',
+            enum: ['x', 'y'],
+            type: 'string',
         },
     },
     description: 'All protocol contracts reachable from the public transport.',

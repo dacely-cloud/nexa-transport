@@ -4552,6 +4552,7 @@ export type DesignOperation =
     | DesignMove
     | DesignRemove
     | DesignPageOperation
+    | DesignGuideOperation
     | DesignMetadata;
 
 /** DesignOverride wire fields. */
@@ -4575,6 +4576,8 @@ export type DesignOverride = DesignOverrideShape;
 export interface DesignPageShape {
     /** background as defined by the Nexa gateway. */
     readonly background: string;
+    /** guides as defined by the Nexa gateway. */
+    readonly guides?: ReadonlyArray<DesignRulerGuide>;
     /** id as defined by the Nexa gateway. */
     readonly id: string;
     /** name as defined by the Nexa gateway. */
@@ -14613,6 +14616,51 @@ export interface DesignScaleOperationShape {
 
 /** DesignScaleOperation from the Nexa wire protocol. */
 export type DesignScaleOperation = DesignScaleOperationShape;
+
+/** DesignGuideValue wire fields. */
+export interface DesignGuideValueShape {
+    /** axis as defined by the Nexa gateway. */
+    readonly axis: DesignRulerAxis;
+    /** position as defined by the Nexa gateway. */
+    readonly position: number;
+}
+
+/** DesignGuideValue from the Nexa wire protocol. */
+export type DesignGuideValue = DesignGuideValueShape;
+
+/** DesignRulerGuide wire fields. */
+export interface DesignRulerGuideShape {
+    /** axis as defined by the Nexa gateway. */
+    readonly axis: DesignRulerAxis;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** position as defined by the Nexa gateway. */
+    readonly position: number;
+}
+
+/** DesignRulerGuide from the Nexa wire protocol. */
+export type DesignRulerGuide = DesignRulerGuideShape;
+
+/** DesignGuideOperation wire fields. */
+export interface DesignGuideOperationShape {
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** op as defined by the Nexa gateway. */
+    readonly op: 'guide';
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+    /** value as defined by the Nexa gateway. */
+    readonly value: DesignGuideValue | null;
+}
+
+/** DesignGuideOperation from the Nexa wire protocol. */
+export type DesignGuideOperation = DesignGuideOperationShape;
+
+/** Allowed values for DesignRulerAxis. */
+export const DesignRulerAxisValues = { Value0: 'x', Value1: 'y' } as const;
+
+/** DesignRulerAxis from the Nexa wire protocol. */
+export type DesignRulerAxis = (typeof DesignRulerAxisValues)[keyof typeof DesignRulerAxisValues];
 
 /** Supported RPC names. */
 export type MethodName = keyof GatewayMethods;

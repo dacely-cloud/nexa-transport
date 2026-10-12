@@ -276,8 +276,23 @@ export interface DesignOverride {
     readonly style: DesignStyle | null;
     readonly visible: boolean | null;
 }
+/** A saved ruler line uses a page-world coordinate on one canvas axis. */
+export const DesignRulerAxis = { X: 'x', Y: 'y' } as const;
+/** Axis names are shared by native tooling, codecs and the canvas. */
+export type DesignRulerAxis = (typeof DesignRulerAxis)[keyof typeof DesignRulerAxis];
+/** A guide edit carries only its axis and world position. */
+export interface DesignGuideValue {
+    readonly axis: DesignRulerAxis;
+    readonly position: number;
+}
+/** Stable guide identity allows independent edits without replacing other agents' guides. */
+export interface DesignRulerGuide extends DesignGuideValue {
+    readonly id: string;
+}
 /** A page has its own root layers and viewport. */
 export interface DesignPage {
+    /** Omitted on legacy pages; ruler guides do not affect exported artwork. */
+    readonly guides?: readonly DesignRulerGuide[];
     readonly id: string;
     readonly name: string;
     readonly roots: readonly string[];

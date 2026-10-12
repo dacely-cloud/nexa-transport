@@ -5,6 +5,7 @@ import { DesignValues as V } from './DesignValues.js';
 import { DesignNodeCodec } from './DesignNodeCodec.js';
 import { DesignFreeze } from './DesignFreeze.js';
 import { DesignBudget } from './DesignBudget.js';
+import { DesignRulerCodec } from './DesignRulerCodec.js';
 import { DesignTree } from './DesignTree.js';
 import {
     DesignTokenCategory,
@@ -69,17 +70,19 @@ export class DesignCodec {
     }
     /** Validates one bounded page record. */
     public static page(raw: unknown): DesignPage {
-        const value: Readonly<Record<string, unknown>> = V.record(raw, [
-            'id',
-            'name',
-            'roots',
-            'background',
-        ]);
+        const value: Readonly<Record<string, unknown>> = V.fields(
+            raw,
+            ['id', 'name', 'roots', 'background', 'guides'],
+            ['id', 'name', 'roots', 'background'],
+        );
         return {
             id: V.id(value['id']),
             name: V.text(value['name']),
             roots: V.list(value['roots'], 10000, (entry: unknown): string => V.id(entry)),
             background: V.color(value['background']),
+            ...(value['guides'] === undefined
+                ? {}
+                : { guides: DesignRulerCodec.guides(value['guides']) }),
         };
     }
     /** Validates one bounded token record. */

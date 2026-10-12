@@ -26,6 +26,8 @@ import { DesignTextMetrics } from './DesignTextMetrics.js';
 import type {
     DesignDocument,
     DesignNode,
+    DesignGuideValue,
+    DesignRulerGuide,
     DesignPage,
     DesignInteraction,
     DesignComment,
@@ -198,6 +200,40 @@ export class DesignEdits {
                     };
                     break;
                 }
+                case DesignOperationKind.Guide: {
+                    const page: DesignPage | undefined = pages.get(operation.pageId);
+                    if (page === undefined) {
+                        throw new Error('Page not found: ' + operation.pageId);
+                    }
+                    const guides: readonly DesignRulerGuide[] = page.guides ?? [];
+                    const value: DesignGuideValue | null = operation.value;
+                    const exists: boolean = guides.some(
+                        (guide: DesignRulerGuide): boolean => guide.id === operation.id,
+                    );
+                    if (value === null && !exists) {
+                        throw new Error('Page guide not found: ' + operation.id);
+                    }
+                    const next: readonly DesignRulerGuide[] =
+                        value === null
+                            ? guides.filter(
+                                  (guide: DesignRulerGuide): boolean => guide.id !== operation.id,
+                              )
+                            : exists
+                              ? guides.map((guide: DesignRulerGuide): DesignRulerGuide =>
+                                    guide.id === operation.id
+                                        ? { id: operation.id, ...value }
+                                        : guide,
+                                )
+                              : [...guides, { id: operation.id, ...value }];
+                    const rest: DesignPage = {
+                        id: page.id,
+                        name: page.name,
+                        background: page.background,
+                        roots: page.roots,
+                    };
+                    pages.set(page.id, next.length === 0 ? rest : { ...rest, guides: next });
+                    break;
+                }
                 case DesignOperationKind.Page: {
                     const page: DesignPage | undefined = pages.get(operation.id);
                     if (operation.name === null) {
@@ -210,6 +246,7 @@ export class DesignEdits {
                         pages.delete(page.id);
                     } else {
                         pages.set(operation.id, {
+                            ...page,
                             id: operation.id,
                             name: operation.name,
                             background: operation.background,

@@ -74,6 +74,7 @@ const files: readonly string[] = [
     'DesignAssetCodec',
     'DesignAssetReferences',
     'DesignTypes',
+    'DesignRulerCodec',
     'DesignValues',
     'DesignBudget',
     'DesignFreeze',

@@ -6,6 +6,7 @@ import type { DesignMask } from './DesignMaskTypes.js';
 import type { DesignBooleanMode } from './DesignBooleanTypes.js';
 
 import type {
+    DesignGuideValue,
     DesignConstraint,
     DesignNode,
     DesignPage,
@@ -36,6 +37,7 @@ export const DesignOperationKind = {
     Move: 'move',
     Remove: 'remove',
     Page: 'page',
+    Guide: 'guide',
     Metadata: 'metadata',
 } as const;
 /** Editable properties exclude identity and tree links, which have dedicated operations. */
@@ -166,6 +168,13 @@ export interface DesignPageOperation {
     readonly name: string | null;
     readonly background: string;
 }
+/** Sets one page guide by identity, or removes it with value:null. */
+export interface DesignGuideOperation {
+    readonly op: typeof DesignOperationKind.Guide;
+    readonly pageId: string;
+    readonly id: string;
+    readonly value: DesignGuideValue | null;
+}
 /** Document properties and supporting design-system or collaboration records. */
 export interface DesignMetadata {
     readonly op: typeof DesignOperationKind.Metadata;
@@ -186,6 +195,7 @@ export type DesignOperation =
     | DesignTextOperation
     | DesignMove
     | DesignRemove
+    | DesignGuideOperation
     | DesignPageOperation
     | DesignMetadata;
 /** Before and after images provide conflict-safe undo and bounded deltas. */
