@@ -4790,6 +4790,8 @@ export interface DesignReceiptShape {
     readonly commandId: string;
     /** previousRevision as defined by the Nexa gateway. */
     readonly previousRevision: null | string;
+    /** selection as defined by the Nexa gateway. */
+    readonly selection?: ReadonlyArray<string>;
     /** summary as defined by the Nexa gateway. */
     readonly summary: DesignSummary;
     /** undoable as defined by the Nexa gateway. */
@@ -7265,6 +7267,14 @@ export interface GatewayMethodsworkspaces_listShape {
     readonly result: ReadonlyArray<Workspace>;
 }
 
+/** GatewayMethodsdesign_arrange wire fields. */
+export interface GatewayMethodsdesign_arrangeShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignArrangeRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignReceipt;
+}
+
 /** GatewayMethods wire fields. */
 export interface GatewayMethodsShape {
     /** accounts.create as defined by the Nexa gateway. */
@@ -7623,6 +7633,8 @@ export interface GatewayMethodsShape {
     readonly 'workspaces.destroy': GatewayMethodsworkspaces_destroyShape;
     /** workspaces.list as defined by the Nexa gateway. */
     readonly 'workspaces.list': GatewayMethodsworkspaces_listShape;
+    /** design.arrange as defined by the Nexa gateway. */
+    readonly 'design.arrange': GatewayMethodsdesign_arrangeShape;
 }
 
 /** GatewayMethods from the Nexa wire protocol. */
@@ -14716,6 +14728,64 @@ export const DesignFrameGridDistributionValues = {
 export type DesignFrameGridDistribution =
     (typeof DesignFrameGridDistributionValues)[keyof typeof DesignFrameGridDistributionValues];
 
+/** DesignArrangeMethod wire fields. */
+export interface DesignArrangeMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignArrangeRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignReceipt;
+}
+
+/** DesignArrangeMethod from the Nexa wire protocol. */
+export type DesignArrangeMethod = DesignArrangeMethodShape;
+
+/** DesignArrangeRequest wire fields. */
+export interface DesignArrangeRequestShape {
+    /** action as defined by the Nexa gateway. */
+    readonly action: DesignSelectionAction;
+    /** commandId as defined by the Nexa gateway. */
+    readonly commandId: string;
+    /** expectedRevision as defined by the Nexa gateway. */
+    readonly expectedRevision: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+    /** selection as defined by the Nexa gateway. */
+    readonly selection: ReadonlyArray<string>;
+}
+
+/** DesignArrangeRequest from the Nexa wire protocol. */
+export type DesignArrangeRequest = DesignArrangeRequestShape;
+
+/** Allowed values for DesignSelectionAction. */
+export const DesignSelectionActionValues = {
+    Value0: 'back',
+    Value1: 'bottom',
+    Value2: 'center',
+    Value3: 'distribute-horizontal',
+    Value4: 'distribute-vertical',
+    Value5: 'duplicate',
+    Value6: 'exclude',
+    Value7: 'flatten',
+    Value8: 'front',
+    Value9: 'group',
+    Value10: 'intersect',
+    Value11: 'left',
+    Value12: 'mask',
+    Value13: 'middle',
+    Value14: 'release-mask',
+    Value15: 'right',
+    Value16: 'subtract',
+    Value17: 'top',
+    Value18: 'ungroup',
+    Value19: 'union',
+} as const;
+
+/** DesignSelectionAction from the Nexa wire protocol. */
+export type DesignSelectionAction =
+    (typeof DesignSelectionActionValues)[keyof typeof DesignSelectionActionValues];
+
 /** Supported RPC names. */
 export type MethodName = keyof GatewayMethods;
 /** Parameters for a particular RPC. */
@@ -15081,4 +15151,6 @@ export enum Method {
     WorkspacesDestroy = 'workspaces.destroy',
     /** Calls workspaces.list. */
     WorkspacesList = 'workspaces.list',
+    /** Calls design.arrange. */
+    DesignArrange = 'design.arrange',
 }

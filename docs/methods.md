@@ -1,6 +1,6 @@
 # RPC reference
 
-All 174 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 173 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
+All 179 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 178 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
 
 - [accounts.create](#accountscreate)
 - [accounts.list](#accountslist)
@@ -40,6 +40,8 @@ All 174 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [design.asset.read](#designassetread)
 - [design.asset.remove](#designassetremove)
 - [design.asset.start](#designassetstart)
+- [design.canvas](#designcanvas)
+- [design.canvas.metrics](#designcanvasmetrics)
 - [design.changes](#designchanges)
 - [design.create](#designcreate)
 - [design.delete](#designdelete)
@@ -50,7 +52,9 @@ All 174 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [design.list](#designlist)
 - [design.read](#designread)
 - [design.save](#designsave)
+- [design.text.window](#designtextwindow)
 - [design.undo](#designundo)
+- [design.view](#designview)
 - [devices.approve](#devicesapprove)
 - [devices.list](#deviceslist)
 - [devices.reject](#devicesreject)
@@ -176,6 +180,7 @@ All 174 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [workspaces.describe](#workspacesdescribe)
 - [workspaces.destroy](#workspacesdestroy)
 - [workspaces.list](#workspaceslist)
+- [design.arrange](#designarrange)
 
 ## accounts.create
 
@@ -1007,6 +1012,70 @@ Parameters: [DesignAssetStartRequest](protocol.md#designassetstartrequest).
 
 Result: [DesignAssetPosition](protocol.md#designassetposition).
 
+## design.canvas
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DesignCanvas> = {
+    cursor: {
+        character: 1,
+        record: 1,
+    },
+    id: 'YOUR_ID',
+    includeIds: [],
+    limit: 1,
+    pageId: null,
+    revision: null,
+};
+const result: ResultOf<typeof Method.DesignCanvas> = await client.call(Method.DesignCanvas, params);
+```
+
+Parameters: [DesignViewRequest](protocol.md#designviewrequest).
+
+| Field        | Required | Type                                              | Description                                                                                              |
+| ------------ | -------- | ------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `cursor`     | Yes      | [DesignCursor](protocol.md#designcursor) / `null` |                                                                                                          |
+| `id`         | Yes      | `string`                                          |                                                                                                          |
+| `includeIds` | Yes      | Array of `string`                                 | Additional existing layers and their dependencies; removed identities are ignored during shared refresh. |
+| `limit`      | Yes      | `number`                                          |                                                                                                          |
+| `pageId`     | Yes      | `null,string`                                     | Null or a removed preferred page selects the document's first page.                                      |
+| `revision`   | Yes      | `null,string`                                     |                                                                                                          |
+
+Result: [DesignCanvasPage](protocol.md#designcanvaspage).
+
+## design.canvas.metrics
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DesignCanvasMetrics> = {
+    id: 'YOUR_ID',
+    includeIds: [],
+    limit: 1,
+    offset: 1,
+    pageId: null,
+    revision: 'YOUR_REVISION',
+};
+const result: ResultOf<typeof Method.DesignCanvasMetrics> = await client.call(
+    Method.DesignCanvasMetrics,
+    params,
+);
+```
+
+Parameters: [DesignCanvasMetricsRequest](protocol.md#designcanvasmetricsrequest).
+
+| Field        | Required | Type              | Description |
+| ------------ | -------- | ----------------- | ----------- |
+| `id`         | Yes      | `string`          |             |
+| `includeIds` | Yes      | Array of `string` |             |
+| `limit`      | Yes      | `number`          |             |
+| `offset`     | Yes      | `number`          |             |
+| `pageId`     | Yes      | `null,string`     |             |
+| `revision`   | Yes      | `string`          |             |
+
+Result: [DesignCanvasMetricsPage](protocol.md#designcanvasmetricspage).
+
 ## design.changes
 
 ```ts
@@ -1256,6 +1325,49 @@ Parameters: [DesignSaveRequest](protocol.md#designsaverequest).
 
 Result: [DesignReceipt](protocol.md#designreceipt).
 
+## design.text.window
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DesignTextWindow> = {
+    cursor: {
+        glyphIndex: null,
+        lineIndex: 1,
+        segmentIndex: 1,
+    },
+    id: 'YOUR_ID',
+    limit: 1,
+    occurrenceId: 'YOUR_OCCURRENCEID',
+    pageId: 'YOUR_PAGEID',
+    revision: 'YOUR_REVISION',
+    window: {
+        height: 1,
+        width: 1,
+        x: 1,
+        y: 1,
+    },
+};
+const result: ResultOf<typeof Method.DesignTextWindow> = await client.call(
+    Method.DesignTextWindow,
+    params,
+);
+```
+
+Parameters: [DesignTextWindowRequest](protocol.md#designtextwindowrequest).
+
+| Field          | Required | Type                                                                  | Description |
+| -------------- | -------- | --------------------------------------------------------------------- | ----------- |
+| `cursor`       | Yes      | [DesignTextWindowCursor](protocol.md#designtextwindowcursor) / `null` |             |
+| `id`           | Yes      | `string`                                                              |             |
+| `limit`        | Yes      | `number`                                                              |             |
+| `occurrenceId` | Yes      | `string`                                                              |             |
+| `pageId`       | Yes      | `string`                                                              |             |
+| `revision`     | Yes      | `string`                                                              |             |
+| `window`       | Yes      | [DesignGlyphBounds](protocol.md#designglyphbounds)                    |             |
+
+Result: [DesignTextWindowPage](protocol.md#designtextwindowpage).
+
 ## design.undo
 
 ```ts
@@ -1280,6 +1392,38 @@ Parameters: [DesignUndoRequest](protocol.md#designundorequest).
 | `targetCommandId`  | Yes      | `string` |             |
 
 Result: [DesignReceipt](protocol.md#designreceipt).
+
+## design.view
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DesignView> = {
+    cursor: {
+        character: 1,
+        record: 1,
+    },
+    id: 'YOUR_ID',
+    includeIds: [],
+    limit: 1,
+    pageId: null,
+    revision: null,
+};
+const result: ResultOf<typeof Method.DesignView> = await client.call(Method.DesignView, params);
+```
+
+Parameters: [DesignViewRequest](protocol.md#designviewrequest).
+
+| Field        | Required | Type                                              | Description                                                                                              |
+| ------------ | -------- | ------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `cursor`     | Yes      | [DesignCursor](protocol.md#designcursor) / `null` |                                                                                                          |
+| `id`         | Yes      | `string`                                          |                                                                                                          |
+| `includeIds` | Yes      | Array of `string`                                 | Additional existing layers and their dependencies; removed identities are ignored during shared refresh. |
+| `limit`      | Yes      | `number`                                          |                                                                                                          |
+| `pageId`     | Yes      | `null,string`                                     | Null or a removed preferred page selects the document's first page.                                      |
+| `revision`   | Yes      | `null,string`                                     |                                                                                                          |
+
+Result: [DesignViewPage](protocol.md#designviewpage).
 
 ## devices.approve
 
@@ -4463,3 +4607,35 @@ Parameters: [Recordstringnever](protocol.md#recordstringnever).
 Type: Dictionary.
 
 Result: Array of [Workspace](protocol.md#workspace).
+
+## design.arrange
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DesignArrange> = {
+    action: 'back',
+    commandId: 'YOUR_COMMANDID',
+    expectedRevision: 'YOUR_EXPECTEDREVISION',
+    id: 'YOUR_ID',
+    pageId: 'YOUR_PAGEID',
+    selection: [],
+};
+const result: ResultOf<typeof Method.DesignArrange> = await client.call(
+    Method.DesignArrange,
+    params,
+);
+```
+
+Parameters: [DesignArrangeRequest](protocol.md#designarrangerequest).
+
+| Field              | Required | Type                                                       | Description |
+| ------------------ | -------- | ---------------------------------------------------------- | ----------- |
+| `action`           | Yes      | [DesignSelectionAction](protocol.md#designselectionaction) |             |
+| `commandId`        | Yes      | `string`                                                   |             |
+| `expectedRevision` | Yes      | `string`                                                   |             |
+| `id`               | Yes      | `string`                                                   |             |
+| `pageId`           | Yes      | `string`                                                   |             |
+| `selection`        | Yes      | Array of `string`                                          |             |
+
+Result: [DesignReceipt](protocol.md#designreceipt).

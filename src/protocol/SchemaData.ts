@@ -7283,6 +7283,14 @@ export const schema: Schema = {
                 previousRevision: {
                     type: ['null', 'string'],
                 },
+                selection: {
+                    description:
+                        'Arrangement acknowledgements retain at most 256 resulting layer IDs, including exact retries.',
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
                 summary: {
                     $ref: '#/definitions/DesignSummary',
                 },
@@ -11269,6 +11277,20 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'design.arrange': {
+                    description:
+                        'Workspace-native arrangement avoids uploading or hydrating selected layer bodies.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/DesignArrangeRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/DesignReceipt',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
             },
             required: [
                 'accounts.create',
@@ -11449,6 +11471,7 @@ export const schema: Schema = {
                 'workspaces.describe',
                 'workspaces.destroy',
                 'workspaces.list',
+                'design.arrange',
             ],
             type: 'object',
         },
@@ -22285,6 +22308,76 @@ export const schema: Schema = {
             description:
                 "Stretch divides available space; fixed tracks retain their authored size.\nTrack distribution within the frame's margins.",
             enum: ['center', 'end', 'start', 'stretch'],
+            type: 'string',
+        },
+        DesignArrangeMethod: {
+            description:
+                'Workspace-native arrangement avoids uploading or hydrating selected layer bodies.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/DesignArrangeRequest',
+                },
+                result: {
+                    $ref: '#/definitions/DesignReceipt',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        DesignArrangeRequest: {
+            description:
+                'Agents use the normal command identity and revision guard for generated selection edits.',
+            properties: {
+                action: {
+                    $ref: '#/definitions/DesignSelectionAction',
+                },
+                commandId: {
+                    type: 'string',
+                },
+                expectedRevision: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+                selection: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+            },
+            required: ['action', 'commandId', 'expectedRevision', 'id', 'pageId', 'selection'],
+            type: 'object',
+        },
+        DesignSelectionAction: {
+            description:
+                "Selection commands share one implementation between agent tools and browser editors.\nA command's stable action identity.",
+            enum: [
+                'back',
+                'bottom',
+                'center',
+                'distribute-horizontal',
+                'distribute-vertical',
+                'duplicate',
+                'exclude',
+                'flatten',
+                'front',
+                'group',
+                'intersect',
+                'left',
+                'mask',
+                'middle',
+                'release-mask',
+                'right',
+                'subtract',
+                'top',
+                'ungroup',
+                'union',
+            ],
             type: 'string',
         },
     },

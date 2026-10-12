@@ -174,3 +174,16 @@ backend, or a provider-key vault.
 | `nexa-transport/design-font-types`          | ESM + types | Design font types.                                                |
 | `nexa-transport/design-font-codec`          | ESM + types | Design font codec.                                                |
 | `nexa-transport/design-font-bindings`       | ESM + types | Design font bindings.                                             |
+
+## Windowed design canvases
+
+| Import                                    | Availability | Contract                                                              |
+| ----------------------------------------- | ------------ | --------------------------------------------------------------------- |
+| `nexa-transport/design-flow-ordering`     | ESM + types  | Native sibling reordering from keyboard and drag geometry             |
+| `nexa-transport/design-view-types`        | ESM + types  | Revision-pinned active-page projections and explicit forest selectors |
+| `nexa-transport/design-view-codec`        | ESM + types  | Strict projection request validation                                  |
+| `nexa-transport/design-font-glyph-types`  | ESM + types  | Saved-font glyph outline and metric records                           |
+| `nexa-transport/design-text-window-types` | ESM + types  | Bounded native text and glyph window contracts                        |
+| `nexa-transport/design-text-window-codec` | ESM + types  | Strict text-window request and page validation                        |
+| `nexa-transport/design-canvas-types`      | ESM + types  | Canvas projections with deferred text and intrinsic metrics           |
+| `nexa-transport/design-canvas-codec`      | ESM + types  | Strict paged canvas-metric request validation                         |
