@@ -22642,6 +22642,9 @@ export const schema: Schema = {
         DesignSizingChanges: {
             description: 'Native sizing changes preserve every omitted saved placement field.',
             properties: {
+                columnSpan: {
+                    type: 'number',
+                },
                 height: {
                     description: 'Sizing relative to the parent and content.\nSizing choice.',
                     enum: ['fill', 'fixed', 'hug'],
@@ -22657,6 +22660,9 @@ export const schema: Schema = {
                     type: 'number',
                 },
                 minWidth: {
+                    type: 'number',
+                },
+                rowSpan: {
                     type: 'number',
                 },
                 width: {

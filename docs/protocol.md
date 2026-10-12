@@ -10558,14 +10558,16 @@ Draft glyph IDs and positions refer to the same public or admitted private fonts
 
 Native sizing changes preserve every omitted saved placement field.
 
-| Field       | Required | Type                           | Description                                |
-| ----------- | -------- | ------------------------------ | ------------------------------------------ |
-| `height`    | No       | `"fill"` / `"fixed"` / `"hug"` | Sizing relative to the parent and content. |
-| `maxHeight` | No       | `number`                       |                                            |
-| `maxWidth`  | No       | `number`                       |                                            |
-| `minHeight` | No       | `number`                       |                                            |
-| `minWidth`  | No       | `number`                       |                                            |
-| `width`     | No       | `"fill"` / `"fixed"` / `"hug"` | Sizing relative to the parent and content. |
+| Field        | Required | Type                           | Description                                |
+| ------------ | -------- | ------------------------------ | ------------------------------------------ |
+| `columnSpan` | No       | `number`                       |                                            |
+| `height`     | No       | `"fill"` / `"fixed"` / `"hug"` | Sizing relative to the parent and content. |
+| `maxHeight`  | No       | `number`                       |                                            |
+| `maxWidth`   | No       | `number`                       |                                            |
+| `minHeight`  | No       | `number`                       |                                            |
+| `minWidth`   | No       | `number`                       |                                            |
+| `rowSpan`    | No       | `number`                       |                                            |
+| `width`      | No       | `"fill"` / `"fixed"` / `"hug"` | Sizing relative to the parent and content. |
 
 ## DesignSizingOperation
 
