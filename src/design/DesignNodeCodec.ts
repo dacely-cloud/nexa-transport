@@ -5,6 +5,7 @@ import { DesignVariantCodec } from './DesignVariantCodec.js';
 import { DesignMaskCodec } from './DesignMaskCodec.js';
 import { DesignBooleanMode } from './DesignBooleanTypes.js';
 import { DesignFlow } from './DesignTypes.js';
+import { DesignFrameGridCodec } from './DesignFrameGridCodec.js';
 import { DesignValues as V } from './DesignValues.js';
 import { DesignStyleCodec } from './DesignStyleCodec.js';
 import { DesignImageFramingCodec } from './DesignImageFramingCodec.js';
@@ -25,7 +26,7 @@ export class DesignNodeCodec {
     public static node(raw: unknown): DesignNode {
         const value: Readonly<Record<string, unknown>> = V.fields(
             raw,
-            [...KEYS, 'booleanMode', 'mask', 'variants', 'variant', 'contentScale'],
+            [...KEYS, 'booleanMode', 'mask', 'variants', 'variant', 'contentScale', 'layoutGrids'],
             KEYS,
         );
         const kind: DesignKind = V.choice(value['kind'], Object.values(DesignKind), 'node.kind');
@@ -38,7 +39,13 @@ export class DesignNodeCodec {
         if (Object.hasOwn(value, 'contentScale') && kind !== DesignKind.Instance) {
             throw new Error('Only linked instances accept contentScale.');
         }
+        if (Object.hasOwn(value, 'layoutGrids') && !DesignFrameGridCodec.supports(kind)) {
+            throw new Error('Only frames and frame definitions accept layout grids.');
+        }
         const node: DesignNode = {
+            ...(value['layoutGrids'] === undefined
+                ? {}
+                : { layoutGrids: DesignFrameGridCodec.grids(value['layoutGrids']) }),
             ...(Object.hasOwn(value, 'contentScale')
                 ? { contentScale: V.number(value['contentScale'], 0.0001, 10000) }
                 : {}),

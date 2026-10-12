@@ -38,6 +38,12 @@ export class DesignFreeze {
     }
     /** Freezes one detached node and each of its nested editable records. */
     public static node(node: DesignNode): DesignNode {
+        if (node.layoutGrids !== undefined) {
+            for (const grid of node.layoutGrids) {
+                Object.freeze(grid);
+            }
+            Object.freeze(node.layoutGrids);
+        }
         this.#style(node.style);
         if (node.mask !== undefined) {
             Object.freeze(node.mask);

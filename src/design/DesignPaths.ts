@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignFrameGridCodec } from './DesignFrameGridCodec.js';
 import {
     DesignKind,
     DesignPathVerb as Verb,
@@ -34,6 +35,7 @@ export class DesignPaths {
     public static resize(node: DesignNode, changes: DesignNodeChanges): DesignNode {
         const {
             booleanMode: previousMode,
+            layoutGrids: previousGrids,
             contentScale: previousScale,
             mask: previousMask,
             variants: previousSet,
@@ -42,6 +44,7 @@ export class DesignPaths {
         }: DesignNode = node;
         const {
             booleanMode: changedMode,
+            layoutGrids: changedGrids,
             contentScale: changedScale,
             mask: changedMask,
             variants: changedSet,
@@ -63,11 +66,23 @@ export class DesignPaths {
         if (changedScale !== undefined && changedScale !== null && kind !== DesignKind.Instance) {
             throw new Error('Only linked instances accept contentScale.');
         }
+        if (
+            changedGrids !== undefined &&
+            changedGrids !== null &&
+            !DesignFrameGridCodec.supports(kind)
+        ) {
+            throw new Error('Only frames and frame definitions accept layout grids.');
+        }
         const mode: DesignNode['booleanMode'] =
             changedMode === null ? undefined : (changedMode ?? previousMode);
         const next: DesignNode = {
             ...base,
             ...properties,
+            ...(DesignFrameGridCodec.supports(kind) &&
+            changedGrids !== null &&
+            (changedGrids ?? previousGrids) !== undefined
+                ? { layoutGrids: changedGrids ?? previousGrids }
+                : {}),
             ...(kind === DesignKind.Instance &&
             changedScale !== null &&
             (changedScale ?? previousScale) !== undefined

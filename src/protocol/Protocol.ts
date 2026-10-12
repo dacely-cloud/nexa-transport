@@ -4406,6 +4406,8 @@ export interface DesignNodeShape {
     readonly kind: DesignKind;
     /** layout as defined by the Nexa gateway. */
     readonly layout: DesignLayout;
+    /** layoutGrids as defined by the Nexa gateway. */
+    readonly layoutGrids?: ReadonlyArray<DesignFrameGrid>;
     /** locked as defined by the Nexa gateway. */
     readonly locked: boolean;
     /** mask as defined by the Nexa gateway. */
@@ -4489,6 +4491,8 @@ export interface DesignNodeChangesShape {
     readonly kind?: (typeof DesignNodeChangeskindValues)[keyof typeof DesignNodeChangeskindValues];
     /** layout as defined by the Nexa gateway. */
     readonly layout?: DesignLayout;
+    /** layoutGrids as defined by the Nexa gateway. */
+    readonly layoutGrids?: ReadonlyArray<DesignFrameGrid> | null;
     /** locked as defined by the Nexa gateway. */
     readonly locked?: boolean;
     /** mask as defined by the Nexa gateway. */
@@ -14661,6 +14665,56 @@ export const DesignRulerAxisValues = { Value0: 'x', Value1: 'y' } as const;
 
 /** DesignRulerAxis from the Nexa wire protocol. */
 export type DesignRulerAxis = (typeof DesignRulerAxisValues)[keyof typeof DesignRulerAxisValues];
+
+/** DesignFrameGrid wire fields. */
+export interface DesignFrameGridShape {
+    /** color as defined by the Nexa gateway. */
+    readonly color: string;
+    /** count as defined by the Nexa gateway. */
+    readonly count: number;
+    /** distribution as defined by the Nexa gateway. */
+    readonly distribution: DesignFrameGridDistribution;
+    /** gutter as defined by the Nexa gateway. */
+    readonly gutter: number;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: DesignFrameGridKind;
+    /** margin as defined by the Nexa gateway. */
+    readonly margin: number;
+    /** offset as defined by the Nexa gateway. */
+    readonly offset: number;
+    /** size as defined by the Nexa gateway. */
+    readonly size: number;
+    /** visible as defined by the Nexa gateway. */
+    readonly visible: boolean;
+}
+
+/** DesignFrameGrid from the Nexa wire protocol. */
+export type DesignFrameGrid = DesignFrameGridShape;
+
+/** Allowed values for DesignFrameGridKind. */
+export const DesignFrameGridKindValues = {
+    Value0: 'columns',
+    Value1: 'rows',
+    Value2: 'square',
+} as const;
+
+/** DesignFrameGridKind from the Nexa wire protocol. */
+export type DesignFrameGridKind =
+    (typeof DesignFrameGridKindValues)[keyof typeof DesignFrameGridKindValues];
+
+/** Allowed values for DesignFrameGridDistribution. */
+export const DesignFrameGridDistributionValues = {
+    Value0: 'center',
+    Value1: 'end',
+    Value2: 'start',
+    Value3: 'stretch',
+} as const;
+
+/** DesignFrameGridDistribution from the Nexa wire protocol. */
+export type DesignFrameGridDistribution =
+    (typeof DesignFrameGridDistributionValues)[keyof typeof DesignFrameGridDistributionValues];
 
 /** Supported RPC names. */
 export type MethodName = keyof GatewayMethods;

@@ -3,6 +3,7 @@
 
 import {
     DesignKind,
+    type DesignFrameGrid,
     type DesignNode,
     type DesignStyle,
     type DesignText,
@@ -13,6 +14,19 @@ import {
 
 /** Uniform artwork metrics are shared by native selection edits and linked-instance expansion. */
 export class DesignScaleMetrics {
+    /** Artwork scaling keeps a frame's construction overlay on the same local rhythm. */
+    public static grids(
+        grids: readonly DesignFrameGrid[],
+        factor: number,
+    ): readonly DesignFrameGrid[] {
+        return grids.map((grid: DesignFrameGrid): DesignFrameGrid => ({
+            ...grid,
+            size: grid.size * factor,
+            gutter: grid.gutter * factor,
+            margin: grid.margin * factor,
+            offset: grid.offset * factor,
+        }));
+    }
     public static text(text: DesignText, factor: number): DesignText {
         return {
             ...text,
@@ -58,6 +72,9 @@ export class DesignScaleMetrics {
         }
         return {
             ...node,
+            ...(node.layoutGrids === undefined
+                ? {}
+                : { layoutGrids: this.grids(node.layoutGrids, factor) }),
             x: node.x * factor,
             y: node.y * factor,
             width: node.width * factor,

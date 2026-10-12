@@ -234,8 +234,37 @@ export interface DesignImageFraming {
 export interface DesignImage extends DesignImageFraming {
     readonly assetId: string;
 }
+/** Saved construction overlays stay separate from automatic child placement. */
+export const DesignFrameGridKind = { Square: 'square', Columns: 'columns', Rows: 'rows' } as const;
+/** Grid orientation for a frame's construction overlay. */
+export type DesignFrameGridKind = (typeof DesignFrameGridKind)[keyof typeof DesignFrameGridKind];
+/** Stretch divides available space; fixed tracks retain their authored size. */
+export const DesignFrameGridDistribution = {
+    Stretch: 'stretch',
+    Start: 'start',
+    Center: 'center',
+    End: 'end',
+} as const;
+/** Track distribution within the frame's margins. */
+export type DesignFrameGridDistribution =
+    (typeof DesignFrameGridDistribution)[keyof typeof DesignFrameGridDistribution];
+/** One editable overlay has a stable identity and complete canonical settings. */
+export interface DesignFrameGrid {
+    readonly id: string;
+    readonly kind: DesignFrameGridKind;
+    readonly distribution: DesignFrameGridDistribution;
+    readonly visible: boolean;
+    readonly color: string;
+    readonly count: number;
+    readonly size: number;
+    readonly gutter: number;
+    readonly margin: number;
+    readonly offset: number;
+}
 /** All layer state is explicit and editable; no generated markup is the source of truth. */
 export interface DesignNode {
+    /** Optional saved frame overlays are omitted from artwork exports. */
+    readonly layoutGrids?: readonly DesignFrameGrid[];
     readonly id: string;
     readonly name: string;
     readonly kind: DesignKind;

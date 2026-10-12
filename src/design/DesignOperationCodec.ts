@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { DesignValues as V } from './DesignValues.js';
+import { DesignFrameGridCodec } from './DesignFrameGridCodec.js';
 import { DesignRulerCodec } from './DesignRulerCodec.js';
 import { DesignCodec } from './DesignCodec.js';
 import { DesignStyleCodec } from './DesignStyleCodec.js';
@@ -404,6 +405,14 @@ export class DesignOperationCodec {
             throw new Error('Layer update requires at least one property');
         }
         return {
+            ...(Object.hasOwn(value, 'layoutGrids')
+                ? {
+                      layoutGrids:
+                          value['layoutGrids'] === null
+                              ? null
+                              : DesignFrameGridCodec.grids(value['layoutGrids']),
+                  }
+                : {}),
             ...(Object.hasOwn(value, 'contentScale')
                 ? {
                       contentScale:
@@ -495,6 +504,7 @@ export class DesignOperationCodec {
 const KEYS: readonly string[] = [
     'booleanMode',
     'contentScale',
+    'layoutGrids',
     'mask',
     'variants',
     'variant',

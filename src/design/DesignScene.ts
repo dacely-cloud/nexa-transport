@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { DesignScaleMetrics } from './DesignScaleMetrics.js';
+export { DesignFrameGridCodec } from './DesignFrameGridCodec.js';
+export { DesignFrameGridGeometry, type DesignFrameGridPattern } from './DesignFrameGridGeometry.js';
 export { DesignScaleMetrics } from './DesignScaleMetrics.js';
 
 import {

@@ -6,6 +6,7 @@ import type { DesignMask } from './DesignMaskTypes.js';
 import type { DesignBooleanMode } from './DesignBooleanTypes.js';
 
 import type {
+    DesignFrameGrid,
     DesignGuideValue,
     DesignConstraint,
     DesignNode,
@@ -42,6 +43,8 @@ export const DesignOperationKind = {
 } as const;
 /** Editable properties exclude identity and tree links, which have dedicated operations. */
 export interface DesignNodeChanges {
+    /** Null removes construction overlays while preserving authored artwork. */
+    readonly layoutGrids?: readonly DesignFrameGrid[] | null;
     readonly contentScale?: number | null;
     /** A null value clears the operation when explicitly flattening a Boolean group. */
     readonly booleanMode?: DesignBooleanMode | null;
