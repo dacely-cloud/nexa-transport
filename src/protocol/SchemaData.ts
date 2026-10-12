@@ -11388,6 +11388,20 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'design.svg.import': {
+                    description:
+                        'Revision-checked SVG imports preserve editable native vectors and paints.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/DesignSvgImportRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/DesignReceipt',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
             },
             required: [
                 'accounts.create',
@@ -11571,6 +11585,7 @@ export const schema: Schema = {
                 'design.arrange',
                 'design.layout.preview',
                 'design.transfer',
+                'design.svg.import',
             ],
             type: 'object',
         },
@@ -23353,6 +23368,55 @@ export const schema: Schema = {
                 },
             },
             required: ['changes', 'id', 'op', 'pageId'],
+            type: 'object',
+        },
+        DesignSvgImportRequest: {
+            description:
+                'Native SVG import creates one editable artboard without sending existing document bodies.',
+            properties: {
+                commandId: {
+                    type: 'string',
+                },
+                expectedRevision: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                index: {
+                    type: ['null', 'number'],
+                },
+                name: {
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+                parentId: {
+                    type: ['null', 'string'],
+                },
+                source: {
+                    type: 'string',
+                },
+                x: {
+                    type: 'number',
+                },
+                y: {
+                    type: 'number',
+                },
+            },
+            required: [
+                'commandId',
+                'expectedRevision',
+                'id',
+                'index',
+                'name',
+                'pageId',
+                'parentId',
+                'source',
+                'x',
+                'y',
+            ],
             type: 'object',
         },
     },

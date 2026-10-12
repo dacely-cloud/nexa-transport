@@ -7322,6 +7322,14 @@ export interface GatewayMethodsdesign_transferShape {
     readonly result: DesignReceipt;
 }
 
+/** GatewayMethodsdesign_svg_import wire fields. */
+export interface GatewayMethodsdesign_svg_importShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignSvgImportRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignReceipt;
+}
+
 /** GatewayMethods wire fields. */
 export interface GatewayMethodsShape {
     /** accounts.create as defined by the Nexa gateway. */
@@ -7686,6 +7694,8 @@ export interface GatewayMethodsShape {
     readonly 'design.layout.preview': GatewayMethodsdesign_layout_previewShape;
     /** design.transfer as defined by the Nexa gateway. */
     readonly 'design.transfer': GatewayMethodsdesign_transferShape;
+    /** design.svg.import as defined by the Nexa gateway. */
+    readonly 'design.svg.import': GatewayMethodsdesign_svg_importShape;
 }
 
 /** GatewayMethods from the Nexa wire protocol. */
@@ -15484,6 +15494,33 @@ export interface DesignStrokeOperationShape {
 /** DesignStrokeOperation from the Nexa wire protocol. */
 export type DesignStrokeOperation = DesignStrokeOperationShape;
 
+/** DesignSvgImportRequest wire fields. */
+export interface DesignSvgImportRequestShape {
+    /** commandId as defined by the Nexa gateway. */
+    readonly commandId: string;
+    /** expectedRevision as defined by the Nexa gateway. */
+    readonly expectedRevision: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** index as defined by the Nexa gateway. */
+    readonly index: null | number;
+    /** name as defined by the Nexa gateway. */
+    readonly name: string;
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+    /** parentId as defined by the Nexa gateway. */
+    readonly parentId: null | string;
+    /** source as defined by the Nexa gateway. */
+    readonly source: string;
+    /** x as defined by the Nexa gateway. */
+    readonly x: number;
+    /** y as defined by the Nexa gateway. */
+    readonly y: number;
+}
+
+/** DesignSvgImportRequest from the Nexa wire protocol. */
+export type DesignSvgImportRequest = DesignSvgImportRequestShape;
+
 /** Supported RPC names. */
 export type MethodName = keyof GatewayMethods;
 /** Parameters for a particular RPC. */
@@ -15855,4 +15892,6 @@ export enum Method {
     DesignLayoutPreview = 'design.layout.preview',
     /** Calls design.transfer. */
     DesignTransfer = 'design.transfer',
+    /** Calls design.svg.import. */
+    DesignSvgImport = 'design.svg.import',
 }

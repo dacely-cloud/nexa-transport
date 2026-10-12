@@ -4269,6 +4269,7 @@ Configurable bounds on gateway-owned work and memory.
 | `design.arrange`                     | Yes      | Object (fields below) | Workspace-native arrangement avoids uploading or hydrating selected layer bodies.                      |
 | `design.layout.preview`              | Yes      | Object (fields below) | Read-only preview support is advertised independently for older workspaces.                            |
 | `design.transfer`                    | Yes      | Object (fields below) | Cross-document reusable copying without source-body uploads.                                           |
+| `design.svg.import`                  | Yes      | Object (fields below) | Revision-checked SVG imports preserve editable native vectors and paints.                              |
 
 **accounts.create**
 
@@ -5609,6 +5610,13 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ---------------------------------------------------------- | ----------- |
 | `params` | Yes      | [DesignTransferRequest](protocol.md#designtransferrequest) |             |
 | `result` | Yes      | [DesignReceipt](protocol.md#designreceipt)                 |             |
+
+**design.svg.import**
+
+| Field    | Required | Type                                                         | Description |
+| -------- | -------- | ------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [DesignSvgImportRequest](protocol.md#designsvgimportrequest) |             |
+| `result` | Yes      | [DesignReceipt](protocol.md#designreceipt)                   |             |
 
 ## GeometryFormat
 
@@ -10914,3 +10922,20 @@ Null removes a border; nonempty changes create or edit one authored layer's bord
 | `id`      | Yes      | `string`                                                        |             |
 | `op`      | Yes      | `"stroke"`                                                      |             |
 | `pageId`  | Yes      | `string`                                                        |             |
+
+## DesignSvgImportRequest
+
+Native SVG import creates one editable artboard without sending existing document bodies.
+
+| Field              | Required | Type          | Description |
+| ------------------ | -------- | ------------- | ----------- |
+| `commandId`        | Yes      | `string`      |             |
+| `expectedRevision` | Yes      | `string`      |             |
+| `id`               | Yes      | `string`      |             |
+| `index`            | Yes      | `null,number` |             |
+| `name`             | Yes      | `string`      |             |
+| `pageId`           | Yes      | `string`      |             |
+| `parentId`         | Yes      | `null,string` |             |
+| `source`           | Yes      | `string`      |             |
+| `x`                | Yes      | `number`      |             |
+| `y`                | Yes      | `number`      |             |

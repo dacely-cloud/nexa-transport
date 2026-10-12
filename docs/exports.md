@@ -197,3 +197,5 @@ backend, or a provider-key vault.
 Gradient geometry and compact edits are available through `nexa-transport/design-gradient-types` (types), `nexa-transport/design-gradient-geometry` and `nexa-transport/design-paint-gradient`.
 
 Stroke cap and join choices are available through `nexa-transport/design-stroke-types`; conservative painted bounds use `nexa-transport/design-stroke-geometry`.
+
+Editable SVG import uses `nexa-transport/design-svg-import` for portable layer conversion and undo, `nexa-transport/design-svg-import-types` for requests and limits, and `nexa-transport/design-svg-import-codec` for strict boundary validation. Saved imports use `client.call(Method.DesignSvgImport, request)`.

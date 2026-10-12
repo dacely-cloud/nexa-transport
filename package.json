@@ -606,6 +606,18 @@
         "./design-stroke-geometry": {
             "types": "./dist/design/DesignStrokeGeometry.d.ts",
             "import": "./dist/design-stroke-geometry.js"
+        },
+        "./design-svg-import": {
+            "types": "./dist/design/DesignSvgImport.d.ts",
+            "import": "./dist/design-svg-import.js"
+        },
+        "./design-svg-import-types": {
+            "types": "./dist/design/DesignSvgImportTypes.d.ts",
+            "import": "./dist/design-svg-import-types.js"
+        },
+        "./design-svg-import-codec": {
+            "types": "./dist/design/DesignSvgImportCodec.d.ts",
+            "import": "./dist/design-svg-import-codec.js"
         }
     },
     "scripts": {
