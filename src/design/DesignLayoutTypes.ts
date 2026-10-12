@@ -17,7 +17,7 @@ export interface DesignLocalBox extends DesignSize {
 }
 /** Font measurement is supplied by the platform without making layout depend on DOM APIs. */
 export interface DesignTextMeasurer {
-    readonly measure: (text: DesignText, maximumWidth: number) => DesignSize;
+    readonly measure: (text: DesignText, maximumWidth: number, occurrenceId?: string) => DesignSize;
 }
 /** World-space boxes retain source identities for selecting nested instances. */
 export interface DesignLayoutResult {

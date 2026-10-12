@@ -8,12 +8,13 @@ import {
     type GlyphRun,
     type Glyph,
     type GlyphPosition,
-    type PathCommand,
 } from 'fontkit';
 import { DesignFontContainer } from './DesignFontContainer.js';
 import type { DesignTextSpanStyle } from './DesignTextLayout.js';
 import type { DesignFontBinding } from './DesignFontTypes.js';
-import { DesignPathVerb, type DesignPathCommand } from './DesignTypes.js';
+import type { DesignPathCommand } from './DesignTypes.js';
+import { DesignFontGlyphGeometry } from './DesignFontGlyphGeometry.js';
+import type { DesignFontGlyph, DesignGlyphBounds } from './DesignFontGlyphTypes.js';
 
 /** A caller supplies authorized font bytes, never a process-global filesystem path. */
 export interface DesignFontSource {
@@ -128,10 +129,36 @@ export class DesignFontEngine {
         baseline: number,
         tracking: number,
     ): readonly DesignPathCommand[] {
+        const output: DesignPathCommand[] = [];
+        for (const glyph of this.glyphs(style, content, x, baseline, tracking)) {
+            const commands: readonly DesignPathCommand[] = this.glyphPath(
+                style,
+                glyph.glyphId,
+                glyph.x,
+                glyph.y,
+            );
+            if (output.length + commands.length > 10000) {
+                throw new Error(
+                    'Outlined span exceeds 10000 vector commands. Split the text into smaller layers.',
+                );
+            }
+            output.push(...commands);
+        }
+        return output;
+    }
+
+    /** Shapes complete spans, rejecting off-window glyphs before allocating their positioned curve records. */
+    public *glyphs(
+        style: DesignTextSpanStyle,
+        content: string,
+        x: number,
+        baseline: number,
+        tracking: number,
+        window: DesignGlyphBounds | null = null,
+    ): IterableIterator<DesignFontGlyph> {
         const face: Font = this.#face(style);
         const run: GlyphRun = this.#shape(face, content, tracking);
         const scale: number = style.size / face.unitsPerEm;
-        const output: DesignPathCommand[] = [];
         let penX: number = x;
         let penY: number = baseline;
         for (let index: number = 0; index < run.glyphs.length; index++) {
@@ -150,49 +177,58 @@ export class DesignFontEngine {
                     'Font does not contain a requested character. Supply its matching workspace font.',
                 );
             }
-            const commands: readonly PathCommand[] = glyph.path.commands;
-            if (
-                commands.length === 0 &&
-                glyph.codePoints.some(
-                    (point: number): boolean =>
-                        !/[\s\p{Cf}\p{Mn}]/u.test(String.fromCodePoint(point)),
-                )
-            ) {
-                throw new Error('This glyph has no editable vector outline.');
-            }
-            for (const command of commands) {
-                if (output.length >= 10000) {
-                    throw new Error(
-                        'Outlined span exceeds 10000 vector commands. Split the text into smaller layers.',
-                    );
+            const bounds: DesignGlyphBounds | null = DesignFontGlyphGeometry.bounds(
+                glyph,
+                position,
+                penX,
+                penY,
+                scale,
+            );
+            if (bounds === null) {
+                if (
+                    glyph.codePoints.some(
+                        (point: number): boolean =>
+                            !/[\s\p{Cf}\p{Mn}]/u.test(String.fromCodePoint(point)),
+                    )
+                ) {
+                    throw new Error('This glyph has no editable vector outline.');
                 }
-                const verbs: Readonly<Record<string, DesignPathVerb>> = {
-                    moveTo: DesignPathVerb.Move,
-                    lineTo: DesignPathVerb.Line,
-                    quadraticCurveTo: DesignPathVerb.Quadratic,
-                    bezierCurveTo: DesignPathVerb.Cubic,
-                    closePath: DesignPathVerb.Close,
+            } else if (window === null || DesignFontGlyphGeometry.intersects(bounds, window)) {
+                yield {
+                    index,
+                    bounds,
+                    glyphId: glyph.id,
+                    x: penX + position.xOffset * scale,
+                    y: penY - position.yOffset * scale,
                 };
-                const verb: DesignPathVerb | undefined = verbs[command.command];
-                if (verb === undefined) {
-                    throw new Error('Font returned an unsupported curve.');
-                }
-                const values: number[] = command.args.map(
-                    (value: number, coordinate: number): number => {
-                        if (!Number.isFinite(value)) {
-                            throw new Error('Font returned a non-finite curve coordinate.');
-                        }
-                        return coordinate % 2 === 0
-                            ? penX + (position.xOffset + value) * scale
-                            : penY - (position.yOffset + value) * scale;
-                    },
-                );
-                output.push({ verb, values });
             }
             penX += position.xAdvance * scale + (glyph.isMark ? 0 : tracking);
             penY -= position.yAdvance * scale;
         }
-        return output;
+    }
+
+    /** Resolves a streamed glyph identity against the exact registered face and requested variation. */
+    public glyphPath(
+        style: DesignTextSpanStyle,
+        glyphId: number,
+        x: number,
+        y: number,
+    ): readonly DesignPathCommand[] {
+        const face: Font = this.#face(style);
+        if (
+            !Number.isSafeInteger(glyphId) ||
+            glyphId < 0 ||
+            glyphId >= face.numGlyphs ||
+            ![x, y].every(Number.isFinite)
+        ) {
+            throw new Error('Invalid positioned glyph identity.');
+        }
+        return DesignFontGlyphGeometry.commands(
+            face.getGlyph(glyphId),
+            x,
+            y,
+            style.size / face.unitsPerEm,
+        );
     }
 
     /** Allows layout to estimate unrelated font families while outline conversion still requires a matching face. */

@@ -117,14 +117,12 @@ export class DesignLayoutEngine {
         }
         let natural: DesignSize = { width: node.width, height: node.height };
         const items: readonly DesignFlowItem[] = node.children
-            .map((id: string): DesignFlowItem => {
-                const child: DesignSceneNode = this.#node(id);
-                return { node: child, ...this.#measure(child) };
-            })
-            .filter(
-                (item: DesignFlowItem): boolean =>
-                    item.node.visible && !item.node.placement.absolute,
-            );
+            .map((id: string): DesignSceneNode => this.#node(id))
+            .filter((child: DesignSceneNode): boolean => child.visible && !child.placement.absolute)
+            .map((child: DesignSceneNode): DesignFlowItem => ({
+                node: child,
+                ...this.#measure(child),
+            }));
         const layout: DesignLayout = node.layout;
         const horizontal: number = layout.padding.left + layout.padding.right;
         const vertical: number = layout.padding.top + layout.padding.bottom;
@@ -132,6 +130,7 @@ export class DesignLayoutEngine {
             natural = this.#measurer.measure(
                 node.text,
                 node.placement.width === DesignSizing.Hug ? 100000 : node.width,
+                node.id,
             );
         } else if (layout.flow === DesignFlow.Row || layout.flow === DesignFlow.Column) {
             const row: boolean = layout.flow === DesignFlow.Row;
@@ -269,6 +268,7 @@ export class DesignLayoutEngine {
                               height: this.#measurer.measure(
                                   item.node.text,
                                   widths.get(item.node.id) ?? item.width,
+                                  item.node.id,
                               ).height,
                           },
             );

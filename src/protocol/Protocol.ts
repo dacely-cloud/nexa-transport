@@ -3646,6 +3646,102 @@ export interface DesignBoxShape {
 /** DesignBox from the Nexa wire protocol. */
 export type DesignBox = DesignBoxShape;
 
+/** DesignCanvasMethod wire fields. */
+export interface DesignCanvasMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignViewRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignCanvasPage;
+}
+
+/** DesignCanvasMethod from the Nexa wire protocol. */
+export type DesignCanvasMethod = DesignCanvasMethodShape;
+
+/** DesignCanvasMetric wire fields. */
+export interface DesignCanvasMetricShape {
+    /** height as defined by the Nexa gateway. */
+    readonly height: number;
+    /** maximumWidth as defined by the Nexa gateway. */
+    readonly maximumWidth: number;
+    /** occurrenceId as defined by the Nexa gateway. */
+    readonly occurrenceId: string;
+    /** streamed as defined by the Nexa gateway. */
+    readonly streamed: boolean;
+    /** width as defined by the Nexa gateway. */
+    readonly width: number;
+}
+
+/** DesignCanvasMetric from the Nexa wire protocol. */
+export type DesignCanvasMetric = DesignCanvasMetricShape;
+
+/** DesignCanvasMetricsMethod wire fields. */
+export interface DesignCanvasMetricsMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignCanvasMetricsRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignCanvasMetricsPage;
+}
+
+/** DesignCanvasMetricsMethod from the Nexa wire protocol. */
+export type DesignCanvasMetricsMethod = DesignCanvasMetricsMethodShape;
+
+/** DesignCanvasMetricsPage wire fields. */
+export interface DesignCanvasMetricsPageShape {
+    /** entries as defined by the Nexa gateway. */
+    readonly entries: ReadonlyArray<DesignCanvasMetric>;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** nextOffset as defined by the Nexa gateway. */
+    readonly nextOffset: null | number;
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: string;
+}
+
+/** DesignCanvasMetricsPage from the Nexa wire protocol. */
+export type DesignCanvasMetricsPage = DesignCanvasMetricsPageShape;
+
+/** DesignCanvasMetricsRequest wire fields. */
+export interface DesignCanvasMetricsRequestShape {
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** includeIds as defined by the Nexa gateway. */
+    readonly includeIds: ReadonlyArray<string>;
+    /** limit as defined by the Nexa gateway. */
+    readonly limit: number;
+    /** offset as defined by the Nexa gateway. */
+    readonly offset: number;
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: null | string;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: string;
+}
+
+/** DesignCanvasMetricsRequest from the Nexa wire protocol. */
+export type DesignCanvasMetricsRequest = DesignCanvasMetricsRequestShape;
+
+/** DesignCanvasPage wire fields. */
+export interface DesignCanvasPageShape {
+    /** deferredIds as defined by the Nexa gateway. */
+    readonly deferredIds: ReadonlyArray<string>;
+    /** fragment as defined by the Nexa gateway. */
+    readonly fragment: DesignRecordFragment | null;
+    /** nextCursor as defined by the Nexa gateway. */
+    readonly nextCursor: DesignCursor | null;
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+    /** records as defined by the Nexa gateway. */
+    readonly records: ReadonlyArray<DesignRecord>;
+    /** summary as defined by the Nexa gateway. */
+    readonly summary: DesignSummary;
+    /** textDeferredIds as defined by the Nexa gateway. */
+    readonly textDeferredIds: ReadonlyArray<string>;
+}
+
+/** DesignCanvasPage from the Nexa wire protocol. */
+export type DesignCanvasPage = DesignCanvasPageShape;
+
 /** DesignChangesMethod wire fields. */
 export interface DesignChangesMethodShape {
     /** params as defined by the Nexa gateway. */
@@ -3976,6 +4072,21 @@ export interface DesignFontSliceShape {
 
 /** DesignFontSlice from the Nexa wire protocol. */
 export type DesignFontSlice = DesignFontSliceShape;
+
+/** DesignGlyphBounds wire fields. */
+export interface DesignGlyphBoundsShape {
+    /** height as defined by the Nexa gateway. */
+    readonly height: number;
+    /** width as defined by the Nexa gateway. */
+    readonly width: number;
+    /** x as defined by the Nexa gateway. */
+    readonly x: number;
+    /** y as defined by the Nexa gateway. */
+    readonly y: number;
+}
+
+/** DesignGlyphBounds from the Nexa wire protocol. */
+export type DesignGlyphBounds = DesignGlyphBoundsShape;
 
 /** DesignGradientStop wire fields. */
 export interface DesignGradientStopShape {
@@ -4923,6 +5034,127 @@ export interface DesignTextRunShape {
 
 /** DesignTextRun from the Nexa wire protocol. */
 export type DesignTextRun = DesignTextRunShape;
+
+/** DesignTextSpanStyle wire fields. */
+export interface DesignTextSpanStyleShape {
+    /** color as defined by the Nexa gateway. */
+    readonly color: string;
+    /** family as defined by the Nexa gateway. */
+    readonly family: string;
+    /** font as defined by the Nexa gateway. */
+    readonly font?: DesignFontBinding | null;
+    /** italic as defined by the Nexa gateway. */
+    readonly italic: boolean;
+    /** rich as defined by the Nexa gateway. */
+    readonly rich: boolean;
+    /** size as defined by the Nexa gateway. */
+    readonly size: number;
+    /** underline as defined by the Nexa gateway. */
+    readonly underline: boolean;
+    /** weight as defined by the Nexa gateway. */
+    readonly weight: number;
+}
+
+/** DesignTextSpanStyle from the Nexa wire protocol. */
+export type DesignTextSpanStyle = DesignTextSpanStyleShape;
+
+/** DesignTextWindowCursor wire fields. */
+export interface DesignTextWindowCursorShape {
+    /** glyphIndex as defined by the Nexa gateway. */
+    readonly glyphIndex: null | number;
+    /** lineIndex as defined by the Nexa gateway. */
+    readonly lineIndex: number;
+    /** segmentIndex as defined by the Nexa gateway. */
+    readonly segmentIndex: number;
+}
+
+/** DesignTextWindowCursor from the Nexa wire protocol. */
+export type DesignTextWindowCursor = DesignTextWindowCursorShape;
+
+/** DesignTextWindowGlyph wire fields. */
+export interface DesignTextWindowGlyphShape {
+    /** id as defined by the Nexa gateway. */
+    readonly id: number;
+    /** x as defined by the Nexa gateway. */
+    readonly x: number;
+    /** y as defined by the Nexa gateway. */
+    readonly y: number;
+}
+
+/** DesignTextWindowGlyph from the Nexa wire protocol. */
+export type DesignTextWindowGlyph = DesignTextWindowGlyphShape;
+
+/** DesignTextWindowMethod wire fields. */
+export interface DesignTextWindowMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignTextWindowRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignTextWindowPage;
+}
+
+/** DesignTextWindowMethod from the Nexa wire protocol. */
+export type DesignTextWindowMethod = DesignTextWindowMethodShape;
+
+/** DesignTextWindowPage wire fields. */
+export interface DesignTextWindowPageShape {
+    /** box as defined by the Nexa gateway. */
+    readonly box: DesignBox;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** nextCursor as defined by the Nexa gateway. */
+    readonly nextCursor: DesignTextWindowCursor | null;
+    /** occurrenceId as defined by the Nexa gateway. */
+    readonly occurrenceId: string;
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: string;
+    /** runs as defined by the Nexa gateway. */
+    readonly runs: ReadonlyArray<DesignTextWindowRun>;
+    /** window as defined by the Nexa gateway. */
+    readonly window: DesignGlyphBounds;
+}
+
+/** DesignTextWindowPage from the Nexa wire protocol. */
+export type DesignTextWindowPage = DesignTextWindowPageShape;
+
+/** DesignTextWindowRequest wire fields. */
+export interface DesignTextWindowRequestShape {
+    /** cursor as defined by the Nexa gateway. */
+    readonly cursor: DesignTextWindowCursor | null;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** limit as defined by the Nexa gateway. */
+    readonly limit: number;
+    /** occurrenceId as defined by the Nexa gateway. */
+    readonly occurrenceId: string;
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: string;
+    /** window as defined by the Nexa gateway. */
+    readonly window: DesignGlyphBounds;
+}
+
+/** DesignTextWindowRequest from the Nexa wire protocol. */
+export type DesignTextWindowRequest = DesignTextWindowRequestShape;
+
+/** DesignTextWindowRun wire fields. */
+export interface DesignTextWindowRunShape {
+    /** glyphs as defined by the Nexa gateway. */
+    readonly glyphs: ReadonlyArray<DesignTextWindowGlyph>;
+    /** lineIndex as defined by the Nexa gateway. */
+    readonly lineIndex: number;
+    /** segmentIndex as defined by the Nexa gateway. */
+    readonly segmentIndex: number;
+    /** style as defined by the Nexa gateway. */
+    readonly style: DesignTextSpanStyle;
+    /** underline as defined by the Nexa gateway. */
+    readonly underline: DesignGlyphBounds | null;
+}
+
+/** DesignTextWindowRun from the Nexa wire protocol. */
+export type DesignTextWindowRun = DesignTextWindowRunShape;
 
 /** DesignToken wire fields. */
 export interface DesignTokenShape {
@@ -5888,6 +6120,22 @@ export interface GatewayMethodsdesign_asset_startShape {
     readonly result: DesignAssetPosition;
 }
 
+/** GatewayMethodsdesign_canvas wire fields. */
+export interface GatewayMethodsdesign_canvasShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignViewRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignCanvasPage;
+}
+
+/** GatewayMethodsdesign_canvas_metrics wire fields. */
+export interface GatewayMethodsdesign_canvas_metricsShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignCanvasMetricsRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignCanvasMetricsPage;
+}
+
 /** GatewayMethodsdesign_changes wire fields. */
 export interface GatewayMethodsdesign_changesShape {
     /** params as defined by the Nexa gateway. */
@@ -5966,6 +6214,14 @@ export interface GatewayMethodsdesign_saveShape {
     readonly params: DesignSaveRequest;
     /** result as defined by the Nexa gateway. */
     readonly result: DesignReceipt;
+}
+
+/** GatewayMethodsdesign_text_window wire fields. */
+export interface GatewayMethodsdesign_text_windowShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignTextWindowRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignTextWindowPage;
 }
 
 /** GatewayMethodsdesign_undo wire fields. */
@@ -7074,6 +7330,10 @@ export interface GatewayMethodsShape {
     readonly 'design.asset.remove': GatewayMethodsdesign_asset_removeShape;
     /** design.asset.start as defined by the Nexa gateway. */
     readonly 'design.asset.start': GatewayMethodsdesign_asset_startShape;
+    /** design.canvas as defined by the Nexa gateway. */
+    readonly 'design.canvas': GatewayMethodsdesign_canvasShape;
+    /** design.canvas.metrics as defined by the Nexa gateway. */
+    readonly 'design.canvas.metrics': GatewayMethodsdesign_canvas_metricsShape;
     /** design.changes as defined by the Nexa gateway. */
     readonly 'design.changes': GatewayMethodsdesign_changesShape;
     /** design.create as defined by the Nexa gateway. */
@@ -7094,6 +7354,8 @@ export interface GatewayMethodsShape {
     readonly 'design.read': GatewayMethodsdesign_readShape;
     /** design.save as defined by the Nexa gateway. */
     readonly 'design.save': GatewayMethodsdesign_saveShape;
+    /** design.text.window as defined by the Nexa gateway. */
+    readonly 'design.text.window': GatewayMethodsdesign_text_windowShape;
     /** design.undo as defined by the Nexa gateway. */
     readonly 'design.undo': GatewayMethodsdesign_undoShape;
     /** design.view as defined by the Nexa gateway. */
@@ -14393,6 +14655,10 @@ export enum Method {
     DesignAssetRemove = 'design.asset.remove',
     /** Calls design.asset.start. */
     DesignAssetStart = 'design.asset.start',
+    /** Calls design.canvas. */
+    DesignCanvas = 'design.canvas',
+    /** Calls design.canvas.metrics. */
+    DesignCanvasMetrics = 'design.canvas.metrics',
     /** Calls design.changes. */
     DesignChanges = 'design.changes',
     /** Calls design.create. */
@@ -14413,6 +14679,8 @@ export enum Method {
     DesignRead = 'design.read',
     /** Calls design.save. */
     DesignSave = 'design.save',
+    /** Calls design.text.window. */
+    DesignTextWindow = 'design.text.window',
     /** Calls design.undo. */
     DesignUndo = 'design.undo',
     /** Calls design.view. */
