@@ -41,6 +41,7 @@ export const DesignOperationKind = {
     Layout: 'layout',
     Sizing: 'sizing',
     Typography: 'typography',
+    TextStyle: 'text-style',
     Text: 'text',
     Move: 'move',
     Remove: 'remove',
@@ -156,6 +157,25 @@ export interface DesignTypographyOperation {
     readonly pageId: string;
     readonly changes: DesignTypographyChanges;
 }
+/** Partial styles for a nonempty UTF-16 range; omitted properties retain their per-range values. */
+export interface DesignTextStyleChanges {
+    readonly family?: string;
+    readonly size?: number;
+    readonly weight?: number;
+    readonly italic?: boolean;
+    readonly color?: string;
+    readonly underline?: boolean;
+    readonly font?: DesignFontBinding | null;
+}
+/** Rich formatting never replaces the source body or styles outside the selected range. */
+export interface DesignTextStyleOperation {
+    readonly op: typeof DesignOperationKind.TextStyle;
+    readonly id: string;
+    readonly pageId: string;
+    readonly start: number;
+    readonly end: number;
+    readonly changes: DesignTextStyleChanges;
+}
 /** Replace text content while preserving typography and clipping existing rich-text ranges. */
 export interface DesignTextOperation {
     readonly op: typeof DesignOperationKind.Text;
@@ -267,6 +287,7 @@ export type DesignOperation =
     | DesignLayoutOperation
     | DesignSizingOperation
     | DesignTypographyOperation
+    | DesignTextStyleOperation
     | DesignTextOperation
     | DesignMove
     | DesignRemove

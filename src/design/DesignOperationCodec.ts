@@ -7,6 +7,7 @@ import { DesignRulerCodec } from './DesignRulerCodec.js';
 import { DesignCodec } from './DesignCodec.js';
 import { DesignStyleCodec } from './DesignStyleCodec.js';
 import { DesignLayoutCodec } from './DesignLayoutCodec.js';
+import { DesignTextStyleChangesCodec } from './DesignTextStyleChangesCodec.js';
 import { DesignTypographyChangesCodec } from './DesignTypographyChangesCodec.js';
 import { DesignSizingChangesCodec } from './DesignSizingChangesCodec.js';
 import { DesignLayoutChangesCodec } from './DesignLayoutChangesCodec.js';
@@ -44,6 +45,8 @@ export class DesignOperationCodec {
                     'id',
                     'changes',
                     'content',
+                    'start',
+                    'end',
                     'name',
                     'background',
                     'value',
@@ -142,6 +145,29 @@ export class DesignOperationCodec {
                         id: V.id(value['id']),
                         pageId: V.id(value['pageId']),
                         changes: DesignTypographyChangesCodec.parse(value['changes']),
+                    };
+                }
+                case Kind.TextStyle: {
+                    const value: Readonly<Record<string, unknown>> = V.record(entry, [
+                        'op',
+                        'id',
+                        'pageId',
+                        'start',
+                        'end',
+                        'changes',
+                    ]);
+                    const start: number = V.number(value['start'], 0, 100000, true);
+                    const end: number = V.number(value['end'], 1, 100000, true);
+                    if (start >= end) {
+                        throw new Error('Choose a nonempty text style range.');
+                    }
+                    return {
+                        op,
+                        id: V.id(value['id']),
+                        pageId: V.id(value['pageId']),
+                        start,
+                        end,
+                        changes: DesignTextStyleChangesCodec.parse(value['changes']),
                     };
                 }
                 case Kind.Text: {

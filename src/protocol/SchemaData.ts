@@ -6927,6 +6927,9 @@ export const schema: Schema = {
                     $ref: '#/definitions/DesignTypographyOperation',
                 },
                 {
+                    $ref: '#/definitions/DesignTextStyleOperation',
+                },
+                {
                     $ref: '#/definitions/DesignTextOperation',
                 },
                 {
@@ -22755,6 +22758,68 @@ export const schema: Schema = {
                 },
             },
             required: ['changes', 'id', 'op', 'pageId'],
+            type: 'object',
+        },
+        DesignTextStyleChanges: {
+            description:
+                'Partial styles for a nonempty UTF-16 range; omitted properties retain their per-range values.',
+            properties: {
+                color: {
+                    type: 'string',
+                },
+                family: {
+                    type: 'string',
+                },
+                font: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignFontBinding',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                italic: {
+                    type: 'boolean',
+                },
+                size: {
+                    type: 'number',
+                },
+                underline: {
+                    type: 'boolean',
+                },
+                weight: {
+                    type: 'number',
+                },
+            },
+            type: 'object',
+        },
+        DesignTextStyleOperation: {
+            description:
+                'Rich formatting never replaces the source body or styles outside the selected range.',
+            properties: {
+                changes: {
+                    $ref: '#/definitions/DesignTextStyleChanges',
+                },
+                end: {
+                    type: 'number',
+                },
+                id: {
+                    type: 'string',
+                },
+                op: {
+                    const: 'text-style',
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+                start: {
+                    type: 'number',
+                },
+            },
+            required: ['changes', 'end', 'id', 'op', 'pageId', 'start'],
             type: 'object',
         },
     },

@@ -3088,7 +3088,18 @@ Variant 5: [DesignTypographyOperation](protocol.md#designtypographyoperation)
 | `op`      | Yes      | `"typography"`                                                 |             |
 | `pageId`  | Yes      | `string`                                                       |             |
 
-Variant 6: [DesignTextOperation](protocol.md#designtextoperation)
+Variant 6: [DesignTextStyleOperation](protocol.md#designtextstyleoperation)
+
+| Field     | Required | Type                                                         | Description |
+| --------- | -------- | ------------------------------------------------------------ | ----------- |
+| `changes` | Yes      | [DesignTextStyleChanges](protocol.md#designtextstylechanges) |             |
+| `end`     | Yes      | `number`                                                     |             |
+| `id`      | Yes      | `string`                                                     |             |
+| `op`      | Yes      | `"text-style"`                                               |             |
+| `pageId`  | Yes      | `string`                                                     |             |
+| `start`   | Yes      | `number`                                                     |             |
+
+Variant 7: [DesignTextOperation](protocol.md#designtextoperation)
 
 | Field     | Required | Type     | Description |
 | --------- | -------- | -------- | ----------- |
@@ -3096,7 +3107,7 @@ Variant 6: [DesignTextOperation](protocol.md#designtextoperation)
 | `id`      | Yes      | `string` |             |
 | `op`      | Yes      | `"text"` |             |
 
-Variant 7: [DesignResizeOperation](protocol.md#designresizeoperation)
+Variant 8: [DesignResizeOperation](protocol.md#designresizeoperation)
 
 | Field       | Required | Type              | Description                                                                              |
 | ----------- | -------- | ----------------- | ---------------------------------------------------------------------------------------- |
@@ -3108,7 +3119,7 @@ Variant 7: [DesignResizeOperation](protocol.md#designresizeoperation)
 | `x`         | No       | `number`          | Position edits accompany a single dragged layer and use its resolved parent coordinates. |
 | `y`         | No       | `number`          |                                                                                          |
 
-Variant 8: [DesignPositionOperation](protocol.md#designpositionoperation)
+Variant 9: [DesignPositionOperation](protocol.md#designpositionoperation)
 
 | Field        | Required | Type                                                       | Description                                                          |
 | ------------ | -------- | ---------------------------------------------------------- | -------------------------------------------------------------------- |
@@ -3121,7 +3132,7 @@ Variant 8: [DesignPositionOperation](protocol.md#designpositionoperation)
 | `x`          | No       | `number`                                                   |                                                                      |
 | `y`          | No       | `number`                                                   |                                                                      |
 
-Variant 9: [DesignRotateOperation](protocol.md#designrotateoperation)
+Variant 10: [DesignRotateOperation](protocol.md#designrotateoperation)
 
 | Field       | Required | Type              | Description |
 | ----------- | -------- | ----------------- | ----------- |
@@ -3132,7 +3143,7 @@ Variant 9: [DesignRotateOperation](protocol.md#designrotateoperation)
 | `pivotY`    | No       | `number`          |             |
 | `selection` | Yes      | Array of `string` |             |
 
-Variant 10: [DesignScaleOperation](protocol.md#designscaleoperation)
+Variant 11: [DesignScaleOperation](protocol.md#designscaleoperation)
 
 | Field       | Required | Type              | Description |
 | ----------- | -------- | ----------------- | ----------- |
@@ -3143,7 +3154,7 @@ Variant 10: [DesignScaleOperation](protocol.md#designscaleoperation)
 | `pivotY`    | No       | `number`          |             |
 | `selection` | Yes      | Array of `string` |             |
 
-Variant 11: [DesignTranslateOperation](protocol.md#designtranslateoperation)
+Variant 12: [DesignTranslateOperation](protocol.md#designtranslateoperation)
 
 | Field       | Required | Type                                                        | Description |
 | ----------- | -------- | ----------------------------------------------------------- | ----------- |
@@ -3154,7 +3165,7 @@ Variant 11: [DesignTranslateOperation](protocol.md#designtranslateoperation)
 | `reorders`  | No       | Array of [DesignFlowReorder](protocol.md#designflowreorder) |             |
 | `selection` | Yes      | Array of `string`                                           |             |
 
-Variant 12: [DesignMove](protocol.md#designmove)
+Variant 13: [DesignMove](protocol.md#designmove)
 
 | Field      | Required | Type          | Description |
 | ---------- | -------- | ------------- | ----------- |
@@ -3164,14 +3175,14 @@ Variant 12: [DesignMove](protocol.md#designmove)
 | `pageId`   | Yes      | `string`      |             |
 | `parentId` | Yes      | `null,string` |             |
 
-Variant 13: [DesignRemove](protocol.md#designremove)
+Variant 14: [DesignRemove](protocol.md#designremove)
 
 | Field | Required | Type       | Description |
 | ----- | -------- | ---------- | ----------- |
 | `id`  | Yes      | `string`   |             |
 | `op`  | Yes      | `"remove"` |             |
 
-Variant 14: [DesignPageOperation](protocol.md#designpageoperation)
+Variant 15: [DesignPageOperation](protocol.md#designpageoperation)
 
 | Field        | Required | Type          | Description |
 | ------------ | -------- | ------------- | ----------- |
@@ -3180,7 +3191,7 @@ Variant 14: [DesignPageOperation](protocol.md#designpageoperation)
 | `name`       | Yes      | `null,string` |             |
 | `op`         | Yes      | `"page"`      |             |
 
-Variant 15: [DesignGuideOperation](protocol.md#designguideoperation)
+Variant 16: [DesignGuideOperation](protocol.md#designguideoperation)
 
 | Field    | Required | Type                                                      | Description |
 | -------- | -------- | --------------------------------------------------------- | ----------- |
@@ -3189,7 +3200,7 @@ Variant 15: [DesignGuideOperation](protocol.md#designguideoperation)
 | `pageId` | Yes      | `string`                                                  |             |
 | `value`  | Yes      | [DesignGuideValue](protocol.md#designguidevalue) / `null` |             |
 
-Variant 16: [DesignMetadata](protocol.md#designmetadata)
+Variant 17: [DesignMetadata](protocol.md#designmetadata)
 
 | Field          | Required | Type                                                        | Description |
 | -------------- | -------- | ----------------------------------------------------------- | ----------- |
@@ -10614,3 +10625,30 @@ The native source remains authoritative while the website sends only changed fon
 | `id`      | Yes      | `string`                                                       |             |
 | `op`      | Yes      | `"typography"`                                                 |             |
 | `pageId`  | Yes      | `string`                                                       |             |
+
+## DesignTextStyleChanges
+
+Partial styles for a nonempty UTF-16 range; omitted properties retain their per-range values.
+
+| Field       | Required | Type                                                        | Description |
+| ----------- | -------- | ----------------------------------------------------------- | ----------- |
+| `color`     | No       | `string`                                                    |             |
+| `family`    | No       | `string`                                                    |             |
+| `font`      | No       | [DesignFontBinding](protocol.md#designfontbinding) / `null` |             |
+| `italic`    | No       | `boolean`                                                   |             |
+| `size`      | No       | `number`                                                    |             |
+| `underline` | No       | `boolean`                                                   |             |
+| `weight`    | No       | `number`                                                    |             |
+
+## DesignTextStyleOperation
+
+Rich formatting never replaces the source body or styles outside the selected range.
+
+| Field     | Required | Type                                                         | Description |
+| --------- | -------- | ------------------------------------------------------------ | ----------- |
+| `changes` | Yes      | [DesignTextStyleChanges](protocol.md#designtextstylechanges) |             |
+| `end`     | Yes      | `number`                                                     |             |
+| `id`      | Yes      | `string`                                                     |             |
+| `op`      | Yes      | `"text-style"`                                               |             |
+| `pageId`  | Yes      | `string`                                                     |             |
+| `start`   | Yes      | `number`                                                     |             |

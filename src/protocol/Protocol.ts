@@ -4550,6 +4550,7 @@ export type DesignOperation =
     | DesignLayoutOperation
     | DesignSizingOperation
     | DesignTypographyOperation
+    | DesignTextStyleOperation
     | DesignTextOperation
     | DesignResizeOperation
     | DesignPositionOperation
@@ -15084,6 +15085,46 @@ export interface DesignTypographyOperationShape {
 
 /** DesignTypographyOperation from the Nexa wire protocol. */
 export type DesignTypographyOperation = DesignTypographyOperationShape;
+
+/** DesignTextStyleChanges wire fields. */
+export interface DesignTextStyleChangesShape {
+    /** color as defined by the Nexa gateway. */
+    readonly color?: string;
+    /** family as defined by the Nexa gateway. */
+    readonly family?: string;
+    /** font as defined by the Nexa gateway. */
+    readonly font?: DesignFontBinding | null;
+    /** italic as defined by the Nexa gateway. */
+    readonly italic?: boolean;
+    /** size as defined by the Nexa gateway. */
+    readonly size?: number;
+    /** underline as defined by the Nexa gateway. */
+    readonly underline?: boolean;
+    /** weight as defined by the Nexa gateway. */
+    readonly weight?: number;
+}
+
+/** DesignTextStyleChanges from the Nexa wire protocol. */
+export type DesignTextStyleChanges = DesignTextStyleChangesShape;
+
+/** DesignTextStyleOperation wire fields. */
+export interface DesignTextStyleOperationShape {
+    /** changes as defined by the Nexa gateway. */
+    readonly changes: DesignTextStyleChanges;
+    /** end as defined by the Nexa gateway. */
+    readonly end: number;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** op as defined by the Nexa gateway. */
+    readonly op: 'text-style';
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+    /** start as defined by the Nexa gateway. */
+    readonly start: number;
+}
+
+/** DesignTextStyleOperation from the Nexa wire protocol. */
+export type DesignTextStyleOperation = DesignTextStyleOperationShape;
 
 /** Supported RPC names. */
 export type MethodName = keyof GatewayMethods;
