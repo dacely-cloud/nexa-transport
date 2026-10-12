@@ -32,6 +32,8 @@ export interface DesignComponentPlace {
     readonly componentId: string;
     readonly x: number;
     readonly y: number;
+    /** Treat x/y as the instance center; omitted preserves ordinary top-left placement. */
+    readonly center?: boolean;
 }
 /** Changes a linked definition while retaining instance geometry and unambiguous layer overrides. */
 export interface DesignComponentSwap {

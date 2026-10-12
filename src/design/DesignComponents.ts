@@ -63,6 +63,7 @@ export class DesignComponents {
                 'componentId',
                 'x',
                 'y',
+                'center',
                 'instanceId',
                 'targetId',
                 'changes',
@@ -86,17 +87,17 @@ export class DesignComponents {
             };
         }
         if (action === Action.Place) {
-            const value: Readonly<Record<string, unknown>> = V.record(raw, [
-                'action',
-                'componentId',
-                'x',
-                'y',
-            ]);
+            const value: Readonly<Record<string, unknown>> = V.fields(
+                raw,
+                ['action', 'componentId', 'x', 'y', 'center'],
+                ['action', 'componentId', 'x', 'y'],
+            );
             return {
                 action,
                 componentId: V.id(value['componentId']),
                 x: V.number(value['x']),
                 y: V.number(value['y']),
+                ...(Object.hasOwn(value, 'center') ? { center: V.boolean(value['center']) } : {}),
             };
         }
         if (action === Action.Reset) {
@@ -251,7 +252,20 @@ export class DesignComponents {
             );
             plan = {
                 operations: [
-                    { op: Op.Insert, node, parentId: null, pageId, index: page.roots.length },
+                    {
+                        op: Op.Insert,
+                        node:
+                            command.center === true
+                                ? {
+                                      ...node,
+                                      x: node.x - node.width / 2,
+                                      y: node.y - node.height / 2,
+                                  }
+                                : node,
+                        parentId: null,
+                        pageId,
+                        index: page.roots.length,
+                    },
                 ],
                 selection: [node.id],
             };

@@ -5302,6 +5302,49 @@ export const schema: Schema = {
             enum: ['between', 'center', 'end', 'start', 'stretch'],
             type: 'string',
         },
+        DesignArrangeMethod: {
+            description:
+                'Workspace-native arrangement avoids uploading or hydrating selected layer bodies.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/DesignArrangeRequest',
+                },
+                result: {
+                    $ref: '#/definitions/DesignReceipt',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        DesignArrangeRequest: {
+            description:
+                'Agents use the normal command identity and revision guard for generated selection edits.',
+            properties: {
+                action: {
+                    $ref: '#/definitions/DesignSelectionAction',
+                },
+                commandId: {
+                    type: 'string',
+                },
+                expectedRevision: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+                selection: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+            },
+            required: ['action', 'commandId', 'expectedRevision', 'id', 'pageId', 'selection'],
+            type: 'object',
+        },
         DesignAsset: {
             description:
                 'Published assets are immutable, and all byte counts remain decimal strings.',
@@ -5835,6 +5878,344 @@ export const schema: Schema = {
             required: ['id', 'kind', 'value'],
             type: 'object',
         },
+        DesignComponentAddVariant: {
+            description:
+                'Copies one set definition, allocating a distinct tuple and editable source layers.',
+            properties: {
+                action: {
+                    const: 'add-variant',
+                    type: 'string',
+                },
+                componentId: {
+                    type: ['null', 'string'],
+                },
+                componentSetId: {
+                    type: 'string',
+                },
+            },
+            required: ['action', 'componentId', 'componentSetId'],
+            type: 'object',
+        },
+        DesignComponentCombineVariants: {
+            description:
+                'Groups sibling component definitions without replacing their authored identities.',
+            properties: {
+                action: {
+                    const: 'combine-variants',
+                    type: 'string',
+                },
+                name: {
+                    type: 'string',
+                },
+                property: {
+                    type: 'string',
+                },
+                selection: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+            },
+            required: ['action', 'name', 'property', 'selection'],
+            type: 'object',
+        },
+        DesignComponentCommand: {
+            anyOf: [
+                {
+                    $ref: '#/definitions/DesignComponentCreate',
+                },
+                {
+                    $ref: '#/definitions/DesignComponentPlace',
+                },
+                {
+                    $ref: '#/definitions/DesignComponentSwap',
+                },
+                {
+                    $ref: '#/definitions/DesignComponentDetach',
+                },
+                {
+                    $ref: '#/definitions/DesignComponentOverride',
+                },
+                {
+                    $ref: '#/definitions/DesignComponentReset',
+                },
+                {
+                    $ref: '#/definitions/DesignComponentCombineVariants',
+                },
+                {
+                    $ref: '#/definitions/DesignComponentAddVariant',
+                },
+                {
+                    $ref: '#/definitions/DesignComponentSetVariant',
+                },
+                {
+                    $ref: '#/definitions/DesignComponentEditVariant',
+                },
+                {
+                    $ref: '#/definitions/DesignComponentVariantProperties',
+                },
+                {
+                    $ref: '#/definitions/DesignComponentReleaseVariants',
+                },
+            ],
+        },
+        DesignComponentCreate: {
+            description: 'Converts selected sibling layers into one reusable definition.',
+            properties: {
+                action: {
+                    const: 'create',
+                    type: 'string',
+                },
+                selection: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+            },
+            required: ['action', 'selection'],
+            type: 'object',
+        },
+        DesignComponentDetach: {
+            description:
+                'Bakes rendered overrides and nested instances into editable authored layers.',
+            properties: {
+                action: {
+                    const: 'detach',
+                    type: 'string',
+                },
+                selection: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+            },
+            required: ['action', 'selection'],
+            type: 'object',
+        },
+        DesignComponentEditVariant: {
+            description:
+                "Replaces a definition's complete dimension tuple without changing linked instance identities.",
+            properties: {
+                action: {
+                    const: 'edit-variant',
+                    type: 'string',
+                },
+                componentId: {
+                    type: 'string',
+                },
+                values: {
+                    items: {
+                        $ref: '#/definitions/DesignVariantValue',
+                    },
+                    type: 'array',
+                },
+            },
+            required: ['action', 'componentId', 'values'],
+            type: 'object',
+        },
+        DesignComponentMethod: {
+            description:
+                "Native component commands keep source forests on the authenticated owner's workspace.",
+            properties: {
+                params: {
+                    $ref: '#/definitions/DesignComponentRequest',
+                },
+                result: {
+                    $ref: '#/definitions/DesignReceipt',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        DesignComponentOverride: {
+            description: 'Edits a reachable source layer within one linked instance.',
+            properties: {
+                action: {
+                    const: 'override',
+                    type: 'string',
+                },
+                changes: {
+                    $ref: '#/definitions/DesignComponentOverrideChanges',
+                },
+                instanceId: {
+                    type: 'string',
+                },
+                targetId: {
+                    type: 'string',
+                },
+            },
+            required: ['action', 'changes', 'instanceId', 'targetId'],
+            type: 'object',
+        },
+        DesignComponentOverrideChanges: {
+            description: 'An explicit null restores inheritance for the chosen field.',
+            properties: {
+                name: {
+                    type: ['null', 'string'],
+                },
+                style: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignStyle',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                text: {
+                    type: ['null', 'string'],
+                },
+                visible: {
+                    type: ['null', 'boolean'],
+                },
+            },
+            type: 'object',
+        },
+        DesignComponentPlace: {
+            description:
+                'Places a linked instance on the active page, including definitions from another page.',
+            properties: {
+                action: {
+                    const: 'place',
+                    type: 'string',
+                },
+                center: {
+                    description:
+                        'Treat x/y as the instance center; omitted preserves ordinary top-left placement.',
+                    type: 'boolean',
+                },
+                componentId: {
+                    type: 'string',
+                },
+                x: {
+                    type: 'number',
+                },
+                y: {
+                    type: 'number',
+                },
+            },
+            required: ['action', 'componentId', 'x', 'y'],
+            type: 'object',
+        },
+        DesignComponentReleaseVariants: {
+            description:
+                'Restores a group of standalone reusable definitions; linked instances remain intact.',
+            properties: {
+                action: {
+                    const: 'release-variants',
+                    type: 'string',
+                },
+                componentSetId: {
+                    type: 'string',
+                },
+            },
+            required: ['action', 'componentSetId'],
+            type: 'object',
+        },
+        DesignComponentRequest: {
+            description:
+                'Owner identity is supplied by the authenticated adapter, never by this command.',
+            properties: {
+                command: {
+                    $ref: '#/definitions/DesignComponentCommand',
+                },
+                commandId: {
+                    type: 'string',
+                },
+                expectedRevision: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+            },
+            required: ['command', 'commandId', 'expectedRevision', 'id', 'pageId'],
+            type: 'object',
+        },
+        DesignComponentReset: {
+            description: 'A null target restores all inherited values; an ID resets one layer.',
+            properties: {
+                action: {
+                    const: 'reset',
+                    type: 'string',
+                },
+                instanceId: {
+                    type: 'string',
+                },
+                targetId: {
+                    type: ['null', 'string'],
+                },
+            },
+            required: ['action', 'instanceId', 'targetId'],
+            type: 'object',
+        },
+        DesignComponentSetVariant: {
+            description:
+                'Partial named choices select an existing variant while retaining other dimensions.',
+            properties: {
+                action: {
+                    const: 'set-variant',
+                    type: 'string',
+                },
+                instanceId: {
+                    type: 'string',
+                },
+                values: {
+                    items: {
+                        $ref: '#/definitions/DesignVariantValue',
+                    },
+                    type: 'array',
+                },
+            },
+            required: ['action', 'instanceId', 'values'],
+            type: 'object',
+        },
+        DesignComponentSwap: {
+            description:
+                'Changes a linked definition while retaining instance geometry and unambiguous layer overrides.',
+            properties: {
+                action: {
+                    const: 'swap',
+                    type: 'string',
+                },
+                componentId: {
+                    type: 'string',
+                },
+                instanceId: {
+                    type: 'string',
+                },
+            },
+            required: ['action', 'componentId', 'instanceId'],
+            type: 'object',
+        },
+        DesignComponentVariantProperties: {
+            description:
+                'Retains, renames, adds or removes dimensions in one atomic set and definition edit.',
+            properties: {
+                action: {
+                    const: 'variant-properties',
+                    type: 'string',
+                },
+                componentSetId: {
+                    type: 'string',
+                },
+                properties: {
+                    items: {
+                        $ref: '#/definitions/DesignVariantPropertyEdit',
+                    },
+                    type: 'array',
+                },
+            },
+            required: ['action', 'componentSetId', 'properties'],
+            type: 'object',
+        },
         DesignConstraint: {
             description:
                 'Absolute children retain a chosen relation to a resized parent.\nConstraint choice.',
@@ -6156,6 +6537,67 @@ export const schema: Schema = {
             required: ['data', 'font', 'nextOffset', 'offset'],
             type: 'object',
         },
+        DesignFrameGrid: {
+            description:
+                'One editable overlay has a stable identity and complete canonical settings.',
+            properties: {
+                color: {
+                    type: 'string',
+                },
+                count: {
+                    type: 'number',
+                },
+                distribution: {
+                    $ref: '#/definitions/DesignFrameGridDistribution',
+                },
+                gutter: {
+                    type: 'number',
+                },
+                id: {
+                    type: 'string',
+                },
+                kind: {
+                    $ref: '#/definitions/DesignFrameGridKind',
+                },
+                margin: {
+                    type: 'number',
+                },
+                offset: {
+                    type: 'number',
+                },
+                size: {
+                    type: 'number',
+                },
+                visible: {
+                    type: 'boolean',
+                },
+            },
+            required: [
+                'color',
+                'count',
+                'distribution',
+                'gutter',
+                'id',
+                'kind',
+                'margin',
+                'offset',
+                'size',
+                'visible',
+            ],
+            type: 'object',
+        },
+        DesignFrameGridDistribution: {
+            description:
+                "Stretch divides available space; fixed tracks retain their authored size.\nTrack distribution within the frame's margins.",
+            enum: ['center', 'end', 'start', 'stretch'],
+            type: 'string',
+        },
+        DesignFrameGridKind: {
+            description:
+                "Saved construction overlays stay separate from automatic child placement.\nGrid orientation for a frame's construction overlay.",
+            enum: ['columns', 'rows', 'square'],
+            type: 'string',
+        },
         DesignGlyphBounds: {
             description: 'Glyph geometry is expressed in text-local design pixels.',
             properties: {
@@ -6186,6 +6628,97 @@ export const schema: Schema = {
                 },
             },
             required: ['color', 'offset'],
+            type: 'object',
+        },
+        DesignGradientTransform: {
+            description:
+                'Top-left-origin normalized points define a linear segment or a radial center and two radius axes.',
+            properties: {
+                axisX: {
+                    type: 'number',
+                },
+                axisY: {
+                    type: 'number',
+                },
+                endX: {
+                    type: 'number',
+                },
+                endY: {
+                    type: 'number',
+                },
+                startX: {
+                    type: 'number',
+                },
+                startY: {
+                    type: 'number',
+                },
+            },
+            required: ['axisX', 'axisY', 'endX', 'endY', 'startX', 'startY'],
+            type: 'object',
+        },
+        DesignGradientTransformChanges: {
+            description:
+                'Each coordinate may change independently without retransmitting other gradient or layer fields.',
+            properties: {
+                axisX: {
+                    type: 'number',
+                },
+                axisY: {
+                    type: 'number',
+                },
+                endX: {
+                    type: 'number',
+                },
+                endY: {
+                    type: 'number',
+                },
+                startX: {
+                    type: 'number',
+                },
+                startY: {
+                    type: 'number',
+                },
+            },
+            type: 'object',
+        },
+        DesignGuideOperation: {
+            description: 'Sets one page guide by identity, or removes it with value:null.',
+            properties: {
+                id: {
+                    type: 'string',
+                },
+                op: {
+                    const: 'guide',
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+                value: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignGuideValue',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+            },
+            required: ['id', 'op', 'pageId', 'value'],
+            type: 'object',
+        },
+        DesignGuideValue: {
+            description: 'A guide edit carries only its axis and world position.',
+            properties: {
+                axis: {
+                    $ref: '#/definitions/DesignRulerAxis',
+                },
+                position: {
+                    type: 'number',
+                },
+            },
+            required: ['axis', 'position'],
             type: 'object',
         },
         DesignImage: {
@@ -6394,6 +6927,47 @@ export const schema: Schema = {
             ],
             type: 'object',
         },
+        DesignLayoutChanges: {
+            description: 'A compact native layout edit changes only supplied fields.',
+            properties: {
+                align: {
+                    description: 'Alignment within the available layout space.\nAlignment choice.',
+                    enum: ['between', 'center', 'end', 'start', 'stretch'],
+                    type: 'string',
+                },
+                clip: {
+                    type: 'boolean',
+                },
+                columns: {
+                    type: 'number',
+                },
+                flow: {
+                    description:
+                        'Free positioning and responsive container layouts.\nLayout direction.',
+                    enum: ['absolute', 'column', 'grid', 'row'],
+                    type: 'string',
+                },
+                gap: {
+                    type: 'number',
+                },
+                justify: {
+                    description: 'Alignment within the available layout space.\nAlignment choice.',
+                    enum: ['between', 'center', 'end', 'start', 'stretch'],
+                    type: 'string',
+                },
+                padding: {
+                    $ref: '#/definitions/DesignPaddingChanges',
+                    description: 'Optional edge changes preserve the other saved padding values.',
+                },
+                rowGap: {
+                    type: 'number',
+                },
+                wrap: {
+                    type: 'boolean',
+                },
+            },
+            type: 'object',
+        },
         DesignLayoutMethod: {
             description: 'Computed-geometry RPC contract.',
             properties: {
@@ -6405,6 +6979,27 @@ export const schema: Schema = {
                 },
             },
             required: ['params', 'result'],
+            type: 'object',
+        },
+        DesignLayoutOperation: {
+            description:
+                'Native layout geometry is resolved against owner-scoped source records, never browser body placeholders.',
+            properties: {
+                changes: {
+                    $ref: '#/definitions/DesignLayoutChanges',
+                },
+                id: {
+                    type: 'string',
+                },
+                op: {
+                    const: 'layout',
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+            },
+            required: ['changes', 'id', 'op', 'pageId'],
             type: 'object',
         },
         DesignLayoutPage: {
@@ -6424,6 +7019,163 @@ export const schema: Schema = {
                 },
             },
             required: ['boxes', 'nextOffset', 'summary'],
+            type: 'object',
+        },
+        DesignLayoutPreviewCanvasRequest: {
+            description: 'Canvas records never ask for explicit source-body hydration.',
+            properties: {
+                action: {
+                    const: 'canvas',
+                    type: 'string',
+                },
+                key: {
+                    type: ['null', 'string'],
+                },
+                operation: {
+                    $ref: '#/definitions/DesignLayoutOperation',
+                },
+                params: {
+                    $ref: '#/definitions/DesignViewRequest',
+                },
+            },
+            required: ['action', 'key', 'operation', 'params'],
+            type: 'object',
+        },
+        DesignLayoutPreviewCanvasResult: {
+            description: 'Paged, body-free draft records carry their checked projection identity.',
+            properties: {
+                action: {
+                    const: 'canvas',
+                    type: 'string',
+                },
+                key: {
+                    type: 'string',
+                },
+                page: {
+                    $ref: '#/definitions/DesignCanvasPage',
+                },
+            },
+            required: ['action', 'key', 'page'],
+            type: 'object',
+        },
+        DesignLayoutPreviewMethod: {
+            description:
+                'Read-only preview support is advertised independently for older workspaces.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/DesignLayoutPreviewRequest',
+                },
+                result: {
+                    $ref: '#/definitions/DesignLayoutPreviewResult',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        DesignLayoutPreviewMetricsRequest: {
+            description:
+                'Width-specific native metrics are paged independently of the source text.',
+            properties: {
+                action: {
+                    const: 'metrics',
+                    type: 'string',
+                },
+                key: {
+                    type: ['null', 'string'],
+                },
+                operation: {
+                    $ref: '#/definitions/DesignLayoutOperation',
+                },
+                params: {
+                    $ref: '#/definitions/DesignCanvasMetricsRequest',
+                },
+            },
+            required: ['action', 'key', 'operation', 'params'],
+            type: 'object',
+        },
+        DesignLayoutPreviewMetricsResult: {
+            description: "Native wrapping remains exact at the preview's requested width.",
+            properties: {
+                action: {
+                    const: 'metrics',
+                    type: 'string',
+                },
+                key: {
+                    type: 'string',
+                },
+                page: {
+                    $ref: '#/definitions/DesignCanvasMetricsPage',
+                },
+            },
+            required: ['action', 'key', 'page'],
+            type: 'object',
+        },
+        DesignLayoutPreviewRequest: {
+            anyOf: [
+                {
+                    $ref: '#/definitions/DesignLayoutPreviewCanvasRequest',
+                },
+                {
+                    $ref: '#/definitions/DesignLayoutPreviewMetricsRequest',
+                },
+                {
+                    $ref: '#/definitions/DesignLayoutPreviewTextRequest',
+                },
+            ],
+            description: 'A preview cannot contain arbitrary scene replacement operations.',
+        },
+        DesignLayoutPreviewResult: {
+            anyOf: [
+                {
+                    $ref: '#/definitions/DesignLayoutPreviewCanvasResult',
+                },
+                {
+                    $ref: '#/definitions/DesignLayoutPreviewMetricsResult',
+                },
+                {
+                    $ref: '#/definitions/DesignLayoutPreviewTextResult',
+                },
+            ],
+            description:
+                'The caller verifies the action and projection key before consuming a reply.',
+        },
+        DesignLayoutPreviewTextRequest: {
+            description:
+                'Only the visible glyph rectangle is transferred for the projected paragraph.',
+            properties: {
+                action: {
+                    const: 'text',
+                    type: 'string',
+                },
+                key: {
+                    type: ['null', 'string'],
+                },
+                operation: {
+                    $ref: '#/definitions/DesignLayoutOperation',
+                },
+                params: {
+                    $ref: '#/definitions/DesignTextWindowRequest',
+                },
+            },
+            required: ['action', 'key', 'operation', 'params'],
+            type: 'object',
+        },
+        DesignLayoutPreviewTextResult: {
+            description:
+                'Draft glyph IDs and positions refer to the same public or admitted private fonts as the saved canvas.',
+            properties: {
+                action: {
+                    const: 'text',
+                    type: 'string',
+                },
+                key: {
+                    type: 'string',
+                },
+                page: {
+                    $ref: '#/definitions/DesignTextWindowPage',
+                },
+            },
+            required: ['action', 'key', 'page'],
             type: 'object',
         },
         DesignLayoutRequest: {
@@ -6929,6 +7681,9 @@ export const schema: Schema = {
                     $ref: '#/definitions/DesignSizingOperation',
                 },
                 {
+                    $ref: '#/definitions/DesignTypographyStyleOperation',
+                },
+                {
                     $ref: '#/definitions/DesignTypographyOperation',
                 },
                 {
@@ -6974,9 +7729,6 @@ export const schema: Schema = {
                     $ref: '#/definitions/DesignPaintColorOperation',
                 },
                 {
-                    $ref: '#/definitions/DesignTypographyStyleOperation',
-                },
-                {
                     $ref: '#/definitions/DesignPaintGradientOperation',
                 },
                 {
@@ -7013,6 +7765,24 @@ export const schema: Schema = {
                 },
             },
             required: ['name', 'nodeId', 'style', 'text', 'visible'],
+            type: 'object',
+        },
+        DesignPaddingChanges: {
+            description: 'Optional edge changes preserve the other saved padding values.',
+            properties: {
+                bottom: {
+                    type: 'number',
+                },
+                left: {
+                    type: 'number',
+                },
+                right: {
+                    type: 'number',
+                },
+                top: {
+                    type: 'number',
+                },
+            },
             type: 'object',
         },
         DesignPage: {
@@ -7107,6 +7877,18 @@ export const schema: Schema = {
                     description:
                         'Omitted framing retains the original centered-cover behavior of existing image paints.',
                 },
+                gradient: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignGradientTransform',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                    description:
+                        'Null or omission retains the original angle-based linear or centered radial geometry.',
+                },
                 kind: {
                     $ref: '#/definitions/DesignPaintKind',
                 },
@@ -7122,20 +7904,113 @@ export const schema: Schema = {
                 tokenId: {
                     type: ['null', 'string'],
                 },
+            },
+            required: ['angle', 'assetId', 'color', 'kind', 'opacity', 'stops', 'tokenId'],
+            type: 'object',
+        },
+        DesignPaintColorChanges: {
+            description:
+                'Omitted color properties retain the original paint; tokenId:null alone preserves its resolved color.',
+            properties: {
+                color: {
+                    type: 'string',
+                },
+                opacity: {
+                    type: 'number',
+                },
+                tokenId: {
+                    type: ['null', 'string'],
+                },
+            },
+            type: 'object',
+        },
+        DesignPaintColorOperation: {
+            description:
+                'Fill index zero may create a first paint; stroke edits require an existing stroke and index zero.',
+            properties: {
+                changes: {
+                    $ref: '#/definitions/DesignPaintColorChanges',
+                },
+                id: {
+                    type: 'string',
+                },
+                index: {
+                    type: 'number',
+                },
+                op: {
+                    const: 'paint-color',
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+                target: {
+                    $ref: '#/definitions/DesignPaintColorTarget',
+                },
+            },
+            required: ['changes', 'id', 'index', 'op', 'pageId', 'target'],
+            type: 'object',
+        },
+        DesignPaintColorTarget: {
+            description:
+                'Existing fill and stroke colors share one compact native edit.\nPaint location.',
+            enum: ['fill', 'stroke'],
+            type: 'string',
+        },
+        DesignPaintGradientChanges: {
+            description:
+                'Geometry and stops are independent of source bodies and the rest of the paint stack.',
+            properties: {
+                angle: {
+                    type: 'number',
+                },
                 gradient: {
                     anyOf: [
                         {
-                            $ref: '#/definitions/DesignGradientTransform',
+                            $ref: '#/definitions/DesignGradientTransformChanges',
                         },
                         {
                             type: 'null',
                         },
                     ],
-                    description:
-                        'Null or omission retains the original angle-based linear or centered radial geometry.',
+                },
+                kind: {
+                    enum: ['linear', 'radial'],
+                    type: 'string',
+                },
+                stops: {
+                    items: {
+                        $ref: '#/definitions/DesignGradientStop',
+                    },
+                    type: 'array',
                 },
             },
-            required: ['angle', 'assetId', 'color', 'kind', 'opacity', 'stops', 'tokenId'],
+            type: 'object',
+        },
+        DesignPaintGradientOperation: {
+            description: 'Page-scoped native editing of one fill or stroke gradient.',
+            properties: {
+                changes: {
+                    $ref: '#/definitions/DesignPaintGradientChanges',
+                },
+                id: {
+                    type: 'string',
+                },
+                index: {
+                    type: 'number',
+                },
+                op: {
+                    const: 'paint-gradient',
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+                target: {
+                    $ref: '#/definitions/DesignPaintColorTarget',
+                },
+            },
+            required: ['changes', 'id', 'index', 'op', 'pageId', 'target'],
             type: 'object',
         },
         DesignPaintKind: {
@@ -7508,6 +8383,29 @@ export const schema: Schema = {
             required: ['angle', 'op', 'pageId', 'selection'],
             type: 'object',
         },
+        DesignRulerAxis: {
+            description:
+                'A saved ruler line uses a page-world coordinate on one canvas axis.\nAxis names are shared by native tooling, codecs and the canvas.',
+            enum: ['x', 'y'],
+            type: 'string',
+        },
+        DesignRulerGuide: {
+            description:
+                "Stable guide identity allows independent edits without replacing other agents' guides.",
+            properties: {
+                axis: {
+                    $ref: '#/definitions/DesignRulerAxis',
+                },
+                id: {
+                    type: 'string',
+                },
+                position: {
+                    type: 'number',
+                },
+            },
+            required: ['axis', 'id', 'position'],
+            type: 'object',
+        },
         DesignSaveMethod: {
             description: 'Atomic editing RPC contract.',
             properties: {
@@ -7543,6 +8441,64 @@ export const schema: Schema = {
             required: ['commandId', 'expectedRevision', 'id', 'operations'],
             type: 'object',
         },
+        DesignScaleOperation: {
+            description:
+                'Uniform artwork scaling preserves text and effect metrics, unlike resizing a container.',
+            properties: {
+                factor: {
+                    type: 'number',
+                },
+                op: {
+                    const: 'scale',
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+                pivotX: {
+                    type: 'number',
+                },
+                pivotY: {
+                    type: 'number',
+                },
+                selection: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+            },
+            required: ['factor', 'op', 'pageId', 'selection'],
+            type: 'object',
+        },
+        DesignSelectionAction: {
+            description:
+                "Selection commands share one implementation between agent tools and browser editors.\nA command's stable action identity.",
+            enum: [
+                'auto-layout',
+                'back',
+                'bottom',
+                'center',
+                'distribute-horizontal',
+                'distribute-vertical',
+                'duplicate',
+                'exclude',
+                'flatten',
+                'front',
+                'group',
+                'intersect',
+                'left',
+                'mask',
+                'middle',
+                'release-mask',
+                'right',
+                'subtract',
+                'top',
+                'ungroup',
+                'union',
+            ],
+            type: 'string',
+        },
         DesignShadow: {
             description: 'Drop or inner shadow.',
             properties: {
@@ -7573,25 +8529,74 @@ export const schema: Schema = {
             enum: ['fill', 'fixed', 'hug'],
             type: 'string',
         },
+        DesignSizingChanges: {
+            description: 'Native sizing changes preserve every omitted saved placement field.',
+            properties: {
+                columnSpan: {
+                    type: 'number',
+                },
+                height: {
+                    description: 'Sizing relative to the parent and content.\nSizing choice.',
+                    enum: ['fill', 'fixed', 'hug'],
+                    type: 'string',
+                },
+                maxHeight: {
+                    type: 'number',
+                },
+                maxWidth: {
+                    type: 'number',
+                },
+                minHeight: {
+                    type: 'number',
+                },
+                minWidth: {
+                    type: 'number',
+                },
+                rowSpan: {
+                    type: 'number',
+                },
+                width: {
+                    description: 'Sizing relative to the parent and content.\nSizing choice.',
+                    enum: ['fill', 'fixed', 'hug'],
+                    type: 'string',
+                },
+            },
+            type: 'object',
+        },
+        DesignSizingOperation: {
+            description:
+                'Limits and sizing modes resolve against complete native sources without transferring their bodies.',
+            properties: {
+                changes: {
+                    $ref: '#/definitions/DesignSizingChanges',
+                },
+                id: {
+                    type: 'string',
+                },
+                op: {
+                    const: 'sizing',
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+            },
+            required: ['changes', 'id', 'op', 'pageId'],
+            type: 'object',
+        },
         DesignStroke: {
             description: 'Outline properties.',
             properties: {
+                cap: {
+                    description: 'Omission retains the original round-cap behavior.',
+                    enum: ['butt', 'round', 'square'],
+                    type: 'string',
+                },
                 dash: {
                     items: {
                         type: 'number',
                     },
                     type: 'array',
-                },
-                paint: {
-                    $ref: '#/definitions/DesignPaint',
-                },
-                width: {
-                    type: 'number',
-                },
-                cap: {
-                    description: 'Omission retains the original round-cap behavior.',
-                    enum: ['butt', 'round', 'square'],
-                    type: 'string',
                 },
                 join: {
                     description: 'Omission retains the original round-join behavior.',
@@ -7602,8 +8607,73 @@ export const schema: Schema = {
                     description: 'A finite ratio bounds miter corners; omission uses four.',
                     type: 'number',
                 },
+                paint: {
+                    $ref: '#/definitions/DesignPaint',
+                },
+                width: {
+                    type: 'number',
+                },
             },
             required: ['dash', 'paint', 'width'],
+            type: 'object',
+        },
+        DesignStrokeChanges: {
+            description:
+                'Omitted border properties retain their current values, including the paint.',
+            properties: {
+                cap: {
+                    description:
+                        'Endpoint shapes match the centered SVG stroke model.\nSupported endpoint shape.',
+                    enum: ['butt', 'round', 'square'],
+                    type: 'string',
+                },
+                dash: {
+                    items: {
+                        type: 'number',
+                    },
+                    type: 'array',
+                },
+                join: {
+                    description:
+                        'Corners may retain a round sector, bevel or bounded miter.\nSupported corner shape.',
+                    enum: ['bevel', 'miter', 'round'],
+                    type: 'string',
+                },
+                miterLimit: {
+                    type: 'number',
+                },
+                width: {
+                    type: 'number',
+                },
+            },
+            type: 'object',
+        },
+        DesignStrokeOperation: {
+            description:
+                "Null removes a border; nonempty changes create or edit one authored layer's border.",
+            properties: {
+                changes: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignStrokeChanges',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                id: {
+                    type: 'string',
+                },
+                op: {
+                    const: 'stroke',
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+            },
+            required: ['changes', 'id', 'op', 'pageId'],
             type: 'object',
         },
         DesignStyle: {
@@ -7667,6 +8737,69 @@ export const schema: Schema = {
             required: ['id', 'name', 'nodeCount', 'pageCount', 'revision', 'updatedAt'],
             type: 'object',
         },
+        DesignSvgImportMethod: {
+            description:
+                'Revision-checked SVG imports preserve editable native vectors and paints.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/DesignSvgImportRequest',
+                },
+                result: {
+                    $ref: '#/definitions/DesignReceipt',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        DesignSvgImportRequest: {
+            description:
+                'Native SVG import creates one editable artboard without sending existing document bodies.',
+            properties: {
+                commandId: {
+                    type: 'string',
+                },
+                expectedRevision: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                index: {
+                    type: ['null', 'number'],
+                },
+                name: {
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+                parentId: {
+                    type: ['null', 'string'],
+                },
+                source: {
+                    type: 'string',
+                },
+                x: {
+                    type: 'number',
+                },
+                y: {
+                    type: 'number',
+                },
+            },
+            required: [
+                'commandId',
+                'expectedRevision',
+                'id',
+                'index',
+                'name',
+                'pageId',
+                'parentId',
+                'source',
+                'x',
+                'y',
+            ],
+            type: 'object',
+        },
         DesignText: {
             description: 'Text layout is shared by the canvas, tools and exported designs.',
             properties: {
@@ -7709,9 +8842,6 @@ export const schema: Schema = {
                 size: {
                     type: 'number',
                 },
-                weight: {
-                    type: 'number',
-                },
                 typographyStyle: {
                     anyOf: [
                         {
@@ -7723,6 +8853,9 @@ export const schema: Schema = {
                     ],
                     description:
                         'Saved typography remains linked while local overrides and rich spans stay editable.',
+                },
+                weight: {
+                    type: 'number',
                 },
             },
             required: [
@@ -7837,6 +8970,68 @@ export const schema: Schema = {
                 },
             },
             required: ['color', 'family', 'italic', 'rich', 'size', 'underline', 'weight'],
+            type: 'object',
+        },
+        DesignTextStyleChanges: {
+            description:
+                'Partial styles for a nonempty UTF-16 range; omitted properties retain their per-range values.',
+            properties: {
+                color: {
+                    type: 'string',
+                },
+                family: {
+                    type: 'string',
+                },
+                font: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignFontBinding',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                italic: {
+                    type: 'boolean',
+                },
+                size: {
+                    type: 'number',
+                },
+                underline: {
+                    type: 'boolean',
+                },
+                weight: {
+                    type: 'number',
+                },
+            },
+            type: 'object',
+        },
+        DesignTextStyleOperation: {
+            description:
+                'Rich formatting never replaces the source body or styles outside the selected range.',
+            properties: {
+                changes: {
+                    $ref: '#/definitions/DesignTextStyleChanges',
+                },
+                end: {
+                    type: 'number',
+                },
+                id: {
+                    type: 'string',
+                },
+                op: {
+                    const: 'text-style',
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+                start: {
+                    type: 'number',
+                },
+            },
+            required: ['changes', 'end', 'id', 'op', 'pageId', 'start'],
             type: 'object',
         },
         DesignTextWindowCursor: {
@@ -8018,13 +9213,13 @@ export const schema: Schema = {
                 name: {
                     type: 'string',
                 },
-                value: {
-                    type: 'string',
-                },
                 typography: {
                     $ref: '#/definitions/DesignTypographyValues',
                     description:
                         'Legacy typography values remain readable; typed styles are explicit and independently validated.',
+                },
+                value: {
+                    type: 'string',
                 },
             },
             required: ['category', 'id', 'name', 'value'],
@@ -8034,6 +9229,58 @@ export const schema: Schema = {
             description: 'Token families.\nToken family.',
             enum: ['color', 'spacing', 'typography'],
             type: 'string',
+        },
+        DesignTokenChanges: {
+            description: 'Omitted token properties keep their saved values.',
+            properties: {
+                category: {
+                    description: 'Token families.\nToken family.',
+                    enum: ['color', 'spacing', 'typography'],
+                    type: 'string',
+                },
+                name: {
+                    type: 'string',
+                },
+                typography: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignTypographyOverrides',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                value: {
+                    type: 'string',
+                },
+            },
+            type: 'object',
+        },
+        DesignTokenOperation: {
+            description:
+                'Create or edit one token; null detaches its paints and deletes it without changing their appearance.',
+            properties: {
+                changes: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignTokenChanges',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                id: {
+                    type: 'string',
+                },
+                op: {
+                    const: 'token',
+                    type: 'string',
+                },
+            },
+            required: ['changes', 'id', 'op'],
+            type: 'object',
         },
         DesignTokenRecord: {
             description: 'Token record.',
@@ -8057,6 +9304,75 @@ export const schema: Schema = {
                 },
             },
             required: ['id', 'kind', 'value'],
+            type: 'object',
+        },
+        DesignTransferMethod: {
+            description: 'Cross-document reusable copying without source-body uploads.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/DesignTransferRequest',
+                },
+                result: {
+                    $ref: '#/definitions/DesignReceipt',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        DesignTransferRequest: {
+            description:
+                'Cross-document copies carry references only; source layers stay inside the authenticated workspace.',
+            properties: {
+                commandId: {
+                    type: 'string',
+                },
+                expectedRevision: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+                parentId: {
+                    type: ['null', 'string'],
+                },
+                selection: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                sourceId: {
+                    type: 'string',
+                },
+                sourcePageId: {
+                    type: 'string',
+                },
+                sourceRevision: {
+                    type: 'string',
+                },
+                x: {
+                    type: 'number',
+                },
+                y: {
+                    type: 'number',
+                },
+            },
+            required: [
+                'commandId',
+                'expectedRevision',
+                'id',
+                'pageId',
+                'parentId',
+                'selection',
+                'sourceId',
+                'sourcePageId',
+                'sourceRevision',
+                'x',
+                'y',
+            ],
             type: 'object',
         },
         DesignTransition: {
@@ -8101,6 +9417,191 @@ export const schema: Schema = {
             description: 'Prototype triggers.\nPrototype trigger.',
             enum: ['after', 'click', 'hover'],
             type: 'string',
+        },
+        DesignTypographyChanges: {
+            description:
+                'Base typography changes preserve the source content and every authored rich-text range.',
+            properties: {
+                align: {
+                    enum: ['center', 'end', 'start'],
+                    type: 'string',
+                },
+                family: {
+                    type: 'string',
+                },
+                font: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignFontBinding',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                italic: {
+                    type: 'boolean',
+                },
+                letterSpacing: {
+                    type: 'number',
+                },
+                lineHeight: {
+                    type: 'number',
+                },
+                size: {
+                    type: 'number',
+                },
+                weight: {
+                    type: 'number',
+                },
+            },
+            type: 'object',
+        },
+        DesignTypographyLink: {
+            description:
+                'A text layer links to a typed typography token and may override individual properties.',
+            properties: {
+                overrides: {
+                    $ref: '#/definitions/DesignTypographyOverrides',
+                    description:
+                        'Local properties override their saved style while other fields remain linked.',
+                },
+                tokenId: {
+                    type: 'string',
+                },
+            },
+            required: ['tokenId'],
+            type: 'object',
+        },
+        DesignTypographyOperation: {
+            description:
+                'The native source remains authoritative while the website sends only changed font properties.',
+            properties: {
+                changes: {
+                    $ref: '#/definitions/DesignTypographyChanges',
+                },
+                id: {
+                    type: 'string',
+                },
+                op: {
+                    const: 'typography',
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+            },
+            required: ['changes', 'id', 'op', 'pageId'],
+            type: 'object',
+        },
+        DesignTypographyOverrides: {
+            description:
+                'Local properties override their saved style while other fields remain linked.',
+            properties: {
+                align: {
+                    enum: ['center', 'end', 'start'],
+                    type: 'string',
+                },
+                family: {
+                    type: 'string',
+                },
+                font: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignFontBinding',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                italic: {
+                    type: 'boolean',
+                },
+                letterSpacing: {
+                    type: 'number',
+                },
+                lineHeight: {
+                    type: 'number',
+                },
+                size: {
+                    type: 'number',
+                },
+                weight: {
+                    type: 'number',
+                },
+            },
+            type: 'object',
+        },
+        DesignTypographyStyleOperation: {
+            description:
+                'Link one text layer to a typed saved style, reset its overrides or detach at its current appearance.',
+            properties: {
+                id: {
+                    type: 'string',
+                },
+                op: {
+                    const: 'typography-style',
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+                tokenId: {
+                    type: ['null', 'string'],
+                },
+            },
+            required: ['id', 'op', 'pageId', 'tokenId'],
+            type: 'object',
+        },
+        DesignTypographyValues: {
+            description:
+                'A saved text style contains typography only; content and rich ranges remain on each layer.',
+            properties: {
+                align: {
+                    enum: ['center', 'end', 'start'],
+                    type: 'string',
+                },
+                family: {
+                    type: 'string',
+                },
+                font: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignFontBinding',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                italic: {
+                    type: 'boolean',
+                },
+                letterSpacing: {
+                    type: 'number',
+                },
+                lineHeight: {
+                    type: 'number',
+                },
+                size: {
+                    type: 'number',
+                },
+                weight: {
+                    type: 'number',
+                },
+            },
+            required: [
+                'align',
+                'family',
+                'font',
+                'italic',
+                'letterSpacing',
+                'lineHeight',
+                'size',
+                'weight',
+            ],
+            type: 'object',
         },
         DesignUndoMethod: {
             description: 'Conflict-safe undo RPC contract.',
@@ -8150,6 +9651,20 @@ export const schema: Schema = {
                 },
             },
             required: ['changes', 'id', 'op'],
+            type: 'object',
+        },
+        DesignVariantPropertyEdit: {
+            description:
+                'A null source adds a property; existing names can be retained, renamed or omitted.',
+            properties: {
+                from: {
+                    type: ['null', 'string'],
+                },
+                name: {
+                    type: 'string',
+                },
+            },
+            required: ['from', 'name'],
             type: 'object',
         },
         DesignVariantSet: {
@@ -9504,6 +11019,20 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'design.arrange': {
+                    description:
+                        'Workspace-native arrangement avoids uploading or hydrating selected layer bodies.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/DesignArrangeRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/DesignReceipt',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'design.asset.cancel': {
                     properties: {
                         params: {
@@ -9629,6 +11158,20 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'design.component': {
+                    description:
+                        "Native component commands keep source forests on the authenticated owner's workspace.",
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/DesignComponentRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/DesignReceipt',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'design.create': {
                     description: 'Create-document RPC contract.',
                     properties: {
@@ -9708,6 +11251,20 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'design.layout.preview': {
+                    description:
+                        'Read-only preview support is advertised independently for older workspaces.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/DesignLayoutPreviewRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/DesignLayoutPreviewResult',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'design.list': {
                     description: 'Owner-scoped library RPC contract.',
                     properties: {
@@ -9747,6 +11304,20 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'design.svg.import': {
+                    description:
+                        'Revision-checked SVG imports preserve editable native vectors and paints.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/DesignSvgImportRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/DesignReceipt',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'design.text.window': {
                     description:
                         'Independently advertised support allows clients to retain complete-body rendering on older workspaces.',
@@ -9756,6 +11327,19 @@ export const schema: Schema = {
                         },
                         result: {
                             $ref: '#/definitions/DesignTextWindowPage',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'design.transfer': {
+                    description: 'Cross-document reusable copying without source-body uploads.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/DesignTransferRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/DesignReceipt',
                         },
                     },
                     required: ['params', 'result'],
@@ -11430,61 +13014,6 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
-                'design.arrange': {
-                    description:
-                        'Workspace-native arrangement avoids uploading or hydrating selected layer bodies.',
-                    properties: {
-                        params: {
-                            $ref: '#/definitions/DesignArrangeRequest',
-                        },
-                        result: {
-                            $ref: '#/definitions/DesignReceipt',
-                        },
-                    },
-                    required: ['params', 'result'],
-                    type: 'object',
-                },
-                'design.layout.preview': {
-                    description:
-                        'Read-only preview support is advertised independently for older workspaces.',
-                    properties: {
-                        params: {
-                            $ref: '#/definitions/DesignLayoutPreviewRequest',
-                        },
-                        result: {
-                            $ref: '#/definitions/DesignLayoutPreviewResult',
-                        },
-                    },
-                    required: ['params', 'result'],
-                    type: 'object',
-                },
-                'design.transfer': {
-                    description: 'Cross-document reusable copying without source-body uploads.',
-                    properties: {
-                        params: {
-                            $ref: '#/definitions/DesignTransferRequest',
-                        },
-                        result: {
-                            $ref: '#/definitions/DesignReceipt',
-                        },
-                    },
-                    required: ['params', 'result'],
-                    type: 'object',
-                },
-                'design.svg.import': {
-                    description:
-                        'Revision-checked SVG imports preserve editable native vectors and paints.',
-                    properties: {
-                        params: {
-                            $ref: '#/definitions/DesignSvgImportRequest',
-                        },
-                        result: {
-                            $ref: '#/definitions/DesignReceipt',
-                        },
-                    },
-                    required: ['params', 'result'],
-                    type: 'object',
-                },
             },
             required: [
                 'accounts.create',
@@ -11518,6 +13047,7 @@ export const schema: Schema = {
                 'data.upload.chunk',
                 'data.upload.finish',
                 'data.upload.start',
+                'design.arrange',
                 'design.asset.cancel',
                 'design.asset.chunk',
                 'design.asset.finish',
@@ -11528,16 +13058,20 @@ export const schema: Schema = {
                 'design.canvas',
                 'design.canvas.metrics',
                 'design.changes',
+                'design.component',
                 'design.create',
                 'design.delete',
                 'design.events',
                 'design.font.list',
                 'design.font.read',
                 'design.layout',
+                'design.layout.preview',
                 'design.list',
                 'design.read',
                 'design.save',
+                'design.svg.import',
                 'design.text.window',
+                'design.transfer',
                 'design.undo',
                 'design.view',
                 'devices.approve',
@@ -11669,10 +13203,6 @@ export const schema: Schema = {
                 'workspaces.describe',
                 'workspaces.destroy',
                 'workspaces.list',
-                'design.arrange',
-                'design.layout.preview',
-                'design.transfer',
-                'design.svg.import',
             ],
             type: 'object',
         },
@@ -22467,1155 +23997,6 @@ export const schema: Schema = {
                 },
             },
             required: ['bytes', 'files', 'reconciledAt'],
-            type: 'object',
-        },
-        DesignScaleOperation: {
-            description:
-                'Uniform artwork scaling preserves text and effect metrics, unlike resizing a container.',
-            properties: {
-                factor: {
-                    type: 'number',
-                },
-                op: {
-                    const: 'scale',
-                    type: 'string',
-                },
-                pageId: {
-                    type: 'string',
-                },
-                pivotX: {
-                    type: 'number',
-                },
-                pivotY: {
-                    type: 'number',
-                },
-                selection: {
-                    items: {
-                        type: 'string',
-                    },
-                    type: 'array',
-                },
-            },
-            required: ['factor', 'op', 'pageId', 'selection'],
-            type: 'object',
-        },
-        DesignGuideValue: {
-            description: 'A guide edit carries only its axis and world position.',
-            properties: {
-                axis: {
-                    $ref: '#/definitions/DesignRulerAxis',
-                },
-                position: {
-                    type: 'number',
-                },
-            },
-            required: ['axis', 'position'],
-            type: 'object',
-        },
-        DesignRulerGuide: {
-            description:
-                "Stable guide identity allows independent edits without replacing other agents' guides.",
-            properties: {
-                axis: {
-                    $ref: '#/definitions/DesignRulerAxis',
-                },
-                id: {
-                    type: 'string',
-                },
-                position: {
-                    type: 'number',
-                },
-            },
-            required: ['axis', 'id', 'position'],
-            type: 'object',
-        },
-        DesignGuideOperation: {
-            description: 'Sets one page guide by identity, or removes it with value:null.',
-            properties: {
-                id: {
-                    type: 'string',
-                },
-                op: {
-                    const: 'guide',
-                    type: 'string',
-                },
-                pageId: {
-                    type: 'string',
-                },
-                value: {
-                    anyOf: [
-                        {
-                            $ref: '#/definitions/DesignGuideValue',
-                        },
-                        {
-                            type: 'null',
-                        },
-                    ],
-                },
-            },
-            required: ['id', 'op', 'pageId', 'value'],
-            type: 'object',
-        },
-        DesignRulerAxis: {
-            description:
-                'A saved ruler line uses a page-world coordinate on one canvas axis.\nAxis names are shared by native tooling, codecs and the canvas.',
-            enum: ['x', 'y'],
-            type: 'string',
-        },
-        DesignFrameGrid: {
-            description:
-                'One editable overlay has a stable identity and complete canonical settings.',
-            properties: {
-                color: {
-                    type: 'string',
-                },
-                count: {
-                    type: 'number',
-                },
-                distribution: {
-                    $ref: '#/definitions/DesignFrameGridDistribution',
-                },
-                gutter: {
-                    type: 'number',
-                },
-                id: {
-                    type: 'string',
-                },
-                kind: {
-                    $ref: '#/definitions/DesignFrameGridKind',
-                },
-                margin: {
-                    type: 'number',
-                },
-                offset: {
-                    type: 'number',
-                },
-                size: {
-                    type: 'number',
-                },
-                visible: {
-                    type: 'boolean',
-                },
-            },
-            required: [
-                'color',
-                'count',
-                'distribution',
-                'gutter',
-                'id',
-                'kind',
-                'margin',
-                'offset',
-                'size',
-                'visible',
-            ],
-            type: 'object',
-        },
-        DesignFrameGridKind: {
-            description:
-                "Saved construction overlays stay separate from automatic child placement.\nGrid orientation for a frame's construction overlay.",
-            enum: ['columns', 'rows', 'square'],
-            type: 'string',
-        },
-        DesignFrameGridDistribution: {
-            description:
-                "Stretch divides available space; fixed tracks retain their authored size.\nTrack distribution within the frame's margins.",
-            enum: ['center', 'end', 'start', 'stretch'],
-            type: 'string',
-        },
-        DesignArrangeMethod: {
-            description:
-                'Workspace-native arrangement avoids uploading or hydrating selected layer bodies.',
-            properties: {
-                params: {
-                    $ref: '#/definitions/DesignArrangeRequest',
-                },
-                result: {
-                    $ref: '#/definitions/DesignReceipt',
-                },
-            },
-            required: ['params', 'result'],
-            type: 'object',
-        },
-        DesignArrangeRequest: {
-            description:
-                'Agents use the normal command identity and revision guard for generated selection edits.',
-            properties: {
-                action: {
-                    $ref: '#/definitions/DesignSelectionAction',
-                },
-                commandId: {
-                    type: 'string',
-                },
-                expectedRevision: {
-                    type: 'string',
-                },
-                id: {
-                    type: 'string',
-                },
-                pageId: {
-                    type: 'string',
-                },
-                selection: {
-                    items: {
-                        type: 'string',
-                    },
-                    type: 'array',
-                },
-            },
-            required: ['action', 'commandId', 'expectedRevision', 'id', 'pageId', 'selection'],
-            type: 'object',
-        },
-        DesignSelectionAction: {
-            description:
-                "Selection commands share one implementation between agent tools and browser editors.\nA command's stable action identity.",
-            enum: [
-                'auto-layout',
-                'back',
-                'bottom',
-                'center',
-                'distribute-horizontal',
-                'distribute-vertical',
-                'duplicate',
-                'exclude',
-                'flatten',
-                'front',
-                'group',
-                'intersect',
-                'left',
-                'mask',
-                'middle',
-                'release-mask',
-                'right',
-                'subtract',
-                'top',
-                'ungroup',
-                'union',
-            ],
-            type: 'string',
-        },
-        DesignLayoutOperation: {
-            description:
-                'Native layout geometry is resolved against owner-scoped source records, never browser body placeholders.',
-            properties: {
-                changes: {
-                    $ref: '#/definitions/DesignLayoutChanges',
-                },
-                id: {
-                    type: 'string',
-                },
-                op: {
-                    const: 'layout',
-                    type: 'string',
-                },
-                pageId: {
-                    type: 'string',
-                },
-            },
-            required: ['changes', 'id', 'op', 'pageId'],
-            type: 'object',
-        },
-        DesignLayoutChanges: {
-            description: 'A compact native layout edit changes only supplied fields.',
-            properties: {
-                align: {
-                    description: 'Alignment within the available layout space.\nAlignment choice.',
-                    enum: ['between', 'center', 'end', 'start', 'stretch'],
-                    type: 'string',
-                },
-                clip: {
-                    type: 'boolean',
-                },
-                columns: {
-                    type: 'number',
-                },
-                flow: {
-                    description:
-                        'Free positioning and responsive container layouts.\nLayout direction.',
-                    enum: ['absolute', 'column', 'grid', 'row'],
-                    type: 'string',
-                },
-                gap: {
-                    type: 'number',
-                },
-                justify: {
-                    description: 'Alignment within the available layout space.\nAlignment choice.',
-                    enum: ['between', 'center', 'end', 'start', 'stretch'],
-                    type: 'string',
-                },
-                padding: {
-                    $ref: '#/definitions/DesignPaddingChanges',
-                    description: 'Optional edge changes preserve the other saved padding values.',
-                },
-                rowGap: {
-                    type: 'number',
-                },
-                wrap: {
-                    type: 'boolean',
-                },
-            },
-            type: 'object',
-        },
-        DesignPaddingChanges: {
-            description: 'Optional edge changes preserve the other saved padding values.',
-            properties: {
-                bottom: {
-                    type: 'number',
-                },
-                left: {
-                    type: 'number',
-                },
-                right: {
-                    type: 'number',
-                },
-                top: {
-                    type: 'number',
-                },
-            },
-            type: 'object',
-        },
-        DesignLayoutPreviewCanvasRequest: {
-            description: 'Canvas records never ask for explicit source-body hydration.',
-            properties: {
-                action: {
-                    const: 'canvas',
-                    type: 'string',
-                },
-                key: {
-                    type: ['null', 'string'],
-                },
-                operation: {
-                    $ref: '#/definitions/DesignLayoutOperation',
-                },
-                params: {
-                    $ref: '#/definitions/DesignViewRequest',
-                },
-            },
-            required: ['action', 'key', 'operation', 'params'],
-            type: 'object',
-        },
-        DesignLayoutPreviewCanvasResult: {
-            description: 'Paged, body-free draft records carry their checked projection identity.',
-            properties: {
-                action: {
-                    const: 'canvas',
-                    type: 'string',
-                },
-                key: {
-                    type: 'string',
-                },
-                page: {
-                    $ref: '#/definitions/DesignCanvasPage',
-                },
-            },
-            required: ['action', 'key', 'page'],
-            type: 'object',
-        },
-        DesignLayoutPreviewMethod: {
-            description:
-                'Read-only preview support is advertised independently for older workspaces.',
-            properties: {
-                params: {
-                    $ref: '#/definitions/DesignLayoutPreviewRequest',
-                },
-                result: {
-                    $ref: '#/definitions/DesignLayoutPreviewResult',
-                },
-            },
-            required: ['params', 'result'],
-            type: 'object',
-        },
-        DesignLayoutPreviewMetricsRequest: {
-            description:
-                'Width-specific native metrics are paged independently of the source text.',
-            properties: {
-                action: {
-                    const: 'metrics',
-                    type: 'string',
-                },
-                key: {
-                    type: ['null', 'string'],
-                },
-                operation: {
-                    $ref: '#/definitions/DesignLayoutOperation',
-                },
-                params: {
-                    $ref: '#/definitions/DesignCanvasMetricsRequest',
-                },
-            },
-            required: ['action', 'key', 'operation', 'params'],
-            type: 'object',
-        },
-        DesignLayoutPreviewMetricsResult: {
-            description: "Native wrapping remains exact at the preview's requested width.",
-            properties: {
-                action: {
-                    const: 'metrics',
-                    type: 'string',
-                },
-                key: {
-                    type: 'string',
-                },
-                page: {
-                    $ref: '#/definitions/DesignCanvasMetricsPage',
-                },
-            },
-            required: ['action', 'key', 'page'],
-            type: 'object',
-        },
-        DesignLayoutPreviewRequest: {
-            anyOf: [
-                {
-                    $ref: '#/definitions/DesignLayoutPreviewCanvasRequest',
-                },
-                {
-                    $ref: '#/definitions/DesignLayoutPreviewMetricsRequest',
-                },
-                {
-                    $ref: '#/definitions/DesignLayoutPreviewTextRequest',
-                },
-            ],
-            description: 'A preview cannot contain arbitrary scene replacement operations.',
-        },
-        DesignLayoutPreviewResult: {
-            anyOf: [
-                {
-                    $ref: '#/definitions/DesignLayoutPreviewCanvasResult',
-                },
-                {
-                    $ref: '#/definitions/DesignLayoutPreviewMetricsResult',
-                },
-                {
-                    $ref: '#/definitions/DesignLayoutPreviewTextResult',
-                },
-            ],
-            description:
-                'The caller verifies the action and projection key before consuming a reply.',
-        },
-        DesignLayoutPreviewTextRequest: {
-            description:
-                'Only the visible glyph rectangle is transferred for the projected paragraph.',
-            properties: {
-                action: {
-                    const: 'text',
-                    type: 'string',
-                },
-                key: {
-                    type: ['null', 'string'],
-                },
-                operation: {
-                    $ref: '#/definitions/DesignLayoutOperation',
-                },
-                params: {
-                    $ref: '#/definitions/DesignTextWindowRequest',
-                },
-            },
-            required: ['action', 'key', 'operation', 'params'],
-            type: 'object',
-        },
-        DesignLayoutPreviewTextResult: {
-            description:
-                'Draft glyph IDs and positions refer to the same public or admitted private fonts as the saved canvas.',
-            properties: {
-                action: {
-                    const: 'text',
-                    type: 'string',
-                },
-                key: {
-                    type: 'string',
-                },
-                page: {
-                    $ref: '#/definitions/DesignTextWindowPage',
-                },
-            },
-            required: ['action', 'key', 'page'],
-            type: 'object',
-        },
-        DesignSizingChanges: {
-            description: 'Native sizing changes preserve every omitted saved placement field.',
-            properties: {
-                columnSpan: {
-                    type: 'number',
-                },
-                height: {
-                    description: 'Sizing relative to the parent and content.\nSizing choice.',
-                    enum: ['fill', 'fixed', 'hug'],
-                    type: 'string',
-                },
-                maxHeight: {
-                    type: 'number',
-                },
-                maxWidth: {
-                    type: 'number',
-                },
-                minHeight: {
-                    type: 'number',
-                },
-                minWidth: {
-                    type: 'number',
-                },
-                rowSpan: {
-                    type: 'number',
-                },
-                width: {
-                    description: 'Sizing relative to the parent and content.\nSizing choice.',
-                    enum: ['fill', 'fixed', 'hug'],
-                    type: 'string',
-                },
-            },
-            type: 'object',
-        },
-        DesignSizingOperation: {
-            description:
-                'Limits and sizing modes resolve against complete native sources without transferring their bodies.',
-            properties: {
-                changes: {
-                    $ref: '#/definitions/DesignSizingChanges',
-                },
-                id: {
-                    type: 'string',
-                },
-                op: {
-                    const: 'sizing',
-                    type: 'string',
-                },
-                pageId: {
-                    type: 'string',
-                },
-            },
-            required: ['changes', 'id', 'op', 'pageId'],
-            type: 'object',
-        },
-        DesignTypographyChanges: {
-            description:
-                'Base typography changes preserve the source content and every authored rich-text range.',
-            properties: {
-                align: {
-                    enum: ['center', 'end', 'start'],
-                    type: 'string',
-                },
-                family: {
-                    type: 'string',
-                },
-                font: {
-                    anyOf: [
-                        {
-                            $ref: '#/definitions/DesignFontBinding',
-                        },
-                        {
-                            type: 'null',
-                        },
-                    ],
-                },
-                italic: {
-                    type: 'boolean',
-                },
-                letterSpacing: {
-                    type: 'number',
-                },
-                lineHeight: {
-                    type: 'number',
-                },
-                size: {
-                    type: 'number',
-                },
-                weight: {
-                    type: 'number',
-                },
-            },
-            type: 'object',
-        },
-        DesignTypographyOperation: {
-            description:
-                'The native source remains authoritative while the website sends only changed font properties.',
-            properties: {
-                changes: {
-                    $ref: '#/definitions/DesignTypographyChanges',
-                },
-                id: {
-                    type: 'string',
-                },
-                op: {
-                    const: 'typography',
-                    type: 'string',
-                },
-                pageId: {
-                    type: 'string',
-                },
-            },
-            required: ['changes', 'id', 'op', 'pageId'],
-            type: 'object',
-        },
-        DesignTextStyleChanges: {
-            description:
-                'Partial styles for a nonempty UTF-16 range; omitted properties retain their per-range values.',
-            properties: {
-                color: {
-                    type: 'string',
-                },
-                family: {
-                    type: 'string',
-                },
-                font: {
-                    anyOf: [
-                        {
-                            $ref: '#/definitions/DesignFontBinding',
-                        },
-                        {
-                            type: 'null',
-                        },
-                    ],
-                },
-                italic: {
-                    type: 'boolean',
-                },
-                size: {
-                    type: 'number',
-                },
-                underline: {
-                    type: 'boolean',
-                },
-                weight: {
-                    type: 'number',
-                },
-            },
-            type: 'object',
-        },
-        DesignTextStyleOperation: {
-            description:
-                'Rich formatting never replaces the source body or styles outside the selected range.',
-            properties: {
-                changes: {
-                    $ref: '#/definitions/DesignTextStyleChanges',
-                },
-                end: {
-                    type: 'number',
-                },
-                id: {
-                    type: 'string',
-                },
-                op: {
-                    const: 'text-style',
-                    type: 'string',
-                },
-                pageId: {
-                    type: 'string',
-                },
-                start: {
-                    type: 'number',
-                },
-            },
-            required: ['changes', 'end', 'id', 'op', 'pageId', 'start'],
-            type: 'object',
-        },
-        DesignTransferMethod: {
-            description: 'Cross-document reusable copying without source-body uploads.',
-            properties: {
-                params: {
-                    $ref: '#/definitions/DesignTransferRequest',
-                },
-                result: {
-                    $ref: '#/definitions/DesignReceipt',
-                },
-            },
-            required: ['params', 'result'],
-            type: 'object',
-        },
-        DesignTransferRequest: {
-            description:
-                'Cross-document copies carry references only; source layers stay inside the authenticated workspace.',
-            properties: {
-                commandId: {
-                    type: 'string',
-                },
-                expectedRevision: {
-                    type: 'string',
-                },
-                id: {
-                    type: 'string',
-                },
-                pageId: {
-                    type: 'string',
-                },
-                parentId: {
-                    type: ['null', 'string'],
-                },
-                selection: {
-                    items: {
-                        type: 'string',
-                    },
-                    type: 'array',
-                },
-                sourceId: {
-                    type: 'string',
-                },
-                sourcePageId: {
-                    type: 'string',
-                },
-                sourceRevision: {
-                    type: 'string',
-                },
-                x: {
-                    type: 'number',
-                },
-                y: {
-                    type: 'number',
-                },
-            },
-            required: [
-                'commandId',
-                'expectedRevision',
-                'id',
-                'pageId',
-                'parentId',
-                'selection',
-                'sourceId',
-                'sourcePageId',
-                'sourceRevision',
-                'x',
-                'y',
-            ],
-            type: 'object',
-        },
-        DesignTokenChanges: {
-            description: 'Omitted token properties keep their saved values.',
-            properties: {
-                category: {
-                    description: 'Token families.\nToken family.',
-                    enum: ['color', 'spacing', 'typography'],
-                    type: 'string',
-                },
-                name: {
-                    type: 'string',
-                },
-                value: {
-                    type: 'string',
-                },
-                typography: {
-                    anyOf: [
-                        {
-                            $ref: '#/definitions/DesignTypographyOverrides',
-                        },
-                        {
-                            type: 'null',
-                        },
-                    ],
-                },
-            },
-            type: 'object',
-        },
-        DesignTokenOperation: {
-            description:
-                'Create or edit one token; null detaches its paints and deletes it without changing their appearance.',
-            properties: {
-                changes: {
-                    anyOf: [
-                        {
-                            $ref: '#/definitions/DesignTokenChanges',
-                        },
-                        {
-                            type: 'null',
-                        },
-                    ],
-                },
-                id: {
-                    type: 'string',
-                },
-                op: {
-                    const: 'token',
-                    type: 'string',
-                },
-            },
-            required: ['changes', 'id', 'op'],
-            type: 'object',
-        },
-        DesignPaintColorChanges: {
-            description:
-                'Omitted color properties retain the original paint; tokenId:null alone preserves its resolved color.',
-            properties: {
-                color: {
-                    type: 'string',
-                },
-                opacity: {
-                    type: 'number',
-                },
-                tokenId: {
-                    type: ['null', 'string'],
-                },
-            },
-            type: 'object',
-        },
-        DesignPaintColorTarget: {
-            description:
-                'Existing fill and stroke colors share one compact native edit.\nPaint location.',
-            enum: ['fill', 'stroke'],
-            type: 'string',
-        },
-        DesignPaintColorOperation: {
-            description:
-                'Fill index zero may create a first paint; stroke edits require an existing stroke and index zero.',
-            properties: {
-                changes: {
-                    $ref: '#/definitions/DesignPaintColorChanges',
-                },
-                id: {
-                    type: 'string',
-                },
-                index: {
-                    type: 'number',
-                },
-                op: {
-                    const: 'paint-color',
-                    type: 'string',
-                },
-                pageId: {
-                    type: 'string',
-                },
-                target: {
-                    $ref: '#/definitions/DesignPaintColorTarget',
-                },
-            },
-            required: ['changes', 'id', 'index', 'op', 'pageId', 'target'],
-            type: 'object',
-        },
-        DesignTypographyStyleOperation: {
-            description:
-                'Link one text layer to a typed saved style, reset its overrides or detach at its current appearance.',
-            properties: {
-                id: {
-                    type: 'string',
-                },
-                op: {
-                    const: 'typography-style',
-                    type: 'string',
-                },
-                pageId: {
-                    type: 'string',
-                },
-                tokenId: {
-                    type: ['null', 'string'],
-                },
-            },
-            required: ['id', 'op', 'pageId', 'tokenId'],
-            type: 'object',
-        },
-        DesignTypographyOverrides: {
-            description:
-                'Local properties override their saved style while other fields remain linked.',
-            properties: {
-                align: {
-                    enum: ['center', 'end', 'start'],
-                    type: 'string',
-                },
-                family: {
-                    type: 'string',
-                },
-                font: {
-                    anyOf: [
-                        {
-                            $ref: '#/definitions/DesignFontBinding',
-                        },
-                        {
-                            type: 'null',
-                        },
-                    ],
-                },
-                italic: {
-                    type: 'boolean',
-                },
-                letterSpacing: {
-                    type: 'number',
-                },
-                lineHeight: {
-                    type: 'number',
-                },
-                size: {
-                    type: 'number',
-                },
-                weight: {
-                    type: 'number',
-                },
-            },
-            type: 'object',
-        },
-        DesignTypographyValues: {
-            description:
-                'A saved text style contains typography only; content and rich ranges remain on each layer.',
-            properties: {
-                align: {
-                    enum: ['center', 'end', 'start'],
-                    type: 'string',
-                },
-                family: {
-                    type: 'string',
-                },
-                font: {
-                    anyOf: [
-                        {
-                            $ref: '#/definitions/DesignFontBinding',
-                        },
-                        {
-                            type: 'null',
-                        },
-                    ],
-                },
-                italic: {
-                    type: 'boolean',
-                },
-                letterSpacing: {
-                    type: 'number',
-                },
-                lineHeight: {
-                    type: 'number',
-                },
-                size: {
-                    type: 'number',
-                },
-                weight: {
-                    type: 'number',
-                },
-            },
-            required: [
-                'align',
-                'family',
-                'font',
-                'italic',
-                'letterSpacing',
-                'lineHeight',
-                'size',
-                'weight',
-            ],
-            type: 'object',
-        },
-        DesignTypographyLink: {
-            description:
-                'A text layer links to a typed typography token and may override individual properties.',
-            properties: {
-                overrides: {
-                    $ref: '#/definitions/DesignTypographyOverrides',
-                    description:
-                        'Local properties override their saved style while other fields remain linked.',
-                },
-                tokenId: {
-                    type: 'string',
-                },
-            },
-            required: ['tokenId'],
-            type: 'object',
-        },
-        DesignGradientTransform: {
-            description:
-                'Top-left-origin normalized points define a linear segment or a radial center and two radius axes.',
-            properties: {
-                axisX: {
-                    type: 'number',
-                },
-                axisY: {
-                    type: 'number',
-                },
-                endX: {
-                    type: 'number',
-                },
-                endY: {
-                    type: 'number',
-                },
-                startX: {
-                    type: 'number',
-                },
-                startY: {
-                    type: 'number',
-                },
-            },
-            required: ['axisX', 'axisY', 'endX', 'endY', 'startX', 'startY'],
-            type: 'object',
-        },
-        DesignGradientTransformChanges: {
-            description:
-                'Each coordinate may change independently without retransmitting other gradient or layer fields.',
-            properties: {
-                axisX: {
-                    type: 'number',
-                },
-                axisY: {
-                    type: 'number',
-                },
-                endX: {
-                    type: 'number',
-                },
-                endY: {
-                    type: 'number',
-                },
-                startX: {
-                    type: 'number',
-                },
-                startY: {
-                    type: 'number',
-                },
-            },
-            type: 'object',
-        },
-        DesignPaintGradientChanges: {
-            description:
-                'Geometry and stops are independent of source bodies and the rest of the paint stack.',
-            properties: {
-                angle: {
-                    type: 'number',
-                },
-                gradient: {
-                    anyOf: [
-                        {
-                            $ref: '#/definitions/DesignGradientTransformChanges',
-                        },
-                        {
-                            type: 'null',
-                        },
-                    ],
-                },
-                kind: {
-                    enum: ['linear', 'radial'],
-                    type: 'string',
-                },
-                stops: {
-                    items: {
-                        $ref: '#/definitions/DesignGradientStop',
-                    },
-                    type: 'array',
-                },
-            },
-            type: 'object',
-        },
-        DesignPaintGradientOperation: {
-            description: 'Page-scoped native editing of one fill or stroke gradient.',
-            properties: {
-                changes: {
-                    $ref: '#/definitions/DesignPaintGradientChanges',
-                },
-                id: {
-                    type: 'string',
-                },
-                index: {
-                    type: 'number',
-                },
-                op: {
-                    const: 'paint-gradient',
-                    type: 'string',
-                },
-                pageId: {
-                    type: 'string',
-                },
-                target: {
-                    $ref: '#/definitions/DesignPaintColorTarget',
-                },
-            },
-            required: ['changes', 'id', 'index', 'op', 'pageId', 'target'],
-            type: 'object',
-        },
-        DesignStrokeChanges: {
-            description:
-                'Omitted border properties retain their current values, including the paint.',
-            properties: {
-                cap: {
-                    description:
-                        'Endpoint shapes match the centered SVG stroke model.\nSupported endpoint shape.',
-                    enum: ['butt', 'round', 'square'],
-                    type: 'string',
-                },
-                dash: {
-                    items: {
-                        type: 'number',
-                    },
-                    type: 'array',
-                },
-                join: {
-                    description:
-                        'Corners may retain a round sector, bevel or bounded miter.\nSupported corner shape.',
-                    enum: ['bevel', 'miter', 'round'],
-                    type: 'string',
-                },
-                miterLimit: {
-                    type: 'number',
-                },
-                width: {
-                    type: 'number',
-                },
-            },
-            type: 'object',
-        },
-        DesignStrokeOperation: {
-            description:
-                "Null removes a border; nonempty changes create or edit one authored layer's border.",
-            properties: {
-                changes: {
-                    anyOf: [
-                        {
-                            $ref: '#/definitions/DesignStrokeChanges',
-                        },
-                        {
-                            type: 'null',
-                        },
-                    ],
-                },
-                id: {
-                    type: 'string',
-                },
-                op: {
-                    const: 'stroke',
-                    type: 'string',
-                },
-                pageId: {
-                    type: 'string',
-                },
-            },
-            required: ['changes', 'id', 'op', 'pageId'],
-            type: 'object',
-        },
-        DesignSvgImportRequest: {
-            description:
-                'Native SVG import creates one editable artboard without sending existing document bodies.',
-            properties: {
-                commandId: {
-                    type: 'string',
-                },
-                expectedRevision: {
-                    type: 'string',
-                },
-                id: {
-                    type: 'string',
-                },
-                index: {
-                    type: ['null', 'number'],
-                },
-                name: {
-                    type: 'string',
-                },
-                pageId: {
-                    type: 'string',
-                },
-                parentId: {
-                    type: ['null', 'string'],
-                },
-                source: {
-                    type: 'string',
-                },
-                x: {
-                    type: 'number',
-                },
-                y: {
-                    type: 'number',
-                },
-            },
-            required: [
-                'commandId',
-                'expectedRevision',
-                'id',
-                'index',
-                'name',
-                'pageId',
-                'parentId',
-                'source',
-                'x',
-                'y',
-            ],
             type: 'object',
         },
     },

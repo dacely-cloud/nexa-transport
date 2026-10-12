@@ -1,4 +1,6 @@
+import type { DesignSvgImportRequest } from './DesignSvgImportTypes.js';
 import type { DesignArrangeRequest } from './DesignSelectionTypes.js';
+import type { DesignComponentRequest } from './DesignComponentTypes.js';
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -68,5 +70,23 @@ export interface DesignDeleteMethod {
 /** Workspace-native arrangement avoids uploading or hydrating selected layer bodies. */
 export interface DesignArrangeMethod {
     readonly params: DesignArrangeRequest;
+    readonly result: DesignReceipt;
+}
+
+/** Native component commands keep source forests on the authenticated owner's workspace. */
+export interface DesignComponentMethod {
+    readonly params: DesignComponentRequest;
+    readonly result: DesignReceipt;
+}
+
+/** Cross-document reusable copying without source-body uploads. */
+export interface DesignTransferMethod {
+    readonly params: import('./DesignTransferTypes.js').DesignTransferRequest;
+    readonly result: DesignReceipt;
+}
+
+/** Revision-checked SVG imports preserve editable native vectors and paints. */
+export interface DesignSvgImportMethod {
+    readonly params: DesignSvgImportRequest;
     readonly result: DesignReceipt;
 }

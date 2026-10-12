@@ -11,7 +11,35 @@ import { methodValidators } from '../src/protocol/MethodValidators.js';
 import { Method } from '../src/protocol/Protocol.js';
 import { DesignScene } from '../src/design/DesignScene.js';
 import { DesignKind, type DesignDocument, type DesignNode } from '../src/design/DesignTypes.js';
+import type { DesignComponentRequest } from '../src/design/DesignComponentTypes.js';
 import type { DesignSelectionPlan } from '../src/design/DesignSelectionTypes.js';
+
+it('component RPC accepts centered placement and rejects malformed commands at the transport boundary', (): void => {
+    const request: DesignComponentRequest = {
+        id: 'layout',
+        expectedRevision: '12',
+        commandId: 'place',
+        pageId: 'page-1',
+        command: { action: 'place', componentId: 'button', x: 400, y: 300, center: true },
+    };
+    expect(methodValidators[Method.DesignComponent].params(request)).toBe(true);
+    expect((): DesignComponentRequest =>
+        DesignComponents.request({ ...request, owner: 'other' }),
+    ).toThrow('Unexpected');
+    expect(
+        methodValidators[Method.DesignComponent].params({
+            ...request,
+            command: { ...request.command, center: 'true' },
+        }),
+    ).toBe(false);
+    expect(
+        methodValidators[Method.DesignComponent].params({
+            ...request,
+            command: { action: 'made-up' },
+        }),
+    ).toBe(false);
+    expect(DesignComponents.command(request.command)).toEqual(request.command);
+});
 
 it('component planning and expansion remain identical to the native model', async (): Promise<void> => {
     for (const name of [
