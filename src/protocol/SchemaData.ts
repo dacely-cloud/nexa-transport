@@ -6607,6 +6607,13 @@ export const schema: Schema = {
                 layout: {
                     $ref: '#/definitions/DesignLayout',
                 },
+                layoutGrids: {
+                    description: 'Optional saved frame overlays are omitted from artwork exports.',
+                    items: {
+                        $ref: '#/definitions/DesignFrameGrid',
+                    },
+                    type: 'array',
+                },
                 locked: {
                     type: 'boolean',
                 },
@@ -6767,6 +6774,21 @@ export const schema: Schema = {
                     $ref: '#/definitions/DesignLayout',
                     description:
                         'Container layout, including wrapping, grid tracks and content alignment.',
+                },
+                layoutGrids: {
+                    anyOf: [
+                        {
+                            items: {
+                                $ref: '#/definitions/DesignFrameGrid',
+                            },
+                            type: 'array',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                    description:
+                        'Null removes construction overlays while preserving authored artwork.',
                 },
                 locked: {
                     type: 'boolean',
@@ -22202,6 +22224,67 @@ export const schema: Schema = {
             description:
                 'A saved ruler line uses a page-world coordinate on one canvas axis.\nAxis names are shared by native tooling, codecs and the canvas.',
             enum: ['x', 'y'],
+            type: 'string',
+        },
+        DesignFrameGrid: {
+            description:
+                'One editable overlay has a stable identity and complete canonical settings.',
+            properties: {
+                color: {
+                    type: 'string',
+                },
+                count: {
+                    type: 'number',
+                },
+                distribution: {
+                    $ref: '#/definitions/DesignFrameGridDistribution',
+                },
+                gutter: {
+                    type: 'number',
+                },
+                id: {
+                    type: 'string',
+                },
+                kind: {
+                    $ref: '#/definitions/DesignFrameGridKind',
+                },
+                margin: {
+                    type: 'number',
+                },
+                offset: {
+                    type: 'number',
+                },
+                size: {
+                    type: 'number',
+                },
+                visible: {
+                    type: 'boolean',
+                },
+            },
+            required: [
+                'color',
+                'count',
+                'distribution',
+                'gutter',
+                'id',
+                'kind',
+                'margin',
+                'offset',
+                'size',
+                'visible',
+            ],
+            type: 'object',
+        },
+        DesignFrameGridKind: {
+            description:
+                "Saved construction overlays stay separate from automatic child placement.\nGrid orientation for a frame's construction overlay.",
+            enum: ['columns', 'rows', 'square'],
+            type: 'string',
+        },
+        DesignFrameGridDistribution: {
+            description:
+                "Stretch divides available space; fixed tracks retain their authored size.\nTrack distribution within the frame's margins.",
+            enum: ['center', 'end', 'start', 'stretch'],
             type: 'string',
         },
     },
