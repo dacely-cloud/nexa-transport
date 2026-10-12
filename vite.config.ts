@@ -34,6 +34,8 @@ const config: UserConfig = {
                 'design-selection': 'src/design/DesignSelection.ts',
                 'design-flow-ordering': 'src/design/DesignFlowOrdering.ts',
                 'design-selection-types': 'src/design/DesignSelectionTypes.ts',
+                'design-gradient-geometry': 'src/design/DesignGradientGeometry.ts',
+                'design-paint-gradient': 'src/design/DesignPaintGradientEdits.ts',
                 'design-types': 'src/design/DesignTypes.ts',
                 'design-defaults': 'src/design/DesignDefaults.ts',
                 'design-codec': 'src/design/DesignCodec.ts',

@@ -587,6 +587,17 @@
         "./design-typography-styles": {
             "types": "./dist/design/DesignTypographyStyleCodec.d.ts",
             "import": "./dist/design-typography-styles.js"
+        },
+        "./design-gradient-types": {
+            "types": "./dist/design/DesignGradientTypes.d.ts"
+        },
+        "./design-gradient-geometry": {
+            "types": "./dist/design/DesignGradientGeometry.d.ts",
+            "import": "./dist/design-gradient-geometry.js"
+        },
+        "./design-paint-gradient": {
+            "types": "./dist/design/DesignPaintGradientEdits.d.ts",
+            "import": "./dist/design-paint-gradient.js"
         }
     },
     "scripts": {

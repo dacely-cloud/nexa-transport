@@ -6971,6 +6971,9 @@ export const schema: Schema = {
                 {
                     $ref: '#/definitions/DesignTypographyStyleOperation',
                 },
+                {
+                    $ref: '#/definitions/DesignPaintGradientOperation',
+                },
             ],
             description: 'A transaction can contain different operation types.',
         },
@@ -7110,6 +7113,18 @@ export const schema: Schema = {
                 },
                 tokenId: {
                     type: ['null', 'string'],
+                },
+                gradient: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignGradientTransform',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                    description:
+                        'Null or omission retains the original angle-based linear or centered radial geometry.',
                 },
             },
             required: ['angle', 'assetId', 'color', 'kind', 'opacity', 'stops', 'tokenId'],
@@ -23155,6 +23170,113 @@ export const schema: Schema = {
                 },
             },
             required: ['tokenId'],
+            type: 'object',
+        },
+        DesignGradientTransform: {
+            description:
+                'Top-left-origin normalized points define a linear segment or a radial center and two radius axes.',
+            properties: {
+                axisX: {
+                    type: 'number',
+                },
+                axisY: {
+                    type: 'number',
+                },
+                endX: {
+                    type: 'number',
+                },
+                endY: {
+                    type: 'number',
+                },
+                startX: {
+                    type: 'number',
+                },
+                startY: {
+                    type: 'number',
+                },
+            },
+            required: ['axisX', 'axisY', 'endX', 'endY', 'startX', 'startY'],
+            type: 'object',
+        },
+        DesignGradientTransformChanges: {
+            description:
+                'Each coordinate may change independently without retransmitting other gradient or layer fields.',
+            properties: {
+                axisX: {
+                    type: 'number',
+                },
+                axisY: {
+                    type: 'number',
+                },
+                endX: {
+                    type: 'number',
+                },
+                endY: {
+                    type: 'number',
+                },
+                startX: {
+                    type: 'number',
+                },
+                startY: {
+                    type: 'number',
+                },
+            },
+            type: 'object',
+        },
+        DesignPaintGradientChanges: {
+            description:
+                'Geometry and stops are independent of source bodies and the rest of the paint stack.',
+            properties: {
+                angle: {
+                    type: 'number',
+                },
+                gradient: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignGradientTransformChanges',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                kind: {
+                    enum: ['linear', 'radial'],
+                    type: 'string',
+                },
+                stops: {
+                    items: {
+                        $ref: '#/definitions/DesignGradientStop',
+                    },
+                    type: 'array',
+                },
+            },
+            type: 'object',
+        },
+        DesignPaintGradientOperation: {
+            description: 'Page-scoped native editing of one fill or stroke gradient.',
+            properties: {
+                changes: {
+                    $ref: '#/definitions/DesignPaintGradientChanges',
+                },
+                id: {
+                    type: 'string',
+                },
+                index: {
+                    type: 'number',
+                },
+                op: {
+                    const: 'paint-gradient',
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+                target: {
+                    $ref: '#/definitions/DesignPaintColorTarget',
+                },
+            },
+            required: ['changes', 'id', 'index', 'op', 'pageId', 'target'],
             type: 'object',
         },
     },
