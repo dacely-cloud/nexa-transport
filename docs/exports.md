@@ -199,3 +199,5 @@ Gradient geometry and compact edits are available through `nexa-transport/design
 Stroke cap and join choices are available through `nexa-transport/design-stroke-types`; conservative painted bounds use `nexa-transport/design-stroke-geometry`.
 
 Editable SVG import uses `nexa-transport/design-svg-import` for portable layer conversion and undo, `nexa-transport/design-svg-import-types` for requests and limits, and `nexa-transport/design-svg-import-codec` for strict boundary validation. Saved imports use `client.call(Method.DesignSvgImport, request)`.
+
+SVG imports retain local use/symbol references as independent editable copies, nested SVG viewport clips, clip paths and alpha/luminance masks. Mask regions and content coordinate systems remain independent; native source layers can be edited and undone through the usual document operations. External resources, SVG text, images and filters remain unsupported.
