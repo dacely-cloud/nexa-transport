@@ -1,6 +1,6 @@
 # RPC reference
 
-All 179 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 178 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
+All 180 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 179 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
 
 - [accounts.create](#accountscreate)
 - [accounts.list](#accountslist)
@@ -181,6 +181,7 @@ All 179 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [workspaces.destroy](#workspacesdestroy)
 - [workspaces.list](#workspaceslist)
 - [design.arrange](#designarrange)
+- [design.layout.preview](#designlayoutpreview)
 
 ## accounts.create
 
@@ -4614,7 +4615,7 @@ Result: Array of [Workspace](protocol.md#workspace).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.DesignArrange> = {
-    action: 'back',
+    action: 'auto-layout',
     commandId: 'YOUR_COMMANDID',
     expectedRevision: 'YOUR_EXPECTEDREVISION',
     id: 'YOUR_ID',
@@ -4639,3 +4640,42 @@ Parameters: [DesignArrangeRequest](protocol.md#designarrangerequest).
 | `selection`        | Yes      | Array of `string`                                          |             |
 
 Result: [DesignReceipt](protocol.md#designreceipt).
+
+## design.layout.preview
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DesignLayoutPreview> = {
+    action: 'canvas',
+    key: null,
+    operation: {
+        op: 'layout',
+        id: 'YOUR_FRAME_ID',
+        pageId: 'YOUR_PAGE_ID',
+        changes: {
+            gap: 24,
+        },
+    },
+    params: {
+        id: 'YOUR_DESIGN_ID',
+        revision: 'YOUR_SAVED_REVISION',
+        pageId: 'YOUR_PAGE_ID',
+        includeIds: [],
+        cursor: null,
+        limit: 128,
+    },
+};
+const result: ResultOf<typeof Method.DesignLayoutPreview> = await client.call(
+    Method.DesignLayoutPreview,
+    params,
+);
+```
+
+Requires an advertised read capability, a current saved revision and a matching page. Start with `action: "canvas"`, `key: null` and `cursor: null`. Reuse the returned key with the same canonical operation for canvas continuations, metrics and visible glyph windows. Previews do not save a revision or hydrate deferred source text.
+
+Parameters: [DesignLayoutPreviewRequest](protocol.md#designlayoutpreviewrequest).
+
+Type: [DesignLayoutPreviewCanvasRequest](protocol.md#designlayoutpreviewcanvasrequest) / [DesignLayoutPreviewMetricsRequest](protocol.md#designlayoutpreviewmetricsrequest) / [DesignLayoutPreviewTextRequest](protocol.md#designlayoutpreviewtextrequest).
+
+Result: [DesignLayoutPreviewResult](protocol.md#designlayoutpreviewresult).

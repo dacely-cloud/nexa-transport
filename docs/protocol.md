@@ -3061,7 +3061,16 @@ Variant 2: [DesignUpdate](protocol.md#designupdate)
 | `id`      | Yes      | `string`                                           |             |
 | `op`      | Yes      | `"update"`                                         |             |
 
-Variant 3: [DesignTextOperation](protocol.md#designtextoperation)
+Variant 3: [DesignLayoutOperation](protocol.md#designlayoutoperation)
+
+| Field     | Required | Type                                                   | Description |
+| --------- | -------- | ------------------------------------------------------ | ----------- |
+| `changes` | Yes      | [DesignLayoutChanges](protocol.md#designlayoutchanges) |             |
+| `id`      | Yes      | `string`                                               |             |
+| `op`      | Yes      | `"layout"`                                             |             |
+| `pageId`  | Yes      | `string`                                               |             |
+
+Variant 4: [DesignTextOperation](protocol.md#designtextoperation)
 
 | Field     | Required | Type     | Description |
 | --------- | -------- | -------- | ----------- |
@@ -3069,7 +3078,7 @@ Variant 3: [DesignTextOperation](protocol.md#designtextoperation)
 | `id`      | Yes      | `string` |             |
 | `op`      | Yes      | `"text"` |             |
 
-Variant 4: [DesignResizeOperation](protocol.md#designresizeoperation)
+Variant 5: [DesignResizeOperation](protocol.md#designresizeoperation)
 
 | Field       | Required | Type              | Description                                                                              |
 | ----------- | -------- | ----------------- | ---------------------------------------------------------------------------------------- |
@@ -3081,7 +3090,7 @@ Variant 4: [DesignResizeOperation](protocol.md#designresizeoperation)
 | `x`         | No       | `number`          | Position edits accompany a single dragged layer and use its resolved parent coordinates. |
 | `y`         | No       | `number`          |                                                                                          |
 
-Variant 5: [DesignPositionOperation](protocol.md#designpositionoperation)
+Variant 6: [DesignPositionOperation](protocol.md#designpositionoperation)
 
 | Field        | Required | Type                                                       | Description                                                          |
 | ------------ | -------- | ---------------------------------------------------------- | -------------------------------------------------------------------- |
@@ -3094,7 +3103,7 @@ Variant 5: [DesignPositionOperation](protocol.md#designpositionoperation)
 | `x`          | No       | `number`                                                   |                                                                      |
 | `y`          | No       | `number`                                                   |                                                                      |
 
-Variant 6: [DesignRotateOperation](protocol.md#designrotateoperation)
+Variant 7: [DesignRotateOperation](protocol.md#designrotateoperation)
 
 | Field       | Required | Type              | Description |
 | ----------- | -------- | ----------------- | ----------- |
@@ -3105,7 +3114,7 @@ Variant 6: [DesignRotateOperation](protocol.md#designrotateoperation)
 | `pivotY`    | No       | `number`          |             |
 | `selection` | Yes      | Array of `string` |             |
 
-Variant 7: [DesignScaleOperation](protocol.md#designscaleoperation)
+Variant 8: [DesignScaleOperation](protocol.md#designscaleoperation)
 
 | Field       | Required | Type              | Description |
 | ----------- | -------- | ----------------- | ----------- |
@@ -3116,7 +3125,7 @@ Variant 7: [DesignScaleOperation](protocol.md#designscaleoperation)
 | `pivotY`    | No       | `number`          |             |
 | `selection` | Yes      | Array of `string` |             |
 
-Variant 8: [DesignTranslateOperation](protocol.md#designtranslateoperation)
+Variant 9: [DesignTranslateOperation](protocol.md#designtranslateoperation)
 
 | Field       | Required | Type                                                        | Description |
 | ----------- | -------- | ----------------------------------------------------------- | ----------- |
@@ -3127,7 +3136,7 @@ Variant 8: [DesignTranslateOperation](protocol.md#designtranslateoperation)
 | `reorders`  | No       | Array of [DesignFlowReorder](protocol.md#designflowreorder) |             |
 | `selection` | Yes      | Array of `string`                                           |             |
 
-Variant 9: [DesignMove](protocol.md#designmove)
+Variant 10: [DesignMove](protocol.md#designmove)
 
 | Field      | Required | Type          | Description |
 | ---------- | -------- | ------------- | ----------- |
@@ -3137,14 +3146,14 @@ Variant 9: [DesignMove](protocol.md#designmove)
 | `pageId`   | Yes      | `string`      |             |
 | `parentId` | Yes      | `null,string` |             |
 
-Variant 10: [DesignRemove](protocol.md#designremove)
+Variant 11: [DesignRemove](protocol.md#designremove)
 
 | Field | Required | Type       | Description |
 | ----- | -------- | ---------- | ----------- |
 | `id`  | Yes      | `string`   |             |
 | `op`  | Yes      | `"remove"` |             |
 
-Variant 11: [DesignPageOperation](protocol.md#designpageoperation)
+Variant 12: [DesignPageOperation](protocol.md#designpageoperation)
 
 | Field        | Required | Type          | Description |
 | ------------ | -------- | ------------- | ----------- |
@@ -3153,7 +3162,7 @@ Variant 11: [DesignPageOperation](protocol.md#designpageoperation)
 | `name`       | Yes      | `null,string` |             |
 | `op`         | Yes      | `"page"`      |             |
 
-Variant 12: [DesignGuideOperation](protocol.md#designguideoperation)
+Variant 13: [DesignGuideOperation](protocol.md#designguideoperation)
 
 | Field    | Required | Type                                                      | Description |
 | -------- | -------- | --------------------------------------------------------- | ----------- |
@@ -3162,7 +3171,7 @@ Variant 12: [DesignGuideOperation](protocol.md#designguideoperation)
 | `pageId` | Yes      | `string`                                                  |             |
 | `value`  | Yes      | [DesignGuideValue](protocol.md#designguidevalue) / `null` |             |
 
-Variant 13: [DesignMetadata](protocol.md#designmetadata)
+Variant 14: [DesignMetadata](protocol.md#designmetadata)
 
 | Field          | Required | Type                                                        | Description |
 | -------------- | -------- | ----------------------------------------------------------- | ----------- |
@@ -4175,6 +4184,7 @@ Configurable bounds on gateway-owned work and memory.
 | `workspaces.destroy`                 | Yes      | Object (fields below) |                                                                                                        |
 | `workspaces.list`                    | Yes      | Object (fields below) |                                                                                                        |
 | `design.arrange`                     | Yes      | Object (fields below) | Workspace-native arrangement avoids uploading or hydrating selected layer bodies.                      |
+| `design.layout.preview`              | Yes      | Object (fields below) | Read-only preview support is advertised independently for older workspaces.                            |
 
 **accounts.create**
 
@@ -5501,6 +5511,13 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | -------------------------------------------------------- | ----------- |
 | `params` | Yes      | [DesignArrangeRequest](protocol.md#designarrangerequest) |             |
 | `result` | Yes      | [DesignReceipt](protocol.md#designreceipt)               |             |
+
+**design.layout.preview**
+
+| Field    | Required | Type                                                                 | Description |
+| -------- | -------- | -------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignLayoutPreviewRequest](protocol.md#designlayoutpreviewrequest) |             |
+| `result` | Yes      | [DesignLayoutPreviewResult](protocol.md#designlayoutpreviewresult)   |             |
 
 ## GeometryFormat
 
@@ -10357,4 +10374,173 @@ Agents use the normal command identity and revision guard for generated selectio
 
 Selection commands share one implementation between agent tools and browser editors.
 
-Type: `"back"` / `"bottom"` / `"center"` / `"distribute-horizontal"` / `"distribute-vertical"` / `"duplicate"` / `"exclude"` / `"flatten"` / `"front"` / `"group"` / `"intersect"` / `"left"` / `"mask"` / `"middle"` / `"release-mask"` / `"right"` / `"subtract"` / `"top"` / `"ungroup"` / `"union"`.
+Type: `"auto-layout"` / `"back"` / `"bottom"` / `"center"` / `"distribute-horizontal"` / `"distribute-vertical"` / `"duplicate"` / `"exclude"` / `"flatten"` / `"front"` / `"group"` / `"intersect"` / `"left"` / `"mask"` / `"middle"` / `"release-mask"` / `"right"` / `"subtract"` / `"top"` / `"ungroup"` / `"union"`.
+
+## DesignLayoutOperation
+
+Native layout geometry is resolved against owner-scoped source records, never browser body placeholders.
+
+| Field     | Required | Type                                                   | Description |
+| --------- | -------- | ------------------------------------------------------ | ----------- |
+| `changes` | Yes      | [DesignLayoutChanges](protocol.md#designlayoutchanges) |             |
+| `id`      | Yes      | `string`                                               |             |
+| `op`      | Yes      | `"layout"`                                             |             |
+| `pageId`  | Yes      | `string`                                               |             |
+
+## DesignLayoutChanges
+
+A compact native layout edit changes only supplied fields.
+
+| Field     | Required | Type                                                         | Description                                                    |
+| --------- | -------- | ------------------------------------------------------------ | -------------------------------------------------------------- |
+| `align`   | No       | `"between"` / `"center"` / `"end"` / `"start"` / `"stretch"` | Alignment within the available layout space.                   |
+| `clip`    | No       | `boolean`                                                    |                                                                |
+| `columns` | No       | `number`                                                     |                                                                |
+| `flow`    | No       | `"absolute"` / `"column"` / `"grid"` / `"row"`               | Free positioning and responsive container layouts.             |
+| `gap`     | No       | `number`                                                     |                                                                |
+| `justify` | No       | `"between"` / `"center"` / `"end"` / `"start"` / `"stretch"` | Alignment within the available layout space.                   |
+| `padding` | No       | [DesignPaddingChanges](protocol.md#designpaddingchanges)     | Optional edge changes preserve the other saved padding values. |
+| `rowGap`  | No       | `number`                                                     |                                                                |
+| `wrap`    | No       | `boolean`                                                    |                                                                |
+
+## DesignPaddingChanges
+
+Optional edge changes preserve the other saved padding values.
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `bottom` | No       | `number` |             |
+| `left`   | No       | `number` |             |
+| `right`  | No       | `number` |             |
+| `top`    | No       | `number` |             |
+
+## DesignLayoutPreviewCanvasRequest
+
+Canvas records never ask for explicit source-body hydration.
+
+| Field       | Required | Type                                                       | Description |
+| ----------- | -------- | ---------------------------------------------------------- | ----------- |
+| `action`    | Yes      | `"canvas"`                                                 |             |
+| `key`       | Yes      | `null,string`                                              |             |
+| `operation` | Yes      | [DesignLayoutOperation](protocol.md#designlayoutoperation) |             |
+| `params`    | Yes      | [DesignViewRequest](protocol.md#designviewrequest)         |             |
+
+## DesignLayoutPreviewCanvasResult
+
+Paged, body-free draft records carry their checked projection identity.
+
+| Field    | Required | Type                                             | Description |
+| -------- | -------- | ------------------------------------------------ | ----------- |
+| `action` | Yes      | `"canvas"`                                       |             |
+| `key`    | Yes      | `string`                                         |             |
+| `page`   | Yes      | [DesignCanvasPage](protocol.md#designcanvaspage) |             |
+
+## DesignLayoutPreviewMethod
+
+Read-only preview support is advertised independently for older workspaces.
+
+| Field    | Required | Type                                                                 | Description |
+| -------- | -------- | -------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignLayoutPreviewRequest](protocol.md#designlayoutpreviewrequest) |             |
+| `result` | Yes      | [DesignLayoutPreviewResult](protocol.md#designlayoutpreviewresult)   |             |
+
+## DesignLayoutPreviewMetricsRequest
+
+Width-specific native metrics are paged independently of the source text.
+
+| Field       | Required | Type                                                                 | Description |
+| ----------- | -------- | -------------------------------------------------------------------- | ----------- |
+| `action`    | Yes      | `"metrics"`                                                          |             |
+| `key`       | Yes      | `null,string`                                                        |             |
+| `operation` | Yes      | [DesignLayoutOperation](protocol.md#designlayoutoperation)           |             |
+| `params`    | Yes      | [DesignCanvasMetricsRequest](protocol.md#designcanvasmetricsrequest) |             |
+
+## DesignLayoutPreviewMetricsResult
+
+Native wrapping remains exact at the preview's requested width.
+
+| Field    | Required | Type                                                           | Description |
+| -------- | -------- | -------------------------------------------------------------- | ----------- |
+| `action` | Yes      | `"metrics"`                                                    |             |
+| `key`    | Yes      | `string`                                                       |             |
+| `page`   | Yes      | [DesignCanvasMetricsPage](protocol.md#designcanvasmetricspage) |             |
+
+## DesignLayoutPreviewRequest
+
+A preview cannot contain arbitrary scene replacement operations.
+
+Variant 1: [DesignLayoutPreviewCanvasRequest](protocol.md#designlayoutpreviewcanvasrequest)
+
+| Field       | Required | Type                                                       | Description |
+| ----------- | -------- | ---------------------------------------------------------- | ----------- |
+| `action`    | Yes      | `"canvas"`                                                 |             |
+| `key`       | Yes      | `null,string`                                              |             |
+| `operation` | Yes      | [DesignLayoutOperation](protocol.md#designlayoutoperation) |             |
+| `params`    | Yes      | [DesignViewRequest](protocol.md#designviewrequest)         |             |
+
+Variant 2: [DesignLayoutPreviewMetricsRequest](protocol.md#designlayoutpreviewmetricsrequest)
+
+| Field       | Required | Type                                                                 | Description |
+| ----------- | -------- | -------------------------------------------------------------------- | ----------- |
+| `action`    | Yes      | `"metrics"`                                                          |             |
+| `key`       | Yes      | `null,string`                                                        |             |
+| `operation` | Yes      | [DesignLayoutOperation](protocol.md#designlayoutoperation)           |             |
+| `params`    | Yes      | [DesignCanvasMetricsRequest](protocol.md#designcanvasmetricsrequest) |             |
+
+Variant 3: [DesignLayoutPreviewTextRequest](protocol.md#designlayoutpreviewtextrequest)
+
+| Field       | Required | Type                                                           | Description |
+| ----------- | -------- | -------------------------------------------------------------- | ----------- |
+| `action`    | Yes      | `"text"`                                                       |             |
+| `key`       | Yes      | `null,string`                                                  |             |
+| `operation` | Yes      | [DesignLayoutOperation](protocol.md#designlayoutoperation)     |             |
+| `params`    | Yes      | [DesignTextWindowRequest](protocol.md#designtextwindowrequest) |             |
+
+## DesignLayoutPreviewResult
+
+The caller verifies the action and projection key before consuming a reply.
+
+Variant 1: [DesignLayoutPreviewCanvasResult](protocol.md#designlayoutpreviewcanvasresult)
+
+| Field    | Required | Type                                             | Description |
+| -------- | -------- | ------------------------------------------------ | ----------- |
+| `action` | Yes      | `"canvas"`                                       |             |
+| `key`    | Yes      | `string`                                         |             |
+| `page`   | Yes      | [DesignCanvasPage](protocol.md#designcanvaspage) |             |
+
+Variant 2: [DesignLayoutPreviewMetricsResult](protocol.md#designlayoutpreviewmetricsresult)
+
+| Field    | Required | Type                                                           | Description |
+| -------- | -------- | -------------------------------------------------------------- | ----------- |
+| `action` | Yes      | `"metrics"`                                                    |             |
+| `key`    | Yes      | `string`                                                       |             |
+| `page`   | Yes      | [DesignCanvasMetricsPage](protocol.md#designcanvasmetricspage) |             |
+
+Variant 3: [DesignLayoutPreviewTextResult](protocol.md#designlayoutpreviewtextresult)
+
+| Field    | Required | Type                                                     | Description |
+| -------- | -------- | -------------------------------------------------------- | ----------- |
+| `action` | Yes      | `"text"`                                                 |             |
+| `key`    | Yes      | `string`                                                 |             |
+| `page`   | Yes      | [DesignTextWindowPage](protocol.md#designtextwindowpage) |             |
+
+## DesignLayoutPreviewTextRequest
+
+Only the visible glyph rectangle is transferred for the projected paragraph.
+
+| Field       | Required | Type                                                           | Description |
+| ----------- | -------- | -------------------------------------------------------------- | ----------- |
+| `action`    | Yes      | `"text"`                                                       |             |
+| `key`       | Yes      | `null,string`                                                  |             |
+| `operation` | Yes      | [DesignLayoutOperation](protocol.md#designlayoutoperation)     |             |
+| `params`    | Yes      | [DesignTextWindowRequest](protocol.md#designtextwindowrequest) |             |
+
+## DesignLayoutPreviewTextResult
+
+Draft glyph IDs and positions refer to the same public or admitted private fonts as the saved canvas.
+
+| Field    | Required | Type                                                     | Description |
+| -------- | -------- | -------------------------------------------------------- | ----------- |
+| `action` | Yes      | `"text"`                                                 |             |
+| `key`    | Yes      | `string`                                                 |             |
+| `page`   | Yes      | [DesignTextWindowPage](protocol.md#designtextwindowpage) |             |

@@ -11063,6 +11063,19 @@
                     },
                     "required": ["params", "result"],
                     "type": "object"
+                },
+                "design.layout.preview": {
+                    "description": "Read-only preview support is advertised independently for older workspaces.",
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/DesignLayoutPreviewRequest"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/DesignLayoutPreviewResult"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
                 }
             },
             "required": [
@@ -11244,7 +11257,8 @@
                 "workspaces.describe",
                 "workspaces.destroy",
                 "workspaces.list",
-                "design.arrange"
+                "design.arrange",
+                "design.layout.preview"
             ],
             "type": "object"
         },
@@ -21898,6 +21912,158 @@
                     "type": "number"
                 }
             },
+            "type": "object"
+        },
+        "DesignLayoutPreviewCanvasRequest": {
+            "description": "Canvas records never ask for explicit source-body hydration.",
+            "properties": {
+                "action": {
+                    "const": "canvas",
+                    "type": "string"
+                },
+                "key": {
+                    "type": ["null", "string"]
+                },
+                "operation": {
+                    "$ref": "#/definitions/DesignLayoutOperation"
+                },
+                "params": {
+                    "$ref": "#/definitions/DesignViewRequest"
+                }
+            },
+            "required": ["action", "key", "operation", "params"],
+            "type": "object"
+        },
+        "DesignLayoutPreviewCanvasResult": {
+            "description": "Paged, body-free draft records carry their checked projection identity.",
+            "properties": {
+                "action": {
+                    "const": "canvas",
+                    "type": "string"
+                },
+                "key": {
+                    "type": "string"
+                },
+                "page": {
+                    "$ref": "#/definitions/DesignCanvasPage"
+                }
+            },
+            "required": ["action", "key", "page"],
+            "type": "object"
+        },
+        "DesignLayoutPreviewMethod": {
+            "description": "Read-only preview support is advertised independently for older workspaces.",
+            "properties": {
+                "params": {
+                    "$ref": "#/definitions/DesignLayoutPreviewRequest"
+                },
+                "result": {
+                    "$ref": "#/definitions/DesignLayoutPreviewResult"
+                }
+            },
+            "required": ["params", "result"],
+            "type": "object"
+        },
+        "DesignLayoutPreviewMetricsRequest": {
+            "description": "Width-specific native metrics are paged independently of the source text.",
+            "properties": {
+                "action": {
+                    "const": "metrics",
+                    "type": "string"
+                },
+                "key": {
+                    "type": ["null", "string"]
+                },
+                "operation": {
+                    "$ref": "#/definitions/DesignLayoutOperation"
+                },
+                "params": {
+                    "$ref": "#/definitions/DesignCanvasMetricsRequest"
+                }
+            },
+            "required": ["action", "key", "operation", "params"],
+            "type": "object"
+        },
+        "DesignLayoutPreviewMetricsResult": {
+            "description": "Native wrapping remains exact at the preview's requested width.",
+            "properties": {
+                "action": {
+                    "const": "metrics",
+                    "type": "string"
+                },
+                "key": {
+                    "type": "string"
+                },
+                "page": {
+                    "$ref": "#/definitions/DesignCanvasMetricsPage"
+                }
+            },
+            "required": ["action", "key", "page"],
+            "type": "object"
+        },
+        "DesignLayoutPreviewRequest": {
+            "anyOf": [
+                {
+                    "$ref": "#/definitions/DesignLayoutPreviewCanvasRequest"
+                },
+                {
+                    "$ref": "#/definitions/DesignLayoutPreviewMetricsRequest"
+                },
+                {
+                    "$ref": "#/definitions/DesignLayoutPreviewTextRequest"
+                }
+            ],
+            "description": "A preview cannot contain arbitrary scene replacement operations."
+        },
+        "DesignLayoutPreviewResult": {
+            "anyOf": [
+                {
+                    "$ref": "#/definitions/DesignLayoutPreviewCanvasResult"
+                },
+                {
+                    "$ref": "#/definitions/DesignLayoutPreviewMetricsResult"
+                },
+                {
+                    "$ref": "#/definitions/DesignLayoutPreviewTextResult"
+                }
+            ],
+            "description": "The caller verifies the action and projection key before consuming a reply."
+        },
+        "DesignLayoutPreviewTextRequest": {
+            "description": "Only the visible glyph rectangle is transferred for the projected paragraph.",
+            "properties": {
+                "action": {
+                    "const": "text",
+                    "type": "string"
+                },
+                "key": {
+                    "type": ["null", "string"]
+                },
+                "operation": {
+                    "$ref": "#/definitions/DesignLayoutOperation"
+                },
+                "params": {
+                    "$ref": "#/definitions/DesignTextWindowRequest"
+                }
+            },
+            "required": ["action", "key", "operation", "params"],
+            "type": "object"
+        },
+        "DesignLayoutPreviewTextResult": {
+            "description": "Draft glyph IDs and positions refer to the same public or admitted private fonts as the saved canvas.",
+            "properties": {
+                "action": {
+                    "const": "text",
+                    "type": "string"
+                },
+                "key": {
+                    "type": "string"
+                },
+                "page": {
+                    "$ref": "#/definitions/DesignTextWindowPage"
+                }
+            },
+            "required": ["action", "key", "page"],
             "type": "object"
         }
     },

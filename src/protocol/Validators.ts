@@ -2634,3 +2634,17 @@ export function result178(value: unknown): boolean {
         value,
     );
 }
+/** Validates params179. */
+export function params179(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/design.layout.preview/properties/params',
+        value,
+    );
+}
+/** Validates result179. */
+export function result179(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/design.layout.preview/properties/result',
+        value,
+    );
+}

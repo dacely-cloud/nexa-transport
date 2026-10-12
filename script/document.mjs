@@ -94,6 +94,28 @@ function sample(node, key = '', depth = 0) {
     if (node.type === 'null') return null;
     return key === 'message' ? 'Your request' : `YOUR_${key.toUpperCase() || 'VALUE'}`;
 }
+function exampleParams(name, params) {
+    if (name === 'design.layout.preview')
+        return {
+            action: 'canvas',
+            key: null,
+            operation: {
+                op: 'layout',
+                id: 'YOUR_FRAME_ID',
+                pageId: 'YOUR_PAGE_ID',
+                changes: { gap: 24 },
+            },
+            params: {
+                id: 'YOUR_DESIGN_ID',
+                revision: 'YOUR_SAVED_REVISION',
+                pageId: 'YOUR_PAGE_ID',
+                includeIds: [],
+                cursor: null,
+                limit: 128,
+            },
+        };
+    return sample(params);
+}
 const methods = definitions.GatewayMethods.properties;
 const enumName = (method) =>
     method
@@ -115,12 +137,15 @@ for (const [name, entry] of Object.entries(methods)) {
         reference +=
             '```ts\n' +
             "import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';\n\n" +
-            `const params: ParamsOf<typeof Method.${enumName(name)}> = ${JSON.stringify(sample(params), null, 4)};\n` +
+            `const params: ParamsOf<typeof Method.${enumName(name)}> = ${JSON.stringify(exampleParams(name, params), null, 4)};\n` +
             `const result: ResultOf<typeof Method.${enumName(name)}> = await client.call(Method.${enumName(name)}, params);\n` +
             '```\n\n';
     if (name === 'agent.ask' || name === 'agent.stream')
         reference +=
             'With a personal API key, omit `userId`; the gateway uses the authenticated identity. A display name such as `Ralph` is not the internal principal `user:ralph`. See [connection and identity](guide.md#connection-and-identity).\n\n';
+    if (name === 'design.layout.preview')
+        reference +=
+            'Requires an advertised read capability, a current saved revision and a matching page. Start with `action: \"canvas\"`, `key: null` and `cursor: null`. Reuse the returned key with the same canonical operation for canvas continuations, metrics and visible glyph windows. Previews do not save a revision or hydrate deferred source text.\n\n';
     reference += `Parameters: ${type(params)}.\n\n${fields(params)}\nResult: ${type(result)}.\n\n`;
 }
 writeFileSync('docs/methods.md', reference);
