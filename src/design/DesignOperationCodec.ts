@@ -7,6 +7,7 @@ import { DesignRulerCodec } from './DesignRulerCodec.js';
 import { DesignCodec } from './DesignCodec.js';
 import { DesignStyleCodec } from './DesignStyleCodec.js';
 import { DesignLayoutCodec } from './DesignLayoutCodec.js';
+import { DesignLayoutChangesCodec } from './DesignLayoutChangesCodec.js';
 import {
     DesignKind,
     DesignConstraint,
@@ -98,6 +99,20 @@ export class DesignOperationCodec {
                         (): DesignNodeChanges => this.#changes(value['changes']),
                     );
                     return { op, id, changes };
+                }
+                case Kind.Layout: {
+                    const value: Readonly<Record<string, unknown>> = V.record(entry, [
+                        'op',
+                        'id',
+                        'pageId',
+                        'changes',
+                    ]);
+                    return {
+                        op,
+                        id: V.id(value['id']),
+                        pageId: V.id(value['pageId']),
+                        changes: DesignLayoutChangesCodec.parse(value['changes']),
+                    };
                 }
                 case Kind.Text: {
                     const value: Readonly<Record<string, unknown>> = V.record(entry, [

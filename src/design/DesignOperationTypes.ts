@@ -7,6 +7,8 @@ import type { DesignBooleanMode } from './DesignBooleanTypes.js';
 
 import type {
     DesignFrameGrid,
+    DesignFlow,
+    DesignAlign,
     DesignGuideValue,
     DesignConstraint,
     DesignNode,
@@ -34,6 +36,7 @@ export const DesignOperationKind = {
     Translate: 'translate',
     Rotate: 'rotate',
     Scale: 'scale',
+    Layout: 'layout',
     Text: 'text',
     Move: 'move',
     Remove: 'remove',
@@ -86,6 +89,32 @@ export interface DesignUpdate {
     readonly op: typeof DesignOperationKind.Update;
     readonly id: string;
     readonly changes: DesignNodeChanges;
+}
+/** Optional edge changes preserve the other saved padding values. */
+export interface DesignPaddingChanges {
+    readonly top?: number;
+    readonly right?: number;
+    readonly bottom?: number;
+    readonly left?: number;
+}
+/** A compact native layout edit changes only supplied fields. */
+export interface DesignLayoutChanges {
+    readonly flow?: DesignFlow;
+    readonly wrap?: boolean;
+    readonly gap?: number;
+    readonly rowGap?: number;
+    readonly padding?: DesignPaddingChanges;
+    readonly align?: DesignAlign;
+    readonly justify?: DesignAlign;
+    readonly columns?: number;
+    readonly clip?: boolean;
+}
+/** Native layout geometry is resolved against owner-scoped source records, never browser body placeholders. */
+export interface DesignLayoutOperation {
+    readonly op: typeof DesignOperationKind.Layout;
+    readonly id: string;
+    readonly pageId: string;
+    readonly changes: DesignLayoutChanges;
 }
 /** Replace text content while preserving typography and clipping existing rich-text ranges. */
 export interface DesignTextOperation {
@@ -195,6 +224,7 @@ export type DesignOperation =
     | DesignTranslateOperation
     | DesignRotateOperation
     | DesignScaleOperation
+    | DesignLayoutOperation
     | DesignTextOperation
     | DesignMove
     | DesignRemove

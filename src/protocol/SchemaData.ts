@@ -6918,6 +6918,9 @@ export const schema: Schema = {
                     $ref: '#/definitions/DesignUpdate',
                 },
                 {
+                    $ref: '#/definitions/DesignLayoutOperation',
+                },
+                {
                     $ref: '#/definitions/DesignTextOperation',
                 },
                 {
@@ -22380,6 +22383,86 @@ export const schema: Schema = {
                 'union',
             ],
             type: 'string',
+        },
+        DesignLayoutOperation: {
+            description:
+                'Native layout geometry is resolved against owner-scoped source records, never browser body placeholders.',
+            properties: {
+                changes: {
+                    $ref: '#/definitions/DesignLayoutChanges',
+                },
+                id: {
+                    type: 'string',
+                },
+                op: {
+                    const: 'layout',
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+            },
+            required: ['changes', 'id', 'op', 'pageId'],
+            type: 'object',
+        },
+        DesignLayoutChanges: {
+            description: 'A compact native layout edit changes only supplied fields.',
+            properties: {
+                align: {
+                    description: 'Alignment within the available layout space.\nAlignment choice.',
+                    enum: ['between', 'center', 'end', 'start', 'stretch'],
+                    type: 'string',
+                },
+                clip: {
+                    type: 'boolean',
+                },
+                columns: {
+                    type: 'number',
+                },
+                flow: {
+                    description:
+                        'Free positioning and responsive container layouts.\nLayout direction.',
+                    enum: ['absolute', 'column', 'grid', 'row'],
+                    type: 'string',
+                },
+                gap: {
+                    type: 'number',
+                },
+                justify: {
+                    description: 'Alignment within the available layout space.\nAlignment choice.',
+                    enum: ['between', 'center', 'end', 'start', 'stretch'],
+                    type: 'string',
+                },
+                padding: {
+                    $ref: '#/definitions/DesignPaddingChanges',
+                    description: 'Optional edge changes preserve the other saved padding values.',
+                },
+                rowGap: {
+                    type: 'number',
+                },
+                wrap: {
+                    type: 'boolean',
+                },
+            },
+            type: 'object',
+        },
+        DesignPaddingChanges: {
+            description: 'Optional edge changes preserve the other saved padding values.',
+            properties: {
+                bottom: {
+                    type: 'number',
+                },
+                left: {
+                    type: 'number',
+                },
+                right: {
+                    type: 'number',
+                },
+                top: {
+                    type: 'number',
+                },
+            },
+            type: 'object',
         },
     },
     description: 'All protocol contracts reachable from the public transport.',

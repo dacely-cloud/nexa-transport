@@ -20,6 +20,7 @@ import { DesignPositionEdits } from './DesignPositionEdits.js';
 import { DesignScaleEdits } from './DesignScaleEdits.js';
 import { DesignRotateEdits } from './DesignRotateEdits.js';
 import { DesignTranslateEdits } from './DesignTranslateEdits.js';
+import { DesignLayoutEdits } from './DesignLayoutEdits.js';
 import { DesignSelectionContext } from './DesignSelectionContext.js';
 import type { DesignTextMeasurer } from './DesignLayoutTypes.js';
 import { DesignTextMetrics } from './DesignTextMetrics.js';
@@ -131,6 +132,7 @@ export class DesignEdits {
                 case DesignOperationKind.Position:
                 case DesignOperationKind.Translate:
                 case DesignOperationKind.Rotate:
+                case DesignOperationKind.Layout:
                 case DesignOperationKind.Scale: {
                     const current: DesignDocument = {
                         ...document,
@@ -141,21 +143,24 @@ export class DesignEdits {
                     const context: DesignSelectionContext = new DesignSelectionContext(
                         current,
                         operation.pageId,
-                        operation.op === DesignOperationKind.Position
+                        operation.op === DesignOperationKind.Position ||
+                            operation.op === DesignOperationKind.Layout
                             ? [operation.id]
                             : operation.selection,
                         measurer,
                     );
                     const changed: readonly DesignNode[] =
-                        operation.op === DesignOperationKind.Resize
-                            ? new DesignResizeEdits(context).apply(operation)
-                            : operation.op === DesignOperationKind.Position
-                              ? new DesignPositionEdits(context).apply(operation)
-                              : operation.op === DesignOperationKind.Rotate
-                                ? new DesignRotateEdits(context).apply(operation)
-                                : operation.op === DesignOperationKind.Scale
-                                  ? new DesignScaleEdits(context).apply(operation)
-                                  : new DesignTranslateEdits(context).apply(operation);
+                        operation.op === DesignOperationKind.Layout
+                            ? new DesignLayoutEdits(context).apply(operation)
+                            : operation.op === DesignOperationKind.Resize
+                              ? new DesignResizeEdits(context).apply(operation)
+                              : operation.op === DesignOperationKind.Position
+                                ? new DesignPositionEdits(context).apply(operation)
+                                : operation.op === DesignOperationKind.Rotate
+                                  ? new DesignRotateEdits(context).apply(operation)
+                                  : operation.op === DesignOperationKind.Scale
+                                    ? new DesignScaleEdits(context).apply(operation)
+                                    : new DesignTranslateEdits(context).apply(operation);
                     for (const node of changed) {
                         nodes.set(node.id, node);
                     }
