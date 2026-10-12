@@ -571,6 +571,14 @@
         "./design-text-styles": {
             "types": "./dist/design/DesignTextStyles.d.ts",
             "import": "./dist/design-text-styles.js"
+        },
+        "./design-transfer-types": {
+            "types": "./dist/design/DesignTransferTypes.d.ts",
+            "import": "./dist/design-transfer-types.js"
+        },
+        "./design-transfer-codec": {
+            "types": "./dist/design/DesignTransferCodec.d.ts",
+            "import": "./dist/design-transfer-codec.js"
         }
     },
     "scripts": {

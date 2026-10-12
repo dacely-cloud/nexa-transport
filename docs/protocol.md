@@ -4214,6 +4214,7 @@ Configurable bounds on gateway-owned work and memory.
 | `workspaces.list`                    | Yes      | Object (fields below) |                                                                                                        |
 | `design.arrange`                     | Yes      | Object (fields below) | Workspace-native arrangement avoids uploading or hydrating selected layer bodies.                      |
 | `design.layout.preview`              | Yes      | Object (fields below) | Read-only preview support is advertised independently for older workspaces.                            |
+| `design.transfer`                    | Yes      | Object (fields below) | Cross-document reusable copying without source-body uploads.                                           |
 
 **accounts.create**
 
@@ -5547,6 +5548,13 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | -------------------------------------------------------------------- | ----------- |
 | `params` | Yes      | [DesignLayoutPreviewRequest](protocol.md#designlayoutpreviewrequest) |             |
 | `result` | Yes      | [DesignLayoutPreviewResult](protocol.md#designlayoutpreviewresult)   |             |
+
+**design.transfer**
+
+| Field    | Required | Type                                                       | Description |
+| -------- | -------- | ---------------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignTransferRequest](protocol.md#designtransferrequest) |             |
+| `result` | Yes      | [DesignReceipt](protocol.md#designreceipt)                 |             |
 
 ## GeometryFormat
 
@@ -10652,3 +10660,30 @@ Rich formatting never replaces the source body or styles outside the selected ra
 | `op`      | Yes      | `"text-style"`                                               |             |
 | `pageId`  | Yes      | `string`                                                     |             |
 | `start`   | Yes      | `number`                                                     |             |
+
+## DesignTransferMethod
+
+Cross-document reusable copying without source-body uploads.
+
+| Field    | Required | Type                                                       | Description |
+| -------- | -------- | ---------------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignTransferRequest](protocol.md#designtransferrequest) |             |
+| `result` | Yes      | [DesignReceipt](protocol.md#designreceipt)                 |             |
+
+## DesignTransferRequest
+
+Cross-document copies carry references only; source layers stay inside the authenticated workspace.
+
+| Field              | Required | Type              | Description |
+| ------------------ | -------- | ----------------- | ----------- |
+| `commandId`        | Yes      | `string`          |             |
+| `expectedRevision` | Yes      | `string`          |             |
+| `id`               | Yes      | `string`          |             |
+| `pageId`           | Yes      | `string`          |             |
+| `parentId`         | Yes      | `null,string`     |             |
+| `selection`        | Yes      | Array of `string` |             |
+| `sourceId`         | Yes      | `string`          |             |
+| `sourcePageId`     | Yes      | `string`          |             |
+| `sourceRevision`   | Yes      | `string`          |             |
+| `x`                | Yes      | `number`          |             |
+| `y`                | Yes      | `number`          |             |

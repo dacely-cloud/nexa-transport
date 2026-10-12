@@ -1,6 +1,6 @@
 # RPC reference
 
-All 180 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 179 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
+All 181 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 180 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
 
 - [accounts.create](#accountscreate)
 - [accounts.list](#accountslist)
@@ -182,6 +182,7 @@ All 180 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [workspaces.list](#workspaceslist)
 - [design.arrange](#designarrange)
 - [design.layout.preview](#designlayoutpreview)
+- [design.transfer](#designtransfer)
 
 ## accounts.create
 
@@ -4679,3 +4680,45 @@ Parameters: [DesignLayoutPreviewRequest](protocol.md#designlayoutpreviewrequest)
 Type: [DesignLayoutPreviewCanvasRequest](protocol.md#designlayoutpreviewcanvasrequest) / [DesignLayoutPreviewMetricsRequest](protocol.md#designlayoutpreviewmetricsrequest) / [DesignLayoutPreviewTextRequest](protocol.md#designlayoutpreviewtextrequest).
 
 Result: [DesignLayoutPreviewResult](protocol.md#designlayoutpreviewresult).
+
+## design.transfer
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DesignTransfer> = {
+    commandId: 'YOUR_COMMANDID',
+    expectedRevision: 'YOUR_EXPECTEDREVISION',
+    id: 'YOUR_ID',
+    pageId: 'YOUR_PAGEID',
+    parentId: null,
+    selection: [],
+    sourceId: 'YOUR_SOURCEID',
+    sourcePageId: 'YOUR_SOURCEPAGEID',
+    sourceRevision: 'YOUR_SOURCEREVISION',
+    x: 1,
+    y: 1,
+};
+const result: ResultOf<typeof Method.DesignTransfer> = await client.call(
+    Method.DesignTransfer,
+    params,
+);
+```
+
+Parameters: [DesignTransferRequest](protocol.md#designtransferrequest).
+
+| Field              | Required | Type              | Description |
+| ------------------ | -------- | ----------------- | ----------- |
+| `commandId`        | Yes      | `string`          |             |
+| `expectedRevision` | Yes      | `string`          |             |
+| `id`               | Yes      | `string`          |             |
+| `pageId`           | Yes      | `string`          |             |
+| `parentId`         | Yes      | `null,string`     |             |
+| `selection`        | Yes      | Array of `string` |             |
+| `sourceId`         | Yes      | `string`          |             |
+| `sourcePageId`     | Yes      | `string`          |             |
+| `sourceRevision`   | Yes      | `string`          |             |
+| `x`                | Yes      | `number`          |             |
+| `y`                | Yes      | `number`          |             |
+
+Result: [DesignReceipt](protocol.md#designreceipt).

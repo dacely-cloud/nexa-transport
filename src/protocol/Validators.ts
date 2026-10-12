@@ -2648,3 +2648,17 @@ export function result179(value: unknown): boolean {
         value,
     );
 }
+/** Validates params180. */
+export function params180(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/design.transfer/properties/params',
+        value,
+    );
+}
+/** Validates result180. */
+export function result180(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/design.transfer/properties/result',
+        value,
+    );
+}
