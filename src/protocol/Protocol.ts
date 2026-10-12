@@ -4549,6 +4549,7 @@ export type DesignOperation =
     | DesignUpdate
     | DesignLayoutOperation
     | DesignSizingOperation
+    | DesignTypographyOperation
     | DesignTextOperation
     | DesignResizeOperation
     | DesignPositionOperation
@@ -15038,6 +15039,51 @@ export interface DesignSizingOperationShape {
 
 /** DesignSizingOperation from the Nexa wire protocol. */
 export type DesignSizingOperation = DesignSizingOperationShape;
+
+/** Allowed values for DesignTypographyChangesalign. */
+export const DesignTypographyChangesalignValues = {
+    Value0: 'center',
+    Value1: 'end',
+    Value2: 'start',
+} as const;
+
+/** DesignTypographyChanges wire fields. */
+export interface DesignTypographyChangesShape {
+    /** align as defined by the Nexa gateway. */
+    readonly align?: (typeof DesignTypographyChangesalignValues)[keyof typeof DesignTypographyChangesalignValues];
+    /** family as defined by the Nexa gateway. */
+    readonly family?: string;
+    /** font as defined by the Nexa gateway. */
+    readonly font?: DesignFontBinding | null;
+    /** italic as defined by the Nexa gateway. */
+    readonly italic?: boolean;
+    /** letterSpacing as defined by the Nexa gateway. */
+    readonly letterSpacing?: number;
+    /** lineHeight as defined by the Nexa gateway. */
+    readonly lineHeight?: number;
+    /** size as defined by the Nexa gateway. */
+    readonly size?: number;
+    /** weight as defined by the Nexa gateway. */
+    readonly weight?: number;
+}
+
+/** DesignTypographyChanges from the Nexa wire protocol. */
+export type DesignTypographyChanges = DesignTypographyChangesShape;
+
+/** DesignTypographyOperation wire fields. */
+export interface DesignTypographyOperationShape {
+    /** changes as defined by the Nexa gateway. */
+    readonly changes: DesignTypographyChanges;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** op as defined by the Nexa gateway. */
+    readonly op: 'typography';
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+}
+
+/** DesignTypographyOperation from the Nexa wire protocol. */
+export type DesignTypographyOperation = DesignTypographyOperationShape;
 
 /** Supported RPC names. */
 export type MethodName = keyof GatewayMethods;

@@ -94,6 +94,8 @@ const files: readonly string[] = [
     'DesignLayoutPreviewTypes',
     'DesignLayoutPreviewCodec',
     'DesignLayoutEdits',
+    'DesignTypographyChangesCodec',
+    'DesignTypographyEdits',
     'DesignSizingChangesCodec',
     'DesignSizingEdits',
     'DesignTree',

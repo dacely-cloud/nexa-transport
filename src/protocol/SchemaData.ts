@@ -6924,6 +6924,9 @@ export const schema: Schema = {
                     $ref: '#/definitions/DesignSizingOperation',
                 },
                 {
+                    $ref: '#/definitions/DesignTypographyOperation',
+                },
+                {
                     $ref: '#/definitions/DesignTextOperation',
                 },
                 {
@@ -22685,6 +22688,66 @@ export const schema: Schema = {
                 },
                 op: {
                     const: 'sizing',
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+            },
+            required: ['changes', 'id', 'op', 'pageId'],
+            type: 'object',
+        },
+        DesignTypographyChanges: {
+            description:
+                'Base typography changes preserve the source content and every authored rich-text range.',
+            properties: {
+                align: {
+                    enum: ['center', 'end', 'start'],
+                    type: 'string',
+                },
+                family: {
+                    type: 'string',
+                },
+                font: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignFontBinding',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                italic: {
+                    type: 'boolean',
+                },
+                letterSpacing: {
+                    type: 'number',
+                },
+                lineHeight: {
+                    type: 'number',
+                },
+                size: {
+                    type: 'number',
+                },
+                weight: {
+                    type: 'number',
+                },
+            },
+            type: 'object',
+        },
+        DesignTypographyOperation: {
+            description:
+                'The native source remains authoritative while the website sends only changed font properties.',
+            properties: {
+                changes: {
+                    $ref: '#/definitions/DesignTypographyChanges',
+                },
+                id: {
+                    type: 'string',
+                },
+                op: {
+                    const: 'typography',
                     type: 'string',
                 },
                 pageId: {

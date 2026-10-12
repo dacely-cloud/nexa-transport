@@ -7,6 +7,7 @@ import { DesignRulerCodec } from './DesignRulerCodec.js';
 import { DesignCodec } from './DesignCodec.js';
 import { DesignStyleCodec } from './DesignStyleCodec.js';
 import { DesignLayoutCodec } from './DesignLayoutCodec.js';
+import { DesignTypographyChangesCodec } from './DesignTypographyChangesCodec.js';
 import { DesignSizingChangesCodec } from './DesignSizingChangesCodec.js';
 import { DesignLayoutChangesCodec } from './DesignLayoutChangesCodec.js';
 import {
@@ -127,6 +128,20 @@ export class DesignOperationCodec {
                         id: V.id(value['id']),
                         pageId: V.id(value['pageId']),
                         changes: DesignSizingChangesCodec.parse(value['changes']),
+                    };
+                }
+                case Kind.Typography: {
+                    const value: Readonly<Record<string, unknown>> = V.record(entry, [
+                        'op',
+                        'id',
+                        'pageId',
+                        'changes',
+                    ]);
+                    return {
+                        op,
+                        id: V.id(value['id']),
+                        pageId: V.id(value['pageId']),
+                        changes: DesignTypographyChangesCodec.parse(value['changes']),
                     };
                 }
                 case Kind.Text: {

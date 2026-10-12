@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { DesignFontBinding } from './DesignFontTypes.js';
 import type { DesignVariantSet, DesignVariantValue } from './DesignVariantTypes.js';
 import type { DesignMask } from './DesignMaskTypes.js';
 import type { DesignBooleanMode } from './DesignBooleanTypes.js';
@@ -39,6 +40,7 @@ export const DesignOperationKind = {
     Scale: 'scale',
     Layout: 'layout',
     Sizing: 'sizing',
+    Typography: 'typography',
     Text: 'text',
     Move: 'move',
     Remove: 'remove',
@@ -135,6 +137,24 @@ export interface DesignSizingOperation {
     readonly id: string;
     readonly pageId: string;
     readonly changes: DesignSizingChanges;
+}
+/** Base typography changes preserve the source content and every authored rich-text range. */
+export interface DesignTypographyChanges {
+    readonly family?: string;
+    readonly size?: number;
+    readonly weight?: number;
+    readonly italic?: boolean;
+    readonly lineHeight?: number;
+    readonly letterSpacing?: number;
+    readonly align?: typeof DesignAlign.Start | typeof DesignAlign.Center | typeof DesignAlign.End;
+    readonly font?: DesignFontBinding | null;
+}
+/** The native source remains authoritative while the website sends only changed font properties. */
+export interface DesignTypographyOperation {
+    readonly op: typeof DesignOperationKind.Typography;
+    readonly id: string;
+    readonly pageId: string;
+    readonly changes: DesignTypographyChanges;
 }
 /** Replace text content while preserving typography and clipping existing rich-text ranges. */
 export interface DesignTextOperation {
@@ -246,6 +266,7 @@ export type DesignOperation =
     | DesignScaleOperation
     | DesignLayoutOperation
     | DesignSizingOperation
+    | DesignTypographyOperation
     | DesignTextOperation
     | DesignMove
     | DesignRemove
