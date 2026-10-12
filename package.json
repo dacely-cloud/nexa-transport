@@ -540,6 +540,50 @@
             "types": "./dist/design/DesignFontBindings.d.ts",
             "import": "./dist/design-font-bindings.js"
         },
+        "./roblox-scene-input": {
+            "types": "./dist/roblox/RobloxSceneInput.d.ts",
+            "import": "./dist/roblox-scene-input.js"
+        },
+        "./roblox-gui-layout": {
+            "types": "./dist/roblox/RobloxGuiLayout.d.ts",
+            "import": "./dist/roblox-gui-layout.js"
+        },
+        "./roblox-scene-types": {
+            "types": "./dist/roblox/RobloxSceneTypes.d.ts",
+            "import": "./dist/roblox-scene-types.js"
+        },
+        "./roblox-scene-schema": {
+            "types": "./dist/roblox/RobloxSceneSchema.d.ts",
+            "import": "./dist/roblox-scene-schema.js"
+        },
+        "./roblox-scene-codec": {
+            "types": "./dist/roblox/RobloxSceneCodec.d.ts",
+            "import": "./dist/roblox-scene-codec.js"
+        },
+        "./roblox-scene-runtime": {
+            "types": "./dist/roblox/RobloxSceneRuntime.d.ts",
+            "import": "./dist/roblox-scene-runtime.js"
+        },
+        "./roblox-scene-xml": {
+            "types": "./dist/roblox/RobloxSceneXml.d.ts",
+            "import": "./dist/roblox-scene-xml.js"
+        },
+        "./roblox-scene-luau": {
+            "types": "./dist/roblox/RobloxSceneLuau.d.ts",
+            "import": "./dist/roblox-scene-luau.js"
+        },
+        "./roblox-scene-diagnostics": {
+            "types": "./dist/roblox/RobloxSceneDiagnostics.d.ts",
+            "import": "./dist/roblox-scene-diagnostics.js"
+        },
+        "./roblox-particles": {
+            "types": "./dist/roblox/RobloxParticleSimulator.d.ts",
+            "import": "./dist/roblox-particles.js"
+        },
+        "./roblox-scene-examples": {
+            "types": "./dist/roblox/RobloxSceneExamples.d.ts",
+            "import": "./dist/roblox-scene-examples.js"
+        },
         "./design-view-types": {
             "types": "./dist/design/DesignViewTypes.d.ts",
             "import": "./dist/design-view-types.js"
@@ -567,6 +611,18 @@
         "./design-canvas-codec": {
             "types": "./dist/design/DesignCanvasCodec.d.ts",
             "import": "./dist/design-canvas-codec.js"
+        },
+        "./roblox-live-state": {
+            "types": "./dist/roblox/RobloxLiveState.d.ts",
+            "import": "./dist/roblox-live-state.js"
+        },
+        "./roblox-live-descriptor": {
+            "types": "./dist/roblox/RobloxLiveDescriptor.d.ts",
+            "import": "./dist/roblox-live-descriptor.js"
+        },
+        "./roblox-part-geometry": {
+            "types": "./dist/roblox/RobloxPartGeometry.d.ts",
+            "import": "./dist/roblox-part-geometry.js"
         },
         "./design-text-styles": {
             "types": "./dist/design/DesignTextStyles.d.ts",
@@ -618,6 +674,10 @@
         "./design-svg-import-codec": {
             "types": "./dist/design/DesignSvgImportCodec.d.ts",
             "import": "./dist/design-svg-import-codec.js"
+        },
+        "./design-selection-index": {
+            "types": "./dist/design/DesignSelectionIndex.d.ts",
+            "import": "./dist/design-selection-index.js"
         }
     },
     "scripts": {
@@ -637,7 +697,8 @@
         "format:check": "prettier --check \"src/**/*.{ts,tsx}\" \"test/**/*.ts\" \"examples/**/*.ts\" \"script/*.{mjs,ts,json}\" \"*.{ts,json,md}\" \"docs/**/*.md\"",
         "test:package": "node script/pack-smoke.mjs",
         "docs": "node script/document.mjs && prettier --write \"docs/**/*.md\"",
-        "docs:check": "node script/check-docs.mjs"
+        "docs:check": "node script/check-docs.mjs",
+        "generate:roblox": "node script/roblox.ts"
     },
     "devDependencies": {
         "@types/node": "^26.5.1",

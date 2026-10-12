@@ -5,11 +5,7 @@ import { BrowserStorageComparisonValues as Value } from './BrowserStorageCompari
 import { BrowserWebMcpReceipt } from './BrowserWebMcpReceipt.js';
 import { BrowserWebMcpView } from './BrowserWebMcpDefinitions.js';
 import type { BrowserWebMcpPage } from '../protocol/Protocol.js';
-import type {
-    BrowserWebMcpMetadata,
-    BrowserWebMcpDescriptor,
-    BrowserSchemaProperty,
-} from '../protocol/Protocol.js';
+import type { BrowserWebMcpMetadata, BrowserWebMcpDescriptor, BrowserSchemaProperty } from '../protocol/Protocol.js';
 
 /** Portable saved pages are pinned to one representation with bounded consecutive retained ordinals. */
 export class BrowserWebMcpPageReceipt {

@@ -1,6 +1,6 @@
 # RPC reference
 
-All 181 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 180 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
+All 186 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 185 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
 
 - [accounts.create](#accountscreate)
 - [accounts.list](#accountslist)
@@ -89,6 +89,10 @@ All 181 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [roblox.credentials.remove](#robloxcredentialsremove)
 - [roblox.credentials.set](#robloxcredentialsset)
 - [roblox.credentials.status](#robloxcredentialsstatus)
+- [roblox.live.close](#robloxliveclose)
+- [roblox.live.export](#robloxliveexport)
+- [roblox.live.start](#robloxlivestart)
+- [roblox.live.step](#robloxlivestep)
 - [roblox.telemetry.funnel](#robloxtelemetryfunnel)
 - [roblox.telemetry.performance](#robloxtelemetryperformance)
 - [roblox.telemetry.projects](#robloxtelemetryprojects)
@@ -183,6 +187,7 @@ All 181 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [design.arrange](#designarrange)
 - [design.layout.preview](#designlayoutpreview)
 - [design.transfer](#designtransfer)
+- [design.svg.import](#designsvgimport)
 
 ## accounts.create
 
@@ -190,22 +195,19 @@ All 181 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.AccountsCreate> = {
-    displayName: 'YOUR_DISPLAYNAME',
+    "displayName": "YOUR_DISPLAYNAME"
 };
-const result: ResultOf<typeof Method.AccountsCreate> = await client.call(
-    Method.AccountsCreate,
-    params,
-);
+const result: ResultOf<typeof Method.AccountsCreate> = await client.call(Method.AccountsCreate, params);
 ```
 
 Parameters: [AccountCreateParams](protocol.md#accountcreateparams).
 
-| Field         | Required | Type     | Description |
-| ------------- | -------- | -------- | ----------- |
-| `displayName` | Yes      | `string` |             |
-| `localId`     | No       | `string` |             |
-| `model`       | No       | `string` |             |
-| `role`        | No       | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `displayName` | Yes | `string` |  |
+| `localId` | No | `string` |  |
+| `model` | No | `string` |  |
+| `role` | No | `string` |  |
 
 Result: [AccountSummary](protocol.md#accountsummary).
 
@@ -230,20 +232,17 @@ Result: Array of [AccountSummary](protocol.md#accountsummary).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.AccountsRemove> = {
-    principalId: 'YOUR_PRINCIPALID',
+    "principalId": "YOUR_PRINCIPALID"
 };
-const result: ResultOf<typeof Method.AccountsRemove> = await client.call(
-    Method.AccountsRemove,
-    params,
-);
+const result: ResultOf<typeof Method.AccountsRemove> = await client.call(Method.AccountsRemove, params);
 ```
 
 Parameters: [AccountRemoveParams](protocol.md#accountremoveparams).
 
-| Field             | Required | Type      | Description                                                  |
-| ----------------- | -------- | --------- | ------------------------------------------------------------ |
-| `principalId`     | Yes      | `string`  |                                                              |
-| `removeWorkspace` | No       | `boolean` | Whether the workspace directory goes too. Defaults to FALSE. |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `principalId` | Yes | `string` |  |
+| `removeWorkspace` | No | `boolean` | Whether the workspace directory goes too. Defaults to FALSE. |
 
 Result: [OkResult](protocol.md#okresult).
 
@@ -253,19 +252,16 @@ Result: [OkResult](protocol.md#okresult).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.AccountsUsage> = {};
-const result: ResultOf<typeof Method.AccountsUsage> = await client.call(
-    Method.AccountsUsage,
-    params,
-);
+const result: ResultOf<typeof Method.AccountsUsage> = await client.call(Method.AccountsUsage, params);
 ```
 
 Parameters: [AccountsUsageParams](protocol.md#accountsusageparams).
 
-| Field    | Required | Type     | Description                                |
-| -------- | -------- | -------- | ------------------------------------------ |
-| `fromMs` | No       | `number` |                                            |
-| `toMs`   | No       | `number` |                                            |
-| `userId` | No       | `string` | One account, or every account when absent. |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `fromMs` | No | `number` |  |
+| `toMs` | No | `number` |  |
+| `userId` | No | `string` | One account, or every account when absent. |
 
 Result: [AccountsUsageResult](protocol.md#accountsusageresult).
 
@@ -275,7 +271,7 @@ Result: [AccountsUsageResult](protocol.md#accountsusageresult).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.AgentAsk> = {
-    message: 'Your request',
+    "message": "Your request"
 };
 const result: ResultOf<typeof Method.AgentAsk> = await client.call(Method.AgentAsk, params);
 ```
@@ -284,17 +280,17 @@ With a personal API key, omit `userId`; the gateway uses the authenticated ident
 
 Parameters: [AskParams](protocol.md#askparams).
 
-| Field               | Required | Type                                                                          | Description                                                                 |
-| ------------------- | -------- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| `agentId`           | No       | `string`                                                                      |                                                                             |
-| `attachments`       | No       | Array of [InboundAttachment](protocol.md#inboundattachment)                   | User-authored image, video, document, and text blocks, in display order.    |
-| `conversationId`    | No       | `string`                                                                      | Continues an existing conversation.                                         |
-| `cwd`               | No       | `string`                                                                      | Where tools operate.                                                        |
-| `message`           | Yes      | `string`                                                                      | User text; may be blank when at least one attachment contains content.      |
-| `reasoningEffort`   | No       | `"high"` / `"low"` / `"max"` / `"medium"` / `"minimal"` / `"off"` / `"xhigh"` | Per-turn reasoning preference; never changes the saved agent configuration. |
-| `responseFormat`    | No       | `"json"` / `"text"`                                                           | Final answer format; JSON mode does not disable tools or verification.      |
-| `targetTimeSeconds` | No       | `integer`                                                                     | Soft task time target in seconds; never a cancellation deadline.            |
-| `userId`            | No       | `string`                                                                      | The principal the turn is billed and authorized as.                         |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `agentId` | No | `string` |  |
+| `attachments` | No | Array of [InboundAttachment](protocol.md#inboundattachment) | User-authored image, video, document, and text blocks, in display order. |
+| `conversationId` | No | `string` | Continues an existing conversation. |
+| `cwd` | No | `string` | Where tools operate. |
+| `message` | Yes | `string` | User text; may be blank when at least one attachment contains content. |
+| `reasoningEffort` | No | `"high"` / `"low"` / `"max"` / `"medium"` / `"minimal"` / `"off"` / `"xhigh"` | Per-turn reasoning preference; never changes the saved agent configuration. |
+| `responseFormat` | No | `"json"` / `"text"` | Final answer format; JSON mode does not disable tools or verification. |
+| `targetTimeSeconds` | No | `integer` | Soft task time target in seconds; never a cancellation deadline. |
+| `userId` | No | `string` | The principal the turn is billed and authorized as. |
 
 Result: [AskResult](protocol.md#askresult).
 
@@ -304,18 +300,18 @@ Result: [AskResult](protocol.md#askresult).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.AgentSteer> = {
-    message: 'Your request',
-    runId: 'YOUR_RUNID',
+    "message": "Your request",
+    "runId": "YOUR_RUNID"
 };
 const result: ResultOf<typeof Method.AgentSteer> = await client.call(Method.AgentSteer, params);
 ```
 
 Parameters: [SteerParams](protocol.md#steerparams).
 
-| Field     | Required | Type     | Description |
-| --------- | -------- | -------- | ----------- |
-| `message` | Yes      | `string` |             |
-| `runId`   | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `message` | Yes | `string` |  |
+| `runId` | Yes | `string` |  |
 
 Result: Object (fields below).
 
@@ -325,7 +321,7 @@ Result: Object (fields below).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.AgentStream> = {
-    message: 'Your request',
+    "message": "Your request"
 };
 const result: ResultOf<typeof Method.AgentStream> = await client.call(Method.AgentStream, params);
 ```
@@ -334,18 +330,18 @@ With a personal API key, omit `userId`; the gateway uses the authenticated ident
 
 Parameters: [StreamParams](protocol.md#streamparams).
 
-| Field               | Required | Type                                                                          | Description                                                                 |
-| ------------------- | -------- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| `agentId`           | No       | `string`                                                                      |                                                                             |
-| `attachments`       | No       | Array of [InboundAttachment](protocol.md#inboundattachment)                   | User-authored image, video, document, and text blocks, in display order.    |
-| `conversationId`    | No       | `string`                                                                      | Continues an existing conversation.                                         |
-| `cwd`               | No       | `string`                                                                      | Where tools operate.                                                        |
-| `message`           | Yes      | `string`                                                                      | User text; may be blank when at least one attachment contains content.      |
-| `reasoningEffort`   | No       | `"high"` / `"low"` / `"max"` / `"medium"` / `"minimal"` / `"off"` / `"xhigh"` | Per-turn reasoning preference; never changes the saved agent configuration. |
-| `responseFormat`    | No       | `"json"` / `"text"`                                                           | Final answer format; JSON mode does not disable tools or verification.      |
-| `streamId`          | No       | `string`                                                                      | The stream's id, chosen by the CLIENT.                                      |
-| `targetTimeSeconds` | No       | `integer`                                                                     | Soft task time target in seconds; never a cancellation deadline.            |
-| `userId`            | No       | `string`                                                                      | The principal the turn is billed and authorized as.                         |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `agentId` | No | `string` |  |
+| `attachments` | No | Array of [InboundAttachment](protocol.md#inboundattachment) | User-authored image, video, document, and text blocks, in display order. |
+| `conversationId` | No | `string` | Continues an existing conversation. |
+| `cwd` | No | `string` | Where tools operate. |
+| `message` | Yes | `string` | User text; may be blank when at least one attachment contains content. |
+| `reasoningEffort` | No | `"high"` / `"low"` / `"max"` / `"medium"` / `"minimal"` / `"off"` / `"xhigh"` | Per-turn reasoning preference; never changes the saved agent configuration. |
+| `responseFormat` | No | `"json"` / `"text"` | Final answer format; JSON mode does not disable tools or verification. |
+| `streamId` | No | `string` | The stream's id, chosen by the CLIENT. |
+| `targetTimeSeconds` | No | `integer` | Soft task time target in seconds; never a cancellation deadline. |
+| `userId` | No | `string` | The principal the turn is billed and authorized as. |
 
 Result: [StreamAccepted](protocol.md#streamaccepted).
 
@@ -355,21 +351,21 @@ Result: [StreamAccepted](protocol.md#streamaccepted).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.AgentsDefine> = {
-    agent: {
-        id: 'YOUR_ID',
-        model: 'YOUR_MODEL',
-        name: 'YOUR_NAME',
-        provider: 'YOUR_PROVIDER',
-    },
+    "agent": {
+        "id": "YOUR_ID",
+        "model": "YOUR_MODEL",
+        "name": "YOUR_NAME",
+        "provider": "YOUR_PROVIDER"
+    }
 };
 const result: ResultOf<typeof Method.AgentsDefine> = await client.call(Method.AgentsDefine, params);
 ```
 
 Parameters: [AgentDefineParams](protocol.md#agentdefineparams).
 
-| Field   | Required | Type                                           | Description |
-| ------- | -------- | ---------------------------------------------- | ----------- |
-| `agent` | Yes      | [AgentDefinition](protocol.md#agentdefinition) |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `agent` | Yes | [AgentDefinition](protocol.md#agentdefinition) |  |
 
 Result: [OkResult](protocol.md#okresult).
 
@@ -394,10 +390,7 @@ Result: Array of [AgentDefinition](protocol.md#agentdefinition).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.ApprovalsList> = {};
-const result: ResultOf<typeof Method.ApprovalsList> = await client.call(
-    Method.ApprovalsList,
-    params,
-);
+const result: ResultOf<typeof Method.ApprovalsList> = await client.call(Method.ApprovalsList, params);
 ```
 
 Parameters: [Recordstringnever](protocol.md#recordstringnever).
@@ -412,22 +405,19 @@ Result: Array of [PendingApproval](protocol.md#pendingapproval).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.ApprovalsResolve> = {
-    approvalId: 'YOUR_APPROVALID',
-    approved: false,
+    "approvalId": "YOUR_APPROVALID",
+    "approved": false
 };
-const result: ResultOf<typeof Method.ApprovalsResolve> = await client.call(
-    Method.ApprovalsResolve,
-    params,
-);
+const result: ResultOf<typeof Method.ApprovalsResolve> = await client.call(Method.ApprovalsResolve, params);
 ```
 
 Parameters: [ApprovalResolveParams](protocol.md#approvalresolveparams).
 
-| Field        | Required | Type      | Description |
-| ------------ | -------- | --------- | ----------- |
-| `approvalId` | Yes      | `string`  |             |
-| `approved`   | Yes      | `boolean` |             |
-| `reason`     | No       | `string`  |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `approvalId` | Yes | `string` |  |
+| `approved` | Yes | `boolean` |  |
+| `reason` | No | `string` |  |
 
 Result: [OkResult](protocol.md#okresult).
 
@@ -437,10 +427,7 @@ Result: [OkResult](protocol.md#okresult).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.ChannelsDeadLettersList> = {};
-const result: ResultOf<typeof Method.ChannelsDeadLettersList> = await client.call(
-    Method.ChannelsDeadLettersList,
-    params,
-);
+const result: ResultOf<typeof Method.ChannelsDeadLettersList> = await client.call(Method.ChannelsDeadLettersList, params);
 ```
 
 Parameters: [Recordstringnever](protocol.md#recordstringnever).
@@ -470,19 +457,16 @@ Result: Array of [ChannelInfo](protocol.md#channelinfo).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.ChannelsStatus> = {
-    id: 'YOUR_ID',
+    "id": "YOUR_ID"
 };
-const result: ResultOf<typeof Method.ChannelsStatus> = await client.call(
-    Method.ChannelsStatus,
-    params,
-);
+const result: ResultOf<typeof Method.ChannelsStatus> = await client.call(Method.ChannelsStatus, params);
 ```
 
 Parameters: [IdParams](protocol.md#idparams).
 
-| Field | Required | Type     | Description |
-| ----- | -------- | -------- | ----------- |
-| `id`  | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `id` | Yes | `string` |  |
 
 Result: [ChannelStatusResult](protocol.md#channelstatusresult).
 
@@ -507,18 +491,18 @@ Result: [ConfigResult](protocol.md#configresult).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.ConfigSet> = {
-    key: 'YOUR_KEY',
-    value: 'YOUR_VALUE',
+    "key": "YOUR_KEY",
+    "value": "YOUR_VALUE"
 };
 const result: ResultOf<typeof Method.ConfigSet> = await client.call(Method.ConfigSet, params);
 ```
 
 Parameters: [ConfigWriteParams](protocol.md#configwriteparams).
 
-| Field   | Required | Type     | Description                |
-| ------- | -------- | -------- | -------------------------- |
-| `key`   | Yes      | `string` |                            |
-| `value` | Yes      | `JSON`   | The value, already parsed. |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `key` | Yes | `string` |  |
+| `value` | Yes | `JSON` | The value, already parsed. |
 
 Result: [ConfigWriteResult](protocol.md#configwriteresult).
 
@@ -528,16 +512,16 @@ Result: [ConfigWriteResult](protocol.md#configwriteresult).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.ConfigUnset> = {
-    key: 'YOUR_KEY',
+    "key": "YOUR_KEY"
 };
 const result: ResultOf<typeof Method.ConfigUnset> = await client.call(Method.ConfigUnset, params);
 ```
 
 Parameters: Object (fields below).
 
-| Field | Required | Type     | Description |
-| ----- | -------- | -------- | ----------- |
-| `key` | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `key` | Yes | `string` |  |
 
 Result: [ConfigWriteResult](protocol.md#configwriteresult).
 
@@ -547,12 +531,12 @@ Use `await NexaClient.connect({ url, apiKey })`; the SDK handles challenge, prot
 
 Parameters: [ConnectParams](protocol.md#connectparams).
 
-| Field         | Required | Type                                               | Description                                                            |
-| ------------- | -------- | -------------------------------------------------- | ---------------------------------------------------------------------- |
-| `client`      | Yes      | [ConnectClientInfo](protocol.md#connectclientinfo) |                                                                        |
-| `maxProtocol` | Yes      | `number`                                           | The newest protocol the client can speak.                              |
-| `minProtocol` | Yes      | `number`                                           | The oldest protocol the client can speak.                              |
-| `nonce`       | Yes      | `string`                                           | The challenge nonce, proving the client read the server's first frame. |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `client` | Yes | [ConnectClientInfo](protocol.md#connectclientinfo) |  |
+| `maxProtocol` | Yes | `number` | The newest protocol the client can speak. |
+| `minProtocol` | Yes | `number` | The oldest protocol the client can speak. |
+| `nonce` | Yes | `string` | The challenge nonce, proving the client read the server's first frame. |
 
 Result: [HelloOk](protocol.md#hellook).
 
@@ -562,10 +546,7 @@ Result: [HelloOk](protocol.md#hellook).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.CreditBudgets> = {};
-const result: ResultOf<typeof Method.CreditBudgets> = await client.call(
-    Method.CreditBudgets,
-    params,
-);
+const result: ResultOf<typeof Method.CreditBudgets> = await client.call(Method.CreditBudgets, params);
 ```
 
 Parameters: [Recordstringnever](protocol.md#recordstringnever).
@@ -580,19 +561,16 @@ Result: Array of [Budget](protocol.md#budget).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.CreditRemoveBudget> = {
-    id: 'YOUR_ID',
+    "id": "YOUR_ID"
 };
-const result: ResultOf<typeof Method.CreditRemoveBudget> = await client.call(
-    Method.CreditRemoveBudget,
-    params,
-);
+const result: ResultOf<typeof Method.CreditRemoveBudget> = await client.call(Method.CreditRemoveBudget, params);
 ```
 
 Parameters: Object (fields below).
 
-| Field | Required | Type     | Description |
-| ----- | -------- | -------- | ----------- |
-| `id`  | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `id` | Yes | `string` |  |
 
 Result: Object (fields below).
 
@@ -602,23 +580,20 @@ Result: Object (fields below).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.CreditResetAllowance> = {
-    cycle: 'YOUR_CYCLE',
-    requestId: 'YOUR_REQUESTID',
-    week: 'YOUR_WEEK',
+    "cycle": "YOUR_CYCLE",
+    "requestId": "YOUR_REQUESTID",
+    "week": "YOUR_WEEK"
 };
-const result: ResultOf<typeof Method.CreditResetAllowance> = await client.call(
-    Method.CreditResetAllowance,
-    params,
-);
+const result: ResultOf<typeof Method.CreditResetAllowance> = await client.call(Method.CreditResetAllowance, params);
 ```
 
 Parameters: [ResetAllowanceParams](protocol.md#resetallowanceparams).
 
-| Field       | Required | Type     | Description |
-| ----------- | -------- | -------- | ----------- |
-| `cycle`     | Yes      | `string` |             |
-| `requestId` | Yes      | `string` |             |
-| `week`      | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `cycle` | Yes | `string` |  |
+| `requestId` | Yes | `string` |  |
+| `week` | Yes | `string` |  |
 
 Result: [ResetAllowanceResult](protocol.md#resetallowanceresult).
 
@@ -628,18 +603,15 @@ Result: [ResetAllowanceResult](protocol.md#resetallowanceresult).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.CreditResetHistory> = {};
-const result: ResultOf<typeof Method.CreditResetHistory> = await client.call(
-    Method.CreditResetHistory,
-    params,
-);
+const result: ResultOf<typeof Method.CreditResetHistory> = await client.call(Method.CreditResetHistory, params);
 ```
 
 Parameters: Object (fields below).
 
-| Field    | Required | Type     | Description |
-| -------- | -------- | -------- | ----------- |
-| `before` | No       | `string` |             |
-| `userId` | No       | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `before` | No | `string` |  |
+| `userId` | No | `string` |  |
 
 Result: [ResetHistoryPage](protocol.md#resethistorypage).
 
@@ -654,9 +626,9 @@ const result: ResultOf<typeof Method.CreditResets> = await client.call(Method.Cr
 
 Parameters: Object (fields below).
 
-| Field    | Required | Type     | Description |
-| -------- | -------- | -------- | ----------- |
-| `userId` | No       | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `userId` | No | `string` |  |
 
 Result: [ResetSnapshot](protocol.md#resetsnapshot) / `null`.
 
@@ -666,28 +638,25 @@ Result: [ResetSnapshot](protocol.md#resetsnapshot) / `null`.
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.CreditSetBudget> = {
-    enforcement: 'block',
-    limitMicrocents: 1,
-    period: 'daily',
-    scope: 'agent',
-    scopeId: 'YOUR_SCOPEID',
+    "enforcement": "block",
+    "limitMicrocents": 1,
+    "period": "daily",
+    "scope": "agent",
+    "scopeId": "YOUR_SCOPEID"
 };
-const result: ResultOf<typeof Method.CreditSetBudget> = await client.call(
-    Method.CreditSetBudget,
-    params,
-);
+const result: ResultOf<typeof Method.CreditSetBudget> = await client.call(Method.CreditSetBudget, params);
 ```
 
 Parameters: Object (fields below).
 
-| Field             | Required | Type                                               | Description |
-| ----------------- | -------- | -------------------------------------------------- | ----------- |
-| `enforcement`     | Yes      | [BudgetEnforcement](protocol.md#budgetenforcement) |             |
-| `id`              | No       | `string`                                           |             |
-| `limitMicrocents` | Yes      | `number`                                           |             |
-| `period`          | Yes      | [BudgetPeriod](protocol.md#budgetperiod)           |             |
-| `scope`           | Yes      | [CreditScope](protocol.md#creditscope)             |             |
-| `scopeId`         | Yes      | `string`                                           |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `enforcement` | Yes | [BudgetEnforcement](protocol.md#budgetenforcement) |  |
+| `id` | No | `string` |  |
+| `limitMicrocents` | Yes | `number` |  |
+| `period` | Yes | [BudgetPeriod](protocol.md#budgetperiod) |  |
+| `scope` | Yes | [CreditScope](protocol.md#creditscope) |  |
+| `scopeId` | Yes | `string` |  |
 
 Result: [Budget](protocol.md#budget).
 
@@ -697,20 +666,17 @@ Result: [Budget](protocol.md#budget).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.CreditSummary> = {};
-const result: ResultOf<typeof Method.CreditSummary> = await client.call(
-    Method.CreditSummary,
-    params,
-);
+const result: ResultOf<typeof Method.CreditSummary> = await client.call(Method.CreditSummary, params);
 ```
 
 Parameters: [CreditSummaryParams](protocol.md#creditsummaryparams).
 
-| Field     | Required | Type                                                               | Description                                         |
-| --------- | -------- | ------------------------------------------------------------------ | --------------------------------------------------- |
-| `from`    | No       | `number`                                                           |                                                     |
-| `scope`   | No       | `"agent"` / `"conversation"` / `"global"` / `"project"` / `"user"` | The scopes a balance or budget can be defined over. |
-| `scopeId` | No       | `string`                                                           |                                                     |
-| `to`      | No       | `number`                                                           |                                                     |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `from` | No | `number` |  |
+| `scope` | No | `"agent"` / `"conversation"` / `"global"` / `"project"` / `"user"` | The scopes a balance or budget can be defined over. |
+| `scopeId` | No | `string` |  |
+| `to` | No | `number` |  |
 
 Result: [CreditSummary](protocol.md#creditsummary).
 
@@ -725,9 +691,9 @@ const result: ResultOf<typeof Method.CreditWallet> = await client.call(Method.Cr
 
 Parameters: Object (fields below).
 
-| Field    | Required | Type     | Description |
-| -------- | -------- | -------- | ----------- |
-| `userId` | No       | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `userId` | No | `string` |  |
 
 Result: [WalletSnapshot](protocol.md#walletsnapshot) / `null`.
 
@@ -737,18 +703,15 @@ Result: [WalletSnapshot](protocol.md#walletsnapshot) / `null`.
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.CreditWalletHistory> = {};
-const result: ResultOf<typeof Method.CreditWalletHistory> = await client.call(
-    Method.CreditWalletHistory,
-    params,
-);
+const result: ResultOf<typeof Method.CreditWalletHistory> = await client.call(Method.CreditWalletHistory, params);
 ```
 
 Parameters: Object (fields below).
 
-| Field    | Required | Type     | Description |
-| -------- | -------- | -------- | ----------- |
-| `before` | No       | `string` |             |
-| `userId` | No       | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `before` | No | `string` |  |
+| `userId` | No | `string` |  |
 
 Result: [WalletHistoryPage](protocol.md#wallethistorypage).
 
@@ -758,19 +721,16 @@ Result: [WalletHistoryPage](protocol.md#wallethistorypage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.DataUploadCancel> = {
-    id: 'YOUR_ID',
+    "id": "YOUR_ID"
 };
-const result: ResultOf<typeof Method.DataUploadCancel> = await client.call(
-    Method.DataUploadCancel,
-    params,
-);
+const result: ResultOf<typeof Method.DataUploadCancel> = await client.call(Method.DataUploadCancel, params);
 ```
 
 Parameters: [DataUploadIdParams](protocol.md#datauploadidparams).
 
-| Field | Required | Type     | Description |
-| ----- | -------- | -------- | ----------- |
-| `id`  | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `id` | Yes | `string` |  |
 
 Result: [OkResult](protocol.md#okresult).
 
@@ -780,23 +740,20 @@ Result: [OkResult](protocol.md#okresult).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.DataUploadChunk> = {
-    data: 'YOUR_DATA',
-    id: 'YOUR_ID',
-    offset: 'YOUR_OFFSET',
+    "data": "YOUR_DATA",
+    "id": "YOUR_ID",
+    "offset": "YOUR_OFFSET"
 };
-const result: ResultOf<typeof Method.DataUploadChunk> = await client.call(
-    Method.DataUploadChunk,
-    params,
-);
+const result: ResultOf<typeof Method.DataUploadChunk> = await client.call(Method.DataUploadChunk, params);
 ```
 
 Parameters: [DataUploadChunkParams](protocol.md#datauploadchunkparams).
 
-| Field    | Required | Type     | Description |
-| -------- | -------- | -------- | ----------- |
-| `data`   | Yes      | `string` |             |
-| `id`     | Yes      | `string` |             |
-| `offset` | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `data` | Yes | `string` |  |
+| `id` | Yes | `string` |  |
+| `offset` | Yes | `string` |  |
 
 Result: [DataUploadPosition](protocol.md#datauploadposition).
 
@@ -806,19 +763,16 @@ Result: [DataUploadPosition](protocol.md#datauploadposition).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.DataUploadFinish> = {
-    id: 'YOUR_ID',
+    "id": "YOUR_ID"
 };
-const result: ResultOf<typeof Method.DataUploadFinish> = await client.call(
-    Method.DataUploadFinish,
-    params,
-);
+const result: ResultOf<typeof Method.DataUploadFinish> = await client.call(Method.DataUploadFinish, params);
 ```
 
 Parameters: [DataUploadIdParams](protocol.md#datauploadidparams).
 
-| Field | Required | Type     | Description |
-| ----- | -------- | -------- | ----------- |
-| `id`  | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `id` | Yes | `string` |  |
 
 Result: [DataFile](protocol.md#datafile).
 
@@ -828,21 +782,18 @@ Result: [DataFile](protocol.md#datafile).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.DataUploadStart> = {
-    byteLength: 'YOUR_BYTELENGTH',
-    filename: 'YOUR_FILENAME',
+    "byteLength": "YOUR_BYTELENGTH",
+    "filename": "YOUR_FILENAME"
 };
-const result: ResultOf<typeof Method.DataUploadStart> = await client.call(
-    Method.DataUploadStart,
-    params,
-);
+const result: ResultOf<typeof Method.DataUploadStart> = await client.call(Method.DataUploadStart, params);
 ```
 
 Parameters: [DataUploadStartParams](protocol.md#datauploadstartparams).
 
-| Field        | Required | Type     | Description |
-| ------------ | -------- | -------- | ----------- |
-| `byteLength` | Yes      | `string` |             |
-| `filename`   | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `byteLength` | Yes | `string` |  |
+| `filename` | Yes | `string` |  |
 
 Result: [DataUpload](protocol.md#dataupload).
 
@@ -852,19 +803,16 @@ Result: [DataUpload](protocol.md#dataupload).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.DesignAssetCancel> = {
-    id: 'YOUR_ID',
+    "id": "YOUR_ID"
 };
-const result: ResultOf<typeof Method.DesignAssetCancel> = await client.call(
-    Method.DesignAssetCancel,
-    params,
-);
+const result: ResultOf<typeof Method.DesignAssetCancel> = await client.call(Method.DesignAssetCancel, params);
 ```
 
 Parameters: [DesignAssetIdRequest](protocol.md#designassetidrequest).
 
-| Field | Required | Type     | Description |
-| ----- | -------- | -------- | ----------- |
-| `id`  | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `id` | Yes | `string` |  |
 
 Result: `null`.
 
@@ -874,23 +822,20 @@ Result: `null`.
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.DesignAssetChunk> = {
-    data: 'YOUR_DATA',
-    id: 'YOUR_ID',
-    offset: 'YOUR_OFFSET',
+    "data": "YOUR_DATA",
+    "id": "YOUR_ID",
+    "offset": "YOUR_OFFSET"
 };
-const result: ResultOf<typeof Method.DesignAssetChunk> = await client.call(
-    Method.DesignAssetChunk,
-    params,
-);
+const result: ResultOf<typeof Method.DesignAssetChunk> = await client.call(Method.DesignAssetChunk, params);
 ```
 
 Parameters: [DesignAssetChunkRequest](protocol.md#designassetchunkrequest).
 
-| Field    | Required | Type     | Description |
-| -------- | -------- | -------- | ----------- |
-| `data`   | Yes      | `string` |             |
-| `id`     | Yes      | `string` |             |
-| `offset` | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `data` | Yes | `string` |  |
+| `id` | Yes | `string` |  |
+| `offset` | Yes | `string` |  |
 
 Result: [DesignAssetPosition](protocol.md#designassetposition).
 
@@ -900,19 +845,16 @@ Result: [DesignAssetPosition](protocol.md#designassetposition).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.DesignAssetFinish> = {
-    id: 'YOUR_ID',
+    "id": "YOUR_ID"
 };
-const result: ResultOf<typeof Method.DesignAssetFinish> = await client.call(
-    Method.DesignAssetFinish,
-    params,
-);
+const result: ResultOf<typeof Method.DesignAssetFinish> = await client.call(Method.DesignAssetFinish, params);
 ```
 
 Parameters: [DesignAssetIdRequest](protocol.md#designassetidrequest).
 
-| Field | Required | Type     | Description |
-| ----- | -------- | -------- | ----------- |
-| `id`  | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `id` | Yes | `string` |  |
 
 Result: [DesignAsset](protocol.md#designasset).
 
@@ -922,21 +864,18 @@ Result: [DesignAsset](protocol.md#designasset).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.DesignAssetList> = {
-    after: null,
-    limit: 1,
+    "after": null,
+    "limit": 1
 };
-const result: ResultOf<typeof Method.DesignAssetList> = await client.call(
-    Method.DesignAssetList,
-    params,
-);
+const result: ResultOf<typeof Method.DesignAssetList> = await client.call(Method.DesignAssetList, params);
 ```
 
 Parameters: [DesignAssetListRequest](protocol.md#designassetlistrequest).
 
-| Field   | Required | Type          | Description |
-| ------- | -------- | ------------- | ----------- |
-| `after` | Yes      | `null,string` |             |
-| `limit` | Yes      | `number`      |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `after` | Yes | `null,string` |  |
+| `limit` | Yes | `number` |  |
 
 Result: [DesignAssetListPage](protocol.md#designassetlistpage).
 
@@ -946,21 +885,18 @@ Result: [DesignAssetListPage](protocol.md#designassetlistpage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.DesignAssetRead> = {
-    id: 'YOUR_ID',
-    offset: 'YOUR_OFFSET',
+    "id": "YOUR_ID",
+    "offset": "YOUR_OFFSET"
 };
-const result: ResultOf<typeof Method.DesignAssetRead> = await client.call(
-    Method.DesignAssetRead,
-    params,
-);
+const result: ResultOf<typeof Method.DesignAssetRead> = await client.call(Method.DesignAssetRead, params);
 ```
 
 Parameters: [DesignAssetReadRequest](protocol.md#designassetreadrequest).
 
-| Field    | Required | Type     | Description |
-| -------- | -------- | -------- | ----------- |
-| `id`     | Yes      | `string` |             |
-| `offset` | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `id` | Yes | `string` |  |
+| `offset` | Yes | `string` |  |
 
 Result: [DesignAssetSlice](protocol.md#designassetslice).
 
@@ -970,19 +906,16 @@ Result: [DesignAssetSlice](protocol.md#designassetslice).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.DesignAssetRemove> = {
-    id: 'YOUR_ID',
+    "id": "YOUR_ID"
 };
-const result: ResultOf<typeof Method.DesignAssetRemove> = await client.call(
-    Method.DesignAssetRemove,
-    params,
-);
+const result: ResultOf<typeof Method.DesignAssetRemove> = await client.call(Method.DesignAssetRemove, params);
 ```
 
 Parameters: [DesignAssetIdRequest](protocol.md#designassetidrequest).
 
-| Field | Required | Type     | Description |
-| ----- | -------- | -------- | ----------- |
-| `id`  | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `id` | Yes | `string` |  |
 
 Result: `null`.
 
@@ -992,25 +925,22 @@ Result: `null`.
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.DesignAssetStart> = {
-    byteLength: 'YOUR_BYTELENGTH',
-    id: 'YOUR_ID',
-    name: 'YOUR_NAME',
-    sha256: 'YOUR_SHA256',
+    "byteLength": "YOUR_BYTELENGTH",
+    "id": "YOUR_ID",
+    "name": "YOUR_NAME",
+    "sha256": "YOUR_SHA256"
 };
-const result: ResultOf<typeof Method.DesignAssetStart> = await client.call(
-    Method.DesignAssetStart,
-    params,
-);
+const result: ResultOf<typeof Method.DesignAssetStart> = await client.call(Method.DesignAssetStart, params);
 ```
 
 Parameters: [DesignAssetStartRequest](protocol.md#designassetstartrequest).
 
-| Field        | Required | Type     | Description |
-| ------------ | -------- | -------- | ----------- |
-| `byteLength` | Yes      | `string` |             |
-| `id`         | Yes      | `string` |             |
-| `name`       | Yes      | `string` |             |
-| `sha256`     | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `byteLength` | Yes | `string` |  |
+| `id` | Yes | `string` |  |
+| `name` | Yes | `string` |  |
+| `sha256` | Yes | `string` |  |
 
 Result: [DesignAssetPosition](protocol.md#designassetposition).
 
@@ -1020,29 +950,29 @@ Result: [DesignAssetPosition](protocol.md#designassetposition).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.DesignCanvas> = {
-    cursor: {
-        character: 1,
-        record: 1,
+    "cursor": {
+        "character": 1,
+        "record": 1
     },
-    id: 'YOUR_ID',
-    includeIds: [],
-    limit: 1,
-    pageId: null,
-    revision: null,
+    "id": "YOUR_ID",
+    "includeIds": [],
+    "limit": 1,
+    "pageId": null,
+    "revision": null
 };
 const result: ResultOf<typeof Method.DesignCanvas> = await client.call(Method.DesignCanvas, params);
 ```
 
 Parameters: [DesignViewRequest](protocol.md#designviewrequest).
 
-| Field        | Required | Type                                              | Description                                                                                              |
-| ------------ | -------- | ------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| `cursor`     | Yes      | [DesignCursor](protocol.md#designcursor) / `null` |                                                                                                          |
-| `id`         | Yes      | `string`                                          |                                                                                                          |
-| `includeIds` | Yes      | Array of `string`                                 | Additional existing layers and their dependencies; removed identities are ignored during shared refresh. |
-| `limit`      | Yes      | `number`                                          |                                                                                                          |
-| `pageId`     | Yes      | `null,string`                                     | Null or a removed preferred page selects the document's first page.                                      |
-| `revision`   | Yes      | `null,string`                                     |                                                                                                          |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `cursor` | Yes | [DesignCursor](protocol.md#designcursor) / `null` |  |
+| `id` | Yes | `string` |  |
+| `includeIds` | Yes | Array of `string` | Additional existing layers and their dependencies; removed identities are ignored during shared refresh. |
+| `limit` | Yes | `number` |  |
+| `pageId` | Yes | `null,string` | Null or a removed preferred page selects the document's first page. |
+| `revision` | Yes | `null,string` |  |
 
 Result: [DesignCanvasPage](protocol.md#designcanvaspage).
 
@@ -1052,29 +982,26 @@ Result: [DesignCanvasPage](protocol.md#designcanvaspage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.DesignCanvasMetrics> = {
-    id: 'YOUR_ID',
-    includeIds: [],
-    limit: 1,
-    offset: 1,
-    pageId: null,
-    revision: 'YOUR_REVISION',
+    "id": "YOUR_ID",
+    "includeIds": [],
+    "limit": 1,
+    "offset": 1,
+    "pageId": null,
+    "revision": "YOUR_REVISION"
 };
-const result: ResultOf<typeof Method.DesignCanvasMetrics> = await client.call(
-    Method.DesignCanvasMetrics,
-    params,
-);
+const result: ResultOf<typeof Method.DesignCanvasMetrics> = await client.call(Method.DesignCanvasMetrics, params);
 ```
 
 Parameters: [DesignCanvasMetricsRequest](protocol.md#designcanvasmetricsrequest).
 
-| Field        | Required | Type              | Description |
-| ------------ | -------- | ----------------- | ----------- |
-| `id`         | Yes      | `string`          |             |
-| `includeIds` | Yes      | Array of `string` |             |
-| `limit`      | Yes      | `number`          |             |
-| `offset`     | Yes      | `number`          |             |
-| `pageId`     | Yes      | `null,string`     |             |
-| `revision`   | Yes      | `string`          |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `id` | Yes | `string` |  |
+| `includeIds` | Yes | Array of `string` |  |
+| `limit` | Yes | `number` |  |
+| `offset` | Yes | `number` |  |
+| `pageId` | Yes | `null,string` |  |
+| `revision` | Yes | `string` |  |
 
 Result: [DesignCanvasMetricsPage](protocol.md#designcanvasmetricspage).
 
@@ -1084,28 +1011,25 @@ Result: [DesignCanvasMetricsPage](protocol.md#designcanvasmetricspage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.DesignChanges> = {
-    commandId: 'YOUR_COMMANDID',
-    cursor: {
-        character: 1,
-        record: 1,
+    "commandId": "YOUR_COMMANDID",
+    "cursor": {
+        "character": 1,
+        "record": 1
     },
-    id: 'YOUR_ID',
-    limit: 1,
+    "id": "YOUR_ID",
+    "limit": 1
 };
-const result: ResultOf<typeof Method.DesignChanges> = await client.call(
-    Method.DesignChanges,
-    params,
-);
+const result: ResultOf<typeof Method.DesignChanges> = await client.call(Method.DesignChanges, params);
 ```
 
 Parameters: [DesignChangesRequest](protocol.md#designchangesrequest).
 
-| Field       | Required | Type                                              | Description |
-| ----------- | -------- | ------------------------------------------------- | ----------- |
-| `commandId` | Yes      | `string`                                          |             |
-| `cursor`    | Yes      | [DesignCursor](protocol.md#designcursor) / `null` |             |
-| `id`        | Yes      | `string`                                          |             |
-| `limit`     | Yes      | `number`                                          |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `commandId` | Yes | `string` |  |
+| `cursor` | Yes | [DesignCursor](protocol.md#designcursor) / `null` |  |
+| `id` | Yes | `string` |  |
+| `limit` | Yes | `number` |  |
 
 Result: [DesignRecordPage](protocol.md#designrecordpage).
 
@@ -1115,20 +1039,20 @@ Result: [DesignRecordPage](protocol.md#designrecordpage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.DesignCreate> = {
-    commandId: 'YOUR_COMMANDID',
-    id: 'YOUR_ID',
-    name: 'YOUR_NAME',
+    "commandId": "YOUR_COMMANDID",
+    "id": "YOUR_ID",
+    "name": "YOUR_NAME"
 };
 const result: ResultOf<typeof Method.DesignCreate> = await client.call(Method.DesignCreate, params);
 ```
 
 Parameters: [DesignCreateRequest](protocol.md#designcreaterequest).
 
-| Field       | Required | Type     | Description |
-| ----------- | -------- | -------- | ----------- |
-| `commandId` | Yes      | `string` |             |
-| `id`        | Yes      | `string` |             |
-| `name`      | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `commandId` | Yes | `string` |  |
+| `id` | Yes | `string` |  |
+| `name` | Yes | `string` |  |
 
 Result: [DesignReceipt](protocol.md#designreceipt).
 
@@ -1138,20 +1062,20 @@ Result: [DesignReceipt](protocol.md#designreceipt).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.DesignDelete> = {
-    commandId: 'YOUR_COMMANDID',
-    expectedRevision: 'YOUR_EXPECTEDREVISION',
-    id: 'YOUR_ID',
+    "commandId": "YOUR_COMMANDID",
+    "expectedRevision": "YOUR_EXPECTEDREVISION",
+    "id": "YOUR_ID"
 };
 const result: ResultOf<typeof Method.DesignDelete> = await client.call(Method.DesignDelete, params);
 ```
 
 Parameters: [DesignDeleteRequest](protocol.md#designdeleterequest).
 
-| Field              | Required | Type     | Description |
-| ------------------ | -------- | -------- | ----------- |
-| `commandId`        | Yes      | `string` |             |
-| `expectedRevision` | Yes      | `string` |             |
-| `id`               | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `commandId` | Yes | `string` |  |
+| `expectedRevision` | Yes | `string` |  |
+| `id` | Yes | `string` |  |
 
 Result: [DesignDeleteReceipt](protocol.md#designdeletereceipt).
 
@@ -1161,20 +1085,20 @@ Result: [DesignDeleteReceipt](protocol.md#designdeletereceipt).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.DesignEvents> = {
-    afterRevision: 'YOUR_AFTERREVISION',
-    id: 'YOUR_ID',
-    limit: 1,
+    "afterRevision": "YOUR_AFTERREVISION",
+    "id": "YOUR_ID",
+    "limit": 1
 };
 const result: ResultOf<typeof Method.DesignEvents> = await client.call(Method.DesignEvents, params);
 ```
 
 Parameters: [DesignEventsRequest](protocol.md#designeventsrequest).
 
-| Field           | Required | Type     | Description |
-| --------------- | -------- | -------- | ----------- |
-| `afterRevision` | Yes      | `string` |             |
-| `id`            | Yes      | `string` |             |
-| `limit`         | Yes      | `number` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `afterRevision` | Yes | `string` |  |
+| `id` | Yes | `string` |  |
+| `limit` | Yes | `number` |  |
 
 Result: [DesignEventsPage](protocol.md#designeventspage).
 
@@ -1184,21 +1108,18 @@ Result: [DesignEventsPage](protocol.md#designeventspage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.DesignFontList> = {
-    after: null,
-    limit: 1,
+    "after": null,
+    "limit": 1
 };
-const result: ResultOf<typeof Method.DesignFontList> = await client.call(
-    Method.DesignFontList,
-    params,
-);
+const result: ResultOf<typeof Method.DesignFontList> = await client.call(Method.DesignFontList, params);
 ```
 
 Parameters: [DesignFontListRequest](protocol.md#designfontlistrequest).
 
-| Field   | Required | Type          | Description |
-| ------- | -------- | ------------- | ----------- |
-| `after` | Yes      | `null,string` |             |
-| `limit` | Yes      | `number`      |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `after` | Yes | `null,string` |  |
+| `limit` | Yes | `number` |  |
 
 Result: [DesignFontListPage](protocol.md#designfontlistpage).
 
@@ -1208,21 +1129,18 @@ Result: [DesignFontListPage](protocol.md#designfontlistpage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.DesignFontRead> = {
-    id: 'YOUR_ID',
-    offset: 'YOUR_OFFSET',
+    "id": "YOUR_ID",
+    "offset": "YOUR_OFFSET"
 };
-const result: ResultOf<typeof Method.DesignFontRead> = await client.call(
-    Method.DesignFontRead,
-    params,
-);
+const result: ResultOf<typeof Method.DesignFontRead> = await client.call(Method.DesignFontRead, params);
 ```
 
 Parameters: [DesignFontReadRequest](protocol.md#designfontreadrequest).
 
-| Field    | Required | Type     | Description |
-| -------- | -------- | -------- | ----------- |
-| `id`     | Yes      | `string` |             |
-| `offset` | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `id` | Yes | `string` |  |
+| `offset` | Yes | `string` |  |
 
 Result: [DesignFontSlice](protocol.md#designfontslice).
 
@@ -1232,24 +1150,24 @@ Result: [DesignFontSlice](protocol.md#designfontslice).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.DesignLayout> = {
-    id: 'YOUR_ID',
-    limit: 1,
-    offset: 1,
-    pageId: 'YOUR_PAGEID',
-    revision: 'YOUR_REVISION',
+    "id": "YOUR_ID",
+    "limit": 1,
+    "offset": 1,
+    "pageId": "YOUR_PAGEID",
+    "revision": "YOUR_REVISION"
 };
 const result: ResultOf<typeof Method.DesignLayout> = await client.call(Method.DesignLayout, params);
 ```
 
 Parameters: [DesignLayoutRequest](protocol.md#designlayoutrequest).
 
-| Field      | Required | Type     | Description |
-| ---------- | -------- | -------- | ----------- |
-| `id`       | Yes      | `string` |             |
-| `limit`    | Yes      | `number` |             |
-| `offset`   | Yes      | `number` |             |
-| `pageId`   | Yes      | `string` |             |
-| `revision` | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `id` | Yes | `string` |  |
+| `limit` | Yes | `number` |  |
+| `offset` | Yes | `number` |  |
+| `pageId` | Yes | `string` |  |
+| `revision` | Yes | `string` |  |
 
 Result: [DesignLayoutPage](protocol.md#designlayoutpage).
 
@@ -1259,18 +1177,18 @@ Result: [DesignLayoutPage](protocol.md#designlayoutpage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.DesignList> = {
-    after: null,
-    limit: 1,
+    "after": null,
+    "limit": 1
 };
 const result: ResultOf<typeof Method.DesignList> = await client.call(Method.DesignList, params);
 ```
 
 Parameters: [DesignListRequest](protocol.md#designlistrequest).
 
-| Field   | Required | Type          | Description |
-| ------- | -------- | ------------- | ----------- |
-| `after` | Yes      | `null,string` |             |
-| `limit` | Yes      | `number`      |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `after` | Yes | `null,string` |  |
+| `limit` | Yes | `number` |  |
 
 Result: [DesignListPage](protocol.md#designlistpage).
 
@@ -1280,25 +1198,25 @@ Result: [DesignListPage](protocol.md#designlistpage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.DesignRead> = {
-    cursor: {
-        character: 1,
-        record: 1,
+    "cursor": {
+        "character": 1,
+        "record": 1
     },
-    id: 'YOUR_ID',
-    limit: 1,
-    revision: null,
+    "id": "YOUR_ID",
+    "limit": 1,
+    "revision": null
 };
 const result: ResultOf<typeof Method.DesignRead> = await client.call(Method.DesignRead, params);
 ```
 
 Parameters: [DesignReadRequest](protocol.md#designreadrequest).
 
-| Field      | Required | Type                                              | Description |
-| ---------- | -------- | ------------------------------------------------- | ----------- |
-| `cursor`   | Yes      | [DesignCursor](protocol.md#designcursor) / `null` |             |
-| `id`       | Yes      | `string`                                          |             |
-| `limit`    | Yes      | `number`                                          |             |
-| `revision` | Yes      | `null,string`                                     |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `cursor` | Yes | [DesignCursor](protocol.md#designcursor) / `null` |  |
+| `id` | Yes | `string` |  |
+| `limit` | Yes | `number` |  |
+| `revision` | Yes | `null,string` |  |
 
 Result: [DesignRecordPage](protocol.md#designrecordpage).
 
@@ -1308,22 +1226,22 @@ Result: [DesignRecordPage](protocol.md#designrecordpage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.DesignSave> = {
-    commandId: 'YOUR_COMMANDID',
-    expectedRevision: 'YOUR_EXPECTEDREVISION',
-    id: 'YOUR_ID',
-    operations: [],
+    "commandId": "YOUR_COMMANDID",
+    "expectedRevision": "YOUR_EXPECTEDREVISION",
+    "id": "YOUR_ID",
+    "operations": []
 };
 const result: ResultOf<typeof Method.DesignSave> = await client.call(Method.DesignSave, params);
 ```
 
 Parameters: [DesignSaveRequest](protocol.md#designsaverequest).
 
-| Field              | Required | Type                                                    | Description |
-| ------------------ | -------- | ------------------------------------------------------- | ----------- |
-| `commandId`        | Yes      | `string`                                                |             |
-| `expectedRevision` | Yes      | `string`                                                |             |
-| `id`               | Yes      | `string`                                                |             |
-| `operations`       | Yes      | Array of [DesignOperation](protocol.md#designoperation) |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `commandId` | Yes | `string` |  |
+| `expectedRevision` | Yes | `string` |  |
+| `id` | Yes | `string` |  |
+| `operations` | Yes | Array of [DesignOperation](protocol.md#designoperation) |  |
 
 Result: [DesignReceipt](protocol.md#designreceipt).
 
@@ -1333,40 +1251,37 @@ Result: [DesignReceipt](protocol.md#designreceipt).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.DesignTextWindow> = {
-    cursor: {
-        glyphIndex: null,
-        lineIndex: 1,
-        segmentIndex: 1,
+    "cursor": {
+        "glyphIndex": null,
+        "lineIndex": 1,
+        "segmentIndex": 1
     },
-    id: 'YOUR_ID',
-    limit: 1,
-    occurrenceId: 'YOUR_OCCURRENCEID',
-    pageId: 'YOUR_PAGEID',
-    revision: 'YOUR_REVISION',
-    window: {
-        height: 1,
-        width: 1,
-        x: 1,
-        y: 1,
-    },
+    "id": "YOUR_ID",
+    "limit": 1,
+    "occurrenceId": "YOUR_OCCURRENCEID",
+    "pageId": "YOUR_PAGEID",
+    "revision": "YOUR_REVISION",
+    "window": {
+        "height": 1,
+        "width": 1,
+        "x": 1,
+        "y": 1
+    }
 };
-const result: ResultOf<typeof Method.DesignTextWindow> = await client.call(
-    Method.DesignTextWindow,
-    params,
-);
+const result: ResultOf<typeof Method.DesignTextWindow> = await client.call(Method.DesignTextWindow, params);
 ```
 
 Parameters: [DesignTextWindowRequest](protocol.md#designtextwindowrequest).
 
-| Field          | Required | Type                                                                  | Description |
-| -------------- | -------- | --------------------------------------------------------------------- | ----------- |
-| `cursor`       | Yes      | [DesignTextWindowCursor](protocol.md#designtextwindowcursor) / `null` |             |
-| `id`           | Yes      | `string`                                                              |             |
-| `limit`        | Yes      | `number`                                                              |             |
-| `occurrenceId` | Yes      | `string`                                                              |             |
-| `pageId`       | Yes      | `string`                                                              |             |
-| `revision`     | Yes      | `string`                                                              |             |
-| `window`       | Yes      | [DesignGlyphBounds](protocol.md#designglyphbounds)                    |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `cursor` | Yes | [DesignTextWindowCursor](protocol.md#designtextwindowcursor) / `null` |  |
+| `id` | Yes | `string` |  |
+| `limit` | Yes | `number` |  |
+| `occurrenceId` | Yes | `string` |  |
+| `pageId` | Yes | `string` |  |
+| `revision` | Yes | `string` |  |
+| `window` | Yes | [DesignGlyphBounds](protocol.md#designglyphbounds) |  |
 
 Result: [DesignTextWindowPage](protocol.md#designtextwindowpage).
 
@@ -1376,22 +1291,22 @@ Result: [DesignTextWindowPage](protocol.md#designtextwindowpage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.DesignUndo> = {
-    commandId: 'YOUR_COMMANDID',
-    expectedRevision: 'YOUR_EXPECTEDREVISION',
-    id: 'YOUR_ID',
-    targetCommandId: 'YOUR_TARGETCOMMANDID',
+    "commandId": "YOUR_COMMANDID",
+    "expectedRevision": "YOUR_EXPECTEDREVISION",
+    "id": "YOUR_ID",
+    "targetCommandId": "YOUR_TARGETCOMMANDID"
 };
 const result: ResultOf<typeof Method.DesignUndo> = await client.call(Method.DesignUndo, params);
 ```
 
 Parameters: [DesignUndoRequest](protocol.md#designundorequest).
 
-| Field              | Required | Type     | Description |
-| ------------------ | -------- | -------- | ----------- |
-| `commandId`        | Yes      | `string` |             |
-| `expectedRevision` | Yes      | `string` |             |
-| `id`               | Yes      | `string` |             |
-| `targetCommandId`  | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `commandId` | Yes | `string` |  |
+| `expectedRevision` | Yes | `string` |  |
+| `id` | Yes | `string` |  |
+| `targetCommandId` | Yes | `string` |  |
 
 Result: [DesignReceipt](protocol.md#designreceipt).
 
@@ -1401,29 +1316,29 @@ Result: [DesignReceipt](protocol.md#designreceipt).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.DesignView> = {
-    cursor: {
-        character: 1,
-        record: 1,
+    "cursor": {
+        "character": 1,
+        "record": 1
     },
-    id: 'YOUR_ID',
-    includeIds: [],
-    limit: 1,
-    pageId: null,
-    revision: null,
+    "id": "YOUR_ID",
+    "includeIds": [],
+    "limit": 1,
+    "pageId": null,
+    "revision": null
 };
 const result: ResultOf<typeof Method.DesignView> = await client.call(Method.DesignView, params);
 ```
 
 Parameters: [DesignViewRequest](protocol.md#designviewrequest).
 
-| Field        | Required | Type                                              | Description                                                                                              |
-| ------------ | -------- | ------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| `cursor`     | Yes      | [DesignCursor](protocol.md#designcursor) / `null` |                                                                                                          |
-| `id`         | Yes      | `string`                                          |                                                                                                          |
-| `includeIds` | Yes      | Array of `string`                                 | Additional existing layers and their dependencies; removed identities are ignored during shared refresh. |
-| `limit`      | Yes      | `number`                                          |                                                                                                          |
-| `pageId`     | Yes      | `null,string`                                     | Null or a removed preferred page selects the document's first page.                                      |
-| `revision`   | Yes      | `null,string`                                     |                                                                                                          |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `cursor` | Yes | [DesignCursor](protocol.md#designcursor) / `null` |  |
+| `id` | Yes | `string` |  |
+| `includeIds` | Yes | Array of `string` | Additional existing layers and their dependencies; removed identities are ignored during shared refresh. |
+| `limit` | Yes | `number` |  |
+| `pageId` | Yes | `null,string` | Null or a removed preferred page selects the document's first page. |
+| `revision` | Yes | `null,string` |  |
 
 Result: [DesignViewPage](protocol.md#designviewpage).
 
@@ -1433,20 +1348,17 @@ Result: [DesignViewPage](protocol.md#designviewpage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.DevicesApprove> = {
-    requestId: 'YOUR_REQUESTID',
+    "requestId": "YOUR_REQUESTID"
 };
-const result: ResultOf<typeof Method.DevicesApprove> = await client.call(
-    Method.DevicesApprove,
-    params,
-);
+const result: ResultOf<typeof Method.DevicesApprove> = await client.call(Method.DevicesApprove, params);
 ```
 
 Parameters: [DeviceApproveParams](protocol.md#deviceapproveparams).
 
-| Field       | Required | Type                                | Description                                                                                   |
-| ----------- | -------- | ----------------------------------- | --------------------------------------------------------------------------------------------- |
-| `requestId` | Yes      | `string`                            |                                                                                               |
-| `scopes`    | No       | Array of [Scope](protocol.md#scope) | Absent grants exactly what the device requested. A list here REPLACES that, and may widen it. |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `requestId` | Yes | `string` |  |
+| `scopes` | No | Array of [Scope](protocol.md#scope) | Absent grants exactly what the device requested. A list here REPLACES that, and may widen it. |
 
 Result: [DeviceApproveResult](protocol.md#deviceapproveresult).
 
@@ -1471,19 +1383,16 @@ Result: [DeviceListResult](protocol.md#devicelistresult).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.DevicesReject> = {
-    id: 'YOUR_ID',
+    "id": "YOUR_ID"
 };
-const result: ResultOf<typeof Method.DevicesReject> = await client.call(
-    Method.DevicesReject,
-    params,
-);
+const result: ResultOf<typeof Method.DevicesReject> = await client.call(Method.DevicesReject, params);
 ```
 
 Parameters: [IdParams](protocol.md#idparams).
 
-| Field | Required | Type     | Description |
-| ----- | -------- | -------- | ----------- |
-| `id`  | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `id` | Yes | `string` |  |
 
 Result: [OkResult](protocol.md#okresult).
 
@@ -1493,19 +1402,16 @@ Result: [OkResult](protocol.md#okresult).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.DevicesRevoke> = {
-    deviceId: 'YOUR_DEVICEID',
+    "deviceId": "YOUR_DEVICEID"
 };
-const result: ResultOf<typeof Method.DevicesRevoke> = await client.call(
-    Method.DevicesRevoke,
-    params,
-);
+const result: ResultOf<typeof Method.DevicesRevoke> = await client.call(Method.DevicesRevoke, params);
 ```
 
 Parameters: [DeviceRefParams](protocol.md#devicerefparams).
 
-| Field      | Required | Type     | Description |
-| ---------- | -------- | -------- | ----------- |
-| `deviceId` | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `deviceId` | Yes | `string` |  |
 
 Result: [OkResult](protocol.md#okresult).
 
@@ -1530,26 +1436,26 @@ Result: [HealthResult](protocol.md#healthresult).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.JobsAdd> = {
-    name: 'YOUR_NAME',
+    "name": "YOUR_NAME"
 };
 const result: ResultOf<typeof Method.JobsAdd> = await client.call(Method.JobsAdd, params);
 ```
 
 Parameters: [JobAddParams](protocol.md#jobaddparams).
 
-| Field             | Required | Type      | Description                                                                    |
-| ----------------- | -------- | --------- | ------------------------------------------------------------------------------ |
-| `agentId`         | No       | `string`  |                                                                                |
-| `at`              | No       | `number`  |                                                                                |
-| `command`         | No       | `string`  | A shell command to run.                                                        |
-| `cron`            | No       | `string`  | A cron expression. Exactly one of `cron`, `intervalMs` and `at` must be given. |
-| `deliverTo`       | No       | `string`  | Where the answer goes, as `channel:conversation` — `telegram:12345`.           |
-| `enabled`         | No       | `boolean` |                                                                                |
-| `intervalMs`      | No       | `number`  |                                                                                |
-| `name`            | Yes      | `string`  |                                                                                |
-| `prompt`          | No       | `string`  | An agent turn to run. Exactly one of `prompt` and `command` must be given.     |
-| `silentWhenEmpty` | No       | `boolean` | Say nothing when the turn produced nothing. A quiet night should be quiet.     |
-| `timezone`        | No       | `string`  |                                                                                |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `agentId` | No | `string` |  |
+| `at` | No | `number` |  |
+| `command` | No | `string` | A shell command to run. |
+| `cron` | No | `string` | A cron expression. Exactly one of `cron`, `intervalMs` and `at` must be given. |
+| `deliverTo` | No | `string` | Where the answer goes, as `channel:conversation` — `telegram:12345`. |
+| `enabled` | No | `boolean` |  |
+| `intervalMs` | No | `number` |  |
+| `name` | Yes | `string` |  |
+| `prompt` | No | `string` | An agent turn to run. Exactly one of `prompt` and `command` must be given. |
+| `silentWhenEmpty` | No | `boolean` | Say nothing when the turn produced nothing. A quiet night should be quiet. |
+| `timezone` | No | `string` |  |
 
 Result: [IdParams](protocol.md#idparams).
 
@@ -1574,16 +1480,16 @@ Result: Array of [Job](protocol.md#job).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.JobsRemove> = {
-    id: 'YOUR_ID',
+    "id": "YOUR_ID"
 };
 const result: ResultOf<typeof Method.JobsRemove> = await client.call(Method.JobsRemove, params);
 ```
 
 Parameters: [IdParams](protocol.md#idparams).
 
-| Field | Required | Type     | Description |
-| ----- | -------- | -------- | ----------- |
-| `id`  | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `id` | Yes | `string` |  |
 
 Result: [OkResult](protocol.md#okresult).
 
@@ -1598,12 +1504,12 @@ const result: ResultOf<typeof Method.LogsTail> = await client.call(Method.LogsTa
 
 Parameters: [LogTailParams](protocol.md#logtailparams).
 
-| Field   | Required | Type                                        | Description                                                                     |
-| ------- | -------- | ------------------------------------------- | ------------------------------------------------------------------------------- |
-| `level` | No       | `"debug"` / `"error"` / `"info"` / `"warn"` | Only lines at or above this level.                                              |
-| `limit` | No       | `number`                                    | How many lines back to read. Absent reads everything the buffer still holds.    |
-| `scope` | No       | `string`                                    | Only lines from this subsystem, e.g. `gateway`.                                 |
-| `since` | No       | `number`                                    | Only lines newer than this timestamp, so a poller does not re-read what it has. |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `level` | No | `"debug"` / `"error"` / `"info"` / `"warn"` | Only lines at or above this level. |
+| `limit` | No | `number` | How many lines back to read. Absent reads everything the buffer still holds. |
+| `scope` | No | `string` | Only lines from this subsystem, e.g. `gateway`. |
+| `since` | No | `number` | Only lines newer than this timestamp, so a poller does not re-read what it has. |
 
 Result: Array of [LogRecord](protocol.md#logrecord).
 
@@ -1613,21 +1519,18 @@ Result: Array of [LogRecord](protocol.md#logrecord).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.MediaAcknowledge> = {
-    id: 'YOUR_ID',
-    received: false,
+    "id": "YOUR_ID",
+    "received": false
 };
-const result: ResultOf<typeof Method.MediaAcknowledge> = await client.call(
-    Method.MediaAcknowledge,
-    params,
-);
+const result: ResultOf<typeof Method.MediaAcknowledge> = await client.call(Method.MediaAcknowledge, params);
 ```
 
 Parameters: [MediaAcknowledgeParams](protocol.md#mediaacknowledgeparams).
 
-| Field      | Required | Type      | Description |
-| ---------- | -------- | --------- | ----------- |
-| `id`       | Yes      | `string`  |             |
-| `received` | Yes      | `boolean` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `id` | Yes | `string` |  |
+| `received` | Yes | `boolean` |  |
 
 Result: [OkResult](protocol.md#okresult).
 
@@ -1637,19 +1540,16 @@ Result: [OkResult](protocol.md#okresult).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.OfficeOwnerProof> = {
-    accountId: 'YOUR_ACCOUNTID',
+    "accountId": "YOUR_ACCOUNTID"
 };
-const result: ResultOf<typeof Method.OfficeOwnerProof> = await client.call(
-    Method.OfficeOwnerProof,
-    params,
-);
+const result: ResultOf<typeof Method.OfficeOwnerProof> = await client.call(Method.OfficeOwnerProof, params);
 ```
 
 Parameters: Object (fields below).
 
-| Field       | Required | Type     | Description |
-| ----------- | -------- | -------- | ----------- |
-| `accountId` | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `accountId` | Yes | `string` |  |
 
 Result: Object (fields below).
 
@@ -1659,23 +1559,20 @@ Result: Object (fields below).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.ProcessesInput> = {
-    data: 'YOUR_DATA',
-    processId: 'YOUR_PROCESSID',
-    sessionId: 'YOUR_SESSIONID',
+    "data": "YOUR_DATA",
+    "processId": "YOUR_PROCESSID",
+    "sessionId": "YOUR_SESSIONID"
 };
-const result: ResultOf<typeof Method.ProcessesInput> = await client.call(
-    Method.ProcessesInput,
-    params,
-);
+const result: ResultOf<typeof Method.ProcessesInput> = await client.call(Method.ProcessesInput, params);
 ```
 
 Parameters: [ProcessInput](protocol.md#processinput).
 
-| Field       | Required | Type     | Description |
-| ----------- | -------- | -------- | ----------- |
-| `data`      | Yes      | `string` |             |
-| `processId` | Yes      | `string` |             |
-| `sessionId` | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `data` | Yes | `string` |  |
+| `processId` | Yes | `string` |  |
+| `sessionId` | Yes | `string` |  |
 
 Result: [OkResult](protocol.md#okresult).
 
@@ -1685,19 +1582,16 @@ Result: [OkResult](protocol.md#okresult).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.ProcessesList> = {
-    sessionId: 'YOUR_SESSIONID',
+    "sessionId": "YOUR_SESSIONID"
 };
-const result: ResultOf<typeof Method.ProcessesList> = await client.call(
-    Method.ProcessesList,
-    params,
-);
+const result: ResultOf<typeof Method.ProcessesList> = await client.call(Method.ProcessesList, params);
 ```
 
 Parameters: [SessionRef](protocol.md#sessionref).
 
-| Field       | Required | Type     | Description |
-| ----------- | -------- | -------- | ----------- |
-| `sessionId` | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `sessionId` | Yes | `string` |  |
 
 Result: Array of [BackgroundProcess](protocol.md#backgroundprocess).
 
@@ -1707,19 +1601,19 @@ Result: Array of [BackgroundProcess](protocol.md#backgroundprocess).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.ProcessesLog> = {
-    processId: 'YOUR_PROCESSID',
-    sessionId: 'YOUR_SESSIONID',
+    "processId": "YOUR_PROCESSID",
+    "sessionId": "YOUR_SESSIONID"
 };
 const result: ResultOf<typeof Method.ProcessesLog> = await client.call(Method.ProcessesLog, params);
 ```
 
 Parameters: [ProcessLogRef](protocol.md#processlogref).
 
-| Field       | Required | Type     | Description |
-| ----------- | -------- | -------- | ----------- |
-| `offset`    | No       | `string` |             |
-| `processId` | Yes      | `string` |             |
-| `sessionId` | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `offset` | No | `string` |  |
+| `processId` | Yes | `string` |  |
+| `sessionId` | Yes | `string` |  |
 
 Result: [BackgroundProcessLog](protocol.md#backgroundprocesslog).
 
@@ -1729,25 +1623,22 @@ Result: [BackgroundProcessLog](protocol.md#backgroundprocesslog).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.ProcessesResize> = {
-    cols: 1,
-    processId: 'YOUR_PROCESSID',
-    rows: 1,
-    sessionId: 'YOUR_SESSIONID',
+    "cols": 1,
+    "processId": "YOUR_PROCESSID",
+    "rows": 1,
+    "sessionId": "YOUR_SESSIONID"
 };
-const result: ResultOf<typeof Method.ProcessesResize> = await client.call(
-    Method.ProcessesResize,
-    params,
-);
+const result: ResultOf<typeof Method.ProcessesResize> = await client.call(Method.ProcessesResize, params);
 ```
 
 Parameters: [ProcessResize](protocol.md#processresize).
 
-| Field       | Required | Type     | Description |
-| ----------- | -------- | -------- | ----------- |
-| `cols`      | Yes      | `number` |             |
-| `processId` | Yes      | `string` |             |
-| `rows`      | Yes      | `number` |             |
-| `sessionId` | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `cols` | Yes | `number` |  |
+| `processId` | Yes | `string` |  |
+| `rows` | Yes | `number` |  |
+| `sessionId` | Yes | `string` |  |
 
 Result: [OkResult](protocol.md#okresult).
 
@@ -1757,21 +1648,18 @@ Result: [OkResult](protocol.md#okresult).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.ProcessesStop> = {
-    processId: 'YOUR_PROCESSID',
-    sessionId: 'YOUR_SESSIONID',
+    "processId": "YOUR_PROCESSID",
+    "sessionId": "YOUR_SESSIONID"
 };
-const result: ResultOf<typeof Method.ProcessesStop> = await client.call(
-    Method.ProcessesStop,
-    params,
-);
+const result: ResultOf<typeof Method.ProcessesStop> = await client.call(Method.ProcessesStop, params);
 ```
 
 Parameters: [BackgroundProcessRef](protocol.md#backgroundprocessref).
 
-| Field       | Required | Type     | Description |
-| ----------- | -------- | -------- | ----------- |
-| `processId` | Yes      | `string` |             |
-| `sessionId` | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `processId` | Yes | `string` |  |
+| `sessionId` | Yes | `string` |  |
 
 Result: [OkResult](protocol.md#okresult).
 
@@ -1781,24 +1669,21 @@ Result: [OkResult](protocol.md#okresult).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.ReverseBrowser> = {
-    evidenceId: 'YOUR_EVIDENCEID',
-    id: 'YOUR_ID',
-    runId: 'YOUR_RUNID',
+    "evidenceId": "YOUR_EVIDENCEID",
+    "id": "YOUR_ID",
+    "runId": "YOUR_RUNID"
 };
-const result: ResultOf<typeof Method.ReverseBrowser> = await client.call(
-    Method.ReverseBrowser,
-    params,
-);
+const result: ResultOf<typeof Method.ReverseBrowser> = await client.call(Method.ReverseBrowser, params);
 ```
 
 Parameters: [ReverseBrowserQuery](protocol.md#reversebrowserquery).
 
-| Field        | Required | Type     | Description |
-| ------------ | -------- | -------- | ----------- |
-| `cursor`     | No       | `string` |             |
-| `evidenceId` | Yes      | `string` |             |
-| `id`         | Yes      | `string` |             |
-| `runId`      | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `cursor` | No | `string` |  |
+| `evidenceId` | Yes | `string` |  |
+| `id` | Yes | `string` |  |
+| `runId` | Yes | `string` |  |
 
 Result: [ReverseBrowserPage](protocol.md#reversebrowserpage).
 
@@ -1808,28 +1693,25 @@ Result: [ReverseBrowserPage](protocol.md#reversebrowserpage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.ReverseBrowserModules> = {
-    evidenceId: 'YOUR_EVIDENCEID',
-    id: 'YOUR_ID',
-    runId: 'YOUR_RUNID',
-    view: 'candidates',
+    "evidenceId": "YOUR_EVIDENCEID",
+    "id": "YOUR_ID",
+    "runId": "YOUR_RUNID",
+    "view": "candidates"
 };
-const result: ResultOf<typeof Method.ReverseBrowserModules> = await client.call(
-    Method.ReverseBrowserModules,
-    params,
-);
+const result: ResultOf<typeof Method.ReverseBrowserModules> = await client.call(Method.ReverseBrowserModules, params);
 ```
 
 Parameters: [BrowserModuleQuery](protocol.md#browsermodulequery).
 
-| Field        | Required | Type                                                                                                                                       | Description                                                         |
-| ------------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------- |
-| `cursor`     | No       | `string`                                                                                                                                   |                                                                     |
-| `evidenceId` | Yes      | `string`                                                                                                                                   |                                                                     |
-| `field`      | No       | `"error-message"` / `"expression"` / `"importer-url"` / `"map-base-url"` / `"module"` / `"parse-error"` / `"resolved-url"` / `"specifier"` | Full fields are read only after selecting an import or its context. |
-| `id`         | Yes      | `string`                                                                                                                                   |                                                                     |
-| `runId`      | Yes      | `string`                                                                                                                                   |                                                                     |
-| `selector`   | No       | `string`                                                                                                                                   |                                                                     |
-| `view`       | Yes      | [BrowserModuleView](protocol.md#browsermoduleview)                                                                                         |                                                                     |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `cursor` | No | `string` |  |
+| `evidenceId` | Yes | `string` |  |
+| `field` | No | `"error-message"` / `"expression"` / `"importer-url"` / `"map-base-url"` / `"module"` / `"parse-error"` / `"resolved-url"` / `"specifier"` | Full fields are read only after selecting an import or its context. |
+| `id` | Yes | `string` |  |
+| `runId` | Yes | `string` |  |
+| `selector` | No | `string` |  |
+| `view` | Yes | [BrowserModuleView](protocol.md#browsermoduleview) |  |
 
 Result: [BrowserModulePage](protocol.md#browsermodulepage).
 
@@ -1839,26 +1721,23 @@ Result: [BrowserModulePage](protocol.md#browsermodulepage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.ReverseBrowserScreenshot> = {
-    evidenceId: 'YOUR_EVIDENCEID',
-    id: 'YOUR_ID',
-    runId: 'YOUR_RUNID',
-    view: 'image',
+    "evidenceId": "YOUR_EVIDENCEID",
+    "id": "YOUR_ID",
+    "runId": "YOUR_RUNID",
+    "view": "image"
 };
-const result: ResultOf<typeof Method.ReverseBrowserScreenshot> = await client.call(
-    Method.ReverseBrowserScreenshot,
-    params,
-);
+const result: ResultOf<typeof Method.ReverseBrowserScreenshot> = await client.call(Method.ReverseBrowserScreenshot, params);
 ```
 
 Parameters: [BrowserScreenshotQuery](protocol.md#browserscreenshotquery).
 
-| Field        | Required | Type                                                       | Description |
-| ------------ | -------- | ---------------------------------------------------------- | ----------- |
-| `cursor`     | No       | `string`                                                   |             |
-| `evidenceId` | Yes      | `string`                                                   |             |
-| `id`         | Yes      | `string`                                                   |             |
-| `runId`      | Yes      | `string`                                                   |             |
-| `view`       | Yes      | [BrowserScreenshotView](protocol.md#browserscreenshotview) |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `cursor` | No | `string` |  |
+| `evidenceId` | Yes | `string` |  |
+| `id` | Yes | `string` |  |
+| `runId` | Yes | `string` |  |
+| `view` | Yes | [BrowserScreenshotView](protocol.md#browserscreenshotview) |  |
 
 Result: [BrowserScreenshotPage](protocol.md#browserscreenshotpage).
 
@@ -1868,27 +1747,24 @@ Result: [BrowserScreenshotPage](protocol.md#browserscreenshotpage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.ReverseBrowserSources> = {
-    evidenceId: 'YOUR_EVIDENCEID',
-    id: 'YOUR_ID',
-    runId: 'YOUR_RUNID',
-    view: 'resources',
+    "evidenceId": "YOUR_EVIDENCEID",
+    "id": "YOUR_ID",
+    "runId": "YOUR_RUNID",
+    "view": "resources"
 };
-const result: ResultOf<typeof Method.ReverseBrowserSources> = await client.call(
-    Method.ReverseBrowserSources,
-    params,
-);
+const result: ResultOf<typeof Method.ReverseBrowserSources> = await client.call(Method.ReverseBrowserSources, params);
 ```
 
 Parameters: [BrowserSourcesQuery](protocol.md#browsersourcesquery).
 
-| Field        | Required | Type                                                 | Description |
-| ------------ | -------- | ---------------------------------------------------- | ----------- |
-| `cursor`     | No       | `string`                                             |             |
-| `evidenceId` | Yes      | `string`                                             |             |
-| `id`         | Yes      | `string`                                             |             |
-| `runId`      | Yes      | `string`                                             |             |
-| `selector`   | No       | `string`                                             |             |
-| `view`       | Yes      | [BrowserSourcesView](protocol.md#browsersourcesview) |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `cursor` | No | `string` |  |
+| `evidenceId` | Yes | `string` |  |
+| `id` | Yes | `string` |  |
+| `runId` | Yes | `string` |  |
+| `selector` | No | `string` |  |
+| `view` | Yes | [BrowserSourcesView](protocol.md#browsersourcesview) |  |
 
 Result: [BrowserSourcesPage](protocol.md#browsersourcespage).
 
@@ -1898,25 +1774,22 @@ Result: [BrowserSourcesPage](protocol.md#browsersourcespage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.ReverseBrowserStorage> = {
-    evidenceId: 'YOUR_EVIDENCEID',
-    id: 'YOUR_ID',
-    runId: 'YOUR_RUNID',
+    "evidenceId": "YOUR_EVIDENCEID",
+    "id": "YOUR_ID",
+    "runId": "YOUR_RUNID"
 };
-const result: ResultOf<typeof Method.ReverseBrowserStorage> = await client.call(
-    Method.ReverseBrowserStorage,
-    params,
-);
+const result: ResultOf<typeof Method.ReverseBrowserStorage> = await client.call(Method.ReverseBrowserStorage, params);
 ```
 
 Parameters: [BrowserStorageQuery](protocol.md#browserstoragequery).
 
-| Field        | Required | Type                                                                                       | Description                                                 |
-| ------------ | -------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------- |
-| `cursor`     | No       | `string`                                                                                   |                                                             |
-| `evidenceId` | Yes      | `string`                                                                                   |                                                             |
-| `group`      | No       | `"cache-storage"` / `"cookies"` / `"indexed-db"` / `"local-storage"` / `"session-storage"` | Each storage authority has independently reported coverage. |
-| `id`         | Yes      | `string`                                                                                   |                                                             |
-| `runId`      | Yes      | `string`                                                                                   |                                                             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `cursor` | No | `string` |  |
+| `evidenceId` | Yes | `string` |  |
+| `group` | No | `"cache-storage"` / `"cookies"` / `"indexed-db"` / `"local-storage"` / `"session-storage"` | Each storage authority has independently reported coverage. |
+| `id` | Yes | `string` |  |
+| `runId` | Yes | `string` |  |
 
 Result: [BrowserStoragePage](protocol.md#browserstoragepage).
 
@@ -1926,25 +1799,22 @@ Result: [BrowserStoragePage](protocol.md#browserstoragepage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.ReverseBrowserStorageComparison> = {
-    evidenceId: 'YOUR_EVIDENCEID',
-    id: 'YOUR_ID',
-    runId: 'YOUR_RUNID',
+    "evidenceId": "YOUR_EVIDENCEID",
+    "id": "YOUR_ID",
+    "runId": "YOUR_RUNID"
 };
-const result: ResultOf<typeof Method.ReverseBrowserStorageComparison> = await client.call(
-    Method.ReverseBrowserStorageComparison,
-    params,
-);
+const result: ResultOf<typeof Method.ReverseBrowserStorageComparison> = await client.call(Method.ReverseBrowserStorageComparison, params);
 ```
 
 Parameters: [BrowserStorageComparisonQuery](protocol.md#browserstoragecomparisonquery).
 
-| Field        | Required | Type                                                                                       | Description                                                 |
-| ------------ | -------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------- |
-| `cursor`     | No       | `string`                                                                                   |                                                             |
-| `evidenceId` | Yes      | `string`                                                                                   |                                                             |
-| `group`      | No       | `"cache-storage"` / `"cookies"` / `"indexed-db"` / `"local-storage"` / `"session-storage"` | Each storage authority has independently reported coverage. |
-| `id`         | Yes      | `string`                                                                                   |                                                             |
-| `runId`      | Yes      | `string`                                                                                   |                                                             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `cursor` | No | `string` |  |
+| `evidenceId` | Yes | `string` |  |
+| `group` | No | `"cache-storage"` / `"cookies"` / `"indexed-db"` / `"local-storage"` / `"session-storage"` | Each storage authority has independently reported coverage. |
+| `id` | Yes | `string` |  |
+| `runId` | Yes | `string` |  |
 
 Result: [BrowserStorageComparisonPage](protocol.md#browserstoragecomparisonpage).
 
@@ -1954,27 +1824,24 @@ Result: [BrowserStorageComparisonPage](protocol.md#browserstoragecomparisonpage)
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.ReverseBrowserStructure> = {
-    evidenceId: 'YOUR_EVIDENCEID',
-    id: 'YOUR_ID',
-    runId: 'YOUR_RUNID',
-    view: 'accessibility',
+    "evidenceId": "YOUR_EVIDENCEID",
+    "id": "YOUR_ID",
+    "runId": "YOUR_RUNID",
+    "view": "accessibility"
 };
-const result: ResultOf<typeof Method.ReverseBrowserStructure> = await client.call(
-    Method.ReverseBrowserStructure,
-    params,
-);
+const result: ResultOf<typeof Method.ReverseBrowserStructure> = await client.call(Method.ReverseBrowserStructure, params);
 ```
 
 Parameters: [BrowserStructureQuery](protocol.md#browserstructurequery).
 
-| Field        | Required | Type                                                     | Description |
-| ------------ | -------- | -------------------------------------------------------- | ----------- |
-| `cursor`     | No       | `string`                                                 |             |
-| `evidenceId` | Yes      | `string`                                                 |             |
-| `id`         | Yes      | `string`                                                 |             |
-| `runId`      | Yes      | `string`                                                 |             |
-| `selector`   | No       | `string`                                                 |             |
-| `view`       | Yes      | [BrowserStructureView](protocol.md#browserstructureview) |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `cursor` | No | `string` |  |
+| `evidenceId` | Yes | `string` |  |
+| `id` | Yes | `string` |  |
+| `runId` | Yes | `string` |  |
+| `selector` | No | `string` |  |
+| `view` | Yes | [BrowserStructureView](protocol.md#browserstructureview) |  |
 
 Result: [BrowserStructurePage](protocol.md#browserstructurepage).
 
@@ -1984,26 +1851,23 @@ Result: [BrowserStructurePage](protocol.md#browserstructurepage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.ReverseBrowserWebmcp> = {
-    evidenceId: 'YOUR_EVIDENCEID',
-    id: 'YOUR_ID',
-    runId: 'YOUR_RUNID',
+    "evidenceId": "YOUR_EVIDENCEID",
+    "id": "YOUR_ID",
+    "runId": "YOUR_RUNID"
 };
-const result: ResultOf<typeof Method.ReverseBrowserWebmcp> = await client.call(
-    Method.ReverseBrowserWebmcp,
-    params,
-);
+const result: ResultOf<typeof Method.ReverseBrowserWebmcp> = await client.call(Method.ReverseBrowserWebmcp, params);
 ```
 
 Parameters: [BrowserWebMcpQuery](protocol.md#browserwebmcpquery).
 
-| Field        | Required | Type                                  | Description                                                                           |
-| ------------ | -------- | ------------------------------------- | ------------------------------------------------------------------------------------- |
-| `cursor`     | No       | `string`                              |                                                                                       |
-| `evidenceId` | Yes      | `string`                              |                                                                                       |
-| `id`         | Yes      | `string`                              |                                                                                       |
-| `runId`      | Yes      | `string`                              |                                                                                       |
-| `selector`   | No       | `string`                              |                                                                                       |
-| `view`       | No       | `"metadata"` / `"schema"` / `"tools"` | Metadata, declaration rows and one selected schema have independent transfer budgets. |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `cursor` | No | `string` |  |
+| `evidenceId` | Yes | `string` |  |
+| `id` | Yes | `string` |  |
+| `runId` | Yes | `string` |  |
+| `selector` | No | `string` |  |
+| `view` | No | `"metadata"` / `"schema"` / `"tools"` | Metadata, declaration rows and one selected schema have independent transfer budgets. |
 
 Result: [BrowserWebMcpPage](protocol.md#browserwebmcppage).
 
@@ -2013,22 +1877,19 @@ Result: [BrowserWebMcpPage](protocol.md#browserwebmcppage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.ReverseCatalog> = {
-    id: 'YOUR_ID',
-    runId: 'YOUR_RUNID',
+    "id": "YOUR_ID",
+    "runId": "YOUR_RUNID"
 };
-const result: ResultOf<typeof Method.ReverseCatalog> = await client.call(
-    Method.ReverseCatalog,
-    params,
-);
+const result: ResultOf<typeof Method.ReverseCatalog> = await client.call(Method.ReverseCatalog, params);
 ```
 
 Parameters: [ReverseCatalogQuery](protocol.md#reversecatalogquery).
 
-| Field    | Required | Type     | Description |
-| -------- | -------- | -------- | ----------- |
-| `cursor` | No       | `string` |             |
-| `id`     | Yes      | `string` |             |
-| `runId`  | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `cursor` | No | `string` |  |
+| `id` | Yes | `string` |  |
+| `runId` | Yes | `string` |  |
 
 Result: [ReverseCatalogPage](protocol.md#reversecatalogpage).
 
@@ -2038,25 +1899,22 @@ Result: [ReverseCatalogPage](protocol.md#reversecatalogpage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.ReverseEvidence> = {
-    evidenceId: 'YOUR_EVIDENCEID',
-    id: 'YOUR_ID',
-    runId: 'YOUR_RUNID',
+    "evidenceId": "YOUR_EVIDENCEID",
+    "id": "YOUR_ID",
+    "runId": "YOUR_RUNID"
 };
-const result: ResultOf<typeof Method.ReverseEvidence> = await client.call(
-    Method.ReverseEvidence,
-    params,
-);
+const result: ResultOf<typeof Method.ReverseEvidence> = await client.call(Method.ReverseEvidence, params);
 ```
 
 Parameters: [ReverseEvidenceQuery](protocol.md#reverseevidencequery).
 
-| Field            | Required | Type                    | Description                                                      |
-| ---------------- | -------- | ----------------------- | ---------------------------------------------------------------- |
-| `cursor`         | No       | `string`                |                                                                  |
-| `evidenceId`     | Yes      | `string`                |                                                                  |
-| `id`             | Yes      | `string`                |                                                                  |
-| `representation` | No       | `"code"` / `"original"` | Code is extracted at capture time; original remains the default. |
-| `runId`          | Yes      | `string`                |                                                                  |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `cursor` | No | `string` |  |
+| `evidenceId` | Yes | `string` |  |
+| `id` | Yes | `string` |  |
+| `representation` | No | `"code"` / `"original"` | Code is extracted at capture time; original remains the default. |
+| `runId` | Yes | `string` |  |
 
 Result: [ReverseEvidencePage](protocol.md#reverseevidencepage).
 
@@ -2066,25 +1924,22 @@ Result: [ReverseEvidencePage](protocol.md#reverseevidencepage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.ReverseFunctions> = {
-    engine: 'ghidra',
-    id: 'YOUR_ID',
-    runId: 'YOUR_RUNID',
+    "engine": "ghidra",
+    "id": "YOUR_ID",
+    "runId": "YOUR_RUNID"
 };
-const result: ResultOf<typeof Method.ReverseFunctions> = await client.call(
-    Method.ReverseFunctions,
-    params,
-);
+const result: ResultOf<typeof Method.ReverseFunctions> = await client.call(Method.ReverseFunctions, params);
 ```
 
 Parameters: [ReverseFunctionsQuery](protocol.md#reversefunctionsquery).
 
-| Field    | Required | Type                                       | Description                                                                  |
-| -------- | -------- | ------------------------------------------ | ---------------------------------------------------------------------------- |
-| `cursor` | No       | `string`                                   |                                                                              |
-| `engine` | Yes      | [ReverseEngine](protocol.md#reverseengine) |                                                                              |
-| `filter` | No       | `string`                                   | Literal case-insensitive name or address prefix, never a regular expression. |
-| `id`     | Yes      | `string`                                   |                                                                              |
-| `runId`  | Yes      | `string`                                   |                                                                              |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `cursor` | No | `string` |  |
+| `engine` | Yes | [ReverseEngine](protocol.md#reverseengine) |  |
+| `filter` | No | `string` | Literal case-insensitive name or address prefix, never a regular expression. |
+| `id` | Yes | `string` |  |
+| `runId` | Yes | `string` |  |
 
 Result: [ReverseFunctionsPage](protocol.md#reversefunctionspage).
 
@@ -2094,22 +1949,22 @@ Result: [ReverseFunctionsPage](protocol.md#reversefunctionspage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.ReverseGraph> = {
-    evidenceId: 'YOUR_EVIDENCEID',
-    id: 'YOUR_ID',
-    runId: 'YOUR_RUNID',
+    "evidenceId": "YOUR_EVIDENCEID",
+    "id": "YOUR_ID",
+    "runId": "YOUR_RUNID"
 };
 const result: ResultOf<typeof Method.ReverseGraph> = await client.call(Method.ReverseGraph, params);
 ```
 
 Parameters: [ReverseGraphQuery](protocol.md#reversegraphquery).
 
-| Field        | Required | Type     | Description                                                                            |
-| ------------ | -------- | -------- | -------------------------------------------------------------------------------------- |
-| `blockId`    | No       | `string` | When present, cursor addresses instructions in this block rather than captured blocks. |
-| `cursor`     | No       | `string` |                                                                                        |
-| `evidenceId` | Yes      | `string` |                                                                                        |
-| `id`         | Yes      | `string` |                                                                                        |
-| `runId`      | Yes      | `string` |                                                                                        |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `blockId` | No | `string` | When present, cursor addresses instructions in this block rather than captured blocks. |
+| `cursor` | No | `string` |  |
+| `evidenceId` | Yes | `string` |  |
+| `id` | Yes | `string` |  |
+| `runId` | Yes | `string` |  |
 
 Result: [ReverseGraphPage](protocol.md#reversegraphpage).
 
@@ -2119,30 +1974,27 @@ Result: [ReverseGraphPage](protocol.md#reversegraphpage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.ReverseInspect> = {
-    engine: 'ghidra',
-    id: 'YOUR_ID',
-    operation: 'decompile',
-    runId: 'YOUR_RUNID',
-    selector: 'YOUR_SELECTOR',
+    "engine": "ghidra",
+    "id": "YOUR_ID",
+    "operation": "decompile",
+    "runId": "YOUR_RUNID",
+    "selector": "YOUR_SELECTOR"
 };
-const result: ResultOf<typeof Method.ReverseInspect> = await client.call(
-    Method.ReverseInspect,
-    params,
-);
+const result: ResultOf<typeof Method.ReverseInspect> = await client.call(Method.ReverseInspect, params);
 ```
 
 Parameters: [ReverseInspectQuery](protocol.md#reverseinspectquery).
 
-| Field       | Required | Type                                               | Description                                                                  |
-| ----------- | -------- | -------------------------------------------------- | ---------------------------------------------------------------------------- |
-| `cursor`    | No       | `string`                                           |                                                                              |
-| `engine`    | Yes      | [ReverseEngine](protocol.md#reverseengine)         |                                                                              |
-| `filter`    | No       | `string`                                           | Literal case-insensitive name or address prefix, never a regular expression. |
-| `id`        | Yes      | `string`                                           |                                                                              |
-| `offset`    | No       | `number`                                           |                                                                              |
-| `operation` | Yes      | [ReverseInspection](protocol.md#reverseinspection) |                                                                              |
-| `runId`     | Yes      | `string`                                           |                                                                              |
-| `selector`  | Yes      | `string`                                           |                                                                              |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `cursor` | No | `string` |  |
+| `engine` | Yes | [ReverseEngine](protocol.md#reverseengine) |  |
+| `filter` | No | `string` | Literal case-insensitive name or address prefix, never a regular expression. |
+| `id` | Yes | `string` |  |
+| `offset` | No | `number` |  |
+| `operation` | Yes | [ReverseInspection](protocol.md#reverseinspection) |  |
+| `runId` | Yes | `string` |  |
+| `selector` | Yes | `string` |  |
 
 Result: [ReverseInspectResult](protocol.md#reverseinspectresult).
 
@@ -2152,25 +2004,22 @@ Result: [ReverseInspectResult](protocol.md#reverseinspectresult).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.ReverseNetwork> = {
-    id: 'YOUR_ID',
-    runId: 'YOUR_RUNID',
+    "id": "YOUR_ID",
+    "runId": "YOUR_RUNID"
 };
-const result: ResultOf<typeof Method.ReverseNetwork> = await client.call(
-    Method.ReverseNetwork,
-    params,
-);
+const result: ResultOf<typeof Method.ReverseNetwork> = await client.call(Method.ReverseNetwork, params);
 ```
 
 Parameters: [ReverseNetworkDirectoryQuery](protocol.md#reversenetworkdirectoryquery).
 
-| Field    | Required | Type     | Description |
-| -------- | -------- | -------- | ----------- |
-| `cursor` | No       | `string` |             |
-| `filter` | No       | `string` |             |
-| `id`     | Yes      | `string` |             |
-| `method` | No       | `string` |             |
-| `runId`  | Yes      | `string` |             |
-| `status` | No       | `number` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `cursor` | No | `string` |  |
+| `filter` | No | `string` |  |
+| `id` | Yes | `string` |  |
+| `method` | No | `string` |  |
+| `runId` | Yes | `string` |  |
+| `status` | No | `number` |  |
 
 Result: [ReverseNetworkDirectoryPage](protocol.md#reversenetworkdirectorypage).
 
@@ -2180,26 +2029,23 @@ Result: [ReverseNetworkDirectoryPage](protocol.md#reversenetworkdirectorypage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.ReverseNetworkDetail> = {
-    id: 'YOUR_ID',
-    runId: 'YOUR_RUNID',
-    selector: 'YOUR_SELECTOR',
-    view: 'query',
+    "id": "YOUR_ID",
+    "runId": "YOUR_RUNID",
+    "selector": "YOUR_SELECTOR",
+    "view": "query"
 };
-const result: ResultOf<typeof Method.ReverseNetworkDetail> = await client.call(
-    Method.ReverseNetworkDetail,
-    params,
-);
+const result: ResultOf<typeof Method.ReverseNetworkDetail> = await client.call(Method.ReverseNetworkDetail, params);
 ```
 
 Parameters: [ReverseNetworkDetailQuery](protocol.md#reversenetworkdetailquery).
 
-| Field      | Required | Type                                               | Description |
-| ---------- | -------- | -------------------------------------------------- | ----------- |
-| `cursor`   | No       | `string`                                           |             |
-| `id`       | Yes      | `string`                                           |             |
-| `runId`    | Yes      | `string`                                           |             |
-| `selector` | Yes      | `string`                                           |             |
-| `view`     | Yes      | [NetworkDetailView](protocol.md#networkdetailview) |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `cursor` | No | `string` |  |
+| `id` | Yes | `string` |  |
+| `runId` | Yes | `string` |  |
+| `selector` | Yes | `string` |  |
+| `view` | Yes | [NetworkDetailView](protocol.md#networkdetailview) |  |
 
 Result: [ReverseNetworkDetailPage](protocol.md#reversenetworkdetailpage).
 
@@ -2209,10 +2055,7 @@ Result: [ReverseNetworkDetailPage](protocol.md#reversenetworkdetailpage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.RobloxCredentialsRemove> = {};
-const result: ResultOf<typeof Method.RobloxCredentialsRemove> = await client.call(
-    Method.RobloxCredentialsRemove,
-    params,
-);
+const result: ResultOf<typeof Method.RobloxCredentialsRemove> = await client.call(Method.RobloxCredentialsRemove, params);
 ```
 
 Parameters: [Recordstringnever](protocol.md#recordstringnever).
@@ -2227,19 +2070,16 @@ Result: [RobloxCredentialStatus](protocol.md#robloxcredentialstatus).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.RobloxCredentialsSet> = {
-    apiKey: 'YOUR_APIKEY',
+    "apiKey": "YOUR_APIKEY"
 };
-const result: ResultOf<typeof Method.RobloxCredentialsSet> = await client.call(
-    Method.RobloxCredentialsSet,
-    params,
-);
+const result: ResultOf<typeof Method.RobloxCredentialsSet> = await client.call(Method.RobloxCredentialsSet, params);
 ```
 
 Parameters: [RobloxCredentialSetParams](protocol.md#robloxcredentialsetparams).
 
-| Field    | Required | Type     | Description |
-| -------- | -------- | -------- | ----------- |
-| `apiKey` | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `apiKey` | Yes | `string` |  |
 
 Result: [RobloxCredentialStatus](protocol.md#robloxcredentialstatus).
 
@@ -2249,10 +2089,7 @@ Result: [RobloxCredentialStatus](protocol.md#robloxcredentialstatus).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.RobloxCredentialsStatus> = {};
-const result: ResultOf<typeof Method.RobloxCredentialsStatus> = await client.call(
-    Method.RobloxCredentialsStatus,
-    params,
-);
+const result: ResultOf<typeof Method.RobloxCredentialsStatus> = await client.call(Method.RobloxCredentialsStatus, params);
 ```
 
 Parameters: [Recordstringnever](protocol.md#recordstringnever).
@@ -2261,37 +2098,123 @@ Type: Dictionary.
 
 Result: [RobloxCredentialStatus](protocol.md#robloxcredentialstatus).
 
+## roblox.live.close
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.RobloxLiveClose> = {
+    "handle": "YOUR_HANDLE",
+    "id": "YOUR_ID"
+};
+const result: ResultOf<typeof Method.RobloxLiveClose> = await client.call(Method.RobloxLiveClose, params);
+```
+
+Parameters: [RobloxLiveHandleRequest](protocol.md#robloxlivehandlerequest).
+
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `handle` | Yes | `string` |  |
+| `id` | Yes | `string` |  |
+
+Result: [RobloxLiveClosed](protocol.md#robloxliveclosed).
+
+## roblox.live.export
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.RobloxLiveExport> = {
+    "handle": "YOUR_HANDLE",
+    "id": "YOUR_ID"
+};
+const result: ResultOf<typeof Method.RobloxLiveExport> = await client.call(Method.RobloxLiveExport, params);
+```
+
+Parameters: [RobloxLiveHandleRequest](protocol.md#robloxlivehandlerequest).
+
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `handle` | Yes | `string` |  |
+| `id` | Yes | `string` |  |
+
+Result: [RobloxLiveExport](protocol.md#robloxliveexport).
+
+## roblox.live.start
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.RobloxLiveStart> = {
+    "attachmentId": "YOUR_ATTACHMENTID",
+    "id": "YOUR_ID",
+    "previewId": "YOUR_PREVIEWID"
+};
+const result: ResultOf<typeof Method.RobloxLiveStart> = await client.call(Method.RobloxLiveStart, params);
+```
+
+Parameters: [RobloxLiveStartRequest](protocol.md#robloxlivestartrequest).
+
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `attachmentId` | Yes | `string` |  |
+| `id` | Yes | `string` |  |
+| `previewId` | Yes | `string` |  |
+
+Result: [RobloxLiveFrame](protocol.md#robloxliveframe).
+
+## roblox.live.step
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.RobloxLiveStep> = {
+    "handle": "YOUR_HANDLE",
+    "id": "YOUR_ID",
+    "seconds": 1
+};
+const result: ResultOf<typeof Method.RobloxLiveStep> = await client.call(Method.RobloxLiveStep, params);
+```
+
+Parameters: [RobloxLiveStepRequest](protocol.md#robloxlivesteprequest).
+
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `handle` | Yes | `string` |  |
+| `id` | Yes | `string` |  |
+| `input` | No | [RobloxLiveActivation](protocol.md#robloxliveactivation) | A logical activation on the retained VM's current clock. |
+| `seconds` | Yes | `number` |  |
+
+Result: [RobloxLiveFrame](protocol.md#robloxliveframe).
+
 ## roblox.telemetry.funnel
 
 ```ts
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.RobloxTelemetryFunnel> = {
-    completionWindowMs: 'YOUR_COMPLETIONWINDOWMS',
-    fromMs: 'YOUR_FROMMS',
-    projectId: 'YOUR_PROJECTID',
-    steps: [],
-    toMs: 'YOUR_TOMS',
+    "completionWindowMs": "YOUR_COMPLETIONWINDOWMS",
+    "fromMs": "YOUR_FROMMS",
+    "projectId": "YOUR_PROJECTID",
+    "steps": [],
+    "toMs": "YOUR_TOMS"
 };
-const result: ResultOf<typeof Method.RobloxTelemetryFunnel> = await client.call(
-    Method.RobloxTelemetryFunnel,
-    params,
-);
+const result: ResultOf<typeof Method.RobloxTelemetryFunnel> = await client.call(Method.RobloxTelemetryFunnel, params);
 ```
 
 Parameters: [TelemetryFunnelParams](protocol.md#telemetryfunnelparams).
 
-| Field                     | Required | Type              | Description |
-| ------------------------- | -------- | ----------------- | ----------- |
-| `appliedConfigKey`        | No       | `string`          |             |
-| `completionWindowMs`      | Yes      | `string`          |             |
-| `configLookbackMs`        | No       | `string`          |             |
-| `fromMs`                  | Yes      | `string`          |             |
-| `performanceFpsThreshold` | No       | `number`          |             |
-| `performanceLookbackMs`   | No       | `string`          |             |
-| `projectId`               | Yes      | `string`          |             |
-| `steps`                   | Yes      | Array of `string` |             |
-| `toMs`                    | Yes      | `string`          |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `appliedConfigKey` | No | `string` |  |
+| `completionWindowMs` | Yes | `string` |  |
+| `configLookbackMs` | No | `string` |  |
+| `fromMs` | Yes | `string` |  |
+| `performanceFpsThreshold` | No | `number` |  |
+| `performanceLookbackMs` | No | `string` |  |
+| `projectId` | Yes | `string` |  |
+| `steps` | Yes | Array of `string` |  |
+| `toMs` | Yes | `string` |  |
 
 Result: [FunnelReport](protocol.md#funnelreport).
 
@@ -2301,23 +2224,20 @@ Result: [FunnelReport](protocol.md#funnelreport).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.RobloxTelemetryPerformance> = {
-    fromMs: 'YOUR_FROMMS',
-    projectId: 'YOUR_PROJECTID',
-    toMs: 'YOUR_TOMS',
+    "fromMs": "YOUR_FROMMS",
+    "projectId": "YOUR_PROJECTID",
+    "toMs": "YOUR_TOMS"
 };
-const result: ResultOf<typeof Method.RobloxTelemetryPerformance> = await client.call(
-    Method.RobloxTelemetryPerformance,
-    params,
-);
+const result: ResultOf<typeof Method.RobloxTelemetryPerformance> = await client.call(Method.RobloxTelemetryPerformance, params);
 ```
 
 Parameters: [TelemetryPerformanceParams](protocol.md#telemetryperformanceparams).
 
-| Field       | Required | Type     | Description |
-| ----------- | -------- | -------- | ----------- |
-| `fromMs`    | Yes      | `string` |             |
-| `projectId` | Yes      | `string` |             |
-| `toMs`      | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `fromMs` | Yes | `string` |  |
+| `projectId` | Yes | `string` |  |
+| `toMs` | Yes | `string` |  |
 
 Result: [PerformanceReport](protocol.md#performancereport).
 
@@ -2327,10 +2247,7 @@ Result: [PerformanceReport](protocol.md#performancereport).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.RobloxTelemetryProjects> = {};
-const result: ResultOf<typeof Method.RobloxTelemetryProjects> = await client.call(
-    Method.RobloxTelemetryProjects,
-    params,
-);
+const result: ResultOf<typeof Method.RobloxTelemetryProjects> = await client.call(Method.RobloxTelemetryProjects, params);
 ```
 
 Parameters: [Recordstringnever](protocol.md#recordstringnever).
@@ -2345,19 +2262,16 @@ Result: Array of [TelemetryProject](protocol.md#telemetryproject).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.SessionsDelete> = {
-    id: 'YOUR_ID',
+    "id": "YOUR_ID"
 };
-const result: ResultOf<typeof Method.SessionsDelete> = await client.call(
-    Method.SessionsDelete,
-    params,
-);
+const result: ResultOf<typeof Method.SessionsDelete> = await client.call(Method.SessionsDelete, params);
 ```
 
 Parameters: [IdParams](protocol.md#idparams).
 
-| Field | Required | Type     | Description |
-| ----- | -------- | -------- | ----------- |
-| `id`  | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `id` | Yes | `string` |  |
 
 Result: [OkResult](protocol.md#okresult).
 
@@ -2367,21 +2281,18 @@ Result: [OkResult](protocol.md#okresult).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.SessionsDownload> = {
-    attachmentId: 'YOUR_ATTACHMENTID',
-    id: 'YOUR_ID',
+    "attachmentId": "YOUR_ATTACHMENTID",
+    "id": "YOUR_ID"
 };
-const result: ResultOf<typeof Method.SessionsDownload> = await client.call(
-    Method.SessionsDownload,
-    params,
-);
+const result: ResultOf<typeof Method.SessionsDownload> = await client.call(Method.SessionsDownload, params);
 ```
 
 Parameters: [SessionFileParams](protocol.md#sessionfileparams).
 
-| Field          | Required | Type     | Description |
-| -------------- | -------- | -------- | ----------- |
-| `attachmentId` | Yes      | `string` |             |
-| `id`           | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `attachmentId` | Yes | `string` |  |
+| `id` | Yes | `string` |  |
 
 Result: [OkResult](protocol.md#okresult).
 
@@ -2391,19 +2302,16 @@ Result: [OkResult](protocol.md#okresult).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.SessionsFiles> = {
-    id: 'YOUR_ID',
+    "id": "YOUR_ID"
 };
-const result: ResultOf<typeof Method.SessionsFiles> = await client.call(
-    Method.SessionsFiles,
-    params,
-);
+const result: ResultOf<typeof Method.SessionsFiles> = await client.call(Method.SessionsFiles, params);
 ```
 
 Parameters: [IdParams](protocol.md#idparams).
 
-| Field | Required | Type     | Description |
-| ----- | -------- | -------- | ----------- |
-| `id`  | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `id` | Yes | `string` |  |
 
 Result: Array of [DeliveredAttachment](protocol.md#deliveredattachment).
 
@@ -2413,16 +2321,16 @@ Result: Array of [DeliveredAttachment](protocol.md#deliveredattachment).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.SessionsGet> = {
-    id: 'YOUR_ID',
+    "id": "YOUR_ID"
 };
 const result: ResultOf<typeof Method.SessionsGet> = await client.call(Method.SessionsGet, params);
 ```
 
 Parameters: [IdParams](protocol.md#idparams).
 
-| Field | Required | Type     | Description |
-| ----- | -------- | -------- | ----------- |
-| `id`  | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `id` | Yes | `string` |  |
 
 Result: [Session](protocol.md#session) / `null`.
 
@@ -2432,24 +2340,21 @@ Result: [Session](protocol.md#session) / `null`.
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.SessionsInput> = {
-    id: 'YOUR_ID',
-    message: {
-        key: 'YOUR_KEY',
-        kind: 'entry',
-    },
+    "id": "YOUR_ID",
+    "message": {
+        "key": "YOUR_KEY",
+        "kind": "entry"
+    }
 };
-const result: ResultOf<typeof Method.SessionsInput> = await client.call(
-    Method.SessionsInput,
-    params,
-);
+const result: ResultOf<typeof Method.SessionsInput> = await client.call(Method.SessionsInput, params);
 ```
 
 Parameters: [ConversationPinParams](protocol.md#conversationpinparams).
 
-| Field     | Required | Type                                                         | Description |
-| --------- | -------- | ------------------------------------------------------------ | ----------- |
-| `id`      | Yes      | `string`                                                     |             |
-| `message` | Yes      | [ConversationMessageRef](protocol.md#conversationmessageref) |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `id` | Yes | `string` |  |
+| `message` | Yes | [ConversationMessageRef](protocol.md#conversationmessageref) |  |
 
 Result: [ConversationInput](protocol.md#conversationinput).
 
@@ -2464,11 +2369,11 @@ const result: ResultOf<typeof Method.SessionsList> = await client.call(Method.Se
 
 Parameters: [SessionListParams](protocol.md#sessionlistparams).
 
-| Field     | Required | Type     | Description |
-| --------- | -------- | -------- | ----------- |
-| `agentId` | No       | `string` |             |
-| `limit`   | No       | `number` |             |
-| `userId`  | No       | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `agentId` | No | `string` |  |
+| `limit` | No | `number` |  |
+| `userId` | No | `string` |  |
 
 Result: Array of [Session](protocol.md#session).
 
@@ -2478,19 +2383,16 @@ Result: Array of [Session](protocol.md#session).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.SessionsMessages> = {
-    id: 'YOUR_ID',
+    "id": "YOUR_ID"
 };
-const result: ResultOf<typeof Method.SessionsMessages> = await client.call(
-    Method.SessionsMessages,
-    params,
-);
+const result: ResultOf<typeof Method.SessionsMessages> = await client.call(Method.SessionsMessages, params);
 ```
 
 Parameters: [IdParams](protocol.md#idparams).
 
-| Field | Required | Type     | Description |
-| ----- | -------- | -------- | ----------- |
-| `id`  | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `id` | Yes | `string` |  |
 
 Result: Array of [ModelMessage](protocol.md#modelmessage).
 
@@ -2500,21 +2402,21 @@ Result: Array of [ModelMessage](protocol.md#modelmessage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.SessionsPin> = {
-    id: 'YOUR_ID',
-    message: {
-        key: 'YOUR_KEY',
-        kind: 'entry',
-    },
+    "id": "YOUR_ID",
+    "message": {
+        "key": "YOUR_KEY",
+        "kind": "entry"
+    }
 };
 const result: ResultOf<typeof Method.SessionsPin> = await client.call(Method.SessionsPin, params);
 ```
 
 Parameters: [ConversationPinParams](protocol.md#conversationpinparams).
 
-| Field     | Required | Type                                                         | Description |
-| --------- | -------- | ------------------------------------------------------------ | ----------- |
-| `id`      | Yes      | `string`                                                     |             |
-| `message` | Yes      | [ConversationMessageRef](protocol.md#conversationmessageref) |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `id` | Yes | `string` |  |
+| `message` | Yes | [ConversationMessageRef](protocol.md#conversationmessageref) |  |
 
 Result: [ConversationPin](protocol.md#conversationpin).
 
@@ -2529,10 +2431,10 @@ const result: ResultOf<typeof Method.SessionsPins> = await client.call(Method.Se
 
 Parameters: [ConversationPinsParams](protocol.md#conversationpinsparams).
 
-| Field    | Required | Type     | Description |
-| -------- | -------- | -------- | ----------- |
-| `before` | No       | `string` |             |
-| `limit`  | No       | `number` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `before` | No | `string` |  |
+| `limit` | No | `number` |  |
 
 Result: [ConversationPinsPage](protocol.md#conversationpinspage).
 
@@ -2542,23 +2444,20 @@ Result: [ConversationPinsPage](protocol.md#conversationpinspage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.SessionsRename> = {
-    expectedTitle: null,
-    id: 'YOUR_ID',
-    title: 'YOUR_TITLE',
+    "expectedTitle": null,
+    "id": "YOUR_ID",
+    "title": "YOUR_TITLE"
 };
-const result: ResultOf<typeof Method.SessionsRename> = await client.call(
-    Method.SessionsRename,
-    params,
-);
+const result: ResultOf<typeof Method.SessionsRename> = await client.call(Method.SessionsRename, params);
 ```
 
 Parameters: [ConversationRenameParams](protocol.md#conversationrenameparams).
 
-| Field           | Required | Type          | Description |
-| --------------- | -------- | ------------- | ----------- |
-| `expectedTitle` | Yes      | `null,string` |             |
-| `id`            | Yes      | `string`      |             |
-| `title`         | Yes      | `string`      |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `expectedTitle` | Yes | `null,string` |  |
+| `id` | Yes | `string` |  |
+| `title` | Yes | `string` |  |
 
 Result: [Session](protocol.md#session).
 
@@ -2568,31 +2467,28 @@ Result: [Session](protocol.md#session).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.SessionsRetry> = {
-    id: 'YOUR_ID',
-    message: {
-        key: 'YOUR_KEY',
-        kind: 'entry',
+    "id": "YOUR_ID",
+    "message": {
+        "key": "YOUR_KEY",
+        "kind": "entry"
     },
-    mode: 'edit',
-    requestId: 'YOUR_REQUESTID',
+    "mode": "edit",
+    "requestId": "YOUR_REQUESTID"
 };
-const result: ResultOf<typeof Method.SessionsRetry> = await client.call(
-    Method.SessionsRetry,
-    params,
-);
+const result: ResultOf<typeof Method.SessionsRetry> = await client.call(Method.SessionsRetry, params);
 ```
 
 Parameters: [ConversationRetryParams](protocol.md#conversationretryparams).
 
-| Field               | Required | Type                                                                          | Description |
-| ------------------- | -------- | ----------------------------------------------------------------------------- | ----------- |
-| `id`                | Yes      | `string`                                                                      |             |
-| `message`           | Yes      | [ConversationMessageRef](protocol.md#conversationmessageref)                  |             |
-| `mode`              | Yes      | `"edit"` / `"regenerate"`                                                     |             |
-| `reasoningEffort`   | No       | `"high"` / `"low"` / `"max"` / `"medium"` / `"minimal"` / `"off"` / `"xhigh"` |             |
-| `requestId`         | Yes      | `string`                                                                      |             |
-| `targetTimeSeconds` | No       | `number`                                                                      |             |
-| `text`              | No       | `string`                                                                      |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `id` | Yes | `string` |  |
+| `message` | Yes | [ConversationMessageRef](protocol.md#conversationmessageref) |  |
+| `mode` | Yes | `"edit"` / `"regenerate"` |  |
+| `reasoningEffort` | No | `"high"` / `"low"` / `"max"` / `"medium"` / `"minimal"` / `"off"` / `"xhigh"` |  |
+| `requestId` | Yes | `string` |  |
+| `targetTimeSeconds` | No | `number` |  |
+| `text` | No | `string` |  |
 
 Result: [ConversationRetryResult](protocol.md#conversationretryresult).
 
@@ -2602,19 +2498,16 @@ Result: [ConversationRetryResult](protocol.md#conversationretryresult).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.SessionsSubscribe> = {
-    sessionId: 'YOUR_SESSIONID',
+    "sessionId": "YOUR_SESSIONID"
 };
-const result: ResultOf<typeof Method.SessionsSubscribe> = await client.call(
-    Method.SessionsSubscribe,
-    params,
-);
+const result: ResultOf<typeof Method.SessionsSubscribe> = await client.call(Method.SessionsSubscribe, params);
 ```
 
 Parameters: [SessionRef](protocol.md#sessionref).
 
-| Field       | Required | Type     | Description |
-| ----------- | -------- | -------- | ----------- |
-| `sessionId` | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `sessionId` | Yes | `string` |  |
 
 Result: [OkResult](protocol.md#okresult).
 
@@ -2624,22 +2517,21 @@ Result: [OkResult](protocol.md#okresult).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.SessionsTranscript> = {
-    id: 'YOUR_ID',
+    "id": "YOUR_ID"
 };
-const result: ResultOf<typeof Method.SessionsTranscript> = await client.call(
-    Method.SessionsTranscript,
-    params,
-);
+const result: ResultOf<typeof Method.SessionsTranscript> = await client.call(Method.SessionsTranscript, params);
 ```
 
 Parameters: [SessionHistoryParams](protocol.md#sessionhistoryparams).
 
-| Field       | Required | Type     | Description                                |
-| ----------- | -------- | -------- | ------------------------------------------ |
-| `cursor`    | No       | `string` |                                            |
-| `endCursor` | No       | `string` |                                            |
-| `id`        | Yes      | `string` |                                            |
-| `pageBytes` | No       | `number` | Optional bounded read window, up to 1 MiB. |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `compact` | No | `boolean` | Canonical display view; the original append-only journal remains available. |
+| `cursor` | No | `string` |  |
+| `endCursor` | No | `string` |  |
+| `id` | Yes | `string` |  |
+| `pageBytes` | No | `number` | Optional bounded read window, up to 1 MiB. |
+| `sourceEndCursor` | No | `string` | Pins a canonical view to an original journal boundary across all of its pages. |
 
 Result: [SessionHistoryPage](protocol.md#sessionhistorypage).
 
@@ -2649,19 +2541,16 @@ Result: [SessionHistoryPage](protocol.md#sessionhistorypage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.SessionsUnpin> = {
-    pinId: 'YOUR_PINID',
+    "pinId": "YOUR_PINID"
 };
-const result: ResultOf<typeof Method.SessionsUnpin> = await client.call(
-    Method.SessionsUnpin,
-    params,
-);
+const result: ResultOf<typeof Method.SessionsUnpin> = await client.call(Method.SessionsUnpin, params);
 ```
 
 Parameters: [ConversationUnpinParams](protocol.md#conversationunpinparams).
 
-| Field   | Required | Type     | Description |
-| ------- | -------- | -------- | ----------- |
-| `pinId` | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `pinId` | Yes | `string` |  |
 
 Result: [OkResult](protocol.md#okresult).
 
@@ -2671,19 +2560,16 @@ Result: [OkResult](protocol.md#okresult).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.SessionsUnsubscribe> = {
-    sessionId: 'YOUR_SESSIONID',
+    "sessionId": "YOUR_SESSIONID"
 };
-const result: ResultOf<typeof Method.SessionsUnsubscribe> = await client.call(
-    Method.SessionsUnsubscribe,
-    params,
-);
+const result: ResultOf<typeof Method.SessionsUnsubscribe> = await client.call(Method.SessionsUnsubscribe, params);
 ```
 
 Parameters: [SessionRef](protocol.md#sessionref).
 
-| Field       | Required | Type     | Description |
-| ----------- | -------- | -------- | ----------- |
-| `sessionId` | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `sessionId` | Yes | `string` |  |
 
 Result: [OkResult](protocol.md#okresult).
 
@@ -2693,19 +2579,19 @@ Result: [OkResult](protocol.md#okresult).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.SharesCreate> = {
-    name: 'YOUR_NAME',
+    "name": "YOUR_NAME"
 };
 const result: ResultOf<typeof Method.SharesCreate> = await client.call(Method.SharesCreate, params);
 ```
 
 Parameters: [ShareCreateParams](protocol.md#sharecreateparams).
 
-| Field         | Required | Type     | Description |
-| ------------- | -------- | -------- | ----------- |
-| `description` | No       | `string` |             |
-| `id`          | No       | `string` |             |
-| `name`        | Yes      | `string` |             |
-| `path`        | No       | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `description` | No | `string` |  |
+| `id` | No | `string` |  |
+| `name` | Yes | `string` |  |
+| `path` | No | `string` |  |
 
 Result: [ShareSummary](protocol.md#sharesummary).
 
@@ -2730,16 +2616,16 @@ Result: Array of [ShareSummary](protocol.md#sharesummary).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.SharesRemove> = {
-    id: 'YOUR_ID',
+    "id": "YOUR_ID"
 };
 const result: ResultOf<typeof Method.SharesRemove> = await client.call(Method.SharesRemove, params);
 ```
 
 Parameters: [IdParams](protocol.md#idparams).
 
-| Field | Required | Type     | Description |
-| ----- | -------- | -------- | ----------- |
-| `id`  | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `id` | Yes | `string` |  |
 
 Result: [OkResult](protocol.md#okresult).
 
@@ -2749,25 +2635,22 @@ Result: [OkResult](protocol.md#okresult).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.SharesSetMember> = {
-    id: 'YOUR_ID',
-    mode: null,
-    shareId: 'YOUR_SHAREID',
-    subject: 'YOUR_SUBJECT',
+    "id": "YOUR_ID",
+    "mode": null,
+    "shareId": "YOUR_SHAREID",
+    "subject": "YOUR_SUBJECT"
 };
-const result: ResultOf<typeof Method.SharesSetMember> = await client.call(
-    Method.SharesSetMember,
-    params,
-);
+const result: ResultOf<typeof Method.SharesSetMember> = await client.call(Method.SharesSetMember, params);
 ```
 
 Parameters: [ShareMemberParams](protocol.md#sharememberparams).
 
-| Field     | Required | Type          | Description |
-| --------- | -------- | ------------- | ----------- |
-| `id`      | Yes      | `string`      |             |
-| `mode`    | Yes      | `null,string` |             |
-| `shareId` | Yes      | `string`      |             |
-| `subject` | Yes      | `string`      |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `id` | Yes | `string` |  |
+| `mode` | Yes | `null,string` |  |
+| `shareId` | Yes | `string` |  |
+| `subject` | Yes | `string` |  |
 
 Result: [ShareSummary](protocol.md#sharesummary).
 
@@ -2777,16 +2660,16 @@ Result: [ShareSummary](protocol.md#sharesummary).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.TasksCancel> = {
-    id: 'YOUR_ID',
+    "id": "YOUR_ID"
 };
 const result: ResultOf<typeof Method.TasksCancel> = await client.call(Method.TasksCancel, params);
 ```
 
 Parameters: [IdParams](protocol.md#idparams).
 
-| Field | Required | Type     | Description |
-| ----- | -------- | -------- | ----------- |
-| `id`  | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `id` | Yes | `string` |  |
 
 Result: [OkResult](protocol.md#okresult).
 
@@ -2796,16 +2679,16 @@ Result: [OkResult](protocol.md#okresult).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.TasksGet> = {
-    id: 'YOUR_ID',
+    "id": "YOUR_ID"
 };
 const result: ResultOf<typeof Method.TasksGet> = await client.call(Method.TasksGet, params);
 ```
 
 Parameters: [IdParams](protocol.md#idparams).
 
-| Field | Required | Type     | Description |
-| ----- | -------- | -------- | ----------- |
-| `id`  | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `id` | Yes | `string` |  |
 
 Result: [TaskRecord](protocol.md#taskrecord) / `null`.
 
@@ -2830,18 +2713,18 @@ Result: Array of [TaskRecord](protocol.md#taskrecord).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.TeamsCreate> = {
-    name: 'YOUR_NAME',
+    "name": "YOUR_NAME"
 };
 const result: ResultOf<typeof Method.TeamsCreate> = await client.call(Method.TeamsCreate, params);
 ```
 
 Parameters: [TeamCreateParams](protocol.md#teamcreateparams).
 
-| Field         | Required | Type     | Description |
-| ------------- | -------- | -------- | ----------- |
-| `description` | No       | `string` |             |
-| `id`          | No       | `string` |             |
-| `name`        | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `description` | No | `string` |  |
+| `id` | No | `string` |  |
+| `name` | Yes | `string` |  |
 
 Result: [TeamSummary](protocol.md#teamsummary).
 
@@ -2866,16 +2749,16 @@ Result: Array of [TeamSummary](protocol.md#teamsummary).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.TeamsRemove> = {
-    id: 'YOUR_ID',
+    "id": "YOUR_ID"
 };
 const result: ResultOf<typeof Method.TeamsRemove> = await client.call(Method.TeamsRemove, params);
 ```
 
 Parameters: [IdParams](protocol.md#idparams).
 
-| Field | Required | Type     | Description |
-| ----- | -------- | -------- | ----------- |
-| `id`  | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `id` | Yes | `string` |  |
 
 Result: [OkResult](protocol.md#okresult).
 
@@ -2885,23 +2768,20 @@ Result: [OkResult](protocol.md#okresult).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.TeamsSetMember> = {
-    member: false,
-    principalId: 'YOUR_PRINCIPALID',
-    teamId: 'YOUR_TEAMID',
+    "member": false,
+    "principalId": "YOUR_PRINCIPALID",
+    "teamId": "YOUR_TEAMID"
 };
-const result: ResultOf<typeof Method.TeamsSetMember> = await client.call(
-    Method.TeamsSetMember,
-    params,
-);
+const result: ResultOf<typeof Method.TeamsSetMember> = await client.call(Method.TeamsSetMember, params);
 ```
 
 Parameters: [TeamMemberParams](protocol.md#teammemberparams).
 
-| Field         | Required | Type      | Description |
-| ------------- | -------- | --------- | ----------- |
-| `member`      | Yes      | `boolean` |             |
-| `principalId` | Yes      | `string`  |             |
-| `teamId`      | Yes      | `string`  |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `member` | Yes | `boolean` |  |
+| `principalId` | Yes | `string` |  |
+| `teamId` | Yes | `string` |  |
 
 Result: [TeamSummary](protocol.md#teamsummary).
 
@@ -2911,18 +2791,18 @@ Result: [TeamSummary](protocol.md#teamsummary).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.VoiceAudio> = {
-    callId: 'YOUR_CALLID',
-    pcm: 'YOUR_PCM',
+    "callId": "YOUR_CALLID",
+    "pcm": "YOUR_PCM"
 };
 const result: ResultOf<typeof Method.VoiceAudio> = await client.call(Method.VoiceAudio, params);
 ```
 
 Parameters: [VoiceAudioParams](protocol.md#voiceaudioparams).
 
-| Field    | Required | Type     | Description                                        |
-| -------- | -------- | -------- | -------------------------------------------------- |
-| `callId` | Yes      | `string` |                                                    |
-| `pcm`    | Yes      | `string` | Base64 PCM16, mono, at the rate the call reported. |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `callId` | Yes | `string` |  |
+| `pcm` | Yes | `string` | Base64 PCM16, mono, at the rate the call reported. |
 
 Result: [OkResult](protocol.md#okresult).
 
@@ -2937,9 +2817,9 @@ const result: ResultOf<typeof Method.VoiceStart> = await client.call(Method.Voic
 
 Parameters: [VoiceStartParams](protocol.md#voicestartparams).
 
-| Field            | Required | Type     | Description |
-| ---------------- | -------- | -------- | ----------- |
-| `conversationId` | No       | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `conversationId` | No | `string` |  |
 
 Result: [VoiceStarted](protocol.md#voicestarted).
 
@@ -2949,16 +2829,16 @@ Result: [VoiceStarted](protocol.md#voicestarted).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.VoiceStop> = {
-    callId: 'YOUR_CALLID',
+    "callId": "YOUR_CALLID"
 };
 const result: ResultOf<typeof Method.VoiceStop> = await client.call(Method.VoiceStop, params);
 ```
 
 Parameters: [VoiceStopParams](protocol.md#voicestopparams).
 
-| Field    | Required | Type     | Description |
-| -------- | -------- | -------- | ----------- |
-| `callId` | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `callId` | Yes | `string` |  |
 
 Result: [OkResult](protocol.md#okresult).
 
@@ -2968,26 +2848,23 @@ Result: [OkResult](protocol.md#okresult).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsAttentionList> = {
-    after: {
-        nodeId: null,
-        runId: 'YOUR_RUNID',
+    "after": {
+        "nodeId": null,
+        "runId": "YOUR_RUNID"
     },
-    category: 'failures',
-    limit: 1,
+    "category": "failures",
+    "limit": 1
 };
-const result: ResultOf<typeof Method.WorkflowsAttentionList> = await client.call(
-    Method.WorkflowsAttentionList,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsAttentionList> = await client.call(Method.WorkflowsAttentionList, params);
 ```
 
 Parameters: [WorkflowAttentionQuery](protocol.md#workflowattentionquery).
 
-| Field      | Required | Type                                                                    | Description |
-| ---------- | -------- | ----------------------------------------------------------------------- | ----------- |
-| `after`    | Yes      | [WorkflowAttentionCursor](protocol.md#workflowattentioncursor) / `null` |             |
-| `category` | Yes      | [WorkflowAttentionCategory](protocol.md#workflowattentioncategory)      |             |
-| `limit`    | Yes      | `number`                                                                |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `after` | Yes | [WorkflowAttentionCursor](protocol.md#workflowattentioncursor) / `null` |  |
+| `category` | Yes | [WorkflowAttentionCategory](protocol.md#workflowattentioncategory) |  |
+| `limit` | Yes | `number` |  |
 
 Result: [WorkflowAttentionPage](protocol.md#workflowattentionpage).
 
@@ -2997,10 +2874,7 @@ Result: [WorkflowAttentionPage](protocol.md#workflowattentionpage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsCatalog> = {};
-const result: ResultOf<typeof Method.WorkflowsCatalog> = await client.call(
-    Method.WorkflowsCatalog,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsCatalog> = await client.call(Method.WorkflowsCatalog, params);
 ```
 
 Parameters: [Recordstringnever](protocol.md#recordstringnever).
@@ -3015,28 +2889,25 @@ Result: [WorkflowCatalog](protocol.md#workflowcatalog).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsCreate> = {
-    commandId: 'YOUR_COMMANDID',
-    details: {
-        description: 'YOUR_DESCRIPTION',
-        folder: null,
-        name: 'YOUR_NAME',
-        tags: [],
+    "commandId": "YOUR_COMMANDID",
+    "details": {
+        "description": "YOUR_DESCRIPTION",
+        "folder": null,
+        "name": "YOUR_NAME",
+        "tags": []
     },
-    workflowId: 'YOUR_WORKFLOWID',
+    "workflowId": "YOUR_WORKFLOWID"
 };
-const result: ResultOf<typeof Method.WorkflowsCreate> = await client.call(
-    Method.WorkflowsCreate,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsCreate> = await client.call(Method.WorkflowsCreate, params);
 ```
 
 Parameters: [WorkflowCreateRequest](protocol.md#workflowcreaterequest).
 
-| Field        | Required | Type                                           | Description |
-| ------------ | -------- | ---------------------------------------------- | ----------- |
-| `commandId`  | Yes      | `string`                                       |             |
-| `details`    | Yes      | [WorkflowDetails](protocol.md#workflowdetails) |             |
-| `workflowId` | Yes      | `string`                                       |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `commandId` | Yes | `string` |  |
+| `details` | Yes | [WorkflowDetails](protocol.md#workflowdetails) |  |
+| `workflowId` | Yes | `string` |  |
 
 Result: [WorkflowReceipt](protocol.md#workflowreceipt).
 
@@ -3046,21 +2917,18 @@ Result: [WorkflowReceipt](protocol.md#workflowreceipt).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsDelete> = {
-    expectedRevision: 'YOUR_EXPECTEDREVISION',
-    workflowId: 'YOUR_WORKFLOWID',
+    "expectedRevision": "YOUR_EXPECTEDREVISION",
+    "workflowId": "YOUR_WORKFLOWID"
 };
-const result: ResultOf<typeof Method.WorkflowsDelete> = await client.call(
-    Method.WorkflowsDelete,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsDelete> = await client.call(Method.WorkflowsDelete, params);
 ```
 
 Parameters: [WorkflowDeleteRequest](protocol.md#workflowdeleterequest).
 
-| Field              | Required | Type     | Description |
-| ------------------ | -------- | -------- | ----------- |
-| `expectedRevision` | Yes      | `string` |             |
-| `workflowId`       | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `expectedRevision` | Yes | `string` |  |
+| `workflowId` | Yes | `string` |  |
 
 Result: [WorkflowDeleteReceipt](protocol.md#workflowdeletereceipt).
 
@@ -3070,24 +2938,21 @@ Result: [WorkflowDeleteReceipt](protocol.md#workflowdeletereceipt).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsList> = {
-    cursor: {
-        updatedAtMs: 'YOUR_UPDATEDATMS',
-        workflowId: 'YOUR_WORKFLOWID',
+    "cursor": {
+        "updatedAtMs": "YOUR_UPDATEDATMS",
+        "workflowId": "YOUR_WORKFLOWID"
     },
-    limit: 1,
+    "limit": 1
 };
-const result: ResultOf<typeof Method.WorkflowsList> = await client.call(
-    Method.WorkflowsList,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsList> = await client.call(Method.WorkflowsList, params);
 ```
 
 Parameters: [WorkflowListRequest](protocol.md#workflowlistrequest).
 
-| Field    | Required | Type                                                          | Description |
-| -------- | -------- | ------------------------------------------------------------- | ----------- |
-| `cursor` | Yes      | [WorkflowListCursor](protocol.md#workflowlistcursor) / `null` |             |
-| `limit`  | Yes      | `number`                                                      |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `cursor` | Yes | [WorkflowListCursor](protocol.md#workflowlistcursor) / `null` |  |
+| `limit` | Yes | `number` |  |
 
 Result: [WorkflowListPage](protocol.md#workflowlistpage).
 
@@ -3097,31 +2962,28 @@ Result: [WorkflowListPage](protocol.md#workflowlistpage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsModels> = {
-    after: null,
-    capability: 'image',
-    compatibleOnly: false,
-    favorites: [],
-    provider: null,
-    query: 'YOUR_QUERY',
-    workflowId: 'YOUR_WORKFLOWID',
+    "after": null,
+    "capability": "image",
+    "compatibleOnly": false,
+    "favorites": [],
+    "provider": null,
+    "query": "YOUR_QUERY",
+    "workflowId": "YOUR_WORKFLOWID"
 };
-const result: ResultOf<typeof Method.WorkflowsModels> = await client.call(
-    Method.WorkflowsModels,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsModels> = await client.call(Method.WorkflowsModels, params);
 ```
 
 Parameters: [WorkflowModelsRequest](protocol.md#workflowmodelsrequest).
 
-| Field            | Required | Type                                                           | Description |
-| ---------------- | -------- | -------------------------------------------------------------- | ----------- |
-| `after`          | Yes      | `null,string`                                                  |             |
-| `capability`     | Yes      | [WorkflowModelCapability](protocol.md#workflowmodelcapability) |             |
-| `compatibleOnly` | Yes      | `boolean`                                                      |             |
-| `favorites`      | Yes      | Array of `string` / `null`                                     |             |
-| `provider`       | Yes      | `null,string`                                                  |             |
-| `query`          | Yes      | `string`                                                       |             |
-| `workflowId`     | Yes      | `string`                                                       |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `after` | Yes | `null,string` |  |
+| `capability` | Yes | [WorkflowModelCapability](protocol.md#workflowmodelcapability) |  |
+| `compatibleOnly` | Yes | `boolean` |  |
+| `favorites` | Yes | Array of `string` / `null` |  |
+| `provider` | Yes | `null,string` |  |
+| `query` | Yes | `string` |  |
+| `workflowId` | Yes | `string` |  |
 
 Result: [WorkflowModelsPage](protocol.md#workflowmodelspage).
 
@@ -3131,33 +2993,30 @@ Result: [WorkflowModelsPage](protocol.md#workflowmodelspage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsModelsImageQuote> = {
-    model: 'YOUR_MODEL',
-    nodeId: 'YOUR_NODEID',
-    provider: 'YOUR_PROVIDER',
-    settings: {
-        count: 1,
-        options: {},
-        outputFormat: 'YOUR_OUTPUTFORMAT',
-        quality: 'YOUR_QUALITY',
-        size: 'YOUR_SIZE',
+    "model": "YOUR_MODEL",
+    "nodeId": "YOUR_NODEID",
+    "provider": "YOUR_PROVIDER",
+    "settings": {
+        "count": 1,
+        "options": {},
+        "outputFormat": "YOUR_OUTPUTFORMAT",
+        "quality": "YOUR_QUALITY",
+        "size": "YOUR_SIZE"
     },
-    workflowId: 'YOUR_WORKFLOWID',
+    "workflowId": "YOUR_WORKFLOWID"
 };
-const result: ResultOf<typeof Method.WorkflowsModelsImageQuote> = await client.call(
-    Method.WorkflowsModelsImageQuote,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsModelsImageQuote> = await client.call(Method.WorkflowsModelsImageQuote, params);
 ```
 
 Parameters: [WorkflowImageQuoteRequest](protocol.md#workflowimagequoterequest).
 
-| Field        | Required | Type                                                       | Description |
-| ------------ | -------- | ---------------------------------------------------------- | ----------- |
-| `model`      | Yes      | `string`                                                   |             |
-| `nodeId`     | Yes      | `string`                                                   |             |
-| `provider`   | Yes      | `string`                                                   |             |
-| `settings`   | Yes      | [WorkflowImageSettings](protocol.md#workflowimagesettings) |             |
-| `workflowId` | Yes      | `string`                                                   |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `model` | Yes | `string` |  |
+| `nodeId` | Yes | `string` |  |
+| `provider` | Yes | `string` |  |
+| `settings` | Yes | [WorkflowImageSettings](protocol.md#workflowimagesettings) |  |
+| `workflowId` | Yes | `string` |  |
 
 Result: [WorkflowImageQuote](protocol.md#workflowimagequote).
 
@@ -3167,30 +3026,27 @@ Result: [WorkflowImageQuote](protocol.md#workflowimagequote).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsModelsImageResolve> = {
-    policy: {
-        allowPreview: false,
-        maxCatalogAgeMs: 'YOUR_MAXCATALOGAGEMS',
-        maxGenerationMicrocents: null,
-        region: null,
+    "policy": {
+        "allowPreview": false,
+        "maxCatalogAgeMs": "YOUR_MAXCATALOGAGEMS",
+        "maxGenerationMicrocents": null,
+        "region": null
     },
-    provider: 'YOUR_PROVIDER',
-    requirements: [],
-    workflowId: 'YOUR_WORKFLOWID',
+    "provider": "YOUR_PROVIDER",
+    "requirements": [],
+    "workflowId": "YOUR_WORKFLOWID"
 };
-const result: ResultOf<typeof Method.WorkflowsModelsImageResolve> = await client.call(
-    Method.WorkflowsModelsImageResolve,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsModelsImageResolve> = await client.call(Method.WorkflowsModelsImageResolve, params);
 ```
 
 Parameters: [WorkflowImageResolutionRequest](protocol.md#workflowimageresolutionrequest).
 
-| Field          | Required | Type                                                                      | Description |
-| -------------- | -------- | ------------------------------------------------------------------------- | ----------- |
-| `policy`       | Yes      | [WorkflowImagePolicy](protocol.md#workflowimagepolicy)                    |             |
-| `provider`     | Yes      | `string`                                                                  |             |
-| `requirements` | Yes      | Array of [WorkflowImageRequirement](protocol.md#workflowimagerequirement) |             |
-| `workflowId`   | Yes      | `string`                                                                  |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `policy` | Yes | [WorkflowImagePolicy](protocol.md#workflowimagepolicy) |  |
+| `provider` | Yes | `string` |  |
+| `requirements` | Yes | Array of [WorkflowImageRequirement](protocol.md#workflowimagerequirement) |  |
+| `workflowId` | Yes | `string` |  |
 
 Result: [WorkflowImageResolution](protocol.md#workflowimageresolution).
 
@@ -3200,31 +3056,28 @@ Result: [WorkflowImageResolution](protocol.md#workflowimageresolution).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsModelsRefresh> = {
-    after: null,
-    capability: 'image',
-    compatibleOnly: false,
-    favorites: [],
-    provider: null,
-    query: 'YOUR_QUERY',
-    workflowId: 'YOUR_WORKFLOWID',
+    "after": null,
+    "capability": "image",
+    "compatibleOnly": false,
+    "favorites": [],
+    "provider": null,
+    "query": "YOUR_QUERY",
+    "workflowId": "YOUR_WORKFLOWID"
 };
-const result: ResultOf<typeof Method.WorkflowsModelsRefresh> = await client.call(
-    Method.WorkflowsModelsRefresh,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsModelsRefresh> = await client.call(Method.WorkflowsModelsRefresh, params);
 ```
 
 Parameters: [WorkflowModelsRequest](protocol.md#workflowmodelsrequest).
 
-| Field            | Required | Type                                                           | Description |
-| ---------------- | -------- | -------------------------------------------------------------- | ----------- |
-| `after`          | Yes      | `null,string`                                                  |             |
-| `capability`     | Yes      | [WorkflowModelCapability](protocol.md#workflowmodelcapability) |             |
-| `compatibleOnly` | Yes      | `boolean`                                                      |             |
-| `favorites`      | Yes      | Array of `string` / `null`                                     |             |
-| `provider`       | Yes      | `null,string`                                                  |             |
-| `query`          | Yes      | `string`                                                       |             |
-| `workflowId`     | Yes      | `string`                                                       |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `after` | Yes | `null,string` |  |
+| `capability` | Yes | [WorkflowModelCapability](protocol.md#workflowmodelcapability) |  |
+| `compatibleOnly` | Yes | `boolean` |  |
+| `favorites` | Yes | Array of `string` / `null` |  |
+| `provider` | Yes | `null,string` |  |
+| `query` | Yes | `string` |  |
+| `workflowId` | Yes | `string` |  |
 
 Result: [WorkflowModelsPage](protocol.md#workflowmodelspage).
 
@@ -3234,35 +3087,32 @@ Result: [WorkflowModelsPage](protocol.md#workflowmodelspage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsModelsResolve> = {
-    capability: 'reasoning',
-    maxOutputTokens: 1,
-    policy: {
-        allowPreview: false,
-        allowUnpriced: false,
-        maxCatalogAgeMs: 'YOUR_MAXCATALOGAGEMS',
-        maxInputUsdPerMillion: null,
-        maxOutputUsdPerMillion: null,
-        region: null,
-        requiredFeatures: [],
+    "capability": "reasoning",
+    "maxOutputTokens": 1,
+    "policy": {
+        "allowPreview": false,
+        "allowUnpriced": false,
+        "maxCatalogAgeMs": "YOUR_MAXCATALOGAGEMS",
+        "maxInputUsdPerMillion": null,
+        "maxOutputUsdPerMillion": null,
+        "region": null,
+        "requiredFeatures": []
     },
-    provider: 'YOUR_PROVIDER',
-    workflowId: 'YOUR_WORKFLOWID',
+    "provider": "YOUR_PROVIDER",
+    "workflowId": "YOUR_WORKFLOWID"
 };
-const result: ResultOf<typeof Method.WorkflowsModelsResolve> = await client.call(
-    Method.WorkflowsModelsResolve,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsModelsResolve> = await client.call(Method.WorkflowsModelsResolve, params);
 ```
 
 Parameters: [WorkflowModelResolutionRequest](protocol.md#workflowmodelresolutionrequest).
 
-| Field             | Required | Type                                                   | Description |
-| ----------------- | -------- | ------------------------------------------------------ | ----------- |
-| `capability`      | Yes      | [Exclude](protocol.md#exclude)                         |             |
-| `maxOutputTokens` | Yes      | `number`                                               |             |
-| `policy`          | Yes      | [WorkflowModelPolicy](protocol.md#workflowmodelpolicy) |             |
-| `provider`        | Yes      | `string`                                               |             |
-| `workflowId`      | Yes      | `string`                                               |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `capability` | Yes | [Exclude](protocol.md#exclude) |  |
+| `maxOutputTokens` | Yes | `number` |  |
+| `policy` | Yes | [WorkflowModelPolicy](protocol.md#workflowmodelpolicy) |  |
+| `provider` | Yes | `string` |  |
+| `workflowId` | Yes | `string` |  |
 
 Result: [WorkflowModelResolution](protocol.md#workflowmodelresolution).
 
@@ -3272,21 +3122,18 @@ Result: [WorkflowModelResolution](protocol.md#workflowmodelresolution).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsPlanningCancel> = {
-    requestId: 'YOUR_REQUESTID',
-    workflowId: 'YOUR_WORKFLOWID',
+    "requestId": "YOUR_REQUESTID",
+    "workflowId": "YOUR_WORKFLOWID"
 };
-const result: ResultOf<typeof Method.WorkflowsPlanningCancel> = await client.call(
-    Method.WorkflowsPlanningCancel,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsPlanningCancel> = await client.call(Method.WorkflowsPlanningCancel, params);
 ```
 
 Parameters: [PlanningTurnRef](protocol.md#planningturnref).
 
-| Field        | Required | Type     | Description |
-| ------------ | -------- | -------- | ----------- |
-| `requestId`  | Yes      | `string` |             |
-| `workflowId` | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `requestId` | Yes | `string` |  |
+| `workflowId` | Yes | `string` |  |
 
 Result: [PlanningTurn](protocol.md#planningturn).
 
@@ -3296,21 +3143,18 @@ Result: [PlanningTurn](protocol.md#planningturn).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsPlanningHistory> = {
-    beforeRequestId: null,
-    workflowId: 'YOUR_WORKFLOWID',
+    "beforeRequestId": null,
+    "workflowId": "YOUR_WORKFLOWID"
 };
-const result: ResultOf<typeof Method.WorkflowsPlanningHistory> = await client.call(
-    Method.WorkflowsPlanningHistory,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsPlanningHistory> = await client.call(Method.WorkflowsPlanningHistory, params);
 ```
 
 Parameters: [PlanningHistoryRequest](protocol.md#planninghistoryrequest).
 
-| Field             | Required | Type          | Description |
-| ----------------- | -------- | ------------- | ----------- |
-| `beforeRequestId` | Yes      | `null,string` |             |
-| `workflowId`      | Yes      | `string`      |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `beforeRequestId` | Yes | `null,string` |  |
+| `workflowId` | Yes | `string` |  |
 
 Result: [PlanningHistory](protocol.md#planninghistory).
 
@@ -3320,21 +3164,18 @@ Result: [PlanningHistory](protocol.md#planninghistory).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsPlanningRead> = {
-    requestId: 'YOUR_REQUESTID',
-    workflowId: 'YOUR_WORKFLOWID',
+    "requestId": "YOUR_REQUESTID",
+    "workflowId": "YOUR_WORKFLOWID"
 };
-const result: ResultOf<typeof Method.WorkflowsPlanningRead> = await client.call(
-    Method.WorkflowsPlanningRead,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsPlanningRead> = await client.call(Method.WorkflowsPlanningRead, params);
 ```
 
 Parameters: [PlanningTurnRef](protocol.md#planningturnref).
 
-| Field        | Required | Type     | Description |
-| ------------ | -------- | -------- | ----------- |
-| `requestId`  | Yes      | `string` |             |
-| `workflowId` | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `requestId` | Yes | `string` |  |
+| `workflowId` | Yes | `string` |  |
 
 Result: [PlanningTurn](protocol.md#planningturn).
 
@@ -3344,40 +3185,37 @@ Result: [PlanningTurn](protocol.md#planningturn).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsPlanningSend> = {
-    baseRevision: 'YOUR_BASEREVISION',
-    document: {
-        details: {
-            description: 'YOUR_DESCRIPTION',
-            folder: null,
-            name: 'YOUR_NAME',
-            tags: [],
+    "baseRevision": "YOUR_BASEREVISION",
+    "document": {
+        "details": {
+            "description": "YOUR_DESCRIPTION",
+            "folder": null,
+            "name": "YOUR_NAME",
+            "tags": []
         },
-        edges: [],
-        nodes: [],
-        positions: [],
+        "edges": [],
+        "nodes": [],
+        "positions": []
     },
-    message: 'Your request',
-    previousRequestId: null,
-    requestId: 'YOUR_REQUESTID',
-    workflowId: 'YOUR_WORKFLOWID',
+    "message": "Your request",
+    "previousRequestId": null,
+    "requestId": "YOUR_REQUESTID",
+    "workflowId": "YOUR_WORKFLOWID"
 };
-const result: ResultOf<typeof Method.WorkflowsPlanningSend> = await client.call(
-    Method.WorkflowsPlanningSend,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsPlanningSend> = await client.call(Method.WorkflowsPlanningSend, params);
 ```
 
 Parameters: [PlanningRequest](protocol.md#planningrequest).
 
-| Field               | Required | Type                                             | Description                                                                    |
-| ------------------- | -------- | ------------------------------------------------ | ------------------------------------------------------------------------------ |
-| `baseRevision`      | Yes      | `string`                                         |                                                                                |
-| `document`          | Yes      | [PlanningDocument](protocol.md#planningdocument) |                                                                                |
-| `message`           | Yes      | `string`                                         |                                                                                |
-| `previousRequestId` | Yes      | `null,string`                                    |                                                                                |
-| `requestId`         | Yes      | `string`                                         |                                                                                |
-| `sourceIds`         | No       | Array of `string`                                | Explicit metadata selections; never resource grants. Omitted by older clients. |
-| `workflowId`        | Yes      | `string`                                         |                                                                                |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `baseRevision` | Yes | `string` |  |
+| `document` | Yes | [PlanningDocument](protocol.md#planningdocument) |  |
+| `message` | Yes | `string` |  |
+| `previousRequestId` | Yes | `null,string` |  |
+| `requestId` | Yes | `string` |  |
+| `sourceIds` | No | Array of `string` | Explicit metadata selections; never resource grants. Omitted by older clients. |
+| `workflowId` | Yes | `string` |  |
 
 Result: [PlanningTurn](protocol.md#planningturn).
 
@@ -3387,21 +3225,18 @@ Result: [PlanningTurn](protocol.md#planningturn).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsPlanningSources> = {
-    after: null,
-    workflowId: 'YOUR_WORKFLOWID',
+    "after": null,
+    "workflowId": "YOUR_WORKFLOWID"
 };
-const result: ResultOf<typeof Method.WorkflowsPlanningSources> = await client.call(
-    Method.WorkflowsPlanningSources,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsPlanningSources> = await client.call(Method.WorkflowsPlanningSources, params);
 ```
 
 Parameters: [PlanningSourcesRequest](protocol.md#planningsourcesrequest).
 
-| Field        | Required | Type          | Description |
-| ------------ | -------- | ------------- | ----------- |
-| `after`      | Yes      | `null,string` |             |
-| `workflowId` | Yes      | `string`      |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `after` | Yes | `null,string` |  |
+| `workflowId` | Yes | `string` |  |
 
 Result: [PlanningSourcesPage](protocol.md#planningsourcespage).
 
@@ -3411,27 +3246,24 @@ Result: [PlanningSourcesPage](protocol.md#planningsourcespage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsPublicationsCheck> = {
-    policy: {
-        maxConcurrency: 1,
-        timeoutMs: 'YOUR_TIMEOUTMS',
-        triggerNodeId: 'YOUR_TRIGGERNODEID',
+    "policy": {
+        "maxConcurrency": 1,
+        "timeoutMs": "YOUR_TIMEOUTMS",
+        "triggerNodeId": "YOUR_TRIGGERNODEID"
     },
-    revision: 'YOUR_REVISION',
-    workflowId: 'YOUR_WORKFLOWID',
+    "revision": "YOUR_REVISION",
+    "workflowId": "YOUR_WORKFLOWID"
 };
-const result: ResultOf<typeof Method.WorkflowsPublicationsCheck> = await client.call(
-    Method.WorkflowsPublicationsCheck,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsPublicationsCheck> = await client.call(Method.WorkflowsPublicationsCheck, params);
 ```
 
 Parameters: [WorkflowPublicationCheckRequest](protocol.md#workflowpublicationcheckrequest).
 
-| Field        | Required | Type                                                               | Description |
-| ------------ | -------- | ------------------------------------------------------------------ | ----------- |
-| `policy`     | Yes      | [WorkflowPublicationPolicy](protocol.md#workflowpublicationpolicy) |             |
-| `revision`   | Yes      | `string`                                                           |             |
-| `workflowId` | Yes      | `string`                                                           |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `policy` | Yes | [WorkflowPublicationPolicy](protocol.md#workflowpublicationpolicy) |  |
+| `revision` | Yes | `string` |  |
+| `workflowId` | Yes | `string` |  |
 
 Result: [WorkflowPublicationCheck](protocol.md#workflowpublicationcheck).
 
@@ -3441,23 +3273,20 @@ Result: [WorkflowPublicationCheck](protocol.md#workflowpublicationcheck).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsPublicationsList> = {
-    afterVersion: null,
-    limit: 1,
-    workflowId: 'YOUR_WORKFLOWID',
+    "afterVersion": null,
+    "limit": 1,
+    "workflowId": "YOUR_WORKFLOWID"
 };
-const result: ResultOf<typeof Method.WorkflowsPublicationsList> = await client.call(
-    Method.WorkflowsPublicationsList,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsPublicationsList> = await client.call(Method.WorkflowsPublicationsList, params);
 ```
 
 Parameters: [WorkflowPublicationListRequest](protocol.md#workflowpublicationlistrequest).
 
-| Field          | Required | Type          | Description |
-| -------------- | -------- | ------------- | ----------- |
-| `afterVersion` | Yes      | `null,string` |             |
-| `limit`        | Yes      | `number`      |             |
-| `workflowId`   | Yes      | `string`      |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `afterVersion` | Yes | `null,string` |  |
+| `limit` | Yes | `number` |  |
+| `workflowId` | Yes | `string` |  |
 
 Result: [WorkflowPublicationPage](protocol.md#workflowpublicationpage).
 
@@ -3467,33 +3296,30 @@ Result: [WorkflowPublicationPage](protocol.md#workflowpublicationpage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsPublicationsPublish> = {
-    commandId: 'YOUR_COMMANDID',
-    expectedDraftRevision: 'YOUR_EXPECTEDDRAFTREVISION',
-    expectedPublicationId: null,
-    policy: {
-        maxConcurrency: 1,
-        timeoutMs: 'YOUR_TIMEOUTMS',
-        triggerNodeId: 'YOUR_TRIGGERNODEID',
+    "commandId": "YOUR_COMMANDID",
+    "expectedDraftRevision": "YOUR_EXPECTEDDRAFTREVISION",
+    "expectedPublicationId": null,
+    "policy": {
+        "maxConcurrency": 1,
+        "timeoutMs": "YOUR_TIMEOUTMS",
+        "triggerNodeId": "YOUR_TRIGGERNODEID"
     },
-    revision: 'YOUR_REVISION',
-    workflowId: 'YOUR_WORKFLOWID',
+    "revision": "YOUR_REVISION",
+    "workflowId": "YOUR_WORKFLOWID"
 };
-const result: ResultOf<typeof Method.WorkflowsPublicationsPublish> = await client.call(
-    Method.WorkflowsPublicationsPublish,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsPublicationsPublish> = await client.call(Method.WorkflowsPublicationsPublish, params);
 ```
 
 Parameters: [WorkflowPublishRequest](protocol.md#workflowpublishrequest).
 
-| Field                   | Required | Type                                                               | Description |
-| ----------------------- | -------- | ------------------------------------------------------------------ | ----------- |
-| `commandId`             | Yes      | `string`                                                           |             |
-| `expectedDraftRevision` | Yes      | `string`                                                           |             |
-| `expectedPublicationId` | Yes      | `null,string`                                                      |             |
-| `policy`                | Yes      | [WorkflowPublicationPolicy](protocol.md#workflowpublicationpolicy) |             |
-| `revision`              | Yes      | `string`                                                           |             |
-| `workflowId`            | Yes      | `string`                                                           |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `commandId` | Yes | `string` |  |
+| `expectedDraftRevision` | Yes | `string` |  |
+| `expectedPublicationId` | Yes | `null,string` |  |
+| `policy` | Yes | [WorkflowPublicationPolicy](protocol.md#workflowpublicationpolicy) |  |
+| `revision` | Yes | `string` |  |
+| `workflowId` | Yes | `string` |  |
 
 Result: [WorkflowPublishResult](protocol.md#workflowpublishresult).
 
@@ -3503,21 +3329,18 @@ Result: [WorkflowPublishResult](protocol.md#workflowpublishresult).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsPublicationsRead> = {
-    publicationId: null,
-    workflowId: 'YOUR_WORKFLOWID',
+    "publicationId": null,
+    "workflowId": "YOUR_WORKFLOWID"
 };
-const result: ResultOf<typeof Method.WorkflowsPublicationsRead> = await client.call(
-    Method.WorkflowsPublicationsRead,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsPublicationsRead> = await client.call(Method.WorkflowsPublicationsRead, params);
 ```
 
 Parameters: [WorkflowPublicationReadRequest](protocol.md#workflowpublicationreadrequest).
 
-| Field           | Required | Type          | Description |
-| --------------- | -------- | ------------- | ----------- |
-| `publicationId` | Yes      | `null,string` |             |
-| `workflowId`    | Yes      | `string`      |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `publicationId` | Yes | `null,string` |  |
+| `workflowId` | Yes | `string` |  |
 
 Result: [WorkflowPublication](protocol.md#workflowpublication) / `null`.
 
@@ -3527,25 +3350,22 @@ Result: [WorkflowPublication](protocol.md#workflowpublication) / `null`.
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsPublicationsRun> = {
-    input: {},
-    publicationId: 'YOUR_PUBLICATIONID',
-    runId: 'YOUR_RUNID',
-    workflowId: 'YOUR_WORKFLOWID',
+    "input": {},
+    "publicationId": "YOUR_PUBLICATIONID",
+    "runId": "YOUR_RUNID",
+    "workflowId": "YOUR_WORKFLOWID"
 };
-const result: ResultOf<typeof Method.WorkflowsPublicationsRun> = await client.call(
-    Method.WorkflowsPublicationsRun,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsPublicationsRun> = await client.call(Method.WorkflowsPublicationsRun, params);
 ```
 
 Parameters: [WorkflowPublishedRunRequest](protocol.md#workflowpublishedrunrequest).
 
-| Field           | Required | Type                                         | Description |
-| --------------- | -------- | -------------------------------------------- | ----------- |
-| `input`         | Yes      | [WorkflowObject](protocol.md#workflowobject) |             |
-| `publicationId` | Yes      | `string`                                     |             |
-| `runId`         | Yes      | `string`                                     |             |
-| `workflowId`    | Yes      | `string`                                     |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `input` | Yes | [WorkflowObject](protocol.md#workflowobject) |  |
+| `publicationId` | Yes | `string` |  |
+| `runId` | Yes | `string` |  |
+| `workflowId` | Yes | `string` |  |
 
 Result: [WorkflowRunSummary](protocol.md#workflowrunsummary).
 
@@ -3555,26 +3375,23 @@ Result: [WorkflowRunSummary](protocol.md#workflowrunsummary).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsRead> = {
-    edgeOffset: 1,
-    nodeOffset: 1,
-    revision: null,
-    workflowId: 'YOUR_WORKFLOWID',
+    "edgeOffset": 1,
+    "nodeOffset": 1,
+    "revision": null,
+    "workflowId": "YOUR_WORKFLOWID"
 };
-const result: ResultOf<typeof Method.WorkflowsRead> = await client.call(
-    Method.WorkflowsRead,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsRead> = await client.call(Method.WorkflowsRead, params);
 ```
 
 Parameters: [WorkflowReadRequest](protocol.md#workflowreadrequest).
 
-| Field         | Required | Type          | Description |
-| ------------- | -------- | ------------- | ----------- |
-| `edgeOffset`  | Yes      | `number`      |             |
-| `groupOffset` | No       | `number`      |             |
-| `nodeOffset`  | Yes      | `number`      |             |
-| `revision`    | Yes      | `null,string` |             |
-| `workflowId`  | Yes      | `string`      |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `edgeOffset` | Yes | `number` |  |
+| `groupOffset` | No | `number` |  |
+| `nodeOffset` | Yes | `number` |  |
+| `revision` | Yes | `null,string` |  |
+| `workflowId` | Yes | `string` |  |
 
 Result: [WorkflowManifestPage](protocol.md#workflowmanifestpage).
 
@@ -3584,23 +3401,20 @@ Result: [WorkflowManifestPage](protocol.md#workflowmanifestpage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsRecord> = {
-    offset: 1,
-    reference: 'YOUR_REFERENCE',
-    workflowId: 'YOUR_WORKFLOWID',
+    "offset": 1,
+    "reference": "YOUR_REFERENCE",
+    "workflowId": "YOUR_WORKFLOWID"
 };
-const result: ResultOf<typeof Method.WorkflowsRecord> = await client.call(
-    Method.WorkflowsRecord,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsRecord> = await client.call(Method.WorkflowsRecord, params);
 ```
 
 Parameters: [WorkflowRecordRequest](protocol.md#workflowrecordrequest).
 
-| Field        | Required | Type     | Description |
-| ------------ | -------- | -------- | ----------- |
-| `offset`     | Yes      | `number` |             |
-| `reference`  | Yes      | `string` |             |
-| `workflowId` | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `offset` | Yes | `number` |  |
+| `reference` | Yes | `string` |  |
+| `workflowId` | Yes | `string` |  |
 
 Result: [WorkflowRecordPage](protocol.md#workflowrecordpage).
 
@@ -3610,21 +3424,18 @@ Result: [WorkflowRecordPage](protocol.md#workflowrecordpage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsRecords> = {
-    references: [],
-    workflowId: 'YOUR_WORKFLOWID',
+    "references": [],
+    "workflowId": "YOUR_WORKFLOWID"
 };
-const result: ResultOf<typeof Method.WorkflowsRecords> = await client.call(
-    Method.WorkflowsRecords,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsRecords> = await client.call(Method.WorkflowsRecords, params);
 ```
 
 Parameters: [WorkflowRecordsRequest](protocol.md#workflowrecordsrequest).
 
-| Field        | Required | Type              | Description |
-| ------------ | -------- | ----------------- | ----------- |
-| `references` | Yes      | Array of `string` |             |
-| `workflowId` | Yes      | `string`          |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `references` | Yes | Array of `string` |  |
+| `workflowId` | Yes | `string` |  |
 
 Result: [WorkflowRecordsPage](protocol.md#workflowrecordspage).
 
@@ -3634,29 +3445,26 @@ Result: [WorkflowRecordsPage](protocol.md#workflowrecordspage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsRunsAgentControl> = {
-    controlId: 'YOUR_CONTROLID',
-    expectedRevision: 'YOUR_EXPECTEDREVISION',
-    invocationId: 'YOUR_INVOCATIONID',
-    nodeId: 'YOUR_NODEID',
-    paused: false,
-    runId: 'YOUR_RUNID',
+    "controlId": "YOUR_CONTROLID",
+    "expectedRevision": "YOUR_EXPECTEDREVISION",
+    "invocationId": "YOUR_INVOCATIONID",
+    "nodeId": "YOUR_NODEID",
+    "paused": false,
+    "runId": "YOUR_RUNID"
 };
-const result: ResultOf<typeof Method.WorkflowsRunsAgentControl> = await client.call(
-    Method.WorkflowsRunsAgentControl,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsRunsAgentControl> = await client.call(Method.WorkflowsRunsAgentControl, params);
 ```
 
 Parameters: [WorkflowAgentControlRequest](protocol.md#workflowagentcontrolrequest).
 
-| Field              | Required | Type      | Description |
-| ------------------ | -------- | --------- | ----------- |
-| `controlId`        | Yes      | `string`  |             |
-| `expectedRevision` | Yes      | `string`  |             |
-| `invocationId`     | Yes      | `string`  |             |
-| `nodeId`           | Yes      | `string`  |             |
-| `paused`           | Yes      | `boolean` |             |
-| `runId`            | Yes      | `string`  |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `controlId` | Yes | `string` |  |
+| `expectedRevision` | Yes | `string` |  |
+| `invocationId` | Yes | `string` |  |
+| `nodeId` | Yes | `string` |  |
+| `paused` | Yes | `boolean` |  |
+| `runId` | Yes | `string` |  |
 
 Result: [WorkflowAgentSession](protocol.md#workflowagentsession).
 
@@ -3666,27 +3474,24 @@ Result: [WorkflowAgentSession](protocol.md#workflowagentsession).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsRunsAgentInput> = {
-    inputId: 'YOUR_INPUTID',
-    invocationId: 'YOUR_INVOCATIONID',
-    nodeId: 'YOUR_NODEID',
-    runId: 'YOUR_RUNID',
-    text: 'YOUR_TEXT',
+    "inputId": "YOUR_INPUTID",
+    "invocationId": "YOUR_INVOCATIONID",
+    "nodeId": "YOUR_NODEID",
+    "runId": "YOUR_RUNID",
+    "text": "YOUR_TEXT"
 };
-const result: ResultOf<typeof Method.WorkflowsRunsAgentInput> = await client.call(
-    Method.WorkflowsRunsAgentInput,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsRunsAgentInput> = await client.call(Method.WorkflowsRunsAgentInput, params);
 ```
 
 Parameters: [WorkflowAgentInputRequest](protocol.md#workflowagentinputrequest).
 
-| Field          | Required | Type     | Description |
-| -------------- | -------- | -------- | ----------- |
-| `inputId`      | Yes      | `string` |             |
-| `invocationId` | Yes      | `string` |             |
-| `nodeId`       | Yes      | `string` |             |
-| `runId`        | Yes      | `string` |             |
-| `text`         | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `inputId` | Yes | `string` |  |
+| `invocationId` | Yes | `string` |  |
+| `nodeId` | Yes | `string` |  |
+| `runId` | Yes | `string` |  |
+| `text` | Yes | `string` |  |
 
 Result: [WorkflowAgentSession](protocol.md#workflowagentsession).
 
@@ -3696,23 +3501,20 @@ Result: [WorkflowAgentSession](protocol.md#workflowagentsession).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsRunsAgentRead> = {
-    invocationId: 'YOUR_INVOCATIONID',
-    nodeId: 'YOUR_NODEID',
-    runId: 'YOUR_RUNID',
+    "invocationId": "YOUR_INVOCATIONID",
+    "nodeId": "YOUR_NODEID",
+    "runId": "YOUR_RUNID"
 };
-const result: ResultOf<typeof Method.WorkflowsRunsAgentRead> = await client.call(
-    Method.WorkflowsRunsAgentRead,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsRunsAgentRead> = await client.call(Method.WorkflowsRunsAgentRead, params);
 ```
 
 Parameters: [WorkflowAgentSessionRequest](protocol.md#workflowagentsessionrequest).
 
-| Field          | Required | Type     | Description |
-| -------------- | -------- | -------- | ----------- |
-| `invocationId` | Yes      | `string` |             |
-| `nodeId`       | Yes      | `string` |             |
-| `runId`        | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `invocationId` | Yes | `string` |  |
+| `nodeId` | Yes | `string` |  |
+| `runId` | Yes | `string` |  |
 
 Result: [WorkflowAgentSession](protocol.md#workflowagentsession).
 
@@ -3722,21 +3524,18 @@ Result: [WorkflowAgentSession](protocol.md#workflowagentsession).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsRunsApplicationsCheck> = {
-    revision: 'YOUR_REVISION',
-    workflowId: 'YOUR_WORKFLOWID',
+    "revision": "YOUR_REVISION",
+    "workflowId": "YOUR_WORKFLOWID"
 };
-const result: ResultOf<typeof Method.WorkflowsRunsApplicationsCheck> = await client.call(
-    Method.WorkflowsRunsApplicationsCheck,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsRunsApplicationsCheck> = await client.call(Method.WorkflowsRunsApplicationsCheck, params);
 ```
 
 Parameters: [WorkflowApplicationRequest](protocol.md#workflowapplicationrequest).
 
-| Field        | Required | Type     | Description |
-| ------------ | -------- | -------- | ----------- |
-| `revision`   | Yes      | `string` |             |
-| `workflowId` | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `revision` | Yes | `string` |  |
+| `workflowId` | Yes | `string` |  |
 
 Result: Array of [WorkflowApplicationStatus](protocol.md#workflowapplicationstatus).
 
@@ -3746,25 +3545,22 @@ Result: Array of [WorkflowApplicationStatus](protocol.md#workflowapplicationstat
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsRunsApplicationsSetup> = {
-    application: 'claude-code',
-    revision: 'YOUR_REVISION',
-    sessionId: 'YOUR_SESSIONID',
-    workflowId: 'YOUR_WORKFLOWID',
+    "application": "claude-code",
+    "revision": "YOUR_REVISION",
+    "sessionId": "YOUR_SESSIONID",
+    "workflowId": "YOUR_WORKFLOWID"
 };
-const result: ResultOf<typeof Method.WorkflowsRunsApplicationsSetup> = await client.call(
-    Method.WorkflowsRunsApplicationsSetup,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsRunsApplicationsSetup> = await client.call(Method.WorkflowsRunsApplicationsSetup, params);
 ```
 
 Parameters: [WorkflowApplicationSetupRequest](protocol.md#workflowapplicationsetuprequest).
 
-| Field         | Required | Type                                                   | Description |
-| ------------- | -------- | ------------------------------------------------------ | ----------- |
-| `application` | Yes      | [WorkflowApplication](protocol.md#workflowapplication) |             |
-| `revision`    | Yes      | `string`                                               |             |
-| `sessionId`   | Yes      | `string`                                               |             |
-| `workflowId`  | Yes      | `string`                                               |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `application` | Yes | [WorkflowApplication](protocol.md#workflowapplication) |  |
+| `revision` | Yes | `string` |  |
+| `sessionId` | Yes | `string` |  |
+| `workflowId` | Yes | `string` |  |
 
 Result: [WorkflowTerminalSnapshot](protocol.md#workflowterminalsnapshot).
 
@@ -3774,31 +3570,28 @@ Result: [WorkflowTerminalSnapshot](protocol.md#workflowterminalsnapshot).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsRunsApprovalDecide> = {
-    commandId: 'YOUR_COMMANDID',
-    comment: 'YOUR_COMMENT',
-    decision: 'approved',
-    invocationId: 'YOUR_INVOCATIONID',
-    nodeId: 'YOUR_NODEID',
-    proposalRevision: 'YOUR_PROPOSALREVISION',
-    runId: 'YOUR_RUNID',
+    "commandId": "YOUR_COMMANDID",
+    "comment": "YOUR_COMMENT",
+    "decision": "approved",
+    "invocationId": "YOUR_INVOCATIONID",
+    "nodeId": "YOUR_NODEID",
+    "proposalRevision": "YOUR_PROPOSALREVISION",
+    "runId": "YOUR_RUNID"
 };
-const result: ResultOf<typeof Method.WorkflowsRunsApprovalDecide> = await client.call(
-    Method.WorkflowsRunsApprovalDecide,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsRunsApprovalDecide> = await client.call(Method.WorkflowsRunsApprovalDecide, params);
 ```
 
 Parameters: [WorkflowApprovalDecision](protocol.md#workflowapprovaldecision).
 
-| Field              | Required | Type                                                         | Description |
-| ------------------ | -------- | ------------------------------------------------------------ | ----------- |
-| `commandId`        | Yes      | `string`                                                     |             |
-| `comment`          | Yes      | `string`                                                     |             |
-| `decision`         | Yes      | [WorkflowApprovalChoice](protocol.md#workflowapprovalchoice) |             |
-| `invocationId`     | Yes      | `string`                                                     |             |
-| `nodeId`           | Yes      | `string`                                                     |             |
-| `proposalRevision` | Yes      | `string`                                                     |             |
-| `runId`            | Yes      | `string`                                                     |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `commandId` | Yes | `string` |  |
+| `comment` | Yes | `string` |  |
+| `decision` | Yes | [WorkflowApprovalChoice](protocol.md#workflowapprovalchoice) |  |
+| `invocationId` | Yes | `string` |  |
+| `nodeId` | Yes | `string` |  |
+| `proposalRevision` | Yes | `string` |  |
+| `runId` | Yes | `string` |  |
 
 Result: [WorkflowHumanRequest](protocol.md#workflowhumanrequest).
 
@@ -3808,23 +3601,20 @@ Result: [WorkflowHumanRequest](protocol.md#workflowhumanrequest).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsRunsArtifact> = {
-    artifactId: 'YOUR_ARTIFACTID',
-    offset: 1,
-    runId: 'YOUR_RUNID',
+    "artifactId": "YOUR_ARTIFACTID",
+    "offset": 1,
+    "runId": "YOUR_RUNID"
 };
-const result: ResultOf<typeof Method.WorkflowsRunsArtifact> = await client.call(
-    Method.WorkflowsRunsArtifact,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsRunsArtifact> = await client.call(Method.WorkflowsRunsArtifact, params);
 ```
 
 Parameters: [WorkflowRunArtifactRequest](protocol.md#workflowrunartifactrequest).
 
-| Field        | Required | Type     | Description |
-| ------------ | -------- | -------- | ----------- |
-| `artifactId` | Yes      | `string` |             |
-| `offset`     | Yes      | `number` |             |
-| `runId`      | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `artifactId` | Yes | `string` |  |
+| `offset` | Yes | `number` |  |
+| `runId` | Yes | `string` |  |
 
 Result: [WorkflowRunArtifactPage](protocol.md#workflowrunartifactpage).
 
@@ -3834,26 +3624,23 @@ Result: [WorkflowRunArtifactPage](protocol.md#workflowrunartifactpage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsRunsArtifacts> = {
-    after: {
-        invocationId: 'YOUR_INVOCATIONID',
-        nodeId: 'YOUR_NODEID',
+    "after": {
+        "invocationId": "YOUR_INVOCATIONID",
+        "nodeId": "YOUR_NODEID"
     },
-    limit: 1,
-    runId: 'YOUR_RUNID',
+    "limit": 1,
+    "runId": "YOUR_RUNID"
 };
-const result: ResultOf<typeof Method.WorkflowsRunsArtifacts> = await client.call(
-    Method.WorkflowsRunsArtifacts,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsRunsArtifacts> = await client.call(Method.WorkflowsRunsArtifacts, params);
 ```
 
 Parameters: [WorkflowArtifactListRequest](protocol.md#workflowartifactlistrequest).
 
-| Field   | Required | Type                                                                  | Description |
-| ------- | -------- | --------------------------------------------------------------------- | ----------- |
-| `after` | Yes      | [WorkflowArtifactCursor](protocol.md#workflowartifactcursor) / `null` |             |
-| `limit` | Yes      | `number`                                                              |             |
-| `runId` | Yes      | `string`                                                              |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `after` | Yes | [WorkflowArtifactCursor](protocol.md#workflowartifactcursor) / `null` |  |
+| `limit` | Yes | `number` |  |
+| `runId` | Yes | `string` |  |
 
 Result: [WorkflowArtifactListPage](protocol.md#workflowartifactlistpage).
 
@@ -3863,25 +3650,22 @@ Result: [WorkflowArtifactListPage](protocol.md#workflowartifactlistpage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsRunsAttempts> = {
-    afterAttempt: null,
-    limit: 1,
-    nodeId: 'YOUR_NODEID',
-    runId: 'YOUR_RUNID',
+    "afterAttempt": null,
+    "limit": 1,
+    "nodeId": "YOUR_NODEID",
+    "runId": "YOUR_RUNID"
 };
-const result: ResultOf<typeof Method.WorkflowsRunsAttempts> = await client.call(
-    Method.WorkflowsRunsAttempts,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsRunsAttempts> = await client.call(Method.WorkflowsRunsAttempts, params);
 ```
 
 Parameters: [WorkflowRunAttemptsRequest](protocol.md#workflowrunattemptsrequest).
 
-| Field          | Required | Type          | Description |
-| -------------- | -------- | ------------- | ----------- |
-| `afterAttempt` | Yes      | `null,number` |             |
-| `limit`        | Yes      | `number`      |             |
-| `nodeId`       | Yes      | `string`      |             |
-| `runId`        | Yes      | `string`      |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `afterAttempt` | Yes | `null,number` |  |
+| `limit` | Yes | `number` |  |
+| `nodeId` | Yes | `string` |  |
+| `runId` | Yes | `string` |  |
 
 Result: [WorkflowRunAttemptsPage](protocol.md#workflowrunattemptspage).
 
@@ -3891,19 +3675,16 @@ Result: [WorkflowRunAttemptsPage](protocol.md#workflowrunattemptspage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsRunsCancel> = {
-    runId: 'YOUR_RUNID',
+    "runId": "YOUR_RUNID"
 };
-const result: ResultOf<typeof Method.WorkflowsRunsCancel> = await client.call(
-    Method.WorkflowsRunsCancel,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsRunsCancel> = await client.call(Method.WorkflowsRunsCancel, params);
 ```
 
 Parameters: [WorkflowRunRequest](protocol.md#workflowrunrequest).
 
-| Field   | Required | Type     | Description |
-| ------- | -------- | -------- | ----------- |
-| `runId` | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `runId` | Yes | `string` |  |
 
 Result: [WorkflowRunSummary](protocol.md#workflowrunsummary).
 
@@ -3913,23 +3694,20 @@ Result: [WorkflowRunSummary](protocol.md#workflowrunsummary).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsRunsEvents> = {
-    after: 'YOUR_AFTER',
-    limit: 1,
-    runId: 'YOUR_RUNID',
+    "after": "YOUR_AFTER",
+    "limit": 1,
+    "runId": "YOUR_RUNID"
 };
-const result: ResultOf<typeof Method.WorkflowsRunsEvents> = await client.call(
-    Method.WorkflowsRunsEvents,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsRunsEvents> = await client.call(Method.WorkflowsRunsEvents, params);
 ```
 
 Parameters: [WorkflowRunEventsRequest](protocol.md#workflowruneventsrequest).
 
-| Field   | Required | Type     | Description |
-| ------- | -------- | -------- | ----------- |
-| `after` | Yes      | `string` |             |
-| `limit` | Yes      | `number` |             |
-| `runId` | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `after` | Yes | `string` |  |
+| `limit` | Yes | `number` |  |
+| `runId` | Yes | `string` |  |
 
 Result: Array of [WorkflowRunEvent](protocol.md#workflowrunevent).
 
@@ -3939,25 +3717,22 @@ Result: Array of [WorkflowRunEvent](protocol.md#workflowrunevent).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsRunsInputs> = {
-    invocationId: 'YOUR_INVOCATIONID',
-    nodeId: 'YOUR_NODEID',
-    offset: 1,
-    runId: 'YOUR_RUNID',
+    "invocationId": "YOUR_INVOCATIONID",
+    "nodeId": "YOUR_NODEID",
+    "offset": 1,
+    "runId": "YOUR_RUNID"
 };
-const result: ResultOf<typeof Method.WorkflowsRunsInputs> = await client.call(
-    Method.WorkflowsRunsInputs,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsRunsInputs> = await client.call(Method.WorkflowsRunsInputs, params);
 ```
 
 Parameters: [WorkflowRunOutputRequest](protocol.md#workflowrunoutputrequest).
 
-| Field          | Required | Type     | Description |
-| -------------- | -------- | -------- | ----------- |
-| `invocationId` | Yes      | `string` |             |
-| `nodeId`       | Yes      | `string` |             |
-| `offset`       | Yes      | `number` |             |
-| `runId`        | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `invocationId` | Yes | `string` |  |
+| `nodeId` | Yes | `string` |  |
+| `offset` | Yes | `number` |  |
+| `runId` | Yes | `string` |  |
 
 Result: [WorkflowRunOutputPage](protocol.md#workflowrunoutputpage) / `null`.
 
@@ -3967,23 +3742,20 @@ Result: [WorkflowRunOutputPage](protocol.md#workflowrunoutputpage) / `null`.
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsRunsList> = {
-    afterRunId: null,
-    limit: 1,
-    workflowId: 'YOUR_WORKFLOWID',
+    "afterRunId": null,
+    "limit": 1,
+    "workflowId": "YOUR_WORKFLOWID"
 };
-const result: ResultOf<typeof Method.WorkflowsRunsList> = await client.call(
-    Method.WorkflowsRunsList,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsRunsList> = await client.call(Method.WorkflowsRunsList, params);
 ```
 
 Parameters: [WorkflowRunListRequest](protocol.md#workflowrunlistrequest).
 
-| Field        | Required | Type          | Description |
-| ------------ | -------- | ------------- | ----------- |
-| `afterRunId` | Yes      | `null,string` |             |
-| `limit`      | Yes      | `number`      |             |
-| `workflowId` | Yes      | `string`      |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `afterRunId` | Yes | `null,string` |  |
+| `limit` | Yes | `number` |  |
+| `workflowId` | Yes | `string` |  |
 
 Result: [WorkflowRunListPage](protocol.md#workflowrunlistpage).
 
@@ -3993,21 +3765,18 @@ Result: [WorkflowRunListPage](protocol.md#workflowrunlistpage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsRunsLoopPricing> = {
-    loopId: 'YOUR_LOOPID',
-    runId: 'YOUR_RUNID',
+    "loopId": "YOUR_LOOPID",
+    "runId": "YOUR_RUNID"
 };
-const result: ResultOf<typeof Method.WorkflowsRunsLoopPricing> = await client.call(
-    Method.WorkflowsRunsLoopPricing,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsRunsLoopPricing> = await client.call(Method.WorkflowsRunsLoopPricing, params);
 ```
 
 Parameters: [WorkflowLoopSpendingRequest](protocol.md#workflowloopspendingrequest).
 
-| Field    | Required | Type     | Description |
-| -------- | -------- | -------- | ----------- |
-| `loopId` | Yes      | `string` |             |
-| `runId`  | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `loopId` | Yes | `string` |  |
+| `runId` | Yes | `string` |  |
 
 Result: [WorkflowLoopSpendingView](protocol.md#workflowloopspendingview).
 
@@ -4017,21 +3786,18 @@ Result: [WorkflowLoopSpendingView](protocol.md#workflowloopspendingview).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsRunsLoopSpending> = {
-    loopId: 'YOUR_LOOPID',
-    runId: 'YOUR_RUNID',
+    "loopId": "YOUR_LOOPID",
+    "runId": "YOUR_RUNID"
 };
-const result: ResultOf<typeof Method.WorkflowsRunsLoopSpending> = await client.call(
-    Method.WorkflowsRunsLoopSpending,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsRunsLoopSpending> = await client.call(Method.WorkflowsRunsLoopSpending, params);
 ```
 
 Parameters: [WorkflowLoopSpendingRequest](protocol.md#workflowloopspendingrequest).
 
-| Field    | Required | Type     | Description |
-| -------- | -------- | -------- | ----------- |
-| `loopId` | Yes      | `string` |             |
-| `runId`  | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `loopId` | Yes | `string` |  |
+| `runId` | Yes | `string` |  |
 
 Result: [WorkflowLoopSpendingView](protocol.md#workflowloopspendingview).
 
@@ -4041,25 +3807,22 @@ Result: [WorkflowLoopSpendingView](protocol.md#workflowloopspendingview).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsRunsOutput> = {
-    invocationId: 'YOUR_INVOCATIONID',
-    nodeId: 'YOUR_NODEID',
-    offset: 1,
-    runId: 'YOUR_RUNID',
+    "invocationId": "YOUR_INVOCATIONID",
+    "nodeId": "YOUR_NODEID",
+    "offset": 1,
+    "runId": "YOUR_RUNID"
 };
-const result: ResultOf<typeof Method.WorkflowsRunsOutput> = await client.call(
-    Method.WorkflowsRunsOutput,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsRunsOutput> = await client.call(Method.WorkflowsRunsOutput, params);
 ```
 
 Parameters: [WorkflowRunOutputRequest](protocol.md#workflowrunoutputrequest).
 
-| Field          | Required | Type     | Description |
-| -------------- | -------- | -------- | ----------- |
-| `invocationId` | Yes      | `string` |             |
-| `nodeId`       | Yes      | `string` |             |
-| `offset`       | Yes      | `number` |             |
-| `runId`        | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `invocationId` | Yes | `string` |  |
+| `nodeId` | Yes | `string` |  |
+| `offset` | Yes | `number` |  |
+| `runId` | Yes | `string` |  |
 
 Result: [WorkflowRunOutputPage](protocol.md#workflowrunoutputpage).
 
@@ -4069,27 +3832,24 @@ Result: [WorkflowRunOutputPage](protocol.md#workflowrunoutputpage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsRunsQuestionAnswer> = {
-    answer: 'YOUR_ANSWER',
-    commandId: 'YOUR_COMMANDID',
-    invocationId: 'YOUR_INVOCATIONID',
-    nodeId: 'YOUR_NODEID',
-    runId: 'YOUR_RUNID',
+    "answer": "YOUR_ANSWER",
+    "commandId": "YOUR_COMMANDID",
+    "invocationId": "YOUR_INVOCATIONID",
+    "nodeId": "YOUR_NODEID",
+    "runId": "YOUR_RUNID"
 };
-const result: ResultOf<typeof Method.WorkflowsRunsQuestionAnswer> = await client.call(
-    Method.WorkflowsRunsQuestionAnswer,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsRunsQuestionAnswer> = await client.call(Method.WorkflowsRunsQuestionAnswer, params);
 ```
 
 Parameters: [WorkflowHumanAnswer](protocol.md#workflowhumananswer).
 
-| Field          | Required | Type             | Description |
-| -------------- | -------- | ---------------- | ----------- |
-| `answer`       | Yes      | `string,boolean` |             |
-| `commandId`    | Yes      | `string`         |             |
-| `invocationId` | Yes      | `string`         |             |
-| `nodeId`       | Yes      | `string`         |             |
-| `runId`        | Yes      | `string`         |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `answer` | Yes | `string,boolean` |  |
+| `commandId` | Yes | `string` |  |
+| `invocationId` | Yes | `string` |  |
+| `nodeId` | Yes | `string` |  |
+| `runId` | Yes | `string` |  |
 
 Result: [WorkflowHumanRequest](protocol.md#workflowhumanrequest).
 
@@ -4099,23 +3859,20 @@ Result: [WorkflowHumanRequest](protocol.md#workflowhumanrequest).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsRunsQuestionRead> = {
-    invocationId: 'YOUR_INVOCATIONID',
-    nodeId: 'YOUR_NODEID',
-    runId: 'YOUR_RUNID',
+    "invocationId": "YOUR_INVOCATIONID",
+    "nodeId": "YOUR_NODEID",
+    "runId": "YOUR_RUNID"
 };
-const result: ResultOf<typeof Method.WorkflowsRunsQuestionRead> = await client.call(
-    Method.WorkflowsRunsQuestionRead,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsRunsQuestionRead> = await client.call(Method.WorkflowsRunsQuestionRead, params);
 ```
 
 Parameters: [WorkflowHumanIdentity](protocol.md#workflowhumanidentity).
 
-| Field          | Required | Type     | Description |
-| -------------- | -------- | -------- | ----------- |
-| `invocationId` | Yes      | `string` |             |
-| `nodeId`       | Yes      | `string` |             |
-| `runId`        | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `invocationId` | Yes | `string` |  |
+| `nodeId` | Yes | `string` |  |
+| `runId` | Yes | `string` |  |
 
 Result: [WorkflowHumanRequest](protocol.md#workflowhumanrequest).
 
@@ -4125,19 +3882,16 @@ Result: [WorkflowHumanRequest](protocol.md#workflowhumanrequest).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsRunsQuestions> = {
-    runId: 'YOUR_RUNID',
+    "runId": "YOUR_RUNID"
 };
-const result: ResultOf<typeof Method.WorkflowsRunsQuestions> = await client.call(
-    Method.WorkflowsRunsQuestions,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsRunsQuestions> = await client.call(Method.WorkflowsRunsQuestions, params);
 ```
 
 Parameters: [WorkflowRunRequest](protocol.md#workflowrunrequest).
 
-| Field   | Required | Type     | Description |
-| ------- | -------- | -------- | ----------- |
-| `runId` | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `runId` | Yes | `string` |  |
 
 Result: [WorkflowHumanPage](protocol.md#workflowhumanpage).
 
@@ -4147,19 +3901,16 @@ Result: [WorkflowHumanPage](protocol.md#workflowhumanpage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsRunsRead> = {
-    runId: 'YOUR_RUNID',
+    "runId": "YOUR_RUNID"
 };
-const result: ResultOf<typeof Method.WorkflowsRunsRead> = await client.call(
-    Method.WorkflowsRunsRead,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsRunsRead> = await client.call(Method.WorkflowsRunsRead, params);
 ```
 
 Parameters: [WorkflowRunRequest](protocol.md#workflowrunrequest).
 
-| Field   | Required | Type     | Description |
-| ------- | -------- | -------- | ----------- |
-| `runId` | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `runId` | Yes | `string` |  |
 
 Result: [WorkflowRunSummary](protocol.md#workflowrunsummary).
 
@@ -4169,33 +3920,30 @@ Result: [WorkflowRunSummary](protocol.md#workflowrunsummary).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsRunsStart> = {
-    input: {},
-    maxConcurrency: 1,
-    mode: 'live-test',
-    revision: 'YOUR_REVISION',
-    runId: 'YOUR_RUNID',
-    timeoutMs: 'YOUR_TIMEOUTMS',
-    triggerNodeId: 'YOUR_TRIGGERNODEID',
-    workflowId: 'YOUR_WORKFLOWID',
+    "input": {},
+    "maxConcurrency": 1,
+    "mode": "live-test",
+    "revision": "YOUR_REVISION",
+    "runId": "YOUR_RUNID",
+    "timeoutMs": "YOUR_TIMEOUTMS",
+    "triggerNodeId": "YOUR_TRIGGERNODEID",
+    "workflowId": "YOUR_WORKFLOWID"
 };
-const result: ResultOf<typeof Method.WorkflowsRunsStart> = await client.call(
-    Method.WorkflowsRunsStart,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsRunsStart> = await client.call(Method.WorkflowsRunsStart, params);
 ```
 
 Parameters: [WorkflowRunStartRequest](protocol.md#workflowrunstartrequest).
 
-| Field            | Required | Type                                           | Description |
-| ---------------- | -------- | ---------------------------------------------- | ----------- |
-| `input`          | Yes      | [WorkflowObject](protocol.md#workflowobject)   |             |
-| `maxConcurrency` | Yes      | `number`                                       |             |
-| `mode`           | Yes      | [WorkflowRunMode](protocol.md#workflowrunmode) |             |
-| `revision`       | Yes      | `string`                                       |             |
-| `runId`          | Yes      | `string`                                       |             |
-| `timeoutMs`      | Yes      | `string`                                       |             |
-| `triggerNodeId`  | Yes      | `string`                                       |             |
-| `workflowId`     | Yes      | `string`                                       |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `input` | Yes | [WorkflowObject](protocol.md#workflowobject) |  |
+| `maxConcurrency` | Yes | `number` |  |
+| `mode` | Yes | [WorkflowRunMode](protocol.md#workflowrunmode) |  |
+| `revision` | Yes | `string` |  |
+| `runId` | Yes | `string` |  |
+| `timeoutMs` | Yes | `string` |  |
+| `triggerNodeId` | Yes | `string` |  |
+| `workflowId` | Yes | `string` |  |
 
 Result: [WorkflowRunSummary](protocol.md#workflowrunsummary).
 
@@ -4205,23 +3953,20 @@ Result: [WorkflowRunSummary](protocol.md#workflowrunsummary).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsRunsSteps> = {
-    afterNodeId: null,
-    limit: 1,
-    runId: 'YOUR_RUNID',
+    "afterNodeId": null,
+    "limit": 1,
+    "runId": "YOUR_RUNID"
 };
-const result: ResultOf<typeof Method.WorkflowsRunsSteps> = await client.call(
-    Method.WorkflowsRunsSteps,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsRunsSteps> = await client.call(Method.WorkflowsRunsSteps, params);
 ```
 
 Parameters: [WorkflowRunStepsRequest](protocol.md#workflowrunstepsrequest).
 
-| Field         | Required | Type          | Description |
-| ------------- | -------- | ------------- | ----------- |
-| `afterNodeId` | Yes      | `null,string` |             |
-| `limit`       | Yes      | `number`      |             |
-| `runId`       | Yes      | `string`      |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `afterNodeId` | Yes | `null,string` |  |
+| `limit` | Yes | `number` |  |
+| `runId` | Yes | `string` |  |
 
 Result: [WorkflowRunStepsPage](protocol.md#workflowrunstepspage).
 
@@ -4231,31 +3976,28 @@ Result: [WorkflowRunStepsPage](protocol.md#workflowrunstepspage).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsRunsTerminalCommand> = {
-    action: 'input',
-    cols: 1,
-    commandId: 'YOUR_COMMANDID',
-    expectedRevision: 'YOUR_EXPECTEDREVISION',
-    input: 'YOUR_INPUT',
-    rows: 1,
-    sessionId: 'YOUR_SESSIONID',
+    "action": "input",
+    "cols": 1,
+    "commandId": "YOUR_COMMANDID",
+    "expectedRevision": "YOUR_EXPECTEDREVISION",
+    "input": "YOUR_INPUT",
+    "rows": 1,
+    "sessionId": "YOUR_SESSIONID"
 };
-const result: ResultOf<typeof Method.WorkflowsRunsTerminalCommand> = await client.call(
-    Method.WorkflowsRunsTerminalCommand,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsRunsTerminalCommand> = await client.call(Method.WorkflowsRunsTerminalCommand, params);
 ```
 
 Parameters: [WorkflowTerminalCommand](protocol.md#workflowterminalcommand).
 
-| Field              | Required | Type                                         | Description |
-| ------------------ | -------- | -------------------------------------------- | ----------- |
-| `action`           | Yes      | [TerminalAction](protocol.md#terminalaction) |             |
-| `cols`             | Yes      | `number`                                     |             |
-| `commandId`        | Yes      | `string`                                     |             |
-| `expectedRevision` | Yes      | `string`                                     |             |
-| `input`            | Yes      | `string`                                     |             |
-| `rows`             | Yes      | `number`                                     |             |
-| `sessionId`        | Yes      | `string`                                     |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `action` | Yes | [TerminalAction](protocol.md#terminalaction) |  |
+| `cols` | Yes | `number` |  |
+| `commandId` | Yes | `string` |  |
+| `expectedRevision` | Yes | `string` |  |
+| `input` | Yes | `string` |  |
+| `rows` | Yes | `number` |  |
+| `sessionId` | Yes | `string` |  |
 
 Result: [WorkflowTerminalSnapshot](protocol.md#workflowterminalsnapshot).
 
@@ -4265,19 +4007,16 @@ Result: [WorkflowTerminalSnapshot](protocol.md#workflowterminalsnapshot).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsRunsTerminalRead> = {
-    sessionId: 'YOUR_SESSIONID',
+    "sessionId": "YOUR_SESSIONID"
 };
-const result: ResultOf<typeof Method.WorkflowsRunsTerminalRead> = await client.call(
-    Method.WorkflowsRunsTerminalRead,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsRunsTerminalRead> = await client.call(Method.WorkflowsRunsTerminalRead, params);
 ```
 
 Parameters: [WorkflowTerminalRequest](protocol.md#workflowterminalrequest).
 
-| Field       | Required | Type     | Description |
-| ----------- | -------- | -------- | ----------- |
-| `sessionId` | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `sessionId` | Yes | `string` |  |
 
 Result: [WorkflowTerminalSnapshot](protocol.md#workflowterminalsnapshot).
 
@@ -4287,21 +4026,18 @@ Result: [WorkflowTerminalSnapshot](protocol.md#workflowterminalsnapshot).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsRunsUsage> = {
-    offset: 'YOUR_OFFSET',
-    runId: 'YOUR_RUNID',
+    "offset": "YOUR_OFFSET",
+    "runId": "YOUR_RUNID"
 };
-const result: ResultOf<typeof Method.WorkflowsRunsUsage> = await client.call(
-    Method.WorkflowsRunsUsage,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsRunsUsage> = await client.call(Method.WorkflowsRunsUsage, params);
 ```
 
 Parameters: [WorkflowRunUsageRequest](protocol.md#workflowrunusagerequest).
 
-| Field    | Required | Type     | Description |
-| -------- | -------- | -------- | ----------- |
-| `offset` | Yes      | `string` |             |
-| `runId`  | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `offset` | Yes | `string` |  |
+| `runId` | Yes | `string` |  |
 
 Result: [WorkflowRunUsageView](protocol.md#workflowrunusageview).
 
@@ -4311,23 +4047,20 @@ Result: [WorkflowRunUsageView](protocol.md#workflowrunusageview).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsRunsUsageBreakdown> = {
-    dimension: 'agents',
-    offset: 'YOUR_OFFSET',
-    runId: 'YOUR_RUNID',
+    "dimension": "agents",
+    "offset": "YOUR_OFFSET",
+    "runId": "YOUR_RUNID"
 };
-const result: ResultOf<typeof Method.WorkflowsRunsUsageBreakdown> = await client.call(
-    Method.WorkflowsRunsUsageBreakdown,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsRunsUsageBreakdown> = await client.call(Method.WorkflowsRunsUsageBreakdown, params);
 ```
 
 Parameters: [WorkflowRunBreakdownRequest](protocol.md#workflowrunbreakdownrequest).
 
-| Field       | Required | Type                                                         | Description |
-| ----------- | -------- | ------------------------------------------------------------ | ----------- |
-| `dimension` | Yes      | [WorkflowUsageDimension](protocol.md#workflowusagedimension) |             |
-| `offset`    | Yes      | `string`                                                     |             |
-| `runId`     | Yes      | `string`                                                     |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `dimension` | Yes | [WorkflowUsageDimension](protocol.md#workflowusagedimension) |  |
+| `offset` | Yes | `string` |  |
+| `runId` | Yes | `string` |  |
 
 Result: [WorkflowRunBreakdownView](protocol.md#workflowrunbreakdownview).
 
@@ -4337,37 +4070,34 @@ Result: [WorkflowRunBreakdownView](protocol.md#workflowrunbreakdownview).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsSave> = {
-    commandId: 'YOUR_COMMANDID',
-    expectedRevision: 'YOUR_EXPECTEDREVISION',
-    patch: {
-        details: {
-            description: 'YOUR_DESCRIPTION',
-            folder: null,
-            name: 'YOUR_NAME',
-            tags: [],
+    "commandId": "YOUR_COMMANDID",
+    "expectedRevision": "YOUR_EXPECTEDREVISION",
+    "patch": {
+        "details": {
+            "description": "YOUR_DESCRIPTION",
+            "folder": null,
+            "name": "YOUR_NAME",
+            "tags": []
         },
-        edges: [],
-        nodes: [],
-        positions: [],
-        removeEdges: [],
-        removeNodes: [],
+        "edges": [],
+        "nodes": [],
+        "positions": [],
+        "removeEdges": [],
+        "removeNodes": []
     },
-    workflowId: 'YOUR_WORKFLOWID',
+    "workflowId": "YOUR_WORKFLOWID"
 };
-const result: ResultOf<typeof Method.WorkflowsSave> = await client.call(
-    Method.WorkflowsSave,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsSave> = await client.call(Method.WorkflowsSave, params);
 ```
 
 Parameters: [WorkflowSaveRequest](protocol.md#workflowsaverequest).
 
-| Field              | Required | Type                                       | Description |
-| ------------------ | -------- | ------------------------------------------ | ----------- |
-| `commandId`        | Yes      | `string`                                   |             |
-| `expectedRevision` | Yes      | `string`                                   |             |
-| `patch`            | Yes      | [WorkflowPatch](protocol.md#workflowpatch) |             |
-| `workflowId`       | Yes      | `string`                                   |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `commandId` | Yes | `string` |  |
+| `expectedRevision` | Yes | `string` |  |
+| `patch` | Yes | [WorkflowPatch](protocol.md#workflowpatch) |  |
+| `workflowId` | Yes | `string` |  |
 
 Result: [WorkflowReceipt](protocol.md#workflowreceipt).
 
@@ -4377,23 +4107,20 @@ Result: [WorkflowReceipt](protocol.md#workflowreceipt).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsSchedulesDisable> = {
-    commandId: 'YOUR_COMMANDID',
-    expectedRevision: 'YOUR_EXPECTEDREVISION',
-    workflowId: 'YOUR_WORKFLOWID',
+    "commandId": "YOUR_COMMANDID",
+    "expectedRevision": "YOUR_EXPECTEDREVISION",
+    "workflowId": "YOUR_WORKFLOWID"
 };
-const result: ResultOf<typeof Method.WorkflowsSchedulesDisable> = await client.call(
-    Method.WorkflowsSchedulesDisable,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsSchedulesDisable> = await client.call(Method.WorkflowsSchedulesDisable, params);
 ```
 
 Parameters: [WorkflowScheduleCommand](protocol.md#workflowschedulecommand).
 
-| Field              | Required | Type     | Description |
-| ------------------ | -------- | -------- | ----------- |
-| `commandId`        | Yes      | `string` |             |
-| `expectedRevision` | Yes      | `string` |             |
-| `workflowId`       | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `commandId` | Yes | `string` |  |
+| `expectedRevision` | Yes | `string` |  |
+| `workflowId` | Yes | `string` |  |
 
 Result: [WorkflowScheduleView](protocol.md#workflowscheduleview).
 
@@ -4403,43 +4130,40 @@ Result: [WorkflowScheduleView](protocol.md#workflowscheduleview).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsSchedulesEnable> = {
-    commandId: 'YOUR_COMMANDID',
-    configuration: {
-        catchUpLimit: 1,
-        input: {},
-        lateGraceMs: 'YOUR_LATEGRACEMS',
-        maxConcurrentRuns: 1,
-        missed: 'catch-up',
-        publicationId: 'YOUR_PUBLICATIONID',
-        timing: {
-            endDate: null,
-            exceptDates: [],
-            fold: 'first',
-            gap: 'next-valid',
-            kind: 'calendar',
-            startDate: 'YOUR_STARTDATE',
-            time: 'YOUR_TIME',
-            timeZone: 'YOUR_TIMEZONE',
-            weekdays: [],
-        },
+    "commandId": "YOUR_COMMANDID",
+    "configuration": {
+        "catchUpLimit": 1,
+        "input": {},
+        "lateGraceMs": "YOUR_LATEGRACEMS",
+        "maxConcurrentRuns": 1,
+        "missed": "catch-up",
+        "publicationId": "YOUR_PUBLICATIONID",
+        "timing": {
+            "endDate": null,
+            "exceptDates": [],
+            "fold": "first",
+            "gap": "next-valid",
+            "kind": "calendar",
+            "startDate": "YOUR_STARTDATE",
+            "time": "YOUR_TIME",
+            "timeZone": "YOUR_TIMEZONE",
+            "weekdays": []
+        }
     },
-    expectedRevision: 'YOUR_EXPECTEDREVISION',
-    workflowId: 'YOUR_WORKFLOWID',
+    "expectedRevision": "YOUR_EXPECTEDREVISION",
+    "workflowId": "YOUR_WORKFLOWID"
 };
-const result: ResultOf<typeof Method.WorkflowsSchedulesEnable> = await client.call(
-    Method.WorkflowsSchedulesEnable,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsSchedulesEnable> = await client.call(Method.WorkflowsSchedulesEnable, params);
 ```
 
 Parameters: [WorkflowScheduleEnable](protocol.md#workflowscheduleenable).
 
-| Field              | Required | Type                                                                       | Description |
-| ------------------ | -------- | -------------------------------------------------------------------------- | ----------- |
-| `commandId`        | Yes      | `string`                                                                   |             |
-| `configuration`    | Yes      | [WorkflowScheduleConfiguration](protocol.md#workflowscheduleconfiguration) |             |
-| `expectedRevision` | Yes      | `string`                                                                   |             |
-| `workflowId`       | Yes      | `string`                                                                   |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `commandId` | Yes | `string` |  |
+| `configuration` | Yes | [WorkflowScheduleConfiguration](protocol.md#workflowscheduleconfiguration) |  |
+| `expectedRevision` | Yes | `string` |  |
+| `workflowId` | Yes | `string` |  |
 
 Result: [WorkflowScheduleView](protocol.md#workflowscheduleview).
 
@@ -4449,31 +4173,28 @@ Result: [WorkflowScheduleView](protocol.md#workflowscheduleview).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsSchedulesPreview> = {
-    afterMs: 'YOUR_AFTERMS',
-    timing: {
-        endDate: null,
-        exceptDates: [],
-        fold: 'first',
-        gap: 'next-valid',
-        kind: 'calendar',
-        startDate: 'YOUR_STARTDATE',
-        time: 'YOUR_TIME',
-        timeZone: 'YOUR_TIMEZONE',
-        weekdays: [],
-    },
+    "afterMs": "YOUR_AFTERMS",
+    "timing": {
+        "endDate": null,
+        "exceptDates": [],
+        "fold": "first",
+        "gap": "next-valid",
+        "kind": "calendar",
+        "startDate": "YOUR_STARTDATE",
+        "time": "YOUR_TIME",
+        "timeZone": "YOUR_TIMEZONE",
+        "weekdays": []
+    }
 };
-const result: ResultOf<typeof Method.WorkflowsSchedulesPreview> = await client.call(
-    Method.WorkflowsSchedulesPreview,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsSchedulesPreview> = await client.call(Method.WorkflowsSchedulesPreview, params);
 ```
 
 Parameters: [WorkflowSchedulePreview](protocol.md#workflowschedulepreview).
 
-| Field     | Required | Type                                                         | Description |
-| --------- | -------- | ------------------------------------------------------------ | ----------- |
-| `afterMs` | Yes      | `string`                                                     |             |
-| `timing`  | Yes      | [WorkflowScheduleTiming](protocol.md#workflowscheduletiming) |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `afterMs` | Yes | `string` |  |
+| `timing` | Yes | [WorkflowScheduleTiming](protocol.md#workflowscheduletiming) |  |
 
 Result: Array of `string`.
 
@@ -4483,19 +4204,16 @@ Result: Array of `string`.
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsSchedulesRead> = {
-    workflowId: 'YOUR_WORKFLOWID',
+    "workflowId": "YOUR_WORKFLOWID"
 };
-const result: ResultOf<typeof Method.WorkflowsSchedulesRead> = await client.call(
-    Method.WorkflowsSchedulesRead,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsSchedulesRead> = await client.call(Method.WorkflowsSchedulesRead, params);
 ```
 
 Parameters: [WorkflowScheduleRead](protocol.md#workflowscheduleread).
 
-| Field        | Required | Type     | Description |
-| ------------ | -------- | -------- | ----------- |
-| `workflowId` | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `workflowId` | Yes | `string` |  |
 
 Result: [WorkflowScheduleView](protocol.md#workflowscheduleview) / `null`.
 
@@ -4505,21 +4223,18 @@ Result: [WorkflowScheduleView](protocol.md#workflowscheduleview) / `null`.
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkflowsValidate> = {
-    revision: 'YOUR_REVISION',
-    workflowId: 'YOUR_WORKFLOWID',
+    "revision": "YOUR_REVISION",
+    "workflowId": "YOUR_WORKFLOWID"
 };
-const result: ResultOf<typeof Method.WorkflowsValidate> = await client.call(
-    Method.WorkflowsValidate,
-    params,
-);
+const result: ResultOf<typeof Method.WorkflowsValidate> = await client.call(Method.WorkflowsValidate, params);
 ```
 
 Parameters: [WorkflowValidateRequest](protocol.md#workflowvalidaterequest).
 
-| Field        | Required | Type     | Description |
-| ------------ | -------- | -------- | ----------- |
-| `revision`   | Yes      | `string` |             |
-| `workflowId` | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `revision` | Yes | `string` |  |
+| `workflowId` | Yes | `string` |  |
 
 Result: [GraphValidation](protocol.md#graphvalidation).
 
@@ -4529,21 +4244,18 @@ Result: [GraphValidation](protocol.md#graphvalidation).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkspacesCreate> = {
-    name: 'YOUR_NAME',
+    "name": "YOUR_NAME"
 };
-const result: ResultOf<typeof Method.WorkspacesCreate> = await client.call(
-    Method.WorkspacesCreate,
-    params,
-);
+const result: ResultOf<typeof Method.WorkspacesCreate> = await client.call(Method.WorkspacesCreate, params);
 ```
 
 Parameters: [WorkspaceCreateParams](protocol.md#workspacecreateparams).
 
-| Field   | Required | Type              | Description |
-| ------- | -------- | ----------------- | ----------- |
-| `name`  | Yes      | `string`          |             |
-| `tags`  | No       | Array of `string` |             |
-| `ttlMs` | No       | `number`          |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `name` | Yes | `string` |  |
+| `tags` | No | Array of `string` |  |
+| `ttlMs` | No | `number` |  |
 
 Result: [Workspace](protocol.md#workspace).
 
@@ -4553,19 +4265,16 @@ Result: [Workspace](protocol.md#workspace).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkspacesDescribe> = {
-    id: 'YOUR_ID',
+    "id": "YOUR_ID"
 };
-const result: ResultOf<typeof Method.WorkspacesDescribe> = await client.call(
-    Method.WorkspacesDescribe,
-    params,
-);
+const result: ResultOf<typeof Method.WorkspacesDescribe> = await client.call(Method.WorkspacesDescribe, params);
 ```
 
 Parameters: [IdParams](protocol.md#idparams).
 
-| Field | Required | Type     | Description |
-| ----- | -------- | -------- | ----------- |
-| `id`  | Yes      | `string` |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `id` | Yes | `string` |  |
 
 Result: [WorkspaceDescription](protocol.md#workspacedescription).
 
@@ -4575,20 +4284,17 @@ Result: [WorkspaceDescription](protocol.md#workspacedescription).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkspacesDestroy> = {
-    id: 'YOUR_ID',
+    "id": "YOUR_ID"
 };
-const result: ResultOf<typeof Method.WorkspacesDestroy> = await client.call(
-    Method.WorkspacesDestroy,
-    params,
-);
+const result: ResultOf<typeof Method.WorkspacesDestroy> = await client.call(Method.WorkspacesDestroy, params);
 ```
 
 Parameters: [WorkspaceDestroyParams](protocol.md#workspacedestroyparams).
 
-| Field   | Required | Type      | Description                                                                   |
-| ------- | -------- | --------- | ----------------------------------------------------------------------------- |
-| `force` | No       | `boolean` | Overrides live leases. Recorded in the audit trail with the runs it overrode. |
-| `id`    | Yes      | `string`  |                                                                               |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `force` | No | `boolean` | Overrides live leases. Recorded in the audit trail with the runs it overrode. |
+| `id` | Yes | `string` |  |
 
 Result: [OkResult](protocol.md#okresult).
 
@@ -4598,10 +4304,7 @@ Result: [OkResult](protocol.md#okresult).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.WorkspacesList> = {};
-const result: ResultOf<typeof Method.WorkspacesList> = await client.call(
-    Method.WorkspacesList,
-    params,
-);
+const result: ResultOf<typeof Method.WorkspacesList> = await client.call(Method.WorkspacesList, params);
 ```
 
 Parameters: [Recordstringnever](protocol.md#recordstringnever).
@@ -4616,29 +4319,26 @@ Result: Array of [Workspace](protocol.md#workspace).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.DesignArrange> = {
-    action: 'auto-layout',
-    commandId: 'YOUR_COMMANDID',
-    expectedRevision: 'YOUR_EXPECTEDREVISION',
-    id: 'YOUR_ID',
-    pageId: 'YOUR_PAGEID',
-    selection: [],
+    "action": "auto-layout",
+    "commandId": "YOUR_COMMANDID",
+    "expectedRevision": "YOUR_EXPECTEDREVISION",
+    "id": "YOUR_ID",
+    "pageId": "YOUR_PAGEID",
+    "selection": []
 };
-const result: ResultOf<typeof Method.DesignArrange> = await client.call(
-    Method.DesignArrange,
-    params,
-);
+const result: ResultOf<typeof Method.DesignArrange> = await client.call(Method.DesignArrange, params);
 ```
 
 Parameters: [DesignArrangeRequest](protocol.md#designarrangerequest).
 
-| Field              | Required | Type                                                       | Description |
-| ------------------ | -------- | ---------------------------------------------------------- | ----------- |
-| `action`           | Yes      | [DesignSelectionAction](protocol.md#designselectionaction) |             |
-| `commandId`        | Yes      | `string`                                                   |             |
-| `expectedRevision` | Yes      | `string`                                                   |             |
-| `id`               | Yes      | `string`                                                   |             |
-| `pageId`           | Yes      | `string`                                                   |             |
-| `selection`        | Yes      | Array of `string`                                          |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `action` | Yes | [DesignSelectionAction](protocol.md#designselectionaction) |  |
+| `commandId` | Yes | `string` |  |
+| `expectedRevision` | Yes | `string` |  |
+| `id` | Yes | `string` |  |
+| `pageId` | Yes | `string` |  |
+| `selection` | Yes | Array of `string` |  |
 
 Result: [DesignReceipt](protocol.md#designreceipt).
 
@@ -4648,29 +4348,26 @@ Result: [DesignReceipt](protocol.md#designreceipt).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.DesignLayoutPreview> = {
-    action: 'canvas',
-    key: null,
-    operation: {
-        op: 'layout',
-        id: 'YOUR_FRAME_ID',
-        pageId: 'YOUR_PAGE_ID',
-        changes: {
-            gap: 24,
-        },
+    "action": "canvas",
+    "key": null,
+    "operation": {
+        "op": "layout",
+        "id": "YOUR_FRAME_ID",
+        "pageId": "YOUR_PAGE_ID",
+        "changes": {
+            "gap": 24
+        }
     },
-    params: {
-        id: 'YOUR_DESIGN_ID',
-        revision: 'YOUR_SAVED_REVISION',
-        pageId: 'YOUR_PAGE_ID',
-        includeIds: [],
-        cursor: null,
-        limit: 128,
-    },
+    "params": {
+        "id": "YOUR_DESIGN_ID",
+        "revision": "YOUR_SAVED_REVISION",
+        "pageId": "YOUR_PAGE_ID",
+        "includeIds": [],
+        "cursor": null,
+        "limit": 128
+    }
 };
-const result: ResultOf<typeof Method.DesignLayoutPreview> = await client.call(
-    Method.DesignLayoutPreview,
-    params,
-);
+const result: ResultOf<typeof Method.DesignLayoutPreview> = await client.call(Method.DesignLayoutPreview, params);
 ```
 
 Requires an advertised read capability, a current saved revision and a matching page. Start with `action: "canvas"`, `key: null` and `cursor: null`. Reuse the returned key with the same canonical operation for canvas continuations, metrics and visible glyph windows. Previews do not save a revision or hydrate deferred source text.
@@ -4687,39 +4384,36 @@ Result: [DesignLayoutPreviewResult](protocol.md#designlayoutpreviewresult).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.DesignTransfer> = {
-    commandId: 'YOUR_COMMANDID',
-    expectedRevision: 'YOUR_EXPECTEDREVISION',
-    id: 'YOUR_ID',
-    pageId: 'YOUR_PAGEID',
-    parentId: null,
-    selection: [],
-    sourceId: 'YOUR_SOURCEID',
-    sourcePageId: 'YOUR_SOURCEPAGEID',
-    sourceRevision: 'YOUR_SOURCEREVISION',
-    x: 1,
-    y: 1,
+    "commandId": "YOUR_COMMANDID",
+    "expectedRevision": "YOUR_EXPECTEDREVISION",
+    "id": "YOUR_ID",
+    "pageId": "YOUR_PAGEID",
+    "parentId": null,
+    "selection": [],
+    "sourceId": "YOUR_SOURCEID",
+    "sourcePageId": "YOUR_SOURCEPAGEID",
+    "sourceRevision": "YOUR_SOURCEREVISION",
+    "x": 1,
+    "y": 1
 };
-const result: ResultOf<typeof Method.DesignTransfer> = await client.call(
-    Method.DesignTransfer,
-    params,
-);
+const result: ResultOf<typeof Method.DesignTransfer> = await client.call(Method.DesignTransfer, params);
 ```
 
 Parameters: [DesignTransferRequest](protocol.md#designtransferrequest).
 
-| Field              | Required | Type              | Description |
-| ------------------ | -------- | ----------------- | ----------- |
-| `commandId`        | Yes      | `string`          |             |
-| `expectedRevision` | Yes      | `string`          |             |
-| `id`               | Yes      | `string`          |             |
-| `pageId`           | Yes      | `string`          |             |
-| `parentId`         | Yes      | `null,string`     |             |
-| `selection`        | Yes      | Array of `string` |             |
-| `sourceId`         | Yes      | `string`          |             |
-| `sourcePageId`     | Yes      | `string`          |             |
-| `sourceRevision`   | Yes      | `string`          |             |
-| `x`                | Yes      | `number`          |             |
-| `y`                | Yes      | `number`          |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `commandId` | Yes | `string` |  |
+| `expectedRevision` | Yes | `string` |  |
+| `id` | Yes | `string` |  |
+| `pageId` | Yes | `string` |  |
+| `parentId` | Yes | `null,string` |  |
+| `selection` | Yes | Array of `string` |  |
+| `sourceId` | Yes | `string` |  |
+| `sourcePageId` | Yes | `string` |  |
+| `sourceRevision` | Yes | `string` |  |
+| `x` | Yes | `number` |  |
+| `y` | Yes | `number` |  |
 
 Result: [DesignReceipt](protocol.md#designreceipt).
 
@@ -4729,36 +4423,33 @@ Result: [DesignReceipt](protocol.md#designreceipt).
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.DesignSvgImport> = {
-    commandId: 'YOUR_COMMANDID',
-    expectedRevision: 'YOUR_EXPECTEDREVISION',
-    id: 'YOUR_ID',
-    index: null,
-    name: 'YOUR_NAME',
-    pageId: 'YOUR_PAGEID',
-    parentId: null,
-    source: 'YOUR_SOURCE',
-    x: 1,
-    y: 1,
+    "commandId": "YOUR_COMMANDID",
+    "expectedRevision": "YOUR_EXPECTEDREVISION",
+    "id": "YOUR_ID",
+    "index": null,
+    "name": "YOUR_NAME",
+    "pageId": "YOUR_PAGEID",
+    "parentId": null,
+    "source": "YOUR_SOURCE",
+    "x": 1,
+    "y": 1
 };
-const result: ResultOf<typeof Method.DesignSvgImport> = await client.call(
-    Method.DesignSvgImport,
-    params,
-);
+const result: ResultOf<typeof Method.DesignSvgImport> = await client.call(Method.DesignSvgImport, params);
 ```
 
 Parameters: [DesignSvgImportRequest](protocol.md#designsvgimportrequest).
 
-| Field              | Required | Type          | Description |
-| ------------------ | -------- | ------------- | ----------- |
-| `commandId`        | Yes      | `string`      |             |
-| `expectedRevision` | Yes      | `string`      |             |
-| `id`               | Yes      | `string`      |             |
-| `index`            | Yes      | `null,number` |             |
-| `name`             | Yes      | `string`      |             |
-| `pageId`           | Yes      | `string`      |             |
-| `parentId`         | Yes      | `null,string` |             |
-| `source`           | Yes      | `string`      |             |
-| `x`                | Yes      | `number`      |             |
-| `y`                | Yes      | `number`      |             |
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `commandId` | Yes | `string` |  |
+| `expectedRevision` | Yes | `string` |  |
+| `id` | Yes | `string` |  |
+| `index` | Yes | `null,number` |  |
+| `name` | Yes | `string` |  |
+| `pageId` | Yes | `string` |  |
+| `parentId` | Yes | `null,string` |  |
+| `source` | Yes | `string` |  |
+| `x` | Yes | `number` |  |
+| `y` | Yes | `number` |  |
 
 Result: [DesignReceipt](protocol.md#designreceipt).

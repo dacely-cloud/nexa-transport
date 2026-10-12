@@ -10,7 +10,7 @@ import type {
 } from './DesignSelectionTypes.js';
 import type { DesignTextMeasurer, DesignSize, DesignLocalBox } from './DesignLayoutTypes.js';
 import { DesignTextMetrics } from './DesignTextMetrics.js';
-import { DesignValues as V } from './DesignValues.js';
+import { DesignSelectionIndex } from './DesignSelectionIndex.js';
 
 /** Indexed, page-local selection ownership and center-based geometric conversions. */
 export class DesignSelectionContext {
@@ -20,6 +20,7 @@ export class DesignSelectionContext {
     public readonly roots: readonly DesignNode[];
     /** Resolved boxes include auto layout and all ancestor rotations. */
     public readonly boxes: ReadonlyMap<string, DesignBox>;
+    readonly #tree: DesignSelectionIndex;
     readonly #layout: DesignLayoutEngine;
     /** Requires real page ownership and rejects locked ancestry before generating any edits. */
     public constructor(
@@ -28,66 +29,9 @@ export class DesignSelectionContext {
         selection: readonly string[],
         public readonly measurer: DesignTextMeasurer = new DesignTextMetrics(),
     ) {
-        V.id(pageId);
-        if (
-            selection.length < 1 ||
-            selection.length > 128 ||
-            new Set(selection).size !== selection.length
-        ) {
-            throw new Error('Select 1 to 128 distinct layers.');
-        }
-        this.nodes = new Map(
-            document.nodes.map((node: DesignNode): readonly [string, DesignNode] => [
-                node.id,
-                node,
-            ]),
-        );
-        const pageRoots: readonly string[] | undefined = document.pages.find(
-            (page): boolean => page.id === pageId,
-        )?.roots;
-        if (pageRoots === undefined) {
-            throw new Error('Design page not found.');
-        }
-        const order: Map<string, number> = new Map();
-        const stack: string[] = pageRoots.toReversed();
-        while (stack.length > 0) {
-            const id: string | undefined = stack.pop();
-            if (id === undefined) {
-                break;
-            }
-            if (order.has(id)) {
-                throw new Error('Invalid design tree.');
-            }
-            const node: DesignNode = this.node(id);
-            order.set(id, order.size);
-            stack.push(...node.children.toReversed());
-        }
-        const selected: Set<string> = new Set(selection.map((id: string): string => V.id(id)));
-        const roots: DesignNode[] = [];
-        for (const id of selected) {
-            if (!order.has(id)) {
-                throw new Error('Selection belongs to another page.');
-            }
-            const node: DesignNode = this.node(id);
-            let current: DesignNode | null = node;
-            let nested: boolean = false;
-            while (current !== null) {
-                if (current.locked) {
-                    throw new Error('Unlock the selected layers and their containers first.');
-                }
-                if (current.id !== id && selected.has(current.id)) {
-                    nested = true;
-                }
-                current = current.parentId === null ? null : this.node(current.parentId);
-            }
-            if (!nested) {
-                roots.push(node);
-            }
-        }
-        this.roots = roots.sort(
-            (a: DesignNode, b: DesignNode): number =>
-                (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0),
-        );
+        this.#tree = new DesignSelectionIndex(document, pageId, selection);
+        this.nodes = this.#tree.nodes;
+        this.roots = this.#tree.roots;
         this.#layout = new DesignLayoutEngine(document, pageId, measurer);
         this.boxes = new Map(
             this.#layout
@@ -97,11 +41,7 @@ export class DesignSelectionContext {
     }
     /** Resolves authored layer identity without unsafe assertions. */
     public node(id: string): DesignNode {
-        const node: DesignNode | undefined = this.nodes.get(id);
-        if (node === undefined) {
-            throw new Error('Design layer not found: ' + id);
-        }
-        return node;
+        return this.#tree.node(id);
     }
     /** The existing solver cache also measures hidden text and component content. */
     public measure(id: string): DesignSize {

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
-import { BinaryChunks } from './BinaryChunks.js';
+import { BinaryChunks } from './BinaryChunks';
 import type { DeliveredAttachment } from '../protocol/Protocol.js';
 
 /** Original bytes and metadata received together in one binary frame. */
@@ -66,7 +66,48 @@ export class BinaryMedia {
         streamId?: string,
         sessionId?: string,
     ): Uint8Array<ArrayBuffer> {
-        if (!BinaryMedia.#metadata(attachment) || bytes.byteLength !== attachment.byteLength) {
+        if (bytes.byteLength !== attachment.byteLength) {
+            throw new RangeError('Invalid binary media metadata or byte length');
+        }
+        const prefix: Uint8Array<ArrayBuffer> = BinaryMedia.#prefix(
+            attachment,
+            streamId,
+            sessionId,
+        );
+        const frame: Uint8Array<ArrayBuffer> = new Uint8Array(prefix.byteLength + bytes.byteLength);
+        frame.set(prefix);
+        frame.set(bytes, prefix.byteLength);
+        return frame;
+    }
+
+    /** Streams saved pages or existing bytes without allocating another full attachment frame. */
+    public static stream(
+        attachment: DeliveredAttachment,
+        parts: AsyncIterable<Uint8Array> | Iterable<Uint8Array>,
+        streamId?: string,
+        sessionId?: string,
+    ): AsyncGenerator<Uint8Array<ArrayBuffer>, void> {
+        const prefix: Uint8Array<ArrayBuffer> = BinaryMedia.#prefix(
+            attachment,
+            streamId,
+            sessionId,
+        );
+        const source: AsyncGenerator<Uint8Array, void> = (async function* (): AsyncGenerator<
+            Uint8Array,
+            void
+        > {
+            yield prefix;
+            yield* parts;
+        })();
+        return BinaryChunks.stream(source, prefix.byteLength + attachment.byteLength);
+    }
+
+    static #prefix(
+        attachment: DeliveredAttachment,
+        streamId?: string,
+        sessionId?: string,
+    ): Uint8Array<ArrayBuffer> {
+        if (!BinaryMedia.#metadata(attachment)) {
             throw new RangeError('Invalid binary media metadata or byte length');
         }
         const header: Uint8Array<ArrayBuffer> = new TextEncoder().encode(
@@ -79,13 +120,10 @@ export class BinaryMedia {
         if (header.byteLength > 16_384) {
             throw new RangeError('Invalid binary media header');
         }
-        const frame: Uint8Array<ArrayBuffer> = new Uint8Array(
-            8 + header.byteLength + bytes.byteLength,
-        );
+        const frame: Uint8Array<ArrayBuffer> = new Uint8Array(8 + header.byteLength);
         frame.set([78, 88, 77, 68]);
         new DataView(frame.buffer).setUint32(4, header.byteLength);
         frame.set(header, 8);
-        frame.set(bytes, 8 + header.byteLength);
         return frame;
     }
 

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
-import { Base64 } from './Base64.js';
-import { BinaryChunks } from './BinaryChunks.js';
+import { Base64 } from './Base64';
+import { BinaryChunks } from './BinaryChunks';
 interface BinaryJsonObject {
     [key: string]: JsonValue | undefined;
 }
@@ -368,8 +368,9 @@ export class BinaryEnvelope {
         }
         return (
             BinaryEnvelope.#record(value) &&
-            Object.values(value).every((entry: unknown): boolean =>
-                entry === undefined || BinaryEnvelope.#json(entry, depth + 1),
+            Object.values(value).every(
+                (entry: unknown): boolean =>
+                    entry === undefined || BinaryEnvelope.#json(entry, depth + 1),
             )
         );
     }

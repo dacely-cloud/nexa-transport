@@ -1,0 +1,284 @@
+// SPDX-License-Identifier: Apache-2.0
+import type { RobloxScene, RobloxSceneNode, RobloxValue, RobloxUDim2 } from './RobloxSceneTypes';
+import { RobloxProperties } from './RobloxSceneRuntime';
+
+/** Affine local-pixel to viewport-pixel transform. */
+export type RobloxGuiTransform = readonly [number, number, number, number, number, number];
+/** Rectangular descendant clipping, independent of a parent's rounded background. */
+export type RobloxGuiClip = readonly [number, number, number, number];
+/** Resolved visual state; text and geometry use the same native layout observation. */
+export interface RobloxGuiElement {
+    readonly id: string;
+    readonly width: number;
+    readonly height: number;
+    readonly transform: RobloxGuiTransform;
+    readonly clip: RobloxGuiClip;
+    readonly background: readonly [number, number, number, number];
+    readonly radius: number;
+    readonly text: string;
+    readonly textColor: readonly [number, number, number, number];
+    readonly textSize: number;
+    readonly textWrapped: boolean;
+    readonly textX: number;
+    readonly textY: number;
+    readonly stroke: readonly [number, number, number, number];
+    readonly strokeWidth: number;
+    readonly strokeText: boolean;
+}
+interface GuiParent {
+    readonly width: number;
+    readonly height: number;
+    readonly transform: RobloxGuiTransform;
+    readonly clip: RobloxGuiClip;
+    readonly rotated: boolean;
+}
+
+/** Deterministic viewport layout for the classes supported by the current projection. */
+export class RobloxGuiLayout {
+    readonly #children: ReadonlyMap<string | null, readonly RobloxSceneNode[]>;
+    readonly #nodes: ReadonlyMap<string, RobloxSceneNode>;
+    readonly #order: ReadonlyMap<string, number>;
+    readonly #screens: readonly RobloxSceneNode[];
+    public constructor(scene: RobloxScene) {
+        const children: Map<string | null, RobloxSceneNode[]> = new Map();
+        for (const node of scene.nodes) {
+            const siblings: RobloxSceneNode[] = children.get(node.parentId) ?? [];
+            siblings.push(node);
+            children.set(node.parentId, siblings);
+        }
+        this.#children = children;
+        this.#nodes = new Map(
+            scene.nodes.map((node: RobloxSceneNode): readonly [string, RobloxSceneNode] => [
+                node.id,
+                node,
+            ]),
+        );
+        this.#screens = scene.nodes.filter(
+            (node: RobloxSceneNode): boolean => node.className === 'ScreenGui',
+        );
+        const order: Map<string, number> = new Map();
+        const visit: (node: RobloxSceneNode) => void = (node: RobloxSceneNode): void => {
+            order.set(node.id, order.size);
+            for (const child of children.get(node.id) ?? []) {
+                visit(child);
+            }
+        };
+        for (const screen of this.#screens) {
+            visit(screen);
+        }
+        this.#order = order;
+    }
+    public evaluate(
+        values: ReadonlyMap<string, Readonly<Record<string, RobloxValue>>>,
+        width: number,
+        height: number,
+    ): readonly RobloxGuiElement[] {
+        const result: RobloxGuiElement[] = [];
+        const screens: RobloxSceneNode[] = [...this.#screens].sort(
+            (a: RobloxSceneNode, b: RobloxSceneNode): number =>
+                RobloxProperties.number(values.get(a.id) ?? a.properties, 'DisplayOrder') -
+                RobloxProperties.number(values.get(b.id) ?? b.properties, 'DisplayOrder'),
+        );
+        for (const screen of screens) {
+            const properties: Readonly<Record<string, RobloxValue>> =
+                values.get(screen.id) ?? screen.properties;
+            if (properties['Enabled'] !== true) {
+                continue;
+            }
+            const parent: GuiParent = {
+                width,
+                height,
+                transform: [1, 0, 0, 1, 0, 0],
+                clip: [0, 0, width, height],
+                rotated: false,
+            };
+            const layer: RobloxGuiElement[] = [];
+            for (const node of this.#siblings(screen.id, values)) {
+                this.#render(node, parent, values, layer, width, height);
+            }
+            if (RobloxProperties.enum(properties, 'ZIndexBehavior') === 0) {
+                layer.sort(
+                    (a: RobloxGuiElement, b: RobloxGuiElement): number =>
+                        this.#zIndex(a.id, values) - this.#zIndex(b.id, values) ||
+                        (this.#order.get(a.id) ?? 0) - (this.#order.get(b.id) ?? 0),
+                );
+            }
+            result.push(...layer);
+        }
+        return result;
+    }
+    #zIndex(
+        id: string,
+        values: ReadonlyMap<string, Readonly<Record<string, RobloxValue>>>,
+    ): number {
+        const node: RobloxSceneNode | undefined = this.#nodes.get(id);
+        if (node === undefined) {
+            throw new Error('Missing GUI node ' + id);
+        }
+        return RobloxProperties.number(values.get(id) ?? node.properties, 'ZIndex');
+    }
+    #siblings(
+        id: string,
+        values: ReadonlyMap<string, Readonly<Record<string, RobloxValue>>>,
+    ): readonly RobloxSceneNode[] {
+        return [...(this.#children.get(id) ?? [])]
+            .filter((node: RobloxSceneNode): boolean =>
+                ['Frame', 'TextLabel', 'TextButton'].includes(node.className),
+            )
+            .sort(
+                (a: RobloxSceneNode, b: RobloxSceneNode): number =>
+                    RobloxProperties.number(values.get(a.id) ?? a.properties, 'ZIndex') -
+                    RobloxProperties.number(values.get(b.id) ?? b.properties, 'ZIndex'),
+            );
+    }
+    #render(
+        node: RobloxSceneNode,
+        parent: GuiParent,
+        values: ReadonlyMap<string, Readonly<Record<string, RobloxValue>>>,
+        result: RobloxGuiElement[],
+        viewportWidth: number,
+        viewportHeight: number,
+    ): void {
+        const properties: Readonly<Record<string, RobloxValue>> =
+            values.get(node.id) ?? node.properties;
+        if (properties['Visible'] !== true) {
+            return;
+        }
+        const position: RobloxUDim2 = this.#dimension(properties, 'Position');
+        const size: RobloxUDim2 = this.#dimension(properties, 'Size');
+        const anchor: RobloxValue | undefined = properties['AnchorPoint'];
+        if (typeof anchor !== 'object' || anchor.kind !== 'Vector2') {
+            throw new Error('Missing GUI anchor');
+        }
+        const width: number = Math.max(0, parent.width * size.xScale + size.xOffset);
+        const height: number = Math.max(0, parent.height * size.yScale + size.yOffset);
+        const x: number = parent.width * position.xScale + position.xOffset - width * anchor.x;
+        const y: number = parent.height * position.yScale + position.yOffset - height * anchor.y;
+        const angle: number = (RobloxProperties.number(properties, 'Rotation') * Math.PI) / 180;
+        const c: number = Math.cos(angle);
+        const s: number = Math.sin(angle);
+        const transform: RobloxGuiTransform = this.#multiply(parent.transform, [
+            c,
+            s,
+            -s,
+            c,
+            x + width / 2 - (c * width) / 2 + (s * height) / 2,
+            y + height / 2 - (s * width) / 2 - (c * height) / 2,
+        ]);
+        const rotated: boolean = parent.rotated || angle !== 0;
+        const clip: RobloxGuiClip = rotated ? [0, 0, viewportWidth, viewportHeight] : parent.clip;
+        const modifiers: readonly RobloxSceneNode[] = this.#children.get(node.id) ?? [];
+        const corner: RobloxSceneNode | undefined = modifiers.find(
+            (child: RobloxSceneNode): boolean => child.className === 'UICorner',
+        );
+        const radius: RobloxValue | undefined =
+            corner === undefined
+                ? undefined
+                : (values.get(corner.id) ?? corner.properties)['CornerRadius'];
+        const rounding: number =
+            typeof radius === 'object' && radius.kind === 'UDim'
+                ? Math.max(
+                      0,
+                      Math.min(
+                          Math.min(width, height) / 2,
+                          Math.min(width, height) * radius.scale + radius.offset,
+                      ),
+                  )
+                : 0;
+        const strokeNode: RobloxSceneNode | undefined = modifiers.find(
+            (child: RobloxSceneNode): boolean => child.className === 'UIStroke',
+        );
+        const strokeProperties: Readonly<Record<string, RobloxValue>> | null =
+            strokeNode === undefined ? null : (values.get(strokeNode.id) ?? strokeNode.properties);
+        const strokeEnabled: boolean = strokeProperties?.['Enabled'] === true;
+        const element: RobloxGuiElement = {
+            id: node.id,
+            width,
+            height,
+            transform,
+            clip,
+            background: this.#color(properties, 'BackgroundColor3', 'BackgroundTransparency'),
+            radius: rounding,
+            text: typeof properties['Text'] === 'string' ? properties['Text'] : '',
+            textColor:
+                node.className === 'Frame'
+                    ? [0, 0, 0, 0]
+                    : this.#color(properties, 'TextColor3', 'TextTransparency'),
+            textSize:
+                node.className === 'Frame' ? 1 : RobloxProperties.number(properties, 'TextSize'),
+            textWrapped: properties['TextWrapped'] === true,
+            textX:
+                node.className === 'Frame'
+                    ? 2
+                    : RobloxProperties.enum(properties, 'TextXAlignment'),
+            textY:
+                node.className === 'Frame'
+                    ? 1
+                    : RobloxProperties.enum(properties, 'TextYAlignment'),
+            stroke:
+                strokeProperties !== null && strokeEnabled
+                    ? this.#color(strokeProperties, 'Color', 'Transparency')
+                    : [0, 0, 0, 0],
+            strokeWidth:
+                strokeProperties !== null && strokeEnabled
+                    ? RobloxProperties.number(strokeProperties, 'Thickness')
+                    : 0,
+            strokeText:
+                strokeProperties !== null &&
+                node.className !== 'Frame' &&
+                RobloxProperties.enum(strokeProperties, 'ApplyStrokeMode') === 0,
+        };
+        if (width > 0 && height > 0) {
+            result.push(element);
+        }
+        const descendantClip: RobloxGuiClip =
+            properties['ClipsDescendants'] === true && !rotated
+                ? this.#intersect(clip, [
+                      transform[4],
+                      transform[5],
+                      transform[4] + width,
+                      transform[5] + height,
+                  ])
+                : clip;
+        const childParent: GuiParent = { width, height, transform, clip: descendantClip, rotated };
+        for (const child of this.#siblings(node.id, values)) {
+            this.#render(child, childParent, values, result, viewportWidth, viewportHeight);
+        }
+    }
+    #dimension(properties: Readonly<Record<string, RobloxValue>>, key: string): RobloxUDim2 {
+        const value: RobloxValue | undefined = properties[key];
+        if (typeof value !== 'object' || value.kind !== 'UDim2') {
+            throw new Error('Missing GUI ' + key);
+        }
+        return value;
+    }
+    #color(
+        properties: Readonly<Record<string, RobloxValue>>,
+        key: string,
+        transparency: string,
+    ): readonly [number, number, number, number] {
+        const color: import('./RobloxSceneTypes').RobloxColor3 = RobloxProperties.color(
+            properties,
+            key,
+        );
+        return [color.r, color.g, color.b, 1 - RobloxProperties.number(properties, transparency)];
+    }
+    #intersect(a: RobloxGuiClip, b: RobloxGuiClip): RobloxGuiClip {
+        return [
+            Math.max(a[0], b[0]),
+            Math.max(a[1], b[1]),
+            Math.min(a[2], b[2]),
+            Math.min(a[3], b[3]),
+        ];
+    }
+    #multiply(a: RobloxGuiTransform, b: RobloxGuiTransform): RobloxGuiTransform {
+        return [
+            a[0] * b[0] + a[2] * b[1],
+            a[1] * b[0] + a[3] * b[1],
+            a[0] * b[2] + a[2] * b[3],
+            a[1] * b[2] + a[3] * b[3],
+            a[0] * b[4] + a[2] * b[5] + a[4],
+            a[1] * b[4] + a[3] * b[5] + a[5],
+        ];
+    }
+}

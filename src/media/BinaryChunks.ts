@@ -55,6 +55,56 @@ export class BinaryChunks {
         }
     }
 
+    /** Frames a known-length stream while retaining only one transport chunk and the current source page. */
+    public static async *stream(
+        parts: AsyncIterable<Uint8Array> | Iterable<Uint8Array>,
+        totalBytes: number,
+    ): AsyncGenerator<Uint8Array<ArrayBuffer>, void> {
+        if (
+            !Number.isSafeInteger(totalBytes) ||
+            totalBytes < 1 ||
+            totalBytes > BinaryChunks.MAX_TRANSFER_BYTES
+        ) {
+            throw new RangeError('Binary transfer exceeds 300 MiB plus framing');
+        }
+        const id: Uint8Array<ArrayBuffer> = crypto.getRandomValues(new Uint8Array(16));
+        let received: number = 0;
+        let offset: number = 0;
+        let used: number = 0;
+        let frame: Uint8Array<ArrayBuffer> = new Uint8Array(
+            28 + Math.min(BinaryChunks.CHUNK_BYTES, totalBytes),
+        );
+        for await (const part of parts) {
+            if (part.byteLength > totalBytes - received) {
+                throw new RangeError('Binary stream exceeds its declared length');
+            }
+            received += part.byteLength;
+            let at: number = 0;
+            while (at < part.byteLength) {
+                const length: number = Math.min(part.byteLength - at, frame.byteLength - 28 - used);
+                frame.set(part.subarray(at, at + length), 28 + used);
+                used += length;
+                at += length;
+                if (used === frame.byteLength - 28) {
+                    const view: DataView = new DataView(frame.buffer);
+                    view.setUint32(0, 0x4e584348);
+                    frame.set(id, 4);
+                    view.setUint32(20, totalBytes);
+                    view.setUint32(24, offset);
+                    yield frame;
+                    offset += used;
+                    used = 0;
+                    frame = new Uint8Array(
+                        28 + Math.min(BinaryChunks.CHUNK_BYTES, totalBytes - offset),
+                    );
+                }
+            }
+        }
+        if (received !== totalBytes) {
+            throw new RangeError('Binary stream does not match its declared length');
+        }
+    }
+
     /** Cancels the transfer identified by a previously sent chunk. */
     public static cancel(chunk: Uint8Array): Uint8Array<ArrayBuffer> {
         const frame: Uint8Array<ArrayBuffer> = new Uint8Array(28);

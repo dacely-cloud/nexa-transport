@@ -3337,6 +3337,8 @@ export interface DeliveredAttachmentShape {
     readonly id: string;
     /** mimeType as defined by the Nexa gateway. */
     readonly mimeType: string;
+    /** website as defined by the Nexa gateway. */
+    readonly website?: boolean;
 }
 
 /** DeliveredAttachment from the Nexa wire protocol. */
@@ -4895,6 +4897,25 @@ export interface DesignResizeOperationShape {
 
 /** DesignResizeOperation from the Nexa wire protocol. */
 export type DesignResizeOperation = DesignResizeOperationShape;
+
+/** DesignRotateOperation wire fields. */
+export interface DesignRotateOperationShape {
+    /** angle as defined by the Nexa gateway. */
+    readonly angle: number;
+    /** op as defined by the Nexa gateway. */
+    readonly op: 'rotate';
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+    /** pivotX as defined by the Nexa gateway. */
+    readonly pivotX?: number;
+    /** pivotY as defined by the Nexa gateway. */
+    readonly pivotY?: number;
+    /** selection as defined by the Nexa gateway. */
+    readonly selection: ReadonlyArray<string>;
+}
+
+/** DesignRotateOperation from the Nexa wire protocol. */
+export type DesignRotateOperation = DesignRotateOperationShape;
 
 /** DesignSaveMethod wire fields. */
 export interface DesignSaveMethodShape {
@@ -6570,6 +6591,38 @@ export interface GatewayMethodsroblox_credentials_statusShape {
     readonly result: RobloxCredentialStatus;
 }
 
+/** GatewayMethodsroblox_live_close wire fields. */
+export interface GatewayMethodsroblox_live_closeShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: RobloxLiveHandleRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: RobloxLiveClosed;
+}
+
+/** GatewayMethodsroblox_live_export wire fields. */
+export interface GatewayMethodsroblox_live_exportShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: RobloxLiveHandleRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: RobloxLiveExport;
+}
+
+/** GatewayMethodsroblox_live_start wire fields. */
+export interface GatewayMethodsroblox_live_startShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: RobloxLiveStartRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: RobloxLiveFrame;
+}
+
+/** GatewayMethodsroblox_live_step wire fields. */
+export interface GatewayMethodsroblox_live_stepShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: RobloxLiveStepRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: RobloxLiveFrame;
+}
+
 /** GatewayMethodsroblox_telemetry_funnel wire fields. */
 export interface GatewayMethodsroblox_telemetry_funnelShape {
     /** params as defined by the Nexa gateway. */
@@ -7506,6 +7559,14 @@ export interface GatewayMethodsShape {
     readonly 'roblox.credentials.set': GatewayMethodsroblox_credentials_setShape;
     /** roblox.credentials.status as defined by the Nexa gateway. */
     readonly 'roblox.credentials.status': GatewayMethodsroblox_credentials_statusShape;
+    /** roblox.live.close as defined by the Nexa gateway. */
+    readonly 'roblox.live.close': GatewayMethodsroblox_live_closeShape;
+    /** roblox.live.export as defined by the Nexa gateway. */
+    readonly 'roblox.live.export': GatewayMethodsroblox_live_exportShape;
+    /** roblox.live.start as defined by the Nexa gateway. */
+    readonly 'roblox.live.start': GatewayMethodsroblox_live_startShape;
+    /** roblox.live.step as defined by the Nexa gateway. */
+    readonly 'roblox.live.step': GatewayMethodsroblox_live_stepShape;
     /** roblox.telemetry.funnel as defined by the Nexa gateway. */
     readonly 'roblox.telemetry.funnel': GatewayMethodsroblox_telemetry_funnelShape;
     /** roblox.telemetry.performance as defined by the Nexa gateway. */
@@ -10737,6 +10798,114 @@ export interface RobloxCredentialStatusShape {
 /** RobloxCredentialStatus from the Nexa wire protocol. */
 export type RobloxCredentialStatus = RobloxCredentialStatusShape;
 
+/** Allowed values for RobloxLiveActivationdevice. */
+export const RobloxLiveActivationdeviceValues = {
+    Value0: 'Gamepad',
+    Value1: 'Mouse',
+    Value2: 'Touch',
+} as const;
+
+/** Allowed values for RobloxLiveActivationevent. */
+export const RobloxLiveActivationeventValues = {
+    Value0: 'Activated',
+    Value1: 'MouseButton1Click',
+} as const;
+
+/** RobloxLiveActivation wire fields. */
+export interface RobloxLiveActivationShape {
+    /** clickCount as defined by the Nexa gateway. */
+    readonly clickCount?: number;
+    /** device as defined by the Nexa gateway. */
+    readonly device?: (typeof RobloxLiveActivationdeviceValues)[keyof typeof RobloxLiveActivationdeviceValues];
+    /** event as defined by the Nexa gateway. */
+    readonly event?: (typeof RobloxLiveActivationeventValues)[keyof typeof RobloxLiveActivationeventValues];
+    /** nodeId as defined by the Nexa gateway. */
+    readonly nodeId: string;
+    /** x as defined by the Nexa gateway. */
+    readonly x?: number;
+    /** y as defined by the Nexa gateway. */
+    readonly y?: number;
+}
+
+/** RobloxLiveActivation from the Nexa wire protocol. */
+export type RobloxLiveActivation = RobloxLiveActivationShape;
+
+/** RobloxLiveClosed wire fields. */
+export interface RobloxLiveClosedShape {
+    /** closed as defined by the Nexa gateway. */
+    readonly closed: boolean;
+}
+
+/** RobloxLiveClosed from the Nexa wire protocol. */
+export type RobloxLiveClosed = RobloxLiveClosedShape;
+
+/** RobloxLiveExport wire fields. */
+export interface RobloxLiveExportShape {
+    /** modelXml as defined by the Nexa gateway. */
+    readonly modelXml: string;
+    /** scene as defined by the Nexa gateway. */
+    readonly scene: string;
+}
+
+/** RobloxLiveExport from the Nexa wire protocol. */
+export type RobloxLiveExport = RobloxLiveExportShape;
+
+/** RobloxLiveFrame wire fields. */
+export interface RobloxLiveFrameShape {
+    /** elapsedUs as defined by the Nexa gateway. */
+    readonly elapsedUs: string;
+    /** handle as defined by the Nexa gateway. */
+    readonly handle: string;
+    /** memoryBytes as defined by the Nexa gateway. */
+    readonly memoryBytes: string;
+    /** output as defined by the Nexa gateway. */
+    readonly output: ReadonlyArray<string>;
+    /** state as defined by the Nexa gateway. */
+    readonly state: string;
+}
+
+/** RobloxLiveFrame from the Nexa wire protocol. */
+export type RobloxLiveFrame = RobloxLiveFrameShape;
+
+/** RobloxLiveHandleRequest wire fields. */
+export interface RobloxLiveHandleRequestShape {
+    /** handle as defined by the Nexa gateway. */
+    readonly handle: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+}
+
+/** RobloxLiveHandleRequest from the Nexa wire protocol. */
+export type RobloxLiveHandleRequest = RobloxLiveHandleRequestShape;
+
+/** RobloxLiveStartRequest wire fields. */
+export interface RobloxLiveStartRequestShape {
+    /** attachmentId as defined by the Nexa gateway. */
+    readonly attachmentId: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** previewId as defined by the Nexa gateway. */
+    readonly previewId: string;
+}
+
+/** RobloxLiveStartRequest from the Nexa wire protocol. */
+export type RobloxLiveStartRequest = RobloxLiveStartRequestShape;
+
+/** RobloxLiveStepRequest wire fields. */
+export interface RobloxLiveStepRequestShape {
+    /** handle as defined by the Nexa gateway. */
+    readonly handle: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** input as defined by the Nexa gateway. */
+    readonly input?: RobloxLiveActivation;
+    /** seconds as defined by the Nexa gateway. */
+    readonly seconds: number;
+}
+
+/** RobloxLiveStepRequest from the Nexa wire protocol. */
+export type RobloxLiveStepRequest = RobloxLiveStepRequestShape;
+
 /** ScalarSchema wire fields. */
 export interface ScalarSchemaShape {
     /** choices as defined by the Nexa gateway. */
@@ -10824,6 +10993,8 @@ export interface SessionHistoryPageShape {
     readonly format: 1;
     /** nextCursor as defined by the Nexa gateway. */
     readonly nextCursor?: string;
+    /** sourceEndCursor as defined by the Nexa gateway. */
+    readonly sourceEndCursor?: string;
 }
 
 /** SessionHistoryPage from the Nexa wire protocol. */
@@ -10831,6 +11002,8 @@ export type SessionHistoryPage = SessionHistoryPageShape;
 
 /** SessionHistoryParams wire fields. */
 export interface SessionHistoryParamsShape {
+    /** compact as defined by the Nexa gateway. */
+    readonly compact?: boolean;
     /** cursor as defined by the Nexa gateway. */
     readonly cursor?: string;
     /** endCursor as defined by the Nexa gateway. */
@@ -10839,6 +11012,8 @@ export interface SessionHistoryParamsShape {
     readonly id: string;
     /** pageBytes as defined by the Nexa gateway. */
     readonly pageBytes?: number;
+    /** sourceEndCursor as defined by the Nexa gateway. */
+    readonly sourceEndCursor?: string;
 }
 
 /** SessionHistoryParams from the Nexa wire protocol. */
@@ -14656,25 +14831,6 @@ export interface WorkspaceUsageShape {
 /** WorkspaceUsage from the Nexa wire protocol. */
 export type WorkspaceUsage = WorkspaceUsageShape;
 
-/** DesignRotateOperation wire fields. */
-export interface DesignRotateOperationShape {
-    /** angle as defined by the Nexa gateway. */
-    readonly angle: number;
-    /** op as defined by the Nexa gateway. */
-    readonly op: 'rotate';
-    /** pageId as defined by the Nexa gateway. */
-    readonly pageId: string;
-    /** pivotX as defined by the Nexa gateway. */
-    readonly pivotX?: number;
-    /** pivotY as defined by the Nexa gateway. */
-    readonly pivotY?: number;
-    /** selection as defined by the Nexa gateway. */
-    readonly selection: ReadonlyArray<string>;
-}
-
-/** DesignRotateOperation from the Nexa wire protocol. */
-export type DesignRotateOperation = DesignRotateOperationShape;
-
 /** DesignScaleOperation wire fields. */
 export interface DesignScaleOperationShape {
     /** factor as defined by the Nexa gateway. */
@@ -15213,58 +15369,6 @@ export interface DesignTransferRequestShape {
 /** DesignTransferRequest from the Nexa wire protocol. */
 export type DesignTransferRequest = DesignTransferRequestShape;
 
-/** DesignPaintColorOperation wire fields. */
-export interface DesignPaintColorOperationShape {
-    /** changes as defined by the Nexa gateway. */
-    readonly changes: DesignPaintColorChanges;
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** index as defined by the Nexa gateway. */
-    readonly index: number;
-    /** op as defined by the Nexa gateway. */
-    readonly op: 'paint-color';
-    /** pageId as defined by the Nexa gateway. */
-    readonly pageId: string;
-    /** target as defined by the Nexa gateway. */
-    readonly target: DesignPaintColorTarget;
-}
-
-/** DesignPaintColorOperation from the Nexa wire protocol. */
-export type DesignPaintColorOperation = DesignPaintColorOperationShape;
-
-/** Allowed values for DesignPaintColorTarget. */
-export const DesignPaintColorTargetValues = { Value0: 'fill', Value1: 'stroke' } as const;
-
-/** DesignPaintColorTarget from the Nexa wire protocol. */
-export type DesignPaintColorTarget =
-    (typeof DesignPaintColorTargetValues)[keyof typeof DesignPaintColorTargetValues];
-
-/** DesignPaintColorChanges wire fields. */
-export interface DesignPaintColorChangesShape {
-    /** color as defined by the Nexa gateway. */
-    readonly color?: string;
-    /** opacity as defined by the Nexa gateway. */
-    readonly opacity?: number;
-    /** tokenId as defined by the Nexa gateway. */
-    readonly tokenId?: null | string;
-}
-
-/** DesignPaintColorChanges from the Nexa wire protocol. */
-export type DesignPaintColorChanges = DesignPaintColorChangesShape;
-
-/** DesignTokenOperation wire fields. */
-export interface DesignTokenOperationShape {
-    /** changes as defined by the Nexa gateway. */
-    readonly changes: DesignTokenChanges | null;
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** op as defined by the Nexa gateway. */
-    readonly op: 'token';
-}
-
-/** DesignTokenOperation from the Nexa wire protocol. */
-export type DesignTokenOperation = DesignTokenOperationShape;
-
 /** Allowed values for DesignTokenChangescategory. */
 export const DesignTokenChangescategoryValues = {
     Value0: 'color',
@@ -15286,6 +15390,58 @@ export interface DesignTokenChangesShape {
 
 /** DesignTokenChanges from the Nexa wire protocol. */
 export type DesignTokenChanges = DesignTokenChangesShape;
+
+/** DesignTokenOperation wire fields. */
+export interface DesignTokenOperationShape {
+    /** changes as defined by the Nexa gateway. */
+    readonly changes: DesignTokenChanges | null;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** op as defined by the Nexa gateway. */
+    readonly op: 'token';
+}
+
+/** DesignTokenOperation from the Nexa wire protocol. */
+export type DesignTokenOperation = DesignTokenOperationShape;
+
+/** DesignPaintColorChanges wire fields. */
+export interface DesignPaintColorChangesShape {
+    /** color as defined by the Nexa gateway. */
+    readonly color?: string;
+    /** opacity as defined by the Nexa gateway. */
+    readonly opacity?: number;
+    /** tokenId as defined by the Nexa gateway. */
+    readonly tokenId?: null | string;
+}
+
+/** DesignPaintColorChanges from the Nexa wire protocol. */
+export type DesignPaintColorChanges = DesignPaintColorChangesShape;
+
+/** Allowed values for DesignPaintColorTarget. */
+export const DesignPaintColorTargetValues = { Value0: 'fill', Value1: 'stroke' } as const;
+
+/** DesignPaintColorTarget from the Nexa wire protocol. */
+export type DesignPaintColorTarget =
+    (typeof DesignPaintColorTargetValues)[keyof typeof DesignPaintColorTargetValues];
+
+/** DesignPaintColorOperation wire fields. */
+export interface DesignPaintColorOperationShape {
+    /** changes as defined by the Nexa gateway. */
+    readonly changes: DesignPaintColorChanges;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** index as defined by the Nexa gateway. */
+    readonly index: number;
+    /** op as defined by the Nexa gateway. */
+    readonly op: 'paint-color';
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+    /** target as defined by the Nexa gateway. */
+    readonly target: DesignPaintColorTarget;
+}
+
+/** DesignPaintColorOperation from the Nexa wire protocol. */
+export type DesignPaintColorOperation = DesignPaintColorOperationShape;
 
 /** DesignTypographyStyleOperation wire fields. */
 export interface DesignTypographyStyleOperationShape {
@@ -15704,6 +15860,14 @@ export enum Method {
     RobloxCredentialsSet = 'roblox.credentials.set',
     /** Calls roblox.credentials.status. */
     RobloxCredentialsStatus = 'roblox.credentials.status',
+    /** Calls roblox.live.close. */
+    RobloxLiveClose = 'roblox.live.close',
+    /** Calls roblox.live.export. */
+    RobloxLiveExport = 'roblox.live.export',
+    /** Calls roblox.live.start. */
+    RobloxLiveStart = 'roblox.live.start',
+    /** Calls roblox.live.step. */
+    RobloxLiveStep = 'roblox.live.step',
     /** Calls roblox.telemetry.funnel. */
     RobloxTelemetryFunnel = 'roblox.telemetry.funnel',
     /** Calls roblox.telemetry.performance. */
