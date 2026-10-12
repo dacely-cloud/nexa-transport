@@ -567,6 +567,10 @@
         "./design-canvas-codec": {
             "types": "./dist/design/DesignCanvasCodec.d.ts",
             "import": "./dist/design-canvas-codec.js"
+        },
+        "./design-text-styles": {
+            "types": "./dist/design/DesignTextStyles.d.ts",
+            "import": "./dist/design-text-styles.js"
         }
     },
     "scripts": {
