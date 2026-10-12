@@ -85,6 +85,9 @@ export class DesignFreeze {
         return Object.freeze(node);
     }
     static #paint(paint: DesignPaint): void {
+        if (paint.gradient != null) {
+            Object.freeze(paint.gradient);
+        }
         for (const stop of paint.stops) {
             Object.freeze(stop);
         }

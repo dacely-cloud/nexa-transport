@@ -1,6 +1,9 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignGradientCodec } from './DesignGradientCodec.js';
+import { DesignGradientGeometry } from './DesignGradientGeometry.js';
+import type { DesignGradientTransform } from './DesignGradientTypes.js';
 import { DesignFontFamilyCodec } from './DesignFontFamilyCodec.js';
 import { DesignTypographyStyleCodec } from './DesignTypographyStyleCodec.js';
 
@@ -24,7 +27,17 @@ export class DesignStyleCodec {
     public static paint(raw: unknown): DesignPaint {
         const value: Readonly<Record<string, unknown>> = V.fields(
             raw,
-            ['framing', 'kind', 'color', 'opacity', 'angle', 'stops', 'assetId', 'tokenId'],
+            [
+                'gradient',
+                'framing',
+                'kind',
+                'color',
+                'opacity',
+                'angle',
+                'stops',
+                'assetId',
+                'tokenId',
+            ],
             ['kind', 'color', 'opacity', 'angle', 'stops', 'assetId', 'tokenId'],
         );
         const kind: DesignPaintKind = V.choice(value['kind'], Object.values(DesignPaintKind));
@@ -49,6 +62,15 @@ export class DesignStyleCodec {
         ) {
             throw new Error('Gradients require ordered color stops');
         }
+        const gradient: DesignGradientTransform | null | undefined =
+            value['gradient'] === undefined
+                ? undefined
+                : value['gradient'] === null
+                  ? null
+                  : DesignGradientCodec.parse(value['gradient']);
+        if (gradient != null) {
+            DesignGradientGeometry.validate(gradient, kind);
+        }
         const assetId: string | null = V.optionalId(value['assetId']);
         if (kind === DesignPaintKind.Image && assetId === null) {
             throw new Error('Image paint requires a workspace asset');
@@ -59,6 +81,7 @@ export class DesignStyleCodec {
             opacity: V.number(value['opacity'], 0, 1),
             angle: V.number(value['angle'], -360, 360),
             stops,
+            ...(gradient === undefined ? {} : { gradient }),
             assetId,
             tokenId: V.optionalId(value['tokenId']),
             ...(Object.hasOwn(value, 'framing')

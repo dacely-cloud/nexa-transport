@@ -193,3 +193,5 @@ backend, or a provider-key vault.
 | `nexa-transport/design-canvas-codec`      | ESM + types  | Strict paged canvas-metric request validation                         |
 
 `nexa-transport/design-typography-styles` exposes strict saved typography definitions, overrides and link validation. Use compact token and typography-style operations through design.save.
+
+Gradient geometry and compact edits are available through `nexa-transport/design-gradient-types` (types), `nexa-transport/design-gradient-geometry` and `nexa-transport/design-paint-gradient`.

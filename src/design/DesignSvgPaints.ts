@@ -10,6 +10,8 @@ import {
 } from './DesignTypes.js';
 import type { DesignAsset } from './DesignAssetTypes.js';
 import type { DesignSvgImage } from './DesignSvgTypes.js';
+import { DesignGradientGeometry } from './DesignGradientGeometry.js';
+import type { DesignGradientTransform } from './DesignGradientTypes.js';
 import { DesignAssetCodec } from './DesignAssetCodec.js';
 import { DesignImageGeometry, type DesignImagePlacement } from './DesignImageGeometry.js';
 import { DesignDefaults } from './DesignDefaults.js';
@@ -39,6 +41,15 @@ export class DesignSvgPaints {
             const stops: string = paint.stops
                 .map((stop): string => `<stop offset="${stop.offset}" stop-color="${stop.color}"/>`)
                 .join('');
+            if (paint.gradient != null) {
+                const gradient: DesignGradientTransform = DesignGradientGeometry.resolve(paint);
+                this.definitions.push(
+                    paint.kind === DesignPaintKind.Radial
+                        ? `<radialGradient id="${id}" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="1" gradientTransform="matrix(${(gradient.endX - gradient.startX) * box.width} ${(gradient.endY - gradient.startY) * box.height} ${(gradient.axisX - gradient.startX) * box.width} ${(gradient.axisY - gradient.startY) * box.height} ${gradient.startX * box.width} ${gradient.startY * box.height})">${stops}</radialGradient>`
+                        : `<linearGradient id="${id}" gradientUnits="userSpaceOnUse" x1="${gradient.startX * box.width}" y1="${gradient.startY * box.height}" x2="${gradient.endX * box.width}" y2="${gradient.endY * box.height}">${stops}</linearGradient>`,
+                );
+                return `url(#${id})`;
+            }
             const angle: number = (paint.angle * Math.PI) / 180;
             this.definitions.push(
                 paint.kind === DesignPaintKind.Radial

@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { DesignGradientTransform } from './DesignGradientTypes.js';
 import type { DesignTypographyValues, DesignTypographyLink } from './DesignTypographyStyleTypes.js';
 
 import type { DesignVariantSet, DesignVariantValue } from './DesignVariantTypes.js';
@@ -80,6 +81,8 @@ export interface DesignPaint {
     readonly color: string;
     readonly opacity: number;
     readonly angle: number;
+    /** Null or omission retains the original angle-based linear or centered radial geometry. */
+    readonly gradient?: DesignGradientTransform | null;
     readonly stops: readonly DesignGradientStop[];
     readonly assetId: string | null;
     readonly tokenId: string | null;

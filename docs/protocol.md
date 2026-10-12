@@ -3238,6 +3238,17 @@ Variant 20: [DesignTypographyStyleOperation](protocol.md#designtypographystyleop
 | `pageId`  | Yes      | `string`             |             |
 | `tokenId` | Yes      | `null,string`        |             |
 
+Variant 21: [DesignPaintGradientOperation](protocol.md#designpaintgradientoperation)
+
+| Field     | Required | Type                                                                 | Description |
+| --------- | -------- | -------------------------------------------------------------------- | ----------- |
+| `changes` | Yes      | [DesignPaintGradientChanges](protocol.md#designpaintgradientchanges) |             |
+| `id`      | Yes      | `string`                                                             |             |
+| `index`   | Yes      | `number`                                                             |             |
+| `op`      | Yes      | `"paint-gradient"`                                                   |             |
+| `pageId`  | Yes      | `string`                                                             |             |
+| `target`  | Yes      | [DesignPaintColorTarget](protocol.md#designpaintcolortarget)         |             |
+
 ## DesignOverride
 
 Instance overrides target a source layer without modifying its component definition.
@@ -3287,16 +3298,17 @@ Page record.
 
 Layer paint. Colors are validated hex values, never arbitrary CSS.
 
-| Field     | Required | Type                                                          | Description                                                                            |
-| --------- | -------- | ------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| `angle`   | Yes      | `number`                                                      |                                                                                        |
-| `assetId` | Yes      | `null,string`                                                 |                                                                                        |
-| `color`   | Yes      | `string`                                                      |                                                                                        |
-| `framing` | No       | [DesignImageFraming](protocol.md#designimageframing)          | Omitted framing retains the original centered-cover behavior of existing image paints. |
-| `kind`    | Yes      | [DesignPaintKind](protocol.md#designpaintkind)                |                                                                                        |
-| `opacity` | Yes      | `number`                                                      |                                                                                        |
-| `stops`   | Yes      | Array of [DesignGradientStop](protocol.md#designgradientstop) |                                                                                        |
-| `tokenId` | Yes      | `null,string`                                                 |                                                                                        |
+| Field      | Required | Type                                                                    | Description                                                                            |
+| ---------- | -------- | ----------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `angle`    | Yes      | `number`                                                                |                                                                                        |
+| `assetId`  | Yes      | `null,string`                                                           |                                                                                        |
+| `color`    | Yes      | `string`                                                                |                                                                                        |
+| `framing`  | No       | [DesignImageFraming](protocol.md#designimageframing)                    | Omitted framing retains the original centered-cover behavior of existing image paints. |
+| `kind`     | Yes      | [DesignPaintKind](protocol.md#designpaintkind)                          |                                                                                        |
+| `opacity`  | Yes      | `number`                                                                |                                                                                        |
+| `stops`    | Yes      | Array of [DesignGradientStop](protocol.md#designgradientstop)           |                                                                                        |
+| `tokenId`  | Yes      | `null,string`                                                           |                                                                                        |
+| `gradient` | No       | [DesignGradientTransform](protocol.md#designgradienttransform) / `null` | Null or omission retains the original angle-based linear or centered radial geometry.  |
 
 ## DesignPaintKind
 
@@ -10817,3 +10829,53 @@ A text layer links to a typed typography token and may override individual prope
 | ----------- | -------- | ------------------------------------------------------------------ | ----------------------------------------------------------------------------- |
 | `overrides` | No       | [DesignTypographyOverrides](protocol.md#designtypographyoverrides) | Local properties override their saved style while other fields remain linked. |
 | `tokenId`   | Yes      | `string`                                                           |                                                                               |
+
+## DesignGradientTransform
+
+Top-left-origin normalized points define a linear segment or a radial center and two radius axes.
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `axisX`  | Yes      | `number` |             |
+| `axisY`  | Yes      | `number` |             |
+| `endX`   | Yes      | `number` |             |
+| `endY`   | Yes      | `number` |             |
+| `startX` | Yes      | `number` |             |
+| `startY` | Yes      | `number` |             |
+
+## DesignGradientTransformChanges
+
+Each coordinate may change independently without retransmitting other gradient or layer fields.
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `axisX`  | No       | `number` |             |
+| `axisY`  | No       | `number` |             |
+| `endX`   | No       | `number` |             |
+| `endY`   | No       | `number` |             |
+| `startX` | No       | `number` |             |
+| `startY` | No       | `number` |             |
+
+## DesignPaintGradientChanges
+
+Geometry and stops are independent of source bodies and the rest of the paint stack.
+
+| Field      | Required | Type                                                                                  | Description |
+| ---------- | -------- | ------------------------------------------------------------------------------------- | ----------- |
+| `angle`    | No       | `number`                                                                              |             |
+| `gradient` | No       | [DesignGradientTransformChanges](protocol.md#designgradienttransformchanges) / `null` |             |
+| `kind`     | No       | `"linear"` / `"radial"`                                                               |             |
+| `stops`    | No       | Array of [DesignGradientStop](protocol.md#designgradientstop)                         |             |
+
+## DesignPaintGradientOperation
+
+Page-scoped native editing of one fill or stroke gradient.
+
+| Field     | Required | Type                                                                 | Description |
+| --------- | -------- | -------------------------------------------------------------------- | ----------- |
+| `changes` | Yes      | [DesignPaintGradientChanges](protocol.md#designpaintgradientchanges) |             |
+| `id`      | Yes      | `string`                                                             |             |
+| `index`   | Yes      | `number`                                                             |             |
+| `op`      | Yes      | `"paint-gradient"`                                                   |             |
+| `pageId`  | Yes      | `string`                                                             |             |
+| `target`  | Yes      | [DesignPaintColorTarget](protocol.md#designpaintcolortarget)         |             |

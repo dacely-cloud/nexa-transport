@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { DesignGradientTransformChanges } from './DesignGradientTypes.js';
 import type { DesignTypographyOverrides } from './DesignTypographyStyleTypes.js';
 
 import type { DesignFontBinding } from './DesignFontTypes.js';
@@ -11,6 +12,8 @@ import type { DesignBooleanMode } from './DesignBooleanTypes.js';
 import type {
     DesignFrameGrid,
     DesignFlow,
+    DesignPaintKind,
+    DesignGradientStop,
     DesignSizing,
     DesignAlign,
     DesignGuideValue,
@@ -54,6 +57,7 @@ export const DesignOperationKind = {
     Metadata: 'metadata',
     Token: 'token',
     PaintColor: 'paint-color',
+    PaintGradient: 'paint-gradient',
 } as const;
 /** Editable properties exclude identity and tree links, which have dedicated operations. */
 export interface DesignNodeChanges {
@@ -321,6 +325,22 @@ export interface DesignPaintColorOperation {
     readonly index: number;
     readonly changes: DesignPaintColorChanges;
 }
+/** Geometry and stops are independent of source bodies and the rest of the paint stack. */
+export interface DesignPaintGradientChanges {
+    readonly kind?: typeof DesignPaintKind.Linear | typeof DesignPaintKind.Radial;
+    readonly angle?: number;
+    readonly gradient?: DesignGradientTransformChanges | null;
+    readonly stops?: readonly DesignGradientStop[];
+}
+/** Page-scoped native editing of one fill or stroke gradient. */
+export interface DesignPaintGradientOperation {
+    readonly op: typeof DesignOperationKind.PaintGradient;
+    readonly id: string;
+    readonly pageId: string;
+    readonly target: DesignPaintColorTarget;
+    readonly index: number;
+    readonly changes: DesignPaintGradientChanges;
+}
 /** A transaction can contain different operation types. */
 export type DesignOperation =
     | DesignInsert
@@ -342,7 +362,8 @@ export type DesignOperation =
     | DesignPageOperation
     | DesignMetadata
     | DesignTokenOperation
-    | DesignPaintColorOperation;
+    | DesignPaintColorOperation
+    | DesignPaintGradientOperation;
 /** Before and after images provide conflict-safe undo and bounded deltas. */
 export interface DesignEntityChange<T> {
     readonly id: string;

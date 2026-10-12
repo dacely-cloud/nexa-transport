@@ -4564,7 +4564,8 @@ export type DesignOperation =
     | DesignMetadata
     | DesignTokenOperation
     | DesignPaintColorOperation
-    | DesignTypographyStyleOperation;
+    | DesignTypographyStyleOperation
+    | DesignPaintGradientOperation;
 
 /** DesignOverride wire fields. */
 export interface DesignOverrideShape {
@@ -4646,6 +4647,8 @@ export interface DesignPaintShape {
     readonly stops: ReadonlyArray<DesignGradientStop>;
     /** tokenId as defined by the Nexa gateway. */
     readonly tokenId: null | string;
+    /** gradient as defined by the Nexa gateway. */
+    readonly gradient?: DesignGradientTransform | null;
 }
 
 /** DesignPaint from the Nexa wire protocol. */
@@ -15342,6 +15345,81 @@ export interface DesignTypographyLinkShape {
 
 /** DesignTypographyLink from the Nexa wire protocol. */
 export type DesignTypographyLink = DesignTypographyLinkShape;
+
+/** DesignGradientTransform wire fields. */
+export interface DesignGradientTransformShape {
+    /** axisX as defined by the Nexa gateway. */
+    readonly axisX: number;
+    /** axisY as defined by the Nexa gateway. */
+    readonly axisY: number;
+    /** endX as defined by the Nexa gateway. */
+    readonly endX: number;
+    /** endY as defined by the Nexa gateway. */
+    readonly endY: number;
+    /** startX as defined by the Nexa gateway. */
+    readonly startX: number;
+    /** startY as defined by the Nexa gateway. */
+    readonly startY: number;
+}
+
+/** DesignGradientTransform from the Nexa wire protocol. */
+export type DesignGradientTransform = DesignGradientTransformShape;
+
+/** DesignGradientTransformChanges wire fields. */
+export interface DesignGradientTransformChangesShape {
+    /** axisX as defined by the Nexa gateway. */
+    readonly axisX?: number;
+    /** axisY as defined by the Nexa gateway. */
+    readonly axisY?: number;
+    /** endX as defined by the Nexa gateway. */
+    readonly endX?: number;
+    /** endY as defined by the Nexa gateway. */
+    readonly endY?: number;
+    /** startX as defined by the Nexa gateway. */
+    readonly startX?: number;
+    /** startY as defined by the Nexa gateway. */
+    readonly startY?: number;
+}
+
+/** DesignGradientTransformChanges from the Nexa wire protocol. */
+export type DesignGradientTransformChanges = DesignGradientTransformChangesShape;
+
+/** Allowed values for DesignPaintGradientChangeskind. */
+export const DesignPaintGradientChangeskindValues = { Value0: 'linear', Value1: 'radial' } as const;
+
+/** DesignPaintGradientChanges wire fields. */
+export interface DesignPaintGradientChangesShape {
+    /** angle as defined by the Nexa gateway. */
+    readonly angle?: number;
+    /** gradient as defined by the Nexa gateway. */
+    readonly gradient?: DesignGradientTransformChanges | null;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind?: (typeof DesignPaintGradientChangeskindValues)[keyof typeof DesignPaintGradientChangeskindValues];
+    /** stops as defined by the Nexa gateway. */
+    readonly stops?: ReadonlyArray<DesignGradientStop>;
+}
+
+/** DesignPaintGradientChanges from the Nexa wire protocol. */
+export type DesignPaintGradientChanges = DesignPaintGradientChangesShape;
+
+/** DesignPaintGradientOperation wire fields. */
+export interface DesignPaintGradientOperationShape {
+    /** changes as defined by the Nexa gateway. */
+    readonly changes: DesignPaintGradientChanges;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** index as defined by the Nexa gateway. */
+    readonly index: number;
+    /** op as defined by the Nexa gateway. */
+    readonly op: 'paint-gradient';
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+    /** target as defined by the Nexa gateway. */
+    readonly target: DesignPaintColorTarget;
+}
+
+/** DesignPaintGradientOperation from the Nexa wire protocol. */
+export type DesignPaintGradientOperation = DesignPaintGradientOperationShape;
 
 /** Supported RPC names. */
 export type MethodName = keyof GatewayMethods;
