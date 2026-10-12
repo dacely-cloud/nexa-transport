@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignStrokeChangesCodec } from './DesignStrokeChangesCodec.js';
 import { DesignPaintGradientChangesCodec } from './DesignPaintGradientChangesCodec.js';
 import { DesignPaintColorChangesCodec } from './DesignPaintColorChangesCodec.js';
 import { DesignPaintColorTarget } from './DesignOperationTypes.js';
@@ -96,6 +97,20 @@ export class DesignOperationCodec {
                         parentId: V.optionalId(value['parentId']),
                         pageId: V.id(value['pageId']),
                         index: V.number(value['index'], 0, 10000, true),
+                    };
+                }
+                case Kind.Stroke: {
+                    const value: Readonly<Record<string, unknown>> = V.record(entry, [
+                        'op',
+                        'id',
+                        'pageId',
+                        'changes',
+                    ]);
+                    return {
+                        op,
+                        id: V.id(value['id']),
+                        pageId: V.id(value['pageId']),
+                        changes: DesignStrokeChangesCodec.parse(value['changes']),
                     };
                 }
                 case Kind.PaintGradient: {

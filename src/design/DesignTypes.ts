@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { DesignStrokeCap, DesignStrokeJoin } from './DesignStrokeTypes.js';
 import type { DesignGradientTransform } from './DesignGradientTypes.js';
 import type { DesignTypographyValues, DesignTypographyLink } from './DesignTypographyStyleTypes.js';
 
@@ -98,6 +99,12 @@ export interface DesignCorners {
 }
 /** Outline properties. */
 export interface DesignStroke {
+    /** Omission retains the original round-cap behavior. */
+    readonly cap?: DesignStrokeCap;
+    /** Omission retains the original round-join behavior. */
+    readonly join?: DesignStrokeJoin;
+    /** A finite ratio bounds miter corners; omission uses four. */
+    readonly miterLimit?: number;
     readonly paint: DesignPaint;
     readonly width: number;
     readonly dash: readonly number[];

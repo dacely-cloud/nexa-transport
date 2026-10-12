@@ -46,12 +46,16 @@ export interface DesignPathKitOperations {
 export interface DesignPathKitFills {
     readonly WINDING: DesignPathKitEnum;
 }
-/** The editor's centered borders use round joins. */
+/** Authored corner shapes map directly to the native stroke kernel. */
 export interface DesignPathKitJoins {
     readonly ROUND: DesignPathKitEnum;
+    readonly MITER: DesignPathKitEnum;
+    readonly BEVEL: DesignPathKitEnum;
 }
-/** The existing vector renderer and SVG exporter use round caps. */
+/** Authored endpoint shapes map directly to the native stroke kernel. */
 export interface DesignPathKitCaps {
+    readonly BUTT: DesignPathKitEnum;
+    readonly SQUARE: DesignPathKitEnum;
     readonly ROUND: DesignPathKitEnum;
 }
 /** The minimal typed FFI surface used by editable layout geometry. */

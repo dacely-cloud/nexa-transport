@@ -4,6 +4,7 @@
 import { DesignGradientCodec } from './DesignGradientCodec.js';
 import { DesignGradientGeometry } from './DesignGradientGeometry.js';
 import type { DesignGradientTransform } from './DesignGradientTypes.js';
+import { DesignStrokeCap, DesignStrokeJoin } from './DesignStrokeTypes.js';
 import { DesignFontFamilyCodec } from './DesignFontFamilyCodec.js';
 import { DesignTypographyStyleCodec } from './DesignTypographyStyleCodec.js';
 
@@ -105,7 +106,13 @@ export class DesignStyleCodec {
             'bottomLeft',
         ]);
         const stroke: Readonly<Record<string, unknown>> | null =
-            value['stroke'] === null ? null : V.record(value['stroke'], ['paint', 'width', 'dash']);
+            value['stroke'] === null
+                ? null
+                : V.fields(
+                      value['stroke'],
+                      ['paint', 'width', 'dash', 'cap', 'join', 'miterLimit'],
+                      ['paint', 'width', 'dash'],
+                  );
         return {
             fills: V.list(value['fills'], 8, (entry: unknown): DesignPaint => this.paint(entry)),
             stroke:
@@ -113,6 +120,17 @@ export class DesignStyleCodec {
                     ? null
                     : {
                           paint: this.paint(stroke['paint']),
+                          ...(stroke['cap'] === undefined
+                              ? {}
+                              : { cap: V.choice(stroke['cap'], Object.values(DesignStrokeCap)) }),
+                          ...(stroke['join'] === undefined
+                              ? {}
+                              : {
+                                    join: V.choice(stroke['join'], Object.values(DesignStrokeJoin)),
+                                }),
+                          ...(stroke['miterLimit'] === undefined
+                              ? {}
+                              : { miterLimit: V.number(stroke['miterLimit'], 1, 100) }),
                           width: V.number(stroke['width'], 0, 1000),
                           dash: V.list(stroke['dash'], 16, (entry: unknown): number =>
                               V.number(entry, 0.01, 1000),

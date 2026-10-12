@@ -4565,7 +4565,8 @@ export type DesignOperation =
     | DesignTokenOperation
     | DesignPaintColorOperation
     | DesignTypographyStyleOperation
-    | DesignPaintGradientOperation;
+    | DesignPaintGradientOperation
+    | DesignStrokeOperation;
 
 /** DesignOverride wire fields. */
 export interface DesignOverrideShape {
@@ -4946,6 +4947,16 @@ export const DesignSizingValues = { Value0: 'fill', Value1: 'fixed', Value2: 'hu
 /** DesignSizing from the Nexa wire protocol. */
 export type DesignSizing = (typeof DesignSizingValues)[keyof typeof DesignSizingValues];
 
+/** Allowed values for DesignStrokecap. */
+export const DesignStrokecapValues = { Value0: 'butt', Value1: 'round', Value2: 'square' } as const;
+
+/** Allowed values for DesignStrokejoin. */
+export const DesignStrokejoinValues = {
+    Value0: 'bevel',
+    Value1: 'miter',
+    Value2: 'round',
+} as const;
+
 /** DesignStroke wire fields. */
 export interface DesignStrokeShape {
     /** dash as defined by the Nexa gateway. */
@@ -4954,6 +4965,12 @@ export interface DesignStrokeShape {
     readonly paint: DesignPaint;
     /** width as defined by the Nexa gateway. */
     readonly width: number;
+    /** cap as defined by the Nexa gateway. */
+    readonly cap?: (typeof DesignStrokecapValues)[keyof typeof DesignStrokecapValues];
+    /** join as defined by the Nexa gateway. */
+    readonly join?: (typeof DesignStrokejoinValues)[keyof typeof DesignStrokejoinValues];
+    /** miterLimit as defined by the Nexa gateway. */
+    readonly miterLimit?: number;
 }
 
 /** DesignStroke from the Nexa wire protocol. */
@@ -15420,6 +15437,52 @@ export interface DesignPaintGradientOperationShape {
 
 /** DesignPaintGradientOperation from the Nexa wire protocol. */
 export type DesignPaintGradientOperation = DesignPaintGradientOperationShape;
+
+/** Allowed values for DesignStrokeChangescap. */
+export const DesignStrokeChangescapValues = {
+    Value0: 'butt',
+    Value1: 'round',
+    Value2: 'square',
+} as const;
+
+/** Allowed values for DesignStrokeChangesjoin. */
+export const DesignStrokeChangesjoinValues = {
+    Value0: 'bevel',
+    Value1: 'miter',
+    Value2: 'round',
+} as const;
+
+/** DesignStrokeChanges wire fields. */
+export interface DesignStrokeChangesShape {
+    /** cap as defined by the Nexa gateway. */
+    readonly cap?: (typeof DesignStrokeChangescapValues)[keyof typeof DesignStrokeChangescapValues];
+    /** dash as defined by the Nexa gateway. */
+    readonly dash?: ReadonlyArray<number>;
+    /** join as defined by the Nexa gateway. */
+    readonly join?: (typeof DesignStrokeChangesjoinValues)[keyof typeof DesignStrokeChangesjoinValues];
+    /** miterLimit as defined by the Nexa gateway. */
+    readonly miterLimit?: number;
+    /** width as defined by the Nexa gateway. */
+    readonly width?: number;
+}
+
+/** DesignStrokeChanges from the Nexa wire protocol. */
+export type DesignStrokeChanges = DesignStrokeChangesShape;
+
+/** DesignStrokeOperation wire fields. */
+export interface DesignStrokeOperationShape {
+    /** changes as defined by the Nexa gateway. */
+    readonly changes: DesignStrokeChanges | null;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** op as defined by the Nexa gateway. */
+    readonly op: 'stroke';
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+}
+
+/** DesignStrokeOperation from the Nexa wire protocol. */
+export type DesignStrokeOperation = DesignStrokeOperationShape;
 
 /** Supported RPC names. */
 export type MethodName = keyof GatewayMethods;

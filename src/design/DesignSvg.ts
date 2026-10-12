@@ -98,7 +98,7 @@ export class DesignSvg {
             }
             if (node.style.stroke !== null) {
                 const stroke: DesignStroke = node.style.stroke;
-                const attributes: string = `fill="none" stroke="${paints.paint(stroke.paint, box)}" stroke-opacity="${stroke.paint.opacity}" stroke-width="${stroke.width}" stroke-dasharray="${stroke.dash.join(' ')}" stroke-linejoin="round" stroke-linecap="round"`;
+                const attributes: string = `fill="none" stroke="${paints.paint(stroke.paint, box)}" stroke-opacity="${stroke.paint.opacity}" stroke-width="${stroke.width}" stroke-dasharray="${stroke.dash.join(' ')}" stroke-linejoin="${stroke.join ?? 'round'}" stroke-linecap="${stroke.cap ?? 'round'}"${stroke.miterLimit === undefined ? '' : ` stroke-miterlimit="${stroke.miterLimit}"`}`;
                 body +=
                     node.text === null
                         ? Geometry.shape(node, box, attributes)

@@ -36,6 +36,8 @@ const config: UserConfig = {
                 'design-selection-types': 'src/design/DesignSelectionTypes.ts',
                 'design-gradient-geometry': 'src/design/DesignGradientGeometry.ts',
                 'design-paint-gradient': 'src/design/DesignPaintGradientEdits.ts',
+                'design-stroke-types': 'src/design/DesignStrokeTypes.ts',
+                'design-stroke-geometry': 'src/design/DesignStrokeGeometry.ts',
                 'design-types': 'src/design/DesignTypes.ts',
                 'design-defaults': 'src/design/DesignDefaults.ts',
                 'design-codec': 'src/design/DesignCodec.ts',

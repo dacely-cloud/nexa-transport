@@ -138,9 +138,19 @@ export class DesignBooleanKernel {
             if (
                 center.stroke({
                     width: stroke.width,
-                    miter_limit: 4,
-                    join: library.StrokeJoin.ROUND,
-                    cap: library.StrokeCap.ROUND,
+                    miter_limit: stroke.miterLimit ?? 4,
+                    join:
+                        stroke.join === 'miter'
+                            ? library.StrokeJoin.MITER
+                            : stroke.join === 'bevel'
+                              ? library.StrokeJoin.BEVEL
+                              : library.StrokeJoin.ROUND,
+                    cap:
+                        stroke.cap === 'butt'
+                            ? library.StrokeCap.BUTT
+                            : stroke.cap === 'square'
+                              ? library.StrokeCap.SQUARE
+                              : library.StrokeCap.ROUND,
                 }) === null
             ) {
                 throw new Error('The vector engine could not expand the source border.');

@@ -89,9 +89,17 @@ export class DesignPathKit {
             (typeof joins === 'function' || (typeof joins === 'object' && joins !== null)) &&
             'ROUND' in joins &&
             this.#enum(joins.ROUND) &&
+            'MITER' in joins &&
+            this.#enum(joins.MITER) &&
+            'BEVEL' in joins &&
+            this.#enum(joins.BEVEL) &&
             (typeof caps === 'function' || (typeof caps === 'object' && caps !== null)) &&
             'ROUND' in caps &&
-            this.#enum(caps.ROUND)
+            this.#enum(caps.ROUND) &&
+            'BUTT' in caps &&
+            this.#enum(caps.BUTT) &&
+            'SQUARE' in caps &&
+            this.#enum(caps.SQUARE)
         );
     }
 }

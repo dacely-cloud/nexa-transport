@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignStrokeGeometry } from './DesignStrokeGeometry.js';
 import { DesignPaintKind, DesignKind, type DesignBox, type DesignCorners } from './DesignTypes.js';
 import type { DesignSceneNode } from './DesignScene.js';
 import type { DesignLayoutResult } from './DesignLayoutTypes.js';
@@ -122,7 +123,7 @@ export class DesignSvgGeometry {
             }
             const bounds: DesignSelectionBounds = DesignSelectionContext.bounds(box);
             const margin: number = Math.max(
-                (node.style.stroke?.width ?? 0) / 2,
+                DesignStrokeGeometry.padding(node.style.stroke),
                 node.style.blur * 3,
                 ...node.style.shadows.map(
                     (shadow): number =>

@@ -5,6 +5,7 @@ import { DesignTypographyLinks } from './DesignTypographyLinks.js';
 import { DesignTypographyStyleEdits } from './DesignTypographyStyleEdits.js';
 
 import { DesignLayerAuthority } from './DesignLayerAuthority.js';
+import { DesignStrokeEdits } from './DesignStrokeEdits.js';
 import { DesignPaintGradientEdits } from './DesignPaintGradientEdits.js';
 import { DesignPaintColorEdits } from './DesignPaintColorEdits.js';
 import { DesignTokenEdits } from './DesignTokenEdits.js';
@@ -280,6 +281,14 @@ export class DesignEdits {
                             roots: page?.roots ?? [],
                         });
                     }
+                    break;
+                }
+                case DesignOperationKind.Stroke: {
+                    const node: DesignNode = DesignStrokeEdits.apply(
+                        new DesignLayerAuthority(nodes, pages),
+                        operation,
+                    );
+                    nodes.set(node.id, node);
                     break;
                 }
                 case DesignOperationKind.PaintGradient: {
