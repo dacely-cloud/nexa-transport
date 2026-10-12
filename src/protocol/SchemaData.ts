@@ -5571,6 +5571,174 @@ export const schema: Schema = {
             required: ['clipId', 'depth', 'height', 'id', 'rotation', 'width', 'x', 'y'],
             type: 'object',
         },
+        DesignCanvasMethod: {
+            description:
+                'Independently advertised canvas records allow complete-read fallback on older workspaces.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/DesignViewRequest',
+                },
+                result: {
+                    $ref: '#/definitions/DesignCanvasPage',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        DesignCanvasMetric: {
+            description:
+                'Intrinsic measurements are pinned to an expanded occurrence and its actual available width.',
+            properties: {
+                height: {
+                    type: 'number',
+                },
+                maximumWidth: {
+                    type: 'number',
+                },
+                occurrenceId: {
+                    type: 'string',
+                },
+                streamed: {
+                    type: 'boolean',
+                },
+                width: {
+                    type: 'number',
+                },
+            },
+            required: ['height', 'maximumWidth', 'occurrenceId', 'streamed', 'width'],
+            type: 'object',
+        },
+        DesignCanvasMetricsMethod: {
+            description: 'Metric reads retain the exact canvas revision across continuations.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/DesignCanvasMetricsRequest',
+                },
+                result: {
+                    $ref: '#/definitions/DesignCanvasMetricsPage',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        DesignCanvasMetricsPage: {
+            description:
+                'No text body is necessary to reproduce saved wrapping and automatic-layout bounds.',
+            properties: {
+                entries: {
+                    items: {
+                        $ref: '#/definitions/DesignCanvasMetric',
+                    },
+                    type: 'array',
+                },
+                id: {
+                    type: 'string',
+                },
+                nextOffset: {
+                    type: ['null', 'number'],
+                },
+                pageId: {
+                    type: 'string',
+                },
+                revision: {
+                    type: 'string',
+                },
+            },
+            required: ['entries', 'id', 'nextOffset', 'pageId', 'revision'],
+            type: 'object',
+        },
+        DesignCanvasMetricsRequest: {
+            description:
+                'Metric pagination uses the same primary page and explicitly hydrated forests as the canvas records.',
+            properties: {
+                id: {
+                    type: 'string',
+                },
+                includeIds: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                limit: {
+                    type: 'number',
+                },
+                offset: {
+                    type: 'number',
+                },
+                pageId: {
+                    type: ['null', 'string'],
+                },
+                revision: {
+                    type: 'string',
+                },
+            },
+            required: ['id', 'includeIds', 'limit', 'offset', 'pageId', 'revision'],
+            type: 'object',
+        },
+        DesignCanvasPage: {
+            description:
+                'Canvas records retain active typography metadata while explicitly deferring large text bodies.',
+            properties: {
+                deferredIds: {
+                    description:
+                        'Only deferred node identities carried in this bounded record page or fragment.',
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                fragment: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignRecordFragment',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                nextCursor: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignCursor',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                pageId: {
+                    description: 'The resolved primary page is stable across all continuations.',
+                    type: 'string',
+                },
+                records: {
+                    items: {
+                        $ref: '#/definitions/DesignRecord',
+                    },
+                    type: 'array',
+                },
+                summary: {
+                    $ref: '#/definitions/DesignSummary',
+                },
+                textDeferredIds: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+            },
+            required: [
+                'deferredIds',
+                'fragment',
+                'nextCursor',
+                'pageId',
+                'records',
+                'summary',
+                'textDeferredIds',
+            ],
+            type: 'object',
+        },
         DesignChangesMethod: {
             description: 'Forward delta RPC contract.',
             properties: {
@@ -5981,6 +6149,25 @@ export const schema: Schema = {
                 },
             },
             required: ['data', 'font', 'nextOffset', 'offset'],
+            type: 'object',
+        },
+        DesignGlyphBounds: {
+            description: 'Glyph geometry is expressed in text-local design pixels.',
+            properties: {
+                height: {
+                    type: 'number',
+                },
+                width: {
+                    type: 'number',
+                },
+                x: {
+                    type: 'number',
+                },
+                y: {
+                    type: 'number',
+                },
+            },
+            required: ['height', 'width', 'x', 'y'],
             type: 'object',
         },
         DesignGradientStop: {
@@ -7455,6 +7642,213 @@ export const schema: Schema = {
                 },
             },
             required: ['color', 'end', 'family', 'italic', 'size', 'start', 'underline', 'weight'],
+            type: 'object',
+        },
+        DesignTextSpanStyle: {
+            description: 'Resolved style of a contiguous rich-text range.',
+            properties: {
+                color: {
+                    type: 'string',
+                },
+                family: {
+                    type: 'string',
+                },
+                font: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignFontBinding',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                    description:
+                        'A bound style selects exactly the saved face instead of an available system family.',
+                },
+                italic: {
+                    type: 'boolean',
+                },
+                rich: {
+                    type: 'boolean',
+                },
+                size: {
+                    type: 'number',
+                },
+                underline: {
+                    type: 'boolean',
+                },
+                weight: {
+                    type: 'number',
+                },
+            },
+            required: ['color', 'family', 'italic', 'rich', 'size', 'underline', 'weight'],
+            type: 'object',
+        },
+        DesignTextWindowCursor: {
+            description: "Null glyphIndex resumes the underline after this span's glyphs.",
+            properties: {
+                glyphIndex: {
+                    type: ['null', 'number'],
+                },
+                lineIndex: {
+                    type: 'number',
+                },
+                segmentIndex: {
+                    type: 'number',
+                },
+            },
+            required: ['glyphIndex', 'lineIndex', 'segmentIndex'],
+            type: 'object',
+        },
+        DesignTextWindowGlyph: {
+            description:
+                'A compact face-local glyph identity replaces repeated source text and vector command payloads.',
+            properties: {
+                id: {
+                    type: 'number',
+                },
+                x: {
+                    type: 'number',
+                },
+                y: {
+                    type: 'number',
+                },
+            },
+            required: ['id', 'x', 'y'],
+            type: 'object',
+        },
+        DesignTextWindowMethod: {
+            description:
+                'Independently advertised support allows clients to retain complete-body rendering on older workspaces.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/DesignTextWindowRequest',
+                },
+                result: {
+                    $ref: '#/definitions/DesignTextWindowPage',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        DesignTextWindowPage: {
+            description:
+                'A window response never includes the source string; continuation keeps the same revision and selectors.',
+            properties: {
+                box: {
+                    $ref: '#/definitions/DesignBox',
+                },
+                id: {
+                    type: 'string',
+                },
+                nextCursor: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignTextWindowCursor',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                occurrenceId: {
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+                revision: {
+                    type: 'string',
+                },
+                runs: {
+                    items: {
+                        $ref: '#/definitions/DesignTextWindowRun',
+                    },
+                    type: 'array',
+                },
+                window: {
+                    $ref: '#/definitions/DesignGlyphBounds',
+                },
+            },
+            required: [
+                'box',
+                'id',
+                'nextCursor',
+                'occurrenceId',
+                'pageId',
+                'revision',
+                'runs',
+                'window',
+            ],
+            type: 'object',
+        },
+        DesignTextWindowRequest: {
+            description:
+                'The workspace owns the text, font resolution and geometry; the caller selects a local paint rectangle.',
+            properties: {
+                cursor: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignTextWindowCursor',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                id: {
+                    type: 'string',
+                },
+                limit: {
+                    type: 'number',
+                },
+                occurrenceId: {
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+                revision: {
+                    type: 'string',
+                },
+                window: {
+                    $ref: '#/definitions/DesignGlyphBounds',
+                },
+            },
+            required: ['cursor', 'id', 'limit', 'occurrenceId', 'pageId', 'revision', 'window'],
+            type: 'object',
+        },
+        DesignTextWindowRun: {
+            description:
+                'Each page groups positions by shaped span and preserves rich style and underline geometry.',
+            properties: {
+                glyphs: {
+                    items: {
+                        $ref: '#/definitions/DesignTextWindowGlyph',
+                    },
+                    type: 'array',
+                },
+                lineIndex: {
+                    type: 'number',
+                },
+                segmentIndex: {
+                    type: 'number',
+                },
+                style: {
+                    $ref: '#/definitions/DesignTextSpanStyle',
+                },
+                underline: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignGlyphBounds',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+            },
+            required: ['glyphs', 'lineIndex', 'segmentIndex', 'style', 'underline'],
             type: 'object',
         },
         DesignToken: {
@@ -9034,6 +9428,34 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'design.canvas': {
+                    description:
+                        'Independently advertised canvas records allow complete-read fallback on older workspaces.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/DesignViewRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/DesignCanvasPage',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'design.canvas.metrics': {
+                    description:
+                        'Metric reads retain the exact canvas revision across continuations.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/DesignCanvasMetricsRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/DesignCanvasMetricsPage',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'design.changes': {
                     description: 'Forward delta RPC contract.',
                     properties: {
@@ -9160,6 +9582,20 @@ export const schema: Schema = {
                         },
                         result: {
                             $ref: '#/definitions/DesignReceipt',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'design.text.window': {
+                    description:
+                        'Independently advertised support allows clients to retain complete-body rendering on older workspaces.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/DesignTextWindowRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/DesignTextWindowPage',
                         },
                     },
                     required: ['params', 'result'],
@@ -10826,6 +11262,8 @@ export const schema: Schema = {
                 'design.asset.read',
                 'design.asset.remove',
                 'design.asset.start',
+                'design.canvas',
+                'design.canvas.metrics',
                 'design.changes',
                 'design.create',
                 'design.delete',
@@ -10836,6 +11274,7 @@ export const schema: Schema = {
                 'design.list',
                 'design.read',
                 'design.save',
+                'design.text.window',
                 'design.undo',
                 'design.view',
                 'devices.approve',

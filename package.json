@@ -547,6 +547,26 @@
         "./design-view-codec": {
             "types": "./dist/design/DesignViewCodec.d.ts",
             "import": "./dist/design-view-codec.js"
+        },
+        "./design-font-glyph-types": {
+            "types": "./dist/design/DesignFontGlyphTypes.d.ts",
+            "import": "./dist/design-font-glyph-types.js"
+        },
+        "./design-text-window-types": {
+            "types": "./dist/design/DesignTextWindowTypes.d.ts",
+            "import": "./dist/design-text-window-types.js"
+        },
+        "./design-text-window-codec": {
+            "types": "./dist/design/DesignTextWindowCodec.d.ts",
+            "import": "./dist/design-text-window-codec.js"
+        },
+        "./design-canvas-types": {
+            "types": "./dist/design/DesignCanvasTypes.d.ts",
+            "import": "./dist/design-canvas-types.js"
+        },
+        "./design-canvas-codec": {
+            "types": "./dist/design/DesignCanvasCodec.d.ts",
+            "import": "./dist/design-canvas-codec.js"
         }
     },
     "scripts": {
