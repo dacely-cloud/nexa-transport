@@ -7,7 +7,7 @@ import {
     type DesignLayout,
     type DesignPlacement,
 } from './DesignTypes.js';
-import type { DesignFlowItem, DesignLocalBox } from './DesignLayoutTypes.js';
+import type { DesignFlowItem, DesignLocalBox, DesignTextMeasurer } from './DesignLayoutTypes.js';
 
 interface GridCell {
     readonly item: DesignFlowItem;
@@ -30,6 +30,7 @@ export class DesignGrid {
         layout: DesignLayout,
         width: number,
         height: number | null,
+        measurer: DesignTextMeasurer | null = null,
     ): DesignGridResult {
         const columns: number = layout.columns;
         const occupied: Set<number> = new Set();
@@ -65,6 +66,41 @@ export class DesignGrid {
                 throw new Error('Grid exceeds its track budget');
             }
         }
+        const trackWidth: number = Math.max(
+            0,
+            (width - layout.padding.left - layout.padding.right - layout.gap * (columns - 1)) /
+                columns,
+        );
+        for (let index: number = 0; index < cells.length; index++) {
+            const cell: GridCell | undefined = cells[index];
+            if (
+                cell === undefined ||
+                measurer === null ||
+                cell.item.node.text === null ||
+                cell.item.node.placement.height !== DesignSizing.Hug
+            ) {
+                continue;
+            }
+            const placement: DesignPlacement = cell.item.node.placement;
+            const cellWidth: number = trackWidth * cell.columns + layout.gap * (cell.columns - 1);
+            const targetWidth: number = Math.max(
+                placement.minWidth,
+                Math.min(
+                    placement.maxWidth,
+                    placement.width === DesignSizing.Fill || layout.align === DesignAlign.Stretch
+                        ? cellWidth
+                        : cell.item.width,
+                ),
+            );
+            const height: number = Math.max(
+                placement.minHeight,
+                Math.min(
+                    placement.maxHeight,
+                    measurer.measure(cell.item.node.text, targetWidth, cell.item.node.id).height,
+                ),
+            );
+            cells[index] = { ...cell, item: { ...cell.item, height } };
+        }
         const heights: number[] = Array.from({ length: rows }, (): number => 0);
         for (const cell of cells) {
             const share: number = Math.max(
@@ -98,11 +134,6 @@ export class DesignGrid {
             offsets.push(offset);
             offset += track + layout.rowGap;
         }
-        const trackWidth: number = Math.max(
-            0,
-            (width - layout.padding.left - layout.padding.right - layout.gap * (columns - 1)) /
-                columns,
-        );
         const boxes: DesignLocalBox[] = cells.map((cell: GridCell): DesignLocalBox => {
             const cellWidth: number = trackWidth * cell.columns + layout.gap * (cell.columns - 1);
             let cellHeight: number = layout.rowGap * (cell.rows - 1);

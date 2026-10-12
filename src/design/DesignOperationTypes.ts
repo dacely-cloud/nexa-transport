@@ -8,6 +8,7 @@ import type { DesignBooleanMode } from './DesignBooleanTypes.js';
 import type {
     DesignFrameGrid,
     DesignFlow,
+    DesignSizing,
     DesignAlign,
     DesignGuideValue,
     DesignConstraint,
@@ -37,6 +38,7 @@ export const DesignOperationKind = {
     Rotate: 'rotate',
     Scale: 'scale',
     Layout: 'layout',
+    Sizing: 'sizing',
     Text: 'text',
     Move: 'move',
     Remove: 'remove',
@@ -115,6 +117,22 @@ export interface DesignLayoutOperation {
     readonly id: string;
     readonly pageId: string;
     readonly changes: DesignLayoutChanges;
+}
+/** Native sizing changes preserve every omitted saved placement field. */
+export interface DesignSizingChanges {
+    readonly width?: DesignSizing;
+    readonly height?: DesignSizing;
+    readonly minWidth?: number;
+    readonly maxWidth?: number;
+    readonly minHeight?: number;
+    readonly maxHeight?: number;
+}
+/** Limits and sizing modes resolve against complete native sources without transferring their bodies. */
+export interface DesignSizingOperation {
+    readonly op: typeof DesignOperationKind.Sizing;
+    readonly id: string;
+    readonly pageId: string;
+    readonly changes: DesignSizingChanges;
 }
 /** Replace text content while preserving typography and clipping existing rich-text ranges. */
 export interface DesignTextOperation {
@@ -225,6 +243,7 @@ export type DesignOperation =
     | DesignRotateOperation
     | DesignScaleOperation
     | DesignLayoutOperation
+    | DesignSizingOperation
     | DesignTextOperation
     | DesignMove
     | DesignRemove

@@ -4548,6 +4548,7 @@ export type DesignOperation =
     | DesignInsert
     | DesignUpdate
     | DesignLayoutOperation
+    | DesignSizingOperation
     | DesignTextOperation
     | DesignResizeOperation
     | DesignPositionOperation
@@ -14985,6 +14986,54 @@ export interface DesignLayoutPreviewTextResultShape {
 
 /** DesignLayoutPreviewTextResult from the Nexa wire protocol. */
 export type DesignLayoutPreviewTextResult = DesignLayoutPreviewTextResultShape;
+
+/** Allowed values for DesignSizingChangesheight. */
+export const DesignSizingChangesheightValues = {
+    Value0: 'fill',
+    Value1: 'fixed',
+    Value2: 'hug',
+} as const;
+
+/** Allowed values for DesignSizingChangeswidth. */
+export const DesignSizingChangeswidthValues = {
+    Value0: 'fill',
+    Value1: 'fixed',
+    Value2: 'hug',
+} as const;
+
+/** DesignSizingChanges wire fields. */
+export interface DesignSizingChangesShape {
+    /** height as defined by the Nexa gateway. */
+    readonly height?: (typeof DesignSizingChangesheightValues)[keyof typeof DesignSizingChangesheightValues];
+    /** maxHeight as defined by the Nexa gateway. */
+    readonly maxHeight?: number;
+    /** maxWidth as defined by the Nexa gateway. */
+    readonly maxWidth?: number;
+    /** minHeight as defined by the Nexa gateway. */
+    readonly minHeight?: number;
+    /** minWidth as defined by the Nexa gateway. */
+    readonly minWidth?: number;
+    /** width as defined by the Nexa gateway. */
+    readonly width?: (typeof DesignSizingChangeswidthValues)[keyof typeof DesignSizingChangeswidthValues];
+}
+
+/** DesignSizingChanges from the Nexa wire protocol. */
+export type DesignSizingChanges = DesignSizingChangesShape;
+
+/** DesignSizingOperation wire fields. */
+export interface DesignSizingOperationShape {
+    /** changes as defined by the Nexa gateway. */
+    readonly changes: DesignSizingChanges;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** op as defined by the Nexa gateway. */
+    readonly op: 'sizing';
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+}
+
+/** DesignSizingOperation from the Nexa wire protocol. */
+export type DesignSizingOperation = DesignSizingOperationShape;
 
 /** Supported RPC names. */
 export type MethodName = keyof GatewayMethods;

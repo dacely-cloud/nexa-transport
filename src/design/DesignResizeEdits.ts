@@ -79,6 +79,13 @@ export class DesignResizeEdits {
                         ...node.placement,
                         width: axes.width ? DesignSizing.Fixed : node.placement.width,
                         height: axes.height ? DesignSizing.Fixed : node.placement.height,
+                        // Explicit resizes retain the legacy minimum drawable size, including collapsed limits.
+                        ...(axes.width
+                            ? { maxWidth: Math.max(0.01, node.placement.maxWidth) }
+                            : {}),
+                        ...(axes.height
+                            ? { maxHeight: Math.max(0.01, node.placement.maxHeight) }
+                            : {}),
                         ...(axes.width && parentBox !== null
                             ? {
                                   referenceWidth:

@@ -129,7 +129,15 @@ export class DesignLayoutEngine {
         if (node.text !== null) {
             natural = this.#measurer.measure(
                 node.text,
-                node.placement.width === DesignSizing.Hug ? 100000 : node.width,
+                Math.max(
+                    node.placement.minWidth,
+                    Math.min(
+                        node.placement.maxWidth,
+                        node.placement.width === DesignSizing.Hug
+                            ? 100000
+                            : Math.max(0.01, node.width),
+                    ),
+                ),
                 node.id,
             );
         } else if (layout.flow === DesignFlow.Row || layout.flow === DesignFlow.Column) {
@@ -156,13 +164,36 @@ export class DesignLayoutEngine {
             };
             if (
                 layout.wrap &&
-                (row ? node.placement.width : node.placement.height) !== DesignSizing.Hug
+                ((row ? node.placement.width : node.placement.height) !== DesignSizing.Hug ||
+                    (row
+                        ? natural.width > node.placement.maxWidth
+                        : natural.height > node.placement.maxHeight))
             ) {
                 const arranged: readonly DesignLocalBox[] = DesignFlex.arrange(
                     items,
                     layout,
-                    row ? node.width : natural.width,
-                    row ? natural.height : node.height,
+                    row
+                        ? Math.max(
+                              node.placement.minWidth,
+                              Math.min(
+                                  node.placement.maxWidth,
+                                  node.placement.width === DesignSizing.Hug
+                                      ? natural.width
+                                      : node.width,
+                              ),
+                          )
+                        : natural.width,
+                    row
+                        ? natural.height
+                        : Math.max(
+                              node.placement.minHeight,
+                              Math.min(
+                                  node.placement.maxHeight,
+                                  node.placement.height === DesignSizing.Hug
+                                      ? natural.height
+                                      : node.height,
+                              ),
+                          ),
                 );
                 natural = {
                     width: row
@@ -200,7 +231,17 @@ export class DesignLayoutEngine {
                           ) +
                       (layout.columns - 1) * layout.gap
                     : node.width;
-            const grid: DesignGridResult = DesignGrid.arrange(items, layout, width, null);
+            const bounded: number = Math.max(
+                node.placement.minWidth,
+                Math.min(node.placement.maxWidth, width),
+            );
+            const grid: DesignGridResult = DesignGrid.arrange(
+                items,
+                layout,
+                bounded,
+                null,
+                this.#measurer,
+            );
             natural = { width, height: grid.height };
         } else if (items.length > 0) {
             natural = {
@@ -222,19 +263,23 @@ export class DesignLayoutEngine {
         }
         const size: DesignSize = {
             width: Math.max(
-                0.01,
                 node.placement.minWidth,
                 Math.min(
                     node.placement.maxWidth,
-                    node.placement.width === DesignSizing.Hug ? natural.width : node.width,
+                    Math.max(
+                        0.01,
+                        node.placement.width === DesignSizing.Hug ? natural.width : node.width,
+                    ),
                 ),
             ),
             height: Math.max(
-                0.01,
                 node.placement.minHeight,
                 Math.min(
                     node.placement.maxHeight,
-                    node.placement.height === DesignSizing.Hug ? natural.height : node.height,
+                    Math.max(
+                        0.01,
+                        node.placement.height === DesignSizing.Hug ? natural.height : node.height,
+                    ),
                 ),
             ),
         };
@@ -253,7 +298,7 @@ export class DesignLayoutEngine {
             }));
         let arranged: readonly DesignLocalBox[] = [];
         if (node.layout.flow === DesignFlow.Grid) {
-            arranged = DesignGrid.arrange(items, node.layout, width, height).boxes;
+            arranged = DesignGrid.arrange(items, node.layout, width, height, this.#measurer).boxes;
         } else if (node.layout.flow !== DesignFlow.Absolute) {
             arranged = DesignFlex.arrange(items, node.layout, width, height);
             const widths: ReadonlyMap<string, number> = new Map(

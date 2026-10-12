@@ -3070,7 +3070,16 @@ Variant 3: [DesignLayoutOperation](protocol.md#designlayoutoperation)
 | `op`      | Yes      | `"layout"`                                             |             |
 | `pageId`  | Yes      | `string`                                               |             |
 
-Variant 4: [DesignTextOperation](protocol.md#designtextoperation)
+Variant 4: [DesignSizingOperation](protocol.md#designsizingoperation)
+
+| Field     | Required | Type                                                   | Description |
+| --------- | -------- | ------------------------------------------------------ | ----------- |
+| `changes` | Yes      | [DesignSizingChanges](protocol.md#designsizingchanges) |             |
+| `id`      | Yes      | `string`                                               |             |
+| `op`      | Yes      | `"sizing"`                                             |             |
+| `pageId`  | Yes      | `string`                                               |             |
+
+Variant 5: [DesignTextOperation](protocol.md#designtextoperation)
 
 | Field     | Required | Type     | Description |
 | --------- | -------- | -------- | ----------- |
@@ -3078,7 +3087,7 @@ Variant 4: [DesignTextOperation](protocol.md#designtextoperation)
 | `id`      | Yes      | `string` |             |
 | `op`      | Yes      | `"text"` |             |
 
-Variant 5: [DesignResizeOperation](protocol.md#designresizeoperation)
+Variant 6: [DesignResizeOperation](protocol.md#designresizeoperation)
 
 | Field       | Required | Type              | Description                                                                              |
 | ----------- | -------- | ----------------- | ---------------------------------------------------------------------------------------- |
@@ -3090,7 +3099,7 @@ Variant 5: [DesignResizeOperation](protocol.md#designresizeoperation)
 | `x`         | No       | `number`          | Position edits accompany a single dragged layer and use its resolved parent coordinates. |
 | `y`         | No       | `number`          |                                                                                          |
 
-Variant 6: [DesignPositionOperation](protocol.md#designpositionoperation)
+Variant 7: [DesignPositionOperation](protocol.md#designpositionoperation)
 
 | Field        | Required | Type                                                       | Description                                                          |
 | ------------ | -------- | ---------------------------------------------------------- | -------------------------------------------------------------------- |
@@ -3103,7 +3112,7 @@ Variant 6: [DesignPositionOperation](protocol.md#designpositionoperation)
 | `x`          | No       | `number`                                                   |                                                                      |
 | `y`          | No       | `number`                                                   |                                                                      |
 
-Variant 7: [DesignRotateOperation](protocol.md#designrotateoperation)
+Variant 8: [DesignRotateOperation](protocol.md#designrotateoperation)
 
 | Field       | Required | Type              | Description |
 | ----------- | -------- | ----------------- | ----------- |
@@ -3114,7 +3123,7 @@ Variant 7: [DesignRotateOperation](protocol.md#designrotateoperation)
 | `pivotY`    | No       | `number`          |             |
 | `selection` | Yes      | Array of `string` |             |
 
-Variant 8: [DesignScaleOperation](protocol.md#designscaleoperation)
+Variant 9: [DesignScaleOperation](protocol.md#designscaleoperation)
 
 | Field       | Required | Type              | Description |
 | ----------- | -------- | ----------------- | ----------- |
@@ -3125,7 +3134,7 @@ Variant 8: [DesignScaleOperation](protocol.md#designscaleoperation)
 | `pivotY`    | No       | `number`          |             |
 | `selection` | Yes      | Array of `string` |             |
 
-Variant 9: [DesignTranslateOperation](protocol.md#designtranslateoperation)
+Variant 10: [DesignTranslateOperation](protocol.md#designtranslateoperation)
 
 | Field       | Required | Type                                                        | Description |
 | ----------- | -------- | ----------------------------------------------------------- | ----------- |
@@ -3136,7 +3145,7 @@ Variant 9: [DesignTranslateOperation](protocol.md#designtranslateoperation)
 | `reorders`  | No       | Array of [DesignFlowReorder](protocol.md#designflowreorder) |             |
 | `selection` | Yes      | Array of `string`                                           |             |
 
-Variant 10: [DesignMove](protocol.md#designmove)
+Variant 11: [DesignMove](protocol.md#designmove)
 
 | Field      | Required | Type          | Description |
 | ---------- | -------- | ------------- | ----------- |
@@ -3146,14 +3155,14 @@ Variant 10: [DesignMove](protocol.md#designmove)
 | `pageId`   | Yes      | `string`      |             |
 | `parentId` | Yes      | `null,string` |             |
 
-Variant 11: [DesignRemove](protocol.md#designremove)
+Variant 12: [DesignRemove](protocol.md#designremove)
 
 | Field | Required | Type       | Description |
 | ----- | -------- | ---------- | ----------- |
 | `id`  | Yes      | `string`   |             |
 | `op`  | Yes      | `"remove"` |             |
 
-Variant 12: [DesignPageOperation](protocol.md#designpageoperation)
+Variant 13: [DesignPageOperation](protocol.md#designpageoperation)
 
 | Field        | Required | Type          | Description |
 | ------------ | -------- | ------------- | ----------- |
@@ -3162,7 +3171,7 @@ Variant 12: [DesignPageOperation](protocol.md#designpageoperation)
 | `name`       | Yes      | `null,string` |             |
 | `op`         | Yes      | `"page"`      |             |
 
-Variant 13: [DesignGuideOperation](protocol.md#designguideoperation)
+Variant 14: [DesignGuideOperation](protocol.md#designguideoperation)
 
 | Field    | Required | Type                                                      | Description |
 | -------- | -------- | --------------------------------------------------------- | ----------- |
@@ -3171,7 +3180,7 @@ Variant 13: [DesignGuideOperation](protocol.md#designguideoperation)
 | `pageId` | Yes      | `string`                                                  |             |
 | `value`  | Yes      | [DesignGuideValue](protocol.md#designguidevalue) / `null` |             |
 
-Variant 14: [DesignMetadata](protocol.md#designmetadata)
+Variant 15: [DesignMetadata](protocol.md#designmetadata)
 
 | Field          | Required | Type                                                        | Description |
 | -------------- | -------- | ----------------------------------------------------------- | ----------- |
@@ -10544,3 +10553,27 @@ Draft glyph IDs and positions refer to the same public or admitted private fonts
 | `action` | Yes      | `"text"`                                                 |             |
 | `key`    | Yes      | `string`                                                 |             |
 | `page`   | Yes      | [DesignTextWindowPage](protocol.md#designtextwindowpage) |             |
+
+## DesignSizingChanges
+
+Native sizing changes preserve every omitted saved placement field.
+
+| Field       | Required | Type                           | Description                                |
+| ----------- | -------- | ------------------------------ | ------------------------------------------ |
+| `height`    | No       | `"fill"` / `"fixed"` / `"hug"` | Sizing relative to the parent and content. |
+| `maxHeight` | No       | `number`                       |                                            |
+| `maxWidth`  | No       | `number`                       |                                            |
+| `minHeight` | No       | `number`                       |                                            |
+| `minWidth`  | No       | `number`                       |                                            |
+| `width`     | No       | `"fill"` / `"fixed"` / `"hug"` | Sizing relative to the parent and content. |
+
+## DesignSizingOperation
+
+Limits and sizing modes resolve against complete native sources without transferring their bodies.
+
+| Field     | Required | Type                                                   | Description |
+| --------- | -------- | ------------------------------------------------------ | ----------- |
+| `changes` | Yes      | [DesignSizingChanges](protocol.md#designsizingchanges) |             |
+| `id`      | Yes      | `string`                                               |             |
+| `op`      | Yes      | `"sizing"`                                             |             |
+| `pageId`  | Yes      | `string`                                               |             |
