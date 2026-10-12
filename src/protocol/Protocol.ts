@@ -4547,6 +4547,7 @@ export type DesignNodeRecord = DesignNodeRecordShape;
 export type DesignOperation =
     | DesignInsert
     | DesignUpdate
+    | DesignLayoutOperation
     | DesignTextOperation
     | DesignResizeOperation
     | DesignPositionOperation
@@ -14786,6 +14787,87 @@ export const DesignSelectionActionValues = {
 /** DesignSelectionAction from the Nexa wire protocol. */
 export type DesignSelectionAction =
     (typeof DesignSelectionActionValues)[keyof typeof DesignSelectionActionValues];
+
+/** DesignLayoutOperation wire fields. */
+export interface DesignLayoutOperationShape {
+    /** changes as defined by the Nexa gateway. */
+    readonly changes: DesignLayoutChanges;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** op as defined by the Nexa gateway. */
+    readonly op: 'layout';
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+}
+
+/** DesignLayoutOperation from the Nexa wire protocol. */
+export type DesignLayoutOperation = DesignLayoutOperationShape;
+
+/** Allowed values for DesignLayoutChangesalign. */
+export const DesignLayoutChangesalignValues = {
+    Value0: 'between',
+    Value1: 'center',
+    Value2: 'end',
+    Value3: 'start',
+    Value4: 'stretch',
+} as const;
+
+/** Allowed values for DesignLayoutChangesflow. */
+export const DesignLayoutChangesflowValues = {
+    Value0: 'absolute',
+    Value1: 'column',
+    Value2: 'grid',
+    Value3: 'row',
+} as const;
+
+/** Allowed values for DesignLayoutChangesjustify. */
+export const DesignLayoutChangesjustifyValues = {
+    Value0: 'between',
+    Value1: 'center',
+    Value2: 'end',
+    Value3: 'start',
+    Value4: 'stretch',
+} as const;
+
+/** DesignLayoutChanges wire fields. */
+export interface DesignLayoutChangesShape {
+    /** align as defined by the Nexa gateway. */
+    readonly align?: (typeof DesignLayoutChangesalignValues)[keyof typeof DesignLayoutChangesalignValues];
+    /** clip as defined by the Nexa gateway. */
+    readonly clip?: boolean;
+    /** columns as defined by the Nexa gateway. */
+    readonly columns?: number;
+    /** flow as defined by the Nexa gateway. */
+    readonly flow?: (typeof DesignLayoutChangesflowValues)[keyof typeof DesignLayoutChangesflowValues];
+    /** gap as defined by the Nexa gateway. */
+    readonly gap?: number;
+    /** justify as defined by the Nexa gateway. */
+    readonly justify?: (typeof DesignLayoutChangesjustifyValues)[keyof typeof DesignLayoutChangesjustifyValues];
+    /** padding as defined by the Nexa gateway. */
+    readonly padding?: DesignPaddingChanges;
+    /** rowGap as defined by the Nexa gateway. */
+    readonly rowGap?: number;
+    /** wrap as defined by the Nexa gateway. */
+    readonly wrap?: boolean;
+}
+
+/** DesignLayoutChanges from the Nexa wire protocol. */
+export type DesignLayoutChanges = DesignLayoutChangesShape;
+
+/** DesignPaddingChanges wire fields. */
+export interface DesignPaddingChangesShape {
+    /** bottom as defined by the Nexa gateway. */
+    readonly bottom?: number;
+    /** left as defined by the Nexa gateway. */
+    readonly left?: number;
+    /** right as defined by the Nexa gateway. */
+    readonly right?: number;
+    /** top as defined by the Nexa gateway. */
+    readonly top?: number;
+}
+
+/** DesignPaddingChanges from the Nexa wire protocol. */
+export type DesignPaddingChanges = DesignPaddingChangesShape;
 
 /** Supported RPC names. */
 export type MethodName = keyof GatewayMethods;
