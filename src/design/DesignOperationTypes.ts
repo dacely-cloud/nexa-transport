@@ -222,6 +222,8 @@ export interface DesignChangeSet {
 }
 /** Result of an atomic scene transaction, prior to assigning its durable revision. */
 export interface DesignEditResult {
+    /** Native selection planners can publish their resulting selection without returning layer bodies. */
+    readonly selection?: readonly string[];
     readonly document: DesignDocument;
     readonly changes: DesignChangeSet;
 }

@@ -116,6 +116,8 @@ export interface DesignUndoRequest {
 }
 /** Commit acknowledgements contain no large text or scene snapshot. */
 export interface DesignReceipt {
+    /** Arrangement acknowledgements retain at most 256 resulting layer IDs, including exact retries. */
+    readonly selection?: readonly string[];
     readonly summary: DesignSummary;
     readonly commandId: string;
     readonly previousRevision: string | null;

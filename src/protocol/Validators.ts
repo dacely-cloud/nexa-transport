@@ -2620,3 +2620,17 @@ export function result177(value: unknown): boolean {
         value,
     );
 }
+/** Validates params178. */
+export function params178(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/design.arrange/properties/params',
+        value,
+    );
+}
+/** Validates result178. */
+export function result178(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/design.arrange/properties/result',
+        value,
+    );
+}

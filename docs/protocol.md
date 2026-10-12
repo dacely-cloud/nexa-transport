@@ -2433,6 +2433,75 @@ Resolved layout boxes are separate from authored values and never written back i
 | `x`        | Yes      | `number`      |             |
 | `y`        | Yes      | `number`      |             |
 
+## DesignCanvasMethod
+
+Independently advertised canvas records allow complete-read fallback on older workspaces.
+
+| Field    | Required | Type                                               | Description |
+| -------- | -------- | -------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignViewRequest](protocol.md#designviewrequest) |             |
+| `result` | Yes      | [DesignCanvasPage](protocol.md#designcanvaspage)   |             |
+
+## DesignCanvasMetric
+
+Intrinsic measurements are pinned to an expanded occurrence and its actual available width.
+
+| Field          | Required | Type      | Description |
+| -------------- | -------- | --------- | ----------- |
+| `height`       | Yes      | `number`  |             |
+| `maximumWidth` | Yes      | `number`  |             |
+| `occurrenceId` | Yes      | `string`  |             |
+| `streamed`     | Yes      | `boolean` |             |
+| `width`        | Yes      | `number`  |             |
+
+## DesignCanvasMetricsMethod
+
+Metric reads retain the exact canvas revision across continuations.
+
+| Field    | Required | Type                                                                 | Description |
+| -------- | -------- | -------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignCanvasMetricsRequest](protocol.md#designcanvasmetricsrequest) |             |
+| `result` | Yes      | [DesignCanvasMetricsPage](protocol.md#designcanvasmetricspage)       |             |
+
+## DesignCanvasMetricsPage
+
+No text body is necessary to reproduce saved wrapping and automatic-layout bounds.
+
+| Field        | Required | Type                                                          | Description |
+| ------------ | -------- | ------------------------------------------------------------- | ----------- |
+| `entries`    | Yes      | Array of [DesignCanvasMetric](protocol.md#designcanvasmetric) |             |
+| `id`         | Yes      | `string`                                                      |             |
+| `nextOffset` | Yes      | `null,number`                                                 |             |
+| `pageId`     | Yes      | `string`                                                      |             |
+| `revision`   | Yes      | `string`                                                      |             |
+
+## DesignCanvasMetricsRequest
+
+Metric pagination uses the same primary page and explicitly hydrated forests as the canvas records.
+
+| Field        | Required | Type              | Description |
+| ------------ | -------- | ----------------- | ----------- |
+| `id`         | Yes      | `string`          |             |
+| `includeIds` | Yes      | Array of `string` |             |
+| `limit`      | Yes      | `number`          |             |
+| `offset`     | Yes      | `number`          |             |
+| `pageId`     | Yes      | `null,string`     |             |
+| `revision`   | Yes      | `string`          |             |
+
+## DesignCanvasPage
+
+Canvas records retain active typography metadata while explicitly deferring large text bodies.
+
+| Field             | Required | Type                                                              | Description                                                                    |
+| ----------------- | -------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| `deferredIds`     | Yes      | Array of `string`                                                 | Only deferred node identities carried in this bounded record page or fragment. |
+| `fragment`        | Yes      | [DesignRecordFragment](protocol.md#designrecordfragment) / `null` |                                                                                |
+| `nextCursor`      | Yes      | [DesignCursor](protocol.md#designcursor) / `null`                 |                                                                                |
+| `pageId`          | Yes      | `string`                                                          | The resolved primary page is stable across all continuations.                  |
+| `records`         | Yes      | Array of [DesignRecord](protocol.md#designrecord)                 |                                                                                |
+| `summary`         | Yes      | [DesignSummary](protocol.md#designsummary)                        |                                                                                |
+| `textDeferredIds` | Yes      | Array of `string`                                                 |                                                                                |
+
 ## DesignChangesMethod
 
 Forward delta RPC contract.
@@ -2586,6 +2655,15 @@ Free positioning and responsive container layouts.
 
 Type: `"absolute"` / `"column"` / `"grid"` / `"row"`.
 
+## DesignFlowReorder
+
+A selected flowing child changes its sibling slot without leaving automatic layout.
+
+| Field   | Required | Type     | Description |
+| ------- | -------- | -------- | ----------- |
+| `id`    | Yes      | `string` |             |
+| `index` | Yes      | `number` |             |
+
 ## DesignFontAsset
 
 Immutable font identity and a declared family/style binding; source bytes are never model output.
@@ -2670,6 +2748,17 @@ Byte transport is separate from metadata discovery and never included in an agen
 | `font`       | Yes      | [DesignFontAsset](protocol.md#designfontasset) |             |
 | `nextOffset` | Yes      | `null,string`                                  |             |
 | `offset`     | Yes      | `string`                                       |             |
+
+## DesignGlyphBounds
+
+Glyph geometry is expressed in text-local design pixels.
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `height` | Yes      | `number` |             |
+| `width`  | Yes      | `number` |             |
+| `x`      | Yes      | `number` |             |
+| `y`      | Yes      | `number` |             |
 
 ## DesignGradientStop
 
@@ -2879,62 +2968,66 @@ Reparent or reorder without breaking both sides of the tree.
 
 All layer state is explicit and editable; no generated markup is the source of truth.
 
-| Field         | Required | Type                                                          | Description                                                                    |
-| ------------- | -------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| `booleanMode` | No       | `"exclude"` / `"intersect"` / `"subtract"` / `"union"`        | Omitted on ordinary layers, preserving existing document and retry identities. |
-| `children`    | Yes      | Array of `string`                                             |                                                                                |
-| `componentId` | Yes      | `null,string`                                                 |                                                                                |
-| `height`      | Yes      | `number`                                                      |                                                                                |
-| `id`          | Yes      | `string`                                                      |                                                                                |
-| `image`       | Yes      | [DesignImage](protocol.md#designimage) / `null`               |                                                                                |
-| `kind`        | Yes      | [DesignKind](protocol.md#designkind)                          |                                                                                |
-| `layout`      | Yes      | [DesignLayout](protocol.md#designlayout)                      |                                                                                |
-| `locked`      | Yes      | `boolean`                                                     |                                                                                |
-| `mask`        | No       | [DesignMask](protocol.md#designmask)                          | Retained source identity and coverage mode; omitted on ordinary layers.        |
-| `name`        | Yes      | `string`                                                      |                                                                                |
-| `opacity`     | Yes      | `number`                                                      |                                                                                |
-| `overrides`   | Yes      | Array of [DesignOverride](protocol.md#designoverride)         |                                                                                |
-| `parentId`    | Yes      | `null,string`                                                 |                                                                                |
-| `path`        | Yes      | Array of [DesignPathCommand](protocol.md#designpathcommand)   |                                                                                |
-| `placement`   | Yes      | [DesignPlacement](protocol.md#designplacement)                |                                                                                |
-| `rotation`    | Yes      | `number`                                                      |                                                                                |
-| `style`       | Yes      | [DesignStyle](protocol.md#designstyle)                        |                                                                                |
-| `text`        | Yes      | [DesignText](protocol.md#designtext) / `null`                 |                                                                                |
-| `variant`     | No       | Array of [DesignVariantValue](protocol.md#designvariantvalue) | Named values on an immediate component definition inside a variant set.        |
-| `variants`    | No       | [DesignVariantSet](protocol.md#designvariantset)              | Reusable variant set metadata; only component-set containers accept it.        |
-| `visible`     | Yes      | `boolean`                                                     |                                                                                |
-| `width`       | Yes      | `number`                                                      |                                                                                |
-| `x`           | Yes      | `number`                                                      |                                                                                |
-| `y`           | Yes      | `number`                                                      |                                                                                |
+| Field          | Required | Type                                                          | Description                                                                          |
+| -------------- | -------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `booleanMode`  | No       | `"exclude"` / `"intersect"` / `"subtract"` / `"union"`        | Omitted on ordinary layers, preserving existing document and retry identities.       |
+| `children`     | Yes      | Array of `string`                                             |                                                                                      |
+| `componentId`  | Yes      | `null,string`                                                 |                                                                                      |
+| `contentScale` | No       | `number`                                                      | Uniform linked artwork scale; definitions retain their original geometry and styles. |
+| `height`       | Yes      | `number`                                                      |                                                                                      |
+| `id`           | Yes      | `string`                                                      |                                                                                      |
+| `image`        | Yes      | [DesignImage](protocol.md#designimage) / `null`               |                                                                                      |
+| `kind`         | Yes      | [DesignKind](protocol.md#designkind)                          |                                                                                      |
+| `layout`       | Yes      | [DesignLayout](protocol.md#designlayout)                      |                                                                                      |
+| `layoutGrids`  | No       | Array of [DesignFrameGrid](protocol.md#designframegrid)       | Optional saved frame overlays are omitted from artwork exports.                      |
+| `locked`       | Yes      | `boolean`                                                     |                                                                                      |
+| `mask`         | No       | [DesignMask](protocol.md#designmask)                          | Retained source identity and coverage mode; omitted on ordinary layers.              |
+| `name`         | Yes      | `string`                                                      |                                                                                      |
+| `opacity`      | Yes      | `number`                                                      |                                                                                      |
+| `overrides`    | Yes      | Array of [DesignOverride](protocol.md#designoverride)         |                                                                                      |
+| `parentId`     | Yes      | `null,string`                                                 |                                                                                      |
+| `path`         | Yes      | Array of [DesignPathCommand](protocol.md#designpathcommand)   |                                                                                      |
+| `placement`    | Yes      | [DesignPlacement](protocol.md#designplacement)                |                                                                                      |
+| `rotation`     | Yes      | `number`                                                      |                                                                                      |
+| `style`        | Yes      | [DesignStyle](protocol.md#designstyle)                        |                                                                                      |
+| `text`         | Yes      | [DesignText](protocol.md#designtext) / `null`                 |                                                                                      |
+| `variant`      | No       | Array of [DesignVariantValue](protocol.md#designvariantvalue) | Named values on an immediate component definition inside a variant set.              |
+| `variants`     | No       | [DesignVariantSet](protocol.md#designvariantset)              | Reusable variant set metadata; only component-set containers accept it.              |
+| `visible`      | Yes      | `boolean`                                                     |                                                                                      |
+| `width`        | Yes      | `number`                                                      |                                                                                      |
+| `x`            | Yes      | `number`                                                      |                                                                                      |
+| `y`            | Yes      | `number`                                                      |                                                                                      |
 
 ## DesignNodeChanges
 
 Editable properties exclude identity and tree links, which have dedicated operations.
 
-| Field         | Required | Type                                                                                                                                                                                       | Description                                                                        |
-| ------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
-| `booleanMode` | No       | `"exclude"` / `"intersect"` / `"subtract"` / `"union"` / `null`                                                                                                                            | A null value clears the operation when explicitly flattening a Boolean group.      |
-| `componentId` | No       | `null,string`                                                                                                                                                                              |                                                                                    |
-| `height`      | No       | `number`                                                                                                                                                                                   |                                                                                    |
-| `image`       | No       | [DesignImage](protocol.md#designimage) / `null`                                                                                                                                            |                                                                                    |
-| `kind`        | No       | `"boolean"` / `"component"` / `"component-set"` / `"ellipse"` / `"frame"` / `"group"` / `"image"` / `"instance"` / `"line"` / `"mask"` / `"path"` / `"polygon"` / `"rectangle"` / `"text"` | Editable scene primitives, including reusable component definitions and instances. |
-| `layout`      | No       | [DesignLayout](protocol.md#designlayout)                                                                                                                                                   | Container layout, including wrapping, grid tracks and content alignment.           |
-| `locked`      | No       | `boolean`                                                                                                                                                                                  |                                                                                    |
-| `mask`        | No       | [DesignMask](protocol.md#designmask) / `null`                                                                                                                                              | Null clears masking when converting the container into an ordinary group.          |
-| `name`        | No       | `string`                                                                                                                                                                                   |                                                                                    |
-| `opacity`     | No       | `number`                                                                                                                                                                                   |                                                                                    |
-| `overrides`   | No       | Array of [DesignOverride](protocol.md#designoverride)                                                                                                                                      |                                                                                    |
-| `path`        | No       | Array of [DesignPathCommand](protocol.md#designpathcommand)                                                                                                                                |                                                                                    |
-| `placement`   | No       | [DesignPlacement](protocol.md#designplacement)                                                                                                                                             | Child sizing and positioning relative to its parent.                               |
-| `rotation`    | No       | `number`                                                                                                                                                                                   |                                                                                    |
-| `style`       | No       | [DesignStyle](protocol.md#designstyle)                                                                                                                                                     | Style can be shared across arbitrary primitives.                                   |
-| `text`        | No       | [DesignText](protocol.md#designtext) / `null`                                                                                                                                              |                                                                                    |
-| `variant`     | No       | Array of [DesignVariantValue](protocol.md#designvariantvalue) / `null`                                                                                                                     | Null releases a definition from its set.                                           |
-| `variants`    | No       | [DesignVariantSet](protocol.md#designvariantset) / `null`                                                                                                                                  | Null releases component-set metadata when converting its container.                |
-| `visible`     | No       | `boolean`                                                                                                                                                                                  |                                                                                    |
-| `width`       | No       | `number`                                                                                                                                                                                   |                                                                                    |
-| `x`           | No       | `number`                                                                                                                                                                                   |                                                                                    |
-| `y`           | No       | `number`                                                                                                                                                                                   |                                                                                    |
+| Field          | Required | Type                                                                                                                                                                                       | Description                                                                        |
+| -------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
+| `booleanMode`  | No       | `"exclude"` / `"intersect"` / `"subtract"` / `"union"` / `null`                                                                                                                            | A null value clears the operation when explicitly flattening a Boolean group.      |
+| `componentId`  | No       | `null,string`                                                                                                                                                                              |                                                                                    |
+| `contentScale` | No       | `null,number`                                                                                                                                                                              |                                                                                    |
+| `height`       | No       | `number`                                                                                                                                                                                   |                                                                                    |
+| `image`        | No       | [DesignImage](protocol.md#designimage) / `null`                                                                                                                                            |                                                                                    |
+| `kind`         | No       | `"boolean"` / `"component"` / `"component-set"` / `"ellipse"` / `"frame"` / `"group"` / `"image"` / `"instance"` / `"line"` / `"mask"` / `"path"` / `"polygon"` / `"rectangle"` / `"text"` | Editable scene primitives, including reusable component definitions and instances. |
+| `layout`       | No       | [DesignLayout](protocol.md#designlayout)                                                                                                                                                   | Container layout, including wrapping, grid tracks and content alignment.           |
+| `layoutGrids`  | No       | Array of [DesignFrameGrid](protocol.md#designframegrid) / `null`                                                                                                                           | Null removes construction overlays while preserving authored artwork.              |
+| `locked`       | No       | `boolean`                                                                                                                                                                                  |                                                                                    |
+| `mask`         | No       | [DesignMask](protocol.md#designmask) / `null`                                                                                                                                              | Null clears masking when converting the container into an ordinary group.          |
+| `name`         | No       | `string`                                                                                                                                                                                   |                                                                                    |
+| `opacity`      | No       | `number`                                                                                                                                                                                   |                                                                                    |
+| `overrides`    | No       | Array of [DesignOverride](protocol.md#designoverride)                                                                                                                                      |                                                                                    |
+| `path`         | No       | Array of [DesignPathCommand](protocol.md#designpathcommand)                                                                                                                                |                                                                                    |
+| `placement`    | No       | [DesignPlacement](protocol.md#designplacement)                                                                                                                                             | Child sizing and positioning relative to its parent.                               |
+| `rotation`     | No       | `number`                                                                                                                                                                                   |                                                                                    |
+| `style`        | No       | [DesignStyle](protocol.md#designstyle)                                                                                                                                                     | Style can be shared across arbitrary primitives.                                   |
+| `text`         | No       | [DesignText](protocol.md#designtext) / `null`                                                                                                                                              |                                                                                    |
+| `variant`      | No       | Array of [DesignVariantValue](protocol.md#designvariantvalue) / `null`                                                                                                                     | Null releases a definition from its set.                                           |
+| `variants`     | No       | [DesignVariantSet](protocol.md#designvariantset) / `null`                                                                                                                                  | Null releases component-set metadata when converting its container.                |
+| `visible`      | No       | `boolean`                                                                                                                                                                                  |                                                                                    |
+| `width`        | No       | `number`                                                                                                                                                                                   |                                                                                    |
+| `x`            | No       | `number`                                                                                                                                                                                   |                                                                                    |
+| `y`            | No       | `number`                                                                                                                                                                                   |                                                                                    |
 
 ## DesignNodeRecord
 
@@ -2976,7 +3069,65 @@ Variant 3: [DesignTextOperation](protocol.md#designtextoperation)
 | `id`      | Yes      | `string` |             |
 | `op`      | Yes      | `"text"` |             |
 
-Variant 4: [DesignMove](protocol.md#designmove)
+Variant 4: [DesignResizeOperation](protocol.md#designresizeoperation)
+
+| Field       | Required | Type              | Description                                                                              |
+| ----------- | -------- | ----------------- | ---------------------------------------------------------------------------------------- |
+| `height`    | No       | `number`          |                                                                                          |
+| `op`        | Yes      | `"resize"`        |                                                                                          |
+| `pageId`    | Yes      | `string`          |                                                                                          |
+| `selection` | Yes      | Array of `string` |                                                                                          |
+| `width`     | No       | `number`          |                                                                                          |
+| `x`         | No       | `number`          | Position edits accompany a single dragged layer and use its resolved parent coordinates. |
+| `y`         | No       | `number`          |                                                                                          |
+
+Variant 5: [DesignPositionOperation](protocol.md#designpositionoperation)
+
+| Field        | Required | Type                                                       | Description                                                          |
+| ------------ | -------- | ---------------------------------------------------------- | -------------------------------------------------------------------- |
+| `absolute`   | No       | `boolean`                                                  | Explicitly leave or rejoin an auto-layout parent's flowing children. |
+| `horizontal` | No       | `"center"` / `"end"` / `"scale"` / `"start"` / `"stretch"` | Absolute children retain a chosen relation to a resized parent.      |
+| `id`         | Yes      | `string`                                                   |                                                                      |
+| `op`         | Yes      | `"position"`                                               |                                                                      |
+| `pageId`     | Yes      | `string`                                                   |                                                                      |
+| `vertical`   | No       | `"center"` / `"end"` / `"scale"` / `"start"` / `"stretch"` | Absolute children retain a chosen relation to a resized parent.      |
+| `x`          | No       | `number`                                                   |                                                                      |
+| `y`          | No       | `number`                                                   |                                                                      |
+
+Variant 6: [DesignRotateOperation](protocol.md#designrotateoperation)
+
+| Field       | Required | Type              | Description |
+| ----------- | -------- | ----------------- | ----------- |
+| `angle`     | Yes      | `number`          |             |
+| `op`        | Yes      | `"rotate"`        |             |
+| `pageId`    | Yes      | `string`          |             |
+| `pivotX`    | No       | `number`          |             |
+| `pivotY`    | No       | `number`          |             |
+| `selection` | Yes      | Array of `string` |             |
+
+Variant 7: [DesignScaleOperation](protocol.md#designscaleoperation)
+
+| Field       | Required | Type              | Description |
+| ----------- | -------- | ----------------- | ----------- |
+| `factor`    | Yes      | `number`          |             |
+| `op`        | Yes      | `"scale"`         |             |
+| `pageId`    | Yes      | `string`          |             |
+| `pivotX`    | No       | `number`          |             |
+| `pivotY`    | No       | `number`          |             |
+| `selection` | Yes      | Array of `string` |             |
+
+Variant 8: [DesignTranslateOperation](protocol.md#designtranslateoperation)
+
+| Field       | Required | Type                                                        | Description |
+| ----------- | -------- | ----------------------------------------------------------- | ----------- |
+| `dx`        | Yes      | `number`                                                    |             |
+| `dy`        | Yes      | `number`                                                    |             |
+| `op`        | Yes      | `"translate"`                                               |             |
+| `pageId`    | Yes      | `string`                                                    |             |
+| `reorders`  | No       | Array of [DesignFlowReorder](protocol.md#designflowreorder) |             |
+| `selection` | Yes      | Array of `string`                                           |             |
+
+Variant 9: [DesignMove](protocol.md#designmove)
 
 | Field      | Required | Type          | Description |
 | ---------- | -------- | ------------- | ----------- |
@@ -2986,14 +3137,14 @@ Variant 4: [DesignMove](protocol.md#designmove)
 | `pageId`   | Yes      | `string`      |             |
 | `parentId` | Yes      | `null,string` |             |
 
-Variant 5: [DesignRemove](protocol.md#designremove)
+Variant 10: [DesignRemove](protocol.md#designremove)
 
 | Field | Required | Type       | Description |
 | ----- | -------- | ---------- | ----------- |
 | `id`  | Yes      | `string`   |             |
 | `op`  | Yes      | `"remove"` |             |
 
-Variant 6: [DesignPageOperation](protocol.md#designpageoperation)
+Variant 11: [DesignPageOperation](protocol.md#designpageoperation)
 
 | Field        | Required | Type          | Description |
 | ------------ | -------- | ------------- | ----------- |
@@ -3002,7 +3153,16 @@ Variant 6: [DesignPageOperation](protocol.md#designpageoperation)
 | `name`       | Yes      | `null,string` |             |
 | `op`         | Yes      | `"page"`      |             |
 
-Variant 7: [DesignMetadata](protocol.md#designmetadata)
+Variant 12: [DesignGuideOperation](protocol.md#designguideoperation)
+
+| Field    | Required | Type                                                      | Description |
+| -------- | -------- | --------------------------------------------------------- | ----------- |
+| `id`     | Yes      | `string`                                                  |             |
+| `op`     | Yes      | `"guide"`                                                 |             |
+| `pageId` | Yes      | `string`                                                  |             |
+| `value`  | Yes      | [DesignGuideValue](protocol.md#designguidevalue) / `null` |             |
+
+Variant 13: [DesignMetadata](protocol.md#designmetadata)
 
 | Field          | Required | Type                                                        | Description |
 | -------------- | -------- | ----------------------------------------------------------- | ----------- |
@@ -3028,12 +3188,13 @@ Instance overrides target a source layer without modifying its component definit
 
 A page has its own root layers and viewport.
 
-| Field        | Required | Type              | Description |
-| ------------ | -------- | ----------------- | ----------- |
-| `background` | Yes      | `string`          |             |
-| `id`         | Yes      | `string`          |             |
-| `name`       | Yes      | `string`          |             |
-| `roots`      | Yes      | Array of `string` |             |
+| Field        | Required | Type                                                      | Description                                                           |
+| ------------ | -------- | --------------------------------------------------------- | --------------------------------------------------------------------- |
+| `background` | Yes      | `string`                                                  |                                                                       |
+| `guides`     | No       | Array of [DesignRulerGuide](protocol.md#designrulerguide) | Omitted on legacy pages; ruler guides do not affect exported artwork. |
+| `id`         | Yes      | `string`                                                  |                                                                       |
+| `name`       | Yes      | `string`                                                  |                                                                       |
+| `roots`      | Yes      | Array of `string`                                         |                                                                       |
 
 ## DesignPageOperation
 
@@ -3096,19 +3257,38 @@ Type: `"C"` / `"L"` / `"M"` / `"Q"` / `"Z"`.
 
 Child sizing and positioning relative to its parent.
 
-| Field        | Required | Type                                             | Description |
-| ------------ | -------- | ------------------------------------------------ | ----------- |
-| `absolute`   | Yes      | `boolean`                                        |             |
-| `columnSpan` | Yes      | `number`                                         |             |
-| `height`     | Yes      | [DesignSizing](protocol.md#designsizing)         |             |
-| `horizontal` | Yes      | [DesignConstraint](protocol.md#designconstraint) |             |
-| `maxHeight`  | Yes      | `number`                                         |             |
-| `maxWidth`   | Yes      | `number`                                         |             |
-| `minHeight`  | Yes      | `number`                                         |             |
-| `minWidth`   | Yes      | `number`                                         |             |
-| `rowSpan`    | Yes      | `number`                                         |             |
-| `vertical`   | Yes      | [DesignConstraint](protocol.md#designconstraint) |             |
-| `width`      | Yes      | [DesignSizing](protocol.md#designsizing)         |             |
+| Field                    | Required | Type                                             | Description                                                                                          |
+| ------------------------ | -------- | ------------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
+| `absolute`               | Yes      | `boolean`                                        |                                                                                                      |
+| `columnSpan`             | Yes      | `number`                                         |                                                                                                      |
+| `contentReferenceHeight` | No       | `number`                                         |                                                                                                      |
+| `contentReferenceWidth`  | No       | `number`                                         | Normalized frame geometry retains the original implicit basis of its absolute content and instances. |
+| `height`                 | Yes      | [DesignSizing](protocol.md#designsizing)         |                                                                                                      |
+| `horizontal`             | Yes      | [DesignConstraint](protocol.md#designconstraint) |                                                                                                      |
+| `maxHeight`              | Yes      | `number`                                         |                                                                                                      |
+| `maxWidth`               | Yes      | `number`                                         |                                                                                                      |
+| `minHeight`              | Yes      | `number`                                         |                                                                                                      |
+| `minWidth`               | Yes      | `number`                                         |                                                                                                      |
+| `referenceHeight`        | No       | `number`                                         |                                                                                                      |
+| `referenceWidth`         | No       | `number`                                         | Optional per-layer constraint baselines; legacy documents inherit the parent's authored dimensions.  |
+| `rowSpan`                | Yes      | `number`                                         |                                                                                                      |
+| `vertical`               | Yes      | [DesignConstraint](protocol.md#designconstraint) |                                                                                                      |
+| `width`                  | Yes      | [DesignSizing](protocol.md#designsizing)         |                                                                                                      |
+
+## DesignPositionOperation
+
+One layer has one coordinate space; batch positions share the save transaction and undo.
+
+| Field        | Required | Type                                                       | Description                                                          |
+| ------------ | -------- | ---------------------------------------------------------- | -------------------------------------------------------------------- |
+| `absolute`   | No       | `boolean`                                                  | Explicitly leave or rejoin an auto-layout parent's flowing children. |
+| `horizontal` | No       | `"center"` / `"end"` / `"scale"` / `"start"` / `"stretch"` | Absolute children retain a chosen relation to a resized parent.      |
+| `id`         | Yes      | `string`                                                   |                                                                      |
+| `op`         | Yes      | `"position"`                                               |                                                                      |
+| `pageId`     | Yes      | `string`                                                   |                                                                      |
+| `vertical`   | No       | `"center"` / `"end"` / `"scale"` / `"start"` / `"stretch"` | Absolute children retain a chosen relation to a resized parent.      |
+| `x`          | No       | `number`                                                   |                                                                      |
+| `y`          | No       | `number`                                                   |                                                                      |
 
 ## DesignReadMethod
 
@@ -3134,13 +3314,14 @@ Strictly revision-pinned pagination prevents merging chunks from different docum
 
 Commit acknowledgements contain no large text or scene snapshot.
 
-| Field              | Required | Type                                       | Description |
-| ------------------ | -------- | ------------------------------------------ | ----------- |
-| `actor`            | Yes      | `string`                                   |             |
-| `commandId`        | Yes      | `string`                                   |             |
-| `previousRevision` | Yes      | `null,string`                              |             |
-| `summary`          | Yes      | [DesignSummary](protocol.md#designsummary) |             |
-| `undoable`         | Yes      | `boolean`                                  |             |
+| Field              | Required | Type                                       | Description                                                                                   |
+| ------------------ | -------- | ------------------------------------------ | --------------------------------------------------------------------------------------------- |
+| `actor`            | Yes      | `string`                                   |                                                                                               |
+| `commandId`        | Yes      | `string`                                   |                                                                                               |
+| `previousRevision` | Yes      | `null,string`                              |                                                                                               |
+| `selection`        | No       | Array of `string`                          | Arrangement acknowledgements retain at most 256 resulting layer IDs, including exact retries. |
+| `summary`          | Yes      | [DesignSummary](protocol.md#designsummary) |                                                                                               |
+| `undoable`         | Yes      | `boolean`                                  |                                                                                               |
 
 ## DesignRecord
 
@@ -3223,6 +3404,20 @@ Delete a subtree and its anchored comments and prototype links.
 | ----- | -------- | ---------- | ----------- |
 | `id`  | Yes      | `string`   |             |
 | `op`  | Yes      | `"remove"` |             |
+
+## DesignResizeOperation
+
+Explicit geometry edits fix requested axes and preserve absolute child constraints atomically.
+
+| Field       | Required | Type              | Description                                                                              |
+| ----------- | -------- | ----------------- | ---------------------------------------------------------------------------------------- |
+| `height`    | No       | `number`          |                                                                                          |
+| `op`        | Yes      | `"resize"`        |                                                                                          |
+| `pageId`    | Yes      | `string`          |                                                                                          |
+| `selection` | Yes      | Array of `string` |                                                                                          |
+| `width`     | No       | `number`          |                                                                                          |
+| `x`         | No       | `number`          | Position edits accompany a single dragged layer and use its resolved parent coordinates. |
+| `y`         | No       | `number`          |                                                                                          |
 
 ## DesignSaveMethod
 
@@ -3341,6 +3536,91 @@ Rich text range. Offsets are UTF-16 indices into the layer's text.
 | `underline` | Yes      | `boolean`                                                   |                                                                                      |
 | `weight`    | Yes      | `number`                                                    |                                                                                      |
 
+## DesignTextSpanStyle
+
+Resolved style of a contiguous rich-text range.
+
+| Field       | Required | Type                                                        | Description                                                                         |
+| ----------- | -------- | ----------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `color`     | Yes      | `string`                                                    |                                                                                     |
+| `family`    | Yes      | `string`                                                    |                                                                                     |
+| `font`      | No       | [DesignFontBinding](protocol.md#designfontbinding) / `null` | A bound style selects exactly the saved face instead of an available system family. |
+| `italic`    | Yes      | `boolean`                                                   |                                                                                     |
+| `rich`      | Yes      | `boolean`                                                   |                                                                                     |
+| `size`      | Yes      | `number`                                                    |                                                                                     |
+| `underline` | Yes      | `boolean`                                                   |                                                                                     |
+| `weight`    | Yes      | `number`                                                    |                                                                                     |
+
+## DesignTextWindowCursor
+
+Null glyphIndex resumes the underline after this span's glyphs.
+
+| Field          | Required | Type          | Description |
+| -------------- | -------- | ------------- | ----------- |
+| `glyphIndex`   | Yes      | `null,number` |             |
+| `lineIndex`    | Yes      | `number`      |             |
+| `segmentIndex` | Yes      | `number`      |             |
+
+## DesignTextWindowGlyph
+
+A compact face-local glyph identity replaces repeated source text and vector command payloads.
+
+| Field | Required | Type     | Description |
+| ----- | -------- | -------- | ----------- |
+| `id`  | Yes      | `number` |             |
+| `x`   | Yes      | `number` |             |
+| `y`   | Yes      | `number` |             |
+
+## DesignTextWindowMethod
+
+Independently advertised support allows clients to retain complete-body rendering on older workspaces.
+
+| Field    | Required | Type                                                           | Description |
+| -------- | -------- | -------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignTextWindowRequest](protocol.md#designtextwindowrequest) |             |
+| `result` | Yes      | [DesignTextWindowPage](protocol.md#designtextwindowpage)       |             |
+
+## DesignTextWindowPage
+
+A window response never includes the source string; continuation keeps the same revision and selectors.
+
+| Field          | Required | Type                                                                  | Description |
+| -------------- | -------- | --------------------------------------------------------------------- | ----------- |
+| `box`          | Yes      | [DesignBox](protocol.md#designbox)                                    |             |
+| `id`           | Yes      | `string`                                                              |             |
+| `nextCursor`   | Yes      | [DesignTextWindowCursor](protocol.md#designtextwindowcursor) / `null` |             |
+| `occurrenceId` | Yes      | `string`                                                              |             |
+| `pageId`       | Yes      | `string`                                                              |             |
+| `revision`     | Yes      | `string`                                                              |             |
+| `runs`         | Yes      | Array of [DesignTextWindowRun](protocol.md#designtextwindowrun)       |             |
+| `window`       | Yes      | [DesignGlyphBounds](protocol.md#designglyphbounds)                    |             |
+
+## DesignTextWindowRequest
+
+The workspace owns the text, font resolution and geometry; the caller selects a local paint rectangle.
+
+| Field          | Required | Type                                                                  | Description |
+| -------------- | -------- | --------------------------------------------------------------------- | ----------- |
+| `cursor`       | Yes      | [DesignTextWindowCursor](protocol.md#designtextwindowcursor) / `null` |             |
+| `id`           | Yes      | `string`                                                              |             |
+| `limit`        | Yes      | `number`                                                              |             |
+| `occurrenceId` | Yes      | `string`                                                              |             |
+| `pageId`       | Yes      | `string`                                                              |             |
+| `revision`     | Yes      | `string`                                                              |             |
+| `window`       | Yes      | [DesignGlyphBounds](protocol.md#designglyphbounds)                    |             |
+
+## DesignTextWindowRun
+
+Each page groups positions by shaped span and preserves rich style and underline geometry.
+
+| Field          | Required | Type                                                                | Description |
+| -------------- | -------- | ------------------------------------------------------------------- | ----------- |
+| `glyphs`       | Yes      | Array of [DesignTextWindowGlyph](protocol.md#designtextwindowglyph) |             |
+| `lineIndex`    | Yes      | `number`                                                            |             |
+| `segmentIndex` | Yes      | `number`                                                            |             |
+| `style`        | Yes      | [DesignTextSpanStyle](protocol.md#designtextspanstyle)              |             |
+| `underline`    | Yes      | [DesignGlyphBounds](protocol.md#designglyphbounds) / `null`         |             |
+
 ## DesignToken
 
 Named design-system values.
@@ -3373,6 +3653,19 @@ Token record.
 Prototype transitions.
 
 Type: `"dissolve"` / `"instant"` / `"slide"`.
+
+## DesignTranslateOperation
+
+Move a selection from one original scene, optionally reordering selected flow children in the same edit.
+
+| Field       | Required | Type                                                        | Description |
+| ----------- | -------- | ----------------------------------------------------------- | ----------- |
+| `dx`        | Yes      | `number`                                                    |             |
+| `dy`        | Yes      | `number`                                                    |             |
+| `op`        | Yes      | `"translate"`                                               |             |
+| `pageId`    | Yes      | `string`                                                    |             |
+| `reorders`  | No       | Array of [DesignFlowReorder](protocol.md#designflowreorder) |             |
+| `selection` | Yes      | Array of `string`                                           |             |
 
 ## DesignTrigger
 
@@ -3427,6 +3720,41 @@ A named dimension and one retained definition's authored value.
 | ---------- | -------- | -------- | ----------- |
 | `property` | Yes      | `string` |             |
 | `value`    | Yes      | `string` |             |
+
+## DesignViewMethod
+
+The gateway advertises view support independently of the legacy complete-record read.
+
+| Field    | Required | Type                                               | Description |
+| -------- | -------- | -------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignViewRequest](protocol.md#designviewrequest) |             |
+| `result` | Yes      | [DesignViewPage](protocol.md#designviewpage)       |             |
+
+## DesignViewPage
+
+Deferred records are valid identity projections, never complete editable copies of their original bodies.
+
+| Field         | Required | Type                                                              | Description                                                                    |
+| ------------- | -------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| `deferredIds` | Yes      | Array of `string`                                                 | Only deferred node identities carried in this bounded record page or fragment. |
+| `fragment`    | Yes      | [DesignRecordFragment](protocol.md#designrecordfragment) / `null` |                                                                                |
+| `nextCursor`  | Yes      | [DesignCursor](protocol.md#designcursor) / `null`                 |                                                                                |
+| `pageId`      | Yes      | `string`                                                          | The resolved primary page is stable across all continuations.                  |
+| `records`     | Yes      | Array of [DesignRecord](protocol.md#designrecord)                 |                                                                                |
+| `summary`     | Yes      | [DesignSummary](protocol.md#designsummary)                        |                                                                                |
+
+## DesignViewRequest
+
+A revision-pinned page view retains topology while deferring inactive text and vector bodies.
+
+| Field        | Required | Type                                              | Description                                                                                              |
+| ------------ | -------- | ------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `cursor`     | Yes      | [DesignCursor](protocol.md#designcursor) / `null` |                                                                                                          |
+| `id`         | Yes      | `string`                                          |                                                                                                          |
+| `includeIds` | Yes      | Array of `string`                                 | Additional existing layers and their dependencies; removed identities are ignored during shared refresh. |
+| `limit`      | Yes      | `number`                                          |                                                                                                          |
+| `pageId`     | Yes      | `null,string`                                     | Null or a removed preferred page selects the document's first page.                                      |
+| `revision`   | Yes      | `null,string`                                     |                                                                                                          |
 
 ## DeviceApproveParams
 
@@ -3666,182 +3994,187 @@ Configurable bounds on gateway-owned work and memory.
 
 ## GatewayMethods
 
-| Field                                | Required | Type                  | Description                                                                                |
-| ------------------------------------ | -------- | --------------------- | ------------------------------------------------------------------------------------------ |
-| `accounts.create`                    | Yes      | Object (fields below) |                                                                                            |
-| `accounts.list`                      | Yes      | Object (fields below) |                                                                                            |
-| `accounts.remove`                    | Yes      | Object (fields below) |                                                                                            |
-| `accounts.usage`                     | Yes      | Object (fields below) |                                                                                            |
-| `agent.ask`                          | Yes      | Object (fields below) |                                                                                            |
-| `agent.steer`                        | Yes      | Object (fields below) |                                                                                            |
-| `agent.stream`                       | Yes      | Object (fields below) |                                                                                            |
-| `agents.define`                      | Yes      | Object (fields below) |                                                                                            |
-| `agents.list`                        | Yes      | Object (fields below) |                                                                                            |
-| `approvals.list`                     | Yes      | Object (fields below) |                                                                                            |
-| `approvals.resolve`                  | Yes      | Object (fields below) |                                                                                            |
-| `channels.deadLetters.list`          | Yes      | Object (fields below) |                                                                                            |
-| `channels.list`                      | Yes      | Object (fields below) |                                                                                            |
-| `channels.status`                    | Yes      | Object (fields below) |                                                                                            |
-| `config.get`                         | Yes      | Object (fields below) |                                                                                            |
-| `config.set`                         | Yes      | Object (fields below) |                                                                                            |
-| `config.unset`                       | Yes      | Object (fields below) |                                                                                            |
-| `connect`                            | Yes      | Object (fields below) |                                                                                            |
-| `credit.budgets`                     | Yes      | Object (fields below) |                                                                                            |
-| `credit.removeBudget`                | Yes      | Object (fields below) |                                                                                            |
-| `credit.resetAllowance`              | Yes      | Object (fields below) |                                                                                            |
-| `credit.resetHistory`                | Yes      | Object (fields below) |                                                                                            |
-| `credit.resets`                      | Yes      | Object (fields below) |                                                                                            |
-| `credit.setBudget`                   | Yes      | Object (fields below) |                                                                                            |
-| `credit.summary`                     | Yes      | Object (fields below) |                                                                                            |
-| `credit.wallet`                      | Yes      | Object (fields below) |                                                                                            |
-| `credit.walletHistory`               | Yes      | Object (fields below) |                                                                                            |
-| `data.upload.cancel`                 | Yes      | Object (fields below) |                                                                                            |
-| `data.upload.chunk`                  | Yes      | Object (fields below) |                                                                                            |
-| `data.upload.finish`                 | Yes      | Object (fields below) |                                                                                            |
-| `data.upload.start`                  | Yes      | Object (fields below) |                                                                                            |
-| `design.asset.cancel`                | Yes      | Object (fields below) |                                                                                            |
-| `design.asset.chunk`                 | Yes      | Object (fields below) |                                                                                            |
-| `design.asset.finish`                | Yes      | Object (fields below) |                                                                                            |
-| `design.asset.list`                  | Yes      | Object (fields below) |                                                                                            |
-| `design.asset.read`                  | Yes      | Object (fields below) |                                                                                            |
-| `design.asset.remove`                | Yes      | Object (fields below) |                                                                                            |
-| `design.asset.start`                 | Yes      | Object (fields below) |                                                                                            |
-| `design.changes`                     | Yes      | Object (fields below) | Forward delta RPC contract.                                                                |
-| `design.create`                      | Yes      | Object (fields below) | Create-document RPC contract.                                                              |
-| `design.delete`                      | Yes      | Object (fields below) | Owner-scoped revision-safe document deletion.                                              |
-| `design.events`                      | Yes      | Object (fields below) | Revision-journal RPC contract.                                                             |
-| `design.font.list`                   | Yes      | Object (fields below) | Authenticated metadata discovery does not carry font bodies.                               |
-| `design.font.read`                   | Yes      | Object (fields below) | Each authenticated WebSocket read transfers one independently bounded immutable slice.     |
-| `design.layout`                      | Yes      | Object (fields below) | Computed-geometry RPC contract.                                                            |
-| `design.list`                        | Yes      | Object (fields below) | Owner-scoped library RPC contract.                                                         |
-| `design.read`                        | Yes      | Object (fields below) | Bounded snapshot RPC contract.                                                             |
-| `design.save`                        | Yes      | Object (fields below) | Atomic editing RPC contract.                                                               |
-| `design.undo`                        | Yes      | Object (fields below) | Conflict-safe undo RPC contract.                                                           |
-| `devices.approve`                    | Yes      | Object (fields below) |                                                                                            |
-| `devices.list`                       | Yes      | Object (fields below) |                                                                                            |
-| `devices.reject`                     | Yes      | Object (fields below) |                                                                                            |
-| `devices.revoke`                     | Yes      | Object (fields below) |                                                                                            |
-| `health`                             | Yes      | Object (fields below) |                                                                                            |
-| `jobs.add`                           | Yes      | Object (fields below) |                                                                                            |
-| `jobs.list`                          | Yes      | Object (fields below) |                                                                                            |
-| `jobs.remove`                        | Yes      | Object (fields below) |                                                                                            |
-| `logs.tail`                          | Yes      | Object (fields below) |                                                                                            |
-| `media.acknowledge`                  | Yes      | Object (fields below) |                                                                                            |
-| `office.ownerProof`                  | Yes      | Object (fields below) | Bind an invitation to the authenticated socket's office, using a short-lived signed proof. |
-| `processes.input`                    | Yes      | Object (fields below) |                                                                                            |
-| `processes.list`                     | Yes      | Object (fields below) |                                                                                            |
-| `processes.log`                      | Yes      | Object (fields below) |                                                                                            |
-| `processes.resize`                   | Yes      | Object (fields below) |                                                                                            |
-| `processes.stop`                     | Yes      | Object (fields below) |                                                                                            |
-| `reverse.browser`                    | Yes      | Object (fields below) |                                                                                            |
-| `reverse.browser.modules`            | Yes      | Object (fields below) |                                                                                            |
-| `reverse.browser.screenshot`         | Yes      | Object (fields below) |                                                                                            |
-| `reverse.browser.sources`            | Yes      | Object (fields below) |                                                                                            |
-| `reverse.browser.storage`            | Yes      | Object (fields below) |                                                                                            |
-| `reverse.browser.storage.comparison` | Yes      | Object (fields below) |                                                                                            |
-| `reverse.browser.structure`          | Yes      | Object (fields below) |                                                                                            |
-| `reverse.browser.webmcp`             | Yes      | Object (fields below) |                                                                                            |
-| `reverse.catalog`                    | Yes      | Object (fields below) |                                                                                            |
-| `reverse.evidence`                   | Yes      | Object (fields below) |                                                                                            |
-| `reverse.functions`                  | Yes      | Object (fields below) |                                                                                            |
-| `reverse.graph`                      | Yes      | Object (fields below) |                                                                                            |
-| `reverse.inspect`                    | Yes      | Object (fields below) |                                                                                            |
-| `reverse.network`                    | Yes      | Object (fields below) |                                                                                            |
-| `reverse.network.detail`             | Yes      | Object (fields below) |                                                                                            |
-| `roblox.credentials.remove`          | Yes      | Object (fields below) |                                                                                            |
-| `roblox.credentials.set`             | Yes      | Object (fields below) |                                                                                            |
-| `roblox.credentials.status`          | Yes      | Object (fields below) |                                                                                            |
-| `roblox.telemetry.funnel`            | Yes      | Object (fields below) |                                                                                            |
-| `roblox.telemetry.performance`       | Yes      | Object (fields below) |                                                                                            |
-| `roblox.telemetry.projects`          | Yes      | Object (fields below) |                                                                                            |
-| `sessions.delete`                    | Yes      | Object (fields below) |                                                                                            |
-| `sessions.download`                  | Yes      | Object (fields below) |                                                                                            |
-| `sessions.files`                     | Yes      | Object (fields below) |                                                                                            |
-| `sessions.get`                       | Yes      | Object (fields below) |                                                                                            |
-| `sessions.input`                     | Yes      | Object (fields below) |                                                                                            |
-| `sessions.list`                      | Yes      | Object (fields below) |                                                                                            |
-| `sessions.messages`                  | Yes      | Object (fields below) |                                                                                            |
-| `sessions.pin`                       | Yes      | Object (fields below) |                                                                                            |
-| `sessions.pins`                      | Yes      | Object (fields below) |                                                                                            |
-| `sessions.rename`                    | Yes      | Object (fields below) |                                                                                            |
-| `sessions.retry`                     | Yes      | Object (fields below) |                                                                                            |
-| `sessions.subscribe`                 | Yes      | Object (fields below) |                                                                                            |
-| `sessions.transcript`                | Yes      | Object (fields below) | Compact transcript blocks with original journal byte cursors.                              |
-| `sessions.unpin`                     | Yes      | Object (fields below) |                                                                                            |
-| `sessions.unsubscribe`               | Yes      | Object (fields below) |                                                                                            |
-| `shares.create`                      | Yes      | Object (fields below) |                                                                                            |
-| `shares.list`                        | Yes      | Object (fields below) |                                                                                            |
-| `shares.remove`                      | Yes      | Object (fields below) |                                                                                            |
-| `shares.setMember`                   | Yes      | Object (fields below) |                                                                                            |
-| `tasks.cancel`                       | Yes      | Object (fields below) |                                                                                            |
-| `tasks.get`                          | Yes      | Object (fields below) |                                                                                            |
-| `tasks.list`                         | Yes      | Object (fields below) |                                                                                            |
-| `teams.create`                       | Yes      | Object (fields below) |                                                                                            |
-| `teams.list`                         | Yes      | Object (fields below) |                                                                                            |
-| `teams.remove`                       | Yes      | Object (fields below) |                                                                                            |
-| `teams.setMember`                    | Yes      | Object (fields below) |                                                                                            |
-| `voice.audio`                        | Yes      | Object (fields below) |                                                                                            |
-| `voice.start`                        | Yes      | Object (fields below) |                                                                                            |
-| `voice.stop`                         | Yes      | Object (fields below) |                                                                                            |
-| `workflows.attention.list`           | Yes      | Object (fields below) |                                                                                            |
-| `workflows.catalog`                  | Yes      | Object (fields below) |                                                                                            |
-| `workflows.create`                   | Yes      | Object (fields below) |                                                                                            |
-| `workflows.delete`                   | Yes      | Object (fields below) |                                                                                            |
-| `workflows.list`                     | Yes      | Object (fields below) |                                                                                            |
-| `workflows.models`                   | Yes      | Object (fields below) |                                                                                            |
-| `workflows.models.image.quote`       | Yes      | Object (fields below) |                                                                                            |
-| `workflows.models.image.resolve`     | Yes      | Object (fields below) |                                                                                            |
-| `workflows.models.refresh`           | Yes      | Object (fields below) |                                                                                            |
-| `workflows.models.resolve`           | Yes      | Object (fields below) |                                                                                            |
-| `workflows.planning.cancel`          | Yes      | Object (fields below) |                                                                                            |
-| `workflows.planning.history`         | Yes      | Object (fields below) |                                                                                            |
-| `workflows.planning.read`            | Yes      | Object (fields below) |                                                                                            |
-| `workflows.planning.send`            | Yes      | Object (fields below) |                                                                                            |
-| `workflows.planning.sources`         | Yes      | Object (fields below) |                                                                                            |
-| `workflows.publications.check`       | Yes      | Object (fields below) |                                                                                            |
-| `workflows.publications.list`        | Yes      | Object (fields below) |                                                                                            |
-| `workflows.publications.publish`     | Yes      | Object (fields below) |                                                                                            |
-| `workflows.publications.read`        | Yes      | Object (fields below) |                                                                                            |
-| `workflows.publications.run`         | Yes      | Object (fields below) |                                                                                            |
-| `workflows.read`                     | Yes      | Object (fields below) |                                                                                            |
-| `workflows.record`                   | Yes      | Object (fields below) |                                                                                            |
-| `workflows.records`                  | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.agent.control`       | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.agent.input`         | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.agent.read`          | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.applications.check`  | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.applications.setup`  | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.approval.decide`     | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.artifact`            | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.artifacts`           | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.attempts`            | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.cancel`              | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.events`              | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.inputs`              | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.list`                | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.loopPricing`         | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.loopSpending`        | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.output`              | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.question.answer`     | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.question.read`       | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.questions`           | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.read`                | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.start`               | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.steps`               | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.terminal.command`    | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.terminal.read`       | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.usage`               | Yes      | Object (fields below) |                                                                                            |
-| `workflows.runs.usageBreakdown`      | Yes      | Object (fields below) |                                                                                            |
-| `workflows.save`                     | Yes      | Object (fields below) |                                                                                            |
-| `workflows.schedules.disable`        | Yes      | Object (fields below) |                                                                                            |
-| `workflows.schedules.enable`         | Yes      | Object (fields below) |                                                                                            |
-| `workflows.schedules.preview`        | Yes      | Object (fields below) |                                                                                            |
-| `workflows.schedules.read`           | Yes      | Object (fields below) |                                                                                            |
-| `workflows.validate`                 | Yes      | Object (fields below) |                                                                                            |
-| `workspaces.create`                  | Yes      | Object (fields below) |                                                                                            |
-| `workspaces.describe`                | Yes      | Object (fields below) |                                                                                            |
-| `workspaces.destroy`                 | Yes      | Object (fields below) |                                                                                            |
-| `workspaces.list`                    | Yes      | Object (fields below) |                                                                                            |
+| Field                                | Required | Type                  | Description                                                                                            |
+| ------------------------------------ | -------- | --------------------- | ------------------------------------------------------------------------------------------------------ |
+| `accounts.create`                    | Yes      | Object (fields below) |                                                                                                        |
+| `accounts.list`                      | Yes      | Object (fields below) |                                                                                                        |
+| `accounts.remove`                    | Yes      | Object (fields below) |                                                                                                        |
+| `accounts.usage`                     | Yes      | Object (fields below) |                                                                                                        |
+| `agent.ask`                          | Yes      | Object (fields below) |                                                                                                        |
+| `agent.steer`                        | Yes      | Object (fields below) |                                                                                                        |
+| `agent.stream`                       | Yes      | Object (fields below) |                                                                                                        |
+| `agents.define`                      | Yes      | Object (fields below) |                                                                                                        |
+| `agents.list`                        | Yes      | Object (fields below) |                                                                                                        |
+| `approvals.list`                     | Yes      | Object (fields below) |                                                                                                        |
+| `approvals.resolve`                  | Yes      | Object (fields below) |                                                                                                        |
+| `channels.deadLetters.list`          | Yes      | Object (fields below) |                                                                                                        |
+| `channels.list`                      | Yes      | Object (fields below) |                                                                                                        |
+| `channels.status`                    | Yes      | Object (fields below) |                                                                                                        |
+| `config.get`                         | Yes      | Object (fields below) |                                                                                                        |
+| `config.set`                         | Yes      | Object (fields below) |                                                                                                        |
+| `config.unset`                       | Yes      | Object (fields below) |                                                                                                        |
+| `connect`                            | Yes      | Object (fields below) |                                                                                                        |
+| `credit.budgets`                     | Yes      | Object (fields below) |                                                                                                        |
+| `credit.removeBudget`                | Yes      | Object (fields below) |                                                                                                        |
+| `credit.resetAllowance`              | Yes      | Object (fields below) |                                                                                                        |
+| `credit.resetHistory`                | Yes      | Object (fields below) |                                                                                                        |
+| `credit.resets`                      | Yes      | Object (fields below) |                                                                                                        |
+| `credit.setBudget`                   | Yes      | Object (fields below) |                                                                                                        |
+| `credit.summary`                     | Yes      | Object (fields below) |                                                                                                        |
+| `credit.wallet`                      | Yes      | Object (fields below) |                                                                                                        |
+| `credit.walletHistory`               | Yes      | Object (fields below) |                                                                                                        |
+| `data.upload.cancel`                 | Yes      | Object (fields below) |                                                                                                        |
+| `data.upload.chunk`                  | Yes      | Object (fields below) |                                                                                                        |
+| `data.upload.finish`                 | Yes      | Object (fields below) |                                                                                                        |
+| `data.upload.start`                  | Yes      | Object (fields below) |                                                                                                        |
+| `design.asset.cancel`                | Yes      | Object (fields below) |                                                                                                        |
+| `design.asset.chunk`                 | Yes      | Object (fields below) |                                                                                                        |
+| `design.asset.finish`                | Yes      | Object (fields below) |                                                                                                        |
+| `design.asset.list`                  | Yes      | Object (fields below) |                                                                                                        |
+| `design.asset.read`                  | Yes      | Object (fields below) |                                                                                                        |
+| `design.asset.remove`                | Yes      | Object (fields below) |                                                                                                        |
+| `design.asset.start`                 | Yes      | Object (fields below) |                                                                                                        |
+| `design.canvas`                      | Yes      | Object (fields below) | Independently advertised canvas records allow complete-read fallback on older workspaces.              |
+| `design.canvas.metrics`              | Yes      | Object (fields below) | Metric reads retain the exact canvas revision across continuations.                                    |
+| `design.changes`                     | Yes      | Object (fields below) | Forward delta RPC contract.                                                                            |
+| `design.create`                      | Yes      | Object (fields below) | Create-document RPC contract.                                                                          |
+| `design.delete`                      | Yes      | Object (fields below) | Owner-scoped revision-safe document deletion.                                                          |
+| `design.events`                      | Yes      | Object (fields below) | Revision-journal RPC contract.                                                                         |
+| `design.font.list`                   | Yes      | Object (fields below) | Authenticated metadata discovery does not carry font bodies.                                           |
+| `design.font.read`                   | Yes      | Object (fields below) | Each authenticated WebSocket read transfers one independently bounded immutable slice.                 |
+| `design.layout`                      | Yes      | Object (fields below) | Computed-geometry RPC contract.                                                                        |
+| `design.list`                        | Yes      | Object (fields below) | Owner-scoped library RPC contract.                                                                     |
+| `design.read`                        | Yes      | Object (fields below) | Bounded snapshot RPC contract.                                                                         |
+| `design.save`                        | Yes      | Object (fields below) | Atomic editing RPC contract.                                                                           |
+| `design.text.window`                 | Yes      | Object (fields below) | Independently advertised support allows clients to retain complete-body rendering on older workspaces. |
+| `design.undo`                        | Yes      | Object (fields below) | Conflict-safe undo RPC contract.                                                                       |
+| `design.view`                        | Yes      | Object (fields below) | The gateway advertises view support independently of the legacy complete-record read.                  |
+| `devices.approve`                    | Yes      | Object (fields below) |                                                                                                        |
+| `devices.list`                       | Yes      | Object (fields below) |                                                                                                        |
+| `devices.reject`                     | Yes      | Object (fields below) |                                                                                                        |
+| `devices.revoke`                     | Yes      | Object (fields below) |                                                                                                        |
+| `health`                             | Yes      | Object (fields below) |                                                                                                        |
+| `jobs.add`                           | Yes      | Object (fields below) |                                                                                                        |
+| `jobs.list`                          | Yes      | Object (fields below) |                                                                                                        |
+| `jobs.remove`                        | Yes      | Object (fields below) |                                                                                                        |
+| `logs.tail`                          | Yes      | Object (fields below) |                                                                                                        |
+| `media.acknowledge`                  | Yes      | Object (fields below) |                                                                                                        |
+| `office.ownerProof`                  | Yes      | Object (fields below) | Bind an invitation to the authenticated socket's office, using a short-lived signed proof.             |
+| `processes.input`                    | Yes      | Object (fields below) |                                                                                                        |
+| `processes.list`                     | Yes      | Object (fields below) |                                                                                                        |
+| `processes.log`                      | Yes      | Object (fields below) |                                                                                                        |
+| `processes.resize`                   | Yes      | Object (fields below) |                                                                                                        |
+| `processes.stop`                     | Yes      | Object (fields below) |                                                                                                        |
+| `reverse.browser`                    | Yes      | Object (fields below) |                                                                                                        |
+| `reverse.browser.modules`            | Yes      | Object (fields below) |                                                                                                        |
+| `reverse.browser.screenshot`         | Yes      | Object (fields below) |                                                                                                        |
+| `reverse.browser.sources`            | Yes      | Object (fields below) |                                                                                                        |
+| `reverse.browser.storage`            | Yes      | Object (fields below) |                                                                                                        |
+| `reverse.browser.storage.comparison` | Yes      | Object (fields below) |                                                                                                        |
+| `reverse.browser.structure`          | Yes      | Object (fields below) |                                                                                                        |
+| `reverse.browser.webmcp`             | Yes      | Object (fields below) |                                                                                                        |
+| `reverse.catalog`                    | Yes      | Object (fields below) |                                                                                                        |
+| `reverse.evidence`                   | Yes      | Object (fields below) |                                                                                                        |
+| `reverse.functions`                  | Yes      | Object (fields below) |                                                                                                        |
+| `reverse.graph`                      | Yes      | Object (fields below) |                                                                                                        |
+| `reverse.inspect`                    | Yes      | Object (fields below) |                                                                                                        |
+| `reverse.network`                    | Yes      | Object (fields below) |                                                                                                        |
+| `reverse.network.detail`             | Yes      | Object (fields below) |                                                                                                        |
+| `roblox.credentials.remove`          | Yes      | Object (fields below) |                                                                                                        |
+| `roblox.credentials.set`             | Yes      | Object (fields below) |                                                                                                        |
+| `roblox.credentials.status`          | Yes      | Object (fields below) |                                                                                                        |
+| `roblox.telemetry.funnel`            | Yes      | Object (fields below) |                                                                                                        |
+| `roblox.telemetry.performance`       | Yes      | Object (fields below) |                                                                                                        |
+| `roblox.telemetry.projects`          | Yes      | Object (fields below) |                                                                                                        |
+| `sessions.delete`                    | Yes      | Object (fields below) |                                                                                                        |
+| `sessions.download`                  | Yes      | Object (fields below) |                                                                                                        |
+| `sessions.files`                     | Yes      | Object (fields below) |                                                                                                        |
+| `sessions.get`                       | Yes      | Object (fields below) |                                                                                                        |
+| `sessions.input`                     | Yes      | Object (fields below) |                                                                                                        |
+| `sessions.list`                      | Yes      | Object (fields below) |                                                                                                        |
+| `sessions.messages`                  | Yes      | Object (fields below) |                                                                                                        |
+| `sessions.pin`                       | Yes      | Object (fields below) |                                                                                                        |
+| `sessions.pins`                      | Yes      | Object (fields below) |                                                                                                        |
+| `sessions.rename`                    | Yes      | Object (fields below) |                                                                                                        |
+| `sessions.retry`                     | Yes      | Object (fields below) |                                                                                                        |
+| `sessions.subscribe`                 | Yes      | Object (fields below) |                                                                                                        |
+| `sessions.transcript`                | Yes      | Object (fields below) | Compact transcript blocks with original journal byte cursors.                                          |
+| `sessions.unpin`                     | Yes      | Object (fields below) |                                                                                                        |
+| `sessions.unsubscribe`               | Yes      | Object (fields below) |                                                                                                        |
+| `shares.create`                      | Yes      | Object (fields below) |                                                                                                        |
+| `shares.list`                        | Yes      | Object (fields below) |                                                                                                        |
+| `shares.remove`                      | Yes      | Object (fields below) |                                                                                                        |
+| `shares.setMember`                   | Yes      | Object (fields below) |                                                                                                        |
+| `tasks.cancel`                       | Yes      | Object (fields below) |                                                                                                        |
+| `tasks.get`                          | Yes      | Object (fields below) |                                                                                                        |
+| `tasks.list`                         | Yes      | Object (fields below) |                                                                                                        |
+| `teams.create`                       | Yes      | Object (fields below) |                                                                                                        |
+| `teams.list`                         | Yes      | Object (fields below) |                                                                                                        |
+| `teams.remove`                       | Yes      | Object (fields below) |                                                                                                        |
+| `teams.setMember`                    | Yes      | Object (fields below) |                                                                                                        |
+| `voice.audio`                        | Yes      | Object (fields below) |                                                                                                        |
+| `voice.start`                        | Yes      | Object (fields below) |                                                                                                        |
+| `voice.stop`                         | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.attention.list`           | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.catalog`                  | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.create`                   | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.delete`                   | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.list`                     | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.models`                   | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.models.image.quote`       | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.models.image.resolve`     | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.models.refresh`           | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.models.resolve`           | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.planning.cancel`          | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.planning.history`         | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.planning.read`            | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.planning.send`            | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.planning.sources`         | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.publications.check`       | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.publications.list`        | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.publications.publish`     | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.publications.read`        | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.publications.run`         | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.read`                     | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.record`                   | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.records`                  | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.runs.agent.control`       | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.runs.agent.input`         | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.runs.agent.read`          | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.runs.applications.check`  | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.runs.applications.setup`  | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.runs.approval.decide`     | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.runs.artifact`            | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.runs.artifacts`           | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.runs.attempts`            | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.runs.cancel`              | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.runs.events`              | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.runs.inputs`              | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.runs.list`                | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.runs.loopPricing`         | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.runs.loopSpending`        | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.runs.output`              | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.runs.question.answer`     | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.runs.question.read`       | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.runs.questions`           | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.runs.read`                | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.runs.start`               | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.runs.steps`               | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.runs.terminal.command`    | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.runs.terminal.read`       | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.runs.usage`               | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.runs.usageBreakdown`      | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.save`                     | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.schedules.disable`        | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.schedules.enable`         | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.schedules.preview`        | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.schedules.read`           | Yes      | Object (fields below) |                                                                                                        |
+| `workflows.validate`                 | Yes      | Object (fields below) |                                                                                                        |
+| `workspaces.create`                  | Yes      | Object (fields below) |                                                                                                        |
+| `workspaces.describe`                | Yes      | Object (fields below) |                                                                                                        |
+| `workspaces.destroy`                 | Yes      | Object (fields below) |                                                                                                        |
+| `workspaces.list`                    | Yes      | Object (fields below) |                                                                                                        |
+| `design.arrange`                     | Yes      | Object (fields below) | Workspace-native arrangement avoids uploading or hydrating selected layer bodies.                      |
 
 **accounts.create**
 
@@ -4170,6 +4503,20 @@ Configurable bounds on gateway-owned work and memory.
 | `params` | Yes      | [DesignAssetStartRequest](protocol.md#designassetstartrequest) |             |
 | `result` | Yes      | [DesignAssetPosition](protocol.md#designassetposition)         |             |
 
+**design.canvas**
+
+| Field    | Required | Type                                               | Description |
+| -------- | -------- | -------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignViewRequest](protocol.md#designviewrequest) |             |
+| `result` | Yes      | [DesignCanvasPage](protocol.md#designcanvaspage)   |             |
+
+**design.canvas.metrics**
+
+| Field    | Required | Type                                                                 | Description |
+| -------- | -------- | -------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignCanvasMetricsRequest](protocol.md#designcanvasmetricsrequest) |             |
+| `result` | Yes      | [DesignCanvasMetricsPage](protocol.md#designcanvasmetricspage)       |             |
+
 **design.changes**
 
 | Field    | Required | Type                                                     | Description |
@@ -4240,12 +4587,26 @@ Configurable bounds on gateway-owned work and memory.
 | `params` | Yes      | [DesignSaveRequest](protocol.md#designsaverequest) |             |
 | `result` | Yes      | [DesignReceipt](protocol.md#designreceipt)         |             |
 
+**design.text.window**
+
+| Field    | Required | Type                                                           | Description |
+| -------- | -------- | -------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignTextWindowRequest](protocol.md#designtextwindowrequest) |             |
+| `result` | Yes      | [DesignTextWindowPage](protocol.md#designtextwindowpage)       |             |
+
 **design.undo**
 
 | Field    | Required | Type                                               | Description |
 | -------- | -------- | -------------------------------------------------- | ----------- |
 | `params` | Yes      | [DesignUndoRequest](protocol.md#designundorequest) |             |
 | `result` | Yes      | [DesignReceipt](protocol.md#designreceipt)         |             |
+
+**design.view**
+
+| Field    | Required | Type                                               | Description |
+| -------- | -------- | -------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignViewRequest](protocol.md#designviewrequest) |             |
+| `result` | Yes      | [DesignViewPage](protocol.md#designviewpage)       |             |
 
 **devices.approve**
 
@@ -5133,6 +5494,13 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | -------------------------------------------------- | ----------- |
 | `params` | Yes      | [Recordstringnever](protocol.md#recordstringnever) |             |
 | `result` | Yes      | Array of [Workspace](protocol.md#workspace)        |             |
+
+**design.arrange**
+
+| Field    | Required | Type                                                     | Description |
+| -------- | -------- | -------------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignArrangeRequest](protocol.md#designarrangerequest) |             |
+| `result` | Yes      | [DesignReceipt](protocol.md#designreceipt)               |             |
 
 ## GeometryFormat
 
@@ -9871,3 +10239,122 @@ What a workspace currently holds, and when that was last measured against the di
 | `bytes`        | Yes      | `number` |                                                                                          |
 | `files`        | Yes      | `number` |                                                                                          |
 | `reconciledAt` | Yes      | `number` | When a full walk last corrected these numbers. `0` means never — the counters are then a |
+
+## DesignRotateOperation
+
+Rotates topmost selected layers together around a world pivot; omitted pivots use their combined bounds.
+
+| Field       | Required | Type              | Description |
+| ----------- | -------- | ----------------- | ----------- |
+| `angle`     | Yes      | `number`          |             |
+| `op`        | Yes      | `"rotate"`        |             |
+| `pageId`    | Yes      | `string`          |             |
+| `pivotX`    | No       | `number`          |             |
+| `pivotY`    | No       | `number`          |             |
+| `selection` | Yes      | Array of `string` |             |
+
+## DesignScaleOperation
+
+Uniform artwork scaling preserves text and effect metrics, unlike resizing a container.
+
+| Field       | Required | Type              | Description |
+| ----------- | -------- | ----------------- | ----------- |
+| `factor`    | Yes      | `number`          |             |
+| `op`        | Yes      | `"scale"`         |             |
+| `pageId`    | Yes      | `string`          |             |
+| `pivotX`    | No       | `number`          |             |
+| `pivotY`    | No       | `number`          |             |
+| `selection` | Yes      | Array of `string` |             |
+
+## DesignGuideValue
+
+A guide edit carries only its axis and world position.
+
+| Field      | Required | Type                                           | Description |
+| ---------- | -------- | ---------------------------------------------- | ----------- |
+| `axis`     | Yes      | [DesignRulerAxis](protocol.md#designruleraxis) |             |
+| `position` | Yes      | `number`                                       |             |
+
+## DesignRulerGuide
+
+Stable guide identity allows independent edits without replacing other agents' guides.
+
+| Field      | Required | Type                                           | Description |
+| ---------- | -------- | ---------------------------------------------- | ----------- |
+| `axis`     | Yes      | [DesignRulerAxis](protocol.md#designruleraxis) |             |
+| `id`       | Yes      | `string`                                       |             |
+| `position` | Yes      | `number`                                       |             |
+
+## DesignGuideOperation
+
+Sets one page guide by identity, or removes it with value:null.
+
+| Field    | Required | Type                                                      | Description |
+| -------- | -------- | --------------------------------------------------------- | ----------- |
+| `id`     | Yes      | `string`                                                  |             |
+| `op`     | Yes      | `"guide"`                                                 |             |
+| `pageId` | Yes      | `string`                                                  |             |
+| `value`  | Yes      | [DesignGuideValue](protocol.md#designguidevalue) / `null` |             |
+
+## DesignRulerAxis
+
+A saved ruler line uses a page-world coordinate on one canvas axis.
+
+Type: `"x"` / `"y"`.
+
+## DesignFrameGrid
+
+One editable overlay has a stable identity and complete canonical settings.
+
+| Field          | Required | Type                                                                   | Description |
+| -------------- | -------- | ---------------------------------------------------------------------- | ----------- |
+| `color`        | Yes      | `string`                                                               |             |
+| `count`        | Yes      | `number`                                                               |             |
+| `distribution` | Yes      | [DesignFrameGridDistribution](protocol.md#designframegriddistribution) |             |
+| `gutter`       | Yes      | `number`                                                               |             |
+| `id`           | Yes      | `string`                                                               |             |
+| `kind`         | Yes      | [DesignFrameGridKind](protocol.md#designframegridkind)                 |             |
+| `margin`       | Yes      | `number`                                                               |             |
+| `offset`       | Yes      | `number`                                                               |             |
+| `size`         | Yes      | `number`                                                               |             |
+| `visible`      | Yes      | `boolean`                                                              |             |
+
+## DesignFrameGridKind
+
+Saved construction overlays stay separate from automatic child placement.
+
+Type: `"columns"` / `"rows"` / `"square"`.
+
+## DesignFrameGridDistribution
+
+Stretch divides available space; fixed tracks retain their authored size.
+
+Type: `"center"` / `"end"` / `"start"` / `"stretch"`.
+
+## DesignArrangeMethod
+
+Workspace-native arrangement avoids uploading or hydrating selected layer bodies.
+
+| Field    | Required | Type                                                     | Description |
+| -------- | -------- | -------------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignArrangeRequest](protocol.md#designarrangerequest) |             |
+| `result` | Yes      | [DesignReceipt](protocol.md#designreceipt)               |             |
+
+## DesignArrangeRequest
+
+Agents use the normal command identity and revision guard for generated selection edits.
+
+| Field              | Required | Type                                                       | Description |
+| ------------------ | -------- | ---------------------------------------------------------- | ----------- |
+| `action`           | Yes      | [DesignSelectionAction](protocol.md#designselectionaction) |             |
+| `commandId`        | Yes      | `string`                                                   |             |
+| `expectedRevision` | Yes      | `string`                                                   |             |
+| `id`               | Yes      | `string`                                                   |             |
+| `pageId`           | Yes      | `string`                                                   |             |
+| `selection`        | Yes      | Array of `string`                                          |             |
+
+## DesignSelectionAction
+
+Selection commands share one implementation between agent tools and browser editors.
+
+Type: `"back"` / `"bottom"` / `"center"` / `"distribute-horizontal"` / `"distribute-vertical"` / `"duplicate"` / `"exclude"` / `"flatten"` / `"front"` / `"group"` / `"intersect"` / `"left"` / `"mask"` / `"middle"` / `"release-mask"` / `"right"` / `"subtract"` / `"top"` / `"ungroup"` / `"union"`.

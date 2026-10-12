@@ -1,3 +1,4 @@
+import type { DesignArrangeRequest } from './DesignSelectionTypes.js';
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -62,4 +63,10 @@ export interface DesignLayoutMethod {
 export interface DesignDeleteMethod {
     readonly params: import('./DesignRequests.js').DesignDeleteRequest;
     readonly result: import('./DesignRequests.js').DesignDeleteReceipt;
+}
+
+/** Workspace-native arrangement avoids uploading or hydrating selected layer bodies. */
+export interface DesignArrangeMethod {
+    readonly params: DesignArrangeRequest;
+    readonly result: DesignReceipt;
 }

@@ -210,4 +210,5 @@ export const methodValidators: Readonly<Record<MethodName, MethodValidation>> = 
     'workspaces.describe': { params: validators.params175, result: validators.result175 },
     'workspaces.destroy': { params: validators.params176, result: validators.result176 },
     'workspaces.list': { params: validators.params177, result: validators.result177 },
+    'design.arrange': { params: validators.params178, result: validators.result178 },
 };
