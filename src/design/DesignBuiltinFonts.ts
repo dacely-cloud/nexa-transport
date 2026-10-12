@@ -10,11 +10,25 @@ export class DesignBuiltinFonts {
     public static async engine(
         sources: readonly DesignFontSource[] = [],
     ): Promise<DesignFontEngine> {
-        if (sources.length > 0) {
+        if (
+            sources.some(
+                (source: DesignFontSource): boolean =>
+                    source.binding === undefined &&
+                    ['inter', 'noto emoji'].includes(source.family.toLowerCase()),
+            )
+        ) {
             return this.#create(sources);
         }
         this.#engine ??= this.#create([]);
-        return this.#engine;
+        const bundled: DesignFontEngine = await this.#engine;
+        return sources.length === 0 ? bundled : bundled.with(sources);
+    }
+
+    /** The original public fallback font also registers the browser's ordinary text and caret rendering. */
+    public static async emojiBytes(): Promise<Uint8Array<ArrayBuffer>> {
+        const { DesignEmojiBytes }: typeof import('./DesignEmojiBytes.js') =
+            await import('./DesignEmojiBytes.js');
+        return DesignEmojiBytes.read();
     }
 
     static async #create(sources: readonly DesignFontSource[]): Promise<DesignFontEngine> {
@@ -41,6 +55,25 @@ export class DesignBuiltinFonts {
                     bytes: DesignInterOutlineBytes.read(italic),
                 });
             }
+        }
+        const { DesignEmojiBytes }: typeof import('./DesignEmojiBytes.js') =
+            await import('./DesignEmojiBytes.js');
+        if (
+            !sources.some(
+                (source: DesignFontSource): boolean =>
+                    source.family.toLowerCase() === 'noto emoji' &&
+                    source.binding === undefined &&
+                    !source.italic &&
+                    source.weight === 400,
+            )
+        ) {
+            engine.add({
+                family: 'Noto Emoji',
+                italic: false,
+                weight: 400,
+                fallback: true,
+                bytes: DesignEmojiBytes.read(),
+            });
         }
         return engine;
     }

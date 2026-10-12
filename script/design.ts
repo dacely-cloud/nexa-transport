@@ -10,6 +10,10 @@ const files: readonly string[] = [
     'DesignFontBindings',
     'DesignShapedTextMetrics',
     'DesignFontEngine',
+    'DesignFontRegistry',
+    'DesignFontShaper',
+    'DesignEmojiBytes',
+    'DesignEmojiLicense',
     'DesignFontGlyphTypes',
     'DesignFontGlyphGeometry',
     'DesignTextWindowTypes',
@@ -140,3 +144,8 @@ await writeFile(
     'utf8',
 );
 await writeFile('licenses/Inter-OFL.txt', await readFile('../nexa/licenses/Inter-OFL.txt', 'utf8'));
+
+await writeFile(
+    'licenses/NotoEmoji-OFL.txt',
+    await readFile('../nexa/licenses/NotoEmoji-OFL.txt', 'utf8'),
+);

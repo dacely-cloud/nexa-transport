@@ -24,7 +24,17 @@ export class DesignSvgFonts {
     ): Promise<DesignSvgResult> {
         const used: ReadonlySet<boolean> = this.#used(selection);
         const privateCss: string = this.#private(result.svg.length, selection, sources);
-        if (used.size === 0 && privateCss === '') {
+        const selectedIds: ReadonlySet<string> = new Set(
+            selection.boxes.map((box: DesignBox): string => box.id),
+        );
+        const emoji: boolean = selection.scene.nodes.some(
+            (node): boolean =>
+                selectedIds.has(node.id) &&
+                node.text !== null &&
+                (/[\p{Extended_Pictographic}\p{Regional_Indicator}]/u.test(node.text.content) ||
+                    node.text.family.toLowerCase() === 'noto emoji'),
+        );
+        if (used.size === 0 && privateCss === '' && !emoji) {
             return result;
         }
         const { DesignInterBytes }: typeof import('./DesignInterBytes.js') =
@@ -37,9 +47,24 @@ export class DesignSvgFonts {
                     `@font-face{font-family:Inter;font-style:${italic ? 'italic' : 'normal'};font-weight:100 900;font-variation-settings:'opsz' 14;src:url(data:font/woff2;base64,${DesignInterBytes.encoded(italic)}) format('woff2');}`,
             )
             .join('');
+        let emojiCss: string = '';
+        let emojiLicense: string = '';
+        if (emoji) {
+            const { DesignEmojiBytes }: typeof import('./DesignEmojiBytes.js') =
+                await import('./DesignEmojiBytes.js');
+            const { DesignEmojiLicense }: typeof import('./DesignEmojiLicense.js') =
+                await import('./DesignEmojiLicense.js');
+            emojiCss = ['normal', 'italic']
+                .map(
+                    (style: string): string =>
+                        `@font-face{font-family:'Noto Emoji';font-style:${style};font-weight:300 700;src:url(data:font/ttf;base64,${DesignEmojiBytes.encoded()}) format('truetype');}`,
+                )
+                .join('');
+            emojiLicense = `<metadata>${DesignSvgGeometry.escape(DesignEmojiLicense.text)}</metadata>`;
+        }
         const svg: string = result.svg.replace(
             '<defs>',
-            `${used.size === 0 ? '' : `<metadata>${DesignSvgGeometry.escape(DesignInterLicense.text)}</metadata>`}<defs><style>${css}${privateCss}</style>`,
+            `${used.size === 0 ? '' : `<metadata>${DesignSvgGeometry.escape(DesignInterLicense.text)}</metadata>`}${emojiLicense}<defs><style>${css}${privateCss}${emojiCss}</style>`,
         );
         if (svg.length > DesignSvgLimits.characters) {
             throw new Error('Export individual frames to stay within the SVG content budget.');
