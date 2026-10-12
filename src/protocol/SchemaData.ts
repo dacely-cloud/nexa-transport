@@ -6580,6 +6580,11 @@ export const schema: Schema = {
                 componentId: {
                     type: ['null', 'string'],
                 },
+                contentScale: {
+                    description:
+                        'Uniform linked artwork scale; definitions retain their original geometry and styles.',
+                    type: 'number',
+                },
                 height: {
                     type: 'number',
                 },
@@ -6720,6 +6725,9 @@ export const schema: Schema = {
                 },
                 componentId: {
                     type: ['null', 'string'],
+                },
+                contentScale: {
+                    type: ['null', 'number'],
                 },
                 height: {
                     type: 'number',
@@ -6898,6 +6906,9 @@ export const schema: Schema = {
                 },
                 {
                     $ref: '#/definitions/DesignRotateOperation',
+                },
+                {
+                    $ref: '#/definitions/DesignScaleOperation',
                 },
                 {
                     $ref: '#/definitions/DesignTranslateOperation',
@@ -22087,6 +22098,36 @@ export const schema: Schema = {
                 },
             },
             required: ['angle', 'op', 'pageId', 'selection'],
+            type: 'object',
+        },
+        DesignScaleOperation: {
+            description:
+                'Uniform artwork scaling preserves text and effect metrics, unlike resizing a container.',
+            properties: {
+                factor: {
+                    type: 'number',
+                },
+                op: {
+                    const: 'scale',
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+                pivotX: {
+                    type: 'number',
+                },
+                pivotY: {
+                    type: 'number',
+                },
+                selection: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+            },
+            required: ['factor', 'op', 'pageId', 'selection'],
             type: 'object',
         },
     },

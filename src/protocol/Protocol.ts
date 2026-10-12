@@ -4394,6 +4394,8 @@ export interface DesignNodeShape {
     readonly children: ReadonlyArray<string>;
     /** componentId as defined by the Nexa gateway. */
     readonly componentId: null | string;
+    /** contentScale as defined by the Nexa gateway. */
+    readonly contentScale?: number;
     /** height as defined by the Nexa gateway. */
     readonly height: number;
     /** id as defined by the Nexa gateway. */
@@ -4477,6 +4479,8 @@ export interface DesignNodeChangesShape {
         | null;
     /** componentId as defined by the Nexa gateway. */
     readonly componentId?: null | string;
+    /** contentScale as defined by the Nexa gateway. */
+    readonly contentScale?: null | number;
     /** height as defined by the Nexa gateway. */
     readonly height?: number;
     /** image as defined by the Nexa gateway. */
@@ -4543,6 +4547,7 @@ export type DesignOperation =
     | DesignResizeOperation
     | DesignPositionOperation
     | DesignRotateOperation
+    | DesignScaleOperation
     | DesignTranslateOperation
     | DesignMove
     | DesignRemove
@@ -14589,6 +14594,25 @@ export interface DesignRotateOperationShape {
 
 /** DesignRotateOperation from the Nexa wire protocol. */
 export type DesignRotateOperation = DesignRotateOperationShape;
+
+/** DesignScaleOperation wire fields. */
+export interface DesignScaleOperationShape {
+    /** factor as defined by the Nexa gateway. */
+    readonly factor: number;
+    /** op as defined by the Nexa gateway. */
+    readonly op: 'scale';
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+    /** pivotX as defined by the Nexa gateway. */
+    readonly pivotX?: number;
+    /** pivotY as defined by the Nexa gateway. */
+    readonly pivotY?: number;
+    /** selection as defined by the Nexa gateway. */
+    readonly selection: ReadonlyArray<string>;
+}
+
+/** DesignScaleOperation from the Nexa wire protocol. */
+export type DesignScaleOperation = DesignScaleOperationShape;
 
 /** Supported RPC names. */
 export type MethodName = keyof GatewayMethods;
