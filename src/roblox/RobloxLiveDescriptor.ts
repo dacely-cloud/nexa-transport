@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { RobloxSceneCodec } from './RobloxSceneCodec';
+import { RobloxExecutionContext } from './RobloxExecutionContext';
 
 /** A delivered authored revision, with no installed dependency payloads. */
 export interface RobloxLiveDescriptor {
+    readonly executionContext: RobloxExecutionContext;
     readonly format: 'nexa.roblox.live';
     readonly version: 1;
     readonly name: string;
@@ -19,15 +21,23 @@ export class RobloxLiveDescriptorCodec {
             throw new Error('Live descriptor exceeds 2 MiB');
         }
         const raw: unknown = JSON.parse(text);
-        const fields: Readonly<Record<string, unknown>> = RobloxSceneCodec.record(raw, [
-            'format',
-            'version',
-            'name',
-            'entry',
-            'source',
-        ]);
+        const fields: Readonly<Record<string, unknown>> = RobloxSceneCodec.record(
+            raw,
+            ['format', 'version', 'name', 'entry', 'source'],
+            ['executionContext'],
+        );
         if (fields['format'] !== 'nexa.roblox.live' || fields['version'] !== 1) {
             throw new Error('Invalid live descriptor');
+        }
+        const executionContext: unknown =
+            fields['executionContext'] === undefined
+                ? RobloxExecutionContext.Server
+                : fields['executionContext'];
+        if (
+            executionContext !== RobloxExecutionContext.Server &&
+            executionContext !== RobloxExecutionContext.Client
+        ) {
+            throw new Error('Live execution context must be server or client');
         }
         const entry: string = RobloxSceneCodec.text(fields['entry'], 1024);
         if (
@@ -44,6 +54,7 @@ export class RobloxLiveDescriptorCodec {
             throw new Error('Live source exceeds 1 MiB');
         }
         return Object.freeze({
+            executionContext,
             format: 'nexa.roblox.live',
             version: 1,
             name: RobloxSceneCodec.text(fields['name'], 160),

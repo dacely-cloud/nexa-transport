@@ -4,10 +4,27 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 
 /** Server-only generation entry. Nexa owns the portable Roblox authoring and evaluation contract. */
-const files: readonly string[] = ['RobloxPartGeometry', 'RobloxLiveState', 'RobloxLiveDescriptor', 'RobloxSceneInput', 'RobloxGuiLayout', 'RobloxSceneExamples', 'RobloxParticleSimulator', 'RobloxSceneTypes', 'RobloxSceneSchema', 'RobloxSceneCodec', 'RobloxSceneRuntime', 'RobloxSceneXml', 'RobloxSceneLuau', 'RobloxSceneDiagnostics'];
+const files: readonly string[] = [
+    'RobloxExecutionContext',
+    'RobloxPartGeometry',
+    'RobloxLiveState',
+    'RobloxLiveDescriptor',
+    'RobloxSceneInput',
+    'RobloxGuiLayout',
+    'RobloxSceneExamples',
+    'RobloxParticleSimulator',
+    'RobloxSceneTypes',
+    'RobloxSceneSchema',
+    'RobloxSceneCodec',
+    'RobloxSceneRuntime',
+    'RobloxSceneXml',
+    'RobloxSceneLuau',
+    'RobloxSceneDiagnostics',
+];
 await mkdir('src/roblox', { recursive: true });
 for (const file of files) {
     const source: string = await readFile('../nexa/src/roblox/preview/' + file + '.ts', 'utf8');
-    if (/from ['"](?:node:|\.\.\/)/u.test(source)) throw new Error('Roblox SDK source imports server-only code: ' + file);
+    if (/from ['"](?:node:|\.\.\/)/u.test(source))
+        throw new Error('Roblox SDK source imports server-only code: ' + file);
     await writeFile('src/roblox/' + file + '.ts', source);
 }

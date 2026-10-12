@@ -83,7 +83,22 @@ company/project budgets are separate binary APIs described in
 [Office/company budgets](office-company.md#budgets-and-passive-reports), and
 workflow usage retains its own reported billing evidence.
 
-## Roblox connections and telemetry
+## Roblox live previews, connections and telemetry
+
+`RobloxLiveStart` opens an authorized delivered `preview.roblox.live.json` attachment
+using its conversation and attachment IDs. The server reads the archived source and
+execution context; callers cannot override either with browser input.
+`RobloxLiveDescriptorCodec` from `nexa-transport/roblox-live-descriptor` validates the
+descriptor and returns an explicit `executionContext`. It accepts server/client from
+`nexa-transport/roblox-execution-context`; older artifacts without that field use server.
+Malformed selectors are rejected. The selected side remains fixed for the session.
+Client execution supports eligible native LocalScripts and their original callbacks;
+it does not create players, replication or a connected client/server pair.
+
+`RobloxLiveStep` advances the retained VM and forwards user input. `RobloxLiveExport`
+returns the current native Studio model, including authored script Source.
+`RobloxLiveClose` releases the session. Handles stay scoped to their original authorized
+connection and conversation. Dispose them when the preview unmounts.
 
 `RobloxCredentialsStatus` reports `connected` and `validated` without returning
 the account's key. `RobloxCredentialsSet` submits `{ apiKey }` to the authenticated

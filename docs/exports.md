@@ -197,6 +197,7 @@ backend, or a provider-key vault.
 | Import                                    | Availability | Contract                                  |
 | ----------------------------------------- | ------------ | ----------------------------------------- |
 | `nexa-transport/roblox-gui-layout`        | ESM + types  | Portable Roblox gui layout support        |
+| `nexa-transport/roblox-execution-context` | ESM + types  | Immutable native server/client VM side    |
 | `nexa-transport/roblox-live-descriptor`   | ESM + types  | Portable Roblox live descriptor support   |
 | `nexa-transport/roblox-live-state`        | ESM + types  | Portable Roblox live state support        |
 | `nexa-transport/roblox-part-geometry`     | ESM + types  | Portable Roblox part geometry support     |
