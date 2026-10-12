@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { DesignScaleMetrics } from './DesignScaleMetrics.js';
+export { DesignScaleMetrics } from './DesignScaleMetrics.js';
 
 import {
     DesignKind,
