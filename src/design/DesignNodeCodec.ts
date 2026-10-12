@@ -25,7 +25,7 @@ export class DesignNodeCodec {
     public static node(raw: unknown): DesignNode {
         const value: Readonly<Record<string, unknown>> = V.fields(
             raw,
-            [...KEYS, 'booleanMode', 'mask', 'variants', 'variant'],
+            [...KEYS, 'booleanMode', 'mask', 'variants', 'variant', 'contentScale'],
             KEYS,
         );
         const kind: DesignKind = V.choice(value['kind'], Object.values(DesignKind), 'node.kind');
@@ -35,7 +35,13 @@ export class DesignNodeCodec {
         ) {
             throw new Error('Variant metadata requires a component set or variant definition.');
         }
+        if (Object.hasOwn(value, 'contentScale') && kind !== DesignKind.Instance) {
+            throw new Error('Only linked instances accept contentScale.');
+        }
         const node: DesignNode = {
+            ...(Object.hasOwn(value, 'contentScale')
+                ? { contentScale: V.number(value['contentScale'], 0.0001, 10000) }
+                : {}),
             id: V.id(value['id']),
             name: V.text(value['name']),
             kind,

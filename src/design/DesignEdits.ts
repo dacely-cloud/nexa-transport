@@ -17,6 +17,7 @@ import {
 import { DesignKind } from './DesignTypes.js';
 import { DesignResizeEdits } from './DesignResizeEdits.js';
 import { DesignPositionEdits } from './DesignPositionEdits.js';
+import { DesignScaleEdits } from './DesignScaleEdits.js';
 import { DesignRotateEdits } from './DesignRotateEdits.js';
 import { DesignTranslateEdits } from './DesignTranslateEdits.js';
 import { DesignSelectionContext } from './DesignSelectionContext.js';
@@ -127,7 +128,8 @@ export class DesignEdits {
                 case DesignOperationKind.Resize:
                 case DesignOperationKind.Position:
                 case DesignOperationKind.Translate:
-                case DesignOperationKind.Rotate: {
+                case DesignOperationKind.Rotate:
+                case DesignOperationKind.Scale: {
                     const current: DesignDocument = {
                         ...document,
                         ...metadata,
@@ -149,7 +151,9 @@ export class DesignEdits {
                               ? new DesignPositionEdits(context).apply(operation)
                               : operation.op === DesignOperationKind.Rotate
                                 ? new DesignRotateEdits(context).apply(operation)
-                                : new DesignTranslateEdits(context).apply(operation);
+                                : operation.op === DesignOperationKind.Scale
+                                  ? new DesignScaleEdits(context).apply(operation)
+                                  : new DesignTranslateEdits(context).apply(operation);
                     for (const node of changed) {
                         nodes.set(node.id, node);
                     }

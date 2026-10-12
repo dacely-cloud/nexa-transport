@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignScaleMetrics } from './DesignScaleMetrics.js';
+
 import {
     DesignKind,
     type DesignDocument,
@@ -51,6 +53,7 @@ export class DesignScene {
             instanceId: string | null,
             overrides: readonly DesignOverride[],
             depth: number,
+            scale: number,
         ) => void = (
             sourceId: string,
             id: string,
@@ -58,6 +61,7 @@ export class DesignScene {
             instanceId: string | null,
             overrides: readonly DesignOverride[],
             depth: number,
+            scale: number,
         ): void => {
             if (depth > 64 || nodes.length >= 20000) {
                 throw new Error('Expanded page exceeds its layer or depth budget');
@@ -69,7 +73,8 @@ export class DesignScene {
             const override: DesignOverride | undefined = overrides.find(
                 (entry: DesignOverride): boolean => entry.nodeId === sourceId,
             );
-            const edited: DesignNode = this.#override(original, override);
+            const authored: DesignNode = this.#override(original, override);
+            const edited: DesignNode = DesignScaleMetrics.node(authored, scale, false);
             if (edited.kind === DesignKind.Instance) {
                 const component: DesignNode | undefined =
                     edited.componentId === null ? undefined : source.get(edited.componentId);
@@ -83,9 +88,11 @@ export class DesignScene {
                 const rootOverride: DesignOverride | undefined = combined.find(
                     (entry: DesignOverride): boolean => entry.nodeId === component.id,
                 );
-                const template: DesignNode = this.#override(
-                    this.#override(component, rootOverride),
-                    override,
+                const contentScale: number = scale * (authored.contentScale ?? 1);
+                const template: DesignNode = DesignScaleMetrics.node(
+                    this.#override(this.#override(component, rootOverride), override),
+                    contentScale,
+                    false,
                 );
                 const ownerId: string = instanceId ?? id;
                 const children: readonly string[] = template.children.map(
@@ -106,7 +113,18 @@ export class DesignScene {
                     width: edited.width,
                     height: edited.height,
                     rotation: edited.rotation,
-                    placement: edited.placement,
+                    placement:
+                        contentScale === 1
+                            ? edited.placement
+                            : {
+                                  ...edited.placement,
+                                  contentReferenceWidth:
+                                      (authored.placement.contentReferenceWidth ??
+                                          component.width) * contentScale,
+                                  contentReferenceHeight:
+                                      (authored.placement.contentReferenceHeight ??
+                                          component.height) * contentScale,
+                              },
                     opacity: edited.opacity * template.opacity,
                     visible: edited.visible && template.visible,
                     locked: edited.locked,
@@ -122,6 +140,7 @@ export class DesignScene {
                         ownerId,
                         combined,
                         depth + 1,
+                        contentScale,
                     );
                 }
             } else {
@@ -158,12 +177,12 @@ export class DesignScene {
                     if (child === undefined || childId === undefined) {
                         throw new Error('Invalid scene children');
                     }
-                    expand(child, childId, id, instanceId, overrides, depth + 1);
+                    expand(child, childId, id, instanceId, overrides, depth + 1, scale);
                 }
             }
         };
         for (const root of page.roots) {
-            expand(root, root, null, null, [], 0);
+            expand(root, root, null, null, [], 0, 1);
         }
         const expanded: Map<string, DesignSceneNode> = new Map();
         for (let index: number = 0; index < nodes.length; index++) {

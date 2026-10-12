@@ -31,6 +31,7 @@ export const DesignOperationKind = {
     Position: 'position',
     Translate: 'translate',
     Rotate: 'rotate',
+    Scale: 'scale',
     Text: 'text',
     Move: 'move',
     Remove: 'remove',
@@ -39,6 +40,7 @@ export const DesignOperationKind = {
 } as const;
 /** Editable properties exclude identity and tree links, which have dedicated operations. */
 export interface DesignNodeChanges {
+    readonly contentScale?: number | null;
     /** A null value clears the operation when explicitly flattening a Boolean group. */
     readonly booleanMode?: DesignBooleanMode | null;
     /** Null clears masking when converting the container into an ordinary group. */
@@ -126,6 +128,15 @@ export interface DesignRotateOperation {
     readonly pivotX?: number;
     readonly pivotY?: number;
 }
+/** Uniform artwork scaling preserves text and effect metrics, unlike resizing a container. */
+export interface DesignScaleOperation {
+    readonly op: typeof DesignOperationKind.Scale;
+    readonly pageId: string;
+    readonly selection: readonly string[];
+    readonly factor: number;
+    readonly pivotX?: number;
+    readonly pivotY?: number;
+}
 /** Move a selection from one original scene, optionally reordering selected flow children in the same edit. */
 export interface DesignTranslateOperation {
     readonly op: typeof DesignOperationKind.Translate;
@@ -171,6 +182,7 @@ export type DesignOperation =
     | DesignPositionOperation
     | DesignTranslateOperation
     | DesignRotateOperation
+    | DesignScaleOperation
     | DesignTextOperation
     | DesignMove
     | DesignRemove

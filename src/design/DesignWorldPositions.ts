@@ -3,6 +3,7 @@
 import {
     DesignConstraint,
     DesignKind,
+    DesignSizing,
     type DesignBox,
     type DesignDocument,
     type DesignNode,
@@ -15,6 +16,7 @@ import { DesignSelectionContext } from './DesignSelectionContext.js';
 import { DesignPositionEdits } from './DesignPositionEdits.js';
 import { DesignOperationKind, type DesignOperation } from './DesignOperationTypes.js';
 import { DesignLayoutEngine } from './DesignLayout.js';
+import { DesignPaths } from './DesignPaths.js';
 import { DesignPositionReferences } from './DesignPositionReferences.js';
 
 interface Target {
@@ -40,6 +42,7 @@ export class DesignWorldPositions {
         targets: readonly DesignBox[],
         captured: ReadonlyMap<string, DesignNode> = new Map(),
         captureContext: DesignSelectionContext | null = null,
+        dimensions: boolean = false,
     ) {
         this.#nodes = new Map(context.nodes);
         for (const [id, node] of captured) {
@@ -66,17 +69,57 @@ export class DesignWorldPositions {
                 );
             }
             const local: DesignSelectionGeometry = measurements.local(box, node.parentId);
+            const positioned: DesignNode = capture.capture({
+                op: DesignOperationKind.Position,
+                id: node.id,
+                pageId: context.pageId,
+                x: local.x,
+                y: local.y,
+            });
+            const natural: DesignSelectionGeometry = {
+                ...measurements.measure(node.id),
+                x: 0,
+                y: 0,
+                rotation: 0,
+            };
+            const sized: DesignNode = dimensions
+                ? DesignPaths.resize(positioned, {
+                      width: box.width > 0 ? box.width : positioned.width,
+                      height: box.height > 0 ? box.height : positioned.height,
+                      placement: {
+                          ...positioned.placement,
+                          width:
+                              positioned.placement.width === DesignSizing.Hug &&
+                              Math.abs(natural.width - box.width) > 0.000001
+                                  ? DesignSizing.Fixed
+                                  : positioned.placement.width,
+                          height:
+                              positioned.placement.height === DesignSizing.Hug &&
+                              Math.abs(natural.height - box.height) > 0.000001
+                                  ? DesignSizing.Fixed
+                                  : positioned.placement.height,
+                          ...(node.kind === DesignKind.Instance || positioned.width === box.width
+                              ? {}
+                              : {
+                                    contentReferenceWidth:
+                                        positioned.placement.contentReferenceWidth ??
+                                        positioned.width,
+                                }),
+                          ...(node.kind === DesignKind.Instance || positioned.height === box.height
+                              ? {}
+                              : {
+                                    contentReferenceHeight:
+                                        positioned.placement.contentReferenceHeight ??
+                                        positioned.height,
+                                }),
+                      },
+                  })
+                : positioned;
             return {
                 node,
                 box,
                 captured: {
-                    ...capture.capture({
-                        op: DesignOperationKind.Position,
-                        id: node.id,
-                        pageId: context.pageId,
-                        x: local.x,
-                        y: local.y,
-                    }),
+                    ...sized,
                     rotation:
                         DesignWorldPositions.#angle(
                             box.rotation - context.box(node.id).rotation,

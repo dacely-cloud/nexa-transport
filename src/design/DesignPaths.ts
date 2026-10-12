@@ -34,6 +34,7 @@ export class DesignPaths {
     public static resize(node: DesignNode, changes: DesignNodeChanges): DesignNode {
         const {
             booleanMode: previousMode,
+            contentScale: previousScale,
             mask: previousMask,
             variants: previousSet,
             variant: previousVariant,
@@ -41,6 +42,7 @@ export class DesignPaths {
         }: DesignNode = node;
         const {
             booleanMode: changedMode,
+            contentScale: changedScale,
             mask: changedMask,
             variants: changedSet,
             variant: changedVariant,
@@ -58,11 +60,19 @@ export class DesignPaths {
         ) {
             throw new Error('Variant metadata requires a component set or variant definition.');
         }
+        if (changedScale !== undefined && changedScale !== null && kind !== DesignKind.Instance) {
+            throw new Error('Only linked instances accept contentScale.');
+        }
         const mode: DesignNode['booleanMode'] =
             changedMode === null ? undefined : (changedMode ?? previousMode);
         const next: DesignNode = {
             ...base,
             ...properties,
+            ...(kind === DesignKind.Instance &&
+            changedScale !== null &&
+            (changedScale ?? previousScale) !== undefined
+                ? { contentScale: changedScale ?? previousScale }
+                : {}),
             ...(kind === DesignKind.ComponentSet &&
             changedSet !== null &&
             (changedSet ?? previousSet) !== undefined

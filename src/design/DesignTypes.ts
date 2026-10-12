@@ -256,6 +256,8 @@ export interface DesignNode {
     readonly path: readonly DesignPathCommand[];
     readonly image: DesignImage | null;
     readonly componentId: string | null;
+    /** Uniform linked artwork scale; definitions retain their original geometry and styles. */
+    readonly contentScale?: number;
     readonly overrides: readonly DesignOverride[];
     /** Omitted on ordinary layers, preserving existing document and retry identities. */
     readonly booleanMode?: DesignBooleanMode;

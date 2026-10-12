@@ -58,6 +58,7 @@ export class DesignOperationCodec {
                     'angle',
                     'pivotX',
                     'pivotY',
+                    'factor',
                 ],
                 ['op'],
             );
@@ -105,6 +106,36 @@ export class DesignOperationCodec {
                         op,
                         id: V.id(value['id']),
                         content: V.text(value['content'], 100000, true),
+                    };
+                }
+                case Kind.Scale: {
+                    const value: Readonly<Record<string, unknown>> = V.fields(
+                        entry,
+                        ['op', 'pageId', 'selection', 'factor', 'pivotX', 'pivotY'],
+                        ['op', 'pageId', 'selection', 'factor'],
+                    );
+                    const selection: readonly string[] = V.list(
+                        value['selection'],
+                        128,
+                        (id: unknown): string => V.id(id),
+                    );
+                    if (selection.length === 0 || new Set(selection).size !== selection.length) {
+                        throw new Error('Scale requires 1 to 128 distinct selected layers.');
+                    }
+                    if ((value['pivotX'] === undefined) !== (value['pivotY'] === undefined)) {
+                        throw new Error('Scaling requires both pivot coordinates or neither.');
+                    }
+                    return {
+                        op,
+                        pageId: V.id(value['pageId']),
+                        selection,
+                        factor: V.number(value['factor'], 0.01, 100),
+                        ...(value['pivotX'] === undefined
+                            ? {}
+                            : {
+                                  pivotX: V.number(value['pivotX'], -100000, 100000),
+                                  pivotY: V.number(value['pivotY'], -100000, 100000),
+                              }),
                     };
                 }
                 case Kind.Rotate: {
@@ -356,6 +387,14 @@ export class DesignOperationCodec {
             throw new Error('Layer update requires at least one property');
         }
         return {
+            ...(Object.hasOwn(value, 'contentScale')
+                ? {
+                      contentScale:
+                          value['contentScale'] === null
+                              ? null
+                              : V.number(value['contentScale'], 0.0001, 10000),
+                  }
+                : {}),
             ...(Object.hasOwn(value, 'variants')
                 ? {
                       variants:
@@ -438,6 +477,7 @@ export class DesignOperationCodec {
 }
 const KEYS: readonly string[] = [
     'booleanMode',
+    'contentScale',
     'mask',
     'variants',
     'variant',
