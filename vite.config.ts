@@ -4,6 +4,7 @@ const config: UserConfig = {
         target: 'es2023',
         lib: {
             entry: {
+                'roblox-execution-context': 'src/roblox/RobloxExecutionContext.ts',
                 'roblox-scene-input': 'src/roblox/RobloxSceneInput.ts',
                 'roblox-part-geometry': 'src/roblox/RobloxPartGeometry.ts',
                 'roblox-gui-layout': 'src/roblox/RobloxGuiLayout.ts',

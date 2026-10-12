@@ -678,6 +678,10 @@
         "./design-selection-index": {
             "types": "./dist/design/DesignSelectionIndex.d.ts",
             "import": "./dist/design-selection-index.js"
+        },
+        "./roblox-execution-context": {
+            "types": "./dist/roblox/RobloxExecutionContext.d.ts",
+            "import": "./dist/roblox-execution-context.js"
         }
     },
     "scripts": {
