@@ -138,6 +138,8 @@ backend, or a provider-key vault.
 | `nexa-transport/design-codec`               | ESM + types | Design codec.                                                             |
 | `nexa-transport/design-edits`               | ESM + types | Design edits.                                                             |
 | `nexa-transport/design-text-styles`         | ESM + types | Unicode-safe partial rich-range formatting and selected-style inspection. |
+| `nexa-transport/design-transfer-types`      | Types only | Revision-pinned references for native copying between saved layouts. |
+| `nexa-transport/design-transfer-codec`      | ESM + types | Strict reference-only copy request validation. |
 | `nexa-transport/design-operation-types`     | ESM + types | Design operation types.                                                   |
 | `nexa-transport/design-operation-codec`     | ESM + types | Design operation codec.                                                   |
 | `nexa-transport/design-scene`               | ESM + types | Design scene.                                                             |

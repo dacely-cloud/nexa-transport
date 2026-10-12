@@ -212,4 +212,5 @@ export const methodValidators: Readonly<Record<MethodName, MethodValidation>> = 
     'workspaces.list': { params: validators.params177, result: validators.result177 },
     'design.arrange': { params: validators.params178, result: validators.result178 },
     'design.layout.preview': { params: validators.params179, result: validators.result179 },
+    'design.transfer': { params: validators.params180, result: validators.result180 },
 };

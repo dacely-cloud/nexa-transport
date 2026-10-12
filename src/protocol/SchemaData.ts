@@ -11317,6 +11317,19 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'design.transfer': {
+                    description: 'Cross-document reusable copying without source-body uploads.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/DesignTransferRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/DesignReceipt',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
             },
             required: [
                 'accounts.create',
@@ -11499,6 +11512,7 @@ export const schema: Schema = {
                 'workspaces.list',
                 'design.arrange',
                 'design.layout.preview',
+                'design.transfer',
             ],
             type: 'object',
         },
@@ -22820,6 +22834,75 @@ export const schema: Schema = {
                 },
             },
             required: ['changes', 'end', 'id', 'op', 'pageId', 'start'],
+            type: 'object',
+        },
+        DesignTransferMethod: {
+            description: 'Cross-document reusable copying without source-body uploads.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/DesignTransferRequest',
+                },
+                result: {
+                    $ref: '#/definitions/DesignReceipt',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        DesignTransferRequest: {
+            description:
+                'Cross-document copies carry references only; source layers stay inside the authenticated workspace.',
+            properties: {
+                commandId: {
+                    type: 'string',
+                },
+                expectedRevision: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+                parentId: {
+                    type: ['null', 'string'],
+                },
+                selection: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                sourceId: {
+                    type: 'string',
+                },
+                sourcePageId: {
+                    type: 'string',
+                },
+                sourceRevision: {
+                    type: 'string',
+                },
+                x: {
+                    type: 'number',
+                },
+                y: {
+                    type: 'number',
+                },
+            },
+            required: [
+                'commandId',
+                'expectedRevision',
+                'id',
+                'pageId',
+                'parentId',
+                'selection',
+                'sourceId',
+                'sourcePageId',
+                'sourceRevision',
+                'x',
+                'y',
+            ],
             type: 'object',
         },
     },

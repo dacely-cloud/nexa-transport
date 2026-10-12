@@ -7287,6 +7287,14 @@ export interface GatewayMethodsdesign_layout_previewShape {
     readonly result: DesignLayoutPreviewResult;
 }
 
+/** GatewayMethodsdesign_transfer wire fields. */
+export interface GatewayMethodsdesign_transferShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignTransferRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignReceipt;
+}
+
 /** GatewayMethods wire fields. */
 export interface GatewayMethodsShape {
     /** accounts.create as defined by the Nexa gateway. */
@@ -7649,6 +7657,8 @@ export interface GatewayMethodsShape {
     readonly 'design.arrange': GatewayMethodsdesign_arrangeShape;
     /** design.layout.preview as defined by the Nexa gateway. */
     readonly 'design.layout.preview': GatewayMethodsdesign_layout_previewShape;
+    /** design.transfer as defined by the Nexa gateway. */
+    readonly 'design.transfer': GatewayMethodsdesign_transferShape;
 }
 
 /** GatewayMethods from the Nexa wire protocol. */
@@ -15126,6 +15136,46 @@ export interface DesignTextStyleOperationShape {
 /** DesignTextStyleOperation from the Nexa wire protocol. */
 export type DesignTextStyleOperation = DesignTextStyleOperationShape;
 
+/** DesignTransferMethod wire fields. */
+export interface DesignTransferMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignTransferRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignReceipt;
+}
+
+/** DesignTransferMethod from the Nexa wire protocol. */
+export type DesignTransferMethod = DesignTransferMethodShape;
+
+/** DesignTransferRequest wire fields. */
+export interface DesignTransferRequestShape {
+    /** commandId as defined by the Nexa gateway. */
+    readonly commandId: string;
+    /** expectedRevision as defined by the Nexa gateway. */
+    readonly expectedRevision: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+    /** parentId as defined by the Nexa gateway. */
+    readonly parentId: null | string;
+    /** selection as defined by the Nexa gateway. */
+    readonly selection: ReadonlyArray<string>;
+    /** sourceId as defined by the Nexa gateway. */
+    readonly sourceId: string;
+    /** sourcePageId as defined by the Nexa gateway. */
+    readonly sourcePageId: string;
+    /** sourceRevision as defined by the Nexa gateway. */
+    readonly sourceRevision: string;
+    /** x as defined by the Nexa gateway. */
+    readonly x: number;
+    /** y as defined by the Nexa gateway. */
+    readonly y: number;
+}
+
+/** DesignTransferRequest from the Nexa wire protocol. */
+export type DesignTransferRequest = DesignTransferRequestShape;
+
 /** Supported RPC names. */
 export type MethodName = keyof GatewayMethods;
 /** Parameters for a particular RPC. */
@@ -15495,4 +15545,6 @@ export enum Method {
     DesignArrange = 'design.arrange',
     /** Calls design.layout.preview. */
     DesignLayoutPreview = 'design.layout.preview',
+    /** Calls design.transfer. */
+    DesignTransfer = 'design.transfer',
 }
