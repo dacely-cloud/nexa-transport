@@ -9,12 +9,14 @@ import type {
     RobloxEmissionSnapshot,
     RobloxEmissionFrame,
     RobloxNumberRange,
+    RobloxCFrame,
 } from './RobloxSceneTypes';
 import { RobloxProperties, RobloxSceneRuntime } from './RobloxSceneRuntime';
 import { RobloxPartGeometry } from './RobloxPartGeometry';
 import { RobloxValues } from './RobloxSceneSchema';
 import { RobloxSceneHierarchy } from './RobloxSceneHierarchy';
 import { RobloxParticleIntervals } from './RobloxParticleIntervals';
+import { RobloxParticleBirthPoses } from './RobloxParticleBirthPoses';
 import { RobloxParticleShape, type RobloxParticleShapePoint } from './RobloxParticleShape';
 
 /** Immutable per-particle state captured at emission; active appearance and forces are sampled separately. */
@@ -29,6 +31,8 @@ export interface RobloxParticleBirth {
     /** Randomized once when the particle is emitted. */
     readonly flipbookRate: number;
     readonly clearedAt: number;
+    /** Exact emitter frame at a locked native Emit; shared by every particle in that burst. */
+    readonly lockedPose: RobloxCFrame | null;
 }
 interface ParticleSpawn {
     readonly at: number;
@@ -63,6 +67,7 @@ export class RobloxParticleBirths {
             (at: number): ParticleSpawn => ({ at, order: -1, emission: null }),
         );
         const clears: ParticleClearPoint[] = [];
+        const lockedPoses: RobloxParticleBirthPoses = new RobloxParticleBirthPoses();
         for (let order: number = 0; order < scene.events.length; order++) {
             const event: import('./RobloxSceneTypes').RobloxSceneEvent | undefined =
                 scene.events[order];
@@ -156,9 +161,28 @@ export class RobloxParticleBirths {
                 normal,
                 random,
             );
+            const lockedPose: RobloxCFrame | null =
+                properties['LockedToPart'] === true
+                    ? lockedPoses.get(
+                          spawn.order,
+                          at,
+                          (point: RobloxVector3, direction: boolean): RobloxVector3 =>
+                              this.#transform(
+                                  point,
+                                  parent,
+                                  byId,
+                                  direction,
+                                  scene,
+                                  at,
+                                  trigger,
+                                  spawn.emission,
+                              ),
+                      )
+                    : null;
             return {
                 at,
                 life,
+                lockedPose,
                 position: this.#transform(
                     shape.position,
                     parent,

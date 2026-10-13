@@ -34,7 +34,7 @@ export class RobloxSceneDiagnostics {
                     : 'Particle sprites sample original shipped or downloaded Roblox image texels from one lossless atlas.';
             findings.push(
                 textures +
-                    ' Missing texture bytes produce an error. Loop/OneShot/PingPong/Random flipbooks and custom grids use deterministic playback with optional linear frame crossfades. Current size, color, transparency, texture and LightEmission apply to living particles. Acceleration, signed exponential drag and TimeScale changes affect living particles; recorded observations are held exactly and authored force tweens use 60 Hz intervals. Box, Sphere, Cylinder and Disc shapes support volume/surface sampling, partial regions, inward/outward emission and all six NormalId axes. Locking, wind, native particle RNG and Studio shape/pixel calibration remain unfinished.',
+                    ' Missing texture bytes produce an error. Loop/OneShot/PingPong/Random flipbooks and custom grids use deterministic playback with optional linear frame crossfades. Current size, color, transparency, texture and LightEmission apply to living particles. Acceleration, signed exponential drag and TimeScale changes affect living particles; recorded observations are held exactly and authored force tweens use 60 Hz intervals. Box, Sphere, Cylinder and Disc shapes support volume/surface sampling, partial regions, inward/outward emission and all six NormalId axes. LockedToPart follows recorded parent translation/rotation even while paused; release preserves current position and velocity direction. Velocity inheritance, wind, native particle RNG and exact Studio lock/shape/pixel calibration remain unfinished.',
             );
         }
         const emitterIds: ReadonlySet<string> = new Set(
@@ -66,6 +66,7 @@ export class RobloxSceneDiagnostics {
                         'Acceleration',
                         'Drag',
                         'TimeScale',
+                        'LockedToPart',
                         'Size',
                         'Color',
                         'Transparency',
@@ -82,7 +83,7 @@ export class RobloxSceneDiagnostics {
             )
         ) {
             findings.push(
-                'Some observed emitter properties are preserved in Studio replay but are not evaluated by the preview. LockedToPart and LightInfluence remain unfinished.',
+                'Some observed emitter properties are preserved in Studio replay but are not evaluated by the preview. LightInfluence remains unfinished.',
             );
         }
         if (

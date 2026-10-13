@@ -4,16 +4,13 @@
 import type { RobloxScene, RobloxValue, RobloxVector3 } from './RobloxSceneTypes';
 import { RobloxProperties, RobloxSceneRuntime } from './RobloxSceneRuntime';
 import { RobloxParticleIntervals } from './RobloxParticleIntervals';
+import { RobloxParticleMotionTree, type RobloxParticleTransfers } from './RobloxParticleMotionTree';
 
 /** Piecewise motion transfers answer arbitrary birth-to-frame intervals without replaying the timeline. */
 export class RobloxParticleMotion {
     readonly #times: readonly number[];
     readonly #states: Float64Array;
-    readonly #tree: Float64Array;
-    readonly #leaves: number;
-    readonly #left: Float64Array = new Float64Array(9);
-    readonly #right: Float64Array = new Float64Array(9);
-    readonly #partial: Float64Array = new Float64Array(9);
+    readonly #tree: RobloxParticleMotionTree;
 
     /** Stores acceleration, exponential drag and scaled time once per observed interval. */
     public constructor(scene: RobloxScene, nodeId: string, trigger: string | null) {
@@ -24,9 +21,7 @@ export class RobloxParticleMotion {
             trigger,
         );
         const count: number = this.#times.length - 1;
-        this.#leaves = 2 ** Math.ceil(Math.log2(count));
         this.#states = new Float64Array(count * 5);
-        this.#tree = new Float64Array(this.#leaves * 2 * 9);
         for (let index: number = 0; index < count; index++) {
             const properties: Readonly<Record<string, RobloxValue>> = RobloxSceneRuntime.properties(
                 scene,
@@ -45,27 +40,27 @@ export class RobloxParticleMotion {
                 ],
                 index * 5,
             );
-            this.#interval(
-                index,
-                this.#times[index] ?? 0,
-                this.#times[index + 1] ?? 0,
-                this.#tree,
-                (this.#leaves + index) * 9,
-            );
         }
-        for (let index: number = count; index < this.#leaves; index++) {
-            this.#identity(this.#tree, (this.#leaves + index) * 9);
-        }
-        for (let index: number = this.#leaves - 1; index > 0; index--) {
-            this.#compose(
-                this.#tree,
-                index * 2 * 9,
-                this.#tree,
-                (index * 2 + 1) * 9,
-                this.#tree,
-                index * 9,
-            );
-        }
+        const operations: RobloxParticleTransfers = {
+            interval: (
+                index: number,
+                begin: number,
+                end: number,
+                output: Float64Array,
+                offset: number,
+            ): void => this.#interval(index, begin, end, output, offset),
+            identity: (output: Float64Array, offset: number): void =>
+                this.#identity(output, offset),
+            compose: (
+                left: Float64Array,
+                a: number,
+                right: Float64Array,
+                b: number,
+                output: Float64Array,
+                offset: number,
+            ): void => this.#compose(left, a, right, b, output, offset),
+        };
+        this.#tree = new RobloxParticleMotionTree(this.#times, 9, operations);
     }
 
     /** Nine coefficients: velocity multiplier/offsets, displacement multiplier/offsets and elapsed effect time. */
@@ -81,31 +76,7 @@ export class RobloxParticleMotion {
                 'Particle motion requires an ordered finite time interval and nine output coefficients',
             );
         }
-        const first: number = this.#index(begin);
-        const last: number = this.#index(end);
-        if (first === last) {
-            this.#interval(first, begin, end, output, 0);
-            return;
-        }
-        this.#range(first + 1, last, output);
-        this.#interval(first, begin, this.#times[first + 1] ?? end, this.#partial, 0);
-        this.#compose(this.#partial, 0, output, 0, output, 0);
-        this.#interval(last, this.#times[last] ?? begin, end, this.#partial, 0);
-        this.#compose(output, 0, this.#partial, 0, output, 0);
-    }
-
-    #index(time: number): number {
-        let low: number = 0;
-        let high: number = this.#times.length;
-        while (low < high) {
-            const middle: number = Math.floor((low + high) / 2);
-            if ((this.#times[middle] ?? Infinity) <= time) {
-                low = middle + 1;
-            } else {
-                high = middle;
-            }
-        }
-        return Math.min(this.#times.length - 2, Math.max(0, low - 1));
+        this.#tree.sample(begin, end, output);
     }
 
     #interval(
@@ -171,25 +142,5 @@ export class RobloxParticleMotion {
         output[target] = leftMultiplier * rightMultiplier;
         output[target + 4] = travel;
         output[target + 8] = age;
-    }
-
-    #range(begin: number, end: number, output: Float64Array): void {
-        this.#identity(this.#left, 0);
-        this.#identity(this.#right, 0);
-        let left: number = begin + this.#leaves;
-        let right: number = end + this.#leaves;
-        while (left < right) {
-            if (left % 2 === 1) {
-                this.#compose(this.#left, 0, this.#tree, left * 9, this.#left, 0);
-                left++;
-            }
-            if (right % 2 === 1) {
-                right--;
-                this.#compose(this.#tree, right * 9, this.#right, 0, this.#right, 0);
-            }
-            left = Math.floor(left / 2);
-            right = Math.floor(right / 2);
-        }
-        this.#compose(this.#left, 0, this.#right, 0, output, 0);
     }
 }

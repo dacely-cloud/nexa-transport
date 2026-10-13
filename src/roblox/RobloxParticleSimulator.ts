@@ -7,6 +7,7 @@ import { RobloxParticleBirths, type RobloxParticleBirth } from './RobloxParticle
 import { RobloxParticleAppearance } from './RobloxParticleAppearance';
 import { RobloxParticleFlipbook } from './RobloxParticleFlipbook';
 import { RobloxParticleMotion } from './RobloxParticleMotion';
+import { RobloxParticleLockedMotion } from './RobloxParticleLockedMotion';
 
 /** Packed particle attributes: x/y/z, size, r/g/b, opacity, rotation in radians. */
 export interface RobloxParticleFrame {
@@ -24,7 +25,8 @@ export class RobloxParticleSimulator {
     readonly #attributes: Float32Array;
     readonly #textureRegions: Float32Array;
     readonly #motion: RobloxParticleMotion;
-    readonly #transfer: Float64Array = new Float64Array(9);
+    readonly #transfer: Float64Array = new Float64Array(18);
+    readonly #lockedMotion: RobloxParticleLockedMotion | null;
 
     /** Separates immutable birth inputs from the emitter's current appearance. */
     public constructor(
@@ -39,6 +41,10 @@ export class RobloxParticleSimulator {
         this.#attributes = new Float32Array(this.#births.length * 9);
         this.#textureRegions = new Float32Array(this.#births.length * 9);
         this.#motion = new RobloxParticleMotion(scene, node.id, trigger);
+        this.#lockedMotion =
+            this.#births.length === 0
+                ? null
+                : RobloxParticleLockedMotion.create(scene, node, trigger, this.#motion);
     }
 
     /** Evaluates current textures and animation into reusable GPU upload buffers. */
@@ -59,17 +65,26 @@ export class RobloxParticleSimulator {
                 : new RobloxParticleFlipbook(this.scene, properties, appearance.rectangle);
         let count: number = 0;
         let previousBirth: number = -1;
+        let previousPose: import('./RobloxSceneTypes').RobloxCFrame | null = null;
         if (appearance.visible && flipbook !== null) {
             for (const birth of this.#births) {
                 if (time < birth.at) {
                     break;
                 }
-                if (birth.at !== previousBirth) {
-                    this.#motion.sample(birth.at, time, this.#transfer);
+                if (time >= birth.clearedAt) {
+                    continue;
+                }
+                if (birth.at !== previousBirth || birth.lockedPose !== previousPose) {
+                    if (this.#lockedMotion === null) {
+                        this.#motion.sample(birth.at, time, this.#transfer);
+                    } else {
+                        this.#lockedMotion.sample(birth.at, time, this.#transfer, birth.lockedPose);
+                    }
                     previousBirth = birth.at;
+                    previousPose = birth.lockedPose;
                 }
                 const age: number = this.#transfer[8] ?? 0;
-                if (age >= birth.life || time >= birth.clearedAt) {
+                if (age >= birth.life) {
                     continue;
                 }
                 const normalized: number = age / birth.life;
@@ -84,17 +99,23 @@ export class RobloxParticleSimulator {
                     offset,
                 );
                 const x: number =
-                    birth.position.x +
-                    (birth.velocity.x === 0 ? 0 : birth.velocity.x * travel) +
-                    (this.#transfer[5] ?? 0);
+                    this.#lockedMotion === null
+                        ? birth.position.x +
+                          (birth.velocity.x === 0 ? 0 : birth.velocity.x * travel) +
+                          (this.#transfer[5] ?? 0)
+                        : this.#position(birth, travel, 0);
                 const y: number =
-                    birth.position.y +
-                    (birth.velocity.y === 0 ? 0 : birth.velocity.y * travel) +
-                    (this.#transfer[6] ?? 0);
+                    this.#lockedMotion === null
+                        ? birth.position.y +
+                          (birth.velocity.y === 0 ? 0 : birth.velocity.y * travel) +
+                          (this.#transfer[6] ?? 0)
+                        : this.#position(birth, travel, 1);
                 const z: number =
-                    birth.position.z +
-                    (birth.velocity.z === 0 ? 0 : birth.velocity.z * travel) +
-                    (this.#transfer[7] ?? 0);
+                    this.#lockedMotion === null
+                        ? birth.position.z +
+                          (birth.velocity.z === 0 ? 0 : birth.velocity.z * travel) +
+                          (this.#transfer[7] ?? 0)
+                        : this.#position(birth, travel, 2);
                 if (
                     !Number.isFinite(x) ||
                     !Number.isFinite(y) ||
@@ -151,5 +172,23 @@ export class RobloxParticleSimulator {
     /** Stable instance identity. */
     public get nodeId(): string {
         return this.node.id;
+    }
+
+    #position(birth: RobloxParticleBirth, travel: number, axis: number): number {
+        const offset: number = 9 + axis * 3;
+        const x: number = this.#transfer[offset] ?? 0;
+        const y: number = this.#transfer[offset + 1] ?? 0;
+        const z: number = this.#transfer[offset + 2] ?? 0;
+        const velocity: number =
+            (x === 0 ? 0 : x * birth.velocity.x) +
+            (y === 0 ? 0 : y * birth.velocity.y) +
+            (z === 0 ? 0 : z * birth.velocity.z);
+        return (
+            (x === 0 ? 0 : x * birth.position.x) +
+            (y === 0 ? 0 : y * birth.position.y) +
+            (z === 0 ? 0 : z * birth.position.z) +
+            (velocity === 0 ? 0 : travel * velocity) +
+            (this.#transfer[5 + axis] ?? 0)
+        );
     }
 }
