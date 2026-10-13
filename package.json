@@ -560,6 +560,14 @@
             "types": "./dist/roblox/RobloxGuiLayout.d.ts",
             "import": "./dist/roblox-gui-layout.js"
         },
+        "./roblox-gui-images": {
+            "types": "./dist/roblox/RobloxGuiImages.d.ts",
+            "import": "./dist/roblox-gui-images.js"
+        },
+        "./roblox-gui-classes": {
+            "types": "./dist/roblox/RobloxGuiClasses.d.ts",
+            "import": "./dist/roblox-gui-classes.js"
+        },
         "./roblox-scene-types": {
             "types": "./dist/roblox/RobloxSceneTypes.d.ts",
             "import": "./dist/roblox-scene-types.js"
