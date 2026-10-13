@@ -36,6 +36,8 @@ const files: readonly string[] = [
     'DesignStrokeGeometry',
     'DesignStrokeChangesCodec',
     'DesignStrokeEdits',
+    'DesignStyleChangesCodec',
+    'DesignStyleEdits',
     'DesignLayerStyleEdit',
     'DesignGradientTypes',
     'DesignGradientCodec',

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { DesignStrokeChangesCodec } from './DesignStrokeChangesCodec.js';
+import { DesignStyleChangesCodec } from './DesignStyleChangesCodec.js';
 import { DesignPaintGradientChangesCodec } from './DesignPaintGradientChangesCodec.js';
 import { DesignPaintColorChangesCodec } from './DesignPaintColorChangesCodec.js';
 import { DesignPaintColorTarget } from './DesignOperationTypes.js';
@@ -111,6 +112,20 @@ export class DesignOperationCodec {
                         id: V.id(value['id']),
                         pageId: V.id(value['pageId']),
                         changes: DesignStrokeChangesCodec.parse(value['changes']),
+                    };
+                }
+                case Kind.Style: {
+                    const value: Readonly<Record<string, unknown>> = V.record(entry, [
+                        'op',
+                        'id',
+                        'pageId',
+                        'changes',
+                    ]);
+                    return {
+                        op,
+                        id: V.id(value['id']),
+                        pageId: V.id(value['pageId']),
+                        changes: DesignStyleChangesCodec.parse(value['changes']),
                     };
                 }
                 case Kind.PaintGradient: {

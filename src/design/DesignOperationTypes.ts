@@ -22,6 +22,7 @@ import type {
     DesignNode,
     DesignPage,
     DesignStyle,
+    DesignShadow,
     DesignLayout,
     DesignPlacement,
     DesignText,
@@ -60,6 +61,7 @@ export const DesignOperationKind = {
     PaintColor: 'paint-color',
     PaintGradient: 'paint-gradient',
     Stroke: 'stroke',
+    Style: 'style',
 } as const;
 /** Editable properties exclude identity and tree links, which have dedicated operations. */
 export interface DesignNodeChanges {
@@ -358,6 +360,27 @@ export interface DesignStrokeOperation {
     readonly pageId: string;
     readonly changes: DesignStrokeChanges | null;
 }
+
+/** Omitted radii retain their original authored values. */
+export interface DesignCornerChanges {
+    readonly topLeft?: number;
+    readonly topRight?: number;
+    readonly bottomRight?: number;
+    readonly bottomLeft?: number;
+}
+/** Decoration changes retain all unrelated style fields; a supplied shadow array replaces only that stack. */
+export interface DesignStyleChanges {
+    readonly blur?: number;
+    readonly shadows?: readonly DesignShadow[];
+    readonly corners?: DesignCornerChanges;
+}
+/** Compact decoration edits apply to an authored layer or a linked instance root. */
+export interface DesignStyleOperation {
+    readonly op: typeof DesignOperationKind.Style;
+    readonly id: string;
+    readonly pageId: string;
+    readonly changes: DesignStyleChanges;
+}
 /** A transaction can contain different operation types. */
 export type DesignOperation =
     | DesignInsert
@@ -381,7 +404,8 @@ export type DesignOperation =
     | DesignTokenOperation
     | DesignPaintColorOperation
     | DesignPaintGradientOperation
-    | DesignStrokeOperation;
+    | DesignStrokeOperation
+    | DesignStyleOperation;
 /** Before and after images provide conflict-safe undo and bounded deltas. */
 export interface DesignEntityChange<T> {
     readonly id: string;
