@@ -103,8 +103,31 @@ export class RobloxSceneCodec {
             if (node.className === RobloxClass.ParticleEmitter) {
                 const rate: RobloxValue | undefined = node.properties['Rate'];
                 let maximumRate: number = typeof rate === 'number' ? rate : 0;
+                const scale: RobloxValue | undefined = node.properties['TimeScale'];
+                let maximumScale: number = typeof scale === 'number' ? scale : 1;
+                const lifetime: RobloxValue | undefined = node.properties['Lifetime'];
+                let nonzeroLifetime: boolean =
+                    typeof lifetime === 'object' &&
+                    lifetime.kind === 'NumberRange' &&
+                    lifetime.max > 0;
                 let enabled: boolean = node.properties['Enabled'] === true;
                 for (const event of events) {
+                    if (
+                        event.kind === 'tween' &&
+                        event.nodeId === node.id &&
+                        event.property === 'Rate' &&
+                        typeof event.to === 'number'
+                    ) {
+                        maximumRate = Math.max(maximumRate, event.to);
+                    }
+                    if (
+                        event.kind === 'tween' &&
+                        event.nodeId === node.id &&
+                        event.property === 'TimeScale' &&
+                        typeof event.to === 'number'
+                    ) {
+                        maximumScale = Math.max(maximumScale, event.to);
+                    }
                     if (event.kind !== 'recording' || event.nodeId !== node.id) {
                         continue;
                     }
@@ -115,10 +138,22 @@ export class RobloxSceneCodec {
                         if (event.property === 'Enabled' && sample.value === true) {
                             enabled = true;
                         }
+                        if (event.property === 'TimeScale' && typeof sample.value === 'number') {
+                            maximumScale = Math.max(maximumScale, sample.value);
+                        }
+                        if (
+                            event.property === 'Lifetime' &&
+                            typeof sample.value === 'object' &&
+                            sample.value.kind === 'NumberRange' &&
+                            sample.value.max > 0
+                        ) {
+                            nonzeroLifetime = true;
+                        }
                     }
                 }
-                if (enabled) {
-                    particles += maximumRate * (hierarchy.activeSeconds.get(node.id) ?? 0);
+                if (enabled && nonzeroLifetime) {
+                    particles +=
+                        maximumRate * maximumScale * (hierarchy.activeSeconds.get(node.id) ?? 0);
                 }
             }
         }
@@ -708,7 +743,7 @@ export class RobloxSceneCodec {
         this.record(raw, ['kind', 'nodeId', 'at', 'trigger', 'duration', 'property', 'to']);
         const property: string = this.text(header['property'], 64);
         const spec: RobloxPropertySpec | undefined = RobloxSceneSchema[node.className][property];
-        if (spec?.tween !== true || property === 'Rate' || property === 'CFrame') {
+        if (spec?.tween !== true || property === 'CFrame') {
             throw new Error('Unsupported tween property: ' + property);
         }
         const seconds: number = this.number(header['duration'], 0.001, duration - at);

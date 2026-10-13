@@ -1,11 +1,12 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { RobloxScene, RobloxSceneNode, RobloxVector3, RobloxValue } from './RobloxSceneTypes';
-import { RobloxProperties, RobloxSceneRuntime } from './RobloxSceneRuntime';
+import type { RobloxScene, RobloxSceneNode, RobloxValue } from './RobloxSceneTypes';
+import { RobloxSceneRuntime } from './RobloxSceneRuntime';
 import { RobloxParticleBirths, type RobloxParticleBirth } from './RobloxParticleBirths';
 import { RobloxParticleAppearance } from './RobloxParticleAppearance';
 import { RobloxParticleFlipbook } from './RobloxParticleFlipbook';
+import { RobloxParticleMotion } from './RobloxParticleMotion';
 
 /** Packed particle attributes: x/y/z, size, r/g/b, opacity, rotation in radians. */
 export interface RobloxParticleFrame {
@@ -22,8 +23,8 @@ export class RobloxParticleSimulator {
     readonly #births: readonly RobloxParticleBirth[];
     readonly #attributes: Float32Array;
     readonly #textureRegions: Float32Array;
-    readonly #acceleration: RobloxVector3;
-    readonly #drag: number;
+    readonly #motion: RobloxParticleMotion;
+    readonly #transfer: Float64Array = new Float64Array(9);
 
     /** Separates immutable birth inputs from the emitter's current appearance. */
     public constructor(
@@ -37,8 +38,7 @@ export class RobloxParticleSimulator {
         this.#births = new RobloxParticleBirths().create(scene, node, trigger);
         this.#attributes = new Float32Array(this.#births.length * 9);
         this.#textureRegions = new Float32Array(this.#births.length * 9);
-        this.#acceleration = RobloxProperties.vector(node.properties, 'Acceleration');
-        this.#drag = RobloxProperties.number(node.properties, 'Drag') * Math.LN2;
+        this.#motion = new RobloxParticleMotion(scene, node.id, trigger);
     }
 
     /** Evaluates current textures and animation into reusable GPU upload buffers. */
@@ -58,20 +58,22 @@ export class RobloxParticleSimulator {
                 ? null
                 : new RobloxParticleFlipbook(this.scene, properties, appearance.rectangle);
         let count: number = 0;
+        let previousBirth: number = -1;
         if (appearance.visible && flipbook !== null) {
             for (const birth of this.#births) {
-                const age: number = time - birth.at;
-                if (age < 0) {
+                if (time < birth.at) {
                     break;
                 }
+                if (birth.at !== previousBirth) {
+                    this.#motion.sample(birth.at, time, this.#transfer);
+                    previousBirth = birth.at;
+                }
+                const age: number = this.#transfer[8] ?? 0;
                 if (age >= birth.life || time >= birth.clearedAt) {
                     continue;
                 }
                 const normalized: number = age / birth.life;
-                const travel: number =
-                    this.#drag > 0 ? -Math.expm1(-this.#drag * age) / this.#drag : age;
-                const accelerationTravel: number =
-                    this.#drag > 0 ? (age - travel) / this.#drag : (age * age) / 2;
+                const travel: number = this.#transfer[4] ?? 0;
                 const offset: number = count * 9;
                 flipbook.write(
                     age,
@@ -81,18 +83,31 @@ export class RobloxParticleSimulator {
                     this.#textureRegions,
                     offset,
                 );
-                this.#attributes[offset] =
+                const x: number =
                     birth.position.x +
-                    birth.velocity.x * travel +
-                    this.#acceleration.x * accelerationTravel;
-                this.#attributes[offset + 1] =
+                    (birth.velocity.x === 0 ? 0 : birth.velocity.x * travel) +
+                    (this.#transfer[5] ?? 0);
+                const y: number =
                     birth.position.y +
-                    birth.velocity.y * travel +
-                    this.#acceleration.y * accelerationTravel;
-                this.#attributes[offset + 2] =
+                    (birth.velocity.y === 0 ? 0 : birth.velocity.y * travel) +
+                    (this.#transfer[6] ?? 0);
+                const z: number =
                     birth.position.z +
-                    birth.velocity.z * travel +
-                    this.#acceleration.z * accelerationTravel;
+                    (birth.velocity.z === 0 ? 0 : birth.velocity.z * travel) +
+                    (this.#transfer[7] ?? 0);
+                if (
+                    !Number.isFinite(x) ||
+                    !Number.isFinite(y) ||
+                    !Number.isFinite(z) ||
+                    Math.abs(x) > 100000000 ||
+                    Math.abs(y) > 100000000 ||
+                    Math.abs(z) > 100000000
+                ) {
+                    throw new Error('Particle motion exceeds the preview coordinate budget');
+                }
+                this.#attributes[offset] = x;
+                this.#attributes[offset + 1] = y;
+                this.#attributes[offset + 2] = z;
                 this.#attributes[offset + 3] = Math.max(
                     0,
                     RobloxParticleAppearance.scalar(

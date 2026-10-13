@@ -14,6 +14,7 @@ import { RobloxProperties, RobloxSceneRuntime } from './RobloxSceneRuntime';
 import { RobloxPartGeometry } from './RobloxPartGeometry';
 import { RobloxValues } from './RobloxSceneSchema';
 import { RobloxSceneHierarchy } from './RobloxSceneHierarchy';
+import { RobloxParticleIntervals } from './RobloxParticleIntervals';
 
 /** Immutable per-particle state captured at emission; active appearance and forces are sampled separately. */
 export interface RobloxParticleBirth {
@@ -71,6 +72,12 @@ export class RobloxParticleBirths {
                 clears.push({ at: event.at, order });
             }
             if (event.kind === 'burst' && event.nodeId === node.id && event.trigger === trigger) {
+                const properties: Readonly<Record<string, RobloxValue>> =
+                    event.emission?.properties ??
+                    RobloxSceneRuntime.properties(scene, node.id, event.at, trigger);
+                if (this.#range(properties, 'Lifetime').max === 0) {
+                    continue;
+                }
                 for (let index: number = 0; index < event.count; index++) {
                     times.push({ at: event.at, order, emission: event.emission ?? null });
                 }
@@ -249,22 +256,16 @@ export class RobloxParticleBirths {
     }
 
     #emissionTimes(scene: RobloxScene, node: RobloxSceneNode, trigger: string | null): number[] {
-        const boundaries: Set<number> = new Set([0, scene.duration]);
+        const boundaries: Set<number> = new Set(
+            RobloxParticleIntervals.boundaries(
+                scene,
+                node.id,
+                ['Rate', 'Enabled', 'TimeScale', 'Lifetime'],
+                trigger,
+            ),
+        );
         for (const delta of scene.hierarchy ?? []) {
             boundaries.add(delta.at);
-        }
-        for (const event of scene.events) {
-            if (
-                event.kind !== 'recording' ||
-                event.nodeId !== node.id ||
-                event.trigger !== trigger ||
-                !['Rate', 'Enabled'].includes(event.property)
-            ) {
-                continue;
-            }
-            for (const sample of event.samples) {
-                boundaries.add(sample.at);
-            }
         }
         const times: readonly number[] = [...boundaries].sort(
             (a: number, b: number): number => a - b,
@@ -291,8 +292,14 @@ export class RobloxParticleBirths {
                 start,
                 trigger,
             );
-            const rate: number = RobloxProperties.number(properties, 'Rate');
-            if (properties['Enabled'] !== true || rate <= 0) {
+            const rate: number =
+                RobloxProperties.number(properties, 'Rate') *
+                RobloxProperties.number(properties, 'TimeScale');
+            if (
+                properties['Enabled'] !== true ||
+                rate <= 0 ||
+                this.#range(properties, 'Lifetime').max === 0
+            ) {
                 continue;
             }
             const total: number = fractional + (end - start) * rate;
