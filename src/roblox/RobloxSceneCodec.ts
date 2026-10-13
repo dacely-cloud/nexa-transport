@@ -3,7 +3,6 @@
 
 import { RobloxSceneInput } from './RobloxSceneInput';
 import { RobloxPartGeometry } from './RobloxPartGeometry';
-import { RobloxDefaultTextures } from './RobloxDefaultTextures';
 import { RobloxSceneTextures, type RobloxSceneTextureAtlas } from './RobloxSceneTextures';
 import { RobloxSceneHierarchy, type RobloxHierarchyDecoded } from './RobloxSceneHierarchy';
 import { RobloxSceneSchema, type RobloxPropertySpec } from './RobloxSceneSchema';
@@ -516,11 +515,10 @@ export class RobloxSceneCodec {
             const texture: RobloxValue | undefined = properties['Texture'];
             if (
                 texture !== '' &&
-                (typeof texture !== 'string' || RobloxDefaultTextures.rect(texture) === null) &&
-                (typeof texture !== 'string' || !/^rbxassetid:\/\/[1-9][0-9]{0,19}$/u.test(texture))
+                (typeof texture !== 'string' || !RobloxSceneTextures.assetUri(texture))
             ) {
                 throw new Error(
-                    'Texture must be empty, a supported Roblox built-in resource or an rbxassetid URI',
+                    'Texture must be empty, an rbxasset image path or an rbxassetid URI',
                 );
             }
         }

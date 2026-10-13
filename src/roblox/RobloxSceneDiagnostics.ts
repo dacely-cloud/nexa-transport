@@ -22,8 +22,8 @@ export class RobloxSceneDiagnostics {
         ) {
             findings.push(
                 scene.textures === undefined
-                    ? 'Particle sprites sample Roblox’s shipped default resource texels. Custom asset IDs require authenticated texture resolution. Flipbook timing and native particle RNG remain unfinished.'
-                    : 'Particle sprites sample shipped default resources and authorized downloaded image texels from one lossless atlas. Flipbook timing and native particle RNG remain unfinished.',
+                    ? 'Particle sprites sample Roblox’s shipped default resource texels. Additional rbxasset image paths require resource resolution; custom asset IDs require authenticated texture resolution. Missing texture bytes produce an error. Flipbook timing and native particle RNG remain unfinished.'
+                    : 'Particle sprites sample original shipped or downloaded Roblox image texels from one lossless atlas. Missing texture bytes produce an error. Flipbook timing and native particle RNG remain unfinished.',
             );
         }
         const emitterIds: ReadonlySet<string> = new Set(

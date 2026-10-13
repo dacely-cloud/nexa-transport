@@ -14,6 +14,21 @@ export interface RobloxSceneTextureAtlas {
 
 /** Portable validation and lookup for bounded image data; no browser or API fetch is performed. */
 export class RobloxSceneTextures {
+    /** Accepts local Roblox image paths without traversal, URL queries or encoded separators. */
+    public static resourceUri(uri: string): boolean {
+        return (
+            uri.length <= 512 &&
+            /^rbxasset:\/\/(?:textures|sky)\/(?:[A-Za-z0-9_@-]+\/)*[A-Za-z0-9_@.-]+\.(?:png|jpg|jpeg|dds|webp)$/iu.test(
+                uri,
+            ) &&
+            !uri.includes('..')
+        );
+    }
+
+    /** The portable scene carries asset identities rather than arbitrary network URLs. */
+    public static assetUri(uri: string): boolean {
+        return /^rbxassetid:\/\/[1-9][0-9]{0,18}$/u.test(uri) || this.resourceUri(uri);
+    }
     /** Rejects arbitrary URLs, oversized decoded surfaces and invalid sprite bounds. */
     public static decode(raw: unknown): RobloxSceneTextureAtlas | undefined {
         if (raw === undefined) {
@@ -82,7 +97,7 @@ export class RobloxSceneTextures {
         }
         const rectangles: Record<string, RobloxTextureRect> = {};
         for (const uri of keys) {
-            if (!/^rbxassetid:\/\/[1-9][0-9]{0,18}$/u.test(uri)) {
+            if (!this.assetUri(uri)) {
                 throw new Error('Invalid texture atlas asset URI');
             }
             const values: readonly unknown[] = RobloxSceneCodec.array(rawRectangles[uri], 4);

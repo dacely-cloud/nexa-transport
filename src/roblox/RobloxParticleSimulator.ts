@@ -182,6 +182,13 @@ export class RobloxParticleSimulator {
                 throw new Error('Invalid particle texture');
             }
             const rectangle: RobloxTextureRect | null = RobloxSceneTextures.rect(scene, texture);
+            if (texture !== '' && rectangle === null) {
+                throw new Error(
+                    'Roblox texture bytes are missing: ' +
+                        texture +
+                        '. Rebuild the preview with asset resolution enabled.',
+                );
+            }
             const width: number = scene.textures?.width ?? RobloxDefaultTextures.size;
             const height: number = scene.textures?.height ?? RobloxDefaultTextures.size;
             const region: RobloxTextureRect =
