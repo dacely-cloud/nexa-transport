@@ -4062,6 +4062,21 @@ export const DesignConstraintValues = {
 /** DesignConstraint from the Nexa wire protocol. */
 export type DesignConstraint = (typeof DesignConstraintValues)[keyof typeof DesignConstraintValues];
 
+/** DesignCornerChanges wire fields. */
+export interface DesignCornerChangesShape {
+    /** bottomLeft as defined by the Nexa gateway. */
+    readonly bottomLeft?: number;
+    /** bottomRight as defined by the Nexa gateway. */
+    readonly bottomRight?: number;
+    /** topLeft as defined by the Nexa gateway. */
+    readonly topLeft?: number;
+    /** topRight as defined by the Nexa gateway. */
+    readonly topRight?: number;
+}
+
+/** DesignCornerChanges from the Nexa wire protocol. */
+export type DesignCornerChanges = DesignCornerChangesShape;
+
 /** DesignCorners wire fields. */
 export interface DesignCornersShape {
     /** bottomLeft as defined by the Nexa gateway. */
@@ -5101,7 +5116,8 @@ export type DesignOperation =
     | DesignTokenOperation
     | DesignPaintColorOperation
     | DesignPaintGradientOperation
-    | DesignStrokeOperation;
+    | DesignStrokeOperation
+    | DesignStyleOperation;
 
 /** DesignOverride wire fields. */
 export interface DesignOverrideShape {
@@ -5802,6 +5818,34 @@ export interface DesignStyleShape {
 
 /** DesignStyle from the Nexa wire protocol. */
 export type DesignStyle = DesignStyleShape;
+
+/** DesignStyleChanges wire fields. */
+export interface DesignStyleChangesShape {
+    /** blur as defined by the Nexa gateway. */
+    readonly blur?: number;
+    /** corners as defined by the Nexa gateway. */
+    readonly corners?: DesignCornerChanges;
+    /** shadows as defined by the Nexa gateway. */
+    readonly shadows?: ReadonlyArray<DesignShadow>;
+}
+
+/** DesignStyleChanges from the Nexa wire protocol. */
+export type DesignStyleChanges = DesignStyleChangesShape;
+
+/** DesignStyleOperation wire fields. */
+export interface DesignStyleOperationShape {
+    /** changes as defined by the Nexa gateway. */
+    readonly changes: DesignStyleChanges;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** op as defined by the Nexa gateway. */
+    readonly op: 'style';
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+}
+
+/** DesignStyleOperation from the Nexa wire protocol. */
+export type DesignStyleOperation = DesignStyleOperationShape;
 
 /** DesignSummary wire fields. */
 export interface DesignSummaryShape {

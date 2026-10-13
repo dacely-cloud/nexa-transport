@@ -6222,6 +6222,24 @@ export const schema: Schema = {
             enum: ['center', 'end', 'scale', 'start', 'stretch'],
             type: 'string',
         },
+        DesignCornerChanges: {
+            description: 'Omitted radii retain their original authored values.',
+            properties: {
+                bottomLeft: {
+                    type: 'number',
+                },
+                bottomRight: {
+                    type: 'number',
+                },
+                topLeft: {
+                    type: 'number',
+                },
+                topRight: {
+                    type: 'number',
+                },
+            },
+            type: 'object',
+        },
         DesignCorners: {
             description: 'Four independent corner radii, in clockwise order.',
             properties: {
@@ -7734,6 +7752,9 @@ export const schema: Schema = {
                 {
                     $ref: '#/definitions/DesignStrokeOperation',
                 },
+                {
+                    $ref: '#/definitions/DesignStyleOperation',
+                },
             ],
             description: 'A transaction can contain different operation types.',
         },
@@ -8709,6 +8730,47 @@ export const schema: Schema = {
                 },
             },
             required: ['blur', 'corners', 'fills', 'shadows', 'stroke'],
+            type: 'object',
+        },
+        DesignStyleChanges: {
+            description:
+                'Decoration changes retain all unrelated style fields; a supplied shadow array replaces only that stack.',
+            properties: {
+                blur: {
+                    type: 'number',
+                },
+                corners: {
+                    $ref: '#/definitions/DesignCornerChanges',
+                    description: 'Omitted radii retain their original authored values.',
+                },
+                shadows: {
+                    items: {
+                        $ref: '#/definitions/DesignShadow',
+                    },
+                    type: 'array',
+                },
+            },
+            type: 'object',
+        },
+        DesignStyleOperation: {
+            description:
+                'Compact decoration edits apply to an authored layer or a linked instance root.',
+            properties: {
+                changes: {
+                    $ref: '#/definitions/DesignStyleChanges',
+                },
+                id: {
+                    type: 'string',
+                },
+                op: {
+                    const: 'style',
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+            },
+            required: ['changes', 'id', 'op', 'pageId'],
             type: 'object',
         },
         DesignSummary: {
