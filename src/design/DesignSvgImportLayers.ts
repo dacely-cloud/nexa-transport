@@ -9,6 +9,7 @@ import { DesignSvgImportViewport, type DesignSvgViewportPlan } from './DesignSvg
 import { DesignSvgImportClipPaths } from './DesignSvgImportClipPaths.js';
 import { DesignSvgImportMask } from './DesignSvgImportMask.js';
 import { DesignSvgImportShape } from './DesignSvgImportShape.js';
+import { DesignSvgImportText } from './DesignSvgImportText.js';
 import { DesignSvgImportTree } from './DesignSvgImportTree.js';
 import { DesignSvgImportAppearance } from './DesignSvgImportAppearance.js';
 import { DesignSvgXml, type DesignSvgElement } from './DesignSvgXml.js';
@@ -34,6 +35,7 @@ export class DesignSvgImportLayers {
     #ancestors: Map<DesignSvgElement, readonly DesignSvgElement[]> = new Map();
     #sequence: number = 0;
     #shape: DesignSvgImportShape;
+    #text: DesignSvgImportText;
     #clips: DesignSvgImportClipPaths;
     #viewports: DesignSvgImportViewport;
     #masks: DesignSvgImportMasks;
@@ -65,6 +67,7 @@ export class DesignSvgImportLayers {
         this.#css = new DesignSvgCss(root);
         this.#paints = new DesignSvgImportPaints(this.#elements, this.#css, this.#ancestors);
         this.#shape = new DesignSvgImportShape(this.#paints, this.#tree, this.identify);
+        this.#text = new DesignSvgImportText(this.#css, this.#tree);
         const masks: DesignSvgImportMask = new DesignSvgImportMask(this.#tree, this.identify);
         this.#viewports = new DesignSvgImportViewport(this.#tree, masks, this.identify);
         this.#clips = new DesignSvgImportClipPaths(
@@ -324,13 +327,13 @@ export class DesignSvgImportLayers {
             return id;
         }
         if (
-            !['path', 'rect', 'circle', 'ellipse', 'line', 'polygon', 'polyline'].includes(
+            !['text', 'path', 'rect', 'circle', 'ellipse', 'line', 'polygon', 'polyline'].includes(
                 element.name,
             )
         ) {
             throw new Error('Unsupported SVG element ' + element.name);
         }
-        const shape: string | null = await this.#shape.build(element, {
+        const shapeContext: Parameters<DesignSvgImportShape['build']>[1] = {
             id,
             parentId: context.parentId,
             name,
@@ -338,7 +341,11 @@ export class DesignSvgImportLayers {
             width: context.width,
             height: context.height,
             style,
-        });
+        };
+        const shape: string | null =
+            element.name === 'text'
+                ? await this.#text.build(element, { ...shapeContext, ancestors: context.ancestors })
+                : await this.#shape.build(element, shapeContext);
         if (shape !== null && style['clip-path'] !== undefined) {
             await this.#clips.apply(shape, style['clip-path'], {
                 matrix,

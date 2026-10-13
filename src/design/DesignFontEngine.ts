@@ -25,6 +25,11 @@ export interface DesignFontWeightRange {
     readonly minimum: number;
     readonly maximum: number;
 }
+/** Exact vertical font-cell dimensions in the requested style's design pixels. */
+export interface DesignFontMetrics {
+    readonly ascent: number;
+    readonly descent: number;
+}
 /** Real font shaping and editable outlines share the same bounded browser-compatible engine. */
 export class DesignFontEngine {
     #registry: DesignFontRegistry = new DesignFontRegistry();
@@ -60,6 +65,17 @@ export class DesignFontEngine {
                     span.face.unitsPerEm,
             0,
         );
+    }
+
+    /** SVG text object bounds include the full font cell rather than only visible glyph ink. */
+    public metrics(style: DesignTextSpanStyle): DesignFontMetrics {
+        const face: Font = this.#registry.resolve(style).face;
+        const ascent: number = (face.ascent * style.size) / face.unitsPerEm;
+        const descent: number = (-face.descent * style.size) / face.unitsPerEm;
+        if (![ascent, descent].every(Number.isFinite) || ascent < 0 || descent < 0) {
+            throw new Error('Font returned invalid vertical cell metrics.');
+        }
+        return { ascent, descent };
     }
 
     /** Converts positioned glyph curves to the editor's M/L/Q/C/Z path records. */

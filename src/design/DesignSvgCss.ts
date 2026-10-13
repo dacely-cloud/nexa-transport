@@ -47,6 +47,13 @@ export class DesignSvgCss {
         'word-spacing',
         'dominant-baseline',
         'text-decoration',
+        'white-space',
+        'direction',
+        'unicode-bidi',
+        'writing-mode',
+        'font-variant',
+        'font-stretch',
+        'font-kerning',
         'clip-rule',
     ]);
     public static readonly properties: ReadonlySet<string> = new Set([
@@ -78,6 +85,10 @@ export class DesignSvgCss {
         'cy',
         'r',
         'd',
+        'dx',
+        'dy',
+        'alignment-baseline',
+        'baseline-shift',
     ]);
     /** Styles may precede or follow their target elements; collect the complete author sheet first. */
     public constructor(root: DesignSvgElement) {

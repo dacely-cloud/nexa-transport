@@ -28,6 +28,8 @@ const files: readonly string[] = [
     'DesignSvgImportAppearance',
     'DesignSvgImportTree',
     'DesignSvgImportLayers',
+    'DesignSvgImportText',
+    'DesignSvgImportTextStyles',
     'DesignSvgImportShape',
     'DesignSvgImportTypes',
     'DesignSvgImportCodec',
