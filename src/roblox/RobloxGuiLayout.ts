@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: Apache-2.0
 import type { RobloxScene, RobloxSceneNode, RobloxValue } from './RobloxSceneTypes';
 import { RobloxProperties } from './RobloxSceneRuntime';
-import { RobloxGuiBoxLayout, type RobloxGuiBox } from './RobloxGuiBoxLayout';
+import { RobloxGuiBoxLayout, type RobloxGuiBox, type RobloxGuiSize } from './RobloxGuiBoxLayout';
+import { RobloxGuiAutoSize } from './RobloxGuiAutoSize';
+import { RobloxGuiPadding, type RobloxGuiInsets } from './RobloxGuiPadding';
 import { RobloxSceneHierarchy } from './RobloxSceneHierarchy';
 import { RobloxGuiClasses } from './RobloxGuiClasses';
 import { RobloxGuiImages, type RobloxGuiImage } from './RobloxGuiImages';
@@ -12,6 +14,8 @@ export type RobloxGuiTransform = readonly [number, number, number, number, numbe
 export type RobloxGuiClip = readonly [number, number, number, number];
 /** Resolved visual state; text and geometry use the same native layout observation. */
 export interface RobloxGuiElement {
+    /** Optional padded text rectangle in local pixels; absent means the whole control. */
+    readonly textRect?: readonly [number, number, number, number];
     readonly id: string;
     readonly width: number;
     readonly height: number;
@@ -47,6 +51,7 @@ export class RobloxGuiLayout {
     readonly #screens: readonly RobloxSceneNode[];
     readonly #source: RobloxScene | null;
     #imagePatches: number = 0;
+    #sizing: RobloxGuiAutoSize | null = null;
     #projected: RobloxGuiLayout | null = null;
     #projectedNodes: readonly RobloxSceneNode[] | null = null;
     public constructor(scene: RobloxScene, projectedNodes?: readonly RobloxSceneNode[]) {
@@ -99,6 +104,7 @@ export class RobloxGuiLayout {
             return this.#projected.evaluate(values, width, height);
         }
         const result: RobloxGuiElement[] = [];
+        this.#sizing = new RobloxGuiAutoSize(this.#children, values, this.#scene.textMetrics);
         this.#imagePatches = 0;
         const screens: RobloxSceneNode[] = [...this.#screens].sort(
             (a: RobloxSceneNode, b: RobloxSceneNode): number =>
@@ -168,6 +174,16 @@ export class RobloxGuiLayout {
             values,
             parent.width,
             parent.height,
+            (
+                node: RobloxSceneNode,
+                minimum: RobloxGuiSize,
+                capacity: RobloxGuiSize,
+            ): RobloxGuiSize => {
+                if (this.#sizing === null) {
+                    throw new Error('Missing automatic GUI sizing observation');
+                }
+                return this.#sizing.resolve(node, minimum, capacity);
+            },
         );
         for (const node of this.#siblings(id, values)) {
             const box: RobloxGuiBox | undefined = boxes.get(node.id);
@@ -208,6 +224,7 @@ export class RobloxGuiLayout {
         const rotated: boolean = parent.rotated || angle !== 0;
         const clip: RobloxGuiClip = rotated ? [0, 0, viewportWidth, viewportHeight] : parent.clip;
         const modifiers: readonly RobloxSceneNode[] = this.#children.get(node.id) ?? [];
+        const padding: RobloxGuiInsets = RobloxGuiPadding.resolve(modifiers, values, width, height);
         const corner: RobloxSceneNode | undefined = modifiers.find(
             (child: RobloxSceneNode): boolean => child.className === 'UICorner',
         );
@@ -232,6 +249,17 @@ export class RobloxGuiLayout {
             strokeNode === undefined ? null : (values.get(strokeNode.id) ?? strokeNode.properties);
         const strokeEnabled: boolean = strokeProperties?.['Enabled'] === true;
         const element: RobloxGuiElement = {
+            ...(RobloxGuiClasses.text(node.className) &&
+            modifiers.some((child: RobloxSceneNode): boolean => child.className === 'UIPadding')
+                ? {
+                      textRect: [
+                          padding.left,
+                          padding.top,
+                          Math.max(0, width - padding.left - padding.right),
+                          Math.max(0, height - padding.top - padding.bottom),
+                      ] as const,
+                  }
+                : {}),
             id: node.id,
             width,
             height,

@@ -144,6 +144,7 @@ const e: (value: number, values: readonly number[], family: string) => RobloxPro
     enumValues: values,
 });
 const gui: Readonly<Record<string, RobloxPropertySpec>> = {
+    AutomaticSize: e(0, [0, 1, 2, 3], 'AutomaticSize'),
     Position: v(RobloxValues.udim2(), true),
     Size: v(RobloxValues.udim2(0, 100, 0, 100), true),
     AnchorPoint: v({ kind: 'Vector2', x: 0, y: 0 }, true),

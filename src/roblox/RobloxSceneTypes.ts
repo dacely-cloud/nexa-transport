@@ -231,6 +231,8 @@ export interface RobloxRecording {
 export type RobloxSceneEvent = RobloxBurst | RobloxParticleClear | RobloxTween | RobloxRecording;
 /** Portable authoring artifact. Version 1 rejects unsupported properties rather than silently dropping them. */
 export interface RobloxScene {
+    /** Actual native font units for shared automatic text sizing. */
+    readonly textMetrics?: import('./RobloxTextMetrics').RobloxTextMetrics;
     /** Authorized asset pixels; original Roblox content URIs remain on the native properties. */
     readonly textures?: import('./RobloxSceneTextures').RobloxSceneTextureAtlas;
     readonly format: 'nexa.roblox.scene';

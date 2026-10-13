@@ -2,6 +2,7 @@
 
 import { RobloxProperties } from './RobloxSceneRuntime';
 import { RobloxGuiClasses } from './RobloxGuiClasses';
+import { RobloxGuiPadding, type RobloxGuiInsets } from './RobloxGuiPadding';
 import type { RobloxSceneNode, RobloxValue, RobloxUDim2 } from './RobloxSceneTypes';
 
 /** A resolved GUI rectangle before its inherited affine transform. */
@@ -13,6 +14,26 @@ export interface RobloxGuiBox {
     readonly y: number;
     readonly rotation: number;
 }
+/** Intrinsic GUI dimensions before placement and transforms. */
+export interface RobloxGuiSize {
+    readonly width: number;
+    readonly height: number;
+}
+/** Placement plus natural content extents, before list alignment or flex fill. */
+export interface RobloxGuiBoxGroup {
+    readonly boxes: ReadonlyMap<string, RobloxGuiBox>;
+    readonly content: RobloxGuiSize;
+    readonly left: number;
+    readonly top: number;
+    readonly right: number;
+    readonly bottom: number;
+}
+/** Resolves an authored minimum against intrinsic content and the parent capacity. */
+export type RobloxGuiSizeResolver = (
+    node: RobloxSceneNode,
+    minimum: RobloxGuiSize,
+    capacity: RobloxGuiSize,
+) => RobloxGuiSize;
 interface ListItem {
     readonly box: RobloxGuiBox;
     readonly main: number;
@@ -37,22 +58,22 @@ export class RobloxGuiBoxLayout {
         values: ReadonlyMap<string, Readonly<Record<string, RobloxValue>>>,
         width: number,
         height: number,
+        resolver?: RobloxGuiSizeResolver,
     ): ReadonlyMap<string, RobloxGuiBox> {
-        const padding: RobloxSceneNode | undefined = children.find(
-            (node: RobloxSceneNode): boolean => node.className === 'UIPadding',
-        );
-        const padded: Readonly<Record<string, RobloxValue>> | null =
-            padding === undefined ? null : (values.get(padding.id) ?? padding.properties);
-        const left: number = this.#padding(padded, 'PaddingLeft', width);
-        const top: number = this.#padding(padded, 'PaddingTop', height);
-        const availableWidth: number = Math.max(
-            0,
-            width - left - this.#padding(padded, 'PaddingRight', width),
-        );
-        const availableHeight: number = Math.max(
-            0,
-            height - top - this.#padding(padded, 'PaddingBottom', height),
-        );
+        return this.group(children, values, width, height, resolver).boxes;
+    }
+    /** Measures natural child/list extents while retaining resolved painting rectangles. */
+    public static group(
+        children: readonly RobloxSceneNode[],
+        values: ReadonlyMap<string, Readonly<Record<string, RobloxValue>>>,
+        width: number,
+        height: number,
+        resolver?: RobloxGuiSizeResolver,
+    ): RobloxGuiBoxGroup {
+        const padding: RobloxGuiInsets = RobloxGuiPadding.resolve(children, values, width, height);
+        const { left, top, right, bottom }: RobloxGuiInsets = padding;
+        const availableWidth: number = Math.max(0, width - left - right);
+        const availableHeight: number = Math.max(0, height - top - bottom);
         const boxes: Map<string, RobloxGuiBox> = new Map();
         for (const node of children) {
             if (!RobloxGuiClasses.objects.includes(node.className)) {
@@ -69,8 +90,15 @@ export class RobloxGuiBoxLayout {
             if (typeof anchor !== 'object' || anchor.kind !== 'Vector2') {
                 throw new Error('Missing GUI anchor');
             }
-            const childWidth: number = Math.max(0, availableWidth * size.xScale + size.xOffset);
-            const childHeight: number = Math.max(0, availableHeight * size.yScale + size.yOffset);
+            const minimum: RobloxGuiSize = {
+                width: Math.max(0, availableWidth * size.xScale + size.xOffset),
+                height: Math.max(0, availableHeight * size.yScale + size.yOffset),
+            };
+            const resolved: RobloxGuiSize =
+                resolver?.(node, minimum, { width: availableWidth, height: availableHeight }) ??
+                minimum;
+            const childWidth: number = resolved.width;
+            const childHeight: number = resolved.height;
             boxes.set(node.id, {
                 node,
                 width: childWidth,
@@ -91,8 +119,9 @@ export class RobloxGuiBoxLayout {
         const layout: RobloxSceneNode | undefined = children.find(
             (node: RobloxSceneNode): boolean => node.className === 'UIListLayout',
         );
+        let content: RobloxGuiSize;
         if (layout !== undefined) {
-            this.#list(
+            const natural: RobloxGuiSize = this.#list(
                 boxes,
                 values,
                 values.get(layout.id) ?? layout.properties,
@@ -103,8 +132,20 @@ export class RobloxGuiBoxLayout {
                 width,
                 height,
             );
+            content = {
+                width: left + right + natural.width,
+                height: top + bottom + natural.height,
+            };
+        } else {
+            let contentWidth: number = left;
+            let contentHeight: number = top;
+            for (const box of boxes.values()) {
+                contentWidth = Math.max(contentWidth, box.x + box.width);
+                contentHeight = Math.max(contentHeight, box.y + box.height);
+            }
+            content = { width: contentWidth + right, height: contentHeight + bottom };
         }
-        return boxes;
+        return { boxes, content, left, top, right, bottom };
     }
     static #list(
         boxes: Map<string, RobloxGuiBox>,
@@ -116,11 +157,11 @@ export class RobloxGuiBoxLayout {
         height: number,
         parentWidth: number,
         parentHeight: number,
-    ): void {
+    ): RobloxGuiSize {
         const horizontal: boolean = RobloxProperties.enum(properties, 'FillDirection') === 0;
         const mainSize: number = horizontal ? width : height;
         const crossSize: number = horizontal ? height : width;
-        const gap: number = this.#padding(
+        const gap: number = RobloxGuiPadding.pixel(
             properties,
             'Padding',
             horizontal ? parentWidth : parentHeight,
@@ -234,6 +275,14 @@ export class RobloxGuiBoxLayout {
             }
             cross += extent + across.gap;
         }
+        const usedMain: number = lines.reduce(
+            (maximum: number, row: ListLine): number => Math.max(maximum, row.main),
+            0,
+        );
+        return {
+            width: horizontal ? usedMain : usedCross,
+            height: horizontal ? usedCross : usedMain,
+        };
     }
     static #distribution(
         space: number,
@@ -260,20 +309,6 @@ export class RobloxGuiBoxLayout {
     }
     static #aligned(space: number, alignment: number): number {
         return alignment === 0 ? space / 2 : alignment === 2 ? space : 0;
-    }
-    static #padding(
-        properties: Readonly<Record<string, RobloxValue>> | null,
-        key: string,
-        size: number,
-    ): number {
-        if (properties === null) {
-            return 0;
-        }
-        const value: RobloxValue | undefined = properties[key];
-        if (typeof value !== 'object' || value.kind !== 'UDim') {
-            throw new Error('Missing GUI ' + key);
-        }
-        return size * value.scale + value.offset;
     }
     static #dimension(properties: Readonly<Record<string, RobloxValue>>, key: string): RobloxUDim2 {
         const value: RobloxValue | undefined = properties[key];

@@ -5,6 +5,7 @@ import { RobloxSceneInput } from './RobloxSceneInput';
 import { RobloxPartGeometry } from './RobloxPartGeometry';
 import { RobloxSceneTextures, type RobloxSceneTextureAtlas } from './RobloxSceneTextures';
 import { RobloxGuiClasses } from './RobloxGuiClasses';
+import { RobloxTextMeasurement } from './RobloxTextMetrics';
 import { RobloxSceneHierarchy, type RobloxHierarchyDecoded } from './RobloxSceneHierarchy';
 import { RobloxSceneSchema, type RobloxPropertySpec } from './RobloxSceneSchema';
 import {
@@ -40,7 +41,7 @@ export class RobloxSceneCodec {
         const fields: Readonly<Record<string, unknown>> = this.record(
             raw,
             ['format', 'version', 'name', 'duration', 'seed', 'camera', 'nodes', 'events'],
-            ['inputs', 'hierarchy', 'textures'],
+            ['inputs', 'hierarchy', 'textures', 'textMetrics'],
         );
         if (fields['format'] !== 'nexa.roblox.scene' || fields['version'] !== 1) {
             throw new Error('Expected nexa.roblox.scene version 1');
@@ -201,6 +202,9 @@ export class RobloxSceneCodec {
             inputs: Object.freeze(RobloxSceneInput.observations(fields['inputs'], duration, byId)),
             ...(hierarchy.deltas.length === 0 ? {} : { hierarchy: hierarchy.deltas }),
             ...(textures === undefined ? {} : { textures }),
+            ...(fields['textMetrics'] === undefined
+                ? {}
+                : { textMetrics: RobloxTextMeasurement.decode(fields['textMetrics']) }),
         });
     }
 
