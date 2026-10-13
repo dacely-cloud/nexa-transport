@@ -146,6 +146,7 @@ const gui: Readonly<Record<string, RobloxPropertySpec>> = {
     ClipsDescendants: b(false),
     Rotation: n(0, -36000, 36000),
     ZIndex: n(1, 1, 10000, 'int'),
+    LayoutOrder: { ...n(0, -2147483648, 2147483647, 'int'), tween: false },
 };
 const text: Readonly<Record<string, RobloxPropertySpec>> = {
     ...gui,
@@ -221,6 +222,23 @@ export const RobloxSceneSchema: Readonly<
     TextLabel: text,
     TextButton: { ...text, AutoButtonColor: b(false), Active: b(true), Interactable: b(true) },
     UICorner: { CornerRadius: v({ kind: 'UDim', scale: 0, offset: 8 }) },
+    UIPadding: {
+        PaddingLeft: v({ kind: 'UDim', scale: 0, offset: 0 }, true),
+        PaddingRight: v({ kind: 'UDim', scale: 0, offset: 0 }, true),
+        PaddingTop: v({ kind: 'UDim', scale: 0, offset: 0 }, true),
+        PaddingBottom: v({ kind: 'UDim', scale: 0, offset: 0 }, true),
+    },
+    UIListLayout: {
+        FillDirection: e(1, [0, 1]),
+        SortOrder: e(0, [0, 2]),
+        HorizontalAlignment: e(1, [0, 1, 2]),
+        VerticalAlignment: e(1, [0, 1, 2]),
+        Padding: v({ kind: 'UDim', scale: 0, offset: 0 }, true),
+        HorizontalFlex: e(0, [0, 1, 2, 3, 4]),
+        VerticalFlex: e(0, [0, 1, 2, 3, 4]),
+        ItemLineAlignment: e(0, [0, 1, 2, 3, 4]),
+        Wraps: b(false),
+    },
     UIStroke: {
         Color: v(RobloxValues.color(0, 0, 0), true),
         Thickness: n(1, 0, 32),

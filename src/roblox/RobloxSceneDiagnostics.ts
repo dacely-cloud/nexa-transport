@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { RobloxScene } from './RobloxSceneTypes';
+import type { RobloxScene, RobloxSceneNode } from './RobloxSceneTypes';
 
 /** Explicit preview fidelity findings, also delivered to the authoring model. */
 export class RobloxSceneDiagnostics {
@@ -66,6 +66,35 @@ export class RobloxSceneDiagnostics {
         if ((scene.inputs?.length ?? 0) > 0) {
             findings.push(
                 'Input traces are observations from actual native callbacks. The viewer and Studio replay captured results; a live browser VM session and pointer hit testing remain unfinished.',
+            );
+        }
+        if (
+            scene.nodes.some(
+                (node: import('./RobloxSceneTypes').RobloxSceneNode): boolean =>
+                    node.className === 'UIListLayout',
+            )
+        ) {
+            findings.push(
+                'List layout supports rows/columns, Name/LayoutOrder sorting, alignment, wrapping and flex spacing. AutomaticSize, UIFlexItem rules and native AbsoluteContentSize observation remain unfinished; Studio flex pixels are not calibrated yet.',
+            );
+        }
+        const textParents: ReadonlySet<string> = new Set(
+            scene.nodes
+                .filter((node: RobloxSceneNode): boolean =>
+                    ['TextLabel', 'TextButton'].includes(node.className),
+                )
+                .map((node: RobloxSceneNode): string => node.id),
+        );
+        if (
+            scene.nodes.some(
+                (node: RobloxSceneNode): boolean =>
+                    node.className === 'UIPadding' &&
+                    node.parentId !== null &&
+                    textParents.has(node.parentId),
+            )
+        ) {
+            findings.push(
+                'UIPadding currently changes child GUI layout. Padding applied to the parent text itself remains unfinished.',
             );
         }
         return Object.freeze(findings);

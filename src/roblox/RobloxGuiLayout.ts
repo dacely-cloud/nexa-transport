@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
-import type { RobloxScene, RobloxSceneNode, RobloxValue, RobloxUDim2 } from './RobloxSceneTypes';
+import type { RobloxScene, RobloxSceneNode, RobloxValue } from './RobloxSceneTypes';
 import { RobloxProperties } from './RobloxSceneRuntime';
+import { RobloxGuiBoxLayout, type RobloxGuiBox } from './RobloxGuiBoxLayout';
 
 /** Affine local-pixel to viewport-pixel transform. */
 export type RobloxGuiTransform = readonly [number, number, number, number, number, number];
@@ -93,9 +94,7 @@ export class RobloxGuiLayout {
                 rotated: false,
             };
             const layer: RobloxGuiElement[] = [];
-            for (const node of this.#siblings(screen.id, values)) {
-                this.#render(node, parent, values, layer, width, height);
-            }
+            this.#renderChildren(screen.id, parent, values, layer, width, height);
             if (RobloxProperties.enum(properties, 'ZIndexBehavior') === 0) {
                 layer.sort(
                     (a: RobloxGuiElement, b: RobloxGuiElement): number =>
@@ -131,30 +130,46 @@ export class RobloxGuiLayout {
                     RobloxProperties.number(values.get(b.id) ?? b.properties, 'ZIndex'),
             );
     }
-    #render(
-        node: RobloxSceneNode,
+    #renderChildren(
+        id: string,
         parent: GuiParent,
         values: ReadonlyMap<string, Readonly<Record<string, RobloxValue>>>,
         result: RobloxGuiElement[],
         viewportWidth: number,
         viewportHeight: number,
     ): void {
+        const boxes: ReadonlyMap<string, RobloxGuiBox> = RobloxGuiBoxLayout.evaluate(
+            this.#children.get(id) ?? [],
+            values,
+            parent.width,
+            parent.height,
+        );
+        for (const node of this.#siblings(id, values)) {
+            const box: RobloxGuiBox | undefined = boxes.get(node.id);
+            if (box !== undefined) {
+                this.#render(box, parent, values, result, viewportWidth, viewportHeight);
+            }
+        }
+    }
+    #render(
+        box: RobloxGuiBox,
+        parent: GuiParent,
+        values: ReadonlyMap<string, Readonly<Record<string, RobloxValue>>>,
+        result: RobloxGuiElement[],
+        viewportWidth: number,
+        viewportHeight: number,
+    ): void {
+        const node: RobloxSceneNode = box.node;
         const properties: Readonly<Record<string, RobloxValue>> =
             values.get(node.id) ?? node.properties;
         if (properties['Visible'] !== true) {
             return;
         }
-        const position: RobloxUDim2 = this.#dimension(properties, 'Position');
-        const size: RobloxUDim2 = this.#dimension(properties, 'Size');
-        const anchor: RobloxValue | undefined = properties['AnchorPoint'];
-        if (typeof anchor !== 'object' || anchor.kind !== 'Vector2') {
-            throw new Error('Missing GUI anchor');
-        }
-        const width: number = Math.max(0, parent.width * size.xScale + size.xOffset);
-        const height: number = Math.max(0, parent.height * size.yScale + size.yOffset);
-        const x: number = parent.width * position.xScale + position.xOffset - width * anchor.x;
-        const y: number = parent.height * position.yScale + position.yOffset - height * anchor.y;
-        const angle: number = (RobloxProperties.number(properties, 'Rotation') * Math.PI) / 180;
+        const width: number = box.width;
+        const height: number = box.height;
+        const x: number = box.x;
+        const y: number = box.y;
+        const angle: number = (box.rotation * Math.PI) / 180;
         const c: number = Math.cos(angle);
         const s: number = Math.sin(angle);
         const transform: RobloxGuiTransform = this.#multiply(parent.transform, [
@@ -241,16 +256,7 @@ export class RobloxGuiLayout {
                   ])
                 : clip;
         const childParent: GuiParent = { width, height, transform, clip: descendantClip, rotated };
-        for (const child of this.#siblings(node.id, values)) {
-            this.#render(child, childParent, values, result, viewportWidth, viewportHeight);
-        }
-    }
-    #dimension(properties: Readonly<Record<string, RobloxValue>>, key: string): RobloxUDim2 {
-        const value: RobloxValue | undefined = properties[key];
-        if (typeof value !== 'object' || value.kind !== 'UDim2') {
-            throw new Error('Missing GUI ' + key);
-        }
-        return value;
+        this.#renderChildren(node.id, childParent, values, result, viewportWidth, viewportHeight);
     }
     #color(
         properties: Readonly<Record<string, RobloxValue>>,

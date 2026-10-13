@@ -517,6 +517,8 @@ export class RobloxSceneCodec {
             TextButton: ['ScreenGui', 'Frame', 'TextLabel', 'TextButton'],
             UICorner: ['Frame', 'TextLabel', 'TextButton'],
             UIStroke: ['Frame', 'TextLabel', 'TextButton'],
+            UIListLayout: ['Frame', 'TextLabel', 'TextButton'],
+            UIPadding: ['Frame', 'TextLabel', 'TextButton'],
         };
         if (
             parent === undefined

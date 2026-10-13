@@ -131,6 +131,8 @@ export const RobloxClass = {
     TextButton: 'TextButton',
     UICorner: 'UICorner',
     UIStroke: 'UIStroke',
+    UIListLayout: 'UIListLayout',
+    UIPadding: 'UIPadding',
 } as const;
 /** Supported instance class. */
 export type RobloxClass = (typeof RobloxClass)[keyof typeof RobloxClass];

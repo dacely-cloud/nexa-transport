@@ -105,6 +105,13 @@ export class RobloxSceneLuau {
                     TextYAlignment: 'TextYAlignment',
                     ApplyStrokeMode: 'ApplyStrokeMode',
                     ZIndexBehavior: 'ZIndexBehavior',
+                    FillDirection: 'FillDirection',
+                    SortOrder: 'SortOrder',
+                    HorizontalAlignment: 'HorizontalAlignment',
+                    VerticalAlignment: 'VerticalAlignment',
+                    HorizontalFlex: 'UIFlexAlignment',
+                    VerticalFlex: 'UIFlexAlignment',
+                    ItemLineAlignment: 'ItemLineAlignment',
                 };
                 const family: string | undefined = families[property];
                 if (family === undefined) {
