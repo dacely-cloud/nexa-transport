@@ -12,6 +12,7 @@ import { DesignSvgImportAppearance } from './DesignSvgImportAppearance.js';
 /** Computed text properties keep inherited relative font sizes from being applied twice. */
 export class DesignSvgImportTextStyles {
     #rootSize: number = 16;
+    /** Resolves the same inert stylesheet used by shape import. */
     public constructor(public readonly css: DesignSvgCss) {}
 
     /** Root em units retain their computed SVG document size independently of label size. */

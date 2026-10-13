@@ -38,6 +38,7 @@ interface TextPartsContext {
 
 /** Real font advances position editable labels; full font cells retain SVG object bounds. */
 export class DesignSvgImportText {
+    /** Appends ordinary text layers to the same atomic import tree as vector artwork. */
     public constructor(
         public readonly css: DesignSvgCss,
         public readonly tree: DesignSvgImportTree,
