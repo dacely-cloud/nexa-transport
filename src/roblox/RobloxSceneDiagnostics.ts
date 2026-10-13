@@ -2,28 +2,30 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { RobloxScene, RobloxSceneNode } from './RobloxSceneTypes';
+import { RobloxSceneHierarchy } from './RobloxSceneHierarchy';
 
 /** Explicit preview fidelity findings, also delivered to the authoring model. */
 export class RobloxSceneDiagnostics {
     /** Reports current renderer limits without claiming Studio fidelity. */
     public static preview(scene: RobloxScene, native: boolean = false): readonly string[] {
+        const nodes: readonly RobloxSceneNode[] = [...RobloxSceneHierarchy.catalog(scene).values()];
         const findings: string[] = [
             native
                 ? 'Capture uses hardware Vulkan with approximated Roblox materials and lighting. Studio pixel fidelity has not been measured.'
                 : 'Preview uses a WebGL approximation of Roblox lighting and materials. Studio pixel fidelity has not been measured.',
         ];
         if (
-            scene.nodes.some(
+            nodes.some(
                 (node: import('./RobloxSceneTypes').RobloxSceneNode): boolean =>
                     node.className === 'ParticleEmitter',
             )
         ) {
             findings.push(
-                'Particles use a procedural sprite in preview. Native textures are preserved in the model; texture resolution, flipbooks and native particle RNG are not emulated yet.',
+                'Particle sprites sample Roblox’s shipped default resource texels. rbxassetid textures still use a procedural substitute until asset resolution is implemented. Flipbook timing and native particle RNG remain unfinished.',
             );
         }
         const emitterIds: ReadonlySet<string> = new Set(
-            scene.nodes
+            nodes
                 .filter(
                     (node: import('./RobloxSceneTypes').RobloxSceneNode): boolean =>
                         node.className === 'ParticleEmitter',

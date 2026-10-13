@@ -15,11 +15,15 @@ import type {
 import { RobloxProperties, RobloxSceneRuntime } from './RobloxSceneRuntime';
 import { RobloxPartGeometry } from './RobloxPartGeometry';
 import { RobloxValues } from './RobloxSceneSchema';
+import { RobloxSceneHierarchy } from './RobloxSceneHierarchy';
+import { RobloxDefaultTextures, type RobloxTextureRect } from './RobloxDefaultTextures';
 
 /** Packed particle attributes: x/y/z, size, r/g/b, opacity, rotation in radians. */
 export interface RobloxParticleFrame {
     readonly attributes: Float32Array;
     readonly count: number;
+    /** Normalized atlas rectangle per visible particle; a negative origin selects an unresolved sprite. */
+    readonly textureRegions: Float32Array;
 }
 /** Seeded birth state, generated once rather than allocating particles on every frame. */
 interface ParticleBirth {
@@ -31,6 +35,8 @@ interface ParticleBirth {
     readonly rotSpeed: number;
     readonly envelope: number;
     readonly clearedAt: number;
+    readonly texture: string;
+    readonly region: RobloxTextureRect;
 }
 interface ParticleSpawn {
     readonly at: number;
@@ -47,6 +53,7 @@ export class RobloxParticleSimulator {
     readonly #node: RobloxSceneNode;
     readonly #births: readonly ParticleBirth[];
     readonly #attributes: Float32Array;
+    readonly #textureRegions: Float32Array;
     readonly #acceleration: RobloxVector3;
     readonly #drag: number;
     readonly #size: RobloxNumberSequence;
@@ -93,17 +100,7 @@ export class RobloxParticleSimulator {
         this.#color = color;
         this.#acceleration = RobloxProperties.vector(properties, 'Acceleration');
         this.#drag = RobloxProperties.number(properties, 'Drag') * Math.LN2;
-        const byId: ReadonlyMap<string, RobloxSceneNode> = new Map(
-            scene.nodes.map((item: RobloxSceneNode): readonly [string, RobloxSceneNode] => [
-                item.id,
-                item,
-            ]),
-        );
-        const parent: RobloxSceneNode | undefined =
-            node.parentId === null ? undefined : byId.get(node.parentId);
-        if (parent === undefined) {
-            throw new Error('Emitter has no parent');
-        }
+        const catalog: ReadonlyMap<string, RobloxSceneNode> = RobloxSceneHierarchy.catalog(scene);
         let seed: number = scene.seed;
         for (const letter of node.id) {
             seed = Math.imul(seed ^ (letter.codePointAt(0) ?? 0), 16777619) >>> 0;
@@ -138,6 +135,35 @@ export class RobloxParticleSimulator {
         );
         this.#births = times.map((spawn: ParticleSpawn): ParticleBirth => {
             const at: number = spawn.at;
+            const birthNodes: Map<string, RobloxSceneNode> = new Map();
+            const byId: ReadonlyMap<string, RobloxSceneNode> =
+                spawn.emission === null
+                    ? RobloxSceneHierarchy.active(
+                          scene,
+                          spawn.order === -1 ? Math.max(0, at - 1e-9) : at,
+                      )
+                    : birthNodes;
+            if (spawn.emission !== null) {
+                for (let index: number = 0; index < spawn.emission.frames.length; index++) {
+                    const frame: RobloxEmissionFrame | undefined = spawn.emission.frames[index];
+                    const original: RobloxSceneNode | undefined =
+                        frame === undefined ? undefined : catalog.get(frame.nodeId);
+                    if (original === undefined) {
+                        throw new Error('Missing emission ancestor');
+                    }
+                    birthNodes.set(original.id, {
+                        ...original,
+                        parentId: spawn.emission.frames[index + 1]?.nodeId ?? null,
+                    });
+                }
+            }
+            const parentId: string | null =
+                spawn.emission?.frames[0]?.nodeId ?? byId.get(node.id)?.parentId ?? null;
+            const parent: RobloxSceneNode | undefined =
+                parentId === null ? undefined : byId.get(parentId);
+            if (parent === undefined) {
+                throw new Error('Emitter has no active birth parent');
+            }
             const properties: Readonly<Record<string, RobloxValue>> =
                 spawn.emission?.properties ??
                 RobloxSceneRuntime.properties(scene, node.id, at, trigger);
@@ -150,6 +176,20 @@ export class RobloxParticleSimulator {
                 throw new Error('Invalid emission spread');
             }
             const direction: number = RobloxProperties.enum(properties, 'EmissionDirection');
+            const texture: RobloxValue | undefined = properties['Texture'];
+            if (typeof texture !== 'string') {
+                throw new Error('Invalid particle texture');
+            }
+            const rectangle: RobloxTextureRect | null = RobloxDefaultTextures.rect(texture);
+            const region: RobloxTextureRect =
+                rectangle === null
+                    ? [-1, 0, 0, 0]
+                    : [
+                          (rectangle[0] + 0.5) / 1024,
+                          (rectangle[1] + 0.5) / 1024,
+                          (rectangle[2] - 1) / 1024,
+                          (rectangle[3] - 1) / 1024,
+                      ];
             const life: number = lifetime.min + (lifetime.max - lifetime.min) * random();
             const velocity: number = speed.min + (speed.max - speed.min) * random();
             const horizontal: number = ((random() - 0.5) * angle.x * Math.PI) / 180;
@@ -189,6 +229,8 @@ export class RobloxParticleSimulator {
             );
             return {
                 at,
+                texture,
+                region,
                 life,
                 position: this.#transform(
                     position,
@@ -219,10 +261,18 @@ export class RobloxParticleSimulator {
                 rotSpeed:
                     ((rotSpeed.min + (rotSpeed.max - rotSpeed.min) * random()) * Math.PI) / 180,
                 envelope: random() * 2 - 1,
-                clearedAt: this.#clearTime(spawn, clears),
+                clearedAt: Math.min(
+                    this.#clearTime(spawn, clears),
+                    ...(scene.hierarchy ?? [])
+                        .filter(
+                            (delta): boolean => delta.at >= at && delta.removed.includes(node.id),
+                        )
+                        .map((delta): number => delta.at),
+                ),
             };
         });
         this.#attributes = new Float32Array(this.#births.length * 9);
+        this.#textureRegions = new Float32Array(this.#births.length * 4);
     }
 
     /** Evaluates a frame into a reusable packed GPU upload buffer. */
@@ -233,7 +283,7 @@ export class RobloxParticleSimulator {
             if (age < 0) {
                 break;
             }
-            if (age >= birth.life || time >= birth.clearedAt) {
+            if (age >= birth.life || time >= birth.clearedAt || birth.texture === '') {
                 continue;
             }
             const normalized: number = age / birth.life;
@@ -242,6 +292,7 @@ export class RobloxParticleSimulator {
             const accelerationTravel: number =
                 this.#drag > 0 ? (age - travel) / this.#drag : (age * age) / 2;
             const offset: number = count * 9;
+            this.#textureRegions.set(birth.region, count * 4);
             this.#attributes[offset] =
                 birth.position.x +
                 birth.velocity.x * travel +
@@ -271,7 +322,7 @@ export class RobloxParticleSimulator {
             this.#attributes[offset + 8] = birth.rotation + birth.rotSpeed * age;
             count++;
         }
-        return { attributes: this.#attributes, count };
+        return { attributes: this.#attributes, count, textureRegions: this.#textureRegions };
     }
 
     /** Number of seeded births, for fixed GPU buffer allocation. */
@@ -340,6 +391,9 @@ export class RobloxParticleSimulator {
 
     #emissionTimes(scene: RobloxScene, node: RobloxSceneNode, trigger: string | null): number[] {
         const boundaries: Set<number> = new Set([0, scene.duration]);
+        for (const delta of scene.hierarchy ?? []) {
+            boundaries.add(delta.at);
+        }
         for (const event of scene.events) {
             if (
                 event.kind !== 'recording' ||
@@ -363,6 +417,14 @@ export class RobloxParticleSimulator {
             const end: number | undefined = times[index];
             if (start === undefined || end === undefined) {
                 throw new Error('Invalid emission interval');
+            }
+            if (
+                !RobloxSceneHierarchy.nodes(scene, start).some(
+                    (active: RobloxSceneNode): boolean => active.id === node.id,
+                )
+            ) {
+                fractional = 0;
+                continue;
             }
             const properties: Readonly<Record<string, RobloxValue>> = RobloxSceneRuntime.properties(
                 scene,

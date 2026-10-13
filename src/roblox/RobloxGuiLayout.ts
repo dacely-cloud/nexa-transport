@@ -2,6 +2,7 @@
 import type { RobloxScene, RobloxSceneNode, RobloxValue } from './RobloxSceneTypes';
 import { RobloxProperties } from './RobloxSceneRuntime';
 import { RobloxGuiBoxLayout, type RobloxGuiBox } from './RobloxGuiBoxLayout';
+import { RobloxSceneHierarchy } from './RobloxSceneHierarchy';
 
 /** Affine local-pixel to viewport-pixel transform. */
 export type RobloxGuiTransform = readonly [number, number, number, number, number, number];
@@ -40,21 +41,26 @@ export class RobloxGuiLayout {
     readonly #nodes: ReadonlyMap<string, RobloxSceneNode>;
     readonly #order: ReadonlyMap<string, number>;
     readonly #screens: readonly RobloxSceneNode[];
-    public constructor(scene: RobloxScene) {
+    readonly #source: RobloxScene | null;
+    #projected: RobloxGuiLayout | null = null;
+    #projectedNodes: readonly RobloxSceneNode[] | null = null;
+    public constructor(scene: RobloxScene, projectedNodes?: readonly RobloxSceneNode[]) {
+        this.#source = projectedNodes === undefined ? scene : null;
+        const nodes: readonly RobloxSceneNode[] = projectedNodes ?? scene.nodes;
         const children: Map<string | null, RobloxSceneNode[]> = new Map();
-        for (const node of scene.nodes) {
+        for (const node of nodes) {
             const siblings: RobloxSceneNode[] = children.get(node.parentId) ?? [];
             siblings.push(node);
             children.set(node.parentId, siblings);
         }
         this.#children = children;
         this.#nodes = new Map(
-            scene.nodes.map((node: RobloxSceneNode): readonly [string, RobloxSceneNode] => [
+            nodes.map((node: RobloxSceneNode): readonly [string, RobloxSceneNode] => [
                 node.id,
                 node,
             ]),
         );
-        this.#screens = scene.nodes.filter(
+        this.#screens = nodes.filter(
             (node: RobloxSceneNode): boolean => node.className === 'ScreenGui',
         );
         const order: Map<string, number> = new Map();
@@ -73,7 +79,19 @@ export class RobloxGuiLayout {
         values: ReadonlyMap<string, Readonly<Record<string, RobloxValue>>>,
         width: number,
         height: number,
+        time: number = 0,
     ): readonly RobloxGuiElement[] {
+        if (this.#source !== null && (this.#source.hierarchy?.length ?? 0) > 0) {
+            const nodes: readonly RobloxSceneNode[] = RobloxSceneHierarchy.nodes(
+                this.#source,
+                time,
+            );
+            if (nodes !== this.#projectedNodes || this.#projected === null) {
+                this.#projectedNodes = nodes;
+                this.#projected = new RobloxGuiLayout(this.#source, nodes);
+            }
+            return this.#projected.evaluate(values, width, height);
+        }
         const result: RobloxGuiElement[] = [];
         const screens: RobloxSceneNode[] = [...this.#screens].sort(
             (a: RobloxSceneNode, b: RobloxSceneNode): number =>

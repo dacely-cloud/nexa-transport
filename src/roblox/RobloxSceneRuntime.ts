@@ -14,6 +14,7 @@ import type {
     RobloxPropertySample,
 } from './RobloxSceneTypes';
 import { RobloxValues } from './RobloxSceneSchema';
+import { RobloxSceneHierarchy } from './RobloxSceneHierarchy';
 
 /** Typed access to validated properties, with explicit missing-property errors. */
 export class RobloxProperties {
@@ -84,7 +85,7 @@ export class RobloxSceneRuntime {
         trigger: string | null = null,
     ): ReadonlyMap<string, Readonly<Record<string, RobloxValue>>> {
         return new Map(
-            scene.nodes.map(
+            RobloxSceneHierarchy.nodes(scene, time).map(
                 (
                     node: RobloxSceneNode,
                 ): readonly [string, Readonly<Record<string, RobloxValue>>] => [
@@ -168,12 +169,7 @@ export class RobloxSceneRuntime {
             events.set(event.nodeId, list);
         }
         const index: RobloxTimelineIndex = {
-            nodes: new Map(
-                scene.nodes.map((node: RobloxSceneNode): readonly [string, RobloxSceneNode] => [
-                    node.id,
-                    node,
-                ]),
-            ),
+            nodes: RobloxSceneHierarchy.catalog(scene),
             events,
         };
         this.#indices.set(scene, index);

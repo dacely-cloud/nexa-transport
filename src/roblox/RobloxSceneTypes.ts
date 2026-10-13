@@ -144,6 +144,19 @@ export interface RobloxSceneNode {
     readonly parentId: string | null;
     readonly properties: Readonly<Record<string, RobloxValue>>;
 }
+/** A currently captured instance's non-property hierarchy metadata. */
+export interface RobloxHierarchyNode {
+    readonly id: string;
+    readonly parentId: string | null;
+    readonly name: string;
+}
+/** One ordered native topology observation; changed entries also reattach known instances. */
+export interface RobloxHierarchyDelta {
+    readonly at: number;
+    readonly created: readonly RobloxSceneNode[];
+    readonly changed: readonly RobloxHierarchyNode[];
+    readonly removed: readonly string[];
+}
 /** Deterministic preview camera, in studs. */
 export interface RobloxSceneCamera {
     readonly position: RobloxVector3;
@@ -215,6 +228,7 @@ export interface RobloxScene {
     readonly nodes: readonly RobloxSceneNode[];
     readonly events: readonly RobloxSceneEvent[];
     readonly inputs?: readonly RobloxInputObservation[];
+    readonly hierarchy?: readonly RobloxHierarchyDelta[];
 }
 
 /** Logical input events whose callbacks run in the native VM. Pointer hit testing is separate. */

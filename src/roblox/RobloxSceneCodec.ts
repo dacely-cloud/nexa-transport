@@ -3,6 +3,8 @@
 
 import { RobloxSceneInput } from './RobloxSceneInput';
 import { RobloxPartGeometry } from './RobloxPartGeometry';
+import { RobloxDefaultTextures } from './RobloxDefaultTextures';
+import { RobloxSceneHierarchy, type RobloxHierarchyDecoded } from './RobloxSceneHierarchy';
 import { RobloxSceneSchema, type RobloxPropertySpec } from './RobloxSceneSchema';
 import {
     RobloxClass,
@@ -15,6 +17,7 @@ import {
     type RobloxPropertySample,
     type RobloxEmissionSnapshot,
     type RobloxEmissionFrame,
+    type RobloxHierarchyDelta,
 } from './RobloxSceneTypes';
 
 /** Strict bounded JSON trust boundary for portable Roblox scenes. */
@@ -36,7 +39,7 @@ export class RobloxSceneCodec {
         const fields: Readonly<Record<string, unknown>> = this.record(
             raw,
             ['format', 'version', 'name', 'duration', 'seed', 'camera', 'nodes', 'events'],
-            ['inputs'],
+            ['inputs', 'hierarchy'],
         );
         if (fields['format'] !== 'nexa.roblox.scene' || fields['version'] !== 1) {
             throw new Error('Expected nexa.roblox.scene version 1');
@@ -69,25 +72,33 @@ export class RobloxSceneCodec {
         const nodes: readonly RobloxSceneNode[] = this.#array(fields['nodes'], 2048).map(
             (value: unknown): RobloxSceneNode => this.#node(value),
         );
-        const byId: ReadonlyMap<string, RobloxSceneNode> = new Map(
+        const initialById: ReadonlyMap<string, RobloxSceneNode> = new Map(
             nodes.map((node: RobloxSceneNode): readonly [string, RobloxSceneNode] => [
                 node.id,
                 node,
             ]),
         );
-        if (nodes.length === 0 || byId.size !== nodes.length) {
+        if (nodes.length === 0 || initialById.size !== nodes.length) {
             throw new Error('Scene needs unique node identities');
         }
         for (const node of nodes) {
-            this.#parent(node, byId);
+            this.#parent(node, initialById);
         }
+        const hierarchy: RobloxHierarchyDecoded = RobloxSceneHierarchy.decode(
+            fields['hierarchy'],
+            nodes,
+            duration,
+        );
+        const byId: ReadonlyMap<string, RobloxSceneNode> = hierarchy.catalog;
         const events: readonly RobloxSceneEvent[] = this.#array(fields['events'], 2048)
-            .map((value: unknown): RobloxSceneEvent => this.#event(value, duration, byId))
+            .map((value: unknown): RobloxSceneEvent =>
+                this.#event(value, duration, byId, nodes, hierarchy.deltas),
+            )
             .sort((a: RobloxSceneEvent, b: RobloxSceneEvent): number => a.at - b.at);
         const endTimes: Map<string, number> = new Map<string, number>();
         let particles: number = 0;
         let samples: number = 0;
-        for (const node of nodes) {
+        for (const node of byId.values()) {
             if (node.className === RobloxClass.ParticleEmitter) {
                 const rate: RobloxValue | undefined = node.properties['Rate'];
                 let maximumRate: number = typeof rate === 'number' ? rate : 0;
@@ -106,7 +117,7 @@ export class RobloxSceneCodec {
                     }
                 }
                 if (enabled) {
-                    particles += maximumRate * duration;
+                    particles += maximumRate * (hierarchy.activeSeconds.get(node.id) ?? 0);
                 }
             }
         }
@@ -149,6 +160,7 @@ export class RobloxSceneCodec {
             nodes: Object.freeze(nodes),
             events: Object.freeze(events),
             inputs: Object.freeze(RobloxSceneInput.observations(fields['inputs'], duration, byId)),
+            ...(hierarchy.deltas.length === 0 ? {} : { hierarchy: hierarchy.deltas }),
         });
     }
 
@@ -187,6 +199,31 @@ export class RobloxSceneCodec {
             }
         }
         return fields;
+    }
+
+    /** Normalizes an instance definition at its first recorded appearance. */
+    public static node(raw: unknown): RobloxSceneNode {
+        return this.#node(raw);
+    }
+    /** Validates membership, parent classes and cycles for one atomic graph state. */
+    public static topology(nodes: readonly RobloxSceneNode[]): void {
+        const byId: ReadonlyMap<string, RobloxSceneNode> = new Map(
+            nodes.map((node: RobloxSceneNode): readonly [string, RobloxSceneNode] => [
+                node.id,
+                node,
+            ]),
+        );
+        for (const node of nodes) {
+            this.#parent(node, byId);
+        }
+    }
+    /** Reads a bounded external list used by native hierarchy observations. */
+    public static array(raw: unknown, limit: number): readonly unknown[] {
+        return this.#array(raw, limit);
+    }
+    /** Validates an external instance identity. */
+    public static identity(raw: unknown): string {
+        return this.#id(raw);
     }
 
     /** Validates an intentionally bounded simulation coordinate. */
@@ -474,10 +511,12 @@ export class RobloxSceneCodec {
             const texture: RobloxValue | undefined = properties['Texture'];
             if (
                 texture !== '' &&
-                texture !== 'rbxasset://textures/particles/sparkles_main.dds' &&
+                (typeof texture !== 'string' || RobloxDefaultTextures.rect(texture) === null) &&
                 (typeof texture !== 'string' || !/^rbxassetid:\/\/[1-9][0-9]{0,19}$/u.test(texture))
             ) {
-                throw new Error('Texture must be empty or an rbxassetid URI');
+                throw new Error(
+                    'Texture must be empty, a supported Roblox built-in resource or an rbxassetid URI',
+                );
             }
         }
         return Object.freeze({
@@ -550,6 +589,8 @@ export class RobloxSceneCodec {
         raw: unknown,
         duration: number,
         nodes: ReadonlyMap<string, RobloxSceneNode>,
+        initial: readonly RobloxSceneNode[],
+        hierarchy: readonly RobloxHierarchyDelta[],
     ): RobloxSceneEvent {
         const header: Readonly<Record<string, unknown>> = this.record(
             raw,
@@ -580,7 +621,14 @@ export class RobloxSceneCodec {
                 count: this.number(header['count'], 1, 20000, true),
                 ...(header['emission'] === undefined
                     ? {}
-                    : { emission: this.#emission(header['emission'], node, nodes) }),
+                    : {
+                          emission: this.#emission(
+                              header['emission'],
+                              node,
+                              nodes,
+                              RobloxSceneHierarchy.ancestors(initial, hierarchy, nodeId, at),
+                          ),
+                      }),
             });
         }
         if (header['kind'] === 'clear') {
@@ -651,6 +699,7 @@ export class RobloxSceneCodec {
         raw: unknown,
         node: RobloxSceneNode,
         nodes: ReadonlyMap<string, RobloxSceneNode>,
+        candidates: readonly (readonly string[])[],
     ): RobloxEmissionSnapshot {
         const fields: Readonly<Record<string, unknown>> = this.record(raw, [
             'properties',
@@ -660,17 +709,6 @@ export class RobloxSceneCodec {
             ...node,
             properties: fields['properties'],
         }).properties;
-        const ancestors: Set<string> = new Set();
-        let parent: RobloxSceneNode | undefined =
-            node.parentId === null ? undefined : nodes.get(node.parentId);
-        while (
-            parent !== undefined &&
-            (parent.className === RobloxClass.Attachment ||
-                RobloxPartGeometry.isPart(parent.className))
-        ) {
-            ancestors.add(parent.id);
-            parent = parent.parentId === null ? undefined : nodes.get(parent.parentId);
-        }
         const seen: Set<string> = new Set();
         const frames: readonly RobloxEmissionFrame[] = this.#array(fields['frames'], 64).map(
             (raw: unknown): RobloxEmissionFrame => {
@@ -681,7 +719,13 @@ export class RobloxSceneCodec {
                 ]);
                 const nodeId: string = this.#id(frame['nodeId']);
                 const ancestor: RobloxSceneNode | undefined = nodes.get(nodeId);
-                if (!ancestors.has(nodeId) || seen.has(nodeId) || ancestor === undefined) {
+                if (
+                    seen.has(nodeId) ||
+                    ancestor === undefined ||
+                    !['Attachment', 'Part', 'WedgePart', 'CornerWedgePart'].includes(
+                        ancestor.className,
+                    )
+                ) {
                     throw new Error('Invalid emission ancestor');
                 }
                 seen.add(nodeId);
@@ -710,7 +754,15 @@ export class RobloxSceneCodec {
                 return Object.freeze({ nodeId, cframe, size });
             },
         );
-        if (seen.size !== ancestors.size) {
+        if (
+            !candidates.some(
+                (chain: readonly string[]): boolean =>
+                    chain.length === frames.length &&
+                    chain.every(
+                        (id: string, index: number): boolean => frames[index]?.nodeId === id,
+                    ),
+            )
+        ) {
             throw new Error('Emission snapshot needs all ancestor poses');
         }
         return Object.freeze({ properties, frames: Object.freeze(frames) });
