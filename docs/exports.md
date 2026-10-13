@@ -130,6 +130,7 @@ backend, or a provider-key vault.
 | Import                                      | Format      | Purpose                                                                      |
 | ------------------------------------------- | ----------- | ---------------------------------------------------------------------------- |
 | `nexa-transport/design-image-geometry`      | ESM + types | Design image geometry.                                                       |
+| `nexa-transport/design-svg-image-types` | Types only | Embedded raster data and host asset-admission callback. |
 | `nexa-transport/design-asset-types`         | ESM + types | Design asset types.                                                          |
 | `nexa-transport/design-asset-codec`         | ESM + types | Design asset codec.                                                          |
 | `nexa-transport/design-asset-references`    | ESM + types | Design asset references.                                                     |
@@ -200,6 +201,8 @@ backend, or a provider-key vault.
 | `nexa-transport/roblox-default-textures`  | ESM + types  | Original built-in sprite atlas and resource lookup          |
 | `nexa-transport/roblox-scene-textures`    | ESM + types  | Validated scene image atlases and resource lookup           |
 | `nexa-transport/roblox-gui-layout`        | ESM + types  | Portable Roblox gui layout support                          |
+| `nexa-transport/roblox-gui-images` | ESM + types | Image patches, crop/scale modes and bounded tiling. |
+| `nexa-transport/roblox-gui-classes` | ESM + types | GUI object, button, image and text class identities. |
 | `nexa-transport/roblox-execution-context` | ESM + types  | Immutable native server/client VM side                      |
 | `nexa-transport/roblox-live-descriptor`   | ESM + types  | Portable Roblox live descriptor support                     |
 | `nexa-transport/roblox-live-state`        | ESM + types  | Portable Roblox live state support                          |
