@@ -11,7 +11,13 @@ import { DesignSvgImportAppearance } from './DesignSvgImportAppearance.js';
 
 /** Computed text properties keep inherited relative font sizes from being applied twice. */
 export class DesignSvgImportTextStyles {
+    #rootSize: number = 16;
     public constructor(public readonly css: DesignSvgCss) {}
+
+    /** Root em units retain their computed SVG document size independently of label size. */
+    public get rootSize(): number {
+        return this.#rootSize;
+    }
 
     /** Replays the actual import ancestry, including use shadow trees, without loading external CSS. */
     public resolve(
@@ -65,6 +71,7 @@ export class DesignSvgImportTextStyles {
                 'font-weight': weight.toString(),
             };
         }
+        this.#rootSize = rootSize;
         return parent;
     }
 
@@ -78,6 +85,18 @@ export class DesignSvgImportTextStyles {
             return DesignSvgNumbers.length(value.slice(0, -2), 1) * size;
         }
         return DesignSvgNumbers.length(value, size);
+    }
+
+    /** Text coordinates and offsets resolve percentages against their viewport axis, not the font size. */
+    public static position(
+        source: string,
+        size: number,
+        rootSize: number,
+        viewport: number,
+    ): number {
+        return source.trim().endsWith('%')
+            ? DesignSvgNumbers.length(source, viewport)
+            : this.length(source, size, rootSize);
     }
 
     /** Exact families are retained; missing faces fail at shaping rather than being silently substituted. */

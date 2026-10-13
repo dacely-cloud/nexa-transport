@@ -8,7 +8,6 @@ import { DesignSvgImportTextStyles as Styles } from './DesignSvgImportTextStyles
 import { DesignSvgImportAppearance as Appearance } from './DesignSvgImportAppearance.js';
 import { DesignSvgTransforms as T, type DesignSvgPoint } from './DesignSvgTransforms.js';
 import { DesignSvgImportTree } from './DesignSvgImportTree.js';
-import { DesignSvgNumbers } from './DesignSvgNumbers.js';
 import { DesignBuiltinFonts } from './DesignBuiltinFonts.js';
 import type { DesignFontEngine, DesignFontMetrics } from './DesignFontEngine.js';
 import { DesignDefaults } from './DesignDefaults.js';
@@ -34,6 +33,7 @@ interface TextPartsContext {
     readonly space: string;
     readonly anchor: string;
     readonly visibility: string;
+    readonly rootSize: number;
 }
 
 /** Real font advances position editable labels; full font cells retain SVG object bounds. */
@@ -61,7 +61,7 @@ export class DesignSvgImportText {
             );
         }
         const base: DesignTextSpanStyle = Styles.span(style);
-        const spacing: number = this.#spacing(style, base.size);
+        const spacing: number = this.#spacing(style, base.size, styles.rootSize);
         const anchor: string = style['text-anchor'] ?? 'start';
         if (!['start', 'middle', 'end'].includes(anchor)) {
             throw new Error('Unsupported SVG text-anchor.');
@@ -79,6 +79,7 @@ export class DesignSvgImportText {
             space,
             anchor,
             visibility: style['visibility'] ?? 'visible',
+            rootSize: styles.rootSize,
         };
         this.#parts(element, style, context.ancestors, partsContext, parts, true);
         if (space === 'default') {
@@ -170,15 +171,40 @@ export class DesignSvgImportText {
             throw new Error('SVG text requires one baseline per editable label.');
         }
         const advance: number = line.width + spacing;
+        if (advance <= 0) {
+            throw new Error(
+                'SVG tracking reverses the text advance; native overlapping text support is required.',
+            );
+        }
         const width: number = Math.max(0.01, line.width, advance);
         const height: number = line.height;
         const x: number =
-            DesignSvgNumbers.length(style['x'] ?? element.attributes['x'] ?? '0', context.width) +
-            Styles.length(style['dx'] ?? element.attributes['dx'] ?? '0', base.size) -
+            Styles.position(
+                style['x'] ?? element.attributes['x'] ?? '0',
+                base.size,
+                styles.rootSize,
+                context.width,
+            ) +
+            Styles.position(
+                style['dx'] ?? element.attributes['dx'] ?? '0',
+                base.size,
+                styles.rootSize,
+                context.width,
+            ) -
             (anchor === 'middle' ? advance / 2 : anchor === 'end' ? advance : 0);
         const y: number =
-            DesignSvgNumbers.length(style['y'] ?? element.attributes['y'] ?? '0', context.height) +
-            Styles.length(style['dy'] ?? element.attributes['dy'] ?? '0', base.size);
+            Styles.position(
+                style['y'] ?? element.attributes['y'] ?? '0',
+                base.size,
+                styles.rootSize,
+                context.height,
+            ) +
+            Styles.position(
+                style['dy'] ?? element.attributes['dy'] ?? '0',
+                base.size,
+                styles.rootSize,
+                context.height,
+            );
         const top: number = y - DesignTextLayout.baseline(line, text.lineHeight);
         const center: DesignSvgPoint = T.point(context.matrix, x + width / 2, top + height / 2);
         const commands: DesignPathCommand[] = [];
@@ -255,7 +281,8 @@ export class DesignSvgImportText {
             }
             if (
                 Appearance.opacity(style['opacity']) !== 1 ||
-                this.#spacing(style, Number(style['font-size'] ?? 16)) !== context.spacing ||
+                this.#spacing(style, Number(style['font-size'] ?? 16), context.rootSize) !==
+                    context.spacing ||
                 (element.attributes['xml:space'] ?? context.space) !== context.space
             ) {
                 throw new Error(
@@ -288,10 +315,13 @@ export class DesignSvgImportText {
             }
         }
     }
-    #spacing(style: Readonly<Record<string, string>>, size: number): number {
+    #spacing(style: Readonly<Record<string, string>>, size: number, rootSize: number): number {
+        if (style['letter-spacing']?.trim().endsWith('%')) {
+            throw new Error('SVG percentage tracking requires per-glyph spacing support.');
+        }
         return style['letter-spacing'] === undefined || style['letter-spacing'] === 'normal'
             ? 0
-            : Styles.length(style['letter-spacing'], size);
+            : Styles.length(style['letter-spacing'], size, rootSize);
     }
     #same(a: DesignTextSpanStyle, b: DesignTextSpanStyle): boolean {
         return (
