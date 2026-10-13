@@ -59,6 +59,8 @@ export interface RobloxPropertySpec {
     readonly min?: number;
     readonly max?: number;
     readonly enumValues?: readonly number[];
+    /** Exact Roblox enum family; property names are not enum family names. */
+    readonly enumFamily?: string;
     readonly xmlName?: string;
     readonly xmlType?: string;
     readonly tween?: boolean;
@@ -131,10 +133,16 @@ const v: (
     value: Exclude<RobloxValue, string | number | boolean>,
     tween: boolean = false,
 ): RobloxPropertySpec => ({ type: value.kind, default: value, tween });
-const e: (value: number, values: readonly number[]) => RobloxPropertySpec = (
+const e: (value: number, values: readonly number[], family: string) => RobloxPropertySpec = (
     value: number,
     values: readonly number[],
-): RobloxPropertySpec => ({ type: 'Enum', default: { kind: 'Enum', value }, enumValues: values });
+    family: string,
+): RobloxPropertySpec => ({
+    enumFamily: family,
+    type: 'Enum',
+    default: { kind: 'Enum', value },
+    enumValues: values,
+});
 const gui: Readonly<Record<string, RobloxPropertySpec>> = {
     Position: v(RobloxValues.udim2(), true),
     Size: v(RobloxValues.udim2(0, 100, 0, 100), true),
@@ -155,9 +163,9 @@ const text: Readonly<Record<string, RobloxPropertySpec>> = {
     TextTransparency: n(0, 0, 1),
     TextSize: n(20, 1, 100),
     TextWrapped: b(false),
-    TextXAlignment: e(2, [0, 1, 2]),
-    TextYAlignment: e(1, [0, 1, 2]),
-    Font: e(0, [0]),
+    TextXAlignment: e(2, [0, 1, 2], 'TextXAlignment'),
+    TextYAlignment: e(1, [0, 1, 2], 'TextYAlignment'),
+    Font: e(0, [0], 'Font'),
 };
 
 const part: Readonly<Record<string, RobloxPropertySpec>> = {
@@ -172,7 +180,7 @@ const part: Readonly<Record<string, RobloxPropertySpec>> = {
     Anchored: b(true),
     CanCollide: b(false),
     CastShadow: b(true),
-    Material: e(RobloxMaterial.Plastic, Object.values(RobloxMaterial)),
+    Material: e(RobloxMaterial.Plastic, Object.values(RobloxMaterial), 'Material'),
 };
 
 const image: Readonly<Record<string, RobloxPropertySpec>> = {
@@ -182,8 +190,8 @@ const image: Readonly<Record<string, RobloxPropertySpec>> = {
     ImageTransparency: n(0, 0, 1),
     ImageRectOffset: v({ kind: 'Vector2', x: 0, y: 0 }, true),
     ImageRectSize: v({ kind: 'Vector2', x: 0, y: 0 }, true),
-    ScaleType: e(0, [0, 1, 2, 3, 4]),
-    ResampleMode: e(0, [0, 1]),
+    ScaleType: e(0, [0, 1, 2, 3, 4], 'ScaleType'),
+    ResampleMode: e(0, [0, 1], 'ResamplerMode'),
     SliceCenter: v({ kind: 'Rect', minX: 0, minY: 0, maxX: 0, maxY: 0 }),
     SliceScale: n(1, 0, 100),
     TileSize: v(RobloxValues.udim2(1, 0, 1, 0), true),
@@ -196,7 +204,7 @@ export const RobloxSceneSchema: Readonly<
     Folder: {},
     Model: {},
     WorldModel: {},
-    Part: { ...part, Shape: e(1, [0, 1, 2, 3, 4]) },
+    Part: { ...part, Shape: e(1, [0, 1, 2, 3, 4], 'PartType') },
     WedgePart: part,
     CornerWedgePart: { ...part, Size: v(RobloxValues.vector3(2, 2, 2), true) },
     Attachment: { CFrame: v(RobloxValues.cframe(), true) },
@@ -222,15 +230,22 @@ export const RobloxSceneSchema: Readonly<
         LightEmission: n(0, 0, 1),
         LightInfluence: n(0, 0, 1),
         Texture: { ...s('rbxasset://textures/particles/sparkles_main.dds'), xmlType: 'ContentId' },
-        EmissionDirection: e(1, [0, 1, 2, 3, 4, 5]),
+        EmissionDirection: e(1, [0, 1, 2, 3, 4, 5], 'NormalId'),
         LockedToPart: b(false),
+        FlipbookLayout: e(0, [0, 1, 2, 3, 4], 'ParticleFlipbookLayout'),
+        FlipbookMode: e(0, [0, 1, 2, 3], 'ParticleFlipbookMode'),
+        FlipbookFramerate: { ...v({ kind: 'NumberRange', min: 1, max: 1 }), min: 0, max: 30 },
+        FlipbookBlendFrames: b(true),
+        FlipbookStartRandom: b(false),
+        FlipbookSizeX: n(1, 1, 16, 'int'),
+        FlipbookSizeY: n(1, 1, 16, 'int'),
     },
     ScreenGui: {
         Enabled: b(true),
         IgnoreGuiInset: b(true),
         ResetOnSpawn: b(false),
         DisplayOrder: n(0, 0, 10000, 'int'),
-        ZIndexBehavior: e(1, [0, 1]),
+        ZIndexBehavior: e(1, [0, 1], 'ZIndexBehavior'),
     },
     Frame: gui,
     TextLabel: text,
@@ -252,14 +267,14 @@ export const RobloxSceneSchema: Readonly<
         PaddingBottom: v({ kind: 'UDim', scale: 0, offset: 0 }, true),
     },
     UIListLayout: {
-        FillDirection: e(1, [0, 1]),
-        SortOrder: e(0, [0, 2]),
-        HorizontalAlignment: e(1, [0, 1, 2]),
-        VerticalAlignment: e(1, [0, 1, 2]),
+        FillDirection: e(1, [0, 1], 'FillDirection'),
+        SortOrder: e(0, [0, 2], 'SortOrder'),
+        HorizontalAlignment: e(1, [0, 1, 2], 'HorizontalAlignment'),
+        VerticalAlignment: e(1, [0, 1, 2], 'VerticalAlignment'),
         Padding: v({ kind: 'UDim', scale: 0, offset: 0 }, true),
-        HorizontalFlex: e(0, [0, 1, 2, 3, 4]),
-        VerticalFlex: e(0, [0, 1, 2, 3, 4]),
-        ItemLineAlignment: e(0, [0, 1, 2, 3, 4]),
+        HorizontalFlex: e(0, [0, 1, 2, 3, 4], 'UIFlexAlignment'),
+        VerticalFlex: e(0, [0, 1, 2, 3, 4], 'UIFlexAlignment'),
+        ItemLineAlignment: e(0, [0, 1, 2, 3, 4], 'ItemLineAlignment'),
         Wraps: b(false),
     },
     UIStroke: {
@@ -267,6 +282,6 @@ export const RobloxSceneSchema: Readonly<
         Thickness: n(1, 0, 32),
         Transparency: n(0, 0, 1),
         Enabled: b(true),
-        ApplyStrokeMode: e(0, [0, 1]),
+        ApplyStrokeMode: e(0, [0, 1], 'ApplyStrokeMode'),
     },
 };

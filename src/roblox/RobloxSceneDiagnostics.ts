@@ -30,8 +30,8 @@ export class RobloxSceneDiagnostics {
         ) {
             findings.push(
                 scene.textures === undefined
-                    ? 'Particle sprites sample Roblox’s shipped default resource texels. Additional rbxasset image paths require resource resolution; custom asset IDs require authenticated texture resolution. Missing texture bytes produce an error. Flipbook timing and native particle RNG remain unfinished.'
-                    : 'Particle sprites sample original shipped or downloaded Roblox image texels from one lossless atlas. Missing texture bytes produce an error. Flipbook timing and native particle RNG remain unfinished.',
+                    ? 'Particle sprites sample Roblox’s shipped default resource texels. Additional rbxasset image paths require resource resolution; custom asset IDs require authenticated texture resolution. Missing texture bytes produce an error. Loop/OneShot/PingPong/Random flipbooks and custom grids use deterministic playback with optional linear frame crossfades. Current size, color, transparency, texture and LightEmission apply to living particles. Native particle RNG, animated forces and Studio calibration remain unfinished.'
+                    : 'Particle sprites sample original shipped or downloaded Roblox image texels from one lossless atlas. Missing texture bytes produce an error. Loop/OneShot/PingPong/Random flipbooks and custom grids use deterministic playback with optional linear frame crossfades. Current size, color, transparency, texture and LightEmission apply to living particles. Native particle RNG, animated forces and Studio calibration remain unfinished.',
             );
         }
         const emitterIds: ReadonlySet<string> = new Set(
@@ -56,11 +56,23 @@ export class RobloxSceneDiagnostics {
                         'RotSpeed',
                         'SpreadAngle',
                         'EmissionDirection',
+                        'Size',
+                        'Color',
+                        'Transparency',
+                        'Texture',
+                        'LightEmission',
+                        'FlipbookLayout',
+                        'FlipbookMode',
+                        'FlipbookFramerate',
+                        'FlipbookStartRandom',
+                        'FlipbookBlendFrames',
+                        'FlipbookSizeX',
+                        'FlipbookSizeY',
                     ].includes(event.property),
             )
         ) {
             findings.push(
-                'Emitter recordings update Rate/Enabled, birth inputs and emission poses. Changes to live appearance and forces are preserved in recorded tracks and Studio replay but remain unfinished in the preview.',
+                'Emitter recordings update Rate/Enabled, birth inputs and emission poses. Live appearance is sampled from current observations. Animated force changes remain preserved in Studio replay but unfinished in the preview.',
             );
         }
         if (
