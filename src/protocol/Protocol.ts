@@ -6688,6 +6688,8 @@ export type FinishReason = (typeof FinishReasonValues)[keyof typeof FinishReason
 
 /** Session wire fields. */
 export interface SessionShape {
+    /** Owning coordination conversation for a delegated transcript. */
+    readonly parentSessionId?: string;
     /** activeToolFamilies as defined by the Nexa gateway. */
     readonly activeToolFamilies?: ReadonlyArray<string>;
     /** agentId as defined by the Nexa gateway. */
@@ -12127,6 +12129,8 @@ export type SessionHistoryData = SessionHistoryDataShape;
 
 /** SessionHistoryPage wire fields. */
 export interface SessionHistoryPageShape {
+    /** Confirms that delegated events were omitted. */
+    readonly excludesWorkers?: boolean;
     /** chunk as defined by the Nexa gateway. */
     readonly chunk: string;
     /** endCursor as defined by the Nexa gateway. */
@@ -12144,6 +12148,11 @@ export type SessionHistoryPage = SessionHistoryPageShape;
 
 /** SessionHistoryParams wire fields. */
 export interface SessionHistoryParamsShape {
+    /** Omits delegated events from the parent view. */
+    readonly excludeWorkers?: boolean;
+    /** Selects one delegated worker within a parent response. */
+    readonly workerId?: string;
+    readonly streamId?: string;
     /** compact as defined by the Nexa gateway. */
     readonly compact?: boolean;
     /** cursor as defined by the Nexa gateway. */

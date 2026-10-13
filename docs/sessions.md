@@ -47,6 +47,19 @@ file metadata. With `supportsSessionHistory`, its optional `history` contains th
 complete presentation journal, including reasoning, tools, worker events,
 attachments, and terminal outcomes. Reading a session does not repeat user input.
 
+`sessions.list` returns parent conversations. Delegated model transcripts remain
+stored for recovery and carry `parentSessionId`; older reserved `sub-agent-…`
+sessions are also excluded from the chat list. Worker presentation events are
+archived under the parent conversation.
+
+For a chat view, request `sessions.transcript` with `compact: true` and
+`excludeWorkers: true` to load parent content and the worker roster without full
+worker transcripts. The response confirms this with `excludesWorkers: true`.
+When the user opens a worker panel, request the same parent `id` with
+`compact: true`, `streamId`, and `workerId` instead. Preserve these selectors and
+`sourceEndCursor` across subsequent pages. The parent ownership check applies
+to every page. Raw journal reads remain complete for recovery and other clients.
+
 `readHistory` returns journal records only. `readHistorySnapshot` also returns
 the complete decimal-string byte boundary for incremental catch-up:
 
