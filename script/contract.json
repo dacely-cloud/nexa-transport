@@ -9862,6 +9862,9 @@
                 },
                 "workspaceId": {
                     "type": "string"
+                },
+                "parentSessionId": {
+                    "type": "string"
                 }
             },
             "required": [
@@ -17832,6 +17835,9 @@
                 "sourceEndCursor": {
                     "description": "Original byte cursor for live catch-up after replaying a canonical view.",
                     "type": "string"
+                },
+                "excludesWorkers": {
+                    "type": "boolean"
                 }
             },
             "required": ["chunk", "endCursor", "format"],
@@ -17859,6 +17865,15 @@
                 },
                 "sourceEndCursor": {
                     "description": "Pins a canonical view to an original journal boundary across all of its pages.",
+                    "type": "string"
+                },
+                "excludeWorkers": {
+                    "type": "boolean"
+                },
+                "workerId": {
+                    "type": "string"
+                },
+                "streamId": {
                     "type": "string"
                 }
             },

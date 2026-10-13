@@ -10115,6 +10115,9 @@ export const schema: Schema = {
                     workspaceId: {
                         type: 'string',
                     },
+                    parentSessionId: {
+                        type: 'string',
+                    },
                 },
                 required: [
                     'agentId',
@@ -18283,6 +18286,9 @@ export const schema: Schema = {
                         'Original byte cursor for live catch-up after replaying a canonical view.',
                     type: 'string',
                 },
+                excludesWorkers: {
+                    type: 'boolean',
+                },
             },
             required: ['chunk', 'endCursor', 'format'],
             type: 'object',
@@ -18311,6 +18317,15 @@ export const schema: Schema = {
                 sourceEndCursor: {
                     description:
                         'Pins a canonical view to an original journal boundary across all of its pages.',
+                    type: 'string',
+                },
+                excludeWorkers: {
+                    type: 'boolean',
+                },
+                workerId: {
+                    type: 'string',
+                },
+                streamId: {
                     type: 'string',
                 },
             },
