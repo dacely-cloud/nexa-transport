@@ -28,10 +28,13 @@ export class RobloxSceneDiagnostics {
                     node.className === 'ParticleEmitter',
             )
         ) {
-            findings.push(
+            const textures: string =
                 scene.textures === undefined
-                    ? 'Particle sprites sample Roblox’s shipped default resource texels. Additional rbxasset image paths require resource resolution; custom asset IDs require authenticated texture resolution. Missing texture bytes produce an error. Loop/OneShot/PingPong/Random flipbooks and custom grids use deterministic playback with optional linear frame crossfades. Current size, color, transparency, texture and LightEmission apply to living particles. Acceleration, signed exponential drag and TimeScale changes affect living particles; recorded observations are held exactly and authored force tweens use 60 Hz intervals. Emitter shapes, locking, wind, native particle RNG and Studio calibration remain unfinished.'
-                    : 'Particle sprites sample original shipped or downloaded Roblox image texels from one lossless atlas. Missing texture bytes produce an error. Loop/OneShot/PingPong/Random flipbooks and custom grids use deterministic playback with optional linear frame crossfades. Current size, color, transparency, texture and LightEmission apply to living particles. Acceleration, signed exponential drag and TimeScale changes affect living particles; recorded observations are held exactly and authored force tweens use 60 Hz intervals. Emitter shapes, locking, wind, native particle RNG and Studio calibration remain unfinished.',
+                    ? 'Particle sprites sample Roblox’s shipped default resource texels. Additional rbxasset image paths require resource resolution; custom asset IDs require authenticated texture resolution.'
+                    : 'Particle sprites sample original shipped or downloaded Roblox image texels from one lossless atlas.';
+            findings.push(
+                textures +
+                    ' Missing texture bytes produce an error. Loop/OneShot/PingPong/Random flipbooks and custom grids use deterministic playback with optional linear frame crossfades. Current size, color, transparency, texture and LightEmission apply to living particles. Acceleration, signed exponential drag and TimeScale changes affect living particles; recorded observations are held exactly and authored force tweens use 60 Hz intervals. Box, Sphere, Cylinder and Disc shapes support volume/surface sampling, partial regions, inward/outward emission and all six NormalId axes. Locking, wind, native particle RNG and Studio shape/pixel calibration remain unfinished.',
             );
         }
         const emitterIds: ReadonlySet<string> = new Set(
@@ -56,6 +59,13 @@ export class RobloxSceneDiagnostics {
                         'RotSpeed',
                         'SpreadAngle',
                         'EmissionDirection',
+                        'Shape',
+                        'ShapeStyle',
+                        'ShapeInOut',
+                        'ShapePartial',
+                        'Acceleration',
+                        'Drag',
+                        'TimeScale',
                         'Size',
                         'Color',
                         'Transparency',
@@ -72,7 +82,7 @@ export class RobloxSceneDiagnostics {
             )
         ) {
             findings.push(
-                'Emitter recordings update Rate/Enabled, birth inputs and emission poses. Live appearance is sampled from current observations. Animated force changes remain preserved in Studio replay but unfinished in the preview.',
+                'Some observed emitter properties are preserved in Studio replay but are not evaluated by the preview. LockedToPart and LightInfluence remain unfinished.',
             );
         }
         if (

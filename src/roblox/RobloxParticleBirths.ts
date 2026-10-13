@@ -15,6 +15,7 @@ import { RobloxPartGeometry } from './RobloxPartGeometry';
 import { RobloxValues } from './RobloxSceneSchema';
 import { RobloxSceneHierarchy } from './RobloxSceneHierarchy';
 import { RobloxParticleIntervals } from './RobloxParticleIntervals';
+import { RobloxParticleShape, type RobloxParticleShapePoint } from './RobloxParticleShape';
 
 /** Immutable per-particle state captured at emission; active appearance and forces are sampled separately. */
 export interface RobloxParticleBirth {
@@ -129,7 +130,6 @@ export class RobloxParticleBirths {
             if (typeof angle !== 'object' || angle.kind !== 'Vector2') {
                 throw new Error('Invalid emission spread');
             }
-            const direction: number = RobloxProperties.enum(properties, 'EmissionDirection');
             const life: number = lifetime.min + (lifetime.max - lifetime.min) * random();
             const velocity: number = speed.min + (speed.max - speed.min) * random();
             const horizontal: number = ((random() - 0.5) * angle.x * Math.PI) / 180;
@@ -139,18 +139,6 @@ export class RobloxParticleBirths {
                 Math.cos(horizontal) * Math.cos(vertical),
                 Math.sin(vertical),
             );
-            const oriented: RobloxVector3 =
-                direction === 0
-                    ? RobloxValues.vector3(normal.y, -normal.x, normal.z)
-                    : direction === 2
-                      ? RobloxValues.vector3(normal.x, -normal.z, normal.y)
-                      : direction === 3
-                        ? RobloxValues.vector3(-normal.y, normal.x, normal.z)
-                        : direction === 4
-                          ? RobloxValues.vector3(normal.x, -normal.y, -normal.z)
-                          : direction === 5
-                            ? RobloxValues.vector3(normal.x, normal.z, -normal.y)
-                            : normal;
             const parentFrame: RobloxEmissionFrame | undefined = spawn.emission?.frames.find(
                 (frame: RobloxEmissionFrame): boolean => frame.nodeId === parent.id,
             );
@@ -162,16 +150,17 @@ export class RobloxParticleBirths {
                           'Size',
                       )
                     : RobloxValues.vector3());
-            const position: RobloxVector3 = RobloxValues.vector3(
-                (random() - 0.5) * dimensions.x,
-                (random() - 0.5) * dimensions.y,
-                (random() - 0.5) * dimensions.z,
+            const shape: RobloxParticleShapePoint = RobloxParticleShape.sample(
+                properties,
+                dimensions,
+                normal,
+                random,
             );
             return {
                 at,
                 life,
                 position: this.#transform(
-                    position,
+                    shape.position,
                     parent,
                     byId,
                     false,
@@ -182,9 +171,9 @@ export class RobloxParticleBirths {
                 ),
                 velocity: this.#transform(
                     RobloxValues.vector3(
-                        oriented.x * velocity,
-                        oriented.y * velocity,
-                        oriented.z * velocity,
+                        shape.normal.x * velocity,
+                        shape.normal.y * velocity,
+                        shape.normal.z * velocity,
                     ),
                     parent,
                     byId,
