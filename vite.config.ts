@@ -17,6 +17,7 @@ const config: UserConfig = {
                 'roblox-live-descriptor': 'src/roblox/RobloxLiveDescriptor.ts',
                 'roblox-scene-examples': 'src/roblox/RobloxSceneExamples.ts',
                 'roblox-particles': 'src/roblox/RobloxParticleSimulator.ts',
+                'roblox-particle-orientation': 'src/roblox/RobloxParticleOrientation.ts',
                 'roblox-scene-types': 'src/roblox/RobloxSceneTypes.ts',
                 'roblox-scene-schema': 'src/roblox/RobloxSceneSchema.ts',
                 'roblox-scene-codec': 'src/roblox/RobloxSceneCodec.ts',

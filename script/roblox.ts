@@ -33,6 +33,7 @@ const files: readonly string[] = [
     'RobloxParticleRoundShape',
     'RobloxParticleCylinderShape',
     'RobloxParticleAppearance',
+    'RobloxParticleOrientation',
     'RobloxParticleFlipbook',
     'RobloxSceneTypes',
     'RobloxSceneSchema',

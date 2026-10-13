@@ -237,6 +237,7 @@ export const RobloxSceneSchema: Readonly<
         Texture: { ...s('rbxasset://textures/particles/sparkles_main.dds'), xmlType: 'ContentId' },
         EmissionDirection: e(1, [0, 1, 2, 3, 4, 5], 'NormalId'),
         LockedToPart: b(false),
+        Orientation: e(0, [0, 1, 2, 3], 'ParticleOrientation'),
         FlipbookLayout: e(0, [0, 1, 2, 3, 4], 'ParticleFlipbookLayout'),
         FlipbookMode: e(0, [0, 1, 2, 3], 'ParticleFlipbookMode'),
         FlipbookFramerate: { ...v({ kind: 'NumberRange', min: 1, max: 1 }), min: 0, max: 30 },

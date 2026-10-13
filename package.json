@@ -600,6 +600,10 @@
             "types": "./dist/roblox/RobloxParticleSimulator.d.ts",
             "import": "./dist/roblox-particles.js"
         },
+        "./roblox-particle-orientation": {
+            "types": "./dist/roblox/RobloxParticleOrientation.d.ts",
+            "import": "./dist/roblox-particle-orientation.js"
+        },
         "./roblox-scene-examples": {
             "types": "./dist/roblox/RobloxSceneExamples.d.ts",
             "import": "./dist/roblox-scene-examples.js"

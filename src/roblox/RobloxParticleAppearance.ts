@@ -25,6 +25,8 @@ export class RobloxParticleAppearance {
     public readonly color: RobloxColorSequence;
     /** Current normal-to-additive compositing factor. */
     public readonly lightEmission: number;
+    /** Current geometry alignment applies to living particles. */
+    public readonly orientation: number;
     /** Reads a single current property observation, rather than freezing appearance at birth. */
     public constructor(scene: RobloxScene, properties: Readonly<Record<string, RobloxValue>>) {
         const size: RobloxValue | undefined = properties['Size'];
@@ -46,6 +48,7 @@ export class RobloxParticleAppearance {
         this.transparency = transparency;
         this.color = color;
         this.lightEmission = RobloxProperties.number(properties, 'LightEmission');
+        this.orientation = RobloxProperties.enum(properties, 'Orientation');
         this.visible = texture !== '';
         const rect: RobloxTextureRect | null = RobloxSceneTextures.rect(scene, texture);
         this.rectangle = rect;

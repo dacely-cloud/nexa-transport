@@ -17,6 +17,10 @@ export interface RobloxParticleFrame {
     readonly textureRegions: Float32Array;
     /** Current continuous normal-to-additive blend for every living particle. */
     readonly lightEmission: number;
+    /** Three current world-space velocity components per visible particle. */
+    readonly velocities: Float32Array;
+    /** Native ParticleOrientation value sampled from the current emitter. */
+    readonly orientation: number;
 }
 
 /** Seekable bounded particle simulation, independent of browser and GPU APIs. */
@@ -24,6 +28,7 @@ export class RobloxParticleSimulator {
     readonly #births: readonly RobloxParticleBirth[];
     readonly #attributes: Float32Array;
     readonly #textureRegions: Float32Array;
+    readonly #velocities: Float32Array;
     readonly #motion: RobloxParticleMotion;
     readonly #transfer: Float64Array = new Float64Array(18);
     readonly #lockedMotion: RobloxParticleLockedMotion | null;
@@ -40,6 +45,7 @@ export class RobloxParticleSimulator {
         this.#births = new RobloxParticleBirths().create(scene, node, trigger);
         this.#attributes = new Float32Array(this.#births.length * 9);
         this.#textureRegions = new Float32Array(this.#births.length * 9);
+        this.#velocities = new Float32Array(this.#births.length * 3);
         this.#motion = new RobloxParticleMotion(scene, node.id, trigger);
         this.#lockedMotion =
             this.#births.length === 0
@@ -129,6 +135,11 @@ export class RobloxParticleSimulator {
                 this.#attributes[offset] = x;
                 this.#attributes[offset + 1] = y;
                 this.#attributes[offset + 2] = z;
+                if (appearance.orientation > 1) {
+                    this.#velocities[count * 3] = this.#velocity(birth, 0);
+                    this.#velocities[count * 3 + 1] = this.#velocity(birth, 1);
+                    this.#velocities[count * 3 + 2] = this.#velocity(birth, 2);
+                }
                 this.#attributes[offset + 3] = Math.max(
                     0,
                     RobloxParticleAppearance.scalar(
@@ -162,6 +173,8 @@ export class RobloxParticleSimulator {
             count,
             textureRegions: this.#textureRegions,
             lightEmission: appearance.lightEmission,
+            velocities: this.#velocities,
+            orientation: appearance.orientation,
         };
     }
 
@@ -189,6 +202,21 @@ export class RobloxParticleSimulator {
             (z === 0 ? 0 : z * birth.position.z) +
             (velocity === 0 ? 0 : travel * velocity) +
             (this.#transfer[5 + axis] ?? 0)
+        );
+    }
+
+    #velocity(birth: RobloxParticleBirth, axis: number): number {
+        let value: number =
+            axis === 0 ? birth.velocity.x : axis === 1 ? birth.velocity.y : birth.velocity.z;
+        if (this.#lockedMotion !== null) {
+            const offset: number = 9 + axis * 3;
+            value =
+                (this.#transfer[offset] ?? 0) * birth.velocity.x +
+                (this.#transfer[offset + 1] ?? 0) * birth.velocity.y +
+                (this.#transfer[offset + 2] ?? 0) * birth.velocity.z;
+        }
+        return (
+            (value === 0 ? 0 : value * (this.#transfer[0] ?? 1)) + (this.#transfer[1 + axis] ?? 0)
         );
     }
 }
