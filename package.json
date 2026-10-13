@@ -552,6 +552,10 @@
             "types": "./dist/roblox/RobloxDefaultTextures.d.ts",
             "import": "./dist/roblox-default-textures.js"
         },
+        "./roblox-scene-textures": {
+            "types": "./dist/roblox/RobloxSceneTextures.d.ts",
+            "import": "./dist/roblox-scene-textures.js"
+        },
         "./roblox-gui-layout": {
             "types": "./dist/roblox/RobloxGuiLayout.d.ts",
             "import": "./dist/roblox-gui-layout.js"

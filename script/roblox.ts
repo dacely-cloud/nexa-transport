@@ -11,6 +11,7 @@ const files: readonly string[] = [
     'RobloxLiveDescriptor',
     'RobloxSceneInput',
     'RobloxSceneHierarchy',
+    'RobloxSceneTextures',
     'RobloxHierarchyLuau',
     'RobloxDefaultTextures',
     'RobloxDefaultTextureData',

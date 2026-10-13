@@ -8,6 +8,7 @@ const config: UserConfig = {
                 'roblox-scene-input': 'src/roblox/RobloxSceneInput.ts',
                 'roblox-scene-hierarchy': 'src/roblox/RobloxSceneHierarchy.ts',
                 'roblox-default-textures': 'src/roblox/RobloxDefaultTextures.ts',
+                'roblox-scene-textures': 'src/roblox/RobloxSceneTextures.ts',
                 'roblox-part-geometry': 'src/roblox/RobloxPartGeometry.ts',
                 'roblox-gui-layout': 'src/roblox/RobloxGuiLayout.ts',
                 'roblox-live-state': 'src/roblox/RobloxLiveState.ts',

@@ -17,6 +17,7 @@ import { RobloxPartGeometry } from './RobloxPartGeometry';
 import { RobloxValues } from './RobloxSceneSchema';
 import { RobloxSceneHierarchy } from './RobloxSceneHierarchy';
 import { RobloxDefaultTextures, type RobloxTextureRect } from './RobloxDefaultTextures';
+import { RobloxSceneTextures } from './RobloxSceneTextures';
 
 /** Packed particle attributes: x/y/z, size, r/g/b, opacity, rotation in radians. */
 export interface RobloxParticleFrame {
@@ -180,15 +181,17 @@ export class RobloxParticleSimulator {
             if (typeof texture !== 'string') {
                 throw new Error('Invalid particle texture');
             }
-            const rectangle: RobloxTextureRect | null = RobloxDefaultTextures.rect(texture);
+            const rectangle: RobloxTextureRect | null = RobloxSceneTextures.rect(scene, texture);
+            const width: number = scene.textures?.width ?? RobloxDefaultTextures.size;
+            const height: number = scene.textures?.height ?? RobloxDefaultTextures.size;
             const region: RobloxTextureRect =
                 rectangle === null
                     ? [-1, 0, 0, 0]
                     : [
-                          (rectangle[0] + 0.5) / 1024,
-                          (rectangle[1] + 0.5) / 1024,
-                          (rectangle[2] - 1) / 1024,
-                          (rectangle[3] - 1) / 1024,
+                          (rectangle[0] + 0.5) / width,
+                          (rectangle[1] + 0.5) / height,
+                          (rectangle[2] - 1) / width,
+                          (rectangle[3] - 1) / height,
                       ];
             const life: number = lifetime.min + (lifetime.max - lifetime.min) * random();
             const velocity: number = speed.min + (speed.max - speed.min) * random();
