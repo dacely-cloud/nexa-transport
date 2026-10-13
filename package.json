@@ -544,6 +544,14 @@
             "types": "./dist/roblox/RobloxSceneInput.d.ts",
             "import": "./dist/roblox-scene-input.js"
         },
+        "./roblox-scene-hierarchy": {
+            "types": "./dist/roblox/RobloxSceneHierarchy.d.ts",
+            "import": "./dist/roblox-scene-hierarchy.js"
+        },
+        "./roblox-default-textures": {
+            "types": "./dist/roblox/RobloxDefaultTextures.d.ts",
+            "import": "./dist/roblox-default-textures.js"
+        },
         "./roblox-gui-layout": {
             "types": "./dist/roblox/RobloxGuiLayout.d.ts",
             "import": "./dist/roblox-gui-layout.js"
