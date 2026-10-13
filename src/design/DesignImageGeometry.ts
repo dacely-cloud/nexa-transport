@@ -20,6 +20,9 @@ export class DesignImageGeometry {
         width: number,
         height: number,
     ): DesignImagePlacement {
+        if (framing?.fit === DesignImageFit.Stretch) {
+            return { x: 0, y: 0, width: box.width, height: box.height };
+        }
         const contain: boolean = framing?.fit === DesignImageFit.Contain;
         const scale: number = contain
             ? Math.min(box.width / width, box.height / height)

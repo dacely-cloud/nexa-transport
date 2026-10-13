@@ -4494,7 +4494,11 @@ export interface DesignImageShape {
 export type DesignImage = DesignImageShape;
 
 /** Allowed values for DesignImageFit. */
-export const DesignImageFitValues = { Value0: 'contain', Value1: 'cover' } as const;
+export const DesignImageFitValues = {
+    Value0: 'contain',
+    Value1: 'cover',
+    Value2: 'stretch',
+} as const;
 
 /** DesignImageFit from the Nexa wire protocol. */
 export type DesignImageFit = (typeof DesignImageFitValues)[keyof typeof DesignImageFitValues];

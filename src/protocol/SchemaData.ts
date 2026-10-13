@@ -6763,7 +6763,7 @@ export const schema: Schema = {
         },
         DesignImageFit: {
             description: 'Image scaling mode.',
-            enum: ['contain', 'cover'],
+            enum: ['contain', 'cover', 'stretch'],
             type: 'string',
         },
         DesignImageFraming: {

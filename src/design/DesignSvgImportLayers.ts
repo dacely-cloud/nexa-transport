@@ -21,6 +21,8 @@ import { DesignSvgRootTransform } from './DesignSvgRootTransform.js';
 import { DesignDefaults } from './DesignDefaults.js';
 import { DesignCodec } from './DesignCodec.js';
 import type { DesignNode } from './DesignTypes.js';
+import { DesignSvgImportImage } from './DesignSvgImportImage.js';
+import type { DesignSvgImageLoader } from './DesignSvgImageTypes.js';
 
 /** One imported artboard and its editable layer forest, without any original markup embedded in nodes. */
 export interface DesignSvgLayerImport {
@@ -36,6 +38,7 @@ export class DesignSvgImportLayers {
     #sequence: number = 0;
     #shape: DesignSvgImportShape;
     #text: DesignSvgImportText;
+    #image: DesignSvgImportImage;
     #clips: DesignSvgImportClipPaths;
     #viewports: DesignSvgImportViewport;
     #masks: DesignSvgImportMasks;
@@ -44,6 +47,7 @@ export class DesignSvgImportLayers {
     public constructor(
         public readonly root: DesignSvgElement,
         public readonly identify: (key: string) => string,
+        images: DesignSvgImageLoader | null = null,
     ) {
         const visit: (element: DesignSvgElement, parents: readonly DesignSvgElement[]) => void = (
             element: DesignSvgElement,
@@ -68,6 +72,7 @@ export class DesignSvgImportLayers {
         this.#paints = new DesignSvgImportPaints(this.#elements, this.#css, this.#ancestors);
         this.#shape = new DesignSvgImportShape(this.#paints, this.#tree, this.identify);
         this.#text = new DesignSvgImportText(this.#css, this.#tree);
+        this.#image = new DesignSvgImportImage(this.#tree, this.identify, images);
         const masks: DesignSvgImportMask = new DesignSvgImportMask(this.#tree, this.identify);
         this.#viewports = new DesignSvgImportViewport(this.#tree, masks, this.identify);
         this.#clips = new DesignSvgImportClipPaths(
@@ -92,8 +97,11 @@ export class DesignSvgImportLayers {
         source: string,
         name: string,
         identify: (key: string) => string,
+        images: DesignSvgImageLoader | null = null,
     ): Promise<DesignSvgLayerImport> {
-        return new DesignSvgImportLayers(new DesignSvgXml(source).parse(), identify).build(name);
+        return new DesignSvgImportLayers(new DesignSvgXml(source).parse(), identify, images).build(
+            name,
+        );
     }
     public async build(name: string): Promise<DesignSvgLayerImport> {
         const a: Readonly<Record<string, string>> = this.root.attributes;
@@ -327,9 +335,17 @@ export class DesignSvgImportLayers {
             return id;
         }
         if (
-            !['text', 'path', 'rect', 'circle', 'ellipse', 'line', 'polygon', 'polyline'].includes(
-                element.name,
-            )
+            ![
+                'image',
+                'text',
+                'path',
+                'rect',
+                'circle',
+                'ellipse',
+                'line',
+                'polygon',
+                'polyline',
+            ].includes(element.name)
         ) {
             throw new Error('Unsupported SVG element ' + element.name);
         }
@@ -343,9 +359,14 @@ export class DesignSvgImportLayers {
             style,
         };
         const shape: string | null =
-            element.name === 'text'
-                ? await this.#text.build(element, { ...shapeContext, ancestors: context.ancestors })
-                : await this.#shape.build(element, shapeContext);
+            element.name === 'image'
+                ? await this.#image.build(element, shapeContext)
+                : element.name === 'text'
+                  ? await this.#text.build(element, {
+                        ...shapeContext,
+                        ancestors: context.ancestors,
+                    })
+                  : await this.#shape.build(element, shapeContext);
         if (shape !== null && style['clip-path'] !== undefined) {
             await this.#clips.apply(shape, style['clip-path'], {
                 matrix,

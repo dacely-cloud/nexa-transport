@@ -210,7 +210,7 @@ export interface DesignPathCommand {
     readonly values: readonly number[];
 }
 /** Image scaling mode. */
-export const DesignImageFit = { Cover: 'cover', Contain: 'contain' } as const;
+export const DesignImageFit = { Cover: 'cover', Contain: 'contain', Stretch: 'stretch' } as const;
 /** Image scaling mode. */
 export type DesignImageFit = (typeof DesignImageFit)[keyof typeof DesignImageFit];
 /** Token families. */

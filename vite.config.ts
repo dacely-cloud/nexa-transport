@@ -62,6 +62,7 @@ const config: UserConfig = {
                 'design-stroke-geometry': 'src/design/DesignStrokeGeometry.ts',
                 'design-svg-import': 'src/design/DesignSvgImport.ts',
                 'design-svg-import-types': 'src/design/DesignSvgImportTypes.ts',
+                'design-svg-image-types': 'src/design/DesignSvgImageTypes.ts',
                 'design-svg-import-codec': 'src/design/DesignSvgImportCodec.ts',
                 'design-types': 'src/design/DesignTypes.ts',
                 'design-defaults': 'src/design/DesignDefaults.ts',
