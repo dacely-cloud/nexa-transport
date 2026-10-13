@@ -78,6 +78,25 @@ export class DesignFontEngine {
         return { ascent, descent };
     }
 
+    /** Declared x-height, measured lowercase x, then half-em synthesis for missing font metrics. */
+    public xHeight(style: DesignTextSpanStyle): number {
+        const face: Font = this.#registry.resolve(style).face;
+        const declared: number | undefined = face.xHeight;
+        if (declared !== undefined && (!Number.isFinite(declared) || declared < 0)) {
+            throw new Error('Font returned invalid x-height.');
+        }
+        const measured: number =
+            declared !== undefined && declared > 0
+                ? declared
+                : face.hasGlyphForCodePoint(0x78)
+                  ? face.glyphForCodePoint(0x78).bbox.maxY
+                  : 0;
+        if (!Number.isFinite(measured)) {
+            throw new Error('Font returned invalid x-height glyph bounds.');
+        }
+        return ((measured > 0 ? measured : face.unitsPerEm / 2) * style.size) / face.unitsPerEm;
+    }
+
     /** Converts positioned glyph curves to the editor's M/L/Q/C/Z path records. */
     public outline(
         style: DesignTextSpanStyle,

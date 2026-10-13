@@ -18,6 +18,7 @@ import {
     type DesignTextLine,
 } from './DesignTextLayout.js';
 import { DesignPaths } from './DesignPaths.js';
+import { DesignSvgTextBaseline } from './DesignSvgTextBaseline.js';
 import type { DesignNode, DesignText, DesignTextRun, DesignPathCommand } from './DesignTypes.js';
 
 /** Imported text retains the stylesheet ancestry of its actual rendered use instance. */
@@ -27,6 +28,7 @@ export interface DesignSvgTextContext extends DesignSvgShapeContext {
 interface TextPart {
     readonly content: string;
     readonly style: DesignTextSpanStyle;
+    readonly baseline: string;
 }
 interface TextPartsContext {
     readonly spacing: number;
@@ -151,6 +153,22 @@ export class DesignSvgImportText {
             runs,
         });
         const fonts: DesignFontEngine = await DesignBuiltinFonts.engine();
+        const baseline: number = DesignSvgTextBaseline.offset(
+            style['dominant-baseline'] ?? 'auto',
+            base,
+            fonts,
+        );
+        for (const part of parts) {
+            if (
+                Math.abs(
+                    DesignSvgTextBaseline.offset(part.baseline, part.style, fonts) - baseline,
+                ) > 0.000001
+            ) {
+                throw new Error(
+                    'SVG rich span baseline changes require independent editable text chunks.',
+                );
+            }
+        }
         const lines: readonly DesignTextLine[] = DesignTextLayout.lines(
             text,
             base.color,
@@ -205,7 +223,8 @@ export class DesignSvgImportText {
                 base.size,
                 styles.rootSize,
                 context.height,
-            );
+            ) +
+            baseline;
         const top: number = y - DesignTextLayout.baseline(line, text.lineHeight);
         const center: DesignSvgPoint = T.point(context.matrix, x + width / 2, top + height / 2);
         const commands: DesignPathCommand[] = [];
@@ -295,15 +314,23 @@ export class DesignSvgImportText {
             return;
         }
         const span: DesignTextSpanStyle = Styles.span(style);
+        const baseline: string =
+            !root && style['alignment-baseline'] === 'alphabetic'
+                ? 'alphabetic'
+                : (style['dominant-baseline'] ?? 'auto');
         for (const child of element.children) {
             if (typeof child === 'string') {
                 const value: string =
                     context.space === 'preserve' ? child.replace(/[\t\r\n]/gu, ' ') : child;
                 const previous: TextPart | undefined = parts.at(-1);
-                if (previous !== undefined && this.#same(previous.style, span)) {
+                if (
+                    previous !== undefined &&
+                    previous.baseline === baseline &&
+                    this.#same(previous.style, span)
+                ) {
                     parts[parts.length - 1] = { ...previous, content: previous.content + value };
                 } else {
-                    parts.push({ content: value, style: span });
+                    parts.push({ content: value, style: span, baseline });
                 }
             } else if (child.name === 'tspan') {
                 const resolved: Readonly<Record<string, string>> = new Styles(this.css).resolve(

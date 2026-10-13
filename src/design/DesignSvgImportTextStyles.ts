@@ -8,6 +8,7 @@ import { DesignSvgColors } from './DesignSvgColors.js';
 import { DesignFontFamilyCodec } from './DesignFontFamilyCodec.js';
 import type { DesignTextSpanStyle } from './DesignTextLayout.js';
 import { DesignSvgImportAppearance } from './DesignSvgImportAppearance.js';
+import { DesignSvgTextBaseline } from './DesignSvgTextBaseline.js';
 
 /** Computed text properties keep inherited relative font sizes from being applied twice. */
 export class DesignSvgImportTextStyles {
@@ -154,7 +155,7 @@ export class DesignSvgImportTextStyles {
             }
         }
         const choices: Readonly<Record<string, readonly string[]>> = {
-            'dominant-baseline': ['auto', 'alphabetic'],
+            'dominant-baseline': DesignSvgTextBaseline.values,
             'alignment-baseline': ['auto', 'baseline', 'alphabetic'],
             'baseline-shift': ['0', '0px', 'baseline'],
             direction: ['ltr'],

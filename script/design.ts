@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+/// <reference types="node" />
+
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 
 /** Server-only generation script. Nexa owns the portable design model and layout implementation. */
@@ -33,6 +35,7 @@ const files: readonly string[] = [
     'DesignSvgImageTypes',
     'DesignSvgImportText',
     'DesignSvgImportTextStyles',
+    'DesignSvgTextBaseline',
     'DesignSvgImportShape',
     'DesignSvgImportTypes',
     'DesignSvgImportCodec',
