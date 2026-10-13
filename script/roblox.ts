@@ -22,6 +22,8 @@ const files: readonly string[] = [
     'RobloxGuiAutoSize',
     'RobloxGuiPadding',
     'RobloxTextMetrics',
+    'RobloxLegacyFont',
+    'RobloxLegacyFontData',
     'RobloxSceneExamples',
     'RobloxParticleSimulator',
     'RobloxParticleBirths',
@@ -53,3 +55,5 @@ for (const file of files) {
         throw new Error('Roblox SDK source imports server-only code: ' + file);
     await writeFile('src/roblox/' + file + '.ts', source);
 }
+await mkdir('licenses/roblox', { recursive: true });
+await writeFile('licenses/roblox/Arimo-OFL.txt', await readFile('../nexa/assets/roblox/fonts/OFL.txt', 'utf8'));

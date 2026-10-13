@@ -2,6 +2,8 @@
 
 /** Font units measured by the same fontdue font used for native GUI drawing. */
 export interface RobloxTextMetrics {
+    /** Original bundled font identity; absent for older scenes or a host-configured override. */
+    readonly fontUri?: string;
     readonly format: 'nexa.roblox.text-metrics';
     readonly version: 1;
     readonly unitsPerEm: number;
@@ -24,6 +26,8 @@ export interface RobloxTextBounds {
 
 /** Portable measured text layout; missing glyph data is an error, never a width estimate. */
 export class RobloxTextMeasurement {
+    /** Default original LegacyArial face from the pinned Roblox resource family. */
+    public static readonly legacyFontUri: string = 'rbxasset://fonts/Arimo-Regular.ttf';
     /** Builds one deduplicated font request, resetting kerning at paragraph boundaries. */
     public static request(texts: readonly string[]): RobloxTextMetricRequest {
         const characters: Set<string> = new Set();
@@ -58,13 +62,17 @@ export class RobloxTextMeasurement {
     public static decode(raw: unknown): RobloxTextMetrics {
         if (
             !this.#record(raw) ||
-            Reflect.ownKeys(raw).length !== 7 ||
+            Reflect.ownKeys(raw).length !== (raw['fontUri'] === undefined ? 7 : 8) ||
             raw['format'] !== 'nexa.roblox.text-metrics' ||
             raw['version'] !== 1
         ) {
             throw new Error('Invalid native GUI text metrics');
         }
+        if (raw['fontUri'] !== undefined && raw['fontUri'] !== this.legacyFontUri) {
+            throw new Error('Invalid native GUI font resource identity');
+        }
         return {
+            ...(raw['fontUri'] === undefined ? {} : { fontUri: this.legacyFontUri }),
             format: 'nexa.roblox.text-metrics',
             version: 1,
             unitsPerEm: this.#number(raw['unitsPerEm'], 1, 65536),

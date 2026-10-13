@@ -556,6 +556,10 @@
             "types": "./dist/roblox/RobloxSceneTextures.d.ts",
             "import": "./dist/roblox-scene-textures.js"
         },
+        "./roblox-legacy-font": {
+            "types": "./dist/roblox/RobloxLegacyFont.d.ts",
+            "import": "./dist/roblox-legacy-font.js"
+        },
         "./roblox-gui-layout": {
             "types": "./dist/roblox/RobloxGuiLayout.d.ts",
             "import": "./dist/roblox-gui-layout.js"

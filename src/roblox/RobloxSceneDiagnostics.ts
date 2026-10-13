@@ -95,8 +95,8 @@ export class RobloxSceneDiagnostics {
         ) {
             findings.push(
                 native
-                    ? 'Native UI composes rounded backgrounds, strokes and glyphs on Vulkan using an installed Arial-compatible TTF (or NEXA_ROBLOX_LEGACY_FONT). AutomaticSize uses measured native advances, wrapped text and child/list extents with authored minimum and parent limits. Complex text shaping, all native fonts, insets, DPI and Studio pixels are not calibrated yet.'
-                    : 'UI shares scale/offset, anchors, rotation, corner radii, clipping and AutomaticSize layout. Automatic text sizing uses attached native font units; glyph painting uses browser fonts. Native fonts, inset behavior, DPI and Studio pixel fidelity are not calibrated yet.',
+                    ? 'Native UI composes rounded backgrounds, strokes and glyphs on Vulkan using the original pinned Roblox LegacyArial Arimo face (or an explicit NEXA_ROBLOX_LEGACY_FONT override). OpenType pair/class kerning and AutomaticSize use measured font units. Other native fonts, complex shaping, insets, DPI and Studio pixels remain uncalibrated.'
+                    : 'UI shares scale/offset, anchors, rotation, corner radii, clipping and AutomaticSize layout. New original-font scenes register the same pinned Roblox LegacyArial Arimo bytes as native rendering; old measurement scenes and host overrides retain browser Arial. Other font families, complex shaping, insets, DPI and Studio pixels remain uncalibrated.',
             );
         }
         if ((scene.inputs?.length ?? 0) > 0) {
