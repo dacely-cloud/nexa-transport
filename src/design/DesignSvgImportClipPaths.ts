@@ -24,6 +24,8 @@ export interface DesignSvgClipContext {
     readonly matrix: DesignSvgMatrix;
     readonly width: number;
     readonly height: number;
+    /** CSS-box targets supply their untransformed layout bounds instead of descendant paint bounds. */
+    readonly referenceBox?: DesignSvgSourceBounds | null;
 }
 
 /** Native editable source layers retain clipping geometry and nested intersections without rasterizing artwork. */
@@ -61,11 +63,13 @@ export class DesignSvgImportClipPaths {
         const units: string = definition.attributes['clipPathUnits'] ?? 'userSpaceOnUse';
         let map: DesignSvgMatrix = T.identity;
         if (units === 'objectBoundingBox') {
-            const bounds: DesignSvgSourceBounds | null = await DesignSvgImportBounds.measure(
-                this.tree,
-                targetId,
-                T.inverse(context.matrix),
-            );
+            const bounds: DesignSvgSourceBounds | null =
+                context.referenceBox ??
+                (await DesignSvgImportBounds.measure(
+                    this.tree,
+                    targetId,
+                    T.inverse(context.matrix),
+                ));
             if (bounds === null || bounds.width === 0 || bounds.height === 0) {
                 const empty: string = this.#group('Empty clip path');
                 this.masks.wrap(targetId, empty);

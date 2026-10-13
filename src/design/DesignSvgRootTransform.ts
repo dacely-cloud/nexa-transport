@@ -22,8 +22,8 @@ export class DesignSvgRootTransform {
             return matrix;
         }
         const box: string = style['transform-box'] ?? 'view-box';
-        if (!['view-box', 'border-box', 'content-box'].includes(box)) {
-            throw new Error('SVG root transform-box requires a viewport reference box.');
+        if (!['view-box', 'border-box', 'content-box', 'fill-box', 'stroke-box'].includes(box)) {
+            throw new Error('Invalid SVG root transform-box.');
         }
         const origin: DesignSvgPoint = this.#origin(
             style['transform-origin'] ?? '50% 50%',

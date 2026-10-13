@@ -46,11 +46,9 @@ export class DesignSvgImportMasks {
         if (definition === undefined || definition.name !== 'mask') {
             throw new Error('SVG mask not found: ' + id);
         }
-        const bounds: DesignSvgSourceBounds | null = await DesignSvgImportBounds.measure(
-            this.tree,
-            targetId,
-            T.inverse(context.matrix),
-        );
+        const bounds: DesignSvgSourceBounds | null =
+            context.referenceBox ??
+            (await DesignSvgImportBounds.measure(this.tree, targetId, T.inverse(context.matrix)));
         const box: DesignSvgMatrix =
             bounds === null
                 ? { ...T.identity, a: 0, d: 0 }
@@ -66,6 +64,7 @@ export class DesignSvgImportMasks {
         const style: Readonly<Record<string, string>> = this.styles.definition(definition);
         const source: string | null = await this.render(definition, {
             ...context,
+            referenceBox: null,
             parentId: context.parentId,
             matrix: T.multiply(
                 context.matrix,

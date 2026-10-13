@@ -126,7 +126,9 @@ export class DesignSvgImportLayers {
             throw new Error('SVG root transform must be invertible.');
         }
         const rootId: string = this.identify('root');
-        const contentId: string = transformed ? this.identify('root-content') : rootId;
+        const separate: boolean =
+            transformed || style['clip-path'] !== undefined || style['mask'] !== undefined;
+        const contentId: string = separate ? this.identify('root-content') : rootId;
         const base: DesignNode = DesignDefaults.node(rootId, 'frame', name);
         const matrix: DesignSvgMatrix = T.multiply(transform, viewport.matrix);
         const children: string[] = [];
@@ -139,7 +141,7 @@ export class DesignSvgImportLayers {
             style: { ...base.style, fills: [] },
             layout: { ...base.layout, clip: !transformed && style['overflow'] !== 'visible' },
         });
-        if (transformed) {
+        if (separate) {
             this.#tree.append({
                 ...DesignDefaults.node(contentId, 'group', name + ' artwork'),
                 parentId: rootId,
@@ -165,17 +167,24 @@ export class DesignSvgImportLayers {
             }
         }
         this.#tree.replace(contentId, (node: DesignNode): DesignNode => ({ ...node, children }));
-        if (transformed) {
+        if (separate) {
             this.#tree.replace(rootId, (node: DesignNode): DesignNode => ({
                 ...node,
                 children: [contentId],
             }));
         }
+        const effects: DesignSvgLayerContext = {
+            ...context,
+            matrix: transform,
+            width,
+            height,
+            referenceBox: { x: 0, y: 0, width, height },
+        };
         if (style['clip-path'] !== undefined) {
-            await this.#clips.apply(contentId, style['clip-path'], context);
+            await this.#clips.apply(contentId, style['clip-path'], effects);
         }
         if (style['mask'] !== undefined) {
-            await this.#masks.apply(contentId, style['mask'], context);
+            await this.#masks.apply(contentId, style['mask'], effects);
         }
         if (transformed && style['overflow'] !== 'visible') {
             await this.#viewports.rectangle(contentId, width, height, transform);
