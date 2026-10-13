@@ -53,6 +53,9 @@ export class DesignSvgTransforms {
         return matrix;
     }
     public static parse(source: string): DesignSvgMatrix {
+        if (source.trim() === 'none') {
+            return this.identity;
+        }
         let matrix: DesignSvgMatrix = this.identity;
         let rest: string = source.trim();
         let count: number = 0;

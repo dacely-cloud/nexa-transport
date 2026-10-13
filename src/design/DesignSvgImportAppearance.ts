@@ -21,7 +21,15 @@ export class DesignSvgImportAppearance {
         }
         return source;
     }
-    public static validate(style: Readonly<Record<string, string>>): void {
+    public static validate(style: Readonly<Record<string, string>>, root: boolean = false): void {
+        if (
+            !root &&
+            (style['transform-origin'] !== undefined || style['transform-box'] !== undefined)
+        ) {
+            throw new Error(
+                'SVG descendant transform origins require native reference-box conversion.',
+            );
+        }
         for (const property of ['filter']) {
             if (style[property] !== undefined && style[property] !== 'none') {
                 throw new Error('SVG ' + property + ' requires native import conversion.');

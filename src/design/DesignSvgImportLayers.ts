@@ -16,6 +16,7 @@ import { DesignSvgCss } from './DesignSvgCss.js';
 import { DesignSvgNumbers } from './DesignSvgNumbers.js';
 import { DesignSvgTransforms as T, type DesignSvgMatrix } from './DesignSvgTransforms.js';
 import { DesignSvgImportPaints } from './DesignSvgImportPaints.js';
+import { DesignSvgRootTransform } from './DesignSvgRootTransform.js';
 import { DesignDefaults } from './DesignDefaults.js';
 import { DesignCodec } from './DesignCodec.js';
 import type { DesignNode } from './DesignTypes.js';
@@ -93,15 +94,16 @@ export class DesignSvgImportLayers {
     }
     public async build(name: string): Promise<DesignSvgLayerImport> {
         const a: Readonly<Record<string, string>> = this.root.attributes;
+        const style: Readonly<Record<string, string>> = this.#css.resolve(this.root, [], {});
         const box: readonly number[] =
             a['viewBox'] === undefined ? [] : DesignSvgNumbers.list(a['viewBox'], 4);
         const width: number = DesignSvgNumbers.length(
-            a['width'] ?? '',
+            style['width'] ?? a['width'] ?? '',
             box[2] ?? 300,
             box[2] ?? 300,
         );
         const height: number = DesignSvgNumbers.length(
-            a['height'] ?? '',
+            style['height'] ?? a['height'] ?? '',
             box[3] ?? 150,
             box[3] ?? 150,
         );
@@ -111,19 +113,22 @@ export class DesignSvgImportLayers {
             a['viewBox'],
             a['preserveAspectRatio'],
         );
-        const style: Readonly<Record<string, string>> = this.#css.resolve(this.root, [], {});
-        if ((style['transform'] ?? a['transform'] ?? '').trim() !== '') {
-            throw new Error(
-                'SVG root transforms require transformed viewport clipping; place the transform on a group.',
-            );
+        DesignSvgImportAppearance.validate(style, true);
+        const transform: DesignSvgMatrix = DesignSvgRootTransform.matrix(style, width, height);
+        const transformed: boolean =
+            transform.a !== 1 ||
+            transform.b !== 0 ||
+            transform.c !== 0 ||
+            transform.d !== 1 ||
+            transform.e !== 0 ||
+            transform.f !== 0;
+        if (transform.a * transform.d - transform.b * transform.c === 0) {
+            throw new Error('SVG root transform must be invertible.');
         }
-        DesignSvgImportAppearance.validate(style);
         const rootId: string = this.identify('root');
+        const contentId: string = transformed ? this.identify('root-content') : rootId;
         const base: DesignNode = DesignDefaults.node(rootId, 'frame', name);
-        const matrix: DesignSvgMatrix = T.multiply(
-            T.parse(style['transform'] ?? a['transform'] ?? ''),
-            viewport.matrix,
-        );
+        const matrix: DesignSvgMatrix = T.multiply(transform, viewport.matrix);
         const children: string[] = [];
         this.#tree.append({
             ...base,
@@ -132,10 +137,18 @@ export class DesignSvgImportLayers {
             opacity: DesignSvgImportAppearance.opacity(style['opacity']),
             visible: style['display'] !== 'none',
             style: { ...base.style, fills: [] },
-            layout: { ...base.layout, clip: style['overflow'] !== 'visible' },
+            layout: { ...base.layout, clip: !transformed && style['overflow'] !== 'visible' },
         });
+        if (transformed) {
+            this.#tree.append({
+                ...DesignDefaults.node(contentId, 'group', name + ' artwork'),
+                parentId: rootId,
+                width,
+                height,
+            });
+        }
         const context: DesignSvgLayerContext = {
-            parentId: rootId,
+            parentId: contentId,
             matrix,
             width: box[2] ?? width,
             height: box[3] ?? height,
@@ -151,12 +164,21 @@ export class DesignSvgImportLayers {
                 }
             }
         }
-        this.#tree.replace(rootId, (node: DesignNode): DesignNode => ({ ...node, children }));
+        this.#tree.replace(contentId, (node: DesignNode): DesignNode => ({ ...node, children }));
+        if (transformed) {
+            this.#tree.replace(rootId, (node: DesignNode): DesignNode => ({
+                ...node,
+                children: [contentId],
+            }));
+        }
         if (style['clip-path'] !== undefined) {
-            await this.#clips.apply(rootId, style['clip-path'], context);
+            await this.#clips.apply(contentId, style['clip-path'], context);
         }
         if (style['mask'] !== undefined) {
-            await this.#masks.apply(rootId, style['mask'], context);
+            await this.#masks.apply(contentId, style['mask'], context);
+        }
+        if (transformed && style['overflow'] !== 'visible') {
+            await this.#viewports.rectangle(contentId, width, height, transform);
         }
         const document: ReturnType<typeof DesignDefaults.document> = DesignCodec.document({
             ...DesignDefaults.document('svg-import'),
