@@ -4,6 +4,7 @@
 /** Native Roblox property encodings shared by the authoring, export and preview engines. */
 export const RobloxValueKind = {
     Vector2: 'Vector2',
+    Rect: 'Rect',
     Vector3: 'Vector3',
     Color3: 'Color3',
     UDim: 'UDim',
@@ -21,6 +22,14 @@ export interface RobloxVector2 {
     readonly kind: 'Vector2';
     readonly x: number;
     readonly y: number;
+}
+/** Native source rectangle, with bounds measured in image pixels. */
+export interface RobloxRect {
+    readonly kind: 'Rect';
+    readonly minX: number;
+    readonly minY: number;
+    readonly maxX: number;
+    readonly maxY: number;
 }
 /** Three component vector in studs. */
 export interface RobloxVector3 {
@@ -106,6 +115,7 @@ export type RobloxValue =
     | number
     | boolean
     | RobloxVector2
+    | RobloxRect
     | RobloxVector3
     | RobloxColor3
     | RobloxUDim
@@ -129,6 +139,8 @@ export const RobloxClass = {
     Frame: 'Frame',
     TextLabel: 'TextLabel',
     TextButton: 'TextButton',
+    ImageLabel: 'ImageLabel',
+    ImageButton: 'ImageButton',
     UICorner: 'UICorner',
     UIStroke: 'UIStroke',
     UIListLayout: 'UIListLayout',

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 import { RobloxSceneCodec } from './RobloxSceneCodec';
+import { RobloxGuiClasses } from './RobloxGuiClasses';
 import {
     RobloxInputEvent,
     RobloxInputDevice,
@@ -56,7 +57,7 @@ export class RobloxSceneInput {
             const input: RobloxInputRequest = this.#request(fields, duration);
             const node: RobloxSceneNode | undefined = nodes.get(input.nodeId);
             if (
-                node?.className !== 'TextButton' ||
+                !RobloxGuiClasses.button(node?.className) ||
                 typeof fields['accepted'] !== 'boolean' ||
                 input.at < previous
             ) {

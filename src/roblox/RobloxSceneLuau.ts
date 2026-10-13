@@ -33,6 +33,10 @@ export class RobloxSceneLuau {
         switch (value.kind) {
             case 'Vector2':
                 return 'Vector2.new(' + String(value.x) + ',' + String(value.y) + ')';
+            case 'Rect':
+                return (
+                    'Rect.new(' + [value.minX, value.minY, value.maxX, value.maxY].join(',') + ')'
+                );
             case 'Vector3':
                 return (
                     'Vector3.new(' +
@@ -99,6 +103,8 @@ export class RobloxSceneLuau {
                 );
             case 'Enum': {
                 const families: Readonly<Record<string, string>> = {
+                    ScaleType: 'ScaleType',
+                    ResampleMode: 'ResamplerMode',
                     Shape: 'PartType',
                     Material: 'Material',
                     EmissionDirection: 'NormalId',

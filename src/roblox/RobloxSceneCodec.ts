@@ -4,6 +4,7 @@
 import { RobloxSceneInput } from './RobloxSceneInput';
 import { RobloxPartGeometry } from './RobloxPartGeometry';
 import { RobloxSceneTextures, type RobloxSceneTextureAtlas } from './RobloxSceneTextures';
+import { RobloxGuiClasses } from './RobloxGuiClasses';
 import { RobloxSceneHierarchy, type RobloxHierarchyDecoded } from './RobloxSceneHierarchy';
 import { RobloxSceneSchema, type RobloxPropertySpec } from './RobloxSceneSchema';
 import {
@@ -292,6 +293,7 @@ export class RobloxSceneCodec {
         }
         const keys: Readonly<Record<string, readonly string[]>> = {
             Vector2: ['x', 'y'],
+            Rect: ['minX', 'minY', 'maxX', 'maxY'],
             Vector3: ['x', 'y', 'z'],
             Color3: ['r', 'g', 'b'],
             UDim: ['scale', 'offset'],
@@ -310,6 +312,13 @@ export class RobloxSceneCodec {
             throw new Error('Expected Roblox ' + spec.type);
         }
         switch (spec.type) {
+            case 'Rect': {
+                const minX: number = this.number(data['minX'], 0, 4096);
+                const minY: number = this.number(data['minY'], 0, 4096);
+                const maxX: number = this.number(data['maxX'], minX, 4096);
+                const maxY: number = this.number(data['maxY'], minY, 4096);
+                return Object.freeze({ kind: 'Rect', minX, minY, maxX, maxY });
+            }
             case 'Vector2':
                 return Object.freeze({
                     kind: 'Vector2',
@@ -503,6 +512,20 @@ export class RobloxSceneCodec {
                 throw new Error('Part.Size must be positive');
             }
         }
+        if (RobloxGuiClasses.image(supported)) {
+            for (const property of ['Image', 'HoverImage', 'PressedImage']) {
+                const content: RobloxValue | undefined = properties[property];
+                if (
+                    content !== undefined &&
+                    content !== '' &&
+                    (typeof content !== 'string' || !RobloxSceneTextures.assetUri(content))
+                ) {
+                    throw new Error(
+                        'GUI image must reference an rbxasset image path or rbxassetid URI',
+                    );
+                }
+            }
+        }
         if (supported === RobloxClass.ParticleEmitter) {
             const angle: RobloxValue | undefined = properties['SpreadAngle'];
             if (
@@ -554,13 +577,15 @@ export class RobloxSceneCodec {
             Attachment: ['Part', 'WedgePart', 'CornerWedgePart', 'Attachment'],
             ParticleEmitter: ['Part', 'WedgePart', 'CornerWedgePart', 'Attachment'],
             ScreenGui: ['Folder', 'Model', 'WorldModel'],
-            Frame: ['ScreenGui', 'Frame', 'TextLabel', 'TextButton'],
-            TextLabel: ['ScreenGui', 'Frame', 'TextLabel', 'TextButton'],
-            TextButton: ['ScreenGui', 'Frame', 'TextLabel', 'TextButton'],
-            UICorner: ['Frame', 'TextLabel', 'TextButton'],
-            UIStroke: ['Frame', 'TextLabel', 'TextButton'],
-            UIListLayout: ['Frame', 'TextLabel', 'TextButton'],
-            UIPadding: ['Frame', 'TextLabel', 'TextButton'],
+            Frame: ['ScreenGui', ...RobloxGuiClasses.objects],
+            TextLabel: ['ScreenGui', ...RobloxGuiClasses.objects],
+            TextButton: ['ScreenGui', ...RobloxGuiClasses.objects],
+            ImageLabel: ['ScreenGui', ...RobloxGuiClasses.objects],
+            ImageButton: ['ScreenGui', ...RobloxGuiClasses.objects],
+            UICorner: RobloxGuiClasses.objects,
+            UIStroke: RobloxGuiClasses.objects,
+            UIListLayout: RobloxGuiClasses.objects,
+            UIPadding: RobloxGuiClasses.objects,
         };
         if (
             parent === undefined
@@ -608,8 +633,8 @@ export class RobloxSceneCodec {
         const at: number = this.number(header['at'], 0, duration);
         const trigger: string | null =
             header['trigger'] === null ? null : this.#id(header['trigger']);
-        if (trigger !== null && nodes.get(trigger)?.className !== RobloxClass.TextButton) {
-            throw new Error('Timeline trigger must be a TextButton');
+        if (trigger !== null && !RobloxGuiClasses.button(nodes.get(trigger)?.className)) {
+            throw new Error('Timeline trigger must be a GuiButton');
         }
         if (header['kind'] === 'burst') {
             this.record(raw, ['kind', 'nodeId', 'at', 'trigger', 'count'], ['emission']);

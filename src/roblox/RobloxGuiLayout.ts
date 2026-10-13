@@ -3,6 +3,8 @@ import type { RobloxScene, RobloxSceneNode, RobloxValue } from './RobloxSceneTyp
 import { RobloxProperties } from './RobloxSceneRuntime';
 import { RobloxGuiBoxLayout, type RobloxGuiBox } from './RobloxGuiBoxLayout';
 import { RobloxSceneHierarchy } from './RobloxSceneHierarchy';
+import { RobloxGuiClasses } from './RobloxGuiClasses';
+import { RobloxGuiImages, type RobloxGuiImage } from './RobloxGuiImages';
 
 /** Affine local-pixel to viewport-pixel transform. */
 export type RobloxGuiTransform = readonly [number, number, number, number, number, number];
@@ -26,6 +28,7 @@ export interface RobloxGuiElement {
     readonly stroke: readonly [number, number, number, number];
     readonly strokeWidth: number;
     readonly strokeText: boolean;
+    readonly image: RobloxGuiImage | null;
 }
 interface GuiParent {
     readonly width: number;
@@ -37,14 +40,17 @@ interface GuiParent {
 
 /** Deterministic viewport layout for the classes supported by the current projection. */
 export class RobloxGuiLayout {
+    readonly #scene: RobloxScene;
     readonly #children: ReadonlyMap<string | null, readonly RobloxSceneNode[]>;
     readonly #nodes: ReadonlyMap<string, RobloxSceneNode>;
     readonly #order: ReadonlyMap<string, number>;
     readonly #screens: readonly RobloxSceneNode[];
     readonly #source: RobloxScene | null;
+    #imagePatches: number = 0;
     #projected: RobloxGuiLayout | null = null;
     #projectedNodes: readonly RobloxSceneNode[] | null = null;
     public constructor(scene: RobloxScene, projectedNodes?: readonly RobloxSceneNode[]) {
+        this.#scene = scene;
         this.#source = projectedNodes === undefined ? scene : null;
         const nodes: readonly RobloxSceneNode[] = projectedNodes ?? scene.nodes;
         const children: Map<string | null, RobloxSceneNode[]> = new Map();
@@ -93,6 +99,7 @@ export class RobloxGuiLayout {
             return this.#projected.evaluate(values, width, height);
         }
         const result: RobloxGuiElement[] = [];
+        this.#imagePatches = 0;
         const screens: RobloxSceneNode[] = [...this.#screens].sort(
             (a: RobloxSceneNode, b: RobloxSceneNode): number =>
                 RobloxProperties.number(values.get(a.id) ?? a.properties, 'DisplayOrder') -
@@ -140,7 +147,7 @@ export class RobloxGuiLayout {
     ): readonly RobloxSceneNode[] {
         return [...(this.#children.get(id) ?? [])]
             .filter((node: RobloxSceneNode): boolean =>
-                ['Frame', 'TextLabel', 'TextButton'].includes(node.className),
+                RobloxGuiClasses.objects.includes(node.className),
             )
             .sort(
                 (a: RobloxSceneNode, b: RobloxSceneNode): number =>
@@ -233,21 +240,19 @@ export class RobloxGuiLayout {
             background: this.#color(properties, 'BackgroundColor3', 'BackgroundTransparency'),
             radius: rounding,
             text: typeof properties['Text'] === 'string' ? properties['Text'] : '',
-            textColor:
-                node.className === 'Frame'
-                    ? [0, 0, 0, 0]
-                    : this.#color(properties, 'TextColor3', 'TextTransparency'),
-            textSize:
-                node.className === 'Frame' ? 1 : RobloxProperties.number(properties, 'TextSize'),
+            textColor: !RobloxGuiClasses.text(node.className)
+                ? [0, 0, 0, 0]
+                : this.#color(properties, 'TextColor3', 'TextTransparency'),
+            textSize: !RobloxGuiClasses.text(node.className)
+                ? 1
+                : RobloxProperties.number(properties, 'TextSize'),
             textWrapped: properties['TextWrapped'] === true,
-            textX:
-                node.className === 'Frame'
-                    ? 2
-                    : RobloxProperties.enum(properties, 'TextXAlignment'),
-            textY:
-                node.className === 'Frame'
-                    ? 1
-                    : RobloxProperties.enum(properties, 'TextYAlignment'),
+            textX: !RobloxGuiClasses.text(node.className)
+                ? 2
+                : RobloxProperties.enum(properties, 'TextXAlignment'),
+            textY: !RobloxGuiClasses.text(node.className)
+                ? 1
+                : RobloxProperties.enum(properties, 'TextYAlignment'),
             stroke:
                 strokeProperties !== null && strokeEnabled
                     ? this.#color(strokeProperties, 'Color', 'Transparency')
@@ -258,10 +263,17 @@ export class RobloxGuiLayout {
                     : 0,
             strokeText:
                 strokeProperties !== null &&
-                node.className !== 'Frame' &&
+                RobloxGuiClasses.text(node.className) &&
                 RobloxProperties.enum(strokeProperties, 'ApplyStrokeMode') === 0,
+            image: RobloxGuiClasses.image(node.className)
+                ? RobloxGuiImages.resolve(this.#scene, properties, width, height)
+                : null,
         };
         if (width > 0 && height > 0) {
+            this.#imagePatches += element.image?.quads.length ?? 0;
+            if (this.#imagePatches > 8192) {
+                throw new Error('GUI image scene exceeds 8192 patches');
+            }
             result.push(element);
         }
         const descendantClip: RobloxGuiClip =

@@ -75,19 +75,40 @@ export class RobloxSceneXml {
                     ? 'string'
                     : value.kind);
         let content: string = '';
-        if (typeof value === 'number' || typeof value === 'boolean') content = String(value);
-        else if (typeof value === 'string')
+        if (typeof value === 'number' || typeof value === 'boolean') {
+            content = String(value);
+        } else if (typeof value === 'string') {
             content =
                 type === 'Content' || type === 'ContentId'
                     ? '<url>' + this.escape(value) + '</url>'
                     : this.escape(value);
-        else
+        } else {
             switch (value.kind) {
+                case 'Rect':
+                    type = 'Rect2D';
+                    content =
+                        '<min><X>' +
+                        String(value.minX) +
+                        '</X><Y>' +
+                        String(value.minY) +
+                        '</Y></min><max><X>' +
+                        String(value.maxX) +
+                        '</X><Y>' +
+                        String(value.maxY) +
+                        '</Y></max>';
+                    break;
                 case 'Vector2':
-                    content = '<X>' + value.x + '</X><Y>' + value.y + '</Y>';
+                    content = '<X>' + String(value.x) + '</X><Y>' + String(value.y) + '</Y>';
                     break;
                 case 'Vector3':
-                    content = '<X>' + value.x + '</X><Y>' + value.y + '</Y><Z>' + value.z + '</Z>';
+                    content =
+                        '<X>' +
+                        String(value.x) +
+                        '</X><Y>' +
+                        String(value.y) +
+                        '</Y><Z>' +
+                        String(value.z) +
+                        '</Z>';
                     break;
                 case 'Color3':
                     content =
@@ -99,25 +120,32 @@ export class RobloxSceneXml {
                                       Math.round(value.b * 255)) >>>
                                       0,
                               )
-                            : '<R>' + value.r + '</R><G>' + value.g + '</G><B>' + value.b + '</B>';
+                            : '<R>' +
+                              String(value.r) +
+                              '</R><G>' +
+                              String(value.g) +
+                              '</G><B>' +
+                              String(value.b) +
+                              '</B>';
                     break;
                 case 'UDim':
-                    content = '<S>' + value.scale + '</S><O>' + value.offset + '</O>';
+                    content =
+                        '<S>' + String(value.scale) + '</S><O>' + String(value.offset) + '</O>';
                     break;
                 case 'UDim2':
                     content =
                         '<XS>' +
-                        value.xScale +
+                        String(value.xScale) +
                         '</XS><XO>' +
-                        value.xOffset +
+                        String(value.xOffset) +
                         '</XO><YS>' +
-                        value.yScale +
+                        String(value.yScale) +
                         '</YS><YO>' +
-                        value.yOffset +
+                        String(value.yOffset) +
                         '</YO>';
                     break;
                 case 'NumberRange':
-                    content = value.min + ' ' + value.max;
+                    content = String(value.min) + ' ' + String(value.max);
                     break;
                 case 'NumberSequence':
                     content =
@@ -125,7 +153,7 @@ export class RobloxSceneXml {
                             .map(
                                 (
                                     point: import('./RobloxSceneTypes').RobloxNumberKeypoint,
-                                ): string => point.time + ' ' + point.value + ' ' + point.envelope,
+                                ): string => [point.time, point.value, point.envelope].join(' '),
                             )
                             .join(' ') + ' ';
                     break;
@@ -134,14 +162,13 @@ export class RobloxSceneXml {
                         value.points
                             .map(
                                 (point: import('./RobloxSceneTypes').RobloxColorKeypoint): string =>
-                                    point.time +
-                                    ' ' +
-                                    point.color.r +
-                                    ' ' +
-                                    point.color.g +
-                                    ' ' +
-                                    point.color.b +
-                                    ' 0',
+                                    [
+                                        point.time,
+                                        point.color.r,
+                                        point.color.g,
+                                        point.color.b,
+                                        0,
+                                    ].join(' '),
                             )
                             .join(' ') + ' ';
                     break;
@@ -167,11 +194,18 @@ export class RobloxSceneXml {
                     ]
                         .map(
                             (key: string, index: number): string =>
-                                '<' + key + '>' + (value.components[index] ?? 0) + '</' + key + '>',
+                                '<' +
+                                key +
+                                '>' +
+                                String(value.components[index] ?? 0) +
+                                '</' +
+                                key +
+                                '>',
                         )
                         .join('');
                     break;
             }
+        }
         return '<' + type + ' name="' + this.escape(diskName) + '">' + content + '</' + type + '>';
     }
 }

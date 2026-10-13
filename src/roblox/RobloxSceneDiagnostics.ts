@@ -3,6 +3,7 @@
 
 import type { RobloxScene, RobloxSceneNode } from './RobloxSceneTypes';
 import { RobloxSceneHierarchy } from './RobloxSceneHierarchy';
+import { RobloxGuiClasses } from './RobloxGuiClasses';
 
 /** Explicit preview fidelity findings, also delivered to the authoring model. */
 export class RobloxSceneDiagnostics {
@@ -14,6 +15,13 @@ export class RobloxSceneDiagnostics {
                 ? 'Capture uses hardware Vulkan with approximated Roblox materials and lighting. Studio pixel fidelity has not been measured.'
                 : 'Preview uses a WebGL approximation of Roblox lighting and materials. Studio pixel fidelity has not been measured.',
         ];
+        if (
+            nodes.some((node: RobloxSceneNode): boolean => RobloxGuiClasses.image(node.className))
+        ) {
+            findings.push(
+                'ImageLabel and ImageButton display original image texels with sprite cropping, tint, transparency, Stretch/Fit/Crop/Tile/nine-slice layout and smooth or pixelated sampling. ImageButton logical activations execute native callbacks. Hover/pressed visual switching, EditableImage loading and Studio edge-pixel calibration remain unfinished.',
+            );
+        }
         if (
             nodes.some(
                 (node: import('./RobloxSceneTypes').RobloxSceneNode): boolean =>

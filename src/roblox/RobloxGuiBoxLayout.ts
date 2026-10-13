@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { RobloxProperties } from './RobloxSceneRuntime';
+import { RobloxGuiClasses } from './RobloxGuiClasses';
 import type { RobloxSceneNode, RobloxValue, RobloxUDim2 } from './RobloxSceneTypes';
 
 /** A resolved GUI rectangle before its inherited affine transform. */
@@ -54,7 +55,7 @@ export class RobloxGuiBoxLayout {
         );
         const boxes: Map<string, RobloxGuiBox> = new Map();
         for (const node of children) {
-            if (!['Frame', 'TextLabel', 'TextButton'].includes(node.className)) {
+            if (!RobloxGuiClasses.objects.includes(node.className)) {
                 continue;
             }
             const properties: Readonly<Record<string, RobloxValue>> =

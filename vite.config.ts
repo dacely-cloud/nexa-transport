@@ -11,6 +11,8 @@ const config: UserConfig = {
                 'roblox-scene-textures': 'src/roblox/RobloxSceneTextures.ts',
                 'roblox-part-geometry': 'src/roblox/RobloxPartGeometry.ts',
                 'roblox-gui-layout': 'src/roblox/RobloxGuiLayout.ts',
+                'roblox-gui-images': 'src/roblox/RobloxGuiImages.ts',
+                'roblox-gui-classes': 'src/roblox/RobloxGuiClasses.ts',
                 'roblox-live-state': 'src/roblox/RobloxLiveState.ts',
                 'roblox-live-descriptor': 'src/roblox/RobloxLiveDescriptor.ts',
                 'roblox-scene-examples': 'src/roblox/RobloxSceneExamples.ts',

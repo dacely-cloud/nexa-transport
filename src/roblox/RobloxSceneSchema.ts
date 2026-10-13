@@ -175,6 +175,20 @@ const part: Readonly<Record<string, RobloxPropertySpec>> = {
     Material: e(RobloxMaterial.Plastic, Object.values(RobloxMaterial)),
 };
 
+const image: Readonly<Record<string, RobloxPropertySpec>> = {
+    ...gui,
+    Image: { ...s(''), xmlType: 'ContentId' },
+    ImageColor3: v(RobloxValues.color(), true),
+    ImageTransparency: n(0, 0, 1),
+    ImageRectOffset: v({ kind: 'Vector2', x: 0, y: 0 }, true),
+    ImageRectSize: v({ kind: 'Vector2', x: 0, y: 0 }, true),
+    ScaleType: e(0, [0, 1, 2, 3, 4]),
+    ResampleMode: e(0, [0, 1]),
+    SliceCenter: v({ kind: 'Rect', minX: 0, minY: 0, maxX: 0, maxY: 0 }),
+    SliceScale: n(1, 0, 100),
+    TileSize: v(RobloxValues.udim2(1, 0, 1, 0), true),
+};
+
 /** One property registry supplies validation, normalization and native XML serialization. */
 export const RobloxSceneSchema: Readonly<
     Record<RobloxClass, Readonly<Record<string, RobloxPropertySpec>>>
@@ -221,6 +235,15 @@ export const RobloxSceneSchema: Readonly<
     Frame: gui,
     TextLabel: text,
     TextButton: { ...text, AutoButtonColor: b(false), Active: b(true), Interactable: b(true) },
+    ImageLabel: image,
+    ImageButton: {
+        ...image,
+        AutoButtonColor: b(false),
+        Active: b(true),
+        Interactable: b(true),
+        HoverImage: { ...s(''), xmlType: 'ContentId' },
+        PressedImage: { ...s(''), xmlType: 'ContentId' },
+    },
     UICorner: { CornerRadius: v({ kind: 'UDim', scale: 0, offset: 8 }) },
     UIPadding: {
         PaddingLeft: v({ kind: 'UDim', scale: 0, offset: 0 }, true),
