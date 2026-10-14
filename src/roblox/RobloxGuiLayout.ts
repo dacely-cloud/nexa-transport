@@ -9,6 +9,7 @@ import { RobloxGuiClasses } from './RobloxGuiClasses';
 import { RobloxGuiText } from './RobloxGuiText';
 import { RobloxGuiImages, type RobloxGuiImage } from './RobloxGuiImages';
 import { RobloxGuiScale } from './RobloxGuiScale';
+import { RobloxTextSelection, type RobloxTextSelectionGeometry } from './RobloxTextSelection';
 
 /** Affine local-pixel to viewport-pixel transform. */
 export type RobloxGuiTransform = readonly [number, number, number, number, number, number];
@@ -46,6 +47,33 @@ interface GuiParent {
 
 /** Deterministic viewport layout for the classes supported by the current projection. */
 export class RobloxGuiLayout {
+    /** Resolves native TextBox byte positions against this scene's measured font and padded text rectangle. */
+    public selection(
+        element: RobloxGuiElement,
+        properties: Readonly<Record<string, RobloxValue>>,
+    ): RobloxTextSelectionGeometry {
+        const cursor: RobloxValue | undefined = properties['CursorPosition'];
+        if (typeof cursor !== 'number' || cursor < 1) {
+            return { insertion: null, selection: [] };
+        }
+        const metrics: import('./RobloxTextMetrics').RobloxTextMetrics | undefined =
+            this.#scene.textMetrics;
+        if (metrics === undefined) {
+            throw new Error('TextBox selection requires the actual native font metrics');
+        }
+        const text: RobloxValue | undefined = properties['Text'];
+        const anchor: RobloxValue | undefined = properties['SelectionStart'];
+        return RobloxTextSelection.resolve(metrics, {
+            text: typeof text === 'string' ? text : '',
+            size: element.textSize,
+            wrapped: element.textWrapped,
+            rect: element.textRect ?? [0, 0, element.width, element.height],
+            alignX: element.textX,
+            alignY: element.textY,
+            cursor,
+            selectionStart: typeof anchor === 'number' ? anchor : -1,
+        });
+    }
     readonly #scene: RobloxScene;
     readonly #children: ReadonlyMap<string | null, readonly RobloxSceneNode[]>;
     readonly #nodes: ReadonlyMap<string, RobloxSceneNode>;

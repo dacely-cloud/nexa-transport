@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
+import { RobloxTextLineLayout } from './RobloxTextLines';
+
 /** Font units measured by the same fontdue font used for native GUI drawing. */
 export interface RobloxTextMetrics {
     /** Original bundled font identity; absent for older scenes or a host-configured override. */
@@ -90,114 +92,11 @@ export class RobloxTextMeasurement {
         size: number,
         wrapWidth: number | null,
     ): RobloxTextBounds {
-        if (
-            !Number.isFinite(size) ||
-            size < 0 ||
-            size > 4096 ||
-            (wrapWidth !== null && (!Number.isFinite(wrapWidth) || wrapWidth < 0)) ||
-            text.length > 131072 ||
-            !text.isWellFormed()
-        ) {
-            throw new Error('Invalid GUI text measurement dimensions');
-        }
-        if (text.length === 0 || size === 0) {
-            return { width: 0, height: 0, lines: 0 };
-        }
-        const scale: number = Math.fround(Math.fround(size) / metrics.unitsPerEm);
-        const limit: number | null = wrapWidth === null ? null : Math.fround(wrapWidth);
-        let width: number = 0;
-        let lines: number = 0;
-        for (const paragraph of this.#paragraphs(text)) {
-            const characters: readonly string[] = Array.from(paragraph);
-            if (characters.length === 0) {
-                lines += 1;
-            }
-            let start: number = 0;
-            while (start < characters.length) {
-                let end: number = start;
-                let used: number = 0;
-                let breakAt: number = start;
-                while (end < characters.length) {
-                    const character: string | undefined = characters[end];
-                    const previous: string | undefined =
-                        end > start ? characters[end - 1] : undefined;
-                    if (character === undefined) {
-                        throw new Error('Missing GUI text character');
-                    }
-                    const next: number = this.#advance(metrics, used, previous, character, scale);
-                    if (limit !== null && next > limit && end > start) {
-                        break;
-                    }
-                    used = next;
-                    end += 1;
-                    if (this.#whitespace(character)) {
-                        breakAt = end;
-                    }
-                }
-                if (end < characters.length && breakAt > start) {
-                    end = breakAt;
-                }
-                used = 0;
-                for (let index: number = start; index < end; index += 1) {
-                    const character: string | undefined = characters[index];
-                    if (character === undefined) {
-                        throw new Error('Missing GUI text character');
-                    }
-                    used = this.#advance(
-                        metrics,
-                        used,
-                        index > start ? characters[index - 1] : undefined,
-                        character,
-                        scale,
-                    );
-                }
-                width = Math.max(width, used);
-                lines += 1;
-                start = end;
-                if (lines > 32768) {
-                    throw new Error('GUI text exceeds the line budget');
-                }
-            }
-            if (lines > 32768) {
-                throw new Error('GUI text exceeds the line budget');
-            }
-        }
-        return {
-            width,
-            height: Math.fround(Math.fround(metrics.lineHeight * scale) * lines),
-            lines,
-        };
+        return RobloxTextLineLayout.measure(metrics, text, size, wrapWidth);
     }
 
-    static #advance(
-        metrics: RobloxTextMetrics,
-        used: number,
-        previous: string | undefined,
-        character: string,
-        scale: number,
-    ): number {
-        const advance: number | undefined = metrics.advances[character];
-        const kern: number | undefined =
-            previous === undefined ? 0 : metrics.kerning[previous + character];
-        if (advance === undefined || kern === undefined) {
-            throw new Error('GUI text metrics do not cover this text');
-        }
-        return Math.fround(
-            Math.fround(used + Math.fround(kern * scale)) + Math.fround(advance * scale),
-        );
-    }
     static #paragraphs(text: string): readonly string[] {
         return text.replace(/\r\n?/gu, '\n').split('\n');
-    }
-    static #whitespace(character: string): boolean {
-        // Rust char::is_whitespace uses Unicode White_Space, excluding JavaScript's BOM.
-        const code: number = character.codePointAt(0) ?? -1;
-        return (
-            (code >= 9 && code <= 13) ||
-            code === 32 ||
-            code === 133 ||
-            /^[\u00a0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000]$/u.test(character)
-        );
     }
     static #record(raw: unknown): raw is Readonly<Record<string, unknown>> {
         if (
