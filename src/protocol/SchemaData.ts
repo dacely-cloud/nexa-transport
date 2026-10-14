@@ -18193,6 +18193,25 @@ export const schema: Schema = {
             required: ['connected', 'validated'],
             type: 'object',
         },
+        RobloxKeyboardGesture: {
+            description: 'A physical key remains held until its matching release or cancellation.',
+            properties: {
+                key: {
+                    type: 'string',
+                },
+                phase: {
+                    $ref: '#/definitions/RobloxKeyboardPhase',
+                },
+            },
+            required: ['key', 'phase'],
+            type: 'object',
+        },
+        RobloxKeyboardPhase: {
+            description:
+                'Keyboard repetition reuses a held input; pointer gestures have no Repeat phase.\nAllowed phases for native held-key commands.',
+            enum: ['Cancel', 'Press', 'Release', 'Repeat'],
+            type: 'string',
+        },
         RobloxLiveActivation: {
             description: "A logical activation on the retained VM's current clock.",
             properties: {
@@ -18258,6 +18277,18 @@ export const schema: Schema = {
                 },
                 handle: {
                     type: 'string',
+                },
+                keyboard: {
+                    const: true,
+                    description:
+                        'The retained executable, rather than gateway source, supports held-key commands.',
+                    type: 'boolean',
+                },
+                keyboardRepeat: {
+                    const: true,
+                    description:
+                        'The retained executable supports editing repeats without another Begin.',
+                    type: 'boolean',
                 },
                 memoryBytes: {
                     type: 'string',
@@ -18332,6 +18363,11 @@ export const schema: Schema = {
                 input: {
                     $ref: '#/definitions/RobloxLiveActivation',
                     description: "A logical activation on the retained VM's current clock.",
+                },
+                keyboard: {
+                    $ref: '#/definitions/RobloxKeyboardGesture',
+                    description:
+                        'A physical key remains held until its matching release or cancellation.',
                 },
                 point: {
                     $ref: '#/definitions/RobloxCoordinateGesture',

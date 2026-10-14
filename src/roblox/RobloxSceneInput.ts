@@ -14,9 +14,16 @@ import {
 /** Shared validation for native input requests and delivered observations, never executable source. */
 export class RobloxSceneInput {
     /** One native command chooses a single targeted, coordinate or focused text channel. */
-    public static exclusive(targeted: boolean, coordinate: boolean, editing: boolean): void {
-        if (Number(targeted) + Number(coordinate) + Number(editing) > 1) {
-            throw new Error('Choose one targeted input, coordinate point or text edit, not both');
+    public static exclusive(
+        targeted: boolean,
+        coordinate: boolean,
+        editing: boolean,
+        keyboard: boolean = false,
+    ): void {
+        if (Number(targeted) + Number(coordinate) + Number(editing) + Number(keyboard) > 1) {
+            throw new Error(
+                'Choose one targeted input, coordinate point, text edit or keyboard gesture, not both',
+            );
         }
     }
     public static requests(raw: unknown): readonly RobloxInputRequest[] {

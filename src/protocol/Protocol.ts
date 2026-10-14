@@ -12056,6 +12056,29 @@ export interface RobloxCredentialStatusShape {
 /** RobloxCredentialStatus from the Nexa wire protocol. */
 export type RobloxCredentialStatus = RobloxCredentialStatusShape;
 
+/** RobloxKeyboardGesture wire fields. */
+export interface RobloxKeyboardGestureShape {
+    /** key as defined by the Nexa gateway. */
+    readonly key: string;
+    /** phase as defined by the Nexa gateway. */
+    readonly phase: RobloxKeyboardPhase;
+}
+
+/** RobloxKeyboardGesture from the Nexa wire protocol. */
+export type RobloxKeyboardGesture = RobloxKeyboardGestureShape;
+
+/** Allowed values for RobloxKeyboardPhase. */
+export const RobloxKeyboardPhaseValues = {
+    Value0: 'Cancel',
+    Value1: 'Press',
+    Value2: 'Release',
+    Value3: 'Repeat',
+} as const;
+
+/** RobloxKeyboardPhase from the Nexa wire protocol. */
+export type RobloxKeyboardPhase =
+    (typeof RobloxKeyboardPhaseValues)[keyof typeof RobloxKeyboardPhaseValues];
+
 /** Allowed values for RobloxLiveActivationdevice. */
 export const RobloxLiveActivationdeviceValues = {
     Value0: 'Gamepad',
@@ -12118,6 +12141,10 @@ export interface RobloxLiveFrameShape {
     readonly elapsedUs: string;
     /** handle as defined by the Nexa gateway. */
     readonly handle: string;
+    /** keyboard as defined by the Nexa gateway. */
+    readonly keyboard?: true;
+    /** keyboardRepeat as defined by the Nexa gateway. */
+    readonly keyboardRepeat?: true;
     /** memoryBytes as defined by the Nexa gateway. */
     readonly memoryBytes: string;
     /** output as defined by the Nexa gateway. */
@@ -12163,6 +12190,8 @@ export interface RobloxLiveStepRequestShape {
     readonly id: string;
     /** input as defined by the Nexa gateway. */
     readonly input?: RobloxLiveActivation;
+    /** keyboard as defined by the Nexa gateway. */
+    readonly keyboard?: RobloxKeyboardGesture;
     /** point as defined by the Nexa gateway. */
     readonly point?: RobloxCoordinateGesture;
     /** seconds as defined by the Nexa gateway. */
