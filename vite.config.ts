@@ -81,6 +81,7 @@ const config: UserConfig = {
                 'design-svg-image-types': 'src/design/DesignSvgImageTypes.ts',
                 'design-svg-import-codec': 'src/design/DesignSvgImportCodec.ts',
                 'design-types': 'src/design/DesignTypes.ts',
+                'design-blend-types': 'src/design/DesignBlendTypes.ts',
                 'design-defaults': 'src/design/DesignDefaults.ts',
                 'design-codec': 'src/design/DesignCodec.ts',
                 'design-edits': 'src/design/DesignEdits.ts',

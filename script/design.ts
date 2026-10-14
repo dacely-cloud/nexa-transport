@@ -47,6 +47,8 @@ const files: readonly string[] = [
     'DesignSvgImportCodec',
     'DesignSvgImport',
     'DesignStrokeTypes',
+    'DesignBlendTypes',
+    'DesignSvgCompositing',
     'DesignStrokeGeometry',
     'DesignStrokeChangesCodec',
     'DesignStrokeEdits',

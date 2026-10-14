@@ -5,6 +5,7 @@ import { DesignValues as V } from './DesignValues.js';
 import { DesignStyleCodec } from './DesignStyleCodec.js';
 import { DesignDefaults } from './DesignDefaults.js';
 import { DesignKind } from './DesignTypes.js';
+import { DesignBlendMode, DesignIsolation } from './DesignBlendTypes.js';
 import type { DesignStyleChanges, DesignCornerChanges } from './DesignOperationTypes.js';
 
 /** Compact decoration edits share canonical style limits while excluding paint and source replacement. */
@@ -13,7 +14,7 @@ export class DesignStyleChangesCodec {
     public static parse(raw: unknown): DesignStyleChanges {
         const value: Readonly<Record<string, unknown>> = V.fields(
             raw,
-            ['blur', 'shadows', 'corners'],
+            ['blur', 'shadows', 'corners', 'blendMode', 'isolation'],
             [],
         );
         if (
@@ -23,6 +24,30 @@ export class DesignStyleChangesCodec {
             throw new Error('Supply at least one style property.');
         }
         return {
+            ...(value['blendMode'] === undefined
+                ? {}
+                : {
+                      blendMode:
+                          value['blendMode'] === null
+                              ? null
+                              : V.choice(
+                                    value['blendMode'],
+                                    Object.values(DesignBlendMode),
+                                    'style.blendMode',
+                                ),
+                  }),
+            ...(value['isolation'] === undefined
+                ? {}
+                : {
+                      isolation:
+                          value['isolation'] === null
+                              ? null
+                              : V.choice(
+                                    value['isolation'],
+                                    Object.values(DesignIsolation),
+                                    'style.isolation',
+                                ),
+                  }),
             ...(value['blur'] === undefined ? {} : { blur: V.number(value['blur'], 0, 1000) }),
             ...(value['shadows'] === undefined
                 ? {}

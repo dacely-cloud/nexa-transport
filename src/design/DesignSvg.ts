@@ -13,6 +13,7 @@ import { DesignMaskMode } from './DesignMaskTypes.js';
 import { DesignMaskGeometry } from './DesignMaskGeometry.js';
 import { DesignSvgGeometry as Geometry } from './DesignSvgGeometry.js';
 import { DesignSvgPaints } from './DesignSvgPaints.js';
+import { DesignSvgCompositing } from './DesignSvgCompositing.js';
 import { DesignFontBindings } from './DesignFontBindings.js';
 import {
     DesignSvgLimits,
@@ -154,7 +155,7 @@ export class DesignSvg {
                 );
                 content = `<g mask="url(#${maskId})">${content}</g>`;
             }
-            let element: string = `<g opacity="${node.opacity}"${paints.effects(node.style, box)}>${content}</g>`;
+            let element: string = `<g opacity="${node.opacity}"${DesignSvgCompositing.attributes(node.style)}${paints.effects(node.style, box)}>${content}</g>`;
             let clipId: string | null = box.clipId;
             while (clipId !== null) {
                 const clip: DesignBox | undefined = boxes.get(clipId);

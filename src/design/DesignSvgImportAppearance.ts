@@ -3,9 +3,34 @@
 
 import { DesignSvgNumbers } from './DesignSvgNumbers.js';
 import type { DesignStroke } from './DesignTypes.js';
+import { DesignBlendMode, DesignIsolation, type DesignBlendStyle } from './DesignBlendTypes.js';
+import { DesignValues } from './DesignValues.js';
 
 /** Shared appearance validation prevents an imported element from silently losing authored effects. */
 export class DesignSvgImportAppearance {
+    /** Compositing is applied once to the logical element, including split fill/stroke geometry. */
+    public static compositing(style: Readonly<Record<string, string>>): DesignBlendStyle {
+        return {
+            ...(style['mix-blend-mode'] === undefined
+                ? {}
+                : {
+                      blendMode: DesignValues.choice(
+                          style['mix-blend-mode'],
+                          Object.values(DesignBlendMode),
+                          'SVG mix-blend-mode',
+                      ),
+                  }),
+            ...(style['isolation'] === undefined
+                ? {}
+                : {
+                      isolation: DesignValues.choice(
+                          style['isolation'],
+                          Object.values(DesignIsolation),
+                          'SVG isolation',
+                      ),
+                  }),
+        };
+    }
     public static opacity(source: string | undefined): number {
         return Math.max(0, Math.min(1, DesignSvgNumbers.length(source ?? '1', 1)));
     }
@@ -50,8 +75,6 @@ export class DesignSvgImportAppearance {
         if (style['paint-order'] !== undefined && style['paint-order'] !== 'normal') {
             throw new Error('SVG custom paint-order requires separate paint layers.');
         }
-        if (style['mix-blend-mode'] !== undefined && style['mix-blend-mode'] !== 'normal') {
-            throw new Error('SVG blend modes require native blend support.');
-        }
+        this.compositing(style);
     }
 }

@@ -153,7 +153,7 @@ export class DesignSvgImportLayers {
             height,
             opacity: DesignSvgImportAppearance.opacity(style['opacity']),
             visible: style['display'] !== 'none',
-            style: { ...base.style, fills: [] },
+            style: { ...base.style, fills: [], ...DesignSvgImportAppearance.compositing(style) },
             layout: { ...base.layout, clip: !transformed && style['overflow'] !== 'visible' },
         });
         if (separate) {
@@ -336,6 +336,10 @@ export class DesignSvgImportLayers {
                     matrix: childContext.matrix,
                 });
             }
+            this.#tree.replace(id, (node: DesignNode): DesignNode => ({
+                ...node,
+                style: { ...node.style, ...DesignSvgImportAppearance.compositing(style) },
+            }));
             return id;
         }
         if (
@@ -380,6 +384,12 @@ export class DesignSvgImportLayers {
         }
         if (shape !== null && style['mask'] !== undefined) {
             await this.#masks.apply(shape, style['mask'], { ...context, matrix, style });
+        }
+        if (shape !== null) {
+            this.#tree.replace(shape, (node: DesignNode): DesignNode => ({
+                ...node,
+                style: { ...node.style, ...DesignSvgImportAppearance.compositing(style) },
+            }));
         }
         return shape;
     }

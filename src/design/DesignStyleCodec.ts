@@ -7,6 +7,7 @@ import type { DesignGradientTransform } from './DesignGradientTypes.js';
 import { DesignStrokeCap, DesignStrokeJoin } from './DesignStrokeTypes.js';
 import { DesignFontFamilyCodec } from './DesignFontFamilyCodec.js';
 import { DesignTypographyStyleCodec } from './DesignTypographyStyleCodec.js';
+import { DesignBlendMode, DesignIsolation } from './DesignBlendTypes.js';
 
 import { DesignValues as V } from './DesignValues.js';
 import { DesignImageFramingCodec } from './DesignImageFramingCodec.js';
@@ -92,13 +93,11 @@ export class DesignStyleCodec {
     }
     /** Canonical bounded style. */
     public static style(raw: unknown): DesignStyle {
-        const value: Readonly<Record<string, unknown>> = V.record(raw, [
-            'fills',
-            'stroke',
-            'corners',
-            'shadows',
-            'blur',
-        ]);
+        const value: Readonly<Record<string, unknown>> = V.fields(
+            raw,
+            ['fills', 'stroke', 'corners', 'shadows', 'blur', 'blendMode', 'isolation'],
+            ['fills', 'stroke', 'corners', 'shadows', 'blur'],
+        );
         const corners: Readonly<Record<string, unknown>> = V.record(value['corners'], [
             'topLeft',
             'topRight',
@@ -115,6 +114,24 @@ export class DesignStyleCodec {
                   );
         return {
             fills: V.list(value['fills'], 8, (entry: unknown): DesignPaint => this.paint(entry)),
+            ...(Object.hasOwn(value, 'blendMode')
+                ? {
+                      blendMode: V.choice(
+                          value['blendMode'],
+                          Object.values(DesignBlendMode),
+                          'style.blendMode',
+                      ),
+                  }
+                : {}),
+            ...(Object.hasOwn(value, 'isolation')
+                ? {
+                      isolation: V.choice(
+                          value['isolation'],
+                          Object.values(DesignIsolation),
+                          'style.isolation',
+                      ),
+                  }
+                : {}),
             stroke:
                 stroke === null
                     ? null

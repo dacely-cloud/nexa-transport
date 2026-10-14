@@ -11,6 +11,7 @@ import type { DesignFontBinding } from './DesignFontTypes.js';
 import type { DesignVariantSet, DesignVariantValue } from './DesignVariantTypes.js';
 import type { DesignMask } from './DesignMaskTypes.js';
 import type { DesignBooleanMode } from './DesignBooleanTypes.js';
+import type { DesignBlendMode, DesignIsolation } from './DesignBlendTypes.js';
 
 import type {
     DesignFrameGrid,
@@ -397,6 +398,10 @@ export interface DesignCornerChanges {
 }
 /** Decoration changes retain all unrelated style fields; a supplied shadow array replaces only that stack. */
 export interface DesignStyleChanges {
+    /** Null removes the authored mode and restores legacy normal compositing. */
+    readonly blendMode?: DesignBlendMode | null;
+    /** Null removes the authored isolation override. */
+    readonly isolation?: DesignIsolation | null;
     readonly blur?: number;
     readonly shadows?: readonly DesignShadow[];
     readonly corners?: DesignCornerChanges;

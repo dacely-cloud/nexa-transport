@@ -9002,6 +9002,29 @@ export const schema: Schema = {
         DesignStyle: {
             description: 'Style can be shared across arbitrary primitives.',
             properties: {
+                blendMode: {
+                    description:
+                        'Omission preserves the normal layer compositing of existing documents.',
+                    enum: [
+                        'color',
+                        'color-burn',
+                        'color-dodge',
+                        'darken',
+                        'difference',
+                        'exclusion',
+                        'hard-light',
+                        'hue',
+                        'lighten',
+                        'luminosity',
+                        'multiply',
+                        'normal',
+                        'overlay',
+                        'saturation',
+                        'screen',
+                        'soft-light',
+                    ],
+                    type: 'string',
+                },
                 blur: {
                     type: 'number',
                 },
@@ -9013,6 +9036,12 @@ export const schema: Schema = {
                         $ref: '#/definitions/DesignPaint',
                     },
                     type: 'array',
+                },
+                isolation: {
+                    description:
+                        'Explicit isolation contains descendant blending without changing their editable tree.',
+                    enum: ['auto', 'isolate'],
+                    type: 'string',
                 },
                 shadows: {
                     items: {
@@ -9038,12 +9067,54 @@ export const schema: Schema = {
             description:
                 'Decoration changes retain all unrelated style fields; a supplied shadow array replaces only that stack.',
             properties: {
+                blendMode: {
+                    anyOf: [
+                        {
+                            enum: [
+                                'color',
+                                'color-burn',
+                                'color-dodge',
+                                'darken',
+                                'difference',
+                                'exclusion',
+                                'hard-light',
+                                'hue',
+                                'lighten',
+                                'luminosity',
+                                'multiply',
+                                'normal',
+                                'overlay',
+                                'saturation',
+                                'screen',
+                                'soft-light',
+                            ],
+                            type: 'string',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                    description:
+                        'Null removes the authored mode and restores legacy normal compositing.',
+                },
                 blur: {
                     type: 'number',
                 },
                 corners: {
                     $ref: '#/definitions/DesignCornerChanges',
                     description: 'Omitted radii retain their original authored values.',
+                },
+                isolation: {
+                    anyOf: [
+                        {
+                            enum: ['auto', 'isolate'],
+                            type: 'string',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                    description: 'Null removes the authored isolation override.',
                 },
                 shadows: {
                     items: {
@@ -10642,6 +10713,12 @@ export const schema: Schema = {
                     const: true,
                     description:
                         'Native image framing supports rotation, reflection, affine placement and repeated image tiles.',
+                    type: 'boolean',
+                },
+                designLayerCompositing: {
+                    const: true,
+                    description:
+                        'Native layer blending and explicit group isolation preserve editable appearance.',
                     type: 'boolean',
                 },
                 events: {

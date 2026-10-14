@@ -12,6 +12,7 @@ import type { DesignVariantSet, DesignVariantValue } from './DesignVariantTypes.
 import type { DesignMask } from './DesignMaskTypes.js';
 import type { DesignBooleanMode } from './DesignBooleanTypes.js';
 import type { DesignFontBinding } from './DesignFontTypes.js';
+import type { DesignBlendMode, DesignIsolation } from './DesignBlendTypes.js';
 
 /** Editable scene primitives, including reusable component definitions and instances. */
 export const DesignKind = {
@@ -123,6 +124,10 @@ export interface DesignShadow {
 }
 /** Style can be shared across arbitrary primitives. */
 export interface DesignStyle {
+    /** Omission preserves the normal layer compositing of existing documents. */
+    readonly blendMode?: DesignBlendMode;
+    /** Explicit isolation contains descendant blending without changing their editable tree. */
+    readonly isolation?: DesignIsolation;
     readonly fills: readonly DesignPaint[];
     readonly stroke: DesignStroke | null;
     readonly corners: DesignCorners;

@@ -5980,14 +5980,41 @@ export interface DesignStrokeOperationShape {
 /** DesignStrokeOperation from the Nexa wire protocol. */
 export type DesignStrokeOperation = DesignStrokeOperationShape;
 
+/** Allowed values for DesignStyleblendMode. */
+export const DesignStyleblendModeValues = {
+    Value0: 'color',
+    Value1: 'color-burn',
+    Value2: 'color-dodge',
+    Value3: 'darken',
+    Value4: 'difference',
+    Value5: 'exclusion',
+    Value6: 'hard-light',
+    Value7: 'hue',
+    Value8: 'lighten',
+    Value9: 'luminosity',
+    Value10: 'multiply',
+    Value11: 'normal',
+    Value12: 'overlay',
+    Value13: 'saturation',
+    Value14: 'screen',
+    Value15: 'soft-light',
+} as const;
+
+/** Allowed values for DesignStyleisolation. */
+export const DesignStyleisolationValues = { Value0: 'auto', Value1: 'isolate' } as const;
+
 /** DesignStyle wire fields. */
 export interface DesignStyleShape {
+    /** blendMode as defined by the Nexa gateway. */
+    readonly blendMode?: (typeof DesignStyleblendModeValues)[keyof typeof DesignStyleblendModeValues];
     /** blur as defined by the Nexa gateway. */
     readonly blur: number;
     /** corners as defined by the Nexa gateway. */
     readonly corners: DesignCorners;
     /** fills as defined by the Nexa gateway. */
     readonly fills: ReadonlyArray<DesignPaint>;
+    /** isolation as defined by the Nexa gateway. */
+    readonly isolation?: (typeof DesignStyleisolationValues)[keyof typeof DesignStyleisolationValues];
     /** shadows as defined by the Nexa gateway. */
     readonly shadows: ReadonlyArray<DesignShadow>;
     /** stroke as defined by the Nexa gateway. */
@@ -5997,12 +6024,46 @@ export interface DesignStyleShape {
 /** DesignStyle from the Nexa wire protocol. */
 export type DesignStyle = DesignStyleShape;
 
+/** Allowed values for DesignStyleChangesblendModeVariant0. */
+export const DesignStyleChangesblendModeVariant0Values = {
+    Value0: 'color',
+    Value1: 'color-burn',
+    Value2: 'color-dodge',
+    Value3: 'darken',
+    Value4: 'difference',
+    Value5: 'exclusion',
+    Value6: 'hard-light',
+    Value7: 'hue',
+    Value8: 'lighten',
+    Value9: 'luminosity',
+    Value10: 'multiply',
+    Value11: 'normal',
+    Value12: 'overlay',
+    Value13: 'saturation',
+    Value14: 'screen',
+    Value15: 'soft-light',
+} as const;
+
+/** Allowed values for DesignStyleChangesisolationVariant0. */
+export const DesignStyleChangesisolationVariant0Values = {
+    Value0: 'auto',
+    Value1: 'isolate',
+} as const;
+
 /** DesignStyleChanges wire fields. */
 export interface DesignStyleChangesShape {
+    /** blendMode as defined by the Nexa gateway. */
+    readonly blendMode?:
+        | (typeof DesignStyleChangesblendModeVariant0Values)[keyof typeof DesignStyleChangesblendModeVariant0Values]
+        | null;
     /** blur as defined by the Nexa gateway. */
     readonly blur?: number;
     /** corners as defined by the Nexa gateway. */
     readonly corners?: DesignCornerChanges;
+    /** isolation as defined by the Nexa gateway. */
+    readonly isolation?:
+        | (typeof DesignStyleChangesisolationVariant0Values)[keyof typeof DesignStyleChangesisolationVariant0Values]
+        | null;
     /** shadows as defined by the Nexa gateway. */
     readonly shadows?: ReadonlyArray<DesignShadow>;
 }
@@ -7021,6 +7082,8 @@ export interface GatewayFeaturesShape {
     readonly designImageAdjustments?: true;
     /** designImageTransforms as defined by the Nexa gateway. */
     readonly designImageTransforms?: true;
+    /** designLayerCompositing as defined by the Nexa gateway. */
+    readonly designLayerCompositing?: true;
     /** events as defined by the Nexa gateway. */
     readonly events: ReadonlyArray<string>;
     /** jsonReplies as defined by the Nexa gateway. */
