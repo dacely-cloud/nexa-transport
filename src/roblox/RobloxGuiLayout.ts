@@ -9,6 +9,7 @@ import {
     type RobloxGuiSizeResolver,
 } from './RobloxGuiBoxLayout';
 import { RobloxGuiScroll, type RobloxGuiScrollGeometry } from './RobloxGuiScroll';
+import { RobloxGuiScrollbars } from './RobloxGuiScrollbars';
 import { RobloxGuiAutoSize } from './RobloxGuiAutoSize';
 import { RobloxGuiPadding, type RobloxGuiInsets } from './RobloxGuiPadding';
 import { RobloxSceneHierarchy } from './RobloxSceneHierarchy';
@@ -25,6 +26,8 @@ export type RobloxGuiTransform = readonly [number, number, number, number, numbe
 export type RobloxGuiClip = readonly [number, number, number, number];
 /** Resolved visual state; text and geometry use the same native layout observation. */
 export interface RobloxGuiElement {
+    /** An owned visual layer, separate from the instance's background and descendants. */
+    readonly decoration?: 'Scrollbars';
     /** Optional padded text rectangle in local pixels; absent means the whole control. */
     readonly textRect?: readonly [number, number, number, number];
     readonly id: string;
@@ -115,6 +118,7 @@ export class RobloxGuiLayout {
     readonly #children: ReadonlyMap<string | null, readonly RobloxSceneNode[]>;
     readonly #nodes: ReadonlyMap<string, RobloxSceneNode>;
     readonly #order: ReadonlyMap<string, number>;
+    readonly #decorationOrder: Map<string, number> = new Map();
     readonly #screens: readonly RobloxSceneNode[];
     readonly #source: RobloxScene | null;
     #imagePatches: number = 0;
@@ -198,12 +202,29 @@ export class RobloxGuiLayout {
                 layer.sort(
                     (a: RobloxGuiElement, b: RobloxGuiElement): number =>
                         this.#zIndex(a.id, values) - this.#zIndex(b.id, values) ||
-                        (this.#order.get(a.id) ?? 0) - (this.#order.get(b.id) ?? 0),
+                        this.#paintOrder(a) - this.#paintOrder(b),
                 );
             }
             result.push(...layer);
         }
         return result;
+    }
+    #paintOrder(element: RobloxGuiElement): number {
+        return element.decoration === undefined
+            ? (this.#order.get(element.id) ?? 0)
+            : this.#descendantOrder(element.id) + 0.5;
+    }
+    #descendantOrder(id: string): number {
+        const cached: number | undefined = this.#decorationOrder.get(id);
+        if (cached !== undefined) {
+            return cached;
+        }
+        let order: number = this.#order.get(id) ?? 0;
+        for (const child of this.#children.get(id) ?? []) {
+            order = Math.max(order, this.#descendantOrder(child.id));
+        }
+        this.#decorationOrder.set(id, order);
+        return order;
     }
     #zIndex(
         id: string,
@@ -248,6 +269,7 @@ export class RobloxGuiLayout {
             return this.#sizing.resolve(node, minimum, capacity);
         };
         const children: readonly RobloxSceneNode[] = this.#children.get(id) ?? [];
+        let decoration: RobloxGuiElement | null = null;
         let group: RobloxGuiBoxGroup = RobloxGuiBoxLayout.group(
             children,
             values,
@@ -282,6 +304,38 @@ export class RobloxGuiLayout {
                     break;
                 }
             }
+            const image: RobloxGuiImage | null = RobloxGuiScrollbars.resolve(
+                this.#scene,
+                properties,
+                size,
+                scroll,
+            );
+            if (image !== null) {
+                this.#imagePatches += image.quads.length;
+                if (this.#imagePatches > 8192) {
+                    throw new Error('GUI image scene exceeds 8192 patches');
+                }
+                decoration = {
+                    decoration: 'Scrollbars',
+                    id,
+                    width: size.width,
+                    height: size.height,
+                    transform: parent.transform,
+                    clip: parent.clip,
+                    background: [0, 0, 0, 0],
+                    radius: 0,
+                    text: '',
+                    textColor: [0, 0, 0, 0],
+                    textSize: 1,
+                    textWrapped: false,
+                    textX: 0,
+                    textY: 0,
+                    stroke: [0, 0, 0, 0],
+                    strokeWidth: 0,
+                    strokeText: false,
+                    image,
+                };
+            }
             const clip: RobloxGuiClip =
                 properties['ClipsDescendants'] === true && !parent.rotated
                     ? this.#intersect(parent.clip, [
@@ -312,6 +366,9 @@ export class RobloxGuiLayout {
             if (box !== undefined) {
                 this.#render(box, parent, values, result, viewportWidth, viewportHeight);
             }
+        }
+        if (decoration !== null) {
+            result.push(decoration);
         }
     }
     #render(

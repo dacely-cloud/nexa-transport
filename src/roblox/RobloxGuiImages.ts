@@ -7,6 +7,8 @@ import { RobloxSceneTextures } from './RobloxSceneTextures';
 
 /** Destination local pixels and source atlas pixels for one image patch. */
 export interface RobloxGuiImageQuad {
+    /** Horizontal scrollbar segments rotate original vertical texels counterclockwise. */
+    readonly counterClockwise?: true;
     readonly position: readonly [number, number, number, number];
     readonly source: readonly [number, number, number, number];
 }

@@ -580,8 +580,15 @@ export class RobloxSceneCodec {
                 throw new Error('GUI minimum size must not exceed maximum size');
             }
         }
-        if (RobloxGuiClasses.image(supported)) {
-            for (const property of ['Image', 'HoverImage', 'PressedImage']) {
+        if (RobloxGuiClasses.image(supported) || supported === RobloxClass.ScrollingFrame) {
+            for (const property of [
+                'Image',
+                'HoverImage',
+                'PressedImage',
+                'TopImage',
+                'MidImage',
+                'BottomImage',
+            ]) {
                 const content: RobloxValue | undefined = properties[property];
                 if (
                     content !== undefined &&
