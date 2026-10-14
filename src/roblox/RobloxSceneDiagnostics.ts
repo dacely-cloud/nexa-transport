@@ -111,7 +111,12 @@ export class RobloxSceneDiagnostics {
             )
         ) {
             findings.push(
-                'List layout supports rows/columns, Name/LayoutOrder sorting, alignment, wrapping and flex spacing. AutomaticSize uses natural list extents independently of alignment slack. UIFlexItem rules and native AbsoluteSize/AbsoluteContentSize observation remain unfinished; Studio flex pixels are not calibrated yet.',
+                'List layout supports rows/columns, Name/LayoutOrder sorting, alignment, wrapping and flex spacing. AutomaticSize uses natural list extents independently of alignment slack. Native AbsoluteSize and AbsoluteContentSize observations use the actual hierarchy. UIFlexItem rules and Studio flex pixels remain uncalibrated.',
+            );
+        }
+        if (nodes.some((node: RobloxSceneNode): boolean => node.className === 'UISizeConstraint')) {
+            findings.push(
+                'UISizeConstraint clamps authored, automatic and flex dimensions independently on each axis. Native unbounded defaults survive JSON, Luau and Studio XML export. Recorded limit changes reflow siblings. Multiple-constraint priority, flex slack redistribution and Studio constraint pixels remain uncalibrated.',
             );
         }
         const textParents: ReadonlySet<string> = new Set(

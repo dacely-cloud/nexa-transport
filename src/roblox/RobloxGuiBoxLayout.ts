@@ -3,10 +3,12 @@
 import { RobloxProperties } from './RobloxSceneRuntime';
 import { RobloxGuiClasses } from './RobloxGuiClasses';
 import { RobloxGuiPadding, type RobloxGuiInsets } from './RobloxGuiPadding';
+import { RobloxGuiSizeConstraint, type RobloxGuiSizeLimits } from './RobloxGuiSizeConstraint';
 import type { RobloxSceneNode, RobloxValue, RobloxUDim2 } from './RobloxSceneTypes';
 
 /** A resolved GUI rectangle before its inherited affine transform. */
 export interface RobloxGuiBox {
+    readonly limits?: RobloxGuiSizeLimits;
     readonly node: RobloxSceneNode;
     readonly width: number;
     readonly height: number;
@@ -16,6 +18,7 @@ export interface RobloxGuiBox {
 }
 /** Intrinsic GUI dimensions before placement and transforms. */
 export interface RobloxGuiSize {
+    readonly limits?: RobloxGuiSizeLimits;
     readonly width: number;
     readonly height: number;
 }
@@ -100,6 +103,7 @@ export class RobloxGuiBoxLayout {
             const childWidth: number = resolved.width;
             const childHeight: number = resolved.height;
             boxes.set(node.id, {
+                ...(resolved.limits === undefined ? {} : { limits: resolved.limits }),
                 node,
                 width: childWidth,
                 height: childHeight,
@@ -247,13 +251,22 @@ export class RobloxGuiBoxLayout {
             );
             let main: number = along.start;
             for (const item of row.items) {
-                const itemMain: number = Math.max(0, item.main + along.growth);
+                const requestedMain: number = Math.max(0, item.main + along.growth);
                 const itemAlignment: number = RobloxProperties.enum(
                     properties,
                     'ItemLineAlignment',
                 );
-                const itemCross: number =
+                const requestedCross: number =
                     itemAlignment === 4 || crossFlex === 1 ? extent : item.cross;
+                const constrained: RobloxGuiSize = RobloxGuiSizeConstraint.apply(
+                    {
+                        width: horizontal ? requestedMain : requestedCross,
+                        height: horizontal ? requestedCross : requestedMain,
+                    },
+                    item.box.limits ?? null,
+                );
+                const itemMain: number = horizontal ? constrained.width : constrained.height;
+                const itemCross: number = horizontal ? constrained.height : constrained.width;
                 const alignment: number =
                     itemAlignment === 0
                         ? crossAlignment
@@ -264,6 +277,7 @@ export class RobloxGuiBoxLayout {
                             : 2;
                 const crossOffset: number = this.#aligned(extent - itemCross, alignment);
                 boxes.set(item.box.node.id, {
+                    ...(item.box.limits === undefined ? {} : { limits: item.box.limits }),
                     node: item.box.node,
                     width: horizontal ? itemMain : itemCross,
                     height: horizontal ? itemCross : itemMain,

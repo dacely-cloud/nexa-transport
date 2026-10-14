@@ -22,6 +22,9 @@ export interface RobloxVector2 {
     readonly kind: 'Vector2';
     readonly x: number;
     readonly y: number;
+    /** Explicit positive infinity for bound vectors; the corresponding stored component is zero. */
+    readonly xUnbounded?: true;
+    readonly yUnbounded?: true;
 }
 /** Native source rectangle, with bounds measured in image pixels. */
 export interface RobloxRect {
@@ -145,6 +148,7 @@ export const RobloxClass = {
     UIStroke: 'UIStroke',
     UIListLayout: 'UIListLayout',
     UIPadding: 'UIPadding',
+    UISizeConstraint: 'UISizeConstraint',
 } as const;
 /** Supported instance class. */
 export type RobloxClass = (typeof RobloxClass)[keyof typeof RobloxClass];

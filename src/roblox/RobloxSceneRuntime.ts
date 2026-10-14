@@ -193,6 +193,16 @@ export class RobloxSceneRuntime {
             return RobloxValues.vector3(lerp(from.x, to.x), lerp(from.y, to.y), lerp(from.z, to.z));
         }
         if (from.kind === 'Vector2' && to.kind === 'Vector2') {
+            if (
+                from.xUnbounded === true ||
+                from.yUnbounded === true ||
+                to.xUnbounded === true ||
+                to.yUnbounded === true
+            ) {
+                throw new Error(
+                    'Unbounded GUI limits require recorded native observations, not interpolation',
+                );
+            }
             return { kind: 'Vector2', x: lerp(from.x, to.x), y: lerp(from.y, to.y) };
         }
         if (from.kind === 'UDim2' && to.kind === 'UDim2') {

@@ -37,7 +37,13 @@ export class RobloxSceneLuau {
         }
         switch (value.kind) {
             case 'Vector2':
-                return 'Vector2.new(' + String(value.x) + ',' + String(value.y) + ')';
+                return (
+                    'Vector2.new(' +
+                    (value.xUnbounded === true ? 'math.huge' : String(value.x)) +
+                    ',' +
+                    (value.yUnbounded === true ? 'math.huge' : String(value.y)) +
+                    ')'
+                );
             case 'Rect':
                 return (
                     'Rect.new(' + [value.minX, value.minY, value.maxX, value.maxY].join(',') + ')'

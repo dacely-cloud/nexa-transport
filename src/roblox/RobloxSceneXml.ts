@@ -98,7 +98,12 @@ export class RobloxSceneXml {
                         '</Y></max>';
                     break;
                 case 'Vector2':
-                    content = '<X>' + String(value.x) + '</X><Y>' + String(value.y) + '</Y>';
+                    content =
+                        '<X>' +
+                        (value.xUnbounded === true ? 'INF' : String(value.x)) +
+                        '</X><Y>' +
+                        (value.yUnbounded === true ? 'INF' : String(value.y)) +
+                        '</Y>';
                     break;
                 case 'Vector3':
                     content =

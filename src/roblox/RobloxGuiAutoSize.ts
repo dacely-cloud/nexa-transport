@@ -7,6 +7,7 @@ import {
 } from './RobloxGuiBoxLayout';
 import { RobloxGuiClasses } from './RobloxGuiClasses';
 import { RobloxGuiPadding, type RobloxGuiInsets } from './RobloxGuiPadding';
+import { RobloxGuiSizeConstraint, type RobloxGuiSizeLimits } from './RobloxGuiSizeConstraint';
 import { RobloxProperties } from './RobloxSceneRuntime';
 import {
     RobloxTextMeasurement,
@@ -21,6 +22,7 @@ export class RobloxGuiAutoSize {
     readonly #values: ReadonlyMap<string, Readonly<Record<string, RobloxValue>>>;
     readonly #metrics: RobloxTextMetrics | undefined;
     readonly #cache: Map<string, Map<string, RobloxGuiSize>> = new Map();
+    readonly #limits: Map<string, RobloxGuiSizeLimits | null> = new Map();
     #work: number = 0;
     public constructor(
         children: ReadonlyMap<string | null, readonly RobloxSceneNode[]>,
@@ -38,13 +40,22 @@ export class RobloxGuiAutoSize {
         minimum: RobloxGuiSize,
         capacity: RobloxGuiSize,
     ): RobloxGuiSize {
+        let limits: RobloxGuiSizeLimits | null | undefined = this.#limits.get(node.id);
+        if (limits === undefined) {
+            limits = RobloxGuiSizeConstraint.limits(
+                this.#children.get(node.id) ?? [],
+                this.#values,
+            );
+            this.#limits.set(node.id, limits);
+        }
+        minimum = RobloxGuiSizeConstraint.apply(minimum, limits);
         const properties: Readonly<Record<string, RobloxValue>> =
             this.#values.get(node.id) ?? node.properties;
         const value: RobloxValue | undefined = properties['AutomaticSize'];
         const automatic: number =
             typeof value === 'object' && value.kind === 'Enum' ? value.value : 0;
         if (automatic === 0) {
-            return minimum;
+            return limits === null ? minimum : { ...minimum, limits };
         }
         const key: string = [minimum.width, minimum.height, capacity.width, capacity.height].join(
             ',',
@@ -58,10 +69,13 @@ export class RobloxGuiAutoSize {
         }
         const x: boolean = automatic === 1 || automatic === 3;
         const y: boolean = automatic === 2 || automatic === 3;
-        const maximum: RobloxGuiSize = {
-            width: Math.max(minimum.width, capacity.width),
-            height: Math.max(minimum.height, capacity.height),
-        };
+        const maximum: RobloxGuiSize = RobloxGuiSizeConstraint.apply(
+            {
+                width: Math.max(minimum.width, capacity.width),
+                height: Math.max(minimum.height, capacity.height),
+            },
+            limits,
+        );
         let current: RobloxGuiSize = minimum;
         for (let iteration: number = 0; iteration < 64; iteration += 1) {
             this.#work += 1;
@@ -100,39 +114,43 @@ export class RobloxGuiAutoSize {
                 automatic,
                 minimum.width - padding.left - padding.right,
             );
-            const next: RobloxGuiSize = {
-                width: x
-                    ? Math.max(
-                          minimum.width,
-                          Math.min(
-                              maximum.width,
-                              Math.fround(
-                                  Math.max(
-                                      group.content.width,
-                                      bounds.width + padding.left + padding.right,
+            const next: RobloxGuiSize = RobloxGuiSizeConstraint.apply(
+                {
+                    width: x
+                        ? Math.max(
+                              minimum.width,
+                              Math.min(
+                                  maximum.width,
+                                  Math.fround(
+                                      Math.max(
+                                          group.content.width,
+                                          bounds.width + padding.left + padding.right,
+                                      ),
                                   ),
                               ),
-                          ),
-                      )
-                    : minimum.width,
-                height: y
-                    ? Math.max(
-                          minimum.height,
-                          Math.min(
-                              maximum.height,
-                              Math.fround(
-                                  Math.max(
-                                      group.content.height,
-                                      bounds.height + padding.top + padding.bottom,
+                          )
+                        : minimum.width,
+                    height: y
+                        ? Math.max(
+                              minimum.height,
+                              Math.min(
+                                  maximum.height,
+                                  Math.fround(
+                                      Math.max(
+                                          group.content.height,
+                                          bounds.height + padding.top + padding.bottom,
+                                      ),
                                   ),
                               ),
-                          ),
-                      )
-                    : minimum.height,
-            };
+                          )
+                        : minimum.height,
+                },
+                limits,
+            );
             if (next.width === current.width && next.height === current.height) {
-                cache.set(key, next);
-                return next;
+                const result: RobloxGuiSize = limits === null ? next : { ...next, limits };
+                cache.set(key, result);
+                return result;
             }
             current = next;
         }

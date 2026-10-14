@@ -54,6 +54,8 @@ export const RobloxMaterial = {
 
 /** Portable native property validation metadata. */
 export interface RobloxPropertySpec {
+    /** Permits explicit positive-infinity flags only on bound vectors such as MaxSize. */
+    readonly unbounded?: boolean;
     readonly default: RobloxValue;
     readonly type: RobloxValueKind | 'number' | 'boolean' | 'string';
     readonly min?: number;
@@ -272,6 +274,15 @@ export const RobloxSceneSchema: Readonly<
         PaddingRight: v({ kind: 'UDim', scale: 0, offset: 0 }, true),
         PaddingTop: v({ kind: 'UDim', scale: 0, offset: 0 }, true),
         PaddingBottom: v({ kind: 'UDim', scale: 0, offset: 0 }, true),
+    },
+    UISizeConstraint: {
+        MinSize: { ...v({ kind: 'Vector2', x: 0, y: 0 }, true), min: 0, max: 16384 },
+        MaxSize: {
+            ...v({ kind: 'Vector2', x: 0, y: 0, xUnbounded: true, yUnbounded: true }, true),
+            min: 0,
+            max: 16384,
+            unbounded: true,
+        },
     },
     UIListLayout: {
         FillDirection: e(1, [0, 1], 'FillDirection'),

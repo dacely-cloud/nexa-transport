@@ -343,10 +343,11 @@ export class RobloxSceneCodec {
             CFrame: ['components'],
             Enum: ['value'],
         };
-        const data: Readonly<Record<string, unknown>> = this.record(raw, [
-            'kind',
-            ...(keys[spec.type] ?? []),
-        ]);
+        const data: Readonly<Record<string, unknown>> = this.record(
+            raw,
+            ['kind', ...(keys[spec.type] ?? [])],
+            spec.type === 'Vector2' && spec.unbounded === true ? ['xUnbounded', 'yUnbounded'] : [],
+        );
         if (data['kind'] !== spec.type) {
             throw new Error('Expected Roblox ' + spec.type);
         }
@@ -359,10 +360,20 @@ export class RobloxSceneCodec {
                 return Object.freeze({ kind: 'Rect', minX, minY, maxX, maxY });
             }
             case 'Vector2':
+                for (const [axis, flag] of [
+                    ['x', 'xUnbounded'],
+                    ['y', 'yUnbounded'],
+                ] as const) {
+                    if (data[flag] !== undefined && (data[flag] !== true || data[axis] !== 0)) {
+                        throw new Error('Invalid unbounded vector component');
+                    }
+                }
                 return Object.freeze({
                     kind: 'Vector2',
-                    x: this.number(data['x']),
-                    y: this.number(data['y']),
+                    x: this.number(data['x'], min, max),
+                    y: this.number(data['y'], min, max),
+                    ...(data['xUnbounded'] === true ? { xUnbounded: true as const } : {}),
+                    ...(data['yUnbounded'] === true ? { yUnbounded: true as const } : {}),
                 });
             case 'Vector3':
                 return Object.freeze({
@@ -551,6 +562,20 @@ export class RobloxSceneCodec {
                 throw new Error('Part.Size must be positive');
             }
         }
+        if (supported === RobloxClass.UISizeConstraint) {
+            const minimum: RobloxValue | undefined = properties['MinSize'];
+            const maximum: RobloxValue | undefined = properties['MaxSize'];
+            if (
+                typeof minimum !== 'object' ||
+                minimum.kind !== 'Vector2' ||
+                typeof maximum !== 'object' ||
+                maximum.kind !== 'Vector2' ||
+                (maximum.xUnbounded !== true && minimum.x > maximum.x) ||
+                (maximum.yUnbounded !== true && minimum.y > maximum.y)
+            ) {
+                throw new Error('GUI minimum size must not exceed maximum size');
+            }
+        }
         if (RobloxGuiClasses.image(supported)) {
             for (const property of ['Image', 'HoverImage', 'PressedImage']) {
                 const content: RobloxValue | undefined = properties[property];
@@ -625,6 +650,7 @@ export class RobloxSceneCodec {
             UIStroke: RobloxGuiClasses.objects,
             UIListLayout: RobloxGuiClasses.objects,
             UIPadding: RobloxGuiClasses.objects,
+            UISizeConstraint: RobloxGuiClasses.objects,
         };
         if (
             parent === undefined
