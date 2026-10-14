@@ -11980,6 +11980,90 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'luau.editor.close': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/LuauEditorHandle',
+                        },
+                        result: {
+                            $ref: '#/definitions/LuauEditorAck',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'luau.editor.commit': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/LuauEditorCommit',
+                        },
+                        result: {
+                            $ref: '#/definitions/LuauEditorReport',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'luau.editor.completion': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/LuauEditorQuery',
+                        },
+                        result: {
+                            $ref: '#/definitions/LuauEditorCompletion',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'luau.editor.definition': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/LuauEditorQuery',
+                        },
+                        result: {
+                            $ref: '#/definitions/LuauEditorDefinition',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'luau.editor.hover': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/LuauEditorQuery',
+                        },
+                        result: {
+                            $ref: '#/definitions/LuauEditorHover',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'luau.editor.stage': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/LuauEditorSourcePart',
+                        },
+                        result: {
+                            $ref: '#/definitions/LuauEditorAck',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'luau.editor.start': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/LuauEditorHandle',
+                        },
+                        result: {
+                            $ref: '#/definitions/LuauEditorAck',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'media.acknowledge': {
                     properties: {
                         params: {
@@ -13575,6 +13659,13 @@ export const schema: Schema = {
                 'jobs.list',
                 'jobs.remove',
                 'logs.tail',
+                'luau.editor.close',
+                'luau.editor.commit',
+                'luau.editor.completion',
+                'luau.editor.definition',
+                'luau.editor.hover',
+                'luau.editor.stage',
+                'luau.editor.start',
                 'media.acknowledge',
                 'office.ownerProof',
                 'processes.input',
@@ -14600,6 +14691,332 @@ export const schema: Schema = {
                     type: 'number',
                 },
             },
+            type: 'object',
+        },
+        LuauEditorAck: {
+            description:
+                'Small staging/close acknowledgments do not imply successful type coverage.',
+            properties: {
+                handle: {
+                    type: 'string',
+                },
+                revision: {
+                    type: 'number',
+                },
+            },
+            required: ['handle', 'revision'],
+            type: 'object',
+        },
+        LuauEditorCommit: {
+            description:
+                'The complete selected source set is committed to the native frontend in one check.',
+            properties: {
+                definitions: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                handle: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                paths: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                revision: {
+                    type: 'number',
+                },
+            },
+            required: ['definitions', 'handle', 'id', 'paths', 'revision'],
+            type: 'object',
+        },
+        LuauEditorCompletion: {
+            description: "Completion entries are bounded by the native analyzer's 2048-item limit.",
+            properties: {
+                handle: {
+                    type: 'string',
+                },
+                isIncomplete: {
+                    type: 'boolean',
+                },
+                items: {
+                    items: {
+                        $ref: '#/definitions/LuauEditorCompletionItem',
+                    },
+                    type: 'array',
+                },
+                revision: {
+                    type: 'number',
+                },
+            },
+            required: ['handle', 'isIncomplete', 'items', 'revision'],
+            type: 'object',
+        },
+        LuauEditorCompletionItem: {
+            description: 'One actual upstream completion entry.',
+            properties: {
+                deprecated: {
+                    type: 'boolean',
+                },
+                detail: {
+                    type: ['null', 'string'],
+                },
+                label: {
+                    type: 'string',
+                },
+            },
+            required: ['deprecated', 'detail', 'label'],
+            type: 'object',
+        },
+        LuauEditorDefinition: {
+            description:
+                'An unresolved definition returns null rather than an invented source location.',
+            properties: {
+                handle: {
+                    type: 'string',
+                },
+                location: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/LuauEditorLocation',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                revision: {
+                    type: 'number',
+                },
+            },
+            required: ['handle', 'location', 'revision'],
+            type: 'object',
+        },
+        LuauEditorDiagnostic: {
+            description:
+                'Native diagnostic positions retain their documented zero-based UTF-8 byte columns.',
+            properties: {
+                code: {
+                    type: 'string',
+                },
+                endColumn: {
+                    type: 'number',
+                },
+                endLine: {
+                    type: 'number',
+                },
+                file: {
+                    type: 'string',
+                },
+                message: {
+                    type: 'string',
+                },
+                severity: {
+                    $ref: '#/definitions/LuauEditorSeverity',
+                },
+                startColumn: {
+                    type: 'number',
+                },
+                startLine: {
+                    type: 'number',
+                },
+            },
+            required: [
+                'code',
+                'endColumn',
+                'endLine',
+                'file',
+                'message',
+                'severity',
+                'startColumn',
+                'startLine',
+            ],
+            type: 'object',
+        },
+        LuauEditorHandle: {
+            description:
+                'Browser connection owns the handle; the conversation is authorized independently on every request.',
+            properties: {
+                handle: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+            },
+            required: ['handle', 'id'],
+            type: 'object',
+        },
+        LuauEditorHover: {
+            description:
+                'Hover preserves native Markdown as text; clients must not inject it as HTML.',
+            properties: {
+                handle: {
+                    type: 'string',
+                },
+                revision: {
+                    type: 'number',
+                },
+                text: {
+                    type: ['null', 'string'],
+                },
+            },
+            required: ['handle', 'revision', 'text'],
+            type: 'object',
+        },
+        LuauEditorLocation: {
+            description:
+                'Definition targets remain relative to the supplied source project, with UTF-16 coordinates.',
+            properties: {
+                endCharacter: {
+                    type: 'number',
+                },
+                endLine: {
+                    type: 'number',
+                },
+                name: {
+                    type: 'string',
+                },
+                startCharacter: {
+                    type: 'number',
+                },
+                startLine: {
+                    type: 'number',
+                },
+            },
+            required: ['endCharacter', 'endLine', 'name', 'startCharacter', 'startLine'],
+            type: 'object',
+        },
+        LuauEditorQuery: {
+            description:
+                'Queries refer to exactly the displayed committed revision and use zero-based UTF-16 positions.',
+            properties: {
+                character: {
+                    type: 'number',
+                },
+                handle: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                line: {
+                    type: 'number',
+                },
+                name: {
+                    type: 'string',
+                },
+                revision: {
+                    type: 'number',
+                },
+            },
+            required: ['character', 'handle', 'id', 'line', 'name', 'revision'],
+            type: 'object',
+        },
+        LuauEditorReport: {
+            description: 'Complete project diagnostics belong to one committed source revision.',
+            properties: {
+                checked: {
+                    type: 'number',
+                },
+                diagnostics: {
+                    items: {
+                        $ref: '#/definitions/LuauEditorDiagnostic',
+                    },
+                    type: 'array',
+                },
+                elapsedUs: {
+                    type: 'string',
+                },
+                error: {
+                    type: ['null', 'string'],
+                },
+                handle: {
+                    type: 'string',
+                },
+                lines: {
+                    type: 'string',
+                },
+                ok: {
+                    type: 'boolean',
+                },
+                rechecked: {
+                    type: 'number',
+                },
+                revision: {
+                    type: 'number',
+                },
+                timeouts: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                typecheckComplete: {
+                    type: 'boolean',
+                },
+                unchecked: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+            },
+            required: [
+                'checked',
+                'diagnostics',
+                'elapsedUs',
+                'error',
+                'handle',
+                'lines',
+                'ok',
+                'rechecked',
+                'revision',
+                'timeouts',
+                'typecheckComplete',
+                'unchecked',
+            ],
+            type: 'object',
+        },
+        LuauEditorSeverity: {
+            description:
+                'Actual native diagnostic classifications.\nClassification shared by generated contracts and source-only native reports.',
+            enum: ['error', 'warning'],
+            type: 'string',
+        },
+        LuauEditorSourcePart: {
+            description:
+                'A bounded source chunk stages an immutable revision without checking an incomplete upload.',
+            properties: {
+                complete: {
+                    type: 'boolean',
+                },
+                handle: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                name: {
+                    type: 'string',
+                },
+                offset: {
+                    type: 'number',
+                },
+                revision: {
+                    type: 'number',
+                },
+                source: {
+                    type: 'string',
+                },
+            },
+            required: ['complete', 'handle', 'id', 'name', 'offset', 'revision', 'source'],
             type: 'object',
         },
         MediaAcknowledgeParams: {
