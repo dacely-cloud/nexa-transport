@@ -18,6 +18,14 @@ export interface RobloxMeshGeometryData {
 
 /** Mesh instances reuse decoded topology and normalized geometry without per-triangle object arrays. */
 export class RobloxMeshGeometry {
+    static readonly #empty: RobloxMeshGeometryData = Object.freeze({
+        positions: new Float32Array(0),
+        normals: new Float32Array(0),
+        uvs: new Float32Array(0),
+        colors: new Uint8Array(0),
+        indices: new Uint32Array(0),
+        transparent: false,
+    });
     static readonly #geometry: WeakMap<RobloxMeshData, Map<string, RobloxMeshGeometryData>> =
         new WeakMap();
 
@@ -26,7 +34,10 @@ export class RobloxMeshGeometry {
         properties: Readonly<Record<string, RobloxValue>>,
     ): RobloxMeshGeometryData {
         const uri: RobloxValue | undefined = properties['MeshId'];
-        if (typeof uri !== 'string' || uri === '') {
+        if (uri === '') {
+            return this.#empty;
+        }
+        if (typeof uri !== 'string') {
             throw new Error('MeshPart requires an imported, loaded mesh identity');
         }
         const source: RobloxMeshData = RobloxSceneMeshes.get(scene, uri);
