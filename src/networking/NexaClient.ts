@@ -1248,7 +1248,12 @@ export class NexaClient {
                     encodeBinary !== undefined
                         ? encodeBinary(id)
                         : this.#hello?.features.binaryMedia === true
-                          ? BinaryEnvelope.encodeValue({ v: GatewayVersion.Current, id, method, params })
+                          ? BinaryEnvelope.encodeValue({
+                                v: GatewayVersion.Current,
+                                id,
+                                method,
+                                params,
+                            })
                           : null;
                 const payload: string | Uint8Array<ArrayBuffer> =
                     binary ?? JSON.stringify({ v: GatewayVersion.Current, id, method, params });

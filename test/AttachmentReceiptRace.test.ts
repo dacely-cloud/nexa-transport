@@ -69,7 +69,14 @@ it('accepts the next large file before the previous receipt RPC replies', async 
                     JSON.stringify({
                         id: pending.id,
                         ok: true,
-                        result: pending === original ? { files: [], nextCursor: null, revision: '00000000-0000-0000-0000-000000000000' } : { ok: true },
+                        result:
+                            pending === original
+                                ? {
+                                      files: [],
+                                      nextCursor: null,
+                                      revision: '00000000-0000-0000-0000-000000000000',
+                                  }
+                                : { ok: true },
                     }),
                 );
             }
