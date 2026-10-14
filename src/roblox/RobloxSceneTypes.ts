@@ -198,6 +198,8 @@ export interface RobloxEmissionFrame {
     readonly nodeId: string;
     readonly cframe: RobloxCFrame;
     readonly size: RobloxVector3 | null;
+    /** Exact world-space parent velocity at Emit; omitted by older native recordings. */
+    readonly velocity?: RobloxVector3 | null;
 }
 /** Birth inputs that may differ from the values observed at the end of a frame. */
 export interface RobloxEmissionSnapshot {

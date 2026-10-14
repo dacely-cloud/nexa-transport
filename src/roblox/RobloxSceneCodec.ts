@@ -863,11 +863,11 @@ export class RobloxSceneCodec {
         const seen: Set<string> = new Set();
         const frames: readonly RobloxEmissionFrame[] = this.#array(fields['frames'], 64).map(
             (raw: unknown): RobloxEmissionFrame => {
-                const frame: Readonly<Record<string, unknown>> = this.record(raw, [
-                    'nodeId',
-                    'cframe',
-                    'size',
-                ]);
+                const frame: Readonly<Record<string, unknown>> = this.record(
+                    raw,
+                    ['nodeId', 'cframe', 'size'],
+                    ['velocity'],
+                );
                 const nodeId: string = this.#id(frame['nodeId']);
                 const ancestor: RobloxSceneNode | undefined = nodes.get(nodeId);
                 if (
@@ -901,7 +901,26 @@ export class RobloxSceneCodec {
                 ) {
                     throw new Error('Invalid emission dimensions');
                 }
-                return Object.freeze({ nodeId, cframe, size });
+                const velocity: RobloxValue | null | undefined =
+                    frame['velocity'] === undefined || frame['velocity'] === null
+                        ? frame['velocity']
+                        : this.value(frame['velocity'], { type: 'Vector3', default: false });
+                if (
+                    (velocity === null && RobloxPartGeometry.isPart(ancestor.className)) ||
+                    (velocity !== undefined &&
+                        velocity !== null &&
+                        (typeof velocity !== 'object' ||
+                            velocity.kind !== 'Vector3' ||
+                            ancestor.className === RobloxClass.Attachment))
+                ) {
+                    throw new Error('Invalid emission velocity');
+                }
+                return Object.freeze({
+                    nodeId,
+                    cframe,
+                    size,
+                    ...(velocity === undefined ? {} : { velocity }),
+                });
             },
         );
         if (

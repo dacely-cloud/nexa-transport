@@ -48,6 +48,7 @@ const files: readonly string[] = [
     'RobloxSceneExamples',
     'RobloxParticleSimulator',
     'RobloxParticleBirths',
+    'RobloxParticleInheritance',
     'RobloxParticleIntervals',
     'RobloxParticleMotion',
     'RobloxParticleMotionTree',

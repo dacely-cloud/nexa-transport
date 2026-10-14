@@ -176,6 +176,7 @@ const text: Readonly<Record<string, RobloxPropertySpec>> = {
 };
 
 const part: Readonly<Record<string, RobloxPropertySpec>> = {
+    Velocity: { ...v(RobloxValues.vector3(), true), serialize: false },
     CFrame: v(RobloxValues.cframe(), true),
     Size: v(RobloxValues.vector3(4, 1.2, 2), true),
     Color: {
@@ -231,6 +232,7 @@ export const RobloxSceneSchema: Readonly<
         Speed: { ...v({ kind: 'NumberRange', min: 5, max: 5 }), min: -1000, max: 1000 },
         Acceleration: v(RobloxValues.vector3(), true),
         Drag: n(0, -100, 100),
+        VelocityInheritance: n(0, 0, 1),
         TimeScale: n(1, 0, 1),
         Shape: e(0, [0, 1, 2, 3], 'ParticleEmitterShape'),
         ShapeStyle: e(0, [0, 1], 'ParticleEmitterShapeStyle'),

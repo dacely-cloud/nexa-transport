@@ -375,11 +375,19 @@ export class RobloxSceneLuau {
                                 access +
                                 '.CFrame' +
                                 (frame.size === null ? '' : ', size=' + access + '.Size') +
+                                (frame.velocity === undefined || frame.velocity === null
+                                    ? ''
+                                    : ', velocity=' + access + '.Velocity') +
                                 '})',
                             '        ' + access + '.CFrame = ' + this.value(frame.cframe),
                         );
                         if (frame.size !== null) {
                             lines.push('        ' + access + '.Size = ' + this.value(frame.size));
+                        }
+                        if (frame.velocity !== undefined && frame.velocity !== null) {
+                            lines.push(
+                                '        ' + access + '.Velocity = ' + this.value(frame.velocity),
+                            );
                         }
                     }
                 }
@@ -392,7 +400,7 @@ export class RobloxSceneLuau {
                 );
                 if (event.emission !== undefined) {
                     lines.push(
-                        '        for _, frame in savedFrames do frame.node.CFrame = frame.cframe; if frame.size then frame.node.Size = frame.size end end',
+                        '        for _, frame in savedFrames do frame.node.CFrame = frame.cframe; if frame.size then frame.node.Size = frame.size end; if frame.velocity then frame.node.Velocity = frame.velocity end end',
                         '        for property, value in savedProperties do emitter[property] = value end',
                         '        for index = #savedParents, 1, -1 do local saved=savedParents[index]; saved.node.Parent=saved.parent end',
                     );

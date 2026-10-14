@@ -16,6 +16,7 @@ import { RobloxPartGeometry } from './RobloxPartGeometry';
 import { RobloxValues } from './RobloxSceneSchema';
 import { RobloxSceneHierarchy } from './RobloxSceneHierarchy';
 import { RobloxParticleIntervals } from './RobloxParticleIntervals';
+import { RobloxParticleInheritance } from './RobloxParticleInheritance';
 import { RobloxParticleBirthPoses } from './RobloxParticleBirthPoses';
 import { RobloxParticleShape, type RobloxParticleShapePoint } from './RobloxParticleShape';
 
@@ -179,6 +180,29 @@ export class RobloxParticleBirths {
                               ),
                       )
                     : null;
+            const emittedVelocity: RobloxVector3 = this.#transform(
+                RobloxValues.vector3(
+                    shape.normal.x * velocity,
+                    shape.normal.y * velocity,
+                    shape.normal.z * velocity,
+                ),
+                parent,
+                byId,
+                true,
+                scene,
+                at,
+                trigger,
+                spawn.emission,
+            );
+            const inherited: RobloxVector3 = RobloxParticleInheritance.velocity(
+                scene,
+                parent,
+                byId,
+                at,
+                trigger,
+                spawn.emission,
+                RobloxProperties.number(properties, 'VelocityInheritance'),
+            );
             return {
                 at,
                 life,
@@ -193,19 +217,10 @@ export class RobloxParticleBirths {
                     trigger,
                     spawn.emission,
                 ),
-                velocity: this.#transform(
-                    RobloxValues.vector3(
-                        shape.normal.x * velocity,
-                        shape.normal.y * velocity,
-                        shape.normal.z * velocity,
-                    ),
-                    parent,
-                    byId,
-                    true,
-                    scene,
-                    at,
-                    trigger,
-                    spawn.emission,
+                velocity: RobloxValues.vector3(
+                    emittedVelocity.x + inherited.x,
+                    emittedVelocity.y + inherited.y,
+                    emittedVelocity.z + inherited.z,
                 ),
                 rotation:
                     ((rotation.min + (rotation.max - rotation.min) * random()) * Math.PI) / 180,
