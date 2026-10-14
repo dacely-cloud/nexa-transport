@@ -5587,6 +5587,50 @@ export const schema: Schema = {
             required: ['byteLength', 'id', 'name', 'sha256'],
             type: 'object',
         },
+        DesignAssetThumbnail: {
+            description:
+                'A small static preview retains the identity of its original immutable owner asset.',
+            properties: {
+                asset: {
+                    $ref: '#/definitions/DesignAsset',
+                },
+                byteLength: {
+                    type: 'string',
+                },
+                data: {
+                    type: 'string',
+                },
+                height: {
+                    type: 'number',
+                },
+                mime: {
+                    const: 'image/png',
+                    type: 'string',
+                },
+                sha256: {
+                    type: 'string',
+                },
+                width: {
+                    type: 'number',
+                },
+            },
+            required: ['asset', 'byteLength', 'data', 'height', 'mime', 'sha256', 'width'],
+            type: 'object',
+        },
+        DesignAssetThumbnailMethod: {
+            description:
+                'Preview delivery is independent of original byte downloads and document writes.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/DesignAssetIdRequest',
+                },
+                result: {
+                    $ref: '#/definitions/DesignAssetThumbnail',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
         DesignBox: {
             description:
                 'Resolved layout boxes are separate from authored values and never written back implicitly.',
@@ -11235,6 +11279,20 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'design.asset.thumbnail': {
+                    description:
+                        'Preview delivery is independent of original byte downloads and document writes.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/DesignAssetIdRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/DesignAssetThumbnail',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'design.canvas': {
                     description:
                         'Independently advertised canvas records allow complete-read fallback on older workspaces.',
@@ -13173,6 +13231,7 @@ export const schema: Schema = {
                 'design.asset.read',
                 'design.asset.remove',
                 'design.asset.start',
+                'design.asset.thumbnail',
                 'design.canvas',
                 'design.canvas.metrics',
                 'design.changes',

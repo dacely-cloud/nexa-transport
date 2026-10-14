@@ -3655,6 +3655,38 @@ export interface DesignAssetStartRequestShape {
 /** DesignAssetStartRequest from the Nexa wire protocol. */
 export type DesignAssetStartRequest = DesignAssetStartRequestShape;
 
+/** DesignAssetThumbnail wire fields. */
+export interface DesignAssetThumbnailShape {
+    /** asset as defined by the Nexa gateway. */
+    readonly asset: DesignAsset;
+    /** byteLength as defined by the Nexa gateway. */
+    readonly byteLength: string;
+    /** data as defined by the Nexa gateway. */
+    readonly data: string;
+    /** height as defined by the Nexa gateway. */
+    readonly height: number;
+    /** mime as defined by the Nexa gateway. */
+    readonly mime: 'image/png';
+    /** sha256 as defined by the Nexa gateway. */
+    readonly sha256: string;
+    /** width as defined by the Nexa gateway. */
+    readonly width: number;
+}
+
+/** DesignAssetThumbnail from the Nexa wire protocol. */
+export type DesignAssetThumbnail = DesignAssetThumbnailShape;
+
+/** DesignAssetThumbnailMethod wire fields. */
+export interface DesignAssetThumbnailMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignAssetIdRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignAssetThumbnail;
+}
+
+/** DesignAssetThumbnailMethod from the Nexa wire protocol. */
+export type DesignAssetThumbnailMethod = DesignAssetThumbnailMethodShape;
+
 /** DesignBox wire fields. */
 export interface DesignBoxShape {
     /** clipId as defined by the Nexa gateway. */
@@ -7373,6 +7405,14 @@ export interface GatewayMethodsdesign_asset_startShape {
     readonly result: DesignAssetPosition;
 }
 
+/** GatewayMethodsdesign_asset_thumbnail wire fields. */
+export interface GatewayMethodsdesign_asset_thumbnailShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignAssetIdRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignAssetThumbnail;
+}
+
 /** GatewayMethodsdesign_canvas wire fields. */
 export interface GatewayMethodsdesign_canvasShape {
     /** params as defined by the Nexa gateway. */
@@ -8649,6 +8689,8 @@ export interface GatewayMethodsShape {
     readonly 'design.asset.remove': GatewayMethodsdesign_asset_removeShape;
     /** design.asset.start as defined by the Nexa gateway. */
     readonly 'design.asset.start': GatewayMethodsdesign_asset_startShape;
+    /** design.asset.thumbnail as defined by the Nexa gateway. */
+    readonly 'design.asset.thumbnail': GatewayMethodsdesign_asset_thumbnailShape;
     /** design.canvas as defined by the Nexa gateway. */
     readonly 'design.canvas': GatewayMethodsdesign_canvasShape;
     /** design.canvas.metrics as defined by the Nexa gateway. */
@@ -16191,6 +16233,8 @@ export enum Method {
     DesignAssetRemove = 'design.asset.remove',
     /** Calls design.asset.start. */
     DesignAssetStart = 'design.asset.start',
+    /** Calls design.asset.thumbnail. */
+    DesignAssetThumbnail = 'design.asset.thumbnail',
     /** Calls design.canvas. */
     DesignCanvas = 'design.canvas',
     /** Calls design.canvas.metrics. */
