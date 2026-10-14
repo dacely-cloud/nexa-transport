@@ -101,7 +101,7 @@ export class RobloxSceneDiagnostics {
         }
         if ((scene.inputs?.length ?? 0) > 0) {
             findings.push(
-                'Input traces are observations from actual native callbacks. The viewer and Studio replay captured results; a live browser VM session and pointer hit testing remain unfinished.',
+                'Input traces preserve actual native callbacks. Offline scenes and Studio packs replay captured results; live Chat panels dispatch new logical inputs and mouse/touch gestures to retained VMs. Independent native coordinate hit testing and Studio event-order calibration remain unfinished.',
             );
         }
         if (

@@ -4,6 +4,8 @@ import { RobloxGuiClasses } from './RobloxGuiClasses';
 import {
     RobloxInputEvent,
     RobloxInputDevice,
+    RobloxPointerPhase,
+    type RobloxPointerInput,
     type RobloxInputRequest,
     type RobloxInputObservation,
     type RobloxSceneNode,
@@ -20,7 +22,7 @@ export class RobloxSceneInput {
             const fields: Readonly<Record<string, unknown>> = RobloxSceneCodec.record(
                 value,
                 ['nodeId', 'at'],
-                ['event', 'device', 'x', 'y', 'clickCount'],
+                ['event', 'device', 'x', 'y', 'clickCount', 'pointer'],
             );
             const input: RobloxInputRequest = this.#request(fields, 60);
             if (input.at < previous) {
@@ -43,17 +45,21 @@ export class RobloxSceneInput {
         }
         let previous: number = 0;
         return raw.map((value: unknown): RobloxInputObservation => {
-            const fields: Readonly<Record<string, unknown>> = RobloxSceneCodec.record(value, [
-                'nodeId',
-                'at',
-                'requestedAt',
-                'event',
-                'device',
-                'x',
-                'y',
-                'clickCount',
-                'accepted',
-            ]);
+            const fields: Readonly<Record<string, unknown>> = RobloxSceneCodec.record(
+                value,
+                [
+                    'nodeId',
+                    'at',
+                    'requestedAt',
+                    'event',
+                    'device',
+                    'x',
+                    'y',
+                    'clickCount',
+                    'accepted',
+                ],
+                ['pointer'],
+            );
             const input: RobloxInputRequest = this.#request(fields, duration);
             const node: RobloxSceneNode | undefined = nodes.get(input.nodeId);
             if (
@@ -78,6 +84,7 @@ export class RobloxSceneInput {
                 y: input.y ?? 0,
                 clickCount: input.clickCount ?? 0,
                 accepted: fields['accepted'],
+                ...(input.pointer === undefined ? {} : { pointer: input.pointer }),
             });
         });
     }
@@ -94,7 +101,11 @@ export class RobloxSceneInput {
                 ? RobloxInputEvent.Activated
                 : fields['event'] === RobloxInputEvent.MouseButton1Click
                   ? RobloxInputEvent.MouseButton1Click
-                  : this.#invalid();
+                  : fields['event'] === RobloxInputEvent.MouseButton1Down
+                    ? RobloxInputEvent.MouseButton1Down
+                    : fields['event'] === RobloxInputEvent.MouseButton1Up
+                      ? RobloxInputEvent.MouseButton1Up
+                      : this.#invalid();
         const device: RobloxInputDevice =
             fields['device'] === undefined || fields['device'] === RobloxInputDevice.Mouse
                 ? RobloxInputDevice.Mouse
@@ -103,8 +114,16 @@ export class RobloxSceneInput {
                   : fields['device'] === RobloxInputDevice.Gamepad
                     ? RobloxInputDevice.Gamepad
                     : this.#invalid();
-        if (event === RobloxInputEvent.MouseButton1Click && device !== RobloxInputDevice.Mouse) {
-            throw new Error('MouseButton1Click requires mouse input');
+        if (event !== RobloxInputEvent.Activated && device !== RobloxInputDevice.Mouse) {
+            throw new Error('Mouse button signals require mouse input');
+        }
+        const pointer: RobloxPointerInput | undefined =
+            fields['pointer'] === undefined ? undefined : this.#pointer(fields['pointer']);
+        if (
+            pointer !== undefined &&
+            (event !== RobloxInputEvent.Activated || device === RobloxInputDevice.Gamepad)
+        ) {
+            throw new Error('Pointer gestures require default activation and mouse or touch input');
         }
         return {
             nodeId,
@@ -114,7 +133,31 @@ export class RobloxSceneInput {
             x: RobloxSceneCodec.number(fields['x'] ?? 0, -32768, 32768, true),
             y: RobloxSceneCodec.number(fields['y'] ?? 0, -32768, 32768, true),
             clickCount: RobloxSceneCodec.number(fields['clickCount'] ?? 0, 0, 64, true),
+            ...(pointer === undefined ? {} : { pointer }),
         };
+    }
+    static #pointer(raw: unknown): RobloxPointerInput {
+        const fields: Readonly<Record<string, unknown>> = RobloxSceneCodec.record(raw, [
+            'phase',
+            'id',
+            'over',
+        ]);
+        const phase: RobloxPointerPhase =
+            fields['phase'] === RobloxPointerPhase.Press
+                ? RobloxPointerPhase.Press
+                : fields['phase'] === RobloxPointerPhase.Release
+                  ? RobloxPointerPhase.Release
+                  : fields['phase'] === RobloxPointerPhase.Cancel
+                    ? RobloxPointerPhase.Cancel
+                    : this.#invalid();
+        if (typeof fields['over'] !== 'boolean') {
+            throw new Error('Pointer hit evidence must be boolean');
+        }
+        return Object.freeze({
+            phase,
+            id: RobloxSceneCodec.number(fields['id'], 0, 4294967295, true),
+            over: fields['over'],
+        });
     }
     static #invalid(): never {
         throw new Error('Invalid native input event/device');

@@ -255,10 +255,22 @@ export interface RobloxScene {
 export const RobloxInputEvent = {
     Activated: 'Activated',
     MouseButton1Click: 'MouseButton1Click',
+    MouseButton1Down: 'MouseButton1Down',
+    MouseButton1Up: 'MouseButton1Up',
 } as const;
 export type RobloxInputEvent = (typeof RobloxInputEvent)[keyof typeof RobloxInputEvent];
 export const RobloxInputDevice = { Mouse: 'Mouse', Touch: 'Touch', Gamepad: 'Gamepad' } as const;
 export type RobloxInputDevice = (typeof RobloxInputDevice)[keyof typeof RobloxInputDevice];
+/** Physical gesture phases owned by the preview protocol, separate from Roblox signal names. */
+export const RobloxPointerPhase = { Press: 'Press', Release: 'Release', Cancel: 'Cancel' } as const;
+/** One retained physical pointer phase. */
+export type RobloxPointerPhase = (typeof RobloxPointerPhase)[keyof typeof RobloxPointerPhase];
+/** Browser hit evidence and bounded pointer identity for an actual press/release gesture. */
+export interface RobloxPointerInput {
+    readonly phase: RobloxPointerPhase;
+    readonly id: number;
+    readonly over: boolean;
+}
 /** A recognized logical activation, relative to the native recording start. */
 export interface RobloxInputRequest {
     readonly nodeId: string;
@@ -268,6 +280,7 @@ export interface RobloxInputRequest {
     readonly x?: number;
     readonly y?: number;
     readonly clickCount?: number;
+    readonly pointer?: RobloxPointerInput;
 }
 /** Native dispatch evidence; timestamps distinguish requested time from the fixed simulation frame. */
 export interface RobloxInputObservation {
@@ -280,4 +293,5 @@ export interface RobloxInputObservation {
     readonly y: number;
     readonly clickCount: number;
     readonly accepted: boolean;
+    readonly pointer?: RobloxPointerInput;
 }
