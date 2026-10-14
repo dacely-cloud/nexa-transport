@@ -64,6 +64,7 @@ export class BinaryChunks {
     public static async *stream(
         parts: AsyncIterable<Uint8Array> | Iterable<Uint8Array>,
         totalBytes: number,
+        chunkBytes: number = BinaryChunks.CHUNK_BYTES,
     ): AsyncGenerator<Uint8Array<ArrayBuffer>, void> {
         if (
             !Number.isSafeInteger(totalBytes) ||
@@ -72,13 +73,18 @@ export class BinaryChunks {
         ) {
             throw new RangeError('Binary transfer exceeds 300 MiB plus framing');
         }
+        if (
+            !Number.isSafeInteger(chunkBytes) ||
+            chunkBytes < 1 ||
+            chunkBytes > BinaryChunks.CHUNK_BYTES
+        ) {
+            throw new RangeError('Invalid binary chunk limit');
+        }
         const id: Uint8Array<ArrayBuffer> = crypto.getRandomValues(new Uint8Array(16));
         let received: number = 0;
         let offset: number = 0;
         let used: number = 0;
-        let frame: Uint8Array<ArrayBuffer> = new Uint8Array(
-            28 + Math.min(BinaryChunks.CHUNK_BYTES, totalBytes),
-        );
+        let frame: Uint8Array<ArrayBuffer> = new Uint8Array(28 + Math.min(chunkBytes, totalBytes));
         let part: Uint8Array;
         for await (part of parts) {
             if (part.byteLength > totalBytes - received) {
@@ -100,9 +106,9 @@ export class BinaryChunks {
                     yield frame;
                     offset += used;
                     used = 0;
-                    frame = new Uint8Array(
-                        28 + Math.min(BinaryChunks.CHUNK_BYTES, totalBytes - offset),
-                    );
+                    if (offset < totalBytes) {
+                        frame = new Uint8Array(28 + Math.min(chunkBytes, totalBytes - offset));
+                    }
                 }
             }
         }

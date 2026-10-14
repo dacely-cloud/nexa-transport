@@ -85,6 +85,7 @@ export class BinaryMedia {
         parts: AsyncIterable<Uint8Array> | Iterable<Uint8Array>,
         streamId?: string,
         sessionId?: string,
+        chunkBytes: number = BinaryChunks.CHUNK_BYTES,
     ): AsyncGenerator<Uint8Array<ArrayBuffer>, void> {
         const prefix: Uint8Array<ArrayBuffer> = BinaryMedia.#prefix(
             attachment,
@@ -98,7 +99,7 @@ export class BinaryMedia {
             yield prefix;
             yield* parts;
         })();
-        return BinaryChunks.stream(source, prefix.byteLength + attachment.byteLength);
+        return BinaryChunks.stream(source, prefix.byteLength + attachment.byteLength, chunkBytes);
     }
 
     static #prefix(
