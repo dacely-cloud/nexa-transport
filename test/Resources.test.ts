@@ -178,7 +178,7 @@ describe('media allocation limits', (): void => {
         const text: string = JSON.stringify(Array.from({ length: 129 }, () => ({ pcm: 'AQID' })));
         const decode = vi.spyOn(globalThis, 'atob');
         expect(() => BinaryEnvelope.encode(text)).toThrow('Too many binary fields');
-        expect(decode).toHaveBeenCalledTimes(128);
+        expect(decode).not.toHaveBeenCalled();
     });
     it('rejects binary-to-JSON expansion before allocating a number array', (): void => {
         const encoded = BinaryEnvelope.encode(

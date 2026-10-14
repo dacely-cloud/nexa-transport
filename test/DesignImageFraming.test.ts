@@ -40,7 +40,7 @@ it('rejects incomplete, unsafe and out-of-range image framing without executing 
     for (const framing of [
         null,
         {},
-        { fit: 'stretch', cropX: 0, cropY: 0, scale: 1 },
+        { fit: 'repeat', cropX: 0, cropY: 0, scale: 1 },
         { fit: 'cover', cropX: 2, cropY: 0, scale: 1 },
         { fit: 'cover', cropX: 0, cropY: Number.NaN, scale: 1 },
         { fit: 'cover', cropX: 0, cropY: 0, scale: 0 },
@@ -59,6 +59,17 @@ it('rejects incomplete, unsafe and out-of-range image framing without executing 
     expect((): DesignPaint => DesignStyleCodec.paint({ ...paint, framing })).toThrow();
     expect(calls).toBe(0);
 });
+
+it.each(Object.values(DesignImageFit))(
+    'accepts the declared image scaling mode %s',
+    (fit: DesignImageFit): void => {
+        const paint: DesignPaint = {
+            ...DesignDefaults.paint(),
+            framing: { fit, cropX: 0, cropY: 0, scale: 1 },
+        };
+        expect(DesignStyleCodec.paint(paint)).toEqual(paint);
+    },
+);
 
 it('exports cover crop and contain paints using one embedded asset and exact authored placement', (): void => {
     const asset: DesignAsset = {

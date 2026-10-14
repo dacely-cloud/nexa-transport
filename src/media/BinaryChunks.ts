@@ -139,6 +139,7 @@ export class BinaryChunks {
             }
             if (
                 total === 0 ||
+                buffer.byteLength === 28 ||
                 total > BinaryChunks.MAX_TRANSFER_BYTES ||
                 offset > total ||
                 buffer.byteLength - 28 > total - offset

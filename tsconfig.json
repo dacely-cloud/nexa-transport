@@ -27,6 +27,7 @@
         "test/**/*.ts",
         "vite.config.ts",
         "examples/**/*.ts",
-        "script/workflows.ts"
+        "script/workflows.ts",
+        "script/MediaSources.ts"
     ]
 }

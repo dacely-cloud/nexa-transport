@@ -465,27 +465,8 @@ execFileSync('./node_modules/.bin/prettier', [
     'script/contract.json',
 ]);
 
-// Keep the portable binary codec identical to the gateway implementation.
-writeFileSync(
-    'src/media/BinaryMedia.ts',
-    readFileSync('../nexa/src/media/BinaryMedia.ts', 'utf8').replace(
-        "'./DeliveredAttachment'",
-        "'../protocol/Protocol.js'",
-    ),
-);
-
-writeFileSync(
-    'src/media/BinaryEnvelope.ts',
-    readFileSync('../nexa/src/media/BinaryEnvelope.ts', 'utf8').replace(
-        "'../providers/Types'",
-        "'../protocol/Protocol.js'",
-    ),
-);
-
-writeFileSync(
-    'src/media/BinaryChunks.ts',
-    readFileSync('../nexa/src/media/BinaryChunks.ts', 'utf8'),
-);
+/** Refresh the complete canonical codec dependency graph, including encoder helpers. */
+execFileSync(process.execPath, ['script/media.ts'], { stdio: 'inherit' });
 
 /** NGOP has one canonical codec; copy it without runtime server dependencies. */
 mkdirSync('src/office', { recursive: true });
