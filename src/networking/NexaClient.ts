@@ -29,6 +29,7 @@ import type { DataFile } from '../protocol/Protocol.js';
 import { materializeError, rethrow } from './ErrorStack.js';
 import { BinaryChunks } from '../media/BinaryChunks.js';
 import { InboundCapacity } from './InboundCapacity.js';
+import { ClientResources } from './ClientResources.js';
 import { InboundPacketMemory } from './InboundPacketMemory.js';
 import { InboundConsumerCredit } from './InboundConsumerCredit.js';
 import { BinaryInputReservation } from '../media/BinaryInputReservation.js';
@@ -224,7 +225,7 @@ export class NexaClient {
             (error) => this.#notify(() => onError(error)),
         );
     }
-    readonly #projects: ProjectChannel = new ProjectChannel();
+    readonly #projects: ProjectChannel;
     /** Read a private project or submit one revision-checked decision on the existing socket. */
     public project(project: string, command?: CompanyWorkCommand): Promise<CompanyProjectState> {
         return this.#projects.state(
@@ -429,7 +430,6 @@ export class NexaClient {
     readonly #events: Set<(event: GatewayEvent) => void> = new Set();
     readonly #closeListeners: Set<(error: Error) => void> = new Set();
     readonly #gaps: Set<(gap: SequenceGap) => void> = new Set();
-    readonly #streamIds: Set<string> = new Set();
     #sequence: bigint = 0n;
     #nextId: bigint = 0n;
     #hello: HelloOk | null = null;
@@ -443,6 +443,8 @@ export class NexaClient {
         const { signal: _signal, ...settings } = options;
         this.#options = settings;
         this.#inbound = new InboundCapacity(options.maxInboundBytes);
+        ClientResources.register(this, this.#inbound, options.maxActiveStreams ?? 64);
+        this.#projects = new ProjectChannel(this.#inbound);
         this.#pending = new PendingRequests(options.maxPendingRequests ?? 64);
         const url: URL = new URL(options.url);
         if (url.protocol === 'https:') {
@@ -1095,30 +1097,10 @@ export class NexaClient {
         if (!this.connected) {
             throw new TransportError(TransportErrorCode.Closed, 'Client is not connected');
         }
-        const streamId: string = params.streamId ?? crypto.randomUUID();
-        if (this.#streamIds.has(streamId)) {
-            throw materializeError(new TypeError('Stream id is already active'));
-        }
-        if (this.#streamIds.size >= (this.#options.maxActiveStreams ?? 64)) {
-            throw new TransportError(TransportErrorCode.Limit, 'Too many active streams');
-        }
-        this.#streamIds.add(streamId);
         try {
-            const turn: TurnStream = new TurnStream(this, { ...params, streamId }, options);
-            void this.#releaseStream(turn);
-            return turn;
+            return new TurnStream(this, params, options);
         } catch (error: unknown) {
-            this.#streamIds.delete(streamId);
             rethrow(error);
-        }
-    }
-    async #releaseStream(turn: TurnStream): Promise<void> {
-        try {
-            await turn.result;
-        } catch {
-            /** Turn consumers receive errors through their iterator and result. */
-        } finally {
-            this.#streamIds.delete(turn.streamId);
         }
     }
     /** Observe authoritative office state over this existing authenticated connection. */
@@ -1408,7 +1390,9 @@ export class NexaClient {
             const credit: BinaryInputReservation = this.#inbound.binary(receipt);
             let retained: boolean = false;
             try {
-                retained = this.#receiveBinary(receipt.buffer, credit);
+                retained = ClientResources.route(this, credit, (): boolean =>
+                    this.#receiveBinary(receipt.buffer, credit),
+                );
             } finally {
                 if (!retained) {
                     credit.close();
@@ -1424,7 +1408,7 @@ export class NexaClient {
             this.#options.maxMessageBytes ?? 16 * 1024 * 1024,
         );
         try {
-            this.#receiveFrame(JSON.parse(raw));
+            ClientResources.route(this, credit, (): void => this.#receiveFrame(JSON.parse(raw)));
         } finally {
             credit.close();
         }
@@ -1714,7 +1698,6 @@ export class NexaClient {
         this.#hosts.clear();
         this.#officeListeners.clear();
         this.#subscriptions.clear();
-        this.#streamIds.clear();
         this.#closeListeners.clear();
         this.#events.clear();
         this.#attachments.clear();

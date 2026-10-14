@@ -4,19 +4,23 @@
 import { BinaryByteBudget } from './BinaryByteBudget';
 import { BinaryChunkCredit } from './BinaryChunkCredit';
 import { BinaryAdmissionError } from './BinaryAdmissionError';
+import { BinaryAllocationCredit } from './BinaryAllocationCredit';
 import type { BinaryDecodeAdmission } from './interface/BinaryDecodeAdmission';
 
 /** Keeps one inbound allocation admitted from reassembly through decoding and consumer completion. */
 export class BinaryInputReservation implements BinaryDecodeAdmission {
-    readonly #credit: BinaryChunkCredit;
+    readonly #credit: BinaryAllocationCredit;
+    readonly #owner: symbol;
     #closed: boolean = false;
 
     /** Construction follows successful admission and retains counters, never the payload buffer. */
     private constructor(
-        credit: BinaryChunkCredit,
+        credit: BinaryAllocationCredit,
+        owner: symbol,
         public readonly limit: number,
     ) {
         this.#credit = credit;
+        this.#owner = owner;
         Object.freeze(this);
     }
 
@@ -29,25 +33,34 @@ export class BinaryInputReservation implements BinaryDecodeAdmission {
         if (input !== undefined && !input.belongsTo(budget)) {
             throw new RangeError('Foreign inbound allocation owner');
         }
-        let credit: BinaryChunkCredit | undefined = input;
+        const credit: BinaryAllocationCredit | null =
+            input === undefined
+                ? BinaryAllocationCredit.acquire(budget, budget.limit, bytes)
+                : BinaryAllocationCredit.adopt(budget, budget.limit, bytes, input);
+        if (credit === null) {
+            throw new BinaryAdmissionError();
+        }
+        return BinaryInputReservation.#create(credit, credit.initialOwner);
+    }
+
+    /** A queued consumer extends the existing input's lifetime without counting its storage twice. */
+    public retain(minimumBytes: number = this.used): BinaryInputReservation {
+        if (this.#closed) {
+            throw new RangeError('Inbound input owner is closed');
+        }
+        const owner: symbol | null = this.#credit.retain(minimumBytes);
+        if (owner === null) {
+            throw new BinaryAdmissionError();
+        }
+        return BinaryInputReservation.#create(this.#credit, owner);
+    }
+
+    /** Failed wrapper construction returns only the owner it just acquired. */
+    static #create(credit: BinaryAllocationCredit, owner: symbol): BinaryInputReservation {
         try {
-            if (credit === undefined) {
-                credit = new BinaryChunkCredit(budget, 0);
-            }
-            const target: number = Math.max(bytes, credit.used);
-            if (
-                !Number.isSafeInteger(bytes) ||
-                bytes < 0 ||
-                target > budget.limit ||
-                !credit.reserve(target - credit.used)
-            ) {
-                throw new BinaryAdmissionError();
-            }
-            return new BinaryInputReservation(credit, budget.limit);
+            return new BinaryInputReservation(credit, owner, credit.limit);
         } catch (error: unknown) {
-            if (input === undefined) {
-                credit?.close();
-            }
+            credit.release(owner);
             throw error;
         }
     }
@@ -63,7 +76,7 @@ export class BinaryInputReservation implements BinaryDecodeAdmission {
         Number.isSafeInteger(bytes) &&
         bytes >= 0 &&
         bytes <= this.limit - this.#credit.used &&
-        this.#credit.reserve(bytes);
+        this.#credit.reserve(this.#owner, bytes);
 
     /** Exactly-once release remains safe after disconnect and late asynchronous consumer settlement. */
     public close(): void {
@@ -71,6 +84,6 @@ export class BinaryInputReservation implements BinaryDecodeAdmission {
             return;
         }
         this.#closed = true;
-        this.#credit.close();
+        this.#credit.release(this.#owner);
     }
 }

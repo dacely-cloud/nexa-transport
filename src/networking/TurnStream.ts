@@ -8,8 +8,12 @@ import type {
 } from '../protocol/Protocol.js';
 import * as validators from '../protocol/Validators.js';
 import { EventStream } from './EventStream.js';
+import { ClientResources } from './ClientResources.js';
+import { JsonSerializedBytes } from '../media/JsonSerializedBytes.js';
+import type { JsonValue, JsonObject, ResultOf } from '../protocol/Protocol.js';
 import type { GatewayEvent, NexaClient } from './NexaClient.js';
 import { TransportError, TransportErrorCode } from './TransportError.js';
+import { materializeError } from './ErrorStack.js';
 
 /** A turn's events, terminal result, and server-side cancellation handle. */
 export class TurnStream implements AsyncIterable<WireTurnEvent> {
@@ -23,6 +27,8 @@ export class TurnStream implements AsyncIterable<WireTurnEvent> {
     #signal: AbortSignal | undefined;
     readonly #abort: () => void;
     #ended: boolean = false;
+    #releaseSlot: (() => void) | undefined;
+    readonly #measure: JsonSerializedBytes;
     /** Client-chosen id, registered before any RPC can emit events. */
     public readonly streamId: string;
     /** Settles when turn.end arrives, even if events have not yet been consumed. */
@@ -54,28 +60,39 @@ export class TurnStream implements AsyncIterable<WireTurnEvent> {
         this.#client = client;
         this.#signal = options.signal;
         this.streamId = params.streamId ?? crypto.randomUUID();
-        this.#events = new EventStream(limit, bytes);
+        this.#measure = new JsonSerializedBytes(bytes);
+        this.#events = new EventStream(limit, bytes, ClientResources.retainer(client));
+        this.#releaseSlot = ClientResources.stream(client, this.streamId);
         this.result = this.#completion.promise;
-        this.#unlisten = client.onEvent((event: GatewayEvent): void => {
-            this.#receive(event);
-        });
-        this.#unclose = client.onClose((error: Error): void => {
-            this.#end(error);
-        });
         this.#abort = (): void => {
             void this.#cancel(new TransportError(TransportErrorCode.Aborted, 'Turn aborted'));
         };
-        this.#timer = setTimeout((): void => {
-            void this.#cancel(new TransportError(TransportErrorCode.Timeout, 'Turn timed out'));
-        }, duration);
-        this.#accepted = client.call(
-            Method.AgentStream,
-            { ...params, streamId: this.streamId },
-            options.timeoutMs === undefined ? {} : { timeoutMs: options.timeoutMs },
-        );
-        void this.#observeStart();
         void this.#observeResult();
-        options.signal?.addEventListener('abort', this.#abort, { once: true });
+        try {
+            this.#unlisten = client.onEvent((event: GatewayEvent): void => {
+                this.#receive(event);
+            });
+            this.#unclose = client.onClose((error: Error): void => {
+                this.#end(error);
+            });
+            this.#timer = setTimeout((): void => {
+                void this.#cancel(new TransportError(TransportErrorCode.Timeout, 'Turn timed out'));
+            }, duration);
+            this.#accepted = client.call(
+                Method.AgentStream,
+                { ...params, streamId: this.streamId },
+                options.timeoutMs === undefined ? {} : { timeoutMs: options.timeoutMs },
+            );
+            void this.#observeStart();
+            options.signal?.addEventListener('abort', this.#abort, { once: true });
+            if (this.#signal?.aborted === true) {
+                this.#abort();
+            }
+        } catch (error: unknown) {
+            const failure: Error = materializeError(asError(error));
+            this.#end(failure);
+            throw failure;
+        }
     }
     /** Stable resolved session identity supplied before the first turn completes. */
     public get accepted(): Promise<StreamAccepted> {
@@ -93,10 +110,13 @@ export class TurnStream implements AsyncIterable<WireTurnEvent> {
         if (this.#ended || this.#client === undefined) {
             return false;
         }
-        const result = await this.#client.call(Method.AgentSteer, {
-            runId: accepted.runId,
-            message,
-        });
+        const result: ResultOf<typeof Method.AgentSteer> = await this.#client.call(
+            Method.AgentSteer,
+            {
+                runId: accepted.runId,
+                message,
+            },
+        );
         return result.accepted;
     }
 
@@ -165,15 +185,35 @@ export class TurnStream implements AsyncIterable<WireTurnEvent> {
     }
     #receive(frame: GatewayEvent): void {
         try {
+            if (frame.event !== 'turn.event' && frame.event !== 'turn.end') {
+                return;
+            }
+            const data: JsonValue = frame.data;
+            if (!TurnStream.#record(data) || data['streamId'] !== this.streamId) {
+                return;
+            }
             if (frame.event === 'turn.event') {
+                const event: JsonValue | undefined = data['event'];
+                if (event === undefined) {
+                    throw new TransportError(TransportErrorCode.Protocol, 'Missing turn event');
+                }
+                let bytes: number;
+                try {
+                    bytes = this.#measure.measure(event);
+                } catch (error: unknown) {
+                    if (error instanceof RangeError) {
+                        throw new TransportError(
+                            TransportErrorCode.Limit,
+                            'Stream consumer fell behind',
+                        );
+                    }
+                    throw error;
+                }
                 if (!validators.turnEvent(frame.data)) {
                     throw new TransportError(TransportErrorCode.Protocol, 'Invalid turn event');
                 }
                 if (frame.data.streamId === this.streamId) {
-                    this.#events.push(
-                        frame.data.event,
-                        new TextEncoder().encode(JSON.stringify(frame.data.event)).length,
-                    );
+                    this.#events.push(frame.data.event, bytes);
                 }
             } else if (frame.event === 'turn.end') {
                 if (!validators.turnEnd(frame.data)) {
@@ -200,11 +240,18 @@ export class TurnStream implements AsyncIterable<WireTurnEvent> {
             void this.#cancel(asError(error));
         }
     }
+
+    /** Routes by the validated JSON envelope's identity before inspecting its potentially large event. */
+    static #record(value: JsonValue): value is JsonObject {
+        return typeof value === 'object' && value !== null && !Array.isArray(value);
+    }
     #end(error?: Error): void {
         if (this.#ended) {
             return;
         }
         this.#ended = true;
+        this.#releaseSlot?.();
+        this.#releaseSlot = undefined;
         this.#unlisten?.();
         this.#unclose?.();
         this.#unlisten = undefined;

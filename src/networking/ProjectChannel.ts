@@ -1,9 +1,14 @@
 import { CompanyProjectProtocol } from '../company/CompanyProjectProtocol.js';
+import { InboundCapacity } from './InboundCapacity.js';
+import { ProjectFileTransfer } from './ProjectFileTransfer.js';
+import { materializeError } from './ErrorStack.js';
+import { ProjectWatch } from './ProjectWatch.js';
 import {
     ProjectOp,
     type ProjectPacket,
     type ProjectClientPacket,
     type CompanyProjectState,
+    type ProjectRequest,
 } from '../company/CompanyProjectTypes.js';
 
 interface PendingProject {
@@ -11,28 +16,25 @@ interface PendingProject {
     readonly receive: (packet: ProjectPacket) => boolean;
     readonly reject: (error: Error) => void;
     readonly timer: ReturnType<typeof setTimeout>;
-}
-interface ProjectWatch {
-    readonly project: string;
-    readonly listener: (state: CompanyProjectState) => void;
-    readonly error: (error: Error) => void;
-    sequence: bigint;
+    readonly cleanup: () => void;
 }
 /** Private state and contiguous delivery chunks multiplexed over NexaClient's current socket. */
 export class ProjectChannel {
     readonly #pending: Map<string, PendingProject> = new Map();
     readonly #watches: Map<string, ProjectWatch> = new Map();
-    #version: 2 | 3 | 4 | 5 | 6 | undefined;
+    #version: ProjectRequest['version'];
     #send: ((bytes: Uint8Array<ArrayBuffer>) => void) | undefined;
+    /** Standalone channels and NexaClient channels both share realm input accounting. */
+    public constructor(public readonly input: InboundCapacity = new InboundCapacity()) {}
     /** Restore read subscriptions only. A lost mutation is never automatically replayed. */
     public resume(
         send: (bytes: Uint8Array<ArrayBuffer>) => void,
-        version?: 2 | 3 | 4 | 5 | 6,
+        version?: ProjectRequest['version'],
     ): void {
         this.#version = version;
         this.#send = send;
         for (const [id, watch] of this.#watches) {
-            watch.sequence = -1n;
+            watch.reset();
             send(
                 this.#encode({
                     op: ProjectOp.Subscribe,
@@ -61,31 +63,19 @@ export class ProjectChannel {
     /** Assemble at most one bounded artifact, validating offsets and totals before copying. */
     public file(project: string, attempt: string, path: string): Promise<Uint8Array<ArrayBuffer>> {
         return new Promise((resolve, reject): void => {
-            let result: Uint8Array<ArrayBuffer> | undefined;
-            let offset: number = 0;
+            const transfer: ProjectFileTransfer = new ProjectFileTransfer(this.input);
             this.#request(
                 { op: ProjectOp.File, id: crypto.randomUUID(), project, attempt, path },
                 (packet): boolean => {
-                    if (
-                        packet.op !== ProjectOp.Chunk ||
-                        packet.offset !== offset ||
-                        packet.total > CompanyProjectProtocol.fileBytes ||
-                        packet.bytes.length > CompanyProjectProtocol.chunkBytes ||
-                        packet.offset + packet.bytes.length > packet.total ||
-                        (result && result.length !== packet.total)
-                    ) {
-                        throw new Error('Invalid or out-of-order delivery chunk');
-                    }
-                    result ??= new Uint8Array(packet.total);
-                    result.set(packet.bytes, offset);
-                    offset += packet.bytes.length;
-                    if (offset !== result.length) {
+                    const result: Uint8Array<ArrayBuffer> | null = transfer.accept(packet);
+                    if (result === null) {
                         return false;
                     }
                     resolve(result);
                     return true;
                 },
                 reject,
+                (): void => transfer.close(),
             );
         });
     }
@@ -104,7 +94,7 @@ export class ProjectChannel {
             id,
             project,
         });
-        this.#watches.set(id, { project, listener, error, sequence: -1n });
+        this.#watches.set(id, new ProjectWatch(project, listener, error));
         try {
             this.#send(bytes);
         } catch (failure: unknown) {
@@ -137,10 +127,13 @@ export class ProjectChannel {
                 }
             } catch (error: unknown) {
                 pending.reject(
-                    error instanceof Error ? error : new Error('Project response failed'),
+                    materializeError(
+                        error instanceof Error ? error : new Error('Project response failed'),
+                    ),
                 );
             }
             clearTimeout(pending.timer);
+            pending.cleanup();
             this.#pending.delete(packet.id);
             return;
         }
@@ -173,7 +166,7 @@ export class ProjectChannel {
             );
             return;
         }
-        watch.sequence = packet.sequence;
+        watch.advance(packet.sequence);
         watch.listener(packet.state);
     }
     /** Fail outstanding requests on disconnect but retain watches for the client's normal reconnect. */
@@ -182,16 +175,18 @@ export class ProjectChannel {
         for (const pending of this.#pending.values()) {
             clearTimeout(pending.timer);
             pending.reject(error);
+            pending.cleanup();
         }
         this.#pending.clear();
         for (const watch of this.#watches.values()) {
-            watch.sequence = -1n;
+            watch.reset();
             watch.error(error);
         }
     }
     /** Explicit disposal drops listener references as well as pending file buffers. */
     public clear(): void {
         this.#watches.clear();
+        this.disconnect(new Error('Project channel disposed'));
     }
     #encode(packet: ProjectClientPacket): Uint8Array<ArrayBuffer> {
         return CompanyProjectProtocol.encode(
@@ -202,6 +197,7 @@ export class ProjectChannel {
         packet: ProjectClientPacket,
         receive: PendingProject['receive'],
         reject: PendingProject['reject'],
+        cleanup: () => void = (): void => {},
     ): void {
         if (
             !this.#send ||
@@ -210,22 +206,27 @@ export class ProjectChannel {
             this.#watches.has(packet.id)
         ) {
             reject(new Error('Project connection is unavailable or request is already pending.'));
+            cleanup();
             return;
         }
         const bytes: Uint8Array<ArrayBuffer> = this.#encode(packet);
         const timer: ReturnType<typeof setTimeout> = setTimeout((): void => {
             this.#pending.delete(packet.id);
+            cleanup();
             reject(
                 new Error('Project request timed out. Retry a decision with the same command ID.'),
             );
         }, 15000);
-        this.#pending.set(packet.id, { project: packet.project, receive, reject, timer });
+        this.#pending.set(packet.id, { project: packet.project, receive, reject, timer, cleanup });
         try {
             this.#send(bytes);
         } catch (error: unknown) {
             clearTimeout(timer);
             this.#pending.delete(packet.id);
-            reject(error instanceof Error ? error : new Error('Project send failed'));
+            cleanup();
+            reject(
+                materializeError(error instanceof Error ? error : new Error('Project send failed')),
+            );
         }
     }
 }

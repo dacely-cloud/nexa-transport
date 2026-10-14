@@ -208,28 +208,30 @@ backend, or a provider-key vault.
 
 ## Integrated scene support
 
-| Import                                    | Availability | Contract                                                    |
-| ----------------------------------------- | ------------ | ----------------------------------------------------------- |
-| `nexa-transport/roblox-scene-hierarchy`   | ESM + types  | Bounded topology validation and forward/backward projection |
-| `nexa-transport/roblox-default-textures`  | ESM + types  | Original built-in sprite atlas and resource lookup          |
-| `nexa-transport/roblox-scene-textures`    | ESM + types  | Validated scene image atlases and resource lookup           |
-| `nexa-transport/roblox-gui-layout`        | ESM + types  | Portable Roblox gui layout support                          |
-| `nexa-transport/roblox-gui-images`        | ESM + types  | Image patches, crop/scale modes and bounded tiling.         |
-| `nexa-transport/roblox-gui-classes`       | ESM + types  | GUI object, button, image and text class identities.        |
-| `nexa-transport/roblox-execution-context` | ESM + types  | Immutable native server/client VM side                      |
-| `nexa-transport/roblox-live-descriptor`   | ESM + types  | Portable Roblox live descriptor support                     |
-| `nexa-transport/roblox-live-state`        | ESM + types  | Portable Roblox live state support                          |
-| `nexa-transport/roblox-part-geometry`     | ESM + types  | Portable Roblox part geometry support                       |
-| `nexa-transport/roblox-particles`         | ESM + types  | Portable Roblox particles support                           |
-| `nexa-transport/roblox-scene-codec`       | ESM + types  | Portable Roblox scene codec support                         |
-| `nexa-transport/roblox-scene-diagnostics` | ESM + types  | Portable Roblox scene diagnostics support                   |
-| `nexa-transport/roblox-scene-examples`    | ESM + types  | Portable Roblox scene examples support                      |
-| `nexa-transport/roblox-scene-input`       | ESM + types  | Portable Roblox scene input support                         |
-| `nexa-transport/roblox-scene-luau`        | ESM + types  | Portable Roblox scene luau support                          |
-| `nexa-transport/roblox-scene-runtime`     | ESM + types  | Portable Roblox scene runtime support                       |
-| `nexa-transport/roblox-scene-schema`      | ESM + types  | Portable Roblox scene schema support                        |
-| `nexa-transport/roblox-scene-types`       | ESM + types  | Portable Roblox scene types support                         |
-| `nexa-transport/roblox-scene-xml`         | ESM + types  | Portable Roblox scene xml support                           |
+| Import                                    | Availability | Contract                                                      |
+| ----------------------------------------- | ------------ | ------------------------------------------------------------- |
+| `nexa-transport/roblox-scene-hierarchy`   | ESM + types  | Bounded topology validation and forward/backward projection   |
+| `nexa-transport/roblox-default-textures`  | ESM + types  | Original built-in sprite atlas and resource lookup            |
+| `nexa-transport/roblox-scene-textures`    | ESM + types  | Validated scene image atlases and resource lookup             |
+| `nexa-transport/roblox-gui-layout`        | ESM + types  | Portable Roblox gui layout support                            |
+| `nexa-transport/roblox-gui-images`        | ESM + types  | Image patches, crop/scale modes and bounded tiling.           |
+| `nexa-transport/roblox-gui-classes`       | ESM + types  | GUI object, button, image and text class identities.          |
+| `nexa-transport/roblox-execution-context` | ESM + types  | Immutable native server/client VM side                        |
+| `nexa-transport/roblox-live-descriptor`   | ESM + types  | Portable Roblox live descriptor support                       |
+| `nexa-transport/roblox-live-state`        | ESM + types  | Portable Roblox live state support                            |
+| `nexa-transport/roblox-part-geometry`     | ESM + types  | Portable Roblox part geometry support                         |
+| `nexa-transport/roblox-mesh-geometry`     | ESM + types  | Indexed MeshPart geometry and decoded resource reuse          |
+| `nexa-transport/roblox-scene-meshes`      | ESM + types  | Bounded original mesh resources and portable scene validation |
+| `nexa-transport/roblox-particles`         | ESM + types  | Portable Roblox particles support                             |
+| `nexa-transport/roblox-scene-codec`       | ESM + types  | Portable Roblox scene codec support                           |
+| `nexa-transport/roblox-scene-diagnostics` | ESM + types  | Portable Roblox scene diagnostics support                     |
+| `nexa-transport/roblox-scene-examples`    | ESM + types  | Portable Roblox scene examples support                        |
+| `nexa-transport/roblox-scene-input`       | ESM + types  | Portable Roblox scene input support                           |
+| `nexa-transport/roblox-scene-luau`        | ESM + types  | Portable Roblox scene luau support                            |
+| `nexa-transport/roblox-scene-runtime`     | ESM + types  | Portable Roblox scene runtime support                         |
+| `nexa-transport/roblox-scene-schema`      | ESM + types  | Portable Roblox scene schema support                          |
+| `nexa-transport/roblox-scene-types`       | ESM + types  | Portable Roblox scene types support                           |
+| `nexa-transport/roblox-scene-xml`         | ESM + types  | Portable Roblox scene xml support                             |
 
 `nexa-transport/design-typography-styles` exposes strict saved typography definitions, overrides and link validation. Use compact token and typography-style operations through design.save.
 
