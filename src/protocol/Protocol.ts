@@ -5385,7 +5385,12 @@ export type DesignPaintColorTarget =
     (typeof DesignPaintColorTargetValues)[keyof typeof DesignPaintColorTargetValues];
 
 /** Allowed values for DesignPaintGradientChangeskind. */
-export const DesignPaintGradientChangeskindValues = { Value0: 'linear', Value1: 'radial' } as const;
+export const DesignPaintGradientChangeskindValues = {
+    Value0: 'angular',
+    Value1: 'diamond',
+    Value2: 'linear',
+    Value3: 'radial',
+} as const;
 
 /** DesignPaintGradientChanges wire fields. */
 export interface DesignPaintGradientChangesShape {
@@ -5477,10 +5482,12 @@ export type DesignPaintImageOperation = DesignPaintImageOperationShape;
 
 /** Allowed values for DesignPaintKind. */
 export const DesignPaintKindValues = {
-    Value0: 'image',
-    Value1: 'linear',
-    Value2: 'radial',
-    Value3: 'solid',
+    Value0: 'angular',
+    Value1: 'diamond',
+    Value2: 'image',
+    Value3: 'linear',
+    Value4: 'radial',
+    Value5: 'solid',
 } as const;
 
 /** DesignPaintKind from the Nexa wire protocol. */
@@ -7078,6 +7085,8 @@ export interface GatewayFeaturesShape {
     readonly binaryDataUploads?: true;
     /** binaryMedia as defined by the Nexa gateway. */
     readonly binaryMedia?: true;
+    /** designExtendedGradients as defined by the Nexa gateway. */
+    readonly designExtendedGradients?: true;
     /** designImageAdjustments as defined by the Nexa gateway. */
     readonly designImageAdjustments?: true;
     /** designImageTransforms as defined by the Nexa gateway. */
