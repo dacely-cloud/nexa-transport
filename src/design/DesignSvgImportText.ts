@@ -9,7 +9,8 @@ import { DesignSvgImportTree } from './DesignSvgImportTree.js';
 import { DesignSvgImportAppearance } from './DesignSvgImportAppearance.js';
 import { DesignSvgImportTextStyles as Styles } from './DesignSvgImportTextStyles.js';
 import { DesignSvgTransforms as T } from './DesignSvgTransforms.js';
-import { DesignBuiltinFonts } from './DesignBuiltinFonts.js';
+import { DesignSvgImportedFonts } from './DesignSvgImportedFonts.js';
+import type { DesignFontEngine } from './DesignFontEngine.js';
 import {
     DesignTextLayout,
     type DesignTextLine,
@@ -29,6 +30,7 @@ export class DesignSvgImportText {
         public readonly css: DesignSvgCss,
         public readonly tree: DesignSvgImportTree,
         public readonly identify: (key: string) => string,
+        public readonly fonts: DesignSvgImportedFonts = new DesignSvgImportedFonts(),
     ) {}
 
     /** A shared group preserves parent opacity, clipping and original glyph object bounds. */
@@ -36,7 +38,11 @@ export class DesignSvgImportText {
         element: DesignSvgElement,
         context: DesignSvgTextContext,
     ): Promise<string | null> {
-        const label: DesignSvgImportLabel = new DesignSvgImportLabel(this.css, this.tree);
+        const label: DesignSvgImportLabel = new DesignSvgImportLabel(
+            this.css,
+            this.tree,
+            this.fonts,
+        );
         const planner: DesignSvgTextChunks = new DesignSvgTextChunks(this.css);
         const chunks: readonly DesignSvgTextChunk[] | null = planner.read(element, context);
         if (chunks === null) {
@@ -86,8 +92,7 @@ export class DesignSvgImportText {
         });
         const children: string[] = [];
         const commands: DesignPathCommand[] = [];
-        const fonts: Awaited<ReturnType<typeof DesignBuiltinFonts.engine>> =
-            await DesignBuiltinFonts.engine();
+        const fonts: DesignFontEngine = await this.fonts.engine();
         const factor: number | null = T.strokeScale(context.matrix);
         if (factor === null) {
             throw new Error('SVG text requires a uniform editable transform.');

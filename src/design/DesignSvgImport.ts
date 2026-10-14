@@ -9,6 +9,7 @@ import { DesignLayerAuthority } from './DesignLayerAuthority.js';
 import type { DesignDocument, DesignNode, DesignPage } from './DesignTypes.js';
 import type { DesignEditResult } from './DesignOperationTypes.js';
 import type { DesignSvgImageLoader } from './DesignSvgImageTypes.js';
+import type { DesignSvgFontLoader } from './DesignSvgFontTypes.js';
 
 /** One owner-scoped revision transaction inserts the complete editable forest and records native undo. */
 export class DesignSvgImport {
@@ -17,6 +18,7 @@ export class DesignSvgImport {
         request: DesignSvgImportRequest,
         identify: (key: string) => string,
         images: DesignSvgImageLoader | null = null,
+        fonts: DesignSvgFontLoader | null = null,
     ): Promise<DesignEditResult> {
         const pages: ReadonlyMap<string, DesignPage> = new Map(
             document.pages.map((page: DesignPage): [string, DesignPage] => [page.id, page]),
@@ -50,6 +52,7 @@ export class DesignSvgImport {
             request.name,
             identify,
             images,
+            fonts,
         );
         const roots: string[] = [...siblings];
         roots.splice(index, 0, imported.rootId);

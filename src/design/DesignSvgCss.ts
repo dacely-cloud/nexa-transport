@@ -167,7 +167,10 @@ export class DesignSvgCss {
         return output;
     }
     /** Semicolons inside quoted font names or functional values do not split declarations. */
-    public static declarations(source: string): readonly DesignSvgDeclaration[] {
+    public static declarations(
+        source: string,
+        allowed: ReadonlySet<string> = this.properties,
+    ): readonly DesignSvgDeclaration[] {
         const output: DesignSvgDeclaration[] = [];
         let start: number = 0;
         let depth: number = 0;
@@ -181,7 +184,7 @@ export class DesignSvgCss {
             );
             const property: string = match?.[1]?.toLowerCase() ?? '';
             const value: string = match?.[2] ?? '';
-            if (!DesignSvgCss.properties.has(property) || value.length === 0) {
+            if (!allowed.has(property) || value.length === 0) {
                 throw new Error('Unsupported SVG style property ' + property);
             }
             const important: boolean = /\s*!important\s*$/iu.test(value);
@@ -220,11 +223,15 @@ export class DesignSvgCss {
         }
         return output;
     }
-    #sheet(source: string): void {
+    /** Font admission and ordinary selectors share the same inert comment handling. */
+    public static clean(source: string): string {
         if (/\/\*(?:(?!\*\/)[\s\S])*$/u.test(source)) {
             throw new Error('Unclosed SVG CSS comment.');
         }
-        let rest: string = source.replace(/\/\*[\s\S]*?\*\//gu, '').trim();
+        return source.replace(/\/\*[\s\S]*?\*\//gu, '').trim();
+    }
+    #sheet(source: string): void {
+        let rest: string = DesignSvgCss.clean(source);
         while (rest.length > 0) {
             const match: RegExpMatchArray | null = /^([^{}]+)\{([^{}]*)\}/u.exec(rest);
             const selectors: string | undefined = match?.[1];

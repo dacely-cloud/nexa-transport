@@ -10,8 +10,8 @@ export class DesignFontContainer {
         this.#bytes = bytes;
     }
 
-    /** Accepts standalone sfnt/WOFF containers, bounding actual table sums as well as declared sizes. */
-    public static inspect(bytes: Uint8Array): void {
+    /** Validates table sums and returns a conservative bound for one decoded standalone face. */
+    public static inspect(bytes: Uint8Array): number {
         if (bytes.length < 12 || bytes.length > 16 * 1024 * 1024) {
             throw new Error('Font must contain 12 bytes to 16 MiB.');
         }
@@ -37,8 +37,11 @@ export class DesignFontContainer {
             if (header.getUint32(4) === 0x74746366) {
                 throw new Error('Font collections require a standalone face file.');
             }
-            new DesignFontContainer(bytes).#woff2(header, count);
-            return;
+            return Math.max(
+                bytes.length,
+                header.getUint32(16),
+                new DesignFontContainer(bytes).#woff2(header, count),
+            );
         }
         const start: number = compressed ? 44 : 12;
         const stride: number = compressed ? 20 : 16;
@@ -60,9 +63,10 @@ export class DesignFontContainer {
                 throw new Error('Font tables exceed the file or decompression budget.');
             }
         }
+        return Math.max(bytes.length, total, compressed ? header.getUint32(16) : 0);
     }
 
-    #woff2(header: DataView, count: number): void {
+    #woff2(header: DataView, count: number): number {
         let original: number = 0;
         let expanded: number = 0;
         for (let index: number = 0; index < count; index++) {
@@ -96,6 +100,7 @@ export class DesignFontContainer {
         if (this.#offset + header.getUint32(20) > this.#bytes.length) {
             throw new Error('Compressed font data is truncated.');
         }
+        return Math.max(original, expanded);
     }
 
     #byte(): number {

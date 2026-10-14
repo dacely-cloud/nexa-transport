@@ -8,7 +8,7 @@ import { DesignSvgImportTextStyles as Styles } from './DesignSvgImportTextStyles
 import { DesignSvgImportAppearance as Appearance } from './DesignSvgImportAppearance.js';
 import { DesignSvgTransforms as T, type DesignSvgPoint } from './DesignSvgTransforms.js';
 import { DesignSvgImportTree } from './DesignSvgImportTree.js';
-import { DesignBuiltinFonts } from './DesignBuiltinFonts.js';
+import { DesignSvgImportedFonts } from './DesignSvgImportedFonts.js';
 import type { DesignFontEngine, DesignFontMetrics } from './DesignFontEngine.js';
 import { DesignDefaults } from './DesignDefaults.js';
 import { DesignStyleCodec } from './DesignStyleCodec.js';
@@ -44,6 +44,7 @@ export class DesignSvgImportLabel {
     public constructor(
         public readonly css: DesignSvgCss,
         public readonly tree: DesignSvgImportTree,
+        public readonly fonts: DesignSvgImportedFonts = new DesignSvgImportedFonts(),
     ) {}
 
     /** Text remains native text with ordinary rich ranges, inspector editing and undo. */
@@ -63,7 +64,7 @@ export class DesignSvgImportLabel {
                 'SVG text skew, reflection and nonuniform scaling require native affine text support.',
             );
         }
-        const base: DesignTextSpanStyle = Styles.span(style);
+        const base: DesignTextSpanStyle = this.fonts.resolve(Styles.span(style));
         const spacing: number = this.#spacing(style, base.size, styles.rootSize);
         const anchor: string = style['text-anchor'] ?? 'start';
         if (!['start', 'middle', 'end'].includes(anchor)) {
@@ -137,6 +138,7 @@ export class DesignSvgImportLabel {
                     underline: false,
                     start: offset,
                     end: offset + part.content.length,
+                    ...(part.style.font == null ? {} : { font: part.style.font }),
                 });
             }
             offset += part.content.length;
@@ -151,8 +153,9 @@ export class DesignSvgImportLabel {
             letterSpacing: spacing,
             align: 'start',
             runs,
+            ...(base.font == null ? {} : { font: base.font }),
         });
-        const fonts: DesignFontEngine = await DesignBuiltinFonts.engine();
+        const fonts: DesignFontEngine = await this.fonts.engine();
         const baseline: number = DesignSvgTextBaseline.offset(
             style['dominant-baseline'] ?? 'auto',
             base,
@@ -313,7 +316,7 @@ export class DesignSvgImportLabel {
         if (style['display'] === 'none') {
             return;
         }
-        const span: DesignTextSpanStyle = Styles.span(style);
+        const span: DesignTextSpanStyle = this.fonts.resolve(Styles.span(style));
         const baseline: string =
             !root && style['alignment-baseline'] === 'alphabetic'
                 ? 'alphabetic'
@@ -357,6 +360,8 @@ export class DesignSvgImportLabel {
             a.size === b.size &&
             a.weight === b.weight &&
             a.italic === b.italic &&
+            a.font?.id === b.font?.id &&
+            a.font?.sha256 === b.font?.sha256 &&
             a.color === b.color
         );
     }

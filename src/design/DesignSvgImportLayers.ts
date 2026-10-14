@@ -23,6 +23,8 @@ import { DesignCodec } from './DesignCodec.js';
 import type { DesignNode } from './DesignTypes.js';
 import { DesignSvgImportImage } from './DesignSvgImportImage.js';
 import type { DesignSvgImageLoader } from './DesignSvgImageTypes.js';
+import type { DesignSvgFontLoader } from './DesignSvgFontTypes.js';
+import { DesignSvgImportedFonts } from './DesignSvgImportedFonts.js';
 
 /** One imported artboard and its editable layer forest, without any original markup embedded in nodes. */
 export interface DesignSvgLayerImport {
@@ -48,6 +50,7 @@ export class DesignSvgImportLayers {
         public readonly root: DesignSvgElement,
         public readonly identify: (key: string) => string,
         images: DesignSvgImageLoader | null = null,
+        fonts: DesignSvgImportedFonts = new DesignSvgImportedFonts(),
     ) {
         const visit: (element: DesignSvgElement, parents: readonly DesignSvgElement[]) => void = (
             element: DesignSvgElement,
@@ -71,7 +74,7 @@ export class DesignSvgImportLayers {
         this.#css = new DesignSvgCss(root);
         this.#paints = new DesignSvgImportPaints(this.#elements, this.#css, this.#ancestors);
         this.#shape = new DesignSvgImportShape(this.#paints, this.#tree, this.identify);
-        this.#text = new DesignSvgImportText(this.#css, this.#tree, this.identify);
+        this.#text = new DesignSvgImportText(this.#css, this.#tree, this.identify, fonts);
         this.#image = new DesignSvgImportImage(this.#tree, this.identify, images);
         const masks: DesignSvgImportMask = new DesignSvgImportMask(this.#tree, this.identify);
         this.#viewports = new DesignSvgImportViewport(this.#tree, masks, this.identify);
@@ -98,10 +101,11 @@ export class DesignSvgImportLayers {
         name: string,
         identify: (key: string) => string,
         images: DesignSvgImageLoader | null = null,
+        fontLoader: DesignSvgFontLoader | null = null,
     ): Promise<DesignSvgLayerImport> {
-        return new DesignSvgImportLayers(new DesignSvgXml(source).parse(), identify, images).build(
-            name,
-        );
+        const fonts: DesignSvgImportedFonts = new DesignSvgImportedFonts(fontLoader);
+        const root: DesignSvgElement = await fonts.prepare(new DesignSvgXml(source).parse());
+        return new DesignSvgImportLayers(root, identify, images, fonts).build(name);
     }
     public async build(name: string): Promise<DesignSvgLayerImport> {
         const a: Readonly<Record<string, string>> = this.root.attributes;
