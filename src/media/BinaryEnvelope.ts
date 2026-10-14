@@ -166,7 +166,8 @@ export class BinaryEnvelope {
                             replacementBytes += byte < 10 ? 1 : byte < 100 ? 2 : 3;
                         }
                     }
-                    jsonBytes += replacementBytes - 4; // Replaces the JSON null placeholder.
+                    /** Replace the four-byte JSON null placeholder. */
+                    jsonBytes += replacementBytes - 4;
                     if (jsonBytes > maxJsonBytes) {
                         throw new RangeError('Decoded binary JSON exceeds limit');
                     }

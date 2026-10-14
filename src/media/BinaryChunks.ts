@@ -74,7 +74,8 @@ export class BinaryChunks {
         let frame: Uint8Array<ArrayBuffer> = new Uint8Array(
             28 + Math.min(BinaryChunks.CHUNK_BYTES, totalBytes),
         );
-        for await (const part of parts) {
+        let part: Uint8Array;
+        for await (part of parts) {
             if (part.byteLength > totalBytes - received) {
                 throw new RangeError('Binary stream exceeds its declared length');
             }
