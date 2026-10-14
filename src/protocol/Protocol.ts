@@ -12278,6 +12278,8 @@ export interface RobloxLiveFrameShape {
     readonly pointerMove?: true;
     /** state as defined by the Nexa gateway. */
     readonly state: string;
+    /** wheel as defined by the Nexa gateway. */
+    readonly wheel?: true;
 }
 
 /** RobloxLiveFrame from the Nexa wire protocol. */
@@ -12325,6 +12327,8 @@ export interface RobloxLiveStepRequestShape {
     readonly seconds: number;
     /** viewport as defined by the Nexa gateway. */
     readonly viewport?: RobloxNativeGuiViewport;
+    /** wheel as defined by the Nexa gateway. */
+    readonly wheel?: RobloxWheelGesture;
 }
 
 /** RobloxLiveStepRequest from the Nexa wire protocol. */
@@ -12418,6 +12422,23 @@ export interface RobloxTextSelectionShape {
 
 /** RobloxTextSelection from the Nexa wire protocol. */
 export type RobloxTextSelection = RobloxTextSelectionShape;
+
+/** RobloxWheelGesture wire fields. */
+export interface RobloxWheelGestureShape {
+    /** deltaX as defined by the Nexa gateway. */
+    readonly deltaX: number;
+    /** deltaY as defined by the Nexa gateway. */
+    readonly deltaY: number;
+    /** rotation as defined by the Nexa gateway. */
+    readonly rotation: number;
+    /** x as defined by the Nexa gateway. */
+    readonly x: number;
+    /** y as defined by the Nexa gateway. */
+    readonly y: number;
+}
+
+/** RobloxWheelGesture from the Nexa wire protocol. */
+export type RobloxWheelGesture = RobloxWheelGestureShape;
 
 /** ScalarSchema wire fields. */
 export interface ScalarSchemaShape {

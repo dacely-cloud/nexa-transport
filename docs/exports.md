@@ -36,12 +36,13 @@ they do not execute server-only handlers or grant access.
 
 ## Roblox preview helpers
 
-| Import                                       | Availability | Contract                                                     |
-| -------------------------------------------- | ------------ | ------------------------------------------------------------ |
-| `nexa-transport/roblox-legacy-font`          | ESM + types  | Portable legacy font data and lookup for native previews.    |
-| `nexa-transport/roblox-particle-orientation` | ESM + types  | Portable native particle orientation calculations.           |
-| `nexa-transport/roblox-keyboard-input`       | ESM + types  | Native keyboard phases and focused preview input.            |
-| `nexa-transport/roblox-text-edit`            | ESM + types  | Typed native text-edit actions for focused preview controls. |
+| Import                                       | Availability | Contract                                                         |
+| -------------------------------------------- | ------------ | ---------------------------------------------------------------- |
+| `nexa-transport/roblox-legacy-font`          | ESM + types  | Portable legacy font data and lookup for native previews.        |
+| `nexa-transport/roblox-particle-orientation` | ESM + types  | Portable native particle orientation calculations.               |
+| `nexa-transport/roblox-keyboard-input`       | ESM + types  | Native keyboard phases and focused preview input.                |
+| `nexa-transport/roblox-wheel-input`          | ESM + types  | Validated native wheel rotation and bounded pixel canvas travel. |
+| `nexa-transport/roblox-text-edit`            | ESM + types  | Typed native text-edit actions for focused preview controls.     |
 
 ## Office and private company channels
 
