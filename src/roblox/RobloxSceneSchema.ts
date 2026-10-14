@@ -65,6 +65,8 @@ export interface RobloxPropertySpec {
     readonly enumFamily?: string;
     readonly xmlName?: string;
     readonly xmlType?: string;
+    /** False for runtime-only properties that Roblox does not save in model XML. */
+    readonly serialize?: boolean;
     readonly tween?: boolean;
 }
 /** Constructors for fully explicit portable native datatypes. */
@@ -226,6 +228,7 @@ export const RobloxSceneSchema: Readonly<
         SpreadAngle: v({ kind: 'Vector2', x: 0, y: 0 }),
         Size: { ...v(RobloxValues.sequence(1)), min: 0, max: 1000 },
         Transparency: { ...v(RobloxValues.sequence(0)), min: 0, max: 1 },
+        LocalTransparencyModifier: { ...n(0, 0, 1), serialize: false },
         Color: v({
             kind: 'ColorSequence',
             points: [

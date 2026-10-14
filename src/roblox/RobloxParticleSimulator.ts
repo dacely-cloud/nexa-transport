@@ -151,19 +151,20 @@ export class RobloxParticleSimulator {
                 );
                 appearance.writeColor(normalized, this.#attributes, offset + 4);
                 this.#attributes[offset + 7] =
-                    1 -
-                    Math.min(
-                        1,
-                        Math.max(
-                            0,
-                            RobloxParticleAppearance.scalar(
-                                appearance.transparency,
-                                normalized,
-                                birth.envelopeSeed,
-                                0x391782a5,
+                    appearance.localOpacity *
+                    (1 -
+                        Math.min(
+                            1,
+                            Math.max(
+                                0,
+                                RobloxParticleAppearance.scalar(
+                                    appearance.transparency,
+                                    normalized,
+                                    birth.envelopeSeed,
+                                    0x391782a5,
+                                ),
                             ),
-                        ),
-                    );
+                        ));
                 this.#attributes[offset + 8] = birth.rotation + birth.rotSpeed * age;
                 count++;
             }

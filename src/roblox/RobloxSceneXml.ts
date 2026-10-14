@@ -64,6 +64,9 @@ export class RobloxSceneXml {
 
     /** Serializes one native property with its class-specific disk name and datatype. */
     public static property(name: string, value: RobloxValue, spec?: RobloxPropertySpec): string {
+        if (spec?.serialize === false) {
+            return '';
+        }
         const diskName: string = spec?.xmlName ?? name;
         let type: string =
             spec?.xmlType ??

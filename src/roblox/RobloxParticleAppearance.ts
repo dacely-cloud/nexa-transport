@@ -21,6 +21,8 @@ export class RobloxParticleAppearance {
     public readonly size: RobloxNumberSequence;
     /** Current per-age transparency curve. */
     public readonly transparency: RobloxNumberSequence;
+    /** Client-local opacity multiplier applies immediately to living particles. */
+    public readonly localOpacity: number;
     /** Current per-age multiplicative color curve. */
     public readonly color: RobloxColorSequence;
     /** Current normal-to-additive compositing factor. */
@@ -46,6 +48,7 @@ export class RobloxParticleAppearance {
         }
         this.size = size;
         this.transparency = transparency;
+        this.localOpacity = 1 - RobloxProperties.number(properties, 'LocalTransparencyModifier');
         this.color = color;
         this.lightEmission = RobloxProperties.number(properties, 'LightEmission');
         this.orientation = RobloxProperties.enum(properties, 'Orientation');

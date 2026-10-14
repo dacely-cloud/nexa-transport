@@ -70,6 +70,7 @@ export class RobloxSceneDiagnostics {
                         'Size',
                         'Color',
                         'Transparency',
+                        'LocalTransparencyModifier',
                         'Texture',
                         'LightEmission',
                         'Orientation',
@@ -101,7 +102,7 @@ export class RobloxSceneDiagnostics {
         }
         if ((scene.inputs?.length ?? 0) > 0) {
             findings.push(
-                'Input traces preserve actual native callbacks. Offline scenes and Studio packs replay captured results; live Chat panels dispatch new logical inputs and mouse/touch gestures to retained VMs. Independent native coordinate hit testing and Studio event-order calibration remain unfinished.',
+                'Input traces preserve actual native callbacks. Offline scenes and Studio packs replay captured results; live Chat panels dispatch logical inputs and mouse/touch gestures to retained VMs with scoped native coordinate picking and pointer capture. Studio event-order calibration remains unfinished.',
             );
         }
         if (
