@@ -36,6 +36,8 @@ const files: readonly string[] = [
     'RobloxGuiScale',
     'RobloxGuiPadding',
     'RobloxTextMetrics',
+    'RobloxTextLines',
+    'RobloxTextSelection',
     'RobloxLegacyFont',
     'RobloxLegacyFontData',
     'RobloxSceneExamples',
