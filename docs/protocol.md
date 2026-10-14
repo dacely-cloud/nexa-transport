@@ -3146,7 +3146,7 @@ A durable workspace image and its authored framing.
 
 Image scaling mode.
 
-Type: `"contain"` / `"cover"`.
+Type: `"contain"` / `"cover"` / `"stretch"`.
 
 ## DesignImageFraming
 
@@ -3757,7 +3757,18 @@ Variant 20: [DesignPaintColorOperation](protocol.md#designpaintcoloroperation)
 | `pageId`  | Yes      | `string`                                                       |             |
 | `target`  | Yes      | [DesignPaintColorTarget](protocol.md#designpaintcolortarget)   |             |
 
-Variant 21: [DesignPaintGradientOperation](protocol.md#designpaintgradientoperation)
+Variant 21: [DesignPaintImageOperation](protocol.md#designpaintimageoperation)
+
+| Field     | Required | Type                                                           | Description |
+| --------- | -------- | -------------------------------------------------------------- | ----------- |
+| `changes` | Yes      | [DesignPaintImageChanges](protocol.md#designpaintimagechanges) |             |
+| `id`      | Yes      | `string`                                                       |             |
+| `index`   | Yes      | `number`                                                       |             |
+| `op`      | Yes      | `"paint-image"`                                                |             |
+| `pageId`  | Yes      | `string`                                                       |             |
+| `target`  | Yes      | [DesignPaintColorTarget](protocol.md#designpaintcolortarget)   |             |
+
+Variant 22: [DesignPaintGradientOperation](protocol.md#designpaintgradientoperation)
 
 | Field     | Required | Type                                                                 | Description |
 | --------- | -------- | -------------------------------------------------------------------- | ----------- |
@@ -3768,7 +3779,7 @@ Variant 21: [DesignPaintGradientOperation](protocol.md#designpaintgradientoperat
 | `pageId`  | Yes      | `string`                                                             |             |
 | `target`  | Yes      | [DesignPaintColorTarget](protocol.md#designpaintcolortarget)         |             |
 
-Variant 22: [DesignStrokeOperation](protocol.md#designstrokeoperation)
+Variant 23: [DesignStrokeOperation](protocol.md#designstrokeoperation)
 
 | Field     | Required | Type                                                            | Description |
 | --------- | -------- | --------------------------------------------------------------- | ----------- |
@@ -3777,7 +3788,7 @@ Variant 22: [DesignStrokeOperation](protocol.md#designstrokeoperation)
 | `op`      | Yes      | `"stroke"`                                                      |             |
 | `pageId`  | Yes      | `string`                                                        |             |
 
-Variant 23: [DesignStyleOperation](protocol.md#designstyleoperation)
+Variant 24: [DesignStyleOperation](protocol.md#designstyleoperation)
 
 | Field     | Required | Type                                                 | Description |
 | --------- | -------- | ---------------------------------------------------- | ----------- |
@@ -3910,6 +3921,31 @@ Page-scoped native editing of one fill or stroke gradient.
 | `op`      | Yes      | `"paint-gradient"`                                                   |             |
 | `pageId`  | Yes      | `string`                                                             |             |
 | `target`  | Yes      | [DesignPaintColorTarget](protocol.md#designpaintcolortarget)         |             |
+
+## DesignPaintImageChanges
+
+Imported imagery and crop properties can be edited without resending any source or style records.
+
+| Field     | Required | Type                                  | Description         |
+| --------- | -------- | ------------------------------------- | ------------------- |
+| `assetId` | No       | `string`                              |                     |
+| `cropX`   | No       | `number`                              |                     |
+| `cropY`   | No       | `number`                              |                     |
+| `fit`     | No       | `"contain"` / `"cover"` / `"stretch"` | Image scaling mode. |
+| `scale`   | No       | `number`                              |                     |
+
+## DesignPaintImageOperation
+
+Page-scoped placement or framing of one image fill or existing stroke.
+
+| Field     | Required | Type                                                           | Description |
+| --------- | -------- | -------------------------------------------------------------- | ----------- |
+| `changes` | Yes      | [DesignPaintImageChanges](protocol.md#designpaintimagechanges) |             |
+| `id`      | Yes      | `string`                                                       |             |
+| `index`   | Yes      | `number`                                                       |             |
+| `op`      | Yes      | `"paint-image"`                                                |             |
+| `pageId`  | Yes      | `string`                                                       |             |
+| `target`  | Yes      | [DesignPaintColorTarget](protocol.md#designpaintcolortarget)   |             |
 
 ## DesignPaintKind
 
@@ -4837,6 +4873,7 @@ Collapses the required/optional intersection into one object type.
 | `createdAt`          | Yes      | `number`                             |             |
 | `id`                 | Yes      | `string`                             |             |
 | `messageCount`       | Yes      | `number`                             |             |
+| `parentSessionId`    | No       | `string`                             |             |
 | `participants`       | Yes      | Array of `string`                    |             |
 | `projectId`          | No       | `string`                             |             |
 | `retryFingerprint`   | No       | `string`                             |             |
@@ -8572,14 +8609,15 @@ Presence only: neither saved key material nor claims about Roblox permissions.
 
 A logical activation on the retained VM's current clock.
 
-| Field        | Required | Type                                  | Description                                                                                 |
-| ------------ | -------- | ------------------------------------- | ------------------------------------------------------------------------------------------- |
-| `clickCount` | No       | `number`                              |                                                                                             |
-| `device`     | No       | `"Gamepad"` / `"Mouse"` / `"Touch"`   |                                                                                             |
-| `event`      | No       | `"Activated"` / `"MouseButton1Click"` | Logical input events whose callbacks run in the native VM. Pointer hit testing is separate. |
-| `nodeId`     | Yes      | `string`                              |                                                                                             |
-| `x`          | No       | `number`                              |                                                                                             |
-| `y`          | No       | `number`                              |                                                                                             |
+| Field        | Required | Type                                                                              | Description                                                                                 |
+| ------------ | -------- | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `clickCount` | No       | `number`                                                                          |                                                                                             |
+| `device`     | No       | `"Gamepad"` / `"Mouse"` / `"Touch"`                                               |                                                                                             |
+| `event`      | No       | `"Activated"` / `"MouseButton1Click"` / `"MouseButton1Down"` / `"MouseButton1Up"` | Logical input events whose callbacks run in the native VM. Pointer hit testing is separate. |
+| `nodeId`     | Yes      | `string`                                                                          |                                                                                             |
+| `pointer`    | No       | [RobloxPointerInput](protocol.md#robloxpointerinput)                              | Browser hit evidence and bounded pointer identity for an actual press/release gesture.      |
+| `x`          | No       | `number`                                                                          |                                                                                             |
+| `y`          | No       | `number`                                                                          |                                                                                             |
 
 ## RobloxLiveClosed
 
@@ -8639,6 +8677,22 @@ One serialized native step and optional logical activation.
 | `id`      | Yes      | `string`                                                 |                                                          |
 | `input`   | No       | [RobloxLiveActivation](protocol.md#robloxliveactivation) | A logical activation on the retained VM's current clock. |
 | `seconds` | Yes      | `number`                                                 |                                                          |
+
+## RobloxPointerInput
+
+Browser hit evidence and bounded pointer identity for an actual press/release gesture.
+
+| Field   | Required | Type                                                 | Description |
+| ------- | -------- | ---------------------------------------------------- | ----------- |
+| `id`    | Yes      | `number`                                             |             |
+| `over`  | Yes      | `boolean`                                            |             |
+| `phase` | Yes      | [RobloxPointerPhase](protocol.md#robloxpointerphase) |             |
+
+## RobloxPointerPhase
+
+Physical gesture phases owned by the preview protocol, separate from Roblox signal names.
+
+Type: `"Cancel"` / `"Press"` / `"Release"`.
 
 ## ScalarSchema
 
@@ -8701,13 +8755,14 @@ A small live notification; large records remain in bounded authenticated pages.
 
 Bounded binary pages can split even a very large individual native event.
 
-| Field             | Required | Type     | Description                                                              |
-| ----------------- | -------- | -------- | ------------------------------------------------------------------------ |
-| `chunk`           | Yes      | `string` |                                                                          |
-| `endCursor`       | Yes      | `string` |                                                                          |
-| `format`          | Yes      | `1`      |                                                                          |
-| `nextCursor`      | No       | `string` |                                                                          |
-| `sourceEndCursor` | No       | `string` | Original byte cursor for live catch-up after replaying a canonical view. |
+| Field             | Required | Type      | Description                                                              |
+| ----------------- | -------- | --------- | ------------------------------------------------------------------------ |
+| `chunk`           | Yes      | `string`  |                                                                          |
+| `endCursor`       | Yes      | `string`  |                                                                          |
+| `excludesWorkers` | No       | `boolean` | Confirms that delegated events were omitted from this projection.        |
+| `format`          | Yes      | `1`       |                                                                          |
+| `nextCursor`      | No       | `string`  |                                                                          |
+| `sourceEndCursor` | No       | `string`  | Original byte cursor for live catch-up after replaying a canonical view. |
 
 ## SessionHistoryParams
 
@@ -8718,9 +8773,12 @@ Byte cursors are decimal strings so large journals retain exact offsets.
 | `compact`         | No       | `boolean` | Canonical display view; the original append-only journal remains available.    |
 | `cursor`          | No       | `string`  |                                                                                |
 | `endCursor`       | No       | `string`  |                                                                                |
+| `excludeWorkers`  | No       | `boolean` | Omits full delegated events when opening the parent conversation.              |
 | `id`              | Yes      | `string`  |                                                                                |
 | `pageBytes`       | No       | `number`  | Optional bounded read window, up to 1 MiB.                                     |
 | `sourceEndCursor` | No       | `string`  | Pins a canonical view to an original journal boundary across all of its pages. |
+| `streamId`        | No       | `string`  |                                                                                |
+| `workerId`        | No       | `string`  | Reads one worker's events from its owned parent, scoped to a response stream.  |
 
 ## SessionHistoryRecord
 
@@ -9210,6 +9268,34 @@ How the content is reduced. Declared by the tool, which knows what it produced.
 
 Type: `"head"` / `"head-tail"` / `"hunk-head"` / `"summary-head"` / `"tail"`.
 
+## TurnActivityEvent
+
+Bounded live activity and time spent in this stage; it is not a completion estimate.
+
+| Field            | Required | Type                                               | Description |
+| ---------------- | -------- | -------------------------------------------------- | ----------- |
+| `detail`         | Yes      | `string`                                           |             |
+| `elapsedSeconds` | Yes      | `number`                                           |             |
+| `phase`          | Yes      | [TurnActivityPhase](protocol.md#turnactivityphase) |             |
+| `type`           | Yes      | `"turn-activity"`                                  |             |
+
+## TurnActivityPhase
+
+Host-observed work, including model calls that do not produce answer text.
+
+Type: `"compacting"` / `"planning"` / `"preparing"` / `"recalling"` / `"thinking"` / `"understanding"` / `"verifying"` / `"working"`.
+
+## TurnActivityStatusEvent
+
+Existing clients can display the status while newer clients read its structured activity.
+
+| Field      | Required | Type                                               | Description                                                                          |
+| ---------- | -------- | -------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `activity` | No       | [TurnActivityEvent](protocol.md#turnactivityevent) | Bounded live activity and time spent in this stage; it is not a completion estimate. |
+| `detail`   | No       | `string`                                           |                                                                                      |
+| `status`   | Yes      | `string`                                           |                                                                                      |
+| `type`     | Yes      | `"status"`                                         |                                                                                      |
+
 ## TurnEndData
 
 The payload of a {@link GATEWAY_EVENTS.TurnEnd} event.
@@ -9409,56 +9495,65 @@ An error, in the shape a client can act on without parsing prose.
 
 A turn event as it travels.
 
-Variant 1: Object (fields below)
+Variant 1: [TurnActivityStatusEvent](protocol.md#turnactivitystatusevent)
+
+| Field      | Required | Type                                               | Description                                                                          |
+| ---------- | -------- | -------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `activity` | No       | [TurnActivityEvent](protocol.md#turnactivityevent) | Bounded live activity and time spent in this stage; it is not a completion estimate. |
+| `detail`   | No       | `string`                                           |                                                                                      |
+| `status`   | Yes      | `string`                                           |                                                                                      |
+| `type`     | Yes      | `"status"`                                         |                                                                                      |
+
+Variant 2: Object (fields below)
 
 | Field     | Required | Type                                              | Description |
 | --------- | -------- | ------------------------------------------------- | ----------- |
 | `type`    | Yes      | `"agents-status"`                                 |             |
 | `workers` | Yes      | Array of [WorkerStatus](protocol.md#workerstatus) |             |
 
-Variant 2: Object (fields below)
+Variant 3: Object (fields below)
 
 | Field        | Required | Type                                                   | Description |
 | ------------ | -------- | ------------------------------------------------------ | ----------- |
 | `attachment` | Yes      | [DeliveredAttachment](protocol.md#deliveredattachment) |             |
 | `type`       | Yes      | `"attachment"`                                         |             |
 
-Variant 3: Object (fields below)
+Variant 4: Object (fields below)
 
 | Field    | Required | Type           | Description |
 | -------- | -------- | -------------- | ----------- |
 | `turnId` | Yes      | `string`       |             |
 | `type`   | Yes      | `"turn-start"` |             |
 
-Variant 4: Object (fields below)
+Variant 5: Object (fields below)
 
 | Field       | Required | Type                | Description |
 | ----------- | -------- | ------------------- | ----------- |
 | `iteration` | Yes      | `number`            |             |
 | `type`      | Yes      | `"iteration-start"` |             |
 
-Variant 5: Object (fields below)
+Variant 6: Object (fields below)
 
 | Field  | Required | Type     | Description |
 | ------ | -------- | -------- | ----------- |
 | `text` | Yes      | `string` |             |
 | `type` | Yes      | `"text"` |             |
 
-Variant 6: Object (fields below)
+Variant 7: Object (fields below)
 
 | Field  | Required | Type          | Description |
 | ------ | -------- | ------------- | ----------- |
 | `text` | Yes      | `string`      |             |
 | `type` | Yes      | `"reasoning"` |             |
 
-Variant 7: Object (fields below)
+Variant 8: Object (fields below)
 
 | Field  | Required | Type                             | Description |
 | ------ | -------- | -------------------------------- | ----------- |
 | `call` | Yes      | [ToolCall](protocol.md#toolcall) |             |
 | `type` | Yes      | `"tool-start"`                   |             |
 
-Variant 8: Object (fields below)
+Variant 9: Object (fields below)
 
 | Field    | Required | Type                                     | Description |
 | -------- | -------- | ---------------------------------------- | ----------- |
@@ -9466,14 +9561,14 @@ Variant 8: Object (fields below)
 | `type`   | Yes      | `"tool-progress"`                        |             |
 | `update` | Yes      | [ToolProgress](protocol.md#toolprogress) |             |
 
-Variant 9: Object (fields below)
+Variant 10: Object (fields below)
 
 | Field     | Required | Type                                   | Description |
 | --------- | -------- | -------------------------------------- | ----------- |
 | `outcome` | Yes      | [ToolOutcome](protocol.md#tooloutcome) |             |
 | `type`    | Yes      | `"tool-finish"`                        |             |
 
-Variant 10: Object (fields below)
+Variant 11: Object (fields below)
 
 | Field     | Required | Type                  | Description |
 | --------- | -------- | --------------------- | ----------- |
@@ -9481,7 +9576,7 @@ Variant 10: Object (fields below)
 | `tool`    | Yes      | `string`              |             |
 | `type`    | Yes      | `"approval-required"` |             |
 
-Variant 11: Object (fields below)
+Variant 12: Object (fields below)
 
 | Field             | Required | Type          | Description |
 | ----------------- | -------- | ------------- | ----------- |
@@ -9489,28 +9584,20 @@ Variant 11: Object (fields below)
 | `summary`         | Yes      | `string`      |             |
 | `type`            | Yes      | `"compacted"` |             |
 
-Variant 12: Object (fields below)
+Variant 13: Object (fields below)
 
 | Field   | Required | Type                                 | Description |
 | ------- | -------- | ------------------------------------ | ----------- |
 | `type`  | Yes      | `"usage"`                            |             |
 | `usage` | Yes      | [TokenUsage](protocol.md#tokenusage) |             |
 
-Variant 13: Object (fields below)
+Variant 14: Object (fields below)
 
 | Field    | Required | Type                               | Description |
 | -------- | -------- | ---------------------------------- | ----------- |
 | `data`   | Yes      | [JsonValue](protocol.md#jsonvalue) |             |
 | `source` | Yes      | `string`                           |             |
 | `type`   | Yes      | `"native"`                         |             |
-
-Variant 14: Object (fields below)
-
-| Field    | Required | Type       | Description |
-| -------- | -------- | ---------- | ----------- |
-| `detail` | No       | `string`   |             |
-| `status` | Yes      | `string`   |             |
-| `type`   | Yes      | `"status"` |             |
 
 Variant 15: Object (fields below)
 

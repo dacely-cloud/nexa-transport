@@ -16,6 +16,7 @@ export class MediaSources {
         'BinaryEnvelopeDecodePlan.ts',
         'BinaryEnvelopeDecoder.ts',
         'BinaryJsonValidation.ts',
+        'BinaryRequestMemory.ts',
         'JsonFrameMemory.ts',
         'BinaryMedia.ts',
         'BinaryCarrierFactory.ts',

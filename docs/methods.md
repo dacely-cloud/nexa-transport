@@ -2932,9 +2932,12 @@ Parameters: [SessionHistoryParams](protocol.md#sessionhistoryparams).
 | `compact`         | No       | `boolean` | Canonical display view; the original append-only journal remains available.    |
 | `cursor`          | No       | `string`  |                                                                                |
 | `endCursor`       | No       | `string`  |                                                                                |
+| `excludeWorkers`  | No       | `boolean` | Omits full delegated events when opening the parent conversation.              |
 | `id`              | Yes      | `string`  |                                                                                |
 | `pageBytes`       | No       | `number`  | Optional bounded read window, up to 1 MiB.                                     |
 | `sourceEndCursor` | No       | `string`  | Pins a canonical view to an original journal boundary across all of its pages. |
+| `streamId`        | No       | `string`  |                                                                                |
+| `workerId`        | No       | `string`  | Reads one worker's events from its owned parent, scoped to a response stream.  |
 
 Result: [SessionHistoryPage](protocol.md#sessionhistorypage).
 

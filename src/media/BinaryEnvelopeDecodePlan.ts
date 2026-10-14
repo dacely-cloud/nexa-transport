@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { BinaryAdmissionError } from './BinaryAdmissionError';
+import { BinaryRequestMemory } from './BinaryRequestMemory';
 import { BinaryJsonValidation } from './BinaryJsonValidation';
 import { JsonFrameMemory } from './JsonFrameMemory';
 import { BinaryEncoding } from './interface/BinaryEncoding';
@@ -12,10 +13,6 @@ import type { BinaryPart } from './interface/BinaryPart';
 
 /** Validates every header, path, body range and expansion before allocating decoded carriers. */
 export class BinaryEnvelopeDecodePlan {
-    /** Covers two number-array copies and capacity growth in tagged element storage. */
-    static readonly #ARRAY_BYTES_PER_BYTE = 32 as const;
-    /** Covers two UTF-16 base64 copies, bounded spread scratch and fallback concatenation. */
-    static readonly #BASE64_BYTES_PER_BYTE = 16 as const;
     /** Decoder-owned metadata; placeholders remain untouched until the complete plan is admitted. */
     public readonly json: BinaryJsonValue;
     /** Immutable restoration instructions referring only to the owned metadata tree. */
@@ -101,14 +98,11 @@ export class BinaryEnvelopeDecodePlan {
                 raw,
                 offset,
             );
-            const workingBytes: number =
-                raw.encoding === BinaryEncoding.Array
-                    ? BinaryEnvelopeDecodePlan.#ARRAY_BYTES_PER_BYTE * raw.length + 256
-                    : raw.encoding === BinaryEncoding.Base64
-                      ? BinaryEnvelopeDecodePlan.#BASE64_BYTES_PER_BYTE * raw.length + 1024
-                      : frame.buffer.byteLength === frame.byteLength
-                        ? 256
-                        : 2 * raw.length + 256;
+            const workingBytes: number = BinaryRequestMemory.carrier(
+                raw.length,
+                raw.encoding,
+                frame.buffer.byteLength !== frame.byteLength,
+            );
             BinaryEnvelopeDecodePlan.#reserve(admission, workingBytes);
             let replacementBytes: number =
                 raw.encoding === BinaryEncoding.Bytes
