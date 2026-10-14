@@ -17903,21 +17903,28 @@
     "RobloxLiveStepRequest": {
       "description": "One serialized native step and optional logical activation.",
       "properties": {
-        "handle": {
-          "type": "string"
-        },
-        "id": {
-          "type": "string"
-        },
+        "handle": { "type": "string" },
+        "id": { "type": "string" },
         "input": {
           "$ref": "#/definitions/RobloxLiveActivation",
           "description": "A logical activation on the retained VM's current clock."
         },
-        "seconds": {
-          "type": "number"
+        "seconds": { "type": "number" },
+        "viewport": {
+          "$ref": "#/definitions/RobloxNativeGuiViewport",
+          "description": "Host-selected execution context, never supplied by the model."
         }
       },
       "required": ["handle", "id", "seconds"],
+      "type": "object"
+    },
+    "RobloxNativeGuiViewport": {
+      "description": "Host-selected execution context, never supplied by the model.",
+      "properties": {
+        "height": { "type": "number" },
+        "width": { "type": "number" }
+      },
+      "required": ["height", "width"],
       "type": "object"
     },
     "RobloxPointerInput": {

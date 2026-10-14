@@ -18587,8 +18587,7 @@ export const schema: Schema = {
       type: "object",
     },
     RobloxLiveStepRequest: {
-      description:
-        "One serialized native step and optional logical activation.",
+      description: "One serialized native step and optional logical activation.",
       properties: {
         handle: {
           type: "string",
@@ -18598,14 +18597,32 @@ export const schema: Schema = {
         },
         input: {
           $ref: "#/definitions/RobloxLiveActivation",
-          description:
-            "A logical activation on the retained VM's current clock.",
+          description: "A logical activation on the retained VM's current clock.",
         },
         seconds: {
           type: "number",
         },
+        viewport: {
+          $ref: "#/definitions/RobloxNativeGuiViewport",
+          description:
+            "Host-selected execution context, never supplied by the model.",
+        },
       },
       required: ["handle", "id", "seconds"],
+      type: "object",
+    },
+    RobloxNativeGuiViewport: {
+      description:
+        "Host-selected execution context, never supplied by the model.",
+      properties: {
+        height: {
+          type: "number",
+        },
+        width: {
+          type: "number",
+        },
+      },
+      required: ["height", "width"],
       type: "object",
     },
     RobloxPointerInput: {

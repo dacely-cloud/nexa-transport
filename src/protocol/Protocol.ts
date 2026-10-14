@@ -12213,10 +12213,23 @@ export interface RobloxLiveStepRequestShape {
   readonly input?: RobloxLiveActivation;
   /** seconds as defined by the Nexa gateway. */
   readonly seconds: number;
+  /** viewport as defined by the Nexa gateway. */
+  readonly viewport?: RobloxNativeGuiViewport;
 }
 
 /** RobloxLiveStepRequest from the Nexa wire protocol. */
 export type RobloxLiveStepRequest = RobloxLiveStepRequestShape;
+
+/** RobloxNativeGuiViewport wire fields. */
+export interface RobloxNativeGuiViewportShape {
+  /** height as defined by the Nexa gateway. */
+  readonly height: number;
+  /** width as defined by the Nexa gateway. */
+  readonly width: number;
+}
+
+/** RobloxNativeGuiViewport from the Nexa wire protocol. */
+export type RobloxNativeGuiViewport = RobloxNativeGuiViewportShape;
 
 /** RobloxPointerInput wire fields. */
 export interface RobloxPointerInputShape {
