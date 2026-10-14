@@ -6,15 +6,10 @@ import {
     type RobloxTextBoundary,
 } from './RobloxTextLines';
 import type { RobloxTextMetrics } from './RobloxTextMetrics';
+import { RobloxTextAlignment, type RobloxTextLayoutInput } from './RobloxTextAlignment';
 
 /** Text editing offsets remain one-based UTF-8 bytes; geometry stays in control-local pixels. */
-export interface RobloxTextSelectionInput {
-    readonly text: string;
-    readonly size: number;
-    readonly wrapped: boolean;
-    readonly rect: readonly [number, number, number, number];
-    readonly alignX: number;
-    readonly alignY: number;
+export interface RobloxTextSelectionInput extends RobloxTextLayoutInput {
     readonly cursor: number;
     readonly selectionStart: number;
 }
@@ -40,21 +35,7 @@ export class RobloxTextSelection {
         if (input.cursor === -1) {
             return { insertion: null, selection: [] };
         }
-        if (
-            !input.rect.every(
-                (value: number): boolean => Number.isFinite(value) && Math.abs(value) <= 16384,
-            ) ||
-            input.rect[2] < 0 ||
-            input.rect[3] < 0 ||
-            !Number.isInteger(input.alignX) ||
-            input.alignX < 0 ||
-            input.alignX > 2 ||
-            !Number.isInteger(input.alignY) ||
-            input.alignY < 0 ||
-            input.alignY > 2
-        ) {
-            throw new Error('Invalid text selection layout');
-        }
+        RobloxTextAlignment.validate(input);
         const bytes: number = new TextEncoder().encode(input.text).length;
         for (const position of [input.cursor, input.selectionStart]) {
             if (position === -1) {
@@ -70,16 +51,8 @@ export class RobloxTextSelection {
             input.size,
             input.wrapped ? input.rect[2] : null,
         );
-        const scale: number = Math.fround(Math.fround(input.size) / metrics.unitsPerEm);
-        const height: number = Math.fround(metrics.lineHeight * scale);
-        const total: number = Math.fround(height * lines.length);
-        const top: number =
-            input.rect[1] +
-            (input.alignY === 0
-                ? 0
-                : input.alignY === 2
-                  ? input.rect[3] - total
-                  : (input.rect[3] - total) / 2);
+        const height: number = RobloxTextAlignment.height(metrics, input.size);
+        const top: number = RobloxTextAlignment.top(input, height, lines.length);
         const cursor: number = input.cursor - 1;
         const anchor: number = input.selectionStart === -1 ? cursor : input.selectionStart - 1;
         const valid: Set<number> = new Set<number>(
@@ -107,13 +80,7 @@ export class RobloxTextSelection {
             if (line === undefined) {
                 throw new Error('Missing text selection line');
             }
-            const left: number =
-                input.rect[0] +
-                (input.alignX === 0
-                    ? 0
-                    : input.alignX === 1
-                      ? input.rect[2] - line.width
-                      : (input.rect[2] - line.width) / 2);
+            const left: number = RobloxTextAlignment.left(input, line.width);
             const y: number = top + Math.fround(index * height);
             const next: RobloxMeasuredTextLine | undefined = lines[index + 1];
             if (

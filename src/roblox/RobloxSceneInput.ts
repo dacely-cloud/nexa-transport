@@ -158,11 +158,13 @@ export class RobloxSceneInput {
         const phase: RobloxPointerPhase =
             fields['phase'] === RobloxPointerPhase.Press
                 ? RobloxPointerPhase.Press
-                : fields['phase'] === RobloxPointerPhase.Release
-                  ? RobloxPointerPhase.Release
-                  : fields['phase'] === RobloxPointerPhase.Cancel
-                    ? RobloxPointerPhase.Cancel
-                    : this.#invalid();
+                : fields['phase'] === RobloxPointerPhase.Move
+                  ? RobloxPointerPhase.Move
+                  : fields['phase'] === RobloxPointerPhase.Release
+                    ? RobloxPointerPhase.Release
+                    : fields['phase'] === RobloxPointerPhase.Cancel
+                      ? RobloxPointerPhase.Cancel
+                      : this.#invalid();
         if (typeof fields['over'] !== 'boolean') {
             throw new Error('Pointer hit evidence must be boolean');
         }

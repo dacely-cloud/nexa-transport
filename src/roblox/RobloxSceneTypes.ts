@@ -268,7 +268,12 @@ export type RobloxInputEvent = (typeof RobloxInputEvent)[keyof typeof RobloxInpu
 export const RobloxInputDevice = { Mouse: 'Mouse', Touch: 'Touch', Gamepad: 'Gamepad' } as const;
 export type RobloxInputDevice = (typeof RobloxInputDevice)[keyof typeof RobloxInputDevice];
 /** Physical gesture phases owned by the preview protocol, separate from Roblox signal names. */
-export const RobloxPointerPhase = { Press: 'Press', Release: 'Release', Cancel: 'Cancel' } as const;
+export const RobloxPointerPhase = {
+    Press: 'Press',
+    Move: 'Move',
+    Release: 'Release',
+    Cancel: 'Cancel',
+} as const;
 /** One retained physical pointer phase. */
 export type RobloxPointerPhase = (typeof RobloxPointerPhase)[keyof typeof RobloxPointerPhase];
 /** Browser hit evidence and bounded pointer identity for an actual press/release gesture. */

@@ -10,6 +10,7 @@ import { RobloxGuiText } from './RobloxGuiText';
 import { RobloxGuiImages, type RobloxGuiImage } from './RobloxGuiImages';
 import { RobloxGuiScale } from './RobloxGuiScale';
 import { RobloxTextSelection, type RobloxTextSelectionGeometry } from './RobloxTextSelection';
+import { RobloxTextHit } from './RobloxTextHit';
 
 /** Affine local-pixel to viewport-pixel transform. */
 export type RobloxGuiTransform = readonly [number, number, number, number, number, number];
@@ -47,6 +48,35 @@ interface GuiParent {
 
 /** Deterministic viewport layout for the classes supported by the current projection. */
 export class RobloxGuiLayout {
+    /** Maps a viewport pointer to the closest native UTF-8 boundary in actual TextBox text. */
+    public textPosition(
+        element: RobloxGuiElement,
+        properties: Readonly<Record<string, RobloxValue>>,
+        x: number,
+        y: number,
+    ): number {
+        const metrics: import('./RobloxTextMetrics').RobloxTextMetrics | undefined =
+            this.#scene.textMetrics;
+        if (metrics === undefined) {
+            throw new Error('TextBox hit testing requires the actual native font metrics');
+        }
+        const [a, b, c, d, tx, ty]: RobloxGuiTransform = element.transform;
+        const determinant: number = a * d - b * c;
+        if (!Number.isFinite(determinant) || determinant === 0) {
+            throw new Error('TextBox transform cannot be inverted');
+        }
+        const text: RobloxValue | undefined = properties['Text'];
+        return RobloxTextHit.position(metrics, {
+            text: typeof text === 'string' ? text : '',
+            size: element.textSize,
+            wrapped: element.textWrapped,
+            rect: element.textRect ?? [0, 0, element.width, element.height],
+            alignX: element.textX,
+            alignY: element.textY,
+            x: ((x - tx) * d - (y - ty) * c) / determinant,
+            y: ((y - ty) * a - (x - tx) * b) / determinant,
+        });
+    }
     /** Resolves native TextBox byte positions against this scene's measured font and padded text rectangle. */
     public selection(
         element: RobloxGuiElement,
