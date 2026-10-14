@@ -30,9 +30,7 @@ export class BinaryRequestMemory {
         }
         if (encoding === BinaryEncoding.Base64) {
             return (
-                BinaryRequestMemory.#BASE64_MULTIPLIER * length +
-                8 * Math.min(length, 8190) +
-                1024
+                BinaryRequestMemory.#BASE64_MULTIPLIER * length + 8 * Math.min(length, 8190) + 1024
             );
         }
         return compact ? 2 * length + 256 : 256;

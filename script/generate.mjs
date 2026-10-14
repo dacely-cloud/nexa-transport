@@ -5,7 +5,10 @@ import { join } from 'node:path';
 import { readFileSync, writeFileSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 
 mkdirSync('src/protocol', { recursive: true });
-writeFileSync('src/protocol/GatewayVersion.ts', readFileSync('../nexa/src/gateway/GatewayVersion.ts', 'utf8'));
+writeFileSync(
+    'src/protocol/GatewayVersion.ts',
+    readFileSync('../nexa/src/gateway/GatewayVersion.ts', 'utf8'),
+);
 
 mkdirSync('src/toolsearch', { recursive: true });
 writeFileSync(

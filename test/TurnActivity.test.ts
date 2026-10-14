@@ -95,7 +95,9 @@ it('delivers setup, internal model work and heartbeat packets before answer text
         targetTimeSeconds: 3600,
     });
     const events: WireTurnEvent[] = [];
-    for await (const event of stream) {events.push(event);}
+    for await (const event of stream) {
+        events.push(event);
+    }
     expect(events.map((event: WireTurnEvent): string => event.type)).toEqual([
         'status',
         'status',
@@ -125,7 +127,9 @@ it('validates stage names and bounded activity at the untrusted wire boundary', 
             },
         },
     };
-    if (data.event.type !== 'status') {throw new Error('Expected status');}
+    if (data.event.type !== 'status') {
+        throw new Error('Expected status');
+    }
     expect(turnEvent(data)).toBe(true);
     expect(
         turnEvent({

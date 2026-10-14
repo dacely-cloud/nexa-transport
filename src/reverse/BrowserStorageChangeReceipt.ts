@@ -6,8 +6,15 @@ import { BrowserStorageComparisonReceipt } from './BrowserStorageComparisonRecei
 import { BrowserStorageReceipt } from './BrowserStorageReceipt.js';
 import { BrowserStorageGroup, BrowserStorageKind } from './BrowserStorageReceipt.js';
 import type { BrowserStorageRow } from '../protocol/Protocol.js';
-import { BrowserStorageChangeKind as Change, BrowserStorageCompareMode as Mode } from './BrowserStorageComparisonDefinitions.js';
-import type { BrowserStorageComparison, BrowserStorageChange, BrowserStorageComparisonPage } from '../protocol/Protocol.js';
+import {
+    BrowserStorageChangeKind as Change,
+    BrowserStorageCompareMode as Mode,
+} from './BrowserStorageComparisonDefinitions.js';
+import type {
+    BrowserStorageComparison,
+    BrowserStorageChange,
+    BrowserStorageComparisonPage,
+} from '../protocol/Protocol.js';
 import type { BrowserStorageComparisonCapture } from './BrowserStorageComparisonDefinitions.js';
 
 interface RetainedCounts {

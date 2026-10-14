@@ -37,21 +37,27 @@ export class RobloxSceneMeshes {
 
     /** Checks all file contents once, before captures or GPU allocations can consume them. */
     public static decode(raw: unknown): RobloxSceneMeshTable | undefined {
-        if (raw === undefined) {return undefined;}
-        if (raw === null || typeof raw !== 'object' || Array.isArray(raw))
-            {throw new Error('Invalid Roblox scene mesh table');}
+        if (raw === undefined) {
+            return undefined;
+        }
+        if (raw === null || typeof raw !== 'object' || Array.isArray(raw)) {
+            throw new Error('Invalid Roblox scene mesh table');
+        }
         const fields: Readonly<Record<string, unknown>> = RobloxSceneCodec.record(
             raw,
             [],
             Object.keys(raw),
         );
         const entries: readonly [string, unknown][] = Object.entries(fields);
-        if (entries.length > 16)
-            {throw new Error('Roblox scene mesh resource budget exceeds 16 assets');}
+        if (entries.length > 16) {
+            throw new Error('Roblox scene mesh resource budget exceeds 16 assets');
+        }
         const output: Record<string, RobloxSceneMeshResource> = {};
         let bytes: number = 0;
         for (const [uri, value] of entries) {
-            if (!this.uri(uri)) {throw new Error('Invalid Roblox scene mesh URI');}
+            if (!this.uri(uri)) {
+                throw new Error('Invalid Roblox scene mesh URI');
+            }
             const record: Readonly<Record<string, unknown>> = RobloxSceneCodec.record(value, [
                 'base64',
                 'sha256',
@@ -62,12 +68,15 @@ export class RobloxSceneMeshes {
                 base64.length % 4 !== 0 ||
                 !/^[A-Za-z0-9+/]*={0,2}$/u.test(base64) ||
                 !/^[a-f0-9]{64}$/u.test(sha256)
-            )
-                {throw new Error('Invalid Roblox scene mesh encoding or provenance');}
+            ) {
+                throw new Error('Invalid Roblox scene mesh encoding or provenance');
+            }
             bytes +=
                 (base64.length / 4) * 3 -
                 (base64.endsWith('==') ? 2 : base64.endsWith('=') ? 1 : 0);
-            if (bytes > this.maximumBytes) {throw new Error('Roblox scene meshes exceed 2 MiB');}
+            if (bytes > this.maximumBytes) {
+                throw new Error('Roblox scene meshes exceed 2 MiB');
+            }
             const cached: RobloxSceneMeshResource | undefined = this.#validated.get(record);
             const resource: RobloxSceneMeshResource =
                 cached?.base64 === base64 && cached.sha256 === sha256
@@ -94,8 +103,9 @@ export class RobloxSceneMeshes {
         const resource: RobloxSceneMeshResource | undefined = scene.meshes?.[uri];
         const decoded: RobloxMeshData | undefined =
             resource === undefined ? undefined : this.#decoded.get(resource);
-        if (decoded === undefined)
-            {throw new Error('Original Roblox mesh bytes are missing: ' + uri);}
+        if (decoded === undefined) {
+            throw new Error('Original Roblox mesh bytes are missing: ' + uri);
+        }
         return decoded;
     }
 }

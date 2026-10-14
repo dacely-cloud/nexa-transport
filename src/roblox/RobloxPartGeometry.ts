@@ -25,7 +25,9 @@ export class RobloxPartGeometry {
         node: RobloxSceneNode,
         properties: Readonly<Record<string, RobloxValue>> = node.properties,
     ): number {
-        if (node.className === 'MeshPart') {return -1;}
+        if (node.className === 'MeshPart') {
+            return -1;
+        }
         if (node.className === 'WedgePart') {
             return 3;
         }
