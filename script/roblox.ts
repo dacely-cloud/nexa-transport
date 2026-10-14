@@ -13,6 +13,7 @@ const files: readonly string[] = [
     'RobloxMeshDecoder',
     'RobloxMeshNormals',
     'RobloxMeshGeometry',
+    'RobloxMeshPlayback',
     'RobloxSceneMeshes',
     'RobloxLiveState',
     'RobloxLiveDescriptor',

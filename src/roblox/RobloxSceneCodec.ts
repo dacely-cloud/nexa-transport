@@ -864,9 +864,8 @@ export class RobloxSceneCodec {
                 if (
                     seen.has(nodeId) ||
                     ancestor === undefined ||
-                    !['Attachment', 'Part', 'WedgePart', 'CornerWedgePart'].includes(
-                        ancestor.className,
-                    )
+                    (ancestor.className !== 'Attachment' &&
+                        !RobloxPartGeometry.isPart(ancestor.className))
                 ) {
                     throw new Error('Invalid emission ancestor');
                 }

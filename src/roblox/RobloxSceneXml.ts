@@ -4,7 +4,7 @@
 import type { RobloxScene, RobloxSceneNode, RobloxValue } from './RobloxSceneTypes';
 import { RobloxSceneSchema, type RobloxPropertySpec } from './RobloxSceneSchema';
 import { RobloxSceneLuau } from './RobloxSceneLuau';
-import { RobloxSceneHierarchy } from './RobloxSceneHierarchy';
+import { RobloxMeshPlayback } from './RobloxMeshPlayback';
 
 /** Native XML serialization, using the rbx-dom version 4 format. */
 export class RobloxSceneXml {
@@ -67,11 +67,10 @@ export class RobloxSceneXml {
 
     /** Immutable imported mesh identity is supplied by cloneable native templates beneath the replay module. */
     public static meshTemplates(scene: RobloxScene): string {
-        const nodes: readonly RobloxSceneNode[] = [...RobloxSceneHierarchy.catalog(scene).values()];
-        const meshes: readonly RobloxSceneNode[] = nodes.filter(
-            (node: RobloxSceneNode): boolean => node.className === 'MeshPart',
-        );
-        if (meshes.length === 0) {return '';}
+        const meshes: readonly RobloxSceneNode[] = RobloxMeshPlayback.plan(scene).templates;
+        if (meshes.length === 0) {
+            return '';
+        }
         return (
             '<Item class="Folder" referent="RBX_MeshTemplates"><Properties><string name="Name">NexaMeshTemplates</string></Properties>' +
             meshes

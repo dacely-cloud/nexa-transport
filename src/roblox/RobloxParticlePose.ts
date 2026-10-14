@@ -6,6 +6,7 @@ import { RobloxSceneHierarchy } from './RobloxSceneHierarchy';
 import { RobloxProperties, RobloxSceneRuntime } from './RobloxSceneRuntime';
 import { RobloxValues } from './RobloxSceneSchema';
 import { RobloxParticleRigidTransfer } from './RobloxParticleRigidTransfer';
+import { RobloxPartGeometry } from './RobloxPartGeometry';
 
 /** Rigid emitter frames are independent of particle age and scaled simulation time. */
 export class RobloxParticlePose {
@@ -27,13 +28,7 @@ export class RobloxParticlePose {
             if (node === undefined) {
                 break;
             }
-            if (
-                node.className !== 'Attachment' &&
-                node.className !== 'Part' &&
-                node.className !== 'WedgePart' &&
-                node.className !== 'CornerWedgePart' &&
-                node.className !== 'MeshPart'
-            ) {
+            if (node.className !== 'Attachment' && !RobloxPartGeometry.isPart(node.className)) {
                 break;
             }
             const frame: RobloxCFrame = RobloxProperties.cframe(

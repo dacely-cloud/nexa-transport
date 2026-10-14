@@ -9,6 +9,7 @@ import { RobloxParticleMotion } from './RobloxParticleMotion';
 import { RobloxParticleMotionTree, type RobloxParticleTransfers } from './RobloxParticleMotionTree';
 import { RobloxParticlePose } from './RobloxParticlePose';
 import { RobloxParticleRigidTransfer } from './RobloxParticleRigidTransfer';
+import { RobloxPartGeometry } from './RobloxPartGeometry';
 
 interface LockedMotionCache {
     readonly entries: Map<string, RobloxParticleLockedMotion>;
@@ -108,7 +109,7 @@ export class RobloxParticleLockedMotion {
                 node = nodes.get(node.parentId);
                 if (
                     node === undefined ||
-                    !['Attachment', 'Part', 'WedgePart', 'CornerWedgePart'].includes(node.className)
+                    (node.className !== 'Attachment' && !RobloxPartGeometry.isPart(node.className))
                 ) {
                     break;
                 }

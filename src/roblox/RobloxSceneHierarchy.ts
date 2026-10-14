@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { RobloxSceneCodec } from './RobloxSceneCodec';
+import { RobloxPartGeometry } from './RobloxPartGeometry';
 import type {
     RobloxScene,
     RobloxSceneNode,
@@ -176,7 +177,7 @@ export class RobloxSceneHierarchy {
                 emitter.parentId === null ? undefined : active.get(emitter.parentId);
             while (
                 parent !== undefined &&
-                ['Attachment', 'Part', 'WedgePart', 'CornerWedgePart'].includes(parent.className)
+                (parent.className === 'Attachment' || RobloxPartGeometry.isPart(parent.className))
             ) {
                 result.push(parent.id);
                 parent = parent.parentId === null ? undefined : active.get(parent.parentId);
