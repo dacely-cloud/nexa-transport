@@ -147,6 +147,7 @@ backend, or a provider-key vault.
 | Import                                          | Format      | Purpose                                                                      |
 | ----------------------------------------------- | ----------- | ---------------------------------------------------------------------------- |
 | `nexa-transport/design-image-geometry`          | ESM + types | Intrinsic fit, rotation, reflection, tiling and affine image placement.      |
+| `nexa-transport/design-blend-types`             | ESM + types | Layer blend modes and compositing group isolation.                          |
 | `nexa-transport/design-image-transform-types`   | ESM + types | Original-image unit coordinates mapped into a paint box.                     |
 | `nexa-transport/design-image-transform-codec`   | ESM + types | Closed finite affine transform validation.                                   |
 | `nexa-transport/design-image-sampling-types`    | ESM + types | Editable source-crop aspect and alignment.                                   |
