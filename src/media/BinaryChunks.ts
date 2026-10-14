@@ -2,6 +2,7 @@
 
 import { BinaryChunkTransfer } from './BinaryChunkTransfer';
 import type { BinaryChunkBudget } from './interface/BinaryChunkBudget';
+import type { BinaryChunkReceipt } from './interface/BinaryChunkReceipt';
 
 /** Ordered, bounded assembly of NXCH frames; JSON and PCM frames may pass between chunks. */
 export class BinaryChunks {
@@ -14,7 +15,7 @@ export class BinaryChunks {
 
     /** Uses host accounting when supplied, otherwise a process-wide bounded receiver pool. */
     public constructor(public readonly budget?: BinaryChunkBudget) {
-        this.#accounting = {
+        this.#accounting = budget ?? {
             reserve: (bytes: number): boolean => this.#reserve(bytes),
             release: (bytes: number): void => this.#release(bytes),
         };
@@ -122,12 +123,28 @@ export class BinaryChunks {
         buffer: ArrayBuffer | Uint8Array,
         progress?: (prefix: Uint8Array<ArrayBuffer>, total: number) => void,
     ): ArrayBuffer | null {
+        const receipt: BinaryChunkReceipt | null = this.acceptOwned(buffer, progress);
+        if (receipt === null) {
+            return null;
+        }
+        receipt.credit?.close();
+        return receipt.buffer;
+    }
+
+    /** Keeps completed storage admitted until its consumer explicitly adopts or closes the credit. */
+    public acceptOwned(
+        buffer: ArrayBuffer | Uint8Array,
+        progress?: (prefix: Uint8Array<ArrayBuffer>, total: number) => void,
+    ): BinaryChunkReceipt | null {
         const bytes: Uint8Array = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
         if (!BinaryChunks.isChunk(bytes)) {
             if (bytes.length > BinaryChunks.MAX_TRANSFER_BYTES) {
                 throw new RangeError('Binary frame exceeds its transfer limit');
             }
-            return buffer instanceof ArrayBuffer ? buffer : Uint8Array.from(bytes).buffer;
+            return Object.freeze({
+                buffer: buffer instanceof ArrayBuffer ? buffer : Uint8Array.from(bytes).buffer,
+                credit: null,
+            });
         }
         try {
             if (bytes.byteLength < 28 || bytes.byteLength > 28 + BinaryChunks.CHUNK_BYTES) {
@@ -174,7 +191,7 @@ export class BinaryChunks {
             transfer.append(offset, bytes.subarray(28));
             progress?.(transfer.prefix(), total);
             if (transfer.offset === total) {
-                const result: ArrayBuffer = transfer.completed();
+                const result: BinaryChunkReceipt = transfer.completed();
                 this.clear();
                 return result;
             }
@@ -194,9 +211,6 @@ export class BinaryChunks {
         }
     }
     #reserve(bytes: number): boolean {
-        if (this.budget !== undefined) {
-            return this.budget.reserve(bytes);
-        }
         if (BinaryChunks.#retained + bytes > 2 * BinaryChunks.MAX_TRANSFER_BYTES) {
             return false;
         }
@@ -204,10 +218,6 @@ export class BinaryChunks {
         return true;
     }
     #release(bytes: number): void {
-        if (this.budget !== undefined) {
-            this.budget.release(bytes);
-        } else {
-            BinaryChunks.#retained -= bytes;
-        }
+        BinaryChunks.#retained -= bytes;
     }
 }

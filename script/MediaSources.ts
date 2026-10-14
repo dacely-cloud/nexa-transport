@@ -11,6 +11,8 @@ export class MediaSources {
     public static readonly FILES: readonly string[] = Object.freeze([
         'Base64.ts',
         'interface/BinaryChunkBudget.ts',
+        'interface/BinaryChunkReceipt.ts',
+        'BinaryChunkCredit.ts',
         'BinaryChunkTransfer.ts',
         'BinaryChunks.ts',
         'BinaryEnvelope.ts',

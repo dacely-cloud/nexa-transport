@@ -2,11 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { BinaryChunkBudget } from './interface/BinaryChunkBudget';
+import type { BinaryChunkReceipt } from './interface/BinaryChunkReceipt';
+import { BinaryChunkCredit } from './BinaryChunkCredit';
 
 /** Owns one ordered transfer, allocating only received capacity and charging growth before copying. */
 export class BinaryChunkTransfer {
     static readonly #OVERHEAD = 512 as const;
-    readonly #budget: BinaryChunkBudget;
+    static readonly #EMPTY: Uint8Array<ArrayBuffer> = new Uint8Array(0);
+    readonly #credit: BinaryChunkCredit;
     readonly #expired: () => void;
     #data: Uint8Array<ArrayBuffer>;
     #offset: number = 0;
@@ -30,17 +33,14 @@ export class BinaryChunkTransfer {
         ) {
             throw new RangeError('Invalid initial binary transfer bounds');
         }
-        this.#budget = budget;
         this.#expired = expired;
         const capacity: number = Math.min(total, Math.max(4096, firstBytes));
         const charge: number = capacity + BinaryChunkTransfer.#OVERHEAD;
-        if (!budget.reserve(charge)) {
-            throw new RangeError('Binary transfer memory budget is exhausted');
-        }
+        this.#credit = new BinaryChunkCredit(budget, charge);
         try {
             this.#data = new Uint8Array(capacity);
         } catch (error: unknown) {
-            budget.release(charge);
+            this.#credit.close();
             throw error;
         }
         Object.freeze(this);
@@ -67,7 +67,7 @@ export class BinaryChunkTransfer {
                 this.total,
                 Math.max(required, this.#data.length * 2),
             );
-            if (!this.#budget.reserve(capacity)) {
+            if (!this.#credit.reserve(capacity)) {
                 throw new RangeError('Binary transfer growth exceeds its memory budget');
             }
             let grown: Uint8Array<ArrayBuffer>;
@@ -75,12 +75,12 @@ export class BinaryChunkTransfer {
                 grown = new Uint8Array(capacity);
                 grown.set(this.#data.subarray(0, this.#offset));
             } catch (error: unknown) {
-                this.#budget.release(capacity);
+                this.#credit.release(capacity);
                 throw error;
             }
             const previous: number = this.#data.length;
             this.#data = grown;
-            this.#budget.release(previous);
+            this.#credit.release(previous);
         }
         this.#data.set(payload, this.#offset);
         this.#offset = required;
@@ -95,11 +95,21 @@ export class BinaryChunkTransfer {
     }
 
     /** Completion owns an exact-sized buffer; no final whole-transfer copy is necessary. */
-    public completed(): ArrayBuffer {
+    public completed(): BinaryChunkReceipt {
         if (this.#closed || this.#offset !== this.total || this.#data.length !== this.total) {
             throw new Error('Binary transfer is incomplete');
         }
-        return this.#data.buffer;
+        const receipt: BinaryChunkReceipt = Object.freeze({
+            buffer: this.#data.buffer,
+            credit: this.#credit,
+        });
+        this.#closed = true;
+        if (this.#timer !== null) {
+            clearTimeout(this.#timer);
+            this.#timer = null;
+        }
+        this.#data = BinaryChunkTransfer.#EMPTY;
+        return receipt;
     }
 
     /** An idle timeout resets only after actual forward progress. */
@@ -123,7 +133,7 @@ export class BinaryChunkTransfer {
             clearTimeout(this.#timer);
             this.#timer = null;
         }
-        this.#budget.release(this.#data.length + BinaryChunkTransfer.#OVERHEAD);
-        this.#data = new Uint8Array(0);
+        this.#credit.close();
+        this.#data = BinaryChunkTransfer.#EMPTY;
     }
 }
