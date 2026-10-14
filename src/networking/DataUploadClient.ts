@@ -4,8 +4,10 @@ import {
     type DataUpload,
     type DataUploadPosition,
     type DataFile,
+    type GatewayLimits,
 } from '../protocol/Protocol.js';
 import type { DataUploadOptions } from '../interface/DataUploadOptions.js';
+import { BinaryUploadSizing } from '../media/BinaryUploadSizing.js';
 
 /** Browser/Node bulk upload with negotiated slices and acknowledged backpressure. */
 export class DataUploadClient {
@@ -26,9 +28,18 @@ export class DataUploadClient {
             options.signal === undefined ? {} : { signal: options.signal },
         );
         try {
+            const limits: GatewayLimits | undefined = client.hello.policy.limits;
+            const budget: number | undefined =
+                limits === undefined
+                    ? undefined
+                    : Math.min(
+                          limits.maxRequestBytes,
+                          limits.maxRequestBytesPerPrincipal ?? limits.maxRequestBytes,
+                      );
             const chunkBytes: number = Math.min(
                 DataUploadClient.#chunkBytes(upload.chunkBytes),
                 Math.floor(client.hello.policy.maxPayloadBytes) - 1024,
+                BinaryUploadSizing.chunkBytes(upload.id, budget),
             );
             if (chunkBytes < 1) {
                 throw new Error('Gateway upload budget is too small');

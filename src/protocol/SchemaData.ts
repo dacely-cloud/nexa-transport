@@ -10658,6 +10658,11 @@ export const schema: Schema = {
                         'Incoming RPC bytes plus estimated input retained by active streams.',
                     type: 'number',
                 },
+                maxRequestBytesPerPrincipal: {
+                    description:
+                        'Combined request, stream and partial-transfer input owned by one authenticated principal.',
+                    type: 'number',
+                },
                 maxRequests: {
                     description: 'Admitted RPC handlers across the process.',
                     type: 'number',
