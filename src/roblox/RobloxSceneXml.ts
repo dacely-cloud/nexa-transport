@@ -4,7 +4,7 @@
 import type { RobloxScene, RobloxSceneNode, RobloxValue } from './RobloxSceneTypes';
 import { RobloxSceneSchema, type RobloxPropertySpec } from './RobloxSceneSchema';
 import { RobloxSceneLuau } from './RobloxSceneLuau';
-import { RobloxMeshPlayback } from './RobloxMeshPlayback';
+import { RobloxMeshPlayback, type RobloxMeshPlaybackPlan } from './RobloxMeshPlayback';
 
 /** Native XML serialization, using the rbx-dom version 4 format. */
 export class RobloxSceneXml {
@@ -66,8 +66,11 @@ export class RobloxSceneXml {
     }
 
     /** Immutable imported mesh identity is supplied by cloneable native templates beneath the replay module. */
-    public static meshTemplates(scene: RobloxScene): string {
-        const meshes: readonly RobloxSceneNode[] = RobloxMeshPlayback.plan(scene).templates;
+    public static meshTemplates(
+        scene: RobloxScene,
+        plan: RobloxMeshPlaybackPlan = RobloxMeshPlayback.plan(scene),
+    ): string {
+        const meshes: readonly RobloxSceneNode[] = plan.templates;
         if (meshes.length === 0) {
             return '';
         }
