@@ -18048,11 +18048,16 @@ export const schema: Schema = {
                 event: {
                     description:
                         'Logical input events whose callbacks run in the native VM. Pointer hit testing is separate.',
-                    enum: ['Activated', 'MouseButton1Click'],
+                    enum: ['Activated', 'MouseButton1Click', 'MouseButton1Down', 'MouseButton1Up'],
                     type: 'string',
                 },
                 nodeId: {
                     type: 'string',
+                },
+                pointer: {
+                    $ref: '#/definitions/RobloxPointerInput',
+                    description:
+                        'Browser hit evidence and bounded pointer identity for an actual press/release gesture.',
                 },
                 x: {
                     type: 'number',
@@ -18161,6 +18166,29 @@ export const schema: Schema = {
             },
             required: ['handle', 'id', 'seconds'],
             type: 'object',
+        },
+        RobloxPointerInput: {
+            description:
+                'Browser hit evidence and bounded pointer identity for an actual press/release gesture.',
+            properties: {
+                id: {
+                    type: 'number',
+                },
+                over: {
+                    type: 'boolean',
+                },
+                phase: {
+                    $ref: '#/definitions/RobloxPointerPhase',
+                },
+            },
+            required: ['id', 'over', 'phase'],
+            type: 'object',
+        },
+        RobloxPointerPhase: {
+            description:
+                'Physical gesture phases owned by the preview protocol, separate from Roblox signal names.\nOne retained physical pointer phase.',
+            enum: ['Cancel', 'Press', 'Release'],
+            type: 'string',
         },
         ScalarSchema: {
             description:
