@@ -52,7 +52,7 @@ export class BinaryChunkCredit {
     public transferTo(budget: BinaryChunkBudget, limit: number, bytes: number): boolean {
         if (
             this.#closed ||
-            budget !== this.#budget ||
+            (budget !== this.#budget && this.#budget.matches?.(budget) !== true) ||
             !Number.isSafeInteger(limit) ||
             limit <= 0 ||
             !Number.isSafeInteger(bytes) ||
