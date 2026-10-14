@@ -246,6 +246,10 @@ try {
 } finally {
     rmSync(temporary, { recursive: true, force: true });
 }
+/** Older gateways advertise process limits without the newer per-principal byte ceiling. */
+schema.definitions.GatewayLimits.required = schema.definitions.GatewayLimits.required.filter(
+    (field) => field !== 'maxRequestBytesPerPrincipal',
+);
 /** Named method interfaces retain the same validator paths as inline method declarations. */
 for (const [name, method] of Object.entries(schema.definitions.GatewayMethods.properties)) {
     let contract = method;

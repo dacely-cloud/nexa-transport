@@ -7008,6 +7008,8 @@ export interface GatewayLimitsShape {
     readonly maxOutboundBytes: number;
     /** maxRequestBytes as defined by the Nexa gateway. */
     readonly maxRequestBytes: number;
+    /** maxRequestBytesPerPrincipal as defined by the Nexa gateway. */
+    readonly maxRequestBytesPerPrincipal?: number;
     /** maxRequests as defined by the Nexa gateway. */
     readonly maxRequests: number;
     /** maxRequestsPerConnection as defined by the Nexa gateway. */

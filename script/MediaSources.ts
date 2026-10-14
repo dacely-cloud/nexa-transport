@@ -16,6 +16,8 @@ export class MediaSources {
         'BinaryChunkTransfer.ts',
         'BinaryChunks.ts',
         'BinaryEnvelope.ts',
+        'BinaryUploadHeader.ts',
+        'BinaryUploadSizing.ts',
         'BinaryAdmissionError.ts',
         'BinaryEnvelopeDecodePlan.ts',
         'BinaryEnvelopeDecoder.ts',

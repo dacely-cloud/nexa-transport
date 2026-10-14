@@ -3,7 +3,7 @@
 
 import { BinaryEnvelopeEncoder } from './BinaryEnvelopeEncoder';
 import type { BinaryJsonValue as JsonValue } from './interface/BinaryJsonValue';
-import { BinaryEncoding } from './interface/BinaryEncoding';
+import { BinaryUploadHeader } from './BinaryUploadHeader';
 import { BinaryEnvelopeDecoder } from './BinaryEnvelopeDecoder';
 import type { BinaryDecodeAdmission } from './interface/BinaryDecodeAdmission';
 
@@ -27,33 +27,11 @@ export class BinaryEnvelope {
         offset: string,
         bytes: Uint8Array,
     ): Uint8Array<ArrayBuffer> {
-        if (
-            bytes.byteLength < 1 ||
-            bytes.byteLength > 4 * 1024 * 1024 ||
-            requestId.length === 0 ||
-            uploadId.length === 0 ||
-            requestId.length > 128 ||
-            uploadId.length > 128 ||
-            !/^(0|[1-9][0-9]{0,11})$/u.test(offset)
-        ) {
-            throw new RangeError('Invalid raw upload chunk');
-        }
-        const header: Uint8Array<ArrayBuffer> = new TextEncoder().encode(
-            JSON.stringify({
-                json: {
-                    v: 1,
-                    id: requestId,
-                    method: 'data.upload.chunk',
-                    params: { id: uploadId, offset, data: null },
-                },
-                parts: [
-                    {
-                        path: ['params', 'data'],
-                        length: bytes.byteLength,
-                        encoding: BinaryEncoding.Bytes,
-                    },
-                ],
-            }),
+        const header: Uint8Array<ArrayBuffer> = BinaryUploadHeader.encode(
+            requestId,
+            uploadId,
+            offset,
+            bytes.byteLength,
         );
         const frame: Uint8Array<ArrayBuffer> = new Uint8Array(
             8 + header.byteLength + bytes.byteLength,
