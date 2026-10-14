@@ -3,6 +3,7 @@
 
 import { DesignStrokeChangesCodec } from './DesignStrokeChangesCodec.js';
 import { DesignStyleChangesCodec } from './DesignStyleChangesCodec.js';
+import { DesignPaintImageChangesCodec } from './DesignPaintImageChangesCodec.js';
 import { DesignPaintGradientChangesCodec } from './DesignPaintGradientChangesCodec.js';
 import { DesignPaintColorChangesCodec } from './DesignPaintColorChangesCodec.js';
 import { DesignPaintColorTarget } from './DesignOperationTypes.js';
@@ -126,6 +127,24 @@ export class DesignOperationCodec {
                         id: V.id(value['id']),
                         pageId: V.id(value['pageId']),
                         changes: DesignStyleChangesCodec.parse(value['changes']),
+                    };
+                }
+                case Kind.PaintImage: {
+                    const value: Readonly<Record<string, unknown>> = V.record(entry, [
+                        'op',
+                        'id',
+                        'pageId',
+                        'target',
+                        'index',
+                        'changes',
+                    ]);
+                    return {
+                        op,
+                        id: V.id(value['id']),
+                        pageId: V.id(value['pageId']),
+                        target: V.choice(value['target'], Object.values(DesignPaintColorTarget)),
+                        index: V.number(value['index'], 0, 7, true),
+                        changes: DesignPaintImageChangesCodec.changes(value['changes']),
                     };
                 }
                 case Kind.PaintGradient: {

@@ -53,6 +53,8 @@ const files: readonly string[] = [
     'DesignPaintLayerEdit',
     'DesignPaintGradientChangesCodec',
     'DesignPaintGradientEdits',
+    'DesignPaintImageChangesCodec',
+    'DesignPaintImageEdits',
     'DesignTypographyStyleTypes',
     'DesignTypographyStyleCodec',
     'DesignFontFamilyCodec',

@@ -7,6 +7,7 @@ import { DesignTypographyStyleEdits } from './DesignTypographyStyleEdits.js';
 import { DesignLayerAuthority } from './DesignLayerAuthority.js';
 import { DesignStrokeEdits } from './DesignStrokeEdits.js';
 import { DesignStyleEdits } from './DesignStyleEdits.js';
+import { DesignPaintImageEdits } from './DesignPaintImageEdits.js';
 import { DesignPaintGradientEdits } from './DesignPaintGradientEdits.js';
 import { DesignPaintColorEdits } from './DesignPaintColorEdits.js';
 import { DesignTokenEdits } from './DesignTokenEdits.js';
@@ -294,6 +295,14 @@ export class DesignEdits {
                 }
                 case DesignOperationKind.Style: {
                     const node: DesignNode = DesignStyleEdits.apply(
+                        new DesignLayerAuthority(nodes, pages),
+                        operation,
+                    );
+                    nodes.set(node.id, node);
+                    break;
+                }
+                case DesignOperationKind.PaintImage: {
+                    const node: DesignNode = DesignPaintImageEdits.apply(
                         new DesignLayerAuthority(nodes, pages),
                         operation,
                     );

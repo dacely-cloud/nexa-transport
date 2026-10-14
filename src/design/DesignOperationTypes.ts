@@ -28,6 +28,7 @@ import type {
     DesignText,
     DesignPathCommand,
     DesignImage,
+    DesignImageFit,
     DesignOverride,
     DesignKind,
     DesignToken,
@@ -60,6 +61,7 @@ export const DesignOperationKind = {
     Token: 'token',
     PaintColor: 'paint-color',
     PaintGradient: 'paint-gradient',
+    PaintImage: 'paint-image',
     Stroke: 'stroke',
     Style: 'style',
 } as const;
@@ -329,6 +331,23 @@ export interface DesignPaintColorOperation {
     readonly index: number;
     readonly changes: DesignPaintColorChanges;
 }
+/** Imported imagery and crop properties can be edited without resending any source or style records. */
+export interface DesignPaintImageChanges {
+    readonly assetId?: string;
+    readonly fit?: DesignImageFit;
+    readonly cropX?: number;
+    readonly cropY?: number;
+    readonly scale?: number;
+}
+/** Page-scoped placement or framing of one image fill or existing stroke. */
+export interface DesignPaintImageOperation {
+    readonly op: typeof DesignOperationKind.PaintImage;
+    readonly id: string;
+    readonly pageId: string;
+    readonly target: DesignPaintColorTarget;
+    readonly index: number;
+    readonly changes: DesignPaintImageChanges;
+}
 /** Geometry and stops are independent of source bodies and the rest of the paint stack. */
 export interface DesignPaintGradientChanges {
     readonly kind?: typeof DesignPaintKind.Linear | typeof DesignPaintKind.Radial;
@@ -404,6 +423,7 @@ export type DesignOperation =
     | DesignTokenOperation
     | DesignPaintColorOperation
     | DesignPaintGradientOperation
+    | DesignPaintImageOperation
     | DesignStrokeOperation
     | DesignStyleOperation;
 /** Before and after images provide conflict-safe undo and bounded deltas. */
