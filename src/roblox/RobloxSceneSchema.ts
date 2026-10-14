@@ -251,6 +251,7 @@ export const RobloxSceneSchema: Readonly<
         RotSpeed: { ...v({ kind: 'NumberRange', min: 0, max: 0 }), min: -36000, max: 36000 },
         LightEmission: n(0, 0, 1),
         LightInfluence: n(0, 0, 1),
+        ZOffset: n(0, -100000, 100000),
         Texture: { ...s('rbxasset://textures/particles/sparkles_main.dds'), xmlType: 'ContentId' },
         EmissionDirection: e(1, [0, 1, 2, 3, 4, 5], 'NormalId'),
         LockedToPart: b(false),

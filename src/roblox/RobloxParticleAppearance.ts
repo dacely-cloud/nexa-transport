@@ -29,6 +29,8 @@ export class RobloxParticleAppearance {
     public readonly lightEmission: number;
     /** Current geometry alignment applies to living particles. */
     public readonly orientation: number;
+    /** Current render depth offset in studs leaves particle motion and projected size unchanged. */
+    public readonly zOffset: number;
     /** Reads a single current property observation, rather than freezing appearance at birth. */
     public constructor(scene: RobloxScene, properties: Readonly<Record<string, RobloxValue>>) {
         const size: RobloxValue | undefined = properties['Size'];
@@ -52,6 +54,7 @@ export class RobloxParticleAppearance {
         this.color = color;
         this.lightEmission = RobloxProperties.number(properties, 'LightEmission');
         this.orientation = RobloxProperties.enum(properties, 'Orientation');
+        this.zOffset = RobloxProperties.number(properties, 'ZOffset');
         this.visible = texture !== '';
         const rect: RobloxTextureRect | null = RobloxSceneTextures.rect(scene, texture);
         this.rectangle = rect;

@@ -21,6 +21,8 @@ export interface RobloxParticleFrame {
     readonly velocities: Float32Array;
     /** Native ParticleOrientation value sampled from the current emitter. */
     readonly orientation: number;
+    /** Current render-only depth offset; older observations default to zero. */
+    readonly zOffset?: number;
 }
 
 /** Seekable bounded particle simulation, independent of browser and GPU APIs. */
@@ -176,6 +178,7 @@ export class RobloxParticleSimulator {
             lightEmission: appearance.lightEmission,
             velocities: this.#velocities,
             orientation: appearance.orientation,
+            zOffset: appearance.zOffset,
         };
     }
 
