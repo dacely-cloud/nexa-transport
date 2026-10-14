@@ -778,6 +778,10 @@
         "./design-blend-types": {
             "types": "./dist/design/DesignBlendTypes.d.ts",
             "import": "./dist/design-blend-types.js"
+        },
+        "./history-records": {
+            "types": "./dist/networking/HistoryRecordDecoder.d.ts",
+            "import": "./dist/history-records.js"
         }
     },
     "scripts": {
