@@ -7,6 +7,7 @@ const config: UserConfig = {
                 'tool-bridge-input': 'src/toolsearch/BridgeInput.ts',
                 'roblox-execution-context': 'src/roblox/RobloxExecutionContext.ts',
                 'roblox-scene-input': 'src/roblox/RobloxSceneInput.ts',
+                'roblox-text-edit': 'src/roblox/RobloxTextEdit.ts',
                 'roblox-scene-hierarchy': 'src/roblox/RobloxSceneHierarchy.ts',
                 'roblox-default-textures': 'src/roblox/RobloxDefaultTextures.ts',
                 'roblox-scene-textures': 'src/roblox/RobloxSceneTextures.ts',

@@ -17,6 +17,10 @@
         "licenses"
     ],
     "exports": {
+        "./roblox-text-edit": {
+            "types": "./dist/roblox/RobloxTextEdit.d.ts",
+            "import": "./dist/roblox-text-edit.js"
+        },
         "./design-image-geometry": {
             "types": "./dist/design/DesignImageGeometry.d.ts",
             "import": "./dist/design-image-geometry.js"

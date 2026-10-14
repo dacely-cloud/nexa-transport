@@ -6977,6 +6977,8 @@ export interface GatewayFeaturesShape {
     readonly officeVerification?: true;
     /** robloxCoordinateInput as defined by the Nexa gateway. */
     readonly robloxCoordinateInput?: true;
+    /** robloxTextEditing as defined by the Nexa gateway. */
+    readonly robloxTextEditing?: true;
     /** sessionHistory as defined by the Nexa gateway. */
     readonly sessionHistory?: true;
     /** sessionHistoryUpdates as defined by the Nexa gateway. */
@@ -12153,6 +12155,8 @@ export type RobloxLiveStartRequest = RobloxLiveStartRequestShape;
 
 /** RobloxLiveStepRequest wire fields. */
 export interface RobloxLiveStepRequestShape {
+    /** edit as defined by the Nexa gateway. */
+    readonly edit?: RobloxTextInsertion | RobloxTextSelection | RobloxTextKeyGesture;
     /** handle as defined by the Nexa gateway. */
     readonly handle: string;
     /** id as defined by the Nexa gateway. */
@@ -12204,6 +12208,59 @@ export const RobloxPointerPhaseValues = {
 /** RobloxPointerPhase from the Nexa wire protocol. */
 export type RobloxPointerPhase =
     (typeof RobloxPointerPhaseValues)[keyof typeof RobloxPointerPhaseValues];
+
+/** Allowed values for RobloxTextEditKey. */
+export const RobloxTextEditKeyValues = {
+    Value0: 'Backspace',
+    Value1: 'Delete',
+    Value2: 'End',
+    Value3: 'Escape',
+    Value4: 'Home',
+    Value5: 'Left',
+    Value6: 'Return',
+    Value7: 'Right',
+} as const;
+
+/** RobloxTextEditKey from the Nexa wire protocol. */
+export type RobloxTextEditKey =
+    (typeof RobloxTextEditKeyValues)[keyof typeof RobloxTextEditKeyValues];
+
+/** RobloxTextInsertion wire fields. */
+export interface RobloxTextInsertionShape {
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: 'Insert';
+    /** text as defined by the Nexa gateway. */
+    readonly text: string;
+}
+
+/** RobloxTextInsertion from the Nexa wire protocol. */
+export type RobloxTextInsertion = RobloxTextInsertionShape;
+
+/** RobloxTextKeyGesture wire fields. */
+export interface RobloxTextKeyGestureShape {
+    /** key as defined by the Nexa gateway. */
+    readonly key: RobloxTextEditKey;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: 'Key';
+    /** shift as defined by the Nexa gateway. */
+    readonly shift?: boolean;
+}
+
+/** RobloxTextKeyGesture from the Nexa wire protocol. */
+export type RobloxTextKeyGesture = RobloxTextKeyGestureShape;
+
+/** RobloxTextSelection wire fields. */
+export interface RobloxTextSelectionShape {
+    /** cursor as defined by the Nexa gateway. */
+    readonly cursor: number;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: 'Selection';
+    /** selectionStart as defined by the Nexa gateway. */
+    readonly selectionStart: number;
+}
+
+/** RobloxTextSelection from the Nexa wire protocol. */
+export type RobloxTextSelection = RobloxTextSelectionShape;
 
 /** ScalarSchema wire fields. */
 export interface ScalarSchemaShape {
