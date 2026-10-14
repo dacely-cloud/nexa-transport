@@ -6975,6 +6975,8 @@ export interface GatewayFeaturesShape {
     readonly officeShowroom?: true;
     /** officeVerification as defined by the Nexa gateway. */
     readonly officeVerification?: true;
+    /** robloxCoordinateInput as defined by the Nexa gateway. */
+    readonly robloxCoordinateInput?: true;
     /** sessionHistory as defined by the Nexa gateway. */
     readonly sessionHistory?: true;
     /** sessionHistoryUpdates as defined by the Nexa gateway. */
@@ -12008,6 +12010,28 @@ export const RiskLevelValues = {
 /** RiskLevel from the Nexa wire protocol. */
 export type RiskLevel = (typeof RiskLevelValues)[keyof typeof RiskLevelValues];
 
+/** Allowed values for RobloxCoordinateGesturedevice. */
+export const RobloxCoordinateGesturedeviceValues = { Value0: 'Mouse', Value1: 'Touch' } as const;
+
+/** RobloxCoordinateGesture wire fields. */
+export interface RobloxCoordinateGestureShape {
+    /** clickCount as defined by the Nexa gateway. */
+    readonly clickCount?: number;
+    /** device as defined by the Nexa gateway. */
+    readonly device?: (typeof RobloxCoordinateGesturedeviceValues)[keyof typeof RobloxCoordinateGesturedeviceValues];
+    /** id as defined by the Nexa gateway. */
+    readonly id: number;
+    /** phase as defined by the Nexa gateway. */
+    readonly phase: RobloxPointerPhase;
+    /** x as defined by the Nexa gateway. */
+    readonly x: number;
+    /** y as defined by the Nexa gateway. */
+    readonly y: number;
+}
+
+/** RobloxCoordinateGesture from the Nexa wire protocol. */
+export type RobloxCoordinateGesture = RobloxCoordinateGestureShape;
+
 /** RobloxCredentialSetParams wire fields. */
 export interface RobloxCredentialSetParamsShape {
     /** apiKey as defined by the Nexa gateway. */
@@ -12133,6 +12157,8 @@ export interface RobloxLiveStepRequestShape {
     readonly id: string;
     /** input as defined by the Nexa gateway. */
     readonly input?: RobloxLiveActivation;
+    /** point as defined by the Nexa gateway. */
+    readonly point?: RobloxCoordinateGesture;
     /** seconds as defined by the Nexa gateway. */
     readonly seconds: number;
     /** viewport as defined by the Nexa gateway. */
