@@ -19,10 +19,18 @@ export class RobloxSceneInput {
         coordinate: boolean,
         editing: boolean,
         keyboard: boolean = false,
+        wheel: boolean = false,
     ): void {
-        if (Number(targeted) + Number(coordinate) + Number(editing) + Number(keyboard) > 1) {
+        if (
+            Number(targeted) +
+                Number(coordinate) +
+                Number(editing) +
+                Number(keyboard) +
+                Number(wheel) >
+            1
+        ) {
             throw new Error(
-                'Choose one targeted input, coordinate point, text edit or keyboard gesture, not both',
+                'Choose one targeted input, coordinate point, text edit, keyboard or wheel gesture, not both',
             );
         }
     }

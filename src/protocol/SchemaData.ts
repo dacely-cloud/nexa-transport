@@ -18554,6 +18554,12 @@ export const schema: Schema = {
                 state: {
                     type: 'string',
                 },
+                wheel: {
+                    const: true,
+                    description:
+                        'The retained executable supports native wheel events and bounded canvas travel.',
+                    type: 'boolean',
+                },
             },
             required: ['elapsedUs', 'handle', 'memoryBytes', 'output', 'state'],
             type: 'object',
@@ -18632,6 +18638,11 @@ export const schema: Schema = {
                 viewport: {
                     $ref: '#/definitions/RobloxNativeGuiViewport',
                     description: 'Host-selected execution context, never supplied by the model.',
+                },
+                wheel: {
+                    $ref: '#/definitions/RobloxWheelGesture',
+                    description:
+                        'Native wheel rotation and host-adapted pixel travel are independent values.',
                 },
             },
             required: ['handle', 'id', 'seconds'],
@@ -18727,6 +18738,29 @@ export const schema: Schema = {
                 },
             },
             required: ['cursor', 'kind', 'selectionStart'],
+            type: 'object',
+        },
+        RobloxWheelGesture: {
+            description:
+                'Native wheel rotation and host-adapted pixel travel are independent values.',
+            properties: {
+                deltaX: {
+                    type: 'number',
+                },
+                deltaY: {
+                    type: 'number',
+                },
+                rotation: {
+                    type: 'number',
+                },
+                x: {
+                    type: 'number',
+                },
+                y: {
+                    type: 'number',
+                },
+            },
+            required: ['deltaX', 'deltaY', 'rotation', 'x', 'y'],
             type: 'object',
         },
         ScalarSchema: {

@@ -8786,6 +8786,7 @@ Bounded JSON state has its own portable native-value codec.
 | `pointerHover`   | No       | `true`            | The retained executable supports uncaptured mouse motion and native GUI hover events. |
 | `pointerMove`    | No       | `true`            | The retained executable supports captured motion and native TextBox drag selection.   |
 | `state`          | Yes      | `string`          |                                                                                       |
+| `wheel`          | No       | `true`            | The retained executable supports native wheel events and bounded canvas travel.       |
 
 ## RobloxLiveHandleRequest
 
@@ -8820,6 +8821,7 @@ One serialized native step and optional logical activation.
 | `point`    | No       | [RobloxCoordinateGesture](protocol.md#robloxcoordinategesture)                                                                                                             | One physical gesture chooses its target from the current native live root.     |
 | `seconds`  | Yes      | `number`                                                                                                                                                                   |                                                                                |
 | `viewport` | No       | [RobloxNativeGuiViewport](protocol.md#robloxnativeguiviewport)                                                                                                             | Host-selected execution context, never supplied by the model.                  |
+| `wheel`    | No       | [RobloxWheelGesture](protocol.md#robloxwheelgesture)                                                                                                                       | Native wheel rotation and host-adapted pixel travel are independent values.    |
 
 ## RobloxNativeGuiViewport
 
@@ -8880,6 +8882,18 @@ Selection positions are one-based UTF-8 bytes; -1 removes the anchor.
 | `cursor`         | Yes      | `number`      |             |
 | `kind`           | Yes      | `"Selection"` |             |
 | `selectionStart` | Yes      | `number`      |             |
+
+## RobloxWheelGesture
+
+Native wheel rotation and host-adapted pixel travel are independent values.
+
+| Field      | Required | Type     | Description |
+| ---------- | -------- | -------- | ----------- |
+| `deltaX`   | Yes      | `number` |             |
+| `deltaY`   | Yes      | `number` |             |
+| `rotation` | Yes      | `number` |             |
+| `x`        | Yes      | `number` |             |
+| `y`        | Yes      | `number` |             |
 
 ## ScalarSchema
 

@@ -2578,6 +2578,7 @@ Parameters: [RobloxLiveStepRequest](protocol.md#robloxlivesteprequest).
 | `point`    | No       | [RobloxCoordinateGesture](protocol.md#robloxcoordinategesture)                                                                                                             | One physical gesture chooses its target from the current native live root.     |
 | `seconds`  | Yes      | `number`                                                                                                                                                                   |                                                                                |
 | `viewport` | No       | [RobloxNativeGuiViewport](protocol.md#robloxnativeguiviewport)                                                                                                             | Host-selected execution context, never supplied by the model.                  |
+| `wheel`    | No       | [RobloxWheelGesture](protocol.md#robloxwheelgesture)                                                                                                                       | Native wheel rotation and host-adapted pixel travel are independent values.    |
 
 Result: [RobloxLiveFrame](protocol.md#robloxliveframe).
 
