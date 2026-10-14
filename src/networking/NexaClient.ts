@@ -28,6 +28,12 @@ export type { DataUploadOptions } from '../interface/DataUploadOptions.js';
 import type { DataFile } from '../protocol/Protocol.js';
 import { materializeError, rethrow } from './ErrorStack.js';
 import { BinaryChunks } from '../media/BinaryChunks.js';
+import { InboundCapacity } from './InboundCapacity.js';
+import { InboundPacketMemory } from './InboundPacketMemory.js';
+import { InboundConsumerCredit } from './InboundConsumerCredit.js';
+import { BinaryInputReservation } from '../media/BinaryInputReservation.js';
+import { BinaryAdmissionError } from '../media/BinaryAdmissionError.js';
+import type { BinaryChunkReceipt } from '../media/interface/BinaryChunkReceipt.js';
 import { NexaMedia } from '../media/NexaMedia.js';
 import { BinaryEnvelope } from '../media/BinaryEnvelope.js';
 import {
@@ -48,6 +54,7 @@ import { Method } from '../protocol/Protocol.js';
 import type { StreamParams } from '../protocol/Protocol.js';
 import { TurnStream } from './TurnStream.js';
 import type { CallOptions, ClientOptions } from '../interface/ClientOptions.js';
+import type { PendingLayout } from '../interface/PendingLayout.js';
 import type {
     ConnectChallengeData,
     HelloOk,
@@ -357,15 +364,8 @@ export class NexaClient {
         }
         return this.#company.request(command, (bytes) => this.#socket.send(bytes));
     }
-    readonly #layouts = new Map<
-        number,
-        {
-            resolve: (state: OfficeLayoutState) => void;
-            reject: (error: Error) => void;
-            timer: ReturnType<typeof setTimeout>;
-        }
-    >();
-    #layoutId = 0;
+    readonly #layouts: Map<number, PendingLayout> = new Map();
+    #layoutId: number = 0;
     /** Read or save owner-only geometry over the existing connection; writes use a revision precondition. */
     public officeLayout(state?: OfficeLayoutState): Promise<OfficeLayoutState> {
         if (!this.connected || this.#hello?.features.officeLayout !== true) {
@@ -415,7 +415,7 @@ export class NexaClient {
     #attempt: number = 0;
     readonly #subscriptions: Set<string> = new Set();
     readonly #reconnectListeners: Set<() => void> = new Set();
-    readonly #binaryChunks: BinaryChunks = new BinaryChunks();
+    readonly #inbound: InboundCapacity;
     readonly #uploads: Map<string, Uint8Array<ArrayBuffer>> = new Map();
     #uploadBytes: number = 0;
     #sending: boolean = false;
@@ -442,6 +442,7 @@ export class NexaClient {
     private constructor(options: ClientOptions) {
         const { signal: _signal, ...settings } = options;
         this.#options = settings;
+        this.#inbound = new InboundCapacity(options.maxInboundBytes);
         this.#pending = new PendingRequests(options.maxPendingRequests ?? 64);
         const url: URL = new URL(options.url);
         if (url.protocol === 'https:') {
@@ -490,7 +491,15 @@ export class NexaClient {
                 this.#fail(
                     error instanceof TransportError
                         ? error
-                        : new TransportError(TransportErrorCode.Protocol, 'Invalid gateway frame'),
+                        : error instanceof BinaryAdmissionError
+                          ? new TransportError(
+                                TransportErrorCode.Limit,
+                                'Inbound working memory budget is full',
+                            )
+                          : new TransportError(
+                                TransportErrorCode.Protocol,
+                                'Invalid gateway frame',
+                            ),
                 );
             }
         };
@@ -562,6 +571,14 @@ export class NexaClient {
                     new RangeError('Connection limits must be positive bounded integers'),
                 );
             }
+        }
+        if (
+            options.maxInboundBytes !== undefined &&
+            (!Number.isSafeInteger(options.maxInboundBytes) ||
+                options.maxInboundBytes < 1 ||
+                options.maxInboundBytes > InboundCapacity.DEFAULT_BYTES)
+        ) {
+            throw new RangeError('Invalid inbound working memory limit');
         }
         if (options.signal?.aborted === true) {
             throw new TransportError(TransportErrorCode.Aborted, 'Connection aborted');
@@ -1377,130 +1394,151 @@ export class NexaClient {
             if (this.#hello === null) {
                 throw materializeError(new Error('Binary media arrived before authentication'));
             }
-            const complete: ArrayBuffer | null = this.#binaryChunks.accept(
+            const receipt: BinaryChunkReceipt | null = this.#inbound.accept(
                 raw,
-                (prefix, total): void => {
-                    const progress: AttachmentProgress | null = BinaryMedia.progress(prefix, total);
-                    if (progress) {
-                        for (const listener of this.#attachmentProgress) {
-                            this.#notify((): void => listener(progress));
-                        }
+                (progress: AttachmentProgress): void => {
+                    for (const listener of this.#attachmentProgress) {
+                        this.#notify((): void => listener(progress));
                     }
                 },
             );
-            if (complete === null) {
+            if (receipt === null) {
                 return;
             }
-            if (CompanyHostProtocol.isFrame(new Uint8Array(complete))) {
-                if (!this.supportsExecutionHosts) {
-                    throw new Error('Unnegotiated workspace resource frame');
+            const credit: BinaryInputReservation = this.#inbound.binary(receipt);
+            let retained: boolean = false;
+            try {
+                retained = this.#receiveBinary(receipt.buffer, credit);
+            } finally {
+                if (!retained) {
+                    credit.close();
                 }
-                this.#hosts.receive(CompanyHostProtocol.decode(new Uint8Array(complete)));
-                return;
             }
-            if (CompanyEmployeeProtocol.isFrame(new Uint8Array(complete))) {
-                if (!this.supportsEmployeeResults) {
-                    throw new Error('Unnegotiated employee results frame');
-                }
-                this.#employees.receive(CompanyEmployeeProtocol.decode(new Uint8Array(complete)));
-                return;
-            }
-            if (CompanyProjectProtocol.isFrame(new Uint8Array(complete))) {
-                if (this.#hello.features.officeProjects !== true) {
-                    throw new Error('Unnegotiated project frame');
-                }
-                this.#projects.receive(CompanyProjectProtocol.decode(new Uint8Array(complete)));
-                return;
-            }
-            if (CompanyProtocol.isFrame(new Uint8Array(complete))) {
-                if (this.#hello.features.officeCompany !== true) {
-                    throw new Error('Unnegotiated company frame');
-                }
-                const packet = CompanyProtocol.decode(new Uint8Array(complete));
-                if (
-                    packet.op >= CompanyOp.LimitsSnapshot &&
-                    this.#hello.features.officeCompanyLimits !== true
-                ) {
-                    throw new Error('Unnegotiated budget frame');
-                }
-                if (packet.version === 3 && !this.supportsDepartmentKnowledge) {
-                    throw new Error('Unnegotiated department knowledge');
-                }
-                if (packet.version === 2 && !this.supportsDepartmentTools) {
-                    throw new Error('Unnegotiated company policy frame');
-                }
-                this.#company.receive(packet);
-                this.#companyLimits.receive(packet);
-                return;
-            }
-            if (OfficeLayoutProtocol.isFrame(new Uint8Array(complete))) {
-                const packet = OfficeLayoutProtocol.decode(new Uint8Array(complete));
-                if (packet.op !== 3 && packet.op !== 4) {
-                    throw new Error('Unexpected layout command');
-                }
-                const pending = this.#layouts.get(packet.id);
-                if (pending) {
-                    this.#layouts.delete(packet.id);
-                    clearTimeout(pending.timer);
-                    if (packet.op === 4) {
-                        pending.reject(new Error(packet.message));
-                    } else {
-                        pending.resolve({
-                            revision: packet.revision,
-                            pieces: packet.pieces,
-                            ...(packet.desks === undefined ? {} : { desks: packet.desks }),
-                        });
-                    }
-                }
-                return;
-            }
-            if (OfficeProtocol.isFrame(new Uint8Array(complete))) {
-                if (this.#hello.features.officeGame !== true) {
-                    throw new Error('Unnegotiated office frame');
-                }
-                const packet = OfficeProtocol.decode(new Uint8Array(complete));
-                for (const listener of this.#officeListeners) {
-                    this.#notify(() => listener(packet));
-                }
-                return;
-            }
-            if (complete.byteLength >= 8 && new DataView(complete).getUint32(0) === 0x4e584246) {
-                this.#receiveFrame(
-                    BinaryEnvelope.decode(
-                        complete,
-                        BinaryChunks.MAX_TRANSFER_BYTES,
-                        this.#options.maxMessageBytes ?? 16 * 1024 * 1024,
-                    ),
-                );
-                return;
-            }
-            const attachment: ReceivedAttachment = BinaryMedia.decode(
-                complete,
-                BinaryChunks.MAX_TRANSFER_BYTES,
-            );
-            const bytes: number = attachment.data.buffer.byteLength;
-            if (
-                this.#deliveries >= 64 ||
-                this.#deliveryBytes + bytes > BinaryChunks.MAX_TRANSFER_BYTES
-            ) {
-                throw new TransportError(
-                    TransportErrorCode.Limit,
-                    'Attachment consumers fell behind',
-                );
-            }
-            this.#deliveries += 1;
-            this.#deliveryBytes += bytes;
-            this.#deliverAttachment(attachment);
             return;
         }
-        if (
-            typeof raw !== 'string' ||
-            new TextEncoder().encode(raw).length >
-                (this.#options.maxMessageBytes ?? 16 * 1024 * 1024)
-        ) {
+        if (typeof raw !== 'string') {
             throw materializeError(new Error('Invalid frame size or encoding'));
         }
-        this.#receiveFrame(JSON.parse(raw));
+        const credit: BinaryInputReservation = this.#inbound.text(
+            raw,
+            this.#options.maxMessageBytes ?? 16 * 1024 * 1024,
+        );
+        try {
+            this.#receiveFrame(JSON.parse(raw));
+        } finally {
+            credit.close();
+        }
+    }
+
+    /** Returns whether asynchronous attachment consumers now own the frame's credit. */
+    #receiveBinary(complete: ArrayBuffer, credit: BinaryInputReservation): boolean {
+        if (this.#hello === null) {
+            throw new Error('Binary media arrived before authentication');
+        }
+        InboundPacketMemory.reserve(new Uint8Array(complete), credit);
+        if (CompanyHostProtocol.isFrame(new Uint8Array(complete))) {
+            if (!this.supportsExecutionHosts) {
+                throw new Error('Unnegotiated workspace resource frame');
+            }
+            this.#hosts.receive(CompanyHostProtocol.decode(new Uint8Array(complete)));
+            return false;
+        }
+        if (CompanyEmployeeProtocol.isFrame(new Uint8Array(complete))) {
+            if (!this.supportsEmployeeResults) {
+                throw new Error('Unnegotiated employee results frame');
+            }
+            this.#employees.receive(CompanyEmployeeProtocol.decode(new Uint8Array(complete)));
+            return false;
+        }
+        if (CompanyProjectProtocol.isFrame(new Uint8Array(complete))) {
+            if (this.#hello.features.officeProjects !== true) {
+                throw new Error('Unnegotiated project frame');
+            }
+            this.#projects.receive(CompanyProjectProtocol.decode(new Uint8Array(complete)));
+            return false;
+        }
+        if (CompanyProtocol.isFrame(new Uint8Array(complete))) {
+            if (this.#hello.features.officeCompany !== true) {
+                throw new Error('Unnegotiated company frame');
+            }
+            const packet: ReturnType<typeof CompanyProtocol.decode> = CompanyProtocol.decode(
+                new Uint8Array(complete),
+            );
+            if (
+                packet.op >= CompanyOp.LimitsSnapshot &&
+                this.#hello.features.officeCompanyLimits !== true
+            ) {
+                throw new Error('Unnegotiated budget frame');
+            }
+            if (packet.version === 3 && !this.supportsDepartmentKnowledge) {
+                throw new Error('Unnegotiated department knowledge');
+            }
+            if (packet.version === 2 && !this.supportsDepartmentTools) {
+                throw new Error('Unnegotiated company policy frame');
+            }
+            this.#company.receive(packet);
+            this.#companyLimits.receive(packet);
+            return false;
+        }
+        if (OfficeLayoutProtocol.isFrame(new Uint8Array(complete))) {
+            const packet: ReturnType<typeof OfficeLayoutProtocol.decode> =
+                OfficeLayoutProtocol.decode(new Uint8Array(complete));
+            if (packet.op !== 3 && packet.op !== 4) {
+                throw new Error('Unexpected layout command');
+            }
+            const pending: PendingLayout | undefined = this.#layouts.get(packet.id);
+            if (pending) {
+                this.#layouts.delete(packet.id);
+                clearTimeout(pending.timer);
+                if (packet.op === 4) {
+                    pending.reject(new Error(packet.message));
+                } else {
+                    pending.resolve({
+                        revision: packet.revision,
+                        pieces: packet.pieces,
+                        ...(packet.desks === undefined ? {} : { desks: packet.desks }),
+                    });
+                }
+            }
+            return false;
+        }
+        if (OfficeProtocol.isFrame(new Uint8Array(complete))) {
+            if (this.#hello.features.officeGame !== true) {
+                throw new Error('Unnegotiated office frame');
+            }
+            const packet: OfficeGamePacket = OfficeProtocol.decode(new Uint8Array(complete));
+            for (const listener of this.#officeListeners) {
+                this.#notify((): void => listener(packet));
+            }
+            return false;
+        }
+        if (complete.byteLength >= 8 && new DataView(complete).getUint32(0) === 0x4e584246) {
+            this.#receiveFrame(
+                BinaryEnvelope.decode(
+                    complete,
+                    BinaryChunks.MAX_TRANSFER_BYTES,
+                    this.#options.maxMessageBytes ?? 16 * 1024 * 1024,
+                    credit,
+                ),
+            );
+            return false;
+        }
+        const attachment: ReceivedAttachment = BinaryMedia.decode(
+            complete,
+            BinaryChunks.MAX_TRANSFER_BYTES,
+            credit,
+        );
+        const bytes: number = attachment.data.buffer.byteLength;
+        if (
+            this.#deliveries >= 64 ||
+            this.#deliveryBytes + bytes > BinaryChunks.MAX_TRANSFER_BYTES
+        ) {
+            throw new TransportError(TransportErrorCode.Limit, 'Attachment consumers fell behind');
+        }
+        this.#deliveries += 1;
+        this.#deliveryBytes += bytes;
+        this.#deliverAttachment(attachment, credit);
+        return true;
     }
     #receiveFrame(frame: unknown): void {
         if (!isRecord(frame)) {
@@ -1560,7 +1598,8 @@ export class NexaClient {
             });
         }
     }
-    #deliverAttachment(attachment: ReceivedAttachment): void {
+    #deliverAttachment(attachment: ReceivedAttachment, credit: BinaryInputReservation): void {
+        InboundConsumerCredit.track(attachment.data.buffer, credit);
         const pending: Promise<void>[] = [...this.#attachments].map((listener): Promise<void> => {
             try {
                 return Promise.resolve(listener(attachment));
@@ -1576,6 +1615,7 @@ export class NexaClient {
             new WeakRef(this.#socket),
             attachment.id,
             attachment.data.buffer.byteLength,
+            credit,
             pending,
         );
     }
@@ -1584,9 +1624,11 @@ export class NexaClient {
         socket: WeakRef<WebSocket>,
         id: string,
         bytes: number,
+        credit: BinaryInputReservation,
         pending: Promise<void>[],
     ): Promise<void> {
         const outcomes: PromiseSettledResult<void>[] = await Promise.allSettled(pending);
+        InboundConsumerCredit.release(credit);
         const client: NexaClient | undefined = owner.deref();
         if (client === undefined) {
             return;
@@ -1656,7 +1698,7 @@ export class NexaClient {
                 listener(error);
             });
         }
-        this.#binaryChunks.clear();
+        this.#inbound.clear();
         this.#detachSocket?.();
         this.#detachSocket = undefined;
         this.#socket.close();

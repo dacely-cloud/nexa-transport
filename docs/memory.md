@@ -17,21 +17,21 @@ The Chrome test opens two actual tabs. Each tab completes 660 turns, including e
 
 ## Resources covered
 
-| Area                      | Ownership and tests                                                                                                                                       |
-| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| RPCs                      | Pending count, timeout/abort listeners, rejection, disconnect, encoding failure, and release of original request parameters while waiting for a response. |
-| Uploads                   | Admission before encoding; queued-payload removal on cancellation, timeout, or close; aggregate retained-byte budget; interrupted transfers.              |
-| Chat streams              | Completion, failure, cancellation, byte/count overflow, iterator exit, active-turn limit, and release of client/abort-signal references.                  |
-| Subscriptions and sockets | Idempotent removal, disposal of callbacks even when cleanup handles are kept, detachment of old socket handlers, and reconnect behavior.                  |
-| Attachments               | Zero-copy file views, outstanding-delivery limits, accounting until all handlers settle, and stalled handlers that outlive disposed clients.              |
-| Binary chunks             | Budget release on completion, cancellation, explicit clear, timeout, and malformed/out-of-order frames.                                                   |
-| Media conversion          | Expanded JSON limits before allocation, excess-field rejection before decoding, and byte arrays without temporary key-string arrays.                      |
-| Errors                    | Saved transport and parameter-validation errors do not retain clients through lazy V8 stack frames.                                                       |
-| Protocol/schema           | Static schema and validator tables, with no per-request cache; existing schema, method, and typed-event tests.                                            |
+| Area                      | Ownership and tests                                                                                                                                                                                            |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| RPCs                      | Pending count, timeout/abort listeners, rejection, disconnect, encoding failure, and release of original request parameters while waiting for a response.                                                      |
+| Uploads                   | Admission before encoding; queued-payload removal on cancellation, timeout, or close; aggregate retained-byte budget; interrupted transfers.                                                                   |
+| Chat streams              | Completion, failure, cancellation, byte/count overflow, iterator exit, active-turn limit, and release of client/abort-signal references.                                                                       |
+| Subscriptions and sockets | Idempotent removal, disposal of callbacks even when cleanup handles are kept, detachment of old socket handlers, and reconnect behavior.                                                                       |
+| Attachments               | Zero-copy file views, outstanding-delivery limits, continuous credit through reassembly, parsing and consumer settlement; abandoned backing-buffer collection; stalled handlers that outlive disposed clients. |
+| Binary chunks             | Completed credit moves into decoding without a release/reacquire gap; cancellation, clear, timeout and malformed frames release incomplete storage.                                                            |
+| Media conversion          | Expanded JSON limits before allocation, excess-field rejection before decoding, and byte arrays without temporary key-string arrays.                                                                           |
+| Errors                    | Saved transport and parameter-validation errors do not retain clients through lazy V8 stack frames.                                                                                                            |
+| Protocol/schema           | Static schema and validator tables, with no per-request cache; existing schema, method, and typed-event tests.                                                                                                 |
 
 ## Limits and caller responsibilities
 
-The default client allows 64 pending RPCs and 64 active turns. Each turn buffers at most 256 unread events and 8 MiB of serialized event data. These are protocol-buffer bounds, not a measurement of JavaScript heap overhead. Binary uploads share a 101 MiB retained-payload budget. Outstanding attachment deliveries share a 101 MiB budget and a 64-delivery limit. Each client and browser tab has separate limits. Temporary media encoding allocations and application-owned data are additional to these budgets.
+The default client allows 64 pending RPCs and 64 active turns. Each turn buffers at most 256 unread events and 8 MiB of serialized event data. These are protocol-buffer bounds, not a measurement of JavaScript heap overhead. Binary uploads share a 301 MiB retained-payload budget. Unfinished attachment handlers share a 301 MiB delivery budget and a 64-delivery limit. `maxInboundBytes` separately bounds working storage across reassembly, JSON/binary parsing, and unfinished attachment handlers, with a 602 MiB default that can be lowered. Clients in one JavaScript realm also share a 1204 MiB ceiling; separate tabs and workers have separate realm counters. These are conservative admission estimates, not a total process heap measurement. Temporary media encoding allocations and application-owned data remain additional.
 
 Consume turn events as they arrive. Normal completion preserves unread events for subsequent iteration; breaking iteration or calling `turn.cancel()` discards unread events. `turn.detach()` also discards the local buffer and releases listeners without cancelling accepted server work. Use `client.call(Method.AgentAsk, ...)` if only the final answer is needed. Stored result promises retain their result or error by design.
 
