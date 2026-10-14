@@ -114,6 +114,10 @@ export interface CollaborationOffice {
 }
 /** Authenticated Nexa gateway connection shared by browsers and Node.js. */
 export class NexaClient {
+    /** Whether physical preview gestures can omit node ids and browser hit hints. */
+    public get supportsRobloxCoordinateInput(): boolean {
+        return this.#hello?.features.robloxCoordinateInput === true;
+    }
     /** Whether the gateway preserves the complete visible event stream. */
     public get supportsSessionHistory(): boolean {
         return this.#hello?.features.sessionHistory === true;

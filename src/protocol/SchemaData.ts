@@ -10583,6 +10583,12 @@ export const schema: Schema = {
                         'Versioned host verification evidence on private project and employee channels.',
                     type: 'boolean',
                 },
+                robloxCoordinateInput: {
+                    const: true,
+                    description:
+                        'Physical mouse/touch gestures can choose buttons using native GUI coordinates.',
+                    type: 'boolean',
+                },
                 sessionHistory: {
                     const: true,
                     description: 'Durable complete presentation history and binary restoration.',
@@ -18123,6 +18129,35 @@ export const schema: Schema = {
             enum: ['destructive', 'execute', 'read', 'write'],
             type: 'string',
         },
+        RobloxCoordinateGesture: {
+            description:
+                'One physical gesture chooses its target from the current native live root.',
+            properties: {
+                clickCount: {
+                    type: 'number',
+                },
+                device: {
+                    description:
+                        'Coordinate routing accepts physical mouse or touch gestures.\nNamed device values for server-owned coordinate commands.',
+                    enum: ['Mouse', 'Touch'],
+                    type: 'string',
+                },
+                id: {
+                    type: 'number',
+                },
+                phase: {
+                    $ref: '#/definitions/RobloxPointerPhase',
+                },
+                x: {
+                    type: 'number',
+                },
+                y: {
+                    type: 'number',
+                },
+            },
+            required: ['id', 'phase', 'x', 'y'],
+            type: 'object',
+        },
         RobloxCredentialSetParams: {
             properties: {
                 apiKey: {
@@ -18271,6 +18306,11 @@ export const schema: Schema = {
                 input: {
                     $ref: '#/definitions/RobloxLiveActivation',
                     description: "A logical activation on the retained VM's current clock.",
+                },
+                point: {
+                    $ref: '#/definitions/RobloxCoordinateGesture',
+                    description:
+                        'One physical gesture chooses its target from the current native live root.',
                 },
                 seconds: {
                     type: 'number',
