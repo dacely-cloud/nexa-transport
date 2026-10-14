@@ -349,21 +349,23 @@ export class DesignComponents {
                 context.nodes,
                 node.componentId,
             );
-            if (command.targetId !== null && !targets.has(command.targetId)) {
+            const targetId: string | null =
+                command.targetId === node.id ? node.componentId : command.targetId;
+            if (targetId !== null && !targets.has(targetId)) {
                 throw new Error('Override target is outside this component.');
             }
             const overrides: DesignOverride[] = node.overrides.filter(
                 (entry: DesignOverride): boolean =>
-                    command.action === Action.Reset && command.targetId === null
+                    command.action === Action.Reset && targetId === null
                         ? false
-                        : entry.nodeId !== command.targetId,
+                        : entry.nodeId !== targetId,
             );
             if (command.action === Action.Override) {
                 const before: DesignOverride | undefined = node.overrides.find(
-                    (entry: DesignOverride): boolean => entry.nodeId === command.targetId,
+                    (entry: DesignOverride): boolean => entry.nodeId === targetId,
                 );
                 overrides.push({
-                    nodeId: command.targetId,
+                    nodeId: command.targetId === node.id ? node.componentId : command.targetId,
                     name: before?.name ?? null,
                     text: before?.text ?? null,
                     style: before?.style ?? null,

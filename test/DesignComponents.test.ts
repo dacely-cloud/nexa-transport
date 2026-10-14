@@ -14,6 +14,51 @@ import { DesignKind, type DesignDocument, type DesignNode } from '../src/design/
 import type { DesignComponentRequest } from '../src/design/DesignComponentTypes.js';
 import type { DesignSelectionPlan } from '../src/design/DesignSelectionTypes.js';
 
+it('visible instance-root overrides cross the typed boundary with source IDs and exact undo', (): void => {
+    const component: DesignNode = DesignDefaults.node('component', DesignKind.Component);
+    const instance: DesignNode = {
+        ...DesignDefaults.node('instance', DesignKind.Instance),
+        componentId: component.id,
+    };
+    const template: DesignDocument = DesignDefaults.document('root-override');
+    const document: DesignDocument = {
+        ...template,
+        pages: template.pages.map((page) => ({ ...page, roots: [component.id, instance.id] })),
+        nodes: [component, instance],
+    };
+    const request: DesignComponentRequest = {
+        id: document.id,
+        expectedRevision: document.revision,
+        commandId: 'root',
+        pageId: 'page-1',
+        command: {
+            action: Action.Override,
+            instanceId: instance.id,
+            targetId: instance.id,
+            changes: { name: 'Local root' },
+        },
+    };
+    expect(methodValidators[Method.DesignComponent].params(request)).toBe(true);
+    const plan: DesignSelectionPlan = DesignComponents.plan(
+        document,
+        request.pageId,
+        request.command,
+        (): string => 'unused',
+    );
+    const result: ReturnType<typeof DesignEdits.apply> = DesignEdits.apply(
+        document,
+        plan.operations,
+    );
+    expect(
+        result.document.nodes.find((node: DesignNode): boolean => node.id === instance.id)
+            ?.overrides,
+    ).toMatchObject([{ nodeId: component.id, name: 'Local root' }]);
+    expect(
+        result.document.nodes.find((node: DesignNode): boolean => node.id === component.id),
+    ).toEqual(component);
+    expect(DesignEdits.restore(result.document, result.changes).document).toEqual(document);
+});
+
 it('component RPC accepts centered placement and rejects malformed commands at the transport boundary', (): void => {
     const request: DesignComponentRequest = {
         id: 'layout',
