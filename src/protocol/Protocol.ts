@@ -7817,6 +7817,62 @@ export interface GatewayMethodslogs_tailShape {
     readonly result: ReadonlyArray<LogRecord>;
 }
 
+/** GatewayMethodsluau_editor_close wire fields. */
+export interface GatewayMethodsluau_editor_closeShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: LuauEditorHandle;
+    /** result as defined by the Nexa gateway. */
+    readonly result: LuauEditorAck;
+}
+
+/** GatewayMethodsluau_editor_commit wire fields. */
+export interface GatewayMethodsluau_editor_commitShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: LuauEditorCommit;
+    /** result as defined by the Nexa gateway. */
+    readonly result: LuauEditorReport;
+}
+
+/** GatewayMethodsluau_editor_completion wire fields. */
+export interface GatewayMethodsluau_editor_completionShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: LuauEditorQuery;
+    /** result as defined by the Nexa gateway. */
+    readonly result: LuauEditorCompletion;
+}
+
+/** GatewayMethodsluau_editor_definition wire fields. */
+export interface GatewayMethodsluau_editor_definitionShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: LuauEditorQuery;
+    /** result as defined by the Nexa gateway. */
+    readonly result: LuauEditorDefinition;
+}
+
+/** GatewayMethodsluau_editor_hover wire fields. */
+export interface GatewayMethodsluau_editor_hoverShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: LuauEditorQuery;
+    /** result as defined by the Nexa gateway. */
+    readonly result: LuauEditorHover;
+}
+
+/** GatewayMethodsluau_editor_stage wire fields. */
+export interface GatewayMethodsluau_editor_stageShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: LuauEditorSourcePart;
+    /** result as defined by the Nexa gateway. */
+    readonly result: LuauEditorAck;
+}
+
+/** GatewayMethodsluau_editor_start wire fields. */
+export interface GatewayMethodsluau_editor_startShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: LuauEditorHandle;
+    /** result as defined by the Nexa gateway. */
+    readonly result: LuauEditorAck;
+}
+
 /** GatewayMethodsmedia_acknowledge wire fields. */
 export interface GatewayMethodsmedia_acknowledgeShape {
     /** params as defined by the Nexa gateway. */
@@ -8927,6 +8983,20 @@ export interface GatewayMethodsShape {
     readonly 'jobs.remove': GatewayMethodsjobs_removeShape;
     /** logs.tail as defined by the Nexa gateway. */
     readonly 'logs.tail': GatewayMethodslogs_tailShape;
+    /** luau.editor.close as defined by the Nexa gateway. */
+    readonly 'luau.editor.close': GatewayMethodsluau_editor_closeShape;
+    /** luau.editor.commit as defined by the Nexa gateway. */
+    readonly 'luau.editor.commit': GatewayMethodsluau_editor_commitShape;
+    /** luau.editor.completion as defined by the Nexa gateway. */
+    readonly 'luau.editor.completion': GatewayMethodsluau_editor_completionShape;
+    /** luau.editor.definition as defined by the Nexa gateway. */
+    readonly 'luau.editor.definition': GatewayMethodsluau_editor_definitionShape;
+    /** luau.editor.hover as defined by the Nexa gateway. */
+    readonly 'luau.editor.hover': GatewayMethodsluau_editor_hoverShape;
+    /** luau.editor.stage as defined by the Nexa gateway. */
+    readonly 'luau.editor.stage': GatewayMethodsluau_editor_stageShape;
+    /** luau.editor.start as defined by the Nexa gateway. */
+    readonly 'luau.editor.start': GatewayMethodsluau_editor_startShape;
     /** media.acknowledge as defined by the Nexa gateway. */
     readonly 'media.acknowledge': GatewayMethodsmedia_acknowledgeShape;
     /** office.ownerProof as defined by the Nexa gateway. */
@@ -9773,6 +9843,217 @@ export interface LogTailParamsShape {
 
 /** LogTailParams from the Nexa wire protocol. */
 export type LogTailParams = LogTailParamsShape;
+
+/** LuauEditorAck wire fields. */
+export interface LuauEditorAckShape {
+    /** handle as defined by the Nexa gateway. */
+    readonly handle: string;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: number;
+}
+
+/** LuauEditorAck from the Nexa wire protocol. */
+export type LuauEditorAck = LuauEditorAckShape;
+
+/** LuauEditorCommit wire fields. */
+export interface LuauEditorCommitShape {
+    /** definitions as defined by the Nexa gateway. */
+    readonly definitions: ReadonlyArray<string>;
+    /** handle as defined by the Nexa gateway. */
+    readonly handle: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** paths as defined by the Nexa gateway. */
+    readonly paths: ReadonlyArray<string>;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: number;
+}
+
+/** LuauEditorCommit from the Nexa wire protocol. */
+export type LuauEditorCommit = LuauEditorCommitShape;
+
+/** LuauEditorCompletion wire fields. */
+export interface LuauEditorCompletionShape {
+    /** handle as defined by the Nexa gateway. */
+    readonly handle: string;
+    /** isIncomplete as defined by the Nexa gateway. */
+    readonly isIncomplete: boolean;
+    /** items as defined by the Nexa gateway. */
+    readonly items: ReadonlyArray<LuauEditorCompletionItem>;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: number;
+}
+
+/** LuauEditorCompletion from the Nexa wire protocol. */
+export type LuauEditorCompletion = LuauEditorCompletionShape;
+
+/** LuauEditorCompletionItem wire fields. */
+export interface LuauEditorCompletionItemShape {
+    /** deprecated as defined by the Nexa gateway. */
+    readonly deprecated: boolean;
+    /** detail as defined by the Nexa gateway. */
+    readonly detail: null | string;
+    /** label as defined by the Nexa gateway. */
+    readonly label: string;
+}
+
+/** LuauEditorCompletionItem from the Nexa wire protocol. */
+export type LuauEditorCompletionItem = LuauEditorCompletionItemShape;
+
+/** LuauEditorDefinition wire fields. */
+export interface LuauEditorDefinitionShape {
+    /** handle as defined by the Nexa gateway. */
+    readonly handle: string;
+    /** location as defined by the Nexa gateway. */
+    readonly location: LuauEditorLocation | null;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: number;
+}
+
+/** LuauEditorDefinition from the Nexa wire protocol. */
+export type LuauEditorDefinition = LuauEditorDefinitionShape;
+
+/** LuauEditorDiagnostic wire fields. */
+export interface LuauEditorDiagnosticShape {
+    /** code as defined by the Nexa gateway. */
+    readonly code: string;
+    /** endColumn as defined by the Nexa gateway. */
+    readonly endColumn: number;
+    /** endLine as defined by the Nexa gateway. */
+    readonly endLine: number;
+    /** file as defined by the Nexa gateway. */
+    readonly file: string;
+    /** message as defined by the Nexa gateway. */
+    readonly message: string;
+    /** severity as defined by the Nexa gateway. */
+    readonly severity: LuauEditorSeverity;
+    /** startColumn as defined by the Nexa gateway. */
+    readonly startColumn: number;
+    /** startLine as defined by the Nexa gateway. */
+    readonly startLine: number;
+}
+
+/** LuauEditorDiagnostic from the Nexa wire protocol. */
+export type LuauEditorDiagnostic = LuauEditorDiagnosticShape;
+
+/** LuauEditorHandle wire fields. */
+export interface LuauEditorHandleShape {
+    /** handle as defined by the Nexa gateway. */
+    readonly handle: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+}
+
+/** LuauEditorHandle from the Nexa wire protocol. */
+export type LuauEditorHandle = LuauEditorHandleShape;
+
+/** LuauEditorHover wire fields. */
+export interface LuauEditorHoverShape {
+    /** handle as defined by the Nexa gateway. */
+    readonly handle: string;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: number;
+    /** text as defined by the Nexa gateway. */
+    readonly text: null | string;
+}
+
+/** LuauEditorHover from the Nexa wire protocol. */
+export type LuauEditorHover = LuauEditorHoverShape;
+
+/** LuauEditorLocation wire fields. */
+export interface LuauEditorLocationShape {
+    /** endCharacter as defined by the Nexa gateway. */
+    readonly endCharacter: number;
+    /** endLine as defined by the Nexa gateway. */
+    readonly endLine: number;
+    /** name as defined by the Nexa gateway. */
+    readonly name: string;
+    /** startCharacter as defined by the Nexa gateway. */
+    readonly startCharacter: number;
+    /** startLine as defined by the Nexa gateway. */
+    readonly startLine: number;
+}
+
+/** LuauEditorLocation from the Nexa wire protocol. */
+export type LuauEditorLocation = LuauEditorLocationShape;
+
+/** LuauEditorQuery wire fields. */
+export interface LuauEditorQueryShape {
+    /** character as defined by the Nexa gateway. */
+    readonly character: number;
+    /** handle as defined by the Nexa gateway. */
+    readonly handle: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** line as defined by the Nexa gateway. */
+    readonly line: number;
+    /** name as defined by the Nexa gateway. */
+    readonly name: string;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: number;
+}
+
+/** LuauEditorQuery from the Nexa wire protocol. */
+export type LuauEditorQuery = LuauEditorQueryShape;
+
+/** LuauEditorReport wire fields. */
+export interface LuauEditorReportShape {
+    /** checked as defined by the Nexa gateway. */
+    readonly checked: number;
+    /** diagnostics as defined by the Nexa gateway. */
+    readonly diagnostics: ReadonlyArray<LuauEditorDiagnostic>;
+    /** elapsedUs as defined by the Nexa gateway. */
+    readonly elapsedUs: string;
+    /** error as defined by the Nexa gateway. */
+    readonly error: null | string;
+    /** handle as defined by the Nexa gateway. */
+    readonly handle: string;
+    /** lines as defined by the Nexa gateway. */
+    readonly lines: string;
+    /** ok as defined by the Nexa gateway. */
+    readonly ok: boolean;
+    /** rechecked as defined by the Nexa gateway. */
+    readonly rechecked: number;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: number;
+    /** timeouts as defined by the Nexa gateway. */
+    readonly timeouts: ReadonlyArray<string>;
+    /** typecheckComplete as defined by the Nexa gateway. */
+    readonly typecheckComplete: boolean;
+    /** unchecked as defined by the Nexa gateway. */
+    readonly unchecked: ReadonlyArray<string>;
+}
+
+/** LuauEditorReport from the Nexa wire protocol. */
+export type LuauEditorReport = LuauEditorReportShape;
+
+/** Allowed values for LuauEditorSeverity. */
+export const LuauEditorSeverityValues = { Value0: 'error', Value1: 'warning' } as const;
+
+/** LuauEditorSeverity from the Nexa wire protocol. */
+export type LuauEditorSeverity =
+    (typeof LuauEditorSeverityValues)[keyof typeof LuauEditorSeverityValues];
+
+/** LuauEditorSourcePart wire fields. */
+export interface LuauEditorSourcePartShape {
+    /** complete as defined by the Nexa gateway. */
+    readonly complete: boolean;
+    /** handle as defined by the Nexa gateway. */
+    readonly handle: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** name as defined by the Nexa gateway. */
+    readonly name: string;
+    /** offset as defined by the Nexa gateway. */
+    readonly offset: number;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: number;
+    /** source as defined by the Nexa gateway. */
+    readonly source: string;
+}
+
+/** LuauEditorSourcePart from the Nexa wire protocol. */
+export type LuauEditorSourcePart = LuauEditorSourcePartShape;
 
 /** MediaAcknowledgeParams wire fields. */
 export interface MediaAcknowledgeParamsShape {
@@ -16652,6 +16933,20 @@ export enum Method {
     JobsRemove = 'jobs.remove',
     /** Calls logs.tail. */
     LogsTail = 'logs.tail',
+    /** Calls luau.editor.close. */
+    LuauEditorClose = 'luau.editor.close',
+    /** Calls luau.editor.commit. */
+    LuauEditorCommit = 'luau.editor.commit',
+    /** Calls luau.editor.completion. */
+    LuauEditorCompletion = 'luau.editor.completion',
+    /** Calls luau.editor.definition. */
+    LuauEditorDefinition = 'luau.editor.definition',
+    /** Calls luau.editor.hover. */
+    LuauEditorHover = 'luau.editor.hover',
+    /** Calls luau.editor.stage. */
+    LuauEditorStage = 'luau.editor.stage',
+    /** Calls luau.editor.start. */
+    LuauEditorStart = 'luau.editor.start',
     /** Calls media.acknowledge. */
     MediaAcknowledge = 'media.acknowledge',
     /** Calls office.ownerProof. */
