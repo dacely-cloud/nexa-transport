@@ -10589,6 +10589,12 @@ export const schema: Schema = {
                         'Physical mouse/touch gestures can choose buttons using native GUI coordinates.',
                     type: 'boolean',
                 },
+                robloxTextEditing: {
+                    const: true,
+                    description:
+                        'Focused TextBoxes accept bounded Unicode edits and logical editing-key gestures.',
+                    type: 'boolean',
+                },
                 sessionHistory: {
                     const: true,
                     description: 'Durable complete presentation history and binary restoration.',
@@ -18302,6 +18308,21 @@ export const schema: Schema = {
         RobloxLiveStepRequest: {
             description: 'One serialized native step and optional logical activation.',
             properties: {
+                edit: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/RobloxTextInsertion',
+                        },
+                        {
+                            $ref: '#/definitions/RobloxTextSelection',
+                        },
+                        {
+                            $ref: '#/definitions/RobloxTextKeyGesture',
+                        },
+                    ],
+                    description:
+                        'The same edit contract is consumed by tools, native processes and the gateway.',
+                },
                 handle: {
                     type: 'string',
                 },
@@ -18363,6 +18384,62 @@ export const schema: Schema = {
                 'Physical gesture phases owned by the preview protocol, separate from Roblox signal names.\nOne retained physical pointer phase.',
             enum: ['Cancel', 'Press', 'Release'],
             type: 'string',
+        },
+        RobloxTextEditKey: {
+            description:
+                'Supported logical editing keys; complete physical keyboard routing is separate.\nKnown editing-key values.',
+            enum: ['Backspace', 'Delete', 'End', 'Escape', 'Home', 'Left', 'Return', 'Right'],
+            type: 'string',
+        },
+        RobloxTextInsertion: {
+            description:
+                'Inserted Unicode text replaces the native selection or inserts at its cursor.',
+            properties: {
+                kind: {
+                    const: 'Insert',
+                    type: 'string',
+                },
+                text: {
+                    type: 'string',
+                },
+            },
+            required: ['kind', 'text'],
+            type: 'object',
+        },
+        RobloxTextKeyGesture: {
+            description:
+                'A complete logical key gesture emits native Begin/End with one real InputObject.',
+            properties: {
+                key: {
+                    $ref: '#/definitions/RobloxTextEditKey',
+                },
+                kind: {
+                    const: 'Key',
+                    type: 'string',
+                },
+                shift: {
+                    type: 'boolean',
+                },
+            },
+            required: ['key', 'kind'],
+            type: 'object',
+        },
+        RobloxTextSelection: {
+            description: 'Selection positions are one-based UTF-8 bytes; -1 removes the anchor.',
+            properties: {
+                cursor: {
+                    type: 'number',
+                },
+                kind: {
+                    const: 'Selection',
+                    type: 'string',
+                },
+                selectionStart: {
+                    type: 'number',
+                },
+            },
+            required: ['cursor', 'kind', 'selectionStart'],
+            type: 'object',
         },
         ScalarSchema: {
             description:

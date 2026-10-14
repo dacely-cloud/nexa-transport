@@ -122,6 +122,10 @@ export interface CollaborationOffice {
 }
 /** Authenticated Nexa gateway connection shared by browsers and Node.js. */
 export class NexaClient {
+    /** Native focus receives bounded Unicode edits when the gateway advertises support. */
+    public get supportsRobloxTextEditing(): boolean {
+        return this.#hello?.features.robloxTextEditing === true;
+    }
     /** Whether physical preview gestures can omit node ids and browser hit hints. */
     public get supportsRobloxCoordinateInput(): boolean {
         return this.#hello?.features.robloxCoordinateInput === true;
