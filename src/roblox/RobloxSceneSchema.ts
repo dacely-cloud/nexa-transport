@@ -67,6 +67,8 @@ export interface RobloxPropertySpec {
     readonly xmlType?: string;
     /** False for runtime-only properties that Roblox does not save in model XML. */
     readonly serialize?: boolean;
+    /** Engine-owned properties must be supplied by an imported template, never assigned by replay. */
+    readonly runtimeReadonly?: boolean;
     readonly tween?: boolean;
 }
 /** Constructors for fully explicit portable native datatypes. */
@@ -184,6 +186,8 @@ const part: Readonly<Record<string, RobloxPropertySpec>> = {
     Transparency: n(0, 0, 1),
     Anchored: b(true),
     CanCollide: b(false),
+    CanQuery: b(true),
+    CanTouch: b(true),
     CastShadow: b(true),
     Material: e(RobloxMaterial.Plastic, Object.values(RobloxMaterial), 'Material'),
 };
@@ -212,6 +216,13 @@ export const RobloxSceneSchema: Readonly<
     Part: { ...part, Shape: e(1, [0, 1, 2, 3, 4], 'PartType') },
     WedgePart: part,
     CornerWedgePart: { ...part, Size: v(RobloxValues.vector3(2, 2, 2), true) },
+    MeshPart: {
+        ...part,
+        MeshId: { ...s(''), xmlType: 'ContentId', runtimeReadonly: true },
+        MeshSize: { ...v(RobloxValues.vector3()), xmlName: 'InitialSize', runtimeReadonly: true },
+        TextureID: { ...s(''), xmlType: 'ContentId' },
+        DoubleSided: b(false),
+    },
     Attachment: { CFrame: v(RobloxValues.cframe(), true) },
     ParticleEmitter: {
         Enabled: b(true),

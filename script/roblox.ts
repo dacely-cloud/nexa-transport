@@ -7,6 +7,13 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 const files: readonly string[] = [
     'RobloxExecutionContext',
     'RobloxPartGeometry',
+    'RobloxMeshTypes',
+    'RobloxMeshHeader',
+    'RobloxMeshAscii',
+    'RobloxMeshDecoder',
+    'RobloxMeshNormals',
+    'RobloxMeshGeometry',
+    'RobloxSceneMeshes',
     'RobloxLiveState',
     'RobloxLiveDescriptor',
     'RobloxSceneInput',
@@ -59,4 +66,7 @@ for (const file of files) {
     await writeFile('src/roblox/' + file + '.ts', source);
 }
 await mkdir('licenses/roblox', { recursive: true });
-await writeFile('licenses/roblox/Arimo-OFL.txt', await readFile('../nexa/assets/roblox/fonts/OFL.txt', 'utf8'));
+await writeFile(
+    'licenses/roblox/Arimo-OFL.txt',
+    await readFile('../nexa/assets/roblox/fonts/OFL.txt', 'utf8'),
+);

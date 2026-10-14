@@ -31,7 +31,8 @@ export class RobloxParticlePose {
                 node.className !== 'Attachment' &&
                 node.className !== 'Part' &&
                 node.className !== 'WedgePart' &&
-                node.className !== 'CornerWedgePart'
+                node.className !== 'CornerWedgePart' &&
+                node.className !== 'MeshPart'
             ) {
                 break;
             }

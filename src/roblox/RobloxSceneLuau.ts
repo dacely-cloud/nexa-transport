@@ -158,14 +158,22 @@ export class RobloxSceneLuau {
                 : []),
             '  local nodes, connections, tweens, playbackConnections = {}, {}, {}, {}',
             '  local generation = 0',
+            '  local meshTemplates = script and script:FindFirstChild("NexaMeshTemplates")',
         ];
         for (const node of nodes) {
             const access: string = 'nodes[' + this.quote(node.id) + ']';
             lines.push(
-                '  ' + access + ' = Instance.new(' + this.quote(node.className) + ')',
+                node.className === 'MeshPart'
+                    ? '  ' +
+                          access +
+                          ' = assert(meshTemplates and meshTemplates:FindFirstChild(' +
+                          this.quote(node.id) +
+                          '), "Imported MeshPart template is required"):Clone()'
+                    : '  ' + access + ' = Instance.new(' + this.quote(node.className) + ')',
                 '  ' + access + '.Name = ' + this.quote(node.name),
             );
             for (const [property, value] of Object.entries(node.properties)) {
+                if (RobloxSceneSchema[node.className][property]?.runtimeReadonly === true) {continue;}
                 lines.push(
                     '  ' +
                         access +

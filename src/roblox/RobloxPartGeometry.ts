@@ -13,13 +13,19 @@ export class RobloxPartGeometry {
     static readonly #meshes: Map<number, readonly RobloxPartVertex[]> = new Map();
     /** Identifies every currently represented native primitive BasePart class. */
     public static isPart(className: RobloxClass): boolean {
-        return className === 'Part' || className === 'WedgePart' || className === 'CornerWedgePart';
+        return (
+            className === 'Part' ||
+            className === 'WedgePart' ||
+            className === 'CornerWedgePart' ||
+            className === 'MeshPart'
+        );
     }
     /** Reads the primitive without inventing a Shape property on dedicated wedge classes. */
     public static shape(
         node: RobloxSceneNode,
         properties: Readonly<Record<string, RobloxValue>> = node.properties,
     ): number {
+        if (node.className === 'MeshPart') {return -1;}
         if (node.className === 'WedgePart') {
             return 3;
         }

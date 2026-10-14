@@ -3,6 +3,7 @@
 
 import { RobloxSceneInput } from './RobloxSceneInput';
 import { RobloxPartGeometry } from './RobloxPartGeometry';
+import { RobloxSceneMeshes } from './RobloxSceneMeshes';
 import { RobloxSceneTextures, type RobloxSceneTextureAtlas } from './RobloxSceneTextures';
 import { RobloxGuiClasses } from './RobloxGuiClasses';
 import { RobloxTextMeasurement } from './RobloxTextMetrics';
@@ -41,7 +42,7 @@ export class RobloxSceneCodec {
         const fields: Readonly<Record<string, unknown>> = this.record(
             raw,
             ['format', 'version', 'name', 'duration', 'seed', 'camera', 'nodes', 'events'],
-            ['inputs', 'hierarchy', 'textures', 'textMetrics'],
+            ['inputs', 'hierarchy', 'textures', 'textMetrics', 'meshes'],
         );
         if (fields['format'] !== 'nexa.roblox.scene' || fields['version'] !== 1) {
             throw new Error('Expected nexa.roblox.scene version 1');
@@ -186,6 +187,8 @@ export class RobloxSceneCodec {
         const textures: RobloxSceneTextureAtlas | undefined = RobloxSceneTextures.decode(
             fields['textures'],
         );
+        const meshes: import('./RobloxSceneMeshes').RobloxSceneMeshTable | undefined =
+            RobloxSceneMeshes.decode(fields['meshes']);
         return Object.freeze({
             format: 'nexa.roblox.scene',
             version: 1,
@@ -202,6 +205,7 @@ export class RobloxSceneCodec {
             inputs: Object.freeze(RobloxSceneInput.observations(fields['inputs'], duration, byId)),
             ...(hierarchy.deltas.length === 0 ? {} : { hierarchy: hierarchy.deltas }),
             ...(textures === undefined ? {} : { textures }),
+            ...(meshes === undefined ? {} : { meshes }),
             ...(fields['textMetrics'] === undefined
                 ? {}
                 : { textMetrics: RobloxTextMeasurement.decode(fields['textMetrics']) }),
@@ -625,11 +629,52 @@ export class RobloxSceneCodec {
             throw new Error('Missing parent for ' + node.id);
         }
         const allowed: Readonly<Record<RobloxClass, readonly RobloxClass[]>> = {
-            Folder: ['Folder', 'Model', 'WorldModel', 'Part', 'WedgePart', 'CornerWedgePart'],
-            Model: ['Folder', 'Model', 'WorldModel', 'Part', 'WedgePart', 'CornerWedgePart'],
+            Folder: [
+                'Folder',
+                'Model',
+                'WorldModel',
+                'Part',
+                'WedgePart',
+                'CornerWedgePart',
+                'MeshPart',
+            ],
+            Model: [
+                'Folder',
+                'Model',
+                'WorldModel',
+                'Part',
+                'WedgePart',
+                'CornerWedgePart',
+                'MeshPart',
+            ],
             WorldModel: ['Folder', 'Model', 'WorldModel'],
-            Part: ['Folder', 'Model', 'WorldModel', 'Part', 'WedgePart', 'CornerWedgePart'],
-            WedgePart: ['Folder', 'Model', 'WorldModel', 'Part', 'WedgePart', 'CornerWedgePart'],
+            MeshPart: [
+                'Folder',
+                'Model',
+                'WorldModel',
+                'Part',
+                'WedgePart',
+                'CornerWedgePart',
+                'MeshPart',
+            ],
+            Part: [
+                'Folder',
+                'Model',
+                'WorldModel',
+                'Part',
+                'WedgePart',
+                'CornerWedgePart',
+                'MeshPart',
+            ],
+            WedgePart: [
+                'Folder',
+                'Model',
+                'WorldModel',
+                'Part',
+                'WedgePart',
+                'CornerWedgePart',
+                'MeshPart',
+            ],
             CornerWedgePart: [
                 'Folder',
                 'Model',
@@ -637,9 +682,10 @@ export class RobloxSceneCodec {
                 'Part',
                 'WedgePart',
                 'CornerWedgePart',
+                'MeshPart',
             ],
-            Attachment: ['Part', 'WedgePart', 'CornerWedgePart', 'Attachment'],
-            ParticleEmitter: ['Part', 'WedgePart', 'CornerWedgePart', 'Attachment'],
+            Attachment: ['Part', 'WedgePart', 'CornerWedgePart', 'MeshPart', 'Attachment'],
+            ParticleEmitter: ['Part', 'WedgePart', 'CornerWedgePart', 'MeshPart', 'Attachment'],
             ScreenGui: ['Folder', 'Model', 'WorldModel'],
             Frame: ['ScreenGui', ...RobloxGuiClasses.objects],
             TextLabel: ['ScreenGui', ...RobloxGuiClasses.objects],
@@ -663,6 +709,7 @@ export class RobloxSceneCodec {
                       'Part',
                       'WedgePart',
                       'CornerWedgePart',
+                      'MeshPart',
                       'ScreenGui',
                   ].includes(node.className)
                 : !allowed[node.className].includes(parent.className)

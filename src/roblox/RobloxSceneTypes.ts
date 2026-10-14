@@ -136,6 +136,7 @@ export const RobloxClass = {
     Part: 'Part',
     WedgePart: 'WedgePart',
     CornerWedgePart: 'CornerWedgePart',
+    MeshPart: 'MeshPart',
     Attachment: 'Attachment',
     ParticleEmitter: 'ParticleEmitter',
     ScreenGui: 'ScreenGui',
@@ -237,6 +238,8 @@ export interface RobloxRecording {
 export type RobloxSceneEvent = RobloxBurst | RobloxParticleClear | RobloxTween | RobloxRecording;
 /** Portable authoring artifact. Version 1 rejects unsupported properties rather than silently dropping them. */
 export interface RobloxScene {
+    /** Original authorized FileMesh bytes shared by all instances referencing the same resource. */
+    readonly meshes?: import('./RobloxSceneMeshes').RobloxSceneMeshTable;
     /** Actual native font units for shared automatic text sizing. */
     readonly textMetrics?: import('./RobloxTextMetrics').RobloxTextMetrics;
     /** Authorized asset pixels; original Roblox content URIs remain on the native properties. */

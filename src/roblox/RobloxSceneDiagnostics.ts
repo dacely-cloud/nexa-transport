@@ -22,6 +22,11 @@ export class RobloxSceneDiagnostics {
                 'ImageLabel and ImageButton display original image texels with sprite cropping, tint, transparency, Stretch/Fit/Crop/Tile/nine-slice layout and smooth or pixelated sampling. ImageButton logical activations execute native callbacks. Hover/pressed visual switching, EditableImage loading and Studio edge-pixel calibration remain unfinished.',
             );
         }
+        if (nodes.some((node: RobloxSceneNode): boolean => node.className === 'MeshPart')) {
+            findings.push(
+                'Imported MeshParts use original FileMesh positions, normals, vertex colors and highest-quality indexed topology. Original MeshSize stays fixed while Size and CFrame animate. TextureID resolves original image texels; mesh UVs wrap within their own atlas rectangle after fragment interpolation. DoubleSided controls reverse faces. Replay clones imported templates instead of assigning read-only MeshId/MeshSize. Missing mesh or texture bytes fail explicitly. Renderer checks do not certify Studio pixel parity. Native AssetService mesh creation, mesh collision fidelity, adaptive LOD selection, bones/skinning, facial animation, exact materials and Studio pixel calibration remain unfinished.',
+            );
+        }
         if (
             nodes.some(
                 (node: import('./RobloxSceneTypes').RobloxSceneNode): boolean =>

@@ -4,6 +4,7 @@
 import type { RobloxScene, RobloxSceneNode, RobloxValue } from './RobloxSceneTypes';
 import { RobloxSceneSchema, type RobloxPropertySpec } from './RobloxSceneSchema';
 import { RobloxSceneLuau } from './RobloxSceneLuau';
+import { RobloxSceneHierarchy } from './RobloxSceneHierarchy';
 
 /** Native XML serialization, using the rbx-dom version 4 format. */
 export class RobloxSceneXml {
@@ -51,7 +52,9 @@ export class RobloxSceneXml {
         const module: string =
             '<Item class="ModuleScript" referent="RBX_Runtime"><Properties><string name="Name">NexaRuntime</string><ProtectedString name="Source">' +
             this.escape(RobloxSceneLuau.source(scene)) +
-            '</ProtectedString></Properties></Item>';
+            '</ProtectedString></Properties>' +
+            this.meshTemplates(scene) +
+            '</Item>';
         return (
             '<roblox version="4"><Meta name="ExplicitAutoJoints">true</Meta><External>null</External><External>nil</External><Item class="Folder" referent="RBX_Pack"><Properties><string name="Name">' +
             this.escape(scene.name) +
@@ -59,6 +62,41 @@ export class RobloxSceneXml {
             (children.get(null) ?? []).map(item).join('') +
             module +
             '</Item></roblox>'
+        );
+    }
+
+    /** Immutable imported mesh identity is supplied by cloneable native templates beneath the replay module. */
+    public static meshTemplates(scene: RobloxScene): string {
+        const nodes: readonly RobloxSceneNode[] = [...RobloxSceneHierarchy.catalog(scene).values()];
+        const meshes: readonly RobloxSceneNode[] = nodes.filter(
+            (node: RobloxSceneNode): boolean => node.className === 'MeshPart',
+        );
+        if (meshes.length === 0) {return '';}
+        return (
+            '<Item class="Folder" referent="RBX_MeshTemplates"><Properties><string name="Name">NexaMeshTemplates</string></Properties>' +
+            meshes
+                .map(
+                    (node: RobloxSceneNode): string =>
+                        '<Item class="MeshPart" referent="RBX_MeshTemplate_' +
+                        node.id +
+                        '"><Properties><string name="Name">' +
+                        this.escape(node.id) +
+                        '</string>' +
+                        Object.entries({
+                            ...node.properties,
+                            Transparency: 1,
+                            CanCollide: false,
+                            CanQuery: false,
+                            CanTouch: false,
+                        })
+                            .map(([name, value]: [string, RobloxValue]): string =>
+                                this.property(name, value, RobloxSceneSchema.MeshPart[name]),
+                            )
+                            .join('') +
+                        '</Properties></Item>',
+                )
+                .join('') +
+            '</Item>'
         );
     }
 
