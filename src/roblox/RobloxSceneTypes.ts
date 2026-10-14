@@ -149,6 +149,7 @@ export const RobloxClass = {
     UIListLayout: 'UIListLayout',
     UIPadding: 'UIPadding',
     UISizeConstraint: 'UISizeConstraint',
+    UIAspectRatioConstraint: 'UIAspectRatioConstraint',
 } as const;
 /** Supported instance class. */
 export type RobloxClass = (typeof RobloxClass)[keyof typeof RobloxClass];

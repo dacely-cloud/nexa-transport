@@ -119,6 +119,15 @@ export class RobloxSceneDiagnostics {
                 'UISizeConstraint clamps authored, automatic and flex dimensions independently on each axis. Native unbounded defaults survive JSON, Luau and Studio XML export. Recorded limit changes reflow siblings. Multiple-constraint priority, flex slack redistribution and Studio constraint pixels remain uncalibrated.',
             );
         }
+        if (
+            nodes.some(
+                (node: RobloxSceneNode): boolean => node.className === 'UIAspectRatioConstraint',
+            )
+        ) {
+            findings.push(
+                'UIAspectRatioConstraint fits the authored box or derives its secondary axis within parent capacity, before anchors and after flex sizing. Ratio changes invalidate native geometry. Conflicting size constraints, multiple-constraint priority and Studio aspect/automatic/flex pixels remain uncalibrated.',
+            );
+        }
         const textParents: ReadonlySet<string> = new Set(
             scene.nodes
                 .filter((node: RobloxSceneNode): boolean =>

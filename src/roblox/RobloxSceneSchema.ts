@@ -275,6 +275,11 @@ export const RobloxSceneSchema: Readonly<
         PaddingTop: v({ kind: 'UDim', scale: 0, offset: 0 }, true),
         PaddingBottom: v({ kind: 'UDim', scale: 0, offset: 0 }, true),
     },
+    UIAspectRatioConstraint: {
+        AspectRatio: n(1, 1.401298464324817e-45, 3.4028234663852886e38),
+        AspectType: e(0, [0, 1], 'AspectType'),
+        DominantAxis: e(0, [0, 1], 'DominantAxis'),
+    },
     UISizeConstraint: {
         MinSize: { ...v({ kind: 'Vector2', x: 0, y: 0 }, true), min: 0, max: 16384 },
         MaxSize: {

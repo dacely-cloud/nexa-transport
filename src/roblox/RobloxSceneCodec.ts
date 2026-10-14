@@ -651,6 +651,7 @@ export class RobloxSceneCodec {
             UIListLayout: RobloxGuiClasses.objects,
             UIPadding: RobloxGuiClasses.objects,
             UISizeConstraint: RobloxGuiClasses.objects,
+            UIAspectRatioConstraint: RobloxGuiClasses.objects,
         };
         if (
             parent === undefined

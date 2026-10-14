@@ -8,6 +8,7 @@ import {
 import { RobloxGuiClasses } from './RobloxGuiClasses';
 import { RobloxGuiPadding, type RobloxGuiInsets } from './RobloxGuiPadding';
 import { RobloxGuiSizeConstraint, type RobloxGuiSizeLimits } from './RobloxGuiSizeConstraint';
+import { RobloxGuiAspectRatio, type RobloxGuiAspectConstraint } from './RobloxGuiAspectRatio';
 import { RobloxProperties } from './RobloxSceneRuntime';
 import {
     RobloxTextMeasurement,
@@ -23,6 +24,7 @@ export class RobloxGuiAutoSize {
     readonly #metrics: RobloxTextMetrics | undefined;
     readonly #cache: Map<string, Map<string, RobloxGuiSize>> = new Map();
     readonly #limits: Map<string, RobloxGuiSizeLimits | null> = new Map();
+    readonly #aspects: Map<string, RobloxGuiAspectConstraint | null> = new Map();
     #work: number = 0;
     public constructor(
         children: ReadonlyMap<string | null, readonly RobloxSceneNode[]>,
@@ -49,13 +51,18 @@ export class RobloxGuiAutoSize {
             this.#limits.set(node.id, limits);
         }
         minimum = RobloxGuiSizeConstraint.apply(minimum, limits);
+        let aspect: RobloxGuiAspectConstraint | null | undefined = this.#aspects.get(node.id);
+        if (aspect === undefined) {
+            aspect = RobloxGuiAspectRatio.read(this.#children.get(node.id) ?? [], this.#values);
+            this.#aspects.set(node.id, aspect);
+        }
         const properties: Readonly<Record<string, RobloxValue>> =
             this.#values.get(node.id) ?? node.properties;
         const value: RobloxValue | undefined = properties['AutomaticSize'];
         const automatic: number =
             typeof value === 'object' && value.kind === 'Enum' ? value.value : 0;
         if (automatic === 0) {
-            return limits === null ? minimum : { ...minimum, limits };
+            return this.#constrain(minimum, capacity, limits, aspect);
         }
         const key: string = [minimum.width, minimum.height, capacity.width, capacity.height].join(
             ',',
@@ -148,13 +155,33 @@ export class RobloxGuiAutoSize {
                 limits,
             );
             if (next.width === current.width && next.height === current.height) {
-                const result: RobloxGuiSize = limits === null ? next : { ...next, limits };
+                const result: RobloxGuiSize = this.#constrain(next, capacity, limits, aspect);
                 cache.set(key, result);
                 return result;
             }
             current = next;
         }
         throw new Error('Automatic GUI sizing did not converge within 64 layout passes');
+    }
+
+    #constrain(
+        size: RobloxGuiSize,
+        capacity: RobloxGuiSize,
+        limits: RobloxGuiSizeLimits | null,
+        aspect: RobloxGuiAspectConstraint | null,
+    ): RobloxGuiSize {
+        if (limits === null && aspect === null) {
+            return size;
+        }
+        const result: RobloxGuiSize = RobloxGuiSizeConstraint.apply(
+            RobloxGuiAspectRatio.apply(size, capacity, aspect),
+            limits,
+        );
+        return {
+            ...result,
+            ...(limits === null ? {} : { limits }),
+            ...(aspect === null ? {} : { aspect }),
+        };
     }
 
     #text(

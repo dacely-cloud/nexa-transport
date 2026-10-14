@@ -21,6 +21,7 @@ const files: readonly string[] = [
     'RobloxGuiBoxLayout',
     'RobloxGuiAutoSize',
     'RobloxGuiSizeConstraint',
+    'RobloxGuiAspectRatio',
     'RobloxGuiPadding',
     'RobloxTextMetrics',
     'RobloxLegacyFont',
