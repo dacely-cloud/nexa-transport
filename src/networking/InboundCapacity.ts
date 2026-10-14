@@ -11,6 +11,7 @@ import { JsonFrameMemory } from '../media/JsonFrameMemory.js';
 import { Utf8Bytes } from '../media/Utf8Bytes.js';
 import type { BinaryChunkReceipt } from '../media/interface/BinaryChunkReceipt.js';
 import { TransportError, TransportErrorCode } from './TransportError.js';
+import { BinaryChunkTransfer } from '../media/BinaryChunkTransfer.js';
 
 /** Shares inbound working storage across partial transfers, decoding and unfinished consumers. */
 export class InboundCapacity {
@@ -35,6 +36,16 @@ export class InboundCapacity {
     /** Retained input belonging to this client, including consumers from an earlier socket. */
     public get used(): number {
         return this.#budget.used;
+    }
+
+    /** Admits new retained storage distinct from the currently decoded wire frame. */
+    public reserve(bytes: number): BinaryInputReservation {
+        return BinaryInputReservation.acquire(this.#budget, bytes);
+    }
+
+    /** Project delivery assembly uses the same bounded geometric allocator as native transfers. */
+    public transfer(id: string, total: number, first: number): BinaryChunkTransfer {
+        return new BinaryChunkTransfer(id, total, first, this.#budget, (): void => {});
     }
 
     /** Reassembly and progress metadata must acquire this same local and realm credit. */
