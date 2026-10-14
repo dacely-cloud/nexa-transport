@@ -3,7 +3,8 @@
 
 import { DesignValues as V } from './DesignValues.js';
 import { DesignGradientCodec } from './DesignGradientCodec.js';
-import { DesignPaintKind, type DesignGradientStop } from './DesignTypes.js';
+import { DesignGradientGeometry } from './DesignGradientGeometry.js';
+import type { DesignGradientStop } from './DesignTypes.js';
 import type { DesignPaintGradientChanges } from './DesignOperationTypes.js';
 
 /** Compact gradient geometry and bounded stops preserve other paint and layer fields. */
@@ -22,10 +23,7 @@ export class DesignPaintGradientChangesCodec {
             ...(value['kind'] === undefined
                 ? {}
                 : {
-                      kind: V.choice(value['kind'], [
-                          DesignPaintKind.Linear,
-                          DesignPaintKind.Radial,
-                      ]),
+                      kind: V.choice(value['kind'], DesignGradientGeometry.kinds),
                   }),
             ...(value['angle'] === undefined ? {} : { angle: V.number(value['angle'], -360, 360) }),
             ...(value['gradient'] === undefined

@@ -16,7 +16,7 @@ import type { DesignBlendMode, DesignIsolation } from './DesignBlendTypes.js';
 import type {
     DesignFrameGrid,
     DesignFlow,
-    DesignPaintKind,
+    DesignGradientKind,
     DesignGradientStop,
     DesignSizing,
     DesignAlign,
@@ -359,7 +359,7 @@ export interface DesignPaintImageOperation {
 }
 /** Geometry and stops are independent of source bodies and the rest of the paint stack. */
 export interface DesignPaintGradientChanges {
-    readonly kind?: typeof DesignPaintKind.Linear | typeof DesignPaintKind.Radial;
+    readonly kind?: DesignGradientKind;
     readonly angle?: number;
     readonly gradient?: DesignGradientTransformChanges | null;
     readonly stops?: readonly DesignGradientStop[];

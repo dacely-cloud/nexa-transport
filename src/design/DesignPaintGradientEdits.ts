@@ -27,8 +27,8 @@ export class DesignPaintGradientEdits {
     /** Omitted fields survive; null restores the legacy geometry, and angle rotates an explicit transform. */
     public static paint(source: DesignPaint, changes: DesignPaintGradientChanges): DesignPaint {
         const kind: DesignPaintKind = changes.kind ?? source.kind;
-        if (kind !== DesignPaintKind.Linear && kind !== DesignPaintKind.Radial) {
-            throw new Error('Choose a linear or radial gradient paint.');
+        if (!DesignGradientGeometry.isGradient(kind)) {
+            throw new Error('Choose a linear, radial, angular or diamond gradient paint.');
         }
         const { gradient: previous, ...rest }: DesignPaint = source;
         let gradient: DesignGradientTransform | null | undefined = previous;

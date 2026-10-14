@@ -72,6 +72,7 @@ const config: UserConfig = {
                 'design-flow-ordering': 'src/design/DesignFlowOrdering.ts',
                 'design-selection-types': 'src/design/DesignSelectionTypes.ts',
                 'design-typography-styles': 'src/design/DesignTypographyStyleCodec.ts',
+                'design-svg-paints': 'src/design/DesignSvgPaints.ts',
                 'design-gradient-geometry': 'src/design/DesignGradientGeometry.ts',
                 'design-paint-gradient': 'src/design/DesignPaintGradientEdits.ts',
                 'design-stroke-types': 'src/design/DesignStrokeTypes.ts',

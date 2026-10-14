@@ -1,6 +1,6 @@
 {
     "name": "nexa-transport",
-    "version": "0.1.0-roblox-particle-inheritance.1",
+    "version": "0.1.0-design-gradients.1",
     "description": "Typed Nexa websocket gateway client for browsers and Node.js",
     "type": "module",
     "license": "Apache-2.0",
@@ -17,6 +17,10 @@
         "licenses"
     ],
     "exports": {
+        "./design-svg-paints": {
+            "types": "./dist/design/DesignSvgPaints.d.ts",
+            "import": "./dist/design-svg-paints.js"
+        },
         "./design-image-sampling-types": {
             "types": "./dist/design/DesignImageSamplingTypes.d.ts",
             "import": "./dist/design-image-sampling-types.js"
@@ -823,6 +827,7 @@
         "transport"
     ],
     "dependencies": {
+        "fflate": "0.8.3",
         "@js-temporal/polyfill": "0.5.1",
         "meshoptimizer": "^1.2.0",
         "pathkit-wasm": "1.0.0",

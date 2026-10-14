@@ -58,6 +58,8 @@ const files: readonly string[] = [
     'DesignGradientTypes',
     'DesignGradientCodec',
     'DesignGradientGeometry',
+    'DesignGradientSampling',
+    'DesignGradientPng',
     'DesignPaintLayerEdit',
     'DesignPaintGradientChangesCodec',
     'DesignPaintGradientEdits',
@@ -240,3 +242,5 @@ await writeFile(
     'licenses/NotoEmoji-OFL.txt',
     await readFile('../nexa/licenses/NotoEmoji-OFL.txt', 'utf8'),
 );
+
+await writeFile('licenses/fflate.txt', await readFile('node_modules/fflate/LICENSE', 'utf8'));

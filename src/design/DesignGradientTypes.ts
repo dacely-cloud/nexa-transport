@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
-/** Top-left-origin normalized points define a linear segment or a radial center and two radius axes. */
+/** Top-left-origin normalized points define a linear segment or a gradient center and two independent basis axes. */
 export interface DesignGradientTransform {
     readonly startX: number;
     readonly startY: number;
@@ -18,4 +18,11 @@ export interface DesignGradientTransformChanges {
     readonly endY?: number;
     readonly axisX?: number;
     readonly axisY?: number;
+}
+/** A stroke export samples beyond its layer bounds while retaining the original gradient basis. */
+export interface DesignGradientViewport {
+    readonly x: number;
+    readonly y: number;
+    readonly width: number;
+    readonly height: number;
 }

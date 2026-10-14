@@ -71,10 +71,17 @@ export const DesignPaintKind = {
     Solid: 'solid',
     Linear: 'linear',
     Radial: 'radial',
+    Angular: 'angular',
+    Diamond: 'diamond',
     Image: 'image',
 } as const;
 /** Paint kind. */
 export type DesignPaintKind = (typeof DesignPaintKind)[keyof typeof DesignPaintKind];
+/** The four editable gradient families share stops and normalized handles. */
+export type DesignGradientKind = Exclude<
+    DesignPaintKind,
+    typeof DesignPaintKind.Solid | typeof DesignPaintKind.Image
+>;
 /** Color stop in a normalized gradient. */
 export interface DesignGradientStop {
     readonly offset: number;

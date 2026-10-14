@@ -55,7 +55,7 @@ export class DesignStyleCodec {
             },
         );
         if (
-            (kind === DesignPaintKind.Linear || kind === DesignPaintKind.Radial) &&
+            DesignGradientGeometry.isGradient(kind) &&
             (stops.length < 2 ||
                 stops.some(
                     (stop: DesignGradientStop, index: number): boolean =>

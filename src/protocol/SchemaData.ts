@@ -6700,7 +6700,7 @@ export const schema: Schema = {
         },
         DesignGradientTransform: {
             description:
-                'Top-left-origin normalized points define a linear segment or a radial center and two radius axes.',
+                'Top-left-origin normalized points define a linear segment or a gradient center and two independent basis axes.',
             properties: {
                 axisX: {
                     type: 'number',
@@ -8217,7 +8217,9 @@ export const schema: Schema = {
                     ],
                 },
                 kind: {
-                    enum: ['linear', 'radial'],
+                    description:
+                        'The four editable gradient families share stops and normalized handles.',
+                    enum: ['angular', 'diamond', 'linear', 'radial'],
                     type: 'string',
                 },
                 stops: {
@@ -8339,7 +8341,7 @@ export const schema: Schema = {
         DesignPaintKind: {
             description:
                 'Supported paint sources. Image assets use workspace references.\nPaint kind.',
-            enum: ['image', 'linear', 'radial', 'solid'],
+            enum: ['angular', 'diamond', 'image', 'linear', 'radial', 'solid'],
             type: 'string',
         },
         DesignPathCommand: {
@@ -10701,6 +10703,11 @@ export const schema: Schema = {
                     const: true,
                     description:
                         'NXMD frames carry outbound file bytes; JSON results contain matching metadata.',
+                    type: 'boolean',
+                },
+                designExtendedGradients: {
+                    const: true,
+                    description: 'Angular and diamond gradient paints, geometry and compact edits.',
                     type: 'boolean',
                 },
                 designImageAdjustments: {

@@ -1,11 +1,26 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { DesignPaintKind, type DesignPaint } from './DesignTypes.js';
+import { DesignPaintKind, type DesignPaint, type DesignGradientKind } from './DesignTypes.js';
 import type { DesignGradientTransform } from './DesignGradientTypes.js';
 
 /** The native exporter, browser shader and editing handles share the same gradient coordinate contract. */
 export class DesignGradientGeometry {
+    /** Discovery, validation and canvas controls use the same supported paint families. */
+    public static readonly kinds: readonly DesignGradientKind[] = Object.freeze([
+        DesignPaintKind.Linear,
+        DesignPaintKind.Radial,
+        DesignPaintKind.Angular,
+        DesignPaintKind.Diamond,
+    ]);
+    /** Gradient-only compact edits cannot silently convert a paint to an image or solid. */
+    public static isGradient(kind: DesignPaintKind): kind is DesignGradientKind {
+        return this.kinds.some((value: DesignGradientKind): boolean => value === kind);
+    }
+    /** Center-based gradients use two independent axes; linear gradients use a segment. */
+    public static centered(kind: DesignPaintKind): boolean {
+        return this.isGradient(kind) && kind !== DesignPaintKind.Linear;
+    }
     /** Legacy angle-only paints retain their exact original coverage without migrating stored records. */
     public static resolve(paint: DesignPaint): DesignGradientTransform {
         if (paint.gradient != null) {
@@ -17,6 +32,18 @@ export class DesignGradientGeometry {
         const angle: number = (paint.angle * Math.PI) / 180;
         const x: number = Math.cos(angle) / 2;
         const y: number = -Math.sin(angle) / 2;
+        if (this.centered(paint.kind)) {
+            const radiusX: number = Math.abs(x) < 1e-12 ? 0 : x;
+            const radiusY: number = Math.abs(y) < 1e-12 ? 0 : y;
+            return {
+                startX: 0.5,
+                startY: 0.5,
+                endX: 0.5 + radiusX,
+                endY: 0.5 + radiusY,
+                axisX: 0.5 - radiusY,
+                axisY: 0.5 + radiusX,
+            };
+        }
         return {
             startX: 0.5 - x,
             startY: 0.5 - y,
@@ -35,8 +62,12 @@ export class DesignGradientGeometry {
         }
         const determinant: number =
             x * (value.axisY - value.startY) - y * (value.axisX - value.startX);
-        if (kind === DesignPaintKind.Radial && Math.abs(determinant) < 1e-6) {
-            throw new Error('Radial gradient axes must span an area.');
+        if (this.centered(kind) && Math.abs(determinant) < 1e-6) {
+            throw new Error(
+                kind === DesignPaintKind.Radial
+                    ? 'Radial gradient axes must span an area.'
+                    : 'Centered gradient axes must span an area.',
+            );
         }
     }
     /** Angles use the original normalized coordinate convention, counterclockwise from the right in an upward Y axis. */
@@ -52,10 +83,12 @@ export class DesignGradientGeometry {
         const radians: number = ((angle - this.angle(value)) * Math.PI) / 180;
         const cosine: number = Math.cos(radians);
         const sine: number = Math.sin(radians);
-        const centerX: number =
-            kind === DesignPaintKind.Radial ? value.startX : (value.startX + value.endX) / 2;
-        const centerY: number =
-            kind === DesignPaintKind.Radial ? value.startY : (value.startY + value.endY) / 2;
+        const centerX: number = this.centered(kind)
+            ? value.startX
+            : (value.startX + value.endX) / 2;
+        const centerY: number = this.centered(kind)
+            ? value.startY
+            : (value.startY + value.endY) / 2;
         const x: (px: number, py: number) => number = (px: number, py: number): number =>
             centerX + (px - centerX) * cosine + (py - centerY) * sine;
         const y: (px: number, py: number) => number = (px: number, py: number): number =>

@@ -13,6 +13,7 @@ import {
 import type { DesignAsset } from './DesignAssetTypes.js';
 import type { DesignSvgImage } from './DesignSvgTypes.js';
 import { DesignGradientGeometry } from './DesignGradientGeometry.js';
+import { DesignGradientPng } from './DesignGradientPng.js';
 import type { DesignGradientTransform } from './DesignGradientTypes.js';
 import type { DesignImageTransform } from './DesignImageTransformTypes.js';
 import { DesignImageSamplingGeometry } from './DesignImageSamplingGeometry.js';
@@ -31,14 +32,54 @@ import { DesignSvgGeometry as Geometry } from './DesignSvgGeometry.js';
 export class DesignSvgPaints {
     #sequence: number = 0;
     #imageIdentities: Map<string, string> = new Map();
+    #gradientIdentities: Map<string, string> = new Map();
+    #gradientPixels: number = 0;
     /** Paint and clipping definitions precede the drawing elements. */
     public readonly definitions: string[] = [];
     /** Asset metadata and original bytes are supplied by the owner-scoped export adapter. */
     public constructor(public readonly images: ReadonlyMap<string, DesignSvgImage>) {}
     /** Returns a safe self-contained paint expression without remote image or font URLs. */
-    public paint(paint: DesignPaint, box: DesignBox): string {
+    public paint(paint: DesignPaint, box: DesignBox, padding: number = 0): string {
         if (paint.kind === DesignPaintKind.Solid) {
             return Geometry.escape(paint.color);
+        }
+        if (paint.kind === DesignPaintKind.Angular || paint.kind === DesignPaintKind.Diamond) {
+            const key: string = JSON.stringify([
+                paint.kind,
+                DesignGradientGeometry.resolve(paint),
+                paint.stops,
+                box.width,
+                box.height,
+                padding,
+            ]);
+            const existing: string | undefined = this.#gradientIdentities.get(key);
+            if (existing !== undefined) {
+                return `url(#${existing})`;
+            }
+            const layerWidth: number = Math.max(1, box.width);
+            const layerHeight: number = Math.max(1, box.height);
+            const extentWidth: number = layerWidth + padding * 2;
+            const extentHeight: number = layerHeight + padding * 2;
+            const width: number = Math.ceil(extentWidth);
+            const height: number = Math.ceil(extentHeight);
+            if (this.#gradientPixels + width * height > 16 * 1024 * 1024) {
+                throw new Error(
+                    'Angular and diamond SVG paint exports exceed the 16 megapixel document budget.',
+                );
+            }
+            const encoded: string = DesignGradientPng.encode(paint, width, height, {
+                x: -padding / layerWidth,
+                y: -padding / layerHeight,
+                width: extentWidth / layerWidth,
+                height: extentHeight / layerHeight,
+            });
+            const id: string = this.identity('gradient');
+            this.definitions.push(
+                `<pattern id="${id}" patternUnits="userSpaceOnUse" x="${-padding}" y="${-padding}" width="${extentWidth}" height="${extentHeight}"><image href="data:image/png;base64,${encoded}" width="${extentWidth}" height="${extentHeight}" preserveAspectRatio="none"/></pattern>`,
+            );
+            this.#gradientPixels += width * height;
+            this.#gradientIdentities.set(key, id);
+            return `url(#${id})`;
         }
         const id: string = this.identity('paint');
         if (paint.kind === DesignPaintKind.Image && paint.assetId !== null) {
