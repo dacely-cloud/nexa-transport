@@ -250,3 +250,11 @@ Editable SVG import uses `nexa-transport/design-svg-import` for portable layer c
 SVG imports retain local use/symbol references as independent editable copies, nested SVG viewport clips, clip paths and alpha/luminance masks. Mask regions and content coordinate systems remain independent; native source layers can be edited and undone through the usual document operations. External resources, SVG text, images and filters remain unsupported.
 
 Metadata-only page ownership, locked ancestry and topmost selection are available through `nexa-transport/design-selection-index`. See [selection indexing](design-selection-index.md).
+
+## Image color controls
+
+| Import                                         | Availability | Contract                                                          |
+| ---------------------------------------------- | ------------ | ----------------------------------------------------------------- |
+| `nexa-transport/design-image-adjustment-types` | ESM + types  | Typed non-destructive photo controls and shared color parameters. |
+| `nexa-transport/design-image-adjustment-codec` | ESM + types  | Bounded canonical controls and partial edits.                     |
+| `nexa-transport/design-image-color`            | ESM + types  | Shared sRGB color matrix, tone curve and SVG primitives.          |

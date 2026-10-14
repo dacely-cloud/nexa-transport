@@ -4510,6 +4510,8 @@ export type DesignGuideValue = DesignGuideValueShape;
 
 /** DesignImage wire fields. */
 export interface DesignImageShape {
+    /** adjustments as defined by the Nexa gateway. */
+    readonly adjustments?: DesignImageAdjustments | null;
     /** assetId as defined by the Nexa gateway. */
     readonly assetId: string;
     /** cropX as defined by the Nexa gateway. */
@@ -4535,6 +4537,27 @@ export interface DesignImageShape {
 /** DesignImage from the Nexa wire protocol. */
 export type DesignImage = DesignImageShape;
 
+/** DesignImageAdjustments wire fields. */
+export interface DesignImageAdjustmentsShape {
+    /** contrast as defined by the Nexa gateway. */
+    readonly contrast: number;
+    /** exposure as defined by the Nexa gateway. */
+    readonly exposure: number;
+    /** highlights as defined by the Nexa gateway. */
+    readonly highlights: number;
+    /** saturation as defined by the Nexa gateway. */
+    readonly saturation: number;
+    /** shadows as defined by the Nexa gateway. */
+    readonly shadows: number;
+    /** temperature as defined by the Nexa gateway. */
+    readonly temperature: number;
+    /** tint as defined by the Nexa gateway. */
+    readonly tint: number;
+}
+
+/** DesignImageAdjustments from the Nexa wire protocol. */
+export type DesignImageAdjustments = DesignImageAdjustmentsShape;
+
 /** Allowed values for DesignImageFit. */
 export const DesignImageFitValues = {
     Value0: 'contain',
@@ -4548,6 +4571,8 @@ export type DesignImageFit = (typeof DesignImageFitValues)[keyof typeof DesignIm
 
 /** DesignImageFraming wire fields. */
 export interface DesignImageFramingShape {
+    /** adjustments as defined by the Nexa gateway. */
+    readonly adjustments?: DesignImageAdjustments | null;
     /** cropX as defined by the Nexa gateway. */
     readonly cropX: number;
     /** cropY as defined by the Nexa gateway. */
@@ -5406,6 +5431,8 @@ export const DesignPaintImageChangesfitValues = {
 
 /** DesignPaintImageChanges wire fields. */
 export interface DesignPaintImageChangesShape {
+    /** adjustments as defined by the Nexa gateway. */
+    readonly adjustments?: PartialDesignImageAdjustments | null;
     /** assetId as defined by the Nexa gateway. */
     readonly assetId?: string;
     /** cropX as defined by the Nexa gateway. */
@@ -6990,6 +7017,8 @@ export interface GatewayFeaturesShape {
     readonly binaryDataUploads?: true;
     /** binaryMedia as defined by the Nexa gateway. */
     readonly binaryMedia?: true;
+    /** designImageAdjustments as defined by the Nexa gateway. */
+    readonly designImageAdjustments?: true;
     /** designImageTransforms as defined by the Nexa gateway. */
     readonly designImageTransforms?: true;
     /** events as defined by the Nexa gateway. */
@@ -10520,6 +10549,27 @@ export interface OmitBrowserScriptSourcetextShape {
 /** OmitBrowserScriptSourcetext from the Nexa wire protocol. */
 export type OmitBrowserScriptSourcetext = OmitBrowserScriptSourcetextShape;
 
+/** PartialDesignImageAdjustments wire fields. */
+export interface PartialDesignImageAdjustmentsShape {
+    /** contrast as defined by the Nexa gateway. */
+    readonly contrast?: number;
+    /** exposure as defined by the Nexa gateway. */
+    readonly exposure?: number;
+    /** highlights as defined by the Nexa gateway. */
+    readonly highlights?: number;
+    /** saturation as defined by the Nexa gateway. */
+    readonly saturation?: number;
+    /** shadows as defined by the Nexa gateway. */
+    readonly shadows?: number;
+    /** temperature as defined by the Nexa gateway. */
+    readonly temperature?: number;
+    /** tint as defined by the Nexa gateway. */
+    readonly tint?: number;
+}
+
+/** PartialDesignImageAdjustments from the Nexa wire protocol. */
+export type PartialDesignImageAdjustments = PartialDesignImageAdjustmentsShape;
+
 /** PendingApproval wire fields. */
 export interface PendingApprovalShape {
     /** approvalId as defined by the Nexa gateway. */
@@ -12222,6 +12272,8 @@ export interface RobloxLiveFrameShape {
     readonly memoryBytes: string;
     /** output as defined by the Nexa gateway. */
     readonly output: ReadonlyArray<string>;
+    /** pointerMove as defined by the Nexa gateway. */
+    readonly pointerMove?: true;
     /** state as defined by the Nexa gateway. */
     readonly state: string;
 }
@@ -12303,8 +12355,9 @@ export type RobloxPointerInput = RobloxPointerInputShape;
 /** Allowed values for RobloxPointerPhase. */
 export const RobloxPointerPhaseValues = {
     Value0: 'Cancel',
-    Value1: 'Press',
-    Value2: 'Release',
+    Value1: 'Move',
+    Value2: 'Press',
+    Value3: 'Release',
 } as const;
 
 /** RobloxPointerPhase from the Nexa wire protocol. */
