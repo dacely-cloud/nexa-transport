@@ -18536,6 +18536,12 @@ export const schema: Schema = {
                     },
                     type: 'array',
                 },
+                pointerHover: {
+                    const: true,
+                    description:
+                        'The retained executable supports uncaptured mouse motion and native GUI hover events.',
+                    type: 'boolean',
+                },
                 pointerMove: {
                     const: true,
                     description:

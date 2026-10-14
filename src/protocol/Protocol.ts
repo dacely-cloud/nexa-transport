@@ -12272,6 +12272,8 @@ export interface RobloxLiveFrameShape {
     readonly memoryBytes: string;
     /** output as defined by the Nexa gateway. */
     readonly output: ReadonlyArray<string>;
+    /** pointerHover as defined by the Nexa gateway. */
+    readonly pointerHover?: true;
     /** pointerMove as defined by the Nexa gateway. */
     readonly pointerMove?: true;
     /** state as defined by the Nexa gateway. */
