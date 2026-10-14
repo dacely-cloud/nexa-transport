@@ -1,107 +1,18 @@
+// SPDX-FileCopyrightText: 2026 Nexa contributors
+// SPDX-License-Identifier: Apache-2.0
+
 import {
     Method,
+    type ResultOf,
     type SessionHistoryPage,
+    type SessionHistoryParams,
     type SessionHistoryRecord,
 } from '../protocol/Protocol.js';
-import { historyRecord } from '../protocol/Validators.js';
-import type { ReceivedAttachment } from '../media/BinaryMedia.js';
+import { HistoryPageWindow } from './HistoryPageWindow.js';
+import { HistoryRecordDecoder } from './HistoryRecordDecoder.js';
+import type { AttachmentProgress, ReceivedAttachment } from '../media/BinaryMedia.js';
 import type { NexaClient, SavedHistorySnapshot } from './NexaClient.js';
-
-/** A speculative read whose rejection is handled even before its turn to decode. */
-interface PendingHistoryPage {
-    readonly controller: AbortController;
-    readonly result: Promise<PromiseSettledResult<SessionHistoryPage>>;
-}
-
-/** Bounded lookahead over a fixed byte snapshot; decoding remains strictly ordered. */
-class HistoryPageWindow {
-    static readonly #MAX_BYTES: bigint = 16n * 1024n * 1024n;
-    readonly #pending: Map<string, PendingHistoryPage> = new Map();
-
-    public constructor(
-        private readonly client: NexaClient,
-        private readonly id: string,
-        private readonly concurrency: number,
-        private readonly signal?: AbortSignal,
-    ) {}
-
-    public async read(cursor: string, endCursor?: string): Promise<SessionHistoryPage> {
-        const pending: PendingHistoryPage =
-            this.#pending.get(cursor) ?? this.#request(cursor, endCursor);
-        const result: PromiseSettledResult<SessionHistoryPage> = await pending.result;
-        this.#pending.delete(cursor);
-        if (result.status === 'rejected') {
-            throw result.reason;
-        }
-        return result.value;
-    }
-
-    /** Infer the server's page stride; a changed stride cancels obsolete lookahead. */
-    public prefetch(cursor: string, endCursor: string, stride: bigint): void {
-        const remaining: Set<string> = new Set();
-        const capacity: number = Math.min(
-            this.concurrency,
-            Number(HistoryPageWindow.#MAX_BYTES / stride),
-        );
-        for (
-            let offset: bigint = BigInt(cursor), count: number = 0;
-            offset < BigInt(endCursor) && count < capacity;
-            offset += stride, count += 1
-        ) {
-            remaining.add(offset.toString());
-        }
-        for (const [offset, pending] of this.#pending) {
-            if (!remaining.has(offset)) {
-                pending.controller.abort();
-                this.#pending.delete(offset);
-            }
-        }
-        for (const offset of remaining) {
-            if (!this.#pending.has(offset)) {
-                this.#request(offset, endCursor);
-            }
-        }
-    }
-
-    public close(): void {
-        for (const pending of this.#pending.values()) {
-            pending.controller.abort();
-        }
-        this.#pending.clear();
-    }
-
-    #request(cursor: string, endCursor?: string): PendingHistoryPage {
-        const controller: AbortController = new AbortController();
-        const pending: PendingHistoryPage = {
-            controller,
-            result: this.client
-                .call(
-                    Method.SessionsTranscript,
-                    {
-                        id: this.id,
-                        cursor,
-                        pageBytes: 1024 * 1024,
-                        ...(endCursor === undefined ? {} : { endCursor }),
-                    },
-                    {
-                        signal:
-                            this.signal === undefined
-                                ? controller.signal
-                                : AbortSignal.any([controller.signal, this.signal]),
-                    },
-                )
-                .then(
-                    (value: SessionHistoryPage): PromiseFulfilledResult<SessionHistoryPage> => ({
-                        status: 'fulfilled',
-                        value,
-                    }),
-                    (reason: unknown): PromiseRejectedResult => ({ status: 'rejected', reason }),
-                ),
-        };
-        this.#pending.set(cursor, pending);
-        return pending;
-    }
-}
+import type { CallOptions } from '../interface/ClientOptions.js';
 
 /** Restores bounded journal pages and exact binary files through authenticated RPCs. */
 export class SessionHistoryReader {
@@ -117,13 +28,19 @@ export class SessionHistoryReader {
         signal?.throwIfAborted();
         const records: SessionHistoryRecord[] = [];
         const decoder: TextDecoder = new TextDecoder('utf-8', { fatal: true });
-        const seen: Set<string> = new Set();
-        let pending: string = '';
-        const pages: HistoryPageWindow = new HistoryPageWindow(client, id, concurrency, signal);
+        const journal: HistoryRecordDecoder = new HistoryRecordDecoder();
+        const pages: HistoryPageWindow = new HistoryPageWindow(
+            (params: SessionHistoryParams, options: CallOptions): Promise<SessionHistoryPage> =>
+                client.call(Method.SessionsTranscript, params, options),
+            id,
+            concurrency,
+            signal,
+        );
         try {
             for (;;) {
                 signal?.throwIfAborted();
                 const page: SessionHistoryPage = await pages.read(cursor, endCursor);
+                signal?.throwIfAborted();
                 if (
                     page.format !== 1 ||
                     !/^\d+$/.test(page.endCursor) ||
@@ -133,6 +50,9 @@ export class SessionHistoryReader {
                 }
                 endCursor = page.endCursor;
                 const raw: string = atob(page.chunk);
+                if (raw.length > HistoryPageWindow.pageBytes) {
+                    throw new Error('History page exceeds requested byte limit');
+                }
                 const bytes: Uint8Array<ArrayBuffer> = new Uint8Array(raw.length);
                 for (let index: number = 0; index < raw.length; index += 1) {
                     bytes[index] = raw.charCodeAt(index);
@@ -149,20 +69,10 @@ export class SessionHistoryReader {
                 if (page.nextCursor !== undefined) {
                     pages.prefetch(page.nextCursor, endCursor, BigInt(bytes.byteLength));
                 }
-                pending += decoder.decode(bytes, { stream: page.nextCursor !== undefined });
-                let newline: number;
-                while ((newline = pending.indexOf('\n')) !== -1) {
-                    const line: string = pending.slice(0, newline);
-                    pending = pending.slice(newline + 1);
-                    const record: unknown = JSON.parse(line);
-                    if (
-                        !historyRecord(record) ||
-                        seen.has(record.id) ||
-                        !Number.isSafeInteger(record.at)
-                    ) {
-                        throw new Error('Invalid or duplicate history record');
-                    }
-                    seen.add(record.id);
+                let record: SessionHistoryRecord;
+                for (record of journal.write(
+                    decoder.decode(bytes, { stream: page.nextCursor !== undefined }),
+                )) {
                     records.push(record);
                 }
                 if (page.nextCursor === undefined) {
@@ -170,9 +80,7 @@ export class SessionHistoryReader {
                 }
                 cursor = page.nextCursor;
             }
-            if (pending.length !== 0) {
-                throw new Error('Incomplete saved history record');
-            }
+            journal.finish();
             return { records, endCursor: endCursor ?? cursor };
         } finally {
             pages.close();
@@ -197,42 +105,47 @@ export class SessionHistoryReader {
         const stalled: () => void = (): void =>
             stalledDelivery.reject(new Error('Download stalled. Please try again.'));
         let idle: ReturnType<typeof setTimeout> = setTimeout(stalled, 60_000);
-        const stopProgress: () => void = client.onAttachmentProgress((update): void => {
-            if (
-                update.sessionId !== id ||
-                update.id !== attachmentId ||
-                update.streamId !== undefined
-            ) {
-                return;
-            }
-            clearTimeout(idle);
-            idle = setTimeout(stalled, 60_000);
-            progress?.(update.receivedBytes, update.totalBytes);
-        });
-        const stop: () => void = client.onAttachment((file): void => {
+        const stopProgress: () => void = client.onAttachmentProgress(
+            (update: AttachmentProgress): void => {
+                if (
+                    update.sessionId !== id ||
+                    update.id !== attachmentId ||
+                    update.streamId !== undefined
+                ) {
+                    return;
+                }
+                clearTimeout(idle);
+                idle = setTimeout(stalled, 60_000);
+                progress?.(update.receivedBytes, update.totalBytes);
+            },
+        );
+        const stop: () => void = client.onAttachment((file: ReceivedAttachment): void => {
             if (file.sessionId === id && file.id === attachmentId && file.streamId === undefined) {
                 progress?.(file.byteLength, file.byteLength);
                 delivery.resolve(file);
             }
         });
-        const stopClose: () => void = client.onClose((error): void => delivery.reject(error));
+        const stopClose: () => void = client.onClose((error: Error): void =>
+            delivery.reject(error),
+        );
         const abort: () => void = (): void => delivery.reject(signal?.reason);
         signal?.addEventListener('abort', abort, { once: true });
         const timeout: ReturnType<typeof setTimeout> = setTimeout((): void => {
             delivery.reject(new Error('Saved file delivery timed out'));
         }, 600_000);
         try {
-            const [, file] = await Promise.race([
-                Promise.all([
-                    client.call(
-                        Method.SessionsDownload,
-                        { id, attachmentId },
-                        { timeoutMs: 600_000, signal: requestSignal },
-                    ),
-                    delivery.promise,
-                ]),
-                stalledDelivery.promise,
-            ]);
+            const [, file]: [ResultOf<typeof Method.SessionsDownload>, ReceivedAttachment] =
+                await Promise.race([
+                    Promise.all([
+                        client.call(
+                            Method.SessionsDownload,
+                            { id, attachmentId },
+                            { timeoutMs: 600_000, signal: requestSignal },
+                        ),
+                        delivery.promise,
+                    ]),
+                    stalledDelivery.promise,
+                ]);
             return file;
         } finally {
             controller.abort();
