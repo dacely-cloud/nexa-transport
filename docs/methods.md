@@ -1,6 +1,6 @@
 # RPC reference
 
-All 187 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 186 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
+All 188 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 187 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
 
 - [accounts.create](#accountscreate)
 - [accounts.list](#accountslist)
@@ -41,6 +41,7 @@ All 187 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [design.asset.read](#designassetread)
 - [design.asset.remove](#designassetremove)
 - [design.asset.start](#designassetstart)
+- [design.asset.thumbnail](#designassetthumbnail)
 - [design.canvas](#designcanvas)
 - [design.canvas.metrics](#designcanvasmetrics)
 - [design.changes](#designchanges)
@@ -1051,6 +1052,28 @@ Parameters: [DesignAssetStartRequest](protocol.md#designassetstartrequest).
 | `sha256`     | Yes      | `string` |             |
 
 Result: [DesignAssetPosition](protocol.md#designassetposition).
+
+## design.asset.thumbnail
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DesignAssetThumbnail> = {
+    id: 'YOUR_ID',
+};
+const result: ResultOf<typeof Method.DesignAssetThumbnail> = await client.call(
+    Method.DesignAssetThumbnail,
+    params,
+);
+```
+
+Parameters: [DesignAssetIdRequest](protocol.md#designassetidrequest).
+
+| Field | Required | Type     | Description |
+| ----- | -------- | -------- | ----------- |
+| `id`  | Yes      | `string` |             |
+
+Result: [DesignAssetThumbnail](protocol.md#designassetthumbnail).
 
 ## design.canvas
 
@@ -2545,12 +2568,16 @@ const result: ResultOf<typeof Method.RobloxLiveStep> = await client.call(
 
 Parameters: [RobloxLiveStepRequest](protocol.md#robloxlivesteprequest).
 
-| Field     | Required | Type                                                     | Description                                              |
-| --------- | -------- | -------------------------------------------------------- | -------------------------------------------------------- |
-| `handle`  | Yes      | `string`                                                 |                                                          |
-| `id`      | Yes      | `string`                                                 |                                                          |
-| `input`   | No       | [RobloxLiveActivation](protocol.md#robloxliveactivation) | A logical activation on the retained VM's current clock. |
-| `seconds` | Yes      | `number`                                                 |                                                          |
+| Field      | Required | Type                                                                                                                                                                       | Description                                                                    |
+| ---------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| `edit`     | No       | [RobloxTextInsertion](protocol.md#robloxtextinsertion) / [RobloxTextSelection](protocol.md#robloxtextselection) / [RobloxTextKeyGesture](protocol.md#robloxtextkeygesture) | The same edit contract is consumed by tools, native processes and the gateway. |
+| `handle`   | Yes      | `string`                                                                                                                                                                   |                                                                                |
+| `id`       | Yes      | `string`                                                                                                                                                                   |                                                                                |
+| `input`    | No       | [RobloxLiveActivation](protocol.md#robloxliveactivation)                                                                                                                   | A logical activation on the retained VM's current clock.                       |
+| `keyboard` | No       | [RobloxKeyboardGesture](protocol.md#robloxkeyboardgesture)                                                                                                                 | A physical key remains held until its matching release or cancellation.        |
+| `point`    | No       | [RobloxCoordinateGesture](protocol.md#robloxcoordinategesture)                                                                                                             | One physical gesture chooses its target from the current native live root.     |
+| `seconds`  | Yes      | `number`                                                                                                                                                                   |                                                                                |
+| `viewport` | No       | [RobloxNativeGuiViewport](protocol.md#robloxnativeguiviewport)                                                                                                             | Host-selected execution context, never supplied by the model.                  |
 
 Result: [RobloxLiveFrame](protocol.md#robloxliveframe).
 
@@ -2692,13 +2719,15 @@ const result: ResultOf<typeof Method.SessionsFiles> = await client.call(
 );
 ```
 
-Parameters: [IdParams](protocol.md#idparams).
+Parameters: [SessionFileListParams](protocol.md#sessionfilelistparams).
 
-| Field | Required | Type     | Description |
-| ----- | -------- | -------- | ----------- |
-| `id`  | Yes      | `string` |             |
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `cursor` | No       | `string` |             |
+| `id`     | Yes      | `string` |             |
+| `limit`  | No       | `number` |             |
 
-Result: Array of [DeliveredAttachment](protocol.md#deliveredattachment).
+Result: [SessionFilePage](protocol.md#sessionfilepage).
 
 ## sessions.get
 

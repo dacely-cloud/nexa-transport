@@ -1,6 +1,20 @@
 import { expect, it } from 'vitest';
 import { SchemaValidator, type Schema } from '../src/protocol/Schema.js';
 
+it('refuses excess array items before reading their values', (): void => {
+    const validator: SchemaValidator = new SchemaValidator({
+        definitions: { Values: { type: 'array', maxItems: 1, items: { type: 'integer' } } },
+    });
+    const values: number[] = [1, 2];
+    Object.defineProperty(values, '0', {
+        get: (): never => {
+            throw new Error('Array element should not be traversed');
+        },
+    });
+    expect(validator.validate('#/definitions/Values', values)).toBe(false);
+    expect(validator.validate('#/definitions/Values', [1])).toBe(true);
+});
+
 const schema: Schema = {
     definitions: {
         Event: {
