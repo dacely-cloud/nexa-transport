@@ -141,6 +141,7 @@ export const RobloxClass = {
     ParticleEmitter: 'ParticleEmitter',
     ScreenGui: 'ScreenGui',
     Frame: 'Frame',
+    ScrollingFrame: 'ScrollingFrame',
     TextLabel: 'TextLabel',
     TextButton: 'TextButton',
     TextBox: 'TextBox',

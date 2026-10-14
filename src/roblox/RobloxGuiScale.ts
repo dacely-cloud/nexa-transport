@@ -85,7 +85,7 @@ export class RobloxGuiScale {
         for (const [name, value] of Object.entries(authored)) {
             if (
                 typeof value === 'number' &&
-                ['TextSize', 'Thickness', 'SliceScale'].includes(name)
+                ['TextSize', 'Thickness', 'SliceScale', 'ScrollBarThickness'].includes(name)
             ) {
                 result[name] = this.#scaled(value, scale);
             } else if (typeof value === 'object' && value.kind === 'UDim') {

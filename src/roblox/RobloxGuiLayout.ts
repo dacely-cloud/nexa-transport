@@ -1,7 +1,14 @@
 // SPDX-License-Identifier: Apache-2.0
 import type { RobloxScene, RobloxSceneNode, RobloxValue } from './RobloxSceneTypes';
 import { RobloxProperties } from './RobloxSceneRuntime';
-import { RobloxGuiBoxLayout, type RobloxGuiBox, type RobloxGuiSize } from './RobloxGuiBoxLayout';
+import {
+    RobloxGuiBoxLayout,
+    type RobloxGuiBox,
+    type RobloxGuiSize,
+    type RobloxGuiBoxGroup,
+    type RobloxGuiSizeResolver,
+} from './RobloxGuiBoxLayout';
+import { RobloxGuiScroll, type RobloxGuiScrollGeometry } from './RobloxGuiScroll';
 import { RobloxGuiAutoSize } from './RobloxGuiAutoSize';
 import { RobloxGuiPadding, type RobloxGuiInsets } from './RobloxGuiPadding';
 import { RobloxSceneHierarchy } from './RobloxSceneHierarchy';
@@ -230,22 +237,76 @@ export class RobloxGuiLayout {
         viewportWidth: number,
         viewportHeight: number,
     ): void {
-        const boxes: ReadonlyMap<string, RobloxGuiBox> = RobloxGuiBoxLayout.evaluate(
-            this.#children.get(id) ?? [],
+        const resolver: RobloxGuiSizeResolver = (
+            node: RobloxSceneNode,
+            minimum: RobloxGuiSize,
+            capacity: RobloxGuiSize,
+        ): RobloxGuiSize => {
+            if (this.#sizing === null) {
+                throw new Error('Missing automatic GUI sizing observation');
+            }
+            return this.#sizing.resolve(node, minimum, capacity);
+        };
+        const children: readonly RobloxSceneNode[] = this.#children.get(id) ?? [];
+        let group: RobloxGuiBoxGroup = RobloxGuiBoxLayout.group(
+            children,
             values,
             parent.width,
             parent.height,
-            (
-                node: RobloxSceneNode,
-                minimum: RobloxGuiSize,
-                capacity: RobloxGuiSize,
-            ): RobloxGuiSize => {
-                if (this.#sizing === null) {
-                    throw new Error('Missing automatic GUI sizing observation');
-                }
-                return this.#sizing.resolve(node, minimum, capacity);
-            },
+            resolver,
         );
+        const owner: RobloxSceneNode | undefined = this.#nodes.get(id);
+        if (owner?.className === 'ScrollingFrame') {
+            const properties: Readonly<Record<string, RobloxValue>> =
+                values.get(id) ?? owner.properties;
+            const size: RobloxGuiSize = { width: parent.width, height: parent.height };
+            let scroll: RobloxGuiScrollGeometry = RobloxGuiScroll.resolve(
+                properties,
+                size,
+                group.content,
+            );
+            for (let iteration: number = 0; iteration < 16; iteration++) {
+                const previous: RobloxGuiSize = scroll.space;
+                group = RobloxGuiBoxLayout.group(
+                    children,
+                    values,
+                    previous.width,
+                    previous.height,
+                    resolver,
+                );
+                scroll = RobloxGuiScroll.resolve(properties, size, group.content);
+                if (
+                    previous.width === scroll.space.width &&
+                    previous.height === scroll.space.height
+                ) {
+                    break;
+                }
+            }
+            const clip: RobloxGuiClip =
+                properties['ClipsDescendants'] === true && !parent.rotated
+                    ? this.#intersect(parent.clip, [
+                          parent.transform[4] + scroll.originX,
+                          parent.transform[5],
+                          parent.transform[4] + scroll.originX + scroll.space.width,
+                          parent.transform[5] + scroll.space.height,
+                      ])
+                    : parent.clip;
+            parent = {
+                ...parent,
+                width: scroll.space.width,
+                height: scroll.space.height,
+                clip,
+                transform: this.#multiply(parent.transform, [
+                    1,
+                    0,
+                    0,
+                    1,
+                    scroll.originX - scroll.x,
+                    -scroll.y,
+                ]),
+            };
+        }
+        const boxes: ReadonlyMap<string, RobloxGuiBox> = group.boxes;
         for (const node of this.#siblings(id, values)) {
             const box: RobloxGuiBox | undefined = boxes.get(node.id);
             if (box !== undefined) {

@@ -688,6 +688,7 @@ export class RobloxSceneCodec {
             ParticleEmitter: ['Part', 'WedgePart', 'CornerWedgePart', 'MeshPart', 'Attachment'],
             ScreenGui: ['Folder', 'Model', 'WorldModel'],
             Frame: ['ScreenGui', ...RobloxGuiClasses.objects],
+            ScrollingFrame: ['ScreenGui', ...RobloxGuiClasses.objects],
             TextLabel: ['ScreenGui', ...RobloxGuiClasses.objects],
             TextButton: ['ScreenGui', ...RobloxGuiClasses.objects],
             TextBox: ['ScreenGui', ...RobloxGuiClasses.objects],

@@ -7,6 +7,7 @@ export class RobloxGuiClasses {
     /** Classes that participate in GUI parenting and layout. */
     public static readonly objects: readonly RobloxClass[] = [
         'Frame',
+        'ScrollingFrame',
         'TextLabel',
         'TextButton',
         'TextBox',

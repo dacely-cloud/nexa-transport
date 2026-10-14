@@ -26,6 +26,7 @@ const files: readonly string[] = [
     'RobloxDefaultTextures',
     'RobloxDefaultTextureData',
     'RobloxGuiLayout',
+    'RobloxGuiScroll',
     'RobloxGuiImages',
     'RobloxGuiClasses',
     'RobloxGuiText',
