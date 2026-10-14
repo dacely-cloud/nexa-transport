@@ -1,6 +1,6 @@
 {
     "name": "nexa-transport",
-    "version": "0.1.0-roblox-text-edit.1",
+    "version": "0.1.0-design-image-transform.1",
     "description": "Typed Nexa websocket gateway client for browsers and Node.js",
     "type": "module",
     "license": "Apache-2.0",
@@ -17,6 +17,22 @@
         "licenses"
     ],
     "exports": {
+        "./design-image-sampling-types": {
+            "types": "./dist/design/DesignImageSamplingTypes.d.ts",
+            "import": "./dist/design-image-sampling-types.js"
+        },
+        "./design-image-sampling-geometry": {
+            "types": "./dist/design/DesignImageSamplingGeometry.d.ts",
+            "import": "./dist/design-image-sampling-geometry.js"
+        },
+        "./design-image-transform-types": {
+            "types": "./dist/design/DesignImageTransformTypes.d.ts",
+            "import": "./dist/design-image-transform-types.js"
+        },
+        "./design-image-transform-codec": {
+            "types": "./dist/design/DesignImageTransformCodec.d.ts",
+            "import": "./dist/design-image-transform-codec.js"
+        },
         "./roblox-keyboard-input": {
             "types": "./dist/roblox/RobloxKeyboardInput.d.ts",
             "import": "./dist/roblox-keyboard-input.js"

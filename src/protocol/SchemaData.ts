@@ -6798,8 +6798,43 @@ export const schema: Schema = {
                 fit: {
                     $ref: '#/definitions/DesignImageFit',
                 },
+                flipX: {
+                    type: 'boolean',
+                },
+                flipY: {
+                    type: 'boolean',
+                },
+                rotation: {
+                    description:
+                        'Optional orientation applies around the painted box center in physical pixels.',
+                    type: 'number',
+                },
+                sampling: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignImageSampling',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                    description:
+                        'Imported source viewport cropping occurs before texture filtering; null uses the full original.',
+                },
                 scale: {
                     type: 'number',
+                },
+                transform: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignImageTransform',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                    description:
+                        'Null or omission uses fit/crop; a forward matrix provides explicit editable affine placement.',
                 },
             },
             required: ['assetId', 'cropX', 'cropY', 'fit', 'scale'],
@@ -6807,7 +6842,7 @@ export const schema: Schema = {
         },
         DesignImageFit: {
             description: 'Image scaling mode.',
-            enum: ['contain', 'cover', 'stretch'],
+            enum: ['contain', 'cover', 'stretch', 'tile'],
             type: 'string',
         },
         DesignImageFraming: {
@@ -6822,11 +6857,83 @@ export const schema: Schema = {
                 fit: {
                     $ref: '#/definitions/DesignImageFit',
                 },
+                flipX: {
+                    type: 'boolean',
+                },
+                flipY: {
+                    type: 'boolean',
+                },
+                rotation: {
+                    description:
+                        'Optional orientation applies around the painted box center in physical pixels.',
+                    type: 'number',
+                },
                 scale: {
                     type: 'number',
                 },
+                transform: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignImageTransform',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                    description:
+                        'Null or omission uses fit/crop; a forward matrix provides explicit editable affine placement.',
+                },
             },
             required: ['cropX', 'cropY', 'fit', 'scale'],
+            type: 'object',
+        },
+        DesignImageSampling: {
+            description:
+                'Aspect and anchors describe a source rectangle without creating a cropped bitmap or another asset.',
+            properties: {
+                alignX: {
+                    $ref: '#/definitions/DesignImageSamplingAlign',
+                },
+                alignY: {
+                    $ref: '#/definitions/DesignImageSamplingAlign',
+                },
+                aspect: {
+                    type: 'number',
+                },
+            },
+            required: ['alignX', 'alignY', 'aspect'],
+            type: 'object',
+        },
+        DesignImageSamplingAlign: {
+            description:
+                'Source viewport anchors retain SVG image cropping before texture interpolation.\nOne supported source crop anchor.',
+            enum: ['center', 'end', 'start'],
+            type: 'string',
+        },
+        DesignImageTransform: {
+            description:
+                'Forward affine map from original image unit coordinates to painted box unit coordinates.',
+            properties: {
+                a: {
+                    type: 'number',
+                },
+                b: {
+                    type: 'number',
+                },
+                c: {
+                    type: 'number',
+                },
+                d: {
+                    type: 'number',
+                },
+                tx: {
+                    type: 'number',
+                },
+                ty: {
+                    type: 'number',
+                },
+            },
+            required: ['a', 'b', 'c', 'd', 'tx', 'ty'],
             type: 'object',
         },
         DesignInsert: {
@@ -8096,11 +8203,30 @@ export const schema: Schema = {
                 },
                 fit: {
                     description: 'Image scaling mode.',
-                    enum: ['contain', 'cover', 'stretch'],
+                    enum: ['contain', 'cover', 'stretch', 'tile'],
                     type: 'string',
+                },
+                flipX: {
+                    type: 'boolean',
+                },
+                flipY: {
+                    type: 'boolean',
+                },
+                rotation: {
+                    type: 'number',
                 },
                 scale: {
                     type: 'number',
+                },
+                transform: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignImageTransform',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
                 },
             },
             type: 'object',
@@ -10425,6 +10551,12 @@ export const schema: Schema = {
                     const: true,
                     description:
                         'NXMD frames carry outbound file bytes; JSON results contain matching metadata.',
+                    type: 'boolean',
+                },
+                designImageTransforms: {
+                    const: true,
+                    description:
+                        'Native image framing supports rotation, reflection, affine placement and repeated image tiles.',
                     type: 'boolean',
                 },
                 events: {

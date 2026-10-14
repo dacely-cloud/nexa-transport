@@ -4518,8 +4518,18 @@ export interface DesignImageShape {
     readonly cropY: number;
     /** fit as defined by the Nexa gateway. */
     readonly fit: DesignImageFit;
+    /** flipX as defined by the Nexa gateway. */
+    readonly flipX?: boolean;
+    /** flipY as defined by the Nexa gateway. */
+    readonly flipY?: boolean;
+    /** rotation as defined by the Nexa gateway. */
+    readonly rotation?: number;
+    /** sampling as defined by the Nexa gateway. */
+    readonly sampling?: DesignImageSampling | null;
     /** scale as defined by the Nexa gateway. */
     readonly scale: number;
+    /** transform as defined by the Nexa gateway. */
+    readonly transform?: DesignImageTransform | null;
 }
 
 /** DesignImage from the Nexa wire protocol. */
@@ -4530,6 +4540,7 @@ export const DesignImageFitValues = {
     Value0: 'contain',
     Value1: 'cover',
     Value2: 'stretch',
+    Value3: 'tile',
 } as const;
 
 /** DesignImageFit from the Nexa wire protocol. */
@@ -4543,12 +4554,63 @@ export interface DesignImageFramingShape {
     readonly cropY: number;
     /** fit as defined by the Nexa gateway. */
     readonly fit: DesignImageFit;
+    /** flipX as defined by the Nexa gateway. */
+    readonly flipX?: boolean;
+    /** flipY as defined by the Nexa gateway. */
+    readonly flipY?: boolean;
+    /** rotation as defined by the Nexa gateway. */
+    readonly rotation?: number;
     /** scale as defined by the Nexa gateway. */
     readonly scale: number;
+    /** transform as defined by the Nexa gateway. */
+    readonly transform?: DesignImageTransform | null;
 }
 
 /** DesignImageFraming from the Nexa wire protocol. */
 export type DesignImageFraming = DesignImageFramingShape;
+
+/** DesignImageSampling wire fields. */
+export interface DesignImageSamplingShape {
+    /** alignX as defined by the Nexa gateway. */
+    readonly alignX: DesignImageSamplingAlign;
+    /** alignY as defined by the Nexa gateway. */
+    readonly alignY: DesignImageSamplingAlign;
+    /** aspect as defined by the Nexa gateway. */
+    readonly aspect: number;
+}
+
+/** DesignImageSampling from the Nexa wire protocol. */
+export type DesignImageSampling = DesignImageSamplingShape;
+
+/** Allowed values for DesignImageSamplingAlign. */
+export const DesignImageSamplingAlignValues = {
+    Value0: 'center',
+    Value1: 'end',
+    Value2: 'start',
+} as const;
+
+/** DesignImageSamplingAlign from the Nexa wire protocol. */
+export type DesignImageSamplingAlign =
+    (typeof DesignImageSamplingAlignValues)[keyof typeof DesignImageSamplingAlignValues];
+
+/** DesignImageTransform wire fields. */
+export interface DesignImageTransformShape {
+    /** a as defined by the Nexa gateway. */
+    readonly a: number;
+    /** b as defined by the Nexa gateway. */
+    readonly b: number;
+    /** c as defined by the Nexa gateway. */
+    readonly c: number;
+    /** d as defined by the Nexa gateway. */
+    readonly d: number;
+    /** tx as defined by the Nexa gateway. */
+    readonly tx: number;
+    /** ty as defined by the Nexa gateway. */
+    readonly ty: number;
+}
+
+/** DesignImageTransform from the Nexa wire protocol. */
+export type DesignImageTransform = DesignImageTransformShape;
 
 /** DesignInsert wire fields. */
 export interface DesignInsertShape {
@@ -5339,6 +5401,7 @@ export const DesignPaintImageChangesfitValues = {
     Value0: 'contain',
     Value1: 'cover',
     Value2: 'stretch',
+    Value3: 'tile',
 } as const;
 
 /** DesignPaintImageChanges wire fields. */
@@ -5351,8 +5414,16 @@ export interface DesignPaintImageChangesShape {
     readonly cropY?: number;
     /** fit as defined by the Nexa gateway. */
     readonly fit?: (typeof DesignPaintImageChangesfitValues)[keyof typeof DesignPaintImageChangesfitValues];
+    /** flipX as defined by the Nexa gateway. */
+    readonly flipX?: boolean;
+    /** flipY as defined by the Nexa gateway. */
+    readonly flipY?: boolean;
+    /** rotation as defined by the Nexa gateway. */
+    readonly rotation?: number;
     /** scale as defined by the Nexa gateway. */
     readonly scale?: number;
+    /** transform as defined by the Nexa gateway. */
+    readonly transform?: DesignImageTransform | null;
 }
 
 /** DesignPaintImageChanges from the Nexa wire protocol. */
@@ -6919,6 +6990,8 @@ export interface GatewayFeaturesShape {
     readonly binaryDataUploads?: true;
     /** binaryMedia as defined by the Nexa gateway. */
     readonly binaryMedia?: true;
+    /** designImageTransforms as defined by the Nexa gateway. */
+    readonly designImageTransforms?: true;
     /** events as defined by the Nexa gateway. */
     readonly events: ReadonlyArray<string>;
     /** jsonReplies as defined by the Nexa gateway. */
