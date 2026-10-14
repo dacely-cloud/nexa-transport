@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignImageColor } from './DesignImageColor.js';
 import {
     DesignPaintKind,
     DesignImageFit,
@@ -68,6 +69,17 @@ export class DesignSvgPaints {
     }
     /** Preserves the editor's cover, contain, scale and normalized crop transform using intrinsic dimensions. */
     public image(image: DesignImage, box: DesignBox): string {
+        const content: string = this.#imageContent(image, box);
+        if (!DesignImageColor.active(image.adjustments)) {
+            return content;
+        }
+        const id: string = this.identity('image-adjustments');
+        this.definitions.push(
+            `<filter id="${id}" filterUnits="userSpaceOnUse" x="0" y="0" width="${box.width}" height="${box.height}" color-interpolation-filters="sRGB">${DesignImageColor.svg(DesignImageColor.transform(image.adjustments))}</filter>`,
+        );
+        return `<g filter="url(#${id})">${content}</g>`;
+    }
+    #imageContent(image: DesignImage, box: DesignBox): string {
         const data: DesignSvgImage | undefined = this.images.get(image.assetId);
         if (data === undefined) {
             throw new Error('Missing export image: ' + image.assetId);

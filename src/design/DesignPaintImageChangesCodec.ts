@@ -5,6 +5,7 @@ import { DesignValues as V } from './DesignValues.js';
 import { DesignImageFit } from './DesignTypes.js';
 import type { DesignPaintImageChanges } from './DesignOperationTypes.js';
 import { DesignImageTransformCodec } from './DesignImageTransformCodec.js';
+import { DesignImageAdjustmentCodec } from './DesignImageAdjustmentCodec.js';
 
 /** Validates compact owner-asset placement and bounded image framing before mutation. */
 export class DesignPaintImageChangesCodec {
@@ -22,6 +23,7 @@ export class DesignPaintImageChangesCodec {
                 'flipX',
                 'flipY',
                 'transform',
+                'adjustments',
             ],
             [],
         );
@@ -29,6 +31,14 @@ export class DesignPaintImageChangesCodec {
             throw new Error('Supply an image asset or framing property.');
         }
         return {
+            ...(value['adjustments'] === undefined
+                ? {}
+                : {
+                      adjustments:
+                          value['adjustments'] === null
+                              ? null
+                              : DesignImageAdjustmentCodec.changes(value['adjustments']),
+                  }),
             ...(value['assetId'] === undefined ? {} : { assetId: V.id(value['assetId']) }),
             ...(value['fit'] === undefined
                 ? {}

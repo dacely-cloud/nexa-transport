@@ -4,6 +4,7 @@
 import type { DesignStrokeCap, DesignStrokeJoin } from './DesignStrokeTypes.js';
 import type { DesignGradientTransformChanges } from './DesignGradientTypes.js';
 import type { DesignImageTransform } from './DesignImageTransformTypes.js';
+import type { DesignImageAdjustments } from './DesignImageAdjustmentTypes.js';
 import type { DesignTypographyOverrides } from './DesignTypographyStyleTypes.js';
 
 import type { DesignFontBinding } from './DesignFontTypes.js';
@@ -334,6 +335,8 @@ export interface DesignPaintColorOperation {
 }
 /** Imported imagery and crop properties can be edited without resending any source or style records. */
 export interface DesignPaintImageChanges {
+    /** Partial color edits retain other adjustments; null restores original image colors. */
+    readonly adjustments?: Partial<DesignImageAdjustments> | null;
     readonly assetId?: string;
     readonly fit?: DesignImageFit;
     readonly cropX?: number;

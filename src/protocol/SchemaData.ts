@@ -6786,6 +6786,18 @@ export const schema: Schema = {
         DesignImage: {
             description: 'A durable workspace image and its authored framing.',
             properties: {
+                adjustments: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignImageAdjustments',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                    description:
+                        'Omission or null retains the original image colors; edits never replace pixel bytes.',
+                },
                 assetId: {
                     type: 'string',
                 },
@@ -6840,6 +6852,43 @@ export const schema: Schema = {
             required: ['assetId', 'cropX', 'cropY', 'fit', 'scale'],
             type: 'object',
         },
+        DesignImageAdjustments: {
+            description:
+                'Non-destructive photographic adjustments use normalized values from minus one to one.',
+            properties: {
+                contrast: {
+                    type: 'number',
+                },
+                exposure: {
+                    type: 'number',
+                },
+                highlights: {
+                    type: 'number',
+                },
+                saturation: {
+                    type: 'number',
+                },
+                shadows: {
+                    type: 'number',
+                },
+                temperature: {
+                    type: 'number',
+                },
+                tint: {
+                    type: 'number',
+                },
+            },
+            required: [
+                'contrast',
+                'exposure',
+                'highlights',
+                'saturation',
+                'shadows',
+                'temperature',
+                'tint',
+            ],
+            type: 'object',
+        },
         DesignImageFit: {
             description: 'Image scaling mode.',
             enum: ['contain', 'cover', 'stretch', 'tile'],
@@ -6848,6 +6897,18 @@ export const schema: Schema = {
         DesignImageFraming: {
             description: 'Workspace image reference and crop transform.',
             properties: {
+                adjustments: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignImageAdjustments',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                    description:
+                        'Omission or null retains the original image colors; edits never replace pixel bytes.',
+                },
                 cropX: {
                     type: 'number',
                 },
@@ -8192,6 +8253,18 @@ export const schema: Schema = {
             description:
                 'Imported imagery and crop properties can be edited without resending any source or style records.',
             properties: {
+                adjustments: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/Partial%3CDesignImageAdjustments%3E',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                    description:
+                        'Partial color edits retain other adjustments; null restores original image colors.',
+                },
                 assetId: {
                     type: 'string',
                 },
@@ -10551,6 +10624,12 @@ export const schema: Schema = {
                     const: true,
                     description:
                         'NXMD frames carry outbound file bytes; JSON results contain matching metadata.',
+                    type: 'boolean',
+                },
+                designImageAdjustments: {
+                    const: true,
+                    description:
+                        'Non-destructive color controls are shared by image layers, fills, strokes and exports.',
                     type: 'boolean',
                 },
                 designImageTransforms: {
@@ -15828,6 +15907,32 @@ export const schema: Schema = {
             required: ['bytes', 'sha256', 'state'],
             type: 'object',
         },
+        'Partial<DesignImageAdjustments>': {
+            properties: {
+                contrast: {
+                    type: 'number',
+                },
+                exposure: {
+                    type: 'number',
+                },
+                highlights: {
+                    type: 'number',
+                },
+                saturation: {
+                    type: 'number',
+                },
+                shadows: {
+                    type: 'number',
+                },
+                temperature: {
+                    type: 'number',
+                },
+                tint: {
+                    type: 'number',
+                },
+            },
+            type: 'object',
+        },
         PendingApproval: {
             description: 'One approval waiting for a human.',
             properties: {
@@ -18431,6 +18536,12 @@ export const schema: Schema = {
                     },
                     type: 'array',
                 },
+                pointerMove: {
+                    const: true,
+                    description:
+                        'The retained executable supports captured motion and native TextBox drag selection.',
+                    type: 'boolean',
+                },
                 state: {
                     type: 'string',
                 },
@@ -18550,7 +18661,7 @@ export const schema: Schema = {
         RobloxPointerPhase: {
             description:
                 'Physical gesture phases owned by the preview protocol, separate from Roblox signal names.\nOne retained physical pointer phase.',
-            enum: ['Cancel', 'Press', 'Release'],
+            enum: ['Cancel', 'Move', 'Press', 'Release'],
             type: 'string',
         },
         RobloxTextEditKey: {

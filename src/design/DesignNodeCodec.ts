@@ -185,6 +185,7 @@ export class DesignNodeCodec {
                 'flipY',
                 'transform',
                 'sampling',
+                'adjustments',
             ],
             ['assetId', 'fit', 'cropX', 'cropY', 'scale'],
         );
@@ -203,6 +204,9 @@ export class DesignNodeCodec {
                 cropX: value['cropX'],
                 cropY: value['cropY'],
                 scale: value['scale'],
+                ...(value['adjustments'] === undefined
+                    ? {}
+                    : { adjustments: value['adjustments'] }),
                 ...(value['rotation'] === undefined ? {} : { rotation: value['rotation'] }),
                 ...(value['flipX'] === undefined ? {} : { flipX: value['flipX'] }),
                 ...(value['flipY'] === undefined ? {} : { flipY: value['flipY'] }),

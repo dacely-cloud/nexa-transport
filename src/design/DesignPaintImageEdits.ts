@@ -5,6 +5,7 @@ import type { DesignLayerAuthority } from './DesignLayerAuthority.js';
 import { DesignDefaults } from './DesignDefaults.js';
 import { DesignPaintLayerEdit } from './DesignPaintLayerEdit.js';
 import { DesignStyleCodec } from './DesignStyleCodec.js';
+import { DesignImageAdjustmentCodec } from './DesignImageAdjustmentCodec.js';
 import { DesignPaintKind, type DesignNode, type DesignPaint } from './DesignTypes.js';
 import type { DesignPaintImageChanges, DesignPaintImageOperation } from './DesignOperationTypes.js';
 
@@ -29,13 +30,28 @@ export class DesignPaintImageEdits {
         }
         const { gradient: previous, ...rest }: DesignPaint = source;
         void previous;
-        const { assetId, ...framing }: DesignPaintImageChanges = changes;
+        const { assetId, adjustments, ...framing }: DesignPaintImageChanges = changes;
         return DesignStyleCodec.paint({
             ...rest,
             kind: DesignPaintKind.Image,
             assetId: assetId ?? source.assetId,
             tokenId: assetId === undefined ? source.tokenId : null,
-            framing: { ...(source.framing ?? DesignDefaults.framing()), ...framing },
+            framing: {
+                ...(source.framing ?? DesignDefaults.framing()),
+                ...framing,
+                ...(adjustments === undefined
+                    ? {}
+                    : {
+                          adjustments:
+                              adjustments === null
+                                  ? null
+                                  : {
+                                        ...(source.framing?.adjustments ??
+                                            DesignImageAdjustmentCodec.neutral),
+                                        ...adjustments,
+                                    },
+                      }),
+            },
         });
     }
 }

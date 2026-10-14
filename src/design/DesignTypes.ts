@@ -5,6 +5,7 @@ import type { DesignStrokeCap, DesignStrokeJoin } from './DesignStrokeTypes.js';
 import type { DesignGradientTransform } from './DesignGradientTypes.js';
 import type { DesignImageTransform } from './DesignImageTransformTypes.js';
 import type { DesignImageSampling } from './DesignImageSamplingTypes.js';
+import type { DesignImageAdjustments } from './DesignImageAdjustmentTypes.js';
 import type { DesignTypographyValues, DesignTypographyLink } from './DesignTypographyStyleTypes.js';
 
 import type { DesignVariantSet, DesignVariantValue } from './DesignVariantTypes.js';
@@ -246,6 +247,8 @@ export const DesignTransition = {
 export type DesignTransition = (typeof DesignTransition)[keyof typeof DesignTransition];
 /** Workspace image reference and crop transform. */
 export interface DesignImageFraming {
+    /** Omission or null retains the original image colors; edits never replace pixel bytes. */
+    readonly adjustments?: DesignImageAdjustments | null;
     readonly fit: DesignImageFit;
     readonly cropX: number;
     readonly cropY: number;
