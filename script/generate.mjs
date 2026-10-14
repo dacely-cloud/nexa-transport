@@ -4,6 +4,15 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { readFileSync, writeFileSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 
+mkdirSync('src/toolsearch', { recursive: true });
+writeFileSync(
+    'src/toolsearch/BridgeInput.ts',
+    readFileSync('../nexa/src/toolsearch/BridgeInput.ts', 'utf8').replace(
+        "'../providers/Types'",
+        "'../protocol/Protocol.js'",
+    ),
+);
+
 execFileSync(process.execPath, ['script/workflows.ts'], { stdio: 'inherit' });
 execFileSync(process.execPath, ['script/design.ts'], { stdio: 'inherit' });
 mkdirSync('src/graphs', { recursive: true });
