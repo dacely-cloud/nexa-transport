@@ -8032,9 +8032,9 @@ export interface GatewayMethodssessions_downloadShape {
 /** GatewayMethodssessions_files wire fields. */
 export interface GatewayMethodssessions_filesShape {
     /** params as defined by the Nexa gateway. */
-    readonly params: IdParams;
+    readonly params: SessionFileListParams;
     /** result as defined by the Nexa gateway. */
-    readonly result: ReadonlyArray<DeliveredAttachment>;
+    readonly result: SessionFilePage;
 }
 
 /** GatewayMethodssessions_get wire fields. */
@@ -12471,6 +12471,32 @@ export interface SegmentationFrameShape {
 
 /** SegmentationFrame from the Nexa wire protocol. */
 export type SegmentationFrame = SegmentationFrameShape;
+
+/** SessionFileListParams wire fields. */
+export interface SessionFileListParamsShape {
+    /** cursor as defined by the Nexa gateway. */
+    readonly cursor?: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** limit as defined by the Nexa gateway. */
+    readonly limit?: number;
+}
+
+/** SessionFileListParams from the Nexa wire protocol. */
+export type SessionFileListParams = SessionFileListParamsShape;
+
+/** SessionFilePage wire fields. */
+export interface SessionFilePageShape {
+    /** files as defined by the Nexa gateway. */
+    readonly files: ReadonlyArray<DeliveredAttachment>;
+    /** nextCursor as defined by the Nexa gateway. */
+    readonly nextCursor: null | string;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: string;
+}
+
+/** SessionFilePage from the Nexa wire protocol. */
+export type SessionFilePage = SessionFilePageShape;
 
 /** SessionFileParams wire fields. */
 export interface SessionFileParamsShape {

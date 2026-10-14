@@ -67,7 +67,7 @@ it.each([false, true])(
             } else {
                 socket.send(frame);
             }
-            socket.send(JSON.stringify({ id: request.id, ok: true, result: [] }));
+            socket.send(JSON.stringify({ id: request.id, ok: true, result: { files: [], nextCursor: null, revision: '00000000-0000-0000-0000-000000000000' } }));
         };
         await client.call(Method.SessionsFiles, { id: 'session' });
         const file: ReceivedAttachment = await delivered.promise;

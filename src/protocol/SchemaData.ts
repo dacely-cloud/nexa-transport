@@ -5177,20 +5177,26 @@ export const schema: Schema = {
                 },
                 byteLength: {
                     description: 'Size of the accompanying binary WebSocket payload.',
+                    maximum: 314572800,
+                    minimum: 0,
                     type: 'number',
                 },
                 description: {
+                    maxLength: 65536,
                     type: 'string',
                 },
                 filename: {
+                    maxLength: 8192,
                     type: 'string',
                 },
                 id: {
                     description:
                         'Stable delivery identifier shared by the event and terminal result.',
+                    maxLength: 36,
                     type: 'string',
                 },
                 mimeType: {
+                    maxLength: 512,
                     type: 'string',
                 },
                 website: {
@@ -12321,13 +12327,10 @@ export const schema: Schema = {
                 'sessions.files': {
                     properties: {
                         params: {
-                            $ref: '#/definitions/IdParams',
+                            $ref: '#/definitions/SessionFileListParams',
                         },
                         result: {
-                            items: {
-                                $ref: '#/definitions/DeliveredAttachment',
-                            },
-                            type: 'array',
+                            $ref: '#/definitions/SessionFilePage',
                         },
                     },
                     required: ['params', 'result'],
@@ -18796,6 +18799,47 @@ export const schema: Schema = {
                 },
             },
             required: ['payload', 'type'],
+            type: 'object',
+        },
+        SessionFileListParams: {
+            description: 'Indexed metadata paging inside one owned conversation.',
+            properties: {
+                cursor: {
+                    maxLength: 73,
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                limit: {
+                    maximum: 128,
+                    minimum: 1,
+                    type: 'number',
+                },
+            },
+            required: ['id'],
+            type: 'object',
+        },
+        SessionFilePage: {
+            description: 'One bounded page, tied to an unchanged archive-directory revision.',
+            properties: {
+                files: {
+                    items: {
+                        $ref: '#/definitions/DeliveredAttachment',
+                    },
+                    maxItems: 128,
+                    type: 'array',
+                },
+                nextCursor: {
+                    maxLength: 73,
+                    type: ['null', 'string'],
+                },
+                revision: {
+                    maxLength: 36,
+                    type: 'string',
+                },
+            },
+            required: ['files', 'nextCursor', 'revision'],
             type: 'object',
         },
         SessionFileParams: {

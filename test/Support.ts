@@ -5,11 +5,11 @@ import type { AskResult, HelloOk, JsonValue } from '../src/protocol/Protocol.js'
 import { BinaryChunks } from '../src/media/BinaryChunks.js';
 import { BinaryEnvelope } from '../src/media/BinaryEnvelope.js';
 import { methodValidators } from '../src/protocol/MethodValidators.js';
-/** Minimal protocol-v1 hello fixture independent of the client implementation. */
+/** Minimal protocol-v2 hello fixture independent of the client implementation. */
 export const hello: HelloOk = {
     type: 'hello-ok',
-    protocol: 1,
-    minProtocol: 1,
+    protocol: 2,
+    minProtocol: 2,
     server: { version: 'test', connId: 'test' },
     features: {
         attachments: true,
@@ -61,7 +61,7 @@ export class TestGateway {
                 JSON.stringify({
                     event: 'connect.challenge',
                     seq: 1,
-                    data: { nonce: 'challenge', ts: 1, protocol: 1, minProtocol: 1 },
+                    data: { nonce: 'challenge', ts: 1, protocol: 2, minProtocol: 2 },
                 }),
             );
             const chunks: BinaryChunks = new BinaryChunks();

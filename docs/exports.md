@@ -14,18 +14,19 @@ they do not execute server-only handlers or grant access.
 
 ## Client, chat, media, and investigations
 
-| Import                                 | Availability   | Contract                                                                             |
-| -------------------------------------- | -------------- | ------------------------------------------------------------------------------------ |
-| `nexa-transport`                       | ESM + types    | Authenticated client, streams, events, voice, recovery, uploads, and binary channels |
-| `nexa-transport/chat-graph`            | ESM + types    | Colored explanatory relationship graphs and ChatGraphs validation                    |
-| `nexa-transport/errors`                | ESM + types    | Transport errors, codes, and WebSocket close details                                 |
-| `nexa-transport/events`                | ESM + types    | EventName, typed EventMap, and event validation                                      |
-| `nexa-transport/media`                 | ESM + types    | Media/3D helpers, native event decoding, and MeshoptDecoder                          |
-| `nexa-transport/options`               | **Types only** | Connection identity, authentication, resource limits, and call options               |
-| `nexa-transport/protocol`              | ESM + types    | Method enum and complete generated RPC parameters/results                            |
-| `nexa-transport/reverse-investigation` | ESM + types    | Native investigation receipts, monotonic replay, and saved-page validators           |
-| `nexa-transport/stream`                | **Types only** | Streaming turn type with acceptance, result, steering, cancel, and detach            |
-| `nexa-transport/stream-options`        | **Types only** | Turn duration, event/byte buffers, timeout, and cancellation options                 |
+| Import                                 | Availability   | Contract                                                                                |
+| -------------------------------------- | -------------- | --------------------------------------------------------------------------------------- |
+| `nexa-transport`                       | ESM + types    | Authenticated client, streams, events, voice, recovery, uploads, and binary channels    |
+| `nexa-transport/session-files`         | ESM + types    | Bounded saved-file metadata pages, source revisions, cancellation and complete recovery |
+| `nexa-transport/chat-graph`            | ESM + types    | Colored explanatory relationship graphs and ChatGraphs validation                       |
+| `nexa-transport/errors`                | ESM + types    | Transport errors, codes, and WebSocket close details                                    |
+| `nexa-transport/events`                | ESM + types    | EventName, typed EventMap, and event validation                                         |
+| `nexa-transport/media`                 | ESM + types    | Media/3D helpers, native event decoding, and MeshoptDecoder                             |
+| `nexa-transport/options`               | **Types only** | Connection identity, authentication, resource limits, and call options                  |
+| `nexa-transport/protocol`              | ESM + types    | Method enum and complete generated RPC parameters/results                               |
+| `nexa-transport/reverse-investigation` | ESM + types    | Native investigation receipts, monotonic replay, and saved-page validators              |
+| `nexa-transport/stream`                | **Types only** | Streaming turn type with acceptance, result, steering, cancel, and detach               |
+| `nexa-transport/stream-options`        | **Types only** | Turn duration, event/byte buffers, timeout, and cancellation options                    |
 
 ## Portable tool input resolution
 

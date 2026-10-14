@@ -17,7 +17,7 @@ it.each([2, 3, 4, 5, 6, 7, 8, 9] as const)(
                 JSON.stringify({
                     event: 'connect.challenge',
                     seq: 1,
-                    data: { nonce: 'challenge', ts: 1, protocol: 1, minProtocol: 1 },
+                    data: { nonce: 'challenge', ts: 1, protocol: 2, minProtocol: 2 },
                 }),
             );
             socket.on('message', (raw: Buffer, binary: boolean) => {

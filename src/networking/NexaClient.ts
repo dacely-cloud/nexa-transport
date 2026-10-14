@@ -68,6 +68,9 @@ import { methodValidators } from '../protocol/MethodValidators.js';
 import * as validators from '../protocol/Validators.js';
 import { PendingRequests } from './PendingRequests.js';
 import { TransportError, TransportErrorCode } from './TransportError.js';
+import { SessionFilePager } from './SessionFilePager.js';
+import { GatewayVersion } from '../protocol/GatewayVersion.js';
+import type { SessionFilePage, SessionFileListParams } from '../protocol/Protocol.js';
 
 /** A validated envelope retaining the complete JSON payload. */
 export interface GatewayEvent {
@@ -109,7 +112,7 @@ export interface SavedHistorySnapshot {
 export interface SessionSnapshot {
     readonly messages: ResultOf<Method.SessionsMessages>;
     readonly tasks: ResultOf<Method.TasksList>;
-    readonly files: ResultOf<Method.SessionsFiles>;
+    readonly files: SessionFilePage['files'];
     /** Full presentation events when supported by the gateway. */
     readonly history?: readonly SessionHistoryRecord[];
 }
@@ -548,7 +551,7 @@ export class NexaClient {
         return socket;
     }
 
-    /** Opens, authenticates, and negotiates protocol v1 before returning. */
+    /** Opens, authenticates, and negotiates protocol v2 before returning. */
     public static async connect(options: ClientOptions): Promise<NexaClient> {
         if (
             options.tokenProvider !== undefined &&
@@ -625,20 +628,20 @@ export class NexaClient {
             }
             if (
                 this.#challenge === null ||
-                this.#challenge.minProtocol > 1 ||
-                this.#challenge.protocol < 1
+                this.#challenge.minProtocol > GatewayVersion.Current ||
+                this.#challenge.protocol < GatewayVersion.Minimum
             ) {
                 throw new TransportError(
                     TransportErrorCode.Protocol,
-                    'Gateway does not support protocol v1',
+                    'Gateway does not support protocol v2',
                 );
             }
             this.#hello = await this.#call(
                 Method.Connect,
                 {
                     nonce: this.#challenge.nonce,
-                    minProtocol: 1,
-                    maxProtocol: 1,
+                    minProtocol: GatewayVersion.Minimum,
+                    maxProtocol: GatewayVersion.Current,
                     client: {
                         id: this.#options.client?.id ?? 'nexa-transport',
                         version: this.#options.client?.version ?? '0.1.0',
@@ -654,7 +657,7 @@ export class NexaClient {
                 },
                 {},
             );
-            if (this.#hello.protocol !== 1) {
+            if (this.#hello.protocol !== GatewayVersion.Current) {
                 throw new TransportError(
                     TransportErrorCode.Protocol,
                     'Unexpected negotiated protocol',
@@ -954,12 +957,12 @@ export class NexaClient {
         const [messages, tasks, files, history]: [
             ResultOf<Method.SessionsMessages>,
             ResultOf<Method.TasksList>,
-            ResultOf<Method.SessionsFiles>,
+            SessionFilePage['files'],
             readonly SessionHistoryRecord[] | undefined,
         ] = await Promise.all([
             this.call(Method.SessionsMessages, { id: sessionId }),
             this.call(Method.TasksList, {}),
-            this.call(Method.SessionsFiles, { id: sessionId }),
+            this.listSessionFiles(sessionId),
             this.supportsSessionHistory ? this.readHistory(sessionId) : Promise.resolve(undefined),
         ]);
         return {
@@ -970,6 +973,27 @@ export class NexaClient {
             files,
             ...(history === undefined ? {} : { history }),
         };
+    }
+    /** Iterates bounded metadata pages without retaining complete directories or file bodies. */
+    public filePages(
+        id: string,
+        options: CallOptions = {},
+    ): AsyncGenerator<SessionFilePage['files'], void> {
+        return new SessionFilePager(
+            (params: SessionFileListParams, callOptions: CallOptions): Promise<SessionFilePage> =>
+                this.call(Method.SessionsFiles, params, callOptions),
+        ).pages(id, options);
+    }
+
+    /** Restores complete metadata through validated pages when the caller needs an array. */
+    public listSessionFiles(
+        id: string,
+        options: CallOptions = {},
+    ): Promise<SessionFilePage['files']> {
+        return new SessionFilePager(
+            (params: SessionFileListParams, callOptions: CallOptions): Promise<SessionFilePage> =>
+                this.call(Method.SessionsFiles, params, callOptions),
+        ).read(id, options);
     }
     /** Subscribes to a catalogued event with a fully validated payload. */
     public on<E extends keyof EventMap>(
@@ -1224,10 +1248,10 @@ export class NexaClient {
                     encodeBinary !== undefined
                         ? encodeBinary(id)
                         : this.#hello?.features.binaryMedia === true
-                          ? BinaryEnvelope.encodeValue({ v: 1, id, method, params })
+                          ? BinaryEnvelope.encodeValue({ v: GatewayVersion.Current, id, method, params })
                           : null;
                 const payload: string | Uint8Array<ArrayBuffer> =
-                    binary ?? JSON.stringify({ v: 1, id, method, params });
+                    binary ?? JSON.stringify({ v: GatewayVersion.Current, id, method, params });
                 const payloadBytes: number =
                     binary?.byteLength ??
                     (typeof payload === 'string'

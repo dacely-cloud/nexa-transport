@@ -2441,6 +2441,29 @@ Retried admission uses the same client-chosen identity. Ownership comes from the
 | `name`       | Yes      | `string` |             |
 | `sha256`     | Yes      | `string` |             |
 
+## DesignAssetThumbnail
+
+A small static preview retains the identity of its original immutable owner asset.
+
+| Field        | Required | Type                                   | Description |
+| ------------ | -------- | -------------------------------------- | ----------- |
+| `asset`      | Yes      | [DesignAsset](protocol.md#designasset) |             |
+| `byteLength` | Yes      | `string`                               |             |
+| `data`       | Yes      | `string`                               |             |
+| `height`     | Yes      | `number`                               |             |
+| `mime`       | Yes      | `"image/png"`                          |             |
+| `sha256`     | Yes      | `string`                               |             |
+| `width`      | Yes      | `number`                               |             |
+
+## DesignAssetThumbnailMethod
+
+Preview delivery is independent of original byte downloads and document writes.
+
+| Field    | Required | Type                                                     | Description |
+| -------- | -------- | -------------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignAssetIdRequest](protocol.md#designassetidrequest) |             |
+| `result` | Yes      | [DesignAssetThumbnail](protocol.md#designassetthumbnail) |             |
+
 ## DesignBox
 
 Resolved layout boxes are separate from authored values and never written back implicitly.
@@ -3134,30 +3157,84 @@ A guide edit carries only its axis and world position.
 
 A durable workspace image and its authored framing.
 
-| Field     | Required | Type                                         | Description |
-| --------- | -------- | -------------------------------------------- | ----------- |
-| `assetId` | Yes      | `string`                                     |             |
-| `cropX`   | Yes      | `number`                                     |             |
-| `cropY`   | Yes      | `number`                                     |             |
-| `fit`     | Yes      | [DesignImageFit](protocol.md#designimagefit) |             |
-| `scale`   | Yes      | `number`                                     |             |
+| Field         | Required | Type                                                                  | Description                                                                                     |
+| ------------- | -------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `adjustments` | No       | [DesignImageAdjustments](protocol.md#designimageadjustments) / `null` | Omission or null retains the original image colors; edits never replace pixel bytes.            |
+| `assetId`     | Yes      | `string`                                                              |                                                                                                 |
+| `cropX`       | Yes      | `number`                                                              |                                                                                                 |
+| `cropY`       | Yes      | `number`                                                              |                                                                                                 |
+| `fit`         | Yes      | [DesignImageFit](protocol.md#designimagefit)                          |                                                                                                 |
+| `flipX`       | No       | `boolean`                                                             |                                                                                                 |
+| `flipY`       | No       | `boolean`                                                             |                                                                                                 |
+| `rotation`    | No       | `number`                                                              | Optional orientation applies around the painted box center in physical pixels.                  |
+| `sampling`    | No       | [DesignImageSampling](protocol.md#designimagesampling) / `null`       | Imported source viewport cropping occurs before texture filtering; null uses the full original. |
+| `scale`       | Yes      | `number`                                                              |                                                                                                 |
+| `transform`   | No       | [DesignImageTransform](protocol.md#designimagetransform) / `null`     | Null or omission uses fit/crop; a forward matrix provides explicit editable affine placement.   |
+
+## DesignImageAdjustments
+
+Non-destructive photographic adjustments use normalized values from minus one to one.
+
+| Field         | Required | Type     | Description |
+| ------------- | -------- | -------- | ----------- |
+| `contrast`    | Yes      | `number` |             |
+| `exposure`    | Yes      | `number` |             |
+| `highlights`  | Yes      | `number` |             |
+| `saturation`  | Yes      | `number` |             |
+| `shadows`     | Yes      | `number` |             |
+| `temperature` | Yes      | `number` |             |
+| `tint`        | Yes      | `number` |             |
 
 ## DesignImageFit
 
 Image scaling mode.
 
-Type: `"contain"` / `"cover"` / `"stretch"`.
+Type: `"contain"` / `"cover"` / `"stretch"` / `"tile"`.
 
 ## DesignImageFraming
 
 Workspace image reference and crop transform.
 
-| Field   | Required | Type                                         | Description |
-| ------- | -------- | -------------------------------------------- | ----------- |
-| `cropX` | Yes      | `number`                                     |             |
-| `cropY` | Yes      | `number`                                     |             |
-| `fit`   | Yes      | [DesignImageFit](protocol.md#designimagefit) |             |
-| `scale` | Yes      | `number`                                     |             |
+| Field         | Required | Type                                                                  | Description                                                                                   |
+| ------------- | -------- | --------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `adjustments` | No       | [DesignImageAdjustments](protocol.md#designimageadjustments) / `null` | Omission or null retains the original image colors; edits never replace pixel bytes.          |
+| `cropX`       | Yes      | `number`                                                              |                                                                                               |
+| `cropY`       | Yes      | `number`                                                              |                                                                                               |
+| `fit`         | Yes      | [DesignImageFit](protocol.md#designimagefit)                          |                                                                                               |
+| `flipX`       | No       | `boolean`                                                             |                                                                                               |
+| `flipY`       | No       | `boolean`                                                             |                                                                                               |
+| `rotation`    | No       | `number`                                                              | Optional orientation applies around the painted box center in physical pixels.                |
+| `scale`       | Yes      | `number`                                                              |                                                                                               |
+| `transform`   | No       | [DesignImageTransform](protocol.md#designimagetransform) / `null`     | Null or omission uses fit/crop; a forward matrix provides explicit editable affine placement. |
+
+## DesignImageSampling
+
+Aspect and anchors describe a source rectangle without creating a cropped bitmap or another asset.
+
+| Field    | Required | Type                                                             | Description |
+| -------- | -------- | ---------------------------------------------------------------- | ----------- |
+| `alignX` | Yes      | [DesignImageSamplingAlign](protocol.md#designimagesamplingalign) |             |
+| `alignY` | Yes      | [DesignImageSamplingAlign](protocol.md#designimagesamplingalign) |             |
+| `aspect` | Yes      | `number`                                                         |             |
+
+## DesignImageSamplingAlign
+
+Source viewport anchors retain SVG image cropping before texture interpolation.
+
+Type: `"center"` / `"end"` / `"start"`.
+
+## DesignImageTransform
+
+Forward affine map from original image unit coordinates to painted box unit coordinates.
+
+| Field | Required | Type     | Description |
+| ----- | -------- | -------- | ----------- |
+| `a`   | Yes      | `number` |             |
+| `b`   | Yes      | `number` |             |
+| `c`   | Yes      | `number` |             |
+| `d`   | Yes      | `number` |             |
+| `tx`  | Yes      | `number` |             |
+| `ty`  | Yes      | `number` |             |
 
 ## DesignInsert
 
@@ -3926,13 +4003,18 @@ Page-scoped native editing of one fill or stroke gradient.
 
 Imported imagery and crop properties can be edited without resending any source or style records.
 
-| Field     | Required | Type                                  | Description         |
-| --------- | -------- | ------------------------------------- | ------------------- |
-| `assetId` | No       | `string`                              |                     |
-| `cropX`   | No       | `number`                              |                     |
-| `cropY`   | No       | `number`                              |                     |
-| `fit`     | No       | `"contain"` / `"cover"` / `"stretch"` | Image scaling mode. |
-| `scale`   | No       | `number`                              |                     |
+| Field         | Required | Type                                                                                | Description                                                                        |
+| ------------- | -------- | ----------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `adjustments` | No       | [PartialDesignImageAdjustments](protocol.md#partialdesignimageadjustments) / `null` | Partial color edits retain other adjustments; null restores original image colors. |
+| `assetId`     | No       | `string`                                                                            |                                                                                    |
+| `cropX`       | No       | `number`                                                                            |                                                                                    |
+| `cropY`       | No       | `number`                                                                            |                                                                                    |
+| `fit`         | No       | `"contain"` / `"cover"` / `"stretch"` / `"tile"`                                    | Image scaling mode.                                                                |
+| `flipX`       | No       | `boolean`                                                                           |                                                                                    |
+| `flipY`       | No       | `boolean`                                                                           |                                                                                    |
+| `rotation`    | No       | `number`                                                                            |                                                                                    |
+| `scale`       | No       | `number`                                                                            |                                                                                    |
+| `transform`   | No       | [DesignImageTransform](protocol.md#designimagetransform) / `null`                   |                                                                                    |
 
 ## DesignPaintImageOperation
 
@@ -4962,6 +5044,8 @@ Methods, events, and additive capabilities supported by this gateway.
 | `attachments`               | No       | `true`                                             | User media attachments are validated and forwarded to the agent.                               |
 | `binaryDataUploads`         | No       | `true`                                             | Disk upload chunks retain raw bytes from the wire through durable storage.                     |
 | `binaryMedia`               | No       | `true`                                             | NXMD frames carry outbound file bytes; JSON results contain matching metadata.                 |
+| `designImageAdjustments`    | No       | `true`                                             | Non-destructive color controls are shared by image layers, fills, strokes and exports.         |
+| `designImageTransforms`     | No       | `true`                                             | Native image framing supports rotation, reflection, affine placement and repeated image tiles. |
 | `events`                    | Yes      | Array of `string`                                  |                                                                                                |
 | `jsonReplies`               | No       | `true`                                             | Host validation of JSON final answers while native tools remain available.                     |
 | `methodScopes`              | Yes      | [RecordstringScope](protocol.md#recordstringscope) | The scope each method requires.                                                                |
@@ -4990,6 +5074,8 @@ Methods, events, and additive capabilities supported by this gateway.
 | `officeProjects`            | No       | `true`                                             | NCP2 private project decisions, subscriptions, and delivery chunks.                            |
 | `officeShowroom`            | No       | `true`                                             | Owner-published accepted product labels in NGOP v9 and private NCP2 v4.                        |
 | `officeVerification`        | No       | `true`                                             | Versioned host verification evidence on private project and employee channels.                 |
+| `robloxCoordinateInput`     | No       | `true`                                             | Physical mouse/touch gestures can choose buttons using native GUI coordinates.                 |
+| `robloxTextEditing`         | No       | `true`                                             | Focused TextBoxes accept bounded Unicode edits and logical editing-key gestures.               |
 | `sessionHistory`            | No       | `true`                                             | Durable complete presentation history and binary restoration.                                  |
 | `sessionHistoryUpdates`     | No       | `true`                                             | Session subscriptions notify exact journal ranges for live catch-up.                           |
 | `transcriptBlocks`          | No       | `true`                                             | Compact persisted NDJSON blocks, read in bounded byte pages.                                   |
@@ -5003,19 +5089,20 @@ Methods, events, and additive capabilities supported by this gateway.
 
 Configurable bounds on gateway-owned work and memory.
 
-| Field                           | Required | Type     | Description                                                                 |
-| ------------------------------- | -------- | -------- | --------------------------------------------------------------------------- |
-| `handshakeTimeoutMs`            | Yes      | `number` | Time after the WebSocket upgrade to complete the application handshake.     |
-| `maxConnections`                | Yes      | `number` | Active sockets plus upgrades awaiting authentication.                       |
-| `maxOutboundBytes`              | Yes      | `number` | Estimated queued outbound storage and writes awaiting completion callbacks. |
-| `maxRequestBytes`               | Yes      | `number` | Incoming RPC bytes plus estimated input retained by active streams.         |
-| `maxRequests`                   | Yes      | `number` | Admitted RPC handlers across the process.                                   |
-| `maxRequestsPerConnection`      | Yes      | `number` | Admitted RPC handlers on one socket.                                        |
-| `maxRequestsPerPrincipal`       | Yes      | `number` | Admitted RPC handlers across an authenticated principal's sockets.          |
-| `maxStreams`                    | Yes      | `number` | Streaming runs that have not finished cleanup.                              |
-| `maxStreamsPerConnection`       | Yes      | `number` | Streaming runs owned by one socket.                                         |
-| `maxStreamsPerPrincipal`        | Yes      | `number` | Streaming runs owned by one authenticated principal.                        |
-| `maxSubscriptionsPerConnection` | Yes      | `number` | Distinct session subscriptions on one socket.                               |
+| Field                           | Required | Type     | Description                                                                               |
+| ------------------------------- | -------- | -------- | ----------------------------------------------------------------------------------------- |
+| `handshakeTimeoutMs`            | Yes      | `number` | Time after the WebSocket upgrade to complete the application handshake.                   |
+| `maxConnections`                | Yes      | `number` | Active sockets plus upgrades awaiting authentication.                                     |
+| `maxOutboundBytes`              | Yes      | `number` | Estimated queued outbound storage and writes awaiting completion callbacks.               |
+| `maxRequestBytes`               | Yes      | `number` | Incoming RPC bytes plus estimated input retained by active streams.                       |
+| `maxRequestBytesPerPrincipal`   | No       | `number` | Combined request, stream and partial-transfer input owned by one authenticated principal. |
+| `maxRequests`                   | Yes      | `number` | Admitted RPC handlers across the process.                                                 |
+| `maxRequestsPerConnection`      | Yes      | `number` | Admitted RPC handlers on one socket.                                                      |
+| `maxRequestsPerPrincipal`       | Yes      | `number` | Admitted RPC handlers across an authenticated principal's sockets.                        |
+| `maxStreams`                    | Yes      | `number` | Streaming runs that have not finished cleanup.                                            |
+| `maxStreamsPerConnection`       | Yes      | `number` | Streaming runs owned by one socket.                                                       |
+| `maxStreamsPerPrincipal`        | Yes      | `number` | Streaming runs owned by one authenticated principal.                                      |
+| `maxSubscriptionsPerConnection` | Yes      | `number` | Distinct session subscriptions on one socket.                                             |
 
 ## GatewayMethods
 
@@ -5060,6 +5147,7 @@ Configurable bounds on gateway-owned work and memory.
 | `design.asset.read`                  | Yes      | Object (fields below) |                                                                                                        |
 | `design.asset.remove`                | Yes      | Object (fields below) |                                                                                                        |
 | `design.asset.start`                 | Yes      | Object (fields below) |                                                                                                        |
+| `design.asset.thumbnail`             | Yes      | Object (fields below) | Preview delivery is independent of original byte downloads and document writes.                        |
 | `design.canvas`                      | Yes      | Object (fields below) | Independently advertised canvas records allow complete-read fallback on older workspaces.              |
 | `design.canvas.metrics`              | Yes      | Object (fields below) | Metric reads retain the exact canvas revision across continuations.                                    |
 | `design.changes`                     | Yes      | Object (fields below) | Forward delta RPC contract.                                                                            |
@@ -5543,6 +5631,13 @@ Configurable bounds on gateway-owned work and memory.
 | `params` | Yes      | [DesignAssetStartRequest](protocol.md#designassetstartrequest) |             |
 | `result` | Yes      | [DesignAssetPosition](protocol.md#designassetposition)         |             |
 
+**design.asset.thumbnail**
+
+| Field    | Required | Type                                                     | Description |
+| -------- | -------- | -------------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignAssetIdRequest](protocol.md#designassetidrequest) |             |
+| `result` | Yes      | [DesignAssetThumbnail](protocol.md#designassetthumbnail) |             |
+
 **design.canvas**
 
 | Field    | Required | Type                                               | Description |
@@ -5991,10 +6086,10 @@ Configurable bounds on gateway-owned work and memory.
 
 **sessions.files**
 
-| Field    | Required | Type                                                            | Description |
-| -------- | -------- | --------------------------------------------------------------- | ----------- |
-| `params` | Yes      | [IdParams](protocol.md#idparams)                                |             |
-| `result` | Yes      | Array of [DeliveredAttachment](protocol.md#deliveredattachment) |             |
+| Field    | Required | Type                                                       | Description |
+| -------- | -------- | ---------------------------------------------------------- | ----------- |
+| `params` | Yes      | [SessionFileListParams](protocol.md#sessionfilelistparams) |             |
+| `result` | Yes      | [SessionFilePage](protocol.md#sessionfilepage)             |             |
 
 **sessions.get**
 
@@ -7593,6 +7688,18 @@ The answer to a method that only reports success.
 | `sha256` | Yes      | `null,string`                                                    |             |
 | `state`  | Yes      | [BrowserScriptSourceState](protocol.md#browserscriptsourcestate) |             |
 
+## PartialDesignImageAdjustments
+
+| Field         | Required | Type     | Description |
+| ------------- | -------- | -------- | ----------- |
+| `contrast`    | No       | `number` |             |
+| `exposure`    | No       | `number` |             |
+| `highlights`  | No       | `number` |             |
+| `saturation`  | No       | `number` |             |
+| `shadows`     | No       | `number` |             |
+| `temperature` | No       | `number` |             |
+| `tint`        | No       | `number` |             |
+
 ## PendingApproval
 
 One approval waiting for a human.
@@ -8590,6 +8697,19 @@ How dangerous an action is.
 
 Type: `"destructive"` / `"execute"` / `"read"` / `"write"`.
 
+## RobloxCoordinateGesture
+
+One physical gesture chooses its target from the current native live root.
+
+| Field        | Required | Type                                                 | Description                                                  |
+| ------------ | -------- | ---------------------------------------------------- | ------------------------------------------------------------ |
+| `clickCount` | No       | `number`                                             |                                                              |
+| `device`     | No       | `"Mouse"` / `"Touch"`                                | Coordinate routing accepts physical mouse or touch gestures. |
+| `id`         | Yes      | `number`                                             |                                                              |
+| `phase`      | Yes      | [RobloxPointerPhase](protocol.md#robloxpointerphase) |                                                              |
+| `x`          | Yes      | `number`                                             |                                                              |
+| `y`          | Yes      | `number`                                             |                                                              |
+
 ## RobloxCredentialSetParams
 
 | Field    | Required | Type     | Description |
@@ -8604,6 +8724,21 @@ Presence only: neither saved key material nor claims about Roblox permissions.
 | ----------- | -------- | --------- | ----------- |
 | `connected` | Yes      | `boolean` |             |
 | `validated` | Yes      | `false`   |             |
+
+## RobloxKeyboardGesture
+
+A physical key remains held until its matching release or cancellation.
+
+| Field   | Required | Type                                                   | Description |
+| ------- | -------- | ------------------------------------------------------ | ----------- |
+| `key`   | Yes      | `string`                                               |             |
+| `phase` | Yes      | [RobloxKeyboardPhase](protocol.md#robloxkeyboardphase) |             |
+
+## RobloxKeyboardPhase
+
+Keyboard repetition reuses a held input; pointer gestures have no Repeat phase.
+
+Type: `"Cancel"` / `"Press"` / `"Release"` / `"Repeat"`.
 
 ## RobloxLiveActivation
 
@@ -8640,13 +8775,17 @@ Current native model bytes are returned only on an explicit export.
 
 Bounded JSON state has its own portable native-value codec.
 
-| Field         | Required | Type              | Description |
-| ------------- | -------- | ----------------- | ----------- |
-| `elapsedUs`   | Yes      | `string`          |             |
-| `handle`      | Yes      | `string`          |             |
-| `memoryBytes` | Yes      | `string`          |             |
-| `output`      | Yes      | Array of `string` |             |
-| `state`       | Yes      | `string`          |             |
+| Field            | Required | Type              | Description                                                                           |
+| ---------------- | -------- | ----------------- | ------------------------------------------------------------------------------------- |
+| `elapsedUs`      | Yes      | `string`          |                                                                                       |
+| `handle`         | Yes      | `string`          |                                                                                       |
+| `keyboard`       | No       | `true`            | The retained executable, rather than gateway source, supports held-key commands.      |
+| `keyboardRepeat` | No       | `true`            | The retained executable supports editing repeats without another Begin.               |
+| `memoryBytes`    | Yes      | `string`          |                                                                                       |
+| `output`         | Yes      | Array of `string` |                                                                                       |
+| `pointerHover`   | No       | `true`            | The retained executable supports uncaptured mouse motion and native GUI hover events. |
+| `pointerMove`    | No       | `true`            | The retained executable supports captured motion and native TextBox drag selection.   |
+| `state`          | Yes      | `string`          |                                                                                       |
 
 ## RobloxLiveHandleRequest
 
@@ -8671,12 +8810,25 @@ Start identifies an existing conversation attachment, never a server path or acc
 
 One serialized native step and optional logical activation.
 
-| Field     | Required | Type                                                     | Description                                              |
-| --------- | -------- | -------------------------------------------------------- | -------------------------------------------------------- |
-| `handle`  | Yes      | `string`                                                 |                                                          |
-| `id`      | Yes      | `string`                                                 |                                                          |
-| `input`   | No       | [RobloxLiveActivation](protocol.md#robloxliveactivation) | A logical activation on the retained VM's current clock. |
-| `seconds` | Yes      | `number`                                                 |                                                          |
+| Field      | Required | Type                                                                                                                                                                       | Description                                                                    |
+| ---------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| `edit`     | No       | [RobloxTextInsertion](protocol.md#robloxtextinsertion) / [RobloxTextSelection](protocol.md#robloxtextselection) / [RobloxTextKeyGesture](protocol.md#robloxtextkeygesture) | The same edit contract is consumed by tools, native processes and the gateway. |
+| `handle`   | Yes      | `string`                                                                                                                                                                   |                                                                                |
+| `id`       | Yes      | `string`                                                                                                                                                                   |                                                                                |
+| `input`    | No       | [RobloxLiveActivation](protocol.md#robloxliveactivation)                                                                                                                   | A logical activation on the retained VM's current clock.                       |
+| `keyboard` | No       | [RobloxKeyboardGesture](protocol.md#robloxkeyboardgesture)                                                                                                                 | A physical key remains held until its matching release or cancellation.        |
+| `point`    | No       | [RobloxCoordinateGesture](protocol.md#robloxcoordinategesture)                                                                                                             | One physical gesture chooses its target from the current native live root.     |
+| `seconds`  | Yes      | `number`                                                                                                                                                                   |                                                                                |
+| `viewport` | No       | [RobloxNativeGuiViewport](protocol.md#robloxnativeguiviewport)                                                                                                             | Host-selected execution context, never supplied by the model.                  |
+
+## RobloxNativeGuiViewport
+
+Host-selected execution context, never supplied by the model.
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `height` | Yes      | `number` |             |
+| `width`  | Yes      | `number` |             |
 
 ## RobloxPointerInput
 
@@ -8692,7 +8844,42 @@ Browser hit evidence and bounded pointer identity for an actual press/release ge
 
 Physical gesture phases owned by the preview protocol, separate from Roblox signal names.
 
-Type: `"Cancel"` / `"Press"` / `"Release"`.
+Type: `"Cancel"` / `"Move"` / `"Press"` / `"Release"`.
+
+## RobloxTextEditKey
+
+Supported logical editing keys; complete physical keyboard routing is separate.
+
+Type: `"Backspace"` / `"Delete"` / `"End"` / `"Escape"` / `"Home"` / `"Left"` / `"Return"` / `"Right"`.
+
+## RobloxTextInsertion
+
+Inserted Unicode text replaces the native selection or inserts at its cursor.
+
+| Field  | Required | Type       | Description |
+| ------ | -------- | ---------- | ----------- |
+| `kind` | Yes      | `"Insert"` |             |
+| `text` | Yes      | `string`   |             |
+
+## RobloxTextKeyGesture
+
+A complete logical key gesture emits native Begin/End with one real InputObject.
+
+| Field   | Required | Type                                               | Description |
+| ------- | -------- | -------------------------------------------------- | ----------- |
+| `key`   | Yes      | [RobloxTextEditKey](protocol.md#robloxtexteditkey) |             |
+| `kind`  | Yes      | `"Key"`                                            |             |
+| `shift` | No       | `boolean`                                          |             |
+
+## RobloxTextSelection
+
+Selection positions are one-based UTF-8 bytes; -1 removes the anchor.
+
+| Field            | Required | Type          | Description |
+| ---------------- | -------- | ------------- | ----------- |
+| `cursor`         | Yes      | `number`      |             |
+| `kind`           | Yes      | `"Selection"` |             |
+| `selectionStart` | Yes      | `number`      |             |
 
 ## ScalarSchema
 
@@ -8731,6 +8918,26 @@ Type: `"admin"` / `"read"` / `"write"`.
 | --------- | -------- | ----------------- | ----------- |
 | `payload` | Yes      | Array of `number` |             |
 | `type`    | Yes      | `number`          |             |
+
+## SessionFileListParams
+
+Indexed metadata paging inside one owned conversation.
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `cursor` | No       | `string` |             |
+| `id`     | Yes      | `string` |             |
+| `limit`  | No       | `number` |             |
+
+## SessionFilePage
+
+One bounded page, tied to an unchanged archive-directory revision.
+
+| Field        | Required | Type                                                            | Description |
+| ------------ | -------- | --------------------------------------------------------------- | ----------- |
+| `files`      | Yes      | Array of [DeliveredAttachment](protocol.md#deliveredattachment) |             |
+| `nextCursor` | Yes      | `null,string`                                                   |             |
+| `revision`   | Yes      | `string`                                                        |             |
 
 ## SessionFileParams
 

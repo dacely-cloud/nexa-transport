@@ -59,6 +59,7 @@ export class MediaSources {
         return readFileSync(new URL('../../nexa/src/media/' + name, import.meta.url), 'utf8')
             .replace("'./DeliveredAttachment'", "'../protocol/Protocol.js'")
             .replace("'../DeliveredAttachment'", "'../../protocol/Protocol.js'")
+            .replace("'../gateway/GatewayVersion.js'", "'../protocol/GatewayVersion.js'")
             .replace(
                 /from '([.][.\/][^']+)'/gu,
                 (_match: string, path: string): string =>

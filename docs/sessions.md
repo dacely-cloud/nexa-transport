@@ -41,6 +41,17 @@ promise that active chat turns survive a server shutdown.
 
 ## Restore a conversation
 
+Protocol v2 returns `sessions.files` as a page with `files`, `revision` and
+`nextCursor`. Each page contains at most 128 descriptors and 512 KiB of encoded
+metadata. `client.filePages(id, options)` iterates these pages without retaining
+the entire directory. `client.listSessionFiles(id, options)` explicitly collects
+complete metadata; `resumeSession` uses it. No helper downloads file bodies.
+
+Every continuation checks the same source revision. A concurrent archive change
+invalidates the cursor. Complete-array recovery discards partial results and
+restarts at most twice, only for the gateway's tagged source-change error.
+Older protocol clients must upgrade with the gateway and Chat bundle.
+
 Keep the session key in application storage scoped to the signed-in account.
 `resumeSession(sessionId)` subscribes and reads messages, active tasks, and saved
 file metadata. With `supportsSessionHistory`, its optional `history` contains the

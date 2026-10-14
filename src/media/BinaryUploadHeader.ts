@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { BinaryEncoding } from './interface/BinaryEncoding.js';
+import { GatewayVersion } from '../protocol/GatewayVersion.js';
 
 /** One canonical raw-upload header used for framing and working-memory negotiation. */
 export class BinaryUploadHeader {
@@ -27,7 +28,7 @@ export class BinaryUploadHeader {
         return new TextEncoder().encode(
             JSON.stringify({
                 json: {
-                    v: 1,
+                    v: GatewayVersion.Current,
                     id: requestId,
                     method: 'data.upload.chunk',
                     params: { id: uploadId, offset, data: null },
