@@ -34,6 +34,8 @@ const files: readonly string[] = [
     'DesignSvgImageSource',
     'DesignSvgImageTypes',
     'DesignSvgImportText',
+    'DesignSvgImportLabel',
+    'DesignSvgTextChunks',
     'DesignSvgImportTextStyles',
     'DesignSvgTextBaseline',
     'DesignSvgImportShape',

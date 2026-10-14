@@ -71,7 +71,7 @@ export class DesignSvgImportLayers {
         this.#css = new DesignSvgCss(root);
         this.#paints = new DesignSvgImportPaints(this.#elements, this.#css, this.#ancestors);
         this.#shape = new DesignSvgImportShape(this.#paints, this.#tree, this.identify);
-        this.#text = new DesignSvgImportText(this.#css, this.#tree);
+        this.#text = new DesignSvgImportText(this.#css, this.#tree, this.identify);
         this.#image = new DesignSvgImportImage(this.#tree, this.identify, images);
         const masks: DesignSvgImportMask = new DesignSvgImportMask(this.#tree, this.identify);
         this.#viewports = new DesignSvgImportViewport(this.#tree, masks, this.identify);
