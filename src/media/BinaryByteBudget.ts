@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { BinaryChunkBudget } from './interface/BinaryChunkBudget';
+import type { BinaryChunkBudget } from './interface/BinaryChunkBudget.js';
 
 /** Finite local storage accounting that can share an additional parent ceiling. */
 export class BinaryByteBudget implements BinaryChunkBudget {

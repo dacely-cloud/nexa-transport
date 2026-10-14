@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { BinaryEncoding } from './interface/BinaryEncoding';
+import { BinaryEncoding } from './interface/BinaryEncoding.js';
 
 /** One canonical raw-upload header used for framing and working-memory negotiation. */
 export class BinaryUploadHeader {

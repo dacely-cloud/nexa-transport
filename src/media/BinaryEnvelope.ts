@@ -1,11 +1,11 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { BinaryEnvelopeEncoder } from './BinaryEnvelopeEncoder';
-import type { BinaryJsonValue as JsonValue } from './interface/BinaryJsonValue';
-import { BinaryUploadHeader } from './BinaryUploadHeader';
-import { BinaryEnvelopeDecoder } from './BinaryEnvelopeDecoder';
-import type { BinaryDecodeAdmission } from './interface/BinaryDecodeAdmission';
+import { BinaryEnvelopeEncoder } from './BinaryEnvelopeEncoder.js';
+import type { BinaryJsonValue as JsonValue } from './interface/BinaryJsonValue.js';
+import { BinaryUploadHeader } from './BinaryUploadHeader.js';
+import { BinaryEnvelopeDecoder } from './BinaryEnvelopeDecoder.js';
+import type { BinaryDecodeAdmission } from './interface/BinaryDecodeAdmission.js';
 
 /** NXBF envelopes replace inline media and PCM strings with raw, contiguous bytes. */
 export class BinaryEnvelope {

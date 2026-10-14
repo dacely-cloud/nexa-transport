@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { BinaryEncodingValues } from './BinaryEncodingValues';
+import type { BinaryEncodingValues } from './BinaryEncodingValues.js';
 
 /** Immutable encoding names shared by envelope planning and restoration. */
 export const BinaryEncoding: Readonly<BinaryEncodingValues> = Object.freeze({

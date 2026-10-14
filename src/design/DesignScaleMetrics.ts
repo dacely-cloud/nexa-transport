@@ -3,6 +3,7 @@
 
 import {
     DesignKind,
+    DesignImageFit,
     type DesignFrameGrid,
     type DesignNode,
     type DesignStyle,
@@ -10,10 +11,24 @@ import {
     type DesignTextRun,
     type DesignShadow,
     type DesignPathCommand,
+    type DesignImageFraming,
+    type DesignPaint,
 } from './DesignTypes.js';
 
 /** Uniform artwork metrics are shared by native selection edits and linked-instance expansion. */
 export class DesignScaleMetrics {
+    /** Repeated intrinsic tiles scale with artwork; normalized explicit matrices already follow box size. */
+    public static framing(value: DesignImageFraming, factor: number): DesignImageFraming {
+        return value.fit === DesignImageFit.Tile && value.transform == null
+            ? { ...value, scale: value.scale * factor }
+            : value;
+    }
+    /** Latent framing stays available when a paint temporarily uses another mode. */
+    public static paint(value: DesignPaint, factor: number): DesignPaint {
+        return value.framing === undefined
+            ? value
+            : { ...value, framing: this.framing(value.framing, factor) };
+    }
     /** Artwork scaling keeps a frame's construction overlay on the same local rhythm. */
     public static grids(
         grids: readonly DesignFrameGrid[],
@@ -53,12 +68,14 @@ export class DesignScaleMetrics {
     public static style(style: DesignStyle, factor: number): DesignStyle {
         return {
             ...style,
+            fills: style.fills.map((paint: DesignPaint): DesignPaint => this.paint(paint, factor)),
             blur: style.blur * factor,
             stroke:
                 style.stroke === null
                     ? null
                     : {
                           ...style.stroke,
+                          paint: this.paint(style.stroke.paint, factor),
                           width: style.stroke.width * factor,
                           dash: style.stroke.dash.map((value: number): number => value * factor),
                       },
@@ -96,6 +113,8 @@ export class DesignScaleMetrics {
                 : {}),
             style: this.style(node.style, factor),
             text: node.text === null ? null : this.text(node.text, factor),
+            image:
+                node.image === null ? null : { ...node.image, ...this.framing(node.image, factor) },
             path: node.path.map((command: DesignPathCommand): DesignPathCommand => ({
                 ...command,
                 values: command.values.map((value: number): number => value * factor),

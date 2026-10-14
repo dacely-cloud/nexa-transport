@@ -3,6 +3,7 @@
 
 import type { DesignStrokeCap, DesignStrokeJoin } from './DesignStrokeTypes.js';
 import type { DesignGradientTransformChanges } from './DesignGradientTypes.js';
+import type { DesignImageTransform } from './DesignImageTransformTypes.js';
 import type { DesignTypographyOverrides } from './DesignTypographyStyleTypes.js';
 
 import type { DesignFontBinding } from './DesignFontTypes.js';
@@ -338,6 +339,10 @@ export interface DesignPaintImageChanges {
     readonly cropX?: number;
     readonly cropY?: number;
     readonly scale?: number;
+    readonly rotation?: number;
+    readonly flipX?: boolean;
+    readonly flipY?: boolean;
+    readonly transform?: DesignImageTransform | null;
 }
 /** Page-scoped placement or framing of one image fill or existing stroke. */
 export interface DesignPaintImageOperation {

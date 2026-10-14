@@ -23,7 +23,7 @@ import {
 /** Complete defaults make tool-created and hand-created layers identical. */
 export class DesignDefaults {
     /** Centered cover is the default for both image layers and legacy image paints. */
-    public static framing(): DesignImageFraming {
+    public static framing(): Pick<DesignImageFraming, 'fit' | 'cropX' | 'cropY' | 'scale'> {
         return { fit: DesignImageFit.Cover, cropX: 0, cropY: 0, scale: 1 };
     }
     /** One solid paint. */

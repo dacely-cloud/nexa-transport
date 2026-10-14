@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { JsonStringBytes } from './JsonStringBytes';
-import type { JsonSerializedValue } from './interface/JsonSerializedValue';
+import { JsonStringBytes } from './JsonStringBytes.js';
+import type { JsonSerializedValue } from './interface/JsonSerializedValue.js';
 
 /** Sizes already validated JSON without allocating serialized text, byte buffers or key arrays. */
 export class JsonSerializedBytes {

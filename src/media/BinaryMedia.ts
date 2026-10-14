@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
-import { BinaryChunks } from './BinaryChunks';
+import { BinaryChunks } from './BinaryChunks.js';
 import type { DeliveredAttachment } from '../protocol/Protocol.js';
-import type { BinaryMediaHeader } from './interface/BinaryMediaHeader';
-import type { BinaryDecodeAdmission } from './interface/BinaryDecodeAdmission';
-import { JsonFrameMemory } from './JsonFrameMemory';
-import { BinaryRequestMemory } from './BinaryRequestMemory';
-import { BinaryAdmissionError } from './BinaryAdmissionError';
+import type { BinaryMediaHeader } from './interface/BinaryMediaHeader.js';
+import type { BinaryDecodeAdmission } from './interface/BinaryDecodeAdmission.js';
+import { JsonFrameMemory } from './JsonFrameMemory.js';
+import { BinaryRequestMemory } from './BinaryRequestMemory.js';
+import { BinaryAdmissionError } from './BinaryAdmissionError.js';
 
 /** Original bytes and metadata received together in one binary frame. */
 export interface ReceivedAttachment extends DeliveredAttachment {

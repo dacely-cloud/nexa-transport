@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { BinaryEncoding } from './BinaryEncoding';
+import type { BinaryEncoding } from './BinaryEncoding.js';
 
 /** Bounded replacement location and byte length in an NXBF envelope header. */
 export interface BinaryPart {

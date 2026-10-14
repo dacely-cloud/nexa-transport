@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { BinaryChunkBudget } from './interface/BinaryChunkBudget';
-import type { BinaryChunkCredit } from './BinaryChunkCredit';
+import type { BinaryChunkBudget } from './interface/BinaryChunkBudget.js';
+import type { BinaryChunkCredit } from './BinaryChunkCredit.js';
 
 /** Owns allocation credit shared by request and stream lifetimes referring to the same input. */
 export class BinaryAllocationCredit {

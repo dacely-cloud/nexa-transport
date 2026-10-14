@@ -1,15 +1,15 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { BinaryAdmissionError } from './BinaryAdmissionError';
-import { BinaryRequestMemory } from './BinaryRequestMemory';
-import { BinaryJsonValidation } from './BinaryJsonValidation';
-import { JsonFrameMemory } from './JsonFrameMemory';
-import { BinaryEncoding } from './interface/BinaryEncoding';
-import type { BinaryDecodeAdmission } from './interface/BinaryDecodeAdmission';
-import type { BinaryDecodedCarrier } from './interface/BinaryDecodedCarrier';
-import type { BinaryJsonValue } from './interface/BinaryJsonValue';
-import type { BinaryPart } from './interface/BinaryPart';
+import { BinaryAdmissionError } from './BinaryAdmissionError.js';
+import { BinaryRequestMemory } from './BinaryRequestMemory.js';
+import { BinaryJsonValidation } from './BinaryJsonValidation.js';
+import { JsonFrameMemory } from './JsonFrameMemory.js';
+import { BinaryEncoding } from './interface/BinaryEncoding.js';
+import type { BinaryDecodeAdmission } from './interface/BinaryDecodeAdmission.js';
+import type { BinaryDecodedCarrier } from './interface/BinaryDecodedCarrier.js';
+import type { BinaryJsonValue } from './interface/BinaryJsonValue.js';
+import type { BinaryPart } from './interface/BinaryPart.js';
 
 /** Validates every header, path, body range and expansion before allocating decoded carriers. */
 export class BinaryEnvelopeDecodePlan {

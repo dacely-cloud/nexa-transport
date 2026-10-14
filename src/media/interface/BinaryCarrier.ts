@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { BinaryPart } from './BinaryPart';
+import type { BinaryPart } from './BinaryPart.js';
 
 /** Prevalidated carrier borrowing unchanged input until the synchronous encoder copies it. */
 export interface BinaryCarrier {

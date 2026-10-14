@@ -17,6 +17,9 @@ import {
 } from './DesignSvgTransforms.js';
 import { DesignDefaults } from './DesignDefaults.js';
 import { DesignPaths } from './DesignPaths.js';
+import { DesignSvgAffineImage } from './DesignSvgAffineImage.js';
+import { DesignSvgImageSampling } from './DesignSvgImageSampling.js';
+import type { DesignImageSampling } from './DesignImageSamplingTypes.js';
 import {
     DesignKind,
     DesignImageFit,
@@ -57,20 +60,18 @@ export class DesignSvgImportImage {
             rawWidth === 'auto' ? null : DesignSvgNumbers.length(rawWidth, context.width);
         let height: number | null =
             rawHeight === 'auto' ? null : DesignSvgNumbers.length(rawHeight, context.height);
-        if (width === 0 || height === 0) {return null;}
+        if (width === 0 || height === 0) {
+            return null;
+        }
         if ((width !== null && width < 0) || (height !== null && height < 0)) {
             throw new Error('SVG image dimensions must be nonnegative.');
         }
         const sx: number = Math.hypot(context.matrix.a, context.matrix.b);
         const sy: number = Math.hypot(context.matrix.c, context.matrix.d);
-        if (
-            sx < 1e-10 ||
-            sy < 1e-10 ||
-            context.matrix.a * context.matrix.d - context.matrix.b * context.matrix.c <= 0 ||
-            Math.abs(context.matrix.a * context.matrix.c + context.matrix.b * context.matrix.d) >
-                1e-8 * sx * sy
-        ) {
-            throw new Error('SVG image skew and reflection require native affine-image support.');
+        const determinant: number =
+            context.matrix.a * context.matrix.d - context.matrix.b * context.matrix.c;
+        if (sx < 1e-10 || sy < 1e-10 || Math.abs(determinant) <= 1e-8 * sx * sy) {
+            throw new Error('SVG image transform must have independent nonzero axes.');
         }
         if (this.load === null) {
             throw new Error('Save this layout to import embedded SVG images.');
@@ -98,7 +99,9 @@ export class DesignSvgImportImage {
         } else if (height === null) {
             height = (width * asset.height) / asset.width;
         }
-        if (width === null || height === null) {throw new Error('Missing SVG image dimensions.');}
+        if (width === null || height === null) {
+            throw new Error('Missing SVG image dimensions.');
+        }
         const x: number = DesignSvgNumbers.length(
             style['x'] ?? element.attributes['x'] ?? '0',
             context.width,
@@ -116,7 +119,29 @@ export class DesignSvgImportImage {
             `0 0 ${asset.width} ${asset.height}`,
             aspect,
         );
+        if (
+            determinant < 0 ||
+            Math.abs(context.matrix.a * context.matrix.c + context.matrix.b * context.matrix.d) >
+                1e-8 * sx * sy
+        ) {
+            return DesignSvgAffineImage.append(
+                this.tree,
+                this.identify,
+                context,
+                asset,
+                viewport,
+                x,
+                y,
+                width,
+                height,
+                overflow !== 'visible',
+            );
+        }
         const center: DesignSvgPoint = T.point(context.matrix, x + width / 2, y + height / 2);
+        const sampling: DesignImageSampling | null =
+            overflow === 'visible'
+                ? null
+                : DesignSvgImageSampling.from(viewport, width, height, asset);
         const contentId: string = this.identify('image-content:' + context.id);
         const frame: DesignNode = DesignDefaults.node(context.id, DesignKind.Frame, context.name);
         const image: DesignNode = DesignDefaults.node(
@@ -148,7 +173,14 @@ export class DesignSvgImportImage {
             width: asset.width * viewport.matrix.a * sx,
             height: asset.height * viewport.matrix.d * sy,
             style: { ...image.style, fills: [] },
-            image: { assetId: asset.id, fit: DesignImageFit.Stretch, cropX: 0, cropY: 0, scale: 1 },
+            image: {
+                assetId: asset.id,
+                fit: DesignImageFit.Stretch,
+                cropX: 0,
+                cropY: 0,
+                scale: 1,
+                ...(sampling === null ? {} : { sampling }),
+            },
         });
         const corners: readonly DesignSvgPoint[] = [
             T.point(context.matrix, x, y),

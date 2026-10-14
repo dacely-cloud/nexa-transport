@@ -1,12 +1,12 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Base64 } from './Base64';
-import { BinaryChunks } from './BinaryChunks';
-import { BinaryEncoding } from './interface/BinaryEncoding';
-import type { BinaryCarrier } from './interface/BinaryCarrier';
-import type { Base64ByteTarget } from './interface/Base64ByteTarget';
-import type { Base64DecodeResult } from './interface/Base64DecodeResult';
+import { Base64 } from './Base64.js';
+import { BinaryChunks } from './BinaryChunks.js';
+import { BinaryEncoding } from './interface/BinaryEncoding.js';
+import type { BinaryCarrier } from './interface/BinaryCarrier.js';
+import type { Base64ByteTarget } from './interface/Base64ByteTarget.js';
+import type { Base64DecodeResult } from './interface/Base64DecodeResult.js';
 
 /** Validates carrier values without enumerating typed bytes or allocating decoded payloads. */
 export class BinaryCarrierFactory {

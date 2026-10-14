@@ -1,11 +1,11 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { BinaryByteBudget } from './BinaryByteBudget';
-import { BinaryChunkCredit } from './BinaryChunkCredit';
-import { BinaryAdmissionError } from './BinaryAdmissionError';
-import { BinaryAllocationCredit } from './BinaryAllocationCredit';
-import type { BinaryDecodeAdmission } from './interface/BinaryDecodeAdmission';
+import { BinaryByteBudget } from './BinaryByteBudget.js';
+import { BinaryChunkCredit } from './BinaryChunkCredit.js';
+import { BinaryAdmissionError } from './BinaryAdmissionError.js';
+import { BinaryAllocationCredit } from './BinaryAllocationCredit.js';
+import type { BinaryDecodeAdmission } from './interface/BinaryDecodeAdmission.js';
 
 /** Keeps one inbound allocation admitted from reassembly through decoding and consumer completion. */
 export class BinaryInputReservation implements BinaryDecodeAdmission {

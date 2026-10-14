@@ -1,10 +1,10 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { BinaryUploadHeader } from './BinaryUploadHeader';
-import { JsonFrameMemory } from './JsonFrameMemory';
-import { BinaryRequestMemory } from './BinaryRequestMemory';
-import { BinaryEncoding } from './interface/BinaryEncoding';
+import { BinaryUploadHeader } from './BinaryUploadHeader.js';
+import { JsonFrameMemory } from './JsonFrameMemory.js';
+import { BinaryRequestMemory } from './BinaryRequestMemory.js';
+import { BinaryEncoding } from './interface/BinaryEncoding.js';
 
 /** Sizes disk-upload slices against the gateway's complete request working-storage policy. */
 export class BinaryUploadSizing {

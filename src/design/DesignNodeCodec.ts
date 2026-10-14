@@ -9,6 +9,7 @@ import { DesignFrameGridCodec } from './DesignFrameGridCodec.js';
 import { DesignValues as V } from './DesignValues.js';
 import { DesignStyleCodec } from './DesignStyleCodec.js';
 import { DesignImageFramingCodec } from './DesignImageFramingCodec.js';
+import { DesignImageSamplingCodec } from './DesignImageSamplingCodec.js';
 import { DesignFreeze } from './DesignFreeze.js';
 import { DesignLayoutCodec } from './DesignLayoutCodec.js';
 import {
@@ -171,20 +172,41 @@ export class DesignNodeCodec {
     }
     /** Validates one bounded layer image value. */
     public static image(raw: unknown): DesignImage {
-        const value: Readonly<Record<string, unknown>> = V.record(raw, [
-            'assetId',
-            'fit',
-            'cropX',
-            'cropY',
-            'scale',
-        ]);
+        const value: Readonly<Record<string, unknown>> = V.fields(
+            raw,
+            [
+                'assetId',
+                'fit',
+                'cropX',
+                'cropY',
+                'scale',
+                'rotation',
+                'flipX',
+                'flipY',
+                'transform',
+                'sampling',
+            ],
+            ['assetId', 'fit', 'cropX', 'cropY', 'scale'],
+        );
         return {
             assetId: V.id(value['assetId']),
+            ...(value['sampling'] === undefined
+                ? {}
+                : {
+                      sampling:
+                          value['sampling'] === null
+                              ? null
+                              : DesignImageSamplingCodec.parse(value['sampling']),
+                  }),
             ...DesignImageFramingCodec.parse({
                 fit: value['fit'],
                 cropX: value['cropX'],
                 cropY: value['cropY'],
                 scale: value['scale'],
+                ...(value['rotation'] === undefined ? {} : { rotation: value['rotation'] }),
+                ...(value['flipX'] === undefined ? {} : { flipX: value['flipX'] }),
+                ...(value['flipY'] === undefined ? {} : { flipY: value['flipY'] }),
+                ...(value['transform'] === undefined ? {} : { transform: value['transform'] }),
             }),
         };
     }

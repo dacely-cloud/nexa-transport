@@ -3,6 +3,8 @@
 
 import type { DesignStrokeCap, DesignStrokeJoin } from './DesignStrokeTypes.js';
 import type { DesignGradientTransform } from './DesignGradientTypes.js';
+import type { DesignImageTransform } from './DesignImageTransformTypes.js';
+import type { DesignImageSampling } from './DesignImageSamplingTypes.js';
 import type { DesignTypographyValues, DesignTypographyLink } from './DesignTypographyStyleTypes.js';
 
 import type { DesignVariantSet, DesignVariantValue } from './DesignVariantTypes.js';
@@ -210,7 +212,12 @@ export interface DesignPathCommand {
     readonly values: readonly number[];
 }
 /** Image scaling mode. */
-export const DesignImageFit = { Cover: 'cover', Contain: 'contain', Stretch: 'stretch' } as const;
+export const DesignImageFit = {
+    Cover: 'cover',
+    Contain: 'contain',
+    Stretch: 'stretch',
+    Tile: 'tile',
+} as const;
 /** Image scaling mode. */
 export type DesignImageFit = (typeof DesignImageFit)[keyof typeof DesignImageFit];
 /** Token families. */
@@ -243,10 +250,18 @@ export interface DesignImageFraming {
     readonly cropX: number;
     readonly cropY: number;
     readonly scale: number;
+    /** Optional orientation applies around the painted box center in physical pixels. */
+    readonly rotation?: number;
+    readonly flipX?: boolean;
+    readonly flipY?: boolean;
+    /** Null or omission uses fit/crop; a forward matrix provides explicit editable affine placement. */
+    readonly transform?: DesignImageTransform | null;
 }
 /** A durable workspace image and its authored framing. */
 export interface DesignImage extends DesignImageFraming {
     readonly assetId: string;
+    /** Imported source viewport cropping occurs before texture filtering; null uses the full original. */
+    readonly sampling?: DesignImageSampling | null;
 }
 /** Saved construction overlays stay separate from automatic child placement. */
 export const DesignFrameGridKind = { Square: 'square', Columns: 'columns', Rows: 'rows' } as const;

@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
-import { BinaryChunkTransfer } from './BinaryChunkTransfer';
-import type { BinaryChunkBudget } from './interface/BinaryChunkBudget';
-import type { BinaryChunkReceipt } from './interface/BinaryChunkReceipt';
+import { BinaryChunkTransfer } from './BinaryChunkTransfer.js';
+import type { BinaryChunkBudget } from './interface/BinaryChunkBudget.js';
+import type { BinaryChunkReceipt } from './interface/BinaryChunkReceipt.js';
 
 /** Ordered, bounded assembly of NXCH frames; JSON and PCM frames may pass between chunks. */
 export class BinaryChunks {

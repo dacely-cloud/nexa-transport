@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { BinaryChunkBudget } from './interface/BinaryChunkBudget';
-import { BinaryAdmissionError } from './BinaryAdmissionError';
+import type { BinaryChunkBudget } from './interface/BinaryChunkBudget.js';
+import { BinaryAdmissionError } from './BinaryAdmissionError.js';
 
 /** Holds admitted transfer storage until cancellation or an atomic handoff to its original budget. */
 export class BinaryChunkCredit {

@@ -1,14 +1,14 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { BinaryCarrierFactory } from './BinaryCarrierFactory';
-import { BinaryChunks } from './BinaryChunks';
-import { BinaryMetadataMeasure } from './BinaryMetadataMeasure';
-import { JsonStringBytes } from './JsonStringBytes';
-import type { BinaryCarrier } from './interface/BinaryCarrier';
-import type { BinaryJsonObject } from './interface/BinaryJsonObject';
-import type { BinaryJsonValue } from './interface/BinaryJsonValue';
-import type { BinaryPart } from './interface/BinaryPart';
+import { BinaryCarrierFactory } from './BinaryCarrierFactory.js';
+import { BinaryChunks } from './BinaryChunks.js';
+import { BinaryMetadataMeasure } from './BinaryMetadataMeasure.js';
+import { JsonStringBytes } from './JsonStringBytes.js';
+import type { BinaryCarrier } from './interface/BinaryCarrier.js';
+import type { BinaryJsonObject } from './interface/BinaryJsonObject.js';
+import type { BinaryJsonValue } from './interface/BinaryJsonValue.js';
+import type { BinaryPart } from './interface/BinaryPart.js';
 
 /** Validates and measures the whole envelope before copying metadata or allocating its frame. */
 export class BinaryEnvelopePlan {

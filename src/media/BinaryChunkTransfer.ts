@@ -1,10 +1,10 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { BinaryChunkBudget } from './interface/BinaryChunkBudget';
-import type { BinaryChunkReceipt } from './interface/BinaryChunkReceipt';
-import { BinaryChunkCredit } from './BinaryChunkCredit';
-import { BinaryAdmissionError } from './BinaryAdmissionError';
+import type { BinaryChunkBudget } from './interface/BinaryChunkBudget.js';
+import type { BinaryChunkReceipt } from './interface/BinaryChunkReceipt.js';
+import { BinaryChunkCredit } from './BinaryChunkCredit.js';
+import { BinaryAdmissionError } from './BinaryAdmissionError.js';
 
 /** Owns one ordered transfer, allocating only received capacity and charging growth before copying. */
 export class BinaryChunkTransfer {

@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { JsonStringBytes } from './JsonStringBytes';
-import type { BinaryJsonValue } from './interface/BinaryJsonValue';
+import { JsonStringBytes } from './JsonStringBytes.js';
+import type { BinaryJsonValue } from './interface/BinaryJsonValue.js';
 
 /** Measures admitted JSON projections before any metadata copy, excluding their raw carriers. */
 export class BinaryMetadataMeasure {

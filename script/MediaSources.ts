@@ -58,7 +58,12 @@ export class MediaSources {
         }
         return readFileSync(new URL('../../nexa/src/media/' + name, import.meta.url), 'utf8')
             .replace("'./DeliveredAttachment'", "'../protocol/Protocol.js'")
-            .replace("'../DeliveredAttachment'", "'../../protocol/Protocol.js'");
+            .replace("'../DeliveredAttachment'", "'../../protocol/Protocol.js'")
+            .replace(
+                /from '([.][.\/][^']+)'/gu,
+                (_match: string, path: string): string =>
+                    "from '" + (path.endsWith('.js') ? path : path + '.js') + "'",
+            );
     }
 
     /** Refreshes current source files without regenerating unrelated contracts or build outputs. */

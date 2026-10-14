@@ -1,10 +1,10 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { BinaryEnvelopePlan } from './BinaryEnvelopePlan';
-import { Utf8Bytes } from './Utf8Bytes';
-import type { BinaryCarrier } from './interface/BinaryCarrier';
-import type { BinaryPart } from './interface/BinaryPart';
+import { BinaryEnvelopePlan } from './BinaryEnvelopePlan.js';
+import { Utf8Bytes } from './Utf8Bytes.js';
+import type { BinaryCarrier } from './interface/BinaryCarrier.js';
+import type { BinaryPart } from './interface/BinaryPart.js';
 
 /** Allocates one admitted NXBF frame and writes carriers into it without a temporary full payload. */
 export class BinaryEnvelopeEncoder {

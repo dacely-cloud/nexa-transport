@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { BinaryChunks } from './BinaryChunks';
-import { BinaryEncoding } from './interface/BinaryEncoding';
+import { BinaryChunks } from './BinaryChunks.js';
+import { BinaryEncoding } from './interface/BinaryEncoding.js';
 
 /** Working-storage policy shared by binary admission and the default full-asset gateway budget. */
 export class BinaryRequestMemory {

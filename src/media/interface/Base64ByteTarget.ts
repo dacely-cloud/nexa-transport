@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Base64DecodeResult } from './Base64DecodeResult';
+import type { Base64DecodeResult } from './Base64DecodeResult.js';
 
 /** Portable feature detection contract for runtimes with a native base64 byte writer. */
 export interface Base64ByteTarget {

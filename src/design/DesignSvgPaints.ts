@@ -3,6 +3,7 @@
 
 import {
     DesignPaintKind,
+    DesignImageFit,
     type DesignPaint,
     type DesignBox,
     type DesignImage,
@@ -12,6 +13,12 @@ import type { DesignAsset } from './DesignAssetTypes.js';
 import type { DesignSvgImage } from './DesignSvgTypes.js';
 import { DesignGradientGeometry } from './DesignGradientGeometry.js';
 import type { DesignGradientTransform } from './DesignGradientTypes.js';
+import type { DesignImageTransform } from './DesignImageTransformTypes.js';
+import { DesignImageSamplingGeometry } from './DesignImageSamplingGeometry.js';
+import {
+    DesignImageSamplingAlign,
+    type DesignImageSampleRectangle,
+} from './DesignImageSamplingTypes.js';
 import { DesignAssetCodec } from './DesignAssetCodec.js';
 import { DesignImageGeometry, type DesignImagePlacement } from './DesignImageGeometry.js';
 import { DesignDefaults } from './DesignDefaults.js';
@@ -66,7 +73,11 @@ export class DesignSvgPaints {
             throw new Error('Missing export image: ' + image.assetId);
         }
         const asset: DesignAsset = data.asset;
-        let id: string | undefined = this.#imageIdentities.get(image.assetId);
+        const imageKey: string =
+            image.sampling == null
+                ? image.assetId
+                : JSON.stringify([image.assetId, image.sampling]);
+        let id: string | undefined = this.#imageIdentities.get(imageKey);
         if (id === undefined) {
             DesignAssetCodec.asset(asset);
             const expected: number = Number((BigInt(asset.byteLength) + 2n) / 3n) * 4;
@@ -78,10 +89,56 @@ export class DesignSvgPaints {
                 throw new Error('Invalid embedded export image.');
             }
             id = this.identity('asset');
-            this.#imageIdentities.set(image.assetId, id);
-            this.definitions.push(
-                `<image id="${id}" href="data:${asset.mime};base64,${data.base64}" width="${asset.width}" height="${asset.height}" preserveAspectRatio="none"/>`,
+            this.#imageIdentities.set(imageKey, id);
+            if (image.sampling == null) {
+                this.definitions.push(
+                    `<image id="${id}" href="data:${asset.mime};base64,${data.base64}" width="${asset.width}" height="${asset.height}" preserveAspectRatio="none"/>`,
+                );
+            } else {
+                const rectangle: DesignImageSampleRectangle = DesignImageSamplingGeometry.rectangle(
+                    image.sampling,
+                    asset.width,
+                    asset.height,
+                );
+                const x: string =
+                    image.sampling.alignX === DesignImageSamplingAlign.Start
+                        ? 'Min'
+                        : image.sampling.alignX === DesignImageSamplingAlign.End
+                          ? 'Max'
+                          : 'Mid';
+                const y: string =
+                    image.sampling.alignY === DesignImageSamplingAlign.Start
+                        ? 'Min'
+                        : image.sampling.alignY === DesignImageSamplingAlign.End
+                          ? 'Max'
+                          : 'Mid';
+                this.definitions.push(
+                    `<image id="${id}" href="data:${asset.mime};base64,${data.base64}" x="${rectangle.x}" y="${rectangle.y}" width="${rectangle.width}" height="${rectangle.height}" preserveAspectRatio="x${x}Y${y} slice"/>`,
+                );
+            }
+        }
+        if (
+            image.fit === DesignImageFit.Tile ||
+            image.transform != null ||
+            (image.rotation ?? 0) !== 0 ||
+            image.flipX === true ||
+            image.flipY === true
+        ) {
+            const matrix: DesignImageTransform = DesignImageGeometry.matrix(
+                image,
+                box,
+                asset.width,
+                asset.height,
             );
+            const transform: string = `matrix(${(matrix.a * box.width) / asset.width} ${(matrix.b * box.height) / asset.width} ${(matrix.c * box.width) / asset.height} ${(matrix.d * box.height) / asset.height} ${matrix.tx * box.width} ${matrix.ty * box.height})`;
+            if (image.fit === DesignImageFit.Tile) {
+                const pattern: string = this.identity('image-tile');
+                this.definitions.push(
+                    `<pattern id="${pattern}" patternUnits="userSpaceOnUse" width="${asset.width}" height="${asset.height}" patternTransform="${transform}"><use href="#${id}"/></pattern>`,
+                );
+                return `<rect width="${box.width}" height="${box.height}" fill="url(#${pattern})"/>`;
+            }
+            return `<use href="#${id}" transform="${transform}"/>`;
         }
         const { x, y, width, height }: DesignImagePlacement = DesignImageGeometry.place(
             image,

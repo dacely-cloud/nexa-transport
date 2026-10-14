@@ -1,9 +1,9 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { BinaryEncoding } from './BinaryEncoding';
-import type { BinaryJsonObject } from './BinaryJsonObject';
-import type { BinaryJsonValue } from './BinaryJsonValue';
+import type { BinaryEncoding } from './BinaryEncoding.js';
+import type { BinaryJsonObject } from './BinaryJsonObject.js';
+import type { BinaryJsonValue } from './BinaryJsonValue.js';
 
 /** Validated destination in the decoder's owned metadata tree, before carrier expansion. */
 export interface BinaryDecodedCarrier {
