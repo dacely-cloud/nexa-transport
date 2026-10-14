@@ -27,8 +27,10 @@ export class BinaryUploadSizing {
             BinaryRequestMemory.wire(new Uint8Array(8 + header.byteLength)) +
             JsonFrameMemory.measure(header, budget) +
             BinaryRequestMemory.carrier(0, BinaryEncoding.Bytes, false) +
+            512 +
+            2 * (8 + header.byteLength + 28) +
             512;
-        const bytes: number = Math.min(maximum, Math.floor((budget - overhead) / 2));
+        const bytes: number = Math.min(maximum, Math.floor((budget - overhead) / 4));
         if (bytes < 1) {
             throw new RangeError('Gateway upload memory budget is too small');
         }

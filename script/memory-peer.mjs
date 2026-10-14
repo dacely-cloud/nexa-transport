@@ -36,7 +36,7 @@ export async function createPeer() {
         let seq = 1;
         const send = (value) => socket.send(JSON.stringify(value));
         const event = (name, data) => send({ event: name, seq: seq++, data });
-        event('connect.challenge', { nonce: 'test', ts: 1, protocol: 1, minProtocol: 1 });
+        event('connect.challenge', { nonce: 'test', ts: 1, protocol: 2, minProtocol: 2 });
         socket.on('message', (raw) => {
             const request = JSON.parse(raw.toString());
             const reply = (result) => send({ id: request.id, ok: true, result });
@@ -44,8 +44,8 @@ export async function createPeer() {
                 case 'connect':
                     reply({
                         type: 'hello-ok',
-                        protocol: 1,
-                        minProtocol: 1,
+                        protocol: 2,
+                        minProtocol: 2,
                         server: { version: 'test', connId: 'test' },
                         features: {
                             attachments: true,
