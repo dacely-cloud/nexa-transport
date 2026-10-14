@@ -11,6 +11,8 @@ const config: UserConfig = {
                 'roblox-default-textures': 'src/roblox/RobloxDefaultTextures.ts',
                 'roblox-scene-textures': 'src/roblox/RobloxSceneTextures.ts',
                 'roblox-part-geometry': 'src/roblox/RobloxPartGeometry.ts',
+                'roblox-mesh-geometry': 'src/roblox/RobloxMeshGeometry.ts',
+                'roblox-scene-meshes': 'src/roblox/RobloxSceneMeshes.ts',
                 'roblox-gui-layout': 'src/roblox/RobloxGuiLayout.ts',
                 'roblox-legacy-font': 'src/roblox/RobloxLegacyFont.ts',
                 'roblox-gui-images': 'src/roblox/RobloxGuiImages.ts',
