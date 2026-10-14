@@ -147,7 +147,7 @@ backend, or a provider-key vault.
 | Import                                          | Format      | Purpose                                                                      |
 | ----------------------------------------------- | ----------- | ---------------------------------------------------------------------------- |
 | `nexa-transport/design-image-geometry`          | ESM + types | Intrinsic fit, rotation, reflection, tiling and affine image placement.      |
-| `nexa-transport/design-blend-types`             | ESM + types | Layer blend modes and compositing group isolation.                          |
+| `nexa-transport/design-blend-types`             | ESM + types | Layer blend modes and compositing group isolation.                           |
 | `nexa-transport/design-image-transform-types`   | ESM + types | Original-image unit coordinates mapped into a paint box.                     |
 | `nexa-transport/design-image-transform-codec`   | ESM + types | Closed finite affine transform validation.                                   |
 | `nexa-transport/design-image-sampling-types`    | ESM + types | Editable source-crop aspect and alignment.                                   |
@@ -179,6 +179,7 @@ backend, or a provider-key vault.
 | `nexa-transport/design-selection-types`         | ESM + types | Design selection types.                                                      |
 | `nexa-transport/design-svg`                     | ESM + types | Design svg.                                                                  |
 | `nexa-transport/design-svg-geometry`            | ESM + types | Design svg geometry.                                                         |
+| `nexa-transport/design-svg-paints`              | ESM + types | Editable paint servers and bounded portable angular/diamond raster paint.    |
 | `nexa-transport/design-svg-types`               | ESM + types | Design svg types.                                                            |
 | `nexa-transport/design-text-layout`             | ESM + types | Design text layout.                                                          |
 | `nexa-transport/design-paths`                   | ESM + types | Design paths.                                                                |

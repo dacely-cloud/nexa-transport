@@ -54,7 +54,11 @@ export class DesignPaintGradientEdits {
             ...rest,
             kind,
             angle:
-                gradient != null && kind === DesignPaintKind.Linear
+                gradient != null &&
+                kind === DesignPaintKind.Linear &&
+                (changes.gradient !== undefined ||
+                    changes.angle !== undefined ||
+                    (changes.kind !== undefined && changes.kind !== source.kind))
                     ? DesignGradientGeometry.angle(gradient)
                     : (changes.angle ?? source.angle),
             stops:
