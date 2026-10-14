@@ -2,7 +2,8 @@ import { getEventListeners } from 'node:events';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { PendingRequests } from '../src/networking/PendingRequests.js';
 import { EventStream } from '../src/networking/EventStream.js';
-import { BinaryChunks, type BinaryChunkBudget } from '../src/media/BinaryChunks.js';
+import { BinaryChunks } from '../src/media/BinaryChunks.js';
+import type { BinaryChunkBudget } from '../src/media/interface/BinaryChunkBudget.js';
 import { BinaryEnvelope } from '../src/media/BinaryEnvelope.js';
 import { NexaMedia } from '../src/media/NexaMedia.js';
 import type { AskParams, BinarySource } from '../src/protocol/Protocol.js';
@@ -156,8 +157,8 @@ describe('binary transfer accounting', (): void => {
                     break;
             }
             chunks.clear();
-            expect(reserve).toHaveBeenCalledExactlyOnceWith(1024);
-            expect(release).toHaveBeenCalledExactlyOnceWith(1024);
+            expect(reserve).toHaveBeenCalledExactlyOnceWith(1536);
+            expect(release).toHaveBeenCalledExactlyOnceWith(1536);
             expect(vi.getTimerCount()).toBe(0);
         },
     );

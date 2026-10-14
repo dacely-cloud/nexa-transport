@@ -10,6 +10,8 @@ export class MediaSources {
     /** Complete codec dependency graph, including the decomposed encoder's interfaces. */
     public static readonly FILES: readonly string[] = Object.freeze([
         'Base64.ts',
+        'interface/BinaryChunkBudget.ts',
+        'BinaryChunkTransfer.ts',
         'BinaryChunks.ts',
         'BinaryEnvelope.ts',
         'BinaryAdmissionError.ts',

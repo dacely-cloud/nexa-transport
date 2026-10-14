@@ -1,16 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
-/** Optional host accounting shared across connections or transport workers. */
-export interface BinaryChunkBudget {
-    reserve(bytes: number): boolean;
-    release(bytes: number): void;
-}
-interface IncomingTransfer {
-    readonly id: string;
-    readonly data: Uint8Array<ArrayBuffer>;
-    offset: number;
-    timer: ReturnType<typeof setTimeout>;
-}
+import { BinaryChunkTransfer } from './BinaryChunkTransfer';
+import type { BinaryChunkBudget } from './interface/BinaryChunkBudget';
 
 /** Ordered, bounded assembly of NXCH frames; JSON and PCM frames may pass between chunks. */
 export class BinaryChunks {
@@ -18,12 +9,25 @@ export class BinaryChunks {
     public static readonly MAX_TRANSFER_BYTES: number = BinaryChunks.MAX_FILE_BYTES + 1024 * 1024;
     public static readonly CHUNK_BYTES: number = 256 * 1024;
     static #retained: number = 0;
-    #incoming: IncomingTransfer | null = null;
+    #incoming: BinaryChunkTransfer | null = null;
+    readonly #accounting: BinaryChunkBudget;
 
-    public constructor(public readonly budget?: BinaryChunkBudget) {}
+    /** Uses host accounting when supplied, otherwise a process-wide bounded receiver pool. */
+    public constructor(public readonly budget?: BinaryChunkBudget) {
+        this.#accounting = {
+            reserve: (bytes: number): boolean => this.#reserve(bytes),
+            release: (bytes: number): void => this.#release(bytes),
+        };
+    }
 
-    public static isChunk(buffer: ArrayBuffer): boolean {
-        return buffer.byteLength >= 4 && new DataView(buffer).getUint32(0) === 0x4e584348;
+    /** Reads the signature directly from the logical view without copying its backing storage. */
+    public static isChunk(buffer: ArrayBuffer | Uint8Array): boolean {
+        const bytes: Uint8Array = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
+        return (
+            bytes.byteLength >= 4 &&
+            new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength).getUint32(0) ===
+                0x4e584348
+        );
     }
 
     /** Produces small frames without duplicating the entire transfer. */
@@ -115,23 +119,27 @@ export class BinaryChunks {
 
     /** Returns the complete frame, null while receiving, or the original unchunked frame. */
     public accept(
-        buffer: ArrayBuffer,
+        buffer: ArrayBuffer | Uint8Array,
         progress?: (prefix: Uint8Array<ArrayBuffer>, total: number) => void,
     ): ArrayBuffer | null {
-        if (!BinaryChunks.isChunk(buffer)) {
-            return buffer;
+        const bytes: Uint8Array = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
+        if (!BinaryChunks.isChunk(bytes)) {
+            if (bytes.length > BinaryChunks.MAX_TRANSFER_BYTES) {
+                throw new RangeError('Binary frame exceeds its transfer limit');
+            }
+            return buffer instanceof ArrayBuffer ? buffer : Uint8Array.from(bytes).buffer;
         }
         try {
-            if (buffer.byteLength < 28 || buffer.byteLength > 28 + BinaryChunks.CHUNK_BYTES) {
+            if (bytes.byteLength < 28 || bytes.byteLength > 28 + BinaryChunks.CHUNK_BYTES) {
                 throw new RangeError('Invalid binary chunk size');
             }
-            const view: DataView = new DataView(buffer);
+            const view: DataView = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
             const total: number = view.getUint32(20);
             const offset: number = view.getUint32(24);
-            const id: string = Array.from(new Uint8Array(buffer, 4, 16), (byte: number): string =>
+            const id: string = Array.from(bytes.subarray(4, 20), (byte: number): string =>
                 byte.toString(16).padStart(2, '0'),
             ).join('');
-            if (total === 0 && offset === 0 && buffer.byteLength === 28) {
+            if (total === 0 && offset === 0 && bytes.byteLength === 28) {
                 if (this.#incoming !== null && this.#incoming.id !== id) {
                     throw new Error('Cancellation targets another binary transfer');
                 }
@@ -140,48 +148,37 @@ export class BinaryChunks {
             }
             if (
                 total === 0 ||
-                buffer.byteLength === 28 ||
+                bytes.byteLength === 28 ||
                 total > BinaryChunks.MAX_TRANSFER_BYTES ||
                 offset > total ||
-                buffer.byteLength - 28 > total - offset
+                bytes.byteLength - 28 > total - offset
             ) {
                 throw new RangeError('Invalid binary transfer bounds');
             }
             if (this.#incoming === null) {
-                if (offset !== 0 || !this.#reserve(total)) {
-                    throw new RangeError(
-                        'Binary transfer is out of order or memory budget is exhausted',
-                    );
+                if (offset !== 0) {
+                    throw new RangeError('Binary transfer is out of order');
                 }
-                try {
-                    this.#incoming = {
-                        id,
-                        data: new Uint8Array(total),
-                        offset: 0,
-                        timer: setTimeout((): void => this.clear(), 30_000),
-                    };
-                } catch (error: unknown) {
-                    this.#release(total);
-                    throw error;
-                }
+                this.#incoming = new BinaryChunkTransfer(
+                    id,
+                    total,
+                    bytes.length - 28,
+                    this.#accounting,
+                    (): void => this.clear(),
+                );
             }
-            if (
-                this.#incoming.id !== id ||
-                this.#incoming.data.byteLength !== total ||
-                this.#incoming.offset !== offset
-            ) {
+            const transfer: BinaryChunkTransfer = this.#incoming;
+            if (transfer.id !== id || transfer.total !== total) {
                 throw new RangeError('Binary chunks are duplicated, interleaved or out of order');
             }
-            this.#incoming.data.set(new Uint8Array(buffer, 28), offset);
-            this.#incoming.offset += buffer.byteLength - 28;
-            progress?.(this.#incoming.data.subarray(0, this.#incoming.offset), total);
-            clearTimeout(this.#incoming.timer);
-            if (this.#incoming.offset === total) {
-                const result: ArrayBuffer = this.#incoming.data.buffer;
+            transfer.append(offset, bytes.subarray(28));
+            progress?.(transfer.prefix(), total);
+            if (transfer.offset === total) {
+                const result: ArrayBuffer = transfer.completed();
                 this.clear();
                 return result;
             }
-            this.#incoming.timer = setTimeout((): void => this.clear(), 30_000);
+            transfer.arm();
             return null;
         } catch (error: unknown) {
             this.clear();
@@ -192,8 +189,7 @@ export class BinaryChunks {
     /** Releases incomplete transfers on disconnect, cancellation, timeout or protocol failure. */
     public clear(): void {
         if (this.#incoming !== null) {
-            clearTimeout(this.#incoming.timer);
-            this.#release(this.#incoming.data.byteLength);
+            this.#incoming.close();
             this.#incoming = null;
         }
     }
