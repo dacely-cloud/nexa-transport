@@ -28,3 +28,5 @@ export interface DesignLayoutResult {
 export interface DesignFlowItem extends DesignSize {
     readonly node: DesignSceneNode;
 }
+/** Nested content is measured at the width its parent actually allocates. */
+export type DesignAllocatedMeasurer = (node: DesignSceneNode, width: number) => DesignSize;

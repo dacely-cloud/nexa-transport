@@ -10,6 +10,7 @@ import {
 } from './DesignTypes.js';
 import { DesignScene, type DesignSceneNode, type DesignScenePage } from './DesignScene.js';
 import { DesignFlex } from './DesignFlex.js';
+import { DesignFlowMeasurement } from './DesignFlowMeasurement.js';
 import { DesignGrid, type DesignGridResult } from './DesignGrid.js';
 import { DesignConstraints } from './DesignConstraints.js';
 import { DesignTextMetrics } from './DesignTextMetrics.js';
@@ -25,6 +26,7 @@ import type {
 export class DesignLayoutEngine {
     readonly #nodes: ReadonlyMap<string, DesignSceneNode>;
     readonly #sizes: Map<string, DesignSize> = new Map();
+    readonly #widthSizes: Map<string, Map<number, DesignSize>> = new Map();
     readonly #positions: Map<string, DesignLocalBox> = new Map();
     #solved: boolean = false;
     readonly #measurer: DesignTextMeasurer;
@@ -110,13 +112,16 @@ export class DesignLayoutEngine {
         }
         return node;
     }
-    #measure(node: DesignSceneNode): DesignSize {
-        const cached: DesignSize | undefined = this.#sizes.get(node.id);
+    #measure(node: DesignSceneNode, allocatedWidth: number | null = null): DesignSize {
+        const cached: DesignSize | undefined =
+            allocatedWidth === null
+                ? this.#sizes.get(node.id)
+                : this.#widthSizes.get(node.id)?.get(allocatedWidth);
         if (cached !== undefined) {
             return cached;
         }
         let natural: DesignSize = { width: node.width, height: node.height };
-        const items: readonly DesignFlowItem[] = node.children
+        let items: readonly DesignFlowItem[] = node.children
             .map((id: string): DesignSceneNode => this.#node(id))
             .filter((child: DesignSceneNode): boolean => child.visible && !child.placement.absolute)
             .map((child: DesignSceneNode): DesignFlowItem => ({
@@ -133,9 +138,11 @@ export class DesignLayoutEngine {
                     node.placement.minWidth,
                     Math.min(
                         node.placement.maxWidth,
-                        node.placement.width === DesignSizing.Hug
-                            ? 100000
-                            : Math.max(0.01, node.width),
+                        allocatedWidth !== null
+                            ? allocatedWidth
+                            : node.placement.width === DesignSizing.Hug
+                              ? 100000
+                              : Math.max(0.01, node.width),
                     ),
                 ),
                 node.id,
@@ -162,9 +169,38 @@ export class DesignLayoutEngine {
                           ) +
                           Math.max(0, items.length - 1) * layout.gap),
             };
+            items = DesignFlowMeasurement.atWidth(
+                items,
+                layout,
+                Math.max(
+                    node.placement.minWidth,
+                    Math.min(
+                        node.placement.maxWidth,
+                        allocatedWidth ??
+                            (node.placement.width === DesignSizing.Hug
+                                ? natural.width
+                                : node.width),
+                    ),
+                ),
+                node.placement.height === DesignSizing.Hug ? natural.height : node.height,
+                (child: DesignSceneNode, width: number): DesignSize => this.#measure(child, width),
+            );
+            natural = {
+                ...natural,
+                height:
+                    vertical +
+                    (row
+                        ? Math.max(0, ...items.map((item: DesignFlowItem): number => item.height))
+                        : items.reduce(
+                              (sum: number, item: DesignFlowItem): number => sum + item.height,
+                              0,
+                          ) +
+                          Math.max(0, items.length - 1) * layout.gap),
+            };
             if (
                 layout.wrap &&
-                ((row ? node.placement.width : node.placement.height) !== DesignSizing.Hug ||
+                ((row && allocatedWidth !== null) ||
+                    (row ? node.placement.width : node.placement.height) !== DesignSizing.Hug ||
                     (row
                         ? natural.width > node.placement.maxWidth
                         : natural.height > node.placement.maxHeight))
@@ -177,9 +213,11 @@ export class DesignLayoutEngine {
                               node.placement.minWidth,
                               Math.min(
                                   node.placement.maxWidth,
-                                  node.placement.width === DesignSizing.Hug
-                                      ? natural.width
-                                      : node.width,
+                                  allocatedWidth !== null
+                                      ? allocatedWidth
+                                      : node.placement.width === DesignSizing.Hug
+                                        ? natural.width
+                                        : node.width,
                               ),
                           )
                         : natural.width,
@@ -218,19 +256,21 @@ export class DesignLayoutEngine {
             }
         } else if (layout.flow === DesignFlow.Grid) {
             const width: number =
-                node.placement.width === DesignSizing.Hug
-                    ? horizontal +
-                      layout.columns *
-                          Math.max(
-                              0,
-                              ...items.map(
-                                  (item: DesignFlowItem): number =>
-                                      item.width /
-                                      Math.min(layout.columns, item.node.placement.columnSpan),
-                              ),
-                          ) +
-                      (layout.columns - 1) * layout.gap
-                    : node.width;
+                allocatedWidth !== null
+                    ? allocatedWidth
+                    : node.placement.width === DesignSizing.Hug
+                      ? horizontal +
+                        layout.columns *
+                            Math.max(
+                                0,
+                                ...items.map(
+                                    (item: DesignFlowItem): number =>
+                                        item.width /
+                                        Math.min(layout.columns, item.node.placement.columnSpan),
+                                ),
+                            ) +
+                        (layout.columns - 1) * layout.gap
+                      : node.width;
             const bounded: number = Math.max(
                 node.placement.minWidth,
                 Math.min(node.placement.maxWidth, width),
@@ -241,6 +281,7 @@ export class DesignLayoutEngine {
                 bounded,
                 null,
                 this.#measurer,
+                (child: DesignSceneNode, width: number): DesignSize => this.#measure(child, width),
             );
             natural = { width, height: grid.height };
         } else if (items.length > 0) {
@@ -268,7 +309,10 @@ export class DesignLayoutEngine {
                     node.placement.maxWidth,
                     Math.max(
                         0.01,
-                        node.placement.width === DesignSizing.Hug ? natural.width : node.width,
+                        allocatedWidth ??
+                            (node.placement.width === DesignSizing.Hug
+                                ? natural.width
+                                : node.width),
                     ),
                 ),
             ),
@@ -283,7 +327,16 @@ export class DesignLayoutEngine {
                 ),
             ),
         };
-        this.#sizes.set(node.id, size);
+        if (allocatedWidth === null) {
+            this.#sizes.set(node.id, size);
+        } else {
+            let widths: Map<number, DesignSize> | undefined = this.#widthSizes.get(node.id);
+            if (widths === undefined) {
+                widths = new Map();
+                this.#widthSizes.set(node.id, widths);
+            }
+            widths.set(allocatedWidth, size);
+        }
         return size;
     }
     #children(node: DesignSceneNode, width: number, height: number): readonly DesignLocalBox[] {
@@ -298,30 +351,21 @@ export class DesignLayoutEngine {
             }));
         let arranged: readonly DesignLocalBox[] = [];
         if (node.layout.flow === DesignFlow.Grid) {
-            arranged = DesignGrid.arrange(items, node.layout, width, height, this.#measurer).boxes;
+            arranged = DesignGrid.arrange(
+                items,
+                node.layout,
+                width,
+                height,
+                this.#measurer,
+                (child: DesignSceneNode, width: number): DesignSize => this.#measure(child, width),
+            ).boxes;
         } else if (node.layout.flow !== DesignFlow.Absolute) {
-            arranged = DesignFlex.arrange(items, node.layout, width, height);
-            const widths: ReadonlyMap<string, number> = new Map(
-                arranged.map((box: DesignLocalBox): [string, number] => [box.id, box.width]),
-            );
-            const measured: readonly DesignFlowItem[] = items.map(
-                (item: DesignFlowItem): DesignFlowItem =>
-                    item.node.text === null || item.node.placement.height !== DesignSizing.Hug
-                        ? item
-                        : {
-                              ...item,
-                              height: Math.max(
-                                  item.node.placement.minHeight,
-                                  Math.min(
-                                      item.node.placement.maxHeight,
-                                      this.#measurer.measure(
-                                          item.node.text,
-                                          widths.get(item.node.id) ?? item.width,
-                                          item.node.id,
-                                      ).height,
-                                  ),
-                              ),
-                          },
+            const measured: readonly DesignFlowItem[] = DesignFlowMeasurement.atWidth(
+                items,
+                node.layout,
+                width,
+                height,
+                (child: DesignSceneNode, width: number): DesignSize => this.#measure(child, width),
             );
             arranged = DesignFlex.arrange(measured, node.layout, width, height);
         }

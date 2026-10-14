@@ -196,6 +196,7 @@ const files: readonly string[] = [
     'DesignScene',
     'DesignLayoutTypes',
     'DesignFlex',
+    'DesignFlowMeasurement',
     'DesignGrid',
     'DesignConstraints',
     'DesignTextMetrics',

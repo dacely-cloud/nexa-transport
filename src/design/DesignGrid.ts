@@ -7,7 +7,12 @@ import {
     type DesignLayout,
     type DesignPlacement,
 } from './DesignTypes.js';
-import type { DesignFlowItem, DesignLocalBox, DesignTextMeasurer } from './DesignLayoutTypes.js';
+import type {
+    DesignAllocatedMeasurer,
+    DesignFlowItem,
+    DesignLocalBox,
+    DesignTextMeasurer,
+} from './DesignLayoutTypes.js';
 
 interface GridCell {
     readonly item: DesignFlowItem;
@@ -35,6 +40,7 @@ export class DesignGrid {
         width: number,
         height: number | null,
         measurer: DesignTextMeasurer | null = null,
+        measureAllocated: DesignAllocatedMeasurer | null = null,
     ): DesignGridResult {
         const columns: number = layout.columns;
         const occupied: Set<number> = new Set();
@@ -81,8 +87,8 @@ export class DesignGrid {
             const cell: GridCell | undefined = cells[index];
             if (
                 cell === undefined ||
-                measurer === null ||
-                cell.item.node.text === null ||
+                (measureAllocated === null &&
+                    (measurer === null || cell.item.node.text === null)) ||
                 cell.item.node.placement.height !== DesignSizing.Hug
             ) {
                 continue;
@@ -102,7 +108,12 @@ export class DesignGrid {
                 placement.minHeight,
                 Math.min(
                     placement.maxHeight,
-                    measurer.measure(cell.item.node.text, targetWidth, cell.item.node.id).height,
+                    measureAllocated !== null
+                        ? measureAllocated(cell.item.node, targetWidth).height
+                        : measurer !== null && cell.item.node.text !== null
+                          ? measurer.measure(cell.item.node.text, targetWidth, cell.item.node.id)
+                                .height
+                          : cell.item.height,
                 ),
             );
             cells[index] = { ...cell, item: { ...cell.item, height } };
