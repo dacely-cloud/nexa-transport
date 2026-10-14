@@ -1,7 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { BinaryReader, BinaryWriter } from './CompanyBinary.js';
+import { BinaryReader } from './BinaryReader.js';
+import { BinaryWriter } from './BinaryWriter.js';
 import type {
     CompanyTask,
     CompanyWork,

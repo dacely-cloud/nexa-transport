@@ -3,7 +3,8 @@
 
 import type { CompanyLimits } from './CompanyLimitsTypes.js';
 
-import { BinaryReader, BinaryWriter } from './CompanyBinary.js';
+import { BinaryReader } from './BinaryReader.js';
+import { BinaryWriter } from './BinaryWriter.js';
 import {
     CompanyOp,
     type CompanyPacket,

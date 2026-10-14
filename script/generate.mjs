@@ -470,22 +470,7 @@ execFileSync(process.execPath, ['script/media.ts'], { stdio: 'inherit' });
 
 /** NGOP has one canonical codec; copy it without runtime server dependencies. */
 mkdirSync('src/office', { recursive: true });
-mkdirSync('src/company', { recursive: true });
-for (const name of [
-    'CompanyBinary',
-    'CompanyTypes',
-    'CompanyLimitsTypes',
-    'CompanyProtocol',
-    'CompanyWorkTypes',
-    'CompanyWorkCodec',
-    'CompanyBudgetTypes',
-    'CompanyProjectTypes',
-    'CompanyProjectProtocol',
-    'CompanyEmployeeTypes',
-    'CompanyEmployeeProtocol',
-]) {
-    writeFileSync(`src/company/${name}.ts`, readFileSync(`../nexa/src/company/${name}.ts`, 'utf8'));
-}
+execFileSync(process.execPath, ['script/company.ts'], { stdio: 'inherit' });
 writeFileSync(
     'src/office/OfficeProtocol.ts',
     readFileSync('../nexa/src/office/OfficeProtocol.ts', 'utf8'),
