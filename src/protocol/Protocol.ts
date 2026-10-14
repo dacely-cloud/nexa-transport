@@ -11953,6 +11953,8 @@ export const RobloxLiveActivationdeviceValues = {
 export const RobloxLiveActivationeventValues = {
     Value0: 'Activated',
     Value1: 'MouseButton1Click',
+    Value2: 'MouseButton1Down',
+    Value3: 'MouseButton1Up',
 } as const;
 
 /** RobloxLiveActivation wire fields. */
@@ -11965,6 +11967,8 @@ export interface RobloxLiveActivationShape {
     readonly event?: (typeof RobloxLiveActivationeventValues)[keyof typeof RobloxLiveActivationeventValues];
     /** nodeId as defined by the Nexa gateway. */
     readonly nodeId: string;
+    /** pointer as defined by the Nexa gateway. */
+    readonly pointer?: RobloxPointerInput;
     /** x as defined by the Nexa gateway. */
     readonly x?: number;
     /** y as defined by the Nexa gateway. */
@@ -12049,6 +12053,30 @@ export interface RobloxLiveStepRequestShape {
 
 /** RobloxLiveStepRequest from the Nexa wire protocol. */
 export type RobloxLiveStepRequest = RobloxLiveStepRequestShape;
+
+/** RobloxPointerInput wire fields. */
+export interface RobloxPointerInputShape {
+    /** id as defined by the Nexa gateway. */
+    readonly id: number;
+    /** over as defined by the Nexa gateway. */
+    readonly over: boolean;
+    /** phase as defined by the Nexa gateway. */
+    readonly phase: RobloxPointerPhase;
+}
+
+/** RobloxPointerInput from the Nexa wire protocol. */
+export type RobloxPointerInput = RobloxPointerInputShape;
+
+/** Allowed values for RobloxPointerPhase. */
+export const RobloxPointerPhaseValues = {
+    Value0: 'Cancel',
+    Value1: 'Press',
+    Value2: 'Release',
+} as const;
+
+/** RobloxPointerPhase from the Nexa wire protocol. */
+export type RobloxPointerPhase =
+    (typeof RobloxPointerPhaseValues)[keyof typeof RobloxPointerPhaseValues];
 
 /** ScalarSchema wire fields. */
 export interface ScalarSchemaShape {
