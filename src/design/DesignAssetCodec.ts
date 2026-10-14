@@ -13,10 +13,43 @@ import {
     type DesignAssetPosition,
     type DesignAssetSlice,
     type DesignAssetListPage,
+    type DesignAssetThumbnail,
 } from './DesignAssetTypes.js';
 
 /** Portable strict boundaries for image metadata and bounded wire slices. */
 export class DesignAssetCodec {
+    /** Closed, bounded preview metadata cannot be mistaken for original asset bytes. */
+    public static thumbnail(raw: unknown): DesignAssetThumbnail {
+        const value: Readonly<Record<string, unknown>> = V.record(raw, [
+            'asset',
+            'mime',
+            'width',
+            'height',
+            'byteLength',
+            'sha256',
+            'data',
+        ]);
+        const data: string = this.base64(value['data']);
+        const byteLength: string = this.offset(value['byteLength']);
+        const decoded: number =
+            (data.length / 4) * 3 - (data.endsWith('==') ? 2 : data.endsWith('=') ? 1 : 0);
+        if (
+            BigInt(byteLength) !== BigInt(decoded) ||
+            decoded < 1 ||
+            decoded > Limits.thumbnailBytes
+        ) {
+            throw new Error('Invalid image thumbnail byte length.');
+        }
+        return {
+            asset: this.asset(value['asset']),
+            mime: V.choice(value['mime'], [DesignAssetMime.Png]),
+            width: V.number(value['width'], 1, Limits.thumbnailEdge, true),
+            height: V.number(value['height'], 1, Limits.thumbnailEdge, true),
+            byteLength,
+            sha256: this.digest(value['sha256']),
+            data,
+        };
+    }
     /** Canonical SHA-256 identity pins retries to the same complete image. */
     public static digest(raw: unknown): string {
         if (typeof raw !== 'string' || !/^[a-f0-9]{64}$/.test(raw)) {

@@ -8,6 +8,7 @@ import {
     type DesignAsset,
     type DesignAssetStartRequest,
     type DesignAssetSlice,
+    type DesignAssetThumbnail,
 } from '../src/design/DesignAssetTypes.js';
 import { DesignAssetReferences } from '../src/design/DesignAssetReferences.js';
 import { DesignDefaults } from '../src/design/DesignDefaults.js';
@@ -29,6 +30,28 @@ const asset: DesignAsset = {
     width: 1,
     height: 1,
 };
+it('validates bounded thumbnail responses independently of original image slices', (): void => {
+    const thumbnail: DesignAssetThumbnail = {
+        asset,
+        mime: 'image/png',
+        width: 1,
+        height: 1,
+        byteLength: '1',
+        sha256: 'b'.repeat(64),
+        data: 'AQ==',
+    };
+    expect(methodValidators[Method.DesignAssetThumbnail].params({ id: asset.id })).toBe(true);
+    expect(methodValidators[Method.DesignAssetThumbnail].result(thumbnail)).toBe(true);
+    expect(Codec.thumbnail(thumbnail)).toEqual(thumbnail);
+    expect((): DesignAssetThumbnail => Codec.thumbnail({ ...thumbnail, width: 193 })).toThrow();
+    expect((): DesignAssetThumbnail =>
+        Codec.thumbnail({ ...thumbnail, byteLength: '2' }),
+    ).toThrow();
+    expect((): DesignAssetThumbnail =>
+        Codec.thumbnail({ ...thumbnail, mime: 'image/jpeg' }),
+    ).toThrow();
+    expect((): DesignAssetThumbnail => Codec.thumbnail({ ...thumbnail, owner: 'other' })).toThrow();
+});
 it('validates image admission and ready metadata through generated method contracts', (): void => {
     const request: DesignAssetStartRequest = {
         id: 'photo',

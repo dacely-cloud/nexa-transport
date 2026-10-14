@@ -11,6 +11,10 @@ export const DesignAssetMime = {
 export type DesignAssetMime = (typeof DesignAssetMime)[keyof typeof DesignAssetMime];
 /** All asset transfers use one acknowledged bounded chunk at a time. */
 export class DesignAssetLimits {
+    /** Library previews never need original-resolution bytes in the browser. */
+    public static readonly thumbnailEdge: number = 192;
+    /** One preview remains smaller than an existing acknowledged image slice. */
+    public static readonly thumbnailBytes: number = 192 * 1024;
     public static readonly chunkBytes: number = 192 * 1024;
     public static readonly fileBytes: bigint = 16n * 1024n * 1024n;
     public static readonly ownerBytes: bigint = 1024n * 1024n * 1024n;
@@ -71,6 +75,21 @@ export interface DesignAssetListRequest {
 export interface DesignAssetListPage {
     readonly items: readonly DesignAsset[];
     readonly nextAfter: string | null;
+}
+/** A small static preview retains the identity of its original immutable owner asset. */
+export interface DesignAssetThumbnail {
+    readonly asset: DesignAsset;
+    readonly mime: typeof DesignAssetMime.Png;
+    readonly width: number;
+    readonly height: number;
+    readonly byteLength: string;
+    readonly sha256: string;
+    readonly data: string;
+}
+/** Preview delivery is independent of original byte downloads and document writes. */
+export interface DesignAssetThumbnailMethod {
+    readonly params: DesignAssetIdRequest;
+    readonly result: DesignAssetThumbnail;
 }
 export interface DesignAssetStartMethod {
     readonly params: DesignAssetStartRequest;
