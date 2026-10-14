@@ -7,6 +7,7 @@ import { RobloxGuiPadding, type RobloxGuiInsets } from './RobloxGuiPadding';
 import { RobloxSceneHierarchy } from './RobloxSceneHierarchy';
 import { RobloxGuiClasses } from './RobloxGuiClasses';
 import { RobloxGuiImages, type RobloxGuiImage } from './RobloxGuiImages';
+import { RobloxGuiScale } from './RobloxGuiScale';
 
 /** Affine local-pixel to viewport-pixel transform. */
 export type RobloxGuiTransform = readonly [number, number, number, number, number, number];
@@ -103,6 +104,7 @@ export class RobloxGuiLayout {
             }
             return this.#projected.evaluate(values, width, height);
         }
+        values = RobloxGuiScale.project(this.#children, values);
         const result: RobloxGuiElement[] = [];
         this.#sizing = new RobloxGuiAutoSize(this.#children, values, this.#scene.textMetrics);
         this.#imagePatches = 0;

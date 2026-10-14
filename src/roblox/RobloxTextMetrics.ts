@@ -92,15 +92,15 @@ export class RobloxTextMeasurement {
     ): RobloxTextBounds {
         if (
             !Number.isFinite(size) ||
-            size < 1 ||
-            size > 100 ||
+            size < 0 ||
+            size > 4096 ||
             (wrapWidth !== null && (!Number.isFinite(wrapWidth) || wrapWidth < 0)) ||
             text.length > 131072 ||
             !text.isWellFormed()
         ) {
             throw new Error('Invalid GUI text measurement dimensions');
         }
-        if (text.length === 0) {
+        if (text.length === 0 || size === 0) {
             return { width: 0, height: 0, lines: 0 };
         }
         const scale: number = Math.fround(Math.fround(size) / metrics.unitsPerEm);
