@@ -690,6 +690,7 @@ export class RobloxSceneCodec {
             Frame: ['ScreenGui', ...RobloxGuiClasses.objects],
             TextLabel: ['ScreenGui', ...RobloxGuiClasses.objects],
             TextButton: ['ScreenGui', ...RobloxGuiClasses.objects],
+            TextBox: ['ScreenGui', ...RobloxGuiClasses.objects],
             ImageLabel: ['ScreenGui', ...RobloxGuiClasses.objects],
             ImageButton: ['ScreenGui', ...RobloxGuiClasses.objects],
             UICorner: RobloxGuiClasses.objects,

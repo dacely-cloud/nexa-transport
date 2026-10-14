@@ -143,6 +143,7 @@ export const RobloxClass = {
     Frame: 'Frame',
     TextLabel: 'TextLabel',
     TextButton: 'TextButton',
+    TextBox: 'TextBox',
     ImageLabel: 'ImageLabel',
     ImageButton: 'ImageButton',
     UICorner: 'UICorner',

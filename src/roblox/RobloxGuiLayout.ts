@@ -6,6 +6,7 @@ import { RobloxGuiAutoSize } from './RobloxGuiAutoSize';
 import { RobloxGuiPadding, type RobloxGuiInsets } from './RobloxGuiPadding';
 import { RobloxSceneHierarchy } from './RobloxSceneHierarchy';
 import { RobloxGuiClasses } from './RobloxGuiClasses';
+import { RobloxGuiText } from './RobloxGuiText';
 import { RobloxGuiImages, type RobloxGuiImage } from './RobloxGuiImages';
 import { RobloxGuiScale } from './RobloxGuiScale';
 
@@ -269,10 +270,16 @@ export class RobloxGuiLayout {
             clip,
             background: this.#color(properties, 'BackgroundColor3', 'BackgroundTransparency'),
             radius: rounding,
-            text: typeof properties['Text'] === 'string' ? properties['Text'] : '',
+            text: RobloxGuiText.content(node.className, properties),
             textColor: !RobloxGuiClasses.text(node.className)
                 ? [0, 0, 0, 0]
-                : this.#color(properties, 'TextColor3', 'TextTransparency'),
+                : this.#color(
+                      properties,
+                      RobloxGuiText.placeholder(node.className, properties)
+                          ? 'PlaceholderColor3'
+                          : 'TextColor3',
+                      'TextTransparency',
+                  ),
             textSize: !RobloxGuiClasses.text(node.className)
                 ? 1
                 : RobloxProperties.number(properties, 'TextSize'),

@@ -6,6 +6,7 @@ import {
     type RobloxGuiSize,
 } from './RobloxGuiBoxLayout';
 import { RobloxGuiClasses } from './RobloxGuiClasses';
+import { RobloxGuiText } from './RobloxGuiText';
 import { RobloxGuiPadding, type RobloxGuiInsets } from './RobloxGuiPadding';
 import { RobloxGuiSizeConstraint, type RobloxGuiSizeLimits } from './RobloxGuiSizeConstraint';
 import { RobloxGuiAspectRatio, type RobloxGuiAspectConstraint } from './RobloxGuiAspectRatio';
@@ -197,10 +198,7 @@ export class RobloxGuiAutoSize {
         if (this.#metrics === undefined) {
             throw new Error('Automatic text sizing requires native font metrics');
         }
-        const text: RobloxValue | undefined = properties['Text'];
-        if (typeof text !== 'string') {
-            throw new Error('Missing automatic GUI text');
-        }
+        const text: string = RobloxGuiText.content(node.className, properties);
         const size: number = RobloxProperties.number(properties, 'TextSize');
         const wrapped: boolean = properties['TextWrapped'] === true;
         const bounds: RobloxTextBounds = RobloxTextMeasurement.measure(

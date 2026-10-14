@@ -9,6 +9,7 @@ export class RobloxGuiClasses {
         'Frame',
         'TextLabel',
         'TextButton',
+        'TextBox',
         'ImageLabel',
         'ImageButton',
     ];
@@ -22,6 +23,6 @@ export class RobloxGuiClasses {
     }
     /** Only text controls read text properties or use contextual text strokes. */
     public static text(className: RobloxClass): boolean {
-        return className === 'TextLabel' || className === 'TextButton';
+        return className === 'TextLabel' || className === 'TextButton' || className === 'TextBox';
     }
 }

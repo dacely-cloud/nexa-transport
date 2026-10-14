@@ -273,6 +273,16 @@ export const RobloxSceneSchema: Readonly<
     Frame: gui,
     TextLabel: text,
     TextButton: { ...text, AutoButtonColor: b(false), Active: b(true), Interactable: b(true) },
+    TextBox: {
+        ...text,
+        ClearTextOnFocus: b(true),
+        MultiLine: b(false),
+        TextEditable: b(true),
+        PlaceholderText: s(''),
+        PlaceholderColor3: v(RobloxValues.color(178 / 255, 178 / 255, 178 / 255), true),
+        CursorPosition: { ...n(-1, -1, 1000000, 'int'), tween: false, serialize: false },
+        SelectionStart: { ...n(-1, -1, 1000000, 'int'), tween: false, serialize: false },
+    },
     ImageLabel: image,
     ImageButton: {
         ...image,

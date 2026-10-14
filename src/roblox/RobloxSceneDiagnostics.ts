@@ -142,7 +142,7 @@ export class RobloxSceneDiagnostics {
         const textParents: ReadonlySet<string> = new Set(
             scene.nodes
                 .filter((node: RobloxSceneNode): boolean =>
-                    ['TextLabel', 'TextButton'].includes(node.className),
+                    ['TextLabel', 'TextButton', 'TextBox'].includes(node.className),
                 )
                 .map((node: RobloxSceneNode): string => node.id),
         );
