@@ -4,6 +4,7 @@ const config: UserConfig = {
         target: 'es2023',
         lib: {
             entry: {
+                'tool-bridge-input': 'src/toolsearch/BridgeInput.ts',
                 'roblox-execution-context': 'src/roblox/RobloxExecutionContext.ts',
                 'roblox-scene-input': 'src/roblox/RobloxSceneInput.ts',
                 'roblox-scene-hierarchy': 'src/roblox/RobloxSceneHierarchy.ts',

@@ -1,6 +1,6 @@
 {
     "name": "nexa-transport",
-    "version": "0.1.0-design-thumbnails.1",
+    "version": "0.1.0-tool-bridge.1",
     "description": "Typed Nexa websocket gateway client for browsers and Node.js",
     "type": "module",
     "license": "Apache-2.0",
@@ -714,6 +714,10 @@
         "./roblox-execution-context": {
             "types": "./dist/roblox/RobloxExecutionContext.d.ts",
             "import": "./dist/roblox-execution-context.js"
+        },
+        "./tool-bridge-input": {
+            "types": "./dist/toolsearch/BridgeInput.d.ts",
+            "import": "./dist/tool-bridge-input.js"
         }
     },
     "scripts": {
