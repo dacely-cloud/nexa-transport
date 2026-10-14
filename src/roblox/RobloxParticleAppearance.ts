@@ -27,6 +27,8 @@ export class RobloxParticleAppearance {
     public readonly color: RobloxColorSequence;
     /** Current normal-to-additive compositing factor. */
     public readonly lightEmission: number;
+    /** Unlit emitted-light intensity; lit particle illumination requires an environment model. */
+    public readonly brightness: number;
     /** Current geometry alignment applies to living particles. */
     public readonly orientation: number;
     /** Current render depth offset in studs leaves particle motion and projected size unchanged. */
@@ -53,6 +55,10 @@ export class RobloxParticleAppearance {
         this.localOpacity = 1 - RobloxProperties.number(properties, 'LocalTransparencyModifier');
         this.color = color;
         this.lightEmission = RobloxProperties.number(properties, 'LightEmission');
+        this.brightness =
+            RobloxProperties.number(properties, 'LightInfluence') === 0
+                ? RobloxProperties.number(properties, 'Brightness')
+                : 1;
         this.orientation = RobloxProperties.enum(properties, 'Orientation');
         this.zOffset = RobloxProperties.number(properties, 'ZOffset');
         this.visible = texture !== '';
@@ -106,9 +112,11 @@ export class RobloxParticleAppearance {
                 this.color.points[index];
             if (a !== undefined && b !== undefined && age <= b.time) {
                 const alpha: number = (age - a.time) / (b.time - a.time);
-                output[offset] = a.color.r + (b.color.r - a.color.r) * alpha;
-                output[offset + 1] = a.color.g + (b.color.g - a.color.g) * alpha;
-                output[offset + 2] = a.color.b + (b.color.b - a.color.b) * alpha;
+                output[offset] = (a.color.r + (b.color.r - a.color.r) * alpha) * this.brightness;
+                output[offset + 1] =
+                    (a.color.g + (b.color.g - a.color.g) * alpha) * this.brightness;
+                output[offset + 2] =
+                    (a.color.b + (b.color.b - a.color.b) * alpha) * this.brightness;
                 return;
             }
         }

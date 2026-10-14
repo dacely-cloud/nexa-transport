@@ -39,7 +39,7 @@ export class RobloxSceneDiagnostics {
                     : 'Particle sprites sample original shipped or downloaded Roblox image texels from one lossless atlas.';
             findings.push(
                 textures +
-                    ' Missing texture bytes produce an error. Loop/OneShot/PingPong/Random flipbooks and custom grids use deterministic playback with optional linear frame crossfades. Current size, color, transparency, texture, LightEmission and Orientation apply to living particles. FacingCamera, FacingCameraWorldUp, VelocityParallel and VelocityPerpendicular share world-space quad axes, with finite zero-velocity fallback and two-sided rendering. Acceleration, signed exponential drag and TimeScale changes affect living particles; recorded observations are held exactly and authored force tweens use 60 Hz intervals. Box, Sphere, Cylinder and Disc shapes support volume/surface sampling, partial regions, inward/outward emission and all six NormalId axes. LockedToPart follows recorded parent translation/rotation even while paused; release preserves current position and velocity direction. Velocity inheritance, wind, native particle RNG and exact Studio lock/shape/pixel calibration remain unfinished.',
+                    ' Missing texture bytes produce an error. Loop/OneShot/PingPong/Random flipbooks and custom grids use deterministic playback with optional linear frame crossfades. Current size, color, transparency, texture, LightEmission, unlit Brightness and Orientation apply to living particles. Brightness scales RGB before texture/opacity compositing when LightInfluence is zero; environment-lit particle illumination remains unfinished. FacingCamera, FacingCameraWorldUp, VelocityParallel and VelocityPerpendicular share world-space quad axes, with finite zero-velocity fallback and two-sided rendering. Acceleration, signed exponential drag and TimeScale changes affect living particles; recorded observations are held exactly and authored force tweens use 60 Hz intervals. Box, Sphere, Cylinder and Disc shapes support volume/surface sampling, partial regions, inward/outward emission and all six NormalId axes. LockedToPart follows recorded parent translation/rotation even while paused; release preserves current position and velocity direction. Velocity inheritance, wind, native particle RNG and exact Studio lock/shape/pixel calibration remain unfinished.',
             );
         }
         const emitterIds: ReadonlySet<string> = new Set(
@@ -77,6 +77,7 @@ export class RobloxSceneDiagnostics {
                         'Transparency',
                         'LocalTransparencyModifier',
                         'Texture',
+                        'Brightness',
                         'LightEmission',
                         'Orientation',
                         'FlipbookLayout',

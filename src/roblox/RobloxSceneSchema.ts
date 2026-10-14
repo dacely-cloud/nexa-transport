@@ -251,6 +251,7 @@ export const RobloxSceneSchema: Readonly<
         }),
         Rotation: { ...v({ kind: 'NumberRange', min: 0, max: 0 }), min: -36000, max: 36000 },
         RotSpeed: { ...v({ kind: 'NumberRange', min: 0, max: 0 }), min: -36000, max: 36000 },
+        Brightness: n(1, 0, 1000),
         LightEmission: n(0, 0, 1),
         LightInfluence: n(0, 0, 1),
         ZOffset: n(0, -100000, 100000),
