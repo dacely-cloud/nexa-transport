@@ -12,6 +12,11 @@ export class MediaSources {
         'Base64.ts',
         'BinaryChunks.ts',
         'BinaryEnvelope.ts',
+        'BinaryAdmissionError.ts',
+        'BinaryEnvelopeDecodePlan.ts',
+        'BinaryEnvelopeDecoder.ts',
+        'BinaryJsonValidation.ts',
+        'JsonFrameMemory.ts',
         'BinaryMedia.ts',
         'BinaryCarrierFactory.ts',
         'BinaryEnvelopeEncoder.ts',
@@ -22,6 +27,9 @@ export class MediaSources {
         'interface/Base64ByteTarget.ts',
         'interface/Base64DecodeResult.ts',
         'interface/BinaryCarrier.ts',
+        'interface/Base64ByteSource.ts',
+        'interface/BinaryDecodeAdmission.ts',
+        'interface/BinaryDecodedCarrier.ts',
         'interface/BinaryEncoding.ts',
         'interface/BinaryEncodingValues.ts',
         'interface/BinaryJsonObject.ts',
@@ -42,11 +50,24 @@ export class MediaSources {
 
     /** Refreshes current source files without regenerating unrelated contracts or build outputs. */
     public static sync(): void {
+        const sources: ReadonlyMap<string, string> = new Map(
+            MediaSources.FILES.map((name: string): readonly [string, string] => [
+                name,
+                MediaSources.source(name),
+            ]),
+        );
+        const names: readonly string[] = MediaSources.FILES.filter(
+            (name: string): boolean => name !== 'BinaryEnvelope.ts',
+        ).concat('BinaryEnvelope.ts');
         let name: string;
-        for (name of MediaSources.FILES) {
+        for (name of names) {
+            const source: string | undefined = sources.get(name);
+            if (source === undefined) {
+                throw new Error('Missing canonical media source');
+            }
             const target: URL = new URL('../src/media/' + name, import.meta.url);
             mkdirSync(dirname(fileURLToPath(target)), { recursive: true });
-            writeFileSync(target, MediaSources.source(name));
+            writeFileSync(target, source);
         }
     }
 }
