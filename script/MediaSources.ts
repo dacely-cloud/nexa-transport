@@ -13,6 +13,8 @@ export class MediaSources {
         'interface/BinaryChunkBudget.ts',
         'interface/BinaryChunkReceipt.ts',
         'BinaryChunkCredit.ts',
+        'BinaryByteBudget.ts',
+        'BinaryInputReservation.ts',
         'BinaryChunkTransfer.ts',
         'BinaryChunks.ts',
         'BinaryEnvelope.ts',
@@ -25,6 +27,7 @@ export class MediaSources {
         'BinaryRequestMemory.ts',
         'JsonFrameMemory.ts',
         'BinaryMedia.ts',
+        'interface/BinaryMediaHeader.ts',
         'BinaryCarrierFactory.ts',
         'BinaryEnvelopeEncoder.ts',
         'BinaryEnvelopePlan.ts',
@@ -49,10 +52,9 @@ export class MediaSources {
         if (!MediaSources.FILES.includes(name)) {
             throw new TypeError('Unknown portable media source');
         }
-        return readFileSync(
-            new URL('../../nexa/src/media/' + name, import.meta.url),
-            'utf8',
-        ).replace("'./DeliveredAttachment'", "'../protocol/Protocol.js'");
+        return readFileSync(new URL('../../nexa/src/media/' + name, import.meta.url), 'utf8')
+            .replace("'./DeliveredAttachment'", "'../protocol/Protocol.js'")
+            .replace("'../DeliveredAttachment'", "'../../protocol/Protocol.js'");
     }
 
     /** Refreshes current source files without regenerating unrelated contracts or build outputs. */

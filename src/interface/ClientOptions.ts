@@ -36,6 +36,8 @@ export interface ClientOptions {
     readonly requestTimeoutMs?: number;
     /** Maximum inbound and outbound JSON frame bytes; default 16 MiB. */
     readonly maxMessageBytes?: number;
+    /** Maximum working memory for reassembly, decoding and unfinished attachment consumers; defaults to twice the maximum transfer size and may be lowered. */
+    readonly maxInboundBytes?: number;
     /** Maximum concurrent pending RPCs; default 64. */
     readonly maxPendingRequests?: number;
     /** Maximum active streaming turns, including acknowledged turns; default 64. */

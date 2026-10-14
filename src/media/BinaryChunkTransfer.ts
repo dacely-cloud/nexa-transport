@@ -4,6 +4,7 @@
 import type { BinaryChunkBudget } from './interface/BinaryChunkBudget';
 import type { BinaryChunkReceipt } from './interface/BinaryChunkReceipt';
 import { BinaryChunkCredit } from './BinaryChunkCredit';
+import { BinaryAdmissionError } from './BinaryAdmissionError';
 
 /** Owns one ordered transfer, allocating only received capacity and charging growth before copying. */
 export class BinaryChunkTransfer {
@@ -68,7 +69,7 @@ export class BinaryChunkTransfer {
                 Math.max(required, this.#data.length * 2),
             );
             if (!this.#credit.reserve(capacity)) {
-                throw new RangeError('Binary transfer growth exceeds its memory budget');
+                throw new BinaryAdmissionError('Binary transfer growth exceeds its memory budget');
             }
             let grown: Uint8Array<ArrayBuffer>;
             try {

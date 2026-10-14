@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { BinaryChunkBudget } from './interface/BinaryChunkBudget';
+import { BinaryAdmissionError } from './BinaryAdmissionError';
 
 /** Holds admitted transfer storage until cancellation or an atomic handoff to its original budget. */
 export class BinaryChunkCredit {
@@ -11,8 +12,11 @@ export class BinaryChunkCredit {
 
     /** Claims credit before the receiver allocates initial storage. */
     public constructor(budget: BinaryChunkBudget, bytes: number) {
-        if (!Number.isSafeInteger(bytes) || bytes < 0 || !budget.reserve(bytes)) {
-            throw new RangeError('Binary transfer memory budget is exhausted');
+        if (!Number.isSafeInteger(bytes) || bytes < 0) {
+            throw new RangeError('Invalid binary transfer credit');
+        }
+        if (!budget.reserve(bytes)) {
+            throw new BinaryAdmissionError('Binary transfer memory budget is exhausted');
         }
         this.#budget = budget;
         this.#bytes = bytes;
@@ -22,6 +26,11 @@ export class BinaryChunkCredit {
     /** Held storage, including a growth peak until the old buffer is discarded. */
     public get used(): number {
         return this.#bytes;
+    }
+
+    /** Ownership can be handed to a decoder only within its original or equivalent host budget. */
+    public belongsTo(budget: BinaryChunkBudget): boolean {
+        return this.#budget === budget || this.#budget.matches?.(budget) === true;
     }
 
     /** Claims additional capacity before allocating or copying. */
@@ -52,7 +61,7 @@ export class BinaryChunkCredit {
     public transferTo(budget: BinaryChunkBudget, limit: number, bytes: number): boolean {
         if (
             this.#closed ||
-            (budget !== this.#budget && this.#budget.matches?.(budget) !== true) ||
+            !this.belongsTo(budget) ||
             !Number.isSafeInteger(limit) ||
             limit <= 0 ||
             !Number.isSafeInteger(bytes) ||

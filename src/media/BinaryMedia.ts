@@ -2,6 +2,11 @@
 
 import { BinaryChunks } from './BinaryChunks';
 import type { DeliveredAttachment } from '../protocol/Protocol.js';
+import type { BinaryMediaHeader } from './interface/BinaryMediaHeader';
+import type { BinaryDecodeAdmission } from './interface/BinaryDecodeAdmission';
+import { JsonFrameMemory } from './JsonFrameMemory';
+import { BinaryRequestMemory } from './BinaryRequestMemory';
+import { BinaryAdmissionError } from './BinaryAdmissionError';
 
 /** Original bytes and metadata received together in one binary frame. */
 export interface ReceivedAttachment extends DeliveredAttachment {
@@ -25,6 +30,7 @@ export class BinaryMedia {
     public static progress(
         prefix: Uint8Array<ArrayBuffer>,
         total: number,
+        admission?: BinaryDecodeAdmission,
     ): AttachmentProgress | null {
         if (prefix.byteLength < 8) {
             return null;
@@ -40,24 +46,17 @@ export class BinaryMedia {
         if (prefix.byteLength < 8 + length) {
             return null;
         }
-        const raw: unknown = JSON.parse(
-            new TextDecoder('utf-8', { fatal: true }).decode(prefix.subarray(8, 8 + length)),
+        const header: BinaryMediaHeader = BinaryMedia.#read(
+            prefix.subarray(8, 8 + length),
+            total - 8 - length,
+            admission,
         );
-        if (
-            !BinaryMedia.#record(raw) ||
-            !BinaryMedia.#metadata(raw['attachment']) ||
-            raw['attachment'].byteLength !== total - 8 - length ||
-            (raw['sessionId'] !== undefined && typeof raw['sessionId'] !== 'string') ||
-            (raw['streamId'] !== undefined && typeof raw['streamId'] !== 'string')
-        ) {
-            throw new TypeError('Invalid binary media metadata');
-        }
         return {
-            id: raw['attachment'].id,
+            id: header.attachment.id,
             receivedBytes: prefix.byteLength - 8 - length,
-            totalBytes: raw['attachment'].byteLength,
-            ...(typeof raw['sessionId'] === 'string' ? { sessionId: raw['sessionId'] } : {}),
-            ...(typeof raw['streamId'] === 'string' ? { streamId: raw['streamId'] } : {}),
+            totalBytes: header.attachment.byteLength,
+            ...(header.sessionId === undefined ? {} : { sessionId: header.sessionId }),
+            ...(header.streamId === undefined ? {} : { streamId: header.streamId }),
         };
     }
     public static encode(
@@ -128,7 +127,11 @@ export class BinaryMedia {
     }
 
     /** Validates metadata and exposes a view of the original bytes, without base64 conversion. */
-    public static decode(buffer: ArrayBuffer, maxBytes: number): ReceivedAttachment {
+    public static decode(
+        buffer: ArrayBuffer,
+        maxBytes: number,
+        admission?: BinaryDecodeAdmission,
+    ): ReceivedAttachment {
         if (buffer.byteLength < 8 || buffer.byteLength > maxBytes) {
             throw new RangeError('Invalid binary media frame size');
         }
@@ -137,9 +140,42 @@ export class BinaryMedia {
         if (view.getUint32(0) !== 0x4e584d44 || length > 16_384 || length > buffer.byteLength - 8) {
             throw new TypeError('Invalid binary media frame header');
         }
-        const raw: unknown = JSON.parse(
-            new TextDecoder('utf-8', { fatal: true }).decode(new Uint8Array(buffer, 8, length)),
+        const data: Uint8Array<ArrayBuffer> = new Uint8Array(buffer, 8 + length);
+        const header: BinaryMediaHeader = BinaryMedia.#read(
+            new Uint8Array(buffer, 8, length),
+            data.byteLength,
+            admission,
         );
+        return {
+            ...header.attachment,
+            data,
+            ...(header.streamId === undefined ? {} : { streamId: header.streamId }),
+            ...(header.sessionId === undefined ? {} : { sessionId: header.sessionId }),
+        };
+    }
+
+    /** Structural preflight precedes parsing; only validated scalar metadata survives decoding. */
+    static #read(
+        bytes: Uint8Array,
+        contentBytes: number,
+        admission: BinaryDecodeAdmission | undefined,
+    ): BinaryMediaHeader {
+        let charge: number;
+        try {
+            charge = JsonFrameMemory.measure(
+                bytes,
+                admission?.limit ?? BinaryRequestMemory.DEFAULT_REQUEST_BYTES,
+            );
+        } catch (error: unknown) {
+            if (admission !== undefined && error instanceof RangeError) {
+                throw new BinaryAdmissionError(error.message);
+            }
+            throw error;
+        }
+        if (admission !== undefined && !admission.reserve(charge)) {
+            throw new BinaryAdmissionError();
+        }
+        const raw: unknown = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(bytes));
         if (
             !BinaryMedia.#record(raw) ||
             !BinaryMedia.#metadata(raw['attachment']) ||
@@ -148,13 +184,25 @@ export class BinaryMedia {
         ) {
             throw new TypeError('Invalid binary media metadata');
         }
-        const data: Uint8Array<ArrayBuffer> = new Uint8Array(buffer, 8 + length);
-        if (raw['attachment'].byteLength !== data.byteLength) {
+        if (raw['attachment'].byteLength !== contentBytes) {
             throw new RangeError('Binary media byte length does not match metadata');
         }
         return {
-            ...raw['attachment'],
-            data,
+            attachment: {
+                id: raw['attachment'].id,
+                filename: raw['attachment'].filename,
+                mimeType: raw['attachment'].mimeType,
+                byteLength: raw['attachment'].byteLength,
+                ...(raw['attachment'].description === undefined
+                    ? {}
+                    : { description: raw['attachment'].description }),
+                ...(raw['attachment'].asFile === undefined
+                    ? {}
+                    : { asFile: raw['attachment'].asFile }),
+                ...(raw['attachment'].website === undefined
+                    ? {}
+                    : { website: raw['attachment'].website }),
+            },
             ...(typeof raw['streamId'] === 'string' ? { streamId: raw['streamId'] } : {}),
             ...(typeof raw['sessionId'] === 'string' ? { sessionId: raw['sessionId'] } : {}),
         };
@@ -181,7 +229,8 @@ export class BinaryMedia {
             (value['description'] === undefined ||
                 (typeof value['description'] === 'string' &&
                     value['description'].length <= 4096)) &&
-            (value['asFile'] === undefined || typeof value['asFile'] === 'boolean')
+            (value['asFile'] === undefined || typeof value['asFile'] === 'boolean') &&
+            (value['website'] === undefined || typeof value['website'] === 'boolean')
         );
     }
 }
