@@ -22,6 +22,19 @@ import {
 
 /** Complete layer validation avoids silently losing newer fields during an older client's edit. */
 export class DesignNodeCodec {
+    static readonly #containers: readonly DesignKind[] = [
+        DesignKind.Frame,
+        DesignKind.Group,
+        DesignKind.Component,
+        DesignKind.ComponentSet,
+        DesignKind.Boolean,
+        DesignKind.Mask,
+    ];
+    /** Authored children belong only to native containers; linked instances expand their definition. */
+    public static acceptsChildren(kind: DesignKind): boolean {
+        return this.#containers.includes(kind);
+    }
+
     /** Parses and detaches one layer with bounded text, effects and geometry. */
     public static node(raw: unknown): DesignNode {
         const value: Readonly<Record<string, unknown>> = V.fields(
@@ -97,17 +110,7 @@ export class DesignNodeCodec {
         if (kind !== DesignKind.Text && node.text !== null) {
             throw new Error('Only text layers accept text settings');
         }
-        if (
-            node.children.length > 0 &&
-            ![
-                DesignKind.Frame,
-                DesignKind.Group,
-                DesignKind.Component,
-                DesignKind.ComponentSet,
-                DesignKind.Boolean,
-                DesignKind.Mask,
-            ].some((entry: DesignKind): boolean => entry === kind)
-        ) {
+        if (node.children.length > 0 && !this.acceptsChildren(kind)) {
             throw new Error('Only containers accept child layers');
         }
         if (kind === DesignKind.Instance && node.componentId === null) {
