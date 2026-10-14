@@ -770,6 +770,10 @@
         "./session-files": {
             "types": "./dist/networking/SessionFilePager.d.ts",
             "import": "./dist/session-files.js"
+        },
+        "./design-blend-types": {
+            "types": "./dist/design/DesignBlendTypes.d.ts",
+            "import": "./dist/design-blend-types.js"
         }
     },
     "scripts": {
