@@ -41,6 +41,12 @@ they do not execute server-only handlers or grant access.
 native endpoint bindings, appearance sequences and texture travel used by both
 hardware preview adapters. It does not execute Luau or certify Studio pixel parity.
 
+`nexa-transport/roblox-trails` provides world-space ribbons from bounded native
+Trail histories, including age-based appearance, disconnected strips and
+backward seeking. Captured history uses incremental head/retention updates;
+the geometry sampler does not execute or synthesize Luau motion. Studio
+pixel parity and replay of paths present before capture remain unverified.
+
 | Import                                       | Availability | Contract                                                         |
 | -------------------------------------------- | ------------ | ---------------------------------------------------------------- |
 | `nexa-transport/roblox-legacy-font`          | ESM + types  | Portable legacy font data and lookup for native previews.        |
