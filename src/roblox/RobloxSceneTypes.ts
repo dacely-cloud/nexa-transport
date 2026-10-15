@@ -142,6 +142,7 @@ export const RobloxClass = {
     WorldModel: 'WorldModel',
     ObjectValue: 'ObjectValue',
     Beam: 'Beam',
+    Trail: 'Trail',
     Part: 'Part',
     WedgePart: 'WedgePart',
     CornerWedgePart: 'CornerWedgePart',
@@ -183,6 +184,8 @@ export interface RobloxHierarchyNode {
 /** One ordered native topology observation; changed entries also reattach known instances. */
 export interface RobloxHierarchyDelta {
     readonly at: number;
+    /** The native mutation occurred after this frame's Trail sampling. */
+    readonly afterFrame?: true;
     readonly created: readonly RobloxSceneNode[];
     readonly changed: readonly RobloxHierarchyNode[];
     readonly removed: readonly string[];
@@ -221,6 +224,8 @@ export interface RobloxParticleClear {
     readonly nodeId: string;
     readonly at: number;
     readonly trigger: string | null;
+    /** Native Trail calls after its frame sample must replay after the current Heartbeat. */
+    readonly afterFrame?: true;
 }
 /** Linear native property animation, evaluated from the previous value on the same track. */
 export interface RobloxTween {
@@ -237,6 +242,8 @@ export interface RobloxTween {
 export interface RobloxPropertySample {
     readonly at: number;
     readonly value: RobloxValue;
+    /** Captured after the Trail frame sampler; the prior same-time value remains its input. */
+    readonly afterFrame?: true;
 }
 /** Step playback of real VM observations; values between observations are held. */
 export interface RobloxRecording {
@@ -253,6 +260,8 @@ export type RobloxSceneEvent = RobloxBurst | RobloxParticleClear | RobloxTween |
 export interface RobloxScene {
     /** Native UV origins and method resets; these are not invented instance properties. */
     readonly beamTexturePhases?: readonly import('./RobloxBeamPhases').RobloxBeamPhaseTrack[];
+    /** Native cross-section history, including negative births before capture begins. */
+    readonly trailHistory?: readonly import('./RobloxTrailHistory').RobloxTrailTrack[];
     /** Bounded world-space observations shared by all native emitters in this scene. */
     readonly environment?: import('./RobloxEnvironment').RobloxEnvironmentState;
     /** Original authorized FileMesh bytes shared by all instances referencing the same resource. */

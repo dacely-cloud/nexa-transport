@@ -5,6 +5,7 @@ import { RobloxSceneInput } from './RobloxSceneInput';
 import { RobloxSceneReferences } from './RobloxSceneReferences';
 import { RobloxBeamBudget } from './RobloxBeamBudget';
 import { RobloxBeamPhases, type RobloxBeamPhaseTrack } from './RobloxBeamPhases';
+import { RobloxTrailHistory, type RobloxTrailTrack } from './RobloxTrailHistory';
 import { RobloxEnvironment } from './RobloxEnvironment';
 import { RobloxPartGeometry } from './RobloxPartGeometry';
 import { RobloxSceneMeshes } from './RobloxSceneMeshes';
@@ -54,6 +55,7 @@ export class RobloxSceneCodec {
                 'meshes',
                 'environment',
                 'beamTexturePhases',
+                'trailHistory',
             ],
         );
         if (fields['format'] !== 'nexa.roblox.scene' || fields['version'] !== 1) {
@@ -206,6 +208,19 @@ export class RobloxSceneCodec {
                 hierarchy.deltas,
                 65536 - samples,
             );
+        const trailHistory: readonly RobloxTrailTrack[] | undefined = RobloxTrailHistory.decode(
+            fields['trailHistory'],
+            duration,
+            byId,
+            hierarchy.deltas,
+            65536 -
+                samples -
+                (beamTexturePhases?.reduce(
+                    (sum: number, track: RobloxBeamPhaseTrack): number =>
+                        sum + track.samples.length,
+                    0,
+                ) ?? 0),
+        );
         const textures: RobloxSceneTextureAtlas | undefined = RobloxSceneTextures.decode(
             fields['textures'],
         );
@@ -232,6 +247,7 @@ export class RobloxSceneCodec {
             ...(meshes === undefined ? {} : { meshes }),
             ...(environment === undefined ? {} : { environment }),
             ...(beamTexturePhases === undefined ? {} : { beamTexturePhases }),
+            ...(trailHistory === undefined ? {} : { trailHistory }),
             ...(fields['textMetrics'] === undefined
                 ? {}
                 : { textMetrics: RobloxTextMeasurement.decode(fields['textMetrics']) }),
@@ -652,7 +668,7 @@ export class RobloxSceneCodec {
                 );
             }
         }
-        if (supported === RobloxClass.Beam) {
+        if (supported === RobloxClass.Beam || supported === RobloxClass.Trail) {
             const texture: RobloxValue | undefined = properties['Texture'];
             if (
                 texture !== '' &&
@@ -680,6 +696,7 @@ export class RobloxSceneCodec {
         }
         const allowed: Readonly<Record<RobloxClass, readonly RobloxClass[]>> = {
             Beam: Object.values(RobloxClass),
+            Trail: Object.values(RobloxClass),
             ObjectValue: Object.values(RobloxClass),
             Folder: [
                 'Folder',
@@ -767,6 +784,7 @@ export class RobloxSceneCodec {
                       'ScreenGui',
                       'ObjectValue',
                       'Beam',
+                      'Trail',
                       'Attachment',
                   ].includes(node.className)
                 : !allowed[node.className].includes(parent.className)
@@ -794,7 +812,7 @@ export class RobloxSceneCodec {
         const header: Readonly<Record<string, unknown>> = this.record(
             raw,
             ['kind', 'nodeId', 'at', 'trigger'],
-            ['count', 'duration', 'property', 'to', 'samples', 'emission'],
+            ['count', 'duration', 'property', 'to', 'samples', 'emission', 'afterFrame'],
         );
         const nodeId: string = this.#id(header['nodeId']);
         const node: RobloxSceneNode | undefined = nodes.get(nodeId);
@@ -831,11 +849,26 @@ export class RobloxSceneCodec {
             });
         }
         if (header['kind'] === 'clear') {
-            this.record(raw, ['kind', 'nodeId', 'at', 'trigger']);
-            if (node.className !== RobloxClass.ParticleEmitter) {
-                throw new Error('Clear target must be a ParticleEmitter');
+            this.record(raw, ['kind', 'nodeId', 'at', 'trigger'], ['afterFrame']);
+            if (
+                node.className !== RobloxClass.ParticleEmitter &&
+                node.className !== RobloxClass.Trail
+            ) {
+                throw new Error('Clear target must be a ParticleEmitter or Trail');
             }
-            return Object.freeze({ kind: 'clear', nodeId, at, trigger });
+            if (
+                header['afterFrame'] !== undefined &&
+                (header['afterFrame'] !== true || node.className !== RobloxClass.Trail)
+            ) {
+                throw new Error('Only native Trail clears accept afterFrame:true');
+            }
+            return Object.freeze({
+                kind: 'clear',
+                nodeId,
+                at,
+                trigger,
+                ...(header['afterFrame'] === true ? { afterFrame: true } : {}),
+            });
         }
         if (header['kind'] === 'recording') {
             this.record(raw, ['kind', 'nodeId', 'at', 'trigger', 'property', 'samples']);
@@ -849,17 +882,33 @@ export class RobloxSceneCodec {
                 throw new Error('Unsupported recorded property: ' + property);
             }
             let previous: number = -1;
+            let previousAfterFrame: boolean = false;
             const samples: readonly RobloxPropertySample[] = this.#array(
                 header['samples'],
-                3601,
+                7202,
             ).map((raw: unknown): RobloxPropertySample => {
-                const fields: Readonly<Record<string, unknown>> = this.record(raw, ['at', 'value']);
+                const fields: Readonly<Record<string, unknown>> = this.record(
+                    raw,
+                    ['at', 'value'],
+                    ['afterFrame'],
+                );
+                if (fields['afterFrame'] !== undefined && fields['afterFrame'] !== true) {
+                    throw new Error('Native afterFrame must be true when present');
+                }
+                const afterFrame: boolean = fields['afterFrame'] === true;
                 const at: number = this.number(fields['at'], 0, duration);
-                if (at <= previous) {
-                    throw new Error('Recorded samples must have strictly increasing timestamps');
+                if (at < previous || (at === previous && (!afterFrame || previousAfterFrame))) {
+                    throw new Error(
+                        'Recorded samples must have strictly increasing timestamps or ordered native frame phases',
+                    );
                 }
                 previous = at;
-                return Object.freeze({ at, value: this.value(fields['value'], spec) });
+                previousAfterFrame = afterFrame;
+                return Object.freeze({
+                    at,
+                    value: this.value(fields['value'], spec),
+                    ...(afterFrame ? { afterFrame: true } : {}),
+                });
             });
             if (samples.length === 0) {
                 throw new Error('Recorded property track needs samples');

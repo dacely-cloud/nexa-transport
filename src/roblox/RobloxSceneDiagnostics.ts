@@ -20,6 +20,35 @@ export class RobloxSceneDiagnostics {
                 'Beam ribbons use current scoped Attachment frames, cubic control points, linear endpoint widths, per-segment color/opacity, camera-facing or attachment-oriented geometry, original texture texels, Wrap/Stretch/Static UVs, signed TextureSpeed travel, Brightness, LocalTransparencyModifier, LightEmission and depth-only ZOffset. Static behaves like Wrap for Beams. Captured phase anchors preserve native pre-capture texture travel and SetTextureOffset resets in previews and Studio replay. Scenes without anchors start at their lifetime origin. Environmental lighting, intersecting transparency order and exact Studio ribbon/UV/phase/pixel calibration remain unfinished.',
             );
         }
+        const trails: readonly RobloxSceneNode[] = nodes.filter(
+            (node: RobloxSceneNode): boolean => node.className === 'Trail',
+        );
+        if (trails.length > 0) {
+            findings.push(
+                'Native Trail captures retain world-space attachment history, point births, disconnected strips, irreversible lifetime/length clipping and Clear. Ribbons apply current age-based color, transparency and width with original textures. Replay preserves mutations before and after native sampling within each frame. Exact Studio sampling, length, UVs, lighting, transparency order and pixels remain uncalibrated.',
+            );
+            if (
+                trails.some(
+                    (node: RobloxSceneNode): boolean =>
+                        !scene.trailHistory?.some((track): boolean => track.nodeId === node.id),
+                )
+            ) {
+                findings.push(
+                    'A Trail has no native history. Authored JSON attachment-motion synthesis remains unfinished; record native Luau motion to capture its path.',
+                );
+            }
+            if (
+                scene.trailHistory?.some((track): boolean =>
+                    track.samples.some(
+                        (sample): boolean => sample.kind === 'reset' && sample.points.length > 1,
+                    ),
+                )
+            ) {
+                findings.push(
+                    'Native previews retain paths already present before capture or scope re-entry. Studio replay cannot yet preseed that history; start recording before motion for reproducible packs.',
+                );
+            }
+        }
         if (
             nodes.some((node: RobloxSceneNode): boolean => RobloxGuiClasses.image(node.className))
         ) {

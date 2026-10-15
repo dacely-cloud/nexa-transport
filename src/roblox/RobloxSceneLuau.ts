@@ -240,8 +240,15 @@ export class RobloxSceneLuau {
                         '])',
                 );
             }
-            if (node.className === 'ParticleEmitter') {
+            if (node.className === 'ParticleEmitter' || node.className === 'Trail') {
                 lines.push('    nodes[' + this.quote(node.id) + ']:Clear()');
+                if (node.className === 'Trail') {
+                    lines.push(
+                        '    task.defer(function() if generation == current then nodes[' +
+                            this.quote(node.id) +
+                            ']:Clear() end end)',
+                    );
+                }
             }
             for (const property of new Set(
                 scene.events
@@ -303,6 +310,22 @@ export class RobloxSceneLuau {
             if (RobloxMeshPlayback.geometry(event, byId.get(event.nodeId))) {
                 continue;
             }
+            if (event.kind === 'clear' && byId.get(event.nodeId)?.className === 'Trail') {
+                lines.push(
+                    '    if trigger == ' +
+                        (event.trigger === null ? 'nil' : this.quote(event.trigger)) +
+                        ' then',
+                    '      table.insert(recordings, {node=nodes[' +
+                        this.quote(event.nodeId) +
+                        '], clear=true, cursor=1, samples={{' +
+                        String(event.at) +
+                        ',false' +
+                        (event.afterFrame === true ? ',true' : '') +
+                        '}}})',
+                    '    end',
+                );
+                continue;
+            }
             if (event.kind === 'recording') {
                 const samples: string = event.samples
                     .map(
@@ -315,6 +338,7 @@ export class RobloxSceneLuau {
                                 event.property,
                                 byId.get(event.nodeId)?.className,
                             ) +
+                            (sample.afterFrame === true ? ',true' : '') +
                             '}',
                     )
                     .join(',');
@@ -429,7 +453,14 @@ export class RobloxSceneLuau {
                     );
                 }
             } else if (event.kind === 'clear') {
-                lines.push('        nodes[' + this.quote(event.nodeId) + ']:Clear()');
+                const clear: string = 'nodes[' + this.quote(event.nodeId) + ']:Clear()';
+                lines.push(
+                    event.afterFrame === true
+                        ? '        task.defer(function() if generation == current then ' +
+                              clear +
+                              ' end end)'
+                        : '        ' + clear,
+                );
             } else {
                 lines.push(
                     '        local tween = TweenService:Create(nodes[' +
@@ -458,6 +489,7 @@ export class RobloxSceneLuau {
             dynamic
                 ? '        local pending = advanceHierarchy(elapsed)'
                 : '        local pending = false',
+            ...(beams ? ['        local deferred = false'] : []),
             '        for _, track in recordings do',
             '          while track.samples[track.cursor] and track.samples[track.cursor][1] <= elapsed + 1e-9 do',
             ...(scene.environment === undefined
@@ -468,12 +500,32 @@ export class RobloxSceneLuau {
                       '            if track.environment then applyWind(track.samples[track.cursor][2])',
                       '            elseif track.mesh then track.node:ApplyMesh(track.samples[track.cursor][2])',
                   ]),
-            '            else track.node[track.property] = track.samples[track.cursor][2] end',
+            '            else',
+            '              local sample = track.samples[track.cursor]',
+            '              if track.clear then',
+            '                local node = track.node',
+            '                if sample[3] and math.abs(sample[1] - elapsed) <= 1e-9 then',
+            '                  task.defer(function() if generation == current then node:Clear() end end)',
+            '                else node:Clear() end',
+            '              elseif sample[3] and math.abs(sample[1] - elapsed) <= 1e-9 then',
+            ...(beams ? ['                deferred = true'] : []),
+            '                local node, property, value = track.node, track.property, sample[2]',
+            '                task.defer(function() if generation == current then node[property] = value end end)',
+            '              else track.node[track.property] = sample[2] end',
+            '            end',
             '            track.cursor += 1',
             '          end',
             '          if track.samples[track.cursor] then pending = true end',
             '        end',
-            ...(beams ? ['        if advanceBeams(elapsed) then pending = true end'] : []),
+            ...(beams
+                ? [
+                      '        if deferred then',
+                      '          pending = true',
+                      '          local time = elapsed',
+                      '          task.defer(function() if generation == current then advanceBeams(time) end end)',
+                      '        elseif advanceBeams(elapsed) then pending = true end',
+                  ]
+                : []),
             '        return pending',
             '      end',
             '      if advance() then',

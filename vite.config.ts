@@ -30,6 +30,7 @@ const config: UserConfig = {
                 'roblox-particle-orientation': 'src/roblox/RobloxParticleOrientation.ts',
                 'roblox-scene-types': 'src/roblox/RobloxSceneTypes.ts',
                 'roblox-beams': 'src/roblox/RobloxBeamGeometry.ts',
+                'roblox-trails': 'src/roblox/RobloxTrailGeometry.ts',
                 'roblox-scene-schema': 'src/roblox/RobloxSceneSchema.ts',
                 'roblox-scene-codec': 'src/roblox/RobloxSceneCodec.ts',
                 'roblox-scene-runtime': 'src/roblox/RobloxSceneRuntime.ts',

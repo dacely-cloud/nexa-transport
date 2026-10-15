@@ -40,14 +40,17 @@ export class RobloxHierarchyLuau {
             for (const id of delta.removed) {
                 lines.push('    nodes[' + RobloxSceneLuau.quote(id) + '].Parent = nil');
             }
-            lines.push('      end},');
+            lines.push('      end' + (delta.afterFrame === true ? ',true' : '') + '},');
         }
         lines.push(
             '    }',
             '    local hierarchyCursor = 1',
             '    local function advanceHierarchy(elapsed)',
             '      while hierarchy[hierarchyCursor] and hierarchy[hierarchyCursor][1] <= elapsed + 1e-9 do',
-            '        hierarchy[hierarchyCursor][2]()',
+            '        local delta = hierarchy[hierarchyCursor]',
+            '        if delta[3] and math.abs(delta[1] - elapsed) <= 1e-9 then',
+            '          task.defer(function() if generation == current then delta[2]() end end)',
+            '        else delta[2]() end',
             '        hierarchyCursor += 1',
             '      end',
             '      return hierarchy[hierarchyCursor] ~= nil',

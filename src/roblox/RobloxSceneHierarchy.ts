@@ -44,16 +44,23 @@ export class RobloxSceneHierarchy {
         );
         const seconds: Map<string, number> = new Map();
         let previous: number = 0;
+        let previousAfterFrame: boolean = false;
         let operations: number = 0;
         const deltas: RobloxHierarchyDelta[] = [];
         for (const value of raw === undefined ? [] : RobloxSceneCodec.array(raw, 4096)) {
-            const fields: Readonly<Record<string, unknown>> = RobloxSceneCodec.record(value, [
-                'at',
-                'created',
-                'changed',
-                'removed',
-            ]);
+            const fields: Readonly<Record<string, unknown>> = RobloxSceneCodec.record(
+                value,
+                ['at', 'created', 'changed', 'removed'],
+                ['afterFrame'],
+            );
             const at: number = RobloxSceneCodec.number(fields['at'], previous, duration);
+            const afterFrame: unknown = fields['afterFrame'];
+            if (afterFrame !== undefined && afterFrame !== true) {
+                throw new Error('Invalid hierarchy sampling phase');
+            }
+            if (at === previous && previousAfterFrame && afterFrame !== true) {
+                throw new Error('Reversed hierarchy sampling phase');
+            }
             const created: readonly RobloxSceneNode[] = RobloxSceneCodec.array(
                 fields['created'],
                 2048,
@@ -128,12 +135,14 @@ export class RobloxSceneHierarchy {
             deltas.push(
                 Object.freeze({
                     at,
+                    ...(afterFrame === true ? { afterFrame: true as const } : {}),
                     created: Object.freeze(created),
                     changed: Object.freeze(changed),
                     removed: Object.freeze(removed),
                 }),
             );
             previous = at;
+            previousAfterFrame = afterFrame === true;
         }
         for (const [id, start] of started) {
             seconds.set(id, (seconds.get(id) ?? 0) + duration - start);

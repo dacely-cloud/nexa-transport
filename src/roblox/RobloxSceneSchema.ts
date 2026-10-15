@@ -74,6 +74,8 @@ export interface RobloxPropertySpec {
     readonly referenceClasses?: readonly RobloxClass[];
     /** Host negotiation for private Beam UV origins and SetTextureOffset observations. */
     readonly capturePhase?: true;
+    /** Host negotiation for retained native Trail cross-sections and history mutations. */
+    readonly captureTrail?: true;
 }
 /** Constructors for fully explicit portable native datatypes. */
 export class RobloxValues {
@@ -262,6 +264,41 @@ export const RobloxSceneSchema: Readonly<
         TextureLength: n(1, 0.001, 10000),
         TextureSpeed: { ...n(1, -1000, 1000), capturePhase: true },
         ZOffset: n(0, -10000, 10000),
+    },
+    Trail: {
+        Attachment0: {
+            type: 'Instance',
+            default: RobloxValues.reference(),
+            xmlType: 'Ref',
+            referenceClasses: ['Attachment'],
+        },
+        Attachment1: {
+            type: 'Instance',
+            default: RobloxValues.reference(),
+            xmlType: 'Ref',
+            referenceClasses: ['Attachment'],
+        },
+        Enabled: b(true),
+        FaceCamera: b(false),
+        Lifetime: { ...n(2, Math.fround(0.01), 20), captureTrail: true },
+        MinLength: n(Math.fround(0.1), 0, 1e6),
+        MaxLength: n(0, 0, 1e6),
+        WidthScale: { ...v(RobloxValues.sequence(1)), min: 0, max: 1 },
+        Color: v({
+            kind: 'ColorSequence',
+            points: [
+                { time: 0, color: RobloxValues.color() },
+                { time: 1, color: RobloxValues.color() },
+            ],
+        }),
+        Transparency: { ...v(RobloxValues.sequence(0.5)), min: 0, max: 1 },
+        LocalTransparencyModifier: { ...n(0, 0, 1), serialize: false },
+        Brightness: n(1, 0, 10000),
+        LightEmission: n(0, 0, 1),
+        LightInfluence: n(0, 0, 1),
+        Texture: { ...s(''), xmlType: 'ContentId' },
+        TextureMode: e(0, [0, 1, 2], 'TextureMode'),
+        TextureLength: n(1, 0.001, 10000),
     },
     Part: { ...part, Shape: e(1, [0, 1, 2, 3, 4], 'PartType') },
     WedgePart: part,
