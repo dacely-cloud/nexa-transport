@@ -263,3 +263,5 @@ Metadata-only page ownership, locked ancestry and topmost selection are availabl
 | `nexa-transport/design-image-adjustment-types` | ESM + types  | Typed non-destructive photo controls and shared color parameters. |
 | `nexa-transport/design-image-adjustment-codec` | ESM + types  | Bounded canonical controls and partial edits.                     |
 | `nexa-transport/design-image-color`            | ESM + types  | Shared sRGB color matrix, tone curve and SVG primitives.          |
+
+`nexa-transport/design-effect-metrics` exports the shared native effect margin and influence calculations used by SVG export, graph import and the website renderer.
