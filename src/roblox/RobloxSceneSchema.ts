@@ -240,6 +240,7 @@ export const RobloxSceneSchema: Readonly<
         ShapePartial: n(1, 0, 1),
         SpreadAngle: v({ kind: 'Vector2', x: 0, y: 0 }),
         Size: { ...v(RobloxValues.sequence(1)), min: 0, max: 1000 },
+        Squash: { ...v(RobloxValues.sequence(0)), min: -1000, max: 1000 },
         Transparency: { ...v(RobloxValues.sequence(0)), min: 0, max: 1 },
         LocalTransparencyModifier: { ...n(0, 0, 1), serialize: false },
         Color: v({

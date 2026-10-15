@@ -73,6 +73,7 @@ export class RobloxSceneDiagnostics {
                         'TimeScale',
                         'LockedToPart',
                         'Size',
+                        'Squash',
                         'Color',
                         'Transparency',
                         'LocalTransparencyModifier',

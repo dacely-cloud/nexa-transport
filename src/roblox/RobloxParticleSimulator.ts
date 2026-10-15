@@ -12,6 +12,8 @@ import { RobloxParticleLockedMotion } from './RobloxParticleLockedMotion';
 /** Packed particle attributes: x/y/z, size, r/g/b, opacity, rotation in radians. */
 export interface RobloxParticleFrame {
     readonly attributes: Float32Array;
+    /** Two positive local-axis scale factors per particle, applied before rotation. */
+    readonly scales: Float32Array;
     readonly count: number;
     /** Nine floats per visible particle: two normalized rectangles followed by crossfade. */
     readonly textureRegions: Float32Array;
@@ -29,6 +31,7 @@ export interface RobloxParticleFrame {
 export class RobloxParticleSimulator {
     readonly #births: readonly RobloxParticleBirth[];
     readonly #attributes: Float32Array;
+    readonly #scales: Float32Array;
     readonly #textureRegions: Float32Array;
     readonly #velocities: Float32Array;
     readonly #motion: RobloxParticleMotion;
@@ -46,6 +49,7 @@ export class RobloxParticleSimulator {
         }
         this.#births = new RobloxParticleBirths().create(scene, node, trigger);
         this.#attributes = new Float32Array(this.#births.length * 9);
+        this.#scales = new Float32Array(this.#births.length * 2);
         this.#textureRegions = new Float32Array(this.#births.length * 9);
         this.#velocities = new Float32Array(this.#births.length * 3);
         this.#motion = new RobloxParticleMotion(scene, node.id, trigger);
@@ -152,6 +156,15 @@ export class RobloxParticleSimulator {
                     ),
                 );
                 appearance.writeColor(normalized, this.#attributes, offset + 4);
+                const squash: number = RobloxParticleAppearance.scalar(
+                    appearance.squash,
+                    normalized,
+                    birth.envelopeSeed,
+                    0x6724b9d3,
+                );
+                const stretch: number = 1 + Math.abs(squash);
+                this.#scales[count * 2] = squash <= 0 ? stretch : 1 / stretch;
+                this.#scales[count * 2 + 1] = squash <= 0 ? 1 / stretch : stretch;
                 this.#attributes[offset + 7] =
                     appearance.localOpacity *
                     (1 -
@@ -173,6 +186,7 @@ export class RobloxParticleSimulator {
         }
         return {
             attributes: this.#attributes,
+            scales: this.#scales,
             count,
             textureRegions: this.#textureRegions,
             lightEmission: appearance.lightEmission,

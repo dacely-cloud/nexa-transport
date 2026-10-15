@@ -19,6 +19,8 @@ export class RobloxParticleAppearance {
     public readonly visible: boolean;
     /** Current per-age size curve. */
     public readonly size: RobloxNumberSequence;
+    /** Current non-uniform scale curve is evaluated for each living particle. */
+    public readonly squash: RobloxNumberSequence;
     /** Current per-age transparency curve. */
     public readonly transparency: RobloxNumberSequence;
     /** Client-local opacity multiplier applies immediately to living particles. */
@@ -36,12 +38,15 @@ export class RobloxParticleAppearance {
     /** Reads a single current property observation, rather than freezing appearance at birth. */
     public constructor(scene: RobloxScene, properties: Readonly<Record<string, RobloxValue>>) {
         const size: RobloxValue | undefined = properties['Size'];
+        const squash: RobloxValue | undefined = properties['Squash'];
         const transparency: RobloxValue | undefined = properties['Transparency'];
         const color: RobloxValue | undefined = properties['Color'];
         const texture: RobloxValue | undefined = properties['Texture'];
         if (
             typeof size !== 'object' ||
             size.kind !== 'NumberSequence' ||
+            typeof squash !== 'object' ||
+            squash.kind !== 'NumberSequence' ||
             typeof transparency !== 'object' ||
             transparency.kind !== 'NumberSequence' ||
             typeof color !== 'object' ||
@@ -51,6 +56,7 @@ export class RobloxParticleAppearance {
             throw new Error('Invalid current particle appearance');
         }
         this.size = size;
+        this.squash = squash;
         this.transparency = transparency;
         this.localOpacity = 1 - RobloxProperties.number(properties, 'LocalTransparencyModifier');
         this.color = color;
