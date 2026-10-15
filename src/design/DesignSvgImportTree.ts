@@ -3,6 +3,13 @@
 
 import type { DesignPathGeometry } from './DesignPaths.js';
 import type { DesignNode } from './DesignTypes.js';
+import type { DesignSvgSourceBounds } from './DesignSvgImportGeometry.js';
+import { DesignSvgTransforms, type DesignSvgMatrix } from './DesignSvgTransforms.js';
+
+interface DesignSvgOriginalBounds {
+    readonly bounds: DesignSvgSourceBounds;
+    readonly matrix: DesignSvgMatrix;
+}
 
 /** Imported hierarchy is indexed once; normalizing nested groups does not scan unrelated layers. */
 export class DesignSvgImportTree {
@@ -10,6 +17,7 @@ export class DesignSvgImportTree {
     #indices: Map<string, number> = new Map();
     #excludedBounds: Set<string> = new Set();
     #geometry: Map<string, DesignPathGeometry> = new Map();
+    #originalBounds: Map<string, DesignSvgOriginalBounds> = new Map();
     public get nodes(): readonly DesignNode[] {
         return this.#nodes;
     }
@@ -25,6 +33,28 @@ export class DesignSvgImportTree {
     }
     public recordGeometry(id: string, geometry: DesignPathGeometry): void {
         this.#geometry.set(id, geometry);
+    }
+    /** Object-unit effects use original tight bounds when undoing the same transform, avoiding float32 path drift. */
+    public recordOriginalBounds(
+        id: string,
+        bounds: DesignSvgSourceBounds,
+        matrix: DesignSvgMatrix,
+    ): void {
+        this.#originalBounds.set(id, { bounds, matrix });
+    }
+    public originalBounds(id: string, matrix: DesignSvgMatrix): DesignSvgSourceBounds | null {
+        const original: DesignSvgOriginalBounds | undefined = this.#originalBounds.get(id);
+        if (original === undefined) {
+            return null;
+        }
+        const map: DesignSvgMatrix = DesignSvgTransforms.multiply(matrix, original.matrix);
+        if (
+            Math.max(Math.abs(map.a - 1), Math.abs(map.b), Math.abs(map.c), Math.abs(map.d - 1)) >
+            1e-12
+        ) {
+            return null;
+        }
+        return { ...original.bounds, x: original.bounds.x + map.e, y: original.bounds.y + map.f };
     }
     public excludeBounds(id: string): void {
         this.#excludedBounds.add(id);

@@ -44,7 +44,7 @@ export class DesignSvgImportImage {
         context: DesignSvgShapeContext,
     ): Promise<string | null> {
         const style: Readonly<Record<string, string>> = context.style;
-        Appearance.validate(style);
+        Appearance.validate(style, false, true);
         const overflow: string = style['overflow'] ?? 'hidden';
         if (!['hidden', 'visible', 'clip'].includes(overflow)) {
             throw new Error('Unsupported SVG image overflow.');

@@ -53,6 +53,7 @@ export class DesignSvgImportShape {
             return null;
         }
         this.tree.recordGeometry(context.id, original.target);
+        this.tree.recordOriginalBounds(context.id, original.source, context.matrix);
         if (style['display'] === 'none') {
             this.tree.excludeBounds(context.id);
         }

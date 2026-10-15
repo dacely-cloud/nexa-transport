@@ -46,7 +46,11 @@ export class DesignSvgImportAppearance {
         }
         return source;
     }
-    public static validate(style: Readonly<Record<string, string>>, root: boolean = false): void {
+    public static validate(
+        style: Readonly<Record<string, string>>,
+        root: boolean = false,
+        filters: boolean = false,
+    ): void {
         if (
             !root &&
             (style['transform-origin'] !== undefined || style['transform-box'] !== undefined)
@@ -55,10 +59,8 @@ export class DesignSvgImportAppearance {
                 'SVG descendant transform origins require native reference-box conversion.',
             );
         }
-        for (const property of ['filter']) {
-            if (style[property] !== undefined && style[property] !== 'none') {
-                throw new Error('SVG ' + property + ' requires native import conversion.');
-            }
+        if (!filters && style['filter'] !== undefined && style['filter'] !== 'none') {
+            throw new Error('SVG filter requires native import conversion.');
         }
         if (
             style['stroke-dashoffset'] !== undefined &&

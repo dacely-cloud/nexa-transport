@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { DesignSvgImportMasks } from './DesignSvgImportMasks.js';
+import { DesignSvgImportFilters } from './DesignSvgImportFilters.js';
 import { DesignSvgImportStyles } from './DesignSvgImportStyles.js';
 import type { DesignSvgLayerContext } from './DesignSvgImportContext.js';
 import { DesignSvgImportUse } from './DesignSvgImportUse.js';
@@ -44,6 +45,7 @@ export class DesignSvgImportLayers {
     #clips: DesignSvgImportClipPaths;
     #viewports: DesignSvgImportViewport;
     #masks: DesignSvgImportMasks;
+    #filters: DesignSvgImportFilters;
     #css: DesignSvgCss;
     #paints: DesignSvgImportPaints;
     public constructor(
@@ -77,6 +79,14 @@ export class DesignSvgImportLayers {
         this.#text = new DesignSvgImportText(this.#css, this.#tree, this.identify, fonts);
         this.#image = new DesignSvgImportImage(this.#tree, this.identify, images);
         const masks: DesignSvgImportMask = new DesignSvgImportMask(this.#tree, this.identify);
+        this.#filters = new DesignSvgImportFilters(
+            this.#elements,
+            this.#css,
+            this.#ancestors,
+            this.#tree,
+            masks,
+            this.identify,
+        );
         this.#viewports = new DesignSvgImportViewport(this.#tree, masks, this.identify);
         this.#clips = new DesignSvgImportClipPaths(
             this.#elements,
@@ -128,7 +138,7 @@ export class DesignSvgImportLayers {
             a['viewBox'],
             a['preserveAspectRatio'],
         );
-        DesignSvgImportAppearance.validate(style, true);
+        DesignSvgImportAppearance.validate(style, true, true);
         const transform: DesignSvgMatrix = DesignSvgRootTransform.matrix(style, width, height);
         const transformed: boolean =
             transform.a !== 1 ||
@@ -142,7 +152,10 @@ export class DesignSvgImportLayers {
         }
         const rootId: string = this.identify('root');
         const separate: boolean =
-            transformed || style['clip-path'] !== undefined || style['mask'] !== undefined;
+            transformed ||
+            style['clip-path'] !== undefined ||
+            style['mask'] !== undefined ||
+            style['filter'] !== undefined;
         const contentId: string = separate ? this.identify('root-content') : rootId;
         const base: DesignNode = DesignDefaults.node(rootId, 'frame', name);
         const matrix: DesignSvgMatrix = T.multiply(transform, viewport.matrix);
@@ -195,6 +208,9 @@ export class DesignSvgImportLayers {
             height,
             referenceBox: { x: 0, y: 0, width, height },
         };
+        if (style['filter'] !== undefined) {
+            await this.#filters.apply(contentId, style['filter'], effects);
+        }
         if (style['clip-path'] !== undefined) {
             await this.#clips.apply(contentId, style['clip-path'], effects);
         }
@@ -226,6 +242,7 @@ export class DesignSvgImportLayers {
                 'linearGradient',
                 'radialGradient',
                 'clipPath',
+                'filter',
             ].includes(element.name)
         ) {
             return null;
@@ -247,7 +264,7 @@ export class DesignSvgImportLayers {
             context.ancestors,
             context.style,
         );
-        DesignSvgImportAppearance.validate(style);
+        DesignSvgImportAppearance.validate(style, false, true);
         const matrix: DesignSvgMatrix = T.multiply(
             context.matrix,
             T.parse(style['transform'] ?? element.attributes['transform'] ?? ''),
@@ -320,6 +337,17 @@ export class DesignSvgImportLayers {
             }
             this.#tree.replace(id, (node: DesignNode): DesignNode => ({ ...node, children }));
             this.#tree.tighten(id);
+            if (style['filter'] !== undefined) {
+                if (
+                    (element.name === 'svg' || element.name === 'symbol') &&
+                    style['filter'].trim().toLowerCase() !== 'none'
+                ) {
+                    throw new Error(
+                        'SVG nested viewport filters require native reference-box conversion.',
+                    );
+                }
+                await this.#filters.apply(id, style['filter'], childContext);
+            }
             if (viewport !== null) {
                 await this.#viewports.clip(id, viewport);
             }
@@ -375,6 +403,9 @@ export class DesignSvgImportLayers {
                         ancestors: context.ancestors,
                     })
                   : await this.#shape.build(element, shapeContext);
+        if (shape !== null && style['filter'] !== undefined) {
+            await this.#filters.apply(shape, style['filter'], { ...context, matrix, style });
+        }
         if (shape !== null && style['clip-path'] !== undefined) {
             await this.#clips.apply(shape, style['clip-path'], {
                 matrix,

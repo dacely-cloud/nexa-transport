@@ -26,6 +26,7 @@ export class DesignSvgCss {
     #comparisons: number = 0;
     public static readonly inherited: ReadonlySet<string> = new Set([
         'color',
+        'color-interpolation-filters',
         'fill',
         'fill-rule',
         'fill-opacity',
@@ -70,6 +71,8 @@ export class DesignSvgCss {
         'filter',
         'stop-color',
         'stop-opacity',
+        'flood-color',
+        'flood-opacity',
         'overflow',
         'vector-effect',
         'paint-order',

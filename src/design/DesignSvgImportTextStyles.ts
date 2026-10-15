@@ -142,7 +142,7 @@ export class DesignSvgImportTextStyles {
         element: DesignSvgElement,
         style: Readonly<Record<string, string>>,
     ): void {
-        DesignSvgImportAppearance.validate(style);
+        DesignSvgImportAppearance.validate(style, false, element.name === 'text');
         for (const name of [
             'rotate',
             'textLength',

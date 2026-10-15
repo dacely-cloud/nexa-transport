@@ -115,7 +115,7 @@ export class DesignSvgImportClipPaths {
         if (style['clip-path'] !== undefined) {
             await this.apply(sourceId, style['clip-path'], clipContext, references);
         }
-        this.masks.wrap(targetId, sourceId);
+        this.masks.wrap(targetId, sourceId, 'vector');
     }
     #group(name: string): string {
         const id: string = this.identify('clip-source:' + (++this.#sequence).toString());

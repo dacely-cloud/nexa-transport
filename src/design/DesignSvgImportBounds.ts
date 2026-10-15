@@ -36,6 +36,14 @@ export class DesignSvgImportBounds {
             if (depth > 64 || ++visited > 10000) {
                 throw new Error('SVG bounds exceed the hierarchy budget.');
             }
+            const exact: DesignSvgSourceBounds | null = tree.originalBounds(node.id, matrix);
+            if (exact !== null) {
+                left = Math.min(left, exact.x);
+                top = Math.min(top, exact.y);
+                right = Math.max(right, exact.x + exact.width);
+                bottom = Math.max(bottom, exact.y + exact.height);
+                return;
+            }
             const original: DesignPathGeometry | undefined = tree.sourceGeometry(node.id);
             const offset: DesignSvgMatrix =
                 original === undefined
