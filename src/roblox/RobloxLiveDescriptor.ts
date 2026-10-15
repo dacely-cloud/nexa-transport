@@ -9,6 +9,17 @@ export interface RobloxLivePlace {
     readonly sha256: string;
 }
 
+/** One pinned project module; no filesystem or account authority travels with its source. */
+export interface RobloxLiveAssetModule {
+    readonly name: string;
+    readonly source: string;
+}
+/** A reusable Studio-native module and the explicit dependency revisions used by its preview. */
+export interface RobloxLiveAsset {
+    readonly entry: string;
+    readonly modules: readonly RobloxLiveAssetModule[];
+}
+
 /** A delivered authored revision, with no installed dependency payloads. */
 export interface RobloxLiveDescriptor {
     readonly executionContext: RobloxExecutionContext;
@@ -18,20 +29,21 @@ export interface RobloxLiveDescriptor {
     readonly entry: string;
     readonly source: string;
     readonly place?: RobloxLivePlace;
+    readonly asset?: RobloxLiveAsset;
 }
 
 /** Bounds executable attachment metadata before a host authorizes its project scope. */
 export class RobloxLiveDescriptorCodec {
     /** Parses only the explicit live-artifact contract. */
     public static parse(text: string): RobloxLiveDescriptor {
-        if (new TextEncoder().encode(text).byteLength > 2 * 1024 * 1024) {
-            throw new Error('Live descriptor exceeds 2 MiB');
+        if (new TextEncoder().encode(text).byteLength > 4 * 1024 * 1024) {
+            throw new Error('Live descriptor exceeds 4 MiB');
         }
         const raw: unknown = JSON.parse(text);
         const fields: Readonly<Record<string, unknown>> = RobloxSceneCodec.record(
             raw,
             ['format', 'version', 'name', 'entry', 'source'],
-            ['executionContext', 'place'],
+            ['executionContext', 'place', 'asset'],
         );
         if (fields['format'] !== 'nexa.roblox.live' || fields['version'] !== 1) {
             throw new Error('Invalid live descriptor');
@@ -76,7 +88,53 @@ export class RobloxLiveDescriptorCodec {
             entry,
             source,
             ...(place === undefined ? {} : { place }),
+            ...(fields['asset'] === undefined ? {} : { asset: this.asset(fields['asset']) }),
         });
+    }
+
+    /** Validates an immutable bounded module selection before any server builds or executes it. */
+    public static asset(raw: unknown): RobloxLiveAsset {
+        const fields: Readonly<Record<string, unknown>> = RobloxSceneCodec.record(raw, [
+            'entry',
+            'modules',
+        ]);
+        const entry: string = this.modulePath(RobloxSceneCodec.text(fields['entry'], 1024));
+        const names: Set<string> = new Set();
+        let total: number = 0;
+        const modules: readonly RobloxLiveAssetModule[] = RobloxSceneCodec.array(
+            fields['modules'],
+            64,
+        ).map((value: unknown): RobloxLiveAssetModule => {
+            const module: Readonly<Record<string, unknown>> = RobloxSceneCodec.record(value, [
+                'name',
+                'source',
+            ]);
+            const name: string = this.modulePath(RobloxSceneCodec.text(module['name'], 1024));
+            if (names.has(name)) {
+                throw new Error('Duplicate live asset module');
+            }
+            names.add(name);
+            const source: string = RobloxSceneCodec.text(module['source'], 1024 * 1024);
+            const bytes: number = new TextEncoder().encode(source).byteLength;
+            total += bytes;
+            if (bytes > 1024 * 1024 || total > 2 * 1024 * 1024) {
+                throw new Error('Live asset modules exceed their source byte budget');
+            }
+            return Object.freeze({ name, source });
+        });
+        if (!names.has(entry)) {
+            throw new Error('Live asset entry must be an included module');
+        }
+        return Object.freeze({ entry, modules: Object.freeze(modules) });
+    }
+
+    /** Keeps source-module names portable and within one project-relative namespace. */
+    public static modulePath(path: string): string {
+        this.#path(path);
+        if (path.length > 1024 || !/\.luau?$/iu.test(path)) {
+            throw new Error('Live asset modules must name project-relative Lua/Luau files');
+        }
+        return path;
     }
 
     /** Validates portable workspace place paths before host filesystem authorization. */

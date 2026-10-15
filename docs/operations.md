@@ -103,6 +103,23 @@ Malformed selectors are rejected. The selected side remains fixed for the sessio
 Client execution supports eligible native LocalScripts and their original callbacks;
 it does not create players, replication or a connected client/server pair.
 
+Descriptors may include an `asset` selection with an `entry` and explicit `modules`
+containing canonical relative Lua/Luau `name` and `source` pairs. The codec validates
+and freezes these revisions: at most 64 files, 1 MiB per file and 2 MiB total, within
+the 4 MiB descriptor limit. Live execution and exports use the pinned revisions;
+the gateway rechecks current read grants for every selected path. Modules first
+required by a later callback use the same saved selection. Missing selected
+dependencies fail rather than falling back to newer workspace files.
+
+When the producer supplies `assetEntry` and `assetModules` to `roblox_preview`, the
+Studio pack includes a real `NexaAsset` ModuleScript and its selected sources.
+`require(pack.NexaAsset)` returns the authored API, including original callbacks
+and lifecycle methods. Relative requires use a local resolver to actual
+ModuleScripts; standard instance requires, caching and yields remain native.
+`NexaRuntime` remains the observation replay adapter, and `NexaAuthor` preserves
+the preview harness. This optional source selection does not reconstruct missing
+callbacks from earlier recordings or supply capture helpers in Studio.
+
 `RobloxLiveStep` advances the retained VM and forwards user input. `RobloxLiveExport`
 returns the current native Studio model, including authored script Source.
 `RobloxLiveClose` releases the session. Handles stay scoped to their original authorized
