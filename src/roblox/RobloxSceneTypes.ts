@@ -3,6 +3,7 @@
 
 /** Native Roblox property encodings shared by the authoring, export and preview engines. */
 export const RobloxValueKind = {
+    Instance: 'Instance',
     Vector2: 'Vector2',
     Rect: 'Rect',
     Vector3: 'Vector3',
@@ -112,6 +113,11 @@ export interface RobloxEnum {
     readonly kind: 'Enum';
     readonly value: number;
 }
+/** Real instance identity within the captured hierarchy; null represents native nil. */
+export interface RobloxInstanceReference {
+    readonly kind: 'Instance';
+    readonly id: string | null;
+}
 /** Supported native values. External inputs must pass RobloxSceneCodec. */
 export type RobloxValue =
     | string
@@ -127,12 +133,14 @@ export type RobloxValue =
     | RobloxNumberSequence
     | RobloxColorSequence
     | RobloxCFrame
-    | RobloxEnum;
+    | RobloxEnum
+    | RobloxInstanceReference;
 /** Explicit supported instance classes. */
 export const RobloxClass = {
     Folder: 'Folder',
     Model: 'Model',
     WorldModel: 'WorldModel',
+    ObjectValue: 'ObjectValue',
     Part: 'Part',
     WedgePart: 'WedgePart',
     CornerWedgePart: 'CornerWedgePart',

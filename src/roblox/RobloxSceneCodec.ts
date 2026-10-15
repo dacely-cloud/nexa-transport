@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { RobloxSceneInput } from './RobloxSceneInput';
+import { RobloxSceneReferences } from './RobloxSceneReferences';
 import { RobloxEnvironment } from './RobloxEnvironment';
 import { RobloxPartGeometry } from './RobloxPartGeometry';
 import { RobloxSceneMeshes } from './RobloxSceneMeshes';
@@ -100,6 +101,7 @@ export class RobloxSceneCodec {
             )
             .sort((a: RobloxSceneEvent, b: RobloxSceneEvent): number => a.at - b.at);
         const endTimes: Map<string, number> = new Map<string, number>();
+        RobloxSceneReferences.validate(nodes, hierarchy.deltas, events);
         let particles: number = 0;
         let samples: number = 0;
         for (const node of byId.values()) {
@@ -339,6 +341,7 @@ export class RobloxSceneCodec {
             return raw;
         }
         const keys: Readonly<Record<string, readonly string[]>> = {
+            Instance: ['id'],
             Vector2: ['x', 'y'],
             Rect: ['minX', 'minY', 'maxX', 'maxY'],
             Vector3: ['x', 'y', 'z'],
@@ -360,6 +363,11 @@ export class RobloxSceneCodec {
             throw new Error('Expected Roblox ' + spec.type);
         }
         switch (spec.type) {
+            case 'Instance':
+                return Object.freeze({
+                    kind: 'Instance',
+                    id: data['id'] === null ? null : this.#id(data['id']),
+                });
             case 'Rect': {
                 const minX: number = this.number(data['minX'], 0, 4096);
                 const minY: number = this.number(data['minY'], 0, 4096);
@@ -640,6 +648,7 @@ export class RobloxSceneCodec {
             throw new Error('Missing parent for ' + node.id);
         }
         const allowed: Readonly<Record<RobloxClass, readonly RobloxClass[]>> = {
+            ObjectValue: Object.values(RobloxClass),
             Folder: [
                 'Folder',
                 'Model',
@@ -724,6 +733,7 @@ export class RobloxSceneCodec {
                       'CornerWedgePart',
                       'MeshPart',
                       'ScreenGui',
+                      'ObjectValue',
                   ].includes(node.className)
                 : !allowed[node.className].includes(parent.className)
         ) {

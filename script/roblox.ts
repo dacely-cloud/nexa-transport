@@ -25,6 +25,7 @@ const files: readonly string[] = [
     'RobloxTextEdit',
     'RobloxKeyboardInput',
     'RobloxSceneHierarchy',
+    'RobloxSceneReferences',
     'RobloxSceneTextures',
     'RobloxHierarchyLuau',
     'RobloxDefaultTextures',

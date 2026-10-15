@@ -73,6 +73,12 @@ export interface RobloxPropertySpec {
 }
 /** Constructors for fully explicit portable native datatypes. */
 export class RobloxValues {
+    /** A scoped native instance link, including an explicitly empty reference. */
+    public static reference(
+        id: string | null = null,
+    ): import('./RobloxSceneTypes').RobloxInstanceReference {
+        return { kind: 'Instance', id };
+    }
     /** Three component position or direction. */
     public static vector3(
         x: number = 0,
@@ -214,6 +220,7 @@ export const RobloxSceneSchema: Readonly<
     Folder: {},
     Model: {},
     WorldModel: {},
+    ObjectValue: { Value: { type: 'Instance', default: RobloxValues.reference(), xmlType: 'Ref' } },
     Part: { ...part, Shape: e(1, [0, 1, 2, 3, 4], 'PartType') },
     WedgePart: part,
     CornerWedgePart: { ...part, Size: v(RobloxValues.vector3(2, 2, 2), true) },

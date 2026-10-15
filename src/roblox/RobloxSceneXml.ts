@@ -38,7 +38,7 @@ export class RobloxSceneXml {
             return (
                 '<Item class="' +
                 node.className +
-                '" referent="RBX_' +
+                '" referent="RBX_NODE_' +
                 node.id +
                 '"><Properties><string name="Name">' +
                 this.escape(node.name) +
@@ -50,13 +50,13 @@ export class RobloxSceneXml {
             );
         };
         const module: string =
-            '<Item class="ModuleScript" referent="RBX_Runtime"><Properties><string name="Name">NexaRuntime</string><ProtectedString name="Source">' +
+            '<Item class="ModuleScript" referent="RBX_AUX_Runtime"><Properties><string name="Name">NexaRuntime</string><ProtectedString name="Source">' +
             this.escape(RobloxSceneLuau.source(scene)) +
             '</ProtectedString></Properties>' +
             this.meshTemplates(scene) +
             '</Item>';
         return (
-            '<roblox version="4"><Meta name="ExplicitAutoJoints">true</Meta><External>null</External><External>nil</External><Item class="Folder" referent="RBX_Pack"><Properties><string name="Name">' +
+            '<roblox version="4"><Meta name="ExplicitAutoJoints">true</Meta><External>null</External><External>nil</External><Item class="Folder" referent="RBX_AUX_Pack"><Properties><string name="Name">' +
             this.escape(scene.name) +
             '</string></Properties>' +
             (children.get(null) ?? []).map(item).join('') +
@@ -75,11 +75,11 @@ export class RobloxSceneXml {
             return '';
         }
         return (
-            '<Item class="Folder" referent="RBX_MeshTemplates"><Properties><string name="Name">NexaMeshTemplates</string></Properties>' +
+            '<Item class="Folder" referent="RBX_AUX_MeshTemplates"><Properties><string name="Name">NexaMeshTemplates</string></Properties>' +
             meshes
                 .map(
                     (node: RobloxSceneNode): string =>
-                        '<Item class="MeshPart" referent="RBX_MeshTemplate_' +
+                        '<Item class="MeshPart" referent="RBX_TEMPLATE_' +
                         node.id +
                         '"><Properties><string name="Name">' +
                         this.escape(node.id) +
@@ -127,6 +127,10 @@ export class RobloxSceneXml {
                     : this.escape(value);
         } else {
             switch (value.kind) {
+                case 'Instance':
+                    type = 'Ref';
+                    content = value.id === null ? 'null' : this.escape('RBX_NODE_' + value.id);
+                    break;
                 case 'Rect':
                     type = 'Rect2D';
                     content =

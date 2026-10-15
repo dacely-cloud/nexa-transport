@@ -39,6 +39,8 @@ export class RobloxSceneLuau {
             return String(value);
         }
         switch (value.kind) {
+            case 'Instance':
+                return value.id === null ? 'nil' : 'nodes[' + this.quote(value.id) + ']';
             case 'Vector2':
                 return (
                     'Vector2.new(' +
@@ -180,6 +182,10 @@ export class RobloxSceneLuau {
                 '  ' + access + '.Name = ' + this.quote(node.name),
                 ...RobloxPhysicsLuau.initialize(node, access),
             );
+        }
+        /** Every instance exists before assigning forward and cyclic links. */
+        for (const node of nodes) {
+            const access: string = 'nodes[' + this.quote(node.id) + ']';
             for (const [property, value] of Object.entries(node.properties)) {
                 if (
                     RobloxSceneSchema[node.className][property]?.runtimeReadonly === true ||
