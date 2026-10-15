@@ -141,6 +141,7 @@ export const RobloxClass = {
     Model: 'Model',
     WorldModel: 'WorldModel',
     ObjectValue: 'ObjectValue',
+    Beam: 'Beam',
     Part: 'Part',
     WedgePart: 'WedgePart',
     CornerWedgePart: 'CornerWedgePart',
@@ -250,6 +251,8 @@ export interface RobloxRecording {
 export type RobloxSceneEvent = RobloxBurst | RobloxParticleClear | RobloxTween | RobloxRecording;
 /** Portable authoring artifact. Version 1 rejects unsupported properties rather than silently dropping them. */
 export interface RobloxScene {
+    /** Native UV origins and method resets; these are not invented instance properties. */
+    readonly beamTexturePhases?: readonly import('./RobloxBeamPhases').RobloxBeamPhaseTrack[];
     /** Bounded world-space observations shared by all native emitters in this scene. */
     readonly environment?: import('./RobloxEnvironment').RobloxEnvironmentState;
     /** Original authorized FileMesh bytes shared by all instances referencing the same resource. */

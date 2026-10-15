@@ -30,6 +30,15 @@ export class RobloxLiveStateCodec {
         }
         const time: number = RobloxSceneCodec.number(fields['time'], 0, 60);
         const scene: RobloxScene = RobloxSceneCodec.decode(fields['scene']);
+        if (
+            scene.beamTexturePhases?.some(
+                (track): boolean =>
+                    track.samples.length !== 1 ||
+                    Math.abs((track.samples[0]?.at ?? -1) - time) > 1e-9,
+            )
+        ) {
+            throw new Error('Live Beam phases must be current-clock origins');
+        }
         if (scene.environment?.wind.some((sample): boolean => sample.at > time + 1e-9)) {
             throw new Error('Live environment observations cannot be in the future');
         }

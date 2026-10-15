@@ -1,6 +1,6 @@
 {
     "name": "nexa-transport",
-    "version": "0.1.0-instance-references.1",
+    "version": "0.1.0-beams.1",
     "description": "Typed Nexa websocket gateway client for browsers and Node.js",
     "type": "module",
     "license": "Apache-2.0",
@@ -17,6 +17,10 @@
         "licenses"
     ],
     "exports": {
+        "./roblox-beams": {
+            "types": "./dist/roblox/RobloxBeamGeometry.d.ts",
+            "import": "./dist/roblox-beams.js"
+        },
         "./design-svg-paints": {
             "types": "./dist/design/DesignSvgPaints.d.ts",
             "import": "./dist/design-svg-paints.js"

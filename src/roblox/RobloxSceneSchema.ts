@@ -70,6 +70,10 @@ export interface RobloxPropertySpec {
     /** Engine-owned properties must be supplied by an imported template, never assigned by replay. */
     readonly runtimeReadonly?: boolean;
     readonly tween?: boolean;
+    /** Native class restrictions on scoped instance references. */
+    readonly referenceClasses?: readonly RobloxClass[];
+    /** Host negotiation for private Beam UV origins and SetTextureOffset observations. */
+    readonly capturePhase?: true;
 }
 /** Constructors for fully explicit portable native datatypes. */
 export class RobloxValues {
@@ -221,6 +225,44 @@ export const RobloxSceneSchema: Readonly<
     Model: {},
     WorldModel: {},
     ObjectValue: { Value: { type: 'Instance', default: RobloxValues.reference(), xmlType: 'Ref' } },
+    Beam: {
+        Attachment0: {
+            type: 'Instance',
+            default: RobloxValues.reference(),
+            xmlType: 'Ref',
+            referenceClasses: ['Attachment'],
+        },
+        Attachment1: {
+            type: 'Instance',
+            default: RobloxValues.reference(),
+            xmlType: 'Ref',
+            referenceClasses: ['Attachment'],
+        },
+        Enabled: b(true),
+        FaceCamera: b(false),
+        Width0: n(1, 0, 10000),
+        Width1: n(1, 0, 10000),
+        CurveSize0: n(0),
+        CurveSize1: n(0),
+        Segments: { ...n(10, 1, 256, 'int'), tween: false },
+        Color: v({
+            kind: 'ColorSequence',
+            points: [
+                { time: 0, color: RobloxValues.color() },
+                { time: 1, color: RobloxValues.color() },
+            ],
+        }),
+        Transparency: { ...v(RobloxValues.sequence(0.5)), min: 0, max: 1 },
+        LocalTransparencyModifier: { ...n(0, 0, 1), serialize: false },
+        Brightness: n(1, 0, 10000),
+        LightEmission: n(0, 0, 1),
+        LightInfluence: n(0, 0, 1),
+        Texture: { ...s(''), xmlType: 'ContentId' },
+        TextureMode: e(0, [0, 1, 2], 'TextureMode'),
+        TextureLength: n(1, 0.001, 10000),
+        TextureSpeed: { ...n(1, -1000, 1000), capturePhase: true },
+        ZOffset: n(0, -10000, 10000),
+    },
     Part: { ...part, Shape: e(1, [0, 1, 2, 3, 4], 'PartType') },
     WedgePart: part,
     CornerWedgePart: { ...part, Size: v(RobloxValues.vector3(2, 2, 2), true) },

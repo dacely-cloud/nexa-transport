@@ -3,6 +3,8 @@
 
 import { RobloxSceneInput } from './RobloxSceneInput';
 import { RobloxSceneReferences } from './RobloxSceneReferences';
+import { RobloxBeamBudget } from './RobloxBeamBudget';
+import { RobloxBeamPhases, type RobloxBeamPhaseTrack } from './RobloxBeamPhases';
 import { RobloxEnvironment } from './RobloxEnvironment';
 import { RobloxPartGeometry } from './RobloxPartGeometry';
 import { RobloxSceneMeshes } from './RobloxSceneMeshes';
@@ -44,7 +46,15 @@ export class RobloxSceneCodec {
         const fields: Readonly<Record<string, unknown>> = this.record(
             raw,
             ['format', 'version', 'name', 'duration', 'seed', 'camera', 'nodes', 'events'],
-            ['inputs', 'hierarchy', 'textures', 'textMetrics', 'meshes', 'environment'],
+            [
+                'inputs',
+                'hierarchy',
+                'textures',
+                'textMetrics',
+                'meshes',
+                'environment',
+                'beamTexturePhases',
+            ],
         );
         if (fields['format'] !== 'nexa.roblox.scene' || fields['version'] !== 1) {
             throw new Error('Expected nexa.roblox.scene version 1');
@@ -102,6 +112,7 @@ export class RobloxSceneCodec {
             .sort((a: RobloxSceneEvent, b: RobloxSceneEvent): number => a.at - b.at);
         const endTimes: Map<string, number> = new Map<string, number>();
         RobloxSceneReferences.validate(nodes, hierarchy.deltas, events);
+        RobloxBeamBudget.validate([...byId.values()], events);
         let particles: number = 0;
         let samples: number = 0;
         for (const node of byId.values()) {
@@ -187,6 +198,14 @@ export class RobloxSceneCodec {
                 'Scene exceeds the 20000 particle birth budget; reduce rates, bursts or duration',
             );
         }
+        const beamTexturePhases: readonly RobloxBeamPhaseTrack[] | undefined =
+            RobloxBeamPhases.decode(
+                fields['beamTexturePhases'],
+                duration,
+                byId,
+                hierarchy.deltas,
+                65536 - samples,
+            );
         const textures: RobloxSceneTextureAtlas | undefined = RobloxSceneTextures.decode(
             fields['textures'],
         );
@@ -212,6 +231,7 @@ export class RobloxSceneCodec {
             ...(textures === undefined ? {} : { textures }),
             ...(meshes === undefined ? {} : { meshes }),
             ...(environment === undefined ? {} : { environment }),
+            ...(beamTexturePhases === undefined ? {} : { beamTexturePhases }),
             ...(fields['textMetrics'] === undefined
                 ? {}
                 : { textMetrics: RobloxTextMeasurement.decode(fields['textMetrics']) }),
@@ -632,6 +652,17 @@ export class RobloxSceneCodec {
                 );
             }
         }
+        if (supported === RobloxClass.Beam) {
+            const texture: RobloxValue | undefined = properties['Texture'];
+            if (
+                texture !== '' &&
+                (typeof texture !== 'string' || !RobloxSceneTextures.assetUri(texture))
+            ) {
+                throw new Error(
+                    'Beam texture must be empty, an rbxasset image path or an rbxassetid URI',
+                );
+            }
+        }
         return Object.freeze({
             id: this.#id(data['id']),
             className: supported,
@@ -648,6 +679,7 @@ export class RobloxSceneCodec {
             throw new Error('Missing parent for ' + node.id);
         }
         const allowed: Readonly<Record<RobloxClass, readonly RobloxClass[]>> = {
+            Beam: Object.values(RobloxClass),
             ObjectValue: Object.values(RobloxClass),
             Folder: [
                 'Folder',
@@ -704,7 +736,7 @@ export class RobloxSceneCodec {
                 'CornerWedgePart',
                 'MeshPart',
             ],
-            Attachment: ['Part', 'WedgePart', 'CornerWedgePart', 'MeshPart', 'Attachment'],
+            Attachment: Object.values(RobloxClass),
             ParticleEmitter: ['Part', 'WedgePart', 'CornerWedgePart', 'MeshPart', 'Attachment'],
             ScreenGui: ['Folder', 'Model', 'WorldModel'],
             Frame: ['ScreenGui', ...RobloxGuiClasses.objects],
@@ -734,6 +766,8 @@ export class RobloxSceneCodec {
                       'MeshPart',
                       'ScreenGui',
                       'ObjectValue',
+                      'Beam',
+                      'Attachment',
                   ].includes(node.className)
                 : !allowed[node.className].includes(parent.className)
         ) {
