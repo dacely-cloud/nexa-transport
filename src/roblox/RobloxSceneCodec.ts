@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { RobloxSceneInput } from './RobloxSceneInput';
+import { RobloxEnvironment } from './RobloxEnvironment';
 import { RobloxPartGeometry } from './RobloxPartGeometry';
 import { RobloxSceneMeshes } from './RobloxSceneMeshes';
 import { RobloxSceneTextures, type RobloxSceneTextureAtlas } from './RobloxSceneTextures';
@@ -42,7 +43,7 @@ export class RobloxSceneCodec {
         const fields: Readonly<Record<string, unknown>> = this.record(
             raw,
             ['format', 'version', 'name', 'duration', 'seed', 'camera', 'nodes', 'events'],
-            ['inputs', 'hierarchy', 'textures', 'textMetrics', 'meshes'],
+            ['inputs', 'hierarchy', 'textures', 'textMetrics', 'meshes', 'environment'],
         );
         if (fields['format'] !== 'nexa.roblox.scene' || fields['version'] !== 1) {
             throw new Error('Expected nexa.roblox.scene version 1');
@@ -189,6 +190,8 @@ export class RobloxSceneCodec {
         );
         const meshes: import('./RobloxSceneMeshes').RobloxSceneMeshTable | undefined =
             RobloxSceneMeshes.decode(fields['meshes']);
+        const environment: import('./RobloxEnvironment').RobloxEnvironmentState | undefined =
+            RobloxEnvironment.decode(fields['environment'], duration);
         return Object.freeze({
             format: 'nexa.roblox.scene',
             version: 1,
@@ -206,6 +209,7 @@ export class RobloxSceneCodec {
             ...(hierarchy.deltas.length === 0 ? {} : { hierarchy: hierarchy.deltas }),
             ...(textures === undefined ? {} : { textures }),
             ...(meshes === undefined ? {} : { meshes }),
+            ...(environment === undefined ? {} : { environment }),
             ...(fields['textMetrics'] === undefined
                 ? {}
                 : { textMetrics: RobloxTextMeasurement.decode(fields['textMetrics']) }),

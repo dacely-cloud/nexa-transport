@@ -242,6 +242,8 @@ export interface RobloxRecording {
 export type RobloxSceneEvent = RobloxBurst | RobloxParticleClear | RobloxTween | RobloxRecording;
 /** Portable authoring artifact. Version 1 rejects unsupported properties rather than silently dropping them. */
 export interface RobloxScene {
+    /** Bounded world-space observations shared by all native emitters in this scene. */
+    readonly environment?: import('./RobloxEnvironment').RobloxEnvironmentState;
     /** Original authorized FileMesh bytes shared by all instances referencing the same resource. */
     readonly meshes?: import('./RobloxSceneMeshes').RobloxSceneMeshTable;
     /** Actual native font units for shared automatic text sizing. */

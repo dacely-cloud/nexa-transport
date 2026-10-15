@@ -38,7 +38,13 @@ export class RobloxParticleLockedMotion {
         trigger: string | null,
         physics: RobloxParticleMotion,
     ): RobloxParticleLockedMotion | null {
-        const properties: readonly string[] = ['Acceleration', 'Drag', 'TimeScale', 'LockedToPart'];
+        const properties: readonly string[] = [
+            'Acceleration',
+            'Drag',
+            'TimeScale',
+            'LockedToPart',
+            'WindAffectsDrag',
+        ];
         const tracks: readonly import('./RobloxSceneTypes').RobloxSceneEvent[] =
             scene.events.filter(
                 (event): boolean =>
@@ -98,6 +104,9 @@ export class RobloxParticleLockedMotion {
             ),
         );
         const sources: Set<string> = new Set();
+        for (const time of physics.boundaries) {
+            times.add(time);
+        }
         for (const time of [0, ...(scene.hierarchy ?? []).map((delta): number => delta.at)]) {
             times.add(time);
             const nodes: ReadonlyMap<string, RobloxSceneNode> = RobloxSceneHierarchy.active(

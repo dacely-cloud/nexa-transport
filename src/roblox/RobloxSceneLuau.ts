@@ -5,6 +5,7 @@ import type { RobloxScene, RobloxValue, RobloxClass } from './RobloxSceneTypes';
 import { RobloxSceneHierarchy } from './RobloxSceneHierarchy';
 import { RobloxSceneSchema } from './RobloxSceneSchema';
 import { RobloxHierarchyLuau } from './RobloxHierarchyLuau';
+import { RobloxEnvironmentLuau } from './RobloxEnvironmentLuau';
 import { RobloxMeshPlayback, type RobloxMeshPlaybackPlan } from './RobloxMeshPlayback';
 
 /** Generates the Studio playback adapter from the same validated scene as the preview. */
@@ -153,7 +154,8 @@ export class RobloxSceneLuau {
             '  error("Unknown enum " .. family)',
             'end',
             'local Runtime = {}',
-            'function Runtime.mount(worldParent, guiParent)',
+            'function Runtime.mount(worldParent, guiParent, applyEnvironment)',
+            ...RobloxEnvironmentLuau.setup(scene),
             ...(nodes.some(
                 (node: import('./RobloxSceneTypes').RobloxSceneNode): boolean =>
                     node.className === 'ScreenGui',
@@ -210,6 +212,7 @@ export class RobloxSceneLuau {
             '    for _, connection in playbackConnections do connection:Disconnect() end',
             '    table.clear(playbackConnections)',
             '    local recordings = {}',
+            ...RobloxEnvironmentLuau.playback(scene),
             '    for _, tween in tweens do tween:Cancel() end',
             '    table.clear(tweens)',
             ...RobloxHierarchyLuau.playback(scene),
@@ -435,7 +438,14 @@ export class RobloxSceneLuau {
                 : '        local pending = false',
             '        for _, track in recordings do',
             '          while track.samples[track.cursor] and track.samples[track.cursor][1] <= elapsed + 1e-9 do',
-            '            if track.mesh then track.node:ApplyMesh(track.samples[track.cursor][2])',
+            ...(scene.environment === undefined
+                ? [
+                      '            if track.mesh then track.node:ApplyMesh(track.samples[track.cursor][2])',
+                  ]
+                : [
+                      '            if track.environment then applyWind(track.samples[track.cursor][2])',
+                      '            elseif track.mesh then track.node:ApplyMesh(track.samples[track.cursor][2])',
+                  ]),
             '            else track.node[track.property] = track.samples[track.cursor][2] end',
             '            track.cursor += 1',
             '          end',
@@ -462,6 +472,7 @@ export class RobloxSceneLuau {
             '    for _, connection in playbackConnections do connection:Disconnect() end',
             '    for _, tween in tweens do tween:Cancel() end',
             '    for _, node in nodes do node:Destroy() end',
+            ...(scene.environment === undefined ? [] : ['    restoreWind()']),
             '  end',
         );
         for (const id of new Set(

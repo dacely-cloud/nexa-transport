@@ -1,26 +1,105 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { RobloxScene, RobloxValue, RobloxVector3 } from './RobloxSceneTypes';
+import type {
+    RobloxScene,
+    RobloxSceneEvent,
+    RobloxTween,
+    RobloxRecording,
+    RobloxValue,
+    RobloxVector3,
+} from './RobloxSceneTypes';
 import { RobloxProperties, RobloxSceneRuntime } from './RobloxSceneRuntime';
 import { RobloxParticleIntervals } from './RobloxParticleIntervals';
+import { RobloxEnvironment } from './RobloxEnvironment';
 import { RobloxParticleMotionTree, type RobloxParticleTransfers } from './RobloxParticleMotionTree';
+
+type MotionEvent = RobloxTween | RobloxRecording;
+interface MotionCache {
+    readonly entries: Map<string, RobloxParticleMotion>;
+    intervals: number;
+}
+const MOTION_PROPERTIES: readonly string[] = [
+    'Acceleration',
+    'Drag',
+    'TimeScale',
+    'WindAffectsDrag',
+];
 
 /** Piecewise motion transfers answer arbitrary birth-to-frame intervals without replaying the timeline. */
 export class RobloxParticleMotion {
+    static readonly #caches: WeakMap<RobloxScene, MotionCache> = new WeakMap();
     readonly #times: readonly number[];
     readonly #states: Float64Array;
     readonly #tree: RobloxParticleMotionTree;
 
     /** Stores acceleration, exponential drag and scaled time once per observed interval. */
     public constructor(scene: RobloxScene, nodeId: string, trigger: string | null) {
-        this.#times = RobloxParticleIntervals.boundaries(
+        const initial: Readonly<Record<string, RobloxValue>> = RobloxSceneRuntime.properties(
             scene,
             nodeId,
-            ['Acceleration', 'Drag', 'TimeScale'],
+            0,
             trigger,
         );
+        const events: readonly MotionEvent[] = scene.events.filter(
+            (event: RobloxSceneEvent): event is MotionEvent =>
+                (event.kind === 'recording' || event.kind === 'tween') &&
+                event.nodeId === nodeId &&
+                event.trigger === trigger &&
+                MOTION_PROPERTIES.includes(event.property),
+        );
+        const key: string = JSON.stringify([
+            trigger,
+            MOTION_PROPERTIES.map((property: string): RobloxValue | undefined => initial[property]),
+            events.map(
+                (
+                    event: MotionEvent,
+                ): readonly (
+                    | string
+                    | number
+                    | RobloxValue
+                    | readonly import('./RobloxSceneTypes').RobloxPropertySample[]
+                )[] =>
+                    event.kind === 'recording'
+                        ? [event.kind, event.at, event.property, event.samples]
+                        : [event.kind, event.at, event.duration, event.property, event.to],
+            ),
+        ]);
+        let cache: MotionCache | undefined = RobloxParticleMotion.#caches.get(scene);
+        if (cache === undefined) {
+            cache = { entries: new Map(), intervals: 0 };
+            RobloxParticleMotion.#caches.set(scene, cache);
+        }
+        const existing: RobloxParticleMotion | undefined = cache.entries.get(key);
+        if (existing !== undefined) {
+            this.#times = existing.#times;
+            this.#states = existing.#states;
+            this.#tree = existing.#tree;
+            return;
+        }
+        const times: Set<number> = new Set(
+            RobloxParticleIntervals.boundaries(scene, nodeId, MOTION_PROPERTIES, trigger),
+        );
+        const windEnabled: boolean =
+            initial['WindAffectsDrag'] === true ||
+            scene.events.some(
+                (event): boolean =>
+                    event.nodeId === nodeId &&
+                    event.trigger === trigger &&
+                    event.kind === 'recording' &&
+                    event.property === 'WindAffectsDrag' &&
+                    event.samples.some((sample): boolean => sample.value === true),
+            );
+        if (windEnabled) {
+            for (const sample of scene.environment?.wind ?? []) {
+                times.add(sample.at);
+            }
+        }
+        this.#times = [...times].sort((a: number, b: number): number => a - b);
         const count: number = this.#times.length - 1;
+        if (cache.intervals + count > 131072) {
+            throw new Error('Particle motion exceeds the 131072 shared interval budget');
+        }
         this.#states = new Float64Array(count * 5);
         for (let index: number = 0; index < count; index++) {
             const properties: Readonly<Record<string, RobloxValue>> = RobloxSceneRuntime.properties(
@@ -30,12 +109,15 @@ export class RobloxParticleMotion {
                 trigger,
             );
             const acceleration: RobloxVector3 = RobloxProperties.vector(properties, 'Acceleration');
+            const drag: number = RobloxProperties.number(properties, 'Drag') * Math.LN2;
+            const wind: RobloxVector3 = RobloxEnvironment.wind(scene, this.#times[index] ?? 0);
+            const windDrag: number = properties['WindAffectsDrag'] === true && drag > 0 ? drag : 0;
             this.#states.set(
                 [
-                    acceleration.x,
-                    acceleration.y,
-                    acceleration.z,
-                    RobloxProperties.number(properties, 'Drag') * Math.LN2,
+                    acceleration.x + windDrag * wind.x,
+                    acceleration.y + windDrag * wind.y,
+                    acceleration.z + windDrag * wind.z,
+                    drag,
                     RobloxProperties.number(properties, 'TimeScale'),
                 ],
                 index * 5,
@@ -61,6 +143,13 @@ export class RobloxParticleMotion {
             ): void => this.#compose(left, a, right, b, output, offset),
         };
         this.#tree = new RobloxParticleMotionTree(this.#times, 9, operations);
+        cache.entries.set(key, this);
+        cache.intervals += count;
+    }
+
+    /** Force boundaries are also required by rigid parent transport. */
+    public get boundaries(): readonly number[] {
+        return this.#times;
     }
 
     /** Nine coefficients: velocity multiplier/offsets, displacement multiplier/offsets and elapsed effect time. */

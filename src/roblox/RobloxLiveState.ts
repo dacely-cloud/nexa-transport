@@ -30,6 +30,9 @@ export class RobloxLiveStateCodec {
         }
         const time: number = RobloxSceneCodec.number(fields['time'], 0, 60);
         const scene: RobloxScene = RobloxSceneCodec.decode(fields['scene']);
+        if (scene.environment?.wind.some((sample): boolean => sample.at > time + 1e-9)) {
+            throw new Error('Live environment observations cannot be in the future');
+        }
         if (scene.events.length !== 0 || (scene.inputs?.length ?? 0) !== 0) {
             throw new Error('Live state must contain current properties, not offline tracks');
         }

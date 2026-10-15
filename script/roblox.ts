@@ -6,6 +6,8 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 /** Server-only generation entry. Nexa owns the portable Roblox authoring and evaluation contract. */
 const files: readonly string[] = [
     'RobloxExecutionContext',
+    'RobloxEnvironment',
+    'RobloxEnvironmentLuau',
     'RobloxPartGeometry',
     'RobloxMeshTypes',
     'RobloxMeshHeader',

@@ -234,6 +234,7 @@ backend, or a provider-key vault.
 | `nexa-transport/roblox-mesh-geometry`     | ESM + types  | Indexed MeshPart geometry and decoded resource reuse          |
 | `nexa-transport/roblox-scene-meshes`      | ESM + types  | Bounded original mesh resources and portable scene validation |
 | `nexa-transport/roblox-particles`         | ESM + types  | Portable Roblox particles support                             |
+| `nexa-transport/roblox-environment`       | ESM + types  | Bounded held world-wind observations and deterministic lookup |
 | `nexa-transport/roblox-scene-codec`       | ESM + types  | Portable Roblox scene codec support                           |
 | `nexa-transport/roblox-scene-diagnostics` | ESM + types  | Portable Roblox scene diagnostics support                     |
 | `nexa-transport/roblox-scene-examples`    | ESM + types  | Portable Roblox scene examples support                        |
