@@ -8,7 +8,7 @@ import { BinaryEncoding } from './interface/BinaryEncoding.js';
 
 /** Sizes disk-upload slices against the gateway's complete request working-storage policy. */
 export class BinaryUploadSizing {
-    /** Bounds any numeric SDK request ID and offset without allocating the upload's content. */
+    /** Covers numeric request IDs, offsets, reassembly, callback input and native geometric capacity. */
     public static chunkBytes(uploadId: string, budget: number | undefined): number {
         const maximum: number = 4 * 1024 * 1024;
         if (budget === undefined) {
@@ -29,8 +29,9 @@ export class BinaryUploadSizing {
             BinaryRequestMemory.carrier(0, BinaryEncoding.Bytes, false) +
             512 +
             2 * (8 + header.byteLength + 28) +
+            2 * (8 + header.byteLength + 28 + 1) +
             512;
-        const bytes: number = Math.min(maximum, Math.floor((budget - overhead) / 4));
+        const bytes: number = Math.min(maximum, Math.floor((budget - overhead) / 6));
         if (bytes < 1) {
             throw new RangeError('Gateway upload memory budget is too small');
         }

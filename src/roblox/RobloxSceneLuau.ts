@@ -6,6 +6,7 @@ import { RobloxSceneHierarchy } from './RobloxSceneHierarchy';
 import { RobloxSceneSchema } from './RobloxSceneSchema';
 import { RobloxHierarchyLuau } from './RobloxHierarchyLuau';
 import { RobloxEnvironmentLuau } from './RobloxEnvironmentLuau';
+import { RobloxPhysicsLuau } from './RobloxPhysicsLuau';
 import { RobloxMeshPlayback, type RobloxMeshPlaybackPlan } from './RobloxMeshPlayback';
 
 /** Generates the Studio playback adapter from the same validated scene as the preview. */
@@ -177,9 +178,13 @@ export class RobloxSceneLuau {
                           '), "Imported MeshPart template is required"):Clone()'
                     : '  ' + access + ' = Instance.new(' + this.quote(node.className) + ')',
                 '  ' + access + '.Name = ' + this.quote(node.name),
+                ...RobloxPhysicsLuau.initialize(node, access),
             );
             for (const [property, value] of Object.entries(node.properties)) {
-                if (RobloxSceneSchema[node.className][property]?.runtimeReadonly === true) {
+                if (
+                    RobloxSceneSchema[node.className][property]?.runtimeReadonly === true ||
+                    RobloxPhysicsLuau.controls(node, property)
+                ) {
                     continue;
                 }
                 lines.push(
@@ -244,7 +249,8 @@ export class RobloxSceneLuau {
                 const value: RobloxValue | undefined = node.properties[property];
                 if (
                     value !== undefined &&
-                    RobloxSceneSchema[node.className][property]?.runtimeReadonly !== true
+                    RobloxSceneSchema[node.className][property]?.runtimeReadonly !== true &&
+                    !RobloxPhysicsLuau.controls(node, property)
                 ) {
                     lines.push(
                         '    nodes[' +
@@ -280,6 +286,12 @@ export class RobloxSceneLuau {
             );
         }
         for (const event of scene.events) {
+            if (
+                (event.kind === 'recording' || event.kind === 'tween') &&
+                RobloxPhysicsLuau.controls(byId.get(event.nodeId), event.property)
+            ) {
+                continue;
+            }
             if (RobloxMeshPlayback.geometry(event, byId.get(event.nodeId))) {
                 continue;
             }

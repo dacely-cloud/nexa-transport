@@ -85,6 +85,14 @@ workflow usage retains its own reported billing evidence.
 
 ## Roblox live previews, connections and telemetry
 
+`RobloxSceneXml.model` embeds a `NexaRuntime` visual replay adapter. Its mounted
+part copies are anchored with collision and touch response disabled, so captured
+poses remain stable under the destination place's gravity, including after the
+timeline ends. The authored native model and `NexaAuthor` retain their original
+physics settings for live game use. Keep the stored pack in ReplicatedStorage and
+mount replay copies explicitly; placing the original model in Workspace also
+activates its own authored behavior.
+
 `RobloxLiveStart` opens an authorized delivered `preview.roblox.live.json` attachment
 using its conversation and attachment IDs. The server reads the archived source and
 execution context; callers cannot override either with browser input.

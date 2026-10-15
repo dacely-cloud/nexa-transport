@@ -8,6 +8,7 @@ const files: readonly string[] = [
     'RobloxExecutionContext',
     'RobloxEnvironment',
     'RobloxEnvironmentLuau',
+    'RobloxPhysicsLuau',
     'RobloxPartGeometry',
     'RobloxMeshTypes',
     'RobloxMeshHeader',
