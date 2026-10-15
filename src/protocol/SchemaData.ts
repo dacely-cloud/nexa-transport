@@ -7474,6 +7474,11 @@ export const schema: Schema = {
                 limit: {
                     type: 'number',
                 },
+                query: {
+                    description:
+                        "Optional literal, case-insensitive title search across this owner's complete library.",
+                    type: 'string',
+                },
             },
             required: ['after', 'limit'],
             type: 'object',

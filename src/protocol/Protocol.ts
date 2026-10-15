@@ -4991,6 +4991,8 @@ export interface DesignListRequestShape {
     readonly after: null | string;
     /** limit as defined by the Nexa gateway. */
     readonly limit: number;
+    /** query as defined by the Nexa gateway. */
+    readonly query?: string;
 }
 
 /** DesignListRequest from the Nexa wire protocol. */
