@@ -87,10 +87,17 @@ export class DesignRequestCodec {
     }
     /** Small library projection. */
     public static list(raw: unknown): DesignListRequest {
-        const value: Readonly<Record<string, unknown>> = V.record(raw, ['after', 'limit']);
+        const value: Readonly<Record<string, unknown>> = V.fields(
+            raw,
+            ['after', 'limit', 'query'],
+            ['after', 'limit'],
+        );
         return {
             after: V.optionalId(value['after']),
             limit: V.number(value['limit'], 1, 100, true),
+            ...(Object.hasOwn(value, 'query')
+                ? { query: V.text(value['query'], 160, true).trim() }
+                : {}),
         };
     }
     /** A durable journal continuation. */

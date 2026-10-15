@@ -128,6 +128,8 @@ export interface DesignReceipt {
 export interface DesignListRequest {
     readonly after: string | null;
     readonly limit: number;
+    /** Optional literal, case-insensitive title search across this owner's complete library. */
+    readonly query?: string;
 }
 /** Bounded library page. */
 export interface DesignListPage {

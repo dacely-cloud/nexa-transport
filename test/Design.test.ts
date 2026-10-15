@@ -10,6 +10,7 @@ import { DesignEdits } from '../src/design/DesignEdits.js';
 import { DesignLayoutEngine } from '../src/design/DesignLayout.js';
 import { DesignRequestCodec } from '../src/design/DesignRequestCodec.js';
 import type {
+    DesignListRequest,
     DesignCreateRequest,
     DesignSaveRequest,
     DesignReceipt,
@@ -18,6 +19,26 @@ import type {
 import type { DesignDocument } from '../src/design/DesignTypes.js';
 
 describe('shared native design contracts', (): void => {
+    it('retains optional literal library queries in both portable codecs and the actual wire validator', (): void => {
+        const request: DesignListRequest = { after: null, limit: 60, query: '  Mobile .* 日本  ' };
+        expect(methodValidators[Method.DesignList].params(request)).toBe(true);
+        expect(DesignRequestCodec.list(request)).toEqual({
+            after: null,
+            limit: 60,
+            query: 'Mobile .* 日本',
+        });
+        expect(methodValidators[Method.DesignList].params({ after: null, limit: 60 })).toBe(true);
+        expect(DesignRequestCodec.list({ after: null, limit: 60 })).toEqual({
+            after: null,
+            limit: 60,
+        });
+        expect(
+            methodValidators[Method.DesignList].params({ ...request, query: { $regex: '.*' } }),
+        ).toBe(false);
+        expect((): void => {
+            DesignRequestCodec.list({ ...request, query: 'x'.repeat(161) });
+        }).toThrow();
+    });
     it('validates named method declarations at the actual parameter and result paths', (): void => {
         const create: DesignCreateRequest = { id: 'design', name: 'A design', commandId: 'create' };
         const receipt: DesignReceipt = {
