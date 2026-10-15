@@ -24,11 +24,13 @@ import {
 } from './DesignSvgFilterEffects.js';
 import { DesignSvgImportGeometry } from './DesignSvgImportGeometry.js';
 import { DesignDefaults } from './DesignDefaults.js';
+import { DesignSvgFilterFrame } from './DesignSvgFilterFrame.js';
 
 /** Filters run before target clipping and opacity; their output region is an editable alpha-mask source. */
 export class DesignSvgImportFilters {
     #sequence: number = 0;
     #styles: DesignSvgImportStyles;
+    #frames: DesignSvgFilterFrame;
     public constructor(
         public readonly elements: ReadonlyMap<string, DesignSvgElement>,
         css: DesignSvgCss,
@@ -38,6 +40,7 @@ export class DesignSvgImportFilters {
         public readonly identify: (key: string) => string,
     ) {
         this.#styles = new DesignSvgImportStyles(css, ancestors);
+        this.#frames = new DesignSvgFilterFrame(tree, identify);
     }
     public async apply(
         targetId: string,
@@ -153,10 +156,34 @@ export class DesignSvgImportFilters {
                       `M${x} ${y}h${width}v${height}h${-width}Z`,
                       regionMatrix,
                   );
-        this.tree.replace(targetId, (node: DesignNode): DesignNode => ({
-            ...node,
-            style: { ...node.style, blur: effects.blur, shadows: effects.shadows },
-        }));
+        if (effects.graph && region !== null) {
+            if (
+                Math.min(Math.abs(regionMatrix.a), Math.abs(regionMatrix.b)) > 1e-12 ||
+                Math.min(Math.abs(regionMatrix.c), Math.abs(regionMatrix.d)) > 1e-12
+            ) {
+                throw new DesignFailure(
+                    DesignFailureReason.Invalid,
+                    'SVG rotated shadow graph regions require native affine effect support.',
+                );
+            }
+            const first: ReturnType<typeof T.point> = T.point(regionMatrix, x, y);
+            const second: ReturnType<typeof T.point> = T.point(regionMatrix, x + width, y + height);
+            this.#frames.apply(
+                targetId,
+                {
+                    x: Math.min(first.x, second.x),
+                    y: Math.min(first.y, second.y),
+                    width: Math.abs(second.x - first.x),
+                    height: Math.abs(second.y - first.y),
+                },
+                effects,
+            );
+        } else {
+            this.tree.replace(targetId, (node: DesignNode): DesignNode => ({
+                ...node,
+                style: { ...node.style, blur: effects.blur, shadows: effects.shadows },
+            }));
+        }
         const sourceId: string = this.identify('filter-region:' + (++this.#sequence).toString());
         const base: DesignNode = DesignDefaults.node(
             sourceId,

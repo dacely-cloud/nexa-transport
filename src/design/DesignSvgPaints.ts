@@ -24,6 +24,7 @@ import {
 import { DesignAssetCodec } from './DesignAssetCodec.js';
 import { DesignImageGeometry, type DesignImagePlacement } from './DesignImageGeometry.js';
 import { DesignDefaults } from './DesignDefaults.js';
+import { DesignEffectMetrics } from './DesignEffectMetrics.js';
 import { DesignSelectionContext } from './DesignSelectionContext.js';
 import type { DesignSelectionBounds } from './DesignSelectionTypes.js';
 import { DesignSvgGeometry as Geometry } from './DesignSvgGeometry.js';
@@ -212,16 +213,7 @@ export class DesignSvgPaints {
         }
         const id: string = this.identity('effect');
         const bounds: DesignSelectionBounds = DesignSelectionContext.bounds(box);
-        const margin: number = Math.max(
-            style.blur * 3,
-            ...style.shadows.map(
-                (shadow): number =>
-                    Math.max(Math.abs(shadow.x), Math.abs(shadow.y)) +
-                    shadow.blur * 3 +
-                    Math.abs(shadow.spread),
-            ),
-            0,
-        );
+        const margin: number = DesignEffectMetrics.margin(style);
         const outer: string[] = [];
         const inner: string[] = [];
         const filters: string[] = [];
