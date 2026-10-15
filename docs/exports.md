@@ -37,6 +37,10 @@ they do not execute server-only handlers or grant access.
 
 ## Roblox preview helpers
 
+`nexa-transport/roblox-beams` provides the shared seekable Beam ribbon geometry,
+native endpoint bindings, appearance sequences and texture travel used by both
+hardware preview adapters. It does not execute Luau or certify Studio pixel parity.
+
 | Import                                       | Availability | Contract                                                         |
 | -------------------------------------------- | ------------ | ---------------------------------------------------------------- |
 | `nexa-transport/roblox-legacy-font`          | ESM + types  | Portable legacy font data and lookup for native previews.        |
