@@ -6476,12 +6476,17 @@ export interface DesignSvgImportRequestShape {
 /** DesignSvgImportRequest from the Nexa wire protocol. */
 export type DesignSvgImportRequest = DesignSvgImportRequestShape;
 
+/** Allowed values for DesignTextdirection. */
+export const DesignTextdirectionValues = { Value0: 'auto', Value1: 'ltr', Value2: 'rtl' } as const;
+
 /** DesignText wire fields. */
 export interface DesignTextShape {
     /** align as defined by the Nexa gateway. */
     readonly align: DesignAlign;
     /** content as defined by the Nexa gateway. */
     readonly content: string;
+    /** direction as defined by the Nexa gateway. */
+    readonly direction?: (typeof DesignTextdirectionValues)[keyof typeof DesignTextdirectionValues];
     /** family as defined by the Nexa gateway. */
     readonly family: string;
     /** font as defined by the Nexa gateway. */
@@ -6543,10 +6548,15 @@ export interface DesignTextRunShape {
 /** DesignTextRun from the Nexa wire protocol. */
 export type DesignTextRun = DesignTextRunShape;
 
+/** Allowed values for DesignTextSpanStyledirection. */
+export const DesignTextSpanStyledirectionValues = { Value0: 'ltr', Value1: 'rtl' } as const;
+
 /** DesignTextSpanStyle wire fields. */
 export interface DesignTextSpanStyleShape {
     /** color as defined by the Nexa gateway. */
     readonly color: string;
+    /** direction as defined by the Nexa gateway. */
+    readonly direction?: (typeof DesignTextSpanStyledirectionValues)[keyof typeof DesignTextSpanStyledirectionValues];
     /** family as defined by the Nexa gateway. */
     readonly family: string;
     /** font as defined by the Nexa gateway. */
@@ -6862,10 +6872,19 @@ export const DesignTypographyChangesalignValues = {
     Value2: 'start',
 } as const;
 
+/** Allowed values for DesignTypographyChangesdirection. */
+export const DesignTypographyChangesdirectionValues = {
+    Value0: 'auto',
+    Value1: 'ltr',
+    Value2: 'rtl',
+} as const;
+
 /** DesignTypographyChanges wire fields. */
 export interface DesignTypographyChangesShape {
     /** align as defined by the Nexa gateway. */
     readonly align?: (typeof DesignTypographyChangesalignValues)[keyof typeof DesignTypographyChangesalignValues];
+    /** direction as defined by the Nexa gateway. */
+    readonly direction?: (typeof DesignTypographyChangesdirectionValues)[keyof typeof DesignTypographyChangesdirectionValues];
     /** family as defined by the Nexa gateway. */
     readonly family?: string;
     /** font as defined by the Nexa gateway. */
@@ -6918,10 +6937,19 @@ export const DesignTypographyOverridesalignValues = {
     Value2: 'start',
 } as const;
 
+/** Allowed values for DesignTypographyOverridesdirection. */
+export const DesignTypographyOverridesdirectionValues = {
+    Value0: 'auto',
+    Value1: 'ltr',
+    Value2: 'rtl',
+} as const;
+
 /** DesignTypographyOverrides wire fields. */
 export interface DesignTypographyOverridesShape {
     /** align as defined by the Nexa gateway. */
     readonly align?: (typeof DesignTypographyOverridesalignValues)[keyof typeof DesignTypographyOverridesalignValues];
+    /** direction as defined by the Nexa gateway. */
+    readonly direction?: (typeof DesignTypographyOverridesdirectionValues)[keyof typeof DesignTypographyOverridesdirectionValues];
     /** family as defined by the Nexa gateway. */
     readonly family?: string;
     /** font as defined by the Nexa gateway. */
@@ -6963,10 +6991,19 @@ export const DesignTypographyValuesalignValues = {
     Value2: 'start',
 } as const;
 
+/** Allowed values for DesignTypographyValuesdirection. */
+export const DesignTypographyValuesdirectionValues = {
+    Value0: 'auto',
+    Value1: 'ltr',
+    Value2: 'rtl',
+} as const;
+
 /** DesignTypographyValues wire fields. */
 export interface DesignTypographyValuesShape {
     /** align as defined by the Nexa gateway. */
     readonly align: (typeof DesignTypographyValuesalignValues)[keyof typeof DesignTypographyValuesalignValues];
+    /** direction as defined by the Nexa gateway. */
+    readonly direction?: (typeof DesignTypographyValuesdirectionValues)[keyof typeof DesignTypographyValuesdirectionValues];
     /** family as defined by the Nexa gateway. */
     readonly family: string;
     /** font as defined by the Nexa gateway. */
@@ -7421,6 +7458,8 @@ export interface GatewayFeaturesShape {
     readonly designImageTransforms?: true;
     /** designLayerCompositing as defined by the Nexa gateway. */
     readonly designLayerCompositing?: true;
+    /** designTextDirection as defined by the Nexa gateway. */
+    readonly designTextDirection?: true;
     /** events as defined by the Nexa gateway. */
     readonly events: ReadonlyArray<string>;
     /** jsonReplies as defined by the Nexa gateway. */

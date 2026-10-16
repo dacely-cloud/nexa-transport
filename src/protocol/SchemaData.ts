@@ -9811,6 +9811,12 @@ export const schema: Schema = {
                 content: {
                     type: 'string',
                 },
+                direction: {
+                    description:
+                        'Auto resolves each paragraph from its first strong character. Alignment remains physical.',
+                    enum: ['auto', 'ltr', 'rtl'],
+                    type: 'string',
+                },
                 family: {
                     type: 'string',
                 },
@@ -9938,6 +9944,11 @@ export const schema: Schema = {
             description: 'Resolved style of a contiguous rich-text range.',
             properties: {
                 color: {
+                    type: 'string',
+                },
+                direction: {
+                    description: 'Individual visual runs always have a concrete shaping direction.',
+                    enum: ['ltr', 'rtl'],
                     type: 'string',
                 },
                 family: {
@@ -10428,6 +10439,12 @@ export const schema: Schema = {
                     enum: ['center', 'end', 'start'],
                     type: 'string',
                 },
+                direction: {
+                    description:
+                        'Base paragraph direction is independent of physical left/center/right alignment.',
+                    enum: ['auto', 'ltr', 'rtl'],
+                    type: 'string',
+                },
                 family: {
                     type: 'string',
                 },
@@ -10504,6 +10521,12 @@ export const schema: Schema = {
                     enum: ['center', 'end', 'start'],
                     type: 'string',
                 },
+                direction: {
+                    description:
+                        'Base paragraph direction is independent of physical left/center/right alignment.',
+                    enum: ['auto', 'ltr', 'rtl'],
+                    type: 'string',
+                },
                 family: {
                     type: 'string',
                 },
@@ -10562,6 +10585,12 @@ export const schema: Schema = {
             properties: {
                 align: {
                     enum: ['center', 'end', 'start'],
+                    type: 'string',
+                },
+                direction: {
+                    description:
+                        'Base paragraph direction is independent of physical left/center/right alignment.',
+                    enum: ['auto', 'ltr', 'rtl'],
                     type: 'string',
                 },
                 family: {
@@ -11296,6 +11325,12 @@ export const schema: Schema = {
                     const: true,
                     description:
                         'Native layer blending and explicit group isolation preserve editable appearance.',
+                    type: 'boolean',
+                },
+                designTextDirection: {
+                    const: true,
+                    description:
+                        'Native typography supports paragraph direction and shared Unicode ordering.',
                     type: 'boolean',
                 },
                 events: {
