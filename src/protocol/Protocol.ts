@@ -3420,6 +3420,36 @@ export const DesignAlignValues = {
 /** DesignAlign from the Nexa wire protocol. */
 export type DesignAlign = (typeof DesignAlignValues)[keyof typeof DesignAlignValues];
 
+/** DesignArcOperation wire fields. */
+export interface DesignArcOperationShape {
+    /** changes as defined by the Nexa gateway. */
+    readonly changes: DesignArcSettings | null;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** op as defined by the Nexa gateway. */
+    readonly op: 'arc';
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+}
+
+/** DesignArcOperation from the Nexa wire protocol. */
+export type DesignArcOperation = DesignArcOperationShape;
+
+/** DesignArcSettings wire fields. */
+export interface DesignArcSettingsShape {
+    /** closed as defined by the Nexa gateway. */
+    readonly closed: boolean;
+    /** innerRadius as defined by the Nexa gateway. */
+    readonly innerRadius: number;
+    /** start as defined by the Nexa gateway. */
+    readonly start: number;
+    /** sweep as defined by the Nexa gateway. */
+    readonly sweep: number;
+}
+
+/** DesignArcSettings from the Nexa wire protocol. */
+export type DesignArcSettings = DesignArcSettingsShape;
+
 /** DesignArrangeMethod wire fields. */
 export interface DesignArrangeMethodShape {
     /** params as defined by the Nexa gateway. */
@@ -5246,6 +5276,8 @@ export const DesignNodebooleanModeValues = {
 
 /** DesignNode wire fields. */
 export interface DesignNodeShape {
+    /** arc as defined by the Nexa gateway. */
+    readonly arc?: DesignArcSettings;
     /** booleanMode as defined by the Nexa gateway. */
     readonly booleanMode?: (typeof DesignNodebooleanModeValues)[keyof typeof DesignNodebooleanModeValues];
     /** children as defined by the Nexa gateway. */
@@ -5335,6 +5367,8 @@ export const DesignNodeChangeskindValues = {
 
 /** DesignNodeChanges wire fields. */
 export interface DesignNodeChangesShape {
+    /** arc as defined by the Nexa gateway. */
+    readonly arc?: DesignArcSettings | null;
     /** booleanMode as defined by the Nexa gateway. */
     readonly booleanMode?:
         | (typeof DesignNodeChangesbooleanModeVariant0Values)[keyof typeof DesignNodeChangesbooleanModeVariant0Values]
@@ -5433,6 +5467,7 @@ export type DesignOperation =
     | DesignPaintGradientOperation
     | DesignStrokeOperation
     | DesignPolygonOperation
+    | DesignArcOperation
     | DesignStyleOperation;
 
 /** DesignOverride wire fields. */

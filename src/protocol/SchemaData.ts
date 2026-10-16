@@ -5313,6 +5313,67 @@ export const schema: Schema = {
             enum: ['between', 'center', 'end', 'start', 'stretch'],
             type: 'string',
         },
+        DesignArcOperation: {
+            description:
+                "Page-scoped arc edits regenerate only the selected ellipse's bounded curve geometry.",
+            properties: {
+                changes: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignArcSettings',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                id: {
+                    type: 'string',
+                },
+                op: {
+                    const: 'arc',
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+            },
+            required: ['changes', 'id', 'op', 'pageId'],
+            type: 'object',
+        },
+        DesignArcSettings: {
+            additionalProperties: false,
+            description:
+                'Ellipse-relative angles and radius preserve editable arcs, sectors and rings.',
+            properties: {
+                closed: {
+                    description:
+                        'Closed partial curves join the center or the inner arc; open curves retain ordinary SVG paint semantics.',
+                    type: 'boolean',
+                },
+                innerRadius: {
+                    description: 'Inner ellipse radius relative to the outer ellipse.',
+                    maximum: 0.999,
+                    minimum: 0,
+                    type: 'number',
+                },
+                start: {
+                    description:
+                        'Start angle in clockwise degrees from the right-hand ellipse axis.',
+                    maximum: 360,
+                    minimum: -360,
+                    type: 'number',
+                },
+                sweep: {
+                    description: 'Signed clockwise sweep; zero produces no painted curve.',
+                    maximum: 360,
+                    minimum: -360,
+                    type: 'number',
+                },
+            },
+            required: ['closed', 'innerRadius', 'start', 'sweep'],
+            type: 'object',
+        },
         DesignArrangeMethod: {
             description:
                 'Workspace-native arrangement avoids uploading or hydrating selected layer bodies.',
@@ -7845,6 +7906,11 @@ export const schema: Schema = {
             description:
                 'All layer state is explicit and editable; no generated markup is the source of truth.',
             properties: {
+                arc: {
+                    $ref: '#/definitions/DesignArcSettings',
+                    additionalProperties: false,
+                    description: 'Optional ellipse-relative arc, sector or ring parameters.',
+                },
                 booleanMode: {
                     description:
                         'Omitted on ordinary layers, preserving existing document and retry identities.',
@@ -8003,6 +8069,18 @@ export const schema: Schema = {
             description:
                 'Editable properties exclude identity and tree links, which have dedicated operations.',
             properties: {
+                arc: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignArcSettings',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                    description:
+                        'Null resets the layer to a complete ellipse, preserving paints and layout.',
+                },
                 booleanMode: {
                     anyOf: [
                         {
@@ -8286,6 +8364,9 @@ export const schema: Schema = {
                 },
                 {
                     $ref: '#/definitions/DesignPolygonOperation',
+                },
+                {
+                    $ref: '#/definitions/DesignArcOperation',
                 },
                 {
                     $ref: '#/definitions/DesignStyleOperation',
