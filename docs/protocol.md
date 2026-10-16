@@ -120,6 +120,7 @@ One agent's configuration.
 | `systemPromptSuffix` | No       | `string`                                                      | Appended to the assembled system prompt, for a tweak that should not discard the default. |
 | `temperature`        | No       | `number`                                                      |                                                                                           |
 | `tools`              | No       | Array of `string`                                             | Tools this agent may use. Absent means every registered tool.                             |
+| `topP`               | No       | `number`                                                      | Nucleus sampling, forwarded unchanged to providers that support it.                       |
 | `voice`              | No       | [AgentVoice](protocol.md#agentvoice)                          | Voice settings, when the agent speaks.                                                    |
 
 ## AgentVoice
@@ -2568,6 +2569,73 @@ Changed entities exclude undo preimages.
 | `id`        | Yes      | `string`                                          |             |
 | `limit`     | Yes      | `number`                                          |             |
 
+## DesignClipboardCopyMethod
+
+Native snapshot capture returns metadata rather than selected source bodies.
+
+| Field    | Required | Type                                                                 | Description |
+| -------- | -------- | -------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignClipboardCopyRequest](protocol.md#designclipboardcopyrequest) |             |
+| `result` | Yes      | [DesignClipboardReceipt](protocol.md#designclipboardreceipt)         |             |
+
+## DesignClipboardCopyRequest
+
+Copy references the exact source revision without transmitting selected source bodies.
+
+| Field            | Required | Type              | Description |
+| ---------------- | -------- | ----------------- | ----------- |
+| `clipboardId`    | Yes      | `string`          |             |
+| `pageId`         | Yes      | `string`          |             |
+| `selection`      | Yes      | Array of `string` |             |
+| `sourceId`       | Yes      | `string`          |             |
+| `sourceRevision` | Yes      | `string`          |             |
+
+## DesignClipboardPasteMethod
+
+Native snapshot paste shares the normal destination command journal and undo contract.
+
+| Field    | Required | Type                                                                   | Description |
+| -------- | -------- | ---------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignClipboardPasteRequest](protocol.md#designclipboardpasterequest) |             |
+| `result` | Yes      | [DesignReceipt](protocol.md#designreceipt)                             |             |
+
+## DesignClipboardPasteRequest
+
+Paste references a native clipboard snapshot and creates one normal undoable destination command.
+
+| Field              | Required | Type                                                             | Description |
+| ------------------ | -------- | ---------------------------------------------------------------- | ----------- |
+| `clipboardId`      | Yes      | `string`                                                         |             |
+| `commandId`        | Yes      | `string`                                                         |             |
+| `expectedRevision` | Yes      | `string`                                                         |             |
+| `id`               | Yes      | `string`                                                         |             |
+| `pageId`           | Yes      | `string`                                                         |             |
+| `parentId`         | Yes      | `null,string`                                                    |             |
+| `placement`        | Yes      | [DesignClipboardPlacement](protocol.md#designclipboardplacement) |             |
+| `x`                | Yes      | `number`                                                         |             |
+| `y`                | Yes      | `number`                                                         |             |
+
+## DesignClipboardPlacement
+
+Placement either centers the copied bounds, uses their original position or specifies a top-left point.
+
+Type: `"center"` / `"original"` / `"point"`.
+
+## DesignClipboardReceipt
+
+Small receipt for the owner's current immutable clipboard snapshot.
+
+| Field            | Required | Type                                                       | Description |
+| ---------------- | -------- | ---------------------------------------------------------- | ----------- |
+| `bounds`         | Yes      | [DesignSelectionBounds](protocol.md#designselectionbounds) |             |
+| `clipboardId`    | Yes      | `string`                                                   |             |
+| `expiresAt`      | Yes      | `string`                                                   |             |
+| `nodeCount`      | Yes      | `number`                                                   |             |
+| `pageId`         | Yes      | `string`                                                   |             |
+| `selection`      | Yes      | Array of `string`                                          |             |
+| `sourceId`       | Yes      | `string`                                                   |             |
+| `sourceRevision` | Yes      | `string`                                                   |             |
+
 ## DesignComment
 
 Anchored comments can refer to exact layers or canvas coordinates.
@@ -3109,7 +3177,7 @@ Color stop in a normalized gradient.
 
 ## DesignGradientTransform
 
-Top-left-origin normalized points define a linear segment or a radial center and two radius axes.
+Top-left-origin normalized points define a linear segment or a gradient center and two independent basis axes.
 
 | Field    | Required | Type     | Description |
 | -------- | -------- | -------- | ----------- |
@@ -3516,10 +3584,11 @@ Bounded library page.
 
 Owner-scoped document listing.
 
-| Field   | Required | Type          | Description |
-| ------- | -------- | ------------- | ----------- |
-| `after` | Yes      | `null,string` |             |
-| `limit` | Yes      | `number`      |             |
+| Field   | Required | Type          | Description                                                                           |
+| ------- | -------- | ------------- | ------------------------------------------------------------------------------------- |
+| `after` | Yes      | `null,string` |                                                                                       |
+| `limit` | Yes      | `number`      |                                                                                       |
+| `query` | No       | `string`      | Optional literal, case-insensitive title search across this owner's complete library. |
 
 ## DesignMask
 
@@ -3979,12 +4048,12 @@ Type: `"fill"` / `"stroke"`.
 
 Geometry and stops are independent of source bodies and the rest of the paint stack.
 
-| Field      | Required | Type                                                                                  | Description |
-| ---------- | -------- | ------------------------------------------------------------------------------------- | ----------- |
-| `angle`    | No       | `number`                                                                              |             |
-| `gradient` | No       | [DesignGradientTransformChanges](protocol.md#designgradienttransformchanges) / `null` |             |
-| `kind`     | No       | `"linear"` / `"radial"`                                                               |             |
-| `stops`    | No       | Array of [DesignGradientStop](protocol.md#designgradientstop)                         |             |
+| Field      | Required | Type                                                                                  | Description                                                             |
+| ---------- | -------- | ------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| `angle`    | No       | `number`                                                                              |                                                                         |
+| `gradient` | No       | [DesignGradientTransformChanges](protocol.md#designgradienttransformchanges) / `null` |                                                                         |
+| `kind`     | No       | `"angular"` / `"diamond"` / `"linear"` / `"radial"`                                   | The four editable gradient families share stops and normalized handles. |
+| `stops`    | No       | Array of [DesignGradientStop](protocol.md#designgradientstop)                         |                                                                         |
 
 ## DesignPaintGradientOperation
 
@@ -4033,7 +4102,7 @@ Page-scoped placement or framing of one image fill or existing stroke.
 
 Supported paint sources. Image assets use workspace references.
 
-Type: `"image"` / `"linear"` / `"radial"` / `"solid"`.
+Type: `"angular"` / `"diamond"` / `"image"` / `"linear"` / `"radial"` / `"solid"`.
 
 ## DesignPathCommand
 
@@ -4284,6 +4353,17 @@ Selection commands share one implementation between agent tools and browser edit
 
 Type: `"auto-layout"` / `"back"` / `"bottom"` / `"center"` / `"distribute-horizontal"` / `"distribute-vertical"` / `"duplicate"` / `"exclude"` / `"flatten"` / `"front"` / `"group"` / `"intersect"` / `"left"` / `"mask"` / `"middle"` / `"release-mask"` / `"right"` / `"subtract"` / `"top"` / `"ungroup"` / `"union"`.
 
+## DesignSelectionBounds
+
+Rotated layer bounds are measured along the containing coordinate axes.
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `bottom` | Yes      | `number` |             |
+| `left`   | Yes      | `number` |             |
+| `right`  | Yes      | `number` |             |
+| `top`    | Yes      | `number` |             |
+
 ## DesignShadow
 
 Drop or inner shadow.
@@ -4369,23 +4449,27 @@ Null removes a border; nonempty changes create or edit one authored layer's bord
 
 Style can be shared across arbitrary primitives.
 
-| Field     | Required | Type                                              | Description |
-| --------- | -------- | ------------------------------------------------- | ----------- |
-| `blur`    | Yes      | `number`                                          |             |
-| `corners` | Yes      | [DesignCorners](protocol.md#designcorners)        |             |
-| `fills`   | Yes      | Array of [DesignPaint](protocol.md#designpaint)   |             |
-| `shadows` | Yes      | Array of [DesignShadow](protocol.md#designshadow) |             |
-| `stroke`  | Yes      | [DesignStroke](protocol.md#designstroke) / `null` |             |
+| Field       | Required | Type                                                                                                                                                                                                                                          | Description                                                                           |
+| ----------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `blendMode` | No       | `"color"` / `"color-burn"` / `"color-dodge"` / `"darken"` / `"difference"` / `"exclusion"` / `"hard-light"` / `"hue"` / `"lighten"` / `"luminosity"` / `"multiply"` / `"normal"` / `"overlay"` / `"saturation"` / `"screen"` / `"soft-light"` | Omission preserves the normal layer compositing of existing documents.                |
+| `blur`      | Yes      | `number`                                                                                                                                                                                                                                      |                                                                                       |
+| `corners`   | Yes      | [DesignCorners](protocol.md#designcorners)                                                                                                                                                                                                    |                                                                                       |
+| `fills`     | Yes      | Array of [DesignPaint](protocol.md#designpaint)                                                                                                                                                                                               |                                                                                       |
+| `isolation` | No       | `"auto"` / `"isolate"`                                                                                                                                                                                                                        | Explicit isolation contains descendant blending without changing their editable tree. |
+| `shadows`   | Yes      | Array of [DesignShadow](protocol.md#designshadow)                                                                                                                                                                                             |                                                                                       |
+| `stroke`    | Yes      | [DesignStroke](protocol.md#designstroke) / `null`                                                                                                                                                                                             |                                                                                       |
 
 ## DesignStyleChanges
 
 Decoration changes retain all unrelated style fields; a supplied shadow array replaces only that stack.
 
-| Field     | Required | Type                                                   | Description                                          |
-| --------- | -------- | ------------------------------------------------------ | ---------------------------------------------------- |
-| `blur`    | No       | `number`                                               |                                                      |
-| `corners` | No       | [DesignCornerChanges](protocol.md#designcornerchanges) | Omitted radii retain their original authored values. |
-| `shadows` | No       | Array of [DesignShadow](protocol.md#designshadow)      |                                                      |
+| Field       | Required | Type                                                                                                                                                                                                                                                   | Description                                                            |
+| ----------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------- |
+| `blendMode` | No       | `"color"` / `"color-burn"` / `"color-dodge"` / `"darken"` / `"difference"` / `"exclusion"` / `"hard-light"` / `"hue"` / `"lighten"` / `"luminosity"` / `"multiply"` / `"normal"` / `"overlay"` / `"saturation"` / `"screen"` / `"soft-light"` / `null` | Null removes the authored mode and restores legacy normal compositing. |
+| `blur`      | No       | `number`                                                                                                                                                                                                                                               |                                                                        |
+| `corners`   | No       | [DesignCornerChanges](protocol.md#designcornerchanges)                                                                                                                                                                                                 | Omitted radii retain their original authored values.                   |
+| `isolation` | No       | `"auto"` / `"isolate"` / `null`                                                                                                                                                                                                                        | Null removes the authored isolation override.                          |
+| `shadows`   | No       | Array of [DesignShadow](protocol.md#designshadow)                                                                                                                                                                                                      |                                                                        |
 
 ## DesignStyleOperation
 
@@ -5043,9 +5127,12 @@ Methods, events, and additive capabilities supported by this gateway.
 | --------------------------- | -------- | -------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
 | `attachments`               | No       | `true`                                             | User media attachments are validated and forwarded to the agent.                               |
 | `binaryDataUploads`         | No       | `true`                                             | Disk upload chunks retain raw bytes from the wire through durable storage.                     |
+| `binaryHistory`             | No       | `true`                                             | History batches use acknowledged raw binary frames.                                            |
 | `binaryMedia`               | No       | `true`                                             | NXMD frames carry outbound file bytes; JSON results contain matching metadata.                 |
+| `designExtendedGradients`   | No       | `true`                                             | Angular and diamond gradient paints, geometry and compact edits.                               |
 | `designImageAdjustments`    | No       | `true`                                             | Non-destructive color controls are shared by image layers, fills, strokes and exports.         |
 | `designImageTransforms`     | No       | `true`                                             | Native image framing supports rotation, reflection, affine placement and repeated image tiles. |
+| `designLayerCompositing`    | No       | `true`                                             | Native layer blending and explicit group isolation preserve editable appearance.               |
 | `events`                    | Yes      | Array of `string`                                  |                                                                                                |
 | `jsonReplies`               | No       | `true`                                             | Host validation of JSON final answers while native tools remain available.                     |
 | `methodScopes`              | Yes      | [RecordstringScope](protocol.md#recordstringscope) | The scope each method requires.                                                                |
@@ -5151,6 +5238,8 @@ Configurable bounds on gateway-owned work and memory.
 | `design.canvas`                      | Yes      | Object (fields below) | Independently advertised canvas records allow complete-read fallback on older workspaces.              |
 | `design.canvas.metrics`              | Yes      | Object (fields below) | Metric reads retain the exact canvas revision across continuations.                                    |
 | `design.changes`                     | Yes      | Object (fields below) | Forward delta RPC contract.                                                                            |
+| `design.clipboard.copy`              | Yes      | Object (fields below) | Native snapshot capture returns metadata rather than selected source bodies.                           |
+| `design.clipboard.paste`             | Yes      | Object (fields below) | Native snapshot paste shares the normal destination command journal and undo contract.                 |
 | `design.component`                   | Yes      | Object (fields below) | Native component commands keep source forests on the authenticated owner's workspace.                  |
 | `design.create`                      | Yes      | Object (fields below) | Create-document RPC contract.                                                                          |
 | `design.delete`                      | Yes      | Object (fields below) | Owner-scoped revision-safe document deletion.                                                          |
@@ -5176,6 +5265,13 @@ Configurable bounds on gateway-owned work and memory.
 | `jobs.list`                          | Yes      | Object (fields below) |                                                                                                        |
 | `jobs.remove`                        | Yes      | Object (fields below) |                                                                                                        |
 | `logs.tail`                          | Yes      | Object (fields below) |                                                                                                        |
+| `luau.editor.close`                  | Yes      | Object (fields below) |                                                                                                        |
+| `luau.editor.commit`                 | Yes      | Object (fields below) |                                                                                                        |
+| `luau.editor.completion`             | Yes      | Object (fields below) |                                                                                                        |
+| `luau.editor.definition`             | Yes      | Object (fields below) |                                                                                                        |
+| `luau.editor.hover`                  | Yes      | Object (fields below) |                                                                                                        |
+| `luau.editor.stage`                  | Yes      | Object (fields below) |                                                                                                        |
+| `luau.editor.start`                  | Yes      | Object (fields below) |                                                                                                        |
 | `media.acknowledge`                  | Yes      | Object (fields below) |                                                                                                        |
 | `office.ownerProof`                  | Yes      | Object (fields below) | Bind an invitation to the authenticated socket's office, using a short-lived signed proof.             |
 | `processes.input`                    | Yes      | Object (fields below) |                                                                                                        |
@@ -5659,6 +5755,20 @@ Configurable bounds on gateway-owned work and memory.
 | `params` | Yes      | [DesignChangesRequest](protocol.md#designchangesrequest) |             |
 | `result` | Yes      | [DesignRecordPage](protocol.md#designrecordpage)         |             |
 
+**design.clipboard.copy**
+
+| Field    | Required | Type                                                                 | Description |
+| -------- | -------- | -------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignClipboardCopyRequest](protocol.md#designclipboardcopyrequest) |             |
+| `result` | Yes      | [DesignClipboardReceipt](protocol.md#designclipboardreceipt)         |             |
+
+**design.clipboard.paste**
+
+| Field    | Required | Type                                                                   | Description |
+| -------- | -------- | ---------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignClipboardPasteRequest](protocol.md#designclipboardpasterequest) |             |
+| `result` | Yes      | [DesignReceipt](protocol.md#designreceipt)                             |             |
+
 **design.component**
 
 | Field    | Required | Type                                                         | Description |
@@ -5833,6 +5943,55 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ------------------------------------------- | ----------- |
 | `params` | Yes      | [LogTailParams](protocol.md#logtailparams)  |             |
 | `result` | Yes      | Array of [LogRecord](protocol.md#logrecord) |             |
+
+**luau.editor.close**
+
+| Field    | Required | Type                                             | Description |
+| -------- | -------- | ------------------------------------------------ | ----------- |
+| `params` | Yes      | [LuauEditorHandle](protocol.md#luaueditorhandle) |             |
+| `result` | Yes      | [LuauEditorAck](protocol.md#luaueditorack)       |             |
+
+**luau.editor.commit**
+
+| Field    | Required | Type                                             | Description |
+| -------- | -------- | ------------------------------------------------ | ----------- |
+| `params` | Yes      | [LuauEditorCommit](protocol.md#luaueditorcommit) |             |
+| `result` | Yes      | [LuauEditorReport](protocol.md#luaueditorreport) |             |
+
+**luau.editor.completion**
+
+| Field    | Required | Type                                                     | Description |
+| -------- | -------- | -------------------------------------------------------- | ----------- |
+| `params` | Yes      | [LuauEditorQuery](protocol.md#luaueditorquery)           |             |
+| `result` | Yes      | [LuauEditorCompletion](protocol.md#luaueditorcompletion) |             |
+
+**luau.editor.definition**
+
+| Field    | Required | Type                                                     | Description |
+| -------- | -------- | -------------------------------------------------------- | ----------- |
+| `params` | Yes      | [LuauEditorQuery](protocol.md#luaueditorquery)           |             |
+| `result` | Yes      | [LuauEditorDefinition](protocol.md#luaueditordefinition) |             |
+
+**luau.editor.hover**
+
+| Field    | Required | Type                                           | Description |
+| -------- | -------- | ---------------------------------------------- | ----------- |
+| `params` | Yes      | [LuauEditorQuery](protocol.md#luaueditorquery) |             |
+| `result` | Yes      | [LuauEditorHover](protocol.md#luaueditorhover) |             |
+
+**luau.editor.stage**
+
+| Field    | Required | Type                                                     | Description |
+| -------- | -------- | -------------------------------------------------------- | ----------- |
+| `params` | Yes      | [LuauEditorSourcePart](protocol.md#luaueditorsourcepart) |             |
+| `result` | Yes      | [LuauEditorAck](protocol.md#luaueditorack)               |             |
+
+**luau.editor.start**
+
+| Field    | Required | Type                                             | Description |
+| -------- | -------- | ------------------------------------------------ | ----------- |
+| `params` | Yes      | [LuauEditorHandle](protocol.md#luaueditorhandle) |             |
+| `result` | Yes      | [LuauEditorAck](protocol.md#luaueditorack)       |             |
 
 **media.acknowledge**
 
@@ -7127,6 +7286,156 @@ A window over the recent log.
 | `limit` | No       | `number`                                    | How many lines back to read. Absent reads everything the buffer still holds.    |
 | `scope` | No       | `string`                                    | Only lines from this subsystem, e.g. `gateway`.                                 |
 | `since` | No       | `number`                                    | Only lines newer than this timestamp, so a poller does not re-read what it has. |
+
+## LuauEditorAck
+
+Small staging/close acknowledgments do not imply successful type coverage.
+
+| Field      | Required | Type     | Description |
+| ---------- | -------- | -------- | ----------- |
+| `handle`   | Yes      | `string` |             |
+| `revision` | Yes      | `number` |             |
+
+## LuauEditorCommit
+
+The complete selected source set is committed to the native frontend in one check.
+
+| Field         | Required | Type              | Description |
+| ------------- | -------- | ----------------- | ----------- |
+| `definitions` | Yes      | Array of `string` |             |
+| `handle`      | Yes      | `string`          |             |
+| `id`          | Yes      | `string`          |             |
+| `paths`       | Yes      | Array of `string` |             |
+| `revision`    | Yes      | `number`          |             |
+
+## LuauEditorCompletion
+
+Completion entries are bounded by the native analyzer's 2048-item limit.
+
+| Field          | Required | Type                                                                      | Description |
+| -------------- | -------- | ------------------------------------------------------------------------- | ----------- |
+| `handle`       | Yes      | `string`                                                                  |             |
+| `isIncomplete` | Yes      | `boolean`                                                                 |             |
+| `items`        | Yes      | Array of [LuauEditorCompletionItem](protocol.md#luaueditorcompletionitem) |             |
+| `revision`     | Yes      | `number`                                                                  |             |
+
+## LuauEditorCompletionItem
+
+One actual upstream completion entry.
+
+| Field        | Required | Type          | Description |
+| ------------ | -------- | ------------- | ----------- |
+| `deprecated` | Yes      | `boolean`     |             |
+| `detail`     | Yes      | `null,string` |             |
+| `label`      | Yes      | `string`      |             |
+
+## LuauEditorDefinition
+
+An unresolved definition returns null rather than an invented source location.
+
+| Field      | Required | Type                                                          | Description |
+| ---------- | -------- | ------------------------------------------------------------- | ----------- |
+| `handle`   | Yes      | `string`                                                      |             |
+| `location` | Yes      | [LuauEditorLocation](protocol.md#luaueditorlocation) / `null` |             |
+| `revision` | Yes      | `number`                                                      |             |
+
+## LuauEditorDiagnostic
+
+Native diagnostic positions retain their documented zero-based UTF-8 byte columns.
+
+| Field         | Required | Type                                                 | Description |
+| ------------- | -------- | ---------------------------------------------------- | ----------- |
+| `code`        | Yes      | `string`                                             |             |
+| `endColumn`   | Yes      | `number`                                             |             |
+| `endLine`     | Yes      | `number`                                             |             |
+| `file`        | Yes      | `string`                                             |             |
+| `message`     | Yes      | `string`                                             |             |
+| `severity`    | Yes      | [LuauEditorSeverity](protocol.md#luaueditorseverity) |             |
+| `startColumn` | Yes      | `number`                                             |             |
+| `startLine`   | Yes      | `number`                                             |             |
+
+## LuauEditorHandle
+
+Browser connection owns the handle; the conversation is authorized independently on every request.
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `handle` | Yes      | `string` |             |
+| `id`     | Yes      | `string` |             |
+
+## LuauEditorHover
+
+Hover preserves native Markdown as text; clients must not inject it as HTML.
+
+| Field      | Required | Type          | Description |
+| ---------- | -------- | ------------- | ----------- |
+| `handle`   | Yes      | `string`      |             |
+| `revision` | Yes      | `number`      |             |
+| `text`     | Yes      | `null,string` |             |
+
+## LuauEditorLocation
+
+Definition targets remain relative to the supplied source project, with UTF-16 coordinates.
+
+| Field            | Required | Type     | Description |
+| ---------------- | -------- | -------- | ----------- |
+| `endCharacter`   | Yes      | `number` |             |
+| `endLine`        | Yes      | `number` |             |
+| `name`           | Yes      | `string` |             |
+| `startCharacter` | Yes      | `number` |             |
+| `startLine`      | Yes      | `number` |             |
+
+## LuauEditorQuery
+
+Queries refer to exactly the displayed committed revision and use zero-based UTF-16 positions.
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `character` | Yes      | `number` |             |
+| `handle`    | Yes      | `string` |             |
+| `id`        | Yes      | `string` |             |
+| `line`      | Yes      | `number` |             |
+| `name`      | Yes      | `string` |             |
+| `revision`  | Yes      | `number` |             |
+
+## LuauEditorReport
+
+Complete project diagnostics belong to one committed source revision.
+
+| Field               | Required | Type                                                              | Description |
+| ------------------- | -------- | ----------------------------------------------------------------- | ----------- |
+| `checked`           | Yes      | `number`                                                          |             |
+| `diagnostics`       | Yes      | Array of [LuauEditorDiagnostic](protocol.md#luaueditordiagnostic) |             |
+| `elapsedUs`         | Yes      | `string`                                                          |             |
+| `error`             | Yes      | `null,string`                                                     |             |
+| `handle`            | Yes      | `string`                                                          |             |
+| `lines`             | Yes      | `string`                                                          |             |
+| `ok`                | Yes      | `boolean`                                                         |             |
+| `rechecked`         | Yes      | `number`                                                          |             |
+| `revision`          | Yes      | `number`                                                          |             |
+| `timeouts`          | Yes      | Array of `string`                                                 |             |
+| `typecheckComplete` | Yes      | `boolean`                                                         |             |
+| `unchecked`         | Yes      | Array of `string`                                                 |             |
+
+## LuauEditorSeverity
+
+Actual native diagnostic classifications.
+
+Type: `"error"` / `"warning"`.
+
+## LuauEditorSourcePart
+
+A bounded source chunk stages an immutable revision without checking an incomplete upload.
+
+| Field      | Required | Type      | Description |
+| ---------- | -------- | --------- | ----------- |
+| `complete` | Yes      | `boolean` |             |
+| `handle`   | Yes      | `string`  |             |
+| `id`       | Yes      | `string`  |             |
+| `name`     | Yes      | `string`  |             |
+| `offset`   | Yes      | `number`  |             |
+| `revision` | Yes      | `number`  |             |
+| `source`   | Yes      | `string`  |             |
 
 ## MediaAcknowledgeParams
 
@@ -8962,6 +9271,16 @@ Identifies a saved file within an owned session.
 | `attachmentId` | Yes      | `string` |             |
 | `id`           | Yes      | `string` |             |
 
+## SessionHistoryChunk
+
+One additional bounded page; the enclosing response pins both snapshot boundaries.
+
+| Field        | Required | Type     | Description |
+| ------------ | -------- | -------- | ----------- |
+| `chunk`      | Yes      | `string` |             |
+| `cursor`     | Yes      | `string` |             |
+| `nextCursor` | No       | `string` |             |
+
 ## SessionHistoryData
 
 A small live notification; large records remain in bounded authenticated pages.
@@ -8976,30 +9295,38 @@ A small live notification; large records remain in bounded authenticated pages.
 
 Bounded binary pages can split even a very large individual native event.
 
-| Field             | Required | Type      | Description                                                              |
-| ----------------- | -------- | --------- | ------------------------------------------------------------------------ |
-| `chunk`           | Yes      | `string`  |                                                                          |
-| `endCursor`       | Yes      | `string`  |                                                                          |
-| `excludesWorkers` | No       | `boolean` | Confirms that delegated events were omitted from this projection.        |
-| `format`          | Yes      | `1`       |                                                                          |
-| `nextCursor`      | No       | `string`  |                                                                          |
-| `sourceEndCursor` | No       | `string`  | Original byte cursor for live catch-up after replaying a canonical view. |
+| Field             | Required | Type                                                            | Description                                                                                |
+| ----------------- | -------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `beforeCursor`    | No       | `string`                                                        | Original journal boundary preceding this window; omitted when all older history is loaded. |
+| `binaryId`        | No       | `string`                                                        | Raw transfer metadata; payload bytes never enter the JSON reply.                           |
+| `byteLength`      | No       | `number`                                                        |                                                                                            |
+| `chunk`           | Yes      | `string`                                                        |                                                                                            |
+| `endCursor`       | Yes      | `string`                                                        |                                                                                            |
+| `excludesWorkers` | No       | `boolean`                                                       | Confirms that delegated events were omitted from this projection.                          |
+| `format`          | Yes      | `1`                                                             |                                                                                            |
+| `nextCursor`      | No       | `string`                                                        |                                                                                            |
+| `pages`           | No       | Array of [SessionHistoryChunk](protocol.md#sessionhistorychunk) | Additional contiguous pages from the same authorized journal snapshot.                     |
+| `sourceEndCursor` | No       | `string`                                                        | Original byte cursor for live catch-up after replaying a canonical view.                   |
 
 ## SessionHistoryParams
 
 Byte cursors are decimal strings so large journals retain exact offsets.
 
-| Field             | Required | Type      | Description                                                                    |
-| ----------------- | -------- | --------- | ------------------------------------------------------------------------------ |
-| `compact`         | No       | `boolean` | Canonical display view; the original append-only journal remains available.    |
-| `cursor`          | No       | `string`  |                                                                                |
-| `endCursor`       | No       | `string`  |                                                                                |
-| `excludeWorkers`  | No       | `boolean` | Omits full delegated events when opening the parent conversation.              |
-| `id`              | Yes      | `string`  |                                                                                |
-| `pageBytes`       | No       | `number`  | Optional bounded read window, up to 1 MiB.                                     |
-| `sourceEndCursor` | No       | `string`  | Pins a canonical view to an original journal boundary across all of its pages. |
-| `streamId`        | No       | `string`  |                                                                                |
-| `workerId`        | No       | `string`  | Reads one worker's events from its owned parent, scoped to a response stream.  |
+| Field             | Required | Type      | Description                                                                              |
+| ----------------- | -------- | --------- | ---------------------------------------------------------------------------------------- |
+| `batchPages`      | No       | `number`  | Returns up to eight bounded journal or compact pages in one authenticated request.       |
+| `beforeCursor`    | No       | `string`  | Exclusive original journal boundary for loading an older turn window.                    |
+| `binaryId`        | No       | `string`  | Unique receiver identity for an acknowledged raw binary history batch.                   |
+| `compact`         | No       | `boolean` | Canonical display view; the original append-only journal remains available.              |
+| `cursor`          | No       | `string`  |                                                                                          |
+| `endCursor`       | No       | `string`  |                                                                                          |
+| `excludeWorkers`  | No       | `boolean` | Omits full delegated events when opening the parent conversation.                        |
+| `id`              | Yes      | `string`  |                                                                                          |
+| `pageBytes`       | No       | `number`  | Optional bounded read window, up to 1 MiB.                                               |
+| `recentTurns`     | No       | `number`  | Selects the newest complete input-delimited turns instead of replaying the full archive. |
+| `sourceEndCursor` | No       | `string`  | Pins a canonical view to an original journal boundary across all of its pages.           |
+| `streamId`        | No       | `string`  |                                                                                          |
+| `workerId`        | No       | `string`  | Reads one worker's events from its owned parent, scoped to a response stream.            |
 
 ## SessionHistoryRecord
 

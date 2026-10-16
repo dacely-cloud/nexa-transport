@@ -173,6 +173,8 @@ export interface AgentDefinitionShape {
     readonly temperature?: number;
     /** tools as defined by the Nexa gateway. */
     readonly tools?: ReadonlyArray<string>;
+    /** topP as defined by the Nexa gateway. */
+    readonly topP?: number;
     /** voice as defined by the Nexa gateway. */
     readonly voice?: AgentVoice;
 }
@@ -3832,6 +3834,104 @@ export interface DesignChangesRequestShape {
 /** DesignChangesRequest from the Nexa wire protocol. */
 export type DesignChangesRequest = DesignChangesRequestShape;
 
+/** DesignClipboardCopyMethod wire fields. */
+export interface DesignClipboardCopyMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignClipboardCopyRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignClipboardReceipt;
+}
+
+/** DesignClipboardCopyMethod from the Nexa wire protocol. */
+export type DesignClipboardCopyMethod = DesignClipboardCopyMethodShape;
+
+/** DesignClipboardCopyRequest wire fields. */
+export interface DesignClipboardCopyRequestShape {
+    /** clipboardId as defined by the Nexa gateway. */
+    readonly clipboardId: string;
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+    /** selection as defined by the Nexa gateway. */
+    readonly selection: ReadonlyArray<string>;
+    /** sourceId as defined by the Nexa gateway. */
+    readonly sourceId: string;
+    /** sourceRevision as defined by the Nexa gateway. */
+    readonly sourceRevision: string;
+}
+
+/** DesignClipboardCopyRequest from the Nexa wire protocol. */
+export type DesignClipboardCopyRequest = DesignClipboardCopyRequestShape;
+
+/** DesignClipboardPasteMethod wire fields. */
+export interface DesignClipboardPasteMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignClipboardPasteRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignReceipt;
+}
+
+/** DesignClipboardPasteMethod from the Nexa wire protocol. */
+export type DesignClipboardPasteMethod = DesignClipboardPasteMethodShape;
+
+/** DesignClipboardPasteRequest wire fields. */
+export interface DesignClipboardPasteRequestShape {
+    /** clipboardId as defined by the Nexa gateway. */
+    readonly clipboardId: string;
+    /** commandId as defined by the Nexa gateway. */
+    readonly commandId: string;
+    /** expectedRevision as defined by the Nexa gateway. */
+    readonly expectedRevision: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+    /** parentId as defined by the Nexa gateway. */
+    readonly parentId: null | string;
+    /** placement as defined by the Nexa gateway. */
+    readonly placement: DesignClipboardPlacement;
+    /** x as defined by the Nexa gateway. */
+    readonly x: number;
+    /** y as defined by the Nexa gateway. */
+    readonly y: number;
+}
+
+/** DesignClipboardPasteRequest from the Nexa wire protocol. */
+export type DesignClipboardPasteRequest = DesignClipboardPasteRequestShape;
+
+/** Allowed values for DesignClipboardPlacement. */
+export const DesignClipboardPlacementValues = {
+    Value0: 'center',
+    Value1: 'original',
+    Value2: 'point',
+} as const;
+
+/** DesignClipboardPlacement from the Nexa wire protocol. */
+export type DesignClipboardPlacement =
+    (typeof DesignClipboardPlacementValues)[keyof typeof DesignClipboardPlacementValues];
+
+/** DesignClipboardReceipt wire fields. */
+export interface DesignClipboardReceiptShape {
+    /** bounds as defined by the Nexa gateway. */
+    readonly bounds: DesignSelectionBounds;
+    /** clipboardId as defined by the Nexa gateway. */
+    readonly clipboardId: string;
+    /** expiresAt as defined by the Nexa gateway. */
+    readonly expiresAt: string;
+    /** nodeCount as defined by the Nexa gateway. */
+    readonly nodeCount: number;
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+    /** selection as defined by the Nexa gateway. */
+    readonly selection: ReadonlyArray<string>;
+    /** sourceId as defined by the Nexa gateway. */
+    readonly sourceId: string;
+    /** sourceRevision as defined by the Nexa gateway. */
+    readonly sourceRevision: string;
+}
+
+/** DesignClipboardReceipt from the Nexa wire protocol. */
+export type DesignClipboardReceipt = DesignClipboardReceiptShape;
+
 /** DesignComment wire fields. */
 export interface DesignCommentShape {
     /** author as defined by the Nexa gateway. */
@@ -5837,6 +5937,21 @@ export const DesignSelectionActionValues = {
 export type DesignSelectionAction =
     (typeof DesignSelectionActionValues)[keyof typeof DesignSelectionActionValues];
 
+/** DesignSelectionBounds wire fields. */
+export interface DesignSelectionBoundsShape {
+    /** bottom as defined by the Nexa gateway. */
+    readonly bottom: number;
+    /** left as defined by the Nexa gateway. */
+    readonly left: number;
+    /** right as defined by the Nexa gateway. */
+    readonly right: number;
+    /** top as defined by the Nexa gateway. */
+    readonly top: number;
+}
+
+/** DesignSelectionBounds from the Nexa wire protocol. */
+export type DesignSelectionBounds = DesignSelectionBoundsShape;
+
 /** DesignShadow wire fields. */
 export interface DesignShadowShape {
     /** blur as defined by the Nexa gateway. */
@@ -7085,6 +7200,8 @@ export interface GatewayFeaturesShape {
     readonly attachments?: true;
     /** binaryDataUploads as defined by the Nexa gateway. */
     readonly binaryDataUploads?: true;
+    /** binaryHistory as defined by the Nexa gateway. */
+    readonly binaryHistory?: true;
     /** binaryMedia as defined by the Nexa gateway. */
     readonly binaryMedia?: true;
     /** designExtendedGradients as defined by the Nexa gateway. */
@@ -7617,6 +7734,22 @@ export interface GatewayMethodsdesign_changesShape {
     readonly params: DesignChangesRequest;
     /** result as defined by the Nexa gateway. */
     readonly result: DesignRecordPage;
+}
+
+/** GatewayMethodsdesign_clipboard_copy wire fields. */
+export interface GatewayMethodsdesign_clipboard_copyShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignClipboardCopyRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignClipboardReceipt;
+}
+
+/** GatewayMethodsdesign_clipboard_paste wire fields. */
+export interface GatewayMethodsdesign_clipboard_pasteShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignClipboardPasteRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignReceipt;
 }
 
 /** GatewayMethodsdesign_component wire fields. */
@@ -8935,6 +9068,10 @@ export interface GatewayMethodsShape {
     readonly 'design.canvas.metrics': GatewayMethodsdesign_canvas_metricsShape;
     /** design.changes as defined by the Nexa gateway. */
     readonly 'design.changes': GatewayMethodsdesign_changesShape;
+    /** design.clipboard.copy as defined by the Nexa gateway. */
+    readonly 'design.clipboard.copy': GatewayMethodsdesign_clipboard_copyShape;
+    /** design.clipboard.paste as defined by the Nexa gateway. */
+    readonly 'design.clipboard.paste': GatewayMethodsdesign_clipboard_pasteShape;
     /** design.component as defined by the Nexa gateway. */
     readonly 'design.component': GatewayMethodsdesign_componentShape;
     /** design.create as defined by the Nexa gateway. */
@@ -12885,6 +13022,19 @@ export interface SessionFileParamsShape {
 /** SessionFileParams from the Nexa wire protocol. */
 export type SessionFileParams = SessionFileParamsShape;
 
+/** SessionHistoryChunk wire fields. */
+export interface SessionHistoryChunkShape {
+    /** chunk as defined by the Nexa gateway. */
+    readonly chunk: string;
+    /** cursor as defined by the Nexa gateway. */
+    readonly cursor: string;
+    /** nextCursor as defined by the Nexa gateway. */
+    readonly nextCursor?: string;
+}
+
+/** SessionHistoryChunk from the Nexa wire protocol. */
+export type SessionHistoryChunk = SessionHistoryChunkShape;
+
 /** SessionHistoryData wire fields. */
 export interface SessionHistoryDataShape {
     /** cursor as defined by the Nexa gateway. */
@@ -12900,6 +13050,12 @@ export type SessionHistoryData = SessionHistoryDataShape;
 
 /** SessionHistoryPage wire fields. */
 export interface SessionHistoryPageShape {
+    /** beforeCursor as defined by the Nexa gateway. */
+    readonly beforeCursor?: string;
+    /** binaryId as defined by the Nexa gateway. */
+    readonly binaryId?: string;
+    /** byteLength as defined by the Nexa gateway. */
+    readonly byteLength?: number;
     /** chunk as defined by the Nexa gateway. */
     readonly chunk: string;
     /** endCursor as defined by the Nexa gateway. */
@@ -12910,6 +13066,8 @@ export interface SessionHistoryPageShape {
     readonly format: 1;
     /** nextCursor as defined by the Nexa gateway. */
     readonly nextCursor?: string;
+    /** pages as defined by the Nexa gateway. */
+    readonly pages?: ReadonlyArray<SessionHistoryChunk>;
     /** sourceEndCursor as defined by the Nexa gateway. */
     readonly sourceEndCursor?: string;
 }
@@ -12919,6 +13077,12 @@ export type SessionHistoryPage = SessionHistoryPageShape;
 
 /** SessionHistoryParams wire fields. */
 export interface SessionHistoryParamsShape {
+    /** batchPages as defined by the Nexa gateway. */
+    readonly batchPages?: number;
+    /** beforeCursor as defined by the Nexa gateway. */
+    readonly beforeCursor?: string;
+    /** binaryId as defined by the Nexa gateway. */
+    readonly binaryId?: string;
     /** compact as defined by the Nexa gateway. */
     readonly compact?: boolean;
     /** cursor as defined by the Nexa gateway. */
@@ -12931,6 +13095,8 @@ export interface SessionHistoryParamsShape {
     readonly id: string;
     /** pageBytes as defined by the Nexa gateway. */
     readonly pageBytes?: number;
+    /** recentTurns as defined by the Nexa gateway. */
+    readonly recentTurns?: number;
     /** sourceEndCursor as defined by the Nexa gateway. */
     readonly sourceEndCursor?: string;
     /** streamId as defined by the Nexa gateway. */
@@ -16885,6 +17051,10 @@ export enum Method {
     DesignCanvasMetrics = 'design.canvas.metrics',
     /** Calls design.changes. */
     DesignChanges = 'design.changes',
+    /** Calls design.clipboard.copy. */
+    DesignClipboardCopy = 'design.clipboard.copy',
+    /** Calls design.clipboard.paste. */
+    DesignClipboardPaste = 'design.clipboard.paste',
     /** Calls design.component. */
     DesignComponent = 'design.component',
     /** Calls design.create. */

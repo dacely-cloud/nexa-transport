@@ -1,6 +1,6 @@
 {
     "name": "nexa-transport",
-    "version": "0.1.0-assets.2",
+    "version": "0.1.0-design.1",
     "description": "Typed Nexa websocket gateway client for browsers and Node.js",
     "type": "module",
     "license": "Apache-2.0",
@@ -17,6 +17,22 @@
         "licenses"
     ],
     "exports": {
+        "./design-clipboard-types": {
+            "types": "./dist/design/DesignClipboardTypes.d.ts",
+            "import": "./dist/design-clipboard-types.js"
+        },
+        "./design-clipboard-codec": {
+            "types": "./dist/design/DesignClipboardCodec.d.ts",
+            "import": "./dist/design-clipboard-codec.js"
+        },
+        "./design-clipboard-snapshot": {
+            "types": "./dist/design/DesignClipboardSnapshot.d.ts",
+            "import": "./dist/design-clipboard-snapshot.js"
+        },
+        "./design-clipboard-paste": {
+            "types": "./dist/design/DesignClipboardPaste.d.ts",
+            "import": "./dist/design-clipboard-paste.js"
+        },
         "./roblox-beams": {
             "types": "./dist/roblox/RobloxBeamGeometry.d.ts",
             "import": "./dist/roblox-beams.js"

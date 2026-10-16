@@ -1,6 +1,6 @@
 # RPC reference
 
-All 188 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 187 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
+All 197 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 196 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
 
 - [accounts.create](#accountscreate)
 - [accounts.list](#accountslist)
@@ -45,6 +45,8 @@ All 188 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [design.canvas](#designcanvas)
 - [design.canvas.metrics](#designcanvasmetrics)
 - [design.changes](#designchanges)
+- [design.clipboard.copy](#designclipboardcopy)
+- [design.clipboard.paste](#designclipboardpaste)
 - [design.component](#designcomponent)
 - [design.create](#designcreate)
 - [design.delete](#designdelete)
@@ -70,6 +72,13 @@ All 188 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [jobs.list](#jobslist)
 - [jobs.remove](#jobsremove)
 - [logs.tail](#logstail)
+- [luau.editor.close](#luaueditorclose)
+- [luau.editor.commit](#luaueditorcommit)
+- [luau.editor.completion](#luaueditorcompletion)
+- [luau.editor.definition](#luaueditordefinition)
+- [luau.editor.hover](#luaueditorhover)
+- [luau.editor.stage](#luaueditorstage)
+- [luau.editor.start](#luaueditorstart)
 - [media.acknowledge](#mediaacknowledge)
 - [office.ownerProof](#officeownerproof)
 - [processes.input](#processesinput)
@@ -1170,6 +1179,74 @@ Parameters: [DesignChangesRequest](protocol.md#designchangesrequest).
 
 Result: [DesignRecordPage](protocol.md#designrecordpage).
 
+## design.clipboard.copy
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DesignClipboardCopy> = {
+    clipboardId: 'YOUR_CLIPBOARDID',
+    pageId: 'YOUR_PAGEID',
+    selection: [],
+    sourceId: 'YOUR_SOURCEID',
+    sourceRevision: 'YOUR_SOURCEREVISION',
+};
+const result: ResultOf<typeof Method.DesignClipboardCopy> = await client.call(
+    Method.DesignClipboardCopy,
+    params,
+);
+```
+
+Parameters: [DesignClipboardCopyRequest](protocol.md#designclipboardcopyrequest).
+
+| Field            | Required | Type              | Description |
+| ---------------- | -------- | ----------------- | ----------- |
+| `clipboardId`    | Yes      | `string`          |             |
+| `pageId`         | Yes      | `string`          |             |
+| `selection`      | Yes      | Array of `string` |             |
+| `sourceId`       | Yes      | `string`          |             |
+| `sourceRevision` | Yes      | `string`          |             |
+
+Result: [DesignClipboardReceipt](protocol.md#designclipboardreceipt).
+
+## design.clipboard.paste
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DesignClipboardPaste> = {
+    clipboardId: 'YOUR_CLIPBOARDID',
+    commandId: 'YOUR_COMMANDID',
+    expectedRevision: 'YOUR_EXPECTEDREVISION',
+    id: 'YOUR_ID',
+    pageId: 'YOUR_PAGEID',
+    parentId: null,
+    placement: 'center',
+    x: 1,
+    y: 1,
+};
+const result: ResultOf<typeof Method.DesignClipboardPaste> = await client.call(
+    Method.DesignClipboardPaste,
+    params,
+);
+```
+
+Parameters: [DesignClipboardPasteRequest](protocol.md#designclipboardpasterequest).
+
+| Field              | Required | Type                                                             | Description |
+| ------------------ | -------- | ---------------------------------------------------------------- | ----------- |
+| `clipboardId`      | Yes      | `string`                                                         |             |
+| `commandId`        | Yes      | `string`                                                         |             |
+| `expectedRevision` | Yes      | `string`                                                         |             |
+| `id`               | Yes      | `string`                                                         |             |
+| `pageId`           | Yes      | `string`                                                         |             |
+| `parentId`         | Yes      | `null,string`                                                    |             |
+| `placement`        | Yes      | [DesignClipboardPlacement](protocol.md#designclipboardplacement) |             |
+| `x`                | Yes      | `number`                                                         |             |
+| `y`                | Yes      | `number`                                                         |             |
+
+Result: [DesignReceipt](protocol.md#designreceipt).
+
 ## design.component
 
 ```ts
@@ -1400,10 +1477,11 @@ const result: ResultOf<typeof Method.DesignList> = await client.call(Method.Desi
 
 Parameters: [DesignListRequest](protocol.md#designlistrequest).
 
-| Field   | Required | Type          | Description |
-| ------- | -------- | ------------- | ----------- |
-| `after` | Yes      | `null,string` |             |
-| `limit` | Yes      | `number`      |             |
+| Field   | Required | Type          | Description                                                                           |
+| ------- | -------- | ------------- | ------------------------------------------------------------------------------------- |
+| `after` | Yes      | `null,string` |                                                                                       |
+| `limit` | Yes      | `number`      |                                                                                       |
+| `query` | No       | `string`      | Optional literal, case-insensitive title search across this owner's complete library. |
 
 Result: [DesignListPage](protocol.md#designlistpage).
 
@@ -1821,6 +1899,214 @@ Parameters: [LogTailParams](protocol.md#logtailparams).
 | `since` | No       | `number`                                    | Only lines newer than this timestamp, so a poller does not re-read what it has. |
 
 Result: Array of [LogRecord](protocol.md#logrecord).
+
+## luau.editor.close
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.LuauEditorClose> = {
+    handle: 'YOUR_HANDLE',
+    id: 'YOUR_ID',
+};
+const result: ResultOf<typeof Method.LuauEditorClose> = await client.call(
+    Method.LuauEditorClose,
+    params,
+);
+```
+
+Parameters: [LuauEditorHandle](protocol.md#luaueditorhandle).
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `handle` | Yes      | `string` |             |
+| `id`     | Yes      | `string` |             |
+
+Result: [LuauEditorAck](protocol.md#luaueditorack).
+
+## luau.editor.commit
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.LuauEditorCommit> = {
+    definitions: [],
+    handle: 'YOUR_HANDLE',
+    id: 'YOUR_ID',
+    paths: [],
+    revision: 1,
+};
+const result: ResultOf<typeof Method.LuauEditorCommit> = await client.call(
+    Method.LuauEditorCommit,
+    params,
+);
+```
+
+Parameters: [LuauEditorCommit](protocol.md#luaueditorcommit).
+
+| Field         | Required | Type              | Description |
+| ------------- | -------- | ----------------- | ----------- |
+| `definitions` | Yes      | Array of `string` |             |
+| `handle`      | Yes      | `string`          |             |
+| `id`          | Yes      | `string`          |             |
+| `paths`       | Yes      | Array of `string` |             |
+| `revision`    | Yes      | `number`          |             |
+
+Result: [LuauEditorReport](protocol.md#luaueditorreport).
+
+## luau.editor.completion
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.LuauEditorCompletion> = {
+    character: 1,
+    handle: 'YOUR_HANDLE',
+    id: 'YOUR_ID',
+    line: 1,
+    name: 'YOUR_NAME',
+    revision: 1,
+};
+const result: ResultOf<typeof Method.LuauEditorCompletion> = await client.call(
+    Method.LuauEditorCompletion,
+    params,
+);
+```
+
+Parameters: [LuauEditorQuery](protocol.md#luaueditorquery).
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `character` | Yes      | `number` |             |
+| `handle`    | Yes      | `string` |             |
+| `id`        | Yes      | `string` |             |
+| `line`      | Yes      | `number` |             |
+| `name`      | Yes      | `string` |             |
+| `revision`  | Yes      | `number` |             |
+
+Result: [LuauEditorCompletion](protocol.md#luaueditorcompletion).
+
+## luau.editor.definition
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.LuauEditorDefinition> = {
+    character: 1,
+    handle: 'YOUR_HANDLE',
+    id: 'YOUR_ID',
+    line: 1,
+    name: 'YOUR_NAME',
+    revision: 1,
+};
+const result: ResultOf<typeof Method.LuauEditorDefinition> = await client.call(
+    Method.LuauEditorDefinition,
+    params,
+);
+```
+
+Parameters: [LuauEditorQuery](protocol.md#luaueditorquery).
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `character` | Yes      | `number` |             |
+| `handle`    | Yes      | `string` |             |
+| `id`        | Yes      | `string` |             |
+| `line`      | Yes      | `number` |             |
+| `name`      | Yes      | `string` |             |
+| `revision`  | Yes      | `number` |             |
+
+Result: [LuauEditorDefinition](protocol.md#luaueditordefinition).
+
+## luau.editor.hover
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.LuauEditorHover> = {
+    character: 1,
+    handle: 'YOUR_HANDLE',
+    id: 'YOUR_ID',
+    line: 1,
+    name: 'YOUR_NAME',
+    revision: 1,
+};
+const result: ResultOf<typeof Method.LuauEditorHover> = await client.call(
+    Method.LuauEditorHover,
+    params,
+);
+```
+
+Parameters: [LuauEditorQuery](protocol.md#luaueditorquery).
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `character` | Yes      | `number` |             |
+| `handle`    | Yes      | `string` |             |
+| `id`        | Yes      | `string` |             |
+| `line`      | Yes      | `number` |             |
+| `name`      | Yes      | `string` |             |
+| `revision`  | Yes      | `number` |             |
+
+Result: [LuauEditorHover](protocol.md#luaueditorhover).
+
+## luau.editor.stage
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.LuauEditorStage> = {
+    complete: false,
+    handle: 'YOUR_HANDLE',
+    id: 'YOUR_ID',
+    name: 'YOUR_NAME',
+    offset: 1,
+    revision: 1,
+    source: 'YOUR_SOURCE',
+};
+const result: ResultOf<typeof Method.LuauEditorStage> = await client.call(
+    Method.LuauEditorStage,
+    params,
+);
+```
+
+Parameters: [LuauEditorSourcePart](protocol.md#luaueditorsourcepart).
+
+| Field      | Required | Type      | Description |
+| ---------- | -------- | --------- | ----------- |
+| `complete` | Yes      | `boolean` |             |
+| `handle`   | Yes      | `string`  |             |
+| `id`       | Yes      | `string`  |             |
+| `name`     | Yes      | `string`  |             |
+| `offset`   | Yes      | `number`  |             |
+| `revision` | Yes      | `number`  |             |
+| `source`   | Yes      | `string`  |             |
+
+Result: [LuauEditorAck](protocol.md#luaueditorack).
+
+## luau.editor.start
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.LuauEditorStart> = {
+    handle: 'YOUR_HANDLE',
+    id: 'YOUR_ID',
+};
+const result: ResultOf<typeof Method.LuauEditorStart> = await client.call(
+    Method.LuauEditorStart,
+    params,
+);
+```
+
+Parameters: [LuauEditorHandle](protocol.md#luaueditorhandle).
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `handle` | Yes      | `string` |             |
+| `id`     | Yes      | `string` |             |
+
+Result: [LuauEditorAck](protocol.md#luaueditorack).
 
 ## media.acknowledge
 
@@ -2957,17 +3243,21 @@ const result: ResultOf<typeof Method.SessionsTranscript> = await client.call(
 
 Parameters: [SessionHistoryParams](protocol.md#sessionhistoryparams).
 
-| Field             | Required | Type      | Description                                                                    |
-| ----------------- | -------- | --------- | ------------------------------------------------------------------------------ |
-| `compact`         | No       | `boolean` | Canonical display view; the original append-only journal remains available.    |
-| `cursor`          | No       | `string`  |                                                                                |
-| `endCursor`       | No       | `string`  |                                                                                |
-| `excludeWorkers`  | No       | `boolean` | Omits full delegated events when opening the parent conversation.              |
-| `id`              | Yes      | `string`  |                                                                                |
-| `pageBytes`       | No       | `number`  | Optional bounded read window, up to 1 MiB.                                     |
-| `sourceEndCursor` | No       | `string`  | Pins a canonical view to an original journal boundary across all of its pages. |
-| `streamId`        | No       | `string`  |                                                                                |
-| `workerId`        | No       | `string`  | Reads one worker's events from its owned parent, scoped to a response stream.  |
+| Field             | Required | Type      | Description                                                                              |
+| ----------------- | -------- | --------- | ---------------------------------------------------------------------------------------- |
+| `batchPages`      | No       | `number`  | Returns up to eight bounded journal or compact pages in one authenticated request.       |
+| `beforeCursor`    | No       | `string`  | Exclusive original journal boundary for loading an older turn window.                    |
+| `binaryId`        | No       | `string`  | Unique receiver identity for an acknowledged raw binary history batch.                   |
+| `compact`         | No       | `boolean` | Canonical display view; the original append-only journal remains available.              |
+| `cursor`          | No       | `string`  |                                                                                          |
+| `endCursor`       | No       | `string`  |                                                                                          |
+| `excludeWorkers`  | No       | `boolean` | Omits full delegated events when opening the parent conversation.                        |
+| `id`              | Yes      | `string`  |                                                                                          |
+| `pageBytes`       | No       | `number`  | Optional bounded read window, up to 1 MiB.                                               |
+| `recentTurns`     | No       | `number`  | Selects the newest complete input-delimited turns instead of replaying the full archive. |
+| `sourceEndCursor` | No       | `string`  | Pins a canonical view to an original journal boundary across all of its pages.           |
+| `streamId`        | No       | `string`  |                                                                                          |
+| `workerId`        | No       | `string`  | Reads one worker's events from its owned parent, scoped to a response stream.            |
 
 Result: [SessionHistoryPage](protocol.md#sessionhistorypage).
 
