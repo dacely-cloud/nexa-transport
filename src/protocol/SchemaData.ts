@@ -8106,6 +8106,9 @@ export const schema: Schema = {
         DesignOperation: {
             anyOf: [
                 {
+                    $ref: '#/definitions/DesignRecolorOperation',
+                },
+                {
                     $ref: '#/definitions/DesignInsert',
                 },
                 {
@@ -8744,6 +8747,33 @@ export const schema: Schema = {
                 },
             },
             required: ['actor', 'commandId', 'previousRevision', 'summary', 'undoable'],
+            type: 'object',
+        },
+        DesignRecolorOperation: {
+            description:
+                'Replace one exact color across selected authored subtrees without transferring their source bodies.',
+            properties: {
+                after: {
+                    type: 'string',
+                },
+                before: {
+                    type: 'string',
+                },
+                op: {
+                    const: 'recolor',
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+                selection: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+            },
+            required: ['after', 'before', 'op', 'pageId', 'selection'],
             type: 'object',
         },
         DesignRecord: {

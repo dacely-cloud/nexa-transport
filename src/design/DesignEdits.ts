@@ -9,6 +9,8 @@ import { DesignStrokeEdits } from './DesignStrokeEdits.js';
 import { DesignStyleEdits } from './DesignStyleEdits.js';
 import { DesignPaintImageEdits } from './DesignPaintImageEdits.js';
 import { DesignPaintGradientEdits } from './DesignPaintGradientEdits.js';
+import { DesignRecolorEdits } from './DesignRecolorEdits.js';
+import { DesignSelectionIndex } from './DesignSelectionIndex.js';
 import { DesignPaintColorEdits } from './DesignPaintColorEdits.js';
 import { DesignTokenEdits } from './DesignTokenEdits.js';
 import { DesignOperationCodec } from './DesignOperationCodec.js';
@@ -315,6 +317,26 @@ export class DesignEdits {
                         operation,
                     );
                     nodes.set(node.id, node);
+                    break;
+                }
+                case DesignOperationKind.Recolor: {
+                    const index: DesignSelectionIndex = new DesignSelectionIndex(
+                        {
+                            ...document,
+                            ...metadata,
+                            nodes: [...nodes.values()],
+                            pages: [...pages.values()],
+                        },
+                        operation.pageId,
+                        operation.selection,
+                    );
+                    for (const node of DesignRecolorEdits.replace(
+                        index,
+                        operation.before,
+                        operation.after,
+                    )) {
+                        nodes.set(node.id, node);
+                    }
                     break;
                 }
                 case DesignOperationKind.PaintColor: {

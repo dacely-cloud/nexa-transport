@@ -77,6 +77,8 @@ export class DesignOperationCodec {
                     'pivotY',
                     'factor',
                     'tokenId',
+                    'before',
+                    'after',
                 ],
                 ['op'],
             );
@@ -163,6 +165,30 @@ export class DesignOperationCodec {
                         target: V.choice(value['target'], Object.values(DesignPaintColorTarget)),
                         index: V.number(value['index'], 0, 7, true),
                         changes: DesignPaintGradientChangesCodec.changes(value['changes']),
+                    };
+                }
+                case Kind.Recolor: {
+                    const value: Readonly<Record<string, unknown>> = V.record(entry, [
+                        'op',
+                        'pageId',
+                        'selection',
+                        'before',
+                        'after',
+                    ]);
+                    const selection: readonly string[] = V.list(
+                        value['selection'],
+                        128,
+                        (id: unknown): string => V.id(id),
+                    );
+                    if (selection.length === 0 || new Set(selection).size !== selection.length) {
+                        throw new Error('Select 1 to 128 distinct layers.');
+                    }
+                    return {
+                        op,
+                        pageId: V.id(value['pageId']),
+                        selection,
+                        before: V.color(value['before']),
+                        after: V.color(value['after']),
                     };
                 }
                 case Kind.PaintColor: {

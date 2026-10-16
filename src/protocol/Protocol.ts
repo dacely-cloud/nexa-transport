@@ -5350,6 +5350,7 @@ export type DesignNodeRecord = DesignNodeRecordShape;
 
 /** DesignOperation from the Nexa wire protocol. */
 export type DesignOperation =
+    | DesignRecolorOperation
     | DesignInsert
     | DesignUpdate
     | DesignLayoutOperation
@@ -5770,6 +5771,23 @@ export interface DesignReceiptShape {
 
 /** DesignReceipt from the Nexa wire protocol. */
 export type DesignReceipt = DesignReceiptShape;
+
+/** DesignRecolorOperation wire fields. */
+export interface DesignRecolorOperationShape {
+    /** after as defined by the Nexa gateway. */
+    readonly after: string;
+    /** before as defined by the Nexa gateway. */
+    readonly before: string;
+    /** op as defined by the Nexa gateway. */
+    readonly op: 'recolor';
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+    /** selection as defined by the Nexa gateway. */
+    readonly selection: ReadonlyArray<string>;
+}
+
+/** DesignRecolorOperation from the Nexa wire protocol. */
+export type DesignRecolorOperation = DesignRecolorOperationShape;
 
 /** DesignRecord from the Nexa wire protocol. */
 export type DesignRecord =

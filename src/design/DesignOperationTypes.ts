@@ -62,12 +62,21 @@ export const DesignOperationKind = {
     Guide: 'guide',
     Metadata: 'metadata',
     Token: 'token',
+    Recolor: 'recolor',
     PaintColor: 'paint-color',
     PaintGradient: 'paint-gradient',
     PaintImage: 'paint-image',
     Stroke: 'stroke',
     Style: 'style',
 } as const;
+/** Replace one exact color across selected authored subtrees without transferring their source bodies. */
+export interface DesignRecolorOperation {
+    readonly op: typeof DesignOperationKind.Recolor;
+    readonly pageId: string;
+    readonly selection: readonly string[];
+    readonly before: string;
+    readonly after: string;
+}
 /** Editable properties exclude identity and tree links, which have dedicated operations. */
 export interface DesignNodeChanges {
     /** Null removes construction overlays while preserving authored artwork. */
@@ -434,6 +443,7 @@ export type DesignOperation =
     | DesignPageOperation
     | DesignMetadata
     | DesignTokenOperation
+    | DesignRecolorOperation
     | DesignPaintColorOperation
     | DesignPaintGradientOperation
     | DesignPaintImageOperation
