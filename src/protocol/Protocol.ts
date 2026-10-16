@@ -3862,6 +3862,36 @@ export interface DesignClipboardCopyRequestShape {
 /** DesignClipboardCopyRequest from the Nexa wire protocol. */
 export type DesignClipboardCopyRequest = DesignClipboardCopyRequestShape;
 
+/** DesignClipboardCutMethod wire fields. */
+export interface DesignClipboardCutMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignClipboardCutRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignReceipt;
+}
+
+/** DesignClipboardCutMethod from the Nexa wire protocol. */
+export type DesignClipboardCutMethod = DesignClipboardCutMethodShape;
+
+/** DesignClipboardCutRequest wire fields. */
+export interface DesignClipboardCutRequestShape {
+    /** clipboardId as defined by the Nexa gateway. */
+    readonly clipboardId: string;
+    /** commandId as defined by the Nexa gateway. */
+    readonly commandId: string;
+    /** expectedRevision as defined by the Nexa gateway. */
+    readonly expectedRevision: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+    /** selection as defined by the Nexa gateway. */
+    readonly selection: ReadonlyArray<string>;
+}
+
+/** DesignClipboardCutRequest from the Nexa wire protocol. */
+export type DesignClipboardCutRequest = DesignClipboardCutRequestShape;
+
 /** DesignClipboardPasteMethod wire fields. */
 export interface DesignClipboardPasteMethodShape {
     /** params as defined by the Nexa gateway. */
@@ -7744,6 +7774,14 @@ export interface GatewayMethodsdesign_clipboard_copyShape {
     readonly result: DesignClipboardReceipt;
 }
 
+/** GatewayMethodsdesign_clipboard_cut wire fields. */
+export interface GatewayMethodsdesign_clipboard_cutShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignClipboardCutRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignReceipt;
+}
+
 /** GatewayMethodsdesign_clipboard_paste wire fields. */
 export interface GatewayMethodsdesign_clipboard_pasteShape {
     /** params as defined by the Nexa gateway. */
@@ -9070,6 +9108,8 @@ export interface GatewayMethodsShape {
     readonly 'design.changes': GatewayMethodsdesign_changesShape;
     /** design.clipboard.copy as defined by the Nexa gateway. */
     readonly 'design.clipboard.copy': GatewayMethodsdesign_clipboard_copyShape;
+    /** design.clipboard.cut as defined by the Nexa gateway. */
+    readonly 'design.clipboard.cut': GatewayMethodsdesign_clipboard_cutShape;
     /** design.clipboard.paste as defined by the Nexa gateway. */
     readonly 'design.clipboard.paste': GatewayMethodsdesign_clipboard_pasteShape;
     /** design.component as defined by the Nexa gateway. */
@@ -17053,6 +17093,8 @@ export enum Method {
     DesignChanges = 'design.changes',
     /** Calls design.clipboard.copy. */
     DesignClipboardCopy = 'design.clipboard.copy',
+    /** Calls design.clipboard.cut. */
+    DesignClipboardCut = 'design.clipboard.cut',
     /** Calls design.clipboard.paste. */
     DesignClipboardPaste = 'design.clipboard.paste',
     /** Calls design.component. */

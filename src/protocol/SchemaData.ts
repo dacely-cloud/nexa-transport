@@ -5921,6 +5921,49 @@ export const schema: Schema = {
             required: ['clipboardId', 'pageId', 'selection', 'sourceId', 'sourceRevision'],
             type: 'object',
         },
+        DesignClipboardCutMethod: {
+            description:
+                'Atomic source cut uses the same durable receipt and undo contract as other native commands.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/DesignClipboardCutRequest',
+                },
+                result: {
+                    $ref: '#/definitions/DesignReceipt',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        DesignClipboardCutRequest: {
+            description:
+                'Cut atomically freezes native source and removes its selected forests as one undoable source command.',
+            properties: {
+                clipboardId: {
+                    type: 'string',
+                },
+                commandId: {
+                    type: 'string',
+                },
+                expectedRevision: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+                selection: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+            },
+            required: ['clipboardId', 'commandId', 'expectedRevision', 'id', 'pageId', 'selection'],
+            type: 'object',
+        },
         DesignClipboardPasteMethod: {
             description:
                 'Native snapshot paste shares the normal destination command journal and undo contract.',
@@ -11848,6 +11891,20 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'design.clipboard.cut': {
+                    description:
+                        'Atomic source cut uses the same durable receipt and undo contract as other native commands.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/DesignClipboardCutRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/DesignReceipt',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'design.clipboard.paste': {
                     description:
                         'Native snapshot paste shares the normal destination command journal and undo contract.',
@@ -13845,6 +13902,7 @@ export const schema: Schema = {
                 'design.canvas.metrics',
                 'design.changes',
                 'design.clipboard.copy',
+                'design.clipboard.cut',
                 'design.clipboard.paste',
                 'design.component',
                 'design.create',

@@ -2590,6 +2590,28 @@ Copy references the exact source revision without transmitting selected source b
 | `sourceId`       | Yes      | `string`          |             |
 | `sourceRevision` | Yes      | `string`          |             |
 
+## DesignClipboardCutMethod
+
+Atomic source cut uses the same durable receipt and undo contract as other native commands.
+
+| Field    | Required | Type                                                               | Description |
+| -------- | -------- | ------------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [DesignClipboardCutRequest](protocol.md#designclipboardcutrequest) |             |
+| `result` | Yes      | [DesignReceipt](protocol.md#designreceipt)                         |             |
+
+## DesignClipboardCutRequest
+
+Cut atomically freezes native source and removes its selected forests as one undoable source command.
+
+| Field              | Required | Type              | Description |
+| ------------------ | -------- | ----------------- | ----------- |
+| `clipboardId`      | Yes      | `string`          |             |
+| `commandId`        | Yes      | `string`          |             |
+| `expectedRevision` | Yes      | `string`          |             |
+| `id`               | Yes      | `string`          |             |
+| `pageId`           | Yes      | `string`          |             |
+| `selection`        | Yes      | Array of `string` |             |
+
 ## DesignClipboardPasteMethod
 
 Native snapshot paste shares the normal destination command journal and undo contract.
@@ -5239,6 +5261,7 @@ Configurable bounds on gateway-owned work and memory.
 | `design.canvas.metrics`              | Yes      | Object (fields below) | Metric reads retain the exact canvas revision across continuations.                                    |
 | `design.changes`                     | Yes      | Object (fields below) | Forward delta RPC contract.                                                                            |
 | `design.clipboard.copy`              | Yes      | Object (fields below) | Native snapshot capture returns metadata rather than selected source bodies.                           |
+| `design.clipboard.cut`               | Yes      | Object (fields below) | Atomic source cut uses the same durable receipt and undo contract as other native commands.            |
 | `design.clipboard.paste`             | Yes      | Object (fields below) | Native snapshot paste shares the normal destination command journal and undo contract.                 |
 | `design.component`                   | Yes      | Object (fields below) | Native component commands keep source forests on the authenticated owner's workspace.                  |
 | `design.create`                      | Yes      | Object (fields below) | Create-document RPC contract.                                                                          |
@@ -5761,6 +5784,13 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | -------------------------------------------------------------------- | ----------- |
 | `params` | Yes      | [DesignClipboardCopyRequest](protocol.md#designclipboardcopyrequest) |             |
 | `result` | Yes      | [DesignClipboardReceipt](protocol.md#designclipboardreceipt)         |             |
+
+**design.clipboard.cut**
+
+| Field    | Required | Type                                                               | Description |
+| -------- | -------- | ------------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [DesignClipboardCutRequest](protocol.md#designclipboardcutrequest) |             |
+| `result` | Yes      | [DesignReceipt](protocol.md#designreceipt)                         |             |
 
 **design.clipboard.paste**
 

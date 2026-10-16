@@ -280,3 +280,5 @@ Metadata-only page ownership, locked ancestry and topmost selection are availabl
 | `nexa-transport/design-image-color`            | ESM + types  | Shared sRGB color matrix, tone curve and SVG primitives.          |
 
 `nexa-transport/design-effect-metrics` exports the shared native effect margin and influence calculations used by SVG export, graph import and the website renderer.
+
+`nexa-transport/design-clipboard-cut` exposes the canonical local cut planner; saved documents use the atomic `design.clipboard.cut` gateway method.
