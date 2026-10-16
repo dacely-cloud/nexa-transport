@@ -26,7 +26,7 @@ import {
     type DesignMetadataState,
     type DesignEditResult,
 } from './DesignOperationTypes.js';
-import { DesignKind } from './DesignTypes.js';
+import { DesignFlow, DesignKind } from './DesignTypes.js';
 import { DesignResizeEdits } from './DesignResizeEdits.js';
 import { DesignPositionEdits } from './DesignPositionEdits.js';
 import { DesignScaleEdits } from './DesignScaleEdits.js';
@@ -210,10 +210,53 @@ export class DesignEdits {
                     if (operation.parentId !== null) {
                         new DesignSelectionIndex(current, operation.pageId, [operation.parentId]);
                     }
+                    if (operation.absolute === false) {
+                        if (
+                            operation.parentId === null ||
+                            context.node(operation.parentId).layout.flow === DesignFlow.Absolute
+                        ) {
+                            throw new Error(
+                                'Flow reparenting requires an automatic destination container.',
+                            );
+                        }
+                        if ((operation.dx ?? 0) !== 0 || (operation.dy ?? 0) !== 0) {
+                            throw new Error(
+                                'Flow placement uses its insertion slot, not a world displacement.',
+                            );
+                        }
+                    }
+                    const roots: readonly string[] = context.roots.map(
+                        (node: DesignNode): string => node.id,
+                    );
+                    const follow: readonly DesignOperation[] =
+                        operation.absolute === false
+                            ? roots.map((id: string): DesignOperation => ({
+                                  op: DesignOperationKind.Position,
+                                  pageId: operation.pageId,
+                                  id,
+                                  absolute: false,
+                              }))
+                            : (operation.dx ?? 0) === 0 && (operation.dy ?? 0) === 0
+                              ? []
+                              : [
+                                    {
+                                        op: DesignOperationKind.Translate,
+                                        pageId: operation.pageId,
+                                        selection: roots,
+                                        dx: operation.dx ?? 0,
+                                        dy: operation.dy ?? 0,
+                                    },
+                                ];
                     const result: DesignDocument = this.apply(
                         current,
-                        DesignSelectionTree.move(context, operation.parentId, operation.index)
-                            .operations,
+                        [
+                            ...DesignSelectionTree.move(
+                                context,
+                                operation.parentId,
+                                operation.index,
+                            ).operations,
+                            ...follow,
+                        ],
                         measurer,
                     ).document;
                     nodes.clear();

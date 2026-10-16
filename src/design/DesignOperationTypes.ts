@@ -78,8 +78,9 @@ export interface DesignRecolorOperation {
     readonly before: string;
     readonly after: string;
 }
-/** Read-only native drafts admit only layout changes and selection recoloring, never arbitrary source replacements. */
-export type DesignPreviewOperation = DesignLayoutOperation | DesignRecolorOperation;
+/** Read-only native drafts admit bounded layout, color and hierarchy edits, never arbitrary source replacements. */
+export type DesignPreviewOperation =
+    DesignLayoutOperation | DesignRecolorOperation | DesignReparentOperation;
 /** Editable properties exclude identity and tree links, which have dedicated operations. */
 export interface DesignNodeChanges {
     /** Null removes construction overlays while preserving authored artwork. */
@@ -293,6 +294,12 @@ export interface DesignReparentOperation {
     readonly selection: readonly string[];
     readonly parentId: string | null;
     readonly index: number;
+    /** Optional world displacement applies after preserving the original geometry. */
+    readonly dx?: number;
+    /** Optional world displacement applies after preserving the original geometry. */
+    readonly dy?: number;
+    /** Defaults to true; false joins an automatic destination's flow instead of applying a displacement. */
+    readonly absolute?: boolean;
 }
 /** Delete a subtree and its anchored comments and prototype links. */
 export interface DesignRemove {

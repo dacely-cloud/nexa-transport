@@ -8198,6 +8198,9 @@ export const schema: Schema = {
                     $ref: '#/definitions/DesignLayoutOperation',
                 },
                 {
+                    $ref: '#/definitions/DesignReparentOperation',
+                },
+                {
                     $ref: '#/definitions/DesignInsert',
                 },
                 {
@@ -8235,9 +8238,6 @@ export const schema: Schema = {
                 },
                 {
                     $ref: '#/definitions/DesignMove',
-                },
-                {
-                    $ref: '#/definitions/DesignReparentOperation',
                 },
                 {
                     $ref: '#/definitions/DesignRemove',
@@ -8776,9 +8776,12 @@ export const schema: Schema = {
                 {
                     $ref: '#/definitions/DesignLayoutOperation',
                 },
+                {
+                    $ref: '#/definitions/DesignReparentOperation',
+                },
             ],
             description:
-                'Read-only native drafts admit only layout changes and selection recoloring, never arbitrary source replacements.',
+                'Read-only native drafts admit bounded layout, color and hierarchy edits, never arbitrary source replacements.',
         },
         DesignReadMethod: {
             description: 'Bounded snapshot RPC contract.',
@@ -8979,6 +8982,21 @@ export const schema: Schema = {
             description:
                 'Moves selected authored roots between containers while preserving their resolved world geometry natively.',
             properties: {
+                absolute: {
+                    description:
+                        "Defaults to true; false joins an automatic destination's flow instead of applying a displacement.",
+                    type: 'boolean',
+                },
+                dx: {
+                    description:
+                        'Optional world displacement applies after preserving the original geometry.',
+                    type: 'number',
+                },
+                dy: {
+                    description:
+                        'Optional world displacement applies after preserving the original geometry.',
+                    type: 'number',
+                },
                 index: {
                     type: 'number',
                 },

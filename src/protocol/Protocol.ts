@@ -5405,6 +5405,7 @@ export type DesignNodeRecord = DesignNodeRecordShape;
 export type DesignOperation =
     | DesignRecolorOperation
     | DesignLayoutOperation
+    | DesignReparentOperation
     | DesignInsert
     | DesignUpdate
     | DesignSizingOperation
@@ -5418,7 +5419,6 @@ export type DesignOperation =
     | DesignScaleOperation
     | DesignTranslateOperation
     | DesignMove
-    | DesignReparentOperation
     | DesignRemove
     | DesignPageOperation
     | DesignGuideOperation
@@ -5782,7 +5782,8 @@ export interface DesignPositionOperationShape {
 export type DesignPositionOperation = DesignPositionOperationShape;
 
 /** DesignPreviewOperation from the Nexa wire protocol. */
-export type DesignPreviewOperation = DesignRecolorOperation | DesignLayoutOperation;
+export type DesignPreviewOperation =
+    DesignRecolorOperation | DesignLayoutOperation | DesignReparentOperation;
 
 /** DesignReadMethod wire fields. */
 export interface DesignReadMethodShape {
@@ -5911,6 +5912,12 @@ export type DesignRemove = DesignRemoveShape;
 
 /** DesignReparentOperation wire fields. */
 export interface DesignReparentOperationShape {
+    /** absolute as defined by the Nexa gateway. */
+    readonly absolute?: boolean;
+    /** dx as defined by the Nexa gateway. */
+    readonly dx?: number;
+    /** dy as defined by the Nexa gateway. */
+    readonly dy?: number;
     /** index as defined by the Nexa gateway. */
     readonly index: number;
     /** op as defined by the Nexa gateway. */

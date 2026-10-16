@@ -11,6 +11,7 @@ import { DesignLayoutEngine } from '../src/design/DesignLayout.js';
 import type { DesignDocument, DesignNode, DesignBox } from '../src/design/DesignTypes.js';
 import type { DesignSaveRequest } from '../src/design/DesignRequests.js';
 import type { DesignEditResult } from '../src/design/DesignOperationTypes.js';
+import { DesignLayoutPreviewCodec } from '../src/design/DesignLayoutPreviewCodec.js';
 
 it('round-trips the compact native reparent contract and preserves world geometry and source content', (): void => {
     const base: DesignDocument = DesignDefaults.document('reparent');
@@ -83,6 +84,32 @@ it('round-trips the compact native reparent contract and preserves world geometr
         result.document.nodes.find((value: DesignNode): boolean => value.id === 'label')?.text,
     ).toEqual(source.nodes.find((value: DesignNode): boolean => value.id === 'label')?.text);
     expect(DesignEdits.restore(result.document, result.changes).document).toEqual(source);
+    const first: (typeof received.operations)[number] | undefined = received.operations[0];
+    if (first?.op !== 'reparent') {
+        throw new Error('Missing reparent operation');
+    }
+    const displaced: DesignSaveRequest = {
+        ...received,
+        operations: [{ ...first, dx: 31, dy: -17 }],
+    };
+    expect(methodValidators[Method.DesignSave].params(displaced)).toBe(true);
+    expect(DesignRequestCodec.save(displaced).operations).toEqual(displaced.operations);
+    const preview: ReturnType<typeof DesignLayoutPreviewCodec.request> =
+        DesignLayoutPreviewCodec.request({
+            action: 'canvas',
+            key: null,
+            operation: displaced.operations[0],
+            params: {
+                id: source.id,
+                revision: source.revision,
+                pageId: 'page-1',
+                includeIds: [],
+                cursor: null,
+                limit: 128,
+            },
+        });
+    expect(methodValidators[Method.DesignLayoutPreview].params(preview)).toBe(true);
+    expect(preview.operation).toEqual(displaced.operations[0]);
     for (const bad of [
         { ...request, operations: [{ ...request.operations[0], selection: 'label' }] },
         { ...request, operations: [{ ...request.operations[0], index: '0' }] },

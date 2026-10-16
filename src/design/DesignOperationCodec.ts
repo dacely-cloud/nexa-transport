@@ -168,13 +168,11 @@ export class DesignOperationCodec {
                     };
                 }
                 case Kind.Reparent: {
-                    const value: Readonly<Record<string, unknown>> = V.record(entry, [
-                        'op',
-                        'pageId',
-                        'selection',
-                        'parentId',
-                        'index',
-                    ]);
+                    const value: Readonly<Record<string, unknown>> = V.fields(
+                        entry,
+                        ['op', 'pageId', 'selection', 'parentId', 'index', 'dx', 'dy', 'absolute'],
+                        ['op', 'pageId', 'selection', 'parentId', 'index'],
+                    );
                     const selection: readonly string[] = V.list(
                         value['selection'],
                         128,
@@ -189,6 +187,15 @@ export class DesignOperationCodec {
                         selection,
                         parentId: value['parentId'] === null ? null : V.id(value['parentId']),
                         index: V.number(value['index'], 0, 10000, true),
+                        ...(Object.hasOwn(value, 'dx')
+                            ? { dx: V.number(value['dx'], -100000, 100000) }
+                            : {}),
+                        ...(Object.hasOwn(value, 'dy')
+                            ? { dy: V.number(value['dy'], -100000, 100000) }
+                            : {}),
+                        ...(Object.hasOwn(value, 'absolute')
+                            ? { absolute: V.boolean(value['absolute']) }
+                            : {}),
                     };
                 }
                 case Kind.Recolor: {

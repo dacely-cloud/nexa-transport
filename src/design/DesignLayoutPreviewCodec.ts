@@ -27,9 +27,10 @@ export class DesignLayoutPreviewCodec {
         ])[0];
         if (
             operation?.op !== DesignOperationKind.Layout &&
-            operation?.op !== DesignOperationKind.Recolor
+            operation?.op !== DesignOperationKind.Recolor &&
+            operation?.op !== DesignOperationKind.Reparent
         ) {
-            throw new Error('Preview requires one native layout or recolor operation.');
+            throw new Error('Preview requires one native layout, recolor or reparent operation.');
         }
         const key: string | null = value['key'] === null ? null : V.text(value['key'], 64);
         const action: Action = V.choice(value['action'], Object.values(Action));
