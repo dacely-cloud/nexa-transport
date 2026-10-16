@@ -40,6 +40,7 @@ const config: UserConfig = {
                 'design-svg-fonts': 'src/design/DesignSvgFonts.ts',
                 'design-shaped-text-metrics': 'src/design/DesignShapedTextMetrics.ts',
                 'design-font-engine': 'src/design/DesignFontEngine.ts',
+                'design-font-run': 'src/design/DesignFontRun.ts',
                 'design-builtin-fonts': 'src/design/DesignBuiltinFonts.ts',
                 'design-inter-bytes': 'src/design/DesignInterBytes.ts',
                 'design-inter-outline-bytes': 'src/design/DesignInterOutlineBytes.ts',
