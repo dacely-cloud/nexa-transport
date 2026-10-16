@@ -78,9 +78,12 @@ export interface DesignRecolorOperation {
     readonly before: string;
     readonly after: string;
 }
-/** Read-only native drafts admit bounded layout, color and hierarchy edits, never arbitrary source replacements. */
+/** Read-only native drafts admit bounded geometry, layout, color and hierarchy edits, never source replacements. */
 export type DesignPreviewOperation =
-    DesignLayoutOperation | DesignRecolorOperation | DesignReparentOperation;
+    | DesignLayoutOperation
+    | DesignRecolorOperation
+    | DesignReparentOperation
+    | DesignResizeOperation;
 /** Editable properties exclude identity and tree links, which have dedicated operations. */
 export interface DesignNodeChanges {
     /** Null removes construction overlays while preserving authored artwork. */
