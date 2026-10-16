@@ -364,6 +364,17 @@ export class DesignEdits {
                     }
                     break;
                 }
+                case DesignOperationKind.Arc: {
+                    const node: DesignNode = new DesignLayerAuthority(nodes, pages).node(
+                        operation.id,
+                        operation.pageId,
+                    );
+                    if (node.kind !== DesignKind.Ellipse) {
+                        throw new Error('Only ellipse layers accept arc settings.');
+                    }
+                    nodes.set(node.id, DesignPaths.resize(node, { arc: operation.changes }));
+                    break;
+                }
                 case DesignOperationKind.Polygon: {
                     const node: DesignNode = new DesignLayerAuthority(nodes, pages).node(
                         operation.id,

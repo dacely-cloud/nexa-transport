@@ -3,6 +3,7 @@
 
 import type { DesignStrokeCap, DesignStrokeJoin } from './DesignStrokeTypes.js';
 import type { DesignPolygonSettings } from './DesignPolygons.js';
+import type { DesignArcSettings } from './DesignArcs.js';
 import type { DesignGradientTransformChanges } from './DesignGradientTypes.js';
 import type { DesignImageTransform } from './DesignImageTransformTypes.js';
 import type { DesignImageAdjustments } from './DesignImageAdjustmentTypes.js';
@@ -70,6 +71,7 @@ export const DesignOperationKind = {
     PaintImage: 'paint-image',
     Stroke: 'stroke',
     Polygon: 'polygon',
+    Arc: 'arc',
     Style: 'style',
 } as const;
 /** Replace one exact color across selected authored subtrees without transferring their source bodies. */
@@ -88,6 +90,8 @@ export type DesignPreviewOperation =
     | DesignResizeOperation;
 /** Editable properties exclude identity and tree links, which have dedicated operations. */
 export interface DesignNodeChanges {
+    /** Null resets the layer to a complete ellipse, preserving paints and layout. */
+    readonly arc?: DesignArcSettings | null;
     /** Replaces regular polygon or star parameters; null keeps its outline as a freeform vector. */
     readonly polygon?: DesignPolygonSettings | null;
     /** Null removes construction overlays while preserving authored artwork. */
@@ -429,6 +433,13 @@ export interface DesignPolygonOperation {
     readonly pageId: string;
     readonly changes: DesignPolygonSettings | null;
 }
+/** Page-scoped arc edits regenerate only the selected ellipse's bounded curve geometry. */
+export interface DesignArcOperation {
+    readonly op: typeof DesignOperationKind.Arc;
+    readonly id: string;
+    readonly pageId: string;
+    readonly changes: DesignArcSettings | null;
+}
 
 /** Omitted radii retain their original authored values. */
 export interface DesignCornerChanges {
@@ -482,6 +493,7 @@ export type DesignOperation =
     | DesignPaintImageOperation
     | DesignStrokeOperation
     | DesignPolygonOperation
+    | DesignArcOperation
     | DesignStyleOperation;
 /** Before and after images provide conflict-safe undo and bounded deltas. */
 export interface DesignEntityChange<T> {

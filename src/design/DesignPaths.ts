@@ -3,6 +3,7 @@
 
 import { DesignFrameGridCodec } from './DesignFrameGridCodec.js';
 import { DesignPolygons, type DesignPolygonSettings } from './DesignPolygons.js';
+import { DesignArcs, type DesignArcSettings } from './DesignArcs.js';
 import {
     DesignKind,
     DesignPathVerb as Verb,
@@ -35,6 +36,7 @@ export class DesignPaths {
     /** Width and height edits resize vector coordinates unless the command supplies an explicit replacement path. */
     public static resize(node: DesignNode, changes: DesignNodeChanges): DesignNode {
         const {
+            arc: previousArc,
             polygon: previousPolygon,
             booleanMode: previousMode,
             layoutGrids: previousGrids,
@@ -45,6 +47,7 @@ export class DesignPaths {
             ...base
         }: DesignNode = node;
         const {
+            arc: changedArc,
             polygon: changedPolygon,
             booleanMode: changedMode,
             layoutGrids: changedGrids,
@@ -54,7 +57,18 @@ export class DesignPaths {
             variant: changedVariant,
             ...properties
         }: DesignNodeChanges = changes;
-        const kind: DesignNode['kind'] = properties.kind ?? node.kind;
+        const kind: DesignNode['kind'] =
+            properties.kind ??
+            (previousArc !== undefined && changes.path !== undefined && changedArc === undefined
+                ? DesignKind.Path
+                : node.kind);
+        if (changedArc !== undefined && changedArc !== null && kind !== DesignKind.Ellipse) {
+            throw new Error('Only ellipse layers accept arc settings.');
+        }
+        const arc: DesignArcSettings | undefined =
+            kind !== DesignKind.Ellipse || changedArc === null
+                ? undefined
+                : (changedArc ?? previousArc);
         if (
             changedPolygon !== undefined &&
             changedPolygon !== null &&
@@ -94,6 +108,8 @@ export class DesignPaths {
         const next: DesignNode = {
             ...base,
             ...properties,
+            kind,
+            ...(arc === undefined ? {} : { arc }),
             ...(polygon === undefined ? {} : { polygon }),
             ...(DesignFrameGridCodec.supports(kind) &&
             changedGrids !== null &&
@@ -122,6 +138,12 @@ export class DesignPaths {
                 : {}),
             ...(kind === DesignKind.Boolean && mode !== undefined ? { booleanMode: mode } : {}),
         };
+        if (arc !== undefined) {
+            return { ...next, path: DesignArcs.path(arc, next.width, next.height) };
+        }
+        if (previousArc !== undefined && kind === DesignKind.Ellipse && changedArc === null) {
+            return { ...next, path: [] };
+        }
         if (polygon !== undefined) {
             return { ...next, path: DesignPolygons.path(polygon, next.width, next.height) };
         }

@@ -183,6 +183,7 @@ export class DesignWorldPositions {
                             rotation: node.rotation,
                             placement: node.placement,
                             ...(node.polygon === undefined ? {} : { polygon: node.polygon }),
+                            ...(node.arc === undefined ? {} : { arc: node.arc }),
                             ...(node.kind === DesignKind.Boolean ? {} : { path: node.path }),
                         },
                     };

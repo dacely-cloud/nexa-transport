@@ -3,6 +3,7 @@
 
 import { DesignStrokeChangesCodec } from './DesignStrokeChangesCodec.js';
 import { DesignPolygons } from './DesignPolygons.js';
+import { DesignArcs } from './DesignArcs.js';
 import { DesignStyleChangesCodec } from './DesignStyleChangesCodec.js';
 import { DesignPaintImageChangesCodec } from './DesignPaintImageChangesCodec.js';
 import { DesignPaintGradientChangesCodec } from './DesignPaintGradientChangesCodec.js';
@@ -102,6 +103,21 @@ export class DesignOperationCodec {
                         parentId: V.optionalId(value['parentId']),
                         pageId: V.id(value['pageId']),
                         index: V.number(value['index'], 0, 10000, true),
+                    };
+                }
+                case Kind.Arc: {
+                    const value: Readonly<Record<string, unknown>> = V.record(entry, [
+                        'op',
+                        'id',
+                        'pageId',
+                        'changes',
+                    ]);
+                    return {
+                        op,
+                        id: V.id(value['id']),
+                        pageId: V.id(value['pageId']),
+                        changes:
+                            value['changes'] === null ? null : DesignArcs.parse(value['changes']),
                     };
                 }
                 case Kind.Polygon: {
@@ -671,6 +687,9 @@ export class DesignOperationCodec {
             throw new Error('Layer update requires at least one property');
         }
         return {
+            ...(Object.hasOwn(value, 'arc')
+                ? { arc: value['arc'] === null ? null : DesignArcs.parse(value['arc']) }
+                : {}),
             ...(Object.hasOwn(value, 'polygon')
                 ? {
                       polygon:
@@ -774,6 +793,7 @@ export class DesignOperationCodec {
     }
 }
 const KEYS: readonly string[] = [
+    'arc',
     'polygon',
     'booleanMode',
     'contentScale',

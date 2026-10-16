@@ -44,6 +44,9 @@ export class DesignFreeze {
     }
     /** Freezes one detached node and each of its nested editable records. */
     public static node(node: DesignNode): DesignNode {
+        if (node.arc !== undefined) {
+            Object.freeze(node.arc);
+        }
         if (node.polygon !== undefined) {
             Object.freeze(node.polygon);
         }

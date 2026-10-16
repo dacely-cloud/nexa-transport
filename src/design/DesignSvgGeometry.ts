@@ -186,7 +186,7 @@ export class DesignSvgGeometry {
         if (node.kind === DesignKind.Boolean && node.path.length === 0) {
             return '';
         }
-        if (node.kind === DesignKind.Ellipse) {
+        if (node.kind === DesignKind.Ellipse && node.path.length === 0) {
             return `<ellipse cx="${box.width / 2}" cy="${box.height / 2}" rx="${box.width / 2}" ry="${box.height / 2}" ${attributes}/>`;
         }
         if (node.path.length > 0) {

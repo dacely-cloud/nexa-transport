@@ -3,6 +3,7 @@
 
 import { DesignVariantCodec } from './DesignVariantCodec.js';
 import { DesignPolygons } from './DesignPolygons.js';
+import { DesignArcs } from './DesignArcs.js';
 import { DesignMaskCodec } from './DesignMaskCodec.js';
 import { DesignBooleanMode } from './DesignBooleanTypes.js';
 import { DesignFlow } from './DesignTypes.js';
@@ -50,10 +51,14 @@ export class DesignNodeCodec {
                 'contentScale',
                 'layoutGrids',
                 'polygon',
+                'arc',
             ],
             KEYS,
         );
         const kind: DesignKind = V.choice(value['kind'], Object.values(DesignKind), 'node.kind');
+        if (Object.hasOwn(value, 'arc') && kind !== DesignKind.Ellipse) {
+            throw new Error('Only ellipse layers accept arc settings.');
+        }
         if (Object.hasOwn(value, 'polygon') && kind !== DesignKind.Polygon) {
             throw new Error('Only polygon layers accept polygon or star parameters.');
         }
@@ -70,6 +75,7 @@ export class DesignNodeCodec {
             throw new Error('Only frames and frame definitions accept layout grids.');
         }
         const node: DesignNode = {
+            ...(Object.hasOwn(value, 'arc') ? { arc: DesignArcs.parse(value['arc']) } : {}),
             ...(Object.hasOwn(value, 'polygon')
                 ? { polygon: DesignPolygons.parse(value['polygon']) }
                 : {}),
@@ -141,6 +147,7 @@ export class DesignNodeCodec {
         }
         if (
             node.path.length > 0 &&
+            node.arc === undefined &&
             ![
                 DesignKind.Path,
                 DesignKind.Polygon,
@@ -172,9 +179,11 @@ export class DesignNodeCodec {
             throw new Error('Boolean sources use an unclipped absolute container');
         }
         return DesignFreeze.node(
-            node.polygon === undefined
-                ? node
-                : { ...node, path: DesignPolygons.path(node.polygon, node.width, node.height) },
+            node.arc !== undefined
+                ? { ...node, path: DesignArcs.path(node.arc, node.width, node.height) }
+                : node.polygon === undefined
+                  ? node
+                  : { ...node, path: DesignPolygons.path(node.polygon, node.width, node.height) },
         );
     }
     /** Validates one bounded layer path value. */

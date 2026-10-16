@@ -161,6 +161,7 @@ export class DesignComponentDetach {
                   }),
             name: node.name,
             ...(node.polygon === undefined ? {} : { polygon: node.polygon }),
+            ...(node.arc === undefined ? {} : { arc: node.arc }),
             kind: node.kind === DesignKind.Component ? DesignKind.Frame : node.kind,
             parentId: null,
             children: [],

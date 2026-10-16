@@ -37,7 +37,7 @@ export class DesignBooleanGeometry {
             );
         }
         let outline: string;
-        if (node.kind === DesignKind.Ellipse) {
+        if (node.kind === DesignKind.Ellipse && node.path.length === 0) {
             const x: number = box.width / 2;
             const y: number = box.height / 2;
             outline = `M0 ${y} A${x} ${y} 0 1 1 ${box.width} ${y} A${x} ${y} 0 1 1 0 ${y} Z`;

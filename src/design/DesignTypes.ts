@@ -3,6 +3,7 @@
 
 import type { DesignStrokeCap, DesignStrokeJoin } from './DesignStrokeTypes.js';
 import type { DesignPolygonSettings } from './DesignPolygons.js';
+import type { DesignArcSettings } from './DesignArcs.js';
 import type { DesignGradientTransform } from './DesignGradientTypes.js';
 import type { DesignImageTransform } from './DesignImageTransformTypes.js';
 import type { DesignImageSampling } from './DesignImageSamplingTypes.js';
@@ -308,6 +309,8 @@ export interface DesignFrameGrid {
 }
 /** All layer state is explicit and editable; no generated markup is the source of truth. */
 export interface DesignNode {
+    /** Optional ellipse-relative arc, sector or ring parameters. */
+    readonly arc?: DesignArcSettings;
     /** Optional regular polygon or star parameters; freeform path edits detach this definition. */
     readonly polygon?: DesignPolygonSettings;
     /** Optional saved frame overlays are omitted from artwork exports. */

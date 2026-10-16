@@ -4,6 +4,7 @@
 /// <reference types="node" />
 
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { format, resolveConfig, type Options } from 'prettier';
 
 /** Server-only generation script. Nexa owns the portable design model and layout implementation. */
 const files: readonly string[] = [
@@ -165,6 +166,7 @@ const files: readonly string[] = [
     'DesignTextLayout',
     'DesignPaths',
     'DesignPolygons',
+    'DesignArcs',
     'DesignComponentTypes',
     'DesignComponentTargets',
     'DesignComponentSwap',
@@ -272,3 +274,15 @@ await writeFile(
 );
 
 await writeFile('licenses/fflate.txt', await readFile('node_modules/fflate/LICENSE', 'utf8'));
+
+/** Native arc geometry regressions run against the generated portable implementation too. */
+const arcTests: string = await readFile('../nexa/test/design/DesignArcs.test.ts', 'utf8');
+const arcTestPath: string = 'test/DesignArcs.test.ts';
+const arcTestFormat: Options = (await resolveConfig(arcTestPath)) ?? {};
+await writeFile(
+    arcTestPath,
+    await format(arcTests.replaceAll('../../src/design/', '../src/design/'), {
+        ...arcTestFormat,
+        filepath: arcTestPath,
+    }),
+);
