@@ -12,7 +12,7 @@ import {
     type DesignLayoutPreviewRequest,
 } from './DesignLayoutPreviewTypes.js';
 
-/** Native previews have a closed boundary and cannot change text, styles, ownership or persisted command identity. */
+/** Native previews have a closed boundary and cannot replace source bodies, alter ownership or persist command identity. */
 export class DesignLayoutPreviewCodec {
     /** Continuations require their projection key and every query pins an existing saved revision. */
     public static request(raw: unknown): DesignLayoutPreviewRequest {
@@ -25,8 +25,11 @@ export class DesignLayoutPreviewCodec {
         const operation: DesignOperation | undefined = DesignOperationCodec.operations([
             value['operation'],
         ])[0];
-        if (operation?.op !== DesignOperationKind.Layout) {
-            throw new Error('Preview requires one native layout operation.');
+        if (
+            operation?.op !== DesignOperationKind.Layout &&
+            operation?.op !== DesignOperationKind.Recolor
+        ) {
+            throw new Error('Preview requires one native layout or recolor operation.');
         }
         const key: string | null = value['key'] === null ? null : V.text(value['key'], 64);
         const action: Action = V.choice(value['action'], Object.values(Action));

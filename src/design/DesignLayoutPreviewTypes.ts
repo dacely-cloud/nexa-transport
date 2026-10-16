@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { DesignLayoutOperation } from './DesignOperationTypes.js';
+import type { DesignPreviewOperation } from './DesignOperationTypes.js';
 import type { DesignViewRequest } from './DesignViewTypes.js';
 import type {
     DesignCanvasPage,
@@ -21,7 +21,7 @@ export type DesignLayoutPreviewAction =
     (typeof DesignLayoutPreviewAction)[keyof typeof DesignLayoutPreviewAction];
 /** A canonical, owner/revision-qualified key pins continuations to one read-only draft. */
 export interface DesignLayoutPreviewBase {
-    readonly operation: DesignLayoutOperation;
+    readonly operation: DesignPreviewOperation;
     readonly key: string | null;
 }
 /** Canvas records never ask for explicit source-body hydration. */

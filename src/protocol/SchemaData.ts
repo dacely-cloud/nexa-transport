@@ -6072,6 +6072,92 @@ export const schema: Schema = {
             ],
             type: 'object',
         },
+        DesignColorReadMethod: {
+            description: 'Native color pages use the authenticated read-only gateway.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/DesignColorReadRequest',
+                },
+                result: {
+                    $ref: '#/definitions/DesignColorReadPage',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        DesignColorReadPage: {
+            description:
+                'Only colors and authored-layer counts leave storage; the digest binds all continuation pages.',
+            properties: {
+                colors: {
+                    items: {
+                        $ref: '#/definitions/DesignSelectionColor',
+                    },
+                    type: 'array',
+                },
+                id: {
+                    type: 'string',
+                },
+                nextOffset: {
+                    type: ['null', 'number'],
+                },
+                offset: {
+                    type: 'number',
+                },
+                pageId: {
+                    type: 'string',
+                },
+                revision: {
+                    type: 'string',
+                },
+                selectionSha256: {
+                    type: 'string',
+                },
+                total: {
+                    type: 'number',
+                },
+            },
+            required: [
+                'colors',
+                'id',
+                'nextOffset',
+                'offset',
+                'pageId',
+                'revision',
+                'selectionSha256',
+                'total',
+            ],
+            type: 'object',
+        },
+        DesignColorReadRequest: {
+            description:
+                'Revision-pinned color grouping addresses authored selection roots without source transfers.',
+            properties: {
+                id: {
+                    type: 'string',
+                },
+                limit: {
+                    type: 'number',
+                },
+                offset: {
+                    type: 'number',
+                },
+                pageId: {
+                    type: 'string',
+                },
+                revision: {
+                    type: 'string',
+                },
+                selection: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+            },
+            required: ['id', 'limit', 'offset', 'pageId', 'revision', 'selection'],
+            type: 'object',
+        },
         DesignComment: {
             description: 'Anchored comments can refer to exact layers or canvas coordinates.',
             properties: {
@@ -7464,7 +7550,7 @@ export const schema: Schema = {
                     type: ['null', 'string'],
                 },
                 operation: {
-                    $ref: '#/definitions/DesignLayoutOperation',
+                    $ref: '#/definitions/DesignPreviewOperation',
                 },
                 params: {
                     $ref: '#/definitions/DesignViewRequest',
@@ -7516,7 +7602,7 @@ export const schema: Schema = {
                     type: ['null', 'string'],
                 },
                 operation: {
-                    $ref: '#/definitions/DesignLayoutOperation',
+                    $ref: '#/definitions/DesignPreviewOperation',
                 },
                 params: {
                     $ref: '#/definitions/DesignCanvasMetricsRequest',
@@ -7583,7 +7669,7 @@ export const schema: Schema = {
                     type: ['null', 'string'],
                 },
                 operation: {
-                    $ref: '#/definitions/DesignLayoutOperation',
+                    $ref: '#/definitions/DesignPreviewOperation',
                 },
                 params: {
                     $ref: '#/definitions/DesignTextWindowRequest',
@@ -8109,13 +8195,13 @@ export const schema: Schema = {
                     $ref: '#/definitions/DesignRecolorOperation',
                 },
                 {
+                    $ref: '#/definitions/DesignLayoutOperation',
+                },
+                {
                     $ref: '#/definitions/DesignInsert',
                 },
                 {
                     $ref: '#/definitions/DesignUpdate',
-                },
-                {
-                    $ref: '#/definitions/DesignLayoutOperation',
                 },
                 {
                     $ref: '#/definitions/DesignSizingOperation',
@@ -8679,6 +8765,18 @@ export const schema: Schema = {
             required: ['id', 'op', 'pageId'],
             type: 'object',
         },
+        DesignPreviewOperation: {
+            anyOf: [
+                {
+                    $ref: '#/definitions/DesignRecolorOperation',
+                },
+                {
+                    $ref: '#/definitions/DesignLayoutOperation',
+                },
+            ],
+            description:
+                'Read-only native drafts admit only layout changes and selection recoloring, never arbitrary source replacements.',
+        },
         DesignReadMethod: {
             description: 'Bounded snapshot RPC contract.',
             properties: {
@@ -9072,6 +9170,20 @@ export const schema: Schema = {
                 },
             },
             required: ['bottom', 'left', 'right', 'top'],
+            type: 'object',
+        },
+        DesignSelectionColor: {
+            description:
+                'A color occurs once per selected authored layer, including editable descendants.',
+            properties: {
+                color: {
+                    type: 'string',
+                },
+                layers: {
+                    type: 'number',
+                },
+            },
+            required: ['color', 'layers'],
             type: 'object',
         },
         DesignShadow: {
@@ -11949,6 +12061,19 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'design.colors': {
+                    description: 'Native color pages use the authenticated read-only gateway.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/DesignColorReadRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/DesignColorReadPage',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'design.component': {
                     description:
                         "Native component commands keep source forests on the authenticated owner's workspace.",
@@ -13934,6 +14059,7 @@ export const schema: Schema = {
                 'design.clipboard.copy',
                 'design.clipboard.cut',
                 'design.clipboard.paste',
+                'design.colors',
                 'design.component',
                 'design.create',
                 'design.delete',

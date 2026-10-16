@@ -77,6 +77,8 @@ export interface DesignRecolorOperation {
     readonly before: string;
     readonly after: string;
 }
+/** Read-only native drafts admit only layout changes and selection recoloring, never arbitrary source replacements. */
+export type DesignPreviewOperation = DesignLayoutOperation | DesignRecolorOperation;
 /** Editable properties exclude identity and tree links, which have dedicated operations. */
 export interface DesignNodeChanges {
     /** Null removes construction overlays while preserving authored artwork. */

@@ -85,6 +85,8 @@ const files: readonly string[] = [
     'DesignPaintColorChangesCodec',
     'DesignPaintColorEdits',
     'DesignRecolorEdits',
+    'DesignColorReadTypes',
+    'DesignColorReadCodec',
     'DesignTransferTypes',
     'DesignTransferCodec',
     'DesignTransfer',

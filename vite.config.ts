@@ -49,6 +49,8 @@ const config: UserConfig = {
                 'design-boolean-types': 'src/design/DesignBooleanTypes.ts',
                 'design-boolean-kernel': 'src/design/DesignBooleanKernel.ts',
                 'design-svg': 'src/design/DesignSvg.ts',
+                'design-color-read-codec': 'src/design/DesignColorReadCodec.ts',
+                'design-color-read-types': 'src/design/DesignColorReadTypes.ts',
                 'design-recolor': 'src/design/DesignRecolorEdits.ts',
                 'design-effect-metrics': 'src/design/DesignEffectMetrics.ts',
                 'design-image-geometry': 'src/design/DesignImageGeometry.ts',
