@@ -185,6 +185,8 @@ export interface DesignPlacement {
 }
 /** Rich text range. Offsets are UTF-16 indices into the layer's text. */
 export interface DesignTextRun {
+    /** An explicit range fill stack replaces layer fills; null or omission retains legacy color/inheritance. */
+    readonly fills?: readonly DesignPaint[] | null;
     /** Omission inherits a compatible base face; null explicitly chooses an unbound family. */
     readonly font?: DesignFontBinding | null;
     readonly start: number;

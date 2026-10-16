@@ -103,8 +103,9 @@ export class DesignTextOutline {
             for (const line of lines) {
                 const baseline: number = DesignTextLayout.baseline(line, text.lineHeight);
                 for (const segment of line.segments) {
-                    const fills: readonly DesignPaint[] = node.style.fills.map(
-                        (paint: DesignPaint): DesignPaint =>
+                    const fills: readonly DesignPaint[] =
+                        segment.style.fills ??
+                        node.style.fills.map((paint: DesignPaint): DesignPaint =>
                             segment.style.rich
                                 ? {
                                       ...paint,
@@ -115,7 +116,7 @@ export class DesignTextOutline {
                                       tokenId: null,
                                   }
                                 : paint,
-                    );
+                        );
                     for (const piece of DesignTextGlyphs.paths(
                         segment,
                         fonts,

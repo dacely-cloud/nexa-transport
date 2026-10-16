@@ -19,6 +19,8 @@ import {
     type DesignPage,
     type DesignPaint,
     type DesignStyle,
+    type DesignText,
+    type DesignTextRun,
     type DesignToken,
     type DesignInteraction,
 } from './DesignTypes.js';
@@ -180,16 +182,7 @@ export class DesignTransfer {
                           },
                       }),
                 style: style(node.style),
-                text:
-                    node.text?.typographyStyle == null
-                        ? node.text
-                        : {
-                              ...node.text,
-                              typographyStyle: {
-                                  ...node.text.typographyStyle,
-                                  tokenId: copyToken(node.text.typographyStyle.tokenId),
-                              },
-                          },
+                text: this.#text(node.text, paint, copyToken),
                 componentId:
                     node.componentId === null
                         ? null
@@ -350,5 +343,28 @@ export class DesignTransfer {
             throw new Error('Missing copied layer identity: ' + id);
         }
         return value;
+    }
+    static #text(
+        text: DesignText | null,
+        paint: (value: DesignPaint) => DesignPaint,
+        copyToken: (id: string) => string,
+    ): DesignText | null {
+        if (text === null) {
+            return null;
+        }
+        return {
+            ...text,
+            ...(text.typographyStyle == null
+                ? {}
+                : {
+                      typographyStyle: {
+                          ...text.typographyStyle,
+                          tokenId: copyToken(text.typographyStyle.tokenId),
+                      },
+                  }),
+            runs: text.runs.map((run: DesignTextRun): DesignTextRun =>
+                run.fills == null ? run : { ...run, fills: run.fills.map(paint) },
+            ),
+        };
     }
 }

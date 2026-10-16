@@ -62,6 +62,13 @@ export class DesignScaleMetrics {
             runs: text.runs.map((run: DesignTextRun): DesignTextRun => ({
                 ...run,
                 size: run.size * factor,
+                ...(run.fills == null
+                    ? {}
+                    : {
+                          fills: run.fills.map((paint: DesignPaint): DesignPaint =>
+                              this.paint(paint, factor),
+                          ),
+                      }),
             })),
         };
     }

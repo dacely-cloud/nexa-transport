@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignTextFills } from './DesignTextFills.js';
 import type {
     DesignFontRun,
     DesignFontRunStyle,
@@ -37,7 +38,10 @@ export interface DesignTextShapedLine {
 export class DesignTextShaping {
     /** Compare ranges of one layer; inherited paint remains distinct from an explicit solid override. */
     public static samePaint(a: DesignTextSpanStyle, b: DesignTextSpanStyle): boolean {
-        return a.rich === b.rich && (!a.rich || a.color === b.color);
+        return (
+            a.rich === b.rich &&
+            (!a.rich || (a.color === b.color && DesignTextFills.same(a.fills, b.fills)))
+        );
     }
     /** Unsupported unbound system families retain the platform's existing fallback measurement. */
     public static factory(fonts: DesignFontEngine): DesignTextRunFactory {

@@ -28,6 +28,7 @@ import type {
     DesignNode,
     DesignPage,
     DesignStyle,
+    DesignPaint,
     DesignShadow,
     DesignLayout,
     DesignPlacement,
@@ -211,6 +212,8 @@ export interface DesignTypographyOperation {
 }
 /** Partial styles for a nonempty UTF-16 range; omitted properties retain their per-range values. */
 export interface DesignTextStyleChanges {
+    /** Up to eight range paints; an empty stack hides fill ink, while null restores layer inheritance. */
+    readonly fills?: readonly DesignPaint[] | null;
     readonly family?: string;
     readonly size?: number;
     readonly weight?: number;

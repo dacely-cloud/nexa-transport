@@ -200,13 +200,10 @@ export class DesignSvgImportTextPaints {
             }
             const value: DesignPaint | null = values[index] ?? null;
             const inherited: boolean = JSON.stringify(value) === key;
-            if (!inherited && value !== null && value.kind !== 'solid') {
-                throw new DesignSvgInputError(
-                    'SVG text with multiple gradient paints requires independent native rich paints.',
-                );
-            }
-            const color: string | null = inherited ? null : this.#solid(value);
-            if (color === null && this.#sameFont(range.style, style)) {
+            const fills: readonly DesignPaint[] | null =
+                !inherited && value !== null && value.kind !== 'solid' ? [value] : null;
+            const color: string | null = inherited || fills !== null ? null : this.#solid(value);
+            if (color === null && fills === null && this.#sameFont(range.style, style)) {
                 continue;
             }
             runs.push({
@@ -217,6 +214,7 @@ export class DesignSvgImportTextPaints {
                 weight: range.style.weight,
                 italic: range.style.italic,
                 color,
+                ...(fills === null ? {} : { fills }),
                 underline: range.style.underline,
                 ...(range.style.font == null ? {} : { font: range.style.font }),
             });

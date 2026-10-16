@@ -5,6 +5,7 @@ import {
     DesignKind,
     type DesignBox,
     type DesignText,
+    type DesignTextRun,
     type DesignPaint,
     type DesignStroke,
 } from './DesignTypes.js';
@@ -20,6 +21,7 @@ import { DesignTextShaping, type DesignTextRunFactory } from './DesignTextShapin
 import { DesignTextGlyphs } from './DesignTextGlyphs.js';
 import { DesignStrokeGeometry } from './DesignStrokeGeometry.js';
 import { DesignSvgTextPaint } from './DesignSvgTextPaint.js';
+import { DesignDefaults } from './DesignDefaults.js';
 import {
     DesignSvgLimits,
     type DesignSvgImage,
@@ -68,6 +70,24 @@ export class DesignSvg {
             ]),
         );
         const paints: DesignSvgPaints = new DesignSvgPaints(images);
+        for (const box of selection.boxes) {
+            const node: DesignSceneNode | undefined = nodes.get(box.id);
+            if (node === undefined) {
+                continue;
+            }
+            const density: number = node.text === null ? 1 : 2;
+            for (const paint of [
+                ...node.style.fills,
+                ...(node.text?.runs.flatMap(
+                    (run: DesignTextRun): readonly DesignPaint[] => run.fills ?? [],
+                ) ?? []),
+            ]) {
+                paints.reserve(paint, box, 0, density);
+            }
+            if (node.style.stroke !== null) {
+                paints.reserve(node.style.stroke.paint, box, this.#paintPadding(node), density);
+            }
+        }
         const clips: Map<string, string> = new Map();
         const elements: Map<string, string> = new Map();
         const needed: Set<string> = new Set();
@@ -88,8 +108,25 @@ export class DesignSvg {
                 parentId = nodes.get(parentId)?.parentId ?? null;
             }
             let body: string = '';
-            for (const paint of node.style.fills) {
-                const attributes: string = `fill="${paints.paint(paint, box)}" fill-opacity="${paint.opacity}"`;
+            const rangeFills: boolean =
+                node.text?.runs.some((run: DesignTextRun): boolean => run.fills != null) === true;
+            if (rangeFills && node.text !== null) {
+                body += this.#text(
+                    node.text,
+                    DesignDefaults.paint(),
+                    box,
+                    paints,
+                    measure,
+                    '',
+                    true,
+                    outlines,
+                    prepare,
+                    0,
+                    node.style.fills,
+                );
+            }
+            for (const paint of rangeFills ? [] : node.style.fills) {
+                const attributes: string = `fill="${paints.paint(paint, box, 0, node.text === null ? 1 : 2)}" fill-opacity="${paint.opacity}"`;
                 if (node.text !== null) {
                     body += this.#text(
                         node.text,
@@ -115,7 +152,7 @@ export class DesignSvg {
             }
             if (node.style.stroke !== null) {
                 const stroke: DesignStroke = node.style.stroke;
-                const attributes: string = `fill="none" stroke="${paints.paint(stroke.paint, box, stroke.width * ((stroke.join ?? 'round') === 'miter' ? (stroke.miterLimit ?? 4) : 1))}" stroke-opacity="${stroke.paint.opacity}" stroke-width="${stroke.width}" stroke-dasharray="${stroke.dash.join(' ')}" stroke-linejoin="${stroke.join ?? 'round'}" stroke-linecap="${stroke.cap ?? 'round'}"${stroke.miterLimit === undefined ? '' : ` stroke-miterlimit="${stroke.miterLimit}"`}`;
+                const attributes: string = `fill="none" stroke="${paints.paint(stroke.paint, box, this.#paintPadding(node), node.text === null ? 1 : 2)}" stroke-opacity="${stroke.paint.opacity}" stroke-width="${stroke.width}" stroke-dasharray="${stroke.dash.join(' ')}" stroke-linejoin="${stroke.join ?? 'round'}" stroke-linecap="${stroke.cap ?? 'round'}"${stroke.miterLimit === undefined ? '' : ` stroke-miterlimit="${stroke.miterLimit}"`}`;
                 body +=
                     node.text === null
                         ? Geometry.shape(node, box, attributes)
@@ -219,6 +256,7 @@ export class DesignSvg {
         outlines: DesignFontEngine | null = null,
         prepare: DesignTextRunFactory | null = null,
         padding: number = 0,
+        fills: readonly DesignPaint[] | null = null,
     ): string {
         const lines: readonly DesignTextLine[] = DesignTextLayout.lines(
             text,
@@ -232,6 +270,10 @@ export class DesignSvg {
         paints.definitions.push(
             `<clipPath id="${id}"><rect x="${-padding}" y="${-padding}" width="${box.width + padding * 2}" height="${box.height + padding * 2}"/></clipPath>`,
         );
+        const textPaint: DesignSvgTextPaint | null =
+            fills === null && outlines !== null
+                ? null
+                : new DesignSvgTextPaint(paints, box, paints.paint(paint, box, 0, 2), fills);
         if (outlines !== null) {
             const shapes: string[] = [];
             for (const line of lines) {
@@ -245,7 +287,11 @@ export class DesignSvg {
                         );
                     }
                     const color: string =
-                        segment.style.rich && richFill ? `fill="${segment.style.color}"` : '';
+                        richFill && textPaint?.fill(segment.style) != null
+                            ? `fill="${textPaint.fill(segment.style)}"`
+                            : segment.style.rich && richFill
+                              ? `fill="${segment.style.color}"`
+                              : '';
                     for (const piece of DesignTextGlyphs.paths(
                         segment,
                         outlines,
@@ -276,13 +322,15 @@ export class DesignSvg {
             }
             return `<g clip-path="url(#${id})" ${attributes}>${shapes.join('')}</g>`;
         }
-        return DesignSvgText.render(
-            lines,
-            text,
-            attributes,
-            id,
-            richFill,
-            new DesignSvgTextPaint(paints, box, paints.paint(paint, box)),
-        );
+        return DesignSvgText.render(lines, text, attributes, id, richFill, textPaint);
+    }
+    static #paintPadding(node: DesignSceneNode): number {
+        const stroke: DesignStroke | null = node.style.stroke;
+        return stroke === null
+            ? 0
+            : node.text !== null
+              ? DesignStrokeGeometry.padding(stroke)
+              : stroke.width *
+                ((stroke.join ?? 'round') === 'miter' ? (stroke.miterLimit ?? 4) : 1);
     }
 }

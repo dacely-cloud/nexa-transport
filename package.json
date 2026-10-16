@@ -1,6 +1,6 @@
 {
     "name": "nexa-transport",
-    "version": "0.1.0-design.17",
+    "version": "0.1.0-design.18",
     "description": "Typed Nexa websocket gateway client for browsers and Node.js",
     "type": "module",
     "license": "Apache-2.0",
@@ -715,6 +715,14 @@
         "./roblox-part-geometry": {
             "types": "./dist/roblox/RobloxPartGeometry.d.ts",
             "import": "./dist/roblox-part-geometry.js"
+        },
+        "./design-gradient-sampling": {
+            "types": "./dist/design/DesignGradientSampling.d.ts",
+            "import": "./dist/design-gradient-sampling.js"
+        },
+        "./design-text-fills": {
+            "types": "./dist/design/DesignTextFills.d.ts",
+            "import": "./dist/design-text-fills.js"
         },
         "./design-text-styles": {
             "types": "./dist/design/DesignTextStyles.d.ts",

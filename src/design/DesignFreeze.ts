@@ -124,6 +124,12 @@ export class DesignFreeze {
             Object.freeze(text.typographyStyle);
         }
         for (const run of text.runs) {
+            if (run.fills != null) {
+                for (const paint of run.fills) {
+                    this.#paint(paint);
+                }
+                Object.freeze(run.fills);
+            }
             Object.freeze(run);
         }
         Object.freeze(text);

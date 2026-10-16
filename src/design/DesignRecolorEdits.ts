@@ -30,6 +30,9 @@ export class DesignRecolorEdits {
             const style: DesignStyle = this.#style(index, node);
             for (const paint of [
                 ...style.fills,
+                ...(node.text?.runs.flatMap(
+                    (run: DesignTextRun): readonly DesignPaint[] => run.fills ?? [],
+                ) ?? []),
                 ...(style.stroke === null ? [] : [style.stroke.paint]),
             ]) {
                 if (paint.kind === DesignPaintKind.Solid) {
@@ -94,21 +97,33 @@ export class DesignRecolorEdits {
                               : { ...style.stroke, paint: stroke },
                   }))
                 : node;
-            if (
-                node.text !== null &&
-                node.text.runs.some(
-                    (run: DesignTextRun): boolean => run.color?.toUpperCase() === before,
-                )
-            ) {
-                next = {
-                    ...next,
-                    text: {
-                        ...node.text,
-                        runs: node.text.runs.map((run: DesignTextRun): DesignTextRun =>
-                            run.color?.toUpperCase() === before ? { ...run, color: after } : run,
-                        ),
+            if (node.text !== null) {
+                const runs: readonly DesignTextRun[] = node.text.runs.map(
+                    (run: DesignTextRun): DesignTextRun => {
+                        const fills: readonly DesignPaint[] | undefined = run.fills?.map(
+                            (paint: DesignPaint): DesignPaint =>
+                                this.#paint(index, paint, before, after),
+                        );
+                        const color: string | null =
+                            run.color?.toUpperCase() === before ? after : run.color;
+                        return color === run.color &&
+                            (fills === undefined ||
+                                fills.every(
+                                    (paint: DesignPaint, slot: number): boolean =>
+                                        paint === run.fills?.[slot],
+                                ))
+                            ? run
+                            : { ...run, color, ...(fills === undefined ? {} : { fills }) };
                     },
-                };
+                );
+                if (
+                    runs.some(
+                        (run: DesignTextRun, slot: number): boolean =>
+                            run !== node.text?.runs[slot],
+                    )
+                ) {
+                    next = { ...next, text: { ...node.text, runs } };
+                }
             }
             if (next !== node) {
                 changed.push(next);

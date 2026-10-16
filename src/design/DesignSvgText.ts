@@ -6,6 +6,7 @@ import {
     DesignTextLayout,
     type DesignTextLine,
     type DesignTextSegment,
+    type DesignTextSpanStyle,
 } from './DesignTextLayout.js';
 import { DesignFontBindings } from './DesignFontBindings.js';
 import { DesignSvgGeometry } from './DesignSvgGeometry.js';
@@ -48,7 +49,7 @@ export class DesignSvgText {
                                       ? segment.width
                                       : 0);
                               const coordinates: string = `x="${x}" y="${DesignTextLayout.baseline(line, text.lineHeight)}"`;
-                              const style: string = this.#style(segment, richFill);
+                              const style: string = this.#style(segment, richFill, true, paint);
                               const content: string = DesignSvgGeometry.escape(segment.text);
                               return directional
                                   ? `<text xml:space="preserve" letter-spacing="${text.letterSpacing}" direction="${segment.style.direction ?? 'ltr'}" unicode-bidi="bidi-override" text-anchor="start" ${coordinates} ${style}>${content}</text>`
@@ -108,7 +109,7 @@ export class DesignSvgText {
             const content: string = slices
                 .map(
                     (slice: DesignSvgTextSlice): string =>
-                        `<tspan ${slice.fill !== null ? `fill="${slice.fill}"` : slice.style.rich && richFill ? `fill="${slice.style.color}"` : ''}>${DesignSvgGeometry.escape(slice.text)}</tspan>`,
+                        `<tspan ${this.#fill(slice.style, richFill, paint, slice.fill)}>${DesignSvgGeometry.escape(slice.text)}</tspan>`,
                 )
                 .join('');
             elements.push(
@@ -118,7 +119,7 @@ export class DesignSvgText {
                 for (const span of spans) {
                     if (span.style.underline && span.width > 0) {
                         elements.push(
-                            `<rect x="${span.x}" y="${DesignTextLayout.baseline(line, text.lineHeight) + Math.max(1, span.style.size / 12)}" width="${span.width}" height="${Math.max(1, span.style.size / 16)}" ${span.style.rich ? `fill="${span.style.color}"` : ''}/>`,
+                            `<rect x="${span.x}" y="${DesignTextLayout.baseline(line, text.lineHeight) + Math.max(1, span.style.size / 12)}" width="${span.width}" height="${Math.max(1, span.style.size / 16)}" ${this.#fill(span.style, true, paint)}/>`,
                         );
                     }
                 }
@@ -131,11 +132,25 @@ export class DesignSvgText {
         segment: DesignTextSegment,
         richFill: boolean,
         decoration: boolean = true,
+        paint: DesignSvgTextPaint | null = null,
     ): string {
         const family: string = DesignSvgGeometry.escape(
             JSON.stringify(DesignFontBindings.family(segment.style.family, segment.style.font)) +
                 ',"Noto Sans Arabic","Noto Sans Hebrew","Noto Emoji"',
         );
-        return `${segment.style.rich && richFill ? `fill="${segment.style.color}"` : ''} font-family="${family}" font-size="${segment.style.size}" font-weight="${segment.style.weight}" font-style="${segment.style.italic ? 'italic' : 'normal'}"${decoration ? ` text-decoration="${segment.style.underline ? 'underline' : 'none'}"` : ''}`;
+        return `${this.#fill(segment.style, richFill, paint)} font-family="${family}" font-size="${segment.style.size}" font-weight="${segment.style.weight}" font-style="${segment.style.italic ? 'italic' : 'normal'}"${decoration ? ` text-decoration="${segment.style.underline ? 'underline' : 'none'}"` : ''}`;
+    }
+    static #fill(
+        style: DesignTextSpanStyle,
+        enabled: boolean,
+        paint: DesignSvgTextPaint | null,
+        explicit: string | null = null,
+    ): string {
+        if (!enabled) {
+            return '';
+        }
+        const value: string | null =
+            explicit ?? paint?.fill(style) ?? (style.rich ? style.color : null);
+        return value === null ? '' : `fill="${value}"`;
     }
 }

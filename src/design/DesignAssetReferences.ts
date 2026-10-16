@@ -31,6 +31,11 @@ export class DesignAssetReferences {
                 ids.add(node.image.assetId);
             }
             this.#style(node.style, ids);
+            for (const run of node.text?.runs ?? []) {
+                for (const paint of run.fills ?? []) {
+                    this.#paint(paint, ids);
+                }
+            }
             for (const override of node.overrides) {
                 if (override.style !== null) {
                     this.#style(override.style, ids);

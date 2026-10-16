@@ -129,7 +129,8 @@ export class DesignFontBindings {
     public static run(text: DesignText, run: DesignTextRun): DesignTextSpanStyle {
         const font: DesignFontBinding | null = this.resolve(text, run);
         return {
-            rich: run.color !== null,
+            rich: run.color !== null || run.fills != null,
+            ...(run.fills === undefined ? {} : { fills: run.fills }),
             family: run.family,
             size: run.size,
             weight: run.weight,

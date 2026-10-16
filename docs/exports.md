@@ -172,6 +172,7 @@ backend, or a provider-key vault.
 | `nexa-transport/design-codec`                   | ESM + types | Design codec.                                                                |
 | `nexa-transport/design-edits`                   | ESM + types | Design edits.                                                                |
 | `nexa-transport/design-text-styles`             | ESM + types | Unicode-safe partial rich-range formatting and selected-style inspection.    |
+| `nexa-transport/design-text-fills`              | ESM + types | Selected-range paint stack resolution and identity.                          |
 | `nexa-transport/design-transfer-types`          | Types only  | Revision-pinned references for native copying between saved layouts.         |
 | `nexa-transport/design-transfer-codec`          | ESM + types | Strict reference-only copy request validation.                               |
 | `nexa-transport/design-clipboard-types`         | ESM + types | Native clipboard references, receipts and placement modes.                   |
@@ -195,6 +196,7 @@ backend, or a provider-key vault.
 | `nexa-transport/design-svg`                     | ESM + types | Design svg.                                                                  |
 | `nexa-transport/design-svg-geometry`            | ESM + types | Design svg geometry.                                                         |
 | `nexa-transport/design-svg-paints`              | ESM + types | Editable paint servers and bounded portable angular/diamond raster paint.    |
+| `nexa-transport/design-gradient-sampling`       | ESM + types | Portable normalized gradient color sampling for angular and diamond paints.  |
 | `nexa-transport/design-svg-types`               | ESM + types | Design svg types.                                                            |
 | `nexa-transport/design-text-layout`             | ESM + types | Design text layout.                                                          |
 | `nexa-transport/design-text-direction`          | ESM + types | Paragraph direction and resolved visual-run types.                           |

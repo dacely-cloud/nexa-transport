@@ -111,6 +111,8 @@ const config: UserConfig = {
                 'design-clipboard-paste': 'src/design/DesignClipboardPaste.ts',
                 'design-clipboard-cut': 'src/design/DesignClipboardCut.ts',
                 'design-text-styles': 'src/design/DesignTextStyles.ts',
+                'design-text-fills': 'src/design/DesignTextFills.ts',
+                'design-gradient-sampling': 'src/design/DesignGradientSampling.ts',
                 'design-operation-types': 'src/design/DesignOperationTypes.ts',
                 'design-operation-codec': 'src/design/DesignOperationCodec.ts',
                 'design-mask-types': 'src/design/DesignMaskTypes.ts',

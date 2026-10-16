@@ -2,7 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { DesignStrokeGeometry } from './DesignStrokeGeometry.js';
-import { DesignPaintKind, DesignKind, type DesignBox, type DesignCorners } from './DesignTypes.js';
+import {
+    DesignPaintKind,
+    DesignKind,
+    type DesignBox,
+    type DesignCorners,
+    type DesignPaint,
+    type DesignTextRun,
+} from './DesignTypes.js';
 import type { DesignSceneNode } from './DesignScene.js';
 import type { DesignLayoutResult } from './DesignLayoutTypes.js';
 import type { DesignSelectionBounds } from './DesignSelectionTypes.js';
@@ -115,6 +122,9 @@ export class DesignSvgGeometry {
             }
             for (const paint of [
                 ...node.style.fills,
+                ...(node.text?.runs.flatMap(
+                    (run: DesignTextRun): readonly DesignPaint[] => run.fills ?? [],
+                ) ?? []),
                 ...(node.style.stroke === null ? [] : [node.style.stroke.paint]),
             ]) {
                 if (paint.kind === DesignPaintKind.Image && paint.assetId !== null) {

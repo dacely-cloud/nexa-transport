@@ -14,6 +14,7 @@ import type { DesignAsset } from './DesignAssetTypes.js';
 import type { DesignSvgImage } from './DesignSvgTypes.js';
 import { DesignGradientGeometry } from './DesignGradientGeometry.js';
 import { DesignGradientPng } from './DesignGradientPng.js';
+import { DesignSvgGradientBudget, type DesignSvgGradientSize } from './DesignSvgGradientBudget.js';
 import type { DesignGradientTransform } from './DesignGradientTypes.js';
 import type { DesignImageTransform } from './DesignImageTransformTypes.js';
 import { DesignImageSamplingGeometry } from './DesignImageSamplingGeometry.js';
@@ -34,25 +35,23 @@ export class DesignSvgPaints {
     #sequence: number = 0;
     #imageIdentities: Map<string, string> = new Map();
     #gradientIdentities: Map<string, string> = new Map();
-    #gradientPixels: number = 0;
+    readonly #gradientBudget: DesignSvgGradientBudget = new DesignSvgGradientBudget();
     /** Paint and clipping definitions precede the drawing elements. */
     public readonly definitions: string[] = [];
     /** Asset metadata and original bytes are supplied by the owner-scoped export adapter. */
     public constructor(public readonly images: ReadonlyMap<string, DesignSvgImage>) {}
     /** Returns a safe self-contained paint expression without remote image or font URLs. */
-    public paint(paint: DesignPaint, box: DesignBox, padding: number = 0): string {
+    public paint(
+        paint: DesignPaint,
+        box: DesignBox,
+        padding: number = 0,
+        density: number = 1,
+    ): string {
         if (paint.kind === DesignPaintKind.Solid) {
             return Geometry.escape(paint.color);
         }
         if (paint.kind === DesignPaintKind.Angular || paint.kind === DesignPaintKind.Diamond) {
-            const key: string = JSON.stringify([
-                paint.kind,
-                DesignGradientGeometry.resolve(paint),
-                paint.stops,
-                box.width,
-                box.height,
-                padding,
-            ]);
+            const key: string = this.#gradientKey(paint, box, padding);
             const existing: string | undefined = this.#gradientIdentities.get(key);
             if (existing !== undefined) {
                 return `url(#${existing})`;
@@ -61,13 +60,14 @@ export class DesignSvgPaints {
             const layerHeight: number = Math.max(1, box.height);
             const extentWidth: number = layerWidth + padding * 2;
             const extentHeight: number = layerHeight + padding * 2;
-            const width: number = Math.ceil(extentWidth);
-            const height: number = Math.ceil(extentHeight);
-            if (this.#gradientPixels + width * height > 16 * 1024 * 1024) {
-                throw new Error(
-                    'Angular and diamond SVG paint exports exceed the 16 megapixel document budget.',
-                );
-            }
+            const size: DesignSvgGradientSize = this.#gradientBudget.allocate(
+                key,
+                extentWidth,
+                extentHeight,
+                density,
+            );
+            const width: number = size.width;
+            const height: number = size.height;
             const encoded: string = DesignGradientPng.encode(paint, width, height, {
                 x: -padding / layerWidth,
                 y: -padding / layerHeight,
@@ -78,7 +78,6 @@ export class DesignSvgPaints {
             this.definitions.push(
                 `<pattern id="${id}" patternUnits="userSpaceOnUse" x="${-padding}" y="${-padding}" width="${extentWidth}" height="${extentHeight}"><image href="data:image/png;base64,${encoded}" width="${extentWidth}" height="${extentHeight}" preserveAspectRatio="none"/></pattern>`,
             );
-            this.#gradientPixels += width * height;
             this.#gradientIdentities.set(key, id);
             return `url(#${id})`;
         }
@@ -252,5 +251,31 @@ export class DesignSvgPaints {
             `<filter id="${id}" filterUnits="userSpaceOnUse" x="${bounds.left - margin}" y="${bounds.top - margin}" width="${bounds.right - bounds.left + margin * 2}" height="${bounds.bottom - bounds.top + margin * 2}" color-interpolation-filters="sRGB">${filters.join('')}${merged}${style.blur > 0 ? `<feGaussianBlur in="merged" stdDeviation="${style.blur / 2}"/>` : ''}</filter>`,
         );
         return ` filter="url(#${id})"`;
+    }
+    /** Planning ordinary resolution first keeps denser text exports within the original acceptance and pixel limits. */
+    public reserve(
+        paint: DesignPaint,
+        box: DesignBox,
+        padding: number = 0,
+        density: number = 1,
+    ): void {
+        if (paint.kind === DesignPaintKind.Angular || paint.kind === DesignPaintKind.Diamond) {
+            this.#gradientBudget.reserve(
+                this.#gradientKey(paint, box, padding),
+                Math.max(1, box.width) + padding * 2,
+                Math.max(1, box.height) + padding * 2,
+                density,
+            );
+        }
+    }
+    #gradientKey(paint: DesignPaint, box: DesignBox, padding: number): string {
+        return JSON.stringify([
+            paint.kind,
+            DesignGradientGeometry.resolve(paint),
+            paint.stops,
+            box.width,
+            box.height,
+            padding,
+        ]);
     }
 }

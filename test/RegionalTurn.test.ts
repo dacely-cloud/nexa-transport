@@ -25,10 +25,10 @@ it.each([true, false])(
                 expect(request.params['userRegion']).toEqual(
                     advertised ? { countryCode: 'GB', timeZone: 'Europe/London' } : undefined,
                 );
-            if (request.method === Method.AgentAsk) {
-                socket.send(JSON.stringify({ id: request.id, ok: true, result }));
-                return;
-            }
+                if (request.method === 'agent.ask') {
+                    socket.send(JSON.stringify({ id: request.id, ok: true, result }));
+                    return;
+                }
                 socket.send(
                     JSON.stringify({
                         id: request.id,
@@ -45,7 +45,9 @@ it.each([true, false])(
                 );
             };
             expect((await client.stream({ message: 'News please' }).result).text).toBe('finished');
-        expect((await client.call(Method.AgentAsk, { message: 'News please' })).text).toBe('finished');
+            expect((await client.call(Method.AgentAsk, { message: 'News please' })).text).toBe(
+                'finished',
+            );
         } finally {
             client?.close();
             await gateway.close();

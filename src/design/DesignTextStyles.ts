@@ -6,6 +6,7 @@ import type { DesignTextStyleChanges } from './DesignOperationTypes.js';
 import { DesignTextStyleChangesCodec } from './DesignTextStyleChangesCodec.js';
 import { DesignStyleCodec } from './DesignStyleCodec.js';
 import { DesignValues as V } from './DesignValues.js';
+import { DesignTextFills } from './DesignTextFills.js';
 
 /** Range styles split only affected intervals, retain source text and coalesce equal adjacent styles. */
 export class DesignTextStyles {
@@ -69,6 +70,12 @@ export class DesignTextStyles {
             const next: DesignTextRun = {
                 ...previous,
                 ...patch,
+                ...(patch.fills !== undefined && patch.color === undefined ? { color: null } : {}),
+                ...(patch.color !== undefined &&
+                patch.fills === undefined &&
+                previous.fills !== undefined
+                    ? { fills: null }
+                    : {}),
                 ...(faceChanged && patch.font === undefined ? { font: null } : {}),
                 start: left,
                 end: right,
@@ -136,6 +143,7 @@ export class DesignTextStyles {
             left.weight === right.weight &&
             left.italic === right.italic &&
             left.color === right.color &&
+            DesignTextFills.same(left.fills, right.fills) &&
             left.underline === right.underline &&
             left.font?.id === right.font?.id &&
             left.font?.sha256 === right.font?.sha256 &&

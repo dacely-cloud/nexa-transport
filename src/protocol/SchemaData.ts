@@ -9930,6 +9930,21 @@ export const schema: Schema = {
                 family: {
                     type: 'string',
                 },
+                fills: {
+                    anyOf: [
+                        {
+                            items: {
+                                $ref: '#/definitions/DesignPaint',
+                            },
+                            type: 'array',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                    description:
+                        'An explicit range fill stack replaces layer fills; null or omission retains legacy color/inheritance.',
+                },
                 font: {
                     anyOf: [
                         {
@@ -9975,6 +9990,21 @@ export const schema: Schema = {
                 family: {
                     type: 'string',
                 },
+                fills: {
+                    anyOf: [
+                        {
+                            items: {
+                                $ref: '#/definitions/DesignPaint',
+                            },
+                            type: 'array',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                    description:
+                        'Native paint stacks keep their whole-layer coordinates while glyph windows remain bounded.',
+                },
                 font: {
                     anyOf: [
                         {
@@ -10017,6 +10047,21 @@ export const schema: Schema = {
                 },
                 family: {
                     type: 'string',
+                },
+                fills: {
+                    anyOf: [
+                        {
+                            items: {
+                                $ref: '#/definitions/DesignPaint',
+                            },
+                            type: 'array',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                    description:
+                        'Up to eight range paints; an empty stack hides fill ink, while null restores layer inheritance.',
                 },
                 font: {
                     anyOf: [
@@ -10147,6 +10192,12 @@ export const schema: Schema = {
                 },
                 pageId: {
                     type: 'string',
+                },
+                rangeFills: {
+                    const: true,
+                    description:
+                        'Whole-layer paint ordering stays stable even when this window has only inherited ranges.',
+                    type: 'boolean',
                 },
                 revision: {
                     type: 'string',
@@ -11374,6 +11425,12 @@ export const schema: Schema = {
                     const: true,
                     description:
                         'Native glyph windows can preserve shared shaping with bounded paint clips.',
+                    type: 'boolean',
+                },
+                designTextRangeFills: {
+                    const: true,
+                    description:
+                        'UTF-16 rich ranges can replace layer fills with their own editable paint stacks.',
                     type: 'boolean',
                 },
                 events: {

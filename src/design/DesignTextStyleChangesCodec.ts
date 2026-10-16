@@ -13,7 +13,7 @@ export class DesignTextStyleChangesCodec {
     public static parse(raw: unknown): DesignTextStyleChanges {
         const value: Readonly<Record<string, unknown>> = V.fields(
             raw,
-            ['family', 'size', 'weight', 'italic', 'color', 'underline', 'font'],
+            ['family', 'size', 'weight', 'italic', 'color', 'underline', 'font', 'fills'],
             [],
         );
         if (Object.keys(value).length === 0) {
@@ -34,7 +34,7 @@ export class DesignTextStyleChangesCodec {
                     size: defaults.size,
                     weight: defaults.weight,
                     italic: defaults.italic,
-                    color: '#000000',
+                    color: value['fills'] === undefined ? '#000000' : null,
                     underline: false,
                     ...value,
                 },
@@ -45,6 +45,7 @@ export class DesignTextStyleChangesCodec {
             throw new Error('Text style defaults are unavailable.');
         }
         return {
+            ...(value['fills'] === undefined ? {} : { fills: parsed.fills ?? null }),
             ...(value['family'] === undefined ? {} : { family: parsed.family }),
             ...(value['size'] === undefined ? {} : { size: parsed.size }),
             ...(value['weight'] === undefined ? {} : { weight: parsed.weight }),

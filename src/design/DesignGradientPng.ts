@@ -8,7 +8,7 @@ import type { DesignGradientViewport } from './DesignGradientTypes.js';
 
 /** SVG has no angular or diamond primitive; only the paint is embedded, preserving vector shapes and text. */
 export class DesignGradientPng {
-    /** One pixel per design unit with explicit bounds; exports never silently lower resolution. */
+    /** Explicit raster bounds; exports retain at least one pixel per design unit. */
     public static readonly maximumEdge: number = 4096;
     public static readonly maximumPixels: number = 4 * 1024 * 1024;
 
@@ -19,6 +19,12 @@ export class DesignGradientPng {
         height: number,
         viewport: DesignGradientViewport = { x: 0, y: 0, width: 1, height: 1 },
     ): string {
+        this.dimensions(width, height);
+        return this.#encode(paint, width, height, viewport);
+    }
+
+    /** Allocation planners use the same limits without creating pixel buffers or compressed output. */
+    public static dimensions(width: number, height: number): void {
         if (
             !Number.isInteger(width) ||
             !Number.isInteger(height) ||
@@ -32,6 +38,14 @@ export class DesignGradientPng {
                 'Angular and diamond SVG paint exports require at most 4096 pixels per edge and 4 megapixels per paint.',
             );
         }
+    }
+
+    static #encode(
+        paint: DesignPaint,
+        width: number,
+        height: number,
+        viewport: DesignGradientViewport,
+    ): string {
         const stride: number = width * 4 + 1;
         const pixels: Uint8Array = new Uint8Array(stride * height);
         const sample: DesignGradientSampling = new DesignGradientSampling(paint);

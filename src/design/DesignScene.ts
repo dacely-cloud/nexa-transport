@@ -15,6 +15,8 @@ import {
     type DesignPaint,
     type DesignToken,
     type DesignStyle,
+    type DesignText,
+    type DesignTextRun,
 } from './DesignTypes.js';
 
 /** Render identity preserves both editable source and instance ownership. */
@@ -132,6 +134,7 @@ export class DesignScene {
                     visible: edited.visible && template.visible,
                     locked: edited.locked,
                     style: this.#style(template.style, tokens),
+                    text: this.#text(template.text, tokens),
                     componentId: null,
                     overrides: [],
                 });
@@ -173,6 +176,7 @@ export class DesignScene {
                               },
                           }),
                     style: this.#style(edited.style, tokens),
+                    text: this.#text(edited.text, tokens),
                 });
                 for (let index: number = 0; index < edited.children.length; index++) {
                     const child: string | undefined = edited.children[index];
@@ -256,9 +260,7 @@ export class DesignScene {
     }
     static #style(style: DesignStyle, tokens: ReadonlyMap<string, string>): DesignStyle {
         const paint: (entry: DesignPaint) => DesignPaint = (entry: DesignPaint): DesignPaint =>
-            entry.tokenId === null
-                ? entry
-                : { ...entry, color: tokens.get(entry.tokenId) ?? entry.color };
+            this.#paint(entry, tokens);
         return {
             ...style,
             fills: style.fills.map(paint),
@@ -267,5 +269,33 @@ export class DesignScene {
                     ? null
                     : { ...style.stroke, paint: paint(style.stroke.paint) },
         };
+    }
+    static #paint(entry: DesignPaint, tokens: ReadonlyMap<string, string>): DesignPaint {
+        const color: string =
+            entry.tokenId === null ? entry.color : (tokens.get(entry.tokenId) ?? entry.color);
+        return color === entry.color ? entry : { ...entry, color };
+    }
+    static #text(text: DesignText | null, tokens: ReadonlyMap<string, string>): DesignText | null {
+        if (text === null) {
+            return null;
+        }
+        const runs: readonly DesignTextRun[] = text.runs.map(
+            (run: DesignTextRun): DesignTextRun => {
+                if (run.fills == null) {
+                    return run;
+                }
+                const fills: readonly DesignPaint[] = run.fills.map(
+                    (paint: DesignPaint): DesignPaint => this.#paint(paint, tokens),
+                );
+                return fills.every(
+                    (paint: DesignPaint, index: number): boolean => paint === run.fills?.[index],
+                )
+                    ? run
+                    : { ...run, fills };
+            },
+        );
+        return runs.every((run: DesignTextRun, index: number): boolean => run === text.runs[index])
+            ? text
+            : { ...text, runs };
     }
 }

@@ -6544,6 +6544,8 @@ export interface DesignTextRunShape {
     readonly end: number;
     /** family as defined by the Nexa gateway. */
     readonly family: string;
+    /** fills as defined by the Nexa gateway. */
+    readonly fills?: ReadonlyArray<DesignPaint> | null;
     /** font as defined by the Nexa gateway. */
     readonly font?: DesignFontBinding | null;
     /** italic as defined by the Nexa gateway. */
@@ -6572,6 +6574,8 @@ export interface DesignTextSpanStyleShape {
     readonly direction?: (typeof DesignTextSpanStyledirectionValues)[keyof typeof DesignTextSpanStyledirectionValues];
     /** family as defined by the Nexa gateway. */
     readonly family: string;
+    /** fills as defined by the Nexa gateway. */
+    readonly fills?: ReadonlyArray<DesignPaint> | null;
     /** font as defined by the Nexa gateway. */
     readonly font?: DesignFontBinding | null;
     /** italic as defined by the Nexa gateway. */
@@ -6595,6 +6599,8 @@ export interface DesignTextStyleChangesShape {
     readonly color?: null | string;
     /** family as defined by the Nexa gateway. */
     readonly family?: string;
+    /** fills as defined by the Nexa gateway. */
+    readonly fills?: ReadonlyArray<DesignPaint> | null;
     /** font as defined by the Nexa gateway. */
     readonly font?: DesignFontBinding | null;
     /** italic as defined by the Nexa gateway. */
@@ -6680,6 +6686,8 @@ export interface DesignTextWindowPageShape {
     readonly occurrenceId: string;
     /** pageId as defined by the Nexa gateway. */
     readonly pageId: string;
+    /** rangeFills as defined by the Nexa gateway. */
+    readonly rangeFills?: true;
     /** revision as defined by the Nexa gateway. */
     readonly revision: string;
     /** runs as defined by the Nexa gateway. */
@@ -7481,6 +7489,8 @@ export interface GatewayFeaturesShape {
     readonly designTextInheritedPaint?: true;
     /** designTextPaintClipping as defined by the Nexa gateway. */
     readonly designTextPaintClipping?: true;
+    /** designTextRangeFills as defined by the Nexa gateway. */
+    readonly designTextRangeFills?: true;
     /** events as defined by the Nexa gateway. */
     readonly events: ReadonlyArray<string>;
     /** jsonReplies as defined by the Nexa gateway. */

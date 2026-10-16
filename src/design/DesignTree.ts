@@ -6,6 +6,8 @@ import {
     DesignTokenCategory,
     type DesignDocument,
     type DesignNode,
+    type DesignPaint,
+    type DesignTextRun,
 } from './DesignTypes.js';
 import { DesignVariantTree } from './DesignVariantTree.js';
 import { DesignComponentTargets } from './DesignComponentTargets.js';
@@ -93,6 +95,9 @@ export class DesignTree {
             }
             for (const paint of [
                 ...node.style.fills,
+                ...(node.text?.runs.flatMap(
+                    (run: DesignTextRun): readonly DesignPaint[] => run.fills ?? [],
+                ) ?? []),
                 ...(node.style.stroke === null ? [] : [node.style.stroke.paint]),
             ]) {
                 if (

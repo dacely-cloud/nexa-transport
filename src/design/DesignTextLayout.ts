@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { DesignText, DesignTextRun } from './DesignTypes.js';
+import type { DesignPaint, DesignText, DesignTextRun } from './DesignTypes.js';
 import type { DesignFontBinding } from './DesignFontTypes.js';
 import { DesignFontBindings } from './DesignFontBindings.js';
 import type { DesignResolvedTextDirection } from './DesignTextDirection.js';
@@ -16,6 +16,8 @@ import {
 
 /** Resolved style of a contiguous rich-text range. */
 export interface DesignTextSpanStyle {
+    /** Native paint stacks keep their whole-layer coordinates while glyph windows remain bounded. */
+    readonly fills?: readonly DesignPaint[] | null;
     readonly direction?: DesignResolvedTextDirection;
     /** A bound style selects exactly the saved face instead of an available system family. */
     readonly font?: DesignFontBinding | null;

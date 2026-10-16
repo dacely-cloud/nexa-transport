@@ -102,13 +102,36 @@ test('positioned chunks share the entire text element gradient bounds', async ()
     expect(second.text?.content).toBe('AAAA');
 });
 
-test('different gradient ranges reject atomically instead of replacing editable source with paths', async (): Promise<void> => {
-    await expect(
-        labels('<text fill="url(#paint)">A<tspan fill="url(#other)">B</tspan></text>'),
-    ).rejects.toThrow('multiple gradient');
-    await expect(
-        labels('<text fill="url(#paint)">A<tspan fill-opacity=".5">B</tspan></text>'),
-    ).rejects.toThrow('multiple gradient');
+test('independent gradient ranges retain editable source, separate colors and paint opacity', async (): Promise<void> => {
+    const independent: DesignNode | undefined = (
+        await labels('<text fill="url(#paint)">A<tspan fill="url(#other)">B</tspan></text>')
+    )[0];
+    expect(independent).toMatchObject({
+        kind: 'text',
+        path: [],
+        text: {
+            content: 'AB',
+            runs: [{ start: 1, end: 2, color: null, fills: [{ kind: 'linear', opacity: 1 }] }],
+        },
+    });
+    expect(independent?.text?.runs[0]?.fills?.[0]?.stops).not.toEqual(
+        independent?.style.fills[0]?.stops,
+    );
+    const translucent: DesignNode | undefined = (
+        await labels('<text fill="url(#paint)">A<tspan fill-opacity=".5">B</tspan></text>')
+    )[0];
+    expect(translucent).toMatchObject({
+        kind: 'text',
+        path: [],
+        text: {
+            content: 'AB',
+            runs: [{ start: 1, end: 2, color: null, fills: [{ kind: 'linear', opacity: 1 }] }],
+        },
+    });
+    expect(translucent?.text?.runs[0]?.fills?.[0]?.stops).toEqual([
+        { offset: 0, color: '#FF000080' },
+        { offset: 1, color: '#0000FF80' },
+    ]);
 });
 
 test.each(['start', 'middle', 'end'])(

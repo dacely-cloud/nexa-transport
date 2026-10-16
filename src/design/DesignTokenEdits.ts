@@ -15,6 +15,7 @@ import type {
     DesignPaint,
     DesignStyle,
     DesignOverride,
+    DesignTextRun,
 } from './DesignTypes.js';
 
 /** Single-token edits preserve linked artwork and detach deleted colors at their last resolved value. */
@@ -112,6 +113,11 @@ export class DesignTokenEdits {
         };
         for (const node of document.nodes) {
             style(node.style);
+            for (const run of node.text?.runs ?? []) {
+                for (const paint of run.fills ?? []) {
+                    inspect(paint);
+                }
+            }
             for (const override of node.overrides) {
                 if (override.style !== null) {
                     style(override.style);
@@ -136,10 +142,36 @@ export class DesignTokenEdits {
                 return { ...override, style: next };
             },
         );
-        const text: DesignText | null =
+        let text: DesignText | null =
             node.text?.typographyStyle?.tokenId === token.id
                 ? { ...node.text, typographyStyle: null }
                 : node.text;
+        if (text !== null) {
+            const runs: readonly DesignTextRun[] = text.runs.map(
+                (run: DesignTextRun): DesignTextRun => {
+                    if (run.fills == null) {
+                        return run;
+                    }
+                    const fills: readonly DesignPaint[] = run.fills.map(
+                        (paint: DesignPaint): DesignPaint =>
+                            paint.tokenId === token.id
+                                ? { ...paint, tokenId: null, color: token.value }
+                                : paint,
+                    );
+                    return fills.every(
+                        (paint: DesignPaint, index: number): boolean =>
+                            paint === run.fills?.[index],
+                    )
+                        ? run
+                        : { ...run, fills };
+                },
+            );
+            if (
+                runs.some((run: DesignTextRun, index: number): boolean => run !== text?.runs[index])
+            ) {
+                text = { ...text, runs };
+            }
+        }
         return changed || text !== node.text ? { ...node, style, overrides, text } : node;
     }
     static #style(style: DesignStyle, token: DesignToken): DesignStyle {

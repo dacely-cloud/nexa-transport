@@ -221,6 +221,8 @@ const files: readonly string[] = [
     'DesignLayoutPreviewCodec',
     'DesignLayoutEdits',
     'DesignTextStyles',
+    'DesignTextFills',
+    'DesignSvgGradientBudget',
     'DesignTextStyleChangesCodec',
     'DesignTextStyleEdits',
     'DesignTypographyChangesCodec',
@@ -334,6 +336,9 @@ for (const testName of [
     'DesignTextPaintInheritance',
     'DesignSvgTextPaintImport',
     'DesignSvgTextStrokeImport',
+    'DesignTextRangeFills',
+    'DesignTextRangeFillsIntegration',
+    'DesignSvgGradientBudget',
 ]) {
     const runTestPath: string = 'test/' + testName + '.test.ts';
     const runTestFormat: Options = (await resolveConfig(runTestPath)) ?? {};

@@ -224,6 +224,7 @@ export class DesignStyleCodec {
                     entry,
                     [
                         'font',
+                        'fills',
                         'start',
                         'end',
                         'family',
@@ -235,7 +236,20 @@ export class DesignStyleCodec {
                     ],
                     ['start', 'end', 'family', 'size', 'weight', 'italic', 'color', 'underline'],
                 );
+                if (run['fills'] != null && run['color'] !== null) {
+                    throw new Error('Choose range fills or a solid range color, not both.');
+                }
                 return {
+                    ...(Object.hasOwn(run, 'fills')
+                        ? {
+                              fills:
+                                  run['fills'] === null
+                                      ? null
+                                      : V.list(run['fills'], 8, (paint: unknown): DesignPaint =>
+                                            this.paint(paint),
+                                        ),
+                          }
+                        : {}),
                     ...(Object.hasOwn(run, 'font')
                         ? { font: DesignFontCodec.binding(run['font']) }
                         : {}),

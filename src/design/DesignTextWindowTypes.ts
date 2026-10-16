@@ -44,6 +44,8 @@ export interface DesignTextWindowRun {
 
 /** A window response never includes the source string; continuation keeps the same revision and selectors. */
 export interface DesignTextWindowPage {
+    /** Whole-layer paint ordering stays stable even when this window has only inherited ranges. */
+    readonly rangeFills?: true;
     readonly id: string;
     readonly revision: string;
     readonly pageId: string;
