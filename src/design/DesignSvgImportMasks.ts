@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignSvgInputError } from './DesignSvgInputError.js';
 import type { DesignSvgElement } from './DesignSvgXml.js';
 import type { DesignSvgLayerContext } from './DesignSvgImportContext.js';
 import { DesignSvgReferences } from './DesignSvgReferences.js';
@@ -40,11 +41,11 @@ export class DesignSvgImportMasks {
         }
         const id: string = DesignSvgReferences.paint(expression);
         if (context.references.includes(id) || context.references.length >= 32) {
-            throw new Error('SVG mask reference is cyclic or too deep.');
+            throw new DesignSvgInputError('SVG mask reference is cyclic or too deep.');
         }
         const definition: DesignSvgElement | undefined = this.elements.get(id);
         if (definition === undefined || definition.name !== 'mask') {
-            throw new Error('SVG mask not found: ' + id);
+            throw new DesignSvgInputError('SVG mask not found: ' + id);
         }
         const bounds: DesignSvgSourceBounds | null =
             context.referenceBox ??
@@ -59,7 +60,7 @@ export class DesignSvgImportMasks {
             !['userSpaceOnUse', 'objectBoundingBox'].includes(contentUnits) ||
             !['userSpaceOnUse', 'objectBoundingBox'].includes(regionUnits)
         ) {
-            throw new Error('Unsupported SVG mask coordinate units.');
+            throw new DesignSvgInputError('Unsupported SVG mask coordinate units.');
         }
         const style: Readonly<Record<string, string>> = this.styles.definition(definition);
         const source: string | null = await this.render(definition, {
@@ -77,7 +78,7 @@ export class DesignSvgImportMasks {
             references: [...context.references, id],
         });
         if (source === null) {
-            throw new Error('Missing SVG mask source.');
+            throw new DesignSvgInputError('Missing SVG mask source.');
         }
         const object: boolean = regionUnits === 'objectBoundingBox';
         const x: number = DesignSvgNumbers.length(
@@ -107,7 +108,7 @@ export class DesignSvgImportMasks {
                 ? (style['mask-type'] ?? 'luminance')
                 : context.style['mask-mode'];
         if (interpretation !== 'alpha' && interpretation !== 'luminance') {
-            throw new Error('Unsupported SVG mask interpretation.');
+            throw new DesignSvgInputError('Unsupported SVG mask interpretation.');
         }
         const mode: DesignMaskMode = interpretation;
         this.masks.wrap(targetId, source, mode);

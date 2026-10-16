@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignSvgInputError } from './DesignSvgInputError.js';
 import type { DesignSvgElement } from './DesignSvgXml.js';
 import { DesignSvgCss } from './DesignSvgCss.js';
 import { DesignSvgImportLabel, type DesignSvgTextContext } from './DesignSvgImportLabel.js';
@@ -103,7 +104,7 @@ export class DesignSvgImportText {
         const fonts: DesignFontEngine = await this.fonts.engine();
         const factor: number | null = T.strokeScale(context.matrix);
         if (factor === null) {
-            throw new Error('SVG text requires a uniform editable transform.');
+            throw new DesignSvgInputError('SVG text requires a uniform editable transform.');
         }
         for (const chunk of chunks) {
             x = chunk.x ?? x;

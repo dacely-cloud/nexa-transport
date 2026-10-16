@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignSvgInputError } from './DesignSvgInputError.js';
 import { DesignSvgCss } from './DesignSvgCss.js';
 import type { DesignSvgElement } from './DesignSvgXml.js';
 import { DesignSvgNumbers } from './DesignSvgNumbers.js';
@@ -129,7 +130,7 @@ export class DesignSvgImportTextStyles {
         );
         const italic: string = style['font-style'] ?? 'normal';
         if (!['normal', 'italic'].includes(italic)) {
-            throw new Error('Unsupported SVG font-style.');
+            throw new DesignSvgInputError('Unsupported SVG font-style.');
         }
         const fill: string = style['fill'] ?? '#000000';
         const color: string =
@@ -172,7 +173,7 @@ export class DesignSvgImportTextStyles {
             'font-feature-settings',
         ]) {
             if (element.attributes[name] !== undefined) {
-                throw new Error('Unsupported SVG text attribute ' + name + '.');
+                throw new DesignSvgInputError('Unsupported SVG text attribute ' + name + '.');
             }
         }
         const choices: Readonly<Record<string, readonly string[]>> = {
@@ -192,7 +193,7 @@ export class DesignSvgImportTextStyles {
         for (const [property, allowed] of Object.entries(choices)) {
             const value: string | undefined = style[property] ?? element.attributes[property];
             if (value !== undefined && !allowed.includes(value)) {
-                throw new Error('Unsupported SVG text ' + property + '.');
+                throw new DesignSvgInputError('Unsupported SVG text ' + property + '.');
             }
         }
     }

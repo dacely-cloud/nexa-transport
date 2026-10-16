@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignSvgInputError } from './DesignSvgInputError.js';
 /** CSS named-color values are fixed facts from https://www.w3.org/TR/css-color-4/#named-colors. */
 const names: Readonly<Record<string, string>> = Object.freeze({
     aliceblue: '#F0F8FF',
@@ -182,11 +183,11 @@ export class DesignSvgColors {
         const kind: string | undefined = match?.[1];
         const raw: string | undefined = match?.[2];
         if (kind === undefined || raw === undefined) {
-            throw new Error('Unsupported SVG color ' + source);
+            throw new DesignSvgInputError('Unsupported SVG color ' + source);
         }
         const parts: readonly string[] = raw.trim().split(/\s*[,/]\s*|\s+/u);
         if (parts.length !== 3 && parts.length !== 4) {
-            throw new Error('Invalid SVG color ' + source);
+            throw new DesignSvgInputError('Invalid SVG color ' + source);
         }
         const alpha: number = this.#channel(parts[3] ?? '1', 1);
         let rgb: readonly number[];
@@ -227,12 +228,12 @@ export class DesignSvgColors {
     }
     static #channel(value: string, maximum: number): number {
         if (!/^[+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?%?$/u.test(value)) {
-            throw new Error('Invalid SVG color channel.');
+            throw new DesignSvgInputError('Invalid SVG color channel.');
         }
         const percent: boolean = value.endsWith('%');
         const channel: number = Number(percent ? value.slice(0, -1) : value);
         if (value === '' || !Number.isFinite(channel)) {
-            throw new Error('Invalid SVG color channel.');
+            throw new DesignSvgInputError('Invalid SVG color channel.');
         }
         return Math.max(0, Math.min(maximum, percent ? (channel * maximum) / 100 : channel));
     }
@@ -242,7 +243,7 @@ export class DesignSvgColors {
         const value: number = Number(match?.[1]);
         const unit: string = match?.[2] ?? 'deg';
         if (match === null || !Number.isFinite(value)) {
-            throw new Error('Invalid SVG hue.');
+            throw new DesignSvgInputError('Invalid SVG hue.');
         }
         const angle: number =
             value *

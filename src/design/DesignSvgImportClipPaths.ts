@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignSvgInputError } from './DesignSvgInputError.js';
 import type { DesignSvgElement } from './DesignSvgXml.js';
 import { DesignSvgNumbers } from './DesignSvgNumbers.js';
 import { DesignSvgReferences } from './DesignSvgReferences.js';
@@ -53,11 +54,11 @@ export class DesignSvgImportClipPaths {
         }
         const id: string = DesignSvgReferences.paint(source);
         if (chain.includes(id) || chain.length >= 32) {
-            throw new Error('SVG clip reference is cyclic or too deep.');
+            throw new DesignSvgInputError('SVG clip reference is cyclic or too deep.');
         }
         const definition: DesignSvgElement | undefined = this.elements.get(id);
         if (definition === undefined || definition.name !== 'clipPath') {
-            throw new Error('SVG clipPath not found: ' + id);
+            throw new DesignSvgInputError('SVG clipPath not found: ' + id);
         }
         const style: Readonly<Record<string, string>> = this.#styles.definition(definition);
         const units: string = definition.attributes['clipPathUnits'] ?? 'userSpaceOnUse';
@@ -77,7 +78,7 @@ export class DesignSvgImportClipPaths {
             }
             map = { a: bounds.width, b: 0, c: 0, d: bounds.height, e: bounds.x, f: bounds.y };
         } else if (units !== 'userSpaceOnUse') {
-            throw new Error('Unsupported SVG clipPathUnits.');
+            throw new DesignSvgInputError('Unsupported SVG clipPathUnits.');
         }
         const matrix: DesignSvgMatrix = T.multiply(
             context.matrix,
@@ -155,11 +156,11 @@ export class DesignSvgImportClipPaths {
                 element.attributes['href'] ?? element.attributes['xlink:href'] ?? '',
             );
             if (uses.has(id) || uses.size >= 32) {
-                throw new Error('SVG clip use reference is cyclic or too deep.');
+                throw new DesignSvgInputError('SVG clip use reference is cyclic or too deep.');
             }
             const referenced: DesignSvgElement | undefined = this.elements.get(id);
             if (referenced === undefined) {
-                throw new Error('SVG clip use element not found: ' + id);
+                throw new DesignSvgInputError('SVG clip use element not found: ' + id);
             }
             const offset: DesignSvgMatrix = {
                 ...T.identity,
@@ -187,7 +188,7 @@ export class DesignSvgImportClipPaths {
                 element.name,
             )
         ) {
-            throw new Error('Unsupported SVG clip content ' + element.name);
+            throw new DesignSvgInputError('Unsupported SVG clip content ' + element.name);
         }
         const data: string = DesignSvgShapePaths.data(
             { ...element, attributes: { ...element.attributes, ...style } },
@@ -196,7 +197,7 @@ export class DesignSvgImportClipPaths {
         );
         const rule: string = style['clip-rule'] ?? 'nonzero';
         if (rule !== 'nonzero' && rule !== 'evenodd') {
-            throw new Error('Unsupported SVG clip-rule.');
+            throw new DesignSvgInputError('Unsupported SVG clip-rule.');
         }
         const geometry: DesignSvgImportedGeometry | null = await DesignSvgImportGeometry.convert(
             data,

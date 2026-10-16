@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignSvgInputError } from './DesignSvgInputError.js';
 import { DesignSvgNumbers } from './DesignSvgNumbers.js';
 
 /** SVG's six affine coefficients map points without relying on a platform DOMMatrix. */
@@ -48,7 +49,7 @@ export class DesignSvgTransforms {
                 (value: number): boolean => !Number.isFinite(value) || Math.abs(value) > 1e9,
             )
         ) {
-            throw new Error('SVG transform exceeds its coordinate range.');
+            throw new DesignSvgInputError('SVG transform exceeds its coordinate range.');
         }
         return matrix;
     }
@@ -61,13 +62,13 @@ export class DesignSvgTransforms {
         let count: number = 0;
         while (rest.length > 0) {
             if (++count > 128) {
-                throw new Error('SVG transform list exceeds its budget.');
+                throw new DesignSvgInputError('SVG transform list exceeds its budget.');
             }
             const match: RegExpMatchArray | null = /^([A-Za-z]+)\s*\(([^()]*)\)/u.exec(rest);
             const name: string | undefined = match?.[1];
             const raw: string | undefined = match?.[2];
             if (match === null || name === undefined || raw === undefined) {
-                throw new Error('Invalid SVG transform ' + rest.slice(0, 40));
+                throw new DesignSvgInputError('Invalid SVG transform ' + rest.slice(0, 40));
             }
             const values: readonly number[] = DesignSvgNumbers.list(raw, 6);
             const x: number = values[0] ?? 0;
@@ -107,14 +108,16 @@ export class DesignSvgTransforms {
                         ? { ...this.identity, c: slope }
                         : { ...this.identity, b: slope };
             } else {
-                throw new Error('Unsupported SVG transform or argument count: ' + name);
+                throw new DesignSvgInputError(
+                    'Unsupported SVG transform or argument count: ' + name,
+                );
             }
             matrix = this.multiply(matrix, local);
             rest = rest.slice(match[0].length).trimStart();
             if (rest.startsWith(',')) {
                 rest = rest.slice(1).trimStart();
                 if (rest.length === 0) {
-                    throw new Error('Trailing SVG transform separator.');
+                    throw new DesignSvgInputError('Trailing SVG transform separator.');
                 }
             }
         }
@@ -128,7 +131,9 @@ export class DesignSvgTransforms {
         aspect: string = 'xMidYMid meet',
     ): DesignSvgViewport {
         if (width <= 0 || height <= 0 || width > 100000 || height > 100000) {
-            throw new Error('SVG viewport dimensions must be positive and at most 100000.');
+            throw new DesignSvgInputError(
+                'SVG viewport dimensions must be positive and at most 100000.',
+            );
         }
         if (viewBox === undefined) {
             return { width, height, matrix: this.identity };
@@ -139,7 +144,7 @@ export class DesignSvgTransforms {
         const boxWidth: number = values[2] ?? 0;
         const boxHeight: number = values[3] ?? 0;
         if (values.length !== 4 || boxWidth <= 0 || boxHeight <= 0) {
-            throw new Error('Invalid SVG viewBox.');
+            throw new DesignSvgInputError('Invalid SVG viewBox.');
         }
         const parts: readonly string[] = aspect.trim().split(/\s+/u);
         const align: string = parts[0] ?? '';
@@ -149,7 +154,7 @@ export class DesignSvgTransforms {
             !['meet', 'slice'].includes(mode) ||
             (align !== 'none' && !/^x(?:Min|Mid|Max)Y(?:Min|Mid|Max)$/u.test(align))
         ) {
-            throw new Error('Unsupported SVG preserveAspectRatio.');
+            throw new DesignSvgInputError('Unsupported SVG preserveAspectRatio.');
         }
         let x: number = width / boxWidth;
         let y: number = height / boxHeight;
@@ -191,7 +196,7 @@ export class DesignSvgTransforms {
     public static inverse(matrix: DesignSvgMatrix): DesignSvgMatrix {
         const determinant: number = matrix.a * matrix.d - matrix.b * matrix.c;
         if (Math.abs(determinant) < 1e-20) {
-            throw new Error('SVG transform is singular.');
+            throw new DesignSvgInputError('SVG transform is singular.');
         }
         return {
             a: matrix.d / determinant,

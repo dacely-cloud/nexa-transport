@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignSvgInputError } from './DesignSvgInputError.js';
 import type { DesignFontEngine, DesignFontMetrics } from './DesignFontEngine.js';
 import type { DesignTextSpanStyle } from './DesignTextLayout.js';
 
@@ -47,7 +48,7 @@ export class DesignSvgTextBaseline {
             case DesignSvgBaseline.Mathematical:
                 return ascent / 2;
             default:
-                throw new Error('Unsupported SVG dominant-baseline.');
+                throw new DesignSvgInputError('Unsupported SVG dominant-baseline.');
         }
     }
 }

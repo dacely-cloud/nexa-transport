@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { XmlReader } from './XmlReader.js';
+import { DesignSvgInputError } from './DesignSvgInputError.js';
 
 /** Inert SVG data; imported markup never enters the browser DOM. */
 export interface DesignSvgElement {
@@ -17,13 +18,21 @@ export class DesignSvgXml {
     public constructor(public readonly source: string) {}
     /** Requires a complete SVG document and its standard namespace when declared. */
     public parse(): DesignSvgElement {
-        const root: DesignSvgElement = new XmlReader(this.source).parse();
+        let root: DesignSvgElement;
+        try {
+            root = new XmlReader(this.source).parse();
+        } catch (error: unknown) {
+            if (error instanceof SyntaxError) {
+                throw new DesignSvgInputError(error.message);
+            }
+            throw error;
+        }
         if (root.name !== 'svg') {
-            throw new Error('Expected an svg root');
+            throw new DesignSvgInputError('Expected an svg root');
         }
         const namespace: string | undefined = root.attributes['xmlns'];
         if (namespace !== undefined && namespace !== 'http://www.w3.org/2000/svg') {
-            throw new Error('Unsupported SVG namespace');
+            throw new DesignSvgInputError('Unsupported SVG namespace');
         }
         return root;
     }

@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignSvgInputError } from './DesignSvgInputError.js';
 import { DesignSvgImportAppearance as Appearance } from './DesignSvgImportAppearance.js';
 import { DesignSvgNumbers } from './DesignSvgNumbers.js';
 import type { DesignSvgImportPaints, DesignSvgPaintContext } from './DesignSvgImportPaints.js';
@@ -28,7 +29,7 @@ export class DesignSvgImportStroke {
     ): DesignSvgStrokeSource | null {
         const width: number = length(style['stroke-width'] ?? '1');
         if (width < 0) {
-            throw new Error('SVG stroke width must be nonnegative.');
+            throw new DesignSvgInputError('SVG stroke width must be nonnegative.');
         }
         const raw: string = (style['stroke-dasharray'] ?? 'none').trim();
         const dash: readonly number[] =
@@ -39,11 +40,11 @@ export class DesignSvgImportStroke {
                       16,
                   );
         if (dash.some((value: number): boolean => value < 0.01)) {
-            throw new Error('SVG dash lengths must be at least 0.01.');
+            throw new DesignSvgInputError('SVG dash lengths must be at least 0.01.');
         }
         const miterLimit: number = DesignSvgNumbers.length(style['stroke-miterlimit'] ?? '4', 1);
         if (miterLimit < 1) {
-            throw new Error('SVG miter limit must be at least one.');
+            throw new DesignSvgInputError('SVG miter limit must be at least one.');
         }
         const source: string = (style['stroke'] ?? 'none').trim();
         return source === 'none'

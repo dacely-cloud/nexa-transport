@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignSvgInputError } from './DesignSvgInputError.js';
 import type { DesignSvgElement } from './DesignSvgXml.js';
 import type { DesignSvgShapeContext } from './DesignSvgImportShape.js';
 import { DesignSvgCss } from './DesignSvgCss.js';
@@ -81,7 +82,7 @@ export class DesignSvgImportLabel {
             factor === null ||
             context.matrix.a * context.matrix.d - context.matrix.b * context.matrix.c < 0
         ) {
-            throw new Error(
+            throw new DesignSvgInputError(
                 'SVG text skew, reflection and nonuniform scaling require native affine text support.',
             );
         }
@@ -89,14 +90,14 @@ export class DesignSvgImportLabel {
         const spacing: number = this.#spacing(style, base.size, styles.rootSize);
         const anchor: string = style['text-anchor'] ?? 'start';
         if (!['start', 'middle', 'end'].includes(anchor)) {
-            throw new Error('Unsupported SVG text-anchor.');
+            throw new DesignSvgInputError('Unsupported SVG text-anchor.');
         }
         let space: string = 'default';
         for (const ancestor of [...context.ancestors, element]) {
             space = ancestor.attributes['xml:space'] ?? space;
         }
         if (!['default', 'preserve'].includes(space)) {
-            throw new Error('Unsupported SVG xml:space.');
+            throw new DesignSvgInputError('Unsupported SVG xml:space.');
         }
         const parts: TextPart[] = [];
         const viewport: number = Math.hypot(context.width, context.height) / Math.SQRT2;
@@ -145,7 +146,7 @@ export class DesignSvgImportLabel {
             return null;
         }
         if (content.length > 100000) {
-            throw new Error('SVG text exceeds the native text layer budget.');
+            throw new DesignSvgInputError('SVG text exceeds the native text layer budget.');
         }
         const runs: DesignTextRun[] = [];
         const ranges: DesignSvgTextPaintRange[] = [];
@@ -201,7 +202,7 @@ export class DesignSvgImportLabel {
                     DesignSvgTextBaseline.offset(part.baseline, part.style, fonts) - baseline,
                 ) > 0.000001
             ) {
-                throw new Error(
+                throw new DesignSvgInputError(
                     'SVG rich span baseline changes require independent editable text chunks.',
                 );
             }
@@ -213,7 +214,7 @@ export class DesignSvgImportLabel {
             Infinity,
             (span: DesignTextSpanStyle, value: string): number => {
                 if (!fonts.supports(span)) {
-                    throw new Error(
+                    throw new DesignSvgInputError(
                         'SVG text requires an available exact font face: ' +
                             span.family +
                             '. Use Inter or import the label separately with its workspace font.',
@@ -225,11 +226,11 @@ export class DesignSvgImportLabel {
         );
         const line: DesignTextLine | undefined = lines[0];
         if (line === undefined || lines.length !== 1) {
-            throw new Error('SVG text requires one baseline per editable label.');
+            throw new DesignSvgInputError('SVG text requires one baseline per editable label.');
         }
         const advance: number = line.width + spacing;
         if (advance <= 0) {
-            throw new Error(
+            throw new DesignSvgInputError(
                 'SVG tracking reverses the text advance; native overlapping text support is required.',
             );
         }
@@ -350,13 +351,13 @@ export class DesignSvgImportLabel {
                 (style['direction'] ?? 'ltr') !== context.direction ||
                 (style['unicode-bidi'] ?? 'normal') !== context.bidi
             ) {
-                throw new Error(
+                throw new DesignSvgInputError(
                     'SVG inline direction changes require independent native directional ranges.',
                 );
             }
             for (const property of ['x', 'y', 'dx', 'dy', 'transform', 'clip-path', 'mask']) {
                 if (style[property] !== undefined || element.attributes[property] !== undefined) {
-                    throw new Error(
+                    throw new DesignSvgInputError(
                         'Positioned or transformed SVG tspan requires independent editable baseline support.',
                     );
                 }
@@ -365,7 +366,9 @@ export class DesignSvgImportLabel {
                 (style['text-anchor'] ?? 'start') !== context.anchor ||
                 (style['visibility'] ?? 'visible') !== context.visibility
             ) {
-                throw new Error('SVG tspan text-anchor changes require separate text chunks.');
+                throw new DesignSvgInputError(
+                    'SVG tspan text-anchor changes require separate text chunks.',
+                );
             }
             if (
                 Appearance.opacity(style['opacity']) !== 1 ||
@@ -373,7 +376,7 @@ export class DesignSvgImportLabel {
                     context.spacing ||
                 (element.attributes['xml:space'] ?? context.space) !== context.space
             ) {
-                throw new Error(
+                throw new DesignSvgInputError(
                     'SVG tspan spacing and opacity changes require separate text chunks.',
                 );
             }
@@ -420,13 +423,15 @@ export class DesignSvgImportLabel {
                 );
                 this.#parts(child, resolved, [...ancestors, element], context, parts, false);
             } else if (!['title', 'desc', 'metadata'].includes(child.name)) {
-                throw new Error('Unsupported SVG text child ' + child.name + '.');
+                throw new DesignSvgInputError('Unsupported SVG text child ' + child.name + '.');
             }
         }
     }
     #spacing(style: Readonly<Record<string, string>>, size: number, rootSize: number): number {
         if (style['letter-spacing']?.trim().endsWith('%')) {
-            throw new Error('SVG percentage tracking requires per-glyph spacing support.');
+            throw new DesignSvgInputError(
+                'SVG percentage tracking requires per-glyph spacing support.',
+            );
         }
         return style['letter-spacing'] === undefined || style['letter-spacing'] === 'normal'
             ? 0

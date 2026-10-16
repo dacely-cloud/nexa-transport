@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignSvgInputError } from './DesignSvgInputError.js';
 import { DesignSvgColors } from './DesignSvgColors.js';
 import type { DesignSvgElement } from './DesignSvgXml.js';
 
@@ -188,7 +189,7 @@ export class DesignSvgCss {
             const property: string = match?.[1]?.toLowerCase() ?? '';
             const value: string = match?.[2] ?? '';
             if (!allowed.has(property) || value.length === 0) {
-                throw new Error('Unsupported SVG style property ' + property);
+                throw new DesignSvgInputError('Unsupported SVG style property ' + property);
             }
             const important: boolean = /\s*!important\s*$/iu.test(value);
             output.push({
@@ -197,7 +198,7 @@ export class DesignSvgCss {
                 important,
             });
             if (output.length > 128) {
-                throw new Error('SVG style declaration budget exceeded.');
+                throw new DesignSvgInputError('SVG style declaration budget exceeded.');
             }
         };
         for (let index: number = 0; index <= source.length; index++) {
@@ -214,7 +215,7 @@ export class DesignSvgCss {
                 depth++;
             } else if (char === ')') {
                 if (--depth < 0) {
-                    throw new Error('Unbalanced SVG style value.');
+                    throw new DesignSvgInputError('Unbalanced SVG style value.');
                 }
             } else if (char === ';' && depth === 0) {
                 append(source.slice(start, index));
@@ -222,14 +223,14 @@ export class DesignSvgCss {
             }
         }
         if (quote !== '' || depth !== 0) {
-            throw new Error('Unclosed SVG style value.');
+            throw new DesignSvgInputError('Unclosed SVG style value.');
         }
         return output;
     }
     /** Font admission and ordinary selectors share the same inert comment handling. */
     public static clean(source: string): string {
         if (/\/\*(?:(?!\*\/)[\s\S])*$/u.test(source)) {
-            throw new Error('Unclosed SVG CSS comment.');
+            throw new DesignSvgInputError('Unclosed SVG CSS comment.');
         }
         return source.replace(/\/\*[\s\S]*?\*\//gu, '').trim();
     }
@@ -240,19 +241,19 @@ export class DesignSvgCss {
             const selectors: string | undefined = match?.[1];
             const body: string | undefined = match?.[2];
             if (match === null || selectors === undefined || body === undefined) {
-                throw new Error('Unsupported SVG stylesheet syntax.');
+                throw new DesignSvgInputError('Unsupported SVG stylesheet syntax.');
             }
             const declarations: readonly DesignSvgDeclaration[] = DesignSvgCss.declarations(body);
             for (const value of selectors.split(',')) {
                 const selector: string = value.trim();
                 if (!/^(?:[A-Za-z_*]|[.#])[A-Za-z0-9_.#* >-]*$/u.test(selector)) {
-                    throw new Error('Unsupported SVG CSS selector ' + selector);
+                    throw new DesignSvgInputError('Unsupported SVG CSS selector ' + selector);
                 }
                 const tokens: readonly string[] = selector
                     .replace(/\s*>\s*/gu, ' > ')
                     .split(/\s+/u);
                 if (tokens.length > 64 || tokens[0] === '>' || tokens.at(-1) === '>') {
-                    throw new Error('Invalid SVG CSS selector.');
+                    throw new DesignSvgInputError('Invalid SVG CSS selector.');
                 }
                 const ids: number = selector.match(/#/gu)?.length ?? 0;
                 const classes: number = selector.match(/\./gu)?.length ?? 0;
@@ -265,7 +266,7 @@ export class DesignSvgCss {
                     declarations,
                 });
                 if (this.#rules.length > 2000) {
-                    throw new Error('SVG stylesheet exceeds its rule budget.');
+                    throw new DesignSvgInputError('SVG stylesheet exceeds its rule budget.');
                 }
             }
             rest = rest.slice(match[0].length).trimStart();
@@ -292,7 +293,7 @@ export class DesignSvgCss {
                 return cached;
             }
             if (++this.#comparisons > 10000000) {
-                throw new Error('SVG CSS matching exceeds its import budget.');
+                throw new DesignSvgInputError('SVG CSS matching exceeds its import budget.');
             }
             const target: DesignSvgElement | undefined = chain[depth];
             const token: string | undefined = tokens[index];

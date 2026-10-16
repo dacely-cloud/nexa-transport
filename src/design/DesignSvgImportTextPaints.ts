@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignSvgInputError } from './DesignSvgInputError.js';
 import { DesignSvgImportPaints, type DesignSvgPaintContext } from './DesignSvgImportPaints.js';
 import { DesignSvgImportAppearance } from './DesignSvgImportAppearance.js';
 import type { DesignSvgSourceBounds } from './DesignSvgImportGeometry.js';
@@ -193,12 +194,14 @@ export class DesignSvgImportTextPaints {
             if (stroke === undefined) {
                 stroke = resolvedStroke;
             } else if (JSON.stringify(stroke) !== JSON.stringify(resolvedStroke)) {
-                throw new Error('SVG inline stroke changes require native rich stroke ranges.');
+                throw new DesignSvgInputError(
+                    'SVG inline stroke changes require native rich stroke ranges.',
+                );
             }
             const value: DesignPaint | null = values[index] ?? null;
             const inherited: boolean = JSON.stringify(value) === key;
             if (!inherited && value !== null && value.kind !== 'solid') {
-                throw new Error(
+                throw new DesignSvgInputError(
                     'SVG text with multiple gradient paints requires independent native rich paints.',
                 );
             }

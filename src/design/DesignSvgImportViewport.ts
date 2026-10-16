@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignSvgInputError } from './DesignSvgInputError.js';
 import type { DesignSvgElement } from './DesignSvgXml.js';
 import type { DesignSvgLayerContext } from './DesignSvgImportContext.js';
 import { DesignSvgNumbers } from './DesignSvgNumbers.js';
@@ -44,7 +45,7 @@ export class DesignSvgImportViewport {
             context.height,
         );
         if (width < 0 || height < 0) {
-            throw new Error('SVG viewport dimensions must be nonnegative.');
+            throw new DesignSvgInputError('SVG viewport dimensions must be nonnegative.');
         }
         if (width === 0 || height === 0) {
             return null;

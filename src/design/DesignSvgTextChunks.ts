@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignSvgInputError } from './DesignSvgInputError.js';
 import type { DesignSvgElement } from './DesignSvgXml.js';
 import type { DesignSvgTextContext } from './DesignSvgImportLabel.js';
 import { DesignSvgCss } from './DesignSvgCss.js';
@@ -42,7 +43,7 @@ export class DesignSvgTextChunks {
             space = parent.attributes['xml:space'] ?? space;
         }
         if (!['default', 'preserve'].includes(space)) {
-            throw new Error('Unsupported SVG xml:space.');
+            throw new DesignSvgInputError('Unsupported SVG xml:space.');
         }
         const visit: (
             node: DesignSvgElement,
@@ -57,7 +58,9 @@ export class DesignSvgTextChunks {
             const resolved: Readonly<Record<string, string>> = styles.resolve(node, ancestors);
             const tracking: string | undefined = resolved['letter-spacing'];
             if (tracking?.trim().endsWith('%')) {
-                throw new Error('SVG percentage tracking requires per-glyph spacing support.');
+                throw new DesignSvgInputError(
+                    'SVG percentage tracking requires per-glyph spacing support.',
+                );
             }
             const style: Readonly<Record<string, string>> = {
                 ...resolved,
@@ -78,7 +81,7 @@ export class DesignSvgTextChunks {
             if (!root) {
                 for (const property of ['dx', 'dy', 'transform', 'clip-path', 'mask']) {
                     if (style[property] !== undefined || node.attributes[property] !== undefined) {
-                        throw new Error(
+                        throw new DesignSvgInputError(
                             'SVG tspan ' +
                                 property +
                                 ' requires independent editable text support.',
@@ -89,7 +92,7 @@ export class DesignSvgTextChunks {
                     DesignSvgImportAppearance.opacity(style['opacity']) !== 1 ||
                     (node.attributes['xml:space'] ?? space) !== space
                 ) {
-                    throw new Error(
+                    throw new DesignSvgInputError(
                         'SVG tspan opacity and whitespace changes require separate text groups.',
                     );
                 }
@@ -127,7 +130,7 @@ export class DesignSvgTextChunks {
                 } else if (child.name === 'tspan') {
                     visit(child, [...ancestors, node], false);
                 } else if (!['title', 'desc', 'metadata'].includes(child.name)) {
-                    throw new Error('Unsupported SVG text child ' + child.name + '.');
+                    throw new DesignSvgInputError('Unsupported SVG text child ' + child.name + '.');
                 }
             }
         };
@@ -146,7 +149,7 @@ export class DesignSvgTextChunks {
                 0,
             ) > 100000
         ) {
-            throw new Error('SVG text exceeds the native text layer budget.');
+            throw new DesignSvgInputError('SVG text exceeds the native text layer budget.');
         }
         for (const part of parts) {
             let content: string =

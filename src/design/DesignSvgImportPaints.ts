@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignSvgInputError } from './DesignSvgInputError.js';
 import type { DesignPaint, DesignGradientStop } from './DesignTypes.js';
 import type { DesignGradientTransform } from './DesignGradientTypes.js';
 import { DesignDefaults } from './DesignDefaults.js';
@@ -52,6 +53,11 @@ export class DesignSvgImportPaints {
         );
         const id: string | undefined = reference?.[1];
         if (id === undefined) {
+            if (/^url\(/iu.test(source)) {
+                throw new DesignSvgInputError(
+                    'SVG paint references must stay within the imported document.',
+                );
+            }
             return {
                 ...DesignDefaults.paint(DesignSvgColors.parse(source, context.color)),
                 opacity,
@@ -60,7 +66,7 @@ export class DesignSvgImportPaints {
         const definition: SvgGradientDefinition = this.#definition(id, new Set());
         const a: Readonly<Record<string, string>> = definition.attributes;
         if (a['spreadMethod'] !== undefined && a['spreadMethod'] !== 'pad') {
-            throw new Error('SVG gradient spreadMethod requires pad.');
+            throw new DesignSvgInputError('SVG gradient spreadMethod requires pad.');
         }
         const stops: readonly DesignGradientStop[] = this.#stops(definition.stops, context.color);
         if (stops.length === 0) {
@@ -68,14 +74,14 @@ export class DesignSvgImportPaints {
         }
         const last: DesignGradientStop | undefined = stops.at(-1);
         if (last === undefined) {
-            throw new Error('Missing SVG gradient color.');
+            throw new DesignSvgInputError('Missing SVG gradient color.');
         }
         if (stops.length === 1) {
             return { ...DesignDefaults.paint(last.color), opacity };
         }
         const object: boolean = (a['gradientUnits'] ?? 'objectBoundingBox') === 'objectBoundingBox';
         if (!object && a['gradientUnits'] !== 'userSpaceOnUse') {
-            throw new Error('Unsupported SVG gradientUnits.');
+            throw new DesignSvgInputError('Unsupported SVG gradientUnits.');
         }
         if (object && (context.source.width <= 0 || context.source.height <= 0)) {
             return null;
@@ -122,12 +128,12 @@ export class DesignSvgImportPaints {
                 Math.abs(cy - fy) > 1e-8 ||
                 DesignSvgNumbers.length(a['fr'] ?? '0', 1) !== 0
             ) {
-                throw new Error(
+                throw new DesignSvgInputError(
                     'SVG radial gradients with an offset focal point are not supported yet.',
                 );
             }
             if (radius < 0) {
-                throw new Error('SVG radial gradient radius must be nonnegative.');
+                throw new DesignSvgInputError('SVG radial gradient radius must be nonnegative.');
             }
             if (radius === 0) {
                 return { ...DesignDefaults.paint(last.color), opacity };
@@ -146,7 +152,7 @@ export class DesignSvgImportPaints {
             }
             const determinant: number = matrix.a * matrix.d - matrix.b * matrix.c;
             if (Math.abs(determinant) < 1e-20) {
-                throw new Error('SVG gradient transform is singular.');
+                throw new DesignSvgInputError('SVG gradient transform is singular.');
             }
             // Linear paint coordinates are covectors: an affine map uses its inverse transpose.
             const nx: number = (matrix.d * dx - matrix.b * dy) / (determinant * length);
@@ -175,7 +181,7 @@ export class DesignSvgImportPaints {
     }
     #definition(id: string, visited: Set<string>): SvgGradientDefinition {
         if (visited.has(id) || visited.size > 64) {
-            throw new Error('SVG gradient reference is cyclic or too deep.');
+            throw new DesignSvgInputError('SVG gradient reference is cyclic or too deep.');
         }
         visited.add(id);
         const element: DesignSvgElement | undefined = this.elements.get(id);
@@ -183,7 +189,7 @@ export class DesignSvgImportPaints {
             element === undefined ||
             (element.name !== 'linearGradient' && element.name !== 'radialGradient')
         ) {
-            throw new Error('Missing SVG gradient ' + id);
+            throw new DesignSvgInputError('Missing SVG gradient ' + id);
         }
         const link: string | undefined =
             element.attributes['href'] ?? element.attributes['xlink:href'];
@@ -194,7 +200,9 @@ export class DesignSvgImportPaints {
                   ? this.#definition(link.slice(1), visited)
                   : null;
         if (link !== undefined && !link.startsWith('#')) {
-            throw new Error('SVG paint references must stay within the imported document.');
+            throw new DesignSvgInputError(
+                'SVG paint references must stay within the imported document.',
+            );
         }
         const stops: readonly DesignSvgElement[] = element.children.filter(
             (child): child is DesignSvgElement =>
@@ -211,7 +219,7 @@ export class DesignSvgImportPaints {
         fallbackColor: string,
     ): readonly DesignGradientStop[] {
         if (elements.length > 64) {
-            throw new Error('SVG gradient requires at most 64 stops.');
+            throw new DesignSvgInputError('SVG gradient requires at most 64 stops.');
         }
         let previous: number = 0;
         return elements.map((element: DesignSvgElement): DesignGradientStop => {

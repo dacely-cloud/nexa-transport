@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignSvgInputError } from './DesignSvgInputError.js';
 import { DesignSvgNumbers } from './DesignSvgNumbers.js';
 
 /** Validates complete SVG path grammar before the native parser can normalize malformed input. */
@@ -27,7 +28,7 @@ export class DesignSvgPathData {
         };
         space();
         if (!/[Mm]/u.test(source[offset] ?? '')) {
-            throw new Error('SVG paths must start with a move.');
+            throw new DesignSvgInputError('SVG paths must start with a move.');
         }
         while (offset < source.length) {
             space();
@@ -40,24 +41,24 @@ export class DesignSvgPathData {
                 offset++;
                 if (command === 'Z' || command === 'z') {
                     if (++count > 10000) {
-                        throw new Error('SVG path exceeds its command budget.');
+                        throw new DesignSvgInputError('SVG path exceeds its command budget.');
                     }
                     command = '';
                     continue;
                 }
             } else if (command === '') {
-                throw new Error('Expected an SVG path command.');
+                throw new DesignSvgInputError('Expected an SVG path command.');
             }
             const kind: string = command.toUpperCase();
             const length: number | undefined = lengths[kind];
             if (length === undefined) {
-                throw new Error('Unsupported SVG path command ' + command);
+                throw new DesignSvgInputError('Unsupported SVG path command ' + command);
             }
             for (let index: number = 0; index < length; index++) {
                 space();
                 if (source[offset] === ',') {
                     if (index === 0) {
-                        throw new Error('Unexpected SVG path separator.');
+                        throw new DesignSvgInputError('Unexpected SVG path separator.');
                     }
                     offset++;
                     space();
@@ -65,7 +66,7 @@ export class DesignSvgPathData {
                 if (kind === 'A' && (index === 3 || index === 4)) {
                     const flag: string = source[offset] ?? '';
                     if (flag !== '0' && flag !== '1') {
-                        throw new Error('SVG arc flags must be zero or one.');
+                        throw new DesignSvgInputError('SVG arc flags must be zero or one.');
                     }
                     offset++;
                     continue;
@@ -75,16 +76,16 @@ export class DesignSvgPathData {
                 );
                 const raw: string | undefined = match?.[0];
                 if (raw === undefined) {
-                    throw new Error('Missing SVG path coordinate.');
+                    throw new DesignSvgInputError('Missing SVG path coordinate.');
                 }
                 const value: number = Number(raw);
                 if (!Number.isFinite(value) || Math.abs(value) > 1000000) {
-                    throw new Error('SVG path coordinate exceeds its range.');
+                    throw new DesignSvgInputError('SVG path coordinate exceeds its range.');
                 }
                 offset += raw.length;
             }
             if (++count > 10000) {
-                throw new Error('SVG path exceeds its command budget.');
+                throw new DesignSvgInputError('SVG path exceeds its command budget.');
             }
             if (kind === 'M') {
                 command = command === 'M' ? 'L' : 'l';
@@ -94,7 +95,7 @@ export class DesignSvgPathData {
                 offset++;
                 space();
                 if (offset >= source.length || /[A-Za-z,]/u.test(source[offset] ?? '')) {
-                    throw new Error('Unexpected SVG path separator.');
+                    throw new DesignSvgInputError('Unexpected SVG path separator.');
                 }
             }
         }

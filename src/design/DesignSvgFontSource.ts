@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignSvgInputError } from './DesignSvgInputError.js';
 import { DesignSvgCss, type DesignSvgDeclaration } from './DesignSvgCss.js';
 import { DesignFontFamilyCodec } from './DesignFontFamilyCodec.js';
 import {
@@ -34,7 +35,7 @@ export class DesignSvgFontSource {
         const values: Record<string, string> = {};
         for (const declaration of descriptors) {
             if (declaration.important || Object.hasOwn(values, declaration.property)) {
-                throw new Error('Ambiguous SVG font-face descriptor.');
+                throw new DesignSvgInputError('Ambiguous SVG font-face descriptor.');
             }
             values[declaration.property] = declaration.value.trim();
         }
@@ -44,7 +45,7 @@ export class DesignSvgFontSource {
         );
         const style: string = values['font-style'] ?? 'normal';
         if (!['normal', 'italic'].includes(style)) {
-            throw new Error('Unsupported embedded SVG font style.');
+            throw new DesignSvgInputError('Unsupported embedded SVG font style.');
         }
         const italic: boolean = style === 'italic';
         const weights: readonly number[] = (values['font-weight'] ?? '400')
@@ -61,14 +62,14 @@ export class DesignSvgFontSource {
             ) ||
             maximum < minimum
         ) {
-            throw new Error('Invalid embedded SVG font weight range.');
+            throw new DesignSvgInputError('Invalid embedded SVG font weight range.');
         }
         const match: RegExpMatchArray | null =
             /^url\(\s*(['"]?)(data:font\/(woff2?|ttf|otf);base64,([A-Za-z0-9+/=\s]+))\1\s*\)(?:\s+format\(\s*(['"])(woff2?|truetype|opentype)\5\s*\))?$/iu.exec(
                 values['src'] ?? '',
             );
         if (match === null) {
-            throw new Error(
+            throw new DesignSvgInputError(
                 'SVG fonts require one embedded standalone font data URL; external URLs and local font lookup are unsupported.',
             );
         }
@@ -78,17 +79,17 @@ export class DesignSvgFontSource {
             declared !== undefined &&
             declared !== (format === 'ttf' ? 'truetype' : format === 'otf' ? 'opentype' : format)
         ) {
-            throw new Error('SVG font format declarations disagree.');
+            throw new DesignSvgInputError('SVG font format declarations disagree.');
         }
         const encoded: string = (match[4] ?? '').replace(/\s/gu, '');
         let decoded: string;
         try {
             decoded = atob(encoded);
         } catch {
-            throw new Error('Invalid embedded SVG font base64.');
+            throw new DesignSvgInputError('Invalid embedded SVG font base64.');
         }
         if (decoded.length < 12 || btoa(decoded) !== encoded) {
-            throw new Error('Embedded SVG font data must be canonical base64.');
+            throw new DesignSvgInputError('Embedded SVG font data must be canonical base64.');
         }
         const bytes: Uint8Array<ArrayBuffer> = Uint8Array.from(
             decoded,
@@ -104,11 +105,13 @@ export class DesignSvgFontSource {
                     ? 'otf'
                     : 'ttf';
         if (format !== actual) {
-            throw new Error('Embedded SVG font MIME does not match its bytes.');
+            throw new DesignSvgInputError('Embedded SVG font MIME does not match its bytes.');
         }
         const decodedBytes: number = DesignFontContainer.inspect(bytes);
         if (decodedBytes > remainingBytes) {
-            throw new Error('Embedded SVG fonts exceed the combined decompression budget.');
+            throw new DesignSvgInputError(
+                'Embedded SVG fonts exceed the combined decompression budget.',
+            );
         }
         const variations: string = values['font-variation-settings'] ?? 'normal';
         if (family.toLowerCase() === 'inter' && format === 'woff2') {
@@ -124,7 +127,7 @@ export class DesignSvgFontSource {
             }
         }
         if (variations !== 'normal') {
-            throw new Error(
+            throw new DesignSvgInputError(
                 'Embedded SVG font axes require supported exact native variation settings.',
             );
         }
@@ -143,7 +146,7 @@ export class DesignSvgFontSource {
         };
         const range: DesignFontWeightRange = engine.weightRange(span);
         if (minimum < range.minimum || maximum > range.maximum) {
-            throw new Error('Embedded SVG font weight range exceeds the exact face.');
+            throw new DesignSvgInputError('Embedded SVG font weight range exceeds the exact face.');
         }
         return { family, minimum, maximum, italic, decodedBytes, source };
     }

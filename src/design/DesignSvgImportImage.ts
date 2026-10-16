@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignSvgInputError } from './DesignSvgInputError.js';
 import type { DesignSvgElement } from './DesignSvgXml.js';
 import type { DesignSvgShapeContext } from './DesignSvgImportShape.js';
 import type { DesignSvgImageLoader } from './DesignSvgImageTypes.js';
@@ -47,11 +48,11 @@ export class DesignSvgImportImage {
         Appearance.validate(style, false, true);
         const overflow: string = style['overflow'] ?? 'hidden';
         if (!['hidden', 'visible', 'clip'].includes(overflow)) {
-            throw new Error('Unsupported SVG image overflow.');
+            throw new DesignSvgInputError('Unsupported SVG image overflow.');
         }
         for (const child of element.children) {
             if (typeof child !== 'string' && !['title', 'desc', 'metadata'].includes(child.name)) {
-                throw new Error('Unsupported content inside SVG image.');
+                throw new DesignSvgInputError('Unsupported content inside SVG image.');
             }
         }
         const rawWidth: string = style['width'] ?? element.attributes['width'] ?? 'auto';
@@ -64,17 +65,19 @@ export class DesignSvgImportImage {
             return null;
         }
         if ((width !== null && width < 0) || (height !== null && height < 0)) {
-            throw new Error('SVG image dimensions must be nonnegative.');
+            throw new DesignSvgInputError('SVG image dimensions must be nonnegative.');
         }
         const sx: number = Math.hypot(context.matrix.a, context.matrix.b);
         const sy: number = Math.hypot(context.matrix.c, context.matrix.d);
         const determinant: number =
             context.matrix.a * context.matrix.d - context.matrix.b * context.matrix.c;
         if (sx < 1e-10 || sy < 1e-10 || Math.abs(determinant) <= 1e-8 * sx * sy) {
-            throw new Error('SVG image transform must have independent nonzero axes.');
+            throw new DesignSvgInputError(
+                'SVG image transform must have independent nonzero axes.',
+            );
         }
         if (this.load === null) {
-            throw new Error('Save this layout to import embedded SVG images.');
+            throw new DesignSvgInputError('Save this layout to import embedded SVG images.');
         }
         const reference: string =
             element.attributes['href'] ?? element.attributes['xlink:href'] ?? '';

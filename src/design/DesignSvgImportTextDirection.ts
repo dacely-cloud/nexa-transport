@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignSvgInputError } from './DesignSvgInputError.js';
 import { DesignBidiParagraph, type DesignBidiRun } from './DesignBidiParagraph.js';
 import { DesignTextDirection, type DesignResolvedTextDirection } from './DesignTextDirection.js';
 
@@ -26,7 +27,7 @@ export class DesignSvgImportTextDirection {
                 run.direction !== direction ||
                 /\p{Bidi_Control}/u.test(content)
             ) {
-                throw new Error(
+                throw new DesignSvgInputError(
                     'SVG bidi override changes logical ordering and requires native directional override support.',
                 );
             }

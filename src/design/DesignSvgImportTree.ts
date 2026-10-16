@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignSvgInputError } from './DesignSvgInputError.js';
 import type { DesignPathGeometry } from './DesignPaths.js';
 import type { DesignNode } from './DesignTypes.js';
 import type { DesignSvgSourceBounds } from './DesignSvgImportGeometry.js';
@@ -64,7 +65,7 @@ export class DesignSvgImportTree {
     }
     public append(node: DesignNode): void {
         if (this.#nodes.length >= 10000) {
-            throw new Error('SVG exceeds the imported layer budget.');
+            throw new DesignSvgInputError('SVG exceeds the imported layer budget.');
         }
         if (this.#indices.has(node.id)) {
             throw new Error('Duplicate imported SVG layer id.');

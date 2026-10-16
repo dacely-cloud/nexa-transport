@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignSvgInputError } from './DesignSvgInputError.js';
 import { DesignSvgImportLayers, type DesignSvgLayerImport } from './DesignSvgImportLayers.js';
 import type { DesignSvgImportRequest } from './DesignSvgImportTypes.js';
 import { DesignCodec } from './DesignCodec.js';
@@ -25,7 +26,7 @@ export class DesignSvgImport {
         );
         const page: DesignPage | undefined = pages.get(request.pageId);
         if (page === undefined) {
-            throw new Error('SVG import destination page not found.');
+            throw new DesignSvgInputError('SVG import destination page not found.');
         }
         const nodes: ReadonlyMap<string, DesignNode> = new Map(
             document.nodes.map((node: DesignNode): [string, DesignNode] => [node.id, node]),
@@ -40,12 +41,12 @@ export class DesignSvgImport {
             parent.kind !== 'group' &&
             parent.kind !== 'component'
         ) {
-            throw new Error('Import SVG into a frame, group or component.');
+            throw new DesignSvgInputError('Import SVG into a frame, group or component.');
         }
         const siblings: readonly string[] = parent?.children ?? page.roots;
         const index: number = request.index ?? siblings.length;
         if (index > siblings.length) {
-            throw new Error('SVG insertion index is outside its container.');
+            throw new DesignSvgInputError('SVG insertion index is outside its container.');
         }
         const imported: DesignSvgLayerImport = await DesignSvgImportLayers.parse(
             request.source,

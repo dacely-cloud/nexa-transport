@@ -10,6 +10,7 @@ import { format, resolveConfig, type Options } from 'prettier';
 const files: readonly string[] = [
     'DesignSelectionIndex',
     'DesignFailure',
+    'DesignSvgInputError',
     'DesignSvgFilterEffects',
     'DesignSvgImportFilters',
     'DesignEffectMetrics',

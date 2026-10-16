@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignSvgInputError } from './DesignSvgInputError.js';
 import { DesignSvgImportMasks } from './DesignSvgImportMasks.js';
 import { DesignSvgImportFilters } from './DesignSvgImportFilters.js';
 import { DesignSvgImportStyles } from './DesignSvgImportStyles.js';
@@ -62,7 +63,7 @@ export class DesignSvgImportLayers {
             const id: string | undefined = element.attributes['id'];
             if (id !== undefined) {
                 if (this.#elements.has(id)) {
-                    throw new Error('Duplicate SVG id ' + id);
+                    throw new DesignSvgInputError('Duplicate SVG id ' + id);
                 }
                 this.#elements.set(id, element);
             }
@@ -154,7 +155,7 @@ export class DesignSvgImportLayers {
             transform.e !== 0 ||
             transform.f !== 0;
         if (transform.a * transform.d - transform.b * transform.c === 0) {
-            throw new Error('SVG root transform must be invertible.');
+            throw new DesignSvgInputError('SVG root transform must be invertible.');
         }
         const rootId: string = this.identify('root');
         const separate: boolean =
@@ -257,13 +258,13 @@ export class DesignSvgImportLayers {
             return null;
         }
         if (context.ancestors.length + context.references.length > 64) {
-            throw new Error('SVG hierarchy is too deep.');
+            throw new DesignSvgInputError('SVG hierarchy is too deep.');
         }
         if (
             element.attributes['xmlns'] !== undefined &&
             element.attributes['xmlns'] !== 'http://www.w3.org/2000/svg'
         ) {
-            throw new Error('Unsupported SVG element namespace.');
+            throw new DesignSvgInputError('Unsupported SVG element namespace.');
         }
         const style: Readonly<Record<string, string>> = this.#css.resolve(
             element,
@@ -348,7 +349,7 @@ export class DesignSvgImportLayers {
                     (element.name === 'svg' || element.name === 'symbol') &&
                     style['filter'].trim().toLowerCase() !== 'none'
                 ) {
-                    throw new Error(
+                    throw new DesignSvgInputError(
                         'SVG nested viewport filters require native reference-box conversion.',
                     );
                 }
@@ -389,7 +390,7 @@ export class DesignSvgImportLayers {
                 'polyline',
             ].includes(element.name)
         ) {
-            throw new Error('Unsupported SVG element ' + element.name);
+            throw new DesignSvgInputError('Unsupported SVG element ' + element.name);
         }
         const shapeContext: Parameters<DesignSvgImportShape['build']>[1] = {
             id,

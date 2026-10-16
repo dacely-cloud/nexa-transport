@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignSvgInputError } from './DesignSvgInputError.js';
 import type { DesignPathGeometry } from './DesignPaths.js';
 import type { DesignSvgImportTree } from './DesignSvgImportTree.js';
 import { DesignSvgImportGeometry, type DesignSvgSourceBounds } from './DesignSvgImportGeometry.js';
@@ -34,7 +35,7 @@ export class DesignSvgImportBounds {
                 return;
             }
             if (depth > 64 || ++visited > 10000) {
-                throw new Error('SVG bounds exceed the hierarchy budget.');
+                throw new DesignSvgInputError('SVG bounds exceed the hierarchy budget.');
             }
             const exact: DesignSvgSourceBounds | null = tree.originalBounds(node.id, matrix);
             if (exact !== null) {

@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignSvgInputError } from './DesignSvgInputError.js';
 /** SVG lexical numbers retain signs, scientific notation and adjacent signed coordinates. */
 export class DesignSvgNumbers {
     public static readonly token: RegExp = /^[+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?/u;
@@ -17,7 +18,7 @@ export class DesignSvgNumbers {
             }
             if (char === ',') {
                 if (values.length === 0 || comma) {
-                    throw new Error('Invalid SVG number separator.');
+                    throw new DesignSvgInputError('Invalid SVG number separator.');
                 }
                 comma = true;
                 offset++;
@@ -26,21 +27,23 @@ export class DesignSvgNumbers {
             const match: RegExpMatchArray | null = this.token.exec(source.slice(offset));
             const raw: string | undefined = match?.[0];
             if (raw === undefined) {
-                throw new Error('Invalid SVG number near ' + source.slice(offset, offset + 20));
+                throw new DesignSvgInputError(
+                    'Invalid SVG number near ' + source.slice(offset, offset + 20),
+                );
             }
             const value: number = Number(raw);
             if (!Number.isFinite(value) || Math.abs(value) > 100000000) {
-                throw new Error('SVG number is outside the supported range.');
+                throw new DesignSvgInputError('SVG number is outside the supported range.');
             }
             values.push(value);
             if (values.length > maximum) {
-                throw new Error('SVG exceeds its numeric coordinate budget.');
+                throw new DesignSvgInputError('SVG exceeds its numeric coordinate budget.');
             }
             offset += raw.length;
             comma = false;
         }
         if (comma) {
-            throw new Error('Trailing SVG number separator.');
+            throw new DesignSvgInputError('Trailing SVG number separator.');
         }
         return values;
     }
@@ -53,7 +56,7 @@ export class DesignSvgNumbers {
         const match: RegExpMatchArray | null = this.token.exec(value);
         const raw: string | undefined = match?.[0];
         if (raw === undefined) {
-            throw new Error('Invalid SVG length ' + source);
+            throw new DesignSvgInputError('Invalid SVG length ' + source);
         }
         const unit: string = value.slice(raw.length);
         const scales: Readonly<Record<string, number>> = {
@@ -70,7 +73,7 @@ export class DesignSvgNumbers {
         const scale: number | undefined = scales[unit];
         const result: number = Number(raw) * (scale ?? 0);
         if (scale === undefined || !Number.isFinite(result) || Math.abs(result) > 1000000) {
-            throw new Error('Unsupported SVG length ' + source);
+            throw new DesignSvgInputError('Unsupported SVG length ' + source);
         }
         return result;
     }

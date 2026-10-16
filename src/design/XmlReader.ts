@@ -24,7 +24,7 @@ export class XmlReader {
         public readonly options: XmlReaderOptions = {},
     ) {
         if (source.length === 0 || source.length > 2 * 1024 * 1024) {
-            throw new Error('XML source must contain 1 to 2097152 characters.');
+            throw new SyntaxError('XML source must contain 1 to 2097152 characters.');
         }
         for (const char of source) {
             const code: number = char.charCodeAt(0);
@@ -34,7 +34,7 @@ export class XmlReader {
                 code === 0xffff ||
                 (char.length === 1 && code >= 0xd800 && code <= 0xdfff)
             ) {
-                throw new Error('XML contains an invalid XML character.');
+                throw new SyntaxError('XML contains an invalid XML character.');
             }
         }
     }
@@ -225,6 +225,6 @@ export class XmlReader {
         this.#offset += value.length;
     }
     #fail(message: string): never {
-        throw new Error(`${message} at XML character ${this.#offset}.`);
+        throw new SyntaxError(`${message} at XML character ${this.#offset}.`);
     }
 }

@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignSvgInputError } from './DesignSvgInputError.js';
 import type { DesignSvgElement } from './DesignSvgXml.js';
 import { DesignSvgCss } from './DesignSvgCss.js';
 import { DesignSvgFontSource } from './DesignSvgFontSource.js';
@@ -36,7 +37,7 @@ export class DesignSvgImportedFonts {
                 let start: number = 0;
                 for (const match of source.matchAll(pattern)) {
                     if (this.#faces.length >= 64) {
-                        throw new Error('SVG exceeds its embedded font-face budget.');
+                        throw new DesignSvgInputError('SVG exceeds its embedded font-face budget.');
                     }
                     const face: DesignSvgFontFace = await DesignSvgFontSource.read(
                         match[1] ?? '',
@@ -52,7 +53,7 @@ export class DesignSvgImportedFonts {
                                 face.minimum <= old.maximum,
                         )
                     ) {
-                        throw new Error(
+                        throw new DesignSvgInputError(
                             'Overlapping embedded SVG font-face declarations are unsupported.',
                         );
                     }
@@ -60,7 +61,7 @@ export class DesignSvgImportedFonts {
                         this.#faces.push(face);
                     } else {
                         if (this.loader === null) {
-                            throw new Error(
+                            throw new DesignSvgInputError(
                                 'Import embedded fonts in a connected design workspace to preserve their exact bytes.',
                             );
                         }
@@ -132,7 +133,9 @@ export class DesignSvgImportedFonts {
                 style.weight <= face.maximum,
         );
         if (selected === undefined) {
-            throw new Error('SVG text requests a style outside its embedded exact font faces.');
+            throw new DesignSvgInputError(
+                'SVG text requests a style outside its embedded exact font faces.',
+            );
         }
         return {
             ...style,

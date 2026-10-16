@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignSvgInputError } from './DesignSvgInputError.js';
 import { DesignSvgNumbers } from './DesignSvgNumbers.js';
 import type { DesignStroke } from './DesignTypes.js';
 import { DesignBlendMode, DesignIsolation, type DesignBlendStyle } from './DesignBlendTypes.js';
@@ -36,13 +37,13 @@ export class DesignSvgImportAppearance {
     }
     public static cap(source: string): NonNullable<DesignStroke['cap']> {
         if (source !== 'butt' && source !== 'round' && source !== 'square') {
-            throw new Error('Unsupported SVG stroke-linecap.');
+            throw new DesignSvgInputError('Unsupported SVG stroke-linecap.');
         }
         return source;
     }
     public static join(source: string): NonNullable<DesignStroke['join']> {
         if (source !== 'miter' && source !== 'round' && source !== 'bevel') {
-            throw new Error('Unsupported SVG stroke-linejoin.');
+            throw new DesignSvgInputError('Unsupported SVG stroke-linejoin.');
         }
         return source;
     }
@@ -55,27 +56,27 @@ export class DesignSvgImportAppearance {
             !root &&
             (style['transform-origin'] !== undefined || style['transform-box'] !== undefined)
         ) {
-            throw new Error(
+            throw new DesignSvgInputError(
                 'SVG descendant transform origins require native reference-box conversion.',
             );
         }
         if (!filters && style['filter'] !== undefined && style['filter'] !== 'none') {
-            throw new Error('SVG filter requires native import conversion.');
+            throw new DesignSvgInputError('SVG filter requires native import conversion.');
         }
         if (
             style['stroke-dashoffset'] !== undefined &&
             DesignSvgNumbers.length(style['stroke-dashoffset'], 1) !== 0
         ) {
-            throw new Error('SVG dash offsets require native dash-phase support.');
+            throw new DesignSvgInputError('SVG dash offsets require native dash-phase support.');
         }
         if (
             style['vector-effect'] !== undefined &&
             !['none', 'non-scaling-stroke'].includes(style['vector-effect'])
         ) {
-            throw new Error('Unsupported SVG vector-effect.');
+            throw new DesignSvgInputError('Unsupported SVG vector-effect.');
         }
         if (style['paint-order'] !== undefined && style['paint-order'] !== 'normal') {
-            throw new Error('SVG custom paint-order requires separate paint layers.');
+            throw new DesignSvgInputError('SVG custom paint-order requires separate paint layers.');
         }
         this.compositing(style);
     }

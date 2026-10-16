@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignSvgInputError } from './DesignSvgInputError.js';
 import type { DesignSvgElement } from './DesignSvgXml.js';
 import type { DesignSvgLayerContext } from './DesignSvgImportContext.js';
 import { DesignSvgReferences } from './DesignSvgReferences.js';
@@ -24,11 +25,11 @@ export class DesignSvgImportUse {
             element.attributes['href'] ?? element.attributes['xlink:href'] ?? '',
         );
         if (context.references.includes(id) || context.references.length >= 32) {
-            throw new Error('SVG use reference is cyclic or too deep.');
+            throw new DesignSvgInputError('SVG use reference is cyclic or too deep.');
         }
         const referenced: DesignSvgElement | undefined = elements.get(id);
         if (referenced === undefined) {
-            throw new Error('SVG use element not found: ' + id);
+            throw new DesignSvgInputError('SVG use element not found: ' + id);
         }
         const x: number = DesignSvgNumbers.length(
             context.style['x'] ?? element.attributes['x'] ?? '0',

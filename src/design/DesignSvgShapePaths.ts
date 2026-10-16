@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignSvgInputError } from './DesignSvgInputError.js';
 import type { DesignSvgElement } from './DesignSvgXml.js';
 import { DesignSvgPathData } from './DesignSvgPathData.js';
 import { DesignSvgNumbers } from './DesignSvgNumbers.js';
@@ -31,7 +32,7 @@ export class DesignSvgShapePaths {
         if (element.name === 'polygon' || element.name === 'polyline') {
             const values: readonly number[] = DesignSvgNumbers.list(a['points'] ?? '', 20000);
             if (values.length % 2 !== 0) {
-                throw new Error('SVG points require paired coordinates.');
+                throw new DesignSvgInputError('SVG points require paired coordinates.');
             }
             if (values.length < 4) {
                 return '';
@@ -48,7 +49,7 @@ export class DesignSvgShapePaths {
             const rx: number = element.name === 'circle' ? radius : x('rx');
             const ry: number = element.name === 'circle' ? radius : y('ry');
             if (rx < 0 || ry < 0) {
-                throw new Error('SVG ellipse radii must be nonnegative.');
+                throw new DesignSvgInputError('SVG ellipse radii must be nonnegative.');
             }
             if (rx === 0 || ry === 0) {
                 return '';
@@ -61,7 +62,7 @@ export class DesignSvgShapePaths {
             const w: number = x('width');
             const h: number = y('height');
             if (w < 0 || h < 0) {
-                throw new Error('SVG rectangle dimensions must be nonnegative.');
+                throw new DesignSvgInputError('SVG rectangle dimensions must be nonnegative.');
             }
             if (w === 0 || h === 0) {
                 return '';
@@ -69,7 +70,7 @@ export class DesignSvgShapePaths {
             const rx: number = Math.min(w / 2, a['rx'] === undefined ? y('ry') : x('rx'));
             const ry: number = Math.min(h / 2, a['ry'] === undefined ? x('rx') : y('ry'));
             if (rx < 0 || ry < 0) {
-                throw new Error('SVG rectangle radii must be nonnegative.');
+                throw new DesignSvgInputError('SVG rectangle radii must be nonnegative.');
             }
             if (rx === 0 || ry === 0) {
                 return `M${left} ${top}H${left + w}V${top + h}H${left}Z`;
@@ -81,7 +82,7 @@ export class DesignSvgShapePaths {
                 `V${top + ry}A${rx} ${ry} 0 0 1 ${left + rx} ${top}Z`
             );
         }
-        throw new Error('Unsupported SVG shape ' + element.name);
+        throw new DesignSvgInputError('Unsupported SVG shape ' + element.name);
     }
     /** Native allocation ownership includes malformed source and conversion failures. */
     public static async parse(data: string): Promise<readonly DesignPathCommand[]> {

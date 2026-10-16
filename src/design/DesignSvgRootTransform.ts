@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignSvgInputError } from './DesignSvgInputError.js';
 import { DesignSvgNumbers } from './DesignSvgNumbers.js';
 import {
     DesignSvgTransforms as T,
@@ -23,7 +24,7 @@ export class DesignSvgRootTransform {
         }
         const box: string = style['transform-box'] ?? 'view-box';
         if (!['view-box', 'border-box', 'content-box', 'fill-box', 'stroke-box'].includes(box)) {
-            throw new Error('Invalid SVG root transform-box.');
+            throw new DesignSvgInputError('Invalid SVG root transform-box.');
         }
         const origin: DesignSvgPoint = this.#origin(
             style['transform-origin'] ?? '50% 50%',
@@ -40,12 +41,12 @@ export class DesignSvgRootTransform {
         const values: string[] = source.trim().split(/\s+/u);
         if (values.length === 3) {
             if (DesignSvgNumbers.length(values[2] ?? '', 1) !== 0) {
-                throw new Error('SVG transform-origin requires a zero depth.');
+                throw new DesignSvgInputError('SVG transform-origin requires a zero depth.');
             }
             values.pop();
         }
         if (values.length < 1 || values.length > 2 || values[0] === '') {
-            throw new Error('Invalid SVG transform-origin.');
+            throw new DesignSvgInputError('Invalid SVG transform-origin.');
         }
         let x: string = values[0] ?? 'center';
         let y: string = values[1] ?? 'center';

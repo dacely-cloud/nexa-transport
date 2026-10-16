@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { DesignSvgInputError } from './DesignSvgInputError.js';
 import type { DesignSvgElement } from './DesignSvgXml.js';
 import { DesignSvgShapePaths } from './DesignSvgShapePaths.js';
 import {
@@ -63,7 +64,7 @@ export class DesignSvgImportShape {
             style['fill-rule'] !== undefined &&
             !['nonzero', 'evenodd'].includes(style['fill-rule'])
         ) {
-            throw new Error('Unsupported SVG fill-rule.');
+            throw new DesignSvgInputError('Unsupported SVG fill-rule.');
         }
         const geometry: DesignSvgImportedGeometry | null = evenOdd
             ? await DesignSvgImportGeometry.convert(data, context.matrix, true)
