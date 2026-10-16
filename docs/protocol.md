@@ -3328,6 +3328,7 @@ A durable workspace image and its authored framing.
 | `rotation`    | No       | `number`                                                              | Optional orientation applies around the painted box center in physical pixels.                  |
 | `sampling`    | No       | [DesignImageSampling](protocol.md#designimagesampling) / `null`       | Imported source viewport cropping occurs before texture filtering; null uses the full original. |
 | `scale`       | Yes      | `number`                                                              |                                                                                                 |
+| `tile`        | No       | [DesignImageTile](protocol.md#designimagetile) / `null`               | In Tile mode, content maps image units into an independently placed repeat cell.                |
 | `transform`   | No       | [DesignImageTransform](protocol.md#designimagetransform) / `null`     | Null or omission uses fit/crop; a forward matrix provides explicit editable affine placement.   |
 
 ## DesignImageAdjustments
@@ -3364,6 +3365,7 @@ Workspace image reference and crop transform.
 | `flipY`       | No       | `boolean`                                                             |                                                                                               |
 | `rotation`    | No       | `number`                                                              | Optional orientation applies around the painted box center in physical pixels.                |
 | `scale`       | Yes      | `number`                                                              |                                                                                               |
+| `tile`        | No       | [DesignImageTile](protocol.md#designimagetile) / `null`               | In Tile mode, content maps image units into an independently placed repeat cell.              |
 | `transform`   | No       | [DesignImageTransform](protocol.md#designimagetransform) / `null`     | Null or omission uses fit/crop; a forward matrix provides explicit editable affine placement. |
 
 ## DesignImageSampling
@@ -3381,6 +3383,26 @@ Aspect and anchors describe a source rectangle without creating a cropped bitmap
 Source viewport anchors retain SVG image cropping before texture interpolation.
 
 Type: `"center"` / `"end"` / `"start"`.
+
+## DesignImageTile
+
+The framing matrix places the cell; content places the original raster inside that cell.
+
+| Field     | Required | Type                                                            | Description                                                                          |
+| --------- | -------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `clip`    | No       | [DesignImageTileClip](protocol.md#designimagetileclip) / `null` | Cropping occurs before source filtering and never replaces the original image bytes. |
+| `content` | Yes      | [DesignImageTransform](protocol.md#designimagetransform)        |                                                                                      |
+
+## DesignImageTileClip
+
+An original-image source rectangle, normalized independently of its repeat cell.
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `height` | Yes      | `number` |             |
+| `width`  | Yes      | `number` |             |
+| `x`      | Yes      | `number` |             |
+| `y`      | Yes      | `number` |             |
 
 ## DesignImageTransform
 
@@ -4219,6 +4241,7 @@ Imported imagery and crop properties can be edited without resending any source 
 | `flipY`       | No       | `boolean`                                                                           |                                                                                    |
 | `rotation`    | No       | `number`                                                                            |                                                                                    |
 | `scale`       | No       | `number`                                                                            |                                                                                    |
+| `tile`        | No       | [DesignImageTile](protocol.md#designimagetile) / `null`                             |                                                                                    |
 | `transform`   | No       | [DesignImageTransform](protocol.md#designimagetransform) / `null`                   |                                                                                    |
 
 ## DesignPaintImageOperation
@@ -5384,6 +5407,7 @@ Methods, events, and additive capabilities supported by this gateway.
 | `binaryMedia`               | No       | `true`                                             | NXMD frames carry outbound file bytes; JSON results contain matching metadata.                 |
 | `designExtendedGradients`   | No       | `true`                                             | Angular and diamond gradient paints, geometry and compact edits.                               |
 | `designImageAdjustments`    | No       | `true`                                             | Non-destructive color controls are shared by image layers, fills, strokes and exports.         |
+| `designImageTiles`          | No       | `true`                                             | Repeat cells retain independent image content transforms and original source crops.            |
 | `designImageTransforms`     | No       | `true`                                             | Native image framing supports rotation, reflection, affine placement and repeated image tiles. |
 | `designLayerCompositing`    | No       | `true`                                             | Native layer blending and explicit group isolation preserve editable appearance.               |
 | `designStrokeDashOffset`    | No       | `true`                                             | Stroke phase is editable and preserved by SVG, glyph windows and Boolean silhouettes.          |
