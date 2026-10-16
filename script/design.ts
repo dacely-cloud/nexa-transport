@@ -93,6 +93,7 @@ const files: readonly string[] = [
     'DesignClipboardCodec',
     'DesignClipboardSnapshot',
     'DesignClipboardPaste',
+    'DesignClipboardCut',
     'DesignFontTypes',
     'DesignFontCodec',
     'DesignFontBindings',

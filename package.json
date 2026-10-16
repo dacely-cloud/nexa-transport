@@ -1,6 +1,6 @@
 {
     "name": "nexa-transport",
-    "version": "0.1.0-design.1",
+    "version": "0.1.0-design.2",
     "description": "Typed Nexa websocket gateway client for browsers and Node.js",
     "type": "module",
     "license": "Apache-2.0",
@@ -814,6 +814,10 @@
         "./roblox-trails": {
             "types": "./dist/roblox/RobloxTrailGeometry.d.ts",
             "import": "./dist/roblox-trails.js"
+        },
+        "./design-clipboard-cut": {
+            "types": "./dist/design/DesignClipboardCut.d.ts",
+            "import": "./dist/design-clipboard-cut.js"
         }
     },
     "scripts": {

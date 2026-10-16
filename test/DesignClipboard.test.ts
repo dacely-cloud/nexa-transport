@@ -5,6 +5,7 @@ import { expect, it } from 'vitest';
 import { DesignClipboardCodec } from '../src/design/DesignClipboardCodec.js';
 import { DesignClipboardCapture } from '../src/design/DesignClipboardSnapshot.js';
 import { DesignClipboardPaste } from '../src/design/DesignClipboardPaste.js';
+import { DesignClipboardCut } from '../src/design/DesignClipboardCut.js';
 import { DesignDefaults } from '../src/design/DesignDefaults.js';
 import { DesignTextMetrics } from '../src/design/DesignTextMetrics.js';
 import { Method } from '../src/protocol/Protocol.js';
@@ -72,6 +73,33 @@ it('portable local capture retains copy-time text and pastes editable layers wit
         copy.selection,
         new DesignTextMetrics(),
     );
+    const cut: ReturnType<typeof DesignClipboardCut.apply> = DesignClipboardCut.apply(
+        source,
+        copy.pageId,
+        copy.selection,
+    );
+    expect(cut.document.nodes).toEqual([]);
+    expect(cut.selection).toEqual([]);
+    expect(
+        DesignClipboardCodec.cut({
+            id: 'source',
+            expectedRevision: '1',
+            commandId: 'cut',
+            clipboardId: 'copy',
+            pageId: copy.pageId,
+            selection: copy.selection,
+        }),
+    ).toMatchObject({ id: 'source', clipboardId: 'copy' });
+    expect(
+        methodValidators[Method.DesignClipboardCut].params({
+            id: 'source',
+            expectedRevision: '1',
+            commandId: 'cut',
+            clipboardId: 'copy',
+            pageId: copy.pageId,
+            selection: copy.selection,
+        }),
+    ).toBe(true);
     const result: ReturnType<typeof DesignClipboardPaste.apply> = DesignClipboardPaste.apply(
         snapshot,
         DesignDefaults.document('target'),

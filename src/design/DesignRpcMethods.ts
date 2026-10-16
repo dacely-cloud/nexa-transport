@@ -3,6 +3,7 @@ import type { DesignArrangeRequest } from './DesignSelectionTypes.js';
 import type { DesignComponentRequest } from './DesignComponentTypes.js';
 import type {
     DesignClipboardCopyRequest,
+    DesignClipboardCutRequest,
     DesignClipboardPasteRequest,
     DesignClipboardReceipt,
 } from './DesignClipboardTypes.js';
@@ -104,5 +105,11 @@ export interface DesignTransferMethod {
 /** Revision-checked SVG imports preserve editable native vectors and paints. */
 export interface DesignSvgImportMethod {
     readonly params: DesignSvgImportRequest;
+    readonly result: DesignReceipt;
+}
+
+/** Atomic source cut uses the same durable receipt and undo contract as other native commands. */
+export interface DesignClipboardCutMethod {
+    readonly params: DesignClipboardCutRequest;
     readonly result: DesignReceipt;
 }

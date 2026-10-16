@@ -46,3 +46,13 @@ export interface DesignClipboardPasteRequest {
     readonly x: number;
     readonly y: number;
 }
+
+/** Cut atomically freezes native source and removes its selected forests as one undoable source command. */
+export interface DesignClipboardCutRequest {
+    readonly id: string;
+    readonly expectedRevision: string;
+    readonly commandId: string;
+    readonly clipboardId: string;
+    readonly pageId: string;
+    readonly selection: readonly string[];
+}

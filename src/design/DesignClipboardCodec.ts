@@ -5,6 +5,7 @@ import { DesignValues as V } from './DesignValues.js';
 import {
     DesignClipboardPlacement,
     type DesignClipboardCopyRequest,
+    type DesignClipboardCutRequest,
     type DesignClipboardPasteRequest,
 } from './DesignClipboardTypes.js';
 
@@ -33,6 +34,32 @@ export class DesignClipboardCodec {
             sourceRevision: V.revision(value['sourceRevision']),
             pageId: V.id(value['pageId']),
             selection,
+        };
+    }
+    /** Cut binds a frozen snapshot and source removal to one revision and command identity. */
+    public static cut(raw: unknown): DesignClipboardCutRequest {
+        const value: Readonly<Record<string, unknown>> = V.record(raw, [
+            'id',
+            'expectedRevision',
+            'commandId',
+            'clipboardId',
+            'pageId',
+            'selection',
+        ]);
+        const copy: DesignClipboardCopyRequest = this.copy({
+            clipboardId: value['clipboardId'],
+            sourceId: value['id'],
+            sourceRevision: value['expectedRevision'],
+            pageId: value['pageId'],
+            selection: value['selection'],
+        });
+        return {
+            id: copy.sourceId,
+            expectedRevision: copy.sourceRevision,
+            commandId: V.id(value['commandId']),
+            clipboardId: copy.clipboardId,
+            pageId: copy.pageId,
+            selection: copy.selection,
         };
     }
     /** No owner, source body or client-supplied snapshot is accepted by paste. */

@@ -1,6 +1,6 @@
 # RPC reference
 
-All 197 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 196 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
+All 198 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 197 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
 
 - [accounts.create](#accountscreate)
 - [accounts.list](#accountslist)
@@ -46,6 +46,7 @@ All 197 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [design.canvas.metrics](#designcanvasmetrics)
 - [design.changes](#designchanges)
 - [design.clipboard.copy](#designclipboardcopy)
+- [design.clipboard.cut](#designclipboardcut)
 - [design.clipboard.paste](#designclipboardpaste)
 - [design.component](#designcomponent)
 - [design.create](#designcreate)
@@ -1208,6 +1209,38 @@ Parameters: [DesignClipboardCopyRequest](protocol.md#designclipboardcopyrequest)
 | `sourceRevision` | Yes      | `string`          |             |
 
 Result: [DesignClipboardReceipt](protocol.md#designclipboardreceipt).
+
+## design.clipboard.cut
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DesignClipboardCut> = {
+    clipboardId: 'YOUR_CLIPBOARDID',
+    commandId: 'YOUR_COMMANDID',
+    expectedRevision: 'YOUR_EXPECTEDREVISION',
+    id: 'YOUR_ID',
+    pageId: 'YOUR_PAGEID',
+    selection: [],
+};
+const result: ResultOf<typeof Method.DesignClipboardCut> = await client.call(
+    Method.DesignClipboardCut,
+    params,
+);
+```
+
+Parameters: [DesignClipboardCutRequest](protocol.md#designclipboardcutrequest).
+
+| Field              | Required | Type              | Description |
+| ------------------ | -------- | ----------------- | ----------- |
+| `clipboardId`      | Yes      | `string`          |             |
+| `commandId`        | Yes      | `string`          |             |
+| `expectedRevision` | Yes      | `string`          |             |
+| `id`               | Yes      | `string`          |             |
+| `pageId`           | Yes      | `string`          |             |
+| `selection`        | Yes      | Array of `string` |             |
+
+Result: [DesignReceipt](protocol.md#designreceipt).
 
 ## design.clipboard.paste
 
