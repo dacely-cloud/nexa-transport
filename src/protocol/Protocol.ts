@@ -4113,6 +4113,7 @@ export type DesignComponentCombineVariants = DesignComponentCombineVariantsShape
 export type DesignComponentCommand =
     | DesignComponentCreate
     | DesignComponentPlace
+    | DesignComponentRepeat
     | DesignComponentSwap
     | DesignComponentDetach
     | DesignComponentOverride
@@ -4227,6 +4228,31 @@ export interface DesignComponentReleaseVariantsShape {
 
 /** DesignComponentReleaseVariants from the Nexa wire protocol. */
 export type DesignComponentReleaseVariants = DesignComponentReleaseVariantsShape;
+
+/** DesignComponentRepeat wire fields. */
+export interface DesignComponentRepeatShape {
+    /** action as defined by the Nexa gateway. */
+    readonly action: 'repeat';
+    /** center as defined by the Nexa gateway. */
+    readonly center?: boolean;
+    /** columns as defined by the Nexa gateway. */
+    readonly columns: number;
+    /** componentId as defined by the Nexa gateway. */
+    readonly componentId: string;
+    /** gapX as defined by the Nexa gateway. */
+    readonly gapX: number;
+    /** gapY as defined by the Nexa gateway. */
+    readonly gapY: number;
+    /** rows as defined by the Nexa gateway. */
+    readonly rows: number;
+    /** x as defined by the Nexa gateway. */
+    readonly x: number;
+    /** y as defined by the Nexa gateway. */
+    readonly y: number;
+}
+
+/** DesignComponentRepeat from the Nexa wire protocol. */
+export type DesignComponentRepeat = DesignComponentRepeatShape;
 
 /** DesignComponentRequest wire fields. */
 export interface DesignComponentRequestShape {
@@ -7511,6 +7537,8 @@ export interface GatewayFeaturesShape {
     readonly binaryHistory?: true;
     /** binaryMedia as defined by the Nexa gateway. */
     readonly binaryMedia?: true;
+    /** designComponentRepeat as defined by the Nexa gateway. */
+    readonly designComponentRepeat?: true;
     /** designExtendedGradients as defined by the Nexa gateway. */
     readonly designExtendedGradients?: true;
     /** designImageAdjustments as defined by the Nexa gateway. */

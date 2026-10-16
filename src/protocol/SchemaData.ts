@@ -6327,6 +6327,9 @@ export const schema: Schema = {
                     $ref: '#/definitions/DesignComponentPlace',
                 },
                 {
+                    $ref: '#/definitions/DesignComponentRepeat',
+                },
+                {
                     $ref: '#/definitions/DesignComponentSwap',
                 },
                 {
@@ -6512,6 +6515,44 @@ export const schema: Schema = {
                 },
             },
             required: ['action', 'componentSetId'],
+            type: 'object',
+        },
+        DesignComponentRepeat: {
+            description:
+                'Places linked artwork in an editable grid without copying definition bodies.',
+            properties: {
+                action: {
+                    const: 'repeat',
+                    type: 'string',
+                },
+                center: {
+                    description:
+                        'Interprets x/y as the complete grid center instead of its top-left corner.',
+                    type: 'boolean',
+                },
+                columns: {
+                    type: 'number',
+                },
+                componentId: {
+                    type: 'string',
+                },
+                gapX: {
+                    type: 'number',
+                },
+                gapY: {
+                    type: 'number',
+                },
+                rows: {
+                    type: 'number',
+                },
+                x: {
+                    type: 'number',
+                },
+                y: {
+                    type: 'number',
+                },
+            },
+            required: ['action', 'columns', 'componentId', 'gapX', 'gapY', 'rows', 'x', 'y'],
             type: 'object',
         },
         DesignComponentRequest: {
@@ -11469,6 +11510,12 @@ export const schema: Schema = {
                     const: true,
                     description:
                         'NXMD frames carry outbound file bytes; JSON results contain matching metadata.',
+                    type: 'boolean',
+                },
+                designComponentRepeat: {
+                    const: true,
+                    description:
+                        'Component commands can place editable linked grids without copying source artwork.',
                     type: 'boolean',
                 },
                 designExtendedGradients: {

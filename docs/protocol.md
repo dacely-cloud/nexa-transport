@@ -2782,7 +2782,21 @@ Variant 2: [DesignComponentPlace](protocol.md#designcomponentplace)
 | `x`           | Yes      | `number`  |                                                                                  |
 | `y`           | Yes      | `number`  |                                                                                  |
 
-Variant 3: [DesignComponentSwap](protocol.md#designcomponentswap)
+Variant 3: [DesignComponentRepeat](protocol.md#designcomponentrepeat)
+
+| Field         | Required | Type       | Description                                                                |
+| ------------- | -------- | ---------- | -------------------------------------------------------------------------- |
+| `action`      | Yes      | `"repeat"` |                                                                            |
+| `center`      | No       | `boolean`  | Interprets x/y as the complete grid center instead of its top-left corner. |
+| `columns`     | Yes      | `number`   |                                                                            |
+| `componentId` | Yes      | `string`   |                                                                            |
+| `gapX`        | Yes      | `number`   |                                                                            |
+| `gapY`        | Yes      | `number`   |                                                                            |
+| `rows`        | Yes      | `number`   |                                                                            |
+| `x`           | Yes      | `number`   |                                                                            |
+| `y`           | Yes      | `number`   |                                                                            |
+
+Variant 4: [DesignComponentSwap](protocol.md#designcomponentswap)
 
 | Field         | Required | Type     | Description |
 | ------------- | -------- | -------- | ----------- |
@@ -2790,14 +2804,14 @@ Variant 3: [DesignComponentSwap](protocol.md#designcomponentswap)
 | `componentId` | Yes      | `string` |             |
 | `instanceId`  | Yes      | `string` |             |
 
-Variant 4: [DesignComponentDetach](protocol.md#designcomponentdetach)
+Variant 5: [DesignComponentDetach](protocol.md#designcomponentdetach)
 
 | Field       | Required | Type              | Description |
 | ----------- | -------- | ----------------- | ----------- |
 | `action`    | Yes      | `"detach"`        |             |
 | `selection` | Yes      | Array of `string` |             |
 
-Variant 5: [DesignComponentOverride](protocol.md#designcomponentoverride)
+Variant 6: [DesignComponentOverride](protocol.md#designcomponentoverride)
 
 | Field        | Required | Type                                                                         | Description |
 | ------------ | -------- | ---------------------------------------------------------------------------- | ----------- |
@@ -2806,7 +2820,7 @@ Variant 5: [DesignComponentOverride](protocol.md#designcomponentoverride)
 | `instanceId` | Yes      | `string`                                                                     |             |
 | `targetId`   | Yes      | `string`                                                                     |             |
 
-Variant 6: [DesignComponentReset](protocol.md#designcomponentreset)
+Variant 7: [DesignComponentReset](protocol.md#designcomponentreset)
 
 | Field        | Required | Type          | Description |
 | ------------ | -------- | ------------- | ----------- |
@@ -2814,7 +2828,7 @@ Variant 6: [DesignComponentReset](protocol.md#designcomponentreset)
 | `instanceId` | Yes      | `string`      |             |
 | `targetId`   | Yes      | `null,string` |             |
 
-Variant 7: [DesignComponentCombineVariants](protocol.md#designcomponentcombinevariants)
+Variant 8: [DesignComponentCombineVariants](protocol.md#designcomponentcombinevariants)
 
 | Field       | Required | Type                 | Description |
 | ----------- | -------- | -------------------- | ----------- |
@@ -2823,7 +2837,7 @@ Variant 7: [DesignComponentCombineVariants](protocol.md#designcomponentcombineva
 | `property`  | Yes      | `string`             |             |
 | `selection` | Yes      | Array of `string`    |             |
 
-Variant 8: [DesignComponentAddVariant](protocol.md#designcomponentaddvariant)
+Variant 9: [DesignComponentAddVariant](protocol.md#designcomponentaddvariant)
 
 | Field            | Required | Type            | Description |
 | ---------------- | -------- | --------------- | ----------- |
@@ -2831,7 +2845,7 @@ Variant 8: [DesignComponentAddVariant](protocol.md#designcomponentaddvariant)
 | `componentId`    | Yes      | `null,string`   |             |
 | `componentSetId` | Yes      | `string`        |             |
 
-Variant 9: [DesignComponentSetVariant](protocol.md#designcomponentsetvariant)
+Variant 10: [DesignComponentSetVariant](protocol.md#designcomponentsetvariant)
 
 | Field        | Required | Type                                                          | Description |
 | ------------ | -------- | ------------------------------------------------------------- | ----------- |
@@ -2839,7 +2853,7 @@ Variant 9: [DesignComponentSetVariant](protocol.md#designcomponentsetvariant)
 | `instanceId` | Yes      | `string`                                                      |             |
 | `values`     | Yes      | Array of [DesignVariantValue](protocol.md#designvariantvalue) |             |
 
-Variant 10: [DesignComponentEditVariant](protocol.md#designcomponenteditvariant)
+Variant 11: [DesignComponentEditVariant](protocol.md#designcomponenteditvariant)
 
 | Field         | Required | Type                                                          | Description |
 | ------------- | -------- | ------------------------------------------------------------- | ----------- |
@@ -2847,7 +2861,7 @@ Variant 10: [DesignComponentEditVariant](protocol.md#designcomponenteditvariant)
 | `componentId` | Yes      | `string`                                                      |             |
 | `values`      | Yes      | Array of [DesignVariantValue](protocol.md#designvariantvalue) |             |
 
-Variant 11: [DesignComponentVariantProperties](protocol.md#designcomponentvariantproperties)
+Variant 12: [DesignComponentVariantProperties](protocol.md#designcomponentvariantproperties)
 
 | Field            | Required | Type                                                                        | Description |
 | ---------------- | -------- | --------------------------------------------------------------------------- | ----------- |
@@ -2855,7 +2869,7 @@ Variant 11: [DesignComponentVariantProperties](protocol.md#designcomponentvarian
 | `componentSetId` | Yes      | `string`                                                                    |             |
 | `properties`     | Yes      | Array of [DesignVariantPropertyEdit](protocol.md#designvariantpropertyedit) |             |
 
-Variant 12: [DesignComponentReleaseVariants](protocol.md#designcomponentreleasevariants)
+Variant 13: [DesignComponentReleaseVariants](protocol.md#designcomponentreleasevariants)
 
 | Field            | Required | Type                 | Description |
 | ---------------- | -------- | -------------------- | ----------- |
@@ -2941,6 +2955,22 @@ Restores a group of standalone reusable definitions; linked instances remain int
 | ---------------- | -------- | -------------------- | ----------- |
 | `action`         | Yes      | `"release-variants"` |             |
 | `componentSetId` | Yes      | `string`             |             |
+
+## DesignComponentRepeat
+
+Places linked artwork in an editable grid without copying definition bodies.
+
+| Field         | Required | Type       | Description                                                                |
+| ------------- | -------- | ---------- | -------------------------------------------------------------------------- |
+| `action`      | Yes      | `"repeat"` |                                                                            |
+| `center`      | No       | `boolean`  | Interprets x/y as the complete grid center instead of its top-left corner. |
+| `columns`     | Yes      | `number`   |                                                                            |
+| `componentId` | Yes      | `string`   |                                                                            |
+| `gapX`        | Yes      | `number`   |                                                                            |
+| `gapY`        | Yes      | `number`   |                                                                            |
+| `rows`        | Yes      | `number`   |                                                                            |
+| `x`           | Yes      | `number`   |                                                                            |
+| `y`           | Yes      | `number`   |                                                                            |
 
 ## DesignComponentRequest
 
@@ -5405,6 +5435,7 @@ Methods, events, and additive capabilities supported by this gateway.
 | `binaryDataUploads`         | No       | `true`                                             | Disk upload chunks retain raw bytes from the wire through durable storage.                     |
 | `binaryHistory`             | No       | `true`                                             | History batches use acknowledged raw binary frames.                                            |
 | `binaryMedia`               | No       | `true`                                             | NXMD frames carry outbound file bytes; JSON results contain matching metadata.                 |
+| `designComponentRepeat`     | No       | `true`                                             | Component commands can place editable linked grids without copying source artwork.             |
 | `designExtendedGradients`   | No       | `true`                                             | Angular and diamond gradient paints, geometry and compact edits.                               |
 | `designImageAdjustments`    | No       | `true`                                             | Non-destructive color controls are shared by image layers, fills, strokes and exports.         |
 | `designImageTiles`          | No       | `true`                                             | Repeat cells retain independent image content transforms and original source crops.            |
