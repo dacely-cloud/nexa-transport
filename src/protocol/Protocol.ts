@@ -3962,6 +3962,59 @@ export interface DesignClipboardReceiptShape {
 /** DesignClipboardReceipt from the Nexa wire protocol. */
 export type DesignClipboardReceipt = DesignClipboardReceiptShape;
 
+/** DesignColorReadMethod wire fields. */
+export interface DesignColorReadMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignColorReadRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignColorReadPage;
+}
+
+/** DesignColorReadMethod from the Nexa wire protocol. */
+export type DesignColorReadMethod = DesignColorReadMethodShape;
+
+/** DesignColorReadPage wire fields. */
+export interface DesignColorReadPageShape {
+    /** colors as defined by the Nexa gateway. */
+    readonly colors: ReadonlyArray<DesignSelectionColor>;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** nextOffset as defined by the Nexa gateway. */
+    readonly nextOffset: null | number;
+    /** offset as defined by the Nexa gateway. */
+    readonly offset: number;
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: string;
+    /** selectionSha256 as defined by the Nexa gateway. */
+    readonly selectionSha256: string;
+    /** total as defined by the Nexa gateway. */
+    readonly total: number;
+}
+
+/** DesignColorReadPage from the Nexa wire protocol. */
+export type DesignColorReadPage = DesignColorReadPageShape;
+
+/** DesignColorReadRequest wire fields. */
+export interface DesignColorReadRequestShape {
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** limit as defined by the Nexa gateway. */
+    readonly limit: number;
+    /** offset as defined by the Nexa gateway. */
+    readonly offset: number;
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: string;
+    /** selection as defined by the Nexa gateway. */
+    readonly selection: ReadonlyArray<string>;
+}
+
+/** DesignColorReadRequest from the Nexa wire protocol. */
+export type DesignColorReadRequest = DesignColorReadRequestShape;
+
 /** DesignComment wire fields. */
 export interface DesignCommentShape {
     /** author as defined by the Nexa gateway. */
@@ -4976,7 +5029,7 @@ export interface DesignLayoutPreviewCanvasRequestShape {
     /** key as defined by the Nexa gateway. */
     readonly key: null | string;
     /** operation as defined by the Nexa gateway. */
-    readonly operation: DesignLayoutOperation;
+    readonly operation: DesignPreviewOperation;
     /** params as defined by the Nexa gateway. */
     readonly params: DesignViewRequest;
 }
@@ -5015,7 +5068,7 @@ export interface DesignLayoutPreviewMetricsRequestShape {
     /** key as defined by the Nexa gateway. */
     readonly key: null | string;
     /** operation as defined by the Nexa gateway. */
-    readonly operation: DesignLayoutOperation;
+    readonly operation: DesignPreviewOperation;
     /** params as defined by the Nexa gateway. */
     readonly params: DesignCanvasMetricsRequest;
 }
@@ -5055,7 +5108,7 @@ export interface DesignLayoutPreviewTextRequestShape {
     /** key as defined by the Nexa gateway. */
     readonly key: null | string;
     /** operation as defined by the Nexa gateway. */
-    readonly operation: DesignLayoutOperation;
+    readonly operation: DesignPreviewOperation;
     /** params as defined by the Nexa gateway. */
     readonly params: DesignTextWindowRequest;
 }
@@ -5351,9 +5404,9 @@ export type DesignNodeRecord = DesignNodeRecordShape;
 /** DesignOperation from the Nexa wire protocol. */
 export type DesignOperation =
     | DesignRecolorOperation
+    | DesignLayoutOperation
     | DesignInsert
     | DesignUpdate
-    | DesignLayoutOperation
     | DesignSizingOperation
     | DesignTypographyStyleOperation
     | DesignTypographyOperation
@@ -5727,6 +5780,9 @@ export interface DesignPositionOperationShape {
 /** DesignPositionOperation from the Nexa wire protocol. */
 export type DesignPositionOperation = DesignPositionOperationShape;
 
+/** DesignPreviewOperation from the Nexa wire protocol. */
+export type DesignPreviewOperation = DesignRecolorOperation | DesignLayoutOperation;
+
 /** DesignReadMethod wire fields. */
 export interface DesignReadMethodShape {
     /** params as defined by the Nexa gateway. */
@@ -5999,6 +6055,17 @@ export interface DesignSelectionBoundsShape {
 
 /** DesignSelectionBounds from the Nexa wire protocol. */
 export type DesignSelectionBounds = DesignSelectionBoundsShape;
+
+/** DesignSelectionColor wire fields. */
+export interface DesignSelectionColorShape {
+    /** color as defined by the Nexa gateway. */
+    readonly color: string;
+    /** layers as defined by the Nexa gateway. */
+    readonly layers: number;
+}
+
+/** DesignSelectionColor from the Nexa wire protocol. */
+export type DesignSelectionColor = DesignSelectionColorShape;
 
 /** DesignShadow wire fields. */
 export interface DesignShadowShape {
@@ -7808,6 +7875,14 @@ export interface GatewayMethodsdesign_clipboard_pasteShape {
     readonly result: DesignReceipt;
 }
 
+/** GatewayMethodsdesign_colors wire fields. */
+export interface GatewayMethodsdesign_colorsShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignColorReadRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignColorReadPage;
+}
+
 /** GatewayMethodsdesign_component wire fields. */
 export interface GatewayMethodsdesign_componentShape {
     /** params as defined by the Nexa gateway. */
@@ -9130,6 +9205,8 @@ export interface GatewayMethodsShape {
     readonly 'design.clipboard.cut': GatewayMethodsdesign_clipboard_cutShape;
     /** design.clipboard.paste as defined by the Nexa gateway. */
     readonly 'design.clipboard.paste': GatewayMethodsdesign_clipboard_pasteShape;
+    /** design.colors as defined by the Nexa gateway. */
+    readonly 'design.colors': GatewayMethodsdesign_colorsShape;
     /** design.component as defined by the Nexa gateway. */
     readonly 'design.component': GatewayMethodsdesign_componentShape;
     /** design.create as defined by the Nexa gateway. */
@@ -17115,6 +17192,8 @@ export enum Method {
     DesignClipboardCut = 'design.clipboard.cut',
     /** Calls design.clipboard.paste. */
     DesignClipboardPaste = 'design.clipboard.paste',
+    /** Calls design.colors. */
+    DesignColors = 'design.colors',
     /** Calls design.component. */
     DesignComponent = 'design.component',
     /** Calls design.create. */
