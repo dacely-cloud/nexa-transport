@@ -65,4 +65,8 @@ The native compact `text-style` operation uses the same semantics, accepts null 
 
 Linear and centered radial gradients import as editable layer fills. Rich font changes inherit the fill, and solid ranges retain their own color and opacity. Object-unit paint uses the bounds of the entire SVG text element across positioned baseline chunks; user-space paint keeps its original coordinate system through uniform scaling and rotation. Source characters stay native text.
 
-LTR and RTL anchors follow paragraph direction. An explicit bidi override is admitted only when native bidi resolves the same single directional run, preserving source without inserted control characters. Overrides that change logical ordering, patterned text, independently different rich gradients, stroked text and affine text skew/reflection remain unsupported and reject atomically.
+LTR and RTL anchors follow paragraph direction. An explicit bidi override is admitted only when native bidi resolves the same single directional run, preserving source without inserted control characters. Overrides that change logical ordering, patterned text, independently different rich paints and affine text skew/reflection remain unsupported and reject atomically.
+
+Uniform solid and gradient strokes import as native editable text, retaining width, alpha, dashes, cap/join choices and miter limits. Font-relative lengths are computed before inheritance; percentage lengths use the normalized viewport diagonal. Positioned baseline chunks share stroke-gradient bounds. Different strokes inside one logical rich label still require native rich-stroke ranges and reject.
+
+Zero-width strokes still validate referenced paint. Malformed dash separators reject before admission; font-relative normalization retains the original separators for that validation.

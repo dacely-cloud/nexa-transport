@@ -16,6 +16,7 @@ import { DesignDefaults } from './DesignDefaults.js';
 import { DesignStyleCodec } from './DesignStyleCodec.js';
 import type { DesignPathGeometry } from './DesignPaths.js';
 import type { DesignNode, DesignPaint, DesignStroke } from './DesignTypes.js';
+import { DesignSvgImportStroke } from './DesignSvgImportStroke.js';
 
 /** SVG geometry is already in page-local pixels; appearance keeps the original user-space paint frame. */
 export interface DesignSvgShapeContext {
@@ -82,41 +83,17 @@ export class DesignSvgImportShape {
                       Appearance.opacity(style['fill-opacity']),
                       { ...paintContext, target: geometry.target },
                   );
-        const strokePaint: DesignPaint | null = this.paints.resolve(
-            style['stroke'] ?? 'none',
-            Appearance.opacity(style['stroke-opacity']),
+        const border: DesignStroke | null = DesignSvgImportStroke.resolve(
+            DesignSvgImportStroke.read(style, (source: string): number =>
+                DesignSvgNumbers.length(
+                    source,
+                    Math.hypot(context.width, context.height) / Math.SQRT2,
+                ),
+            ),
+            this.paints,
             paintContext,
+            1,
         );
-        const width: number = DesignSvgNumbers.length(
-            style['stroke-width'] ?? '1',
-            Math.hypot(context.width, context.height) / Math.SQRT2,
-        );
-        if (width < 0) {
-            throw new Error('SVG stroke width must be nonnegative.');
-        }
-        const dash: readonly number[] =
-            (style['stroke-dasharray'] ?? 'none') === 'none'
-                ? []
-                : DesignSvgNumbers.list(style['stroke-dasharray'] ?? '', 16);
-        if (dash.some((value: number): boolean => value < 0.01)) {
-            throw new Error(
-                'SVG zero or very small dash lengths require native dotted-stroke support.',
-            );
-        }
-        const border: DesignStroke | null =
-            strokePaint === null || width === 0
-                ? null
-                : {
-                      paint: strokePaint,
-                      width,
-                      dash,
-                      cap: Appearance.cap(style['stroke-linecap'] ?? 'butt'),
-                      join: Appearance.join(style['stroke-linejoin'] ?? 'miter'),
-                      miterLimit: DesignSvgNumbers.length(style['stroke-miterlimit'] ?? '4', 1),
-                  };
-        if (border !== null && (border.miterLimit ?? 4) < 1) {
-            throw new Error('SVG miter limit must be at least one.');
-        }
         const factor: number | null =
             style['vector-effect'] === 'non-scaling-stroke' ? 1 : T.strokeScale(context.matrix);
         const outlined: boolean =

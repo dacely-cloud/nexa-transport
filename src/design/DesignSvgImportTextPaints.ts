@@ -8,7 +8,14 @@ import type { DesignSvgImportTree } from './DesignSvgImportTree.js';
 import type { DesignTextSpanStyle } from './DesignTextLayout.js';
 import { DesignFontBindings } from './DesignFontBindings.js';
 import { DesignStyleCodec } from './DesignStyleCodec.js';
-import type { DesignNode, DesignPaint, DesignText, DesignTextRun } from './DesignTypes.js';
+import type {
+    DesignNode,
+    DesignPaint,
+    DesignText,
+    DesignTextRun,
+    DesignStroke,
+} from './DesignTypes.js';
+import { DesignSvgImportStroke, type DesignSvgStrokeSource } from './DesignSvgImportStroke.js';
 
 /** Paint identity stays separate from typography until the complete text object bounds are known. */
 export interface DesignSvgTextFill {
@@ -23,11 +30,13 @@ export interface DesignSvgTextPaintRange {
     readonly end: number;
     readonly style: DesignTextSpanStyle;
     readonly fill: DesignSvgTextFill;
+    readonly stroke: DesignSvgStrokeSource | null;
 }
 
 /** An imported text node receives ordinary editable layer fills and rich source ranges. */
 export interface DesignSvgTextAppearance {
     readonly fills: readonly DesignPaint[];
+    readonly stroke: DesignStroke | null;
     readonly text: DesignText;
 }
 
@@ -115,7 +124,7 @@ export class DesignSvgImportTextPaints {
             this.tree.replace(id, (node: DesignNode): DesignNode => ({
                 ...node,
                 text: appearance.text,
-                style: { ...node.style, fills: appearance.fills },
+                style: { ...node.style, fills: appearance.fills, stroke: appearance.stroke },
             }));
         }
     }
@@ -165,7 +174,27 @@ export class DesignSvgImportTextPaints {
         const key: string = JSON.stringify(layer);
         const style: DesignTextSpanStyle = DesignFontBindings.base(plan.text, '#000000');
         const runs: DesignTextRun[] = [];
+        const strokes: Map<string, DesignStroke | null> = new Map();
+        let stroke: DesignStroke | null | undefined;
         for (const [index, range] of plan.ranges.entries()) {
+            const strokeKey: string = JSON.stringify(range.stroke);
+            if (!strokes.has(strokeKey)) {
+                strokes.set(
+                    strokeKey,
+                    DesignSvgImportStroke.resolve(
+                        range.stroke,
+                        this.paints,
+                        { ...plan.context, source },
+                        plan.scale,
+                    ),
+                );
+            }
+            const resolvedStroke: DesignStroke | null = strokes.get(strokeKey) ?? null;
+            if (stroke === undefined) {
+                stroke = resolvedStroke;
+            } else if (JSON.stringify(stroke) !== JSON.stringify(resolvedStroke)) {
+                throw new Error('SVG inline stroke changes require native rich stroke ranges.');
+            }
             const value: DesignPaint | null = values[index] ?? null;
             const inherited: boolean = JSON.stringify(value) === key;
             if (!inherited && value !== null && value.kind !== 'solid') {
@@ -191,6 +220,7 @@ export class DesignSvgImportTextPaints {
         }
         return {
             fills: layer === null ? [] : [layer],
+            stroke: stroke ?? null,
             text: DesignStyleCodec.text({
                 ...plan.text,
                 size: plan.text.size * plan.scale,

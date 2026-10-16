@@ -71,10 +71,29 @@ export class DesignSvgImportTextStyles {
                 ...resolved,
                 'font-size': size.toString(),
                 'font-weight': weight.toString(),
+                ...(resolved['stroke-width'] === undefined
+                    ? {}
+                    : {
+                          'stroke-width': this.#relative(resolved['stroke-width'], size, rootSize),
+                      }),
+                ...(resolved['stroke-dasharray'] === undefined
+                    ? {}
+                    : {
+                          'stroke-dasharray': resolved['stroke-dasharray'].replace(
+                              /[^,\s]+/gu,
+                              (value: string): string => this.#relative(value, size, rootSize),
+                          ),
+                      }),
             };
         }
         this.#rootSize = rootSize;
         return parent;
+    }
+
+    #relative(source: string, size: number, rootSize: number): string {
+        return source.trim().endsWith('em')
+            ? DesignSvgImportTextStyles.length(source, size, rootSize).toString()
+            : source;
     }
 
     /** Font-relative lengths resolve before the authored text is transformed into design pixels. */
@@ -169,7 +188,6 @@ export class DesignSvgImportTextStyles {
             'text-decoration': ['none'],
             'word-spacing': ['normal', '0', '0px'],
             'white-space': ['normal', 'nowrap'],
-            stroke: ['none'],
         };
         for (const [property, allowed] of Object.entries(choices)) {
             const value: string | undefined = style[property] ?? element.attributes[property];

@@ -18,6 +18,7 @@ import { DesignSvgText } from './DesignSvgText.js';
 import type { DesignFontEngine } from './DesignFontEngine.js';
 import { DesignTextShaping, type DesignTextRunFactory } from './DesignTextShaping.js';
 import { DesignTextGlyphs } from './DesignTextGlyphs.js';
+import { DesignStrokeGeometry } from './DesignStrokeGeometry.js';
 import { DesignSvgTextPaint } from './DesignSvgTextPaint.js';
 import {
     DesignSvgLimits,
@@ -128,6 +129,7 @@ export class DesignSvg {
                               false,
                               outlines,
                               prepare,
+                              DesignStrokeGeometry.padding(stroke),
                           );
             }
             const element: string = `<g transform="translate(${box.x} ${box.y}) rotate(${box.rotation} ${box.width / 2} ${box.height / 2})"><title>${Geometry.escape(node.name)}</title>${body}</g>`;
@@ -216,6 +218,7 @@ export class DesignSvg {
         richFill: boolean = true,
         outlines: DesignFontEngine | null = null,
         prepare: DesignTextRunFactory | null = null,
+        padding: number = 0,
     ): string {
         const lines: readonly DesignTextLine[] = DesignTextLayout.lines(
             text,
@@ -227,7 +230,7 @@ export class DesignSvg {
         );
         const id: string = paints.identity('text-clip');
         paints.definitions.push(
-            `<clipPath id="${id}"><rect width="${box.width}" height="${box.height}"/></clipPath>`,
+            `<clipPath id="${id}"><rect x="${-padding}" y="${-padding}" width="${box.width + padding * 2}" height="${box.height + padding * 2}"/></clipPath>`,
         );
         if (outlines !== null) {
             const shapes: string[] = [];
@@ -255,10 +258,10 @@ export class DesignSvg {
                         let clip: string = '';
                         if (piece.clip !== undefined) {
                             const clipId: string = paints.identity('text-paint-clip');
-                            const left: number = piece.clip.left ?? 0;
-                            const right: number = piece.clip.right ?? box.width;
+                            const left: number = piece.clip.left ?? -padding;
+                            const right: number = piece.clip.right ?? box.width + padding;
                             paints.definitions.push(
-                                `<clipPath id="${clipId}" clipPathUnits="userSpaceOnUse"><rect x="${left}" width="${Math.max(0, right - left)}" height="${box.height}"/></clipPath>`,
+                                `<clipPath id="${clipId}" clipPathUnits="userSpaceOnUse"><rect x="${left}" y="${-padding}" width="${Math.max(0, right - left)}" height="${box.height + padding * 2}"/></clipPath>`,
                             );
                             clip = `clip-path="url(#${clipId})"`;
                         }

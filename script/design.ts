@@ -50,6 +50,7 @@ const files: readonly string[] = [
     'DesignSvgImportLabel',
     'DesignSvgImportTextPaints',
     'DesignSvgImportTextDirection',
+    'DesignSvgImportStroke',
     'DesignSvgTextChunks',
     'DesignSvgImportTextStyles',
     'DesignSvgTextBaseline',
@@ -331,6 +332,7 @@ for (const testName of [
     'DesignTextShaping',
     'DesignTextPaintInheritance',
     'DesignSvgTextPaintImport',
+    'DesignSvgTextStrokeImport',
 ]) {
     const runTestPath: string = 'test/' + testName + '.test.ts';
     const runTestFormat: Options = (await resolveConfig(runTestPath)) ?? {};

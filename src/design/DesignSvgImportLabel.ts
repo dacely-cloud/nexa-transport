@@ -30,6 +30,7 @@ import { DesignTextShaping } from './DesignTextShaping.js';
 import { DesignSvgImportTextDirection } from './DesignSvgImportTextDirection.js';
 import type { DesignSvgSourceBounds } from './DesignSvgImportGeometry.js';
 import type { DesignNode, DesignText, DesignTextRun, DesignPathCommand } from './DesignTypes.js';
+import { DesignSvgImportStroke, type DesignSvgStrokeSource } from './DesignSvgImportStroke.js';
 
 /** Imported text retains the stylesheet ancestry of its actual rendered use instance. */
 export interface DesignSvgTextContext extends DesignSvgShapeContext {
@@ -40,6 +41,7 @@ interface TextPart {
     readonly style: DesignTextSpanStyle;
     readonly baseline: string;
     readonly fill: DesignSvgTextFill;
+    readonly stroke: DesignSvgStrokeSource | null;
 }
 interface TextPartsContext {
     readonly spacing: number;
@@ -49,6 +51,7 @@ interface TextPartsContext {
     readonly rootSize: number;
     readonly direction: string;
     readonly bidi: string;
+    readonly viewport: number;
 }
 
 /** Real font advances position editable labels; full font cells retain SVG object bounds. */
@@ -96,6 +99,7 @@ export class DesignSvgImportLabel {
             throw new Error('Unsupported SVG xml:space.');
         }
         const parts: TextPart[] = [];
+        const viewport: number = Math.hypot(context.width, context.height) / Math.SQRT2;
         const partsContext: TextPartsContext = {
             spacing,
             space,
@@ -104,6 +108,7 @@ export class DesignSvgImportLabel {
             rootSize: styles.rootSize,
             direction: style['direction'] ?? 'ltr',
             bidi: style['unicode-bidi'] ?? 'normal',
+            viewport,
         };
         this.#parts(element, style, context.ancestors, partsContext, parts, true);
         if (space === 'default') {
@@ -154,6 +159,7 @@ export class DesignSvgImportLabel {
                 end: offset + part.content.length,
                 style: part.style,
                 fill: part.fill,
+                stroke: part.stroke,
             });
             if (!this.#same(part.style, base)) {
                 runs.push({
@@ -324,7 +330,7 @@ export class DesignSvgImportLabel {
                 style['display'] !== 'none' &&
                 !['hidden', 'collapse'].includes(style['visibility'] ?? 'visible'),
             opacity: Appearance.opacity(style['opacity']),
-            style: { ...node.style, fills: appearance.fills },
+            style: { ...node.style, fills: appearance.fills, stroke: appearance.stroke },
             text: appearance.text,
         });
         return context.id;
@@ -377,6 +383,16 @@ export class DesignSvgImportLabel {
         }
         const span: DesignTextSpanStyle = this.fonts.resolve(Styles.span(style));
         const fill: DesignSvgTextFill = DesignSvgImportTextPaints.fill(style);
+        const stroke: DesignSvgStrokeSource | null = DesignSvgImportStroke.read(
+            style,
+            (source: string): number =>
+                Styles.position(
+                    source,
+                    Number(style['font-size'] ?? 16),
+                    context.rootSize,
+                    context.viewport,
+                ),
+        );
         const baseline: string =
             !root && style['alignment-baseline'] === 'alphabetic'
                 ? 'alphabetic'
@@ -390,11 +406,12 @@ export class DesignSvgImportLabel {
                     previous !== undefined &&
                     previous.baseline === baseline &&
                     JSON.stringify(previous.fill) === JSON.stringify(fill) &&
+                    JSON.stringify(previous.stroke) === JSON.stringify(stroke) &&
                     this.#same(previous.style, span)
                 ) {
                     parts[parts.length - 1] = { ...previous, content: previous.content + value };
                 } else {
-                    parts.push({ content: value, style: span, baseline, fill });
+                    parts.push({ content: value, style: span, baseline, fill, stroke });
                 }
             } else if (child.name === 'tspan') {
                 const resolved: Readonly<Record<string, string>> = new Styles(this.css).resolve(
