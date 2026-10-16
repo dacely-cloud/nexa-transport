@@ -10,6 +10,8 @@ import { DesignSvgImportAppearance } from './DesignSvgImportAppearance.js';
 import { DesignSvgImportTextStyles as Styles } from './DesignSvgImportTextStyles.js';
 import { DesignSvgTransforms as T } from './DesignSvgTransforms.js';
 import { DesignSvgImportedFonts } from './DesignSvgImportedFonts.js';
+import { DesignSvgImportPaints } from './DesignSvgImportPaints.js';
+import { DesignTextShaping } from './DesignTextShaping.js';
 import type { DesignFontEngine } from './DesignFontEngine.js';
 import {
     DesignTextLayout,
@@ -31,6 +33,11 @@ export class DesignSvgImportText {
         public readonly tree: DesignSvgImportTree,
         public readonly identify: (key: string) => string,
         public readonly fonts: DesignSvgImportedFonts = new DesignSvgImportedFonts(),
+        public readonly paints: DesignSvgImportPaints = new DesignSvgImportPaints(
+            new Map(),
+            css,
+            new Map(),
+        ),
     ) {}
 
     /** A shared group preserves parent opacity, clipping and original glyph object bounds. */
@@ -42,6 +49,7 @@ export class DesignSvgImportText {
             this.css,
             this.tree,
             this.fonts,
+            this.paints,
         );
         const planner: DesignSvgTextChunks = new DesignSvgTextChunks(this.css);
         const chunks: readonly DesignSvgTextChunk[] | null = planner.read(element, context);
@@ -142,19 +150,24 @@ export class DesignSvgImportText {
             };
             const lines: readonly DesignTextLine[] = DesignTextLayout.lines(
                 unscaled,
-                chunk.element.attributes['fill'] ?? '#000000',
+                '#000000',
                 Infinity,
                 Infinity,
                 (span: DesignTextSpanStyle, value: string): number => fonts.measure(span, value),
+                DesignTextShaping.factory(fonts),
             );
             const advance: number = (lines[0]?.width ?? 0) + unscaled.letterSpacing;
             const anchor: string = chunk.element.attributes['text-anchor'] ?? 'start';
-            x += advance * (anchor === 'middle' ? 0.5 : anchor === 'end' ? 0 : 1);
+            x +=
+                (text.direction === 'rtl' ? -1 : 1) *
+                advance *
+                (anchor === 'middle' ? 0.5 : anchor === 'end' ? 0 : 1);
         }
         if (commands.length > 0) {
             this.tree.recordGeometry(context.id, DesignPaths.normalize(commands));
         }
         this.tree.replace(context.id, (node: DesignNode): DesignNode => ({ ...node, children }));
+        label.textPaints.rebase(children);
         this.tree.tighten(context.id);
         return children.length === 0 ? null : context.id;
     }

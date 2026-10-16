@@ -60,3 +60,9 @@ Glyph-window callers request `paintClipping: true` only when Hello advertises `d
 `DesignTextRun.color` is a solid override or `null`. Null keeps the layer's fill stack, including gradients and images, while retaining the run's font metrics and underline. Existing explicit colors remain explicit. `DesignTextStyles.apply(text, start, end, changes)` now creates inherited ranges by default; its optional solid fallback argument remains available for older hosts. Apply `{color: null}` to remove an override without changing source characters or other range styles. `DesignFontBindings.run` exposes inherited ranges with `rich: false`, so glyph painters use the layer paint instead of the placeholder style color.
 
 The native compact `text-style` operation uses the same semantics, accepts null in its exact tool schema, and exposes it in bounded `text-style` reads. Hosts advertise `designTextInheritedPaint`; the website's reset control is gated by that capability and older hosts retain their explicit solid fallback. Selection recoloring changes the actual layer paint and leaves inherited ranges linked to it.
+
+## Editable SVG text import
+
+Linear and centered radial gradients import as editable layer fills. Rich font changes inherit the fill, and solid ranges retain their own color and opacity. Object-unit paint uses the bounds of the entire SVG text element across positioned baseline chunks; user-space paint keeps its original coordinate system through uniform scaling and rotation. Source characters stay native text.
+
+LTR and RTL anchors follow paragraph direction. An explicit bidi override is admitted only when native bidi resolves the same single directional run, preserving source without inserted control characters. Overrides that change logical ordering, patterned text, independently different rich gradients, stroked text and affine text skew/reflection remain unsupported and reject atomically.

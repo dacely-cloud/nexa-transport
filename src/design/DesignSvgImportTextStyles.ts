@@ -116,7 +116,9 @@ export class DesignSvgImportTextStyles {
         const color: string =
             fill === 'none'
                 ? '#00000000'
-                : DesignSvgColors.parse(fill, style['color'] ?? '#000000');
+                : fill.trim().startsWith('url(')
+                  ? '#000000'
+                  : DesignSvgColors.parse(fill, style['color'] ?? '#000000');
         const alpha: number = color.length === 9 ? Number.parseInt(color.slice(7), 16) / 255 : 1;
         const opacity: number = DesignSvgImportAppearance.opacity(style['fill-opacity']);
         return {
@@ -158,8 +160,8 @@ export class DesignSvgImportTextStyles {
             'dominant-baseline': DesignSvgTextBaseline.values,
             'alignment-baseline': ['auto', 'baseline', 'alphabetic'],
             'baseline-shift': ['0', '0px', 'baseline'],
-            direction: ['ltr'],
-            'unicode-bidi': ['normal'],
+            direction: ['ltr', 'rtl'],
+            'unicode-bidi': ['normal', 'bidi-override'],
             'writing-mode': ['horizontal-tb', 'lr-tb'],
             'font-variant': ['normal'],
             'font-stretch': ['normal', '100%'],

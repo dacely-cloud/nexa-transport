@@ -19,6 +19,16 @@ import {
 } from './DesignTextLayout.js';
 import { DesignPaths } from './DesignPaths.js';
 import { DesignSvgTextBaseline } from './DesignSvgTextBaseline.js';
+import { DesignSvgImportPaints } from './DesignSvgImportPaints.js';
+import {
+    DesignSvgImportTextPaints,
+    type DesignSvgTextFill,
+    type DesignSvgTextPaintRange,
+    type DesignSvgTextAppearance,
+} from './DesignSvgImportTextPaints.js';
+import { DesignTextShaping } from './DesignTextShaping.js';
+import { DesignSvgImportTextDirection } from './DesignSvgImportTextDirection.js';
+import type { DesignSvgSourceBounds } from './DesignSvgImportGeometry.js';
 import type { DesignNode, DesignText, DesignTextRun, DesignPathCommand } from './DesignTypes.js';
 
 /** Imported text retains the stylesheet ancestry of its actual rendered use instance. */
@@ -29,6 +39,7 @@ interface TextPart {
     readonly content: string;
     readonly style: DesignTextSpanStyle;
     readonly baseline: string;
+    readonly fill: DesignSvgTextFill;
 }
 interface TextPartsContext {
     readonly spacing: number;
@@ -36,16 +47,23 @@ interface TextPartsContext {
     readonly anchor: string;
     readonly visibility: string;
     readonly rootSize: number;
+    readonly direction: string;
+    readonly bidi: string;
 }
 
 /** Real font advances position editable labels; full font cells retain SVG object bounds. */
 export class DesignSvgImportLabel {
+    /** Paint plans share the entire SVG text object's bounds across positioned baseline chunks. */
+    public readonly textPaints: DesignSvgImportTextPaints;
     /** Appends ordinary text layers to the same atomic import tree as vector artwork. */
     public constructor(
         public readonly css: DesignSvgCss,
         public readonly tree: DesignSvgImportTree,
         public readonly fonts: DesignSvgImportedFonts = new DesignSvgImportedFonts(),
-    ) {}
+        paints: DesignSvgImportPaints = new DesignSvgImportPaints(new Map(), css, new Map()),
+    ) {
+        this.textPaints = new DesignSvgImportTextPaints(paints, tree);
+    }
 
     /** Text remains native text with ordinary rich ranges, inspector editing and undo. */
     public async build(
@@ -84,6 +102,8 @@ export class DesignSvgImportLabel {
             anchor,
             visibility: style['visibility'] ?? 'visible',
             rootSize: styles.rootSize,
+            direction: style['direction'] ?? 'ltr',
+            bidi: style['unicode-bidi'] ?? 'normal',
         };
         this.#parts(element, style, context.ancestors, partsContext, parts, true);
         if (space === 'default') {
@@ -123,18 +143,25 @@ export class DesignSvgImportLabel {
             throw new Error('SVG text exceeds the native text layer budget.');
         }
         const runs: DesignTextRun[] = [];
+        const ranges: DesignSvgTextPaintRange[] = [];
         let offset: number = 0;
         for (const part of parts) {
             if (part.content === '') {
                 continue;
             }
+            ranges.push({
+                start: offset,
+                end: offset + part.content.length,
+                style: part.style,
+                fill: part.fill,
+            });
             if (!this.#same(part.style, base)) {
                 runs.push({
                     family: part.style.family,
                     size: part.style.size,
                     weight: part.style.weight,
                     italic: part.style.italic,
-                    color: part.style.color,
+                    color: null,
                     underline: false,
                     start: offset,
                     end: offset + part.content.length,
@@ -152,6 +179,7 @@ export class DesignSvgImportLabel {
             lineHeight: 1.4,
             letterSpacing: spacing,
             align: 'start',
+            direction: DesignSvgImportTextDirection.read(content, style),
             runs,
             ...(base.font == null ? {} : { font: base.font }),
         });
@@ -187,6 +215,7 @@ export class DesignSvgImportLabel {
                 }
                 return fonts.measure(span, value);
             },
+            DesignTextShaping.factory(fonts),
         );
         const line: DesignTextLine | undefined = lines[0];
         if (line === undefined || lines.length !== 1) {
@@ -213,7 +242,11 @@ export class DesignSvgImportLabel {
                 styles.rootSize,
                 context.width,
             ) -
-            (anchor === 'middle' ? advance / 2 : anchor === 'end' ? advance : 0);
+            advance *
+                DesignSvgImportTextDirection.anchor(
+                    anchor,
+                    text.direction === 'rtl' ? 'rtl' : 'ltr',
+                );
         const y: number =
             Styles.position(
                 style['y'] ?? element.attributes['y'] ?? '0',
@@ -231,10 +264,14 @@ export class DesignSvgImportLabel {
         const top: number = y - DesignTextLayout.baseline(line, text.lineHeight);
         const center: DesignSvgPoint = T.point(context.matrix, x + width / 2, top + height / 2);
         const commands: DesignPathCommand[] = [];
+        let sourceTop: number = Infinity;
+        let sourceBottom: number = -Infinity;
         for (const segment of line.segments) {
             const metrics: DesignFontMetrics = fonts.metrics(segment.style);
             const left: number = x + segment.x;
             const right: number = left + Math.max(0, segment.width + spacing);
+            sourceTop = Math.min(sourceTop, y - metrics.ascent);
+            sourceBottom = Math.max(sourceBottom, y + metrics.descent);
             const points: readonly DesignSvgPoint[] = [
                 T.point(context.matrix, left, y - metrics.ascent),
                 T.point(context.matrix, right, y - metrics.ascent),
@@ -253,6 +290,28 @@ export class DesignSvgImportLabel {
             this.tree.recordGeometry(context.id, DesignPaths.normalize(commands));
         }
         const node: DesignNode = DesignDefaults.node(context.id, 'text', context.name);
+        const sourceBounds: DesignSvgSourceBounds = {
+            x,
+            y: sourceTop,
+            width: advance,
+            height: sourceBottom - sourceTop,
+        };
+        this.tree.recordOriginalBounds(context.id, sourceBounds, context.matrix);
+        const appearance: DesignSvgTextAppearance = this.textPaints.prepare(
+            context.id,
+            text,
+            ranges,
+            DesignSvgImportTextPaints.fill(style),
+            {
+                source: sourceBounds,
+                target: { x, y: top, width, height, path: [] },
+                matrix: T.identity,
+                viewportWidth: context.width,
+                viewportHeight: context.height,
+                color: style['color'] ?? '#000000',
+            },
+            factor,
+        );
         this.tree.append({
             ...node,
             parentId: context.parentId,
@@ -265,16 +324,8 @@ export class DesignSvgImportLabel {
                 style['display'] !== 'none' &&
                 !['hidden', 'collapse'].includes(style['visibility'] ?? 'visible'),
             opacity: Appearance.opacity(style['opacity']),
-            style: { ...node.style, fills: [DesignDefaults.paint(base.color)] },
-            text: {
-                ...text,
-                size: text.size * factor,
-                letterSpacing: text.letterSpacing * factor,
-                runs: text.runs.map((run: DesignTextRun): DesignTextRun => ({
-                    ...run,
-                    size: run.size * factor,
-                })),
-            },
+            style: { ...node.style, fills: appearance.fills },
+            text: appearance.text,
         });
         return context.id;
     }
@@ -289,6 +340,14 @@ export class DesignSvgImportLabel {
     ): void {
         Styles.validate(element, style);
         if (!root) {
+            if (
+                (style['direction'] ?? 'ltr') !== context.direction ||
+                (style['unicode-bidi'] ?? 'normal') !== context.bidi
+            ) {
+                throw new Error(
+                    'SVG inline direction changes require independent native directional ranges.',
+                );
+            }
             for (const property of ['x', 'y', 'dx', 'dy', 'transform', 'clip-path', 'mask']) {
                 if (style[property] !== undefined || element.attributes[property] !== undefined) {
                     throw new Error(
@@ -317,6 +376,7 @@ export class DesignSvgImportLabel {
             return;
         }
         const span: DesignTextSpanStyle = this.fonts.resolve(Styles.span(style));
+        const fill: DesignSvgTextFill = DesignSvgImportTextPaints.fill(style);
         const baseline: string =
             !root && style['alignment-baseline'] === 'alphabetic'
                 ? 'alphabetic'
@@ -329,11 +389,12 @@ export class DesignSvgImportLabel {
                 if (
                     previous !== undefined &&
                     previous.baseline === baseline &&
+                    JSON.stringify(previous.fill) === JSON.stringify(fill) &&
                     this.#same(previous.style, span)
                 ) {
                     parts[parts.length - 1] = { ...previous, content: previous.content + value };
                 } else {
-                    parts.push({ content: value, style: span, baseline });
+                    parts.push({ content: value, style: span, baseline, fill });
                 }
             } else if (child.name === 'tspan') {
                 const resolved: Readonly<Record<string, string>> = new Styles(this.css).resolve(
