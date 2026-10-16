@@ -8,6 +8,7 @@ import {
     type DesignBezierSegment,
 } from './DesignBezier.js';
 import { DesignPathVerb as Verb, type DesignPathCommand } from './DesignTypes.js';
+import { DesignStrokeGeometry, type DesignStrokePhase } from './DesignStrokeGeometry.js';
 
 /** General SVG dash arrays retain editable curves and joins, including odd patterns and closed seams. */
 export class DesignPathDashes {
@@ -15,6 +16,7 @@ export class DesignPathDashes {
     public static paint(
         path: readonly DesignPathCommand[],
         pattern: readonly number[],
+        offset: number = 0,
     ): readonly DesignPathCommand[] {
         if (pattern.length === 0) {
             return path;
@@ -37,6 +39,7 @@ export class DesignPathDashes {
                 contour,
                 values,
                 metric,
+                offset,
             );
             for (const run of runs) {
                 if (output.length + run.length > 10_000) {
@@ -52,14 +55,13 @@ export class DesignPathDashes {
         contour: DesignBezierContour,
         values: readonly number[],
         metric: DesignBezier,
+        offset: number,
     ): readonly (readonly DesignPathCommand[])[] {
         const runs: DesignPathCommand[][] = [];
         let run: DesignPathCommand[] = [];
-        let index: number = 0;
-        while (values[index] === 0) {
-            index += 1;
-        }
-        let remaining: number = values[index] ?? 0;
+        const phase: DesignStrokePhase = DesignStrokeGeometry.dashPhase(values, offset);
+        let index: number = phase.index;
+        let remaining: number = phase.remaining;
         const startsPainted: boolean = index % 2 === 0;
         let endsPainted: boolean = false;
         let commands: number = 0;

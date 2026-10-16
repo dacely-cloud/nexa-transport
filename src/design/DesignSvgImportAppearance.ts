@@ -64,12 +64,6 @@ export class DesignSvgImportAppearance {
             throw new DesignSvgInputError('SVG filter requires native import conversion.');
         }
         if (
-            style['stroke-dashoffset'] !== undefined &&
-            DesignSvgNumbers.length(style['stroke-dashoffset'], 1) !== 0
-        ) {
-            throw new DesignSvgInputError('SVG dash offsets require native dash-phase support.');
-        }
-        if (
             style['vector-effect'] !== undefined &&
             !['none', 'non-scaling-stroke'].includes(style['vector-effect'])
         ) {

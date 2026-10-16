@@ -131,6 +131,7 @@ export class DesignBooleanKernel {
                                   DesignPathDashes.paint(
                                       DesignPathConics.decode(outline.toCmds()),
                                       stroke.dash,
+                                      stroke.dashOffset ?? 0,
                                   ),
                               ),
                           ),

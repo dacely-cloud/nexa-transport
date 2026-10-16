@@ -421,6 +421,7 @@ export interface DesignPaintGradientOperation {
 export interface DesignStrokeChanges {
     readonly width?: number;
     readonly dash?: readonly number[];
+    readonly dashOffset?: number;
     readonly cap?: DesignStrokeCap;
     readonly join?: DesignStrokeJoin;
     readonly miterLimit?: number;

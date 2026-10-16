@@ -122,6 +122,8 @@ export interface DesignStroke {
     readonly paint: DesignPaint;
     readonly width: number;
     readonly dash: readonly number[];
+    /** Signed distance into the repeated dash pattern; omission starts at zero. */
+    readonly dashOffset?: number;
 }
 /** Drop or inner shadow. */
 export interface DesignShadow {

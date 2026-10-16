@@ -9507,6 +9507,11 @@ export const schema: Schema = {
                     },
                     type: 'array',
                 },
+                dashOffset: {
+                    description:
+                        'Signed distance into the repeated dash pattern; omission starts at zero.',
+                    type: 'number',
+                },
                 join: {
                     description: 'Omission retains the original round-join behavior.',
                     enum: ['bevel', 'miter', 'round'],
@@ -9541,6 +9546,9 @@ export const schema: Schema = {
                         type: 'number',
                     },
                     type: 'array',
+                },
+                dashOffset: {
+                    type: 'number',
                 },
                 join: {
                     description:
@@ -11407,6 +11415,12 @@ export const schema: Schema = {
                     const: true,
                     description:
                         'Native layer blending and explicit group isolation preserve editable appearance.',
+                    type: 'boolean',
+                },
+                designStrokeDashOffset: {
+                    const: true,
+                    description:
+                        'Stroke phase is editable and preserved by SVG, glyph windows and Boolean silhouettes.',
                     type: 'boolean',
                 },
                 designTextDirection: {
@@ -20998,6 +21012,11 @@ export const schema: Schema = {
                 },
                 durationMs: {
                     type: 'number',
+                },
+                executionStarted: {
+                    description:
+                        'Registry-owned leaf-entry evidence; absent means unknown, and tool-returned data cannot set it.',
+                    type: 'boolean',
                 },
                 result: {
                     $ref: '#/definitions/ToolResult',

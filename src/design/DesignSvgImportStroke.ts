@@ -14,6 +14,7 @@ export interface DesignSvgStrokeSource {
     readonly color: string;
     readonly width: number;
     readonly dash: readonly number[];
+    readonly dashOffset: number;
     readonly cap: NonNullable<DesignStroke['cap']>;
     readonly join: NonNullable<DesignStroke['join']>;
     readonly miterLimit: number;
@@ -53,6 +54,7 @@ export class DesignSvgImportStroke {
                   source,
                   width,
                   dash,
+                  dashOffset: length(style['stroke-dashoffset'] ?? '0'),
                   opacity: Appearance.opacity(style['stroke-opacity']),
                   color: style['color'] ?? '#000000',
                   cap: Appearance.cap(style['stroke-linecap'] ?? 'butt'),
@@ -83,6 +85,7 @@ export class DesignSvgImportStroke {
                   paint,
                   width: source.width * scale,
                   dash: source.dash.map((value: number): number => value * scale),
+                  ...(source.dashOffset === 0 ? {} : { dashOffset: source.dashOffset * scale }),
                   cap: source.cap,
                   join: source.join,
                   miterLimit: source.miterLimit,

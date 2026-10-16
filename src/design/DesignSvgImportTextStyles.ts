@@ -85,6 +85,15 @@ export class DesignSvgImportTextStyles {
                               (value: string): string => this.#relative(value, size, rootSize),
                           ),
                       }),
+                ...(resolved['stroke-dashoffset'] === undefined
+                    ? {}
+                    : {
+                          'stroke-dashoffset': this.#relative(
+                              resolved['stroke-dashoffset'],
+                              size,
+                              rootSize,
+                          ),
+                      }),
             };
         }
         this.#rootSize = rootSize;

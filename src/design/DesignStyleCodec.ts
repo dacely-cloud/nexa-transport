@@ -110,7 +110,7 @@ export class DesignStyleCodec {
                 ? null
                 : V.fields(
                       value['stroke'],
-                      ['paint', 'width', 'dash', 'cap', 'join', 'miterLimit'],
+                      ['paint', 'width', 'dash', 'dashOffset', 'cap', 'join', 'miterLimit'],
                       ['paint', 'width', 'dash'],
                   );
         return {
@@ -150,6 +150,9 @@ export class DesignStyleCodec {
                               ? {}
                               : { miterLimit: V.number(stroke['miterLimit'], 1, 100) }),
                           width: V.number(stroke['width'], 0, 1000),
+                          ...(stroke['dashOffset'] === undefined
+                              ? {}
+                              : { dashOffset: V.number(stroke['dashOffset'], -1000000, 1000000) }),
                           dash: V.list(stroke['dash'], 16, (entry: unknown): number =>
                               V.number(entry, 0.01, 1000),
                           ),

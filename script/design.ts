@@ -338,6 +338,7 @@ for (const testName of [
     'DesignSvgTextStrokeImport',
     'DesignTextRangeFills',
     'DesignTextRangeFillsIntegration',
+    'DesignDashOffset',
     'DesignSvgGradientBudget',
 ]) {
     const runTestPath: string = 'test/' + testName + '.test.ts';

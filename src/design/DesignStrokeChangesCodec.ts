@@ -14,13 +14,16 @@ export class DesignStrokeChangesCodec {
         }
         const value: Readonly<Record<string, unknown>> = V.fields(
             raw,
-            ['width', 'dash', 'cap', 'join', 'miterLimit'],
+            ['width', 'dash', 'dashOffset', 'cap', 'join', 'miterLimit'],
             [],
         );
         if (Object.keys(value).length === 0) {
             throw new Error('Supply at least one stroke property.');
         }
         return {
+            ...(value['dashOffset'] === undefined
+                ? {}
+                : { dashOffset: V.number(value['dashOffset'], -1000000, 1000000) }),
             ...(value['width'] === undefined ? {} : { width: V.number(value['width'], 0, 1000) }),
             ...(value['dash'] === undefined
                 ? {}

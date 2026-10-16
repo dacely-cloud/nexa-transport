@@ -244,6 +244,7 @@ What one turn is asked for.
 | `responseFormat`    | No       | `"json"` / `"text"`                                                           | Final answer format; JSON mode does not disable tools or verification.      |
 | `targetTimeSeconds` | No       | `integer`                                                                     | Soft task time target in seconds; never a cancellation deadline.            |
 | `userId`            | No       | `string`                                                                      | The principal the turn is billed and authorized as.                         |
+| `userRegion`        | No       | [UserRegion](protocol.md#userregion)                                          | Coarse regional preferences, never authorization or precise location.       |
 
 ## AskResult
 
@@ -2276,6 +2277,28 @@ Alignment within the available layout space.
 
 Type: `"between"` / `"center"` / `"end"` / `"start"` / `"stretch"`.
 
+## DesignArcOperation
+
+Page-scoped arc edits regenerate only the selected ellipse's bounded curve geometry.
+
+| Field     | Required | Type                                                        | Description |
+| --------- | -------- | ----------------------------------------------------------- | ----------- |
+| `changes` | Yes      | [DesignArcSettings](protocol.md#designarcsettings) / `null` |             |
+| `id`      | Yes      | `string`                                                    |             |
+| `op`      | Yes      | `"arc"`                                                     |             |
+| `pageId`  | Yes      | `string`                                                    |             |
+
+## DesignArcSettings
+
+Ellipse-relative angles and radius preserve editable arcs, sectors and rings.
+
+| Field         | Required | Type      | Description                                                                                              |
+| ------------- | -------- | --------- | -------------------------------------------------------------------------------------------------------- |
+| `closed`      | Yes      | `boolean` | Closed partial curves join the center or the inner arc; open curves retain ordinary SVG paint semantics. |
+| `innerRadius` | Yes      | `number`  | Inner ellipse radius relative to the outer ellipse.                                                      |
+| `start`       | Yes      | `number`  | Start angle in clockwise degrees from the right-hand ellipse axis.                                       |
+| `sweep`       | Yes      | `number`  | Signed clockwise sweep; zero produces no painted curve.                                                  |
+
 ## DesignArrangeMethod
 
 Workspace-native arrangement avoids uploading or hydrating selected layer bodies.
@@ -2657,6 +2680,43 @@ Small receipt for the owner's current immutable clipboard snapshot.
 | `selection`      | Yes      | Array of `string`                                          |             |
 | `sourceId`       | Yes      | `string`                                                   |             |
 | `sourceRevision` | Yes      | `string`                                                   |             |
+
+## DesignColorReadMethod
+
+Native color pages use the authenticated read-only gateway.
+
+| Field    | Required | Type                                                         | Description |
+| -------- | -------- | ------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [DesignColorReadRequest](protocol.md#designcolorreadrequest) |             |
+| `result` | Yes      | [DesignColorReadPage](protocol.md#designcolorreadpage)       |             |
+
+## DesignColorReadPage
+
+Only colors and authored-layer counts leave storage; the digest binds all continuation pages.
+
+| Field             | Required | Type                                                              | Description |
+| ----------------- | -------- | ----------------------------------------------------------------- | ----------- |
+| `colors`          | Yes      | Array of [DesignSelectionColor](protocol.md#designselectioncolor) |             |
+| `id`              | Yes      | `string`                                                          |             |
+| `nextOffset`      | Yes      | `null,number`                                                     |             |
+| `offset`          | Yes      | `number`                                                          |             |
+| `pageId`          | Yes      | `string`                                                          |             |
+| `revision`        | Yes      | `string`                                                          |             |
+| `selectionSha256` | Yes      | `string`                                                          |             |
+| `total`           | Yes      | `number`                                                          |             |
+
+## DesignColorReadRequest
+
+Revision-pinned color grouping addresses authored selection roots without source transfers.
+
+| Field       | Required | Type              | Description |
+| ----------- | -------- | ----------------- | ----------- |
+| `id`        | Yes      | `string`          |             |
+| `limit`     | Yes      | `number`          |             |
+| `offset`    | Yes      | `number`          |             |
+| `pageId`    | Yes      | `string`          |             |
+| `revision`  | Yes      | `string`          |             |
+| `selection` | Yes      | Array of `string` |             |
 
 ## DesignComment
 
@@ -3119,6 +3179,15 @@ Library browsing carries metadata, with a stable lexicographic cursor.
 | `after` | Yes      | `null,string` |             |
 | `limit` | Yes      | `number`      |             |
 
+## DesignFontPaintClip
+
+Only a source boundary inside a glyph cluster clips its ink; exterior overhang stays visible.
+
+| Field   | Required | Type          | Description |
+| ------- | -------- | ------------- | ----------- |
+| `left`  | Yes      | `null,number` |             |
+| `right` | Yes      | `null,number` |             |
+
 ## DesignFontReadMethod
 
 Each authenticated WebSocket read transfers one independently bounded immutable slice.
@@ -3445,12 +3514,12 @@ Native geometry uses the same layout engine as the canvas.
 
 Canvas records never ask for explicit source-body hydration.
 
-| Field       | Required | Type                                                       | Description |
-| ----------- | -------- | ---------------------------------------------------------- | ----------- |
-| `action`    | Yes      | `"canvas"`                                                 |             |
-| `key`       | Yes      | `null,string`                                              |             |
-| `operation` | Yes      | [DesignLayoutOperation](protocol.md#designlayoutoperation) |             |
-| `params`    | Yes      | [DesignViewRequest](protocol.md#designviewrequest)         |             |
+| Field       | Required | Type                                                         | Description |
+| ----------- | -------- | ------------------------------------------------------------ | ----------- |
+| `action`    | Yes      | `"canvas"`                                                   |             |
+| `key`       | Yes      | `null,string`                                                |             |
+| `operation` | Yes      | [DesignPreviewOperation](protocol.md#designpreviewoperation) |             |
+| `params`    | Yes      | [DesignViewRequest](protocol.md#designviewrequest)           |             |
 
 ## DesignLayoutPreviewCanvasResult
 
@@ -3479,7 +3548,7 @@ Width-specific native metrics are paged independently of the source text.
 | ----------- | -------- | -------------------------------------------------------------------- | ----------- |
 | `action`    | Yes      | `"metrics"`                                                          |             |
 | `key`       | Yes      | `null,string`                                                        |             |
-| `operation` | Yes      | [DesignLayoutOperation](protocol.md#designlayoutoperation)           |             |
+| `operation` | Yes      | [DesignPreviewOperation](protocol.md#designpreviewoperation)         |             |
 | `params`    | Yes      | [DesignCanvasMetricsRequest](protocol.md#designcanvasmetricsrequest) |             |
 
 ## DesignLayoutPreviewMetricsResult
@@ -3498,12 +3567,12 @@ A preview cannot contain arbitrary scene replacement operations.
 
 Variant 1: [DesignLayoutPreviewCanvasRequest](protocol.md#designlayoutpreviewcanvasrequest)
 
-| Field       | Required | Type                                                       | Description |
-| ----------- | -------- | ---------------------------------------------------------- | ----------- |
-| `action`    | Yes      | `"canvas"`                                                 |             |
-| `key`       | Yes      | `null,string`                                              |             |
-| `operation` | Yes      | [DesignLayoutOperation](protocol.md#designlayoutoperation) |             |
-| `params`    | Yes      | [DesignViewRequest](protocol.md#designviewrequest)         |             |
+| Field       | Required | Type                                                         | Description |
+| ----------- | -------- | ------------------------------------------------------------ | ----------- |
+| `action`    | Yes      | `"canvas"`                                                   |             |
+| `key`       | Yes      | `null,string`                                                |             |
+| `operation` | Yes      | [DesignPreviewOperation](protocol.md#designpreviewoperation) |             |
+| `params`    | Yes      | [DesignViewRequest](protocol.md#designviewrequest)           |             |
 
 Variant 2: [DesignLayoutPreviewMetricsRequest](protocol.md#designlayoutpreviewmetricsrequest)
 
@@ -3511,7 +3580,7 @@ Variant 2: [DesignLayoutPreviewMetricsRequest](protocol.md#designlayoutpreviewme
 | ----------- | -------- | -------------------------------------------------------------------- | ----------- |
 | `action`    | Yes      | `"metrics"`                                                          |             |
 | `key`       | Yes      | `null,string`                                                        |             |
-| `operation` | Yes      | [DesignLayoutOperation](protocol.md#designlayoutoperation)           |             |
+| `operation` | Yes      | [DesignPreviewOperation](protocol.md#designpreviewoperation)         |             |
 | `params`    | Yes      | [DesignCanvasMetricsRequest](protocol.md#designcanvasmetricsrequest) |             |
 
 Variant 3: [DesignLayoutPreviewTextRequest](protocol.md#designlayoutpreviewtextrequest)
@@ -3520,7 +3589,7 @@ Variant 3: [DesignLayoutPreviewTextRequest](protocol.md#designlayoutpreviewtextr
 | ----------- | -------- | -------------------------------------------------------------- | ----------- |
 | `action`    | Yes      | `"text"`                                                       |             |
 | `key`       | Yes      | `null,string`                                                  |             |
-| `operation` | Yes      | [DesignLayoutOperation](protocol.md#designlayoutoperation)     |             |
+| `operation` | Yes      | [DesignPreviewOperation](protocol.md#designpreviewoperation)   |             |
 | `params`    | Yes      | [DesignTextWindowRequest](protocol.md#designtextwindowrequest) |             |
 
 ## DesignLayoutPreviewResult
@@ -3559,7 +3628,7 @@ Only the visible glyph rectangle is transferred for the projected paragraph.
 | ----------- | -------- | -------------------------------------------------------------- | ----------- |
 | `action`    | Yes      | `"text"`                                                       |             |
 | `key`       | Yes      | `null,string`                                                  |             |
-| `operation` | Yes      | [DesignLayoutOperation](protocol.md#designlayoutoperation)     |             |
+| `operation` | Yes      | [DesignPreviewOperation](protocol.md#designpreviewoperation)   |             |
 | `params`    | Yes      | [DesignTextWindowRequest](protocol.md#designtextwindowrequest) |             |
 
 ## DesignLayoutPreviewTextResult
@@ -3655,66 +3724,70 @@ Reparent or reorder without breaking both sides of the tree.
 
 All layer state is explicit and editable; no generated markup is the source of truth.
 
-| Field          | Required | Type                                                          | Description                                                                          |
-| -------------- | -------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| `booleanMode`  | No       | `"exclude"` / `"intersect"` / `"subtract"` / `"union"`        | Omitted on ordinary layers, preserving existing document and retry identities.       |
-| `children`     | Yes      | Array of `string`                                             |                                                                                      |
-| `componentId`  | Yes      | `null,string`                                                 |                                                                                      |
-| `contentScale` | No       | `number`                                                      | Uniform linked artwork scale; definitions retain their original geometry and styles. |
-| `height`       | Yes      | `number`                                                      |                                                                                      |
-| `id`           | Yes      | `string`                                                      |                                                                                      |
-| `image`        | Yes      | [DesignImage](protocol.md#designimage) / `null`               |                                                                                      |
-| `kind`         | Yes      | [DesignKind](protocol.md#designkind)                          |                                                                                      |
-| `layout`       | Yes      | [DesignLayout](protocol.md#designlayout)                      |                                                                                      |
-| `layoutGrids`  | No       | Array of [DesignFrameGrid](protocol.md#designframegrid)       | Optional saved frame overlays are omitted from artwork exports.                      |
-| `locked`       | Yes      | `boolean`                                                     |                                                                                      |
-| `mask`         | No       | [DesignMask](protocol.md#designmask)                          | Retained source identity and coverage mode; omitted on ordinary layers.              |
-| `name`         | Yes      | `string`                                                      |                                                                                      |
-| `opacity`      | Yes      | `number`                                                      |                                                                                      |
-| `overrides`    | Yes      | Array of [DesignOverride](protocol.md#designoverride)         |                                                                                      |
-| `parentId`     | Yes      | `null,string`                                                 |                                                                                      |
-| `path`         | Yes      | Array of [DesignPathCommand](protocol.md#designpathcommand)   |                                                                                      |
-| `placement`    | Yes      | [DesignPlacement](protocol.md#designplacement)                |                                                                                      |
-| `rotation`     | Yes      | `number`                                                      |                                                                                      |
-| `style`        | Yes      | [DesignStyle](protocol.md#designstyle)                        |                                                                                      |
-| `text`         | Yes      | [DesignText](protocol.md#designtext) / `null`                 |                                                                                      |
-| `variant`      | No       | Array of [DesignVariantValue](protocol.md#designvariantvalue) | Named values on an immediate component definition inside a variant set.              |
-| `variants`     | No       | [DesignVariantSet](protocol.md#designvariantset)              | Reusable variant set metadata; only component-set containers accept it.              |
-| `visible`      | Yes      | `boolean`                                                     |                                                                                      |
-| `width`        | Yes      | `number`                                                      |                                                                                      |
-| `x`            | Yes      | `number`                                                      |                                                                                      |
-| `y`            | Yes      | `number`                                                      |                                                                                      |
+| Field          | Required | Type                                                          | Description                                                                              |
+| -------------- | -------- | ------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `arc`          | No       | [DesignArcSettings](protocol.md#designarcsettings)            | Optional ellipse-relative arc, sector or ring parameters.                                |
+| `booleanMode`  | No       | `"exclude"` / `"intersect"` / `"subtract"` / `"union"`        | Omitted on ordinary layers, preserving existing document and retry identities.           |
+| `children`     | Yes      | Array of `string`                                             |                                                                                          |
+| `componentId`  | Yes      | `null,string`                                                 |                                                                                          |
+| `contentScale` | No       | `number`                                                      | Uniform linked artwork scale; definitions retain their original geometry and styles.     |
+| `height`       | Yes      | `number`                                                      |                                                                                          |
+| `id`           | Yes      | `string`                                                      |                                                                                          |
+| `image`        | Yes      | [DesignImage](protocol.md#designimage) / `null`               |                                                                                          |
+| `kind`         | Yes      | [DesignKind](protocol.md#designkind)                          |                                                                                          |
+| `layout`       | Yes      | [DesignLayout](protocol.md#designlayout)                      |                                                                                          |
+| `layoutGrids`  | No       | Array of [DesignFrameGrid](protocol.md#designframegrid)       | Optional saved frame overlays are omitted from artwork exports.                          |
+| `locked`       | Yes      | `boolean`                                                     |                                                                                          |
+| `mask`         | No       | [DesignMask](protocol.md#designmask)                          | Retained source identity and coverage mode; omitted on ordinary layers.                  |
+| `name`         | Yes      | `string`                                                      |                                                                                          |
+| `opacity`      | Yes      | `number`                                                      |                                                                                          |
+| `overrides`    | Yes      | Array of [DesignOverride](protocol.md#designoverride)         |                                                                                          |
+| `parentId`     | Yes      | `null,string`                                                 |                                                                                          |
+| `path`         | Yes      | Array of [DesignPathCommand](protocol.md#designpathcommand)   |                                                                                          |
+| `placement`    | Yes      | [DesignPlacement](protocol.md#designplacement)                |                                                                                          |
+| `polygon`      | No       | [DesignPolygonSettings](protocol.md#designpolygonsettings)    | Optional regular polygon or star parameters; freeform path edits detach this definition. |
+| `rotation`     | Yes      | `number`                                                      |                                                                                          |
+| `style`        | Yes      | [DesignStyle](protocol.md#designstyle)                        |                                                                                          |
+| `text`         | Yes      | [DesignText](protocol.md#designtext) / `null`                 |                                                                                          |
+| `variant`      | No       | Array of [DesignVariantValue](protocol.md#designvariantvalue) | Named values on an immediate component definition inside a variant set.                  |
+| `variants`     | No       | [DesignVariantSet](protocol.md#designvariantset)              | Reusable variant set metadata; only component-set containers accept it.                  |
+| `visible`      | Yes      | `boolean`                                                     |                                                                                          |
+| `width`        | Yes      | `number`                                                      |                                                                                          |
+| `x`            | Yes      | `number`                                                      |                                                                                          |
+| `y`            | Yes      | `number`                                                      |                                                                                          |
 
 ## DesignNodeChanges
 
 Editable properties exclude identity and tree links, which have dedicated operations.
 
-| Field          | Required | Type                                                                                                                                                                                       | Description                                                                        |
-| -------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
-| `booleanMode`  | No       | `"exclude"` / `"intersect"` / `"subtract"` / `"union"` / `null`                                                                                                                            | A null value clears the operation when explicitly flattening a Boolean group.      |
-| `componentId`  | No       | `null,string`                                                                                                                                                                              |                                                                                    |
-| `contentScale` | No       | `null,number`                                                                                                                                                                              |                                                                                    |
-| `height`       | No       | `number`                                                                                                                                                                                   |                                                                                    |
-| `image`        | No       | [DesignImage](protocol.md#designimage) / `null`                                                                                                                                            |                                                                                    |
-| `kind`         | No       | `"boolean"` / `"component"` / `"component-set"` / `"ellipse"` / `"frame"` / `"group"` / `"image"` / `"instance"` / `"line"` / `"mask"` / `"path"` / `"polygon"` / `"rectangle"` / `"text"` | Editable scene primitives, including reusable component definitions and instances. |
-| `layout`       | No       | [DesignLayout](protocol.md#designlayout)                                                                                                                                                   | Container layout, including wrapping, grid tracks and content alignment.           |
-| `layoutGrids`  | No       | Array of [DesignFrameGrid](protocol.md#designframegrid) / `null`                                                                                                                           | Null removes construction overlays while preserving authored artwork.              |
-| `locked`       | No       | `boolean`                                                                                                                                                                                  |                                                                                    |
-| `mask`         | No       | [DesignMask](protocol.md#designmask) / `null`                                                                                                                                              | Null clears masking when converting the container into an ordinary group.          |
-| `name`         | No       | `string`                                                                                                                                                                                   |                                                                                    |
-| `opacity`      | No       | `number`                                                                                                                                                                                   |                                                                                    |
-| `overrides`    | No       | Array of [DesignOverride](protocol.md#designoverride)                                                                                                                                      |                                                                                    |
-| `path`         | No       | Array of [DesignPathCommand](protocol.md#designpathcommand)                                                                                                                                |                                                                                    |
-| `placement`    | No       | [DesignPlacement](protocol.md#designplacement)                                                                                                                                             | Child sizing and positioning relative to its parent.                               |
-| `rotation`     | No       | `number`                                                                                                                                                                                   |                                                                                    |
-| `style`        | No       | [DesignStyle](protocol.md#designstyle)                                                                                                                                                     | Style can be shared across arbitrary primitives.                                   |
-| `text`         | No       | [DesignText](protocol.md#designtext) / `null`                                                                                                                                              |                                                                                    |
-| `variant`      | No       | Array of [DesignVariantValue](protocol.md#designvariantvalue) / `null`                                                                                                                     | Null releases a definition from its set.                                           |
-| `variants`     | No       | [DesignVariantSet](protocol.md#designvariantset) / `null`                                                                                                                                  | Null releases component-set metadata when converting its container.                |
-| `visible`      | No       | `boolean`                                                                                                                                                                                  |                                                                                    |
-| `width`        | No       | `number`                                                                                                                                                                                   |                                                                                    |
-| `x`            | No       | `number`                                                                                                                                                                                   |                                                                                    |
-| `y`            | No       | `number`                                                                                                                                                                                   |                                                                                    |
+| Field          | Required | Type                                                                                                                                                                                       | Description                                                                               |
+| -------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
+| `arc`          | No       | [DesignArcSettings](protocol.md#designarcsettings) / `null`                                                                                                                                | Null resets the layer to a complete ellipse, preserving paints and layout.                |
+| `booleanMode`  | No       | `"exclude"` / `"intersect"` / `"subtract"` / `"union"` / `null`                                                                                                                            | A null value clears the operation when explicitly flattening a Boolean group.             |
+| `componentId`  | No       | `null,string`                                                                                                                                                                              |                                                                                           |
+| `contentScale` | No       | `null,number`                                                                                                                                                                              |                                                                                           |
+| `height`       | No       | `number`                                                                                                                                                                                   |                                                                                           |
+| `image`        | No       | [DesignImage](protocol.md#designimage) / `null`                                                                                                                                            |                                                                                           |
+| `kind`         | No       | `"boolean"` / `"component"` / `"component-set"` / `"ellipse"` / `"frame"` / `"group"` / `"image"` / `"instance"` / `"line"` / `"mask"` / `"path"` / `"polygon"` / `"rectangle"` / `"text"` | Editable scene primitives, including reusable component definitions and instances.        |
+| `layout`       | No       | [DesignLayout](protocol.md#designlayout)                                                                                                                                                   | Container layout, including wrapping, grid tracks and content alignment.                  |
+| `layoutGrids`  | No       | Array of [DesignFrameGrid](protocol.md#designframegrid) / `null`                                                                                                                           | Null removes construction overlays while preserving authored artwork.                     |
+| `locked`       | No       | `boolean`                                                                                                                                                                                  |                                                                                           |
+| `mask`         | No       | [DesignMask](protocol.md#designmask) / `null`                                                                                                                                              | Null clears masking when converting the container into an ordinary group.                 |
+| `name`         | No       | `string`                                                                                                                                                                                   |                                                                                           |
+| `opacity`      | No       | `number`                                                                                                                                                                                   |                                                                                           |
+| `overrides`    | No       | Array of [DesignOverride](protocol.md#designoverride)                                                                                                                                      |                                                                                           |
+| `path`         | No       | Array of [DesignPathCommand](protocol.md#designpathcommand)                                                                                                                                |                                                                                           |
+| `placement`    | No       | [DesignPlacement](protocol.md#designplacement)                                                                                                                                             | Child sizing and positioning relative to its parent.                                      |
+| `polygon`      | No       | [DesignPolygonSettings](protocol.md#designpolygonsettings) / `null`                                                                                                                        | Replaces regular polygon or star parameters; null keeps its outline as a freeform vector. |
+| `rotation`     | No       | `number`                                                                                                                                                                                   |                                                                                           |
+| `style`        | No       | [DesignStyle](protocol.md#designstyle)                                                                                                                                                     | Style can be shared across arbitrary primitives.                                          |
+| `text`         | No       | [DesignText](protocol.md#designtext) / `null`                                                                                                                                              |                                                                                           |
+| `variant`      | No       | Array of [DesignVariantValue](protocol.md#designvariantvalue) / `null`                                                                                                                     | Null releases a definition from its set.                                                  |
+| `variants`     | No       | [DesignVariantSet](protocol.md#designvariantset) / `null`                                                                                                                                  | Null releases component-set metadata when converting its container.                       |
+| `visible`      | No       | `boolean`                                                                                                                                                                                  |                                                                                           |
+| `width`        | No       | `number`                                                                                                                                                                                   |                                                                                           |
+| `x`            | No       | `number`                                                                                                                                                                                   |                                                                                           |
+| `y`            | No       | `number`                                                                                                                                                                                   |                                                                                           |
 
 ## DesignNodeRecord
 
@@ -3730,25 +3803,17 @@ Layer record.
 
 A transaction can contain different operation types.
 
-Variant 1: [DesignInsert](protocol.md#designinsert)
+Variant 1: [DesignRecolorOperation](protocol.md#designrecoloroperation)
 
-| Field      | Required | Type                                 | Description |
-| ---------- | -------- | ------------------------------------ | ----------- |
-| `index`    | Yes      | `number`                             |             |
-| `node`     | Yes      | [DesignNode](protocol.md#designnode) |             |
-| `op`       | Yes      | `"insert"`                           |             |
-| `pageId`   | Yes      | `string`                             |             |
-| `parentId` | Yes      | `null,string`                        |             |
+| Field       | Required | Type              | Description |
+| ----------- | -------- | ----------------- | ----------- |
+| `after`     | Yes      | `string`          |             |
+| `before`    | Yes      | `string`          |             |
+| `op`        | Yes      | `"recolor"`       |             |
+| `pageId`    | Yes      | `string`          |             |
+| `selection` | Yes      | Array of `string` |             |
 
-Variant 2: [DesignUpdate](protocol.md#designupdate)
-
-| Field     | Required | Type                                               | Description |
-| --------- | -------- | -------------------------------------------------- | ----------- |
-| `changes` | Yes      | [DesignNodeChanges](protocol.md#designnodechanges) |             |
-| `id`      | Yes      | `string`                                           |             |
-| `op`      | Yes      | `"update"`                                         |             |
-
-Variant 3: [DesignLayoutOperation](protocol.md#designlayoutoperation)
+Variant 2: [DesignLayoutOperation](protocol.md#designlayoutoperation)
 
 | Field     | Required | Type                                                   | Description |
 | --------- | -------- | ------------------------------------------------------ | ----------- |
@@ -3757,53 +3822,20 @@ Variant 3: [DesignLayoutOperation](protocol.md#designlayoutoperation)
 | `op`      | Yes      | `"layout"`                                             |             |
 | `pageId`  | Yes      | `string`                                               |             |
 
-Variant 4: [DesignSizingOperation](protocol.md#designsizingoperation)
+Variant 3: [DesignReparentOperation](protocol.md#designreparentoperation)
 
-| Field     | Required | Type                                                   | Description |
-| --------- | -------- | ------------------------------------------------------ | ----------- |
-| `changes` | Yes      | [DesignSizingChanges](protocol.md#designsizingchanges) |             |
-| `id`      | Yes      | `string`                                               |             |
-| `op`      | Yes      | `"sizing"`                                             |             |
-| `pageId`  | Yes      | `string`                                               |             |
+| Field       | Required | Type              | Description                                                                                       |
+| ----------- | -------- | ----------------- | ------------------------------------------------------------------------------------------------- |
+| `absolute`  | No       | `boolean`         | Defaults to true; false joins an automatic destination's flow instead of applying a displacement. |
+| `dx`        | No       | `number`          | Optional world displacement applies after preserving the original geometry.                       |
+| `dy`        | No       | `number`          | Optional world displacement applies after preserving the original geometry.                       |
+| `index`     | Yes      | `number`          |                                                                                                   |
+| `op`        | Yes      | `"reparent"`      |                                                                                                   |
+| `pageId`    | Yes      | `string`          |                                                                                                   |
+| `parentId`  | Yes      | `null,string`     |                                                                                                   |
+| `selection` | Yes      | Array of `string` |                                                                                                   |
 
-Variant 5: [DesignTypographyStyleOperation](protocol.md#designtypographystyleoperation)
-
-| Field     | Required | Type                 | Description |
-| --------- | -------- | -------------------- | ----------- |
-| `id`      | Yes      | `string`             |             |
-| `op`      | Yes      | `"typography-style"` |             |
-| `pageId`  | Yes      | `string`             |             |
-| `tokenId` | Yes      | `null,string`        |             |
-
-Variant 6: [DesignTypographyOperation](protocol.md#designtypographyoperation)
-
-| Field     | Required | Type                                                           | Description |
-| --------- | -------- | -------------------------------------------------------------- | ----------- |
-| `changes` | Yes      | [DesignTypographyChanges](protocol.md#designtypographychanges) |             |
-| `id`      | Yes      | `string`                                                       |             |
-| `op`      | Yes      | `"typography"`                                                 |             |
-| `pageId`  | Yes      | `string`                                                       |             |
-
-Variant 7: [DesignTextStyleOperation](protocol.md#designtextstyleoperation)
-
-| Field     | Required | Type                                                         | Description |
-| --------- | -------- | ------------------------------------------------------------ | ----------- |
-| `changes` | Yes      | [DesignTextStyleChanges](protocol.md#designtextstylechanges) |             |
-| `end`     | Yes      | `number`                                                     |             |
-| `id`      | Yes      | `string`                                                     |             |
-| `op`      | Yes      | `"text-style"`                                               |             |
-| `pageId`  | Yes      | `string`                                                     |             |
-| `start`   | Yes      | `number`                                                     |             |
-
-Variant 8: [DesignTextOperation](protocol.md#designtextoperation)
-
-| Field     | Required | Type     | Description |
-| --------- | -------- | -------- | ----------- |
-| `content` | Yes      | `string` |             |
-| `id`      | Yes      | `string` |             |
-| `op`      | Yes      | `"text"` |             |
-
-Variant 9: [DesignResizeOperation](protocol.md#designresizeoperation)
+Variant 4: [DesignResizeOperation](protocol.md#designresizeoperation)
 
 | Field       | Required | Type              | Description                                                                              |
 | ----------- | -------- | ----------------- | ---------------------------------------------------------------------------------------- |
@@ -3815,7 +3847,71 @@ Variant 9: [DesignResizeOperation](protocol.md#designresizeoperation)
 | `x`         | No       | `number`          | Position edits accompany a single dragged layer and use its resolved parent coordinates. |
 | `y`         | No       | `number`          |                                                                                          |
 
-Variant 10: [DesignPositionOperation](protocol.md#designpositionoperation)
+Variant 5: [DesignInsert](protocol.md#designinsert)
+
+| Field      | Required | Type                                 | Description |
+| ---------- | -------- | ------------------------------------ | ----------- |
+| `index`    | Yes      | `number`                             |             |
+| `node`     | Yes      | [DesignNode](protocol.md#designnode) |             |
+| `op`       | Yes      | `"insert"`                           |             |
+| `pageId`   | Yes      | `string`                             |             |
+| `parentId` | Yes      | `null,string`                        |             |
+
+Variant 6: [DesignUpdate](protocol.md#designupdate)
+
+| Field     | Required | Type                                               | Description |
+| --------- | -------- | -------------------------------------------------- | ----------- |
+| `changes` | Yes      | [DesignNodeChanges](protocol.md#designnodechanges) |             |
+| `id`      | Yes      | `string`                                           |             |
+| `op`      | Yes      | `"update"`                                         |             |
+
+Variant 7: [DesignSizingOperation](protocol.md#designsizingoperation)
+
+| Field     | Required | Type                                                   | Description |
+| --------- | -------- | ------------------------------------------------------ | ----------- |
+| `changes` | Yes      | [DesignSizingChanges](protocol.md#designsizingchanges) |             |
+| `id`      | Yes      | `string`                                               |             |
+| `op`      | Yes      | `"sizing"`                                             |             |
+| `pageId`  | Yes      | `string`                                               |             |
+
+Variant 8: [DesignTypographyStyleOperation](protocol.md#designtypographystyleoperation)
+
+| Field     | Required | Type                 | Description |
+| --------- | -------- | -------------------- | ----------- |
+| `id`      | Yes      | `string`             |             |
+| `op`      | Yes      | `"typography-style"` |             |
+| `pageId`  | Yes      | `string`             |             |
+| `tokenId` | Yes      | `null,string`        |             |
+
+Variant 9: [DesignTypographyOperation](protocol.md#designtypographyoperation)
+
+| Field     | Required | Type                                                           | Description |
+| --------- | -------- | -------------------------------------------------------------- | ----------- |
+| `changes` | Yes      | [DesignTypographyChanges](protocol.md#designtypographychanges) |             |
+| `id`      | Yes      | `string`                                                       |             |
+| `op`      | Yes      | `"typography"`                                                 |             |
+| `pageId`  | Yes      | `string`                                                       |             |
+
+Variant 10: [DesignTextStyleOperation](protocol.md#designtextstyleoperation)
+
+| Field     | Required | Type                                                         | Description |
+| --------- | -------- | ------------------------------------------------------------ | ----------- |
+| `changes` | Yes      | [DesignTextStyleChanges](protocol.md#designtextstylechanges) |             |
+| `end`     | Yes      | `number`                                                     |             |
+| `id`      | Yes      | `string`                                                     |             |
+| `op`      | Yes      | `"text-style"`                                               |             |
+| `pageId`  | Yes      | `string`                                                     |             |
+| `start`   | Yes      | `number`                                                     |             |
+
+Variant 11: [DesignTextOperation](protocol.md#designtextoperation)
+
+| Field     | Required | Type     | Description |
+| --------- | -------- | -------- | ----------- |
+| `content` | Yes      | `string` |             |
+| `id`      | Yes      | `string` |             |
+| `op`      | Yes      | `"text"` |             |
+
+Variant 12: [DesignPositionOperation](protocol.md#designpositionoperation)
 
 | Field        | Required | Type                                                       | Description                                                          |
 | ------------ | -------- | ---------------------------------------------------------- | -------------------------------------------------------------------- |
@@ -3828,7 +3924,7 @@ Variant 10: [DesignPositionOperation](protocol.md#designpositionoperation)
 | `x`          | No       | `number`                                                   |                                                                      |
 | `y`          | No       | `number`                                                   |                                                                      |
 
-Variant 11: [DesignRotateOperation](protocol.md#designrotateoperation)
+Variant 13: [DesignRotateOperation](protocol.md#designrotateoperation)
 
 | Field       | Required | Type              | Description |
 | ----------- | -------- | ----------------- | ----------- |
@@ -3839,7 +3935,7 @@ Variant 11: [DesignRotateOperation](protocol.md#designrotateoperation)
 | `pivotY`    | No       | `number`          |             |
 | `selection` | Yes      | Array of `string` |             |
 
-Variant 12: [DesignScaleOperation](protocol.md#designscaleoperation)
+Variant 14: [DesignScaleOperation](protocol.md#designscaleoperation)
 
 | Field       | Required | Type              | Description |
 | ----------- | -------- | ----------------- | ----------- |
@@ -3850,7 +3946,7 @@ Variant 12: [DesignScaleOperation](protocol.md#designscaleoperation)
 | `pivotY`    | No       | `number`          |             |
 | `selection` | Yes      | Array of `string` |             |
 
-Variant 13: [DesignTranslateOperation](protocol.md#designtranslateoperation)
+Variant 15: [DesignTranslateOperation](protocol.md#designtranslateoperation)
 
 | Field       | Required | Type                                                        | Description |
 | ----------- | -------- | ----------------------------------------------------------- | ----------- |
@@ -3861,7 +3957,7 @@ Variant 13: [DesignTranslateOperation](protocol.md#designtranslateoperation)
 | `reorders`  | No       | Array of [DesignFlowReorder](protocol.md#designflowreorder) |             |
 | `selection` | Yes      | Array of `string`                                           |             |
 
-Variant 14: [DesignMove](protocol.md#designmove)
+Variant 16: [DesignMove](protocol.md#designmove)
 
 | Field      | Required | Type          | Description |
 | ---------- | -------- | ------------- | ----------- |
@@ -3871,14 +3967,14 @@ Variant 14: [DesignMove](protocol.md#designmove)
 | `pageId`   | Yes      | `string`      |             |
 | `parentId` | Yes      | `null,string` |             |
 
-Variant 15: [DesignRemove](protocol.md#designremove)
+Variant 17: [DesignRemove](protocol.md#designremove)
 
 | Field | Required | Type       | Description |
 | ----- | -------- | ---------- | ----------- |
 | `id`  | Yes      | `string`   |             |
 | `op`  | Yes      | `"remove"` |             |
 
-Variant 16: [DesignPageOperation](protocol.md#designpageoperation)
+Variant 18: [DesignPageOperation](protocol.md#designpageoperation)
 
 | Field        | Required | Type          | Description |
 | ------------ | -------- | ------------- | ----------- |
@@ -3887,7 +3983,7 @@ Variant 16: [DesignPageOperation](protocol.md#designpageoperation)
 | `name`       | Yes      | `null,string` |             |
 | `op`         | Yes      | `"page"`      |             |
 
-Variant 17: [DesignGuideOperation](protocol.md#designguideoperation)
+Variant 19: [DesignGuideOperation](protocol.md#designguideoperation)
 
 | Field    | Required | Type                                                      | Description |
 | -------- | -------- | --------------------------------------------------------- | ----------- |
@@ -3896,7 +3992,7 @@ Variant 17: [DesignGuideOperation](protocol.md#designguideoperation)
 | `pageId` | Yes      | `string`                                                  |             |
 | `value`  | Yes      | [DesignGuideValue](protocol.md#designguidevalue) / `null` |             |
 
-Variant 18: [DesignMetadata](protocol.md#designmetadata)
+Variant 20: [DesignMetadata](protocol.md#designmetadata)
 
 | Field          | Required | Type                                                        | Description |
 | -------------- | -------- | ----------------------------------------------------------- | ----------- |
@@ -3906,7 +4002,7 @@ Variant 18: [DesignMetadata](protocol.md#designmetadata)
 | `op`           | Yes      | `"metadata"`                                                |             |
 | `tokens`       | No       | Array of [DesignToken](protocol.md#designtoken)             |             |
 
-Variant 19: [DesignTokenOperation](protocol.md#designtokenoperation)
+Variant 21: [DesignTokenOperation](protocol.md#designtokenoperation)
 
 | Field     | Required | Type                                                          | Description |
 | --------- | -------- | ------------------------------------------------------------- | ----------- |
@@ -3914,7 +4010,7 @@ Variant 19: [DesignTokenOperation](protocol.md#designtokenoperation)
 | `id`      | Yes      | `string`                                                      |             |
 | `op`      | Yes      | `"token"`                                                     |             |
 
-Variant 20: [DesignPaintColorOperation](protocol.md#designpaintcoloroperation)
+Variant 22: [DesignPaintColorOperation](protocol.md#designpaintcoloroperation)
 
 | Field     | Required | Type                                                           | Description |
 | --------- | -------- | -------------------------------------------------------------- | ----------- |
@@ -3925,7 +4021,7 @@ Variant 20: [DesignPaintColorOperation](protocol.md#designpaintcoloroperation)
 | `pageId`  | Yes      | `string`                                                       |             |
 | `target`  | Yes      | [DesignPaintColorTarget](protocol.md#designpaintcolortarget)   |             |
 
-Variant 21: [DesignPaintImageOperation](protocol.md#designpaintimageoperation)
+Variant 23: [DesignPaintImageOperation](protocol.md#designpaintimageoperation)
 
 | Field     | Required | Type                                                           | Description |
 | --------- | -------- | -------------------------------------------------------------- | ----------- |
@@ -3936,7 +4032,7 @@ Variant 21: [DesignPaintImageOperation](protocol.md#designpaintimageoperation)
 | `pageId`  | Yes      | `string`                                                       |             |
 | `target`  | Yes      | [DesignPaintColorTarget](protocol.md#designpaintcolortarget)   |             |
 
-Variant 22: [DesignPaintGradientOperation](protocol.md#designpaintgradientoperation)
+Variant 24: [DesignPaintGradientOperation](protocol.md#designpaintgradientoperation)
 
 | Field     | Required | Type                                                                 | Description |
 | --------- | -------- | -------------------------------------------------------------------- | ----------- |
@@ -3947,7 +4043,7 @@ Variant 22: [DesignPaintGradientOperation](protocol.md#designpaintgradientoperat
 | `pageId`  | Yes      | `string`                                                             |             |
 | `target`  | Yes      | [DesignPaintColorTarget](protocol.md#designpaintcolortarget)         |             |
 
-Variant 23: [DesignStrokeOperation](protocol.md#designstrokeoperation)
+Variant 25: [DesignStrokeOperation](protocol.md#designstrokeoperation)
 
 | Field     | Required | Type                                                            | Description |
 | --------- | -------- | --------------------------------------------------------------- | ----------- |
@@ -3956,7 +4052,25 @@ Variant 23: [DesignStrokeOperation](protocol.md#designstrokeoperation)
 | `op`      | Yes      | `"stroke"`                                                      |             |
 | `pageId`  | Yes      | `string`                                                        |             |
 
-Variant 24: [DesignStyleOperation](protocol.md#designstyleoperation)
+Variant 26: [DesignPolygonOperation](protocol.md#designpolygonoperation)
+
+| Field     | Required | Type                                                                | Description |
+| --------- | -------- | ------------------------------------------------------------------- | ----------- |
+| `changes` | Yes      | [DesignPolygonSettings](protocol.md#designpolygonsettings) / `null` |             |
+| `id`      | Yes      | `string`                                                            |             |
+| `op`      | Yes      | `"polygon"`                                                         |             |
+| `pageId`  | Yes      | `string`                                                            |             |
+
+Variant 27: [DesignArcOperation](protocol.md#designarcoperation)
+
+| Field     | Required | Type                                                        | Description |
+| --------- | -------- | ----------------------------------------------------------- | ----------- |
+| `changes` | Yes      | [DesignArcSettings](protocol.md#designarcsettings) / `null` |             |
+| `id`      | Yes      | `string`                                                    |             |
+| `op`      | Yes      | `"arc"`                                                     |             |
+| `pageId`  | Yes      | `string`                                                    |             |
+
+Variant 28: [DesignStyleOperation](protocol.md#designstyleoperation)
 
 | Field     | Required | Type                                                 | Description |
 | --------- | -------- | ---------------------------------------------------- | ----------- |
@@ -4163,6 +4277,26 @@ Child sizing and positioning relative to its parent.
 | `vertical`               | Yes      | [DesignConstraint](protocol.md#designconstraint) |                                                                                                      |
 | `width`                  | Yes      | [DesignSizing](protocol.md#designsizing)         |                                                                                                      |
 
+## DesignPolygonOperation
+
+Page-scoped native shape regeneration preserves other layers and checks locked ancestry.
+
+| Field     | Required | Type                                                                | Description |
+| --------- | -------- | ------------------------------------------------------------------- | ----------- |
+| `changes` | Yes      | [DesignPolygonSettings](protocol.md#designpolygonsettings) / `null` |             |
+| `id`      | Yes      | `string`                                                            |             |
+| `op`      | Yes      | `"polygon"`                                                         |             |
+| `pageId`  | Yes      | `string`                                                            |             |
+
+## DesignPolygonSettings
+
+A null inner radius produces a regular polygon; a ratio produces an alternating-radius star.
+
+| Field         | Required | Type          | Description                                                                 |
+| ------------- | -------- | ------------- | --------------------------------------------------------------------------- |
+| `innerRadius` | Yes      | `null,number` | Inner radius relative to the outer circle, before fitting the authored box. |
+| `points`      | Yes      | `integer`     | Number of outer vertices.                                                   |
+
 ## DesignPositionOperation
 
 One layer has one coordinate space; batch positions share the save transaction and undo.
@@ -4177,6 +4311,54 @@ One layer has one coordinate space; batch positions share the save transaction a
 | `vertical`   | No       | `"center"` / `"end"` / `"scale"` / `"start"` / `"stretch"` | Absolute children retain a chosen relation to a resized parent.      |
 | `x`          | No       | `number`                                                   |                                                                      |
 | `y`          | No       | `number`                                                   |                                                                      |
+
+## DesignPreviewOperation
+
+Read-only native drafts admit bounded geometry, layout, color and hierarchy edits, never source replacements.
+
+Variant 1: [DesignRecolorOperation](protocol.md#designrecoloroperation)
+
+| Field       | Required | Type              | Description |
+| ----------- | -------- | ----------------- | ----------- |
+| `after`     | Yes      | `string`          |             |
+| `before`    | Yes      | `string`          |             |
+| `op`        | Yes      | `"recolor"`       |             |
+| `pageId`    | Yes      | `string`          |             |
+| `selection` | Yes      | Array of `string` |             |
+
+Variant 2: [DesignLayoutOperation](protocol.md#designlayoutoperation)
+
+| Field     | Required | Type                                                   | Description |
+| --------- | -------- | ------------------------------------------------------ | ----------- |
+| `changes` | Yes      | [DesignLayoutChanges](protocol.md#designlayoutchanges) |             |
+| `id`      | Yes      | `string`                                               |             |
+| `op`      | Yes      | `"layout"`                                             |             |
+| `pageId`  | Yes      | `string`                                               |             |
+
+Variant 3: [DesignReparentOperation](protocol.md#designreparentoperation)
+
+| Field       | Required | Type              | Description                                                                                       |
+| ----------- | -------- | ----------------- | ------------------------------------------------------------------------------------------------- |
+| `absolute`  | No       | `boolean`         | Defaults to true; false joins an automatic destination's flow instead of applying a displacement. |
+| `dx`        | No       | `number`          | Optional world displacement applies after preserving the original geometry.                       |
+| `dy`        | No       | `number`          | Optional world displacement applies after preserving the original geometry.                       |
+| `index`     | Yes      | `number`          |                                                                                                   |
+| `op`        | Yes      | `"reparent"`      |                                                                                                   |
+| `pageId`    | Yes      | `string`          |                                                                                                   |
+| `parentId`  | Yes      | `null,string`     |                                                                                                   |
+| `selection` | Yes      | Array of `string` |                                                                                                   |
+
+Variant 4: [DesignResizeOperation](protocol.md#designresizeoperation)
+
+| Field       | Required | Type              | Description                                                                              |
+| ----------- | -------- | ----------------- | ---------------------------------------------------------------------------------------- |
+| `height`    | No       | `number`          |                                                                                          |
+| `op`        | Yes      | `"resize"`        |                                                                                          |
+| `pageId`    | Yes      | `string`          |                                                                                          |
+| `selection` | Yes      | Array of `string` |                                                                                          |
+| `width`     | No       | `number`          |                                                                                          |
+| `x`         | No       | `number`          | Position edits accompany a single dragged layer and use its resolved parent coordinates. |
+| `y`         | No       | `number`          |                                                                                          |
 
 ## DesignReadMethod
 
@@ -4210,6 +4392,18 @@ Commit acknowledgements contain no large text or scene snapshot.
 | `selection`        | No       | Array of `string`                          | Arrangement acknowledgements retain at most 256 resulting layer IDs, including exact retries. |
 | `summary`          | Yes      | [DesignSummary](protocol.md#designsummary) |                                                                                               |
 | `undoable`         | Yes      | `boolean`                                  |                                                                                               |
+
+## DesignRecolorOperation
+
+Replace one exact color across selected authored subtrees without transferring their source bodies.
+
+| Field       | Required | Type              | Description |
+| ----------- | -------- | ----------------- | ----------- |
+| `after`     | Yes      | `string`          |             |
+| `before`    | Yes      | `string`          |             |
+| `op`        | Yes      | `"recolor"`       |             |
+| `pageId`    | Yes      | `string`          |             |
+| `selection` | Yes      | Array of `string` |             |
 
 ## DesignRecord
 
@@ -4292,6 +4486,21 @@ Delete a subtree and its anchored comments and prototype links.
 | ----- | -------- | ---------- | ----------- |
 | `id`  | Yes      | `string`   |             |
 | `op`  | Yes      | `"remove"` |             |
+
+## DesignReparentOperation
+
+Moves selected authored roots between containers while preserving their resolved world geometry natively.
+
+| Field       | Required | Type              | Description                                                                                       |
+| ----------- | -------- | ----------------- | ------------------------------------------------------------------------------------------------- |
+| `absolute`  | No       | `boolean`         | Defaults to true; false joins an automatic destination's flow instead of applying a displacement. |
+| `dx`        | No       | `number`          | Optional world displacement applies after preserving the original geometry.                       |
+| `dy`        | No       | `number`          | Optional world displacement applies after preserving the original geometry.                       |
+| `index`     | Yes      | `number`          |                                                                                                   |
+| `op`        | Yes      | `"reparent"`      |                                                                                                   |
+| `pageId`    | Yes      | `string`          |                                                                                                   |
+| `parentId`  | Yes      | `null,string`     |                                                                                                   |
+| `selection` | Yes      | Array of `string` |                                                                                                   |
 
 ## DesignResizeOperation
 
@@ -4386,6 +4595,15 @@ Rotated layer bounds are measured along the containing coordinate axes.
 | `right`  | Yes      | `number` |             |
 | `top`    | Yes      | `number` |             |
 
+## DesignSelectionColor
+
+A color occurs once per selected authored layer, including editable descendants.
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `color`  | Yes      | `string` |             |
+| `layers` | Yes      | `number` |             |
+
 ## DesignShadow
 
 Drop or inner shadow.
@@ -4435,14 +4653,15 @@ Limits and sizing modes resolve against complete native sources without transfer
 
 Outline properties.
 
-| Field        | Required | Type                                   | Description                                              |
-| ------------ | -------- | -------------------------------------- | -------------------------------------------------------- |
-| `cap`        | No       | `"butt"` / `"round"` / `"square"`      | Omission retains the original round-cap behavior.        |
-| `dash`       | Yes      | Array of `number`                      |                                                          |
-| `join`       | No       | `"bevel"` / `"miter"` / `"round"`      | Omission retains the original round-join behavior.       |
-| `miterLimit` | No       | `number`                               | A finite ratio bounds miter corners; omission uses four. |
-| `paint`      | Yes      | [DesignPaint](protocol.md#designpaint) |                                                          |
-| `width`      | Yes      | `number`                               |                                                          |
+| Field        | Required | Type                                   | Description                                                              |
+| ------------ | -------- | -------------------------------------- | ------------------------------------------------------------------------ |
+| `cap`        | No       | `"butt"` / `"round"` / `"square"`      | Omission retains the original round-cap behavior.                        |
+| `dash`       | Yes      | Array of `number`                      |                                                                          |
+| `dashOffset` | No       | `number`                               | Signed distance into the repeated dash pattern; omission starts at zero. |
+| `join`       | No       | `"bevel"` / `"miter"` / `"round"`      | Omission retains the original round-join behavior.                       |
+| `miterLimit` | No       | `number`                               | A finite ratio bounds miter corners; omission uses four.                 |
+| `paint`      | Yes      | [DesignPaint](protocol.md#designpaint) |                                                                          |
+| `width`      | Yes      | `number`                               |                                                                          |
 
 ## DesignStrokeChanges
 
@@ -4452,6 +4671,7 @@ Omitted border properties retain their current values, including the paint.
 | ------------ | -------- | --------------------------------- | ---------------------------------------------------------- |
 | `cap`        | No       | `"butt"` / `"round"` / `"square"` | Endpoint shapes match the centered SVG stroke model.       |
 | `dash`       | No       | Array of `number`                 |                                                            |
+| `dashOffset` | No       | `number`                          |                                                            |
 | `join`       | No       | `"bevel"` / `"miter"` / `"round"` | Corners may retain a round sector, bevel or bounded miter. |
 | `miterLimit` | No       | `number`                          |                                                            |
 | `width`      | No       | `number`                          |                                                            |
@@ -4551,6 +4771,7 @@ Text layout is shared by the canvas, tools and exported designs.
 | ----------------- | -------- | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
 | `align`           | Yes      | [DesignAlign](protocol.md#designalign)                            |                                                                                           |
 | `content`         | Yes      | `string`                                                          |                                                                                           |
+| `direction`       | No       | `"auto"` / `"ltr"` / `"rtl"`                                      | Auto resolves each paragraph from its first strong character. Alignment remains physical. |
 | `family`          | Yes      | `string`                                                          |                                                                                           |
 | `font`            | No       | [DesignFontBinding](protocol.md#designfontbinding) / `null`       | Exact private font bytes remain in the owner's library, independently of the saved scene. |
 | `italic`          | Yes      | `boolean`                                                         |                                                                                           |
@@ -4575,46 +4796,50 @@ Replace text content while preserving typography and clipping existing rich-text
 
 Rich text range. Offsets are UTF-16 indices into the layer's text.
 
-| Field       | Required | Type                                                        | Description                                                                          |
-| ----------- | -------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| `color`     | Yes      | `string`                                                    |                                                                                      |
-| `end`       | Yes      | `number`                                                    |                                                                                      |
-| `family`    | Yes      | `string`                                                    |                                                                                      |
-| `font`      | No       | [DesignFontBinding](protocol.md#designfontbinding) / `null` | Omission inherits a compatible base face; null explicitly chooses an unbound family. |
-| `italic`    | Yes      | `boolean`                                                   |                                                                                      |
-| `size`      | Yes      | `number`                                                    |                                                                                      |
-| `start`     | Yes      | `number`                                                    |                                                                                      |
-| `underline` | Yes      | `boolean`                                                   |                                                                                      |
-| `weight`    | Yes      | `number`                                                    |                                                                                      |
+| Field       | Required | Type                                                        | Description                                                                                           |
+| ----------- | -------- | ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `color`     | Yes      | `null,string`                                               | Null inherits the layer's fills, including gradients and image paints.                                |
+| `end`       | Yes      | `number`                                                    |                                                                                                       |
+| `family`    | Yes      | `string`                                                    |                                                                                                       |
+| `fills`     | No       | Array of [DesignPaint](protocol.md#designpaint) / `null`    | An explicit range fill stack replaces layer fills; null or omission retains legacy color/inheritance. |
+| `font`      | No       | [DesignFontBinding](protocol.md#designfontbinding) / `null` | Omission inherits a compatible base face; null explicitly chooses an unbound family.                  |
+| `italic`    | Yes      | `boolean`                                                   |                                                                                                       |
+| `size`      | Yes      | `number`                                                    |                                                                                                       |
+| `start`     | Yes      | `number`                                                    |                                                                                                       |
+| `underline` | Yes      | `boolean`                                                   |                                                                                                       |
+| `weight`    | Yes      | `number`                                                    |                                                                                                       |
 
 ## DesignTextSpanStyle
 
 Resolved style of a contiguous rich-text range.
 
-| Field       | Required | Type                                                        | Description                                                                         |
-| ----------- | -------- | ----------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| `color`     | Yes      | `string`                                                    |                                                                                     |
-| `family`    | Yes      | `string`                                                    |                                                                                     |
-| `font`      | No       | [DesignFontBinding](protocol.md#designfontbinding) / `null` | A bound style selects exactly the saved face instead of an available system family. |
-| `italic`    | Yes      | `boolean`                                                   |                                                                                     |
-| `rich`      | Yes      | `boolean`                                                   |                                                                                     |
-| `size`      | Yes      | `number`                                                    |                                                                                     |
-| `underline` | Yes      | `boolean`                                                   |                                                                                     |
-| `weight`    | Yes      | `number`                                                    |                                                                                     |
+| Field       | Required | Type                                                        | Description                                                                                |
+| ----------- | -------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `color`     | Yes      | `string`                                                    |                                                                                            |
+| `direction` | No       | `"ltr"` / `"rtl"`                                           | Individual visual runs always have a concrete shaping direction.                           |
+| `family`    | Yes      | `string`                                                    |                                                                                            |
+| `fills`     | No       | Array of [DesignPaint](protocol.md#designpaint) / `null`    | Native paint stacks keep their whole-layer coordinates while glyph windows remain bounded. |
+| `font`      | No       | [DesignFontBinding](protocol.md#designfontbinding) / `null` | A bound style selects exactly the saved face instead of an available system family.        |
+| `italic`    | Yes      | `boolean`                                                   |                                                                                            |
+| `rich`      | Yes      | `boolean`                                                   |                                                                                            |
+| `size`      | Yes      | `number`                                                    |                                                                                            |
+| `underline` | Yes      | `boolean`                                                   |                                                                                            |
+| `weight`    | Yes      | `number`                                                    |                                                                                            |
 
 ## DesignTextStyleChanges
 
 Partial styles for a nonempty UTF-16 range; omitted properties retain their per-range values.
 
-| Field       | Required | Type                                                        | Description |
-| ----------- | -------- | ----------------------------------------------------------- | ----------- |
-| `color`     | No       | `string`                                                    |             |
-| `family`    | No       | `string`                                                    |             |
-| `font`      | No       | [DesignFontBinding](protocol.md#designfontbinding) / `null` |             |
-| `italic`    | No       | `boolean`                                                   |             |
-| `size`      | No       | `number`                                                    |             |
-| `underline` | No       | `boolean`                                                   |             |
-| `weight`    | No       | `number`                                                    |             |
+| Field       | Required | Type                                                        | Description                                                                                     |
+| ----------- | -------- | ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `color`     | No       | `null,string`                                               | Null removes a range's solid override and restores the layer's fills.                           |
+| `family`    | No       | `string`                                                    |                                                                                                 |
+| `fills`     | No       | Array of [DesignPaint](protocol.md#designpaint) / `null`    | Up to eight range paints; an empty stack hides fill ink, while null restores layer inheritance. |
+| `font`      | No       | [DesignFontBinding](protocol.md#designfontbinding) / `null` |                                                                                                 |
+| `italic`    | No       | `boolean`                                                   |                                                                                                 |
+| `size`      | No       | `number`                                                    |                                                                                                 |
+| `underline` | No       | `boolean`                                                   |                                                                                                 |
+| `weight`    | No       | `number`                                                    |                                                                                                 |
 
 ## DesignTextStyleOperation
 
@@ -4643,11 +4868,12 @@ Null glyphIndex resumes the underline after this span's glyphs.
 
 A compact face-local glyph identity replaces repeated source text and vector command payloads.
 
-| Field | Required | Type     | Description |
-| ----- | -------- | -------- | ----------- |
-| `id`  | Yes      | `number` |             |
-| `x`   | Yes      | `number` |             |
-| `y`   | Yes      | `number` |             |
+| Field  | Required | Type                                                   | Description                                                                                   |
+| ------ | -------- | ------------------------------------------------------ | --------------------------------------------------------------------------------------------- |
+| `clip` | No       | [DesignFontPaintClip](protocol.md#designfontpaintclip) | Only a source boundary inside a glyph cluster clips its ink; exterior overhang stays visible. |
+| `id`   | Yes      | `number`                                               |                                                                                               |
+| `x`    | Yes      | `number`                                               |                                                                                               |
+| `y`    | Yes      | `number`                                               |                                                                                               |
 
 ## DesignTextWindowMethod
 
@@ -4662,30 +4888,32 @@ Independently advertised support allows clients to retain complete-body renderin
 
 A window response never includes the source string; continuation keeps the same revision and selectors.
 
-| Field          | Required | Type                                                                  | Description |
-| -------------- | -------- | --------------------------------------------------------------------- | ----------- |
-| `box`          | Yes      | [DesignBox](protocol.md#designbox)                                    |             |
-| `id`           | Yes      | `string`                                                              |             |
-| `nextCursor`   | Yes      | [DesignTextWindowCursor](protocol.md#designtextwindowcursor) / `null` |             |
-| `occurrenceId` | Yes      | `string`                                                              |             |
-| `pageId`       | Yes      | `string`                                                              |             |
-| `revision`     | Yes      | `string`                                                              |             |
-| `runs`         | Yes      | Array of [DesignTextWindowRun](protocol.md#designtextwindowrun)       |             |
-| `window`       | Yes      | [DesignGlyphBounds](protocol.md#designglyphbounds)                    |             |
+| Field          | Required | Type                                                                  | Description                                                                              |
+| -------------- | -------- | --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `box`          | Yes      | [DesignBox](protocol.md#designbox)                                    |                                                                                          |
+| `id`           | Yes      | `string`                                                              |                                                                                          |
+| `nextCursor`   | Yes      | [DesignTextWindowCursor](protocol.md#designtextwindowcursor) / `null` |                                                                                          |
+| `occurrenceId` | Yes      | `string`                                                              |                                                                                          |
+| `pageId`       | Yes      | `string`                                                              |                                                                                          |
+| `rangeFills`   | No       | `true`                                                                | Whole-layer paint ordering stays stable even when this window has only inherited ranges. |
+| `revision`     | Yes      | `string`                                                              |                                                                                          |
+| `runs`         | Yes      | Array of [DesignTextWindowRun](protocol.md#designtextwindowrun)       |                                                                                          |
+| `window`       | Yes      | [DesignGlyphBounds](protocol.md#designglyphbounds)                    |                                                                                          |
 
 ## DesignTextWindowRequest
 
 The workspace owns the text, font resolution and geometry; the caller selects a local paint rectangle.
 
-| Field          | Required | Type                                                                  | Description |
-| -------------- | -------- | --------------------------------------------------------------------- | ----------- |
-| `cursor`       | Yes      | [DesignTextWindowCursor](protocol.md#designtextwindowcursor) / `null` |             |
-| `id`           | Yes      | `string`                                                              |             |
-| `limit`        | Yes      | `number`                                                              |             |
-| `occurrenceId` | Yes      | `string`                                                              |             |
-| `pageId`       | Yes      | `string`                                                              |             |
-| `revision`     | Yes      | `string`                                                              |             |
-| `window`       | Yes      | [DesignGlyphBounds](protocol.md#designglyphbounds)                    |             |
+| Field           | Required | Type                                                                  | Description |
+| --------------- | -------- | --------------------------------------------------------------------- | ----------- |
+| `cursor`        | Yes      | [DesignTextWindowCursor](protocol.md#designtextwindowcursor) / `null` |             |
+| `id`            | Yes      | `string`                                                              |             |
+| `limit`         | Yes      | `number`                                                              |             |
+| `occurrenceId`  | Yes      | `string`                                                              |             |
+| `pageId`        | Yes      | `string`                                                              |             |
+| `paintClipping` | No       | `boolean`                                                             |             |
+| `revision`      | Yes      | `string`                                                              |             |
+| `window`        | Yes      | [DesignGlyphBounds](protocol.md#designglyphbounds)                    |             |
 
 ## DesignTextWindowRun
 
@@ -4804,16 +5032,17 @@ Type: `"after"` / `"click"` / `"hover"`.
 
 Base typography changes preserve the source content and every authored rich-text range.
 
-| Field           | Required | Type                                                        | Description |
-| --------------- | -------- | ----------------------------------------------------------- | ----------- |
-| `align`         | No       | `"center"` / `"end"` / `"start"`                            |             |
-| `family`        | No       | `string`                                                    |             |
-| `font`          | No       | [DesignFontBinding](protocol.md#designfontbinding) / `null` |             |
-| `italic`        | No       | `boolean`                                                   |             |
-| `letterSpacing` | No       | `number`                                                    |             |
-| `lineHeight`    | No       | `number`                                                    |             |
-| `size`          | No       | `number`                                                    |             |
-| `weight`        | No       | `number`                                                    |             |
+| Field           | Required | Type                                                        | Description                                                                      |
+| --------------- | -------- | ----------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `align`         | No       | `"center"` / `"end"` / `"start"`                            |                                                                                  |
+| `direction`     | No       | `"auto"` / `"ltr"` / `"rtl"`                                | Base paragraph direction is independent of physical left/center/right alignment. |
+| `family`        | No       | `string`                                                    |                                                                                  |
+| `font`          | No       | [DesignFontBinding](protocol.md#designfontbinding) / `null` |                                                                                  |
+| `italic`        | No       | `boolean`                                                   |                                                                                  |
+| `letterSpacing` | No       | `number`                                                    |                                                                                  |
+| `lineHeight`    | No       | `number`                                                    |                                                                                  |
+| `size`          | No       | `number`                                                    |                                                                                  |
+| `weight`        | No       | `number`                                                    |                                                                                  |
 
 ## DesignTypographyLink
 
@@ -4839,16 +5068,17 @@ The native source remains authoritative while the website sends only changed fon
 
 Local properties override their saved style while other fields remain linked.
 
-| Field           | Required | Type                                                        | Description |
-| --------------- | -------- | ----------------------------------------------------------- | ----------- |
-| `align`         | No       | `"center"` / `"end"` / `"start"`                            |             |
-| `family`        | No       | `string`                                                    |             |
-| `font`          | No       | [DesignFontBinding](protocol.md#designfontbinding) / `null` |             |
-| `italic`        | No       | `boolean`                                                   |             |
-| `letterSpacing` | No       | `number`                                                    |             |
-| `lineHeight`    | No       | `number`                                                    |             |
-| `size`          | No       | `number`                                                    |             |
-| `weight`        | No       | `number`                                                    |             |
+| Field           | Required | Type                                                        | Description                                                                      |
+| --------------- | -------- | ----------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `align`         | No       | `"center"` / `"end"` / `"start"`                            |                                                                                  |
+| `direction`     | No       | `"auto"` / `"ltr"` / `"rtl"`                                | Base paragraph direction is independent of physical left/center/right alignment. |
+| `family`        | No       | `string`                                                    |                                                                                  |
+| `font`          | No       | [DesignFontBinding](protocol.md#designfontbinding) / `null` |                                                                                  |
+| `italic`        | No       | `boolean`                                                   |                                                                                  |
+| `letterSpacing` | No       | `number`                                                    |                                                                                  |
+| `lineHeight`    | No       | `number`                                                    |                                                                                  |
+| `size`          | No       | `number`                                                    |                                                                                  |
+| `weight`        | No       | `number`                                                    |                                                                                  |
 
 ## DesignTypographyStyleOperation
 
@@ -4865,16 +5095,17 @@ Link one text layer to a typed saved style, reset its overrides or detach at its
 
 A saved text style contains typography only; content and rich ranges remain on each layer.
 
-| Field           | Required | Type                                                        | Description |
-| --------------- | -------- | ----------------------------------------------------------- | ----------- |
-| `align`         | Yes      | `"center"` / `"end"` / `"start"`                            |             |
-| `family`        | Yes      | `string`                                                    |             |
-| `font`          | Yes      | [DesignFontBinding](protocol.md#designfontbinding) / `null` |             |
-| `italic`        | Yes      | `boolean`                                                   |             |
-| `letterSpacing` | Yes      | `number`                                                    |             |
-| `lineHeight`    | Yes      | `number`                                                    |             |
-| `size`          | Yes      | `number`                                                    |             |
-| `weight`        | Yes      | `number`                                                    |             |
+| Field           | Required | Type                                                        | Description                                                                      |
+| --------------- | -------- | ----------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `align`         | Yes      | `"center"` / `"end"` / `"start"`                            |                                                                                  |
+| `direction`     | No       | `"auto"` / `"ltr"` / `"rtl"`                                | Base paragraph direction is independent of physical left/center/right alignment. |
+| `family`        | Yes      | `string`                                                    |                                                                                  |
+| `font`          | Yes      | [DesignFontBinding](protocol.md#designfontbinding) / `null` |                                                                                  |
+| `italic`        | Yes      | `boolean`                                                   |                                                                                  |
+| `letterSpacing` | Yes      | `number`                                                    |                                                                                  |
+| `lineHeight`    | Yes      | `number`                                                    |                                                                                  |
+| `size`          | Yes      | `number`                                                    |                                                                                  |
+| `weight`        | Yes      | `number`                                                    |                                                                                  |
 
 ## DesignUndoMethod
 
@@ -5155,6 +5386,11 @@ Methods, events, and additive capabilities supported by this gateway.
 | `designImageAdjustments`    | No       | `true`                                             | Non-destructive color controls are shared by image layers, fills, strokes and exports.         |
 | `designImageTransforms`     | No       | `true`                                             | Native image framing supports rotation, reflection, affine placement and repeated image tiles. |
 | `designLayerCompositing`    | No       | `true`                                             | Native layer blending and explicit group isolation preserve editable appearance.               |
+| `designStrokeDashOffset`    | No       | `true`                                             | Stroke phase is editable and preserved by SVG, glyph windows and Boolean silhouettes.          |
+| `designTextDirection`       | No       | `true`                                             | Native typography supports paragraph direction and shared Unicode ordering.                    |
+| `designTextInheritedPaint`  | No       | `true`                                             | Rich typography can inherit the layer's gradient, image or solid fill stack.                   |
+| `designTextPaintClipping`   | No       | `true`                                             | Native glyph windows can preserve shared shaping with bounded paint clips.                     |
+| `designTextRangeFills`      | No       | `true`                                             | UTF-16 rich ranges can replace layer fills with their own editable paint stacks.               |
 | `events`                    | Yes      | Array of `string`                                  |                                                                                                |
 | `jsonReplies`               | No       | `true`                                             | Host validation of JSON final answers while native tools remain available.                     |
 | `methodScopes`              | Yes      | [RecordstringScope](protocol.md#recordstringscope) | The scope each method requires.                                                                |
@@ -5188,6 +5424,7 @@ Methods, events, and additive capabilities supported by this gateway.
 | `sessionHistory`            | No       | `true`                                             | Durable complete presentation history and binary restoration.                                  |
 | `sessionHistoryUpdates`     | No       | `true`                                             | Session subscriptions notify exact journal ranges for live catch-up.                           |
 | `transcriptBlocks`          | No       | `true`                                             | Compact persisted NDJSON blocks, read in bounded byte pages.                                   |
+| `userRegion`                | No       | `true`                                             | Supports coarse per-turn regional context for news and local information.                      |
 | `workflowDraftsVersion`     | No       | `1`                                                |                                                                                                |
 | `workflowGraphVersion`      | No       | `1`                                                | Exact component catalog and structural validation of pinned drafts.                            |
 | `workflowGroupsVersion`     | No       | `1`                                                | Saved parent-local groups, published aliases and paginated immutable group records.            |
@@ -5263,6 +5500,7 @@ Configurable bounds on gateway-owned work and memory.
 | `design.clipboard.copy`              | Yes      | Object (fields below) | Native snapshot capture returns metadata rather than selected source bodies.                           |
 | `design.clipboard.cut`               | Yes      | Object (fields below) | Atomic source cut uses the same durable receipt and undo contract as other native commands.            |
 | `design.clipboard.paste`             | Yes      | Object (fields below) | Native snapshot paste shares the normal destination command journal and undo contract.                 |
+| `design.colors`                      | Yes      | Object (fields below) | Native color pages use the authenticated read-only gateway.                                            |
 | `design.component`                   | Yes      | Object (fields below) | Native component commands keep source forests on the authenticated owner's workspace.                  |
 | `design.create`                      | Yes      | Object (fields below) | Create-document RPC contract.                                                                          |
 | `design.delete`                      | Yes      | Object (fields below) | Owner-scoped revision-safe document deletion.                                                          |
@@ -5798,6 +6036,13 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ---------------------------------------------------------------------- | ----------- |
 | `params` | Yes      | [DesignClipboardPasteRequest](protocol.md#designclipboardpasterequest) |             |
 | `result` | Yes      | [DesignReceipt](protocol.md#designreceipt)                             |             |
+
+**design.colors**
+
+| Field    | Required | Type                                                         | Description |
+| -------- | -------- | ------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [DesignColorReadRequest](protocol.md#designcolorreadrequest) |             |
+| `result` | Yes      | [DesignColorReadPage](protocol.md#designcolorreadpage)       |             |
 
 **design.component**
 
@@ -9542,6 +9787,7 @@ What one turn is asked for, when the client wants its events streamed.
 | `streamId`          | No       | `string`                                                                      | The stream's id, chosen by the CLIENT.                                      |
 | `targetTimeSeconds` | No       | `integer`                                                                     | Soft task time target in seconds; never a cancellation deadline.            |
 | `userId`            | No       | `string`                                                                      | The principal the turn is billed and authorized as.                         |
+| `userRegion`        | No       | [UserRegion](protocol.md#userregion)                                          | Coarse regional preferences, never authorization or precise location.       |
 
 ## TaskRecord
 
@@ -9721,11 +9967,12 @@ A tool call the model asked for.
 
 One tool call's outcome, paired back to its call.
 
-| Field        | Required | Type                                 | Description |
-| ------------ | -------- | ------------------------------------ | ----------- |
-| `call`       | Yes      | [ToolCall](protocol.md#toolcall)     |             |
-| `durationMs` | Yes      | `number`                             |             |
-| `result`     | Yes      | [ToolResult](protocol.md#toolresult) |             |
+| Field              | Required | Type                                 | Description                                                                                     |
+| ------------------ | -------- | ------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| `call`             | Yes      | [ToolCall](protocol.md#toolcall)     |                                                                                                 |
+| `durationMs`       | Yes      | `number`                             |                                                                                                 |
+| `executionStarted` | No       | `boolean`                            | Registry-owned leaf-entry evidence; absent means unknown, and tool-returned data cannot set it. |
+| `result`           | Yes      | [ToolResult](protocol.md#toolresult) |                                                                                                 |
 
 ## ToolProgress
 
@@ -9897,6 +10144,16 @@ The payload of a {@link GATEWAY_EVENTS.TurnEnd} event.
 | `historyId` | No       | `string`                                   | Stable record identity shared by the immediate event and its later durable copy. |
 | `sessionId` | No       | `string`                                   |                                                                                  |
 | `streamId`  | Yes      | `string`                                   |                                                                                  |
+
+## UserRegion
+
+Coarse caller-supplied regional preferences, never authorization or precise geolocation.
+
+| Field         | Required | Type     | Description |
+| ------------- | -------- | -------- | ----------- |
+| `countryCode` | No       | `string` |             |
+| `locale`      | No       | `string` |             |
+| `timeZone`    | No       | `string` |             |
 
 ## ValueSchema
 

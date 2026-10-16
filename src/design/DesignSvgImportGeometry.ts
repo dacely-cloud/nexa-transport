@@ -138,6 +138,7 @@ export class DesignSvgImportGeometry {
             const paths: readonly DesignPathCommand[] = DesignPathDashes.paint(
                 commands,
                 stroke.dash,
+                stroke.dashOffset ?? 0,
             );
             const dashed: DesignPathKitPath = scope.own(
                 library.FromSVGString(

@@ -85,6 +85,9 @@ export class DesignScaleMetrics {
                           paint: this.paint(style.stroke.paint, factor),
                           width: style.stroke.width * factor,
                           dash: style.stroke.dash.map((value: number): number => value * factor),
+                          ...(style.stroke.dashOffset === undefined
+                              ? {}
+                              : { dashOffset: style.stroke.dashOffset * factor }),
                       },
             corners: {
                 topLeft: style.corners.topLeft * factor,

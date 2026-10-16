@@ -1,6 +1,6 @@
 # RPC reference
 
-All 198 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 197 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
+All 199 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 198 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
 
 - [accounts.create](#accountscreate)
 - [accounts.list](#accountslist)
@@ -48,6 +48,7 @@ All 198 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [design.clipboard.copy](#designclipboardcopy)
 - [design.clipboard.cut](#designclipboardcut)
 - [design.clipboard.paste](#designclipboardpaste)
+- [design.colors](#designcolors)
 - [design.component](#designcomponent)
 - [design.create](#designcreate)
 - [design.delete](#designdelete)
@@ -312,6 +313,7 @@ Parameters: [AskParams](protocol.md#askparams).
 | `responseFormat`    | No       | `"json"` / `"text"`                                                           | Final answer format; JSON mode does not disable tools or verification.      |
 | `targetTimeSeconds` | No       | `integer`                                                                     | Soft task time target in seconds; never a cancellation deadline.            |
 | `userId`            | No       | `string`                                                                      | The principal the turn is billed and authorized as.                         |
+| `userRegion`        | No       | [UserRegion](protocol.md#userregion)                                          | Coarse regional preferences, never authorization or precise location.       |
 
 Result: [AskResult](protocol.md#askresult).
 
@@ -363,6 +365,7 @@ Parameters: [StreamParams](protocol.md#streamparams).
 | `streamId`          | No       | `string`                                                                      | The stream's id, chosen by the CLIENT.                                      |
 | `targetTimeSeconds` | No       | `integer`                                                                     | Soft task time target in seconds; never a cancellation deadline.            |
 | `userId`            | No       | `string`                                                                      | The principal the turn is billed and authorized as.                         |
+| `userRegion`        | No       | [UserRegion](protocol.md#userregion)                                          | Coarse regional preferences, never authorization or precise location.       |
 
 Result: [StreamAccepted](protocol.md#streamaccepted).
 
@@ -1280,6 +1283,35 @@ Parameters: [DesignClipboardPasteRequest](protocol.md#designclipboardpastereques
 
 Result: [DesignReceipt](protocol.md#designreceipt).
 
+## design.colors
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DesignColors> = {
+    id: 'YOUR_ID',
+    limit: 1,
+    offset: 1,
+    pageId: 'YOUR_PAGEID',
+    revision: 'YOUR_REVISION',
+    selection: [],
+};
+const result: ResultOf<typeof Method.DesignColors> = await client.call(Method.DesignColors, params);
+```
+
+Parameters: [DesignColorReadRequest](protocol.md#designcolorreadrequest).
+
+| Field       | Required | Type              | Description |
+| ----------- | -------- | ----------------- | ----------- |
+| `id`        | Yes      | `string`          |             |
+| `limit`     | Yes      | `number`          |             |
+| `offset`    | Yes      | `number`          |             |
+| `pageId`    | Yes      | `string`          |             |
+| `revision`  | Yes      | `string`          |             |
+| `selection` | Yes      | Array of `string` |             |
+
+Result: [DesignColorReadPage](protocol.md#designcolorreadpage).
+
 ## design.component
 
 ```ts
@@ -1642,15 +1674,16 @@ const result: ResultOf<typeof Method.DesignTextWindow> = await client.call(
 
 Parameters: [DesignTextWindowRequest](protocol.md#designtextwindowrequest).
 
-| Field          | Required | Type                                                                  | Description |
-| -------------- | -------- | --------------------------------------------------------------------- | ----------- |
-| `cursor`       | Yes      | [DesignTextWindowCursor](protocol.md#designtextwindowcursor) / `null` |             |
-| `id`           | Yes      | `string`                                                              |             |
-| `limit`        | Yes      | `number`                                                              |             |
-| `occurrenceId` | Yes      | `string`                                                              |             |
-| `pageId`       | Yes      | `string`                                                              |             |
-| `revision`     | Yes      | `string`                                                              |             |
-| `window`       | Yes      | [DesignGlyphBounds](protocol.md#designglyphbounds)                    |             |
+| Field           | Required | Type                                                                  | Description |
+| --------------- | -------- | --------------------------------------------------------------------- | ----------- |
+| `cursor`        | Yes      | [DesignTextWindowCursor](protocol.md#designtextwindowcursor) / `null` |             |
+| `id`            | Yes      | `string`                                                              |             |
+| `limit`         | Yes      | `number`                                                              |             |
+| `occurrenceId`  | Yes      | `string`                                                              |             |
+| `pageId`        | Yes      | `string`                                                              |             |
+| `paintClipping` | No       | `boolean`                                                             |             |
+| `revision`      | Yes      | `string`                                                              |             |
+| `window`        | Yes      | [DesignGlyphBounds](protocol.md#designglyphbounds)                    |             |
 
 Result: [DesignTextWindowPage](protocol.md#designtextwindowpage).
 

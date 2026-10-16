@@ -186,6 +186,7 @@ export class DesignSvgImportShape {
             ...stroke,
             width: stroke.width * factor,
             dash: stroke.dash.map((value: number): number => value * factor),
+            ...(stroke.dashOffset === undefined ? {} : { dashOffset: stroke.dashOffset * factor }),
         };
     }
     #visible(style: Readonly<Record<string, string>>): boolean {
