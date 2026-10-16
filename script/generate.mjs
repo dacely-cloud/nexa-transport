@@ -287,6 +287,8 @@ schema.definitions.JsonValue = {
         { type: 'object', additionalProperties: { $ref: '#/definitions/JsonValue' } },
     ],
 };
+/** Native history payload is private binary transport state, never a JSON response field. */
+delete schema.definitions.SessionHistoryPage.properties.payload;
 function normalize(node) {
     if (Array.isArray(node)) {
         node.forEach(normalize);

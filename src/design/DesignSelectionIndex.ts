@@ -15,6 +15,7 @@ export class DesignSelectionIndex {
         public readonly document: DesignDocument,
         public readonly pageId: string,
         selection: readonly string[],
+        allowLocked: boolean = false,
     ) {
         V.id(pageId);
         if (
@@ -64,7 +65,7 @@ export class DesignSelectionIndex {
                 if (++ancestors > this.nodes.size) {
                     throw new Error('Invalid design tree.');
                 }
-                if (current.locked) {
+                if (current.locked && !allowLocked) {
                     throw new Error('Unlock the selected layers and their containers first.');
                 }
                 if (current.id !== id && selected.has(current.id)) {

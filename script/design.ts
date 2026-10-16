@@ -25,6 +25,7 @@ const files: readonly string[] = [
     'DesignSvgImportViewport',
     'DesignSvgReferences',
     'DesignSvgXml',
+    'XmlReader',
     'DesignSvgNumbers',
     'DesignSvgPathData',
     'DesignSvgTransforms',
@@ -85,6 +86,13 @@ const files: readonly string[] = [
     'DesignPaintColorEdits',
     'DesignTransferTypes',
     'DesignTransferCodec',
+    'DesignTransfer',
+    'DesignTransferGraph',
+    'DesignTransferLinks',
+    'DesignClipboardTypes',
+    'DesignClipboardCodec',
+    'DesignClipboardSnapshot',
+    'DesignClipboardPaste',
     'DesignFontTypes',
     'DesignFontCodec',
     'DesignFontBindings',
@@ -224,7 +232,15 @@ const files: readonly string[] = [
 ];
 await mkdir('src/design', { recursive: true });
 for (const file of files) {
-    const source: string = await readFile('../nexa/src/design/' + file + '.ts', 'utf8');
+    const path: string =
+        file === 'XmlReader'
+            ? '../nexa/src/core/XmlReader.ts'
+            : '../nexa/src/design/' + file + '.ts';
+    const native: string = await readFile(path, 'utf8');
+    const source: string =
+        file === 'DesignSvgXml'
+            ? native.replace("from '../core/XmlReader'", "from './XmlReader.js'")
+            : native;
     if (/from ['"](?:node:|mongodb|\.\.\/)/u.test(source)) {
         throw new Error('Design SDK source contains a server-only import: ' + file);
     }

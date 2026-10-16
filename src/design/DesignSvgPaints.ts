@@ -142,11 +142,23 @@ export class DesignSvgPaints {
             ) {
                 throw new Error('Invalid embedded export image.');
             }
+            const preview: DesignSvgImage['preview'] = data.preview;
+            if (
+                preview !== undefined &&
+                (!/^[1-9][0-9]{0,18}$/u.test(preview.byteLength) ||
+                    BigInt(preview.byteLength) > 4n * 1024n * 1024n ||
+                    preview.base64.length !== Number((BigInt(preview.byteLength) + 2n) / 3n) * 4 ||
+                    !/^[A-Za-z0-9+/]+={0,2}$/u.test(preview.base64))
+            ) {
+                throw new Error('Invalid bounded inspection image.');
+            }
+            const mime: string = preview === undefined ? asset.mime : 'image/png';
+            const base64: string = preview?.base64 ?? data.base64;
             id = this.identity('asset');
             this.#imageIdentities.set(imageKey, id);
             if (image.sampling == null) {
                 this.definitions.push(
-                    `<image id="${id}" href="data:${asset.mime};base64,${data.base64}" width="${asset.width}" height="${asset.height}" preserveAspectRatio="none"/>`,
+                    `<image id="${id}" href="data:${mime};base64,${base64}" width="${asset.width}" height="${asset.height}" preserveAspectRatio="none"/>`,
                 );
             } else {
                 const rectangle: DesignImageSampleRectangle = DesignImageSamplingGeometry.rectangle(
@@ -167,7 +179,7 @@ export class DesignSvgPaints {
                           ? 'Max'
                           : 'Mid';
                 this.definitions.push(
-                    `<image id="${id}" href="data:${asset.mime};base64,${data.base64}" x="${rectangle.x}" y="${rectangle.y}" width="${rectangle.width}" height="${rectangle.height}" preserveAspectRatio="x${x}Y${y} slice"/>`,
+                    `<image id="${id}" href="data:${mime};base64,${base64}" x="${rectangle.x}" y="${rectangle.y}" width="${rectangle.width}" height="${rectangle.height}" preserveAspectRatio="x${x}Y${y} slice"/>`,
                 );
             }
         }

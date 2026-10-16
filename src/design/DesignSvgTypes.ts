@@ -9,6 +9,13 @@ import type { DesignBox } from './DesignTypes.js';
 export interface DesignSvgImage {
     readonly asset: DesignAsset;
     readonly base64: string;
+    /** Native inspection only; original data remains verified and defines the crop coordinate system. */
+    readonly preview?: DesignSvgImagePreview;
+}
+/** Bounded ephemeral pixels never become a published Design asset. */
+export interface DesignSvgImagePreview {
+    readonly base64: string;
+    readonly byteLength: string;
 }
 /** Export selection retains the complete scene for ancestor opacity and clipping lookup. */
 export interface DesignSvgSelection {

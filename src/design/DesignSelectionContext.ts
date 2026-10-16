@@ -28,8 +28,9 @@ export class DesignSelectionContext {
         public readonly pageId: string,
         selection: readonly string[],
         public readonly measurer: DesignTextMeasurer = new DesignTextMetrics(),
+        allowLocked: boolean = false,
     ) {
-        this.#tree = new DesignSelectionIndex(document, pageId, selection);
+        this.#tree = new DesignSelectionIndex(document, pageId, selection, allowLocked);
         this.nodes = this.#tree.nodes;
         this.roots = this.#tree.roots;
         this.#layout = new DesignLayoutEngine(document, pageId, measurer);

@@ -290,6 +290,11 @@ export const schema: Schema = {
                     },
                     type: 'array',
                 },
+                topP: {
+                    description:
+                        'Nucleus sampling, forwarded unchanged to providers that support it.',
+                    type: 'number',
+                },
                 voice: {
                     $ref: '#/definitions/AgentVoice',
                     description: 'Voice settings, when the agent speaks.',
@@ -5876,6 +5881,154 @@ export const schema: Schema = {
             required: ['commandId', 'cursor', 'id', 'limit'],
             type: 'object',
         },
+        DesignClipboardCopyMethod: {
+            description:
+                'Native snapshot capture returns metadata rather than selected source bodies.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/DesignClipboardCopyRequest',
+                },
+                result: {
+                    $ref: '#/definitions/DesignClipboardReceipt',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        DesignClipboardCopyRequest: {
+            description:
+                'Copy references the exact source revision without transmitting selected source bodies.',
+            properties: {
+                clipboardId: {
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+                selection: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                sourceId: {
+                    type: 'string',
+                },
+                sourceRevision: {
+                    type: 'string',
+                },
+            },
+            required: ['clipboardId', 'pageId', 'selection', 'sourceId', 'sourceRevision'],
+            type: 'object',
+        },
+        DesignClipboardPasteMethod: {
+            description:
+                'Native snapshot paste shares the normal destination command journal and undo contract.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/DesignClipboardPasteRequest',
+                },
+                result: {
+                    $ref: '#/definitions/DesignReceipt',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        DesignClipboardPasteRequest: {
+            description:
+                'Paste references a native clipboard snapshot and creates one normal undoable destination command.',
+            properties: {
+                clipboardId: {
+                    type: 'string',
+                },
+                commandId: {
+                    type: 'string',
+                },
+                expectedRevision: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+                parentId: {
+                    type: ['null', 'string'],
+                },
+                placement: {
+                    $ref: '#/definitions/DesignClipboardPlacement',
+                },
+                x: {
+                    type: 'number',
+                },
+                y: {
+                    type: 'number',
+                },
+            },
+            required: [
+                'clipboardId',
+                'commandId',
+                'expectedRevision',
+                'id',
+                'pageId',
+                'parentId',
+                'placement',
+                'x',
+                'y',
+            ],
+            type: 'object',
+        },
+        DesignClipboardPlacement: {
+            description:
+                'Placement either centers the copied bounds, uses their original position or specifies a top-left point.\nClosed placement mode for native paste commands.',
+            enum: ['center', 'original', 'point'],
+            type: 'string',
+        },
+        DesignClipboardReceipt: {
+            description: "Small receipt for the owner's current immutable clipboard snapshot.",
+            properties: {
+                bounds: {
+                    $ref: '#/definitions/DesignSelectionBounds',
+                },
+                clipboardId: {
+                    type: 'string',
+                },
+                expiresAt: {
+                    type: 'string',
+                },
+                nodeCount: {
+                    type: 'number',
+                },
+                pageId: {
+                    type: 'string',
+                },
+                selection: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                sourceId: {
+                    type: 'string',
+                },
+                sourceRevision: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'bounds',
+                'clipboardId',
+                'expiresAt',
+                'nodeCount',
+                'pageId',
+                'selection',
+                'sourceId',
+                'sourceRevision',
+            ],
+            type: 'object',
+        },
         DesignComment: {
             description: 'Anchored comments can refer to exact layers or canvas coordinates.',
             properties: {
@@ -8829,6 +8982,25 @@ export const schema: Schema = {
             ],
             type: 'string',
         },
+        DesignSelectionBounds: {
+            description: 'Rotated layer bounds are measured along the containing coordinate axes.',
+            properties: {
+                bottom: {
+                    type: 'number',
+                },
+                left: {
+                    type: 'number',
+                },
+                right: {
+                    type: 'number',
+                },
+                top: {
+                    type: 'number',
+                },
+            },
+            required: ['bottom', 'left', 'right', 'top'],
+            type: 'object',
+        },
         DesignShadow: {
             description: 'Drop or inner shadow.',
             properties: {
@@ -10704,6 +10876,11 @@ export const schema: Schema = {
                         'Disk upload chunks retain raw bytes from the wire through durable storage.',
                     type: 'boolean',
                 },
+                binaryHistory: {
+                    const: true,
+                    description: 'History batches use acknowledged raw binary frames.',
+                    type: 'boolean',
+                },
                 binaryMedia: {
                     const: true,
                     description:
@@ -11652,6 +11829,34 @@ export const schema: Schema = {
                         },
                         result: {
                             $ref: '#/definitions/DesignRecordPage',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'design.clipboard.copy': {
+                    description:
+                        'Native snapshot capture returns metadata rather than selected source bodies.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/DesignClipboardCopyRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/DesignClipboardReceipt',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'design.clipboard.paste': {
+                    description:
+                        'Native snapshot paste shares the normal destination command journal and undo contract.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/DesignClipboardPasteRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/DesignReceipt',
                         },
                     },
                     required: ['params', 'result'],
@@ -13639,6 +13844,8 @@ export const schema: Schema = {
                 'design.canvas',
                 'design.canvas.metrics',
                 'design.changes',
+                'design.clipboard.copy',
+                'design.clipboard.paste',
                 'design.component',
                 'design.create',
                 'design.delete',
@@ -19395,6 +19602,23 @@ export const schema: Schema = {
             required: ['attachmentId', 'id'],
             type: 'object',
         },
+        SessionHistoryChunk: {
+            description:
+                'One additional bounded page; the enclosing response pins both snapshot boundaries.',
+            properties: {
+                chunk: {
+                    type: 'string',
+                },
+                cursor: {
+                    type: 'string',
+                },
+                nextCursor: {
+                    type: 'string',
+                },
+            },
+            required: ['chunk', 'cursor'],
+            type: 'object',
+        },
         SessionHistoryData: {
             description:
                 'A small live notification; large records remain in bounded authenticated pages.',
@@ -19416,6 +19640,18 @@ export const schema: Schema = {
             description:
                 'Bounded binary pages can split even a very large individual native event.',
             properties: {
+                beforeCursor: {
+                    description:
+                        'Original journal boundary preceding this window; omitted when all older history is loaded.',
+                    type: 'string',
+                },
+                binaryId: {
+                    description: 'Raw transfer metadata; payload bytes never enter the JSON reply.',
+                    type: 'string',
+                },
+                byteLength: {
+                    type: 'number',
+                },
                 chunk: {
                     type: 'string',
                 },
@@ -19434,6 +19670,14 @@ export const schema: Schema = {
                 nextCursor: {
                     type: 'string',
                 },
+                pages: {
+                    description:
+                        'Additional contiguous pages from the same authorized journal snapshot.',
+                    items: {
+                        $ref: '#/definitions/SessionHistoryChunk',
+                    },
+                    type: 'array',
+                },
                 sourceEndCursor: {
                     description:
                         'Original byte cursor for live catch-up after replaying a canonical view.',
@@ -19446,6 +19690,21 @@ export const schema: Schema = {
         SessionHistoryParams: {
             description: 'Byte cursors are decimal strings so large journals retain exact offsets.',
             properties: {
+                batchPages: {
+                    description:
+                        'Returns up to eight bounded journal or compact pages in one authenticated request.',
+                    type: 'number',
+                },
+                beforeCursor: {
+                    description:
+                        'Exclusive original journal boundary for loading an older turn window.',
+                    type: 'string',
+                },
+                binaryId: {
+                    description:
+                        'Unique receiver identity for an acknowledged raw binary history batch.',
+                    type: 'string',
+                },
                 compact: {
                     description:
                         'Canonical display view; the original append-only journal remains available.',
@@ -19467,6 +19726,11 @@ export const schema: Schema = {
                 },
                 pageBytes: {
                     description: 'Optional bounded read window, up to 1 MiB.',
+                    type: 'number',
+                },
+                recentTurns: {
+                    description:
+                        'Selects the newest complete input-delimited turns instead of replaying the full archive.',
                     type: 'number',
                 },
                 sourceEndCursor: {

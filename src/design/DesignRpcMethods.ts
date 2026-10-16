@@ -1,6 +1,22 @@
 import type { DesignSvgImportRequest } from './DesignSvgImportTypes.js';
 import type { DesignArrangeRequest } from './DesignSelectionTypes.js';
 import type { DesignComponentRequest } from './DesignComponentTypes.js';
+import type {
+    DesignClipboardCopyRequest,
+    DesignClipboardPasteRequest,
+    DesignClipboardReceipt,
+} from './DesignClipboardTypes.js';
+
+/** Native snapshot capture returns metadata rather than selected source bodies. */
+export interface DesignClipboardCopyMethod {
+    readonly params: DesignClipboardCopyRequest;
+    readonly result: DesignClipboardReceipt;
+}
+/** Native snapshot paste shares the normal destination command journal and undo contract. */
+export interface DesignClipboardPasteMethod {
+    readonly params: DesignClipboardPasteRequest;
+    readonly result: DesignReceipt;
+}
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
