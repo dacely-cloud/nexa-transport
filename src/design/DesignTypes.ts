@@ -193,7 +193,8 @@ export interface DesignTextRun {
     readonly size: number;
     readonly weight: number;
     readonly italic: boolean;
-    readonly color: string;
+    /** Null inherits the layer's fills, including gradients and image paints. */
+    readonly color: string | null;
     readonly underline: boolean;
 }
 /** Text layout is shared by the canvas, tools and exported designs. */

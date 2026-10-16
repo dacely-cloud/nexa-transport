@@ -215,7 +215,8 @@ export interface DesignTextStyleChanges {
     readonly size?: number;
     readonly weight?: number;
     readonly italic?: boolean;
-    readonly color?: string;
+    /** Null removes a range's solid override and restores the layer's fills. */
+    readonly color?: string | null;
     readonly underline?: boolean;
     readonly font?: DesignFontBinding | null;
 }

@@ -6537,7 +6537,7 @@ export type DesignTextOperation = DesignTextOperationShape;
 /** DesignTextRun wire fields. */
 export interface DesignTextRunShape {
     /** color as defined by the Nexa gateway. */
-    readonly color: string;
+    readonly color: null | string;
     /** end as defined by the Nexa gateway. */
     readonly end: number;
     /** family as defined by the Nexa gateway. */
@@ -6590,7 +6590,7 @@ export type DesignTextSpanStyle = DesignTextSpanStyleShape;
 /** DesignTextStyleChanges wire fields. */
 export interface DesignTextStyleChangesShape {
     /** color as defined by the Nexa gateway. */
-    readonly color?: string;
+    readonly color?: null | string;
     /** family as defined by the Nexa gateway. */
     readonly family?: string;
     /** font as defined by the Nexa gateway. */
@@ -7475,6 +7475,8 @@ export interface GatewayFeaturesShape {
     readonly designLayerCompositing?: true;
     /** designTextDirection as defined by the Nexa gateway. */
     readonly designTextDirection?: true;
+    /** designTextInheritedPaint as defined by the Nexa gateway. */
+    readonly designTextInheritedPaint?: true;
     /** designTextPaintClipping as defined by the Nexa gateway. */
     readonly designTextPaintClipping?: true;
     /** events as defined by the Nexa gateway. */

@@ -21,7 +21,6 @@ export class DesignTextStyleEdits {
             operation.start,
             operation.end,
             operation.changes,
-            node.style.fills[0]?.color ?? '#18181B',
         );
         return text === node.text ? [] : [{ ...node, text }];
     }

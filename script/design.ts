@@ -324,7 +324,7 @@ await writeFile(
 );
 
 /** Prepared shaping and asymmetric ligature carets are verified against the canonical native cases. */
-for (const testName of ['DesignFontRun', 'DesignTextShaping']) {
+for (const testName of ['DesignFontRun', 'DesignTextShaping', 'DesignTextPaintInheritance']) {
     const runTestPath: string = 'test/' + testName + '.test.ts';
     const runTestFormat: Options = (await resolveConfig(runTestPath)) ?? {};
     const runTests: string = await readFile('../nexa/test/design/' + testName + '.test.ts', 'utf8');

@@ -5,6 +5,7 @@ import type { DesignFontRun, DesignFontSourceCluster } from './DesignFontRun.js'
 import type { DesignTextSegment, DesignTextSpanStyle } from './DesignTextLayout.js';
 import type { DesignBox } from './DesignTypes.js';
 import type { DesignSvgPaints } from './DesignSvgPaints.js';
+import { DesignTextShaping } from './DesignTextShaping.js';
 
 /** A logical editable text slice can use an exact paint server without positioning or replacing its characters. */
 export interface DesignSvgTextSlice {
@@ -87,7 +88,16 @@ export class DesignSvgTextPaint {
         spans: readonly DesignTextSegment[],
         run: DesignFontRun,
         cluster: DesignFontSourceCluster,
-    ): string {
+    ): string | null {
+        const firstStyle: DesignTextSpanStyle | undefined = spans[0]?.style;
+        if (
+            firstStyle !== undefined &&
+            spans.every((span: DesignTextSegment): boolean =>
+                DesignTextShaping.samePaint(firstStyle, span.style),
+            )
+        ) {
+            return null;
+        }
         const id: string = this.paints.identity('text-cluster-paint');
         const first: number = run.caret(cluster.start);
         const last: number = run.caret(cluster.end);

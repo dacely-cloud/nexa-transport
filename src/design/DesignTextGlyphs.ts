@@ -26,10 +26,13 @@ export class DesignTextGlyphs {
             yield* fonts.glyphs(segment.style, segment.text, segment.x, baseline, tracking);
             return;
         }
+        if (prepared.paintRange === null) {
+            return;
+        }
         const styles: Map<DesignTextSpanStyle, DesignTextSpanStyle> = new Map();
         for (const glyph of prepared.run.paint(
-            prepared.start,
-            prepared.end,
+            prepared.paintRange?.start ?? prepared.start,
+            prepared.paintRange?.end ?? prepared.end,
             prepared.x,
             baseline,
         )) {

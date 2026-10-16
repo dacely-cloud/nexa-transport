@@ -41,7 +41,9 @@ export class DesignRecolorEdits {
                 }
             }
             for (const run of node.text?.runs ?? []) {
-                colors.add(run.color.toUpperCase());
+                if (run.color !== null) {
+                    colors.add(run.color.toUpperCase());
+                }
             }
             for (const color of colors) {
                 groups.set(color, (groups.get(color) ?? 0) + 1);
@@ -95,7 +97,7 @@ export class DesignRecolorEdits {
             if (
                 node.text !== null &&
                 node.text.runs.some(
-                    (run: DesignTextRun): boolean => run.color.toUpperCase() === before,
+                    (run: DesignTextRun): boolean => run.color?.toUpperCase() === before,
                 )
             ) {
                 next = {
@@ -103,7 +105,7 @@ export class DesignRecolorEdits {
                     text: {
                         ...node.text,
                         runs: node.text.runs.map((run: DesignTextRun): DesignTextRun =>
-                            run.color.toUpperCase() === before ? { ...run, color: after } : run,
+                            run.color?.toUpperCase() === before ? { ...run, color: after } : run,
                         ),
                     },
                 };

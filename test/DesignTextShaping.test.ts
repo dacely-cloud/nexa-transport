@@ -20,6 +20,7 @@ import {
 import { DesignTextShaping, type DesignTextRunFactory } from '../src/design/DesignTextShaping.js';
 import type { DesignLogicalTextSpan } from '../src/design/DesignTextBidi.js';
 import type { DesignText, DesignTextRun } from '../src/design/DesignTypes.js';
+import { DesignTextGlyphs } from '../src/design/DesignTextGlyphs.js';
 
 function text(content: string, split: number): DesignText {
     const template: DesignText | null = DesignDefaults.node('text', 'text').text;
@@ -249,4 +250,48 @@ test('tracking selects the same physical ligature policy before and after a pain
     expect(lines(engine, source, 51)).toHaveLength(
         lines(engine, { ...source, runs: [] }, 51).length,
     );
+});
+
+test('underline-only source boundaries paint one unchanged ligature while retaining their own decoration intervals', async (): Promise<void> => {
+    const engine: DesignFontEngine = await DesignBuiltinFonts.engine([
+        {
+            family: 'Nexa Caret Fixture',
+            weight: 400,
+            italic: false,
+            bytes: readFileSync(
+                new URL('./fixtures/design-font-runs/NexaCaretFixture.woff2', import.meta.url),
+            ),
+        },
+    ]);
+    const template: DesignText = text('ffi', 1);
+    const source: DesignText = {
+        ...template,
+        family: 'Nexa Caret Fixture',
+        runs: template.runs.map((run: DesignTextRun): DesignTextRun => ({
+            ...run,
+            family: 'Nexa Caret Fixture',
+            color: null,
+            underline: true,
+        })),
+    };
+    const line: DesignTextLine | undefined = lines(engine, source)[0];
+    if (line === undefined) {
+        throw new Error('Missing shaped line');
+    }
+    expect(line.segments).toHaveLength(2);
+    expect(line.segments[0]?.width).toBe((200 * 48) / 2048);
+    expect(line.segments[0]?.style.underline).toBe(true);
+    expect(line.segments[1]?.style.underline).toBe(false);
+    const glyphs: readonly DesignFontPaintGlyph[] = line.segments.flatMap(
+        (segment: DesignTextSegment): readonly DesignFontPaintGlyph[] => [
+            ...DesignTextGlyphs.paint(segment, engine, 60, 0),
+        ],
+    );
+    expect(glyphs).toHaveLength(1);
+    expect(glyphs[0]?.clip).toBeUndefined();
+    const first: DesignTextSegment | undefined = line.segments[0];
+    if (first === undefined) {
+        throw new Error('Missing first paint span');
+    }
+    expect(glyphs).toEqual([...engine.glyphs(first.style, 'ffi', 0, 60, 0)]);
 });

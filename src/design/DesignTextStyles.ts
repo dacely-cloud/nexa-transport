@@ -15,7 +15,7 @@ export class DesignTextStyles {
         start: number,
         end: number,
         changes: DesignTextStyleChanges,
-        color: string,
+        color: string | null = null,
     ): DesignText {
         V.number(start, 0, text.content.length, true);
         V.number(end, 0, text.content.length, true);
@@ -89,7 +89,7 @@ export class DesignTextStyles {
     /** Base gaps inherit a compatible saved binding instead of introducing another font identity. */
     public static base(
         text: DesignText,
-        color: string,
+        color: string | null = null,
         start: number = 0,
         end: number = text.content.length,
     ): DesignTextRun {
@@ -100,7 +100,7 @@ export class DesignTextStyles {
             size: text.size,
             weight: text.weight,
             italic: text.italic,
-            color: V.color(color),
+            color: color === null ? null : V.color(color),
             underline: false,
         };
     }
@@ -109,7 +109,7 @@ export class DesignTextStyles {
         text: DesignText,
         start: number,
         end: number,
-        color: string,
+        color: string | null = null,
     ): readonly DesignTextRun[] {
         const result: DesignTextRun[] = [];
         let cursor: number = start;

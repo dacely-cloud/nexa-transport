@@ -245,7 +245,7 @@ export class DesignStyleCodec {
                     size: V.number(run['size'], 1, 1000),
                     weight: V.number(run['weight'], 100, 900, true),
                     italic: V.boolean(run['italic']),
-                    color: V.color(run['color']),
+                    color: run['color'] === null ? null : V.color(run['color']),
                     underline: V.boolean(run['underline']),
                 };
             },

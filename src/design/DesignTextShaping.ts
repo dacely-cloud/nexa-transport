@@ -1,7 +1,11 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { DesignFontRun, DesignFontRunStyle } from './DesignFontRun.js';
+import type {
+    DesignFontRun,
+    DesignFontRunStyle,
+    DesignFontSourceCluster,
+} from './DesignFontRun.js';
 import type { DesignLogicalTextSpan } from './DesignTextBidi.js';
 import type { DesignFontEngine } from './DesignFontEngine.js';
 import type { DesignTextSegment, DesignTextSpanStyle } from './DesignTextLayout.js';
@@ -19,6 +23,8 @@ export interface DesignTextPreparedPaint {
     readonly start: number;
     readonly end: number;
     readonly x: number;
+    /** Equal adjacent paint draws once; null leaves this source slice's decorations only. */
+    readonly paintRange?: DesignFontSourceCluster | null;
 }
 
 /** Visual positions are relative to the line's eventual physical alignment. */
@@ -29,6 +35,10 @@ export interface DesignTextShapedLine {
 
 /** Metric changes split shaping; paint-only changes retain contextual glyphs across logical adjacent spans. */
 export class DesignTextShaping {
+    /** Compare ranges of one layer; inherited paint remains distinct from an explicit solid override. */
+    public static samePaint(a: DesignTextSpanStyle, b: DesignTextSpanStyle): boolean {
+        return a.rich === b.rich && (!a.rich || a.color === b.color);
+    }
     /** Unsupported unbound system families retain the platform's existing fallback measurement. */
     public static factory(fonts: DesignFontEngine): DesignTextRunFactory {
         return (
@@ -111,7 +121,53 @@ export class DesignTextShaping {
             }
             index = end;
         }
+        if (factory !== null) {
+            this.#paint(segments);
+        }
         return { width: Math.max(0, x - (segments.length > 0 ? tracking : 0)), segments };
+    }
+
+    static #paint(segments: DesignTextSegment[]): void {
+        for (let index: number = 0; index < segments.length;) {
+            const first: DesignTextSegment | undefined = segments[index];
+            const prepared: DesignTextPreparedPaint | undefined = first?.prepared;
+            if (first === undefined || prepared === undefined) {
+                index++;
+                continue;
+            }
+            let end: number = index + 1;
+            while (end < segments.length) {
+                const next: DesignTextSegment | undefined = segments[end];
+                if (
+                    next?.prepared?.run !== prepared.run ||
+                    !this.samePaint(first.style, next.style)
+                ) {
+                    break;
+                }
+                end++;
+            }
+            const last: DesignTextPreparedPaint | undefined = segments[end - 1]?.prepared;
+            if (end > index + 1 && last !== undefined) {
+                const range: DesignFontSourceCluster = {
+                    start: Math.min(prepared.start, last.start),
+                    end: Math.max(prepared.end, last.end),
+                };
+                for (let slot: number = index; slot < end; slot++) {
+                    const segment: DesignTextSegment | undefined = segments[slot];
+                    if (segment?.prepared === undefined) {
+                        throw new Error('Missing prepared text paint.');
+                    }
+                    segments[slot] = {
+                        ...segment,
+                        prepared: {
+                            ...segment.prepared,
+                            paintRange: slot === index ? range : null,
+                        },
+                    };
+                }
+            }
+            index = end;
+        }
     }
 
     static #adjacent(
