@@ -160,6 +160,7 @@ export class DesignComponentDetach {
                       },
                   }),
             name: node.name,
+            ...(node.polygon === undefined ? {} : { polygon: node.polygon }),
             kind: node.kind === DesignKind.Component ? DesignKind.Frame : node.kind,
             parentId: null,
             children: [],

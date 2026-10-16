@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { DesignStrokeCap, DesignStrokeJoin } from './DesignStrokeTypes.js';
+import type { DesignPolygonSettings } from './DesignPolygons.js';
 import type { DesignGradientTransformChanges } from './DesignGradientTypes.js';
 import type { DesignImageTransform } from './DesignImageTransformTypes.js';
 import type { DesignImageAdjustments } from './DesignImageAdjustmentTypes.js';
@@ -68,6 +69,7 @@ export const DesignOperationKind = {
     PaintGradient: 'paint-gradient',
     PaintImage: 'paint-image',
     Stroke: 'stroke',
+    Polygon: 'polygon',
     Style: 'style',
 } as const;
 /** Replace one exact color across selected authored subtrees without transferring their source bodies. */
@@ -86,6 +88,8 @@ export type DesignPreviewOperation =
     | DesignResizeOperation;
 /** Editable properties exclude identity and tree links, which have dedicated operations. */
 export interface DesignNodeChanges {
+    /** Replaces regular polygon or star parameters; null keeps its outline as a freeform vector. */
+    readonly polygon?: DesignPolygonSettings | null;
     /** Null removes construction overlays while preserving authored artwork. */
     readonly layoutGrids?: readonly DesignFrameGrid[] | null;
     readonly contentScale?: number | null;
@@ -418,6 +422,13 @@ export interface DesignStrokeOperation {
     readonly pageId: string;
     readonly changes: DesignStrokeChanges | null;
 }
+/** Page-scoped native shape regeneration preserves other layers and checks locked ancestry. */
+export interface DesignPolygonOperation {
+    readonly op: typeof DesignOperationKind.Polygon;
+    readonly id: string;
+    readonly pageId: string;
+    readonly changes: DesignPolygonSettings | null;
+}
 
 /** Omitted radii retain their original authored values. */
 export interface DesignCornerChanges {
@@ -470,6 +481,7 @@ export type DesignOperation =
     | DesignPaintGradientOperation
     | DesignPaintImageOperation
     | DesignStrokeOperation
+    | DesignPolygonOperation
     | DesignStyleOperation;
 /** Before and after images provide conflict-safe undo and bounded deltas. */
 export interface DesignEntityChange<T> {

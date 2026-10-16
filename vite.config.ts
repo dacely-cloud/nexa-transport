@@ -69,6 +69,7 @@ const config: UserConfig = {
                 'design-components': 'src/design/DesignComponents.ts',
                 'design-component-types': 'src/design/DesignComponentTypes.ts',
                 'design-paths': 'src/design/DesignPaths.ts',
+                'design-polygons': 'src/design/DesignPolygons.ts',
                 'design-font-types': 'src/design/DesignFontTypes.ts',
                 'design-font-codec': 'src/design/DesignFontCodec.ts',
                 'design-font-bindings': 'src/design/DesignFontBindings.ts',

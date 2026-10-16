@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { DesignStrokeCap, DesignStrokeJoin } from './DesignStrokeTypes.js';
+import type { DesignPolygonSettings } from './DesignPolygons.js';
 import type { DesignGradientTransform } from './DesignGradientTypes.js';
 import type { DesignImageTransform } from './DesignImageTransformTypes.js';
 import type { DesignImageSampling } from './DesignImageSamplingTypes.js';
@@ -307,6 +308,8 @@ export interface DesignFrameGrid {
 }
 /** All layer state is explicit and editable; no generated markup is the source of truth. */
 export interface DesignNode {
+    /** Optional regular polygon or star parameters; freeform path edits detach this definition. */
+    readonly polygon?: DesignPolygonSettings;
     /** Optional saved frame overlays are omitted from artwork exports. */
     readonly layoutGrids?: readonly DesignFrameGrid[];
     readonly id: string;

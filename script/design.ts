@@ -164,6 +164,7 @@ const files: readonly string[] = [
     'DesignImageGeometry',
     'DesignTextLayout',
     'DesignPaths',
+    'DesignPolygons',
     'DesignComponentTypes',
     'DesignComponentTargets',
     'DesignComponentSwap',

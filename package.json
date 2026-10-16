@@ -1,6 +1,6 @@
 {
     "name": "nexa-transport",
-    "version": "0.1.0-design.7",
+    "version": "0.1.0-design.8",
     "description": "Typed Nexa websocket gateway client for browsers and Node.js",
     "type": "module",
     "license": "Apache-2.0",
@@ -507,6 +507,10 @@
         "./design-text-layout": {
             "types": "./dist/design/DesignTextLayout.d.ts",
             "import": "./dist/design-text-layout.js"
+        },
+        "./design-polygons": {
+            "types": "./dist/design/DesignPolygons.d.ts",
+            "import": "./dist/design-polygons.js"
         },
         "./design-paths": {
             "types": "./dist/design/DesignPaths.d.ts",

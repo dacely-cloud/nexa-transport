@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { DesignStrokeChangesCodec } from './DesignStrokeChangesCodec.js';
+import { DesignPolygons } from './DesignPolygons.js';
 import { DesignStyleChangesCodec } from './DesignStyleChangesCodec.js';
 import { DesignPaintImageChangesCodec } from './DesignPaintImageChangesCodec.js';
 import { DesignPaintGradientChangesCodec } from './DesignPaintGradientChangesCodec.js';
@@ -101,6 +102,23 @@ export class DesignOperationCodec {
                         parentId: V.optionalId(value['parentId']),
                         pageId: V.id(value['pageId']),
                         index: V.number(value['index'], 0, 10000, true),
+                    };
+                }
+                case Kind.Polygon: {
+                    const value: Readonly<Record<string, unknown>> = V.record(entry, [
+                        'op',
+                        'id',
+                        'pageId',
+                        'changes',
+                    ]);
+                    return {
+                        op,
+                        id: V.id(value['id']),
+                        pageId: V.id(value['pageId']),
+                        changes:
+                            value['changes'] === null
+                                ? null
+                                : DesignPolygons.parse(value['changes']),
                     };
                 }
                 case Kind.Stroke: {
@@ -653,6 +671,12 @@ export class DesignOperationCodec {
             throw new Error('Layer update requires at least one property');
         }
         return {
+            ...(Object.hasOwn(value, 'polygon')
+                ? {
+                      polygon:
+                          value['polygon'] === null ? null : DesignPolygons.parse(value['polygon']),
+                  }
+                : {}),
             ...(Object.hasOwn(value, 'layoutGrids')
                 ? {
                       layoutGrids:
@@ -750,6 +774,7 @@ export class DesignOperationCodec {
     }
 }
 const KEYS: readonly string[] = [
+    'polygon',
     'booleanMode',
     'contentScale',
     'layoutGrids',

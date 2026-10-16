@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { DesignFrameGridCodec } from './DesignFrameGridCodec.js';
+import { DesignPolygons, type DesignPolygonSettings } from './DesignPolygons.js';
 import {
     DesignKind,
     DesignPathVerb as Verb,
@@ -34,6 +35,7 @@ export class DesignPaths {
     /** Width and height edits resize vector coordinates unless the command supplies an explicit replacement path. */
     public static resize(node: DesignNode, changes: DesignNodeChanges): DesignNode {
         const {
+            polygon: previousPolygon,
             booleanMode: previousMode,
             layoutGrids: previousGrids,
             contentScale: previousScale,
@@ -43,6 +45,7 @@ export class DesignPaths {
             ...base
         }: DesignNode = node;
         const {
+            polygon: changedPolygon,
             booleanMode: changedMode,
             layoutGrids: changedGrids,
             contentScale: changedScale,
@@ -52,6 +55,19 @@ export class DesignPaths {
             ...properties
         }: DesignNodeChanges = changes;
         const kind: DesignNode['kind'] = properties.kind ?? node.kind;
+        if (
+            changedPolygon !== undefined &&
+            changedPolygon !== null &&
+            kind !== DesignKind.Polygon
+        ) {
+            throw new Error('Only polygon layers accept polygon or star parameters.');
+        }
+        const polygon: DesignPolygonSettings | undefined =
+            kind !== DesignKind.Polygon ||
+            changedPolygon === null ||
+            (changes.path !== undefined && changedPolygon === undefined)
+                ? undefined
+                : (changedPolygon ?? previousPolygon);
         if (changedMask !== undefined && changedMask !== null && kind !== DesignKind.Mask) {
             throw new Error('Only mask groups accept a mask source and mode');
         }
@@ -78,6 +94,7 @@ export class DesignPaths {
         const next: DesignNode = {
             ...base,
             ...properties,
+            ...(polygon === undefined ? {} : { polygon }),
             ...(DesignFrameGridCodec.supports(kind) &&
             changedGrids !== null &&
             (changedGrids ?? previousGrids) !== undefined
@@ -105,6 +122,9 @@ export class DesignPaths {
                 : {}),
             ...(kind === DesignKind.Boolean && mode !== undefined ? { booleanMode: mode } : {}),
         };
+        if (polygon !== undefined) {
+            return { ...next, path: DesignPolygons.path(polygon, next.width, next.height) };
+        }
         if (
             node.path.length === 0 ||
             changes.path !== undefined ||

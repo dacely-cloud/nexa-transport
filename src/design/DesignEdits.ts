@@ -364,6 +364,17 @@ export class DesignEdits {
                     }
                     break;
                 }
+                case DesignOperationKind.Polygon: {
+                    const node: DesignNode = new DesignLayerAuthority(nodes, pages).node(
+                        operation.id,
+                        operation.pageId,
+                    );
+                    if (node.kind !== DesignKind.Polygon) {
+                        throw new Error('Only polygon layers accept polygon or star parameters.');
+                    }
+                    nodes.set(node.id, DesignPaths.resize(node, { polygon: operation.changes }));
+                    break;
+                }
                 case DesignOperationKind.Stroke: {
                     const node: DesignNode = DesignStrokeEdits.apply(
                         new DesignLayerAuthority(nodes, pages),

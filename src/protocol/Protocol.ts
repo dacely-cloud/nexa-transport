@@ -5282,6 +5282,8 @@ export interface DesignNodeShape {
     readonly path: ReadonlyArray<DesignPathCommand>;
     /** placement as defined by the Nexa gateway. */
     readonly placement: DesignPlacement;
+    /** polygon as defined by the Nexa gateway. */
+    readonly polygon?: DesignPolygonSettings;
     /** rotation as defined by the Nexa gateway. */
     readonly rotation: number;
     /** style as defined by the Nexa gateway. */
@@ -5365,6 +5367,8 @@ export interface DesignNodeChangesShape {
     readonly path?: ReadonlyArray<DesignPathCommand>;
     /** placement as defined by the Nexa gateway. */
     readonly placement?: DesignPlacement;
+    /** polygon as defined by the Nexa gateway. */
+    readonly polygon?: DesignPolygonSettings | null;
     /** rotation as defined by the Nexa gateway. */
     readonly rotation?: number;
     /** style as defined by the Nexa gateway. */
@@ -5428,6 +5432,7 @@ export type DesignOperation =
     | DesignPaintImageOperation
     | DesignPaintGradientOperation
     | DesignStrokeOperation
+    | DesignPolygonOperation
     | DesignStyleOperation;
 
 /** DesignOverride wire fields. */
@@ -5739,6 +5744,32 @@ export interface DesignPlacementShape {
 
 /** DesignPlacement from the Nexa wire protocol. */
 export type DesignPlacement = DesignPlacementShape;
+
+/** DesignPolygonOperation wire fields. */
+export interface DesignPolygonOperationShape {
+    /** changes as defined by the Nexa gateway. */
+    readonly changes: DesignPolygonSettings | null;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** op as defined by the Nexa gateway. */
+    readonly op: 'polygon';
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+}
+
+/** DesignPolygonOperation from the Nexa wire protocol. */
+export type DesignPolygonOperation = DesignPolygonOperationShape;
+
+/** DesignPolygonSettings wire fields. */
+export interface DesignPolygonSettingsShape {
+    /** innerRadius as defined by the Nexa gateway. */
+    readonly innerRadius: null | number;
+    /** points as defined by the Nexa gateway. */
+    readonly points: number;
+}
+
+/** DesignPolygonSettings from the Nexa wire protocol. */
+export type DesignPolygonSettings = DesignPolygonSettingsShape;
 
 /** Allowed values for DesignPositionOperationhorizontal. */
 export const DesignPositionOperationhorizontalValues = {

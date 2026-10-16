@@ -7926,6 +7926,12 @@ export const schema: Schema = {
                 placement: {
                     $ref: '#/definitions/DesignPlacement',
                 },
+                polygon: {
+                    $ref: '#/definitions/DesignPolygonSettings',
+                    additionalProperties: false,
+                    description:
+                        'Optional regular polygon or star parameters; freeform path edits detach this definition.',
+                },
                 rotation: {
                     type: 'number',
                 },
@@ -8107,6 +8113,18 @@ export const schema: Schema = {
                     $ref: '#/definitions/DesignPlacement',
                     description: 'Child sizing and positioning relative to its parent.',
                 },
+                polygon: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignPolygonSettings',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                    description:
+                        'Replaces regular polygon or star parameters; null keeps its outline as a freeform vector.',
+                },
                 rotation: {
                     type: 'number',
                 },
@@ -8265,6 +8283,9 @@ export const schema: Schema = {
                 },
                 {
                     $ref: '#/definitions/DesignStrokeOperation',
+                },
+                {
+                    $ref: '#/definitions/DesignPolygonOperation',
                 },
                 {
                     $ref: '#/definitions/DesignStyleOperation',
@@ -8725,6 +8746,56 @@ export const schema: Schema = {
                 'vertical',
                 'width',
             ],
+            type: 'object',
+        },
+        DesignPolygonOperation: {
+            description:
+                'Page-scoped native shape regeneration preserves other layers and checks locked ancestry.',
+            properties: {
+                changes: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignPolygonSettings',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                id: {
+                    type: 'string',
+                },
+                op: {
+                    const: 'polygon',
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+            },
+            required: ['changes', 'id', 'op', 'pageId'],
+            type: 'object',
+        },
+        DesignPolygonSettings: {
+            additionalProperties: false,
+            description:
+                'A null inner radius produces a regular polygon; a ratio produces an alternating-radius star.',
+            properties: {
+                innerRadius: {
+                    description:
+                        'Inner radius relative to the outer circle, before fitting the authored box.',
+                    maximum: 1,
+                    minimum: 0.01,
+                    type: ['null', 'number'],
+                },
+                points: {
+                    description: 'Number of outer vertices.',
+                    maximum: 64,
+                    minimum: 3,
+                    type: 'integer',
+                },
+            },
+            required: ['innerRadius', 'points'],
             type: 'object',
         },
         DesignPositionOperation: {

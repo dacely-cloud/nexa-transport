@@ -198,6 +198,10 @@ backend, or a provider-key vault.
 | `nexa-transport/design-svg-types`               | ESM + types | Design svg types.                                                            |
 | `nexa-transport/design-text-layout`             | ESM + types | Design text layout.                                                          |
 | `nexa-transport/design-paths`                   | ESM + types | Design paths.                                                                |
+| `nexa-transport/design-polygons`                | ESM + types | Editable regular polygon and star geometry and validated compact settings.   |
+| `nexa-transport/design-recolor`                 | ESM + types | Scoped native subtree recoloring without source-body replacement.            |
+| `nexa-transport/design-color-read-codec`        | ESM + types | Bounded selection-color read validation.                                     |
+| `nexa-transport/design-color-read-types`        | ESM + types | Native selection-color request and response types.                           |
 | `nexa-transport/design-components`              | ESM + types | Design components.                                                           |
 | `nexa-transport/design-component-types`         | ESM + types | Design component types.                                                      |
 | `nexa-transport/design-boolean-edits`           | ESM + types | Design boolean edits.                                                        |

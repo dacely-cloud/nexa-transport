@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { DesignVariantCodec } from './DesignVariantCodec.js';
+import { DesignPolygons } from './DesignPolygons.js';
 import { DesignMaskCodec } from './DesignMaskCodec.js';
 import { DesignBooleanMode } from './DesignBooleanTypes.js';
 import { DesignFlow } from './DesignTypes.js';
@@ -40,10 +41,22 @@ export class DesignNodeCodec {
     public static node(raw: unknown): DesignNode {
         const value: Readonly<Record<string, unknown>> = V.fields(
             raw,
-            [...KEYS, 'booleanMode', 'mask', 'variants', 'variant', 'contentScale', 'layoutGrids'],
+            [
+                ...KEYS,
+                'booleanMode',
+                'mask',
+                'variants',
+                'variant',
+                'contentScale',
+                'layoutGrids',
+                'polygon',
+            ],
             KEYS,
         );
         const kind: DesignKind = V.choice(value['kind'], Object.values(DesignKind), 'node.kind');
+        if (Object.hasOwn(value, 'polygon') && kind !== DesignKind.Polygon) {
+            throw new Error('Only polygon layers accept polygon or star parameters.');
+        }
         if (
             (Object.hasOwn(value, 'variants') && kind !== DesignKind.ComponentSet) ||
             (Object.hasOwn(value, 'variant') && kind !== DesignKind.Component)
@@ -57,6 +70,9 @@ export class DesignNodeCodec {
             throw new Error('Only frames and frame definitions accept layout grids.');
         }
         const node: DesignNode = {
+            ...(Object.hasOwn(value, 'polygon')
+                ? { polygon: DesignPolygons.parse(value['polygon']) }
+                : {}),
             ...(value['layoutGrids'] === undefined
                 ? {}
                 : { layoutGrids: DesignFrameGridCodec.grids(value['layoutGrids']) }),
@@ -155,7 +171,11 @@ export class DesignNodeCodec {
         ) {
             throw new Error('Boolean sources use an unclipped absolute container');
         }
-        return DesignFreeze.node(node);
+        return DesignFreeze.node(
+            node.polygon === undefined
+                ? node
+                : { ...node, path: DesignPolygons.path(node.polygon, node.width, node.height) },
+        );
     }
     /** Validates one bounded layer path value. */
     public static path(raw: unknown): DesignPathCommand {
