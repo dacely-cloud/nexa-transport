@@ -26,6 +26,7 @@ import { DesignVariants } from './DesignVariants.js';
 import { DesignVariantCommands } from './DesignVariantCommands.js';
 import { DesignVariantEdits } from './DesignVariantEdits.js';
 import { DesignComponentSwap } from './DesignComponentSwap.js';
+import { DesignComponentRepeat } from './DesignComponentRepeat.js';
 import { DesignDefaults } from './DesignDefaults.js';
 import { DesignLayoutEngine } from './DesignLayout.js';
 import { DesignNodeCodec } from './DesignNodeCodec.js';
@@ -72,12 +73,19 @@ export class DesignComponents {
                 'property',
                 'values',
                 'properties',
+                'rows',
+                'columns',
+                'gapX',
+                'gapY',
             ],
             ['action'],
         );
         const action: Action = V.choice(header['action'], Object.values(Action));
         if (DesignVariantCommands.action(action)) {
             return DesignVariantCommands.parse(raw);
+        }
+        if (action === Action.Repeat) {
+            return DesignComponentRepeat.parse(raw);
         }
         if (action === Action.Create || action === Action.Detach) {
             const value: Readonly<Record<string, unknown>> = V.record(raw, ['action', 'selection']);
@@ -241,6 +249,21 @@ export class DesignComponents {
         let plan: DesignSelectionPlan;
         if (DesignVariantCommands.is(command)) {
             plan = DesignVariantEdits.plan(document, pageId, command, identify, measurer);
+        } else if (command.action === Action.Repeat) {
+            plan = DesignComponentRepeat.plan(
+                document,
+                page,
+                command,
+                this.instance(
+                    document,
+                    command.componentId,
+                    identify('repeat-template'),
+                    0,
+                    0,
+                    measurer,
+                ),
+                identify,
+            );
         } else if (command.action === Action.Place) {
             const node: DesignNode = this.instance(
                 document,

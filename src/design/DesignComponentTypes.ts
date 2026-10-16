@@ -8,6 +8,7 @@ import type { DesignStyle } from './DesignTypes.js';
 export const DesignComponentAction = {
     Create: 'create',
     Place: 'place',
+    Repeat: 'repeat',
     Swap: 'swap',
     Detach: 'detach',
     Override: 'override',
@@ -33,6 +34,22 @@ export interface DesignComponentPlace {
     readonly x: number;
     readonly y: number;
     /** Treat x/y as the instance center; omitted preserves ordinary top-left placement. */
+    readonly center?: boolean;
+}
+/** Editable linked-grid dimensions and local pixel gaps. */
+export interface DesignComponentRepeatSettings {
+    readonly rows: number;
+    readonly columns: number;
+    readonly gapX: number;
+    readonly gapY: number;
+}
+/** Places linked artwork in an editable grid without copying definition bodies. */
+export interface DesignComponentRepeat extends DesignComponentRepeatSettings {
+    readonly action: typeof DesignComponentAction.Repeat;
+    readonly componentId: string;
+    readonly x: number;
+    readonly y: number;
+    /** Interprets x/y as the complete grid center instead of its top-left corner. */
     readonly center?: boolean;
 }
 /** Changes a linked definition while retaining instance geometry and unambiguous layer overrides. */
@@ -113,6 +130,7 @@ export type DesignVariantCommand =
 export type DesignComponentCommand =
     | DesignComponentCreate
     | DesignComponentPlace
+    | DesignComponentRepeat
     | DesignComponentSwap
     | DesignComponentDetach
     | DesignComponentOverride
