@@ -6900,6 +6900,20 @@ export const schema: Schema = {
             required: ['after', 'limit'],
             type: 'object',
         },
+        DesignFontPaintClip: {
+            description:
+                'Only a source boundary inside a glyph cluster clips its ink; exterior overhang stays visible.',
+            properties: {
+                left: {
+                    type: ['null', 'number'],
+                },
+                right: {
+                    type: ['null', 'number'],
+                },
+            },
+            required: ['left', 'right'],
+            type: 'object',
+        },
         DesignFontReadMethod: {
             description:
                 'Each authenticated WebSocket read transfers one independently bounded immutable slice.',
@@ -10067,6 +10081,11 @@ export const schema: Schema = {
             description:
                 'A compact face-local glyph identity replaces repeated source text and vector command payloads.',
             properties: {
+                clip: {
+                    $ref: '#/definitions/DesignFontPaintClip',
+                    description:
+                        'Only a source boundary inside a glyph cluster clips its ink; exterior overhang stays visible.',
+                },
                 id: {
                     type: 'number',
                 },
@@ -10170,6 +10189,9 @@ export const schema: Schema = {
                 },
                 pageId: {
                     type: 'string',
+                },
+                paintClipping: {
+                    type: 'boolean',
                 },
                 revision: {
                     type: 'string',
@@ -11331,6 +11353,12 @@ export const schema: Schema = {
                     const: true,
                     description:
                         'Native typography supports paragraph direction and shared Unicode ordering.',
+                    type: 'boolean',
+                },
+                designTextPaintClipping: {
+                    const: true,
+                    description:
+                        'Native glyph windows can preserve shared shaping with bounded paint clips.',
                     type: 'boolean',
                 },
                 events: {

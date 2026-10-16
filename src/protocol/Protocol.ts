@@ -4544,6 +4544,17 @@ export interface DesignFontListRequestShape {
 /** DesignFontListRequest from the Nexa wire protocol. */
 export type DesignFontListRequest = DesignFontListRequestShape;
 
+/** DesignFontPaintClip wire fields. */
+export interface DesignFontPaintClipShape {
+    /** left as defined by the Nexa gateway. */
+    readonly left: null | number;
+    /** right as defined by the Nexa gateway. */
+    readonly right: null | number;
+}
+
+/** DesignFontPaintClip from the Nexa wire protocol. */
+export type DesignFontPaintClip = DesignFontPaintClipShape;
+
 /** DesignFontReadMethod wire fields. */
 export interface DesignFontReadMethodShape {
     /** params as defined by the Nexa gateway. */
@@ -6631,6 +6642,8 @@ export type DesignTextWindowCursor = DesignTextWindowCursorShape;
 
 /** DesignTextWindowGlyph wire fields. */
 export interface DesignTextWindowGlyphShape {
+    /** clip as defined by the Nexa gateway. */
+    readonly clip?: DesignFontPaintClip;
     /** id as defined by the Nexa gateway. */
     readonly id: number;
     /** x as defined by the Nexa gateway. */
@@ -6688,6 +6701,8 @@ export interface DesignTextWindowRequestShape {
     readonly occurrenceId: string;
     /** pageId as defined by the Nexa gateway. */
     readonly pageId: string;
+    /** paintClipping as defined by the Nexa gateway. */
+    readonly paintClipping?: boolean;
     /** revision as defined by the Nexa gateway. */
     readonly revision: string;
     /** window as defined by the Nexa gateway. */
@@ -7460,6 +7475,8 @@ export interface GatewayFeaturesShape {
     readonly designLayerCompositing?: true;
     /** designTextDirection as defined by the Nexa gateway. */
     readonly designTextDirection?: true;
+    /** designTextPaintClipping as defined by the Nexa gateway. */
+    readonly designTextPaintClipping?: true;
     /** events as defined by the Nexa gateway. */
     readonly events: ReadonlyArray<string>;
     /** jsonReplies as defined by the Nexa gateway. */
