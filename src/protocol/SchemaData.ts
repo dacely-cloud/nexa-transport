@@ -9915,7 +9915,9 @@ export const schema: Schema = {
             description: "Rich text range. Offsets are UTF-16 indices into the layer's text.",
             properties: {
                 color: {
-                    type: 'string',
+                    description:
+                        "Null inherits the layer's fills, including gradients and image paints.",
+                    type: ['null', 'string'],
                 },
                 end: {
                     type: 'number',
@@ -10004,7 +10006,9 @@ export const schema: Schema = {
                 'Partial styles for a nonempty UTF-16 range; omitted properties retain their per-range values.',
             properties: {
                 color: {
-                    type: 'string',
+                    description:
+                        "Null removes a range's solid override and restores the layer's fills.",
+                    type: ['null', 'string'],
                 },
                 family: {
                     type: 'string',
@@ -11353,6 +11357,12 @@ export const schema: Schema = {
                     const: true,
                     description:
                         'Native typography supports paragraph direction and shared Unicode ordering.',
+                    type: 'boolean',
+                },
+                designTextInheritedPaint: {
+                    const: true,
+                    description:
+                        "Rich typography can inherit the layer's gradient, image or solid fill stack.",
                     type: 'boolean',
                 },
                 designTextPaintClipping: {
