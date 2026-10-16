@@ -14,6 +14,7 @@ import type { DesignVariantSet, DesignVariantValue } from './DesignVariantTypes.
 import type { DesignMask } from './DesignMaskTypes.js';
 import type { DesignBooleanMode } from './DesignBooleanTypes.js';
 import type { DesignFontBinding } from './DesignFontTypes.js';
+import type { DesignTextDirection } from './DesignTextDirection.js';
 import type { DesignBlendMode, DesignIsolation } from './DesignBlendTypes.js';
 
 /** Editable scene primitives, including reusable component definitions and instances. */
@@ -197,6 +198,8 @@ export interface DesignTextRun {
 }
 /** Text layout is shared by the canvas, tools and exported designs. */
 export interface DesignText {
+    /** Auto resolves each paragraph from its first strong character. Alignment remains physical. */
+    readonly direction?: DesignTextDirection;
     /** Saved typography remains linked while local overrides and rich spans stay editable. */
     readonly typographyStyle?: DesignTypographyLink | null;
     /** Exact private font bytes remain in the owner's library, independently of the saved scene. */

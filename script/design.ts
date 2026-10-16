@@ -105,6 +105,19 @@ const files: readonly string[] = [
     'DesignFontEngine',
     'DesignFontRegistry',
     'DesignFontShaper',
+    'DesignHarfBuzz',
+    'DesignHarfBuzzRuntime',
+    'DesignHarfBuzzBytes',
+    'DesignFontSfnt',
+    'DesignUnicodeScripts',
+    'DesignTextDirection',
+    'DesignBidiParagraph',
+    'DesignTextBidi',
+    'DesignTextBreaks',
+    'DesignScriptFontBytes',
+    'DesignScriptFontLicense',
+    'DesignSvgScriptFonts',
+    'DesignSvgText',
     'DesignEmojiBytes',
     'DesignEmojiLicense',
     'DesignFontGlyphTypes',
@@ -274,6 +287,22 @@ await writeFile(
 );
 
 await writeFile('licenses/fflate.txt', await readFile('node_modules/fflate/LICENSE', 'utf8'));
+for (const name of [
+    'NotoSansArabic-OFL.txt',
+    'NotoSansHebrew-OFL.txt',
+    'Unicode-3.0.txt',
+    'HarfBuzz.txt',
+    'Wasi-libc.txt',
+    'LLVM-runtime.txt',
+]) {
+    await writeFile('licenses/' + name, await readFile('../nexa/licenses/' + name, 'utf8'));
+}
+for (const name of ['bidi-shaper', 'woff2-encoder']) {
+    await writeFile(
+        'licenses/' + name + '.txt',
+        await readFile('node_modules/' + name + '/LICENSE', 'utf8'),
+    );
+}
 
 /** Native arc geometry regressions run against the generated portable implementation too. */
 const arcTests: string = await readFile('../nexa/test/design/DesignArcs.test.ts', 'utf8');

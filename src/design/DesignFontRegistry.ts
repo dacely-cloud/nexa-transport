@@ -6,6 +6,7 @@ import { DesignFontContainer } from './DesignFontContainer.js';
 import type { DesignFontSource, DesignFontWeightRange } from './DesignFontEngine.js';
 import type { DesignTextSpanStyle } from './DesignTextLayout.js';
 import type { DesignFontBinding } from './DesignFontTypes.js';
+import { DesignFontSfnt } from './DesignFontSfnt.js';
 
 interface RegisteredFont {
     readonly source: DesignFontSource;
@@ -13,6 +14,7 @@ interface RegisteredFont {
 }
 /** The actual physical face and its exact binding travel together through mixed-face shaping. */
 export interface DesignResolvedFace {
+    readonly source: DesignFontSource;
     readonly face: Font;
     readonly style: DesignTextSpanStyle;
 }
@@ -21,6 +23,13 @@ export interface DesignResolvedFace {
 export class DesignFontRegistry {
     readonly #fonts: RegisteredFont[] = [];
     readonly #variations: Map<string, Font> = new Map();
+
+    /** Decode compressed faces sequentially before synchronous layout, without concurrent decoder allocations. */
+    public async prepare(): Promise<void> {
+        for (const entry of this.#fonts) {
+            await DesignFontSfnt.prepare(entry.source.bytes);
+        }
+    }
 
     /** Validates font containers before parser entry and rejects ambiguous family/style/binding identities. */
     public add(source: DesignFontSource): void {
@@ -74,7 +83,7 @@ export class DesignFontRegistry {
                 `No matching ${style.family} font at weight ${style.weight}${style.italic ? ' italic' : ''}. Supply a matching workspace font.`,
             );
         }
-        return { face: this.#face(entry, style.weight), style };
+        return { source: entry.source, face: this.#face(entry, style.weight), style };
     }
 
     /** Only explicitly admitted fallback faces can supply a missing complete grapheme. */
@@ -98,7 +107,7 @@ export class DesignFontRegistry {
                 italic: entry.source.italic,
                 weight,
             };
-            return { face: this.#face(entry, weight), style: fallback };
+            return { source: entry.source, face: this.#face(entry, weight), style: fallback };
         }
         return null;
     }

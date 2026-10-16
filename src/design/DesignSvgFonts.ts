@@ -14,6 +14,7 @@ import {
     type DesignFontWeightRange,
 } from './DesignFontEngine.js';
 import type { DesignTextSpanStyle } from './DesignTextLayout.js';
+import { DesignSvgScriptFonts } from './DesignSvgScriptFonts.js';
 
 /** Explicit exports embed only selected faces; ordinary scene transfers contain no font bytes. */
 export class DesignSvgFonts {
@@ -23,6 +24,7 @@ export class DesignSvgFonts {
         sources: readonly DesignFontSource[] = [],
     ): Promise<DesignSvgResult> {
         const used: ReadonlySet<boolean> = this.#used(selection);
+        const scriptFonts: string = await DesignSvgScriptFonts.embed(selection);
         const privateCss: string = this.#private(result.svg.length, selection, sources);
         const selectedIds: ReadonlySet<string> = new Set(
             selection.boxes.map((box: DesignBox): string => box.id),
@@ -34,7 +36,7 @@ export class DesignSvgFonts {
                 (/[\p{Extended_Pictographic}\p{Regional_Indicator}]/u.test(node.text.content) ||
                     node.text.family.toLowerCase() === 'noto emoji'),
         );
-        if (used.size === 0 && privateCss === '' && !emoji) {
+        if (used.size === 0 && privateCss === '' && !emoji && scriptFonts === '') {
             return result;
         }
         const { DesignInterBytes }: typeof import('./DesignInterBytes.js') =
@@ -64,7 +66,7 @@ export class DesignSvgFonts {
         }
         const svg: string = result.svg.replace(
             '<defs>',
-            `${used.size === 0 ? '' : `<metadata>${DesignSvgGeometry.escape(DesignInterLicense.text)}</metadata>`}${emojiLicense}<defs><style>${css}${privateCss}${emojiCss}</style>`,
+            `${used.size === 0 ? '' : `<metadata>${DesignSvgGeometry.escape(DesignInterLicense.text)}</metadata>`}${emojiLicense}<defs>${scriptFonts}<style>${css}${privateCss}${emojiCss}</style>`,
         );
         if (svg.length > DesignSvgLimits.characters) {
             throw new Error('Export individual frames to stay within the SVG content budget.');

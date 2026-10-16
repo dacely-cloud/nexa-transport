@@ -14,14 +14,21 @@ export class DesignBuiltinFonts {
             sources.some(
                 (source: DesignFontSource): boolean =>
                     source.binding === undefined &&
-                    ['inter', 'noto emoji'].includes(source.family.toLowerCase()),
+                    ['inter', 'noto emoji', 'noto sans arabic', 'noto sans hebrew'].includes(
+                        source.family.toLowerCase(),
+                    ),
             )
         ) {
             return this.#create(sources);
         }
         this.#engine ??= this.#create([]);
         const bundled: DesignFontEngine = await this.#engine;
-        return sources.length === 0 ? bundled : bundled.with(sources);
+        if (sources.length === 0) {
+            return bundled;
+        }
+        const result: DesignFontEngine = bundled.with(sources);
+        await result.prepare();
+        return result;
     }
 
     /** The original public fallback font also registers the browser's ordinary text and caret rendering. */
@@ -75,6 +82,30 @@ export class DesignBuiltinFonts {
                 bytes: DesignEmojiBytes.read(),
             });
         }
+        const {
+            DesignScriptFont,
+            DesignScriptFontBytes,
+        }: typeof import('./DesignScriptFontBytes.js') = await import('./DesignScriptFontBytes.js');
+        for (const family of Object.values(DesignScriptFont)) {
+            if (
+                !sources.some(
+                    (source: DesignFontSource): boolean =>
+                        source.family.toLowerCase() === family.toLowerCase() &&
+                        source.binding === undefined &&
+                        !source.italic &&
+                        source.weight === 400,
+                )
+            ) {
+                engine.add({
+                    family,
+                    italic: false,
+                    weight: 400,
+                    fallback: true,
+                    bytes: DesignScriptFontBytes.read(family),
+                });
+            }
+        }
+        await engine.prepare();
         return engine;
     }
 }

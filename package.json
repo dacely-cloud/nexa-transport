@@ -1,6 +1,6 @@
 {
     "name": "nexa-transport",
-    "version": "0.1.0-design.9",
+    "version": "0.1.0-design.10",
     "description": "Typed Nexa websocket gateway client for browsers and Node.js",
     "type": "module",
     "license": "Apache-2.0",
@@ -838,6 +838,18 @@
         "./design-color-read-types": {
             "types": "./dist/design/DesignColorReadTypes.d.ts",
             "import": "./dist/design-color-read-types.js"
+        },
+        "./design-text-direction": {
+            "types": "./dist/design/DesignTextDirection.d.ts",
+            "import": "./dist/design-text-direction.js"
+        },
+        "./design-text-bidi": {
+            "types": "./dist/design/DesignTextBidi.d.ts",
+            "import": "./dist/design-text-bidi.js"
+        },
+        "./design-script-font-bytes": {
+            "types": "./dist/design/DesignScriptFontBytes.d.ts",
+            "import": "./dist/design-script-font-bytes.js"
         }
     },
     "scripts": {
@@ -891,6 +903,8 @@
         "@js-temporal/polyfill": "0.5.1",
         "meshoptimizer": "^1.2.0",
         "pathkit-wasm": "1.0.0",
-        "fontkit": "2.0.4"
+        "fontkit": "2.0.4",
+        "bidi-shaper": "0.1.2",
+        "woff2-encoder": "2.0.0"
     }
 }

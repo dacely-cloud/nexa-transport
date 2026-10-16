@@ -9,6 +9,7 @@ import {
 } from './DesignTypes.js';
 import type { DesignTypographyValues } from './DesignTypographyStyleTypes.js';
 import { DesignTypographyMerge } from './DesignTypographyMerge.js';
+import { DesignTextDirection } from './DesignTextDirection.js';
 
 /** Linked styles are materialized into complete layer typography without replacing their source bodies. */
 export class DesignTypographyLinks {
@@ -55,12 +56,19 @@ export class DesignTypographyLinks {
                 previous.lineHeight === target.lineHeight &&
                 previous.letterSpacing === target.letterSpacing &&
                 previous.align === target.align &&
+                (previous.direction ?? DesignTextDirection.Auto) ===
+                    (target.direction ?? DesignTextDirection.Auto) &&
                 (previous.font?.id ?? null) === (target.font?.id ?? null) &&
                 (previous.font?.sha256 ?? null) === (target.font?.sha256 ?? null)
             ) {
                 return node;
             }
-            const text: DesignText = DesignTypographyMerge.changes(previous, target);
+            const text: DesignText = DesignTypographyMerge.changes(previous, {
+                ...target,
+                ...(previous.direction !== undefined || target.direction !== undefined
+                    ? { direction: target.direction ?? DesignTextDirection.Auto }
+                    : {}),
+            });
             return { ...node, text };
         });
     }

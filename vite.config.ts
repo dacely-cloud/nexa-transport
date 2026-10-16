@@ -64,6 +64,9 @@ const config: UserConfig = {
                 'design-svg-geometry': 'src/design/DesignSvgGeometry.ts',
                 'design-svg-types': 'src/design/DesignSvgTypes.ts',
                 'design-text-layout': 'src/design/DesignTextLayout.ts',
+                'design-text-direction': 'src/design/DesignTextDirection.ts',
+                'design-text-bidi': 'src/design/DesignTextBidi.ts',
+                'design-script-font-bytes': 'src/design/DesignScriptFontBytes.ts',
                 'design-variants': 'src/design/DesignVariants.ts',
                 'design-variant-types': 'src/design/DesignVariantTypes.ts',
                 'design-components': 'src/design/DesignComponents.ts',
@@ -210,7 +213,7 @@ const config: UserConfig = {
             },
             formats: ['es'],
         },
-        rolldownOptions: { external: ['pathkit-wasm'] },
+        rolldownOptions: { external: ['pathkit-wasm', 'woff2-encoder/decompress'] },
         sourcemap: true,
     },
 };

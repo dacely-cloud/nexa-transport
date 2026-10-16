@@ -10,6 +10,7 @@ import { DesignTypographyStyleCodec } from './DesignTypographyStyleCodec.js';
 import { DesignBlendMode, DesignIsolation } from './DesignBlendTypes.js';
 
 import { DesignValues as V } from './DesignValues.js';
+import { DesignTextDirection } from './DesignTextDirection.js';
 import { DesignImageFramingCodec } from './DesignImageFramingCodec.js';
 import { DesignFontCodec } from './DesignFontCodec.js';
 import {
@@ -190,6 +191,7 @@ export class DesignStyleCodec {
             raw,
             [
                 'font',
+                'direction',
                 'typographyStyle',
                 'content',
                 'family',
@@ -261,6 +263,15 @@ export class DesignStyleCodec {
         return {
             ...(Object.hasOwn(value, 'typographyStyle')
                 ? { typographyStyle: DesignTypographyStyleCodec.link(value['typographyStyle']) }
+                : {}),
+            ...(Object.hasOwn(value, 'direction')
+                ? {
+                      direction: V.choice(
+                          value['direction'],
+                          Object.values(DesignTextDirection),
+                          'text.direction',
+                      ),
+                  }
                 : {}),
             ...(Object.hasOwn(value, 'font')
                 ? { font: DesignFontCodec.binding(value['font']) }

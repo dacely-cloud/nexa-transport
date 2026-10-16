@@ -4,9 +4,13 @@
 import type { DesignText, DesignTextRun } from './DesignTypes.js';
 import type { DesignFontBinding } from './DesignFontTypes.js';
 import { DesignFontBindings } from './DesignFontBindings.js';
+import type { DesignResolvedTextDirection } from './DesignTextDirection.js';
+import { DesignTextBidi, type DesignLogicalTextSpan } from './DesignTextBidi.js';
+import { DesignTextBreaks } from './DesignTextBreaks.js';
 
 /** Resolved style of a contiguous rich-text range. */
 export interface DesignTextSpanStyle {
+    readonly direction?: DesignResolvedTextDirection;
     /** A bound style selects exactly the saved face instead of an available system family. */
     readonly font?: DesignFontBinding | null;
     readonly rich: boolean;
@@ -31,10 +35,7 @@ export interface DesignTextLine {
     readonly width: number;
     readonly segments: readonly DesignTextSegment[];
 }
-interface Span {
-    readonly text: string;
-    readonly style: DesignTextSpanStyle;
-}
+type Span = DesignLogicalTextSpan;
 
 /** Complete shaped spans determine word wrapping; oversized words break only at Unicode grapheme boundaries. */
 export class DesignTextLayout {
@@ -60,6 +61,8 @@ export class DesignTextLayout {
         ): number => DesignTextLayout.estimate(style, content),
     ): readonly DesignTextLine[] {
         const base: DesignTextSpanStyle = DesignFontBindings.base(text, color);
+        const bidi: DesignTextBidi = new DesignTextBidi(text.content, text.direction);
+        const tokenSource: string = DesignTextBreaks.paragraphs(text.content);
         const styles: readonly DesignTextSpanStyle[] = text.runs.map(
             (run: DesignTextRun): DesignTextSpanStyle => DesignFontBindings.run(text, run),
         );
@@ -67,19 +70,24 @@ export class DesignTextLayout {
         let spans: readonly Span[] = [];
         let y: number = 0;
         let runIndex: number = 0;
-        const measured: (parts: readonly Span[]) => number = (parts: readonly Span[]): number =>
-            this.#widths(parts, text.letterSpacing, measure).reduce(
-                (sum: number, advance: number): number => sum + advance,
-                0,
-            ) +
-            Math.max(0, parts.length - 1) * text.letterSpacing;
+        const measured: (parts: readonly Span[]) => number = (parts: readonly Span[]): number => {
+            const visual: readonly Span[] = bidi.visual(parts);
+            return (
+                this.#widths(visual, text.letterSpacing, measure).reduce(
+                    (sum: number, advance: number): number => sum + advance,
+                    0,
+                ) +
+                Math.max(0, visual.length - 1) * text.letterSpacing
+            );
+        };
         const fits: (parts: readonly Span[]) => boolean = (parts: readonly Span[]): boolean =>
             measured(parts) <= width + 0.001;
         const flush: () => void = (): void => {
-            const widths: readonly number[] = this.#widths(spans, text.letterSpacing, measure);
+            const visual: readonly Span[] = bidi.visual(spans);
+            const widths: readonly number[] = this.#widths(visual, text.letterSpacing, measure);
             const lineWidth: number =
                 widths.reduce((sum: number, value: number): number => sum + value, 0) +
-                Math.max(0, spans.length - 1) * text.letterSpacing;
+                Math.max(0, visual.length - 1) * text.letterSpacing;
             const lineHeight: number =
                 Math.max(text.size, ...spans.map((span: Span): number => span.style.size)) *
                 text.lineHeight;
@@ -89,7 +97,7 @@ export class DesignTextLayout {
                     : text.align === 'end'
                       ? width - lineWidth
                       : 0;
-            const segments: readonly DesignTextSegment[] = spans.map(
+            const segments: readonly DesignTextSegment[] = visual.map(
                 (span: Span, index: number): DesignTextSegment => {
                     const advance: number = widths[index] ?? 0;
                     const segment: DesignTextSegment = {
@@ -109,7 +117,7 @@ export class DesignTextLayout {
         if (
             height > 0 &&
             (height === Infinity || text.content.length <= 4096) &&
-            !/[\r\n]/u.test(text.content)
+            !/[\r\n\u0085\u2028\u2029]/u.test(tokenSource)
         ) {
             const complete: Span[] = [];
             let offset: number = 0;
@@ -120,13 +128,21 @@ export class DesignTextLayout {
                     break;
                 }
                 if (run.start > offset) {
-                    complete.push({ text: text.content.slice(offset, run.start), style: base });
+                    complete.push({
+                        start: offset,
+                        text: text.content.slice(offset, run.start),
+                        style: base,
+                    });
                 }
-                complete.push({ text: text.content.slice(run.start, run.end), style });
+                complete.push({
+                    start: run.start,
+                    text: text.content.slice(run.start, run.end),
+                    style,
+                });
                 offset = run.end;
             }
             if (offset < text.content.length) {
-                complete.push({ text: text.content.slice(offset), style: base });
+                complete.push({ start: offset, text: text.content.slice(offset), style: base });
             }
             if (fits(complete)) {
                 spans = complete;
@@ -134,12 +150,14 @@ export class DesignTextLayout {
                 return lines;
             }
         }
-        for (const token of text.content.matchAll(/\r\n|[\r\n]|[^\S\r\n]+|[^\s]+/gu)) {
+        for (const token of tokenSource.matchAll(
+            /\r\n|[\r\n\u0085\u2028\u2029]|[^\S\r\n\u0085\u2028\u2029]+|[^\s\u0085]+/gu,
+        )) {
             if (y >= height) {
                 break;
             }
             const content: string = token[0];
-            if (content === '\n' || content === '\r' || content === '\r\n') {
+            if (/^(?:\r\n|[\r\n\u0085\u2028\u2029])$/u.test(content)) {
                 flush();
                 continue;
             }
@@ -157,6 +175,7 @@ export class DesignTextLayout {
                     active ? (run?.end ?? end) : (run?.start ?? end),
                 );
                 parts.push({
+                    start: offset,
                     text: text.content.slice(offset, next),
                     style: active ? (styles[runIndex] ?? base) : base,
                 });
@@ -227,7 +246,11 @@ export class DesignTextLayout {
         for (const span of after) {
             const last: Span | undefined = result.at(-1);
             if (last?.style === span.style) {
-                result[result.length - 1] = { style: last.style, text: last.text + span.text };
+                result[result.length - 1] = {
+                    start: last.start,
+                    style: last.style,
+                    text: last.text + span.text,
+                };
             } else {
                 result.push(span);
             }
@@ -242,6 +265,7 @@ export class DesignTextLayout {
             const stop: number = offset + span.text.length;
             if (stop > start && offset < end) {
                 result.push({
+                    start: span.start + Math.max(0, start - offset),
                     style: span.style,
                     text: span.text.slice(Math.max(0, start - offset), end - offset),
                 });

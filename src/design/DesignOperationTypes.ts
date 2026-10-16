@@ -8,6 +8,7 @@ import type { DesignGradientTransformChanges } from './DesignGradientTypes.js';
 import type { DesignImageTransform } from './DesignImageTransformTypes.js';
 import type { DesignImageAdjustments } from './DesignImageAdjustmentTypes.js';
 import type { DesignTypographyOverrides } from './DesignTypographyStyleTypes.js';
+import type { DesignTextDirection } from './DesignTextDirection.js';
 
 import type { DesignFontBinding } from './DesignFontTypes.js';
 import type { DesignVariantSet, DesignVariantValue } from './DesignVariantTypes.js';
@@ -184,6 +185,7 @@ export interface DesignSizingOperation {
 }
 /** Base typography changes preserve the source content and every authored rich-text range. */
 export interface DesignTypographyChanges {
+    readonly direction?: DesignTextDirection;
     readonly family?: string;
     readonly size?: number;
     readonly weight?: number;

@@ -3,9 +3,11 @@
 
 import type { DesignAlign } from './DesignTypes.js';
 import type { DesignFontBinding } from './DesignFontTypes.js';
+import type { DesignTextDirection } from './DesignTextDirection.js';
 
 /** A saved text style contains typography only; content and rich ranges remain on each layer. */
 export interface DesignTypographyValues {
+    readonly direction?: DesignTextDirection;
     readonly family: string;
     readonly size: number;
     readonly weight: number;
@@ -17,6 +19,7 @@ export interface DesignTypographyValues {
 }
 /** Local properties override their saved style while other fields remain linked. */
 export interface DesignTypographyOverrides {
+    readonly direction?: DesignTextDirection;
     readonly family?: string;
     readonly size?: number;
     readonly weight?: number;

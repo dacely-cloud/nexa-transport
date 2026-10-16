@@ -1,7 +1,9 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Font, GlyphRun, Glyph, GlyphPosition } from 'fontkit';
+import type { Font, Glyph, GlyphPosition } from 'fontkit';
+import { DesignHarfBuzzRuntime } from './DesignHarfBuzzRuntime.js';
+import type { DesignShapedGlyph } from './DesignHarfBuzz.js';
 import { DesignFontRegistry } from './DesignFontRegistry.js';
 import { DesignFontShaper, type DesignShapedFace } from './DesignFontShaper.js';
 import type { DesignTextSpanStyle } from './DesignTextLayout.js';
@@ -39,6 +41,12 @@ export class DesignFontEngine {
         this.#registry.add(source);
     }
 
+    /** Compressed WOFF2 faces are prepared once before synchronous measurement or outline rendering. */
+    public async prepare(): Promise<void> {
+        await DesignHarfBuzzRuntime.prepare();
+        await this.#registry.prepare();
+    }
+
     /** Private faces extend a fresh engine without modifying the public bundled-font cache. */
     public with(sources: readonly DesignFontSource[]): DesignFontEngine {
         const result: DesignFontEngine = new DesignFontEngine();
@@ -56,9 +64,9 @@ export class DesignFontEngine {
         return DesignFontShaper.spans(this.#registry, style, content, 0).reduce(
             (width: number, span: DesignShapedFace): number =>
                 width +
-                (span.run.positions.reduce(
-                    (advance: number, position: GlyphPosition): number =>
-                        advance + position.xAdvance,
+                (span.glyphs.reduce(
+                    (advance: number, glyph: DesignShapedGlyph): number =>
+                        advance + glyph.position.xAdvance,
                     0,
                 ) *
                     style.size) /
@@ -136,20 +144,15 @@ export class DesignFontEngine {
         let penY: number = baseline;
         let runOffset: number = 0;
         for (const span of DesignFontShaper.spans(this.#registry, style, content, tracking)) {
-            const run: GlyphRun = span.run;
             const scale: number = style.size / span.face.unitsPerEm;
-            for (let index: number = 0; index < run.glyphs.length; index++) {
-                const glyph: Glyph | undefined = run.glyphs[index];
-                const position: GlyphPosition | undefined = run.positions[index];
-                if (glyph === undefined || position === undefined) {
+            for (let index: number = 0; index < span.glyphs.length; index++) {
+                const shaped: DesignShapedGlyph | undefined = span.glyphs[index];
+                if (shaped === undefined) {
                     throw new Error('Font returned mismatched glyph positions.');
                 }
-                if (
-                    glyph.id === 0 &&
-                    !glyph.codePoints.every((point: number): boolean =>
-                        /\s/u.test(String.fromCodePoint(point)),
-                    )
-                ) {
+                const glyph: Glyph = shaped.glyph;
+                const position: GlyphPosition = shaped.position;
+                if (glyph.id === 0 && /[^\s\p{Cf}]/u.test(shaped.source)) {
                     throw new Error(
                         'Font does not contain a requested character. Supply its matching workspace font.',
                     );
@@ -162,12 +165,7 @@ export class DesignFontEngine {
                     scale,
                 );
                 if (bounds === null) {
-                    if (
-                        glyph.codePoints.some(
-                            (point: number): boolean =>
-                                !/[\s\p{Cf}\p{Mn}]/u.test(String.fromCodePoint(point)),
-                        )
-                    ) {
+                    if (/[^\s\p{Cf}\p{Mn}]/u.test(shaped.source)) {
                         throw new Error('This glyph has no editable vector outline.');
                     }
                 } else if (window === null || DesignFontGlyphGeometry.intersects(bounds, window)) {
@@ -180,10 +178,12 @@ export class DesignFontEngine {
                         y: penY - position.yOffset * scale,
                     };
                 }
-                penX += position.xAdvance * scale + (glyph.isMark ? 0 : tracking);
+                penX +=
+                    position.xAdvance * scale +
+                    (shaped.mark || (bounds === null && position.xAdvance === 0) ? 0 : tracking);
                 penY -= position.yAdvance * scale;
             }
-            runOffset += run.glyphs.length;
+            runOffset += span.glyphs.length;
         }
     }
 

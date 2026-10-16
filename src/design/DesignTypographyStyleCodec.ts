@@ -6,6 +6,7 @@ import { DesignFontFamilyCodec } from './DesignFontFamilyCodec.js';
 import { DesignValues as V } from './DesignValues.js';
 import { DesignFontCodec } from './DesignFontCodec.js';
 import { DesignAlign } from './DesignTypes.js';
+import { DesignTextDirection } from './DesignTextDirection.js';
 import type {
     DesignTypographyValues,
     DesignTypographyOverrides,
@@ -29,17 +30,31 @@ export class DesignTypographyStyleCodec {
     }
     /** Complete persisted style values are canonical and detached from input. */
     public static values(raw: unknown): DesignTypographyValues {
-        const value: Readonly<Record<string, unknown>> = V.record(raw, [
-            'family',
-            'size',
-            'weight',
-            'italic',
-            'lineHeight',
-            'letterSpacing',
-            'align',
-            'font',
-        ]);
+        const value: Readonly<Record<string, unknown>> = V.fields(
+            raw,
+            [
+                'family',
+                'size',
+                'weight',
+                'italic',
+                'lineHeight',
+                'letterSpacing',
+                'align',
+                'font',
+                'direction',
+            ],
+            ['family', 'size', 'weight', 'italic', 'lineHeight', 'letterSpacing', 'align', 'font'],
+        );
         return {
+            ...(Object.hasOwn(value, 'direction')
+                ? {
+                      direction: V.choice(
+                          value['direction'],
+                          Object.values(DesignTextDirection),
+                          'typography.direction',
+                      ),
+                  }
+                : {}),
             family: DesignFontFamilyCodec.family(value['family']),
             size: V.number(value['size'], 1, 1000),
             weight: V.number(value['weight'], 100, 900, true),
@@ -58,7 +73,17 @@ export class DesignTypographyStyleCodec {
     public static changes(raw: unknown, empty: boolean = false): DesignTypographyOverrides {
         const value: Readonly<Record<string, unknown>> = V.fields(
             raw,
-            ['family', 'size', 'weight', 'italic', 'lineHeight', 'letterSpacing', 'align', 'font'],
+            [
+                'family',
+                'size',
+                'weight',
+                'italic',
+                'lineHeight',
+                'letterSpacing',
+                'align',
+                'font',
+                'direction',
+            ],
             [],
         );
         if (!empty && Object.keys(value).length === 0) {
@@ -66,6 +91,7 @@ export class DesignTypographyStyleCodec {
         }
         const parsed: DesignTypographyValues = this.values({ ...this.defaults(), ...value });
         return {
+            ...(value['direction'] === undefined ? {} : { direction: parsed.direction }),
             ...(value['family'] === undefined ? {} : { family: parsed.family }),
             ...(value['size'] === undefined ? {} : { size: parsed.size }),
             ...(value['weight'] === undefined ? {} : { weight: parsed.weight }),

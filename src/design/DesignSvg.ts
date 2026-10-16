@@ -14,7 +14,7 @@ import { DesignMaskGeometry } from './DesignMaskGeometry.js';
 import { DesignSvgGeometry as Geometry } from './DesignSvgGeometry.js';
 import { DesignSvgPaints } from './DesignSvgPaints.js';
 import { DesignSvgCompositing } from './DesignSvgCompositing.js';
-import { DesignFontBindings } from './DesignFontBindings.js';
+import { DesignSvgText } from './DesignSvgText.js';
 import type { DesignFontEngine } from './DesignFontEngine.js';
 import {
     DesignSvgLimits,
@@ -26,7 +26,6 @@ import {
     DesignTextLayout,
     type DesignTextSpanStyle,
     type DesignTextLine,
-    type DesignTextSegment,
 } from './DesignTextLayout.js';
 
 /** Shared native and browser serializer exports actual editable geometry, with no screenshot dependency. */
@@ -256,6 +255,6 @@ export class DesignSvg {
             }
             return `<g clip-path="url(#${id})" ${attributes}>${shapes.join('')}</g>`;
         }
-        return `<g clip-path="url(#${id})"><text xml:space="preserve" letter-spacing="${text.letterSpacing}" ${attributes}>${lines.map((line: DesignTextLine): string => line.segments.map((segment: DesignTextSegment): string => `<tspan x="${segment.x}" y="${DesignTextLayout.baseline(line, text.lineHeight)}" ${segment.style.rich && richFill ? `fill="${segment.style.color}"` : ''} font-family="${Geometry.escape(JSON.stringify(DesignFontBindings.family(segment.style.family, segment.style.font)) + ',"Noto Emoji"')}" font-size="${segment.style.size}" font-weight="${segment.style.weight}" font-style="${segment.style.italic ? 'italic' : 'normal'}" text-decoration="${segment.style.underline ? 'underline' : 'none'}">${Geometry.escape(segment.text)}</tspan>`).join('')).join('')}</text></g>`;
+        return DesignSvgText.render(lines, text, attributes, id, richFill);
     }
 }

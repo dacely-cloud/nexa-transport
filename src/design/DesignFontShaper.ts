@@ -1,22 +1,27 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Font, GlyphRun, GlyphPosition } from 'fontkit';
 import type { DesignTextSpanStyle } from './DesignTextLayout.js';
 import { DesignFontRegistry, type DesignResolvedFace } from './DesignFontRegistry.js';
+import { DesignHarfBuzz, type DesignShapedGlyph } from './DesignHarfBuzz.js';
+import { DesignUnicodeScripts } from './DesignUnicodeScripts.js';
 
-/** One contiguous physical-face run retains contextual shaping rather than shaping individual characters. */
+/** One physical face and script retain contextual shaping across complete grapheme clusters. */
 export interface DesignShapedFace extends DesignResolvedFace {
-    readonly run: GlyphRun;
+    readonly glyphs: readonly DesignShapedGlyph[];
+}
+interface Grapheme {
+    readonly text: string;
+    readonly script: string | null;
 }
 
-/** Whole-grapheme fallback preserves joined emoji and leaves primary-face kerning/ligatures unchanged. */
+/** Whole-grapheme fallback and script itemization feed the same shaper on the server and browser. */
 export class DesignFontShaper {
     static readonly #segmenter: Intl.Segmenter = new Intl.Segmenter('und', {
         granularity: 'grapheme',
     });
 
-    /** A covered string keeps its original one-run path; missing characters split only at grapheme boundaries. */
+    /** Logical source slices remain intact; resolved RTL face/script runs are emitted in visual order. */
     public static spans(
         registry: DesignFontRegistry,
         style: DesignTextSpanStyle,
@@ -27,62 +32,60 @@ export class DesignFontShaper {
             throw new Error('Text exceeds the shaping budget.');
         }
         const primary: DesignResolvedFace = registry.resolve(style);
-        if (DesignFontRegistry.covers(primary.face, content)) {
-            return [{ ...primary, run: this.#shape(primary.face, content, tracking) }];
+        if (/^\p{ASCII}*$/u.test(content) && DesignFontRegistry.covers(primary.face, content)) {
+            return [
+                { ...primary, glyphs: DesignHarfBuzz.shape(primary, content, 'Latn', tracking) },
+            ];
         }
+        const graphemes: readonly Grapheme[] = Array.from(
+            this.#segmenter.segment(content),
+            (grapheme: Intl.SegmentData): Grapheme => {
+                let script: string | null = null;
+                for (const character of grapheme.segment) {
+                    const point: number | undefined = character.codePointAt(0);
+                    script = point === undefined ? null : DesignUnicodeScripts.script(point);
+                    if (script !== null) {
+                        break;
+                    }
+                }
+                return { text: grapheme.segment, script };
+            },
+        );
         const runs: DesignShapedFace[] = [];
         const cached: Map<string, DesignResolvedFace> = new Map();
         let current: DesignResolvedFace = primary;
+        let script: string =
+            graphemes.find((grapheme: Grapheme): boolean => grapheme.script !== null)?.script ??
+            'Zyyy';
         let pieces: string[] = [];
         const finish: () => void = (): void => {
             if (pieces.length > 0) {
                 runs.push({
                     ...current,
-                    run: this.#shape(current.face, pieces.join(''), tracking),
+                    glyphs: DesignHarfBuzz.shape(current, pieces.join(''), script, tracking),
                 });
             }
             pieces = [];
         };
-        for (const grapheme of this.#segmenter.segment(content)) {
-            let resolved: DesignResolvedFace | undefined = cached.get(grapheme.segment);
+        for (const grapheme of graphemes) {
+            let resolved: DesignResolvedFace | undefined = cached.get(grapheme.text);
             if (resolved === undefined) {
-                resolved = DesignFontRegistry.covers(primary.face, grapheme.segment)
+                resolved = DesignFontRegistry.covers(primary.face, grapheme.text)
                     ? primary
-                    : (registry.fallback(style, grapheme.segment) ?? primary);
+                    : (registry.fallback(style, grapheme.text) ?? primary);
                 if (cached.size < 256) {
-                    cached.set(grapheme.segment, resolved);
+                    cached.set(grapheme.text, resolved);
                 }
             }
-            if (resolved.face !== current.face) {
+            const next: string = grapheme.script ?? script;
+            if (resolved.face !== current.face || next !== script) {
                 finish();
                 current = resolved;
+                script = next;
             }
-            pieces.push(grapheme.segment);
+            pieces.push(grapheme.text);
         }
         finish();
-        return runs;
-    }
-
-    static #shape(face: Font, content: string, tracking: number): GlyphRun {
-        const run: GlyphRun = face.layout(
-            content,
-            tracking === 0 ? {} : { liga: false, clig: false },
-        );
-        if (
-            run.glyphs.length > 100000 ||
-            run.glyphs.length !== run.positions.length ||
-            run.positions.some(
-                (position: GlyphPosition): boolean =>
-                    ![
-                        position.xAdvance,
-                        position.yAdvance,
-                        position.xOffset,
-                        position.yOffset,
-                    ].every(Number.isFinite),
-            )
-        ) {
-            throw new Error('Font returned invalid or oversized shaping data.');
-        }
-        return run;
+        return style.direction === 'rtl' ? runs.reverse() : runs;
     }
 }

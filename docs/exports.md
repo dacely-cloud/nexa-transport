@@ -197,6 +197,9 @@ backend, or a provider-key vault.
 | `nexa-transport/design-svg-paints`              | ESM + types | Editable paint servers and bounded portable angular/diamond raster paint.    |
 | `nexa-transport/design-svg-types`               | ESM + types | Design svg types.                                                            |
 | `nexa-transport/design-text-layout`             | ESM + types | Design text layout.                                                          |
+| `nexa-transport/design-text-direction`          | ESM + types | Paragraph direction and resolved visual-run types.                           |
+| `nexa-transport/design-text-bidi`               | ESM + types | Paragraph-aware visual ordering with logical source slices.                  |
+| `nexa-transport/design-script-font-bytes`       | ESM + types | Original public Arabic and Hebrew font bytes.                                |
 | `nexa-transport/design-paths`                   | ESM + types | Design paths.                                                                |
 | `nexa-transport/design-polygons`                | ESM + types | Editable regular polygon and star geometry and validated compact settings.   |
 | `nexa-transport/design-arcs`                    | ESM + types | Editable ellipse arcs, pie sectors and donuts with bounded native curves.    |
