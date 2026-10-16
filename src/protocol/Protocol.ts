@@ -397,6 +397,8 @@ export interface AskParamsShape {
     readonly targetTimeSeconds?: number;
     /** userId as defined by the Nexa gateway. */
     readonly userId?: string;
+    /** userRegion as defined by the Nexa gateway. */
+    readonly userRegion?: UserRegion;
 }
 
 /** AskParams from the Nexa wire protocol. */
@@ -7545,6 +7547,8 @@ export interface GatewayFeaturesShape {
     readonly sessionHistoryUpdates?: true;
     /** transcriptBlocks as defined by the Nexa gateway. */
     readonly transcriptBlocks?: true;
+    /** userRegion as defined by the Nexa gateway. */
+    readonly userRegion?: true;
     /** workflowDraftsVersion as defined by the Nexa gateway. */
     readonly workflowDraftsVersion?: 1;
     /** workflowGraphVersion as defined by the Nexa gateway. */
@@ -13594,6 +13598,8 @@ export interface StreamParamsShape {
     readonly targetTimeSeconds?: number;
     /** userId as defined by the Nexa gateway. */
     readonly userId?: string;
+    /** userRegion as defined by the Nexa gateway. */
+    readonly userRegion?: UserRegion;
 }
 
 /** StreamParams from the Nexa wire protocol. */
@@ -14157,6 +14163,19 @@ export interface TurnEventDataShape {
 
 /** TurnEventData from the Nexa wire protocol. */
 export type TurnEventData = TurnEventDataShape;
+
+/** UserRegion wire fields. */
+export interface UserRegionShape {
+    /** countryCode as defined by the Nexa gateway. */
+    readonly countryCode?: string;
+    /** locale as defined by the Nexa gateway. */
+    readonly locale?: string;
+    /** timeZone as defined by the Nexa gateway. */
+    readonly timeZone?: string;
+}
+
+/** UserRegion from the Nexa wire protocol. */
+export type UserRegion = UserRegionShape;
 
 /** ValueSchema from the Nexa wire protocol. */
 export type ValueSchema = ScalarSchema | ObjectSchema | ListSchema | ResourceSchema;
