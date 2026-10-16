@@ -12,6 +12,8 @@ export interface ClientIdentity {
 
 /** Browser and Node.js connection configuration. Credentials stay in memory. */
 export interface ClientOptions {
+    /** Override coarse browser regional hints, or null to disable automatic hints. */
+    readonly userRegion?: import('../protocol/Protocol.js').UserRegion | null;
     /** ws(s) endpoint, or an http(s) URL converted to ws(s). */
     readonly url: string;
     /** Nexa token, or a previously provisioned device token. */

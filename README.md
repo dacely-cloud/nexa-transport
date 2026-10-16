@@ -605,3 +605,13 @@ means the receipt predates adaptive planning. `ReverseInvestigation.parse` bound
 these steps, checks owner/provenance references and rejects dependency cycles.
 Plan evidence ids can refer to earlier records outside the latest evidence preview.
 Use the native shared evidence index to page through those records.
+
+### Regional context for Chat
+
+With a gateway advertising `features.userRegion`, browser chat calls automatically include the
+browser's locale and time zone. These are approximate regional preferences, not verified residence
+or authorization. No GPS permission or external IP lookup is used. Node clients send no automatic
+location. Applications can supply `userRegion: { countryCode: 'GB', timeZone: 'Europe/London' }` in
+`ClientOptions` or an individual `agent.ask`/`agent.stream` request. Set `ClientOptions.userRegion`
+to `null` to disable automatic hints. An explicitly requested place takes priority in answers;
+generic news should balance regional and worldwide developments.

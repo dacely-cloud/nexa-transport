@@ -575,6 +575,11 @@ export const schema: Schema = {
                     description: 'The principal the turn is billed and authorized as.',
                     type: 'string',
                 },
+                userRegion: {
+                    $ref: '#/definitions/UserRegion',
+                    description:
+                        'Coarse regional preferences, never authorization or precise location.',
+                },
             },
             required: ['message'],
             type: 'object',
@@ -11555,6 +11560,12 @@ export const schema: Schema = {
                     description: 'Compact persisted NDJSON blocks, read in bounded byte pages.',
                     type: 'boolean',
                 },
+                userRegion: {
+                    const: true,
+                    description:
+                        'Supports coarse per-turn regional context for news and local information.',
+                    type: 'boolean',
+                },
                 workflowDraftsVersion: {
                     const: 1,
                     type: 'number',
@@ -20516,6 +20527,11 @@ export const schema: Schema = {
                     description: 'The principal the turn is billed and authorized as.',
                     type: 'string',
                 },
+                userRegion: {
+                    $ref: '#/definitions/UserRegion',
+                    description:
+                        'Coarse regional preferences, never authorization or precise location.',
+                },
             },
             required: ['message'],
             type: 'object',
@@ -21396,6 +21412,22 @@ export const schema: Schema = {
                 },
             },
             required: ['event', 'streamId'],
+            type: 'object',
+        },
+        UserRegion: {
+            description:
+                'Coarse caller-supplied regional preferences, never authorization or precise geolocation.',
+            properties: {
+                countryCode: {
+                    type: 'string',
+                },
+                locale: {
+                    type: 'string',
+                },
+                timeZone: {
+                    type: 'string',
+                },
+            },
             type: 'object',
         },
         ValueSchema: {

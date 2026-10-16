@@ -52,7 +52,8 @@ import {
 } from '../protocol/Events.js';
 import type { StreamOptions } from '../interface/StreamOptions.js';
 import { Method } from '../protocol/Protocol.js';
-import type { StreamParams } from '../protocol/Protocol.js';
+import type { StreamParams, UserRegion } from '../protocol/Protocol.js';
+import { BrowserRegion } from './BrowserRegion.js';
 import { TurnStream } from './TurnStream.js';
 import type { CallOptions, ClientOptions } from '../interface/ClientOptions.js';
 import type { PendingLayout } from '../interface/PendingLayout.js';
@@ -125,6 +126,10 @@ export interface CollaborationOffice {
 }
 /** Authenticated Nexa gateway connection shared by browsers and Node.js. */
 export class NexaClient {
+    /** Browser locale and timezone hints; returns undefined in server environments. */
+    public static browserRegion(): UserRegion | undefined {
+        return BrowserRegion.read();
+    }
     /** Native focus receives bounded Unicode edits when the gateway advertises support. */
     public get supportsRobloxTextEditing(): boolean {
         return this.#hello?.features.robloxTextEditing === true;
@@ -856,6 +861,19 @@ export class NexaClient {
     ): Promise<ResultOf<M>> {
         if (!this.connected) {
             throw new TransportError(TransportErrorCode.Closed, 'Client is not connected');
+        }
+        if (
+            (method === Method.AgentAsk || method === Method.AgentStream) &&
+            this.#hello?.features.userRegion === true &&
+            !Object.hasOwn(params, 'userRegion')
+        ) {
+            const region: UserRegion | undefined =
+                this.#options.userRegion === null
+                    ? undefined
+                    : (this.#options.userRegion ?? BrowserRegion.read());
+            if (region !== undefined) {
+                params = { ...params, userRegion: region };
+            }
         }
         if (
             (method === Method.AgentAsk || method === Method.AgentStream) &&
