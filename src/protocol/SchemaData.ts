@@ -8237,6 +8237,9 @@ export const schema: Schema = {
                     $ref: '#/definitions/DesignMove',
                 },
                 {
+                    $ref: '#/definitions/DesignReparentOperation',
+                },
+                {
                     $ref: '#/definitions/DesignRemove',
                 },
                 {
@@ -8970,6 +8973,33 @@ export const schema: Schema = {
                 },
             },
             required: ['id', 'op'],
+            type: 'object',
+        },
+        DesignReparentOperation: {
+            description:
+                'Moves selected authored roots between containers while preserving their resolved world geometry natively.',
+            properties: {
+                index: {
+                    type: 'number',
+                },
+                op: {
+                    const: 'reparent',
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+                parentId: {
+                    type: ['null', 'string'],
+                },
+                selection: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+            },
+            required: ['index', 'op', 'pageId', 'parentId', 'selection'],
             type: 'object',
         },
         DesignResizeOperation: {

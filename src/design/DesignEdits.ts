@@ -37,6 +37,7 @@ import { DesignTypographyEdits } from './DesignTypographyEdits.js';
 import { DesignSizingEdits } from './DesignSizingEdits.js';
 import { DesignLayoutEdits } from './DesignLayoutEdits.js';
 import { DesignSelectionContext } from './DesignSelectionContext.js';
+import { DesignSelectionTree } from './DesignSelectionTree.js';
 import type { DesignTextMeasurer } from './DesignLayoutTypes.js';
 import { DesignTextMetrics } from './DesignTextMetrics.js';
 import type {
@@ -191,6 +192,39 @@ export class DesignEdits {
                     for (const node of changed) {
                         nodes.set(node.id, node);
                     }
+                    break;
+                }
+                case DesignOperationKind.Reparent: {
+                    const current: DesignDocument = {
+                        ...document,
+                        ...metadata,
+                        nodes: [...nodes.values()],
+                        pages: [...pages.values()],
+                    };
+                    const context: DesignSelectionContext = new DesignSelectionContext(
+                        current,
+                        operation.pageId,
+                        operation.selection,
+                        measurer,
+                    );
+                    if (operation.parentId !== null) {
+                        new DesignSelectionIndex(current, operation.pageId, [operation.parentId]);
+                    }
+                    const result: DesignDocument = this.apply(
+                        current,
+                        DesignSelectionTree.move(context, operation.parentId, operation.index)
+                            .operations,
+                        measurer,
+                    ).document;
+                    nodes.clear();
+                    pages.clear();
+                    for (const node of result.nodes) {
+                        nodes.set(node.id, node);
+                    }
+                    for (const page of result.pages) {
+                        pages.set(page.id, page);
+                    }
+                    metadata = this.#metadata(result);
                     break;
                 }
                 case DesignOperationKind.Move: {

@@ -167,6 +167,30 @@ export class DesignOperationCodec {
                         changes: DesignPaintGradientChangesCodec.changes(value['changes']),
                     };
                 }
+                case Kind.Reparent: {
+                    const value: Readonly<Record<string, unknown>> = V.record(entry, [
+                        'op',
+                        'pageId',
+                        'selection',
+                        'parentId',
+                        'index',
+                    ]);
+                    const selection: readonly string[] = V.list(
+                        value['selection'],
+                        128,
+                        (id: unknown): string => V.id(id),
+                    );
+                    if (selection.length === 0 || new Set(selection).size !== selection.length) {
+                        throw new Error('Select 1 to 128 distinct layers.');
+                    }
+                    return {
+                        op,
+                        pageId: V.id(value['pageId']),
+                        selection,
+                        parentId: value['parentId'] === null ? null : V.id(value['parentId']),
+                        index: V.number(value['index'], 0, 10000, true),
+                    };
+                }
                 case Kind.Recolor: {
                     const value: Readonly<Record<string, unknown>> = V.record(entry, [
                         'op',

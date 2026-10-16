@@ -57,6 +57,7 @@ export const DesignOperationKind = {
     TextStyle: 'text-style',
     Text: 'text',
     Move: 'move',
+    Reparent: 'reparent',
     Remove: 'remove',
     Page: 'page',
     Guide: 'guide',
@@ -285,6 +286,14 @@ export interface DesignMove {
     readonly pageId: string;
     readonly index: number;
 }
+/** Moves selected authored roots between containers while preserving their resolved world geometry natively. */
+export interface DesignReparentOperation {
+    readonly op: typeof DesignOperationKind.Reparent;
+    readonly pageId: string;
+    readonly selection: readonly string[];
+    readonly parentId: string | null;
+    readonly index: number;
+}
 /** Delete a subtree and its anchored comments and prototype links. */
 export interface DesignRemove {
     readonly op: typeof DesignOperationKind.Remove;
@@ -440,6 +449,7 @@ export type DesignOperation =
     | DesignTextStyleOperation
     | DesignTextOperation
     | DesignMove
+    | DesignReparentOperation
     | DesignRemove
     | DesignGuideOperation
     | DesignPageOperation
