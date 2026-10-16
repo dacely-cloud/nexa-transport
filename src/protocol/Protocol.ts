@@ -5406,6 +5406,7 @@ export type DesignOperation =
     | DesignRecolorOperation
     | DesignLayoutOperation
     | DesignReparentOperation
+    | DesignResizeOperation
     | DesignInsert
     | DesignUpdate
     | DesignSizingOperation
@@ -5413,7 +5414,6 @@ export type DesignOperation =
     | DesignTypographyOperation
     | DesignTextStyleOperation
     | DesignTextOperation
-    | DesignResizeOperation
     | DesignPositionOperation
     | DesignRotateOperation
     | DesignScaleOperation
@@ -5783,7 +5783,10 @@ export type DesignPositionOperation = DesignPositionOperationShape;
 
 /** DesignPreviewOperation from the Nexa wire protocol. */
 export type DesignPreviewOperation =
-    DesignRecolorOperation | DesignLayoutOperation | DesignReparentOperation;
+    | DesignRecolorOperation
+    | DesignLayoutOperation
+    | DesignReparentOperation
+    | DesignResizeOperation;
 
 /** DesignReadMethod wire fields. */
 export interface DesignReadMethodShape {

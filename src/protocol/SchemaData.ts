@@ -8201,6 +8201,9 @@ export const schema: Schema = {
                     $ref: '#/definitions/DesignReparentOperation',
                 },
                 {
+                    $ref: '#/definitions/DesignResizeOperation',
+                },
+                {
                     $ref: '#/definitions/DesignInsert',
                 },
                 {
@@ -8220,9 +8223,6 @@ export const schema: Schema = {
                 },
                 {
                     $ref: '#/definitions/DesignTextOperation',
-                },
-                {
-                    $ref: '#/definitions/DesignResizeOperation',
                 },
                 {
                     $ref: '#/definitions/DesignPositionOperation',
@@ -8779,9 +8779,12 @@ export const schema: Schema = {
                 {
                     $ref: '#/definitions/DesignReparentOperation',
                 },
+                {
+                    $ref: '#/definitions/DesignResizeOperation',
+                },
             ],
             description:
-                'Read-only native drafts admit bounded layout, color and hierarchy edits, never arbitrary source replacements.',
+                'Read-only native drafts admit bounded geometry, layout, color and hierarchy edits, never source replacements.',
         },
         DesignReadMethod: {
             description: 'Bounded snapshot RPC contract.',
