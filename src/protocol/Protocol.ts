@@ -4756,6 +4756,8 @@ export interface DesignImageShape {
     readonly sampling?: DesignImageSampling | null;
     /** scale as defined by the Nexa gateway. */
     readonly scale: number;
+    /** tile as defined by the Nexa gateway. */
+    readonly tile?: DesignImageTile | null;
     /** transform as defined by the Nexa gateway. */
     readonly transform?: DesignImageTransform | null;
 }
@@ -4813,6 +4815,8 @@ export interface DesignImageFramingShape {
     readonly rotation?: number;
     /** scale as defined by the Nexa gateway. */
     readonly scale: number;
+    /** tile as defined by the Nexa gateway. */
+    readonly tile?: DesignImageTile | null;
     /** transform as defined by the Nexa gateway. */
     readonly transform?: DesignImageTransform | null;
 }
@@ -4843,6 +4847,32 @@ export const DesignImageSamplingAlignValues = {
 /** DesignImageSamplingAlign from the Nexa wire protocol. */
 export type DesignImageSamplingAlign =
     (typeof DesignImageSamplingAlignValues)[keyof typeof DesignImageSamplingAlignValues];
+
+/** DesignImageTile wire fields. */
+export interface DesignImageTileShape {
+    /** clip as defined by the Nexa gateway. */
+    readonly clip?: DesignImageTileClip | null;
+    /** content as defined by the Nexa gateway. */
+    readonly content: DesignImageTransform;
+}
+
+/** DesignImageTile from the Nexa wire protocol. */
+export type DesignImageTile = DesignImageTileShape;
+
+/** DesignImageTileClip wire fields. */
+export interface DesignImageTileClipShape {
+    /** height as defined by the Nexa gateway. */
+    readonly height: number;
+    /** width as defined by the Nexa gateway. */
+    readonly width: number;
+    /** x as defined by the Nexa gateway. */
+    readonly x: number;
+    /** y as defined by the Nexa gateway. */
+    readonly y: number;
+}
+
+/** DesignImageTileClip from the Nexa wire protocol. */
+export type DesignImageTileClip = DesignImageTileClipShape;
 
 /** DesignImageTransform wire fields. */
 export interface DesignImageTransformShape {
@@ -5694,6 +5724,8 @@ export interface DesignPaintImageChangesShape {
     readonly rotation?: number;
     /** scale as defined by the Nexa gateway. */
     readonly scale?: number;
+    /** tile as defined by the Nexa gateway. */
+    readonly tile?: DesignImageTile | null;
     /** transform as defined by the Nexa gateway. */
     readonly transform?: DesignImageTransform | null;
 }
@@ -7483,6 +7515,8 @@ export interface GatewayFeaturesShape {
     readonly designExtendedGradients?: true;
     /** designImageAdjustments as defined by the Nexa gateway. */
     readonly designImageAdjustments?: true;
+    /** designImageTiles as defined by the Nexa gateway. */
+    readonly designImageTiles?: true;
     /** designImageTransforms as defined by the Nexa gateway. */
     readonly designImageTransforms?: true;
     /** designLayerCompositing as defined by the Nexa gateway. */

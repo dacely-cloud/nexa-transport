@@ -269,6 +269,8 @@ export const DesignTransition = {
 export type DesignTransition = (typeof DesignTransition)[keyof typeof DesignTransition];
 /** Workspace image reference and crop transform. */
 export interface DesignImageFraming {
+    /** In Tile mode, content maps image units into an independently placed repeat cell. */
+    readonly tile?: import('./DesignImageTileTypes.js').DesignImageTile | null;
     /** Omission or null retains the original image colors; edits never replace pixel bytes. */
     readonly adjustments?: DesignImageAdjustments | null;
     readonly fit: DesignImageFit;

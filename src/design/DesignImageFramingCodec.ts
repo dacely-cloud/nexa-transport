@@ -4,6 +4,7 @@
 import { DesignValues as V } from './DesignValues.js';
 import { DesignImageTransformCodec } from './DesignImageTransformCodec.js';
 import { DesignImageAdjustmentCodec } from './DesignImageAdjustmentCodec.js';
+import { DesignImageTileCodec } from './DesignImageTileCodec.js';
 import { DesignImageFit, type DesignImageFraming } from './DesignTypes.js';
 
 /** Validates the same bounded framing for image layers, fills and strokes. */
@@ -22,10 +23,17 @@ export class DesignImageFramingCodec {
                 'flipY',
                 'transform',
                 'adjustments',
+                'tile',
             ],
             ['fit', 'cropX', 'cropY', 'scale'],
         );
         return {
+            ...(value['tile'] === undefined
+                ? {}
+                : {
+                      tile:
+                          value['tile'] === null ? null : DesignImageTileCodec.parse(value['tile']),
+                  }),
             fit: V.choice(value['fit'], Object.values(DesignImageFit)),
             cropX: V.number(value['cropX'], -1, 1),
             cropY: V.number(value['cropY'], -1, 1),

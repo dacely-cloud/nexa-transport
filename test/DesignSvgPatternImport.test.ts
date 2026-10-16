@@ -194,6 +194,43 @@ test('image layers, aliases, shapes and positioned text chunks share one admitte
     }
 });
 
+test('a raster offset or oversized inside a cell retains independent cell and content matrices', async (): Promise<void> => {
+    const gap: DesignPaint = paint(
+        await parse(userTile.replace('<image ', '<image x="4" '), rectangle),
+    );
+    expect(gap.framing?.transform).toEqual({
+        a: 0.4,
+        b: 0,
+        c: 0,
+        d: 1 / 3,
+        tx: -0.17,
+        ty: -25 / 60,
+    });
+    expect(gap.framing?.tile).toEqual({ content: { a: 1, b: 0, c: 0, d: 1, tx: 0.1, ty: 0 } });
+    const oversized: DesignPaint = paint(
+        await parse(userTile.replace('<image ', '<image transform="scale(2)" '), rectangle),
+    );
+    expect(oversized.framing?.tile).toEqual({ content: { a: 2, b: 0, c: 0, d: 2, tx: 0, ty: 0 } });
+});
+
+test('image slice viewport crops before filtering and leaves its original raster editable', async (): Promise<void> => {
+    const cropped: DesignPaint = paint(
+        await parse(
+            userTile.replace(
+                'width="40" height="20"/>',
+                'x="5" y="6" width="20" height="40" preserveAspectRatio="xMidYMid slice"/>',
+            ),
+            rectangle,
+        ),
+    );
+    expect(cropped.assetId).toBe('raster');
+    expect(cropped.framing?.tile).toMatchObject({
+        content: { a: 2, b: 0, c: 0, d: 2, tx: -0.625 },
+        clip: { x: 0.375, y: 0, width: 0.25, height: 1 },
+    });
+    expect(cropped.framing?.tile?.content.ty).toBeCloseTo(0.3, 10);
+});
+
 test('unused patterns remain inert and zero-sized tiles do not admit images', async (): Promise<void> => {
     const result: DesignSvgLayerImport = await parse(
         '<pattern id="unused" href="https://example.invalid/p.svg"/>' +
@@ -236,6 +273,61 @@ test('native tiled-paint export reimports as the same image framing without a se
     expect(imported).toEqual(original);
 });
 
+test.each(['gap', 'slice'])(
+    'editable %s cells retain source identity, placement and crop after SVG export/reimport',
+    async (kind: string): Promise<void> => {
+        const definitions: string =
+            kind === 'gap'
+                ? userTile.replace('<image ', '<image x="4" ')
+                : userTile.replace(
+                      'width="40" height="20"/>',
+                      'x="5" y="6" width="20" height="40" preserveAspectRatio="xMidYMid slice"/>',
+                  );
+        const original: DesignPaint = paint(await parse(definitions, rectangle));
+        const asset: DesignAsset = await load({
+            name: 'Pixels',
+            mime: 'image/png',
+            bytes: Uint8Array.from(atob(encoded), (value: string): number => value.charCodeAt(0)),
+        });
+        const exported: DesignSvgPaints = new DesignSvgPaints(
+            new Map([[asset.id, { asset, base64: encoded }]]),
+        );
+        const fill: string = exported.paint(original, {
+            id: 'box',
+            x: 0,
+            y: 0,
+            width: 100,
+            height: 60,
+            rotation: 0,
+            depth: 0,
+            clipId: null,
+        });
+        expect(exported.definitions.join('')).not.toContain('<clipPath');
+        const restored: DesignPaint = paint(
+            await parse(
+                exported.definitions.join(''),
+                `<rect id="Shape" width="100" height="60" fill="${fill}"/>`,
+            ),
+        );
+        expect(restored.assetId).toBe(original.assetId);
+        const previous: NonNullable<DesignPaint['framing']> | undefined = original.framing;
+        const next: NonNullable<DesignPaint['framing']> | undefined = restored.framing;
+        if (
+            previous?.transform == null ||
+            next?.transform == null ||
+            previous.tile == null ||
+            next.tile == null
+        ) {
+            throw new Error('Missing restored cell geometry');
+        }
+        for (const key of ['a', 'b', 'c', 'd', 'tx', 'ty'] as const) {
+            expect(next.transform[key]).toBeCloseTo(previous.transform[key], 10);
+            expect(next.tile.content[key]).toBeCloseTo(previous.tile.content[key], 10);
+        }
+        expect(next.tile.clip ?? null).toEqual(previous.tile.clip ?? null);
+    },
+);
+
 test.each([
     [
         'pattern cycle',
@@ -257,15 +349,6 @@ test.each([
         'use cycle',
         '<g id="again"><use href="#again"/></g><pattern id="tile" patternUnits="userSpaceOnUse" width="40" height="20"><use href="#again"/></pattern>',
         /cyclic/,
-    ],
-    ['gaps', userTile.replace('<image ', '<image x="4" '), /gaps/],
-    [
-        'cropped raster',
-        userTile.replace(
-            'width="40" height="20"/>',
-            'width="40" height="20" preserveAspectRatio="xMidYMid slice" transform="scale(2)"/>',
-        ),
-        /gaps|cropping/,
     ],
     [
         'vector artwork',

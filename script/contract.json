@@ -7018,6 +7018,17 @@
                 "scale": {
                     "type": "number"
                 },
+                "tile": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/DesignImageTile"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "In Tile mode, content maps image units into an independently placed repeat cell."
+                },
                 "transform": {
                     "anyOf": [
                         {
@@ -7110,6 +7121,17 @@
                 "scale": {
                     "type": "number"
                 },
+                "tile": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/DesignImageTile"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "In Tile mode, content maps image units into an independently placed repeat cell."
+                },
                 "transform": {
                     "anyOf": [
                         {
@@ -7145,6 +7167,46 @@
             "description": "Source viewport anchors retain SVG image cropping before texture interpolation.\nOne supported source crop anchor.",
             "enum": ["center", "end", "start"],
             "type": "string"
+        },
+        "DesignImageTile": {
+            "description": "The framing matrix places the cell; content places the original raster inside that cell.",
+            "properties": {
+                "clip": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/DesignImageTileClip"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "Cropping occurs before source filtering and never replaces the original image bytes."
+                },
+                "content": {
+                    "$ref": "#/definitions/DesignImageTransform"
+                }
+            },
+            "required": ["content"],
+            "type": "object"
+        },
+        "DesignImageTileClip": {
+            "description": "An original-image source rectangle, normalized independently of its repeat cell.",
+            "properties": {
+                "height": {
+                    "type": "number"
+                },
+                "width": {
+                    "type": "number"
+                },
+                "x": {
+                    "type": "number"
+                },
+                "y": {
+                    "type": "number"
+                }
+            },
+            "required": ["height", "width", "x", "y"],
+            "type": "object"
         },
         "DesignImageTransform": {
             "description": "Forward affine map from original image unit coordinates to painted box unit coordinates.",
@@ -8485,6 +8547,16 @@
                 },
                 "scale": {
                     "type": "number"
+                },
+                "tile": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/DesignImageTile"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
                 },
                 "transform": {
                     "anyOf": [
@@ -11089,6 +11161,11 @@
                 "designImageAdjustments": {
                     "const": true,
                     "description": "Non-destructive color controls are shared by image layers, fills, strokes and exports.",
+                    "type": "boolean"
+                },
+                "designImageTiles": {
+                    "const": true,
+                    "description": "Repeat cells retain independent image content transforms and original source crops.",
                     "type": "boolean"
                 },
                 "designImageTransforms": {

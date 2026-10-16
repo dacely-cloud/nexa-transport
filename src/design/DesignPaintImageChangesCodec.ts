@@ -6,6 +6,7 @@ import { DesignImageFit } from './DesignTypes.js';
 import type { DesignPaintImageChanges } from './DesignOperationTypes.js';
 import { DesignImageTransformCodec } from './DesignImageTransformCodec.js';
 import { DesignImageAdjustmentCodec } from './DesignImageAdjustmentCodec.js';
+import { DesignImageTileCodec } from './DesignImageTileCodec.js';
 
 /** Validates compact owner-asset placement and bounded image framing before mutation. */
 export class DesignPaintImageChangesCodec {
@@ -24,6 +25,7 @@ export class DesignPaintImageChangesCodec {
                 'flipY',
                 'transform',
                 'adjustments',
+                'tile',
             ],
             [],
         );
@@ -31,6 +33,12 @@ export class DesignPaintImageChangesCodec {
             throw new Error('Supply an image asset or framing property.');
         }
         return {
+            ...(value['tile'] === undefined
+                ? {}
+                : {
+                      tile:
+                          value['tile'] === null ? null : DesignImageTileCodec.parse(value['tile']),
+                  }),
             ...(value['adjustments'] === undefined
                 ? {}
                 : {

@@ -7,6 +7,7 @@ import type {
     DesignStyle,
     DesignPaint,
     DesignText,
+    DesignImageFraming,
 } from './DesignTypes.js';
 
 /** Decoded state is immutable at runtime as well as in TypeScript. */
@@ -80,6 +81,10 @@ export class DesignFreeze {
             Object.freeze(command);
         }
         if (node.image !== null) {
+            this.#framing(node.image);
+            if (node.image.sampling != null) {
+                Object.freeze(node.image.sampling);
+            }
             Object.freeze(node.image);
         }
         for (const override of node.overrides) {
@@ -91,6 +96,9 @@ export class DesignFreeze {
         return Object.freeze(node);
     }
     static #paint(paint: DesignPaint): void {
+        if (paint.framing !== undefined) {
+            this.#framing(paint.framing);
+        }
         if (paint.gradient != null) {
             Object.freeze(paint.gradient);
         }
@@ -98,6 +106,22 @@ export class DesignFreeze {
             Object.freeze(stop);
         }
         Object.freeze(paint);
+    }
+    static #framing(framing: DesignImageFraming): void {
+        if (framing.transform != null) {
+            Object.freeze(framing.transform);
+        }
+        if (framing.adjustments != null) {
+            Object.freeze(framing.adjustments);
+        }
+        if (framing.tile != null) {
+            Object.freeze(framing.tile.content);
+            if (framing.tile.clip != null) {
+                Object.freeze(framing.tile.clip);
+            }
+            Object.freeze(framing.tile);
+        }
+        Object.freeze(framing);
     }
     static #style(style: DesignStyle): void {
         for (const paint of style.fills) {

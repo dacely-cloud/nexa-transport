@@ -214,6 +214,7 @@ export class DesignNodeCodec {
                 'flipY',
                 'transform',
                 'sampling',
+                'tile',
                 'adjustments',
             ],
             ['assetId', 'fit', 'cropX', 'cropY', 'scale'],
@@ -229,6 +230,7 @@ export class DesignNodeCodec {
                               : DesignImageSamplingCodec.parse(value['sampling']),
                   }),
             ...DesignImageFramingCodec.parse({
+                ...(value['tile'] === undefined ? {} : { tile: value['tile'] }),
                 fit: value['fit'],
                 cropX: value['cropX'],
                 cropY: value['cropY'],

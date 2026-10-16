@@ -380,6 +380,7 @@ export interface DesignPaintColorOperation {
 }
 /** Imported imagery and crop properties can be edited without resending any source or style records. */
 export interface DesignPaintImageChanges {
+    readonly tile?: import('./DesignImageTileTypes.js').DesignImageTile | null;
     /** Partial color edits retain other adjustments; null restores original image colors. */
     readonly adjustments?: Partial<DesignImageAdjustments> | null;
     readonly assetId?: string;

@@ -19,6 +19,10 @@ import {
 } from './DesignSvgTransforms.js';
 import type { DesignSvgElement } from './DesignSvgXml.js';
 import type { DesignPaint } from './DesignTypes.js';
+import {
+    DesignSvgPatternPlacement,
+    type DesignSvgPatternPlacementResult,
+} from './DesignSvgPatternPlacement.js';
 
 interface PatternDefinition {
     readonly element: DesignSvgElement;
@@ -141,12 +145,21 @@ export class DesignSvgImportPatterns {
                       f: 0,
                   }
                 : T.viewport(width, height, viewBox, a['preserveAspectRatio']).matrix;
-        const image: DesignSvgMatrix | null = this.#image(raster, contentWidth, contentHeight);
+        const image: DesignSvgPatternPlacementResult | null = DesignSvgPatternPlacement.image(
+            raster,
+            contentWidth,
+            contentHeight,
+        );
         if (image === null) {
             return null;
         }
-        const tile: DesignSvgMatrix = T.multiply(content, image);
-        this.#completeTile(tile, width, height);
+        const artwork: DesignSvgMatrix = T.multiply(content, image.matrix);
+        const complete: boolean = image.clip === null && this.#completeTile(artwork, width, height);
+        const tile: DesignSvgMatrix = complete ? artwork : { ...T.identity, a: width, d: height };
+        const cellContent: DesignSvgMatrix = T.multiply(
+            { ...T.identity, a: 1 / width, d: 1 / height },
+            artwork,
+        );
         const units: DesignSvgMatrix = object
             ? {
                   a: context.source.width,
@@ -189,6 +202,21 @@ export class DesignSvgImportPatterns {
             framing: {
                 ...DesignDefaults.framing(),
                 fit: 'tile',
+                ...(complete
+                    ? {}
+                    : {
+                          tile: {
+                              content: {
+                                  a: cellContent.a,
+                                  b: cellContent.b,
+                                  c: cellContent.c,
+                                  d: cellContent.d,
+                                  tx: cellContent.e,
+                                  ty: cellContent.f,
+                              },
+                              ...(image.clip === null ? {} : { clip: image.clip }),
+                          },
+                      }),
                 transform: {
                     a: placement.a / box.width,
                     b: placement.b / box.height,
@@ -201,66 +229,7 @@ export class DesignSvgImportPatterns {
         });
     }
 
-    #image(raster: DesignSvgPatternRaster, width: number, height: number): DesignSvgMatrix | null {
-        const a: Readonly<Record<string, string>> = {
-            ...raster.element.attributes,
-            ...raster.style,
-        };
-        const rawWidth: string = a['width'] ?? 'auto';
-        const rawHeight: string = a['height'] ?? 'auto';
-        let w: number | null =
-            rawWidth === 'auto' ? null : DesignSvgNumbers.length(rawWidth, width);
-        let h: number | null =
-            rawHeight === 'auto' ? null : DesignSvgNumbers.length(rawHeight, height);
-        if (w === null && h === null) {
-            w = raster.asset.width;
-            h = raster.asset.height;
-        } else if (w === null) {
-            w = ((h ?? raster.asset.height) * raster.asset.width) / raster.asset.height;
-        } else if (h === null) {
-            h = (w * raster.asset.height) / raster.asset.width;
-        }
-        if (w === null || h === null || w < 0 || h < 0) {
-            throw new DesignSvgInputError('SVG pattern image dimensions must be nonnegative.');
-        }
-        if (w === 0 || h === 0) {
-            return null;
-        }
-        const viewport: DesignSvgMatrix = T.viewport(
-            w,
-            h,
-            `0 0 ${raster.asset.width} ${raster.asset.height}`,
-            (a['preserveAspectRatio'] ?? 'xMidYMid meet').replace(/^defer\s+/u, ''),
-        ).matrix;
-        // A separate image viewport can clip a larger raster before the tile; do not discard it.
-        if (
-            viewport.e < -1e-8 ||
-            viewport.f < -1e-8 ||
-            viewport.a * raster.asset.width > w + 1e-8 ||
-            viewport.d * raster.asset.height > h + 1e-8
-        ) {
-            throw new DesignSvgInputError(
-                'SVG raster pattern image cropping requires editable pattern content.',
-            );
-        }
-        return T.multiply(
-            DesignSvgPatternImage.matrix(raster, width, height),
-            T.multiply(
-                {
-                    ...T.identity,
-                    e: DesignSvgNumbers.length(a['x'] ?? '0', width),
-                    f: DesignSvgNumbers.length(a['y'] ?? '0', height),
-                },
-                T.multiply(viewport, {
-                    ...T.identity,
-                    a: raster.asset.width,
-                    d: raster.asset.height,
-                }),
-            ),
-        );
-    }
-
-    #completeTile(matrix: DesignSvgMatrix, width: number, height: number): void {
+    #completeTile(matrix: DesignSvgMatrix, width: number, height: number): boolean {
         const points: readonly DesignSvgPoint[] = [
             T.point(matrix, 0, 0),
             T.point(matrix, 1, 0),
@@ -273,17 +242,13 @@ export class DesignSvgImportPatterns {
         const axes: boolean =
             (close(matrix.b, 0) && close(matrix.c, 0)) ||
             (close(matrix.a, 0) && close(matrix.d, 0));
-        if (
-            !axes ||
-            !close(Math.min(...points.map((p: DesignSvgPoint): number => p.x)), 0) ||
-            !close(Math.max(...points.map((p: DesignSvgPoint): number => p.x)), width) ||
-            !close(Math.min(...points.map((p: DesignSvgPoint): number => p.y)), 0) ||
-            !close(Math.max(...points.map((p: DesignSvgPoint): number => p.y)), height)
-        ) {
-            throw new DesignSvgInputError(
-                'SVG raster pattern gaps, overlaps or clipped content require editable pattern content.',
-            );
-        }
+        return (
+            axes &&
+            close(Math.min(...points.map((p: DesignSvgPoint): number => p.x)), 0) &&
+            close(Math.max(...points.map((p: DesignSvgPoint): number => p.x)), width) &&
+            close(Math.min(...points.map((p: DesignSvgPoint): number => p.y)), 0) &&
+            close(Math.max(...points.map((p: DesignSvgPoint): number => p.y)), height)
+        );
     }
 
     #object(value: string): boolean {

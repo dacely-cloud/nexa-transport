@@ -1,6 +1,6 @@
 {
     "name": "nexa-transport",
-    "version": "0.1.0-design.20",
+    "version": "0.1.0-design.21",
     "description": "Typed Nexa websocket gateway client for browsers and Node.js",
     "type": "module",
     "license": "Apache-2.0",
@@ -48,6 +48,18 @@
         "./design-image-sampling-geometry": {
             "types": "./dist/design/DesignImageSamplingGeometry.d.ts",
             "import": "./dist/design-image-sampling-geometry.js"
+        },
+        "./design-image-tile-types": {
+            "types": "./dist/design/DesignImageTileTypes.d.ts",
+            "import": "./dist/design-image-tile-types.js"
+        },
+        "./design-image-tile-codec": {
+            "types": "./dist/design/DesignImageTileCodec.d.ts",
+            "import": "./dist/design-image-tile-codec.js"
+        },
+        "./design-image-tile-geometry": {
+            "types": "./dist/design/DesignImageTileGeometry.d.ts",
+            "import": "./dist/design-image-tile-geometry.js"
         },
         "./design-image-transform-types": {
             "types": "./dist/design/DesignImageTransformTypes.d.ts",

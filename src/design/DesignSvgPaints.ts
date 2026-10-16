@@ -25,6 +25,10 @@ import {
 import { DesignAssetCodec } from './DesignAssetCodec.js';
 import { DesignImageGeometry, type DesignImagePlacement } from './DesignImageGeometry.js';
 import { DesignDefaults } from './DesignDefaults.js';
+import { DesignSvgImageTile } from './DesignSvgImageTile.js';
+import { DesignImageTileGeometry } from './DesignImageTileGeometry.js';
+import type { DesignImageSampling } from './DesignImageSamplingTypes.js';
+import type { DesignImageTileClip } from './DesignImageTileTypes.js';
 import { DesignEffectMetrics } from './DesignEffectMetrics.js';
 import { DesignSelectionContext } from './DesignSelectionContext.js';
 import type { DesignSelectionBounds } from './DesignSelectionTypes.js';
@@ -134,10 +138,18 @@ export class DesignSvgPaints {
             throw new Error('Missing export image: ' + image.assetId);
         }
         const asset: DesignAsset = data.asset;
+        const crop: DesignImageTileClip | null = DesignImageTileGeometry.clip(
+            image,
+            asset.width,
+            asset.height,
+        );
+        const tileSampling: DesignImageSampling | null =
+            image.fit === DesignImageFit.Tile && image.tile?.clip != null && crop !== null
+                ? DesignImageTileGeometry.sampling(crop, asset.width, asset.height)
+                : null;
+        const sampling: DesignImageSampling | null | undefined = tileSampling ?? image.sampling;
         const imageKey: string =
-            image.sampling == null
-                ? image.assetId
-                : JSON.stringify([image.assetId, image.sampling]);
+            sampling == null ? image.assetId : JSON.stringify([image.assetId, sampling]);
         let id: string | undefined = this.#imageIdentities.get(imageKey);
         if (id === undefined) {
             DesignAssetCodec.asset(asset);
@@ -163,26 +175,26 @@ export class DesignSvgPaints {
             const base64: string = preview?.base64 ?? data.base64;
             id = this.identity('asset');
             this.#imageIdentities.set(imageKey, id);
-            if (image.sampling == null) {
+            if (sampling == null) {
                 this.definitions.push(
                     `<image id="${id}" href="data:${mime};base64,${base64}" width="${asset.width}" height="${asset.height}" preserveAspectRatio="none"/>`,
                 );
             } else {
                 const rectangle: DesignImageSampleRectangle = DesignImageSamplingGeometry.rectangle(
-                    image.sampling,
+                    sampling,
                     asset.width,
                     asset.height,
                 );
                 const x: string =
-                    image.sampling.alignX === DesignImageSamplingAlign.Start
+                    sampling.alignX === DesignImageSamplingAlign.Start
                         ? 'Min'
-                        : image.sampling.alignX === DesignImageSamplingAlign.End
+                        : sampling.alignX === DesignImageSamplingAlign.End
                           ? 'Max'
                           : 'Mid';
                 const y: string =
-                    image.sampling.alignY === DesignImageSamplingAlign.Start
+                    sampling.alignY === DesignImageSamplingAlign.Start
                         ? 'Min'
-                        : image.sampling.alignY === DesignImageSamplingAlign.End
+                        : sampling.alignY === DesignImageSamplingAlign.End
                           ? 'Max'
                           : 'Mid';
                 this.definitions.push(
@@ -206,9 +218,23 @@ export class DesignSvgPaints {
             const transform: string = `matrix(${(matrix.a * box.width) / asset.width} ${(matrix.b * box.height) / asset.width} ${(matrix.c * box.width) / asset.height} ${(matrix.d * box.height) / asset.height} ${matrix.tx * box.width} ${matrix.ty * box.height})`;
             if (image.fit === DesignImageFit.Tile) {
                 const pattern: string = this.identity('image-tile');
-                this.definitions.push(
-                    `<pattern id="${pattern}" patternUnits="userSpaceOnUse" width="${asset.width}" height="${asset.height}" patternTransform="${transform}"><use href="#${id}"/></pattern>`,
-                );
+                if (image.tile != null) {
+                    const content: string = DesignSvgImageTile.content(
+                        id,
+                        tileSampling === null ? image.tile : { ...image.tile, clip: null },
+                        asset.width,
+                        asset.height,
+                        (prefix: string): string => this.identity(prefix),
+                        this.definitions,
+                    );
+                    this.definitions.push(
+                        `<pattern id="${pattern}" patternUnits="userSpaceOnUse" width="1" height="1" patternTransform="${DesignSvgImageTile.transform(matrix, box)}">${content}</pattern>`,
+                    );
+                } else {
+                    this.definitions.push(
+                        `<pattern id="${pattern}" patternUnits="userSpaceOnUse" width="${asset.width}" height="${asset.height}" patternTransform="${transform}"><use href="#${id}"/></pattern>`,
+                    );
+                }
                 return paintReference
                     ? `url(#${pattern})`
                     : `<rect width="${box.width}" height="${box.height}" fill="url(#${pattern})"/>`;
