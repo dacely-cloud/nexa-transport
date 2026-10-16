@@ -6267,6 +6267,8 @@ export interface DesignStrokeShape {
     readonly cap?: (typeof DesignStrokecapValues)[keyof typeof DesignStrokecapValues];
     /** dash as defined by the Nexa gateway. */
     readonly dash: ReadonlyArray<number>;
+    /** dashOffset as defined by the Nexa gateway. */
+    readonly dashOffset?: number;
     /** join as defined by the Nexa gateway. */
     readonly join?: (typeof DesignStrokejoinValues)[keyof typeof DesignStrokejoinValues];
     /** miterLimit as defined by the Nexa gateway. */
@@ -6300,6 +6302,8 @@ export interface DesignStrokeChangesShape {
     readonly cap?: (typeof DesignStrokeChangescapValues)[keyof typeof DesignStrokeChangescapValues];
     /** dash as defined by the Nexa gateway. */
     readonly dash?: ReadonlyArray<number>;
+    /** dashOffset as defined by the Nexa gateway. */
+    readonly dashOffset?: number;
     /** join as defined by the Nexa gateway. */
     readonly join?: (typeof DesignStrokeChangesjoinValues)[keyof typeof DesignStrokeChangesjoinValues];
     /** miterLimit as defined by the Nexa gateway. */
@@ -7483,6 +7487,8 @@ export interface GatewayFeaturesShape {
     readonly designImageTransforms?: true;
     /** designLayerCompositing as defined by the Nexa gateway. */
     readonly designLayerCompositing?: true;
+    /** designStrokeDashOffset as defined by the Nexa gateway. */
+    readonly designStrokeDashOffset?: true;
     /** designTextDirection as defined by the Nexa gateway. */
     readonly designTextDirection?: true;
     /** designTextInheritedPaint as defined by the Nexa gateway. */
@@ -13883,6 +13889,8 @@ export interface ToolOutcomeShape {
     readonly call: ToolCall;
     /** durationMs as defined by the Nexa gateway. */
     readonly durationMs: number;
+    /** executionStarted as defined by the Nexa gateway. */
+    readonly executionStarted?: boolean;
     /** result as defined by the Nexa gateway. */
     readonly result: ToolResult;
 }
