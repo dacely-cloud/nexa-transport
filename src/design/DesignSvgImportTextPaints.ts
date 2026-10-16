@@ -69,14 +69,24 @@ export class DesignSvgImportTextPaints {
     }
 
     /** The initial single-label appearance also retains enough local geometry to rebase sibling chunks. */
-    public prepare(
+    public async prepare(
         id: string,
         text: DesignText,
         ranges: readonly DesignSvgTextPaintRange[],
         base: DesignSvgTextFill,
         context: DesignSvgPaintContext,
         scale: number,
-    ): DesignSvgTextAppearance {
+    ): Promise<DesignSvgTextAppearance> {
+        const sources: Set<string> = new Set([base.source]);
+        for (const range of ranges) {
+            sources.add(range.fill.source);
+            if (range.stroke !== null) {
+                sources.add(range.stroke.source);
+            }
+        }
+        for (const source of sources) {
+            await this.paints.prepare(source);
+        }
         const plan: TextPaintPlan = { text, ranges, base, context, scale };
         this.#plans.set(id, plan);
         return this.#resolve(plan, context.source);
@@ -145,8 +155,8 @@ export class DesignSvgImportTextPaints {
                 color: fill.color,
             });
             const value: DesignPaint | null =
-                resolved === null
-                    ? null
+                resolved === null || resolved.kind === 'image'
+                    ? resolved
                     : {
                           ...resolved,
                           opacity: 1,

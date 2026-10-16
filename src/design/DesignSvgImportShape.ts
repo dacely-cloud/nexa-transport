@@ -76,6 +76,10 @@ export class DesignSvgImportShape {
             viewportHeight: context.height,
             color: style['color'] ?? '#000000',
         };
+        if (geometry !== null) {
+            await this.paints.prepare(style['fill'] ?? '#000000');
+        }
+        await this.paints.prepare(style['stroke'] ?? 'none');
         const fill: DesignPaint | null =
             geometry === null
                 ? null

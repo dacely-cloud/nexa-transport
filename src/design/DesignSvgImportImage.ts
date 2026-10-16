@@ -4,9 +4,7 @@
 import { DesignSvgInputError } from './DesignSvgInputError.js';
 import type { DesignSvgElement } from './DesignSvgXml.js';
 import type { DesignSvgShapeContext } from './DesignSvgImportShape.js';
-import type { DesignSvgImageLoader } from './DesignSvgImageTypes.js';
-import { DesignSvgImageSource } from './DesignSvgImageSource.js';
-import { DesignAssetCodec } from './DesignAssetCodec.js';
+import { DesignSvgImageAssets } from './DesignSvgImageAssets.js';
 import type { DesignAsset } from './DesignAssetTypes.js';
 import { DesignSvgImportTree } from './DesignSvgImportTree.js';
 import { DesignSvgImportAppearance as Appearance } from './DesignSvgImportAppearance.js';
@@ -30,13 +28,11 @@ import {
 
 /** The image viewport remains editable independently of its aspect-fitted raster content. */
 export class DesignSvgImportImage {
-    readonly #assets: Map<string, DesignAsset> = new Map();
-
     /** Host image admission remains separate from the portable layer converter. */
     public constructor(
         public readonly tree: DesignSvgImportTree,
         public readonly identify: (key: string) => string,
-        public readonly load: DesignSvgImageLoader | null,
+        public readonly assets: DesignSvgImageAssets,
     ) {}
 
     /** Positioning rectangles supply object bounds even when meet leaves unpainted margins. */
@@ -76,24 +72,9 @@ export class DesignSvgImportImage {
                 'SVG image transform must have independent nonzero axes.',
             );
         }
-        if (this.load === null) {
-            throw new DesignSvgInputError('Save this layout to import embedded SVG images.');
-        }
         const reference: string =
             element.attributes['href'] ?? element.attributes['xlink:href'] ?? '';
-        let asset: DesignAsset | undefined = this.#assets.get(reference);
-        if (asset === undefined) {
-            const source: ReturnType<typeof DesignSvgImageSource.decode> =
-                DesignSvgImageSource.decode(reference, context.name);
-            asset = DesignAssetCodec.asset(await this.load(source));
-            if (
-                asset.mime !== source.mime ||
-                BigInt(asset.byteLength) !== BigInt(source.bytes.length)
-            ) {
-                throw new Error('SVG image admission does not match the embedded raster.');
-            }
-            this.#assets.set(reference, asset);
-        }
+        const asset: DesignAsset = await this.assets.admit(reference, context.name);
         if (width === null && height === null) {
             width = asset.width;
             height = asset.height;

@@ -12,6 +12,8 @@ import type { DesignSvgElement } from './DesignSvgXml.js';
 import { DesignSvgCss } from './DesignSvgCss.js';
 import { DesignSvgColors } from './DesignSvgColors.js';
 import { DesignSvgNumbers } from './DesignSvgNumbers.js';
+import { DesignSvgImportPatterns } from './DesignSvgImportPatterns.js';
+import { DesignSvgImageAssets } from './DesignSvgImageAssets.js';
 import {
     DesignSvgTransforms as T,
     type DesignSvgMatrix,
@@ -35,11 +37,22 @@ interface SvgGradientDefinition {
 
 /** Local gradient references become editable native paints; no URL leaves the imported document. */
 export class DesignSvgImportPaints {
+    readonly #patterns: DesignSvgImportPatterns;
     public constructor(
         public readonly elements: ReadonlyMap<string, DesignSvgElement>,
         public readonly css: DesignSvgCss,
         public readonly ancestors: ReadonlyMap<DesignSvgElement, readonly DesignSvgElement[]>,
-    ) {}
+        images: DesignSvgImageAssets = new DesignSvgImageAssets(null),
+    ) {
+        this.#patterns = new DesignSvgImportPatterns(elements, css, ancestors, images);
+    }
+    /** Referenced raster assets are admitted once before synchronous geometry and rich-range rebasing. */
+    public async prepare(source: string): Promise<void> {
+        const id: string | null = this.#reference(source);
+        if (id !== null && this.elements.get(id)?.name === 'pattern') {
+            await this.#patterns.prepare(id);
+        }
+    }
     public resolve(
         source: string,
         opacity: number,
@@ -48,20 +61,15 @@ export class DesignSvgImportPaints {
         if (source === 'none') {
             return null;
         }
-        const reference: RegExpMatchArray | null = /^url\(\s*['"]?#([^'"\s)]+)['"]?\s*\)$/u.exec(
-            source,
-        );
-        const id: string | undefined = reference?.[1];
-        if (id === undefined) {
-            if (/^url\(/iu.test(source)) {
-                throw new DesignSvgInputError(
-                    'SVG paint references must stay within the imported document.',
-                );
-            }
+        const id: string | null = this.#reference(source);
+        if (id === null) {
             return {
                 ...DesignDefaults.paint(DesignSvgColors.parse(source, context.color)),
                 opacity,
             };
+        }
+        if (this.elements.get(id)?.name === 'pattern') {
+            return this.#patterns.resolve(id, opacity, context);
         }
         const definition: SvgGradientDefinition = this.#definition(id, new Set());
         const a: Readonly<Record<string, string>> = definition.attributes;
@@ -178,6 +186,15 @@ export class DesignSvgImportPaints {
             stops,
             gradient,
         });
+    }
+    #reference(source: string): string | null {
+        const id: string | undefined = /^url\(\s*['"]?#([^'"\s)]+)['"]?\s*\)$/u.exec(source)?.[1];
+        if (id === undefined && /^url\(/iu.test(source)) {
+            throw new DesignSvgInputError(
+                'SVG paint references must stay within the imported document.',
+            );
+        }
+        return id ?? null;
     }
     #definition(id: string, visited: Set<string>): SvgGradientDefinition {
         if (visited.has(id) || visited.size > 64) {

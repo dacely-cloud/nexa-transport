@@ -304,7 +304,7 @@ export class DesignSvgImportLabel {
             height: sourceBottom - sourceTop,
         };
         this.tree.recordOriginalBounds(context.id, sourceBounds, context.matrix);
-        const appearance: DesignSvgTextAppearance = this.textPaints.prepare(
+        const appearance: DesignSvgTextAppearance = await this.textPaints.prepare(
             context.id,
             text,
             ranges,

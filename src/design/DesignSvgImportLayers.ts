@@ -24,6 +24,7 @@ import { DesignDefaults } from './DesignDefaults.js';
 import { DesignCodec } from './DesignCodec.js';
 import type { DesignNode } from './DesignTypes.js';
 import { DesignSvgImportImage } from './DesignSvgImportImage.js';
+import { DesignSvgImageAssets } from './DesignSvgImageAssets.js';
 import type { DesignSvgImageLoader } from './DesignSvgImageTypes.js';
 import type { DesignSvgFontLoader } from './DesignSvgFontTypes.js';
 import { DesignSvgImportedFonts } from './DesignSvgImportedFonts.js';
@@ -75,7 +76,13 @@ export class DesignSvgImportLayers {
         };
         visit(root, []);
         this.#css = new DesignSvgCss(root);
-        this.#paints = new DesignSvgImportPaints(this.#elements, this.#css, this.#ancestors);
+        const assets: DesignSvgImageAssets = new DesignSvgImageAssets(images);
+        this.#paints = new DesignSvgImportPaints(
+            this.#elements,
+            this.#css,
+            this.#ancestors,
+            assets,
+        );
         this.#shape = new DesignSvgImportShape(this.#paints, this.#tree, this.identify);
         this.#text = new DesignSvgImportText(
             this.#css,
@@ -84,7 +91,7 @@ export class DesignSvgImportLayers {
             fonts,
             this.#paints,
         );
-        this.#image = new DesignSvgImportImage(this.#tree, this.identify, images);
+        this.#image = new DesignSvgImportImage(this.#tree, this.identify, assets);
         const masks: DesignSvgImportMask = new DesignSvgImportMask(this.#tree, this.identify);
         this.#filters = new DesignSvgImportFilters(
             this.#elements,
@@ -248,6 +255,7 @@ export class DesignSvgImportLayers {
                 'metadata',
                 'linearGradient',
                 'radialGradient',
+                'pattern',
                 'clipPath',
                 'filter',
             ].includes(element.name)

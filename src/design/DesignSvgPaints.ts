@@ -81,6 +81,14 @@ export class DesignSvgPaints {
             this.#gradientIdentities.set(key, id);
             return `url(#${id})`;
         }
+        if (
+            paint.kind === DesignPaintKind.Image &&
+            paint.assetId !== null &&
+            paint.framing?.fit === DesignImageFit.Tile &&
+            !DesignImageColor.active(paint.framing.adjustments)
+        ) {
+            return this.#imageContent({ assetId: paint.assetId, ...paint.framing }, box, true);
+        }
         const id: string = this.identity('paint');
         if (paint.kind === DesignPaintKind.Image && paint.assetId !== null) {
             this.definitions.push(
@@ -120,7 +128,7 @@ export class DesignSvgPaints {
         );
         return `<g filter="url(#${id})">${content}</g>`;
     }
-    #imageContent(image: DesignImage, box: DesignBox): string {
+    #imageContent(image: DesignImage, box: DesignBox, paintReference: boolean = false): string {
         const data: DesignSvgImage | undefined = this.images.get(image.assetId);
         if (data === undefined) {
             throw new Error('Missing export image: ' + image.assetId);
@@ -201,7 +209,9 @@ export class DesignSvgPaints {
                 this.definitions.push(
                     `<pattern id="${pattern}" patternUnits="userSpaceOnUse" width="${asset.width}" height="${asset.height}" patternTransform="${transform}"><use href="#${id}"/></pattern>`,
                 );
-                return `<rect width="${box.width}" height="${box.height}" fill="url(#${pattern})"/>`;
+                return paintReference
+                    ? `url(#${pattern})`
+                    : `<rect width="${box.width}" height="${box.height}" fill="url(#${pattern})"/>`;
             }
             return `<use href="#${id}" transform="${transform}"/>`;
         }
