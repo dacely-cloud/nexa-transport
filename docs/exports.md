@@ -215,6 +215,7 @@ backend, or a provider-key vault.
 | `nexa-transport/design-mask-geometry`           | ESM + types | Design mask geometry.                                                        |
 | `nexa-transport/design-variants`                | ESM + types | Design variants.                                                             |
 | `nexa-transport/design-variant-types`           | ESM + types | Design variant types.                                                        |
+| `nexa-transport/design-font-run`                | ESM + types | Prepared glyph runs and logical source paint ranges.                         |
 | `nexa-transport/design-font-engine`             | ESM + types | Design font engine.                                                          |
 | `nexa-transport/design-builtin-fonts`           | ESM + types | Design builtin fonts.                                                        |
 | `nexa-transport/design-inter-bytes`             | ESM + types | Design inter bytes.                                                          |

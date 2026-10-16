@@ -4,12 +4,17 @@
 import type { Font, GlyphPosition, Glyph } from 'fontkit';
 import type { DesignResolvedFace } from './DesignFontRegistry.js';
 import { DesignFontSfnt } from './DesignFontSfnt.js';
+import { DesignFontGraphemes } from './DesignFontGraphemes.js';
+import { DesignFontShapeBudget } from './DesignFontShapeBudget.js';
 import { DesignHarfBuzzRuntime } from './DesignHarfBuzzRuntime.js';
 
 /** Source clusters belong to a shaping result, never fontkit's shared mutable glyph cache. */
 export interface DesignShapedGlyph {
     readonly glyph: Glyph;
     readonly source: string;
+    readonly start: number;
+    readonly end: number;
+    readonly carets?: readonly number[];
     readonly mark: boolean;
     readonly position: GlyphPosition;
 }
@@ -39,6 +44,7 @@ export class DesignHarfBuzz {
         content: string,
         script: string,
         tracking: number,
+        budget: DesignFontShapeBudget = new DesignFontShapeBudget(),
     ): readonly DesignShapedGlyph[] {
         if (content.length > 100000) {
             throw new Error('Text shaping exceeds its source budget.');
@@ -78,6 +84,7 @@ export class DesignHarfBuzz {
                 buffer,
                 content.length,
                 resolved.face.numGlyphs,
+                budget,
             );
             const clusters: readonly number[] = [
                 ...new Set(glyphs.map((glyph: NativeGlyph): number => glyph.cluster)),
@@ -92,15 +99,106 @@ export class DesignHarfBuzz {
                     ]),
             );
             const face: number = runtime.integer('hb_font_get_face', font);
-            return glyphs.map((glyph: NativeGlyph): DesignShapedGlyph => ({
-                glyph: resolved.face.getGlyph(glyph.id),
-                source: sources.get(glyph.cluster) ?? '',
-                mark: runtime.integer('hb_ot_layout_get_glyph_class', face, glyph.id) === 3,
-                position: glyph.position,
-            }));
+            let cached: Map<string, readonly number[]> | null = null;
+            let counts: Map<number, number> | null = null;
+            return glyphs.map((glyph: NativeGlyph): DesignShapedGlyph => {
+                const source: string = sources.get(glyph.cluster) ?? '';
+                const classification: number = runtime.integer(
+                    'hb_ot_layout_get_glyph_class',
+                    face,
+                    glyph.id,
+                );
+                let count: number = 0;
+                if (budget.collectCarets && classification !== 3 && source.length > 1) {
+                    const previous: number | undefined = counts?.get(glyph.cluster);
+                    count = previous ?? DesignFontGraphemes.count(source) - 1;
+                    counts ??= new Map();
+                    counts.set(glyph.cluster, count);
+                }
+                let positions: readonly number[] = [];
+                if (count > 0) {
+                    const key: string = String(glyph.id) + ':' + String(count);
+                    positions =
+                        cached?.get(key) ??
+                        this.#carets(
+                            runtime,
+                            font,
+                            glyph.id,
+                            resolved.style.direction === 'rtl',
+                            count,
+                            budget,
+                        );
+                    cached ??= new Map();
+                    if (cached.size < 1024) {
+                        cached.set(key, positions);
+                    }
+                }
+                return {
+                    glyph: resolved.face.getGlyph(glyph.id),
+                    source,
+                    start: glyph.cluster,
+                    end: glyph.cluster + source.length,
+                    ...(positions.length === 0 ? {} : { carets: positions }),
+                    mark: classification === 3,
+                    position: glyph.position,
+                };
+            });
         } finally {
             runtime.invoke('free', input);
             runtime.invoke('hb_buffer_reset', buffer);
+        }
+    }
+
+    static #carets(
+        runtime: DesignHarfBuzzRuntime,
+        font: number,
+        glyph: number,
+        rtl: boolean,
+        expected: number,
+        budget: DesignFontShapeBudget,
+    ): readonly number[] {
+        const count: number = runtime.allocate(4);
+        let positions: number = 0;
+        try {
+            new DataView(runtime.memory.buffer).setUint32(count, 0, true);
+            const total: number = runtime.integer(
+                'hb_ot_layout_get_ligature_carets',
+                font,
+                rtl ? 5 : 4,
+                glyph,
+                0,
+                count,
+                0,
+            );
+            if (total !== expected || total < 1 || total > 100000) {
+                return [];
+            }
+            budget.carets(total);
+            positions = runtime.allocate(total * 4);
+            new DataView(runtime.memory.buffer).setUint32(count, total, true);
+            runtime.integer(
+                'hb_ot_layout_get_ligature_carets',
+                font,
+                rtl ? 5 : 4,
+                glyph,
+                0,
+                count,
+                positions,
+            );
+            const view: DataView = new DataView(runtime.memory.buffer);
+            if (view.getUint32(count, true) !== total) {
+                throw new Error('Font returned mismatched ligature caret data.');
+            }
+            return Array.from<undefined, number>(
+                { length: total },
+                (_value: undefined, index: number): number =>
+                    view.getInt32(positions + index * 4, true),
+            ).sort((left: number, right: number): number => left - right);
+        } finally {
+            if (positions !== 0) {
+                runtime.invoke('free', positions);
+            }
+            runtime.invoke('free', count);
         }
     }
 
@@ -109,6 +207,7 @@ export class DesignHarfBuzz {
         buffer: number,
         sourceLength: number,
         maximumGlyph: number,
+        budget: DesignFontShapeBudget,
     ): readonly NativeGlyph[] {
         if (runtime.integer('hb_buffer_allocation_successful', buffer) === 0) {
             throw new Error('The text shaper exhausted its memory budget.');
@@ -117,6 +216,7 @@ export class DesignHarfBuzz {
         if (count > 100000) {
             throw new Error('Font returned oversized shaping data.');
         }
+        budget.glyphs(count);
         const infos: number = runtime.integer('hb_buffer_get_glyph_infos', buffer, 0);
         const positions: number = runtime.integer('hb_buffer_get_glyph_positions', buffer, 0);
         const view: DataView = new DataView(runtime.memory.buffer);

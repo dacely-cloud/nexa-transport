@@ -4,11 +4,13 @@
 import type { DesignTextSpanStyle } from './DesignTextLayout.js';
 import { DesignFontRegistry, type DesignResolvedFace } from './DesignFontRegistry.js';
 import { DesignHarfBuzz, type DesignShapedGlyph } from './DesignHarfBuzz.js';
+import { DesignFontShapeBudget } from './DesignFontShapeBudget.js';
 import { DesignUnicodeScripts } from './DesignUnicodeScripts.js';
 
 /** One physical face and script retain contextual shaping across complete grapheme clusters. */
 export interface DesignShapedFace extends DesignResolvedFace {
     readonly glyphs: readonly DesignShapedGlyph[];
+    readonly start: number;
 }
 interface Grapheme {
     readonly text: string;
@@ -27,14 +29,20 @@ export class DesignFontShaper {
         style: DesignTextSpanStyle,
         content: string,
         tracking: number,
+        carets: boolean = false,
     ): readonly DesignShapedFace[] {
         if (content.length > 100000) {
             throw new Error('Text exceeds the shaping budget.');
         }
+        const budget: DesignFontShapeBudget = new DesignFontShapeBudget(carets);
         const primary: DesignResolvedFace = registry.resolve(style);
         if (/^\p{ASCII}*$/u.test(content) && DesignFontRegistry.covers(primary.face, content)) {
             return [
-                { ...primary, glyphs: DesignHarfBuzz.shape(primary, content, 'Latn', tracking) },
+                {
+                    ...primary,
+                    start: 0,
+                    glyphs: DesignHarfBuzz.shape(primary, content, 'Latn', tracking, budget),
+                },
             ];
         }
         const graphemes: readonly Grapheme[] = Array.from(
@@ -58,11 +66,20 @@ export class DesignFontShaper {
             graphemes.find((grapheme: Grapheme): boolean => grapheme.script !== null)?.script ??
             'Zyyy';
         let pieces: string[] = [];
+        let start: number = 0;
+        let offset: number = 0;
         const finish: () => void = (): void => {
             if (pieces.length > 0) {
                 runs.push({
                     ...current,
-                    glyphs: DesignHarfBuzz.shape(current, pieces.join(''), script, tracking),
+                    start,
+                    glyphs: DesignHarfBuzz.shape(
+                        current,
+                        pieces.join(''),
+                        script,
+                        tracking,
+                        budget,
+                    ),
                 });
             }
             pieces = [];
@@ -82,8 +99,10 @@ export class DesignFontShaper {
                 finish();
                 current = resolved;
                 script = next;
+                start = offset;
             }
             pieces.push(grapheme.text);
+            offset += grapheme.text.length;
         }
         finish();
         return style.direction === 'rtl' ? runs.reverse() : runs;

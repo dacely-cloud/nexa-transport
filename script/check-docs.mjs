@@ -120,7 +120,7 @@ try {
                     ]),
                 ),
             },
-            include: ['./*.ts'],
+            include: ['./*.ts', '../src/**/*.d.ts'],
         }),
     );
     const result = spawnSync(

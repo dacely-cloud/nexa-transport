@@ -1,0 +1,8 @@
+{
+    "source": "https://dejavu-fonts.github.io/",
+    "sourceVersion": "DejaVu Sans 2.37, Debian fonts-dejavu-core 2.37-8",
+    "sourceSha256": "ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280",
+    "woff2Sha256": "6f862e31e1b59ef8992dad1e9bb10148a1922341072d1ee717cb7366cafb0e9d",
+    "changes": "Retain original outlines and substitutions. Rename family and replace GDEF with ffi glyph 5044, advance 1980, caret coordinates 200 and 1200, unitsPerEm 2048. GDEF glyph classification is intentionally absent.",
+    "encoder": "woff2-encoder@2.0.0"
+}

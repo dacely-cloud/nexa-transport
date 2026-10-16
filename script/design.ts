@@ -103,6 +103,10 @@ const files: readonly string[] = [
     'DesignFontBindings',
     'DesignShapedTextMetrics',
     'DesignFontEngine',
+    'DesignFontRun',
+    'DesignFontPlacement',
+    'DesignFontShapeBudget',
+    'DesignFontGraphemes',
     'DesignFontRegistry',
     'DesignFontShaper',
     'DesignHarfBuzz',
@@ -315,3 +319,24 @@ await writeFile(
         filepath: arcTestPath,
     }),
 );
+
+/** Prepared shaping and asymmetric ligature carets are verified against the canonical native cases. */
+const runTestPath: string = 'test/DesignFontRun.test.ts';
+const runTestFormat: Options = (await resolveConfig(runTestPath)) ?? {};
+const runTests: string = await readFile('../nexa/test/design/DesignFontRun.test.ts', 'utf8');
+await writeFile(
+    runTestPath,
+    await format(
+        runTests
+            .replaceAll('../../src/design/', '../src/design/')
+            .replaceAll('../fixtures/design-font-runs/', './fixtures/design-font-runs/'),
+        { ...runTestFormat, filepath: runTestPath },
+    ),
+);
+await mkdir('test/fixtures/design-font-runs', { recursive: true });
+for (const name of ['NexaCaretFixture.woff2', 'LICENSE.txt', 'sources.json']) {
+    await writeFile(
+        'test/fixtures/design-font-runs/' + name,
+        await readFile('../nexa/test/fixtures/design-font-runs/' + name),
+    );
+}
