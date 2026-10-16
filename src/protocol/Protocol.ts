@@ -5418,6 +5418,7 @@ export type DesignOperation =
     | DesignScaleOperation
     | DesignTranslateOperation
     | DesignMove
+    | DesignReparentOperation
     | DesignRemove
     | DesignPageOperation
     | DesignGuideOperation
@@ -5907,6 +5908,23 @@ export interface DesignRemoveShape {
 
 /** DesignRemove from the Nexa wire protocol. */
 export type DesignRemove = DesignRemoveShape;
+
+/** DesignReparentOperation wire fields. */
+export interface DesignReparentOperationShape {
+    /** index as defined by the Nexa gateway. */
+    readonly index: number;
+    /** op as defined by the Nexa gateway. */
+    readonly op: 'reparent';
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+    /** parentId as defined by the Nexa gateway. */
+    readonly parentId: null | string;
+    /** selection as defined by the Nexa gateway. */
+    readonly selection: ReadonlyArray<string>;
+}
+
+/** DesignReparentOperation from the Nexa wire protocol. */
+export type DesignReparentOperation = DesignReparentOperationShape;
 
 /** DesignResizeOperation wire fields. */
 export interface DesignResizeOperationShape {
