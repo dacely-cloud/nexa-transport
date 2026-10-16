@@ -9,15 +9,20 @@ import type { DesignTextWindowRequest, DesignTextWindowCursor } from './DesignTe
 export class DesignTextWindowCodec {
     /** Expanded occurrence identities may contain escaped instance paths rather than authored layer IDs. */
     public static request(raw: unknown): DesignTextWindowRequest {
-        const value: Readonly<Record<string, unknown>> = V.record(raw, [
-            'id',
-            'revision',
-            'pageId',
-            'occurrenceId',
-            'window',
-            'cursor',
-            'limit',
-        ]);
+        const value: Readonly<Record<string, unknown>> = V.fields(
+            raw,
+            [
+                'id',
+                'revision',
+                'pageId',
+                'occurrenceId',
+                'window',
+                'cursor',
+                'limit',
+                'paintClipping',
+            ],
+            ['id', 'revision', 'pageId', 'occurrenceId', 'window', 'cursor', 'limit'],
+        );
         return {
             id: V.id(value['id']),
             revision: V.revision(value['revision']),
@@ -26,6 +31,9 @@ export class DesignTextWindowCodec {
             window: this.bounds(value['window']),
             cursor: value['cursor'] === null ? null : this.cursor(value['cursor']),
             limit: V.number(value['limit'], 1, 256, true),
+            ...(value['paintClipping'] === undefined
+                ? {}
+                : { paintClipping: V.boolean(value['paintClipping']) }),
         };
     }
 

@@ -16,6 +16,9 @@ import { DesignSvgPaints } from './DesignSvgPaints.js';
 import { DesignSvgCompositing } from './DesignSvgCompositing.js';
 import { DesignSvgText } from './DesignSvgText.js';
 import type { DesignFontEngine } from './DesignFontEngine.js';
+import { DesignTextShaping, type DesignTextRunFactory } from './DesignTextShaping.js';
+import { DesignTextGlyphs } from './DesignTextGlyphs.js';
+import { DesignSvgTextPaint } from './DesignSvgTextPaint.js';
 import {
     DesignSvgLimits,
     type DesignSvgImage,
@@ -39,6 +42,7 @@ export class DesignSvg {
             content: string,
         ): number => DesignTextLayout.estimate(style, content),
         outlines: DesignFontEngine | null = null,
+        prepare: DesignTextRunFactory | null = null,
     ): DesignSvgResult {
         let imageBytes: bigint = 0n;
         for (const id of selection.assetIds) {
@@ -95,6 +99,7 @@ export class DesignSvg {
                         attributes,
                         true,
                         outlines,
+                        prepare,
                     );
                 } else if (node.kind !== DesignKind.Line) {
                     body += Geometry.shape(node, box, attributes);
@@ -122,6 +127,7 @@ export class DesignSvg {
                               attributes,
                               false,
                               outlines,
+                              prepare,
                           );
             }
             const element: string = `<g transform="translate(${box.x} ${box.y}) rotate(${box.rotation} ${box.width / 2} ${box.height / 2})"><title>${Geometry.escape(node.name)}</title>${body}</g>`;
@@ -209,6 +215,7 @@ export class DesignSvg {
         attributes: string,
         richFill: boolean = true,
         outlines: DesignFontEngine | null = null,
+        prepare: DesignTextRunFactory | null = null,
     ): string {
         const lines: readonly DesignTextLine[] = DesignTextLayout.lines(
             text,
@@ -216,6 +223,7 @@ export class DesignSvg {
             box.width,
             box.height,
             measure,
+            prepare ?? (outlines === null ? null : DesignTextShaping.factory(outlines)),
         );
         const id: string = paints.identity('text-clip');
         paints.definitions.push(
@@ -233,19 +241,29 @@ export class DesignSvg {
                                 '. Import that font or use bundled Inter.',
                         );
                     }
-                    const path: string = outlines
-                        .outline(
-                            segment.style,
-                            segment.text,
-                            segment.x,
-                            baseline,
-                            text.letterSpacing,
-                        )
-                        .map((command): string => command.verb + command.values.join(' '))
-                        .join(' ');
                     const color: string =
                         segment.style.rich && richFill ? `fill="${segment.style.color}"` : '';
-                    shapes.push(`<path d="${path}" ${color}/>`);
+                    for (const piece of DesignTextGlyphs.paths(
+                        segment,
+                        outlines,
+                        baseline,
+                        text.letterSpacing,
+                    )) {
+                        const path: string = piece.path
+                            .map((command): string => command.verb + command.values.join(' '))
+                            .join(' ');
+                        let clip: string = '';
+                        if (piece.clip !== undefined) {
+                            const clipId: string = paints.identity('text-paint-clip');
+                            const left: number = piece.clip.left ?? 0;
+                            const right: number = piece.clip.right ?? box.width;
+                            paints.definitions.push(
+                                `<clipPath id="${clipId}" clipPathUnits="userSpaceOnUse"><rect x="${left}" width="${Math.max(0, right - left)}" height="${box.height}"/></clipPath>`,
+                            );
+                            clip = `clip-path="url(#${clipId})"`;
+                        }
+                        shapes.push(`<path d="${path}" ${color} ${clip}/>`);
+                    }
                     if (segment.style.underline && richFill) {
                         shapes.push(
                             `<rect x="${segment.x}" y="${baseline + Math.max(1, segment.style.size / 12)}" width="${segment.width}" height="${Math.max(1, segment.style.size / 16)}" ${color}/>`,
@@ -255,6 +273,13 @@ export class DesignSvg {
             }
             return `<g clip-path="url(#${id})" ${attributes}>${shapes.join('')}</g>`;
         }
-        return DesignSvgText.render(lines, text, attributes, id, richFill);
+        return DesignSvgText.render(
+            lines,
+            text,
+            attributes,
+            id,
+            richFill,
+            new DesignSvgTextPaint(paints, box, paints.paint(paint, box)),
+        );
     }
 }

@@ -18,6 +18,20 @@ export interface DesignFontSlice {
     readonly x: number;
     readonly width: number;
 }
+/** Only a source boundary inside a glyph cluster clips its ink; exterior overhang stays visible. */
+export interface DesignFontPaintClip {
+    readonly left: number | null;
+    readonly right: number | null;
+}
+/** Paint geometry retains the original whole-run glyph identity without carrying its source text. */
+export interface DesignFontPaintGlyph extends DesignFontGlyph {
+    readonly clip?: DesignFontPaintClip;
+}
+/** A physical shaping cluster retains its original logical UTF-16 source interval. */
+export interface DesignFontSourceCluster {
+    readonly start: number;
+    readonly end: number;
+}
 interface RunCluster {
     readonly start: number;
     readonly end: number;
@@ -31,6 +45,7 @@ interface RunCluster {
 export class DesignFontRun {
     readonly #spans: readonly DesignShapedFace[];
     readonly #carets: ReadonlyMap<number, number>;
+    readonly #offsets: readonly number[];
     /** Total typographic advance excludes the final inter-glyph tracking interval. */
     public readonly width: number;
 
@@ -42,6 +57,12 @@ export class DesignFontRun {
         spans: readonly DesignShapedFace[],
     ) {
         this.#spans = spans;
+        let count: number = 0;
+        this.#offsets = spans.map((span: DesignShapedFace): number => {
+            const start: number = count;
+            count += span.glyphs.length;
+            return start;
+        });
         const clusters: Map<number, RunCluster> = new Map();
         let pen: number = 0;
         let lastTracked: RunCluster | null = null;
@@ -138,6 +159,25 @@ export class DesignFontRun {
         return value;
     }
 
+    /** Raw rich ranges can be inspected without guessing a caret inside a Unicode grapheme. */
+    public boundary(offset: number): boolean {
+        return Number.isInteger(offset) && this.#carets.has(offset);
+    }
+
+    /** Exporters can separate crossing paint clusters without reinterpreting or duplicating the source. */
+    public *clusters(): IterableIterator<DesignFontSourceCluster> {
+        const seen: Set<number> = new Set();
+        for (const span of this.#spans) {
+            for (const glyph of span.glyphs) {
+                const start: number = span.start + glyph.start;
+                if (!seen.has(start)) {
+                    seen.add(start);
+                    yield { start, end: span.start + glyph.end };
+                }
+            }
+        }
+    }
+
     /** Caret intervals use matching font data or equal advance fractions; glyph ink may overhang them. */
     public slice(start: number, end: number): DesignFontSlice {
         if (start > end) {
@@ -162,6 +202,57 @@ export class DesignFontRun {
             this.tracking,
             window,
         );
+    }
+
+    /** Complete source clusters keep their overhang; shared ligature clusters use exact prepared carets. */
+    public *paint(
+        start: number,
+        end: number,
+        x: number,
+        baseline: number,
+        window: DesignGlyphBounds | null = null,
+    ): IterableIterator<DesignFontPaintGlyph> {
+        const selected: DesignFontSlice = this.slice(start, end);
+        if (start === end) {
+            return;
+        }
+        for (const glyph of this.glyphs(x, baseline, window)) {
+            let low: number = 0;
+            let high: number = this.#spans.length;
+            while (low + 1 < high) {
+                const middle: number = Math.floor((low + high) / 2);
+                if ((this.#offsets[middle] ?? Infinity) <= glyph.index) {
+                    low = middle;
+                } else {
+                    high = middle;
+                }
+            }
+            const span: DesignShapedFace | undefined = this.#spans[low];
+            const source: DesignShapedFace['glyphs'][number] | undefined =
+                span?.glyphs[glyph.index - (this.#offsets[low] ?? 0)];
+            if (span === undefined || source === undefined) {
+                throw new Error('Missing prepared glyph source range.');
+            }
+            const first: number = span.start + source.start;
+            const last: number = span.start + source.end;
+            if (last <= start || first >= end) {
+                continue;
+            }
+            if (start <= first && end >= last) {
+                yield glyph;
+                continue;
+            }
+            if (selected.width === 0) {
+                continue;
+            }
+            const selectedLeft: number = Math.min(this.caret(start), this.caret(end));
+            const selectedRight: number = Math.max(this.caret(start), this.caret(end));
+            const clusterLeft: number = Math.min(this.caret(first), this.caret(last));
+            const clusterRight: number = Math.max(this.caret(first), this.caret(last));
+            const left: number | null = selectedLeft > clusterLeft ? x + selectedLeft : null;
+            const right: number | null = selectedRight < clusterRight ? x + selectedRight : null;
+            yield left === null && right === null ? glyph : { ...glyph, clip: { left, right } };
+        }
     }
 
     static #boundary(boundaries: readonly DesignFontBoundary[], offset: number): number {

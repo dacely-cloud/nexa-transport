@@ -7,6 +7,12 @@ import { DesignFontBindings } from './DesignFontBindings.js';
 import type { DesignResolvedTextDirection } from './DesignTextDirection.js';
 import { DesignTextBidi, type DesignLogicalTextSpan } from './DesignTextBidi.js';
 import { DesignTextBreaks } from './DesignTextBreaks.js';
+import {
+    DesignTextShaping,
+    type DesignTextPreparedPaint,
+    type DesignTextRunFactory,
+    type DesignTextShapedLine,
+} from './DesignTextShaping.js';
 
 /** Resolved style of a contiguous rich-text range. */
 export interface DesignTextSpanStyle {
@@ -27,6 +33,7 @@ export interface DesignTextSegment {
     readonly style: DesignTextSpanStyle;
     readonly x: number;
     readonly width: number;
+    readonly prepared?: DesignTextPreparedPaint;
 }
 /** Measured line positions are shared by the GPU text raster and SVG export. */
 export interface DesignTextLine {
@@ -59,6 +66,7 @@ export class DesignTextLayout {
             style: DesignTextSpanStyle,
             content: string,
         ): number => DesignTextLayout.estimate(style, content),
+        prepare: DesignTextRunFactory | null = null,
     ): readonly DesignTextLine[] {
         const base: DesignTextSpanStyle = DesignFontBindings.base(text, color);
         const bidi: DesignTextBidi = new DesignTextBidi(text.content, text.direction);
@@ -71,44 +79,37 @@ export class DesignTextLayout {
         let y: number = 0;
         let runIndex: number = 0;
         const measured: (parts: readonly Span[]) => number = (parts: readonly Span[]): number => {
-            const visual: readonly Span[] = bidi.visual(parts);
-            return (
-                this.#widths(visual, text.letterSpacing, measure).reduce(
-                    (sum: number, advance: number): number => sum + advance,
-                    0,
-                ) +
-                Math.max(0, visual.length - 1) * text.letterSpacing
-            );
+            return DesignTextShaping.line(bidi.visual(parts), text.letterSpacing, measure, prepare)
+                .width;
         };
         const fits: (parts: readonly Span[]) => boolean = (parts: readonly Span[]): boolean =>
             measured(parts) <= width + 0.001;
         const flush: () => void = (): void => {
             const visual: readonly Span[] = bidi.visual(spans);
-            const widths: readonly number[] = this.#widths(visual, text.letterSpacing, measure);
-            const lineWidth: number =
-                widths.reduce((sum: number, value: number): number => sum + value, 0) +
-                Math.max(0, visual.length - 1) * text.letterSpacing;
+            const shaped: DesignTextShapedLine = DesignTextShaping.line(
+                visual,
+                text.letterSpacing,
+                measure,
+                prepare,
+            );
+            const lineWidth: number = shaped.width;
             const lineHeight: number =
                 Math.max(text.size, ...spans.map((span: Span): number => span.style.size)) *
                 text.lineHeight;
-            let x: number =
+            const x: number =
                 text.align === 'center'
                     ? (width - lineWidth) / 2
                     : text.align === 'end'
                       ? width - lineWidth
                       : 0;
-            const segments: readonly DesignTextSegment[] = visual.map(
-                (span: Span, index: number): DesignTextSegment => {
-                    const advance: number = widths[index] ?? 0;
-                    const segment: DesignTextSegment = {
-                        text: span.text,
-                        style: span.style,
-                        x,
-                        width: advance,
-                    };
-                    x += advance + text.letterSpacing;
-                    return segment;
-                },
+            const segments: readonly DesignTextSegment[] = shaped.segments.map(
+                (segment: DesignTextSegment): DesignTextSegment => ({
+                    ...segment,
+                    x: segment.x + x,
+                    ...(segment.prepared === undefined
+                        ? {}
+                        : { prepared: { ...segment.prepared, x: segment.prepared.x + x } }),
+                }),
             );
             lines.push({ y, height: lineHeight, width: Math.max(0, lineWidth), segments });
             y += lineHeight;
@@ -293,21 +294,6 @@ export class DesignTextLayout {
             result.pop();
         }
         return result;
-    }
-
-    static #widths(
-        spans: readonly Span[],
-        tracking: number,
-        measure: (style: DesignTextSpanStyle, content: string) => number,
-    ): readonly number[] {
-        return spans.map((span: Span): number =>
-            Math.max(
-                0,
-                measure(span.style, span.text) +
-                    Math.max(0, Array.from(this.#graphemes.segment(span.text)).length - 1) *
-                        tracking,
-            ),
-        );
     }
 
     /** Explicit estimate for fonts without a loaded platform face. */

@@ -25,6 +25,8 @@ import {
     type DesignPathCommand,
 } from './DesignTypes.js';
 import type { DesignOperation } from './DesignOperationTypes.js';
+import { DesignTextShaping } from './DesignTextShaping.js';
+import { DesignTextGlyphs } from './DesignTextGlyphs.js';
 
 /** Text becomes editable span paths while retaining its original identity, box, paints and effects. */
 export class DesignTextOutline {
@@ -40,6 +42,7 @@ export class DesignTextOutline {
                 fonts.supports(style)
                     ? fonts.measure(style, content)
                     : DesignTextLayout.estimate(style, content),
+            DesignTextShaping.factory(fonts),
         ),
     ): DesignSelectionPlan {
         const context: DesignSelectionContext = new DesignSelectionContext(
@@ -94,18 +97,12 @@ export class DesignTextOutline {
                 box.height,
                 (style: DesignTextSpanStyle, content: string): number =>
                     fonts.measure(style, content),
+                DesignTextShaping.factory(fonts),
             );
             let index: number = 0;
             for (const line of lines) {
                 const baseline: number = DesignTextLayout.baseline(line, text.lineHeight);
                 for (const segment of line.segments) {
-                    const path: readonly DesignPathCommand[] = fonts.outline(
-                        segment.style,
-                        segment.text,
-                        segment.x,
-                        baseline,
-                        text.letterSpacing,
-                    );
                     const fills: readonly DesignPaint[] = node.style.fills.map(
                         (paint: DesignPaint): DesignPaint =>
                             segment.style.rich
@@ -119,18 +116,56 @@ export class DesignTextOutline {
                                   }
                                 : paint,
                     );
-                    if (path.length > 0) {
+                    for (const piece of DesignTextGlyphs.paths(
+                        segment,
+                        fonts,
+                        baseline,
+                        text.letterSpacing,
+                    )) {
+                        let parent: DesignNode = node;
+                        let offset: number = 0;
+                        const pathId: string = id(`${node.id}:outline:${index}`);
+                        let position: number = index++;
+                        if (piece.clip !== undefined) {
+                            const frameId: string = id(`${pathId}:clip`);
+                            const left: number = piece.clip.left ?? 0;
+                            const right: number = piece.clip.right ?? box.width;
+                            const template: DesignNode = DesignDefaults.node(
+                                frameId,
+                                DesignKind.Frame,
+                                'Text paint clip',
+                            );
+                            parent = { ...node, id: frameId };
+                            offset = -left;
+                            operations.push({
+                                op: 'insert',
+                                pageId,
+                                parentId: node.id,
+                                index: position,
+                                node: {
+                                    ...template,
+                                    x: left,
+                                    width: Math.max(0.01, right - left),
+                                    height: box.height,
+                                    layout: { ...template.layout, clip: true },
+                                    placement: { ...template.placement, absolute: true },
+                                    style: { ...template.style, fills: [], stroke: null },
+                                },
+                            });
+                            position = 0;
+                        }
                         this.#insert(
                             operations,
-                            node,
+                            parent,
                             pageId,
                             box,
-                            id(`${node.id}:outline:${index}`),
-                            index++,
+                            pathId,
+                            position,
                             segment,
-                            path,
+                            piece.path,
                             fills,
                             false,
+                            offset,
                         );
                     }
                     if (segment.style.underline && segment.width > 0) {
@@ -179,6 +214,7 @@ export class DesignTextOutline {
         path: readonly DesignPathCommand[],
         fills: readonly DesignPaint[],
         underline: boolean,
+        x: number = 0,
     ): void {
         const template: DesignNode = DesignDefaults.node(
             id,
@@ -192,6 +228,7 @@ export class DesignTextOutline {
             index,
             node: {
                 ...template,
+                x,
                 width: box.width,
                 height: box.height,
                 path,

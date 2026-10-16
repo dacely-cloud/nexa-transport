@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { DesignText } from './DesignTypes.js';
+import type { DesignTextRunFactory } from './DesignTextShaping.js';
 import type { DesignSize, DesignTextMeasurer } from './DesignLayoutTypes.js';
 import {
     DesignTextLayout,
@@ -14,6 +15,7 @@ export class DesignShapedTextMetrics implements DesignTextMeasurer {
     /** The platform supplies complete font advances without introducing DOM or filesystem dependencies. */
     public constructor(
         public readonly span: (style: DesignTextSpanStyle, content: string) => number,
+        public readonly prepare: DesignTextRunFactory | null = null,
     ) {}
 
     /** Measures all lines, including blank lines and rich spans larger than the base type size. */
@@ -43,6 +45,7 @@ export class DesignShapedTextMetrics implements DesignTextMeasurer {
                 }
                 return width;
             },
+            this.prepare,
         );
         let width: number = 0;
         let height: number = 0;

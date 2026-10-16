@@ -4,6 +4,7 @@
 import type { DesignBox } from './DesignTypes.js';
 import type { DesignGlyphBounds } from './DesignFontGlyphTypes.js';
 import type { DesignTextSpanStyle } from './DesignTextLayout.js';
+import type { DesignFontPaintClip } from './DesignFontRun.js';
 
 /** Null glyphIndex resumes the underline after this span's glyphs. */
 export interface DesignTextWindowCursor {
@@ -21,6 +22,7 @@ export interface DesignTextWindowRequest {
     readonly window: DesignGlyphBounds;
     readonly cursor: DesignTextWindowCursor | null;
     readonly limit: number;
+    readonly paintClipping?: boolean;
 }
 
 /** A compact face-local glyph identity replaces repeated source text and vector command payloads. */
@@ -28,6 +30,7 @@ export interface DesignTextWindowGlyph {
     readonly id: number;
     readonly x: number;
     readonly y: number;
+    readonly clip?: DesignFontPaintClip;
 }
 
 /** Each page groups positions by shaped span and preserves rich style and underline geometry. */
