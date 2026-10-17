@@ -73,6 +73,11 @@ export interface DesignCreateRequest {
     readonly name: string;
     readonly commandId: string;
 }
+/** Exact saved-document copy; layer bodies never cross the caller boundary. */
+export interface DesignDuplicateRequest extends DesignCreateRequest {
+    readonly sourceId: string;
+    readonly sourceRevision: string;
+}
 /** Record and UTF-16 character offsets allow large entities to remain bounded on the wire. */
 export interface DesignCursor {
     readonly record: number;

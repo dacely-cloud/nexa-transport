@@ -3109,6 +3109,27 @@ Revision-fenced document removal with an exact retry identity.
 | `expectedRevision` | Yes      | `string` |             |
 | `id`               | Yes      | `string` |             |
 
+## DesignDuplicateMethod
+
+Atomic owner-scoped saved-document duplication.
+
+| Field    | Required | Type                                                         | Description |
+| -------- | -------- | ------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [DesignDuplicateRequest](protocol.md#designduplicaterequest) |             |
+| `result` | Yes      | [DesignReceipt](protocol.md#designreceipt)                   |             |
+
+## DesignDuplicateRequest
+
+Exact saved-document copy; layer bodies never cross the caller boundary.
+
+| Field            | Required | Type     | Description |
+| ---------------- | -------- | -------- | ----------- |
+| `commandId`      | Yes      | `string` |             |
+| `id`             | Yes      | `string` |             |
+| `name`           | Yes      | `string` |             |
+| `sourceId`       | Yes      | `string` |             |
+| `sourceRevision` | Yes      | `string` |             |
+
 ## DesignEventsMethod
 
 Revision-journal RPC contract.
@@ -5644,6 +5665,7 @@ Configurable bounds on gateway-owned work and memory.
 | `design.component`                   | Yes      | Object (fields below) | Native component commands keep source forests on the authenticated owner's workspace.                  |
 | `design.create`                      | Yes      | Object (fields below) | Create-document RPC contract.                                                                          |
 | `design.delete`                      | Yes      | Object (fields below) | Owner-scoped revision-safe document deletion.                                                          |
+| `design.duplicate`                   | Yes      | Object (fields below) | Atomic owner-scoped saved-document duplication.                                                        |
 | `design.events`                      | Yes      | Object (fields below) | Revision-journal RPC contract.                                                                         |
 | `design.font.list`                   | Yes      | Object (fields below) | Authenticated metadata discovery does not carry font bodies.                                           |
 | `design.font.read`                   | Yes      | Object (fields below) | Each authenticated WebSocket read transfers one independently bounded immutable slice.                 |
@@ -6205,6 +6227,13 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ------------------------------------------------------ | ----------- |
 | `params` | Yes      | [DesignDeleteRequest](protocol.md#designdeleterequest) |             |
 | `result` | Yes      | [DesignDeleteReceipt](protocol.md#designdeletereceipt) |             |
+
+**design.duplicate**
+
+| Field    | Required | Type                                                         | Description |
+| -------- | -------- | ------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [DesignDuplicateRequest](protocol.md#designduplicaterequest) |             |
+| `result` | Yes      | [DesignReceipt](protocol.md#designreceipt)                   |             |
 
 **design.events**
 

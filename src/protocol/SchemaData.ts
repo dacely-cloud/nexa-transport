@@ -6787,6 +6787,41 @@ export const schema: Schema = {
             required: ['commandId', 'expectedRevision', 'id'],
             type: 'object',
         },
+        DesignDuplicateMethod: {
+            description: 'Atomic owner-scoped saved-document duplication.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/DesignDuplicateRequest',
+                },
+                result: {
+                    $ref: '#/definitions/DesignReceipt',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        DesignDuplicateRequest: {
+            description: 'Exact saved-document copy; layer bodies never cross the caller boundary.',
+            properties: {
+                commandId: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                name: {
+                    type: 'string',
+                },
+                sourceId: {
+                    type: 'string',
+                },
+                sourceRevision: {
+                    type: 'string',
+                },
+            },
+            required: ['commandId', 'id', 'name', 'sourceId', 'sourceRevision'],
+            type: 'object',
+        },
         DesignEventsMethod: {
             description: 'Revision-journal RPC contract.',
             properties: {
@@ -12804,6 +12839,19 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'design.duplicate': {
+                    description: 'Atomic owner-scoped saved-document duplication.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/DesignDuplicateRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/DesignReceipt',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'design.events': {
                     description: 'Revision-journal RPC contract.',
                     properties: {
@@ -14767,6 +14815,7 @@ export const schema: Schema = {
                 'design.component',
                 'design.create',
                 'design.delete',
+                'design.duplicate',
                 'design.events',
                 'design.font.list',
                 'design.font.read',

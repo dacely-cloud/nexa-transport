@@ -5,6 +5,7 @@ import { DesignValues as V } from './DesignValues.js';
 import { DesignOperationCodec } from './DesignOperationCodec.js';
 import type {
     DesignCreateRequest,
+    DesignDuplicateRequest,
     DesignDeleteRequest,
     DesignReadRequest,
     DesignSaveRequest,
@@ -18,6 +19,23 @@ import type {
 
 /** Strict detached request decoding shared by agent and gateway boundaries. */
 export class DesignRequestCodec {
+    /** Duplicates only one explicit owner-scoped saved revision. */
+    public static duplicate(raw: unknown): DesignDuplicateRequest {
+        const value: Readonly<Record<string, unknown>> = V.record(raw, [
+            'id',
+            'name',
+            'commandId',
+            'sourceId',
+            'sourceRevision',
+        ]);
+        return {
+            id: V.id(value['id']),
+            name: V.text(value['name']),
+            commandId: V.id(value['commandId']),
+            sourceId: V.id(value['sourceId']),
+            sourceRevision: V.revision(value['sourceRevision']),
+        };
+    }
     /** Empty document creation. */
     public static create(raw: unknown): DesignCreateRequest {
         const value: Readonly<Record<string, unknown>> = V.record(raw, ['id', 'name', 'commandId']);

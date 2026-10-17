@@ -1,6 +1,6 @@
 # RPC reference
 
-All 200 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 199 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
+All 201 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 200 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
 
 - [accounts.create](#accountscreate)
 - [accounts.list](#accountslist)
@@ -52,6 +52,7 @@ All 200 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [design.component](#designcomponent)
 - [design.create](#designcreate)
 - [design.delete](#designdelete)
+- [design.duplicate](#designduplicate)
 - [design.events](#designevents)
 - [design.font.list](#designfontlist)
 - [design.font.read](#designfontread)
@@ -1391,6 +1392,36 @@ Parameters: [DesignDeleteRequest](protocol.md#designdeleterequest).
 | `id`               | Yes      | `string` |             |
 
 Result: [DesignDeleteReceipt](protocol.md#designdeletereceipt).
+
+## design.duplicate
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DesignDuplicate> = {
+    commandId: 'YOUR_COMMANDID',
+    id: 'YOUR_ID',
+    name: 'YOUR_NAME',
+    sourceId: 'YOUR_SOURCEID',
+    sourceRevision: 'YOUR_SOURCEREVISION',
+};
+const result: ResultOf<typeof Method.DesignDuplicate> = await client.call(
+    Method.DesignDuplicate,
+    params,
+);
+```
+
+Parameters: [DesignDuplicateRequest](protocol.md#designduplicaterequest).
+
+| Field            | Required | Type     | Description |
+| ---------------- | -------- | -------- | ----------- |
+| `commandId`      | Yes      | `string` |             |
+| `id`             | Yes      | `string` |             |
+| `name`           | Yes      | `string` |             |
+| `sourceId`       | Yes      | `string` |             |
+| `sourceRevision` | Yes      | `string` |             |
+
+Result: [DesignReceipt](protocol.md#designreceipt).
 
 ## design.events
 
