@@ -1,6 +1,6 @@
 {
     "name": "nexa-transport",
-    "version": "0.1.0-design.24",
+    "version": "0.1.0-design.25",
     "description": "Typed Nexa websocket gateway client for browsers and Node.js",
     "type": "module",
     "license": "Apache-2.0",
@@ -651,6 +651,10 @@
         "./roblox-scene-textures": {
             "types": "./dist/roblox/RobloxSceneTextures.d.ts",
             "import": "./dist/roblox-scene-textures.js"
+        },
+        "./roblox-fonts": {
+            "types": "./dist/roblox/RobloxFonts.d.ts",
+            "import": "./dist/roblox-fonts.js"
         },
         "./roblox-legacy-font": {
             "types": "./dist/roblox/RobloxLegacyFont.d.ts",

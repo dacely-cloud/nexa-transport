@@ -20,6 +20,7 @@ const config: UserConfig = {
                 'roblox-gui-layout': 'src/roblox/RobloxGuiLayout.ts',
                 'roblox-wheel-input': 'src/roblox/RobloxWheelInput.ts',
                 'roblox-legacy-font': 'src/roblox/RobloxLegacyFont.ts',
+                'roblox-fonts': 'src/roblox/RobloxFonts.ts',
                 'roblox-gui-images': 'src/roblox/RobloxGuiImages.ts',
                 'roblox-gui-classes': 'src/roblox/RobloxGuiClasses.ts',
                 'roblox-live-state': 'src/roblox/RobloxLiveState.ts',
