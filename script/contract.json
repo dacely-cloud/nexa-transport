@@ -8326,6 +8326,9 @@
                     "$ref": "#/definitions/DesignLayoutOperation"
                 },
                 {
+                    "$ref": "#/definitions/DesignTidyOperation"
+                },
+                {
                     "$ref": "#/definitions/DesignReparentOperation"
                 },
                 {
@@ -8360,9 +8363,6 @@
                 },
                 {
                     "$ref": "#/definitions/DesignScaleOperation"
-                },
-                {
-                    "$ref": "#/definitions/DesignTidyOperation"
                 },
                 {
                     "$ref": "#/definitions/DesignTranslateOperation"
@@ -9139,6 +9139,9 @@
                 },
                 {
                     "$ref": "#/definitions/DesignLayoutOperation"
+                },
+                {
+                    "$ref": "#/definitions/DesignTidyOperation"
                 },
                 {
                     "$ref": "#/definitions/DesignReparentOperation"
@@ -11616,6 +11619,11 @@
                 "designTidy": {
                     "const": true,
                     "description": "Compact tidy commands arrange free selections without replacing their source bodies.",
+                    "type": "boolean"
+                },
+                "designTidyPreview": {
+                    "const": true,
+                    "description": "Read-only Tidy previews retain deferred text and exact owner-scoped font geometry.",
                     "type": "boolean"
                 },
                 "designVectorPatterns": {

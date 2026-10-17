@@ -29,10 +29,11 @@ export class DesignLayoutPreviewCodec {
             operation?.op !== DesignOperationKind.Layout &&
             operation?.op !== DesignOperationKind.Recolor &&
             operation?.op !== DesignOperationKind.Reparent &&
+            operation?.op !== DesignOperationKind.Tidy &&
             operation?.op !== DesignOperationKind.Resize
         ) {
             throw new Error(
-                'Preview requires one native layout, recolor, reparent or resize operation.',
+                'Preview requires one native layout, tidy, recolor, reparent or resize operation.',
             );
         }
         const key: string | null = value['key'] === null ? null : V.text(value['key'], 64);

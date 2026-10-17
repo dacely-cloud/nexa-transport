@@ -89,6 +89,7 @@ export interface DesignRecolorOperation {
 /** Read-only native drafts admit bounded geometry, layout, color and hierarchy edits, never source replacements. */
 export type DesignPreviewOperation =
     | DesignLayoutOperation
+    | DesignTidyOperation
     | DesignRecolorOperation
     | DesignReparentOperation
     | DesignResizeOperation;
