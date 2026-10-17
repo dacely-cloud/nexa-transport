@@ -1,6 +1,6 @@
 {
     "name": "nexa-transport",
-    "version": "0.1.0-design.22",
+    "version": "0.1.0-design.23",
     "description": "Typed Nexa websocket gateway client for browsers and Node.js",
     "type": "module",
     "license": "Apache-2.0",
@@ -531,6 +531,34 @@
         "./design-paths": {
             "types": "./dist/design/DesignPaths.d.ts",
             "import": "./dist/design-paths.js"
+        },
+        "./design-pattern-references": {
+            "types": "./dist/design/DesignPatternReferences.d.ts",
+            "import": "./dist/design-pattern-references.js"
+        },
+        "./design-pattern-geometry": {
+            "types": "./dist/design/DesignPatternGeometry.d.ts",
+            "import": "./dist/design-pattern-geometry.js"
+        },
+        "./design-pattern-sources": {
+            "types": "./dist/design/DesignPatternSources.d.ts",
+            "import": "./dist/design-pattern-sources.js"
+        },
+        "./design-pattern-tile-types": {
+            "types": "./dist/design/DesignPatternTileTypes.d.ts",
+            "import": "./dist/design-pattern-tile-types.js"
+        },
+        "./design-pattern-tile-codec": {
+            "types": "./dist/design/DesignPatternTileCodec.d.ts",
+            "import": "./dist/design-pattern-tile-codec.js"
+        },
+        "./design-paint-pattern-edits": {
+            "types": "./dist/design/DesignPaintPatternEdits.d.ts",
+            "import": "./dist/design-paint-pattern-edits.js"
+        },
+        "./design-svg-selections": {
+            "types": "./dist/design/DesignSvgSelections.d.ts",
+            "import": "./dist/design-svg-selections.js"
         },
         "./design-components": {
             "types": "./dist/design/DesignComponents.d.ts",

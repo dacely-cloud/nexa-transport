@@ -298,3 +298,12 @@ Metadata-only page ownership, locked ancestry and topmost selection are availabl
 `nexa-transport/design-effect-metrics` exports the shared native effect margin and influence calculations used by SVG export, graph import and the website renderer.
 
 `nexa-transport/design-clipboard-cut` exposes the canonical local cut planner; saved documents use the atomic `design.clipboard.cut` gateway method.
+
+- `nexa-transport/design-pattern-geometry`: DesignPatternGeometry.
+- `nexa-transport/design-pattern-sources`: DesignPatternSources.
+- `nexa-transport/design-pattern-tile-types`: DesignPatternTileTypes.
+- `nexa-transport/design-pattern-tile-codec`: DesignPatternTileCodec.
+- `nexa-transport/design-paint-pattern-edits`: DesignPaintPatternEdits.
+- `nexa-transport/design-svg-selections`: DesignSvgSelections.
+
+- `nexa-transport/design-pattern-references`: linked source dependency traversal and remapping.

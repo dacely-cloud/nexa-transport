@@ -1,6 +1,6 @@
 # RPC reference
 
-All 199 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 198 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
+All 200 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 199 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
 
 - [accounts.create](#accountscreate)
 - [accounts.list](#accountslist)
@@ -58,6 +58,7 @@ All 199 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [design.layout](#designlayout)
 - [design.layout.preview](#designlayoutpreview)
 - [design.list](#designlist)
+- [design.pattern.tile](#designpatterntile)
 - [design.read](#designread)
 - [design.save](#designsave)
 - [design.svg.import](#designsvgimport)
@@ -1549,6 +1550,38 @@ Parameters: [DesignListRequest](protocol.md#designlistrequest).
 | `query` | No       | `string`      | Optional literal, case-insensitive title search across this owner's complete library. |
 
 Result: [DesignListPage](protocol.md#designlistpage).
+
+## design.pattern.tile
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DesignPatternTile> = {
+    density: 1,
+    id: 'YOUR_ID',
+    maxDimension: 1,
+    offset: 'YOUR_OFFSET',
+    patternId: 'YOUR_PATTERNID',
+    revision: 'YOUR_REVISION',
+};
+const result: ResultOf<typeof Method.DesignPatternTile> = await client.call(
+    Method.DesignPatternTile,
+    params,
+);
+```
+
+Parameters: [DesignPatternTileRequest](protocol.md#designpatterntilerequest).
+
+| Field          | Required | Type     | Description |
+| -------------- | -------- | -------- | ----------- |
+| `density`      | Yes      | `number` |             |
+| `id`           | Yes      | `string` |             |
+| `maxDimension` | Yes      | `number` |             |
+| `offset`       | Yes      | `string` |             |
+| `patternId`    | Yes      | `string` |             |
+| `revision`     | Yes      | `string` |             |
+
+Result: [DesignPatternTileSlice](protocol.md#designpatterntileslice).
 
 ## design.read
 

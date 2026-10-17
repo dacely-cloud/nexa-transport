@@ -4084,7 +4084,18 @@ Variant 23: [DesignPaintImageOperation](protocol.md#designpaintimageoperation)
 | `pageId`  | Yes      | `string`                                                       |             |
 | `target`  | Yes      | [DesignPaintColorTarget](protocol.md#designpaintcolortarget)   |             |
 
-Variant 24: [DesignPaintGradientOperation](protocol.md#designpaintgradientoperation)
+Variant 24: [DesignPaintPatternOperation](protocol.md#designpaintpatternoperation)
+
+| Field     | Required | Type                                                               | Description |
+| --------- | -------- | ------------------------------------------------------------------ | ----------- |
+| `changes` | Yes      | [DesignPaintPatternChanges](protocol.md#designpaintpatternchanges) |             |
+| `id`      | Yes      | `string`                                                           |             |
+| `index`   | Yes      | `number`                                                           |             |
+| `op`      | Yes      | `"paint-pattern"`                                                  |             |
+| `pageId`  | Yes      | `string`                                                           |             |
+| `target`  | Yes      | [DesignPaintColorTarget](protocol.md#designpaintcolortarget)       |             |
+
+Variant 25: [DesignPaintGradientOperation](protocol.md#designpaintgradientoperation)
 
 | Field     | Required | Type                                                                 | Description |
 | --------- | -------- | -------------------------------------------------------------------- | ----------- |
@@ -4095,7 +4106,7 @@ Variant 24: [DesignPaintGradientOperation](protocol.md#designpaintgradientoperat
 | `pageId`  | Yes      | `string`                                                             |             |
 | `target`  | Yes      | [DesignPaintColorTarget](protocol.md#designpaintcolortarget)         |             |
 
-Variant 25: [DesignStrokeOperation](protocol.md#designstrokeoperation)
+Variant 26: [DesignStrokeOperation](protocol.md#designstrokeoperation)
 
 | Field     | Required | Type                                                            | Description |
 | --------- | -------- | --------------------------------------------------------------- | ----------- |
@@ -4104,7 +4115,7 @@ Variant 25: [DesignStrokeOperation](protocol.md#designstrokeoperation)
 | `op`      | Yes      | `"stroke"`                                                      |             |
 | `pageId`  | Yes      | `string`                                                        |             |
 
-Variant 26: [DesignPolygonOperation](protocol.md#designpolygonoperation)
+Variant 27: [DesignPolygonOperation](protocol.md#designpolygonoperation)
 
 | Field     | Required | Type                                                                | Description |
 | --------- | -------- | ------------------------------------------------------------------- | ----------- |
@@ -4113,7 +4124,7 @@ Variant 26: [DesignPolygonOperation](protocol.md#designpolygonoperation)
 | `op`      | Yes      | `"polygon"`                                                         |             |
 | `pageId`  | Yes      | `string`                                                            |             |
 
-Variant 27: [DesignArcOperation](protocol.md#designarcoperation)
+Variant 28: [DesignArcOperation](protocol.md#designarcoperation)
 
 | Field     | Required | Type                                                        | Description |
 | --------- | -------- | ----------------------------------------------------------- | ----------- |
@@ -4122,7 +4133,7 @@ Variant 27: [DesignArcOperation](protocol.md#designarcoperation)
 | `op`      | Yes      | `"arc"`                                                     |             |
 | `pageId`  | Yes      | `string`                                                    |             |
 
-Variant 28: [DesignStyleOperation](protocol.md#designstyleoperation)
+Variant 29: [DesignStyleOperation](protocol.md#designstyleoperation)
 
 | Field     | Required | Type                                                 | Description |
 | --------- | -------- | ---------------------------------------------------- | ----------- |
@@ -4191,17 +4202,18 @@ Page record.
 
 Layer paint. Colors are validated hex values, never arbitrary CSS.
 
-| Field      | Required | Type                                                                    | Description                                                                            |
-| ---------- | -------- | ----------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| `angle`    | Yes      | `number`                                                                |                                                                                        |
-| `assetId`  | Yes      | `null,string`                                                           |                                                                                        |
-| `color`    | Yes      | `string`                                                                |                                                                                        |
-| `framing`  | No       | [DesignImageFraming](protocol.md#designimageframing)                    | Omitted framing retains the original centered-cover behavior of existing image paints. |
-| `gradient` | No       | [DesignGradientTransform](protocol.md#designgradienttransform) / `null` | Null or omission retains the original angle-based linear or centered radial geometry.  |
-| `kind`     | Yes      | [DesignPaintKind](protocol.md#designpaintkind)                          |                                                                                        |
-| `opacity`  | Yes      | `number`                                                                |                                                                                        |
-| `stops`    | Yes      | Array of [DesignGradientStop](protocol.md#designgradientstop)           |                                                                                        |
-| `tokenId`  | Yes      | `null,string`                                                           |                                                                                        |
+| Field       | Required | Type                                                                    | Description                                                                               |
+| ----------- | -------- | ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `angle`     | Yes      | `number`                                                                |                                                                                           |
+| `assetId`   | Yes      | `null,string`                                                           |                                                                                           |
+| `color`     | Yes      | `string`                                                                |                                                                                           |
+| `framing`   | No       | [DesignImageFraming](protocol.md#designimageframing)                    | Omitted framing retains the original centered-cover behavior of existing image paints.    |
+| `gradient`  | No       | [DesignGradientTransform](protocol.md#designgradienttransform) / `null` | Null or omission retains the original angle-based linear or centered radial geometry.     |
+| `kind`      | Yes      | [DesignPaintKind](protocol.md#designpaintkind)                          |                                                                                           |
+| `opacity`   | Yes      | `number`                                                                |                                                                                           |
+| `patternId` | No       | `null,string`                                                           | A linked component definition supplies editable repeat artwork; omitted on legacy paints. |
+| `stops`     | Yes      | Array of [DesignGradientStop](protocol.md#designgradientstop)           |                                                                                           |
+| `tokenId`   | Yes      | `null,string`                                                           |                                                                                           |
 
 ## DesignPaintColorChanges
 
@@ -4291,7 +4303,38 @@ Page-scoped placement or framing of one image fill or existing stroke.
 
 Supported paint sources. Image assets use workspace references.
 
-Type: `"angular"` / `"diamond"` / `"image"` / `"linear"` / `"radial"` / `"solid"`.
+Type: `"angular"` / `"diamond"` / `"image"` / `"linear"` / `"pattern"` / `"radial"` / `"solid"`.
+
+## DesignPaintPatternChanges
+
+Linked source edits retain all other paint, layer and text properties.
+
+| Field         | Required | Type                                                                                | Description                                                                        |
+| ------------- | -------- | ----------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `adjustments` | No       | [PartialDesignImageAdjustments](protocol.md#partialdesignimageadjustments) / `null` | Partial color edits retain other adjustments; null restores original image colors. |
+| `cropX`       | No       | `number`                                                                            |                                                                                    |
+| `cropY`       | No       | `number`                                                                            |                                                                                    |
+| `fit`         | No       | `"contain"` / `"cover"` / `"stretch"` / `"tile"`                                    | Image scaling mode.                                                                |
+| `flipX`       | No       | `boolean`                                                                           |                                                                                    |
+| `flipY`       | No       | `boolean`                                                                           |                                                                                    |
+| `patternId`   | No       | `string`                                                                            |                                                                                    |
+| `rotation`    | No       | `number`                                                                            |                                                                                    |
+| `scale`       | No       | `number`                                                                            |                                                                                    |
+| `tile`        | No       | [DesignImageTile](protocol.md#designimagetile) / `null`                             |                                                                                    |
+| `transform`   | No       | [DesignImageTransform](protocol.md#designimagetransform) / `null`                   |                                                                                    |
+
+## DesignPaintPatternOperation
+
+Revision-checked vector pattern framing shares the existing indexed paint authority.
+
+| Field     | Required | Type                                                               | Description |
+| --------- | -------- | ------------------------------------------------------------------ | ----------- |
+| `changes` | Yes      | [DesignPaintPatternChanges](protocol.md#designpaintpatternchanges) |             |
+| `id`      | Yes      | `string`                                                           |             |
+| `index`   | Yes      | `number`                                                           |             |
+| `op`      | Yes      | `"paint-pattern"`                                                  |             |
+| `pageId`  | Yes      | `string`                                                           |             |
+| `target`  | Yes      | [DesignPaintColorTarget](protocol.md#designpaintcolortarget)       |             |
 
 ## DesignPathCommand
 
@@ -4307,6 +4350,47 @@ A vector instruction in layer-local coordinates.
 Path verbs use explicit coordinates; cubic curves are preserved as editable geometry.
 
 Type: `"C"` / `"L"` / `"M"` / `"Q"` / `"Z"`.
+
+## DesignPatternTileMethod
+
+A read-only authenticated gateway method samples the saved definition at an exact revision.
+
+| Field    | Required | Type                                                             | Description |
+| -------- | -------- | ---------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignPatternTileRequest](protocol.md#designpatterntilerequest) |             |
+| `result` | Yes      | [DesignPatternTileSlice](protocol.md#designpatterntileslice)     |             |
+
+## DesignPatternTileRequest
+
+One visible linked source is sampled at requested density within a bounded raster surface.
+
+| Field          | Required | Type     | Description |
+| -------------- | -------- | -------- | ----------- |
+| `density`      | Yes      | `number` |             |
+| `id`           | Yes      | `string` |             |
+| `maxDimension` | Yes      | `number` |             |
+| `offset`       | Yes      | `string` |             |
+| `patternId`    | Yes      | `string` |             |
+| `revision`     | Yes      | `string` |             |
+
+## DesignPatternTileSlice
+
+Ephemeral PNG chunks never become published image assets and never include source text.
+
+| Field             | Required | Type          | Description |
+| ----------------- | -------- | ------------- | ----------- |
+| `byteLength`      | Yes      | `string`      |             |
+| `data`            | Yes      | `string`      |             |
+| `height`          | Yes      | `number`      |             |
+| `id`              | Yes      | `string`      |             |
+| `intrinsicHeight` | Yes      | `number`      |             |
+| `intrinsicWidth`  | Yes      | `number`      |             |
+| `nextOffset`      | Yes      | `null,string` |             |
+| `offset`          | Yes      | `string`      |             |
+| `patternId`       | Yes      | `string`      |             |
+| `revision`        | Yes      | `string`      |             |
+| `sha256`          | Yes      | `string`      |             |
+| `width`           | Yes      | `number`      |             |
 
 ## DesignPlacement
 
@@ -5446,6 +5530,7 @@ Methods, events, and additive capabilities supported by this gateway.
 | `designTextInheritedPaint`  | No       | `true`                                             | Rich typography can inherit the layer's gradient, image or solid fill stack.                   |
 | `designTextPaintClipping`   | No       | `true`                                             | Native glyph windows can preserve shared shaping with bounded paint clips.                     |
 | `designTextRangeFills`      | No       | `true`                                             | UTF-16 rich ranges can replace layer fills with their own editable paint stacks.               |
+| `designVectorPatterns`      | No       | `true`                                             | Linked component paints support revision-pinned bounded source-cell sampling.                  |
 | `events`                    | Yes      | Array of `string`                                  |                                                                                                |
 | `jsonReplies`               | No       | `true`                                             | Host validation of JSON final answers while native tools remain available.                     |
 | `methodScopes`              | Yes      | [RecordstringScope](protocol.md#recordstringscope) | The scope each method requires.                                                                |
@@ -5565,6 +5650,7 @@ Configurable bounds on gateway-owned work and memory.
 | `design.layout`                      | Yes      | Object (fields below) | Computed-geometry RPC contract.                                                                        |
 | `design.layout.preview`              | Yes      | Object (fields below) | Read-only preview support is advertised independently for older workspaces.                            |
 | `design.list`                        | Yes      | Object (fields below) | Owner-scoped library RPC contract.                                                                     |
+| `design.pattern.tile`                | Yes      | Object (fields below) | A read-only authenticated gateway method samples the saved definition at an exact revision.            |
 | `design.read`                        | Yes      | Object (fields below) | Bounded snapshot RPC contract.                                                                         |
 | `design.save`                        | Yes      | Object (fields below) | Atomic editing RPC contract.                                                                           |
 | `design.svg.import`                  | Yes      | Object (fields below) | Revision-checked SVG imports preserve editable native vectors and paints.                              |
@@ -6161,6 +6247,13 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | -------------------------------------------------- | ----------- |
 | `params` | Yes      | [DesignListRequest](protocol.md#designlistrequest) |             |
 | `result` | Yes      | [DesignListPage](protocol.md#designlistpage)       |             |
+
+**design.pattern.tile**
+
+| Field    | Required | Type                                                             | Description |
+| -------- | -------- | ---------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignPatternTileRequest](protocol.md#designpatterntilerequest) |             |
+| `result` | Yes      | [DesignPatternTileSlice](protocol.md#designpatterntileslice)     |             |
 
 **design.read**
 

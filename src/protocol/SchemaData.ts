@@ -8484,6 +8484,9 @@ export const schema: Schema = {
                     $ref: '#/definitions/DesignPaintImageOperation',
                 },
                 {
+                    $ref: '#/definitions/DesignPaintPatternOperation',
+                },
+                {
                     $ref: '#/definitions/DesignPaintGradientOperation',
                 },
                 {
@@ -8658,6 +8661,11 @@ export const schema: Schema = {
                 },
                 opacity: {
                     type: 'number',
+                },
+                patternId: {
+                    description:
+                        'A linked component definition supplies editable repeat artwork; omitted on legacy paints.',
+                    type: ['null', 'string'],
                 },
                 stops: {
                     items: {
@@ -8873,8 +8881,99 @@ export const schema: Schema = {
         DesignPaintKind: {
             description:
                 'Supported paint sources. Image assets use workspace references.\nPaint kind.',
-            enum: ['angular', 'diamond', 'image', 'linear', 'radial', 'solid'],
+            enum: ['angular', 'diamond', 'image', 'linear', 'pattern', 'radial', 'solid'],
             type: 'string',
+        },
+        DesignPaintPatternChanges: {
+            description: 'Linked source edits retain all other paint, layer and text properties.',
+            properties: {
+                adjustments: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/Partial%3CDesignImageAdjustments%3E',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                    description:
+                        'Partial color edits retain other adjustments; null restores original image colors.',
+                },
+                cropX: {
+                    type: 'number',
+                },
+                cropY: {
+                    type: 'number',
+                },
+                fit: {
+                    description: 'Image scaling mode.',
+                    enum: ['contain', 'cover', 'stretch', 'tile'],
+                    type: 'string',
+                },
+                flipX: {
+                    type: 'boolean',
+                },
+                flipY: {
+                    type: 'boolean',
+                },
+                patternId: {
+                    type: 'string',
+                },
+                rotation: {
+                    type: 'number',
+                },
+                scale: {
+                    type: 'number',
+                },
+                tile: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignImageTile',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                transform: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignImageTransform',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+            },
+            type: 'object',
+        },
+        DesignPaintPatternOperation: {
+            description:
+                'Revision-checked vector pattern framing shares the existing indexed paint authority.',
+            properties: {
+                changes: {
+                    $ref: '#/definitions/DesignPaintPatternChanges',
+                },
+                id: {
+                    type: 'string',
+                },
+                index: {
+                    type: 'number',
+                },
+                op: {
+                    const: 'paint-pattern',
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+                target: {
+                    $ref: '#/definitions/DesignPaintColorTarget',
+                },
+            },
+            required: ['changes', 'id', 'index', 'op', 'pageId', 'target'],
+            type: 'object',
         },
         DesignPathCommand: {
             description: 'A vector instruction in layer-local coordinates.',
@@ -8897,6 +8996,103 @@ export const schema: Schema = {
                 'Path verbs use explicit coordinates; cubic curves are preserved as editable geometry.\nVector path verb.',
             enum: ['C', 'L', 'M', 'Q', 'Z'],
             type: 'string',
+        },
+        DesignPatternTileMethod: {
+            description:
+                'A read-only authenticated gateway method samples the saved definition at an exact revision.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/DesignPatternTileRequest',
+                },
+                result: {
+                    $ref: '#/definitions/DesignPatternTileSlice',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        DesignPatternTileRequest: {
+            description:
+                'One visible linked source is sampled at requested density within a bounded raster surface.',
+            properties: {
+                density: {
+                    type: 'number',
+                },
+                id: {
+                    type: 'string',
+                },
+                maxDimension: {
+                    type: 'number',
+                },
+                offset: {
+                    type: 'string',
+                },
+                patternId: {
+                    type: 'string',
+                },
+                revision: {
+                    type: 'string',
+                },
+            },
+            required: ['density', 'id', 'maxDimension', 'offset', 'patternId', 'revision'],
+            type: 'object',
+        },
+        DesignPatternTileSlice: {
+            description:
+                'Ephemeral PNG chunks never become published image assets and never include source text.',
+            properties: {
+                byteLength: {
+                    type: 'string',
+                },
+                data: {
+                    type: 'string',
+                },
+                height: {
+                    type: 'number',
+                },
+                id: {
+                    type: 'string',
+                },
+                intrinsicHeight: {
+                    type: 'number',
+                },
+                intrinsicWidth: {
+                    type: 'number',
+                },
+                nextOffset: {
+                    type: ['null', 'string'],
+                },
+                offset: {
+                    type: 'string',
+                },
+                patternId: {
+                    type: 'string',
+                },
+                revision: {
+                    type: 'string',
+                },
+                sha256: {
+                    type: 'string',
+                },
+                width: {
+                    type: 'number',
+                },
+            },
+            required: [
+                'byteLength',
+                'data',
+                'height',
+                'id',
+                'intrinsicHeight',
+                'intrinsicWidth',
+                'nextOffset',
+                'offset',
+                'patternId',
+                'revision',
+                'sha256',
+                'width',
+            ],
+            type: 'object',
         },
         DesignPlacement: {
             description: 'Child sizing and positioning relative to its parent.',
@@ -11577,6 +11773,12 @@ export const schema: Schema = {
                         'UTF-16 rich ranges can replace layer fills with their own editable paint stacks.',
                     type: 'boolean',
                 },
+                designVectorPatterns: {
+                    const: true,
+                    description:
+                        'Linked component paints support revision-pinned bounded source-cell sampling.',
+                    type: 'boolean',
+                },
                 events: {
                     items: {
                         type: 'string',
@@ -12677,6 +12879,20 @@ export const schema: Schema = {
                         },
                         result: {
                             $ref: '#/definitions/DesignListPage',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'design.pattern.tile': {
+                    description:
+                        'A read-only authenticated gateway method samples the saved definition at an exact revision.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/DesignPatternTileRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/DesignPatternTileSlice',
                         },
                     },
                     required: ['params', 'result'],
@@ -14557,6 +14773,7 @@ export const schema: Schema = {
                 'design.layout',
                 'design.layout.preview',
                 'design.list',
+                'design.pattern.tile',
                 'design.read',
                 'design.save',
                 'design.svg.import',
