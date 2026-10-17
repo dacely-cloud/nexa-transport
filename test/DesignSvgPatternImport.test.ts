@@ -351,16 +351,6 @@ test.each([
         /cyclic/,
     ],
     [
-        'vector artwork',
-        userTile.replace(/<image[^>]+\/>/u, '<rect width="40" height="20" fill="red"/>'),
-        /pattern content/,
-    ],
-    [
-        'multiple images',
-        userTile.replace('</pattern>', `<image href="${uri}" width="40" height="20"/></pattern>`),
-        /multiple drawing/,
-    ],
-    [
         'singular pattern transform',
         userTile.replace('id="tile"', 'id="tile" patternTransform="scale(0 1)"'),
         /independent nonzero/,

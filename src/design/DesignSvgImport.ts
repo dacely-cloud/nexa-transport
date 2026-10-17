@@ -71,9 +71,12 @@ export class DesignSvgImport {
                 ),
                 ...additions,
             ],
-            pages: document.pages.map((source: DesignPage): DesignPage =>
-                parent === null && source.id === page.id ? { ...source, roots } : source,
-            ),
+            pages: [
+                ...document.pages.map((source: DesignPage): DesignPage =>
+                    parent === null && source.id === page.id ? { ...source, roots } : source,
+                ),
+                ...(imported.library === undefined ? [] : [imported.library]),
+            ],
         });
         return {
             document: next,

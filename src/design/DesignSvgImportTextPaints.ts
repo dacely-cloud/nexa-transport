@@ -155,7 +155,7 @@ export class DesignSvgImportTextPaints {
                 color: fill.color,
             });
             const value: DesignPaint | null =
-                resolved === null || resolved.kind === 'image'
+                resolved === null || resolved.kind === 'image' || resolved.kind === 'pattern'
                     ? resolved
                     : {
                           ...resolved,

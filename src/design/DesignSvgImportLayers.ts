@@ -22,17 +22,22 @@ import { DesignSvgImportPaints } from './DesignSvgImportPaints.js';
 import { DesignSvgRootTransform } from './DesignSvgRootTransform.js';
 import { DesignDefaults } from './DesignDefaults.js';
 import { DesignCodec } from './DesignCodec.js';
-import type { DesignNode } from './DesignTypes.js';
+import type { DesignNode, DesignPage } from './DesignTypes.js';
 import { DesignSvgImportImage } from './DesignSvgImportImage.js';
 import { DesignSvgImageAssets } from './DesignSvgImageAssets.js';
 import type { DesignSvgImageLoader } from './DesignSvgImageTypes.js';
 import type { DesignSvgFontLoader } from './DesignSvgFontTypes.js';
 import { DesignSvgImportedFonts } from './DesignSvgImportedFonts.js';
+import { DesignSvgPatternBuilder } from './DesignSvgPatternBuilder.js';
+import { DesignSvgPatternSources } from './DesignSvgPatternSources.js';
+import type { DesignSvgPatternSourcePlan } from './DesignSvgPatternTypes.js';
+import { DesignPatternReferences } from './DesignPatternReferences.js';
 
 /** One imported artboard and its editable layer forest, without any original markup embedded in nodes. */
 export interface DesignSvgLayerImport {
     readonly rootId: string;
     readonly nodes: readonly DesignNode[];
+    readonly library?: DesignPage;
 }
 
 /** SVG import authors ordinary native layers that use the same editor, paths, paints and undo. */
@@ -50,6 +55,8 @@ export class DesignSvgImportLayers {
     #filters: DesignSvgImportFilters;
     #css: DesignSvgCss;
     #paints: DesignSvgImportPaints;
+    readonly #patternSources: DesignSvgPatternSources;
+    readonly #patternBuilder: DesignSvgPatternBuilder;
     public constructor(
         public readonly root: DesignSvgElement,
         public readonly identify: (key: string) => string,
@@ -76,12 +83,17 @@ export class DesignSvgImportLayers {
         };
         visit(root, []);
         this.#css = new DesignSvgCss(root);
+        this.#patternSources = new DesignSvgPatternSources(
+            this.identify,
+            (plan: DesignSvgPatternSourcePlan): Promise<void> => this.#patternBuilder.build(plan),
+        );
         const assets: DesignSvgImageAssets = new DesignSvgImageAssets(images);
         this.#paints = new DesignSvgImportPaints(
             this.#elements,
             this.#css,
             this.#ancestors,
             assets,
+            this.#patternSources,
         );
         this.#shape = new DesignSvgImportShape(this.#paints, this.#tree, this.identify);
         this.#text = new DesignSvgImportText(
@@ -118,6 +130,13 @@ export class DesignSvgImportLayers {
             this.#viewports,
             (element: DesignSvgElement, context: DesignSvgLayerContext): Promise<string | null> =>
                 this.#visit(element, context, true),
+        );
+        this.#patternBuilder = new DesignSvgPatternBuilder(
+            this.#tree,
+            this.identify,
+            this.#ancestors,
+            (element: DesignSvgElement, context: DesignSvgLayerContext): Promise<string | null> =>
+                this.#visit(element, context),
         );
     }
     public static async parse(
@@ -234,13 +253,28 @@ export class DesignSvgImportLayers {
         if (transformed && style['overflow'] !== 'visible') {
             await this.#viewports.rectangle(contentId, width, height, transform);
         }
+        await this.#patternSources.build(
+            (): ReadonlySet<string> =>
+                new Set(
+                    this.#tree.nodes.flatMap((node: DesignNode): readonly string[] =>
+                        DesignPatternReferences.ids(node),
+                    ),
+                ),
+        );
+        const library: DesignPage | undefined = this.#patternBuilder.library(
+            this.#patternSources.roots,
+        );
         const document: ReturnType<typeof DesignDefaults.document> = DesignCodec.document({
             ...DesignDefaults.document('svg-import'),
-            pages: [{ id: 'page-1', name: 'SVG', background: '#FFFFFF', roots: [rootId] }],
+            pages: [
+                { id: 'page-1', name: 'SVG', background: '#FFFFFF', roots: [rootId] },
+                ...(library === undefined ? [] : [library]),
+            ],
             nodes: this.#tree.nodes,
         });
-        return { rootId, nodes: document.nodes };
+        return { rootId, nodes: document.nodes, ...(library === undefined ? {} : { library }) };
     }
+
     async #visit(
         element: DesignSvgElement,
         context: DesignSvgLayerContext,

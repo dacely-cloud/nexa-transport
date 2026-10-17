@@ -14,6 +14,7 @@ import { DesignSvgColors } from './DesignSvgColors.js';
 import { DesignSvgNumbers } from './DesignSvgNumbers.js';
 import { DesignSvgImportPatterns } from './DesignSvgImportPatterns.js';
 import { DesignSvgImageAssets } from './DesignSvgImageAssets.js';
+import type { DesignSvgPatternSources } from './DesignSvgPatternSources.js';
 import {
     DesignSvgTransforms as T,
     type DesignSvgMatrix,
@@ -43,8 +44,9 @@ export class DesignSvgImportPaints {
         public readonly css: DesignSvgCss,
         public readonly ancestors: ReadonlyMap<DesignSvgElement, readonly DesignSvgElement[]>,
         images: DesignSvgImageAssets = new DesignSvgImageAssets(null),
+        sources: DesignSvgPatternSources | null = null,
     ) {
-        this.#patterns = new DesignSvgImportPatterns(elements, css, ancestors, images);
+        this.#patterns = new DesignSvgImportPatterns(elements, css, ancestors, images, sources);
     }
     /** Referenced raster assets are admitted once before synchronous geometry and rich-range rebasing. */
     public async prepare(source: string): Promise<void> {

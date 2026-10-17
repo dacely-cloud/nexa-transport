@@ -35,12 +35,16 @@ export class DesignSvgPatternImage {
         public readonly assets: DesignSvgImageAssets,
     ) {}
 
+    /** A complex source returns false for native layer conversion; null denotes empty raster content. */
     public async prepare(
         children: readonly DesignSvgElement[],
         style: Readonly<Record<string, string>>,
         ancestors: readonly DesignSvgElement[],
-    ): Promise<DesignSvgPatternRaster | null> {
-        const child: DesignSvgElement | undefined = this.#child(children);
+    ): Promise<DesignSvgPatternRaster | null | false> {
+        const child: DesignSvgElement | undefined | false = this.#child(children);
+        if (child === false) {
+            return false;
+        }
         return child === undefined
             ? null
             : this.#visit(
@@ -80,7 +84,7 @@ export class DesignSvgPatternImage {
         steps: readonly RasterStep[],
         opacity: number,
         references: ReadonlySet<string>,
-    ): Promise<DesignSvgPatternRaster | null> {
+    ): Promise<DesignSvgPatternRaster | null | false> {
         if (steps.length >= 64) {
             throw new DesignSvgInputError('SVG raster pattern content is too deep.');
         }
@@ -92,18 +96,14 @@ export class DesignSvgPatternImage {
         if (style['display'] === 'none') {
             return null;
         }
-        Appearance.validate(style);
+        Appearance.validate(style, false, true);
         for (const key of ['clip-path', 'mask', 'filter']) {
             if (style[key] !== undefined && style[key] !== 'none') {
-                throw new DesignSvgInputError(
-                    'SVG raster pattern effects require editable pattern content.',
-                );
+                return false;
             }
         }
         if ((style['mix-blend-mode'] ?? 'normal') !== 'normal') {
-            throw new DesignSvgInputError(
-                'SVG raster pattern blending requires editable pattern content.',
-            );
+            return false;
         }
         const next: readonly RasterStep[] = [
             ...steps,
@@ -132,16 +132,17 @@ export class DesignSvgPatternImage {
         const children: readonly DesignSvgElement[] = element.children.filter(
             (child): child is DesignSvgElement => typeof child !== 'string',
         );
-        const child: DesignSvgElement | undefined = this.#child(children);
+        const child: DesignSvgElement | undefined | false = this.#child(children);
+        if (child === false) {
+            return false;
+        }
         if (element.name === 'g') {
             return child === undefined
                 ? null
                 : this.#visit(child, style, [...ancestors, element], next, alpha, references);
         }
         if (element.name !== 'image' || child !== undefined) {
-            throw new DesignSvgInputError(
-                'SVG pattern artwork requires editable pattern content; this importer currently supports raster image tiles.',
-            );
+            return false;
         }
         if (['hidden', 'collapse'].includes(style['visibility'] ?? 'visible') || alpha === 0) {
             return null;
@@ -158,16 +159,11 @@ export class DesignSvgPatternImage {
         };
     }
 
-    #child(children: readonly DesignSvgElement[]): DesignSvgElement | undefined {
+    #child(children: readonly DesignSvgElement[]): DesignSvgElement | undefined | false {
         const content: readonly DesignSvgElement[] = children.filter(
             (child: DesignSvgElement): boolean =>
                 !['title', 'desc', 'metadata', 'style', 'defs'].includes(child.name),
         );
-        if (content.length > 1) {
-            throw new DesignSvgInputError(
-                'SVG pattern artwork requires editable pattern content; multiple drawing elements cannot be reduced to one image tile.',
-            );
-        }
-        return content[0];
+        return content.length > 1 ? false : content[0];
     }
 }

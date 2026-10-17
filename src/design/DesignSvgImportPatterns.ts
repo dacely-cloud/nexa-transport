@@ -23,17 +23,15 @@ import {
     DesignSvgPatternPlacement,
     type DesignSvgPatternPlacementResult,
 } from './DesignSvgPatternPlacement.js';
+import type { DesignSvgPatternDefinition as PatternDefinition } from './DesignSvgPatternTypes.js';
+import type { DesignSvgPatternSources } from './DesignSvgPatternSources.js';
 
-interface PatternDefinition {
-    readonly element: DesignSvgElement;
-    readonly attributes: Readonly<Record<string, string>>;
-    readonly children: readonly DesignSvgElement[];
-}
 interface PreparedPattern extends PatternDefinition {
-    readonly raster: DesignSvgPatternRaster | null;
+    readonly raster: DesignSvgPatternRaster | null | false;
+    readonly style: Readonly<Record<string, string>>;
 }
 
-/** Full raster tiles retain their original pixels and editable native repeat/affine framing. */
+/** Raster cells retain original pixels; richer pattern artwork resolves to linked editable sources. */
 export class DesignSvgImportPatterns {
     readonly #prepared: Map<string, PreparedPattern> = new Map();
     readonly #styles: DesignSvgImportStyles;
@@ -44,6 +42,7 @@ export class DesignSvgImportPatterns {
         css: DesignSvgCss,
         public readonly ancestors: ReadonlyMap<DesignSvgElement, readonly DesignSvgElement[]>,
         assets: DesignSvgImageAssets,
+        public readonly sources: DesignSvgPatternSources | null = null,
     ) {
         this.#styles = new DesignSvgImportStyles(css, ancestors);
         this.#images = new DesignSvgPatternImage(elements, css, assets);
@@ -56,20 +55,14 @@ export class DesignSvgImportPatterns {
         }
         const definition: PatternDefinition = this.#definition(id, new Set());
         const style: Readonly<Record<string, string>> = this.#styles.definition(definition.element);
-        Appearance.validate(style);
-        for (const key of ['clip-path', 'mask', 'filter']) {
-            if (style[key] !== undefined && style[key] !== 'none') {
-                throw new DesignSvgInputError(
-                    'SVG raster pattern effects require editable pattern content.',
-                );
-            }
-        }
-        if (
-            (style['mix-blend-mode'] ?? 'normal') !== 'normal' ||
-            !['hidden', 'clip'].includes(style['overflow'] ?? 'hidden')
-        ) {
+        Appearance.validate(style, false, true);
+        const effects: boolean =
+            ['clip-path', 'mask', 'filter'].some(
+                (key: string): boolean => style[key] !== undefined && style[key] !== 'none',
+            ) || (style['mix-blend-mode'] ?? 'normal') !== 'normal';
+        if (!['hidden', 'clip'].includes(style['overflow'] ?? 'hidden')) {
             throw new DesignSvgInputError(
-                'SVG raster pattern overflow or blending requires editable pattern content.',
+                'SVG pattern visible overflow requires repeating neighboring editable sources.',
             );
         }
         const attributes: Readonly<Record<string, string>> = {
@@ -79,13 +72,15 @@ export class DesignSvgImportPatterns {
         const empty: boolean =
             DesignSvgNumbers.length(attributes['width'] ?? '0', 1) === 0 ||
             DesignSvgNumbers.length(attributes['height'] ?? '0', 1) === 0;
-        const raster: DesignSvgPatternRaster | null = empty
+        const raster: DesignSvgPatternRaster | null | false = empty
             ? null
-            : await this.#images.prepare(definition.children, style, [
-                  ...(this.ancestors.get(definition.element) ?? []),
-                  definition.element,
-              ]);
-        this.#prepared.set(id, { ...definition, attributes, raster });
+            : effects
+              ? false
+              : await this.#images.prepare(definition.children, style, [
+                    ...(this.ancestors.get(definition.element) ?? []),
+                    definition.element,
+                ]);
+        this.#prepared.set(id, { ...definition, attributes, raster, style });
     }
 
     /** Source and destination boxes remain independent under skewed, reflected and nonuniform object transforms. */
@@ -99,6 +94,14 @@ export class DesignSvgImportPatterns {
             throw new DesignSvgInputError(
                 'SVG raster pattern was not prepared before paint resolution.',
             );
+        }
+        if (definition.raster === false) {
+            if (this.sources === null) {
+                throw new DesignSvgInputError(
+                    'SVG pattern artwork requires editable pattern content.',
+                );
+            }
+            return this.sources.resolve(id, definition, definition.style, opacity, context);
         }
         const a: Readonly<Record<string, string>> = definition.attributes;
         const object: boolean = this.#object(a['patternUnits'] ?? 'objectBoundingBox');
@@ -144,7 +147,19 @@ export class DesignSvgImportPatterns {
                       e: 0,
                       f: 0,
                   }
-                : T.viewport(width, height, viewBox, a['preserveAspectRatio']).matrix;
+                : T.multiply(
+                      {
+                          ...T.identity,
+                          a: object ? 1 / context.source.width : 1,
+                          d: object ? 1 / context.source.height : 1,
+                      },
+                      T.viewport(
+                          width * (object ? context.source.width : 1),
+                          height * (object ? context.source.height : 1),
+                          viewBox,
+                          a['preserveAspectRatio'],
+                      ).matrix,
+                  );
         const image: DesignSvgPatternPlacementResult | null = DesignSvgPatternPlacement.image(
             raster,
             contentWidth,
