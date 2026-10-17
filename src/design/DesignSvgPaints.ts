@@ -32,6 +32,8 @@ import type { DesignImageTileClip } from './DesignImageTileTypes.js';
 import { DesignEffectMetrics } from './DesignEffectMetrics.js';
 import { DesignSelectionContext } from './DesignSelectionContext.js';
 import type { DesignSelectionBounds } from './DesignSelectionTypes.js';
+import type { DesignSvgResult } from './DesignSvgTypes.js';
+import { DesignSvgPatterns } from './DesignSvgPatterns.js';
 import { DesignSvgGeometry as Geometry } from './DesignSvgGeometry.js';
 
 /** Generated identifiers keep every URL local to the exported SVG, including image paints. */
@@ -42,8 +44,21 @@ export class DesignSvgPaints {
     readonly #gradientBudget: DesignSvgGradientBudget = new DesignSvgGradientBudget();
     /** Paint and clipping definitions precede the drawing elements. */
     public readonly definitions: string[] = [];
+    readonly #patterns: DesignSvgPatterns;
     /** Asset metadata and original bytes are supplied by the owner-scoped export adapter. */
-    public constructor(public readonly images: ReadonlyMap<string, DesignSvgImage>) {}
+    public constructor(
+        public readonly images: ReadonlyMap<string, DesignSvgImage>,
+        public readonly prefix: string = '',
+        renderPattern: (id: string, prefix: string) => DesignSvgResult = (): DesignSvgResult => {
+            throw new Error('Pattern sources are unavailable.');
+        },
+    ) {
+        this.#patterns = new DesignSvgPatterns(
+            this.definitions,
+            (prefix: string): string => this.identity(prefix),
+            renderPattern,
+        );
+    }
     /** Returns a safe self-contained paint expression without remote image or font URLs. */
     public paint(
         paint: DesignPaint,
@@ -53,6 +68,9 @@ export class DesignSvgPaints {
     ): string {
         if (paint.kind === DesignPaintKind.Solid) {
             return Geometry.escape(paint.color);
+        }
+        if (paint.kind === DesignPaintKind.Pattern) {
+            return this.#patterns.paint(paint, box);
         }
         if (paint.kind === DesignPaintKind.Angular || paint.kind === DesignPaintKind.Diamond) {
             const key: string = this.#gradientKey(paint, box, padding);
@@ -251,7 +269,7 @@ export class DesignSvgPaints {
     }
     /** Every mask has a unique identifier, even when the same image or clip is reused. */
     public identity(prefix: string): string {
-        return `${prefix}-${this.#sequence++}`;
+        return `${this.prefix}${prefix}-${this.#sequence++}`;
     }
     /** Preserves layer blur, outer shadows and inset shadows as local SVG filter primitives. */
     public effects(style: DesignStyle, box: DesignBox): string {

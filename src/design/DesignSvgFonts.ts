@@ -5,7 +5,7 @@ import {
     type DesignSvgResult,
     type DesignSvgSelection,
 } from './DesignSvgTypes.js';
-import type { DesignBox, DesignText, DesignTextRun } from './DesignTypes.js';
+import type { DesignText, DesignTextRun } from './DesignTypes.js';
 import { DesignSvgGeometry } from './DesignSvgGeometry.js';
 import { DesignFontBindings } from './DesignFontBindings.js';
 import {
@@ -15,6 +15,7 @@ import {
 } from './DesignFontEngine.js';
 import type { DesignTextSpanStyle } from './DesignTextLayout.js';
 import { DesignSvgScriptFonts } from './DesignSvgScriptFonts.js';
+import { DesignSvgSelections } from './DesignSvgSelections.js';
 
 /** Explicit exports embed only selected faces; ordinary scene transfers contain no font bytes. */
 export class DesignSvgFonts {
@@ -26,12 +27,8 @@ export class DesignSvgFonts {
         const used: ReadonlySet<boolean> = this.#used(selection);
         const scriptFonts: string = await DesignSvgScriptFonts.embed(selection);
         const privateCss: string = this.#private(result.svg.length, selection, sources);
-        const selectedIds: ReadonlySet<string> = new Set(
-            selection.boxes.map((box: DesignBox): string => box.id),
-        );
-        const emoji: boolean = selection.scene.nodes.some(
+        const emoji: boolean = DesignSvgSelections.nodes(selection).some(
             (node): boolean =>
-                selectedIds.has(node.id) &&
                 node.text !== null &&
                 (/[\p{Extended_Pictographic}\p{Regional_Indicator}]/u.test(node.text.content) ||
                     node.text.family.toLowerCase() === 'noto emoji'),
@@ -78,12 +75,9 @@ export class DesignSvgFonts {
         return this.#used(selection).size > 0;
     }
     static #used(selection: DesignSvgSelection): ReadonlySet<boolean> {
-        const ids: ReadonlySet<string> = new Set(
-            selection.boxes.map((box: DesignBox): string => box.id),
-        );
         const used: Set<boolean> = new Set();
-        for (const node of selection.scene.nodes) {
-            if (!ids.has(node.id) || node.text === null || node.text.content === '') {
+        for (const node of DesignSvgSelections.nodes(selection)) {
+            if (node.text === null || node.text.content === '') {
                 continue;
             }
             if (node.text.font == null && node.text.family.toLowerCase() === 'inter') {
@@ -105,13 +99,10 @@ export class DesignSvgFonts {
         selection: DesignSvgSelection,
         sources: readonly DesignFontSource[],
     ): string {
-        const ids: ReadonlySet<string> = new Set(
-            selection.boxes.map((box: DesignBox): string => box.id),
-        );
         const needed: Map<string, DesignTextSpanStyle> = new Map();
-        for (const node of selection.scene.nodes) {
+        for (const node of DesignSvgSelections.nodes(selection)) {
             const text: DesignText | null = node.text;
-            if (!ids.has(node.id) || text === null || text.content === '') {
+            if (text === null || text.content === '') {
                 continue;
             }
             const styles: readonly DesignTextSpanStyle[] = [

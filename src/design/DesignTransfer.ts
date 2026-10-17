@@ -103,8 +103,20 @@ export class DesignTransfer {
             copiedTokens.push({ ...token, id });
             return id;
         };
-        const paint: (value: DesignPaint) => DesignPaint = (value: DesignPaint): DesignPaint =>
-            value.tokenId === null ? value : { ...value, tokenId: copyToken(value.tokenId) };
+        const paint: (value: DesignPaint) => DesignPaint = (value: DesignPaint): DesignPaint => ({
+            ...value,
+            tokenId: value.tokenId === null ? null : copyToken(value.tokenId),
+            ...(value.patternId == null
+                ? {}
+                : {
+                      patternId:
+                          value.kind === 'pattern'
+                              ? graph.reference(value.patternId, content, dependencies)
+                              : (content.get(value.patternId) ??
+                                dependencies.get(value.patternId) ??
+                                value.patternId),
+                  }),
+        });
         const style: (value: DesignStyle) => DesignStyle = (value: DesignStyle): DesignStyle => ({
             ...value,
             fills: value.fills.map(paint),

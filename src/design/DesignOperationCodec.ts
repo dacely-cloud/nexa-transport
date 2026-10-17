@@ -6,6 +6,7 @@ import { DesignPolygons } from './DesignPolygons.js';
 import { DesignArcs } from './DesignArcs.js';
 import { DesignStyleChangesCodec } from './DesignStyleChangesCodec.js';
 import { DesignPaintImageChangesCodec } from './DesignPaintImageChangesCodec.js';
+import { DesignPaintPatternChangesCodec } from './DesignPaintPatternChangesCodec.js';
 import { DesignPaintGradientChangesCodec } from './DesignPaintGradientChangesCodec.js';
 import { DesignPaintColorChangesCodec } from './DesignPaintColorChangesCodec.js';
 import { DesignPaintColorTarget } from './DesignOperationTypes.js';
@@ -165,7 +166,8 @@ export class DesignOperationCodec {
                         changes: DesignStyleChangesCodec.parse(value['changes']),
                     };
                 }
-                case Kind.PaintImage: {
+                case Kind.PaintImage:
+                case Kind.PaintPattern: {
                     const value: Readonly<Record<string, unknown>> = V.record(entry, [
                         'op',
                         'id',
@@ -175,12 +177,19 @@ export class DesignOperationCodec {
                         'changes',
                     ]);
                     return {
-                        op,
                         id: V.id(value['id']),
                         pageId: V.id(value['pageId']),
                         target: V.choice(value['target'], Object.values(DesignPaintColorTarget)),
                         index: V.number(value['index'], 0, 7, true),
-                        changes: DesignPaintImageChangesCodec.changes(value['changes']),
+                        ...(op === Kind.PaintImage
+                            ? {
+                                  op,
+                                  changes: DesignPaintImageChangesCodec.changes(value['changes']),
+                              }
+                            : {
+                                  op,
+                                  changes: DesignPaintPatternChangesCodec.changes(value['changes']),
+                              }),
                     };
                 }
                 case Kind.PaintGradient: {

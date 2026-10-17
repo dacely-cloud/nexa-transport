@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { DesignVariants } from './DesignVariants.js';
+import { DesignPatternReferences } from './DesignPatternReferences.js';
 import type { DesignVariantValue } from './DesignVariantTypes.js';
 import { DesignDefaults } from './DesignDefaults.js';
 import { DesignSelectionContext as Context } from './DesignSelectionContext.js';
@@ -92,8 +93,12 @@ export class DesignSelectionTree {
                 used.add(DesignVariants.key(variant));
                 claimed.set(parent.id, used);
             }
+            const patternCopy: DesignNode = DesignPatternReferences.remap(
+                node,
+                (reference: string): string => remap.get(reference) ?? reference,
+            );
             const copy: DesignNode = {
-                ...node,
+                ...patternCopy,
                 ...(variant === undefined ? {} : { variant }),
                 ...(node.variants === undefined
                     ? {}
@@ -128,7 +133,7 @@ export class DesignSelectionTree {
                     node.componentId === null
                         ? null
                         : (remap.get(node.componentId) ?? node.componentId),
-                overrides: node.overrides.map((override): typeof override => ({
+                overrides: patternCopy.overrides.map((override): typeof override => ({
                     ...override,
                     nodeId: remap.get(override.nodeId) ?? override.nodeId,
                 })),

@@ -3,6 +3,7 @@
 
 import {
     DesignKind,
+    DesignPaintKind,
     DesignImageFit,
     type DesignFrameGrid,
     type DesignNode,
@@ -14,6 +15,7 @@ import {
     type DesignImageFraming,
     type DesignPaint,
 } from './DesignTypes.js';
+import { DesignPatternGeometry } from './DesignPatternGeometry.js';
 
 /** Uniform artwork metrics are shared by native selection edits and linked-instance expansion. */
 export class DesignScaleMetrics {
@@ -25,6 +27,12 @@ export class DesignScaleMetrics {
     }
     /** Latent framing stays available when a paint temporarily uses another mode. */
     public static paint(value: DesignPaint, factor: number): DesignPaint {
+        if (value.kind === DesignPaintKind.Pattern) {
+            return {
+                ...value,
+                framing: this.framing(DesignPatternGeometry.framing(value), factor),
+            };
+        }
         return value.framing === undefined
             ? value
             : { ...value, framing: this.framing(value.framing, factor) };

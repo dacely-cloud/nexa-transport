@@ -5533,6 +5533,7 @@ export type DesignOperation =
     | DesignTokenOperation
     | DesignPaintColorOperation
     | DesignPaintImageOperation
+    | DesignPaintPatternOperation
     | DesignPaintGradientOperation
     | DesignStrokeOperation
     | DesignPolygonOperation
@@ -5632,6 +5633,8 @@ export interface DesignPaintShape {
     readonly kind: DesignPaintKind;
     /** opacity as defined by the Nexa gateway. */
     readonly opacity: number;
+    /** patternId as defined by the Nexa gateway. */
+    readonly patternId?: null | string;
     /** stops as defined by the Nexa gateway. */
     readonly stops: ReadonlyArray<DesignGradientStop>;
     /** tokenId as defined by the Nexa gateway. */
@@ -5784,12 +5787,69 @@ export const DesignPaintKindValues = {
     Value1: 'diamond',
     Value2: 'image',
     Value3: 'linear',
-    Value4: 'radial',
-    Value5: 'solid',
+    Value4: 'pattern',
+    Value5: 'radial',
+    Value6: 'solid',
 } as const;
 
 /** DesignPaintKind from the Nexa wire protocol. */
 export type DesignPaintKind = (typeof DesignPaintKindValues)[keyof typeof DesignPaintKindValues];
+
+/** Allowed values for DesignPaintPatternChangesfit. */
+export const DesignPaintPatternChangesfitValues = {
+    Value0: 'contain',
+    Value1: 'cover',
+    Value2: 'stretch',
+    Value3: 'tile',
+} as const;
+
+/** DesignPaintPatternChanges wire fields. */
+export interface DesignPaintPatternChangesShape {
+    /** adjustments as defined by the Nexa gateway. */
+    readonly adjustments?: PartialDesignImageAdjustments | null;
+    /** cropX as defined by the Nexa gateway. */
+    readonly cropX?: number;
+    /** cropY as defined by the Nexa gateway. */
+    readonly cropY?: number;
+    /** fit as defined by the Nexa gateway. */
+    readonly fit?: (typeof DesignPaintPatternChangesfitValues)[keyof typeof DesignPaintPatternChangesfitValues];
+    /** flipX as defined by the Nexa gateway. */
+    readonly flipX?: boolean;
+    /** flipY as defined by the Nexa gateway. */
+    readonly flipY?: boolean;
+    /** patternId as defined by the Nexa gateway. */
+    readonly patternId?: string;
+    /** rotation as defined by the Nexa gateway. */
+    readonly rotation?: number;
+    /** scale as defined by the Nexa gateway. */
+    readonly scale?: number;
+    /** tile as defined by the Nexa gateway. */
+    readonly tile?: DesignImageTile | null;
+    /** transform as defined by the Nexa gateway. */
+    readonly transform?: DesignImageTransform | null;
+}
+
+/** DesignPaintPatternChanges from the Nexa wire protocol. */
+export type DesignPaintPatternChanges = DesignPaintPatternChangesShape;
+
+/** DesignPaintPatternOperation wire fields. */
+export interface DesignPaintPatternOperationShape {
+    /** changes as defined by the Nexa gateway. */
+    readonly changes: DesignPaintPatternChanges;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** index as defined by the Nexa gateway. */
+    readonly index: number;
+    /** op as defined by the Nexa gateway. */
+    readonly op: 'paint-pattern';
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+    /** target as defined by the Nexa gateway. */
+    readonly target: DesignPaintColorTarget;
+}
+
+/** DesignPaintPatternOperation from the Nexa wire protocol. */
+export type DesignPaintPatternOperation = DesignPaintPatternOperationShape;
 
 /** DesignPathCommand wire fields. */
 export interface DesignPathCommandShape {
@@ -5813,6 +5873,67 @@ export const DesignPathVerbValues = {
 
 /** DesignPathVerb from the Nexa wire protocol. */
 export type DesignPathVerb = (typeof DesignPathVerbValues)[keyof typeof DesignPathVerbValues];
+
+/** DesignPatternTileMethod wire fields. */
+export interface DesignPatternTileMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignPatternTileRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignPatternTileSlice;
+}
+
+/** DesignPatternTileMethod from the Nexa wire protocol. */
+export type DesignPatternTileMethod = DesignPatternTileMethodShape;
+
+/** DesignPatternTileRequest wire fields. */
+export interface DesignPatternTileRequestShape {
+    /** density as defined by the Nexa gateway. */
+    readonly density: number;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** maxDimension as defined by the Nexa gateway. */
+    readonly maxDimension: number;
+    /** offset as defined by the Nexa gateway. */
+    readonly offset: string;
+    /** patternId as defined by the Nexa gateway. */
+    readonly patternId: string;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: string;
+}
+
+/** DesignPatternTileRequest from the Nexa wire protocol. */
+export type DesignPatternTileRequest = DesignPatternTileRequestShape;
+
+/** DesignPatternTileSlice wire fields. */
+export interface DesignPatternTileSliceShape {
+    /** byteLength as defined by the Nexa gateway. */
+    readonly byteLength: string;
+    /** data as defined by the Nexa gateway. */
+    readonly data: string;
+    /** height as defined by the Nexa gateway. */
+    readonly height: number;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** intrinsicHeight as defined by the Nexa gateway. */
+    readonly intrinsicHeight: number;
+    /** intrinsicWidth as defined by the Nexa gateway. */
+    readonly intrinsicWidth: number;
+    /** nextOffset as defined by the Nexa gateway. */
+    readonly nextOffset: null | string;
+    /** offset as defined by the Nexa gateway. */
+    readonly offset: string;
+    /** patternId as defined by the Nexa gateway. */
+    readonly patternId: string;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: string;
+    /** sha256 as defined by the Nexa gateway. */
+    readonly sha256: string;
+    /** width as defined by the Nexa gateway. */
+    readonly width: number;
+}
+
+/** DesignPatternTileSlice from the Nexa wire protocol. */
+export type DesignPatternTileSlice = DesignPatternTileSliceShape;
 
 /** DesignPlacement wire fields. */
 export interface DesignPlacementShape {
@@ -7559,6 +7680,8 @@ export interface GatewayFeaturesShape {
     readonly designTextPaintClipping?: true;
     /** designTextRangeFills as defined by the Nexa gateway. */
     readonly designTextRangeFills?: true;
+    /** designVectorPatterns as defined by the Nexa gateway. */
+    readonly designVectorPatterns?: true;
     /** events as defined by the Nexa gateway. */
     readonly events: ReadonlyArray<string>;
     /** jsonReplies as defined by the Nexa gateway. */
@@ -8187,6 +8310,14 @@ export interface GatewayMethodsdesign_listShape {
     readonly params: DesignListRequest;
     /** result as defined by the Nexa gateway. */
     readonly result: DesignListPage;
+}
+
+/** GatewayMethodsdesign_pattern_tile wire fields. */
+export interface GatewayMethodsdesign_pattern_tileShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignPatternTileRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignPatternTileSlice;
 }
 
 /** GatewayMethodsdesign_read wire fields. */
@@ -9459,6 +9590,8 @@ export interface GatewayMethodsShape {
     readonly 'design.layout.preview': GatewayMethodsdesign_layout_previewShape;
     /** design.list as defined by the Nexa gateway. */
     readonly 'design.list': GatewayMethodsdesign_listShape;
+    /** design.pattern.tile as defined by the Nexa gateway. */
+    readonly 'design.pattern.tile': GatewayMethodsdesign_pattern_tileShape;
     /** design.read as defined by the Nexa gateway. */
     readonly 'design.read': GatewayMethodsdesign_readShape;
     /** design.save as defined by the Nexa gateway. */
@@ -17463,6 +17596,8 @@ export enum Method {
     DesignLayoutPreview = 'design.layout.preview',
     /** Calls design.list. */
     DesignList = 'design.list',
+    /** Calls design.pattern.tile. */
+    DesignPatternTile = 'design.pattern.tile',
     /** Calls design.read. */
     DesignRead = 'design.read',
     /** Calls design.save. */

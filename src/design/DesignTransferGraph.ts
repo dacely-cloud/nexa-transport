@@ -3,6 +3,7 @@
 
 import { DesignKind, type DesignNode } from './DesignTypes.js';
 import type { DesignSelectionContext } from './DesignSelectionContext.js';
+import { DesignPatternReferences } from './DesignPatternReferences.js';
 
 /** Selected forests and reusable dependencies are indexed once, preserving variant topology. */
 export class DesignTransferGraph {
@@ -33,23 +34,25 @@ export class DesignTransferGraph {
         const pending: string[] = [...content];
         for (let index: number = 0; index < pending.length; index++) {
             const node: DesignNode = context.node(pending[index] ?? '');
-            if (
-                node.componentId === null ||
-                this.#reusable.has(node.componentId) ||
-                dependencies.has(node.componentId)
-            ) {
-                continue;
-            }
-            const component: DesignNode = context.node(node.componentId);
-            const parent: DesignNode | undefined = context.nodes.get(component.parentId ?? '');
-            const root: string =
-                parent?.kind === DesignKind.ComponentSet ? parent.id : component.id;
-            const added: Set<string> = new Set();
-            this.#collect(root, added);
-            for (const id of added) {
-                if (!dependencies.has(id)) {
-                    dependencies.add(id);
-                    pending.push(id);
+            const references: readonly string[] = [
+                ...(node.componentId === null ? [] : [node.componentId]),
+                ...DesignPatternReferences.ids(node),
+            ];
+            for (const reference of references) {
+                if (this.#reusable.has(reference) || dependencies.has(reference)) {
+                    continue;
+                }
+                const component: DesignNode = context.node(reference);
+                const parent: DesignNode | undefined = context.nodes.get(component.parentId ?? '');
+                const root: string =
+                    parent?.kind === DesignKind.ComponentSet ? parent.id : component.id;
+                const added: Set<string> = new Set();
+                this.#collect(root, added);
+                for (const id of added) {
+                    if (!dependencies.has(id)) {
+                        dependencies.add(id);
+                        pending.push(id);
+                    }
                 }
             }
         }

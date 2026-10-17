@@ -71,6 +71,7 @@ export const DesignOperationKind = {
     PaintColor: 'paint-color',
     PaintGradient: 'paint-gradient',
     PaintImage: 'paint-image',
+    PaintPattern: 'paint-pattern',
     Stroke: 'stroke',
     Polygon: 'polygon',
     Arc: 'arc',
@@ -402,6 +403,19 @@ export interface DesignPaintImageOperation {
     readonly index: number;
     readonly changes: DesignPaintImageChanges;
 }
+/** Linked source edits retain all other paint, layer and text properties. */
+export interface DesignPaintPatternChanges extends Omit<DesignPaintImageChanges, 'assetId'> {
+    readonly patternId?: string;
+}
+/** Revision-checked vector pattern framing shares the existing indexed paint authority. */
+export interface DesignPaintPatternOperation {
+    readonly op: typeof DesignOperationKind.PaintPattern;
+    readonly id: string;
+    readonly pageId: string;
+    readonly target: DesignPaintColorTarget;
+    readonly index: number;
+    readonly changes: DesignPaintPatternChanges;
+}
 /** Geometry and stops are independent of source bodies and the rest of the paint stack. */
 export interface DesignPaintGradientChanges {
     readonly kind?: DesignGradientKind;
@@ -499,6 +513,7 @@ export type DesignOperation =
     | DesignPaintColorOperation
     | DesignPaintGradientOperation
     | DesignPaintImageOperation
+    | DesignPaintPatternOperation
     | DesignStrokeOperation
     | DesignPolygonOperation
     | DesignArcOperation

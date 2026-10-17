@@ -3,16 +3,16 @@
 
 import type { DesignSvgSelection } from './DesignSvgTypes.js';
 import { DesignSvgGeometry } from './DesignSvgGeometry.js';
+import { DesignSvgSelections } from './DesignSvgSelections.js';
 
 /** Script fallback bytes are embedded only when selected editable text can need those faces. */
 export class DesignSvgScriptFonts {
     /** Exact public originals and their licenses keep downloaded text independent of system fonts. */
     public static async embed(selection: DesignSvgSelection): Promise<string> {
-        const ids: ReadonlySet<string> = new Set(selection.boxes.map((box): string => box.id));
         let arabic: boolean = false;
         let hebrew: boolean = false;
-        for (const node of selection.scene.nodes) {
-            if (!ids.has(node.id) || node.text === null) {
+        for (const node of DesignSvgSelections.nodes(selection)) {
+            if (node.text === null) {
                 continue;
             }
             arabic ||=

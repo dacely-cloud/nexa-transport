@@ -10,23 +10,24 @@ import { DesignImageTileCodec } from './DesignImageTileCodec.js';
 
 /** Validates compact owner-asset placement and bounded image framing before mutation. */
 export class DesignPaintImageChangesCodec {
+    /** Linked vector patterns accept exactly these same non-source framing properties. */
+    public static readonly framingFields: readonly string[] = Object.freeze([
+        'fit',
+        'cropX',
+        'cropY',
+        'scale',
+        'rotation',
+        'flipX',
+        'flipY',
+        'transform',
+        'adjustments',
+        'tile',
+    ]);
     /** Empty patches and unknown properties cannot silently produce a partial edit. */
     public static changes(raw: unknown): DesignPaintImageChanges {
         const value: Readonly<Record<string, unknown>> = V.fields(
             raw,
-            [
-                'assetId',
-                'fit',
-                'cropX',
-                'cropY',
-                'scale',
-                'rotation',
-                'flipX',
-                'flipY',
-                'transform',
-                'adjustments',
-                'tile',
-            ],
+            ['assetId', ...this.framingFields],
             [],
         );
         if (Object.keys(value).length === 0) {

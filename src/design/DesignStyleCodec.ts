@@ -32,6 +32,7 @@ export class DesignStyleCodec {
             raw,
             [
                 'gradient',
+                'patternId',
                 'framing',
                 'kind',
                 'color',
@@ -78,6 +79,11 @@ export class DesignStyleCodec {
         if (kind === DesignPaintKind.Image && assetId === null) {
             throw new Error('Image paint requires a workspace asset');
         }
+        const patternId: string | null | undefined =
+            value['patternId'] === undefined ? undefined : V.optionalId(value['patternId']);
+        if (kind === DesignPaintKind.Pattern && patternId == null) {
+            throw new Error('Pattern paint requires a linked component definition.');
+        }
         return {
             kind,
             color: V.color(value['color']),
@@ -87,6 +93,7 @@ export class DesignStyleCodec {
             ...(gradient === undefined ? {} : { gradient }),
             assetId,
             tokenId: V.optionalId(value['tokenId']),
+            ...(patternId === undefined ? {} : { patternId }),
             ...(Object.hasOwn(value, 'framing')
                 ? { framing: DesignImageFramingCodec.parse(value['framing']) }
                 : {}),

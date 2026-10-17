@@ -8,6 +8,7 @@ import { DesignLayerAuthority } from './DesignLayerAuthority.js';
 import { DesignStrokeEdits } from './DesignStrokeEdits.js';
 import { DesignStyleEdits } from './DesignStyleEdits.js';
 import { DesignPaintImageEdits } from './DesignPaintImageEdits.js';
+import { DesignPaintPatternEdits } from './DesignPaintPatternEdits.js';
 import { DesignPaintGradientEdits } from './DesignPaintGradientEdits.js';
 import { DesignRecolorEdits } from './DesignRecolorEdits.js';
 import { DesignSelectionIndex } from './DesignSelectionIndex.js';
@@ -404,6 +405,14 @@ export class DesignEdits {
                 }
                 case DesignOperationKind.PaintImage: {
                     const node: DesignNode = DesignPaintImageEdits.apply(
+                        new DesignLayerAuthority(nodes, pages),
+                        operation,
+                    );
+                    nodes.set(node.id, node);
+                    break;
+                }
+                case DesignOperationKind.PaintPattern: {
+                    const node: DesignNode = DesignPaintPatternEdits.apply(
                         new DesignLayerAuthority(nodes, pages),
                         operation,
                     );

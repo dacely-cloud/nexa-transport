@@ -19,6 +19,8 @@ export interface DesignSvgImagePreview {
 }
 /** Export selection retains the complete scene for ancestor opacity and clipping lookup. */
 export interface DesignSvgSelection {
+    /** Referenced editable component scenes are resolved independently of the painted page. */
+    readonly patternSources?: readonly DesignSvgPatternSource[];
     readonly scene: DesignLayoutResult;
     readonly boxes: readonly DesignBox[];
     readonly x: number;
@@ -26,6 +28,11 @@ export interface DesignSvgSelection {
     readonly width: number;
     readonly height: number;
     readonly assetIds: readonly string[];
+}
+/** One original component cell is shared by every referencing paint in this selection. */
+export interface DesignSvgPatternSource {
+    readonly id: string;
+    readonly selection: DesignSvgSelection;
 }
 /** File and artboard dimensions stay small and independent of any model response. */
 export interface DesignSvgResult {

@@ -46,7 +46,12 @@ export class DesignSvg {
         ): number => DesignTextLayout.estimate(style, content),
         outlines: DesignFontEngine | null = null,
         prepare: DesignTextRunFactory | null = null,
+        prefix: string = '',
+        depth: number = 0,
     ): DesignSvgResult {
+        if (depth > 64 || prefix.length > 2048 || !/^[a-zA-Z0-9_-]*$/u.test(prefix)) {
+            throw new Error('SVG pattern namespace or depth exceeds supported bounds.');
+        }
         let imageBytes: bigint = 0n;
         for (const id of selection.assetIds) {
             const image: DesignSvgImage | undefined = images.get(id);
@@ -69,7 +74,27 @@ export class DesignSvg {
                 box,
             ]),
         );
-        const paints: DesignSvgPaints = new DesignSvgPaints(images);
+        const paints: DesignSvgPaints = new DesignSvgPaints(
+            images,
+            prefix,
+            (id: string, namespace: string): DesignSvgResult => {
+                const source: DesignSvgSelection | undefined = selection.patternSources?.find(
+                    (entry): boolean => entry.id === id,
+                )?.selection;
+                if (source === undefined) {
+                    throw new Error('Missing SVG pattern source: ' + id);
+                }
+                return this.render(
+                    source,
+                    images,
+                    measure,
+                    outlines,
+                    prepare,
+                    namespace,
+                    depth + 1,
+                );
+            },
+        );
         for (const box of selection.boxes) {
             const node: DesignSceneNode | undefined = nodes.get(box.id);
             if (node === undefined) {

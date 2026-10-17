@@ -77,13 +77,14 @@ export const DesignPaintKind = {
     Angular: 'angular',
     Diamond: 'diamond',
     Image: 'image',
+    Pattern: 'pattern',
 } as const;
 /** Paint kind. */
 export type DesignPaintKind = (typeof DesignPaintKind)[keyof typeof DesignPaintKind];
 /** The four editable gradient families share stops and normalized handles. */
 export type DesignGradientKind = Exclude<
     DesignPaintKind,
-    typeof DesignPaintKind.Solid | typeof DesignPaintKind.Image
+    typeof DesignPaintKind.Solid | typeof DesignPaintKind.Image | typeof DesignPaintKind.Pattern
 >;
 /** Color stop in a normalized gradient. */
 export interface DesignGradientStop {
@@ -92,6 +93,8 @@ export interface DesignGradientStop {
 }
 /** Layer paint. Colors are validated hex values, never arbitrary CSS. */
 export interface DesignPaint {
+    /** A linked component definition supplies editable repeat artwork; omitted on legacy paints. */
+    readonly patternId?: string | null;
     readonly kind: DesignPaintKind;
     readonly color: string;
     readonly opacity: number;

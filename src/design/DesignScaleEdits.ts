@@ -1,7 +1,17 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { DesignKind, type DesignNode, type DesignBox, type DesignOverride } from './DesignTypes.js';
+import {
+    DesignKind,
+    DesignPaintKind,
+    DesignImageFit,
+    type DesignNode,
+    type DesignPaint,
+    type DesignBox,
+    type DesignOverride,
+} from './DesignTypes.js';
+import { DesignPatternReferences } from './DesignPatternReferences.js';
+import { DesignPatternGeometry } from './DesignPatternGeometry.js';
 import type { DesignScaleOperation, DesignOperation } from './DesignOperationTypes.js';
 import { DesignOperationKind } from './DesignOperationTypes.js';
 import { DesignScaleMetrics } from './DesignScaleMetrics.js';
@@ -103,6 +113,36 @@ export class DesignScaleEdits {
             width: box.width * operation.factor,
             height: box.height * operation.factor,
         }));
+        for (const [id, node] of captured) {
+            if (
+                !scaledIds.has(id) ||
+                !DesignPatternReferences.ids(node).some((source: string): boolean =>
+                    scaledIds.has(source),
+                )
+            ) {
+                continue;
+            }
+            captured.set(
+                id,
+                DesignPatternReferences.map(node, (paint: DesignPaint): DesignPaint => {
+                    if (
+                        paint.kind !== DesignPaintKind.Pattern ||
+                        paint.patternId == null ||
+                        !scaledIds.has(paint.patternId)
+                    ) {
+                        return paint;
+                    }
+                    const framing: ReturnType<typeof DesignPatternGeometry.framing> =
+                        DesignPatternGeometry.framing(paint);
+                    return framing.fit === DesignImageFit.Tile && framing.transform == null
+                        ? {
+                              ...paint,
+                              framing: { ...framing, scale: framing.scale / operation.factor },
+                          }
+                        : paint;
+                }),
+            );
+        }
         const operations: readonly DesignOperation[] = new DesignWorldPositions(
             this.context,
             targets,

@@ -11,6 +11,7 @@ import {
 } from './DesignTypes.js';
 import { DesignVariantTree } from './DesignVariantTree.js';
 import { DesignComponentTargets } from './DesignComponentTargets.js';
+import { DesignPatternReferences } from './DesignPatternReferences.js';
 
 /** Explicit topology keeps layer edits, reusable components and prototype references coherent. */
 export class DesignTree {
@@ -170,6 +171,12 @@ export class DesignTree {
             }
             if (node.componentId !== null) {
                 references(node.componentId, depth + 1);
+            }
+            for (const patternId of DesignPatternReferences.ids(node)) {
+                if (nodes.get(patternId)?.kind !== DesignKind.Component) {
+                    throw new Error('Pattern paint requires an existing component definition.');
+                }
+                references(patternId, depth + 1);
             }
             active.delete(id);
             checked.add(id);

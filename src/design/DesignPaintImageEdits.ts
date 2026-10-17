@@ -2,10 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { DesignLayerAuthority } from './DesignLayerAuthority.js';
-import { DesignDefaults } from './DesignDefaults.js';
 import { DesignPaintLayerEdit } from './DesignPaintLayerEdit.js';
-import { DesignStyleCodec } from './DesignStyleCodec.js';
-import { DesignImageAdjustmentCodec } from './DesignImageAdjustmentCodec.js';
+import { DesignPaintSourceEdits } from './DesignPaintSourceEdits.js';
 import { DesignPaintKind, type DesignNode, type DesignPaint } from './DesignTypes.js';
 import type { DesignPaintImageChanges, DesignPaintImageOperation } from './DesignOperationTypes.js';
 
@@ -22,36 +20,7 @@ export class DesignPaintImageEdits {
     }
     /** Replacing an image retains framing; conversion clears gradient geometry and color-token linkage. */
     public static paint(source: DesignPaint, changes: DesignPaintImageChanges): DesignPaint {
-        if (
-            changes.assetId === undefined &&
-            (source.kind !== DesignPaintKind.Image || source.assetId === null)
-        ) {
-            throw new Error('Choose an imported image asset before editing its framing.');
-        }
-        const { gradient: previous, ...rest }: DesignPaint = source;
-        void previous;
-        const { assetId, adjustments, ...framing }: DesignPaintImageChanges = changes;
-        return DesignStyleCodec.paint({
-            ...rest,
-            kind: DesignPaintKind.Image,
-            assetId: assetId ?? source.assetId,
-            tokenId: assetId === undefined ? source.tokenId : null,
-            framing: {
-                ...(source.framing ?? DesignDefaults.framing()),
-                ...framing,
-                ...(adjustments === undefined
-                    ? {}
-                    : {
-                          adjustments:
-                              adjustments === null
-                                  ? null
-                                  : {
-                                        ...(source.framing?.adjustments ??
-                                            DesignImageAdjustmentCodec.neutral),
-                                        ...adjustments,
-                                    },
-                      }),
-            },
-        });
+        const { assetId, ...framing }: DesignPaintImageChanges = changes;
+        return DesignPaintSourceEdits.paint(source, DesignPaintKind.Image, assetId, framing);
     }
 }
