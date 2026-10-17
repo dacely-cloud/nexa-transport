@@ -105,6 +105,13 @@ export class DesignFlowOrdering {
         const result: DesignFlowReorder[] = [];
         for (const [parentId, selected] of groups) {
             const parent: DesignNode = context.node(parentId);
+            const overlapping: boolean = parent.layout.gap < 0 || parent.layout.rowGap < 0;
+            const ranks: ReadonlyMap<string, number> = new Map(
+                parent.children.map((id: string, index: number): readonly [string, number] => [
+                    id,
+                    index,
+                ]),
+            );
             const box: DesignBox = context.box(parentId);
             const angle: number = (-box.rotation * Math.PI) / 180;
             const x: number = delta.x * Math.cos(angle) - delta.y * Math.sin(angle);
@@ -137,6 +144,22 @@ export class DesignFlowOrdering {
                     horizontal ? value.x + value.width : value.y + value.height,
                 ),
             );
+            const leading: number = overlapping
+                ? Math.min(
+                      ...local.map((value: DesignSelectionGeometry): number =>
+                          horizontal ? value.x + value.width / 2 : value.y + value.height / 2,
+                      ),
+                  )
+                : low;
+            const trailing: number = overlapping
+                ? Math.max(
+                      ...local.map((value: DesignSelectionGeometry): number =>
+                          horizontal ? value.x + value.width / 2 : value.y + value.height / 2,
+                      ),
+                  )
+                : high;
+            const firstRank: number = ranks.get(ordered[0] ?? '') ?? 0;
+            const lastRank: number = ranks.get(ordered.at(-1) ?? '') ?? 0;
             const crossLow: number = Math.min(
                 ...local.map((value: DesignSelectionGeometry): number =>
                     horizontal ? value.y : value.x,
@@ -155,8 +178,18 @@ export class DesignFlowOrdering {
                 const peer: DesignSelectionGeometry = context.local(context.box(id), parentId);
                 const start: number = horizontal ? peer.x : peer.y;
                 const end: number = start + (horizontal ? peer.width : peer.height);
-                const main: number = forward ? (start + end) / 2 - high : low - (start + end) / 2;
+                const main: number = forward
+                    ? (start + end) / 2 - trailing
+                    : leading - (start + end) / 2;
                 if (main < -1e-8) {
+                    continue;
+                }
+                const rank: number = ranks.get(id) ?? 0;
+                if (
+                    overlapping &&
+                    Math.abs(main) <= 1e-8 &&
+                    (forward ? rank < lastRank : rank > firstRank)
+                ) {
                     continue;
                 }
                 const crossStart: number = horizontal ? peer.y : peer.x;
@@ -165,7 +198,13 @@ export class DesignFlowOrdering {
                 candidates.push({ id, cross, main });
             }
             candidates.sort(
-                (a: Candidate, b: Candidate): number => a.cross - b.cross || a.main - b.main,
+                (a: Candidate, b: Candidate): number =>
+                    a.cross - b.cross ||
+                    a.main - b.main ||
+                    (overlapping
+                        ? Math.abs((ranks.get(a.id) ?? 0) - (forward ? lastRank : firstRank)) -
+                          Math.abs((ranks.get(b.id) ?? 0) - (forward ? lastRank : firstRank))
+                        : 0),
             );
             const target: Candidate | undefined =
                 candidates[Math.min(count, candidates.length) - 1];
@@ -175,7 +214,8 @@ export class DesignFlowOrdering {
             const remaining: readonly string[] = parent.children.filter(
                 (id: string): boolean => !selected.has(id),
             );
-            const index: number = remaining.indexOf(target.id) + (forward ? 1 : 0);
+            const after: boolean = overlapping ? (ranks.get(target.id) ?? 0) > lastRank : forward;
+            const index: number = remaining.indexOf(target.id) + (after ? 1 : 0);
             const desired: readonly string[] = [
                 ...remaining.slice(0, index),
                 ...ordered,

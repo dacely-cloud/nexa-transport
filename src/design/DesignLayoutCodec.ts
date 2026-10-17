@@ -35,8 +35,8 @@ export class DesignLayoutCodec {
         return {
             flow: V.choice(value['flow'], Object.values(DesignFlow), 'layout.flow'),
             wrap: V.boolean(value['wrap']),
-            gap: V.number(value['gap'], 0, 10000),
-            rowGap: V.number(value['rowGap'], 0, 10000),
+            gap: V.number(value['gap'], -10000, 10000),
+            rowGap: V.number(value['rowGap'], -10000, 10000),
             padding: {
                 top: V.number(padding['top'], 0, 10000),
                 right: V.number(padding['right'], 0, 10000),

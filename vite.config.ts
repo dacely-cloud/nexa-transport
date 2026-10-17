@@ -131,6 +131,8 @@ const config: UserConfig = {
                 'design-mask-geometry': 'src/design/DesignMaskGeometry.ts',
                 'design-scene': 'src/design/DesignScene.ts',
                 'design-layout': 'src/design/DesignLayout.ts',
+                'design-flex': 'src/design/DesignFlex.ts',
+                'design-grid-packing': 'src/design/DesignGridPacking.ts',
                 'design-layout-types': 'src/design/DesignLayoutTypes.ts',
                 'design-requests': 'src/design/DesignRequests.ts',
                 'design-view-types': 'src/design/DesignViewTypes.ts',

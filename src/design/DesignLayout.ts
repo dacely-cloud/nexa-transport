@@ -10,6 +10,7 @@ import {
 } from './DesignTypes.js';
 import { DesignScene, type DesignSceneNode, type DesignScenePage } from './DesignScene.js';
 import { DesignFlex } from './DesignFlex.js';
+import { DesignStackGeometry } from './DesignStackGeometry.js';
 import { DesignFlowMeasurement } from './DesignFlowMeasurement.js';
 import { DesignGrid, type DesignGridResult } from './DesignGrid.js';
 import { DesignConstraints } from './DesignConstraints.js';
@@ -149,25 +150,24 @@ export class DesignLayoutEngine {
             );
         } else if (layout.flow === DesignFlow.Row || layout.flow === DesignFlow.Column) {
             const row: boolean = layout.flow === DesignFlow.Row;
+            const gap: number = DesignFlex.gap(layout);
             natural = {
                 width:
                     horizontal +
                     (row
-                        ? items.reduce(
-                              (sum: number, item: DesignFlowItem): number => sum + item.width,
-                              0,
-                          ) +
-                          Math.max(0, items.length - 1) * layout.gap
+                        ? DesignStackGeometry.span(
+                              items.map((item: DesignFlowItem): number => item.width),
+                              gap,
+                          )
                         : Math.max(0, ...items.map((item: DesignFlowItem): number => item.width))),
                 height:
                     vertical +
                     (row
                         ? Math.max(0, ...items.map((item: DesignFlowItem): number => item.height))
-                        : items.reduce(
-                              (sum: number, item: DesignFlowItem): number => sum + item.height,
-                              0,
-                          ) +
-                          Math.max(0, items.length - 1) * layout.gap),
+                        : DesignStackGeometry.span(
+                              items.map((item: DesignFlowItem): number => item.height),
+                              gap,
+                          )),
             };
             items = DesignFlowMeasurement.atWidth(
                 items,
@@ -191,11 +191,10 @@ export class DesignLayoutEngine {
                     vertical +
                     (row
                         ? Math.max(0, ...items.map((item: DesignFlowItem): number => item.height))
-                        : items.reduce(
-                              (sum: number, item: DesignFlowItem): number => sum + item.height,
-                              0,
-                          ) +
-                          Math.max(0, items.length - 1) * layout.gap),
+                        : DesignStackGeometry.span(
+                              items.map((item: DesignFlowItem): number => item.height),
+                              gap,
+                          )),
             };
             if (
                 layout.wrap &&
@@ -260,16 +259,22 @@ export class DesignLayoutEngine {
                     ? allocatedWidth
                     : node.placement.width === DesignSizing.Hug
                       ? horizontal +
-                        layout.columns *
+                        DesignStackGeometry.uniform(
                             Math.max(
                                 0,
-                                ...items.map(
-                                    (item: DesignFlowItem): number =>
-                                        item.width /
-                                        Math.min(layout.columns, item.node.placement.columnSpan),
-                                ),
-                            ) +
-                        (layout.columns - 1) * layout.gap
+                                ...items.map((item: DesignFlowItem): number => {
+                                    const span: number = Math.min(
+                                        layout.columns,
+                                        item.node.placement.columnSpan,
+                                    );
+                                    return (
+                                        (item.width - Math.min(0, layout.gap) * (span - 1)) / span
+                                    );
+                                }),
+                            ),
+                            layout.columns,
+                            layout.gap,
+                        )
                       : node.width;
             const bounded: number = Math.max(
                 node.placement.minWidth,

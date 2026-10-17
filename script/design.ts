@@ -8,6 +8,8 @@ import { format, resolveConfig, type Options } from 'prettier';
 
 /** Server-only generation script. Nexa owns the portable design model and layout implementation. */
 const files: readonly string[] = [
+    'DesignStackGeometry',
+    'DesignGridPacking',
     'DesignSelectionIndex',
     'DesignFailure',
     'DesignSvgInputError',
@@ -354,6 +356,8 @@ await writeFile(
 
 /** Prepared shaping and asymmetric ligature carets are verified against the canonical native cases. */
 for (const testName of [
+    'DesignOverlapLayout',
+    'DesignStackFill',
     'DesignResizePivot',
     'DesignFontRun',
     'DesignTextShaping',

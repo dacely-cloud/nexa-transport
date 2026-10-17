@@ -13,14 +13,13 @@ import type {
     DesignLocalBox,
     DesignTextMeasurer,
 } from './DesignLayoutTypes.js';
+import {
+    DesignGridPacking,
+    type DesignGridCell,
+    type DesignGridPackingResult,
+} from './DesignGridPacking.js';
+import { DesignStackGeometry, type DesignStackPlacement } from './DesignStackGeometry.js';
 
-interface GridCell {
-    readonly item: DesignFlowItem;
-    readonly row: number;
-    readonly column: number;
-    readonly rows: number;
-    readonly columns: number;
-}
 /** Resolved tracks also expose natural height for hug containers. */
 export interface DesignGridResult {
     readonly boxes: readonly DesignLocalBox[];
@@ -30,7 +29,7 @@ export interface DesignGridResult {
 /** Bounded dense grid placement with independent row and column spans. */
 export class DesignGrid {
     /**
-     * Places cells without overlaps, retaining authored size unless fill or stretch is selected.
+     * Packs logical cells without collisions while signed gaps may overlap their painted tracks.
      * @remarks Failed candidates stay occupied. A cursor per shape backfills holes without
      * rescanning uniform grids.
      */
@@ -43,48 +42,16 @@ export class DesignGrid {
         measureAllocated: DesignAllocatedMeasurer | null = null,
     ): DesignGridResult {
         const columns: number = layout.columns;
-        const occupied: Set<number> = new Set();
-        const cells: GridCell[] = [];
-        const cursors: Map<number, number> = new Map();
-        let rows: number = 0;
-        for (const item of items) {
-            const span: number = Math.min(columns, item.node.placement.columnSpan);
-            const rowSpan: number = item.node.placement.rowSpan;
-            const shape: number = rowSpan * 129 + span;
-            let cursor: number = cursors.get(shape) ?? 0;
-            let placed: boolean = false;
-            while (cursor < columns * 4096) {
-                const column: number = cursor % columns;
-                const row: number = Math.floor(cursor / columns);
-                if (
-                    column + span <= columns &&
-                    row + rowSpan <= 4096 &&
-                    this.#free(occupied, row, column, rowSpan, span, columns)
-                ) {
-                    for (let y: number = row; y < row + rowSpan; y++) {
-                        for (let x: number = column; x < column + span; x++) {
-                            occupied.add(y * columns + x);
-                        }
-                    }
-                    cells.push({ item, row, column, rows: rowSpan, columns: span });
-                    rows = Math.max(rows, row + rowSpan);
-                    cursors.set(shape, cursor + 1);
-                    placed = true;
-                    break;
-                }
-                cursor++;
-            }
-            if (!placed) {
-                throw new Error('Grid exceeds its track budget');
-            }
-        }
+        const packing: DesignGridPackingResult = DesignGridPacking.arrange(items, columns);
+        const cells: DesignGridCell[] = [...packing.cells];
+        const rows: number = packing.rows;
         const trackWidth: number = Math.max(
             0,
             (width - layout.padding.left - layout.padding.right - layout.gap * (columns - 1)) /
                 columns,
         );
         for (let index: number = 0; index < cells.length; index++) {
-            const cell: GridCell | undefined = cells[index];
+            const cell: DesignGridCell | undefined = cells[index];
             if (
                 cell === undefined ||
                 (measureAllocated === null &&
@@ -94,7 +61,11 @@ export class DesignGrid {
                 continue;
             }
             const placement: DesignPlacement = cell.item.node.placement;
-            const cellWidth: number = trackWidth * cell.columns + layout.gap * (cell.columns - 1);
+            const cellWidth: number = DesignStackGeometry.uniform(
+                trackWidth,
+                cell.columns,
+                layout.gap,
+            );
             const targetWidth: number = Math.max(
                 placement.minWidth,
                 Math.min(
@@ -128,9 +99,7 @@ export class DesignGrid {
                 heights[row] = Math.max(heights[row] ?? 0, share);
             }
         }
-        const natural: number =
-            heights.reduce((sum: number, track: number): number => sum + track, 0) +
-            Math.max(0, rows - 1) * layout.rowGap;
+        const natural: number = DesignStackGeometry.span(heights, layout.rowGap);
         const available: number =
             height === null
                 ? natural
@@ -141,22 +110,28 @@ export class DesignGrid {
                 (item: DesignFlowItem): boolean => item.node.placement.height === DesignSizing.Fill,
             );
         if (stretchRows && rows > 0 && available > natural) {
+            const growth: number = DesignStackGeometry.growth(heights, layout.rowGap, available);
             for (let row: number = 0; row < rows; row++) {
-                heights[row] = (heights[row] ?? 0) + (available - natural) / rows;
+                heights[row] = (heights[row] ?? 0) + growth;
             }
         }
-        const offsets: number[] = [];
-        let offset: number = layout.padding.top;
-        for (const track of heights) {
-            offsets.push(offset);
-            offset += track + layout.rowGap;
-        }
-        const boxes: DesignLocalBox[] = cells.map((cell: GridCell): DesignLocalBox => {
-            const cellWidth: number = trackWidth * cell.columns + layout.gap * (cell.columns - 1);
-            let cellHeight: number = layout.rowGap * (cell.rows - 1);
+        const tracks: DesignStackPlacement = DesignStackGeometry.arrange(heights, layout.rowGap);
+        const step: number = trackWidth + layout.gap;
+        const columnOrigin: number = -Math.min(0, (columns - 1) * step);
+        const boxes: DesignLocalBox[] = cells.map((cell: DesignGridCell): DesignLocalBox => {
+            const cellWidth: number = DesignStackGeometry.uniform(
+                trackWidth,
+                cell.columns,
+                layout.gap,
+            );
+            let top: number = Infinity;
+            let bottom: number = -Infinity;
             for (let row: number = cell.row; row < cell.row + cell.rows; row++) {
-                cellHeight += heights[row] ?? 0;
+                const offset: number = tracks.offsets[row] ?? 0;
+                top = Math.min(top, offset);
+                bottom = Math.max(bottom, offset + (heights[row] ?? 0));
             }
+            const cellHeight: number = bottom - top;
             const placement: DesignPlacement = cell.item.node.placement;
             const itemWidth: number = Math.max(
                 placement.minWidth,
@@ -180,11 +155,10 @@ export class DesignGrid {
                 id: cell.item.node.id,
                 x:
                     layout.padding.left +
-                    cell.column * (trackWidth + layout.gap) +
+                    columnOrigin +
+                    Math.min(cell.column * step, (cell.column + cell.columns - 1) * step) +
                     this.#align(layout.justify, cellWidth - itemWidth),
-                y:
-                    (offsets[cell.row] ?? layout.padding.top) +
-                    this.#align(layout.align, cellHeight - itemHeight),
+                y: layout.padding.top + top + this.#align(layout.align, cellHeight - itemHeight),
                 width: itemWidth,
                 height: itemHeight,
             };
@@ -196,23 +170,6 @@ export class DesignGrid {
                 layout.padding.top +
                 layout.padding.bottom,
         };
-    }
-    static #free(
-        occupied: ReadonlySet<number>,
-        row: number,
-        column: number,
-        rows: number,
-        span: number,
-        columns: number,
-    ): boolean {
-        for (let y: number = row; y < row + rows; y++) {
-            for (let x: number = column; x < column + span; x++) {
-                if (occupied.has(y * columns + x)) {
-                    return false;
-                }
-            }
-        }
-        return true;
     }
     static #align(align: string, spare: number): number {
         return align === DesignAlign.Center

@@ -1,29 +1,33 @@
 /** Server-only release verification: install the tarball in an isolated consumer. */
-import { mkdtemp, writeFile, rm } from 'node:fs/promises';
+import { mkdtemp, readFile, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { execFileSync } from 'node:child_process';
 const root = resolve('.');
+const manifest = JSON.parse(await readFile(join(root, 'package.json'), 'utf8'));
+if (typeof manifest?.version !== 'string' || !/^[0-9A-Za-z.+-]+$/.test(manifest.version)) {
+    throw new Error('Invalid package version for archive verification');
+}
+const archive = resolve(process.argv[2] ?? join(root, `nexa-transport-${manifest.version}.tgz`));
 const directory = await mkdtemp(join(tmpdir(), 'nexa-transport-consumer-'));
 try {
     await writeFile(
         join(directory, 'package.json'),
         JSON.stringify({ private: true, type: 'module' }),
     );
-    execFileSync(
-        'npm',
-        [
-            'install',
-            '--ignore-scripts',
-            '--no-audit',
-            '--no-fund',
-            join(root, 'nexa-transport-0.1.0.tgz'),
-        ],
-        { cwd: directory, stdio: 'pipe' },
-    );
+    execFileSync('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', archive], {
+        cwd: directory,
+        stdio: 'pipe',
+    });
     await writeFile(
         join(directory, 'consumer.ts'),
         `import { NexaClient } from 'nexa-transport';
+import { DesignFlex } from 'nexa-transport/design-flex';
+import { DesignGridPacking } from 'nexa-transport/design-grid-packing';
+import * as DesignTextDirection from 'nexa-transport/design-text-direction';
+void DesignFlex.lines;
+void DesignGridPacking.arrange;
+void DesignTextDirection;
 import { WorkflowGroupCodec } from 'nexa-transport/workflow-group-codec';
 import type { WorkflowGroup } from 'nexa-transport/workflow-group-types';
 const savedGroup: WorkflowGroup = WorkflowGroupCodec.parse({id: 'group', title: 'Research', objective: '', parent: null, x: 0, y: 0, nodes: [], ports: []});
@@ -93,7 +97,7 @@ void downloadArtifact;
         [
             '--input-type=module',
             '-e',
-            `import { NexaClient } from 'nexa-transport'; import { NexaMedia } from 'nexa-transport/media'; import { EventName } from 'nexa-transport/events'; import { WorkflowArtifactDownloads } from 'nexa-transport/workflow-artifacts'; if (typeof NexaClient.connect !== 'function' || typeof WorkflowArtifactDownloads.forClient !== 'function' || NexaMedia.base64(new Uint8Array([1,2,3])) !== 'AQID' || EventName.TurnEvent !== 'turn.event') throw new Error('Package exports failed');`,
+            `import { NexaClient } from 'nexa-transport'; import { NexaMedia } from 'nexa-transport/media'; import { EventName } from 'nexa-transport/events'; import { WorkflowArtifactDownloads } from 'nexa-transport/workflow-artifacts'; import { DesignFlex } from 'nexa-transport/design-flex'; import { DesignGridPacking } from 'nexa-transport/design-grid-packing'; import * as DesignTextDirection from 'nexa-transport/design-text-direction'; if (typeof NexaClient.connect !== 'function' || typeof WorkflowArtifactDownloads.forClient !== 'function' || typeof DesignFlex.lines !== 'function' || typeof DesignGridPacking.arrange !== 'function' || Object.keys(DesignTextDirection).length === 0 || NexaMedia.base64(new Uint8Array([1,2,3])) !== 'AQID' || EventName.TurnEvent !== 'turn.event') throw new Error('Package exports failed');`,
         ],
         { cwd: directory, stdio: 'pipe' },
     );

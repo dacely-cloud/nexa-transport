@@ -2,10 +2,53 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { DesignAlign, DesignFlow, DesignSizing, type DesignLayout } from './DesignTypes.js';
+import { DesignStackGeometry, type DesignStackPlacement } from './DesignStackGeometry.js';
 import type { DesignFlowItem, DesignLocalBox } from './DesignLayoutTypes.js';
 
 /** Deterministic wrapping and bounded flex sizing for row and column auto layout. */
 export class DesignFlex {
+    /** Distributed spacing never creates accidental overlaps when fixed children overflow. */
+    public static gap(layout: DesignLayout): number {
+        return layout.justify === DesignAlign.Between ? Math.max(0, layout.gap) : layout.gap;
+    }
+    /** Logical lines use occupied extents and retain original item identity for canvas controls. */
+    public static lines(
+        items: readonly DesignFlowItem[],
+        layout: DesignLayout,
+        main: number,
+    ): readonly (readonly DesignFlowItem[])[] {
+        const row: boolean = layout.flow === DesignFlow.Row;
+        const lines: DesignFlowItem[][] = [[]];
+        const itemGap: number = this.gap(layout);
+        let used: number = 0;
+        let minimum: number = 0;
+        let maximum: number = 0;
+        for (const item of items) {
+            let line: DesignFlowItem[] | undefined = lines.at(-1);
+            if (line === undefined) {
+                throw new Error('Invalid flex line');
+            }
+            const length: number = row ? item.width : item.height;
+            let start: number = line.length > 0 ? used + itemGap : 0;
+            if (
+                layout.wrap &&
+                line.length > 0 &&
+                Math.max(maximum, start + length) - Math.min(minimum, start) > main
+            ) {
+                line = [];
+                lines.push(line);
+                start = 0;
+                minimum = 0;
+                maximum = 0;
+            }
+            used = start + length;
+            minimum = Math.min(minimum, start);
+            maximum = Math.max(maximum, used);
+            line.push(item);
+        }
+        return lines;
+    }
+
     /** Places rows or columns, including fill children, min/max clamps and distributed gaps. */
     public static arrange(
         items: readonly DesignFlowItem[],
@@ -26,25 +69,26 @@ export class DesignFlex {
                 ? height - layout.padding.top - layout.padding.bottom
                 : width - layout.padding.left - layout.padding.right,
         );
-        const lines: DesignFlowItem[][] = [[]];
-        let used: number = 0;
-        for (const item of items) {
-            let line: DesignFlowItem[] | undefined = lines.at(-1);
-            if (line === undefined) {
-                throw new Error('Invalid flex line');
-            }
-            const length: number = row ? item.width : item.height;
-            if (layout.wrap && line.length > 0 && used + layout.gap + length > main) {
-                line = [];
-                lines.push(line);
-                used = 0;
-            }
-            used += (line.length > 0 ? layout.gap : 0) + length;
-            line.push(item);
-        }
+        const itemGap: number = this.gap(layout);
+        const lines: readonly (readonly DesignFlowItem[])[] = this.lines(items, layout, main);
         const output: DesignLocalBox[] = [];
-        let lineOffset: number = 0;
-        for (const line of lines) {
+        const crossLengths: readonly number[] = lines.map(
+            (line: readonly DesignFlowItem[]): number =>
+                lines.length === 1
+                    ? cross
+                    : Math.max(
+                          0,
+                          ...line.map((item: DesignFlowItem): number =>
+                              row ? item.height : item.width,
+                          ),
+                      ),
+        );
+        const linePositions: DesignStackPlacement = DesignStackGeometry.arrange(
+            crossLengths,
+            layout.rowGap,
+        );
+        for (let lineIndex: number = 0; lineIndex < lines.length; lineIndex++) {
+            const line: readonly DesignFlowItem[] = lines[lineIndex] ?? [];
             if (line.length === 0) {
                 continue;
             }
@@ -62,14 +106,18 @@ export class DesignFlex {
                     flexible.add(index);
                 }
             }
-            const available: number = Math.max(0, main - layout.gap * (line.length - 1));
+            const available: number = Math.max(0, main - itemGap * (line.length - 1));
             for (let pass: number = 0; pass <= line.length && flexible.size > 0; pass++) {
                 const fixed: number = lengths.reduce(
                     (total: number, length: number, index: number): number =>
                         total + (flexible.has(index) ? 0 : length),
                     0,
                 );
-                const share: number = Math.max(0, (available - fixed) / flexible.size);
+                const preferred: number = Math.max(0, (available - fixed) / flexible.size);
+                const share: number =
+                    itemGap < 0
+                        ? DesignStackGeometry.fill(lengths, flexible, itemGap, main, preferred)
+                        : preferred;
                 let clamped: boolean = false;
                 for (const index of [...flexible]) {
                     const item: DesignFlowItem | undefined = line[index];
@@ -92,28 +140,21 @@ export class DesignFlex {
                     break;
                 }
             }
-            const consumed: number =
-                lengths.reduce((sum: number, length: number): number => sum + length, 0) +
-                layout.gap * (line.length - 1);
+            const consumed: number = DesignStackGeometry.span(lengths, itemGap);
             const spare: number = Math.max(0, main - consumed);
             const gap: number =
                 layout.justify === DesignAlign.Between && line.length > 1
-                    ? layout.gap + spare / (line.length - 1)
-                    : layout.gap;
-            let cursor: number =
+                    ? itemGap + spare / (line.length - 1)
+                    : itemGap;
+            const offsetMain: number =
                 layout.justify === DesignAlign.Center
                     ? spare / 2
                     : layout.justify === DesignAlign.End
                       ? spare
                       : 0;
-            const lineCross: number =
-                lines.length === 1
-                    ? cross
-                    : Math.max(
-                          ...line.map((item: DesignFlowItem): number =>
-                              row ? item.height : item.width,
-                          ),
-                      );
+            const positions: DesignStackPlacement = DesignStackGeometry.arrange(lengths, gap);
+            const lineCross: number = crossLengths[lineIndex] ?? 0;
+            const lineOffset: number = linePositions.offsets[lineIndex] ?? 0;
             for (let index: number = 0; index < line.length; index++) {
                 const item: DesignFlowItem | undefined = line[index];
                 const length: number | undefined = lengths[index];
@@ -143,14 +184,16 @@ export class DesignFlex {
                           : 0;
                 output.push({
                     id: item.node.id,
-                    x: layout.padding.left + (row ? cursor : lineOffset + offset),
-                    y: layout.padding.top + (row ? lineOffset + offset : cursor),
+                    x:
+                        layout.padding.left +
+                        (row ? offsetMain + (positions.offsets[index] ?? 0) : lineOffset + offset),
+                    y:
+                        layout.padding.top +
+                        (row ? lineOffset + offset : offsetMain + (positions.offsets[index] ?? 0)),
                     width: row ? length : sizeCross,
                     height: row ? sizeCross : length,
                 });
-                cursor += length + gap;
             }
-            lineOffset += lineCross + layout.rowGap;
         }
         return output;
     }
