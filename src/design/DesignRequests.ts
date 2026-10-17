@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type {
+    DesignDocument,
     DesignNode,
     DesignPage,
     DesignToken,
@@ -77,6 +78,10 @@ export interface DesignCreateRequest {
 export interface DesignDuplicateRequest extends DesignCreateRequest {
     readonly sourceId: string;
     readonly sourceRevision: string;
+}
+/** A user-selected local document is imported once without rebuilding it as edit operations. */
+export interface DesignImportRequest extends DesignCreateRequest {
+    readonly document: DesignDocument;
 }
 /** Record and UTF-16 character offsets allow large entities to remain bounded on the wire. */
 export interface DesignCursor {

@@ -1,6 +1,6 @@
 # RPC reference
 
-All 201 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 200 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
+All 202 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 201 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
 
 - [accounts.create](#accountscreate)
 - [accounts.list](#accountslist)
@@ -56,6 +56,7 @@ All 201 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [design.events](#designevents)
 - [design.font.list](#designfontlist)
 - [design.font.read](#designfontread)
+- [design.import](#designimport)
 - [design.layout](#designlayout)
 - [design.layout.preview](#designlayoutpreview)
 - [design.list](#designlist)
@@ -1493,6 +1494,41 @@ Parameters: [DesignFontReadRequest](protocol.md#designfontreadrequest).
 | `offset` | Yes      | `string` |             |
 
 Result: [DesignFontSlice](protocol.md#designfontslice).
+
+## design.import
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DesignImport> = {
+    commandId: 'YOUR_COMMANDID',
+    document: {
+        comments: [],
+        format: 1,
+        id: 'YOUR_ID',
+        interactions: [],
+        name: 'YOUR_NAME',
+        nodes: [],
+        pages: [],
+        revision: 'YOUR_REVISION',
+        tokens: [],
+    },
+    id: 'YOUR_ID',
+    name: 'YOUR_NAME',
+};
+const result: ResultOf<typeof Method.DesignImport> = await client.call(Method.DesignImport, params);
+```
+
+Parameters: [DesignImportRequest](protocol.md#designimportrequest).
+
+| Field       | Required | Type                                         | Description |
+| ----------- | -------- | -------------------------------------------- | ----------- |
+| `commandId` | Yes      | `string`                                     |             |
+| `document`  | Yes      | [DesignDocument](protocol.md#designdocument) |             |
+| `id`        | Yes      | `string`                                     |             |
+| `name`      | Yes      | `string`                                     |             |
+
+Result: [DesignReceipt](protocol.md#designreceipt).
 
 ## design.layout
 

@@ -24,6 +24,7 @@ export interface DesignClipboardPasteMethod {
 import type {
     DesignCreateRequest,
     DesignDuplicateRequest,
+    DesignImportRequest,
     DesignSaveRequest,
     DesignUndoRequest,
     DesignReadRequest,
@@ -46,6 +47,11 @@ export interface DesignCreateMethod {
 /** Atomic owner-scoped saved-document duplication. */
 export interface DesignDuplicateMethod {
     readonly params: DesignDuplicateRequest;
+    readonly result: DesignReceipt;
+}
+/** Complete user-selected document import, independent of the edit-operation batch size. */
+export interface DesignImportMethod {
+    readonly params: DesignImportRequest;
     readonly result: DesignReceipt;
 }
 /** Atomic editing RPC contract. */

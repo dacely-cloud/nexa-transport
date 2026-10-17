@@ -4437,6 +4437,31 @@ export interface DesignDeleteRequestShape {
 /** DesignDeleteRequest from the Nexa wire protocol. */
 export type DesignDeleteRequest = DesignDeleteRequestShape;
 
+/** DesignDocument wire fields. */
+export interface DesignDocumentShape {
+    /** comments as defined by the Nexa gateway. */
+    readonly comments: ReadonlyArray<DesignComment>;
+    /** format as defined by the Nexa gateway. */
+    readonly format: 1;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** interactions as defined by the Nexa gateway. */
+    readonly interactions: ReadonlyArray<DesignInteraction>;
+    /** name as defined by the Nexa gateway. */
+    readonly name: string;
+    /** nodes as defined by the Nexa gateway. */
+    readonly nodes: ReadonlyArray<DesignNode>;
+    /** pages as defined by the Nexa gateway. */
+    readonly pages: ReadonlyArray<DesignPage>;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: string;
+    /** tokens as defined by the Nexa gateway. */
+    readonly tokens: ReadonlyArray<DesignToken>;
+}
+
+/** DesignDocument from the Nexa wire protocol. */
+export type DesignDocument = DesignDocumentShape;
+
 /** DesignDuplicateMethod wire fields. */
 export interface DesignDuplicateMethodShape {
     /** params as defined by the Nexa gateway. */
@@ -4946,6 +4971,32 @@ export interface DesignImageTransformShape {
 
 /** DesignImageTransform from the Nexa wire protocol. */
 export type DesignImageTransform = DesignImageTransformShape;
+
+/** DesignImportMethod wire fields. */
+export interface DesignImportMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignImportRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignReceipt;
+}
+
+/** DesignImportMethod from the Nexa wire protocol. */
+export type DesignImportMethod = DesignImportMethodShape;
+
+/** DesignImportRequest wire fields. */
+export interface DesignImportRequestShape {
+    /** commandId as defined by the Nexa gateway. */
+    readonly commandId: string;
+    /** document as defined by the Nexa gateway. */
+    readonly document: DesignDocument;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** name as defined by the Nexa gateway. */
+    readonly name: string;
+}
+
+/** DesignImportRequest from the Nexa wire protocol. */
+export type DesignImportRequest = DesignImportRequestShape;
 
 /** DesignInsert wire fields. */
 export interface DesignInsertShape {
@@ -8324,6 +8375,14 @@ export interface GatewayMethodsdesign_font_readShape {
     readonly result: DesignFontSlice;
 }
 
+/** GatewayMethodsdesign_import wire fields. */
+export interface GatewayMethodsdesign_importShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignImportRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignReceipt;
+}
+
 /** GatewayMethodsdesign_layout wire fields. */
 export interface GatewayMethodsdesign_layoutShape {
     /** params as defined by the Nexa gateway. */
@@ -9622,6 +9681,8 @@ export interface GatewayMethodsShape {
     readonly 'design.font.list': GatewayMethodsdesign_font_listShape;
     /** design.font.read as defined by the Nexa gateway. */
     readonly 'design.font.read': GatewayMethodsdesign_font_readShape;
+    /** design.import as defined by the Nexa gateway. */
+    readonly 'design.import': GatewayMethodsdesign_importShape;
     /** design.layout as defined by the Nexa gateway. */
     readonly 'design.layout': GatewayMethodsdesign_layoutShape;
     /** design.layout.preview as defined by the Nexa gateway. */
@@ -17630,6 +17691,8 @@ export enum Method {
     DesignFontList = 'design.font.list',
     /** Calls design.font.read. */
     DesignFontRead = 'design.font.read',
+    /** Calls design.import. */
+    DesignImport = 'design.import',
     /** Calls design.layout. */
     DesignLayout = 'design.layout',
     /** Calls design.layout.preview. */

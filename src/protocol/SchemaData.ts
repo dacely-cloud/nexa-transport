@@ -6787,6 +6787,67 @@ export const schema: Schema = {
             required: ['commandId', 'expectedRevision', 'id'],
             type: 'object',
         },
+        DesignDocument: {
+            description:
+                'Revision numbers are decimal strings across JavaScript runtimes and the wire.',
+            properties: {
+                comments: {
+                    items: {
+                        $ref: '#/definitions/DesignComment',
+                    },
+                    type: 'array',
+                },
+                format: {
+                    const: 1,
+                    type: 'number',
+                },
+                id: {
+                    type: 'string',
+                },
+                interactions: {
+                    items: {
+                        $ref: '#/definitions/DesignInteraction',
+                    },
+                    type: 'array',
+                },
+                name: {
+                    type: 'string',
+                },
+                nodes: {
+                    items: {
+                        $ref: '#/definitions/DesignNode',
+                    },
+                    type: 'array',
+                },
+                pages: {
+                    items: {
+                        $ref: '#/definitions/DesignPage',
+                    },
+                    type: 'array',
+                },
+                revision: {
+                    type: 'string',
+                },
+                tokens: {
+                    items: {
+                        $ref: '#/definitions/DesignToken',
+                    },
+                    type: 'array',
+                },
+            },
+            required: [
+                'comments',
+                'format',
+                'id',
+                'interactions',
+                'name',
+                'nodes',
+                'pages',
+                'revision',
+                'tokens',
+            ],
+            type: 'object',
+        },
         DesignDuplicateMethod: {
             description: 'Atomic owner-scoped saved-document duplication.',
             properties: {
@@ -7506,6 +7567,40 @@ export const schema: Schema = {
                 },
             },
             required: ['a', 'b', 'c', 'd', 'tx', 'ty'],
+            type: 'object',
+        },
+        DesignImportMethod: {
+            description:
+                'Complete user-selected document import, independent of the edit-operation batch size.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/DesignImportRequest',
+                },
+                result: {
+                    $ref: '#/definitions/DesignReceipt',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        DesignImportRequest: {
+            description:
+                'A user-selected local document is imported once without rebuilding it as edit operations.',
+            properties: {
+                commandId: {
+                    type: 'string',
+                },
+                document: {
+                    $ref: '#/definitions/DesignDocument',
+                },
+                id: {
+                    type: 'string',
+                },
+                name: {
+                    type: 'string',
+                },
+            },
+            required: ['commandId', 'document', 'id', 'name'],
             type: 'object',
         },
         DesignInsert: {
@@ -12892,6 +12987,20 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'design.import': {
+                    description:
+                        'Complete user-selected document import, independent of the edit-operation batch size.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/DesignImportRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/DesignReceipt',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'design.layout': {
                     description: 'Computed-geometry RPC contract.',
                     properties: {
@@ -14819,6 +14928,7 @@ export const schema: Schema = {
                 'design.events',
                 'design.font.list',
                 'design.font.read',
+                'design.import',
                 'design.layout',
                 'design.layout.preview',
                 'design.list',

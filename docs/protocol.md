@@ -3109,6 +3109,22 @@ Revision-fenced document removal with an exact retry identity.
 | `expectedRevision` | Yes      | `string` |             |
 | `id`               | Yes      | `string` |             |
 
+## DesignDocument
+
+Revision numbers are decimal strings across JavaScript runtimes and the wire.
+
+| Field          | Required | Type                                                        | Description |
+| -------------- | -------- | ----------------------------------------------------------- | ----------- |
+| `comments`     | Yes      | Array of [DesignComment](protocol.md#designcomment)         |             |
+| `format`       | Yes      | `1`                                                         |             |
+| `id`           | Yes      | `string`                                                    |             |
+| `interactions` | Yes      | Array of [DesignInteraction](protocol.md#designinteraction) |             |
+| `name`         | Yes      | `string`                                                    |             |
+| `nodes`        | Yes      | Array of [DesignNode](protocol.md#designnode)               |             |
+| `pages`        | Yes      | Array of [DesignPage](protocol.md#designpage)               |             |
+| `revision`     | Yes      | `string`                                                    |             |
+| `tokens`       | Yes      | Array of [DesignToken](protocol.md#designtoken)             |             |
+
 ## DesignDuplicateMethod
 
 Atomic owner-scoped saved-document duplication.
@@ -3467,6 +3483,26 @@ Forward affine map from original image unit coordinates to painted box unit coor
 | `d`   | Yes      | `number` |             |
 | `tx`  | Yes      | `number` |             |
 | `ty`  | Yes      | `number` |             |
+
+## DesignImportMethod
+
+Complete user-selected document import, independent of the edit-operation batch size.
+
+| Field    | Required | Type                                                   | Description |
+| -------- | -------- | ------------------------------------------------------ | ----------- |
+| `params` | Yes      | [DesignImportRequest](protocol.md#designimportrequest) |             |
+| `result` | Yes      | [DesignReceipt](protocol.md#designreceipt)             |             |
+
+## DesignImportRequest
+
+A user-selected local document is imported once without rebuilding it as edit operations.
+
+| Field       | Required | Type                                         | Description |
+| ----------- | -------- | -------------------------------------------- | ----------- |
+| `commandId` | Yes      | `string`                                     |             |
+| `document`  | Yes      | [DesignDocument](protocol.md#designdocument) |             |
+| `id`        | Yes      | `string`                                     |             |
+| `name`      | Yes      | `string`                                     |             |
 
 ## DesignInsert
 
@@ -5669,6 +5705,7 @@ Configurable bounds on gateway-owned work and memory.
 | `design.events`                      | Yes      | Object (fields below) | Revision-journal RPC contract.                                                                         |
 | `design.font.list`                   | Yes      | Object (fields below) | Authenticated metadata discovery does not carry font bodies.                                           |
 | `design.font.read`                   | Yes      | Object (fields below) | Each authenticated WebSocket read transfers one independently bounded immutable slice.                 |
+| `design.import`                      | Yes      | Object (fields below) | Complete user-selected document import, independent of the edit-operation batch size.                  |
 | `design.layout`                      | Yes      | Object (fields below) | Computed-geometry RPC contract.                                                                        |
 | `design.layout.preview`              | Yes      | Object (fields below) | Read-only preview support is advertised independently for older workspaces.                            |
 | `design.list`                        | Yes      | Object (fields below) | Owner-scoped library RPC contract.                                                                     |
@@ -6255,6 +6292,13 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ---------------------------------------------------------- | ----------- |
 | `params` | Yes      | [DesignFontReadRequest](protocol.md#designfontreadrequest) |             |
 | `result` | Yes      | [DesignFontSlice](protocol.md#designfontslice)             |             |
+
+**design.import**
+
+| Field    | Required | Type                                                   | Description |
+| -------- | -------- | ------------------------------------------------------ | ----------- |
+| `params` | Yes      | [DesignImportRequest](protocol.md#designimportrequest) |             |
+| `result` | Yes      | [DesignReceipt](protocol.md#designreceipt)             |             |
 
 **design.layout**
 
