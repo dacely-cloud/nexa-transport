@@ -67,6 +67,8 @@ export class DesignOperationCodec {
                     'selection',
                     'width',
                     'height',
+                    'anchorX',
+                    'anchorY',
                     'x',
                     'y',
                     'horizontal',
@@ -549,7 +551,17 @@ export class DesignOperationCodec {
                 case Kind.Resize: {
                     const value: Readonly<Record<string, unknown>> = V.fields(
                         entry,
-                        ['op', 'pageId', 'selection', 'width', 'height', 'x', 'y'],
+                        [
+                            'op',
+                            'pageId',
+                            'selection',
+                            'width',
+                            'height',
+                            'x',
+                            'y',
+                            'anchorX',
+                            'anchorY',
+                        ],
                         ['op', 'pageId', 'selection'],
                     );
                     const selection: readonly string[] = V.list(
@@ -571,9 +583,23 @@ export class DesignOperationCodec {
                     }
                     if (
                         selection.length !== 1 &&
-                        (value['x'] !== undefined || value['y'] !== undefined)
+                        (value['x'] !== undefined ||
+                            value['y'] !== undefined ||
+                            value['anchorX'] !== undefined ||
+                            value['anchorY'] !== undefined)
                     ) {
                         throw new Error('Resize position edits require one selected layer.');
+                    }
+                    if ((value['anchorX'] === undefined) !== (value['anchorY'] === undefined)) {
+                        throw new Error('Resize anchorX and anchorY must be supplied together.');
+                    }
+                    if (
+                        value['anchorX'] !== undefined &&
+                        (value['x'] !== undefined || value['y'] !== undefined)
+                    ) {
+                        throw new Error(
+                            'Resize anchors cannot be combined with explicit x/y positions.',
+                        );
                     }
                     return {
                         op,
@@ -591,6 +617,12 @@ export class DesignOperationCodec {
                         ...(value['y'] === undefined
                             ? {}
                             : { y: V.number(value['y'], -100000, 100000) }),
+                        ...(value['anchorX'] === undefined
+                            ? {}
+                            : {
+                                  anchorX: V.number(value['anchorX'], 0, 1),
+                                  anchorY: V.number(value['anchorY'], 0, 1),
+                              }),
                     };
                 }
                 case Kind.Move: {

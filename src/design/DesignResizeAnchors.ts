@@ -37,6 +37,11 @@ export class DesignResizeAnchors {
         );
         const targets: DesignBox[] = [];
         for (const node of this.context.roots) {
+            if (operation.anchorX !== undefined && this.context.flowing(node.id)) {
+                throw new Error(
+                    'Enable absolute positioning before resizing around an explicit anchor.',
+                );
+            }
             if (this.context.flowing(node.id) || !this.context.boxes.has(node.id)) {
                 continue;
             }
@@ -52,12 +57,25 @@ export class DesignResizeAnchors {
                           working.box(node.parentId),
                           DesignSelectionContext.corner(this.context.box(node.parentId)),
                       );
+            const dw: number = previous.width - current.width;
+            const dh: number = previous.height - current.height;
+            const radians: number = (previous.rotation * Math.PI) / 180;
+            const anchorX: number = (operation.anchorX ?? 0) - 0.5;
+            const anchorY: number = (operation.anchorY ?? 0) - 0.5;
+            const dx: number =
+                operation.anchorX === undefined
+                    ? 0
+                    : dw / 2 + Math.cos(radians) * anchorX * dw - Math.sin(radians) * anchorY * dh;
+            const dy: number =
+                operation.anchorY === undefined
+                    ? 0
+                    : dh / 2 + Math.sin(radians) * anchorX * dw + Math.cos(radians) * anchorY * dh;
             targets.push(
                 DesignBooleanTransforms.world(
                     node.id,
                     {
-                        x: operation.x ?? previous.x,
-                        y: operation.y ?? previous.y,
+                        x: operation.x ?? previous.x + dx,
+                        y: operation.y ?? previous.y + dy,
                         width: current.width,
                         height: current.height,
                         rotation: previous.rotation,

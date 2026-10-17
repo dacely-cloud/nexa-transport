@@ -6275,6 +6275,10 @@ export type DesignReparentOperation = DesignReparentOperationShape;
 
 /** DesignResizeOperation wire fields. */
 export interface DesignResizeOperationShape {
+    /** anchorX as defined by the Nexa gateway. */
+    readonly anchorX?: number;
+    /** anchorY as defined by the Nexa gateway. */
+    readonly anchorY?: number;
     /** height as defined by the Nexa gateway. */
     readonly height?: number;
     /** op as defined by the Nexa gateway. */
@@ -7749,6 +7753,8 @@ export interface GatewayFeaturesShape {
     readonly designImageTransforms?: true;
     /** designLayerCompositing as defined by the Nexa gateway. */
     readonly designLayerCompositing?: true;
+    /** designResizeAnchors as defined by the Nexa gateway. */
+    readonly designResizeAnchors?: true;
     /** designStrokeDashOffset as defined by the Nexa gateway. */
     readonly designStrokeDashOffset?: true;
     /** designTextDirection as defined by the Nexa gateway. */

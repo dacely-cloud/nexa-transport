@@ -354,6 +354,7 @@ await writeFile(
 
 /** Prepared shaping and asymmetric ligature carets are verified against the canonical native cases. */
 for (const testName of [
+    'DesignResizePivot',
     'DesignFontRun',
     'DesignTextShaping',
     'DesignTextPaintInheritance',

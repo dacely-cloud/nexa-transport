@@ -249,6 +249,9 @@ export interface DesignResizeOperation {
     /** Position edits accompany a single dragged layer and use its resolved parent coordinates. */
     readonly x?: number;
     readonly y?: number;
+    /** Paired normalized coordinates retain this point of one layer through resize and native content reflow. */
+    readonly anchorX?: number;
+    readonly anchorY?: number;
 }
 /** Visible parent-local coordinates and pin changes preserve the layer's resolved size. */
 export interface DesignPositionChanges {
