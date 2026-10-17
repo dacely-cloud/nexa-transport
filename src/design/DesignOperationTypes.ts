@@ -67,6 +67,7 @@ export const DesignOperationKind = {
     Page: 'page',
     Guide: 'guide',
     Metadata: 'metadata',
+    Comment: 'comment',
     Token: 'token',
     Recolor: 'recolor',
     PaintColor: 'paint-color',
@@ -360,6 +361,21 @@ export interface DesignMetadata {
     readonly interactions?: readonly DesignInteraction[];
     readonly comments?: readonly DesignComment[];
 }
+/** Only supplied values change; authored page scope and trusted author remain outside this patch. */
+export interface DesignCommentChanges {
+    readonly nodeId?: string | null;
+    readonly x?: number;
+    readonly y?: number;
+    readonly text?: string;
+    readonly resolved?: boolean;
+}
+/** Null deletes one scoped note; creations receive attribution from the authenticated writer. */
+export interface DesignCommentOperation {
+    readonly op: typeof DesignOperationKind.Comment;
+    readonly id: string;
+    readonly pageId: string | null;
+    readonly changes: DesignCommentChanges | null;
+}
 /** Omitted token properties keep their saved values. */
 export interface DesignTokenChanges {
     readonly typography?: DesignTypographyOverrides | null;
@@ -523,6 +539,7 @@ export type DesignOperation =
     | DesignGuideOperation
     | DesignPageOperation
     | DesignMetadata
+    | DesignCommentOperation
     | DesignTokenOperation
     | DesignRecolorOperation
     | DesignPaintColorOperation

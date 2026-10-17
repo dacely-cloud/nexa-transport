@@ -58,6 +58,8 @@ const config: UserConfig = {
                 'design-svg': 'src/design/DesignSvg.ts',
                 'design-color-read-codec': 'src/design/DesignColorReadCodec.ts',
                 'design-color-read-types': 'src/design/DesignColorReadTypes.ts',
+                'design-comment-read-codec': 'src/design/DesignCommentReadCodec.ts',
+                'design-comment-read-types': 'src/design/DesignCommentReadTypes.ts',
                 'design-recolor': 'src/design/DesignRecolorEdits.ts',
                 'design-effect-metrics': 'src/design/DesignEffectMetrics.ts',
                 'design-image-geometry': 'src/design/DesignImageGeometry.ts',

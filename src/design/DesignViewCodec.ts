@@ -9,14 +9,19 @@ import type { DesignViewRequest } from './DesignViewTypes.js';
 export class DesignViewCodec {
     /** Retains the normal read envelope and caps explicit hydration selectors. */
     public static request(raw: unknown): DesignViewRequest {
-        const value: Readonly<Record<string, unknown>> = V.record(raw, [
+        const required: readonly string[] = [
             'id',
             'revision',
             'cursor',
             'limit',
             'pageId',
             'includeIds',
-        ]);
+        ];
+        const value: Readonly<Record<string, unknown>> = V.fields(
+            raw,
+            [...required, 'deferComments'],
+            required,
+        );
         return {
             ...DesignRequestCodec.read({
                 id: value['id'],
@@ -26,6 +31,9 @@ export class DesignViewCodec {
             }),
             pageId: value['pageId'] === null ? null : V.id(value['pageId']),
             includeIds: V.list(value['includeIds'], 256, (entry: unknown): string => V.id(entry)),
+            ...(Object.hasOwn(value, 'deferComments')
+                ? { deferComments: V.boolean(value['deferComments']) }
+                : {}),
         };
     }
 }

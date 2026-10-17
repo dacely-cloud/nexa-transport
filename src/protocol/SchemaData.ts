@@ -5849,6 +5849,17 @@ export const schema: Schema = {
             description:
                 'Canvas records retain active typography metadata while explicitly deferring large text bodies.',
             properties: {
+                commentCount: {
+                    description:
+                        'Total saved comments, independent of the requested page or record cursor.',
+                    type: 'number',
+                },
+                commentsDeferred: {
+                    const: true,
+                    description:
+                        'Present with commentCount only when all comment records were explicitly omitted.',
+                    type: 'boolean',
+                },
                 deferredIds: {
                     description:
                         'Only deferred node identities carried in this bounded record page or fragment.',
@@ -6236,6 +6247,11 @@ export const schema: Schema = {
                 nodeId: {
                     type: ['null', 'string'],
                 },
+                pageId: {
+                    description:
+                        "Canvas notes can select a page; anchored notes inherit their layer's page and legacy unbound notes remain document-wide.",
+                    type: 'string',
+                },
                 resolved: {
                     type: 'boolean',
                 },
@@ -6250,6 +6266,56 @@ export const schema: Schema = {
                 },
             },
             required: ['author', 'id', 'nodeId', 'resolved', 'text', 'x', 'y'],
+            type: 'object',
+        },
+        DesignCommentChanges: {
+            description:
+                'Only supplied values change; authored page scope and trusted author remain outside this patch.',
+            properties: {
+                nodeId: {
+                    type: ['null', 'string'],
+                },
+                resolved: {
+                    type: 'boolean',
+                },
+                text: {
+                    type: 'string',
+                },
+                x: {
+                    type: 'number',
+                },
+                y: {
+                    type: 'number',
+                },
+            },
+            type: 'object',
+        },
+        DesignCommentOperation: {
+            description:
+                'Null deletes one scoped note; creations receive attribution from the authenticated writer.',
+            properties: {
+                changes: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/DesignCommentChanges',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                id: {
+                    type: 'string',
+                },
+                op: {
+                    const: 'comment',
+                    type: 'string',
+                },
+                pageId: {
+                    type: ['null', 'string'],
+                },
+            },
+            required: ['changes', 'id', 'op', 'pageId'],
             type: 'object',
         },
         DesignCommentRecord: {
@@ -6274,6 +6340,215 @@ export const schema: Schema = {
                 },
             },
             required: ['id', 'kind', 'value'],
+            type: 'object',
+        },
+        DesignCommentSummary: {
+            description:
+                'An excerpt identifies a note without being an editable replacement for its saved body.',
+            properties: {
+                author: {
+                    type: 'string',
+                },
+                characters: {
+                    type: 'number',
+                },
+                id: {
+                    type: 'string',
+                },
+                nodeId: {
+                    type: ['null', 'string'],
+                },
+                pageId: {
+                    type: ['null', 'string'],
+                },
+                preview: {
+                    type: 'string',
+                },
+                resolved: {
+                    type: 'boolean',
+                },
+                sha256: {
+                    type: 'string',
+                },
+                x: {
+                    type: 'number',
+                },
+                y: {
+                    type: 'number',
+                },
+            },
+            required: [
+                'author',
+                'characters',
+                'id',
+                'nodeId',
+                'pageId',
+                'preview',
+                'resolved',
+                'sha256',
+                'x',
+                'y',
+            ],
+            type: 'object',
+        },
+        DesignCommentTextMethod: {
+            description:
+                'Body windows retain the same owner and saved-revision fence as their summary.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/DesignCommentTextRequest',
+                },
+                result: {
+                    $ref: '#/definitions/DesignCommentTextPage',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        DesignCommentTextPage: {
+            description:
+                'Only one selected body window travels; pageId names its actual page, or null for a legacy document-wide note.',
+            properties: {
+                commentId: {
+                    type: 'string',
+                },
+                content: {
+                    type: 'string',
+                },
+                nextOffset: {
+                    type: ['null', 'number'],
+                },
+                offset: {
+                    type: 'number',
+                },
+                pageId: {
+                    type: ['null', 'string'],
+                },
+                sha256: {
+                    type: 'string',
+                },
+                summary: {
+                    $ref: '#/definitions/DesignSummary',
+                },
+                total: {
+                    type: 'number',
+                },
+            },
+            required: [
+                'commentId',
+                'content',
+                'nextOffset',
+                'offset',
+                'pageId',
+                'sha256',
+                'summary',
+                'total',
+            ],
+            type: 'object',
+        },
+        DesignCommentTextRequest: {
+            description:
+                "A concrete page checks ownership of the note's anchor; null selects any note in the owned document.",
+            properties: {
+                commentId: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                limit: {
+                    type: 'number',
+                },
+                offset: {
+                    type: 'number',
+                },
+                pageId: {
+                    type: ['null', 'string'],
+                },
+                revision: {
+                    type: 'string',
+                },
+            },
+            required: ['commentId', 'id', 'limit', 'offset', 'pageId', 'revision'],
+            type: 'object',
+        },
+        DesignCommentsMethod: {
+            description: 'Comment summaries use the authenticated read-only connection.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/DesignCommentsRequest',
+                },
+                result: {
+                    $ref: '#/definitions/DesignCommentsPage',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        DesignCommentsPage: {
+            description:
+                'Pages preserve saved note order and return an exact continuation shortened by byte budgets.',
+            properties: {
+                comments: {
+                    items: {
+                        $ref: '#/definitions/DesignCommentSummary',
+                    },
+                    type: 'array',
+                },
+                nextOffset: {
+                    type: ['null', 'number'],
+                },
+                offset: {
+                    type: 'number',
+                },
+                pageId: {
+                    type: ['null', 'string'],
+                },
+                resolved: {
+                    type: ['null', 'boolean'],
+                },
+                summary: {
+                    $ref: '#/definitions/DesignSummary',
+                },
+                total: {
+                    type: 'number',
+                },
+            },
+            required: [
+                'comments',
+                'nextOffset',
+                'offset',
+                'pageId',
+                'resolved',
+                'summary',
+                'total',
+            ],
+            type: 'object',
+        },
+        DesignCommentsRequest: {
+            description:
+                'Null selects the whole document or either resolution state; offsets index only matching notes.',
+            properties: {
+                id: {
+                    type: 'string',
+                },
+                limit: {
+                    type: 'number',
+                },
+                offset: {
+                    type: 'number',
+                },
+                pageId: {
+                    type: ['null', 'string'],
+                },
+                resolved: {
+                    type: ['null', 'boolean'],
+                },
+                revision: {
+                    type: 'string',
+                },
+            },
+            required: ['id', 'limit', 'offset', 'pageId', 'resolved', 'revision'],
             type: 'object',
         },
         DesignComponentAddVariant: {
@@ -8606,6 +8881,9 @@ export const schema: Schema = {
                 },
                 {
                     $ref: '#/definitions/DesignMetadata',
+                },
+                {
+                    $ref: '#/definitions/DesignCommentOperation',
                 },
                 {
                     $ref: '#/definitions/DesignTokenOperation',
@@ -11323,6 +11601,17 @@ export const schema: Schema = {
             description:
                 'Deferred records are valid identity projections, never complete editable copies of their original bodies.',
             properties: {
+                commentCount: {
+                    description:
+                        'Total saved comments, independent of the requested page or record cursor.',
+                    type: 'number',
+                },
+                commentsDeferred: {
+                    const: true,
+                    description:
+                        'Present with commentCount only when all comment records were explicitly omitted.',
+                    type: 'boolean',
+                },
                 deferredIds: {
                     description:
                         'Only deferred node identities carried in this bounded record page or fragment.',
@@ -11381,6 +11670,11 @@ export const schema: Schema = {
                             type: 'null',
                         },
                     ],
+                },
+                deferComments: {
+                    description:
+                        'Explicit omission keeps note bodies native; absent or false retains complete legacy records.',
+                    type: 'boolean',
                 },
                 id: {
                     type: 'string',
@@ -12957,6 +13251,33 @@ export const schema: Schema = {
                         },
                         result: {
                             $ref: '#/definitions/DesignColorReadPage',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'design.comment.text': {
+                    description:
+                        'Body windows retain the same owner and saved-revision fence as their summary.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/DesignCommentTextRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/DesignCommentTextPage',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'design.comments': {
+                    description: 'Comment summaries use the authenticated read-only connection.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/DesignCommentsRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/DesignCommentsPage',
                         },
                     },
                     required: ['params', 'result'],
@@ -14989,6 +15310,8 @@ export const schema: Schema = {
                 'design.clipboard.cut',
                 'design.clipboard.paste',
                 'design.colors',
+                'design.comment.text',
+                'design.comments',
                 'design.component',
                 'design.create',
                 'design.delete',

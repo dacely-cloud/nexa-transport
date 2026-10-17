@@ -29,6 +29,14 @@ void DesignTidyGeometry.inspect;
 void DesignTidyEdits;
 import { DesignGridPacking } from 'nexa-transport/design-grid-packing';
 import * as DesignTextDirection from 'nexa-transport/design-text-direction';
+import { DesignCommentReadCodec } from 'nexa-transport/design-comment-read-codec';
+import type { DesignCommentTextPage } from 'nexa-transport/design-comment-read-types';
+import { Method } from 'nexa-transport/protocol';
+DesignCommentReadCodec.commentsRequest({ id: 'layout', revision: '9007199254740993', pageId: null });
+function readFeedback(client: NexaClient): Promise<DesignCommentTextPage> {
+    return client.call(Method.DesignCommentText, { id: 'layout', revision: '9007199254740993', pageId: null, commentId: 'note', offset: 0, limit: 2000 });
+}
+void readFeedback;
 void DesignFlex.lines;
 void DesignGridPacking.arrange;
 void DesignTextDirection;
@@ -101,7 +109,7 @@ void downloadArtifact;
         [
             '--input-type=module',
             '-e',
-            `import { NexaClient } from 'nexa-transport'; import { NexaMedia } from 'nexa-transport/media'; import { EventName } from 'nexa-transport/events'; import { WorkflowArtifactDownloads } from 'nexa-transport/workflow-artifacts'; import { DesignFlex } from 'nexa-transport/design-flex'; import { DesignGridPacking } from 'nexa-transport/design-grid-packing'; import * as DesignTextDirection from 'nexa-transport/design-text-direction'; if (typeof NexaClient.connect !== 'function' || typeof WorkflowArtifactDownloads.forClient !== 'function' || typeof DesignFlex.lines !== 'function' || typeof DesignGridPacking.arrange !== 'function' || Object.keys(DesignTextDirection).length === 0 || NexaMedia.base64(new Uint8Array([1,2,3])) !== 'AQID' || EventName.TurnEvent !== 'turn.event') throw new Error('Package exports failed');`,
+            `import { NexaClient } from 'nexa-transport'; import { NexaMedia } from 'nexa-transport/media'; import { EventName } from 'nexa-transport/events'; import { WorkflowArtifactDownloads } from 'nexa-transport/workflow-artifacts'; import { DesignFlex } from 'nexa-transport/design-flex'; import { DesignGridPacking } from 'nexa-transport/design-grid-packing'; import * as DesignTextDirection from 'nexa-transport/design-text-direction'; import { DesignCommentReadCodec } from 'nexa-transport/design-comment-read-codec'; if (typeof DesignCommentReadCodec.textRequest !== 'function' || typeof NexaClient.connect !== 'function' || typeof WorkflowArtifactDownloads.forClient !== 'function' || typeof DesignFlex.lines !== 'function' || typeof DesignGridPacking.arrange !== 'function' || Object.keys(DesignTextDirection).length === 0 || NexaMedia.base64(new Uint8Array([1,2,3])) !== 'AQID' || EventName.TurnEvent !== 'turn.event') throw new Error('Package exports failed');`,
         ],
         { cwd: directory, stdio: 'pipe' },
     );

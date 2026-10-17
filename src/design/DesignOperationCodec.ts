@@ -11,6 +11,7 @@ import { DesignPaintGradientChangesCodec } from './DesignPaintGradientChangesCod
 import { DesignPaintColorChangesCodec } from './DesignPaintColorChangesCodec.js';
 import { DesignPaintColorTarget } from './DesignOperationTypes.js';
 import { DesignTokenChangesCodec } from './DesignTokenChangesCodec.js';
+import { DesignCommentChangesCodec } from './DesignCommentChangesCodec.js';
 import { DesignValues as V } from './DesignValues.js';
 import { DesignFrameGridCodec } from './DesignFrameGridCodec.js';
 import { DesignRulerCodec } from './DesignRulerCodec.js';
@@ -92,6 +93,23 @@ export class DesignOperationCodec {
             );
             const op: string = V.choice(tag['op'], Object.values(Kind));
             switch (op) {
+                case Kind.Comment: {
+                    const value: Readonly<Record<string, unknown>> = V.record(entry, [
+                        'op',
+                        'id',
+                        'pageId',
+                        'changes',
+                    ]);
+                    return {
+                        op,
+                        id: V.id(value['id']),
+                        pageId: V.optionalId(value['pageId']),
+                        changes:
+                            value['changes'] === null
+                                ? null
+                                : DesignCommentChangesCodec.changes(value['changes']),
+                    };
+                }
                 case Kind.Insert: {
                     const value: Readonly<Record<string, unknown>> = V.record(entry, [
                         'op',

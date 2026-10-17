@@ -199,7 +199,8 @@ export class DesignTree {
         for (const comment of document.comments) {
             if (
                 comments.has(comment.id) ||
-                (comment.nodeId !== null && !nodes.has(comment.nodeId))
+                (comment.nodeId !== null && !nodes.has(comment.nodeId)) ||
+                (comment.pageId !== undefined && !pages.has(comment.pageId))
             ) {
                 throw new Error('Invalid design comment reference');
             }

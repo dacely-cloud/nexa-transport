@@ -138,7 +138,7 @@ export class DesignCodec {
     }
     /** Validates one bounded comment record. */
     public static comment(raw: unknown): DesignComment {
-        const value: Readonly<Record<string, unknown>> = V.record(raw, [
+        const required: readonly string[] = [
             'id',
             'nodeId',
             'x',
@@ -146,15 +146,25 @@ export class DesignCodec {
             'text',
             'author',
             'resolved',
-        ]);
+        ];
+        const value: Readonly<Record<string, unknown>> = V.fields(
+            raw,
+            [...required, 'pageId'],
+            required,
+        );
+        const nodeId: string | null = V.optionalId(value['nodeId']);
+        if (nodeId !== null && Object.hasOwn(value, 'pageId')) {
+            throw new Error('Anchored comments inherit their layer page; omit pageId.');
+        }
         return {
             id: V.id(value['id']),
-            nodeId: V.optionalId(value['nodeId']),
+            nodeId,
             x: V.number(value['x']),
             y: V.number(value['y']),
             text: V.text(value['text'], 8000),
             author: V.text(value['author']),
             resolved: V.boolean(value['resolved']),
+            ...(Object.hasOwn(value, 'pageId') ? { pageId: V.id(value['pageId']) } : {}),
         };
     }
 }

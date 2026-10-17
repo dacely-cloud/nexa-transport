@@ -14,6 +14,7 @@ import { DesignRecolorEdits } from './DesignRecolorEdits.js';
 import { DesignSelectionIndex } from './DesignSelectionIndex.js';
 import { DesignPaintColorEdits } from './DesignPaintColorEdits.js';
 import { DesignTokenEdits } from './DesignTokenEdits.js';
+import { DesignCommentEdits } from './DesignCommentEdits.js';
 import { DesignOperationCodec } from './DesignOperationCodec.js';
 import { DesignTreeEdits as Tree } from './DesignTreeEdits.js';
 import { DesignEntityChanges as Entity } from './DesignEntityChanges.js';
@@ -64,6 +65,7 @@ export class DesignEdits {
         source: DesignDocument,
         operations: readonly DesignOperation[],
         measurer: DesignTextMeasurer = new DesignTextMetrics(),
+        actor: string | null = null,
     ): DesignEditResult {
         if (operations.length < 1 || operations.length > 512) {
             throw new Error('A design transaction requires 1 to 512 operations');
@@ -358,6 +360,12 @@ export class DesignEdits {
                             throw new Error('Move or delete page layers before deleting the page');
                         }
                         pages.delete(page.id);
+                        metadata = {
+                            ...metadata,
+                            comments: metadata.comments.filter(
+                                (comment: DesignComment): boolean => comment.pageId !== page.id,
+                            ),
+                        };
                     } else {
                         pages.set(operation.id, {
                             ...page,
@@ -496,6 +504,22 @@ export class DesignEdits {
                         ...(operation.comments === undefined
                             ? {}
                             : { comments: operation.comments }),
+                    };
+                    break;
+                }
+                case DesignOperationKind.Comment: {
+                    metadata = {
+                        ...metadata,
+                        comments: DesignCommentEdits.apply(
+                            {
+                                ...document,
+                                ...metadata,
+                                nodes: [...nodes.values()],
+                                pages: [...pages.values()],
+                            },
+                            operation,
+                            actor,
+                        ),
                     };
                     break;
                 }

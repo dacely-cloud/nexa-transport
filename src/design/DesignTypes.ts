@@ -413,6 +413,8 @@ export interface DesignInteraction {
 export interface DesignComment {
     readonly id: string;
     readonly nodeId: string | null;
+    /** Canvas notes can select a page; anchored notes inherit their layer's page and legacy unbound notes remain document-wide. */
+    readonly pageId?: string;
     readonly x: number;
     readonly y: number;
     readonly text: string;
