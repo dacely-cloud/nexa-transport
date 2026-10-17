@@ -4437,6 +4437,34 @@ export interface DesignDeleteRequestShape {
 /** DesignDeleteRequest from the Nexa wire protocol. */
 export type DesignDeleteRequest = DesignDeleteRequestShape;
 
+/** DesignDuplicateMethod wire fields. */
+export interface DesignDuplicateMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignDuplicateRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignReceipt;
+}
+
+/** DesignDuplicateMethod from the Nexa wire protocol. */
+export type DesignDuplicateMethod = DesignDuplicateMethodShape;
+
+/** DesignDuplicateRequest wire fields. */
+export interface DesignDuplicateRequestShape {
+    /** commandId as defined by the Nexa gateway. */
+    readonly commandId: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** name as defined by the Nexa gateway. */
+    readonly name: string;
+    /** sourceId as defined by the Nexa gateway. */
+    readonly sourceId: string;
+    /** sourceRevision as defined by the Nexa gateway. */
+    readonly sourceRevision: string;
+}
+
+/** DesignDuplicateRequest from the Nexa wire protocol. */
+export type DesignDuplicateRequest = DesignDuplicateRequestShape;
+
 /** DesignEventsMethod wire fields. */
 export interface DesignEventsMethodShape {
     /** params as defined by the Nexa gateway. */
@@ -8264,6 +8292,14 @@ export interface GatewayMethodsdesign_deleteShape {
     readonly result: DesignDeleteReceipt;
 }
 
+/** GatewayMethodsdesign_duplicate wire fields. */
+export interface GatewayMethodsdesign_duplicateShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignDuplicateRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignReceipt;
+}
+
 /** GatewayMethodsdesign_events wire fields. */
 export interface GatewayMethodsdesign_eventsShape {
     /** params as defined by the Nexa gateway. */
@@ -9578,6 +9614,8 @@ export interface GatewayMethodsShape {
     readonly 'design.create': GatewayMethodsdesign_createShape;
     /** design.delete as defined by the Nexa gateway. */
     readonly 'design.delete': GatewayMethodsdesign_deleteShape;
+    /** design.duplicate as defined by the Nexa gateway. */
+    readonly 'design.duplicate': GatewayMethodsdesign_duplicateShape;
     /** design.events as defined by the Nexa gateway. */
     readonly 'design.events': GatewayMethodsdesign_eventsShape;
     /** design.font.list as defined by the Nexa gateway. */
@@ -17584,6 +17622,8 @@ export enum Method {
     DesignCreate = 'design.create',
     /** Calls design.delete. */
     DesignDelete = 'design.delete',
+    /** Calls design.duplicate. */
+    DesignDuplicate = 'design.duplicate',
     /** Calls design.events. */
     DesignEvents = 'design.events',
     /** Calls design.font.list. */
