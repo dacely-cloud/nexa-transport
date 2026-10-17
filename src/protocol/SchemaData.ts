@@ -9642,6 +9642,14 @@ export const schema: Schema = {
             description:
                 'Explicit geometry edits fix requested axes and preserve absolute child constraints atomically.',
             properties: {
+                anchorX: {
+                    description:
+                        'Paired normalized coordinates retain this point of one layer through resize and native content reflow.',
+                    type: 'number',
+                },
+                anchorY: {
+                    type: 'number',
+                },
                 height: {
                     type: 'number',
                 },
@@ -11871,6 +11879,12 @@ export const schema: Schema = {
                     const: true,
                     description:
                         'Native layer blending and explicit group isolation preserve editable appearance.',
+                    type: 'boolean',
+                },
+                designResizeAnchors: {
+                    const: true,
+                    description:
+                        'Native Resize commands preserve normalized anchors through one-axis sizing and content reflow.',
                     type: 'boolean',
                 },
                 designStrokeDashOffset: {
