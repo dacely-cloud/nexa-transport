@@ -3821,6 +3821,10 @@ export type DesignCanvasMetricsRequest = DesignCanvasMetricsRequestShape;
 
 /** DesignCanvasPage wire fields. */
 export interface DesignCanvasPageShape {
+    /** commentCount as defined by the Nexa gateway. */
+    readonly commentCount?: number;
+    /** commentsDeferred as defined by the Nexa gateway. */
+    readonly commentsDeferred?: true;
     /** deferredIds as defined by the Nexa gateway. */
     readonly deferredIds: ReadonlyArray<string>;
     /** fragment as defined by the Nexa gateway. */
@@ -4055,6 +4059,8 @@ export interface DesignCommentShape {
     readonly id: string;
     /** nodeId as defined by the Nexa gateway. */
     readonly nodeId: null | string;
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId?: string;
     /** resolved as defined by the Nexa gateway. */
     readonly resolved: boolean;
     /** text as defined by the Nexa gateway. */
@@ -4068,6 +4074,38 @@ export interface DesignCommentShape {
 /** DesignComment from the Nexa wire protocol. */
 export type DesignComment = DesignCommentShape;
 
+/** DesignCommentChanges wire fields. */
+export interface DesignCommentChangesShape {
+    /** nodeId as defined by the Nexa gateway. */
+    readonly nodeId?: null | string;
+    /** resolved as defined by the Nexa gateway. */
+    readonly resolved?: boolean;
+    /** text as defined by the Nexa gateway. */
+    readonly text?: string;
+    /** x as defined by the Nexa gateway. */
+    readonly x?: number;
+    /** y as defined by the Nexa gateway. */
+    readonly y?: number;
+}
+
+/** DesignCommentChanges from the Nexa wire protocol. */
+export type DesignCommentChanges = DesignCommentChangesShape;
+
+/** DesignCommentOperation wire fields. */
+export interface DesignCommentOperationShape {
+    /** changes as defined by the Nexa gateway. */
+    readonly changes: DesignCommentChanges | null;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** op as defined by the Nexa gateway. */
+    readonly op: 'comment';
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: null | string;
+}
+
+/** DesignCommentOperation from the Nexa wire protocol. */
+export type DesignCommentOperation = DesignCommentOperationShape;
+
 /** DesignCommentRecord wire fields. */
 export interface DesignCommentRecordShape {
     /** id as defined by the Nexa gateway. */
@@ -4080,6 +4118,137 @@ export interface DesignCommentRecordShape {
 
 /** DesignCommentRecord from the Nexa wire protocol. */
 export type DesignCommentRecord = DesignCommentRecordShape;
+
+/** DesignCommentSummary wire fields. */
+export interface DesignCommentSummaryShape {
+    /** author as defined by the Nexa gateway. */
+    readonly author: string;
+    /** characters as defined by the Nexa gateway. */
+    readonly characters: number;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** nodeId as defined by the Nexa gateway. */
+    readonly nodeId: null | string;
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: null | string;
+    /** preview as defined by the Nexa gateway. */
+    readonly preview: string;
+    /** resolved as defined by the Nexa gateway. */
+    readonly resolved: boolean;
+    /** sha256 as defined by the Nexa gateway. */
+    readonly sha256: string;
+    /** x as defined by the Nexa gateway. */
+    readonly x: number;
+    /** y as defined by the Nexa gateway. */
+    readonly y: number;
+}
+
+/** DesignCommentSummary from the Nexa wire protocol. */
+export type DesignCommentSummary = DesignCommentSummaryShape;
+
+/** DesignCommentTextMethod wire fields. */
+export interface DesignCommentTextMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignCommentTextRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignCommentTextPage;
+}
+
+/** DesignCommentTextMethod from the Nexa wire protocol. */
+export type DesignCommentTextMethod = DesignCommentTextMethodShape;
+
+/** DesignCommentTextPage wire fields. */
+export interface DesignCommentTextPageShape {
+    /** commentId as defined by the Nexa gateway. */
+    readonly commentId: string;
+    /** content as defined by the Nexa gateway. */
+    readonly content: string;
+    /** nextOffset as defined by the Nexa gateway. */
+    readonly nextOffset: null | number;
+    /** offset as defined by the Nexa gateway. */
+    readonly offset: number;
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: null | string;
+    /** sha256 as defined by the Nexa gateway. */
+    readonly sha256: string;
+    /** summary as defined by the Nexa gateway. */
+    readonly summary: DesignSummary;
+    /** total as defined by the Nexa gateway. */
+    readonly total: number;
+}
+
+/** DesignCommentTextPage from the Nexa wire protocol. */
+export type DesignCommentTextPage = DesignCommentTextPageShape;
+
+/** DesignCommentTextRequest wire fields. */
+export interface DesignCommentTextRequestShape {
+    /** commentId as defined by the Nexa gateway. */
+    readonly commentId: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** limit as defined by the Nexa gateway. */
+    readonly limit: number;
+    /** offset as defined by the Nexa gateway. */
+    readonly offset: number;
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: null | string;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: string;
+}
+
+/** DesignCommentTextRequest from the Nexa wire protocol. */
+export type DesignCommentTextRequest = DesignCommentTextRequestShape;
+
+/** DesignCommentsMethod wire fields. */
+export interface DesignCommentsMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignCommentsRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignCommentsPage;
+}
+
+/** DesignCommentsMethod from the Nexa wire protocol. */
+export type DesignCommentsMethod = DesignCommentsMethodShape;
+
+/** DesignCommentsPage wire fields. */
+export interface DesignCommentsPageShape {
+    /** comments as defined by the Nexa gateway. */
+    readonly comments: ReadonlyArray<DesignCommentSummary>;
+    /** nextOffset as defined by the Nexa gateway. */
+    readonly nextOffset: null | number;
+    /** offset as defined by the Nexa gateway. */
+    readonly offset: number;
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: null | string;
+    /** resolved as defined by the Nexa gateway. */
+    readonly resolved: null | boolean;
+    /** summary as defined by the Nexa gateway. */
+    readonly summary: DesignSummary;
+    /** total as defined by the Nexa gateway. */
+    readonly total: number;
+}
+
+/** DesignCommentsPage from the Nexa wire protocol. */
+export type DesignCommentsPage = DesignCommentsPageShape;
+
+/** DesignCommentsRequest wire fields. */
+export interface DesignCommentsRequestShape {
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** limit as defined by the Nexa gateway. */
+    readonly limit: number;
+    /** offset as defined by the Nexa gateway. */
+    readonly offset: number;
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: null | string;
+    /** resolved as defined by the Nexa gateway. */
+    readonly resolved: null | boolean;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: string;
+}
+
+/** DesignCommentsRequest from the Nexa wire protocol. */
+export type DesignCommentsRequest = DesignCommentsRequestShape;
 
 /** DesignComponentAddVariant wire fields. */
 export interface DesignComponentAddVariantShape {
@@ -5610,6 +5779,7 @@ export type DesignOperation =
     | DesignPageOperation
     | DesignGuideOperation
     | DesignMetadata
+    | DesignCommentOperation
     | DesignTokenOperation
     | DesignPaintColorOperation
     | DesignPaintImageOperation
@@ -7420,6 +7590,10 @@ export type DesignViewMethod = DesignViewMethodShape;
 
 /** DesignViewPage wire fields. */
 export interface DesignViewPageShape {
+    /** commentCount as defined by the Nexa gateway. */
+    readonly commentCount?: number;
+    /** commentsDeferred as defined by the Nexa gateway. */
+    readonly commentsDeferred?: true;
     /** deferredIds as defined by the Nexa gateway. */
     readonly deferredIds: ReadonlyArray<string>;
     /** fragment as defined by the Nexa gateway. */
@@ -7441,6 +7615,8 @@ export type DesignViewPage = DesignViewPageShape;
 export interface DesignViewRequestShape {
     /** cursor as defined by the Nexa gateway. */
     readonly cursor: DesignCursor | null;
+    /** deferComments as defined by the Nexa gateway. */
+    readonly deferComments?: boolean;
     /** id as defined by the Nexa gateway. */
     readonly id: string;
     /** includeIds as defined by the Nexa gateway. */
@@ -8350,6 +8526,22 @@ export interface GatewayMethodsdesign_colorsShape {
     readonly params: DesignColorReadRequest;
     /** result as defined by the Nexa gateway. */
     readonly result: DesignColorReadPage;
+}
+
+/** GatewayMethodsdesign_comment_text wire fields. */
+export interface GatewayMethodsdesign_comment_textShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignCommentTextRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignCommentTextPage;
+}
+
+/** GatewayMethodsdesign_comments wire fields. */
+export interface GatewayMethodsdesign_commentsShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DesignCommentsRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DesignCommentsPage;
 }
 
 /** GatewayMethodsdesign_component wire fields. */
@@ -9700,6 +9892,10 @@ export interface GatewayMethodsShape {
     readonly 'design.clipboard.paste': GatewayMethodsdesign_clipboard_pasteShape;
     /** design.colors as defined by the Nexa gateway. */
     readonly 'design.colors': GatewayMethodsdesign_colorsShape;
+    /** design.comment.text as defined by the Nexa gateway. */
+    readonly 'design.comment.text': GatewayMethodsdesign_comment_textShape;
+    /** design.comments as defined by the Nexa gateway. */
+    readonly 'design.comments': GatewayMethodsdesign_commentsShape;
     /** design.component as defined by the Nexa gateway. */
     readonly 'design.component': GatewayMethodsdesign_componentShape;
     /** design.create as defined by the Nexa gateway. */
@@ -17710,6 +17906,10 @@ export enum Method {
     DesignClipboardPaste = 'design.clipboard.paste',
     /** Calls design.colors. */
     DesignColors = 'design.colors',
+    /** Calls design.comment.text. */
+    DesignCommentText = 'design.comment.text',
+    /** Calls design.comments. */
+    DesignComments = 'design.comments',
     /** Calls design.component. */
     DesignComponent = 'design.component',
     /** Calls design.create. */

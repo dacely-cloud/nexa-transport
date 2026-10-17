@@ -222,6 +222,8 @@ backend, or a provider-key vault.
 | `nexa-transport/design-recolor`                 | ESM + types | Scoped native subtree recoloring without source-body replacement.            |
 | `nexa-transport/design-color-read-codec`        | ESM + types | Bounded selection-color read validation.                                     |
 | `nexa-transport/design-color-read-types`        | ESM + types | Native selection-color request and response types.                           |
+| `nexa-transport/design-comment-read-codec`      | ESM + types | Closed feedback-summary and selected body-window validation.                 |
+| `nexa-transport/design-comment-read-types`      | ESM + types | Revision-pinned feedback scopes, excerpts and text continuations.            |
 | `nexa-transport/design-components`              | ESM + types | Design components.                                                           |
 | `nexa-transport/design-component-types`         | ESM + types | Design component types.                                                      |
 | `nexa-transport/design-boolean-edits`           | ESM + types | Design boolean edits.                                                        |

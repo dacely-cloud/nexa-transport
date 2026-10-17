@@ -2562,15 +2562,17 @@ Metric pagination uses the same primary page and explicitly hydrated forests as 
 
 Canvas records retain active typography metadata while explicitly deferring large text bodies.
 
-| Field             | Required | Type                                                              | Description                                                                    |
-| ----------------- | -------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| `deferredIds`     | Yes      | Array of `string`                                                 | Only deferred node identities carried in this bounded record page or fragment. |
-| `fragment`        | Yes      | [DesignRecordFragment](protocol.md#designrecordfragment) / `null` |                                                                                |
-| `nextCursor`      | Yes      | [DesignCursor](protocol.md#designcursor) / `null`                 |                                                                                |
-| `pageId`          | Yes      | `string`                                                          | The resolved primary page is stable across all continuations.                  |
-| `records`         | Yes      | Array of [DesignRecord](protocol.md#designrecord)                 |                                                                                |
-| `summary`         | Yes      | [DesignSummary](protocol.md#designsummary)                        |                                                                                |
-| `textDeferredIds` | Yes      | Array of `string`                                                 |                                                                                |
+| Field              | Required | Type                                                              | Description                                                                      |
+| ------------------ | -------- | ----------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `commentCount`     | No       | `number`                                                          | Total saved comments, independent of the requested page or record cursor.        |
+| `commentsDeferred` | No       | `true`                                                            | Present with commentCount only when all comment records were explicitly omitted. |
+| `deferredIds`      | Yes      | Array of `string`                                                 | Only deferred node identities carried in this bounded record page or fragment.   |
+| `fragment`         | Yes      | [DesignRecordFragment](protocol.md#designrecordfragment) / `null` |                                                                                  |
+| `nextCursor`       | Yes      | [DesignCursor](protocol.md#designcursor) / `null`                 |                                                                                  |
+| `pageId`           | Yes      | `string`                                                          | The resolved primary page is stable across all continuations.                    |
+| `records`          | Yes      | Array of [DesignRecord](protocol.md#designrecord)                 |                                                                                  |
+| `summary`          | Yes      | [DesignSummary](protocol.md#designsummary)                        |                                                                                  |
+| `textDeferredIds`  | Yes      | Array of `string`                                                 |                                                                                  |
 
 ## DesignChangesMethod
 
@@ -2722,15 +2724,39 @@ Revision-pinned color grouping addresses authored selection roots without source
 
 Anchored comments can refer to exact layers or canvas coordinates.
 
+| Field      | Required | Type          | Description                                                                                                              |
+| ---------- | -------- | ------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `author`   | Yes      | `string`      |                                                                                                                          |
+| `id`       | Yes      | `string`      |                                                                                                                          |
+| `nodeId`   | Yes      | `null,string` |                                                                                                                          |
+| `pageId`   | No       | `string`      | Canvas notes can select a page; anchored notes inherit their layer's page and legacy unbound notes remain document-wide. |
+| `resolved` | Yes      | `boolean`     |                                                                                                                          |
+| `text`     | Yes      | `string`      |                                                                                                                          |
+| `x`        | Yes      | `number`      |                                                                                                                          |
+| `y`        | Yes      | `number`      |                                                                                                                          |
+
+## DesignCommentChanges
+
+Only supplied values change; authored page scope and trusted author remain outside this patch.
+
 | Field      | Required | Type          | Description |
 | ---------- | -------- | ------------- | ----------- |
-| `author`   | Yes      | `string`      |             |
-| `id`       | Yes      | `string`      |             |
-| `nodeId`   | Yes      | `null,string` |             |
-| `resolved` | Yes      | `boolean`     |             |
-| `text`     | Yes      | `string`      |             |
-| `x`        | Yes      | `number`      |             |
-| `y`        | Yes      | `number`      |             |
+| `nodeId`   | No       | `null,string` |             |
+| `resolved` | No       | `boolean`     |             |
+| `text`     | No       | `string`      |             |
+| `x`        | No       | `number`      |             |
+| `y`        | No       | `number`      |             |
+
+## DesignCommentOperation
+
+Null deletes one scoped note; creations receive attribution from the authenticated writer.
+
+| Field     | Required | Type                                                              | Description |
+| --------- | -------- | ----------------------------------------------------------------- | ----------- |
+| `changes` | Yes      | [DesignCommentChanges](protocol.md#designcommentchanges) / `null` |             |
+| `id`      | Yes      | `string`                                                          |             |
+| `op`      | Yes      | `"comment"`                                                       |             |
+| `pageId`  | Yes      | `null,string`                                                     |             |
 
 ## DesignCommentRecord
 
@@ -2741,6 +2767,96 @@ Comment record.
 | `id`    | Yes      | `string`                                            |             |
 | `kind`  | Yes      | `"comment"`                                         |             |
 | `value` | Yes      | [DesignComment](protocol.md#designcomment) / `null` |             |
+
+## DesignCommentSummary
+
+An excerpt identifies a note without being an editable replacement for its saved body.
+
+| Field        | Required | Type          | Description |
+| ------------ | -------- | ------------- | ----------- |
+| `author`     | Yes      | `string`      |             |
+| `characters` | Yes      | `number`      |             |
+| `id`         | Yes      | `string`      |             |
+| `nodeId`     | Yes      | `null,string` |             |
+| `pageId`     | Yes      | `null,string` |             |
+| `preview`    | Yes      | `string`      |             |
+| `resolved`   | Yes      | `boolean`     |             |
+| `sha256`     | Yes      | `string`      |             |
+| `x`          | Yes      | `number`      |             |
+| `y`          | Yes      | `number`      |             |
+
+## DesignCommentTextMethod
+
+Body windows retain the same owner and saved-revision fence as their summary.
+
+| Field    | Required | Type                                                             | Description |
+| -------- | -------- | ---------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignCommentTextRequest](protocol.md#designcommenttextrequest) |             |
+| `result` | Yes      | [DesignCommentTextPage](protocol.md#designcommenttextpage)       |             |
+
+## DesignCommentTextPage
+
+Only one selected body window travels; pageId names its actual page, or null for a legacy document-wide note.
+
+| Field        | Required | Type                                       | Description |
+| ------------ | -------- | ------------------------------------------ | ----------- |
+| `commentId`  | Yes      | `string`                                   |             |
+| `content`    | Yes      | `string`                                   |             |
+| `nextOffset` | Yes      | `null,number`                              |             |
+| `offset`     | Yes      | `number`                                   |             |
+| `pageId`     | Yes      | `null,string`                              |             |
+| `sha256`     | Yes      | `string`                                   |             |
+| `summary`    | Yes      | [DesignSummary](protocol.md#designsummary) |             |
+| `total`      | Yes      | `number`                                   |             |
+
+## DesignCommentTextRequest
+
+A concrete page checks ownership of the note's anchor; null selects any note in the owned document.
+
+| Field       | Required | Type          | Description |
+| ----------- | -------- | ------------- | ----------- |
+| `commentId` | Yes      | `string`      |             |
+| `id`        | Yes      | `string`      |             |
+| `limit`     | Yes      | `number`      |             |
+| `offset`    | Yes      | `number`      |             |
+| `pageId`    | Yes      | `null,string` |             |
+| `revision`  | Yes      | `string`      |             |
+
+## DesignCommentsMethod
+
+Comment summaries use the authenticated read-only connection.
+
+| Field    | Required | Type                                                       | Description |
+| -------- | -------- | ---------------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignCommentsRequest](protocol.md#designcommentsrequest) |             |
+| `result` | Yes      | [DesignCommentsPage](protocol.md#designcommentspage)       |             |
+
+## DesignCommentsPage
+
+Pages preserve saved note order and return an exact continuation shortened by byte budgets.
+
+| Field        | Required | Type                                                              | Description |
+| ------------ | -------- | ----------------------------------------------------------------- | ----------- |
+| `comments`   | Yes      | Array of [DesignCommentSummary](protocol.md#designcommentsummary) |             |
+| `nextOffset` | Yes      | `null,number`                                                     |             |
+| `offset`     | Yes      | `number`                                                          |             |
+| `pageId`     | Yes      | `null,string`                                                     |             |
+| `resolved`   | Yes      | `null,boolean`                                                    |             |
+| `summary`    | Yes      | [DesignSummary](protocol.md#designsummary)                        |             |
+| `total`      | Yes      | `number`                                                          |             |
+
+## DesignCommentsRequest
+
+Null selects the whole document or either resolution state; offsets index only matching notes.
+
+| Field      | Required | Type           | Description |
+| ---------- | -------- | -------------- | ----------- |
+| `id`       | Yes      | `string`       |             |
+| `limit`    | Yes      | `number`       |             |
+| `offset`   | Yes      | `number`       |             |
+| `pageId`   | Yes      | `null,string`  |             |
+| `resolved` | Yes      | `null,boolean` |             |
+| `revision` | Yes      | `string`       |             |
 
 ## DesignComponentAddVariant
 
@@ -3931,7 +4047,18 @@ Variant 2: [DesignLayoutOperation](protocol.md#designlayoutoperation)
 | `op`      | Yes      | `"layout"`                                             |             |
 | `pageId`  | Yes      | `string`                                               |             |
 
-Variant 3: [DesignReparentOperation](protocol.md#designreparentoperation)
+Variant 3: [DesignTidyOperation](protocol.md#designtidyoperation)
+
+| Field       | Required | Type              | Description |
+| ----------- | -------- | ----------------- | ----------- |
+| `columns`   | No       | `number`          |             |
+| `gapX`      | No       | `number`          |             |
+| `gapY`      | No       | `number`          |             |
+| `op`        | Yes      | `"tidy"`          |             |
+| `pageId`    | Yes      | `string`          |             |
+| `selection` | Yes      | Array of `string` |             |
+
+Variant 4: [DesignReparentOperation](protocol.md#designreparentoperation)
 
 | Field       | Required | Type              | Description                                                                                       |
 | ----------- | -------- | ----------------- | ------------------------------------------------------------------------------------------------- |
@@ -3944,7 +4071,7 @@ Variant 3: [DesignReparentOperation](protocol.md#designreparentoperation)
 | `parentId`  | Yes      | `null,string`     |                                                                                                   |
 | `selection` | Yes      | Array of `string` |                                                                                                   |
 
-Variant 4: [DesignResizeOperation](protocol.md#designresizeoperation)
+Variant 5: [DesignResizeOperation](protocol.md#designresizeoperation)
 
 | Field       | Required | Type              | Description                                                                                            |
 | ----------- | -------- | ----------------- | ------------------------------------------------------------------------------------------------------ |
@@ -3958,7 +4085,7 @@ Variant 4: [DesignResizeOperation](protocol.md#designresizeoperation)
 | `x`         | No       | `number`          | Position edits accompany a single dragged layer and use its resolved parent coordinates.               |
 | `y`         | No       | `number`          |                                                                                                        |
 
-Variant 5: [DesignInsert](protocol.md#designinsert)
+Variant 6: [DesignInsert](protocol.md#designinsert)
 
 | Field      | Required | Type                                 | Description |
 | ---------- | -------- | ------------------------------------ | ----------- |
@@ -3968,7 +4095,7 @@ Variant 5: [DesignInsert](protocol.md#designinsert)
 | `pageId`   | Yes      | `string`                             |             |
 | `parentId` | Yes      | `null,string`                        |             |
 
-Variant 6: [DesignUpdate](protocol.md#designupdate)
+Variant 7: [DesignUpdate](protocol.md#designupdate)
 
 | Field     | Required | Type                                               | Description |
 | --------- | -------- | -------------------------------------------------- | ----------- |
@@ -3976,7 +4103,7 @@ Variant 6: [DesignUpdate](protocol.md#designupdate)
 | `id`      | Yes      | `string`                                           |             |
 | `op`      | Yes      | `"update"`                                         |             |
 
-Variant 7: [DesignSizingOperation](protocol.md#designsizingoperation)
+Variant 8: [DesignSizingOperation](protocol.md#designsizingoperation)
 
 | Field     | Required | Type                                                   | Description |
 | --------- | -------- | ------------------------------------------------------ | ----------- |
@@ -3985,7 +4112,7 @@ Variant 7: [DesignSizingOperation](protocol.md#designsizingoperation)
 | `op`      | Yes      | `"sizing"`                                             |             |
 | `pageId`  | Yes      | `string`                                               |             |
 
-Variant 8: [DesignTypographyStyleOperation](protocol.md#designtypographystyleoperation)
+Variant 9: [DesignTypographyStyleOperation](protocol.md#designtypographystyleoperation)
 
 | Field     | Required | Type                 | Description |
 | --------- | -------- | -------------------- | ----------- |
@@ -3994,7 +4121,7 @@ Variant 8: [DesignTypographyStyleOperation](protocol.md#designtypographystyleope
 | `pageId`  | Yes      | `string`             |             |
 | `tokenId` | Yes      | `null,string`        |             |
 
-Variant 9: [DesignTypographyOperation](protocol.md#designtypographyoperation)
+Variant 10: [DesignTypographyOperation](protocol.md#designtypographyoperation)
 
 | Field     | Required | Type                                                           | Description |
 | --------- | -------- | -------------------------------------------------------------- | ----------- |
@@ -4003,7 +4130,7 @@ Variant 9: [DesignTypographyOperation](protocol.md#designtypographyoperation)
 | `op`      | Yes      | `"typography"`                                                 |             |
 | `pageId`  | Yes      | `string`                                                       |             |
 
-Variant 10: [DesignTextStyleOperation](protocol.md#designtextstyleoperation)
+Variant 11: [DesignTextStyleOperation](protocol.md#designtextstyleoperation)
 
 | Field     | Required | Type                                                         | Description |
 | --------- | -------- | ------------------------------------------------------------ | ----------- |
@@ -4014,7 +4141,7 @@ Variant 10: [DesignTextStyleOperation](protocol.md#designtextstyleoperation)
 | `pageId`  | Yes      | `string`                                                     |             |
 | `start`   | Yes      | `number`                                                     |             |
 
-Variant 11: [DesignTextOperation](protocol.md#designtextoperation)
+Variant 12: [DesignTextOperation](protocol.md#designtextoperation)
 
 | Field     | Required | Type     | Description |
 | --------- | -------- | -------- | ----------- |
@@ -4022,7 +4149,7 @@ Variant 11: [DesignTextOperation](protocol.md#designtextoperation)
 | `id`      | Yes      | `string` |             |
 | `op`      | Yes      | `"text"` |             |
 
-Variant 12: [DesignPositionOperation](protocol.md#designpositionoperation)
+Variant 13: [DesignPositionOperation](protocol.md#designpositionoperation)
 
 | Field        | Required | Type                                                       | Description                                                          |
 | ------------ | -------- | ---------------------------------------------------------- | -------------------------------------------------------------------- |
@@ -4035,7 +4162,7 @@ Variant 12: [DesignPositionOperation](protocol.md#designpositionoperation)
 | `x`          | No       | `number`                                                   |                                                                      |
 | `y`          | No       | `number`                                                   |                                                                      |
 
-Variant 13: [DesignRotateOperation](protocol.md#designrotateoperation)
+Variant 14: [DesignRotateOperation](protocol.md#designrotateoperation)
 
 | Field       | Required | Type              | Description |
 | ----------- | -------- | ----------------- | ----------- |
@@ -4046,7 +4173,7 @@ Variant 13: [DesignRotateOperation](protocol.md#designrotateoperation)
 | `pivotY`    | No       | `number`          |             |
 | `selection` | Yes      | Array of `string` |             |
 
-Variant 14: [DesignScaleOperation](protocol.md#designscaleoperation)
+Variant 15: [DesignScaleOperation](protocol.md#designscaleoperation)
 
 | Field       | Required | Type              | Description |
 | ----------- | -------- | ----------------- | ----------- |
@@ -4057,7 +4184,7 @@ Variant 14: [DesignScaleOperation](protocol.md#designscaleoperation)
 | `pivotY`    | No       | `number`          |             |
 | `selection` | Yes      | Array of `string` |             |
 
-Variant 15: [DesignTranslateOperation](protocol.md#designtranslateoperation)
+Variant 16: [DesignTranslateOperation](protocol.md#designtranslateoperation)
 
 | Field       | Required | Type                                                        | Description |
 | ----------- | -------- | ----------------------------------------------------------- | ----------- |
@@ -4068,7 +4195,7 @@ Variant 15: [DesignTranslateOperation](protocol.md#designtranslateoperation)
 | `reorders`  | No       | Array of [DesignFlowReorder](protocol.md#designflowreorder) |             |
 | `selection` | Yes      | Array of `string`                                           |             |
 
-Variant 16: [DesignMove](protocol.md#designmove)
+Variant 17: [DesignMove](protocol.md#designmove)
 
 | Field      | Required | Type          | Description |
 | ---------- | -------- | ------------- | ----------- |
@@ -4078,14 +4205,14 @@ Variant 16: [DesignMove](protocol.md#designmove)
 | `pageId`   | Yes      | `string`      |             |
 | `parentId` | Yes      | `null,string` |             |
 
-Variant 17: [DesignRemove](protocol.md#designremove)
+Variant 18: [DesignRemove](protocol.md#designremove)
 
 | Field | Required | Type       | Description |
 | ----- | -------- | ---------- | ----------- |
 | `id`  | Yes      | `string`   |             |
 | `op`  | Yes      | `"remove"` |             |
 
-Variant 18: [DesignPageOperation](protocol.md#designpageoperation)
+Variant 19: [DesignPageOperation](protocol.md#designpageoperation)
 
 | Field        | Required | Type          | Description |
 | ------------ | -------- | ------------- | ----------- |
@@ -4094,7 +4221,7 @@ Variant 18: [DesignPageOperation](protocol.md#designpageoperation)
 | `name`       | Yes      | `null,string` |             |
 | `op`         | Yes      | `"page"`      |             |
 
-Variant 19: [DesignGuideOperation](protocol.md#designguideoperation)
+Variant 20: [DesignGuideOperation](protocol.md#designguideoperation)
 
 | Field    | Required | Type                                                      | Description |
 | -------- | -------- | --------------------------------------------------------- | ----------- |
@@ -4103,7 +4230,7 @@ Variant 19: [DesignGuideOperation](protocol.md#designguideoperation)
 | `pageId` | Yes      | `string`                                                  |             |
 | `value`  | Yes      | [DesignGuideValue](protocol.md#designguidevalue) / `null` |             |
 
-Variant 20: [DesignMetadata](protocol.md#designmetadata)
+Variant 21: [DesignMetadata](protocol.md#designmetadata)
 
 | Field          | Required | Type                                                        | Description |
 | -------------- | -------- | ----------------------------------------------------------- | ----------- |
@@ -4113,7 +4240,16 @@ Variant 20: [DesignMetadata](protocol.md#designmetadata)
 | `op`           | Yes      | `"metadata"`                                                |             |
 | `tokens`       | No       | Array of [DesignToken](protocol.md#designtoken)             |             |
 
-Variant 21: [DesignTokenOperation](protocol.md#designtokenoperation)
+Variant 22: [DesignCommentOperation](protocol.md#designcommentoperation)
+
+| Field     | Required | Type                                                              | Description |
+| --------- | -------- | ----------------------------------------------------------------- | ----------- |
+| `changes` | Yes      | [DesignCommentChanges](protocol.md#designcommentchanges) / `null` |             |
+| `id`      | Yes      | `string`                                                          |             |
+| `op`      | Yes      | `"comment"`                                                       |             |
+| `pageId`  | Yes      | `null,string`                                                     |             |
+
+Variant 23: [DesignTokenOperation](protocol.md#designtokenoperation)
 
 | Field     | Required | Type                                                          | Description |
 | --------- | -------- | ------------------------------------------------------------- | ----------- |
@@ -4121,7 +4257,7 @@ Variant 21: [DesignTokenOperation](protocol.md#designtokenoperation)
 | `id`      | Yes      | `string`                                                      |             |
 | `op`      | Yes      | `"token"`                                                     |             |
 
-Variant 22: [DesignPaintColorOperation](protocol.md#designpaintcoloroperation)
+Variant 24: [DesignPaintColorOperation](protocol.md#designpaintcoloroperation)
 
 | Field     | Required | Type                                                           | Description |
 | --------- | -------- | -------------------------------------------------------------- | ----------- |
@@ -4132,7 +4268,7 @@ Variant 22: [DesignPaintColorOperation](protocol.md#designpaintcoloroperation)
 | `pageId`  | Yes      | `string`                                                       |             |
 | `target`  | Yes      | [DesignPaintColorTarget](protocol.md#designpaintcolortarget)   |             |
 
-Variant 23: [DesignPaintImageOperation](protocol.md#designpaintimageoperation)
+Variant 25: [DesignPaintImageOperation](protocol.md#designpaintimageoperation)
 
 | Field     | Required | Type                                                           | Description |
 | --------- | -------- | -------------------------------------------------------------- | ----------- |
@@ -4143,7 +4279,7 @@ Variant 23: [DesignPaintImageOperation](protocol.md#designpaintimageoperation)
 | `pageId`  | Yes      | `string`                                                       |             |
 | `target`  | Yes      | [DesignPaintColorTarget](protocol.md#designpaintcolortarget)   |             |
 
-Variant 24: [DesignPaintPatternOperation](protocol.md#designpaintpatternoperation)
+Variant 26: [DesignPaintPatternOperation](protocol.md#designpaintpatternoperation)
 
 | Field     | Required | Type                                                               | Description |
 | --------- | -------- | ------------------------------------------------------------------ | ----------- |
@@ -4154,7 +4290,7 @@ Variant 24: [DesignPaintPatternOperation](protocol.md#designpaintpatternoperatio
 | `pageId`  | Yes      | `string`                                                           |             |
 | `target`  | Yes      | [DesignPaintColorTarget](protocol.md#designpaintcolortarget)       |             |
 
-Variant 25: [DesignPaintGradientOperation](protocol.md#designpaintgradientoperation)
+Variant 27: [DesignPaintGradientOperation](protocol.md#designpaintgradientoperation)
 
 | Field     | Required | Type                                                                 | Description |
 | --------- | -------- | -------------------------------------------------------------------- | ----------- |
@@ -4165,7 +4301,7 @@ Variant 25: [DesignPaintGradientOperation](protocol.md#designpaintgradientoperat
 | `pageId`  | Yes      | `string`                                                             |             |
 | `target`  | Yes      | [DesignPaintColorTarget](protocol.md#designpaintcolortarget)         |             |
 
-Variant 26: [DesignStrokeOperation](protocol.md#designstrokeoperation)
+Variant 28: [DesignStrokeOperation](protocol.md#designstrokeoperation)
 
 | Field     | Required | Type                                                            | Description |
 | --------- | -------- | --------------------------------------------------------------- | ----------- |
@@ -4174,7 +4310,7 @@ Variant 26: [DesignStrokeOperation](protocol.md#designstrokeoperation)
 | `op`      | Yes      | `"stroke"`                                                      |             |
 | `pageId`  | Yes      | `string`                                                        |             |
 
-Variant 27: [DesignPolygonOperation](protocol.md#designpolygonoperation)
+Variant 29: [DesignPolygonOperation](protocol.md#designpolygonoperation)
 
 | Field     | Required | Type                                                                | Description |
 | --------- | -------- | ------------------------------------------------------------------- | ----------- |
@@ -4183,7 +4319,7 @@ Variant 27: [DesignPolygonOperation](protocol.md#designpolygonoperation)
 | `op`      | Yes      | `"polygon"`                                                         |             |
 | `pageId`  | Yes      | `string`                                                            |             |
 
-Variant 28: [DesignArcOperation](protocol.md#designarcoperation)
+Variant 30: [DesignArcOperation](protocol.md#designarcoperation)
 
 | Field     | Required | Type                                                        | Description |
 | --------- | -------- | ----------------------------------------------------------- | ----------- |
@@ -4192,7 +4328,7 @@ Variant 28: [DesignArcOperation](protocol.md#designarcoperation)
 | `op`      | Yes      | `"arc"`                                                     |             |
 | `pageId`  | Yes      | `string`                                                    |             |
 
-Variant 29: [DesignStyleOperation](protocol.md#designstyleoperation)
+Variant 31: [DesignStyleOperation](protocol.md#designstyleoperation)
 
 | Field     | Required | Type                                                 | Description |
 | --------- | -------- | ---------------------------------------------------- | ----------- |
@@ -4531,7 +4667,18 @@ Variant 2: [DesignLayoutOperation](protocol.md#designlayoutoperation)
 | `op`      | Yes      | `"layout"`                                             |             |
 | `pageId`  | Yes      | `string`                                               |             |
 
-Variant 3: [DesignReparentOperation](protocol.md#designreparentoperation)
+Variant 3: [DesignTidyOperation](protocol.md#designtidyoperation)
+
+| Field       | Required | Type              | Description |
+| ----------- | -------- | ----------------- | ----------- |
+| `columns`   | No       | `number`          |             |
+| `gapX`      | No       | `number`          |             |
+| `gapY`      | No       | `number`          |             |
+| `op`        | Yes      | `"tidy"`          |             |
+| `pageId`    | Yes      | `string`          |             |
+| `selection` | Yes      | Array of `string` |             |
+
+Variant 4: [DesignReparentOperation](protocol.md#designreparentoperation)
 
 | Field       | Required | Type              | Description                                                                                       |
 | ----------- | -------- | ----------------- | ------------------------------------------------------------------------------------------------- |
@@ -4544,7 +4691,7 @@ Variant 3: [DesignReparentOperation](protocol.md#designreparentoperation)
 | `parentId`  | Yes      | `null,string`     |                                                                                                   |
 | `selection` | Yes      | Array of `string` |                                                                                                   |
 
-Variant 4: [DesignResizeOperation](protocol.md#designresizeoperation)
+Variant 5: [DesignResizeOperation](protocol.md#designresizeoperation)
 
 | Field       | Required | Type              | Description                                                                                            |
 | ----------- | -------- | ----------------- | ------------------------------------------------------------------------------------------------------ |
@@ -5127,6 +5274,19 @@ Each page groups positions by shaped span and preserves rich style and underline
 | `style`        | Yes      | [DesignTextSpanStyle](protocol.md#designtextspanstyle)              |             |
 | `underline`    | Yes      | [DesignGlyphBounds](protocol.md#designglyphbounds) / `null`         |             |
 
+## DesignTidyOperation
+
+Tidy free roots into a grid while retaining their hierarchy, dimensions and source artwork.
+
+| Field       | Required | Type              | Description |
+| ----------- | -------- | ----------------- | ----------- |
+| `columns`   | No       | `number`          |             |
+| `gapX`      | No       | `number`          |             |
+| `gapY`      | No       | `number`          |             |
+| `op`        | Yes      | `"tidy"`          |             |
+| `pageId`    | Yes      | `string`          |             |
+| `selection` | Yes      | Array of `string` |             |
+
 ## DesignToken
 
 Named design-system values.
@@ -5377,27 +5537,30 @@ The gateway advertises view support independently of the legacy complete-record 
 
 Deferred records are valid identity projections, never complete editable copies of their original bodies.
 
-| Field         | Required | Type                                                              | Description                                                                    |
-| ------------- | -------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| `deferredIds` | Yes      | Array of `string`                                                 | Only deferred node identities carried in this bounded record page or fragment. |
-| `fragment`    | Yes      | [DesignRecordFragment](protocol.md#designrecordfragment) / `null` |                                                                                |
-| `nextCursor`  | Yes      | [DesignCursor](protocol.md#designcursor) / `null`                 |                                                                                |
-| `pageId`      | Yes      | `string`                                                          | The resolved primary page is stable across all continuations.                  |
-| `records`     | Yes      | Array of [DesignRecord](protocol.md#designrecord)                 |                                                                                |
-| `summary`     | Yes      | [DesignSummary](protocol.md#designsummary)                        |                                                                                |
+| Field              | Required | Type                                                              | Description                                                                      |
+| ------------------ | -------- | ----------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `commentCount`     | No       | `number`                                                          | Total saved comments, independent of the requested page or record cursor.        |
+| `commentsDeferred` | No       | `true`                                                            | Present with commentCount only when all comment records were explicitly omitted. |
+| `deferredIds`      | Yes      | Array of `string`                                                 | Only deferred node identities carried in this bounded record page or fragment.   |
+| `fragment`         | Yes      | [DesignRecordFragment](protocol.md#designrecordfragment) / `null` |                                                                                  |
+| `nextCursor`       | Yes      | [DesignCursor](protocol.md#designcursor) / `null`                 |                                                                                  |
+| `pageId`           | Yes      | `string`                                                          | The resolved primary page is stable across all continuations.                    |
+| `records`          | Yes      | Array of [DesignRecord](protocol.md#designrecord)                 |                                                                                  |
+| `summary`          | Yes      | [DesignSummary](protocol.md#designsummary)                        |                                                                                  |
 
 ## DesignViewRequest
 
 A revision-pinned page view retains topology while deferring inactive text and vector bodies.
 
-| Field        | Required | Type                                              | Description                                                                                              |
-| ------------ | -------- | ------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| `cursor`     | Yes      | [DesignCursor](protocol.md#designcursor) / `null` |                                                                                                          |
-| `id`         | Yes      | `string`                                          |                                                                                                          |
-| `includeIds` | Yes      | Array of `string`                                 | Additional existing layers and their dependencies; removed identities are ignored during shared refresh. |
-| `limit`      | Yes      | `number`                                          |                                                                                                          |
-| `pageId`     | Yes      | `null,string`                                     | Null or a removed preferred page selects the document's first page.                                      |
-| `revision`   | Yes      | `null,string`                                     |                                                                                                          |
+| Field           | Required | Type                                              | Description                                                                                              |
+| --------------- | -------- | ------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `cursor`        | Yes      | [DesignCursor](protocol.md#designcursor) / `null` |                                                                                                          |
+| `deferComments` | No       | `boolean`                                         | Explicit omission keeps note bodies native; absent or false retains complete legacy records.             |
+| `id`            | Yes      | `string`                                          |                                                                                                          |
+| `includeIds`    | Yes      | Array of `string`                                 | Additional existing layers and their dependencies; removed identities are ignored during shared refresh. |
+| `limit`         | Yes      | `number`                                          |                                                                                                          |
+| `pageId`        | Yes      | `null,string`                                     | Null or a removed preferred page selects the document's first page.                                      |
+| `revision`      | Yes      | `null,string`                                     |                                                                                                          |
 
 ## DeviceApproveParams
 
@@ -5595,6 +5758,8 @@ Methods, events, and additive capabilities supported by this gateway.
 | `designTextInheritedPaint`  | No       | `true`                                             | Rich typography can inherit the layer's gradient, image or solid fill stack.                   |
 | `designTextPaintClipping`   | No       | `true`                                             | Native glyph windows can preserve shared shaping with bounded paint clips.                     |
 | `designTextRangeFills`      | No       | `true`                                             | UTF-16 rich ranges can replace layer fills with their own editable paint stacks.               |
+| `designTidy`                | No       | `true`                                             | Compact tidy commands arrange free selections without replacing their source bodies.           |
+| `designTidyPreview`         | No       | `true`                                             | Read-only Tidy previews retain deferred text and exact owner-scoped font geometry.             |
 | `designVectorPatterns`      | No       | `true`                                             | Linked component paints support revision-pinned bounded source-cell sampling.                  |
 | `events`                    | Yes      | Array of `string`                                  |                                                                                                |
 | `jsonReplies`               | No       | `true`                                             | Host validation of JSON final answers while native tools remain available.                     |
@@ -5706,6 +5871,8 @@ Configurable bounds on gateway-owned work and memory.
 | `design.clipboard.cut`               | Yes      | Object (fields below) | Atomic source cut uses the same durable receipt and undo contract as other native commands.            |
 | `design.clipboard.paste`             | Yes      | Object (fields below) | Native snapshot paste shares the normal destination command journal and undo contract.                 |
 | `design.colors`                      | Yes      | Object (fields below) | Native color pages use the authenticated read-only gateway.                                            |
+| `design.comment.text`                | Yes      | Object (fields below) | Body windows retain the same owner and saved-revision fence as their summary.                          |
+| `design.comments`                    | Yes      | Object (fields below) | Comment summaries use the authenticated read-only connection.                                          |
 | `design.component`                   | Yes      | Object (fields below) | Native component commands keep source forests on the authenticated owner's workspace.                  |
 | `design.create`                      | Yes      | Object (fields below) | Create-document RPC contract.                                                                          |
 | `design.delete`                      | Yes      | Object (fields below) | Owner-scoped revision-safe document deletion.                                                          |
@@ -6251,6 +6418,20 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ------------------------------------------------------------ | ----------- |
 | `params` | Yes      | [DesignColorReadRequest](protocol.md#designcolorreadrequest) |             |
 | `result` | Yes      | [DesignColorReadPage](protocol.md#designcolorreadpage)       |             |
+
+**design.comment.text**
+
+| Field    | Required | Type                                                             | Description |
+| -------- | -------- | ---------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignCommentTextRequest](protocol.md#designcommenttextrequest) |             |
+| `result` | Yes      | [DesignCommentTextPage](protocol.md#designcommenttextpage)       |             |
+
+**design.comments**
+
+| Field    | Required | Type                                                       | Description |
+| -------- | -------- | ---------------------------------------------------------- | ----------- |
+| `params` | Yes      | [DesignCommentsRequest](protocol.md#designcommentsrequest) |             |
+| `result` | Yes      | [DesignCommentsPage](protocol.md#designcommentspage)       |             |
 
 **design.component**
 

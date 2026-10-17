@@ -1,6 +1,6 @@
 # RPC reference
 
-All 202 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 201 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
+All 204 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 203 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
 
 - [accounts.create](#accountscreate)
 - [accounts.list](#accountslist)
@@ -49,6 +49,8 @@ All 202 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [design.clipboard.cut](#designclipboardcut)
 - [design.clipboard.paste](#designclipboardpaste)
 - [design.colors](#designcolors)
+- [design.comment.text](#designcommenttext)
+- [design.comments](#designcomments)
 - [design.component](#designcomponent)
 - [design.create](#designcreate)
 - [design.delete](#designdelete)
@@ -1112,14 +1114,15 @@ const result: ResultOf<typeof Method.DesignCanvas> = await client.call(Method.De
 
 Parameters: [DesignViewRequest](protocol.md#designviewrequest).
 
-| Field        | Required | Type                                              | Description                                                                                              |
-| ------------ | -------- | ------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| `cursor`     | Yes      | [DesignCursor](protocol.md#designcursor) / `null` |                                                                                                          |
-| `id`         | Yes      | `string`                                          |                                                                                                          |
-| `includeIds` | Yes      | Array of `string`                                 | Additional existing layers and their dependencies; removed identities are ignored during shared refresh. |
-| `limit`      | Yes      | `number`                                          |                                                                                                          |
-| `pageId`     | Yes      | `null,string`                                     | Null or a removed preferred page selects the document's first page.                                      |
-| `revision`   | Yes      | `null,string`                                     |                                                                                                          |
+| Field           | Required | Type                                              | Description                                                                                              |
+| --------------- | -------- | ------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `cursor`        | Yes      | [DesignCursor](protocol.md#designcursor) / `null` |                                                                                                          |
+| `deferComments` | No       | `boolean`                                         | Explicit omission keeps note bodies native; absent or false retains complete legacy records.             |
+| `id`            | Yes      | `string`                                          |                                                                                                          |
+| `includeIds`    | Yes      | Array of `string`                                 | Additional existing layers and their dependencies; removed identities are ignored during shared refresh. |
+| `limit`         | Yes      | `number`                                          |                                                                                                          |
+| `pageId`        | Yes      | `null,string`                                     | Null or a removed preferred page selects the document's first page.                                      |
+| `revision`      | Yes      | `null,string`                                     |                                                                                                          |
 
 Result: [DesignCanvasPage](protocol.md#designcanvaspage).
 
@@ -1314,6 +1317,70 @@ Parameters: [DesignColorReadRequest](protocol.md#designcolorreadrequest).
 | `selection` | Yes      | Array of `string` |             |
 
 Result: [DesignColorReadPage](protocol.md#designcolorreadpage).
+
+## design.comment.text
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DesignCommentText> = {
+    commentId: 'YOUR_COMMENTID',
+    id: 'YOUR_ID',
+    limit: 1,
+    offset: 1,
+    pageId: null,
+    revision: 'YOUR_REVISION',
+};
+const result: ResultOf<typeof Method.DesignCommentText> = await client.call(
+    Method.DesignCommentText,
+    params,
+);
+```
+
+Parameters: [DesignCommentTextRequest](protocol.md#designcommenttextrequest).
+
+| Field       | Required | Type          | Description |
+| ----------- | -------- | ------------- | ----------- |
+| `commentId` | Yes      | `string`      |             |
+| `id`        | Yes      | `string`      |             |
+| `limit`     | Yes      | `number`      |             |
+| `offset`    | Yes      | `number`      |             |
+| `pageId`    | Yes      | `null,string` |             |
+| `revision`  | Yes      | `string`      |             |
+
+Result: [DesignCommentTextPage](protocol.md#designcommenttextpage).
+
+## design.comments
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DesignComments> = {
+    id: 'YOUR_ID',
+    limit: 1,
+    offset: 1,
+    pageId: null,
+    resolved: null,
+    revision: 'YOUR_REVISION',
+};
+const result: ResultOf<typeof Method.DesignComments> = await client.call(
+    Method.DesignComments,
+    params,
+);
+```
+
+Parameters: [DesignCommentsRequest](protocol.md#designcommentsrequest).
+
+| Field      | Required | Type           | Description |
+| ---------- | -------- | -------------- | ----------- |
+| `id`       | Yes      | `string`       |             |
+| `limit`    | Yes      | `number`       |             |
+| `offset`   | Yes      | `number`       |             |
+| `pageId`   | Yes      | `null,string`  |             |
+| `resolved` | Yes      | `null,boolean` |             |
+| `revision` | Yes      | `string`       |             |
+
+Result: [DesignCommentsPage](protocol.md#designcommentspage).
 
 ## design.component
 
@@ -1875,14 +1942,15 @@ const result: ResultOf<typeof Method.DesignView> = await client.call(Method.Desi
 
 Parameters: [DesignViewRequest](protocol.md#designviewrequest).
 
-| Field        | Required | Type                                              | Description                                                                                              |
-| ------------ | -------- | ------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| `cursor`     | Yes      | [DesignCursor](protocol.md#designcursor) / `null` |                                                                                                          |
-| `id`         | Yes      | `string`                                          |                                                                                                          |
-| `includeIds` | Yes      | Array of `string`                                 | Additional existing layers and their dependencies; removed identities are ignored during shared refresh. |
-| `limit`      | Yes      | `number`                                          |                                                                                                          |
-| `pageId`     | Yes      | `null,string`                                     | Null or a removed preferred page selects the document's first page.                                      |
-| `revision`   | Yes      | `null,string`                                     |                                                                                                          |
+| Field           | Required | Type                                              | Description                                                                                              |
+| --------------- | -------- | ------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `cursor`        | Yes      | [DesignCursor](protocol.md#designcursor) / `null` |                                                                                                          |
+| `deferComments` | No       | `boolean`                                         | Explicit omission keeps note bodies native; absent or false retains complete legacy records.             |
+| `id`            | Yes      | `string`                                          |                                                                                                          |
+| `includeIds`    | Yes      | Array of `string`                                 | Additional existing layers and their dependencies; removed identities are ignored during shared refresh. |
+| `limit`         | Yes      | `number`                                          |                                                                                                          |
+| `pageId`        | Yes      | `null,string`                                     | Null or a removed preferred page selects the document's first page.                                      |
+| `revision`      | Yes      | `null,string`                                     |                                                                                                          |
 
 Result: [DesignViewPage](protocol.md#designviewpage).
 
