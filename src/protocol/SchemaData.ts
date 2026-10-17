@@ -8587,6 +8587,9 @@ export const schema: Schema = {
                     $ref: '#/definitions/DesignScaleOperation',
                 },
                 {
+                    $ref: '#/definitions/DesignTidyOperation',
+                },
+                {
                     $ref: '#/definitions/DesignTranslateOperation',
                 },
                 {
@@ -10756,6 +10759,36 @@ export const schema: Schema = {
             required: ['glyphs', 'lineIndex', 'segmentIndex', 'style', 'underline'],
             type: 'object',
         },
+        DesignTidyOperation: {
+            description:
+                'Tidy free roots into a grid while retaining their hierarchy, dimensions and source artwork.',
+            properties: {
+                columns: {
+                    type: 'number',
+                },
+                gapX: {
+                    type: 'number',
+                },
+                gapY: {
+                    type: 'number',
+                },
+                op: {
+                    const: 'tidy',
+                    type: 'string',
+                },
+                pageId: {
+                    type: 'string',
+                },
+                selection: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+            },
+            required: ['op', 'pageId', 'selection'],
+            type: 'object',
+        },
         DesignToken: {
             description: 'Named design-system values.',
             properties: {
@@ -11921,6 +11954,12 @@ export const schema: Schema = {
                     const: true,
                     description:
                         'UTF-16 rich ranges can replace layer fills with their own editable paint stacks.',
+                    type: 'boolean',
+                },
+                designTidy: {
+                    const: true,
+                    description:
+                        'Compact tidy commands arrange free selections without replacing their source bodies.',
                     type: 'boolean',
                 },
                 designVectorPatterns: {

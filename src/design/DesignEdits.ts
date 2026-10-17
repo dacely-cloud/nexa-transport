@@ -31,6 +31,7 @@ import { DesignFlow, DesignKind } from './DesignTypes.js';
 import { DesignResizeEdits } from './DesignResizeEdits.js';
 import { DesignPositionEdits } from './DesignPositionEdits.js';
 import { DesignScaleEdits } from './DesignScaleEdits.js';
+import { DesignTidyEdits } from './DesignTidyEdits.js';
 import { DesignRotateEdits } from './DesignRotateEdits.js';
 import { DesignTranslateEdits } from './DesignTranslateEdits.js';
 import { DesignTextStyleEdits } from './DesignTextStyleEdits.js';
@@ -153,6 +154,7 @@ export class DesignEdits {
                 case DesignOperationKind.Sizing:
                 case DesignOperationKind.Typography:
                 case DesignOperationKind.TextStyle:
+                case DesignOperationKind.Tidy:
                 case DesignOperationKind.Scale: {
                     const current: DesignDocument = {
                         ...document,
@@ -189,7 +191,9 @@ export class DesignEdits {
                                         ? new DesignRotateEdits(context).apply(operation)
                                         : operation.op === DesignOperationKind.Scale
                                           ? new DesignScaleEdits(context).apply(operation)
-                                          : new DesignTranslateEdits(context).apply(operation);
+                                          : operation.op === DesignOperationKind.Tidy
+                                            ? new DesignTidyEdits(context).apply(operation)
+                                            : new DesignTranslateEdits(context).apply(operation);
                     for (const node of changed) {
                         nodes.set(node.id, node);
                     }

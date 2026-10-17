@@ -81,6 +81,9 @@ export class DesignOperationCodec {
                     'pivotX',
                     'pivotY',
                     'factor',
+                    'columns',
+                    'gapX',
+                    'gapY',
                     'tokenId',
                     'before',
                     'after',
@@ -402,6 +405,35 @@ export class DesignOperationCodec {
                         op,
                         id: V.id(value['id']),
                         content: V.text(value['content'], 100000, true),
+                    };
+                }
+                case Kind.Tidy: {
+                    const value: Readonly<Record<string, unknown>> = V.fields(
+                        entry,
+                        ['op', 'pageId', 'selection', 'columns', 'gapX', 'gapY'],
+                        ['op', 'pageId', 'selection'],
+                    );
+                    const selection: readonly string[] = V.list(
+                        value['selection'],
+                        128,
+                        (id: unknown): string => V.id(id),
+                    );
+                    if (selection.length < 2 || new Set(selection).size !== selection.length) {
+                        throw new Error('Tidy requires 2 to 128 distinct selected layers.');
+                    }
+                    return {
+                        op,
+                        pageId: V.id(value['pageId']),
+                        selection,
+                        ...(value['columns'] === undefined
+                            ? {}
+                            : { columns: V.number(value['columns'], 1, 128, true) }),
+                        ...(value['gapX'] === undefined
+                            ? {}
+                            : { gapX: V.number(value['gapX'], -10000, 10000) }),
+                        ...(value['gapY'] === undefined
+                            ? {}
+                            : { gapY: V.number(value['gapY'], -10000, 10000) }),
                     };
                 }
                 case Kind.Scale: {

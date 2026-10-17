@@ -54,6 +54,7 @@ export const DesignOperationKind = {
     Translate: 'translate',
     Rotate: 'rotate',
     Scale: 'scale',
+    Tidy: 'tidy',
     Layout: 'layout',
     Sizing: 'sizing',
     Typography: 'typography',
@@ -291,6 +292,15 @@ export interface DesignScaleOperation {
     readonly pivotX?: number;
     readonly pivotY?: number;
 }
+/** Tidy free roots into a grid while retaining their hierarchy, dimensions and source artwork. */
+export interface DesignTidyOperation {
+    readonly op: typeof DesignOperationKind.Tidy;
+    readonly pageId: string;
+    readonly selection: readonly string[];
+    readonly columns?: number;
+    readonly gapX?: number;
+    readonly gapY?: number;
+}
 /** Move a selection from one original scene, optionally reordering selected flow children in the same edit. */
 export interface DesignTranslateOperation {
     readonly op: typeof DesignOperationKind.Translate;
@@ -499,6 +509,7 @@ export type DesignOperation =
     | DesignTranslateOperation
     | DesignRotateOperation
     | DesignScaleOperation
+    | DesignTidyOperation
     | DesignLayoutOperation
     | DesignSizingOperation
     | DesignTypographyStyleOperation

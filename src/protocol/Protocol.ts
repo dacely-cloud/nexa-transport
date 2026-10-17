@@ -5603,6 +5603,7 @@ export type DesignOperation =
     | DesignPositionOperation
     | DesignRotateOperation
     | DesignScaleOperation
+    | DesignTidyOperation
     | DesignTranslateOperation
     | DesignMove
     | DesignRemove
@@ -7005,6 +7006,25 @@ export interface DesignTextWindowRunShape {
 /** DesignTextWindowRun from the Nexa wire protocol. */
 export type DesignTextWindowRun = DesignTextWindowRunShape;
 
+/** DesignTidyOperation wire fields. */
+export interface DesignTidyOperationShape {
+    /** columns as defined by the Nexa gateway. */
+    readonly columns?: number;
+    /** gapX as defined by the Nexa gateway. */
+    readonly gapX?: number;
+    /** gapY as defined by the Nexa gateway. */
+    readonly gapY?: number;
+    /** op as defined by the Nexa gateway. */
+    readonly op: 'tidy';
+    /** pageId as defined by the Nexa gateway. */
+    readonly pageId: string;
+    /** selection as defined by the Nexa gateway. */
+    readonly selection: ReadonlyArray<string>;
+}
+
+/** DesignTidyOperation from the Nexa wire protocol. */
+export type DesignTidyOperation = DesignTidyOperationShape;
+
 /** DesignToken wire fields. */
 export interface DesignTokenShape {
     /** category as defined by the Nexa gateway. */
@@ -7767,6 +7787,8 @@ export interface GatewayFeaturesShape {
     readonly designTextPaintClipping?: true;
     /** designTextRangeFills as defined by the Nexa gateway. */
     readonly designTextRangeFills?: true;
+    /** designTidy as defined by the Nexa gateway. */
+    readonly designTidy?: true;
     /** designVectorPatterns as defined by the Nexa gateway. */
     readonly designVectorPatterns?: true;
     /** events as defined by the Nexa gateway. */

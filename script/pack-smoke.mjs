@@ -23,6 +23,10 @@ try {
         join(directory, 'consumer.ts'),
         `import { NexaClient } from 'nexa-transport';
 import { DesignFlex } from 'nexa-transport/design-flex';
+import { DesignTidyGeometry } from 'nexa-transport/design-tidy-geometry';
+import { DesignTidyEdits } from 'nexa-transport/design-tidy-edits';
+void DesignTidyGeometry.inspect;
+void DesignTidyEdits;
 import { DesignGridPacking } from 'nexa-transport/design-grid-packing';
 import * as DesignTextDirection from 'nexa-transport/design-text-direction';
 void DesignFlex.lines;
