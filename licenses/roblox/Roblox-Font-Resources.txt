@@ -1,0 +1,11 @@
+LicenseRef-Roblox-Font-Resource
+
+The generated browser font modules preserve unmodified original Roblox client
+font bytes. They do not replace or relicense the original fonts. Each font's
+original copyright, license text and license URL remain embedded in its SFNT
+name table. The release, official download source and individual byte digests
+are recorded in assets/roblox/fonts/catalog.json.
+
+Arimo's SIL Open Font License is also retained in assets/roblox/fonts/OFL.txt.
+The Apache-2.0 license on the importer, metadata and rendering code does not
+apply to the embedded original font resources.

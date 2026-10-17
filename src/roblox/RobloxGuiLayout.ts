@@ -19,6 +19,7 @@ import { RobloxGuiImages, type RobloxGuiImage } from './RobloxGuiImages';
 import { RobloxGuiScale } from './RobloxGuiScale';
 import { RobloxTextSelection, type RobloxTextSelectionGeometry } from './RobloxTextSelection';
 import { RobloxTextHit } from './RobloxTextHit';
+import { RobloxFonts } from './RobloxFonts';
 
 /** Affine local-pixel to viewport-pixel transform. */
 export type RobloxGuiTransform = readonly [number, number, number, number, number, number];
@@ -40,6 +41,8 @@ export interface RobloxGuiElement {
     readonly text: string;
     readonly textColor: readonly [number, number, number, number];
     readonly textSize: number;
+    /** Native Enum.Font ordinal selects the original face in both rendering paths. */
+    readonly font?: number;
     readonly textWrapped: boolean;
     readonly textX: number;
     readonly textY: number;
@@ -66,7 +69,11 @@ export class RobloxGuiLayout {
         y: number,
     ): number {
         const metrics: import('./RobloxTextMetrics').RobloxTextMetrics | undefined =
-            this.#scene.textMetrics;
+            RobloxFonts.metrics(
+                element.font ?? 0,
+                this.#scene.textMetrics,
+                this.#scene.textMetricsByFont,
+            );
         if (metrics === undefined) {
             throw new Error('TextBox hit testing requires the actual native font metrics');
         }
@@ -97,7 +104,11 @@ export class RobloxGuiLayout {
             return { insertion: null, selection: [] };
         }
         const metrics: import('./RobloxTextMetrics').RobloxTextMetrics | undefined =
-            this.#scene.textMetrics;
+            RobloxFonts.metrics(
+                element.font ?? 0,
+                this.#scene.textMetrics,
+                this.#scene.textMetricsByFont,
+            );
         if (metrics === undefined) {
             throw new Error('TextBox selection requires the actual native font metrics');
         }
@@ -176,7 +187,12 @@ export class RobloxGuiLayout {
         }
         values = RobloxGuiScale.project(this.#children, values);
         const result: RobloxGuiElement[] = [];
-        this.#sizing = new RobloxGuiAutoSize(this.#children, values, this.#scene.textMetrics);
+        this.#sizing = new RobloxGuiAutoSize(
+            this.#children,
+            values,
+            this.#scene.textMetrics,
+            this.#scene.textMetricsByFont,
+        );
         this.#imagePatches = 0;
         const screens: RobloxSceneNode[] = [...this.#screens].sort(
             (a: RobloxSceneNode, b: RobloxSceneNode): number =>
@@ -459,6 +475,9 @@ export class RobloxGuiLayout {
             textSize: !RobloxGuiClasses.text(node.className)
                 ? 1
                 : RobloxProperties.number(properties, 'TextSize'),
+            ...(RobloxGuiClasses.text(node.className)
+                ? { font: RobloxProperties.enum(properties, 'Font') }
+                : {}),
             textWrapped: properties['TextWrapped'] === true,
             textX: !RobloxGuiClasses.text(node.className)
                 ? 2

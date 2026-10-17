@@ -4,6 +4,7 @@
 import type { RobloxScene, RobloxSceneNode, RobloxValue } from './RobloxSceneTypes';
 import { RobloxSceneSchema, type RobloxPropertySpec } from './RobloxSceneSchema';
 import { RobloxSceneLuau } from './RobloxSceneLuau';
+import { RobloxFonts } from './RobloxFonts';
 import { RobloxMeshPlayback, type RobloxMeshPlaybackPlan } from './RobloxMeshPlayback';
 
 /** Native XML serialization, using the rbx-dom version 4 format. */
@@ -106,6 +107,18 @@ export class RobloxSceneXml {
     public static property(name: string, value: RobloxValue, spec?: RobloxPropertySpec): string {
         if (spec?.serialize === false) {
             return '';
+        }
+        if (spec?.enumFamily === 'Font' && typeof value === 'object' && value.kind === 'Enum') {
+            const face: ReturnType<typeof RobloxFonts.face> = RobloxFonts.face(value.value);
+            return (
+                '<Font name="FontFace"><Family><url>' +
+                this.escape(face.family) +
+                '</url></Family><Weight>' +
+                String(face.weight) +
+                '</Weight><Style>' +
+                (face.style === 'italic' ? 'Italic' : 'Normal') +
+                '</Style></Font>'
+            );
         }
         const diskName: string = spec?.xmlName ?? name;
         let type: string =

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { RobloxClass, RobloxValue, RobloxValueKind } from './RobloxSceneTypes';
+import { RobloxFontCatalog, type RobloxFontDefinition } from './RobloxFontCatalog';
 
 /** Official native Enum.Material values retained in previews and Studio exports. */
 export const RobloxMaterial = {
@@ -184,7 +185,11 @@ const text: Readonly<Record<string, RobloxPropertySpec>> = {
     TextWrapped: b(false),
     TextXAlignment: e(2, [0, 1, 2], 'TextXAlignment'),
     TextYAlignment: e(1, [0, 1, 2], 'TextYAlignment'),
-    Font: e(0, [0], 'Font'),
+    Font: e(
+        0,
+        RobloxFontCatalog.map((face: RobloxFontDefinition): number => face.value),
+        'Font',
+    ),
 };
 
 const part: Readonly<Record<string, RobloxPropertySpec>> = {

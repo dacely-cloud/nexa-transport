@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { RobloxTextLineLayout } from './RobloxTextLines';
+import { RobloxFontCatalog, type RobloxFontDefinition } from './RobloxFontCatalog';
 
 /** Font units measured by the same fontdue font used for native GUI drawing. */
 export interface RobloxTextMetrics {
@@ -70,11 +71,16 @@ export class RobloxTextMeasurement {
         ) {
             throw new Error('Invalid native GUI text metrics');
         }
-        if (raw['fontUri'] !== undefined && raw['fontUri'] !== this.legacyFontUri) {
+        if (
+            raw['fontUri'] !== undefined &&
+            !RobloxFontCatalog.some(
+                (face: RobloxFontDefinition): boolean => face.uri === raw['fontUri'],
+            )
+        ) {
             throw new Error('Invalid native GUI font resource identity');
         }
         return {
-            ...(raw['fontUri'] === undefined ? {} : { fontUri: this.legacyFontUri }),
+            ...(typeof raw['fontUri'] === 'string' ? { fontUri: raw['fontUri'] } : {}),
             format: 'nexa.roblox.text-metrics',
             version: 1,
             unitsPerEm: this.#number(raw['unitsPerEm'], 1, 65536),
@@ -83,6 +89,29 @@ export class RobloxTextMeasurement {
             advances: this.#table(raw['advances'], 1, 8192),
             kerning: this.#table(raw['kerning'], 2, 32768),
         };
+    }
+
+    /** Validate bounded per-face metrics and bind each table to the requested original resource. */
+    public static decodeFaces(raw: unknown): Readonly<Record<string, RobloxTextMetrics>> {
+        if (!this.#record(raw) || Object.keys(raw).length > RobloxFontCatalog.length) {
+            throw new Error('Invalid native GUI font metric table');
+        }
+        const faces: Record<string, RobloxTextMetrics> = {};
+        for (const [key, value] of Object.entries(raw)) {
+            const face: RobloxFontDefinition | undefined = RobloxFontCatalog[Number(key)];
+            if (face === undefined || String(face.value) !== key) {
+                throw new Error('Invalid native GUI font metric key');
+            }
+            const metrics: RobloxTextMetrics = this.decode(value);
+            if (
+                (face.value !== 0 || metrics.fontUri !== undefined) &&
+                metrics.fontUri !== face.uri
+            ) {
+                throw new Error('Native GUI font metric identity mismatch');
+            }
+            faces[key] = metrics;
+        }
+        return Object.freeze(faces);
     }
 
     /** Matches native paragraph wrapping and f32 advance accumulation at the requested size. */

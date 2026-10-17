@@ -7,6 +7,7 @@ import {
 } from './RobloxGuiBoxLayout';
 import { RobloxGuiClasses } from './RobloxGuiClasses';
 import { RobloxGuiText } from './RobloxGuiText';
+import { RobloxFonts } from './RobloxFonts';
 import { RobloxGuiPadding, type RobloxGuiInsets } from './RobloxGuiPadding';
 import { RobloxGuiSizeConstraint, type RobloxGuiSizeLimits } from './RobloxGuiSizeConstraint';
 import { RobloxGuiAspectRatio, type RobloxGuiAspectConstraint } from './RobloxGuiAspectRatio';
@@ -31,6 +32,7 @@ export class RobloxGuiAutoSize {
         children: ReadonlyMap<string | null, readonly RobloxSceneNode[]>,
         values: ReadonlyMap<string, Readonly<Record<string, RobloxValue>>>,
         metrics: RobloxTextMetrics | undefined,
+        public readonly metricsByFont?: Readonly<Record<string, RobloxTextMetrics>>,
     ) {
         this.#children = children;
         this.#values = values;
@@ -195,14 +197,19 @@ export class RobloxGuiAutoSize {
         if (!RobloxGuiClasses.text(node.className)) {
             return { width: 0, height: 0, lines: 0 };
         }
-        if (this.#metrics === undefined) {
+        const metrics: RobloxTextMetrics | undefined = RobloxFonts.metrics(
+            RobloxProperties.enum(properties, 'Font'),
+            this.#metrics,
+            this.metricsByFont,
+        );
+        if (metrics === undefined) {
             throw new Error('Automatic text sizing requires native font metrics');
         }
         const text: string = RobloxGuiText.content(node.className, properties);
         const size: number = RobloxProperties.number(properties, 'TextSize');
         const wrapped: boolean = properties['TextWrapped'] === true;
         const bounds: RobloxTextBounds = RobloxTextMeasurement.measure(
-            this.#metrics,
+            metrics,
             text,
             size,
             wrapped ? width : null,
@@ -212,7 +219,7 @@ export class RobloxGuiAutoSize {
         }
         if (automatic === 3 && wrapped) {
             const final: RobloxTextBounds = RobloxTextMeasurement.measure(
-                this.#metrics,
+                metrics,
                 text,
                 size,
                 Math.max(minimumWidth, Math.min(width, bounds.width)),

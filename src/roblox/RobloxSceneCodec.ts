@@ -52,6 +52,7 @@ export class RobloxSceneCodec {
                 'hierarchy',
                 'textures',
                 'textMetrics',
+                'textMetricsByFont',
                 'meshes',
                 'environment',
                 'beamTexturePhases',
@@ -251,6 +252,13 @@ export class RobloxSceneCodec {
             ...(fields['textMetrics'] === undefined
                 ? {}
                 : { textMetrics: RobloxTextMeasurement.decode(fields['textMetrics']) }),
+            ...(fields['textMetricsByFont'] === undefined
+                ? {}
+                : {
+                      textMetricsByFont: RobloxTextMeasurement.decodeFaces(
+                          fields['textMetricsByFont'],
+                      ),
+                  }),
         });
     }
 

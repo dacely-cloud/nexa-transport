@@ -268,6 +268,10 @@ export interface RobloxScene {
     readonly meshes?: import('./RobloxSceneMeshes').RobloxSceneMeshTable;
     /** Actual native font units for shared automatic text sizing. */
     readonly textMetrics?: import('./RobloxTextMetrics').RobloxTextMetrics;
+    /** Per-font measurements for mixed-face native GUI sizing and text editing. */
+    readonly textMetricsByFont?: Readonly<
+        Record<string, import('./RobloxTextMetrics').RobloxTextMetrics>
+    >;
     /** Authorized asset pixels; original Roblox content URIs remain on the native properties. */
     readonly textures?: import('./RobloxSceneTextures').RobloxSceneTextureAtlas;
     readonly format: 'nexa.roblox.scene';
