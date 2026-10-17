@@ -141,6 +141,7 @@ export const RobloxClass = {
     Model: 'Model',
     WorldModel: 'WorldModel',
     ObjectValue: 'ObjectValue',
+    PointLight: 'PointLight',
     Beam: 'Beam',
     Trail: 'Trail',
     Part: 'Part',

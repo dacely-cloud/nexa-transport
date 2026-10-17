@@ -232,6 +232,13 @@ export const RobloxSceneSchema: Readonly<
     Model: {},
     WorldModel: {},
     ObjectValue: { Value: { type: 'Instance', default: RobloxValues.reference(), xmlType: 'Ref' } },
+    PointLight: {
+        Enabled: b(true),
+        Color: v(RobloxValues.color(), true),
+        Brightness: n(1, 0, 10000),
+        Range: n(8, 0, 60),
+        Shadows: b(false),
+    },
     Beam: {
         Attachment0: {
             type: 'Instance',

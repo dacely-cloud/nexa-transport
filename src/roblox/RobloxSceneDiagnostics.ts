@@ -15,6 +15,11 @@ export class RobloxSceneDiagnostics {
                 ? 'Capture uses hardware Vulkan with approximated Roblox materials and lighting. Studio pixel fidelity has not been measured.'
                 : 'Preview uses a WebGL approximation of Roblox lighting and materials. Studio pixel fidelity has not been measured.',
         ];
+        if (nodes.some((node: RobloxSceneNode): boolean => node.className === 'PointLight')) {
+            findings.push(
+                'PointLight previews retain native Color, Brightness, Range, Enabled and moving Attachment/BasePart positions. Local illumination is approximate and bounded to 64 active lights; PointLight shadows and Studio photometric parity remain unfinished. Original lights and shadow settings remain in Studio exports.',
+            );
+        }
         if (nodes.some((node: RobloxSceneNode): boolean => node.className === 'Beam')) {
             findings.push(
                 'Beam ribbons use current scoped Attachment frames, cubic control points, linear endpoint widths, per-segment color/opacity, camera-facing or attachment-oriented geometry, original texture texels, Wrap/Stretch/Static UVs, signed TextureSpeed travel, Brightness, LocalTransparencyModifier, LightEmission and depth-only ZOffset. Static behaves like Wrap for Beams. Captured phase anchors preserve native pre-capture texture travel and SetTextureOffset resets in previews and Studio replay. Scenes without anchors start at their lifetime origin. Environmental lighting, intersecting transparency order and exact Studio ribbon/UV/phase/pixel calibration remain unfinished.',

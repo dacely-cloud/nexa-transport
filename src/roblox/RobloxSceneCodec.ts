@@ -703,6 +703,7 @@ export class RobloxSceneCodec {
             throw new Error('Missing parent for ' + node.id);
         }
         const allowed: Readonly<Record<RobloxClass, readonly RobloxClass[]>> = {
+            PointLight: Object.values(RobloxClass),
             Beam: Object.values(RobloxClass),
             Trail: Object.values(RobloxClass),
             ObjectValue: Object.values(RobloxClass),

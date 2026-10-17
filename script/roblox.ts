@@ -19,6 +19,7 @@ const files: readonly string[] = [
     'RobloxTrailTimeline',
     'RobloxTrailGeometry',
     'RobloxPartGeometry',
+    'RobloxPointLights',
     'RobloxMeshTypes',
     'RobloxMeshHeader',
     'RobloxMeshAscii',
@@ -103,7 +104,16 @@ for (const file of fontFiles) {
     if (!/^Font[A-Za-z0-9]+\.ts$/u.test(file)) {
         throw new Error('Unexpected Roblox font module: ' + file);
     }
-    await writeFile('src/roblox/fonts/' + file, await readFile('../nexa/src/roblox/preview/fonts/' + file));
+    await writeFile(
+        'src/roblox/fonts/' + file,
+        await readFile('../nexa/src/roblox/preview/fonts/' + file),
+    );
 }
-await writeFile('licenses/roblox/font-resources.json', await readFile('../nexa/assets/roblox/fonts/catalog.json'));
-await writeFile('licenses/roblox/Roblox-Font-Resources.txt', await readFile('../nexa/licenses/Roblox-Font-Resources.txt'));
+await writeFile(
+    'licenses/roblox/font-resources.json',
+    await readFile('../nexa/assets/roblox/fonts/catalog.json'),
+);
+await writeFile(
+    'licenses/roblox/Roblox-Font-Resources.txt',
+    await readFile('../nexa/licenses/Roblox-Font-Resources.txt'),
+);

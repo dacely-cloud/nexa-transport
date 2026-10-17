@@ -1,6 +1,6 @@
 {
     "name": "nexa-transport",
-    "version": "0.1.0-design.25",
+    "version": "0.1.0-design.26",
     "description": "Typed Nexa websocket gateway client for browsers and Node.js",
     "type": "module",
     "license": "Apache-2.0",
@@ -17,6 +17,10 @@
         "licenses"
     ],
     "exports": {
+        "./roblox-point-lights": {
+            "types": "./dist/roblox/RobloxPointLights.d.ts",
+            "import": "./dist/roblox-point-lights.js"
+        },
         "./design-clipboard-types": {
             "types": "./dist/design/DesignClipboardTypes.d.ts",
             "import": "./dist/design-clipboard-types.js"
