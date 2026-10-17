@@ -3946,15 +3946,17 @@ Variant 3: [DesignReparentOperation](protocol.md#designreparentoperation)
 
 Variant 4: [DesignResizeOperation](protocol.md#designresizeoperation)
 
-| Field       | Required | Type              | Description                                                                              |
-| ----------- | -------- | ----------------- | ---------------------------------------------------------------------------------------- |
-| `height`    | No       | `number`          |                                                                                          |
-| `op`        | Yes      | `"resize"`        |                                                                                          |
-| `pageId`    | Yes      | `string`          |                                                                                          |
-| `selection` | Yes      | Array of `string` |                                                                                          |
-| `width`     | No       | `number`          |                                                                                          |
-| `x`         | No       | `number`          | Position edits accompany a single dragged layer and use its resolved parent coordinates. |
-| `y`         | No       | `number`          |                                                                                          |
+| Field       | Required | Type              | Description                                                                                            |
+| ----------- | -------- | ----------------- | ------------------------------------------------------------------------------------------------------ |
+| `anchorX`   | No       | `number`          | Paired normalized coordinates retain this point of one layer through resize and native content reflow. |
+| `anchorY`   | No       | `number`          |                                                                                                        |
+| `height`    | No       | `number`          |                                                                                                        |
+| `op`        | Yes      | `"resize"`        |                                                                                                        |
+| `pageId`    | Yes      | `string`          |                                                                                                        |
+| `selection` | Yes      | Array of `string` |                                                                                                        |
+| `width`     | No       | `number`          |                                                                                                        |
+| `x`         | No       | `number`          | Position edits accompany a single dragged layer and use its resolved parent coordinates.               |
+| `y`         | No       | `number`          |                                                                                                        |
 
 Variant 5: [DesignInsert](protocol.md#designinsert)
 
@@ -4544,15 +4546,17 @@ Variant 3: [DesignReparentOperation](protocol.md#designreparentoperation)
 
 Variant 4: [DesignResizeOperation](protocol.md#designresizeoperation)
 
-| Field       | Required | Type              | Description                                                                              |
-| ----------- | -------- | ----------------- | ---------------------------------------------------------------------------------------- |
-| `height`    | No       | `number`          |                                                                                          |
-| `op`        | Yes      | `"resize"`        |                                                                                          |
-| `pageId`    | Yes      | `string`          |                                                                                          |
-| `selection` | Yes      | Array of `string` |                                                                                          |
-| `width`     | No       | `number`          |                                                                                          |
-| `x`         | No       | `number`          | Position edits accompany a single dragged layer and use its resolved parent coordinates. |
-| `y`         | No       | `number`          |                                                                                          |
+| Field       | Required | Type              | Description                                                                                            |
+| ----------- | -------- | ----------------- | ------------------------------------------------------------------------------------------------------ |
+| `anchorX`   | No       | `number`          | Paired normalized coordinates retain this point of one layer through resize and native content reflow. |
+| `anchorY`   | No       | `number`          |                                                                                                        |
+| `height`    | No       | `number`          |                                                                                                        |
+| `op`        | Yes      | `"resize"`        |                                                                                                        |
+| `pageId`    | Yes      | `string`          |                                                                                                        |
+| `selection` | Yes      | Array of `string` |                                                                                                        |
+| `width`     | No       | `number`          |                                                                                                        |
+| `x`         | No       | `number`          | Position edits accompany a single dragged layer and use its resolved parent coordinates.               |
+| `y`         | No       | `number`          |                                                                                                        |
 
 ## DesignReadMethod
 
@@ -4700,15 +4704,17 @@ Moves selected authored roots between containers while preserving their resolved
 
 Explicit geometry edits fix requested axes and preserve absolute child constraints atomically.
 
-| Field       | Required | Type              | Description                                                                              |
-| ----------- | -------- | ----------------- | ---------------------------------------------------------------------------------------- |
-| `height`    | No       | `number`          |                                                                                          |
-| `op`        | Yes      | `"resize"`        |                                                                                          |
-| `pageId`    | Yes      | `string`          |                                                                                          |
-| `selection` | Yes      | Array of `string` |                                                                                          |
-| `width`     | No       | `number`          |                                                                                          |
-| `x`         | No       | `number`          | Position edits accompany a single dragged layer and use its resolved parent coordinates. |
-| `y`         | No       | `number`          |                                                                                          |
+| Field       | Required | Type              | Description                                                                                            |
+| ----------- | -------- | ----------------- | ------------------------------------------------------------------------------------------------------ |
+| `anchorX`   | No       | `number`          | Paired normalized coordinates retain this point of one layer through resize and native content reflow. |
+| `anchorY`   | No       | `number`          |                                                                                                        |
+| `height`    | No       | `number`          |                                                                                                        |
+| `op`        | Yes      | `"resize"`        |                                                                                                        |
+| `pageId`    | Yes      | `string`          |                                                                                                        |
+| `selection` | Yes      | Array of `string` |                                                                                                        |
+| `width`     | No       | `number`          |                                                                                                        |
+| `x`         | No       | `number`          | Position edits accompany a single dragged layer and use its resolved parent coordinates.               |
+| `y`         | No       | `number`          |                                                                                                        |
 
 ## DesignRotateOperation
 
@@ -5582,6 +5588,8 @@ Methods, events, and additive capabilities supported by this gateway.
 | `designImageTiles`          | No       | `true`                                             | Repeat cells retain independent image content transforms and original source crops.            |
 | `designImageTransforms`     | No       | `true`                                             | Native image framing supports rotation, reflection, affine placement and repeated image tiles. |
 | `designLayerCompositing`    | No       | `true`                                             | Native layer blending and explicit group isolation preserve editable appearance.               |
+| `designResizeAnchors`       | No       | `true`                                             | Native Resize commands preserve normalized anchors through one-axis sizing and content reflow. |
+| `designSignedGaps`          | No       | `true`                                             | Layout gaps accept signed values and use occupied bounds for overlapping flow and grid tracks. |
 | `designStrokeDashOffset`    | No       | `true`                                             | Stroke phase is editable and preserved by SVG, glyph windows and Boolean silhouettes.          |
 | `designTextDirection`       | No       | `true`                                             | Native typography supports paragraph direction and shared Unicode ordering.                    |
 | `designTextInheritedPaint`  | No       | `true`                                             | Rich typography can inherit the layer's gradient, image or solid fill stack.                   |

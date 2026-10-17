@@ -11887,6 +11887,12 @@ export const schema: Schema = {
                         'Native Resize commands preserve normalized anchors through one-axis sizing and content reflow.',
                     type: 'boolean',
                 },
+                designSignedGaps: {
+                    const: true,
+                    description:
+                        'Layout gaps accept signed values and use occupied bounds for overlapping flow and grid tracks.',
+                    type: 'boolean',
+                },
                 designStrokeDashOffset: {
                     const: true,
                     description:

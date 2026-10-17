@@ -194,6 +194,8 @@ backend, or a provider-key vault.
 | `nexa-transport/design-operation-codec`         | ESM + types | Design operation codec.                                                      |
 | `nexa-transport/design-scene`                   | ESM + types | Design scene.                                                                |
 | `nexa-transport/design-layout`                  | ESM + types | Design layout.                                                               |
+| `nexa-transport/design-flex`                    | ESM + types | Canonical logical flow lines and signed-gap placement.                       |
+| `nexa-transport/design-grid-packing`            | ESM + types | Canonical dense cell ownership independent of visual track overlap.          |
 | `nexa-transport/design-layout-types`            | ESM + types | Design layout types.                                                         |
 | `nexa-transport/design-requests`                | ESM + types | Design requests.                                                             |
 | `nexa-transport/design-record-codec`            | ESM + types | Design record codec.                                                         |

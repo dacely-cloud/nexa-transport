@@ -7755,6 +7755,8 @@ export interface GatewayFeaturesShape {
     readonly designLayerCompositing?: true;
     /** designResizeAnchors as defined by the Nexa gateway. */
     readonly designResizeAnchors?: true;
+    /** designSignedGaps as defined by the Nexa gateway. */
+    readonly designSignedGaps?: true;
     /** designStrokeDashOffset as defined by the Nexa gateway. */
     readonly designStrokeDashOffset?: true;
     /** designTextDirection as defined by the Nexa gateway. */
