@@ -25,6 +25,13 @@ import {
 
 /** Complete layer validation avoids silently losing newer fields during an older client's edit. */
 export class DesignNodeCodec {
+    static readonly #pathLengths: Readonly<Record<DesignPathVerb, number>> = Object.freeze({
+        M: 2,
+        L: 2,
+        Q: 4,
+        C: 6,
+        Z: 0,
+    });
     static readonly #containers: readonly DesignKind[] = [
         DesignKind.Frame,
         DesignKind.Group,
@@ -186,17 +193,30 @@ export class DesignNodeCodec {
                   : { ...node, path: DesignPolygons.path(node.polygon, node.width, node.height) },
         );
     }
+    /** Exact coordinate counts are shared by native parsing and model-visible input schemas. */
+    public static pathValueCount(verb: DesignPathVerb): number {
+        return DesignNodeCodec.#pathLengths[verb];
+    }
+
     /** Validates one bounded layer path value. */
     public static path(raw: unknown): DesignPathCommand {
         const value: Readonly<Record<string, unknown>> = V.record(raw, ['verb', 'values']);
         const verb: DesignPathVerb = V.choice(value['verb'], Object.values(DesignPathVerb));
-        const values: readonly number[] = V.list(value['values'], 6, (entry: unknown): number =>
+        const expected: number = DesignNodeCodec.pathValueCount(verb);
+        const rawValues: unknown = value['values'];
+        if (Array.isArray(rawValues) && rawValues.length !== expected) {
+            throw new Error(
+                'Vector ' +
+                    verb +
+                    ' requires ' +
+                    String(expected) +
+                    ' coordinates; received ' +
+                    String(rawValues.length),
+            );
+        }
+        const values: readonly number[] = V.list(rawValues, 6, (entry: unknown): number =>
             V.number(entry),
         );
-        const lengths: Readonly<Record<DesignPathVerb, number>> = { M: 2, L: 2, Q: 4, C: 6, Z: 0 };
-        if (values.length !== lengths[verb]) {
-            throw new Error('Vector command has the wrong coordinate count');
-        }
         return { verb, values };
     }
     /** Validates one bounded layer image value. */
