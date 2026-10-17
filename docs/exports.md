@@ -203,6 +203,8 @@ backend, or a provider-key vault.
 | `nexa-transport/design-request-codec`           | ESM + types | Design request codec.                                                        |
 | `nexa-transport/design-change-codec`            | ESM + types | Design change codec.                                                         |
 | `nexa-transport/design-paging`                  | ESM + types | Design paging.                                                               |
+| `nexa-transport/design-tidy-geometry`           | ESM + types | Free-selection grid inference and signed spacing.                            |
+| `nexa-transport/design-tidy-edits`              | ESM + types | Native tidy planning with parent transforms and constraint captures.         |
 | `nexa-transport/design-selection`               | ESM + types | Design selection.                                                            |
 | `nexa-transport/design-selection-types`         | ESM + types | Design selection types.                                                      |
 | `nexa-transport/design-svg`                     | ESM + types | Design svg.                                                                  |
