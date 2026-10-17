@@ -8551,6 +8551,9 @@ export const schema: Schema = {
                     $ref: '#/definitions/DesignLayoutOperation',
                 },
                 {
+                    $ref: '#/definitions/DesignTidyOperation',
+                },
+                {
                     $ref: '#/definitions/DesignReparentOperation',
                 },
                 {
@@ -8585,9 +8588,6 @@ export const schema: Schema = {
                 },
                 {
                     $ref: '#/definitions/DesignScaleOperation',
-                },
-                {
-                    $ref: '#/definitions/DesignTidyOperation',
                 },
                 {
                     $ref: '#/definitions/DesignTranslateOperation',
@@ -9393,6 +9393,9 @@ export const schema: Schema = {
                 },
                 {
                     $ref: '#/definitions/DesignLayoutOperation',
+                },
+                {
+                    $ref: '#/definitions/DesignTidyOperation',
                 },
                 {
                     $ref: '#/definitions/DesignReparentOperation',
@@ -11960,6 +11963,12 @@ export const schema: Schema = {
                     const: true,
                     description:
                         'Compact tidy commands arrange free selections without replacing their source bodies.',
+                    type: 'boolean',
+                },
+                designTidyPreview: {
+                    const: true,
+                    description:
+                        'Read-only Tidy previews retain deferred text and exact owner-scoped font geometry.',
                     type: 'boolean',
                 },
                 designVectorPatterns: {

@@ -5591,6 +5591,7 @@ export type DesignNodeRecord = DesignNodeRecordShape;
 export type DesignOperation =
     | DesignRecolorOperation
     | DesignLayoutOperation
+    | DesignTidyOperation
     | DesignReparentOperation
     | DesignResizeOperation
     | DesignInsert
@@ -5603,7 +5604,6 @@ export type DesignOperation =
     | DesignPositionOperation
     | DesignRotateOperation
     | DesignScaleOperation
-    | DesignTidyOperation
     | DesignTranslateOperation
     | DesignMove
     | DesignRemove
@@ -6123,6 +6123,7 @@ export type DesignPositionOperation = DesignPositionOperationShape;
 export type DesignPreviewOperation =
     | DesignRecolorOperation
     | DesignLayoutOperation
+    | DesignTidyOperation
     | DesignReparentOperation
     | DesignResizeOperation;
 
@@ -7789,6 +7790,8 @@ export interface GatewayFeaturesShape {
     readonly designTextRangeFills?: true;
     /** designTidy as defined by the Nexa gateway. */
     readonly designTidy?: true;
+    /** designTidyPreview as defined by the Nexa gateway. */
+    readonly designTidyPreview?: true;
     /** designVectorPatterns as defined by the Nexa gateway. */
     readonly designVectorPatterns?: true;
     /** events as defined by the Nexa gateway. */
