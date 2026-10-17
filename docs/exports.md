@@ -37,6 +37,13 @@ they do not execute server-only handlers or grant access.
 
 ## Roblox preview helpers
 
+`nexa-transport/roblox-point-lights` evaluates scoped native point lights and their
+moving attachment poses for hardware previews. Local illumination is approximate;
+point-light shadows and Studio photometric parity are not implemented.
+
+`nexa-transport/roblox-fonts` resolves the pinned native Roblox font faces used by
+text measurement and hardware previews.
+
 `nexa-transport/roblox-beams` provides the shared seekable Beam ribbon geometry,
 native endpoint bindings, appearance sequences and texture travel used by both
 hardware preview adapters. It does not execute Luau or certify Studio pixel parity.
