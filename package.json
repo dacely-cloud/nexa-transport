@@ -1,6 +1,6 @@
 {
     "name": "nexa-transport",
-    "version": "0.1.0-design.34",
+    "version": "0.1.0-design.35",
     "description": "Typed Nexa websocket gateway client for browsers and Node.js",
     "type": "module",
     "license": "Apache-2.0",
@@ -942,6 +942,18 @@
         "./design-tidy-edits": {
             "types": "./dist/design/DesignTidyEdits.d.ts",
             "import": "./dist/design-tidy-edits.js"
+        },
+        "./roblox-lighting": {
+            "types": "./dist/roblox/RobloxLighting.d.ts",
+            "import": "./dist/roblox-lighting.js"
+        },
+        "./roblox-surface-material": {
+            "types": "./dist/roblox/RobloxSurfaceMaterial.d.ts",
+            "import": "./dist/roblox-surface-material.js"
+        },
+        "./roblox-visual-parts": {
+            "types": "./dist/roblox/RobloxVisualParts.d.ts",
+            "import": "./dist/roblox-visual-parts.js"
         }
     },
     "scripts": {
