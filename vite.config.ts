@@ -51,6 +51,8 @@ const config: UserConfig = {
                 'design-text-shaping': 'src/design/DesignTextShaping.ts',
                 'design-text-glyphs': 'src/design/DesignTextGlyphs.ts',
                 'design-builtin-fonts': 'src/design/DesignBuiltinFonts.ts',
+                'design-builtin-font-catalog': 'src/design/DesignBuiltinFontCatalog.ts',
+                'design-source-serif-bytes': 'src/design/DesignSourceSerifBytes.ts',
                 'design-inter-bytes': 'src/design/DesignInterBytes.ts',
                 'design-inter-outline-bytes': 'src/design/DesignInterOutlineBytes.ts',
                 'design-text-outline': 'src/design/DesignTextOutline.ts',

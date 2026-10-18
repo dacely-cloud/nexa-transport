@@ -16,6 +16,7 @@ import {
 import type { DesignTextSpanStyle } from './DesignTextLayout.js';
 import { DesignSvgScriptFonts } from './DesignSvgScriptFonts.js';
 import { DesignSvgSelections } from './DesignSvgSelections.js';
+import { DesignSvgSerifFonts } from './DesignSvgSerifFonts.js';
 
 /** Explicit exports embed only selected faces; ordinary scene transfers contain no font bytes. */
 export class DesignSvgFonts {
@@ -26,6 +27,7 @@ export class DesignSvgFonts {
     ): Promise<DesignSvgResult> {
         const used: ReadonlySet<boolean> = this.#used(selection);
         const scriptFonts: string = await DesignSvgScriptFonts.embed(selection);
+        const serifFonts: string = await DesignSvgSerifFonts.embed(selection);
         const privateCss: string = this.#private(result.svg.length, selection, sources);
         const emoji: boolean = DesignSvgSelections.nodes(selection).some(
             (node): boolean =>
@@ -33,19 +35,30 @@ export class DesignSvgFonts {
                 (/[\p{Extended_Pictographic}\p{Regional_Indicator}]/u.test(node.text.content) ||
                     node.text.family.toLowerCase() === 'noto emoji'),
         );
-        if (used.size === 0 && privateCss === '' && !emoji && scriptFonts === '') {
+        if (
+            used.size === 0 &&
+            privateCss === '' &&
+            !emoji &&
+            scriptFonts === '' &&
+            serifFonts === ''
+        ) {
             return result;
         }
-        const { DesignInterBytes }: typeof import('./DesignInterBytes.js') =
-            await import('./DesignInterBytes.js');
-        const { DesignInterLicense }: typeof import('./DesignInterLicense.js') =
-            await import('./DesignInterLicense.js');
-        const css: string = [...used]
-            .map(
-                (italic: boolean): string =>
-                    `@font-face{font-family:Inter;font-style:${italic ? 'italic' : 'normal'};font-weight:100 900;font-variation-settings:'opsz' 14;src:url(data:font/woff2;base64,${DesignInterBytes.encoded(italic)}) format('woff2');}`,
-            )
-            .join('');
+        let css: string = '';
+        let interLicense: string = '';
+        if (used.size > 0) {
+            const { DesignInterBytes }: typeof import('./DesignInterBytes.js') =
+                await import('./DesignInterBytes.js');
+            const { DesignInterLicense }: typeof import('./DesignInterLicense.js') =
+                await import('./DesignInterLicense.js');
+            interLicense = `<metadata>${DesignSvgGeometry.escape(DesignInterLicense.text)}</metadata>`;
+            css = [...used]
+                .map(
+                    (italic: boolean): string =>
+                        `@font-face{font-family:Inter;font-style:${italic ? 'italic' : 'normal'};font-weight:100 900;font-variation-settings:'opsz' 14;src:url(data:font/woff2;base64,${DesignInterBytes.encoded(italic)}) format('woff2');}`,
+                )
+                .join('');
+        }
         let emojiCss: string = '';
         let emojiLicense: string = '';
         if (emoji) {
@@ -63,7 +76,7 @@ export class DesignSvgFonts {
         }
         const svg: string = result.svg.replace(
             '<defs>',
-            `${used.size === 0 ? '' : `<metadata>${DesignSvgGeometry.escape(DesignInterLicense.text)}</metadata>`}${emojiLicense}<defs>${scriptFonts}<style>${css}${privateCss}${emojiCss}</style>`,
+            `${interLicense}${emojiLicense}<defs>${scriptFonts}${serifFonts}<style>${css}${privateCss}${emojiCss}</style>`,
         );
         if (svg.length > DesignSvgLimits.characters) {
             throw new Error('Export individual frames to stay within the SVG content budget.');

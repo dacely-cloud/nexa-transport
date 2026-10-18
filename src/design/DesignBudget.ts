@@ -3,7 +3,12 @@
 
 /** Incremental byte accounting prevents allocating an unbounded graph before rejecting it. */
 export class DesignBudget {
-    #remaining: number = 16 * 1024 * 1024 - 4096;
+    /** Whole-document content admission also bounds canonical import fingerprints. */
+    public static get maximumBytes(): number {
+        return 16 * 1024 * 1024;
+    }
+
+    #remaining: number = DesignBudget.maximumBytes - 4096;
     /** Charges each already-validated entity before the next entity is decoded. */
     public consume<T>(value: T): T {
         const encoded: string | undefined = JSON.stringify(value);

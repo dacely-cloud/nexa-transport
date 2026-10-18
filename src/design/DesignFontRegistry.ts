@@ -158,6 +158,28 @@ export class DesignFontRegistry {
         return { minimum, maximum };
     }
 
+    /** Browser registration pins a real default axis instead of applying automatic optical sizing. */
+    public variationDefault(style: DesignTextSpanStyle, axis: string): number | null {
+        const entry: RegisteredFont | undefined = this.#entry(style);
+        if (entry === undefined) {
+            throw new Error('No matching font binding.');
+        }
+        if (!Object.hasOwn(entry.face.variationAxes, axis)) {
+            return null;
+        }
+        const coordinate: Font['variationAxes'][string] | undefined =
+            entry.face.variationAxes[axis];
+        if (
+            coordinate === undefined ||
+            !Number.isFinite(coordinate.default) ||
+            coordinate.default < coordinate.min ||
+            coordinate.default > coordinate.max
+        ) {
+            throw new Error('Font has an invalid default variation coordinate.');
+        }
+        return coordinate.default;
+    }
+
     #entry(style: DesignTextSpanStyle): RegisteredFont | undefined {
         return this.#fonts.find(
             (entry: RegisteredFont): boolean =>

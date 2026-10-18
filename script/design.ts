@@ -168,6 +168,10 @@ const files: readonly string[] = [
     'DesignCanvasCodec',
     'DesignFontContainer',
     'DesignBuiltinFonts',
+    'DesignBuiltinFontCatalog',
+    'DesignSourceSerifBytes',
+    'DesignSourceSerifLicense',
+    'DesignSvgSerifFonts',
     'DesignInterBytes',
     'DesignInterLicense',
     'DesignSvgFonts',
@@ -324,6 +328,9 @@ await writeFile(
     'utf8',
 );
 await writeFile('licenses/Inter-OFL.txt', await readFile('../nexa/licenses/Inter-OFL.txt', 'utf8'));
+for (const name of ['SourceSerif4-OFL.txt', 'SourceSerif4-sources.json']) {
+    await writeFile('licenses/' + name, await readFile('../nexa/licenses/' + name));
+}
 
 await writeFile(
     'licenses/NotoEmoji-OFL.txt',
@@ -362,6 +369,7 @@ await writeFile(
 
 /** Prepared shaping and asymmetric ligature carets are verified against the canonical native cases. */
 for (const testName of [
+    'DesignBuiltinSerif',
     'DesignTidy',
     'DesignOverlapLayout',
     'DesignStackFill',

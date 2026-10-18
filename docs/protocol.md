@@ -5653,19 +5653,6 @@ Readable self-model makes the functional claims and their limits explicit.
 | `subjectiveExperience` | Yes      | `"unverified"`    |             |
 | `values`               | Yes      | Array of `string` |             |
 
-## EmotionalMemory
-
-A bounded private memory preserves what prompted the reaction after its intensity subsides.
-
-| Field        | Required | Type                                     | Description |
-| ------------ | -------- | ---------------------------------------- | ----------- |
-| `at`         | Yes      | `string`                                 |             |
-| `confidence` | Yes      | `number`                                 |             |
-| `evidence`   | Yes      | `string`                                 |             |
-| `id`         | Yes      | `string`                                 |             |
-| `signal`     | Yes      | [SocialSignal](protocol.md#socialsignal) |             |
-| `strength`   | Yes      | `number`                                 |             |
-
 ## EmotionalReadMethod
 
 Account-scoped emotional introspection contract shared by the gateway and generated transport.
@@ -5695,20 +5682,19 @@ Relational trust is social familiarity and never a security or authorization sco
 
 ## EmotionalSnapshot
 
-UI and model read the same time-projected state; private evidence never enters the public self.
+The transport exposes current expression and relationship scores without personal memory records.
 
-| Field            | Required | Type                                                       | Description |
-| ---------------- | -------- | ---------------------------------------------------------- | ----------- |
-| `agentId`        | Yes      | `string`                                                   |             |
-| `asOf`           | Yes      | `string`                                                   |             |
-| `awareness`      | Yes      | [EmotionalAwareness](protocol.md#emotionalawareness)       |             |
-| `emotions`       | Yes      | [EmotionVector](protocol.md#emotionvector)                 |             |
-| `mood`           | Yes      | [EmotionMood](protocol.md#emotionmood)                     |             |
-| `moodEnergy`     | Yes      | `number`                                                   |             |
-| `moodValence`    | Yes      | `number`                                                   |             |
-| `recentMemories` | Yes      | Array of [EmotionalMemory](protocol.md#emotionalmemory)    |             |
-| `towardUser`     | Yes      | [EmotionalRelationship](protocol.md#emotionalrelationship) |             |
-| `updatedAt`      | Yes      | `string`                                                   |             |
+| Field         | Required | Type                                                       | Description |
+| ------------- | -------- | ---------------------------------------------------------- | ----------- |
+| `agentId`     | Yes      | `string`                                                   |             |
+| `asOf`        | Yes      | `string`                                                   |             |
+| `awareness`   | Yes      | [EmotionalAwareness](protocol.md#emotionalawareness)       |             |
+| `emotions`    | Yes      | [EmotionVector](protocol.md#emotionvector)                 |             |
+| `mood`        | Yes      | [EmotionMood](protocol.md#emotionmood)                     |             |
+| `moodEnergy`  | Yes      | `number`                                                   |             |
+| `moodValence` | Yes      | `number`                                                   |             |
+| `towardUser`  | Yes      | [EmotionalRelationship](protocol.md#emotionalrelationship) |             |
+| `updatedAt`   | Yes      | `string`                                                   |             |
 
 ## ErrorCode
 
@@ -10249,12 +10235,6 @@ Only server-fetched raster bytes cross the gateway; clients never fetch the visi
 | --------- | -------- | -------- | ----------- |
 | `favicon` | Yes      | `string` |             |
 | `origin`  | Yes      | `string` |             |
-
-## SocialSignal
-
-Contextual appraisals describe an interaction, never grant authority to act.
-
-Type: `"criticism"` / `"curiosity"` / `"distress"` / `"hostility"` / `"kindness"` / `"neutral"` / `"repair"` / `"setback"` / `"success"`.
 
 ## SourceLanguage
 

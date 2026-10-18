@@ -150,7 +150,10 @@ export class DesignSvgImportedFonts {
             (face: DesignSvgFontFace): readonly DesignFontSource[] =>
                 face.source === null ? [] : [face.source],
         );
-        this.#engine ??= DesignBuiltinFonts.engine(sources);
+        this.#engine ??= DesignBuiltinFonts.engine(
+            sources,
+            this.#faces.map((face: DesignSvgFontFace): string => face.family),
+        );
         return this.#engine;
     }
 }

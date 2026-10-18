@@ -61,6 +61,11 @@ export class DesignFontEngine {
         return this.#registry.weightRange(style);
     }
 
+    /** The original default coordinate keeps browser font registration aligned with native shaping. */
+    public variationDefault(style: DesignTextSpanStyle, axis: string): number | null {
+        return this.#registry.variationDefault(style, axis);
+    }
+
     /** Measures complete shaped strings including kerning and ligatures; layout applies tracking. */
     public measure(style: DesignTextSpanStyle, content: string): number {
         return DesignFontShaper.spans(this.#registry, style, content, 0).reduce(

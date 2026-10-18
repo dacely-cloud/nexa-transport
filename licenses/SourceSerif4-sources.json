@@ -1,0 +1,17 @@
+{
+  "upstream": "https://github.com/adobe-fonts/source-serif/releases/tag/4.005R",
+  "files": [
+    {
+      "path": "VAR/SourceSerif4Variable-Roman.ttf",
+      "url": "https://raw.githubusercontent.com/adobe-fonts/source-serif/4.005R/VAR/SourceSerif4Variable-Roman.ttf",
+      "sha256": "14d360ee1b76655da9276628b229e11671bc1f5d1083636144db6677d452cf55",
+      "bytes": 1204208
+    },
+    {
+      "path": "VAR/SourceSerif4Variable-Italic.ttf",
+      "url": "https://raw.githubusercontent.com/adobe-fonts/source-serif/4.005R/VAR/SourceSerif4Variable-Italic.ttf",
+      "sha256": "6a059a64838978d54e8fab71ed86b0d82e948c0e12b2664d0c15166326dcff82",
+      "bytes": 850036
+    }
+  ]
+}

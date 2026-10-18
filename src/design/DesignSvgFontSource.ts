@@ -126,6 +126,25 @@ export class DesignSvgFontSource {
                 return { family: 'Inter', minimum, maximum, italic, decodedBytes, source: null };
             }
         }
+        if (family.toLowerCase() === 'source serif 4' && format === 'ttf') {
+            const { DesignSourceSerifBytes }: typeof import('./DesignSourceSerifBytes.js') =
+                await import('./DesignSourceSerifBytes.js');
+            if (
+                encoded === DesignSourceSerifBytes.encoded(italic) &&
+                minimum === 200 &&
+                maximum === 900 &&
+                /^(['"])opsz\1\s+20$/u.test(variations)
+            ) {
+                return {
+                    family: 'Source Serif 4',
+                    minimum,
+                    maximum,
+                    italic,
+                    decodedBytes,
+                    source: null,
+                };
+            }
+        }
         if (variations !== 'normal') {
             throw new DesignSvgInputError(
                 'Embedded SVG font axes require supported exact native variation settings.',
