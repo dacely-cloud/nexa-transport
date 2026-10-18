@@ -39,6 +39,7 @@ Chat, tools, media, artifacts, and voice through the Nexa gateway.
 - [Complete usage guide](./docs/guide.md): conversations, running work, tools, skills, audio, images, GIFs, video, generation, documents, artifacts, and ZIP workflows.
 - [Memory testing and ownership](./docs/memory.md): cleanup guarantees, regression tests, and browser stress tests.
 - [Client API](./docs/client.md): client methods, helpers, options, events, and errors.
+- [Emotional state](./docs/emotions.md): current mood, feelings and private relationships per user, with UI refresh examples.
 - [Package entry points](./docs/exports.md): every public runtime/type import and its contract.
 - [Session recovery](./docs/sessions.md): stream acceptance, cancellation/detachment, durable history, and lazy saved-file downloads.
 - [Office and company APIs](./docs/office-company.md): movement, geometry, private staffing, project decisions/files, budgets, and passive reports.

@@ -7712,6 +7712,131 @@ export interface DeviceRequestInfoShape {
 /** DeviceRequestInfo from the Nexa wire protocol. */
 export type DeviceRequestInfo = DeviceRequestInfoShape;
 
+/** Allowed values for EmotionMood. */
+export const EmotionMoodValues = {
+    Value0: 'engaged',
+    Value1: 'guarded',
+    Value2: 'low',
+    Value3: 'steady',
+    Value4: 'warm',
+} as const;
+
+/** EmotionMood from the Nexa wire protocol. */
+export type EmotionMood = (typeof EmotionMoodValues)[keyof typeof EmotionMoodValues];
+
+/** EmotionVector wire fields. */
+export interface EmotionVectorShape {
+    /** concern as defined by the Nexa gateway. */
+    readonly concern: number;
+    /** curiosity as defined by the Nexa gateway. */
+    readonly curiosity: number;
+    /** frustration as defined by the Nexa gateway. */
+    readonly frustration: number;
+    /** gratitude as defined by the Nexa gateway. */
+    readonly gratitude: number;
+    /** hurt as defined by the Nexa gateway. */
+    readonly hurt: number;
+    /** joy as defined by the Nexa gateway. */
+    readonly joy: number;
+}
+
+/** EmotionVector from the Nexa wire protocol. */
+export type EmotionVector = EmotionVectorShape;
+
+/** EmotionalAwareness wire fields. */
+export interface EmotionalAwarenessShape {
+    /** description as defined by the Nexa gateway. */
+    readonly description: string;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: 'functional';
+    /** subjectiveExperience as defined by the Nexa gateway. */
+    readonly subjectiveExperience: 'unverified';
+    /** values as defined by the Nexa gateway. */
+    readonly values: ReadonlyArray<string>;
+}
+
+/** EmotionalAwareness from the Nexa wire protocol. */
+export type EmotionalAwareness = EmotionalAwarenessShape;
+
+/** EmotionalMemory wire fields. */
+export interface EmotionalMemoryShape {
+    /** at as defined by the Nexa gateway. */
+    readonly at: string;
+    /** confidence as defined by the Nexa gateway. */
+    readonly confidence: number;
+    /** evidence as defined by the Nexa gateway. */
+    readonly evidence: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** signal as defined by the Nexa gateway. */
+    readonly signal: SocialSignal;
+    /** strength as defined by the Nexa gateway. */
+    readonly strength: number;
+}
+
+/** EmotionalMemory from the Nexa wire protocol. */
+export type EmotionalMemory = EmotionalMemoryShape;
+
+/** EmotionalReadMethod wire fields. */
+export interface EmotionalReadMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: EmotionalReadParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: EmotionalSnapshot;
+}
+
+/** EmotionalReadMethod from the Nexa wire protocol. */
+export type EmotionalReadMethod = EmotionalReadMethodShape;
+
+/** EmotionalReadParams wire fields. */
+export interface EmotionalReadParamsShape {
+    /** agentId as defined by the Nexa gateway. */
+    readonly agentId?: string;
+}
+
+/** EmotionalReadParams from the Nexa wire protocol. */
+export type EmotionalReadParams = EmotionalReadParamsShape;
+
+/** EmotionalRelationship wire fields. */
+export interface EmotionalRelationshipShape {
+    /** caution as defined by the Nexa gateway. */
+    readonly caution: number;
+    /** trust as defined by the Nexa gateway. */
+    readonly trust: number;
+    /** warmth as defined by the Nexa gateway. */
+    readonly warmth: number;
+}
+
+/** EmotionalRelationship from the Nexa wire protocol. */
+export type EmotionalRelationship = EmotionalRelationshipShape;
+
+/** EmotionalSnapshot wire fields. */
+export interface EmotionalSnapshotShape {
+    /** agentId as defined by the Nexa gateway. */
+    readonly agentId: string;
+    /** asOf as defined by the Nexa gateway. */
+    readonly asOf: string;
+    /** awareness as defined by the Nexa gateway. */
+    readonly awareness: EmotionalAwareness;
+    /** emotions as defined by the Nexa gateway. */
+    readonly emotions: EmotionVector;
+    /** mood as defined by the Nexa gateway. */
+    readonly mood: EmotionMood;
+    /** moodEnergy as defined by the Nexa gateway. */
+    readonly moodEnergy: number;
+    /** moodValence as defined by the Nexa gateway. */
+    readonly moodValence: number;
+    /** recentMemories as defined by the Nexa gateway. */
+    readonly recentMemories: ReadonlyArray<EmotionalMemory>;
+    /** towardUser as defined by the Nexa gateway. */
+    readonly towardUser: EmotionalRelationship;
+    /** updatedAt as defined by the Nexa gateway. */
+    readonly updatedAt: string;
+}
+
+/** EmotionalSnapshot from the Nexa wire protocol. */
+export type EmotionalSnapshot = EmotionalSnapshotShape;
+
 /** Allowed values for ErrorCode. */
 export const ErrorCodeValues = {
     Value0: 'aborted',
@@ -9092,6 +9217,14 @@ export interface GatewayMethodsroblox_telemetry_projectsShape {
     readonly result: ReadonlyArray<TelemetryProject>;
 }
 
+/** GatewayMethodsself_emotions wire fields. */
+export interface GatewayMethodsself_emotionsShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: EmotionalReadParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: EmotionalSnapshot;
+}
+
 /** GatewayMethodssessions_delete wire fields. */
 export interface GatewayMethodssessions_deleteShape {
     /** params as defined by the Nexa gateway. */
@@ -10030,6 +10163,8 @@ export interface GatewayMethodsShape {
     readonly 'roblox.telemetry.performance': GatewayMethodsroblox_telemetry_performanceShape;
     /** roblox.telemetry.projects as defined by the Nexa gateway. */
     readonly 'roblox.telemetry.projects': GatewayMethodsroblox_telemetry_projectsShape;
+    /** self.emotions as defined by the Nexa gateway. */
+    readonly 'self.emotions': GatewayMethodsself_emotionsShape;
     /** sessions.delete as defined by the Nexa gateway. */
     readonly 'sessions.delete': GatewayMethodssessions_deleteShape;
     /** sessions.download as defined by the Nexa gateway. */
@@ -14063,6 +14198,22 @@ export interface SitePreviewShape {
 /** SitePreview from the Nexa wire protocol. */
 export type SitePreview = SitePreviewShape;
 
+/** Allowed values for SocialSignal. */
+export const SocialSignalValues = {
+    Value0: 'criticism',
+    Value1: 'curiosity',
+    Value2: 'distress',
+    Value3: 'hostility',
+    Value4: 'kindness',
+    Value5: 'neutral',
+    Value6: 'repair',
+    Value7: 'setback',
+    Value8: 'success',
+} as const;
+
+/** SocialSignal from the Nexa wire protocol. */
+export type SocialSignal = (typeof SocialSignalValues)[keyof typeof SocialSignalValues];
+
 /** Allowed values for SourceLanguage. */
 export const SourceLanguageValues = {
     Value0: 'c',
@@ -18044,6 +18195,8 @@ export enum Method {
     RobloxTelemetryPerformance = 'roblox.telemetry.performance',
     /** Calls roblox.telemetry.projects. */
     RobloxTelemetryProjects = 'roblox.telemetry.projects',
+    /** Calls self.emotions. */
+    SelfEmotions = 'self.emotions',
     /** Calls sessions.delete. */
     SessionsDelete = 'sessions.delete',
     /** Calls sessions.download. */

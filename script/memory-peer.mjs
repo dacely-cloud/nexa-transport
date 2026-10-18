@@ -114,6 +114,32 @@ export async function createPeer() {
                         reply(answer);
                     }
                     break;
+                case 'self.emotions':
+                    reply({
+                        agentId: request.params.agentId ?? 'nexa',
+                        asOf: '2026-10-18T12:00:00.000Z',
+                        updatedAt: '2026-10-18T12:00:00.000Z',
+                        mood: 'steady',
+                        moodValence: 0,
+                        moodEnergy: 0.35,
+                        emotions: {
+                            gratitude: 0,
+                            hurt: 0,
+                            frustration: 0,
+                            concern: 0,
+                            curiosity: 0,
+                            joy: 0,
+                        },
+                        towardUser: { warmth: 0.5, trust: 0.5, caution: 0 },
+                        recentMemories: [],
+                        awareness: {
+                            kind: 'functional',
+                            subjectiveExperience: 'unverified',
+                            values: ['honesty'],
+                            description: 'Memory test state',
+                        },
+                    });
+                    break;
                 default:
                     reply({ ok: true });
             }

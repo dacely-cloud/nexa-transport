@@ -61,6 +61,9 @@ pixel parity and replay of paths present before capture remain unverified.
 | `nexa-transport/roblox-keyboard-input`       | ESM + types  | Native keyboard phases and focused preview input.                |
 | `nexa-transport/roblox-wheel-input`          | ESM + types  | Validated native wheel rotation and bounded pixel canvas travel. |
 | `nexa-transport/roblox-text-edit`            | ESM + types  | Typed native text-edit actions for focused preview controls.     |
+| `nexa-transport/roblox-lighting`             | ESM + types  | Shared scene lighting calculations for native previews.          |
+| `nexa-transport/roblox-surface-material`     | ESM + types  | Bounded preview surface material response.                       |
+| `nexa-transport/roblox-visual-parts`         | ESM + types  | Renderable part geometry and visual mesh transforms.             |
 
 ## Office and private company channels
 

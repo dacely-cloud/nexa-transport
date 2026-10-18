@@ -5623,6 +5623,93 @@ A device waiting for an operator, as it appears on the wire.
 | `requestId`       | Yes      | `string`                            |             |
 | `requestedScopes` | Yes      | Array of [Scope](protocol.md#scope) |             |
 
+## EmotionMood
+
+A slower mood can outlast the immediate reaction.
+
+Type: `"engaged"` / `"guarded"` / `"low"` / `"steady"` / `"warm"`.
+
+## EmotionVector
+
+Immediate functional emotions, with intensities in [0, 1].
+
+| Field         | Required | Type     | Description |
+| ------------- | -------- | -------- | ----------- |
+| `concern`     | Yes      | `number` |             |
+| `curiosity`   | Yes      | `number` |             |
+| `frustration` | Yes      | `number` |             |
+| `gratitude`   | Yes      | `number` |             |
+| `hurt`        | Yes      | `number` |             |
+| `joy`         | Yes      | `number` |             |
+
+## EmotionalAwareness
+
+Readable self-model makes the functional claims and their limits explicit.
+
+| Field                  | Required | Type              | Description |
+| ---------------------- | -------- | ----------------- | ----------- |
+| `description`          | Yes      | `string`          |             |
+| `kind`                 | Yes      | `"functional"`    |             |
+| `subjectiveExperience` | Yes      | `"unverified"`    |             |
+| `values`               | Yes      | Array of `string` |             |
+
+## EmotionalMemory
+
+A bounded private memory preserves what prompted the reaction after its intensity subsides.
+
+| Field        | Required | Type                                     | Description |
+| ------------ | -------- | ---------------------------------------- | ----------- |
+| `at`         | Yes      | `string`                                 |             |
+| `confidence` | Yes      | `number`                                 |             |
+| `evidence`   | Yes      | `string`                                 |             |
+| `id`         | Yes      | `string`                                 |             |
+| `signal`     | Yes      | [SocialSignal](protocol.md#socialsignal) |             |
+| `strength`   | Yes      | `number`                                 |             |
+
+## EmotionalReadMethod
+
+Account-scoped emotional introspection contract shared by the gateway and generated transport.
+
+| Field    | Required | Type                                                   | Description |
+| -------- | -------- | ------------------------------------------------------ | ----------- |
+| `params` | Yes      | [EmotionalReadParams](protocol.md#emotionalreadparams) |             |
+| `result` | Yes      | [EmotionalSnapshot](protocol.md#emotionalsnapshot)     |             |
+
+## EmotionalReadParams
+
+A browser selects an agent, but the gateway always supplies the authenticated user.
+
+| Field     | Required | Type     | Description |
+| --------- | -------- | -------- | ----------- |
+| `agentId` | No       | `string` |             |
+
+## EmotionalRelationship
+
+Relational trust is social familiarity and never a security or authorization score.
+
+| Field     | Required | Type     | Description |
+| --------- | -------- | -------- | ----------- |
+| `caution` | Yes      | `number` |             |
+| `trust`   | Yes      | `number` |             |
+| `warmth`  | Yes      | `number` |             |
+
+## EmotionalSnapshot
+
+UI and model read the same time-projected state; private evidence never enters the public self.
+
+| Field            | Required | Type                                                       | Description |
+| ---------------- | -------- | ---------------------------------------------------------- | ----------- |
+| `agentId`        | Yes      | `string`                                                   |             |
+| `asOf`           | Yes      | `string`                                                   |             |
+| `awareness`      | Yes      | [EmotionalAwareness](protocol.md#emotionalawareness)       |             |
+| `emotions`       | Yes      | [EmotionVector](protocol.md#emotionvector)                 |             |
+| `mood`           | Yes      | [EmotionMood](protocol.md#emotionmood)                     |             |
+| `moodEnergy`     | Yes      | `number`                                                   |             |
+| `moodValence`    | Yes      | `number`                                                   |             |
+| `recentMemories` | Yes      | Array of [EmotionalMemory](protocol.md#emotionalmemory)    |             |
+| `towardUser`     | Yes      | [EmotionalRelationship](protocol.md#emotionalrelationship) |             |
+| `updatedAt`      | Yes      | `string`                                                   |             |
+
 ## ErrorCode
 
 A stable, machine-readable failure classification.
@@ -5940,6 +6027,7 @@ Configurable bounds on gateway-owned work and memory.
 | `roblox.telemetry.funnel`            | Yes      | Object (fields below) |                                                                                                        |
 | `roblox.telemetry.performance`       | Yes      | Object (fields below) |                                                                                                        |
 | `roblox.telemetry.projects`          | Yes      | Object (fields below) |                                                                                                        |
+| `self.emotions`                      | Yes      | Object (fields below) | Account-scoped emotional introspection contract shared by the gateway and generated transport.         |
 | `sessions.delete`                    | Yes      | Object (fields below) |                                                                                                        |
 | `sessions.download`                  | Yes      | Object (fields below) |                                                                                                        |
 | `sessions.files`                     | Yes      | Object (fields below) |                                                                                                        |
@@ -6913,6 +7001,13 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | --------------------------------------------------------- | ----------- |
 | `params` | Yes      | [Recordstringnever](protocol.md#recordstringnever)        |             |
 | `result` | Yes      | Array of [TelemetryProject](protocol.md#telemetryproject) |             |
+
+**self.emotions**
+
+| Field    | Required | Type                                                   | Description |
+| -------- | -------- | ------------------------------------------------------ | ----------- |
+| `params` | Yes      | [EmotionalReadParams](protocol.md#emotionalreadparams) |             |
+| `result` | Yes      | [EmotionalSnapshot](protocol.md#emotionalsnapshot)     |             |
 
 **sessions.delete**
 
@@ -10154,6 +10249,12 @@ Only server-fetched raster bytes cross the gateway; clients never fetch the visi
 | --------- | -------- | -------- | ----------- |
 | `favicon` | Yes      | `string` |             |
 | `origin`  | Yes      | `string` |             |
+
+## SocialSignal
+
+Contextual appraisals describe an interaction, never grant authority to act.
+
+Type: `"criticism"` / `"curiosity"` / `"distress"` / `"hostility"` / `"kindness"` / `"neutral"` / `"repair"` / `"setback"` / `"success"`.
 
 ## SourceLanguage
 

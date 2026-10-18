@@ -15,6 +15,7 @@ export interface Schema {
     readonly minimum?: number;
     readonly maximum?: number;
     readonly maxLength?: number;
+    readonly minLength?: number;
     readonly maxItems?: number;
     readonly $id?: string;
     readonly $schema?: string;
@@ -171,8 +172,8 @@ export class SchemaValidator {
         }
         if (
             typeof value === 'string' &&
-            schema.maxLength !== undefined &&
-            value.length > schema.maxLength
+            ((schema.maxLength !== undefined && value.length > schema.maxLength) ||
+                (schema.minLength !== undefined && value.length < schema.minLength))
         ) {
             return false;
         }

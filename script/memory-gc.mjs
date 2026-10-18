@@ -80,6 +80,52 @@ test('retained closed sockets do not retain their clients', async () => {
     }
 });
 
+test('emotional subscription cleanup handles release listeners while the client stays connected', async () => {
+    const client = await NexaClient.connect({ url: peer.url, reconnect: false });
+    function subscribe() {
+        const listener = () => {};
+        const onError = () => {};
+        const stop = client.subscribeEmotions(listener, onError);
+        stop();
+        return { stop, listener: new WeakRef(listener), onError: new WeakRef(onError) };
+    }
+    try {
+        const retained = subscribe();
+        assert.equal(
+            await collected(retained.listener),
+            true,
+            'emotional cleanup handle retained listener',
+        );
+        assert.equal(
+            await collected(retained.onError),
+            true,
+            'emotional cleanup handle retained error callback',
+        );
+        retained.stop();
+        assert.equal(client.connected, true);
+    } finally {
+        client.close();
+    }
+});
+
+test('closed emotional subscriptions release clients even when their unused cleanup handles survive', async () => {
+    async function subscribeAndClose() {
+        const client = await NexaClient.connect({ url: peer.url, reconnect: false });
+        const listener = () => {};
+        const stop = client.subscribeEmotions(listener, () => {});
+        client.close();
+        return { stop, listener: new WeakRef(listener), client: new WeakRef(client) };
+    }
+    const retained = await subscribeAndClose();
+    assert.equal(
+        await collected(retained.listener),
+        true,
+        'closed emotional view retained listener',
+    );
+    assert.equal(await collected(retained.client), true, 'closed emotional view retained client');
+    retained.stop();
+});
+
 test('cleanup handles do not retain callbacks after the client is closed', async () => {
     async function subscribeAndClose() {
         const client = await NexaClient.connect({ url: peer.url, reconnect: false });
