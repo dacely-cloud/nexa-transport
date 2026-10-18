@@ -39,7 +39,10 @@ export class RobloxLiveStateCodec {
         ) {
             throw new Error('Live Beam phases must be current-clock origins');
         }
-        if (scene.environment?.wind.some((sample): boolean => sample.at > time + 1e-9)) {
+        if (
+            scene.environment?.wind.some((sample): boolean => sample.at > time + 1e-9) ||
+            scene.environment?.lighting?.some((sample): boolean => sample.at > time + 1e-9)
+        ) {
             throw new Error('Live environment observations cannot be in the future');
         }
         if (scene.events.length !== 0 || (scene.inputs?.length ?? 0) !== 0) {

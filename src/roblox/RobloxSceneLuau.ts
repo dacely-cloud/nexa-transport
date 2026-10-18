@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { RobloxScene, RobloxValue, RobloxClass } from './RobloxSceneTypes';
+import type { RobloxScene, RobloxValue, RobloxSchemaClass } from './RobloxSceneTypes';
 import { RobloxSceneHierarchy } from './RobloxSceneHierarchy';
 import { RobloxSceneSchema } from './RobloxSceneSchema';
 import { RobloxHierarchyLuau } from './RobloxHierarchyLuau';
@@ -31,7 +31,7 @@ export class RobloxSceneLuau {
     public static value(
         value: RobloxValue,
         property: string = '',
-        className?: RobloxClass,
+        className?: RobloxSchemaClass,
     ): string {
         if (typeof value === 'string') {
             return this.quote(value);
@@ -498,6 +498,7 @@ export class RobloxSceneLuau {
                   ]
                 : [
                       '            if track.environment then applyWind(track.samples[track.cursor][2])',
+                      '            elseif track.lighting then applyLighting(track.samples[track.cursor][2])',
                       '            elseif track.mesh then track.node:ApplyMesh(track.samples[track.cursor][2])',
                   ]),
             '            else',
@@ -547,7 +548,9 @@ export class RobloxSceneLuau {
             '    for _, connection in playbackConnections do connection:Disconnect() end',
             '    for _, tween in tweens do tween:Cancel() end',
             '    for _, node in nodes do node:Destroy() end',
-            ...(scene.environment === undefined ? [] : ['    restoreWind()']),
+            ...(scene.environment === undefined
+                ? []
+                : ['    restoreWind()', '    restoreLighting()']),
             '  end',
         );
         for (const id of new Set(

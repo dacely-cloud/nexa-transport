@@ -3,6 +3,7 @@
 import { RobloxSceneCodec } from './RobloxSceneCodec';
 import { RobloxDefaultTextures, type RobloxTextureRect } from './RobloxDefaultTextures';
 import type { RobloxScene } from './RobloxSceneTypes';
+import { RobloxContentId } from './RobloxContentId';
 
 /** Downloaded sprites share an immutable PNG atlas with the original built-in sprites. */
 export interface RobloxSceneTextureAtlas {
@@ -27,7 +28,7 @@ export class RobloxSceneTextures {
 
     /** The portable scene carries asset identities rather than arbitrary network URLs. */
     public static assetUri(uri: string): boolean {
-        return /^rbxassetid:\/\/[1-9][0-9]{0,18}$/u.test(uri) || this.resourceUri(uri);
+        return RobloxContentId.asset(uri) !== null || this.resourceUri(uri);
     }
     /** Rejects arbitrary URLs, oversized decoded surfaces and invalid sprite bounds. */
     public static decode(raw: unknown): RobloxSceneTextureAtlas | undefined {

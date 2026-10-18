@@ -4,6 +4,7 @@ import { RobloxSceneCodec } from './RobloxSceneCodec';
 import { RobloxMeshDecoder } from './RobloxMeshDecoder';
 import type { RobloxMeshData } from './RobloxMeshTypes';
 import type { RobloxScene } from './RobloxSceneTypes';
+import { RobloxContentId } from './RobloxContentId';
 
 /** Original FileMesh content, with authenticated download provenance retained separately from geometry. */
 export interface RobloxSceneMeshResource {
@@ -25,8 +26,7 @@ export class RobloxSceneMeshes {
     /** Only real Roblox mesh content identities are accepted, with no traversal or arbitrary URLs. */
     public static uri(value: string): boolean {
         return (
-            (/^rbxassetid:\/\/[1-9][0-9]{0,18}$/u.test(value) &&
-                BigInt(value.slice(13)) <= 9223372036854775807n) ||
+            RobloxContentId.asset(value) !== null ||
             (value.length <= 512 &&
                 /^rbxasset:\/\/(?:meshes|heads|avatar|models)\/(?:[A-Za-z0-9_-]+\/)*[A-Za-z0-9_.-]+\.mesh$/iu.test(
                     value,

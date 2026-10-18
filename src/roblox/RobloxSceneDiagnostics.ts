@@ -15,6 +15,20 @@ export class RobloxSceneDiagnostics {
                 ? 'Capture uses hardware Vulkan with approximated Roblox materials and lighting. Studio pixel fidelity has not been measured.'
                 : 'Preview uses a WebGL approximation of Roblox lighting and materials. Studio pixel fidelity has not been measured.',
         ];
+        if (scene.environment?.lighting !== undefined) {
+            findings.push(
+                'Authored Lighting values and held changes drive ambient/directional illumination, exposure and material highlights. ClockTime/latitude use an approximate sun path. Studio sky convolution, occlusion, shadows and exact material/photometric calibration remain unfinished; pixel parity is not certified.',
+            );
+        }
+        if (
+            nodes.some((node: RobloxSceneNode): boolean =>
+                ['SpecialMesh', 'BlockMesh', 'CylinderMesh', 'FileMesh'].includes(node.className),
+            )
+        ) {
+            findings.push(
+                'Native mesh modifiers retain original file geometry, texture, per-axis Scale, parent-local Offset and VertexColor. Head/Torso use original shipped files; ellipsoids preserve all three axes. Births, removal, reparenting and mesh-property recordings are evaluated at each frame. Multiple simultaneous modifiers on one BasePart require explicit resolution. Skinned deformation and Studio pixels remain uncalibrated.',
+            );
+        }
         if (nodes.some((node: RobloxSceneNode): boolean => node.className === 'PointLight')) {
             findings.push(
                 'PointLight previews retain native Color, Brightness, Range, Enabled and moving Attachment/BasePart positions. Local illumination is approximate and bounded to 64 active lights; PointLight shadows and Studio photometric parity remain unfinished. Original lights and shadow settings remain in Studio exports.',

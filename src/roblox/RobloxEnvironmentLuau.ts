@@ -3,6 +3,7 @@
 
 import type { RobloxScene } from './RobloxSceneTypes';
 import { RobloxSceneLuau } from './RobloxSceneLuau';
+import { RobloxLightingLuau } from './RobloxLightingLuau';
 
 /** Studio environment replay is explicit because Workspace wind affects the whole place. */
 export class RobloxEnvironmentLuau {
@@ -10,7 +11,7 @@ export class RobloxEnvironmentLuau {
     public static instructions(scene: RobloxScene): string {
         return scene.environment === undefined
             ? ''
-            : "Recorded Workspace wind is included. Runtime.mount(worldParent, guiParent, true) opts into replaying it for the whole place and restores the previous wind on destroy if nothing else changed it. Omit the third argument to keep the game's current wind. Coordinate simultaneous recorded-environment replays in Studio.\n";
+            : "Recorded Workspace wind and/or Lighting settings are included. Runtime.mount(worldParent, guiParent, true) opts into replaying the captured environment for the whole place. Destroy restores values still owned by this replay; later game edits are preserved. Omit the third argument to keep the game's current environment. Coordinate simultaneous recorded-environment replays in Studio.\n";
     }
     /** Captures wind only when playback first writes it and yields ownership after an external edit. */
     public static setup(scene: RobloxScene): readonly string[] {
@@ -27,6 +28,7 @@ export class RobloxEnvironmentLuau {
             '    workspace.GlobalWind = value',
             '    windWritten = value',
             '  end',
+            ...RobloxLightingLuau.setup(),
             '  local function restoreWind()',
             '    if applyEnvironment and windWritten ~= nil and workspace.GlobalWind == windWritten then workspace.GlobalWind = windBefore end',
             '    windWritten = nil',
@@ -40,7 +42,7 @@ export class RobloxEnvironmentLuau {
             scene.environment;
         const first: import('./RobloxEnvironment').RobloxWindSample | undefined = wind?.wind[0];
         if (wind === undefined || first === undefined) {
-            return [];
+            return RobloxLightingLuau.playback(scene);
         }
         return [
             '    if applyEnvironment then',
@@ -56,6 +58,7 @@ export class RobloxEnvironmentLuau {
             ),
             '      } })',
             '    end',
+            ...RobloxLightingLuau.playback(scene),
         ];
     }
 }

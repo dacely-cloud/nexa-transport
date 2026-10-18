@@ -142,6 +142,10 @@ export const RobloxClass = {
     WorldModel: 'WorldModel',
     ObjectValue: 'ObjectValue',
     PointLight: 'PointLight',
+    SpecialMesh: 'SpecialMesh',
+    BlockMesh: 'BlockMesh',
+    CylinderMesh: 'CylinderMesh',
+    FileMesh: 'FileMesh',
     Beam: 'Beam',
     Trail: 'Trail',
     Part: 'Part',
@@ -168,6 +172,10 @@ export const RobloxClass = {
 } as const;
 /** Supported instance class. */
 export type RobloxClass = (typeof RobloxClass)[keyof typeof RobloxClass];
+/** Native capture schemas include services observed outside the projected model hierarchy. */
+export const RobloxSchemaClass = { ...RobloxClass, Lighting: 'Lighting' } as const;
+/** Visual node classes and negotiated environment service classes. */
+export type RobloxSchemaClass = (typeof RobloxSchemaClass)[keyof typeof RobloxSchemaClass];
 /** Flat instance record with stable identity independent of Roblox Name. */
 export interface RobloxSceneNode {
     readonly id: string;

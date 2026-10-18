@@ -28,6 +28,59 @@ export class RobloxMeshGeometry {
     });
     static readonly #geometry: WeakMap<RobloxMeshData, Map<string, RobloxMeshGeometryData>> =
         new WeakMap();
+    static readonly #original: WeakMap<RobloxMeshData, RobloxMeshGeometryData> = new WeakMap();
+    static readonly #sizes: WeakMap<RobloxMeshData, RobloxVector3> = new WeakMap();
+
+    /** Built-in Head/Torso meshes scale to their parent dimensions rather than FileMesh stud scale. */
+    public static fitted(scene: RobloxScene, uri: string): RobloxMeshGeometryData {
+        const source: RobloxMeshData = RobloxSceneMeshes.get(scene, uri);
+        let size: RobloxVector3 | undefined = this.#sizes.get(source);
+        if (size === undefined) {
+            const minimum: number[] = [Infinity, Infinity, Infinity];
+            const maximum: number[] = [-Infinity, -Infinity, -Infinity];
+            for (let index: number = 0; index < source.positions.length; index++) {
+                const value: number = source.positions[index] ?? 0;
+                minimum[index % 3] = Math.min(minimum[index % 3] ?? Infinity, value);
+                maximum[index % 3] = Math.max(maximum[index % 3] ?? -Infinity, value);
+            }
+            size = {
+                kind: 'Vector3',
+                x: (maximum[0] ?? 0) - (minimum[0] ?? 0),
+                y: (maximum[1] ?? 0) - (minimum[1] ?? 0),
+                z: (maximum[2] ?? 0) - (minimum[2] ?? 0),
+            };
+            this.#sizes.set(source, size);
+        }
+        return this.get(scene, { MeshId: uri, MeshSize: size });
+    }
+
+    /** FileMesh Scale operates on original stud coordinates, independently of its parent Part.Size. */
+    public static original(scene: RobloxScene, uri: string): RobloxMeshGeometryData {
+        if (uri === '') {
+            return this.#empty;
+        }
+        const source: RobloxMeshData = RobloxSceneMeshes.get(scene, uri);
+        if (source.boneCount !== 0 || source.facialBytes !== 0) {
+            throw new Error(
+                'Rigged mesh deformation is not implemented; use an explicitly static mesh',
+            );
+        }
+        let geometry: RobloxMeshGeometryData | undefined = this.#original.get(source);
+        if (geometry === undefined) {
+            geometry = {
+                positions: source.positions,
+                normals: RobloxMeshNormals.export(source),
+                uvs: source.uvs,
+                colors: source.colors,
+                indices: source.highQualityIndices,
+                transparent: source.colors.some(
+                    (value: number, index: number): boolean => index % 4 === 3 && value !== 255,
+                ),
+            };
+            this.#original.set(source, geometry);
+        }
+        return geometry;
+    }
 
     public static get(
         scene: RobloxScene,

@@ -1,7 +1,12 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { RobloxClass, RobloxValue, RobloxValueKind } from './RobloxSceneTypes';
+import type {
+    RobloxClass,
+    RobloxSchemaClass,
+    RobloxValue,
+    RobloxValueKind,
+} from './RobloxSceneTypes';
 import { RobloxFontCatalog, type RobloxFontDefinition } from './RobloxFontCatalog';
 
 /** Official native Enum.Material values retained in previews and Studio exports. */
@@ -208,6 +213,7 @@ const part: Readonly<Record<string, RobloxPropertySpec>> = {
     CanTouch: b(true),
     CastShadow: b(true),
     Material: e(RobloxMaterial.Plastic, Object.values(RobloxMaterial), 'Material'),
+    Reflectance: n(0, 0, 1),
 };
 
 const image: Readonly<Record<string, RobloxPropertySpec>> = {
@@ -226,11 +232,49 @@ const image: Readonly<Record<string, RobloxPropertySpec>> = {
 
 /** One property registry supplies validation, normalization and native XML serialization. */
 export const RobloxSceneSchema: Readonly<
-    Record<RobloxClass, Readonly<Record<string, RobloxPropertySpec>>>
+    Record<RobloxSchemaClass, Readonly<Record<string, RobloxPropertySpec>>>
 > = {
     Folder: {},
     Model: {},
     WorldModel: {},
+    Lighting: {
+        Ambient: v(RobloxValues.color(0, 0, 0), true),
+        OutdoorAmbient: v(RobloxValues.color(0.5, 0.5, 0.5), true),
+        Brightness: n(1, 0, 100),
+        ClockTime: n(14, 0, 24),
+        GeographicLatitude: n(41.733, -90, 90),
+        ExposureCompensation: n(0, -5, 5),
+        ColorShift_Top: v(RobloxValues.color(0, 0, 0), true),
+        ColorShift_Bottom: v(RobloxValues.color(0, 0, 0), true),
+        EnvironmentDiffuseScale: n(0, 0, 1),
+        EnvironmentSpecularScale: n(0, 0, 1),
+        GlobalShadows: b(true),
+    },
+    SpecialMesh: {
+        MeshType: e(0, [0, 1, 2, 3, 4, 5, 6], 'MeshType'),
+        MeshId: { ...s(''), xmlType: 'ContentId' },
+        TextureId: { ...s(''), xmlType: 'ContentId' },
+        Scale: v(RobloxValues.vector3(1, 1, 1), true),
+        Offset: v(RobloxValues.vector3(), true),
+        VertexColor: v(RobloxValues.vector3(1, 1, 1), true),
+    },
+    BlockMesh: {
+        Scale: v(RobloxValues.vector3(1, 1, 1), true),
+        Offset: v(RobloxValues.vector3(), true),
+        VertexColor: v(RobloxValues.vector3(1, 1, 1), true),
+    },
+    CylinderMesh: {
+        Scale: v(RobloxValues.vector3(1, 1, 1), true),
+        Offset: v(RobloxValues.vector3(), true),
+        VertexColor: v(RobloxValues.vector3(1, 1, 1), true),
+    },
+    FileMesh: {
+        MeshId: { ...s(''), xmlType: 'ContentId' },
+        TextureId: { ...s(''), xmlType: 'ContentId' },
+        Scale: v(RobloxValues.vector3(1, 1, 1), true),
+        Offset: v(RobloxValues.vector3(), true),
+        VertexColor: v(RobloxValues.vector3(1, 1, 1), true),
+    },
     ObjectValue: { Value: { type: 'Instance', default: RobloxValues.reference(), xmlType: 'Ref' } },
     PointLight: {
         Enabled: b(true),

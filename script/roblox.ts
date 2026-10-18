@@ -7,6 +7,11 @@ import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 const files: readonly string[] = [
     'RobloxExecutionContext',
     'RobloxEnvironment',
+    'RobloxLighting',
+    'RobloxLightingLuau',
+    'RobloxSurfaceMaterial',
+    'RobloxVisualParts',
+    'RobloxContentId',
     'RobloxEnvironmentLuau',
     'RobloxPhysicsLuau',
     'RobloxBeamBudget',

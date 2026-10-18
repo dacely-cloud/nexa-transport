@@ -3,6 +3,7 @@
 
 import type { RobloxScene, RobloxVector3 } from './RobloxSceneTypes';
 import { RobloxSceneCodec } from './RobloxSceneCodec';
+import { RobloxLighting, type RobloxLightingSample } from './RobloxLighting';
 
 /** A held native Workspace.GlobalWind observation, relative to this scene's clock. */
 export interface RobloxWindSample {
@@ -12,6 +13,7 @@ export interface RobloxWindSample {
 /** Environment observations remain separate from imported instance properties. */
 export interface RobloxEnvironmentState {
     readonly wind: readonly RobloxWindSample[];
+    readonly lighting?: readonly RobloxLightingSample[];
 }
 
 /** Validates and samples bounded native environment data without replaying earlier frames. */
@@ -23,9 +25,21 @@ export class RobloxEnvironment {
         if (raw === undefined) {
             return undefined;
         }
-        const fields: Readonly<Record<string, unknown>> = RobloxSceneCodec.record(raw, ['wind']);
-        const wind: unknown = fields['wind'];
-        if (!Array.isArray(wind) || wind.length < 1 || wind.length > 4096) {
+        const fields: Readonly<Record<string, unknown>> = RobloxSceneCodec.record(
+            raw,
+            [],
+            ['wind', 'lighting'],
+        );
+        const wind: unknown = fields['wind'] === undefined ? [] : fields['wind'];
+        const lighting: readonly RobloxLightingSample[] | undefined =
+            fields['lighting'] === undefined
+                ? undefined
+                : RobloxLighting.decode(fields['lighting'], duration);
+        if (
+            !Array.isArray(wind) ||
+            wind.length > 4096 ||
+            (wind.length === 0 && (lighting?.length ?? 0) === 0)
+        ) {
             throw new Error('Environment wind requires 1..4096 observations');
         }
         let previous: number = -1;
@@ -60,7 +74,10 @@ export class RobloxEnvironment {
                 });
             },
         );
-        return Object.freeze({ wind: Object.freeze(samples) });
+        return Object.freeze({
+            wind: Object.freeze(samples),
+            ...(lighting === undefined ? {} : { lighting }),
+        });
     }
 
     /** Looks up the current held world-space wind; scenes without metadata remain calm. */

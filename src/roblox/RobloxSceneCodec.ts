@@ -584,7 +584,7 @@ export class RobloxSceneCodec {
             'properties',
         ]);
         const className: string = this.text(data['className'], 64);
-        if (!Object.hasOwn(RobloxSceneSchema, className)) {
+        if (!Object.hasOwn(RobloxClass, className)) {
             throw new Error('Unsupported Roblox class: ' + className);
         }
         const supported: RobloxClass = className as RobloxClass;
@@ -703,6 +703,10 @@ export class RobloxSceneCodec {
             throw new Error('Missing parent for ' + node.id);
         }
         const allowed: Readonly<Record<RobloxClass, readonly RobloxClass[]>> = {
+            SpecialMesh: Object.values(RobloxClass),
+            FileMesh: Object.values(RobloxClass),
+            BlockMesh: Object.values(RobloxClass),
+            CylinderMesh: Object.values(RobloxClass),
             PointLight: Object.values(RobloxClass),
             Beam: Object.values(RobloxClass),
             Trail: Object.values(RobloxClass),
