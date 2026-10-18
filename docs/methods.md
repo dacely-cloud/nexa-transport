@@ -1,6 +1,6 @@
 # RPC reference
 
-All 204 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 203 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
+All 205 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 204 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
 
 - [accounts.create](#accountscreate)
 - [accounts.list](#accountslist)
@@ -118,6 +118,7 @@ All 204 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [roblox.telemetry.funnel](#robloxtelemetryfunnel)
 - [roblox.telemetry.performance](#robloxtelemetryperformance)
 - [roblox.telemetry.projects](#robloxtelemetryprojects)
+- [self.emotions](#selfemotions)
 - [sessions.delete](#sessionsdelete)
 - [sessions.download](#sessionsdownload)
 - [sessions.files](#sessionsfiles)
@@ -3179,6 +3180,23 @@ Parameters: [Recordstringnever](protocol.md#recordstringnever).
 Type: Dictionary.
 
 Result: Array of [TelemetryProject](protocol.md#telemetryproject).
+
+## self.emotions
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.SelfEmotions> = {};
+const result: ResultOf<typeof Method.SelfEmotions> = await client.call(Method.SelfEmotions, params);
+```
+
+Parameters: [EmotionalReadParams](protocol.md#emotionalreadparams).
+
+| Field     | Required | Type     | Description |
+| --------- | -------- | -------- | ----------- |
+| `agentId` | No       | `string` |             |
+
+Result: [EmotionalSnapshot](protocol.md#emotionalsnapshot).
 
 ## sessions.delete
 

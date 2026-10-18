@@ -4,6 +4,8 @@ Import `NexaClient` from `nexa-transport`, `Method` and protocol types from `nex
 
 ## NexaClient
 
+`client.emotions(agentId?, options?)` reads the current mood, feelings and private relationship toward the authenticated user. Use `client.supportsEmotions` to check gateway support, and `client.subscribeEmotions(listener, onError, agentId?)` to keep a view current. The returned cleanup function releases that view. Same-agent views share reads and timers; disconnect pauses polling and reconnect reads fresh state. See [emotional state](emotions.md) for response fields and UI examples.
+
 | Member                                       | Contract                                                                                                                                                     |
 | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `NexaClient.connect(options)`                | Returns `Promise<NexaClient>` after socket connection, challenge, negotiation, and authentication. Throws if connection/authentication fails.                |

@@ -1,4 +1,6 @@
 import { SessionHistoryReader } from './SessionHistoryReader.js';
+import { EmotionWatches } from './EmotionWatches.js';
+import type { EmotionalSnapshot, TurnEventData } from '../protocol/Protocol.js';
 import type { SessionHistoryRecord } from '../protocol/Protocol.js';
 import { CompanyFormats } from './CompanyFormats.js';
 import { EmployeeChannels } from './EmployeeChannels.js';
@@ -126,6 +128,40 @@ export interface CollaborationOffice {
 }
 /** Authenticated Nexa gateway connection shared by browsers and Node.js. */
 export class NexaClient {
+    readonly #emotionalWatches: EmotionWatches = new EmotionWatches({
+        read: (agentId: string | undefined, signal: AbortSignal): Promise<EmotionalSnapshot> =>
+            this.emotions(agentId, { signal }),
+        notify: (operation: () => void): void => this.#notify(operation),
+    });
+
+    /** Whether the authenticated gateway advertises private emotional state reads. */
+    public get supportsEmotions(): boolean {
+        return (
+            this.connected && this.#hello?.features.methods.includes(Method.SelfEmotions) === true
+        );
+    }
+
+    /** Shares live emotional reads across views; release on unmount. Refreshes after reactions, completion, reconnect and every 30 idle seconds. */
+    public subscribeEmotions(
+        listener: (snapshot: EmotionalSnapshot) => void,
+        onError: (error: Error) => void,
+        agentId?: string,
+    ): () => void {
+        if (!this.supportsEmotions) {
+            throw new TransportError(
+                TransportErrorCode.Protocol,
+                'Emotional state subscriptions require an updated connected Nexa gateway',
+            );
+        }
+        return this.#emotionalWatches.subscribe(agentId, { state: listener, error: onError });
+    }
+    /** Read Nexa's current mood, emotions and private relationship toward this authenticated user. */
+    public emotions(
+        agentId?: string,
+        options: CallOptions = {},
+    ): Promise<ResultOf<Method.SelfEmotions>> {
+        return this.call(Method.SelfEmotions, agentId === undefined ? {} : { agentId }, options);
+    }
     /** Browser locale and timezone hints; returns undefined in server environments. */
     public static browserRegion(): UserRegion | undefined {
         return BrowserRegion.read();
@@ -1611,6 +1647,7 @@ export class NexaClient {
             throw materializeError(new Error('Non-monotonic event sequence'));
         }
         if (seq !== this.#sequence + 1n) {
+            this.#emotionalWatches.refresh();
             for (const listener of this.#gaps) {
                 this.#notify((): void => {
                     listener({ expected: this.#sequence + 1n, received: seq });
@@ -1625,6 +1662,26 @@ export class NexaClient {
             this.#challenge = frame['data'];
             this.#wake?.();
             return;
+        }
+        if (
+            this.#emotionalWatches.active &&
+            (frame['event'] === EventName.TurnEnd || frame['event'] === EventName.TurnEvent)
+        ) {
+            const eventName: typeof EventName.TurnEnd | typeof EventName.TurnEvent = frame['event'];
+            if (eventName === EventName.TurnEnd && isEventData(eventName, frame['data'])) {
+                this.#emotionalWatches.refresh();
+            } else if (
+                eventName === EventName.TurnEvent &&
+                isRecord(frame['data']) &&
+                isRecord(frame['data']['event']) &&
+                frame['data']['event']['type'] === 'tool-finish' &&
+                isEventData(eventName, frame['data'])
+            ) {
+                const event: TurnEventData['event'] = frame['data'].event;
+                if (event.type === 'tool-finish' && event.outcome.call.name === 'self_emotion') {
+                    this.#emotionalWatches.refresh();
+                }
+            }
         }
         for (const listener of this.#events) {
             const event: GatewayEvent = { event: frame['event'], data: frame['data'], seq };
@@ -1717,6 +1774,7 @@ export class NexaClient {
         this.#closed = true;
         this.#failure = materializeError(error);
         this.#pending.close(error);
+        this.#emotionalWatches.pause(error);
         this.#company.close(error);
         this.#companyLimits.close(error);
         this.#employees.close(error);
@@ -1742,6 +1800,7 @@ export class NexaClient {
         }
     }
     #clearListeners(): void {
+        this.#emotionalWatches.clear();
         this.#projects.clear();
         this.#company.clear();
         this.#companyLimits.clear();
@@ -1802,6 +1861,7 @@ export class NexaClient {
             }
             this.#socket = this.#openSocket();
             await this.#handshake();
+            this.#emotionalWatches.resume();
             for (const listener of this.#reconnectListeners) {
                 this.#notify(listener);
             }

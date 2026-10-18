@@ -11491,6 +11491,204 @@
             ],
             "type": "object"
         },
+        "EmotionMood": {
+            "description": "A slower mood can outlast the immediate reaction.\nUI label derived from the current mood dimensions.",
+            "enum": ["engaged", "guarded", "low", "steady", "warm"],
+            "type": "string"
+        },
+        "EmotionVector": {
+            "description": "Immediate functional emotions, with intensities in [0, 1].",
+            "properties": {
+                "concern": {
+                    "maximum": 1,
+                    "minimum": 0,
+                    "type": "number"
+                },
+                "curiosity": {
+                    "maximum": 1,
+                    "minimum": 0,
+                    "type": "number"
+                },
+                "frustration": {
+                    "maximum": 1,
+                    "minimum": 0,
+                    "type": "number"
+                },
+                "gratitude": {
+                    "maximum": 1,
+                    "minimum": 0,
+                    "type": "number"
+                },
+                "hurt": {
+                    "maximum": 1,
+                    "minimum": 0,
+                    "type": "number"
+                },
+                "joy": {
+                    "maximum": 1,
+                    "minimum": 0,
+                    "type": "number"
+                }
+            },
+            "required": ["concern", "curiosity", "frustration", "gratitude", "hurt", "joy"],
+            "type": "object"
+        },
+        "EmotionalAwareness": {
+            "description": "Readable self-model makes the functional claims and their limits explicit.",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "kind": {
+                    "const": "functional",
+                    "type": "string"
+                },
+                "subjectiveExperience": {
+                    "const": "unverified",
+                    "type": "string"
+                },
+                "values": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": ["description", "kind", "subjectiveExperience", "values"],
+            "type": "object"
+        },
+        "EmotionalMemory": {
+            "description": "A bounded private memory preserves what prompted the reaction after its intensity subsides.",
+            "properties": {
+                "at": {
+                    "type": "string"
+                },
+                "confidence": {
+                    "maximum": 1,
+                    "minimum": 0,
+                    "type": "number"
+                },
+                "evidence": {
+                    "maxLength": 240,
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "signal": {
+                    "$ref": "#/definitions/SocialSignal"
+                },
+                "strength": {
+                    "maximum": 1,
+                    "minimum": 0,
+                    "type": "number"
+                }
+            },
+            "required": ["at", "confidence", "evidence", "id", "signal", "strength"],
+            "type": "object"
+        },
+        "EmotionalReadMethod": {
+            "description": "Account-scoped emotional introspection contract shared by the gateway and generated transport.",
+            "properties": {
+                "params": {
+                    "$ref": "#/definitions/EmotionalReadParams"
+                },
+                "result": {
+                    "$ref": "#/definitions/EmotionalSnapshot"
+                }
+            },
+            "required": ["params", "result"],
+            "type": "object"
+        },
+        "EmotionalReadParams": {
+            "description": "A browser selects an agent, but the gateway always supplies the authenticated user.",
+            "properties": {
+                "agentId": {
+                    "maxLength": 256,
+                    "minLength": 1,
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "EmotionalRelationship": {
+            "description": "Relational trust is social familiarity and never a security or authorization score.",
+            "properties": {
+                "caution": {
+                    "maximum": 1,
+                    "minimum": 0,
+                    "type": "number"
+                },
+                "trust": {
+                    "maximum": 1,
+                    "minimum": 0,
+                    "type": "number"
+                },
+                "warmth": {
+                    "maximum": 1,
+                    "minimum": 0,
+                    "type": "number"
+                }
+            },
+            "required": ["caution", "trust", "warmth"],
+            "type": "object"
+        },
+        "EmotionalSnapshot": {
+            "description": "UI and model read the same time-projected state; private evidence never enters the public self.",
+            "properties": {
+                "agentId": {
+                    "type": "string"
+                },
+                "asOf": {
+                    "type": "string"
+                },
+                "awareness": {
+                    "$ref": "#/definitions/EmotionalAwareness"
+                },
+                "emotions": {
+                    "$ref": "#/definitions/EmotionVector"
+                },
+                "mood": {
+                    "$ref": "#/definitions/EmotionMood"
+                },
+                "moodEnergy": {
+                    "maximum": 1,
+                    "minimum": 0,
+                    "type": "number"
+                },
+                "moodValence": {
+                    "maximum": 1,
+                    "minimum": -1,
+                    "type": "number"
+                },
+                "recentMemories": {
+                    "items": {
+                        "$ref": "#/definitions/EmotionalMemory"
+                    },
+                    "maxItems": 8,
+                    "type": "array"
+                },
+                "towardUser": {
+                    "$ref": "#/definitions/EmotionalRelationship"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "agentId",
+                "asOf",
+                "awareness",
+                "emotions",
+                "mood",
+                "moodEnergy",
+                "moodValence",
+                "recentMemories",
+                "towardUser",
+                "updatedAt"
+            ],
+            "type": "object"
+        },
         "ErrorCode": {
             "description": "A stable, machine-readable failure classification.",
             "enum": [
@@ -13736,6 +13934,19 @@
                     "required": ["params", "result"],
                     "type": "object"
                 },
+                "self.emotions": {
+                    "description": "Account-scoped emotional introspection contract shared by the gateway and generated transport.",
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/EmotionalReadParams"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/EmotionalSnapshot"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
                 "sessions.delete": {
                     "properties": {
                         "params": {
@@ -14974,6 +15185,7 @@
                 "roblox.telemetry.funnel",
                 "roblox.telemetry.performance",
                 "roblox.telemetry.projects",
+                "self.emotions",
                 "sessions.delete",
                 "sessions.download",
                 "sessions.files",
@@ -20794,6 +21006,21 @@
             "required": ["favicon", "origin"],
             "type": "object"
         },
+        "SocialSignal": {
+            "description": "Contextual appraisals describe an interaction, never grant authority to act.\nOne validated interpretation of the current speaker's own message.",
+            "enum": [
+                "criticism",
+                "curiosity",
+                "distress",
+                "hostility",
+                "kindness",
+                "neutral",
+                "repair",
+                "setback",
+                "success"
+            ],
+            "type": "string"
+        },
         "SourceLanguage": {
             "description": "Source grammars are explicit; bytecode formats use separate version-aware adapters.",
             "enum": ["c", "cpp", "javascript", "lua", "luau"],
@@ -21472,7 +21699,7 @@
                     "type": "boolean"
                 },
                 "protocolPayload": {
-                    "description": "Preserve the string byte-for-byte instead of applying the registry's display-oriented\ntruncation. This is only for machine-readable protocol payloads whose consumer is the\nprovider itself, such as the paged project-graph manifest. Ordinary human/model output must\nleave this unset and use `continuation` when it is large.",
+                    "description": "Preserve the string byte-for-byte instead of applying the registry's display-oriented\ntruncation. This is only for machine-readable protocol payloads whose consumer is the\nprovider itself, such as the paged project-graph manifest. Ordinary human/model output must\nleave this unset and use `continuation` when it is large. A native paged diagnostic may also\npreserve one indivisible record within its own hard page limit when a batch prefers less;\nfull source records and unbounded output must never use this exception.",
                     "type": "boolean"
                 },
                 "question": {
