@@ -160,10 +160,6 @@ export class EmotionWatch {
     static #freeze(snapshot: EmotionalSnapshot): EmotionalSnapshot {
         Object.freeze(snapshot.emotions);
         Object.freeze(snapshot.towardUser);
-        for (const memory of snapshot.recentMemories) {
-            Object.freeze(memory);
-        }
-        Object.freeze(snapshot.recentMemories);
         Object.freeze(snapshot.awareness.values);
         Object.freeze(snapshot.awareness);
         return Object.freeze(snapshot);

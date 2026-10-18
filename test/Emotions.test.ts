@@ -14,7 +14,7 @@ interface PendingEmotionReply {
     readonly request: Request;
 }
 
-/** A private, time-projected state with the complete introspection contract. */
+/** Current expression and relationship scores with no private memory records. */
 const snapshot: EmotionalSnapshot = {
     agentId: 'nexa',
     asOf: '2026-10-18T12:10:00.000Z',
@@ -24,7 +24,6 @@ const snapshot: EmotionalSnapshot = {
     moodEnergy: 0.35,
     emotions: { gratitude: 0.4, hurt: 0, frustration: 0, concern: 0, curiosity: 0, joy: 0.2 },
     towardUser: { warmth: 0.6, trust: 0.55, caution: 0 },
-    recentMemories: [],
     awareness: {
         kind: 'functional',
         subjectiveExperience: 'unverified',
@@ -50,6 +49,11 @@ it('reads private emotions with no browser-selectable user identity and validate
         expect(gateway.requests.at(-1)?.params).toEqual({});
         expect(await client.emotions('nexa')).toEqual(snapshot);
         expect(gateway.requests.at(-1)?.params).toEqual({ agentId: 'nexa' });
+        reply = { ...snapshot };
+        Reflect.set(reply, 'recentMemories', [{ evidence: 'PRIVATE MEMORY' }]);
+        await expect(client.emotions()).rejects.toThrow();
+        await expect(client.call(Method.SelfEmotions, {})).rejects.toThrow();
+        reply = snapshot;
         await expect(client.emotions('')).rejects.toThrow();
         await expect(client.emotions('x'.repeat(257))).rejects.toThrow();
         reply = { ...snapshot, emotions: { ...snapshot.emotions, hurt: 100 } };

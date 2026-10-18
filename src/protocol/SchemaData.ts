@@ -11834,6 +11834,7 @@ export const schema: Schema = {
             type: 'string',
         },
         EmotionVector: {
+            additionalProperties: false,
             description: 'Immediate functional emotions, with intensities in [0, 1].',
             properties: {
                 concern: {
@@ -11871,6 +11872,7 @@ export const schema: Schema = {
             type: 'object',
         },
         EmotionalAwareness: {
+            additionalProperties: false,
             description:
                 'Readable self-model makes the functional claims and their limits explicit.',
             properties: {
@@ -11895,37 +11897,6 @@ export const schema: Schema = {
             required: ['description', 'kind', 'subjectiveExperience', 'values'],
             type: 'object',
         },
-        EmotionalMemory: {
-            description:
-                'A bounded private memory preserves what prompted the reaction after its intensity subsides.',
-            properties: {
-                at: {
-                    type: 'string',
-                },
-                confidence: {
-                    maximum: 1,
-                    minimum: 0,
-                    type: 'number',
-                },
-                evidence: {
-                    maxLength: 240,
-                    type: 'string',
-                },
-                id: {
-                    type: 'string',
-                },
-                signal: {
-                    $ref: '#/definitions/SocialSignal',
-                },
-                strength: {
-                    maximum: 1,
-                    minimum: 0,
-                    type: 'number',
-                },
-            },
-            required: ['at', 'confidence', 'evidence', 'id', 'signal', 'strength'],
-            type: 'object',
-        },
         EmotionalReadMethod: {
             description:
                 'Account-scoped emotional introspection contract shared by the gateway and generated transport.',
@@ -11941,6 +11912,7 @@ export const schema: Schema = {
             type: 'object',
         },
         EmotionalReadParams: {
+            additionalProperties: false,
             description:
                 'A browser selects an agent, but the gateway always supplies the authenticated user.',
             properties: {
@@ -11953,6 +11925,7 @@ export const schema: Schema = {
             type: 'object',
         },
         EmotionalRelationship: {
+            additionalProperties: false,
             description:
                 'Relational trust is social familiarity and never a security or authorization score.',
             properties: {
@@ -11976,8 +11949,9 @@ export const schema: Schema = {
             type: 'object',
         },
         EmotionalSnapshot: {
+            additionalProperties: false,
             description:
-                'UI and model read the same time-projected state; private evidence never enters the public self.',
+                'The transport exposes current expression and relationship scores without personal memory records.',
             properties: {
                 agentId: {
                     type: 'string',
@@ -12004,13 +11978,6 @@ export const schema: Schema = {
                     minimum: -1,
                     type: 'number',
                 },
-                recentMemories: {
-                    items: {
-                        $ref: '#/definitions/EmotionalMemory',
-                    },
-                    maxItems: 8,
-                    type: 'array',
-                },
                 towardUser: {
                     $ref: '#/definitions/EmotionalRelationship',
                 },
@@ -12026,7 +11993,6 @@ export const schema: Schema = {
                 'mood',
                 'moodEnergy',
                 'moodValence',
-                'recentMemories',
                 'towardUser',
                 'updatedAt',
             ],
@@ -21616,22 +21582,6 @@ export const schema: Schema = {
             },
             required: ['favicon', 'origin'],
             type: 'object',
-        },
-        SocialSignal: {
-            description:
-                "Contextual appraisals describe an interaction, never grant authority to act.\nOne validated interpretation of the current speaker's own message.",
-            enum: [
-                'criticism',
-                'curiosity',
-                'distress',
-                'hostility',
-                'kindness',
-                'neutral',
-                'repair',
-                'setback',
-                'success',
-            ],
-            type: 'string',
         },
         SourceLanguage: {
             description:
