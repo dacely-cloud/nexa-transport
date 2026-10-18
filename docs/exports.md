@@ -241,6 +241,8 @@ backend, or a provider-key vault.
 | `nexa-transport/design-text-glyphs`             | ESM + types | Paint-preserving glyphs and clipped outline pieces from prepared layout.     |
 | `nexa-transport/design-font-engine`             | ESM + types | Design font engine.                                                          |
 | `nexa-transport/design-builtin-fonts`           | ESM + types | Design builtin fonts.                                                        |
+| `nexa-transport/design-builtin-font-catalog`    | ESM + types | Metadata and real weight/style ranges for portable bundled text families.    |
+| `nexa-transport/design-source-serif-bytes`      | ESM + types | Original Source Serif 4 roman/italic TTFs for lazy shaping and font loading. |
 | `nexa-transport/design-inter-bytes`             | ESM + types | Design inter bytes.                                                          |
 | `nexa-transport/design-inter-outline-bytes`     | ESM + types | Original Inter sfnt bytes for font shaping and browser consumers.            |
 | `nexa-transport/design-text-outline`            | ESM + types | Design text outline.                                                         |

@@ -1,6 +1,6 @@
 {
     "name": "nexa-transport",
-    "version": "0.1.0-design.37",
+    "version": "0.1.0-design.38",
     "description": "Typed Nexa websocket gateway client for browsers and Node.js",
     "type": "module",
     "license": "Apache-2.0",
@@ -17,6 +17,14 @@
         "licenses"
     ],
     "exports": {
+        "./design-builtin-font-catalog": {
+            "types": "./dist/design/DesignBuiltinFontCatalog.d.ts",
+            "import": "./dist/design-builtin-font-catalog.js"
+        },
+        "./design-source-serif-bytes": {
+            "types": "./dist/design/DesignSourceSerifBytes.d.ts",
+            "import": "./dist/design-source-serif-bytes.js"
+        },
         "./design-flex": {
             "types": "./dist/design/DesignFlex.d.ts",
             "import": "./dist/design-flex.js"
