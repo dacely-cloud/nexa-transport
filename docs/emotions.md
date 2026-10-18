@@ -19,12 +19,11 @@ The response includes:
 | `emotions`                  | Gratitude, hurt, frustration, concern, curiosity and joy, each between zero and one      |
 | `moodValence`, `moodEnergy` | Slower mood dimensions, respectively −1…1 and 0…1                                        |
 | `towardUser`                | Warmth, social trust and caution toward this caller, each 0…1                            |
-| `recentMemories`            | Up to eight dated, private appraisals and their bounded evidence excerpts                |
 | `asOf`                      | UTC time used to project the current feelings                                            |
 | `updatedAt`                 | Last recorded input time; a read does not change it                                      |
 | `awareness`                 | Nexa's functional self-model, values, and the unverified status of subjective experience |
 
-Immediate emotion has a 20-minute half-life, mood a six-hour half-life, and relationship deviations a 30-day half-life. Time spent offline counts. Memories remain after intensity subsides. Reads compute the current state, so refresh after `self_emotion` tool completions, turn completion, reconnect, and periodically while a display is open.
+Immediate emotion has a 20-minute half-life, mood a six-hour half-life, and relationship deviations a 30-day half-life. Time spent offline counts. Emotional memories and original evidence remain internal to Nexa and are never exposed by this API. Reads compute the current state, so refresh after `self_emotion` tool completions, turn completion, reconnect, and periodically while a display is open.
 
 Use `client.supportsEmotions` to check gateway support. `subscribeEmotions` updates a mounted view immediately, after a reaction or turn completes, after reconnect or missed events, and every 30 idle seconds so elapsed time is reflected. Views watching the same agent share the current snapshot, pending read and timer. A reaction received during an older read schedules one follow-up read. Snapshots delivered to subscribers are immutable.
 

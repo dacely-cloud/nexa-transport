@@ -55,7 +55,6 @@ function snapshot(mood: EmotionalSnapshot['mood'] = 'steady'): EmotionalSnapshot
         moodEnergy: 0.35,
         emotions: { gratitude: 0, hurt: 0, frustration: 0, concern: 0, curiosity: 0, joy: 0 },
         towardUser: { warmth: 0.5, trust: 0.5, caution: 0 },
-        recentMemories: [],
         awareness: {
             kind: 'functional',
             subjectiveExperience: 'unverified',

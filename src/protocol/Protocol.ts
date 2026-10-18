@@ -7758,25 +7758,6 @@ export interface EmotionalAwarenessShape {
 /** EmotionalAwareness from the Nexa wire protocol. */
 export type EmotionalAwareness = EmotionalAwarenessShape;
 
-/** EmotionalMemory wire fields. */
-export interface EmotionalMemoryShape {
-    /** at as defined by the Nexa gateway. */
-    readonly at: string;
-    /** confidence as defined by the Nexa gateway. */
-    readonly confidence: number;
-    /** evidence as defined by the Nexa gateway. */
-    readonly evidence: string;
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** signal as defined by the Nexa gateway. */
-    readonly signal: SocialSignal;
-    /** strength as defined by the Nexa gateway. */
-    readonly strength: number;
-}
-
-/** EmotionalMemory from the Nexa wire protocol. */
-export type EmotionalMemory = EmotionalMemoryShape;
-
 /** EmotionalReadMethod wire fields. */
 export interface EmotionalReadMethodShape {
     /** params as defined by the Nexa gateway. */
@@ -7826,8 +7807,6 @@ export interface EmotionalSnapshotShape {
     readonly moodEnergy: number;
     /** moodValence as defined by the Nexa gateway. */
     readonly moodValence: number;
-    /** recentMemories as defined by the Nexa gateway. */
-    readonly recentMemories: ReadonlyArray<EmotionalMemory>;
     /** towardUser as defined by the Nexa gateway. */
     readonly towardUser: EmotionalRelationship;
     /** updatedAt as defined by the Nexa gateway. */
@@ -14197,22 +14176,6 @@ export interface SitePreviewShape {
 
 /** SitePreview from the Nexa wire protocol. */
 export type SitePreview = SitePreviewShape;
-
-/** Allowed values for SocialSignal. */
-export const SocialSignalValues = {
-    Value0: 'criticism',
-    Value1: 'curiosity',
-    Value2: 'distress',
-    Value3: 'hostility',
-    Value4: 'kindness',
-    Value5: 'neutral',
-    Value6: 'repair',
-    Value7: 'setback',
-    Value8: 'success',
-} as const;
-
-/** SocialSignal from the Nexa wire protocol. */
-export type SocialSignal = (typeof SocialSignalValues)[keyof typeof SocialSignalValues];
 
 /** Allowed values for SourceLanguage. */
 export const SourceLanguageValues = {
