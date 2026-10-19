@@ -2111,7 +2111,6 @@ Spend totals over some slice of the ledger.
 | -------------------- | -------- | ---------------------------------------------------- | --------------------------------------------------------------------------- |
 | `byCategory`         | No       | [Recordstringnumber](protocol.md#recordstringnumber) | Missing on older authorities; other includes historical unclassified usage. |
 | `byKind`             | Yes      | [Recordstringnumber](protocol.md#recordstringnumber) | Totals split by charge kind, so "how much of this was voice" is answerable. |
-| `byModel`            | Yes      | [Recordstringnumber](protocol.md#recordstringnumber) | Totals split by model.                                                      |
 | `cachedInputTokens`  | Yes      | `number`                                             |                                                                             |
 | `entries`            | Yes      | `number`                                             |                                                                             |
 | `from`               | Yes      | `number`                                             |                                                                             |
