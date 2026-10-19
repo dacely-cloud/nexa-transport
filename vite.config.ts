@@ -241,7 +241,10 @@ const config: UserConfig = {
             },
             formats: ['es'],
         },
-        rolldownOptions: { external: ['pathkit-wasm', 'woff2-encoder/decompress'] },
+        rolldownOptions: {
+            external: ['pathkit-wasm', 'woff2-encoder/decompress'],
+            output: { entryFileNames: '[name].js', chunkFileNames: 'chunks/[name].js' },
+        },
         sourcemap: true,
     },
 };

@@ -5696,6 +5696,62 @@ The transport exposes current expression and relationship scores without persona
 | `towardUser`  | Yes      | [EmotionalRelationship](protocol.md#emotionalrelationship) |             |
 | `updatedAt`   | Yes      | `string`                                                   |             |
 
+## EnvironmentPreparationEvent
+
+Ordered controller-authored presentation; guest command output is never progress text.
+
+| Field    | Required | Type                                                                   | Description |
+| -------- | -------- | ---------------------------------------------------------------------- | ----------- |
+| `cursor` | Yes      | `string`                                                               |             |
+| `detail` | Yes      | `string`                                                               |             |
+| `state`  | Yes      | [EnvironmentPreparationState](protocol.md#environmentpreparationstate) |             |
+
+## EnvironmentPreparationPage
+
+One current account preparation, resumable from any Nexa replica.
+
+| Field         | Required | Type                                                                            | Description |
+| ------------- | -------- | ------------------------------------------------------------------------------- | ----------- |
+| `currentTask` | Yes      | `string`                                                                        |             |
+| `cursor`      | Yes      | `string`                                                                        |             |
+| `events`      | Yes      | Array of [EnvironmentPreparationEvent](protocol.md#environmentpreparationevent) |             |
+| `operationId` | Yes      | `string`                                                                        |             |
+| `reset`       | Yes      | `boolean`                                                                       |             |
+| `state`       | Yes      | [EnvironmentPreparationState](protocol.md#environmentpreparationstate)          |             |
+
+## EnvironmentPreparationQuery
+
+The account always comes from the authenticated connection.
+
+| Field         | Required | Type     | Description |
+| ------------- | -------- | -------- | ----------- |
+| `cursor`      | Yes      | `string` |             |
+| `operationId` | Yes      | `string` |             |
+
+## EnvironmentPreparationState
+
+Tooling readiness is separate from fleet security qualification.
+
+Type: `"preparing"` / `"ready"` / `"failed"` / `"interrupted"`.
+
+## EnvironmentPrepareMethod
+
+Starts or joins preparation; it never accepts an account, host, command or machine selector.
+
+| Field    | Required | Type                                                                 | Description |
+| -------- | -------- | -------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [Recordstringnever](protocol.md#recordstringnever)                   |             |
+| `result` | Yes      | [EnvironmentPreparationPage](protocol.md#environmentpreparationpage) |             |
+
+## EnvironmentStatusMethod
+
+Reads bounded progress after the last acknowledged cursor.
+
+| Field    | Required | Type                                                                   | Description |
+| -------- | -------- | ---------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [EnvironmentPreparationQuery](protocol.md#environmentpreparationquery) |             |
+| `result` | Yes      | [EnvironmentPreparationPage](protocol.md#environmentpreparationpage)   |             |
+
 ## ErrorCode
 
 A stable, machine-readable failure classification.
@@ -5969,6 +6025,8 @@ Configurable bounds on gateway-owned work and memory.
 | `devices.list`                       | Yes      | Object (fields below) |                                                                                                        |
 | `devices.reject`                     | Yes      | Object (fields below) |                                                                                                        |
 | `devices.revoke`                     | Yes      | Object (fields below) |                                                                                                        |
+| `environment.prepare`                | Yes      | Object (fields below) | Starts or joins preparation; it never accepts an account, host, command or machine selector.           |
+| `environment.status`                 | Yes      | Object (fields below) | Reads bounded progress after the last acknowledged cursor.                                             |
 | `health`                             | Yes      | Object (fields below) |                                                                                                        |
 | `jobs.add`                           | Yes      | Object (fields below) |                                                                                                        |
 | `jobs.list`                          | Yes      | Object (fields below) |                                                                                                        |
@@ -6667,6 +6725,20 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ---------------------------------------------- | ----------- |
 | `params` | Yes      | [DeviceRefParams](protocol.md#devicerefparams) |             |
 | `result` | Yes      | [OkResult](protocol.md#okresult)               |             |
+
+**environment.prepare**
+
+| Field    | Required | Type                                                                 | Description |
+| -------- | -------- | -------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [Recordstringnever](protocol.md#recordstringnever)                   |             |
+| `result` | Yes      | [EnvironmentPreparationPage](protocol.md#environmentpreparationpage) |             |
+
+**environment.status**
+
+| Field    | Required | Type                                                                   | Description |
+| -------- | -------- | ---------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [EnvironmentPreparationQuery](protocol.md#environmentpreparationquery) |             |
+| `result` | Yes      | [EnvironmentPreparationPage](protocol.md#environmentpreparationpage)   |             |
 
 **health**
 

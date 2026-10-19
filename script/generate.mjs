@@ -385,6 +385,17 @@ function type(node, hint) {
 }
 for (const [name, def] of Object.entries(schema.definitions)) {
     const outputName = nameFor(name);
+    if (name === 'EnvironmentPreparationState') {
+        const source = readFileSync('../nexa/src/dataplane/EnvironmentPreparationTypes.ts', 'utf8');
+        const declaration = source.match(/export enum EnvironmentPreparationState \{[^}]+\}/u)?.[0];
+        if (declaration === undefined)
+            throw new Error('Missing environment preparation state enum');
+        declarations.push(
+            '/** Controller tooling readiness, separate from fleet security qualification. */\n' +
+                declaration,
+        );
+        continue;
+    }
     if (name === 'JsonValue') {
         declarations.push(
             '/** Arbitrary JSON object. */\nexport interface JsonObject { readonly [key: string]: JsonValue; }\n/** Lossless JSON values carried by extensible protocol fields. */\nexport type JsonValue = string | number | boolean | null | ReadonlyArray<JsonValue> | JsonObject;',
