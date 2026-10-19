@@ -1,6 +1,6 @@
 # RPC reference
 
-All 205 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 204 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
+All 207 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 206 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
 
 - [accounts.create](#accountscreate)
 - [accounts.list](#accountslist)
@@ -74,6 +74,8 @@ All 205 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [devices.list](#deviceslist)
 - [devices.reject](#devicesreject)
 - [devices.revoke](#devicesrevoke)
+- [environment.prepare](#environmentprepare)
+- [environment.status](#environmentstatus)
 - [health](#health)
 - [jobs.add](#jobsadd)
 - [jobs.list](#jobslist)
@@ -2036,6 +2038,48 @@ Parameters: [DeviceRefParams](protocol.md#devicerefparams).
 | `deviceId` | Yes      | `string` |             |
 
 Result: [OkResult](protocol.md#okresult).
+
+## environment.prepare
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.EnvironmentPrepare> = {};
+const result: ResultOf<typeof Method.EnvironmentPrepare> = await client.call(
+    Method.EnvironmentPrepare,
+    params,
+);
+```
+
+Parameters: [Recordstringnever](protocol.md#recordstringnever).
+
+Type: Dictionary.
+
+Result: [EnvironmentPreparationPage](protocol.md#environmentpreparationpage).
+
+## environment.status
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.EnvironmentStatus> = {
+    cursor: 'YOUR_CURSOR',
+    operationId: 'YOUR_OPERATIONID',
+};
+const result: ResultOf<typeof Method.EnvironmentStatus> = await client.call(
+    Method.EnvironmentStatus,
+    params,
+);
+```
+
+Parameters: [EnvironmentPreparationQuery](protocol.md#environmentpreparationquery).
+
+| Field         | Required | Type     | Description |
+| ------------- | -------- | -------- | ----------- |
+| `cursor`      | Yes      | `string` |             |
+| `operationId` | Yes      | `string` |             |
+
+Result: [EnvironmentPreparationPage](protocol.md#environmentpreparationpage).
 
 ## health
 

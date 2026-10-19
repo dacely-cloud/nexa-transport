@@ -7816,6 +7816,79 @@ export interface EmotionalSnapshotShape {
 /** EmotionalSnapshot from the Nexa wire protocol. */
 export type EmotionalSnapshot = EmotionalSnapshotShape;
 
+/** EnvironmentPreparationEvent wire fields. */
+export interface EnvironmentPreparationEventShape {
+    /** cursor as defined by the Nexa gateway. */
+    readonly cursor: string;
+    /** detail as defined by the Nexa gateway. */
+    readonly detail: string;
+    /** state as defined by the Nexa gateway. */
+    readonly state: EnvironmentPreparationState;
+}
+
+/** EnvironmentPreparationEvent from the Nexa wire protocol. */
+export type EnvironmentPreparationEvent = EnvironmentPreparationEventShape;
+
+/** EnvironmentPreparationPage wire fields. */
+export interface EnvironmentPreparationPageShape {
+    /** currentTask as defined by the Nexa gateway. */
+    readonly currentTask: string;
+    /** cursor as defined by the Nexa gateway. */
+    readonly cursor: string;
+    /** events as defined by the Nexa gateway. */
+    readonly events: ReadonlyArray<EnvironmentPreparationEvent>;
+    /** operationId as defined by the Nexa gateway. */
+    readonly operationId: string;
+    /** reset as defined by the Nexa gateway. */
+    readonly reset: boolean;
+    /** state as defined by the Nexa gateway. */
+    readonly state: EnvironmentPreparationState;
+}
+
+/** EnvironmentPreparationPage from the Nexa wire protocol. */
+export type EnvironmentPreparationPage = EnvironmentPreparationPageShape;
+
+/** EnvironmentPreparationQuery wire fields. */
+export interface EnvironmentPreparationQueryShape {
+    /** cursor as defined by the Nexa gateway. */
+    readonly cursor: string;
+    /** operationId as defined by the Nexa gateway. */
+    readonly operationId: string;
+}
+
+/** EnvironmentPreparationQuery from the Nexa wire protocol. */
+export type EnvironmentPreparationQuery = EnvironmentPreparationQueryShape;
+
+/** Controller tooling readiness, separate from fleet security qualification. */
+export enum EnvironmentPreparationState {
+    Preparing = 'preparing',
+    Ready = 'ready',
+    Failed = 'failed',
+    Interrupted = 'interrupted',
+}
+
+/** EnvironmentPrepareMethod wire fields. */
+export interface EnvironmentPrepareMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: Recordstringnever;
+    /** result as defined by the Nexa gateway. */
+    readonly result: EnvironmentPreparationPage;
+}
+
+/** EnvironmentPrepareMethod from the Nexa wire protocol. */
+export type EnvironmentPrepareMethod = EnvironmentPrepareMethodShape;
+
+/** EnvironmentStatusMethod wire fields. */
+export interface EnvironmentStatusMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: EnvironmentPreparationQuery;
+    /** result as defined by the Nexa gateway. */
+    readonly result: EnvironmentPreparationPage;
+}
+
+/** EnvironmentStatusMethod from the Nexa wire protocol. */
+export type EnvironmentStatusMethod = EnvironmentStatusMethodShape;
+
 /** Allowed values for ErrorCode. */
 export const ErrorCodeValues = {
     Value0: 'aborted',
@@ -8830,6 +8903,22 @@ export interface GatewayMethodsdevices_revokeShape {
     readonly params: DeviceRefParams;
     /** result as defined by the Nexa gateway. */
     readonly result: OkResult;
+}
+
+/** GatewayMethodsenvironment_prepare wire fields. */
+export interface GatewayMethodsenvironment_prepareShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: Recordstringnever;
+    /** result as defined by the Nexa gateway. */
+    readonly result: EnvironmentPreparationPage;
+}
+
+/** GatewayMethodsenvironment_status wire fields. */
+export interface GatewayMethodsenvironment_statusShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: EnvironmentPreparationQuery;
+    /** result as defined by the Nexa gateway. */
+    readonly result: EnvironmentPreparationPage;
 }
 
 /** GatewayMethodshealth wire fields. */
@@ -10054,6 +10143,10 @@ export interface GatewayMethodsShape {
     readonly 'devices.reject': GatewayMethodsdevices_rejectShape;
     /** devices.revoke as defined by the Nexa gateway. */
     readonly 'devices.revoke': GatewayMethodsdevices_revokeShape;
+    /** environment.prepare as defined by the Nexa gateway. */
+    readonly 'environment.prepare': GatewayMethodsenvironment_prepareShape;
+    /** environment.status as defined by the Nexa gateway. */
+    readonly 'environment.status': GatewayMethodsenvironment_statusShape;
     /** health as defined by the Nexa gateway. */
     readonly health: GatewayMethodshealthShape;
     /** jobs.add as defined by the Nexa gateway. */
@@ -18070,6 +18163,10 @@ export enum Method {
     DevicesReject = 'devices.reject',
     /** Calls devices.revoke. */
     DevicesRevoke = 'devices.revoke',
+    /** Calls environment.prepare. */
+    EnvironmentPrepare = 'environment.prepare',
+    /** Calls environment.status. */
+    EnvironmentStatus = 'environment.status',
     /** Calls health. */
     Health = 'health',
     /** Calls jobs.add. */

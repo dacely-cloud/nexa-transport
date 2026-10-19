@@ -11998,6 +11998,96 @@ export const schema: Schema = {
             ],
             type: 'object',
         },
+        EnvironmentPreparationEvent: {
+            description:
+                'Ordered controller-authored presentation; guest command output is never progress text.',
+            properties: {
+                cursor: {
+                    type: 'string',
+                },
+                detail: {
+                    type: 'string',
+                },
+                state: {
+                    $ref: '#/definitions/EnvironmentPreparationState',
+                },
+            },
+            required: ['cursor', 'detail', 'state'],
+            type: 'object',
+        },
+        EnvironmentPreparationPage: {
+            description: 'One current account preparation, resumable from any Nexa replica.',
+            properties: {
+                currentTask: {
+                    type: 'string',
+                },
+                cursor: {
+                    type: 'string',
+                },
+                events: {
+                    items: {
+                        $ref: '#/definitions/EnvironmentPreparationEvent',
+                    },
+                    type: 'array',
+                },
+                operationId: {
+                    type: 'string',
+                },
+                reset: {
+                    type: 'boolean',
+                },
+                state: {
+                    $ref: '#/definitions/EnvironmentPreparationState',
+                },
+            },
+            required: ['currentTask', 'cursor', 'events', 'operationId', 'reset', 'state'],
+            type: 'object',
+        },
+        EnvironmentPreparationQuery: {
+            description: 'The account always comes from the authenticated connection.',
+            properties: {
+                cursor: {
+                    type: 'string',
+                },
+                operationId: {
+                    type: 'string',
+                },
+            },
+            required: ['cursor', 'operationId'],
+            type: 'object',
+        },
+        EnvironmentPreparationState: {
+            description: 'Tooling readiness is separate from fleet security qualification.',
+            enum: ['preparing', 'ready', 'failed', 'interrupted'],
+            type: 'string',
+        },
+        EnvironmentPrepareMethod: {
+            description:
+                'Starts or joins preparation; it never accepts an account, host, command or machine selector.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/Record%3Cstring%2Cnever%3E',
+                },
+                result: {
+                    $ref: '#/definitions/EnvironmentPreparationPage',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        EnvironmentStatusMethod: {
+            description: 'Reads bounded progress after the last acknowledged cursor.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/EnvironmentPreparationQuery',
+                },
+                result: {
+                    $ref: '#/definitions/EnvironmentPreparationPage',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
         ErrorCode: {
             description: 'A stable, machine-readable failure classification.',
             enum: [
@@ -13752,6 +13842,33 @@ export const schema: Schema = {
                         },
                         result: {
                             $ref: '#/definitions/OkResult',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'environment.prepare': {
+                    description:
+                        'Starts or joins preparation; it never accepts an account, host, command or machine selector.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/Record%3Cstring%2Cnever%3E',
+                        },
+                        result: {
+                            $ref: '#/definitions/EnvironmentPreparationPage',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'environment.status': {
+                    description: 'Reads bounded progress after the last acknowledged cursor.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/EnvironmentPreparationQuery',
+                        },
+                        result: {
+                            $ref: '#/definitions/EnvironmentPreparationPage',
                         },
                     },
                     required: ['params', 'result'],
@@ -15520,6 +15637,8 @@ export const schema: Schema = {
                 'devices.list',
                 'devices.reject',
                 'devices.revoke',
+                'environment.prepare',
+                'environment.status',
                 'health',
                 'jobs.add',
                 'jobs.list',
