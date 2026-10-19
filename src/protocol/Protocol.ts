@@ -389,6 +389,8 @@ export interface AskParamsShape {
     readonly cwd?: string;
     /** message as defined by the Nexa gateway. */
     readonly message: string;
+    /** modelReview as defined by the Nexa gateway. */
+    readonly modelReview?: boolean;
     /** reasoningEffort as defined by the Nexa gateway. */
     readonly reasoningEffort?: (typeof AskParamsreasoningEffortValues)[keyof typeof AskParamsreasoningEffortValues];
     /** responseFormat as defined by the Nexa gateway. */
@@ -3101,6 +3103,8 @@ export interface ConversationRetryParamsShape {
     readonly message: ConversationMessageRef;
     /** mode as defined by the Nexa gateway. */
     readonly mode: (typeof ConversationRetryParamsmodeValues)[keyof typeof ConversationRetryParamsmodeValues];
+    /** modelReview as defined by the Nexa gateway. */
+    readonly modelReview?: boolean;
     /** reasoningEffort as defined by the Nexa gateway. */
     readonly reasoningEffort?: (typeof ConversationRetryParamsreasoningEffortValues)[keyof typeof ConversationRetryParamsreasoningEffortValues];
     /** requestId as defined by the Nexa gateway. */
@@ -8155,6 +8159,8 @@ export interface GatewayFeaturesShape {
     readonly methodScopes: RecordstringScope;
     /** methods as defined by the Nexa gateway. */
     readonly methods: ReadonlyArray<string>;
+    /** modelReview as defined by the Nexa gateway. */
+    readonly modelReview?: true;
     /** officeAppearance as defined by the Nexa gateway. */
     readonly officeAppearance?: true;
     /** officeCompany as defined by the Nexa gateway. */
@@ -14334,6 +14340,8 @@ export interface StreamParamsShape {
     readonly cwd?: string;
     /** message as defined by the Nexa gateway. */
     readonly message: string;
+    /** modelReview as defined by the Nexa gateway. */
+    readonly modelReview?: boolean;
     /** reasoningEffort as defined by the Nexa gateway. */
     readonly reasoningEffort?: (typeof StreamParamsreasoningEffortValues)[keyof typeof StreamParamsreasoningEffortValues];
     /** responseFormat as defined by the Nexa gateway. */

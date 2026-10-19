@@ -233,18 +233,19 @@ The payload of a {@link GATEWAY_EVENTS.ApprovalResolved} event.
 
 What one turn is asked for.
 
-| Field               | Required | Type                                                                          | Description                                                                 |
-| ------------------- | -------- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| `agentId`           | No       | `string`                                                                      |                                                                             |
-| `attachments`       | No       | Array of [InboundAttachment](protocol.md#inboundattachment)                   | User-authored image, video, document, and text blocks, in display order.    |
-| `conversationId`    | No       | `string`                                                                      | Continues an existing conversation.                                         |
-| `cwd`               | No       | `string`                                                                      | Where tools operate.                                                        |
-| `message`           | Yes      | `string`                                                                      | User text; may be blank when at least one attachment contains content.      |
-| `reasoningEffort`   | No       | `"high"` / `"low"` / `"max"` / `"medium"` / `"minimal"` / `"off"` / `"xhigh"` | Per-turn reasoning preference; never changes the saved agent configuration. |
-| `responseFormat`    | No       | `"json"` / `"text"`                                                           | Final answer format; JSON mode does not disable tools or verification.      |
-| `targetTimeSeconds` | No       | `integer`                                                                     | Soft task time target in seconds; never a cancellation deadline.            |
-| `userId`            | No       | `string`                                                                      | The principal the turn is billed and authorized as.                         |
-| `userRegion`        | No       | [UserRegion](protocol.md#userregion)                                          | Coarse regional preferences, never authorization or precise location.       |
+| Field               | Required | Type                                                                          | Description                                                                               |
+| ------------------- | -------- | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `agentId`           | No       | `string`                                                                      |                                                                                           |
+| `attachments`       | No       | Array of [InboundAttachment](protocol.md#inboundattachment)                   | User-authored image, video, document, and text blocks, in display order.                  |
+| `conversationId`    | No       | `string`                                                                      | Continues an existing conversation.                                                       |
+| `cwd`               | No       | `string`                                                                      | Where tools operate.                                                                      |
+| `message`           | Yes      | `string`                                                                      | User text; may be blank when at least one attachment contains content.                    |
+| `modelReview`       | No       | `boolean`                                                                     | Optional AI completion audit for this turn; local execution checks always remain enabled. |
+| `reasoningEffort`   | No       | `"high"` / `"low"` / `"max"` / `"medium"` / `"minimal"` / `"off"` / `"xhigh"` | Per-turn reasoning preference; never changes the saved agent configuration.               |
+| `responseFormat`    | No       | `"json"` / `"text"`                                                           | Final answer format; JSON mode does not disable tools or verification.                    |
+| `targetTimeSeconds` | No       | `integer`                                                                     | Soft task time target in seconds; never a cancellation deadline.                          |
+| `userId`            | No       | `string`                                                                      | The principal the turn is billed and authorized as.                                       |
+| `userRegion`        | No       | [UserRegion](protocol.md#userregion)                                          | Coarse regional preferences, never authorization or precise location.                     |
 
 ## AskResult
 
@@ -2072,6 +2073,7 @@ Edits a human prompt or repeats its response in a separate saved version.
 | `id`                | Yes      | `string`                                                                      |             |
 | `message`           | Yes      | [ConversationMessageRef](protocol.md#conversationmessageref)                  |             |
 | `mode`              | Yes      | `"edit"` / `"regenerate"`                                                     |             |
+| `modelReview`       | No       | `boolean`                                                                     |             |
 | `reasoningEffort`   | No       | `"high"` / `"low"` / `"max"` / `"medium"` / `"minimal"` / `"off"` / `"xhigh"` |             |
 | `requestId`         | Yes      | `string`                                                                      |             |
 | `targetTimeSeconds` | No       | `number`                                                                      |             |
@@ -5894,6 +5896,7 @@ Methods, events, and additive capabilities supported by this gateway.
 | `jsonReplies`               | No       | `true`                                             | Host validation of JSON final answers while native tools remain available.                     |
 | `methodScopes`              | Yes      | [RecordstringScope](protocol.md#recordstringscope) | The scope each method requires.                                                                |
 | `methods`                   | Yes      | Array of `string`                                  |                                                                                                |
+| `modelReview`               | No       | `true`                                             | Per-turn optional AI completion audits retain mandatory local checks.                          |
 | `officeAppearance`          | No       | `true`                                             | Stable employee cosmetics in NGOP v7.                                                          |
 | `officeCompany`             | No       | `true`                                             | NCO2 persistent company staffing and project briefs.                                           |
 | `officeCompanyLimits`       | No       | `true`                                             | Private company-wide funding and capacity over the existing connection.                        |
@@ -10338,19 +10341,20 @@ The acknowledgement of a streaming run.
 
 What one turn is asked for, when the client wants its events streamed.
 
-| Field               | Required | Type                                                                          | Description                                                                 |
-| ------------------- | -------- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| `agentId`           | No       | `string`                                                                      |                                                                             |
-| `attachments`       | No       | Array of [InboundAttachment](protocol.md#inboundattachment)                   | User-authored image, video, document, and text blocks, in display order.    |
-| `conversationId`    | No       | `string`                                                                      | Continues an existing conversation.                                         |
-| `cwd`               | No       | `string`                                                                      | Where tools operate.                                                        |
-| `message`           | Yes      | `string`                                                                      | User text; may be blank when at least one attachment contains content.      |
-| `reasoningEffort`   | No       | `"high"` / `"low"` / `"max"` / `"medium"` / `"minimal"` / `"off"` / `"xhigh"` | Per-turn reasoning preference; never changes the saved agent configuration. |
-| `responseFormat`    | No       | `"json"` / `"text"`                                                           | Final answer format; JSON mode does not disable tools or verification.      |
-| `streamId`          | No       | `string`                                                                      | The stream's id, chosen by the CLIENT.                                      |
-| `targetTimeSeconds` | No       | `integer`                                                                     | Soft task time target in seconds; never a cancellation deadline.            |
-| `userId`            | No       | `string`                                                                      | The principal the turn is billed and authorized as.                         |
-| `userRegion`        | No       | [UserRegion](protocol.md#userregion)                                          | Coarse regional preferences, never authorization or precise location.       |
+| Field               | Required | Type                                                                          | Description                                                                               |
+| ------------------- | -------- | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `agentId`           | No       | `string`                                                                      |                                                                                           |
+| `attachments`       | No       | Array of [InboundAttachment](protocol.md#inboundattachment)                   | User-authored image, video, document, and text blocks, in display order.                  |
+| `conversationId`    | No       | `string`                                                                      | Continues an existing conversation.                                                       |
+| `cwd`               | No       | `string`                                                                      | Where tools operate.                                                                      |
+| `message`           | Yes      | `string`                                                                      | User text; may be blank when at least one attachment contains content.                    |
+| `modelReview`       | No       | `boolean`                                                                     | Optional AI completion audit for this turn; local execution checks always remain enabled. |
+| `reasoningEffort`   | No       | `"high"` / `"low"` / `"max"` / `"medium"` / `"minimal"` / `"off"` / `"xhigh"` | Per-turn reasoning preference; never changes the saved agent configuration.               |
+| `responseFormat`    | No       | `"json"` / `"text"`                                                           | Final answer format; JSON mode does not disable tools or verification.                    |
+| `streamId`          | No       | `string`                                                                      | The stream's id, chosen by the CLIENT.                                                    |
+| `targetTimeSeconds` | No       | `integer`                                                                     | Soft task time target in seconds; never a cancellation deadline.                          |
+| `userId`            | No       | `string`                                                                      | The principal the turn is billed and authorized as.                                       |
+| `userRegion`        | No       | [UserRegion](protocol.md#userregion)                                          | Coarse regional preferences, never authorization or precise location.                     |
 
 ## TaskRecord
 
