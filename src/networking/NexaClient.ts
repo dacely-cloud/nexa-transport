@@ -1,5 +1,6 @@
 import { SessionHistoryReader } from './SessionHistoryReader.js';
 import { EmotionWatches } from './EmotionWatches.js';
+import { resolveBridgeInput } from '../toolsearch/BridgeInput.js';
 import type { EmotionalSnapshot, TurnEventData } from '../protocol/Protocol.js';
 import type { SessionHistoryRecord } from '../protocol/Protocol.js';
 import { CompanyFormats } from './CompanyFormats.js';
@@ -1678,7 +1679,15 @@ export class NexaClient {
                 isEventData(eventName, frame['data'])
             ) {
                 const event: TurnEventData['event'] = frame['data'].event;
-                if (event.type === 'tool-finish' && event.outcome.call.name === 'self_emotion') {
+                if (
+                    event.type === 'tool-finish' &&
+                    (event.outcome.call.name === 'self_emotion' ||
+                        (event.outcome.call.name === 'tool_call' &&
+                            resolveBridgeInput({
+                                name: event.outcome.call.name,
+                                arguments: event.outcome.call.input,
+                            })?.name === 'self_emotion'))
+                ) {
                     this.#emotionalWatches.refresh();
                 }
             }

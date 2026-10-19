@@ -29,6 +29,8 @@ Use `client.supportsEmotions` to check gateway support. `subscribeEmotions` upda
 
 Call the returned function when the view unmounts. Removing the last view cancels its pending read and timer; closing the client releases every subscription. Temporary disconnects report `onError`, pause polling, and resume with a fresh snapshot after reconnect. At most eight agent watches and 32 views per agent are retained per client.
 
+Reactions completed through `tool_call` refresh the same subscription as direct `self_emotion` calls, including during an ongoing turn. A failed read invalidates the cached snapshot: a newly mounted view requests fresh state instead of replaying the last successful expression. If the application replaces the SDK client entirely, mounted views must release the old subscription and subscribe on the replacement client.
+
 ```ts
 import type { EmotionalSnapshot } from 'nexa-transport/protocol';
 

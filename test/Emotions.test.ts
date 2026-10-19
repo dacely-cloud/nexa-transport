@@ -4,7 +4,7 @@
 import { expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
 import { NexaClient } from '../src/networking/NexaClient.js';
-import { Method, type EmotionalSnapshot } from '../src/protocol/Protocol.js';
+import { Method, type EmotionalSnapshot, type JsonValue } from '../src/protocol/Protocol.js';
 import { TestGateway, type Request } from './Support.js';
 import { EventName } from '../src/protocol/Events.js';
 
@@ -31,6 +31,69 @@ const snapshot: EmotionalSnapshot = {
         description: 'Inspectable functional emotional state.',
     },
 };
+
+it('refreshes during work when a reaction completes through the tool bridge', async (): Promise<void> => {
+    const gateway: TestGateway = new TestGateway();
+    const client: NexaClient = await NexaClient.connect({
+        url: await gateway.url(),
+        reconnect: false,
+    });
+    const states: string[] = [];
+    let peer: WebSocket | undefined;
+    let reads: number = 0;
+    try {
+        gateway.handler = (socket: WebSocket, request: Request): void => {
+            peer = socket;
+            reads++;
+            socket.send(JSON.stringify({ id: request.id, ok: true, result: snapshot }));
+        };
+        const stop: () => void = client.subscribeEmotions(
+            (state: EmotionalSnapshot): void => {
+                states.push(state.mood);
+            },
+            (error: Error): never => {
+                throw error;
+            },
+        );
+        await expect.poll((): number => states.length).toBe(1);
+        const socket: WebSocket | undefined = peer;
+        if (socket === undefined) {
+            throw new Error('Missing emotional state peer');
+        }
+        const inputs: readonly JsonValue[] = [
+            { name: 'self_emotion', arguments: { appraisal: {} } },
+            { name: 'tool_call', arguments: { name: 'self_emotion', arguments: {} } },
+        ];
+        for (const [index, input] of inputs.entries()) {
+            socket.send(
+                JSON.stringify({
+                    event: 'turn.event',
+                    seq: index + 2,
+                    data: {
+                        streamId: 'work',
+                        event: {
+                            type: 'tool-finish',
+                            outcome: {
+                                call: { id: `bridge-${index}`, name: 'tool_call', input },
+                                result: {
+                                    status: 'ok',
+                                    content: '{}',
+                                    display: { bridgedTool: 'self_emotion' },
+                                },
+                                durationMs: 1,
+                            },
+                        },
+                    },
+                }),
+            );
+            await expect.poll((): number => reads, { timeout: 1000 }).toBe(index + 2);
+        }
+        stop();
+    } finally {
+        client.close();
+        await gateway.close();
+    }
+});
 
 it('reads private emotions with no browser-selectable user identity and validates all returned fields', async (): Promise<void> => {
     const gateway: TestGateway = new TestGateway();

@@ -117,6 +117,7 @@ export class EmotionWatch {
             }
         } catch (error: unknown) {
             if (!controller.signal.aborted && this.#source === source) {
+                this.#snapshot = undefined;
                 this.#errors(
                     error instanceof Error ? error : new Error('Emotional state read failed'),
                 );

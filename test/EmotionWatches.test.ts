@@ -10,6 +10,7 @@ import type { EmotionalSnapshot } from '../src/protocol/Protocol.js';
 interface EmotionRead {
     readonly signal: AbortSignal;
     readonly resolve: (state: EmotionalSnapshot) => void;
+    readonly reject: (error: Error) => void;
 }
 
 /** The fixture supplies decoded server replies without a second network or an unbounded test queue. */
@@ -30,6 +31,10 @@ class WatchSource implements EmotionWatchSource {
                 resolve: (state: EmotionalSnapshot): void => {
                     signal.removeEventListener('abort', abort);
                     resolve(state);
+                },
+                reject: (error: Error): void => {
+                    signal.removeEventListener('abort', abort);
+                    reject(error);
                 },
             });
         });
@@ -66,6 +71,38 @@ function snapshot(mood: EmotionalSnapshot['mood'] = 'steady'): EmotionalSnapshot
 
 afterEach((): void => {
     vi.useRealTimers();
+});
+
+it('does not replay an old successful snapshot to a new view after a read fails', async (): Promise<void> => {
+    vi.useFakeTimers();
+    const source: WatchSource = new WatchSource();
+    const watches: EmotionWatches = new EmotionWatches(source);
+    const errors: Error[] = [];
+    watches.subscribe('nexa', {
+        state: (): void => {},
+        error: (error: Error): void => {
+            errors.push(error);
+        },
+    });
+    source.reads[0]?.resolve(snapshot('warm'));
+    await vi.advanceTimersByTimeAsync(0);
+    watches.refresh();
+    source.reads[1]?.reject(new Error('State unavailable'));
+    await vi.advanceTimersByTimeAsync(0);
+    const states: EmotionalSnapshot[] = [];
+    watches.subscribe('nexa', {
+        state: (state: EmotionalSnapshot): void => {
+            states.push(state);
+        },
+        error: (): void => {},
+    });
+    expect(errors).toHaveLength(1);
+    expect(states).toEqual([]);
+    expect(source.reads).toHaveLength(3);
+    source.reads[2]?.resolve(snapshot('guarded'));
+    await vi.advanceTimersByTimeAsync(0);
+    expect(states.map((state: EmotionalSnapshot): string => state.mood)).toEqual(['guarded']);
+    watches.clear();
 });
 
 it('shares one read and timer across views, coalesces in-flight invalidations and freezes shared state', async (): Promise<void> => {
