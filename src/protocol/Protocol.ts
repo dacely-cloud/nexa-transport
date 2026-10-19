@@ -3158,6 +3158,8 @@ export interface CreditSummaryShape {
     readonly byCategory?: Recordstringnumber;
     /** byKind as defined by the Nexa gateway. */
     readonly byKind: Recordstringnumber;
+    /** cacheWriteTokens as defined by the Nexa gateway. */
+    readonly cacheWriteTokens?: number;
     /** cachedInputTokens as defined by the Nexa gateway. */
     readonly cachedInputTokens: number;
     /** entries as defined by the Nexa gateway. */
@@ -11398,6 +11400,27 @@ export interface NcapBlockDeltaShape {
 /** NcapBlockDelta from the Nexa wire protocol. */
 export type NcapBlockDelta = NcapBlockDeltaShape;
 
+/** NcapCacheState wire fields. */
+export interface NcapCacheStateShape {
+    /** agentId as defined by the Nexa gateway. */
+    readonly agentId: number;
+    /** cacheId as defined by the Nexa gateway. */
+    readonly cacheId: string;
+    /** conversationId as defined by the Nexa gateway. */
+    readonly conversationId: string;
+    /** createdTokens as defined by the Nexa gateway. */
+    readonly createdTokens: number;
+    /** residentTokens as defined by the Nexa gateway. */
+    readonly residentTokens: number;
+    /** state as defined by the Nexa gateway. */
+    readonly state: number;
+    /** ttlMs as defined by the Nexa gateway. */
+    readonly ttlMs: number;
+}
+
+/** NcapCacheState from the Nexa wire protocol. */
+export type NcapCacheState = NcapCacheStateShape;
+
 /** NcapDeltabacklogVariant0 wire fields. */
 export interface NcapDeltabacklogVariant0Shape {
     /** goal as defined by the Nexa gateway. */
@@ -11659,6 +11682,8 @@ export interface NcapDeltaShape {
         | NcapDeltabacklogVariant3Shape;
     /** block as defined by the Nexa gateway. */
     readonly block?: NcapBlockDelta;
+    /** cache as defined by the Nexa gateway. */
+    readonly cache?: NcapCacheState;
     /** content as defined by the Nexa gateway. */
     readonly content: string;
     /** conversationId as defined by the Nexa gateway. */
@@ -17734,6 +17759,8 @@ export type WorkflowUsageDimension =
 
 /** WorkflowUsageDimensions wire fields. */
 export interface WorkflowUsageDimensionsShape {
+    /** cacheWriteTokens as defined by the Nexa gateway. */
+    readonly cacheWriteTokens?: string;
     /** cachedInputTokens as defined by the Nexa gateway. */
     readonly cachedInputTokens?: string;
     /** inputTokens as defined by the Nexa gateway. */

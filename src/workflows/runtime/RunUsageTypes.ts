@@ -13,6 +13,7 @@ export interface WorkflowUsageDimensions {
     readonly inputTokens?: string;
     readonly outputTokens?: string;
     readonly cachedInputTokens?: string;
+    readonly cacheWriteTokens?: string;
     readonly reasoningTokens?: string;
 }
 /** Actual executed identity and original tariff, never current catalog prices. */

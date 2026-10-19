@@ -4944,6 +4944,11 @@ export const schema: Schema = {
                     description:
                         'Totals split by charge kind, so "how much of this was voice" is answerable.',
                 },
+                cacheWriteTokens: {
+                    description:
+                        'Logical tokens newly retained; absent on older reporting authorities.',
+                    type: 'number',
+                },
                 cachedInputTokens: {
                     type: 'number',
                 },
@@ -17230,6 +17235,43 @@ export const schema: Schema = {
             required: ['blockId', 'phase'],
             type: 'object',
         },
+        NcapCacheState: {
+            description:
+                'Actual server cache state; a renewal never creates inference or resurrects missing KV.',
+            properties: {
+                agentId: {
+                    type: 'number',
+                },
+                cacheId: {
+                    type: 'string',
+                },
+                conversationId: {
+                    type: 'string',
+                },
+                createdTokens: {
+                    type: 'number',
+                },
+                residentTokens: {
+                    type: 'number',
+                },
+                state: {
+                    type: 'number',
+                },
+                ttlMs: {
+                    type: 'number',
+                },
+            },
+            required: [
+                'agentId',
+                'cacheId',
+                'conversationId',
+                'createdTokens',
+                'residentTokens',
+                'state',
+                'ttlMs',
+            ],
+            type: 'object',
+        },
         NcapDelta: {
             description:
                 'A single streamed delta from the engine.\n\nUnder NCAP the server DECODES the model stream into typed packets, so a delta carries exactly one\nof: answer `content`, `reasoning`, an engine `status`, a `block` phase, a `tool` call, or one of\nthe out-of-band reports (graph, backlog, roster, findings, learning, research, skills).',
@@ -17387,6 +17429,11 @@ export const schema: Schema = {
                 block: {
                     $ref: '#/definitions/NcapBlockDelta',
                     description: 'A live rich-block phase (begin/delta/end) decoded server-side.',
+                },
+                cache: {
+                    $ref: '#/definitions/NcapCacheState',
+                    description:
+                        'Actual cache creation/residency, separate from model token accounting.',
                 },
                 content: {
                     description: 'Answer content for this chunk (empty on a non-content chunk).',
@@ -26908,6 +26955,9 @@ export const schema: Schema = {
         WorkflowUsageDimensions: {
             description: 'Exact counters; missing dimensions were not reported.',
             properties: {
+                cacheWriteTokens: {
+                    type: 'string',
+                },
                 cachedInputTokens: {
                     type: 'string',
                 },

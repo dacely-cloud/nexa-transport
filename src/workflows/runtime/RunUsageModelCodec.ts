@@ -69,6 +69,7 @@ export class WorkflowUsageModelCodec {
             'inputTokens',
             'outputTokens',
             'cachedInputTokens',
+            'cacheWriteTokens',
             'reasoningTokens',
         ] as const) {
             const count: string | undefined = usageEntries[key];
@@ -104,6 +105,7 @@ export class WorkflowUsageModelCodec {
             'inputTokens',
             'outputTokens',
             'cachedInputTokens',
+            'cacheWriteTokens',
             'reasoningTokens',
         ];
         WorkflowInput.record(
