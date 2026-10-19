@@ -123,6 +123,14 @@ After an established connection drops, the SDK reconnects with jittered exponent
 
 ## Streaming and running work
 
+Pass `modelReview: true` to `client.stream`, `agent.ask`, or `sessions.retry` to request an
+additional AI completion audit. Pass `false` to use local completion checks only; omitting
+it uses the server's `verification.modelReview` default. Local execution, evidence, and
+delivery checks remain active in both modes. The AI audit adds inference latency and token
+usage. Enabling it requires a gateway advertising `hello.features.modelReview: true`.
+The preference belongs to that invocation, including saved retries, and does not change
+other users or the saved agent configuration.
+
 ```ts
 import type { NcapDelta, AskResult } from 'nexa-transport/protocol';
 import type { TurnStream } from 'nexa-transport/stream';

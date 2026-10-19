@@ -935,6 +935,19 @@ export class NexaClient {
                 'Workflow source selection requires an updated NEXA gateway',
             );
         }
+        if (
+            (method === Method.AgentAsk ||
+                method === Method.AgentStream ||
+                method === Method.SessionsRetry) &&
+            'modelReview' in params &&
+            params.modelReview &&
+            this.#hello?.features.modelReview !== true
+        ) {
+            throw new TransportError(
+                TransportErrorCode.Protocol,
+                'AI completion review requires an updated Nexa gateway',
+            );
+        }
         const patch: unknown =
             method === Method.WorkflowsSave ? Reflect.get(params, 'patch') : undefined;
         const hierarchy: boolean =

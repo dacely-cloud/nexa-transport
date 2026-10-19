@@ -553,6 +553,11 @@ export const schema: Schema = {
                         'User text; may be blank when at least one attachment contains content.',
                     type: 'string',
                 },
+                modelReview: {
+                    description:
+                        'Optional AI completion audit for this turn; local execution checks always remain enabled.',
+                    type: 'boolean',
+                },
                 reasoningEffort: {
                     description:
                         'Per-turn reasoning preference; never changes the saved agent configuration.',
@@ -4872,6 +4877,9 @@ export const schema: Schema = {
                 mode: {
                     enum: ['edit', 'regenerate'],
                     type: 'string',
+                },
+                modelReview: {
+                    type: 'boolean',
                 },
                 reasoningEffort: {
                     enum: ['high', 'low', 'max', 'medium', 'minimal', 'off', 'xhigh'],
@@ -12554,6 +12562,12 @@ export const schema: Schema = {
                         type: 'string',
                     },
                     type: 'array',
+                },
+                modelReview: {
+                    const: true,
+                    description:
+                        'Per-turn optional AI completion audits retain mandatory local checks.',
+                    type: 'boolean',
                 },
                 officeAppearance: {
                     const: true,
@@ -21772,6 +21786,11 @@ export const schema: Schema = {
                     description:
                         'User text; may be blank when at least one attachment contains content.',
                     type: 'string',
+                },
+                modelReview: {
+                    description:
+                        'Optional AI completion audit for this turn; local execution checks always remain enabled.',
+                    type: 'boolean',
                 },
                 reasoningEffort: {
                     description:

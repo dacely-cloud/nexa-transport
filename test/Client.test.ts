@@ -27,6 +27,62 @@ async function connect(): Promise<NexaClient> {
     return client;
 }
 describe('Nexa websocket lifetimes', (): void => {
+    it.each([false, true])(
+        'rejects unsupported AI completion audits (stream=%s)',
+        async (streaming: boolean): Promise<void> => {
+            const connected: NexaClient = await connect();
+            const before: number = gateway?.requests.length ?? 0;
+            const response = streaming
+                ? connected.stream({ message: 'Work', modelReview: true }).result
+                : connected.call(Method.AgentAsk, { message: 'Work', modelReview: true });
+            await expect(response).rejects.toThrow(
+                'AI completion review requires an updated Nexa gateway',
+            );
+            expect(gateway?.requests.length).toBe(before);
+        },
+    );
+
+    it.each([false, true])(
+        'sends both AI review preferences through the socket (stream=%s)',
+        async (streaming: boolean): Promise<void> => {
+            gateway = new TestGateway({
+                ...hello,
+                features: { ...hello.features, modelReview: true },
+            });
+            client = await NexaClient.connect({ url: await gateway.url(), reconnect: false });
+            for (const modelReview of [true, false]) {
+                gateway.handler = (socket: WebSocket, request: Request): void => {
+                    expect(request.params['modelReview']).toBe(modelReview);
+                    if (streaming) {
+                        socket.send(
+                            JSON.stringify({
+                                id: request.id,
+                                ok: true,
+                                result: {
+                                    streamId: request.params['streamId'],
+                                    runId: 'review-run',
+                                },
+                            }),
+                        );
+                        socket.send(
+                            JSON.stringify({
+                                event: 'turn.end',
+                                seq: modelReview ? 2 : 3,
+                                data: { streamId: request.params['streamId'], ok: true, result },
+                            }),
+                        );
+                    } else {
+                        socket.send(JSON.stringify({ id: request.id, ok: true, result }));
+                    }
+                };
+                const answer: AskResult = streaming
+                    ? await client.stream({ message: 'Work', modelReview }).result
+                    : await client.call(Method.AgentAsk, { message: 'Work', modelReview });
+                expect(answer.text).toBe(result.text);
+            }
+        },
+    );
+
     it('preserves cumulative usage snapshots and cached counts through the turn stream', async (): Promise<void> => {
         const connected: NexaClient = await connect();
         if (gateway === undefined) {
