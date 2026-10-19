@@ -1,6 +1,7 @@
 import {
     Method,
     WorkerState,
+    type TokenUsage,
     type WorkerStatus,
     type AskResult,
 } from '../src/protocol/Protocol.js';
@@ -26,6 +27,56 @@ async function connect(): Promise<NexaClient> {
     return client;
 }
 describe('Nexa websocket lifetimes', (): void => {
+    it('preserves cumulative usage snapshots and cached counts through the turn stream', async (): Promise<void> => {
+        const connected: NexaClient = await connect();
+        if (gateway === undefined) {
+            throw new Error('No peer');
+        }
+        const snapshots: readonly TokenUsage[] = [
+            { inputTokens: 100, outputTokens: 20, cachedInputTokens: 60 },
+            { inputTokens: 250, outputTokens: 20, cachedInputTokens: 160 },
+            { inputTokens: 250, outputTokens: 55, cachedInputTokens: 160 },
+        ];
+        const completed = { ...result, usage: snapshots[2] };
+        gateway.handler = (socket: WebSocket, request: Request): void => {
+            socket.send(
+                JSON.stringify({
+                    id: request.id,
+                    ok: true,
+                    result: { streamId: request.params['streamId'], runId: 'usage-run' },
+                }),
+            );
+            for (const [index, usage] of snapshots.entries()) {
+                socket.send(
+                    JSON.stringify({
+                        event: 'turn.event',
+                        seq: index + 2,
+                        data: {
+                            streamId: request.params['streamId'],
+                            event: { type: 'usage', usage },
+                        },
+                    }),
+                );
+            }
+            socket.send(
+                JSON.stringify({
+                    event: 'turn.end',
+                    seq: 5,
+                    data: { streamId: request.params['streamId'], ok: true, result: completed },
+                }),
+            );
+        };
+        const turn: TurnStream = connected.stream({ message: 'Continue after the tool' });
+        const observed: TokenUsage[] = [];
+        for await (const event of turn) {
+            if (event.type === 'usage') {
+                observed.push(event.usage);
+            }
+        }
+        expect(observed).toEqual(snapshots);
+        expect((await turn.result).usage).toEqual(snapshots[2]);
+    });
+
     it.each([false, true])(
         'requires JSON reply capability before issuing a formatted request (stream=%s)',
         async (streaming: boolean): Promise<void> => {
