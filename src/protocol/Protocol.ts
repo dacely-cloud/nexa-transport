@@ -3158,8 +3158,6 @@ export interface CreditSummaryShape {
     readonly byCategory?: Recordstringnumber;
     /** byKind as defined by the Nexa gateway. */
     readonly byKind: Recordstringnumber;
-    /** byModel as defined by the Nexa gateway. */
-    readonly byModel: Recordstringnumber;
     /** cachedInputTokens as defined by the Nexa gateway. */
     readonly cachedInputTokens: number;
     /** entries as defined by the Nexa gateway. */

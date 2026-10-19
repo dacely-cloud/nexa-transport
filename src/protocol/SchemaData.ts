@@ -4944,10 +4944,6 @@ export const schema: Schema = {
                     description:
                         'Totals split by charge kind, so "how much of this was voice" is answerable.',
                 },
-                byModel: {
-                    $ref: '#/definitions/Record%3Cstring%2Cnumber%3E',
-                    description: 'Totals split by model.',
-                },
                 cachedInputTokens: {
                     type: 'number',
                 },
@@ -4986,7 +4982,6 @@ export const schema: Schema = {
             },
             required: [
                 'byKind',
-                'byModel',
                 'cachedInputTokens',
                 'entries',
                 'from',
