@@ -322,6 +322,451 @@ export const schema: Schema = {
             required: ['provider', 'voiceId'],
             type: 'object',
         },
+        AgileBoardPlan: {
+            description:
+                'Browser-facing plan fields; execution evidence remains in its own authorized APIs.',
+            properties: {
+                acceptance: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                agile: {
+                    $ref: '#/definitions/AgilePlan',
+                    description:
+                        'Agile structure attached atomically to the existing durable plan and its execution steps.',
+                },
+                goal: {
+                    type: 'string',
+                },
+                status: {
+                    $ref: '#/definitions/PlanStatus',
+                },
+                steps: {
+                    items: {
+                        $ref: '#/definitions/PlanStep',
+                    },
+                    type: 'array',
+                },
+            },
+            required: ['acceptance', 'goal', 'status', 'steps'],
+            type: 'object',
+        },
+        AgileChanged: {
+            description:
+                'A notification invalidates an older view without replaying the complete backlog on each write.',
+            properties: {
+                sessionId: {
+                    type: 'string',
+                },
+                version: {
+                    type: 'number',
+                },
+            },
+            required: ['sessionId', 'version'],
+            type: 'object',
+        },
+        AgileDecision: {
+            description:
+                'A short planning question and its answer; sources are references, never authorization.',
+            properties: {
+                answer: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                question: {
+                    type: 'string',
+                },
+                sources: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+            },
+            required: ['answer', 'id', 'question', 'sources'],
+            type: 'object',
+        },
+        AgileDesign: {
+            description:
+                'A single rooted tree describes containment independently of the execution dependency graph.',
+            properties: {
+                nodes: {
+                    items: {
+                        $ref: '#/definitions/AgileDesignNode',
+                    },
+                    type: 'array',
+                },
+            },
+            required: ['nodes'],
+            type: 'object',
+        },
+        AgileDesignNode: {
+            description:
+                'One architectural responsibility; a leaf references the sole authoritative execution step.',
+            properties: {
+                id: {
+                    type: 'string',
+                },
+                interfaces: {
+                    description:
+                        'Concrete inputs, outputs and collaboration contracts, not invented implementation evidence.',
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                parentId: {
+                    type: ['null', 'string'],
+                },
+                responsibility: {
+                    type: 'string',
+                },
+                stepId: {
+                    description:
+                        'Null for a branch; leaves bind exactly one task whose acceptance and state remain in the plan.',
+                    type: ['null', 'string'],
+                },
+                title: {
+                    type: 'string',
+                },
+            },
+            required: ['id', 'interfaces', 'parentId', 'responsibility', 'stepId', 'title'],
+            type: 'object',
+        },
+        AgileEpic: {
+            description:
+                'A product outcome containing stories, with explicit dependencies on other epics.',
+            properties: {
+                dependsOn: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                id: {
+                    type: 'string',
+                },
+                outcome: {
+                    type: 'string',
+                },
+                title: {
+                    type: 'string',
+                },
+            },
+            required: ['dependsOn', 'id', 'outcome', 'title'],
+            type: 'object',
+        },
+        AgilePlan: {
+            description:
+                'Agile structure attached atomically to the existing durable plan and its execution steps.',
+            properties: {
+                assumptions: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                decisions: {
+                    items: {
+                        $ref: '#/definitions/AgileDecision',
+                    },
+                    type: 'array',
+                },
+                design: {
+                    $ref: '#/definitions/AgileDesign',
+                    description:
+                        'Required for new proposals; older saved plans remain readable without fabricated design.',
+                },
+                epics: {
+                    items: {
+                        $ref: '#/definitions/AgileEpic',
+                    },
+                    type: 'array',
+                },
+                intent: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                qualitySeconds: {
+                    description:
+                        'Bounded soft quality target in seconds, not a deadline or permission to omit requirements.',
+                    type: 'number',
+                },
+                sprints: {
+                    items: {
+                        $ref: '#/definitions/AgileSprint',
+                    },
+                    type: 'array',
+                },
+                stories: {
+                    items: {
+                        $ref: '#/definitions/AgileStory',
+                    },
+                    type: 'array',
+                },
+                tasks: {
+                    items: {
+                        $ref: '#/definitions/AgileTask',
+                    },
+                    type: 'array',
+                },
+                version: {
+                    const: 1,
+                    type: 'number',
+                },
+            },
+            required: [
+                'assumptions',
+                'decisions',
+                'epics',
+                'intent',
+                'qualitySeconds',
+                'sprints',
+                'stories',
+                'tasks',
+                'version',
+            ],
+            type: 'object',
+        },
+        AgileSessionCommand: {
+            description:
+                'Session ownership is resolved before the command reaches the planning store.',
+            properties: {
+                command: {
+                    $ref: '#/definitions/AgileSprintCommand',
+                },
+                sessionId: {
+                    type: 'string',
+                },
+            },
+            required: ['command', 'sessionId'],
+            type: 'object',
+        },
+        AgileSprint: {
+            description:
+                'A bounded increment; completion requires settled tasks and a recorded review.',
+            properties: {
+                dependsOn: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                goal: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                review: {
+                    type: ['null', 'string'],
+                },
+                status: {
+                    $ref: '#/definitions/AgileSprintStatus',
+                },
+                title: {
+                    type: 'string',
+                },
+            },
+            required: ['dependsOn', 'goal', 'id', 'review', 'status', 'title'],
+            type: 'object',
+        },
+        AgileSprintAction: {
+            description:
+                'Explicit sprint actions preserve a review boundary between completed work and the next increment.\nSupported lifecycle commands, shared by the model tool and authorized UI actions.',
+            enum: ['complete', 'reopen', 'review', 'start'],
+            type: 'string',
+        },
+        AgileSprintCommand: {
+            description:
+                'A version-bound edit cannot silently overwrite a newer model or user decision.',
+            properties: {
+                action: {
+                    $ref: '#/definitions/AgileSprintAction',
+                },
+                expectedVersion: {
+                    type: 'number',
+                },
+                id: {
+                    type: 'string',
+                },
+                review: {
+                    type: 'string',
+                },
+            },
+            required: ['action', 'expectedVersion', 'id'],
+            type: 'object',
+        },
+        AgileSprintStatus: {
+            description:
+                'Sprint transitions are checked against the actual task graph before persistence.\nPersisted sprint lifecycle.',
+            enum: ['active', 'complete', 'planned', 'review'],
+            type: 'string',
+        },
+        AgileStory: {
+            description:
+                "A user-visible behavior delivered in one sprint and linked to the plan's acceptance indices.",
+            properties: {
+                acceptance: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                criteria: {
+                    items: {
+                        type: 'number',
+                    },
+                    type: 'array',
+                },
+                dependsOn: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                epicId: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                sprintId: {
+                    type: 'string',
+                },
+                title: {
+                    type: 'string',
+                },
+                userStory: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'acceptance',
+                'criteria',
+                'dependsOn',
+                'epicId',
+                'id',
+                'sprintId',
+                'title',
+                'userStory',
+            ],
+            type: 'object',
+        },
+        AgileTask: {
+            description:
+                'Binds one durable execution step to a story without duplicating its status or worker owner.',
+            properties: {
+                acceptance: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                stepId: {
+                    type: 'string',
+                },
+                storyId: {
+                    type: 'string',
+                },
+            },
+            required: ['acceptance', 'stepId', 'storyId'],
+            type: 'object',
+        },
+        AgileView: {
+            description:
+                'One authoritative revision drives both the board and its dependency graph.',
+            properties: {
+                epics: {
+                    items: {
+                        $ref: '#/definitions/AgileViewDependency',
+                    },
+                    type: 'array',
+                },
+                paused: {
+                    type: 'boolean',
+                },
+                plan: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/AgileBoardPlan',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                sprints: {
+                    items: {
+                        $ref: '#/definitions/AgileViewDependency',
+                    },
+                    type: 'array',
+                },
+                stories: {
+                    items: {
+                        $ref: '#/definitions/AgileViewDependency',
+                    },
+                    type: 'array',
+                },
+                tasks: {
+                    items: {
+                        $ref: '#/definitions/AgileViewTask',
+                    },
+                    type: 'array',
+                },
+                version: {
+                    type: 'number',
+                },
+            },
+            required: ['epics', 'paused', 'plan', 'sprints', 'stories', 'tasks', 'version'],
+            type: 'object',
+        },
+        AgileViewDependency: {
+            description:
+                'Compact effective group edges, including ordering induced by individual tasks.',
+            properties: {
+                dependsOn: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                id: {
+                    type: 'string',
+                },
+            },
+            required: ['dependsOn', 'id'],
+            type: 'object',
+        },
+        AgileViewTask: {
+            description:
+                'Bounded blocker details do not send the potentially quadratic expanded graph to every browser.',
+            properties: {
+                blockerCount: {
+                    type: 'number',
+                },
+                blockers: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                id: {
+                    type: 'string',
+                },
+                ready: {
+                    type: 'boolean',
+                },
+            },
+            required: ['blockerCount', 'blockers', 'id', 'ready'],
+            type: 'object',
+        },
         ApplicationBoundary: {
             properties: {
                 id: {
@@ -14579,6 +15024,18 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'sessions.planning': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/SessionRef',
+                        },
+                        result: {
+                            $ref: '#/definitions/AgileView',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
                 'sessions.rename': {
                     properties: {
                         params: {
@@ -14598,6 +15055,18 @@ export const schema: Schema = {
                         },
                         result: {
                             $ref: '#/definitions/ConversationRetryResult',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'sessions.sprint': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/AgileSessionCommand',
+                        },
+                        result: {
+                            $ref: '#/definitions/AgileView',
                         },
                     },
                     required: ['params', 'result'],
@@ -15707,8 +16176,10 @@ export const schema: Schema = {
                 'sessions.messages',
                 'sessions.pin',
                 'sessions.pins',
+                'sessions.planning',
                 'sessions.rename',
                 'sessions.retry',
+                'sessions.sprint',
                 'sessions.subscribe',
                 'sessions.transcript',
                 'sessions.unpin',
@@ -18671,6 +19142,47 @@ export const schema: Schema = {
                 'query',
             ],
             type: 'object',
+        },
+        PlanStatus: {
+            description: 'Whether a plan is still being worked.',
+            enum: ['abandoned', 'active', 'complete'],
+            type: 'string',
+        },
+        PlanStep: {
+            description: 'One step of a plan.',
+            properties: {
+                assignedRunId: {
+                    description:
+                        'A native delegated run owning this step; absence means parent work.',
+                    type: 'string',
+                },
+                blocker: {
+                    type: 'string',
+                },
+                dependsOn: {
+                    description: 'Ids of steps that must be settled before this one may start.',
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                id: {
+                    type: 'string',
+                },
+                status: {
+                    $ref: '#/definitions/PlanStepStatus',
+                },
+                title: {
+                    type: 'string',
+                },
+            },
+            required: ['dependsOn', 'id', 'status', 'title'],
+            type: 'object',
+        },
+        PlanStepStatus: {
+            description: 'Where a plan step is.',
+            enum: ['active', 'blocked', 'done', 'pending', 'skipped'],
+            type: 'string',
         },
         PlanningAlignmentAnchor: {
             description: 'Server-created semantic anchors for the request and the proposed graph.',
@@ -27488,6 +28000,9 @@ export const schema: Schema = {
         sessionMessage: {
             $ref: '#/definitions/SessionMessageData',
         },
+        sessionPlanning: {
+            $ref: '#/definitions/AgileChanged',
+        },
         toolSites: {
             $ref: '#/definitions/ToolSitesData',
         },
@@ -27528,6 +28043,7 @@ export const schema: Schema = {
         'reverseSnapshot',
         'sessionHistory',
         'sessionMessage',
+        'sessionPlanning',
         'toolSites',
         'turnEnd',
         'turnEvent',
