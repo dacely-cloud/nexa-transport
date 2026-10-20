@@ -3,15 +3,7 @@
 
 import { BrowserStorageComparisonValues as Value } from './BrowserStorageComparisonValues.js';
 import { BrowserSchemaType, BrowserWebMcpDeclaration } from './BrowserWebMcpDefinitions.js';
-import type {
-    BrowserWebMcpMetadata,
-    BrowserWebMcpDescriptor,
-    BrowserSchemaSummary,
-    BrowserSchemaProperty,
-    BrowserWebMcpAnnotations,
-    BrowserWebMcpSource,
-    BrowserWebMcpSnapshot,
-} from '../protocol/Protocol.js';
+import type { BrowserWebMcpMetadata, BrowserWebMcpDescriptor, BrowserSchemaSummary, BrowserSchemaProperty, BrowserWebMcpAnnotations, BrowserWebMcpSource, BrowserWebMcpSnapshot } from '../protocol/Protocol.js';
 import type { BrowserWebMcpCapture, BrowserWebMcpTool } from './BrowserWebMcpDefinitions.js';
 import type { ReverseBrowserReference } from '../protocol/Protocol.js';
 

@@ -1,5 +1,6 @@
 import type {
     ApprovalRequestedData,
+    AgileChanged,
     ApprovalResolvedData,
     ChangedData,
     ConnectChallengeData,
@@ -20,6 +21,7 @@ export const EventName = {
     TurnEnd: 'turn.end',
     SessionMessage: 'session.message',
     SessionHistory: 'session.history',
+    SessionPlanning: 'session.planning',
     ApprovalRequested: 'approval.requested',
     ApprovalResolved: 'approval.resolved',
     JobsChanged: 'jobs.changed',
@@ -55,6 +57,7 @@ export interface EventMap {
     readonly 'turn.end': TurnEndData;
     readonly 'session.message': SessionMessageData;
     readonly 'session.history': SessionHistoryData;
+    readonly 'session.planning': AgileChanged;
     readonly 'approval.requested': ApprovalRequestedData;
     readonly 'approval.resolved': ApprovalResolvedData;
     readonly 'jobs.changed': ChangedData;
@@ -70,6 +73,7 @@ const eventValidators: Readonly<Record<keyof EventMap, Validator>> = {
     'turn.end': validators.turnEnd,
     'session.message': validators.sessionMessage,
     'session.history': validators.sessionHistory,
+    'session.planning': validators.sessionPlanning,
     'approval.requested': validators.approvalRequested,
     'approval.resolved': validators.approvalResolved,
     'jobs.changed': validators.changed,

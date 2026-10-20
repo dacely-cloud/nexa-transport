@@ -3,14 +3,8 @@
 
 import { BrowserStorageGroup } from './BrowserStorageReceipt.js';
 import type { BrowserStorageMetadata } from '../protocol/Protocol.js';
-import {
-    BrowserStorageCompareMode as Mode,
-    BrowserStorageCompareStatus as Status,
-} from './BrowserStorageComparisonDefinitions.js';
-import type {
-    BrowserStorageCompareMode,
-    BrowserStorageQuotaComparison,
-} from '../protocol/Protocol.js';
+import { BrowserStorageCompareMode as Mode, BrowserStorageCompareStatus as Status } from './BrowserStorageComparisonDefinitions.js';
+import type { BrowserStorageCompareMode, BrowserStorageQuotaComparison } from '../protocol/Protocol.js';
 
 /** Shared portable scope rules keep native comparison and external receipt validation equivalent. */
 export class BrowserStorageComparisonPolicy {

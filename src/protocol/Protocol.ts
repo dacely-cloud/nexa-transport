@@ -195,6 +195,271 @@ export interface AgentVoiceShape {
 /** AgentVoice from the Nexa wire protocol. */
 export type AgentVoice = AgentVoiceShape;
 
+/** AgileBoardPlan wire fields. */
+export interface AgileBoardPlanShape {
+    /** acceptance as defined by the Nexa gateway. */
+    readonly acceptance: ReadonlyArray<string>;
+    /** agile as defined by the Nexa gateway. */
+    readonly agile?: AgilePlan;
+    /** goal as defined by the Nexa gateway. */
+    readonly goal: string;
+    /** status as defined by the Nexa gateway. */
+    readonly status: PlanStatus;
+    /** steps as defined by the Nexa gateway. */
+    readonly steps: ReadonlyArray<PlanStep>;
+}
+
+/** AgileBoardPlan from the Nexa wire protocol. */
+export type AgileBoardPlan = AgileBoardPlanShape;
+
+/** AgileChanged wire fields. */
+export interface AgileChangedShape {
+    /** sessionId as defined by the Nexa gateway. */
+    readonly sessionId: string;
+    /** version as defined by the Nexa gateway. */
+    readonly version: number;
+}
+
+/** AgileChanged from the Nexa wire protocol. */
+export type AgileChanged = AgileChangedShape;
+
+/** AgileDecision wire fields. */
+export interface AgileDecisionShape {
+    /** answer as defined by the Nexa gateway. */
+    readonly answer: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** question as defined by the Nexa gateway. */
+    readonly question: string;
+    /** sources as defined by the Nexa gateway. */
+    readonly sources: ReadonlyArray<string>;
+}
+
+/** AgileDecision from the Nexa wire protocol. */
+export type AgileDecision = AgileDecisionShape;
+
+/** AgileDesign wire fields. */
+export interface AgileDesignShape {
+    /** nodes as defined by the Nexa gateway. */
+    readonly nodes: ReadonlyArray<AgileDesignNode>;
+}
+
+/** AgileDesign from the Nexa wire protocol. */
+export type AgileDesign = AgileDesignShape;
+
+/** AgileDesignNode wire fields. */
+export interface AgileDesignNodeShape {
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** interfaces as defined by the Nexa gateway. */
+    readonly interfaces: ReadonlyArray<string>;
+    /** parentId as defined by the Nexa gateway. */
+    readonly parentId: null | string;
+    /** responsibility as defined by the Nexa gateway. */
+    readonly responsibility: string;
+    /** stepId as defined by the Nexa gateway. */
+    readonly stepId: null | string;
+    /** title as defined by the Nexa gateway. */
+    readonly title: string;
+}
+
+/** AgileDesignNode from the Nexa wire protocol. */
+export type AgileDesignNode = AgileDesignNodeShape;
+
+/** AgileEpic wire fields. */
+export interface AgileEpicShape {
+    /** dependsOn as defined by the Nexa gateway. */
+    readonly dependsOn: ReadonlyArray<string>;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** outcome as defined by the Nexa gateway. */
+    readonly outcome: string;
+    /** title as defined by the Nexa gateway. */
+    readonly title: string;
+}
+
+/** AgileEpic from the Nexa wire protocol. */
+export type AgileEpic = AgileEpicShape;
+
+/** AgilePlan wire fields. */
+export interface AgilePlanShape {
+    /** assumptions as defined by the Nexa gateway. */
+    readonly assumptions: ReadonlyArray<string>;
+    /** decisions as defined by the Nexa gateway. */
+    readonly decisions: ReadonlyArray<AgileDecision>;
+    /** design as defined by the Nexa gateway. */
+    readonly design?: AgileDesign;
+    /** epics as defined by the Nexa gateway. */
+    readonly epics: ReadonlyArray<AgileEpic>;
+    /** intent as defined by the Nexa gateway. */
+    readonly intent: ReadonlyArray<string>;
+    /** qualitySeconds as defined by the Nexa gateway. */
+    readonly qualitySeconds: number;
+    /** sprints as defined by the Nexa gateway. */
+    readonly sprints: ReadonlyArray<AgileSprint>;
+    /** stories as defined by the Nexa gateway. */
+    readonly stories: ReadonlyArray<AgileStory>;
+    /** tasks as defined by the Nexa gateway. */
+    readonly tasks: ReadonlyArray<AgileTask>;
+    /** version as defined by the Nexa gateway. */
+    readonly version: 1;
+}
+
+/** AgilePlan from the Nexa wire protocol. */
+export type AgilePlan = AgilePlanShape;
+
+/** AgileSessionCommand wire fields. */
+export interface AgileSessionCommandShape {
+    /** command as defined by the Nexa gateway. */
+    readonly command: AgileSprintCommand;
+    /** sessionId as defined by the Nexa gateway. */
+    readonly sessionId: string;
+}
+
+/** AgileSessionCommand from the Nexa wire protocol. */
+export type AgileSessionCommand = AgileSessionCommandShape;
+
+/** AgileSprint wire fields. */
+export interface AgileSprintShape {
+    /** dependsOn as defined by the Nexa gateway. */
+    readonly dependsOn: ReadonlyArray<string>;
+    /** goal as defined by the Nexa gateway. */
+    readonly goal: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** review as defined by the Nexa gateway. */
+    readonly review: null | string;
+    /** status as defined by the Nexa gateway. */
+    readonly status: AgileSprintStatus;
+    /** title as defined by the Nexa gateway. */
+    readonly title: string;
+}
+
+/** AgileSprint from the Nexa wire protocol. */
+export type AgileSprint = AgileSprintShape;
+
+/** Allowed values for AgileSprintAction. */
+export const AgileSprintActionValues = {
+    Value0: 'complete',
+    Value1: 'reopen',
+    Value2: 'review',
+    Value3: 'start',
+} as const;
+
+/** AgileSprintAction from the Nexa wire protocol. */
+export type AgileSprintAction =
+    (typeof AgileSprintActionValues)[keyof typeof AgileSprintActionValues];
+
+/** AgileSprintCommand wire fields. */
+export interface AgileSprintCommandShape {
+    /** action as defined by the Nexa gateway. */
+    readonly action: AgileSprintAction;
+    /** expectedVersion as defined by the Nexa gateway. */
+    readonly expectedVersion: number;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** review as defined by the Nexa gateway. */
+    readonly review?: string;
+}
+
+/** AgileSprintCommand from the Nexa wire protocol. */
+export type AgileSprintCommand = AgileSprintCommandShape;
+
+/** Allowed values for AgileSprintStatus. */
+export const AgileSprintStatusValues = {
+    Value0: 'active',
+    Value1: 'complete',
+    Value2: 'planned',
+    Value3: 'review',
+} as const;
+
+/** AgileSprintStatus from the Nexa wire protocol. */
+export type AgileSprintStatus =
+    (typeof AgileSprintStatusValues)[keyof typeof AgileSprintStatusValues];
+
+/** AgileStory wire fields. */
+export interface AgileStoryShape {
+    /** acceptance as defined by the Nexa gateway. */
+    readonly acceptance: ReadonlyArray<string>;
+    /** criteria as defined by the Nexa gateway. */
+    readonly criteria: ReadonlyArray<number>;
+    /** dependsOn as defined by the Nexa gateway. */
+    readonly dependsOn: ReadonlyArray<string>;
+    /** epicId as defined by the Nexa gateway. */
+    readonly epicId: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** sprintId as defined by the Nexa gateway. */
+    readonly sprintId: string;
+    /** title as defined by the Nexa gateway. */
+    readonly title: string;
+    /** userStory as defined by the Nexa gateway. */
+    readonly userStory: string;
+}
+
+/** AgileStory from the Nexa wire protocol. */
+export type AgileStory = AgileStoryShape;
+
+/** AgileTask wire fields. */
+export interface AgileTaskShape {
+    /** acceptance as defined by the Nexa gateway. */
+    readonly acceptance: ReadonlyArray<string>;
+    /** stepId as defined by the Nexa gateway. */
+    readonly stepId: string;
+    /** storyId as defined by the Nexa gateway. */
+    readonly storyId: string;
+}
+
+/** AgileTask from the Nexa wire protocol. */
+export type AgileTask = AgileTaskShape;
+
+/** AgileView wire fields. */
+export interface AgileViewShape {
+    /** epics as defined by the Nexa gateway. */
+    readonly epics: ReadonlyArray<AgileViewDependency>;
+    /** paused as defined by the Nexa gateway. */
+    readonly paused: boolean;
+    /** plan as defined by the Nexa gateway. */
+    readonly plan: AgileBoardPlan | null;
+    /** sprints as defined by the Nexa gateway. */
+    readonly sprints: ReadonlyArray<AgileViewDependency>;
+    /** stories as defined by the Nexa gateway. */
+    readonly stories: ReadonlyArray<AgileViewDependency>;
+    /** tasks as defined by the Nexa gateway. */
+    readonly tasks: ReadonlyArray<AgileViewTask>;
+    /** version as defined by the Nexa gateway. */
+    readonly version: number;
+}
+
+/** AgileView from the Nexa wire protocol. */
+export type AgileView = AgileViewShape;
+
+/** AgileViewDependency wire fields. */
+export interface AgileViewDependencyShape {
+    /** dependsOn as defined by the Nexa gateway. */
+    readonly dependsOn: ReadonlyArray<string>;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+}
+
+/** AgileViewDependency from the Nexa wire protocol. */
+export type AgileViewDependency = AgileViewDependencyShape;
+
+/** AgileViewTask wire fields. */
+export interface AgileViewTaskShape {
+    /** blockerCount as defined by the Nexa gateway. */
+    readonly blockerCount: number;
+    /** blockers as defined by the Nexa gateway. */
+    readonly blockers: ReadonlyArray<string>;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** ready as defined by the Nexa gateway. */
+    readonly ready: boolean;
+}
+
+/** AgileViewTask from the Nexa wire protocol. */
+export type AgileViewTask = AgileViewTaskShape;
+
 /** ApplicationBoundary wire fields. */
 export interface ApplicationBoundaryShape {
     /** id as defined by the Nexa gateway. */
@@ -9371,6 +9636,14 @@ export interface GatewayMethodssessions_pinsShape {
     readonly result: ConversationPinsPage;
 }
 
+/** GatewayMethodssessions_planning wire fields. */
+export interface GatewayMethodssessions_planningShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: SessionRef;
+    /** result as defined by the Nexa gateway. */
+    readonly result: AgileView;
+}
+
 /** GatewayMethodssessions_rename wire fields. */
 export interface GatewayMethodssessions_renameShape {
     /** params as defined by the Nexa gateway. */
@@ -9385,6 +9658,14 @@ export interface GatewayMethodssessions_retryShape {
     readonly params: ConversationRetryParams;
     /** result as defined by the Nexa gateway. */
     readonly result: ConversationRetryResult;
+}
+
+/** GatewayMethodssessions_sprint wire fields. */
+export interface GatewayMethodssessions_sprintShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: AgileSessionCommand;
+    /** result as defined by the Nexa gateway. */
+    readonly result: AgileView;
 }
 
 /** GatewayMethodssessions_subscribe wire fields. */
@@ -10261,10 +10542,14 @@ export interface GatewayMethodsShape {
     readonly 'sessions.pin': GatewayMethodssessions_pinShape;
     /** sessions.pins as defined by the Nexa gateway. */
     readonly 'sessions.pins': GatewayMethodssessions_pinsShape;
+    /** sessions.planning as defined by the Nexa gateway. */
+    readonly 'sessions.planning': GatewayMethodssessions_planningShape;
     /** sessions.rename as defined by the Nexa gateway. */
     readonly 'sessions.rename': GatewayMethodssessions_renameShape;
     /** sessions.retry as defined by the Nexa gateway. */
     readonly 'sessions.retry': GatewayMethodssessions_retryShape;
+    /** sessions.sprint as defined by the Nexa gateway. */
+    readonly 'sessions.sprint': GatewayMethodssessions_sprintShape;
     /** sessions.subscribe as defined by the Nexa gateway. */
     readonly 'sessions.subscribe': GatewayMethodssessions_subscribeShape;
     /** sessions.transcript as defined by the Nexa gateway. */
@@ -12234,6 +12519,47 @@ export interface PerformanceReportShape {
 
 /** PerformanceReport from the Nexa wire protocol. */
 export type PerformanceReport = PerformanceReportShape;
+
+/** Allowed values for PlanStatus. */
+export const PlanStatusValues = {
+    Value0: 'abandoned',
+    Value1: 'active',
+    Value2: 'complete',
+} as const;
+
+/** PlanStatus from the Nexa wire protocol. */
+export type PlanStatus = (typeof PlanStatusValues)[keyof typeof PlanStatusValues];
+
+/** PlanStep wire fields. */
+export interface PlanStepShape {
+    /** assignedRunId as defined by the Nexa gateway. */
+    readonly assignedRunId?: string;
+    /** blocker as defined by the Nexa gateway. */
+    readonly blocker?: string;
+    /** dependsOn as defined by the Nexa gateway. */
+    readonly dependsOn: ReadonlyArray<string>;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** status as defined by the Nexa gateway. */
+    readonly status: PlanStepStatus;
+    /** title as defined by the Nexa gateway. */
+    readonly title: string;
+}
+
+/** PlanStep from the Nexa wire protocol. */
+export type PlanStep = PlanStepShape;
+
+/** Allowed values for PlanStepStatus. */
+export const PlanStepStatusValues = {
+    Value0: 'active',
+    Value1: 'blocked',
+    Value2: 'done',
+    Value3: 'pending',
+    Value4: 'skipped',
+} as const;
+
+/** PlanStepStatus from the Nexa wire protocol. */
+export type PlanStepStatus = (typeof PlanStepStatusValues)[keyof typeof PlanStepStatusValues];
 
 /** PlanningAlignmentAnchor wire fields. */
 export interface PlanningAlignmentAnchorShape {
@@ -18308,10 +18634,14 @@ export enum Method {
     SessionsPin = 'sessions.pin',
     /** Calls sessions.pins. */
     SessionsPins = 'sessions.pins',
+    /** Calls sessions.planning. */
+    SessionsPlanning = 'sessions.planning',
     /** Calls sessions.rename. */
     SessionsRename = 'sessions.rename',
     /** Calls sessions.retry. */
     SessionsRetry = 'sessions.retry',
+    /** Calls sessions.sprint. */
+    SessionsSprint = 'sessions.sprint',
     /** Calls sessions.subscribe. */
     SessionsSubscribe = 'sessions.subscribe',
     /** Calls sessions.transcript. */

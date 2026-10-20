@@ -1,4 +1,5 @@
 import type { SessionHistoryRecord, SessionHistoryData } from '../../nexa/src/gateway/HistoryTypes';
+import type { AgileChanged } from '../../nexa/src/agile/interface/AgileView.js';
 /** Server-only generation input; never imported by the published package. */
 import type {
     GatewayMethods,
@@ -33,6 +34,7 @@ import type { BrowserWebMcpPage } from '../../nexa/src/reverse/BrowserWebMcpDire
 import type { BrowserModulePage } from '../../nexa/src/reverse/BrowserModuleDirectoryTypes';
 /** All protocol contracts reachable from the public transport. */
 export interface Contract {
+    readonly sessionPlanning: AgileChanged;
     readonly reverseBrowser: ReverseBrowserPage;
     readonly reverseBrowserStructure: BrowserStructurePage;
     readonly reverseBrowserScreenshot: BrowserScreenshotPage;
