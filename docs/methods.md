@@ -1,6 +1,6 @@
 # RPC reference
 
-All 207 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 206 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
+All 209 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 208 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
 
 - [accounts.create](#accountscreate)
 - [accounts.list](#accountslist)
@@ -130,8 +130,10 @@ All 207 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [sessions.messages](#sessionsmessages)
 - [sessions.pin](#sessionspin)
 - [sessions.pins](#sessionspins)
+- [sessions.planning](#sessionsplanning)
 - [sessions.rename](#sessionsrename)
 - [sessions.retry](#sessionsretry)
+- [sessions.sprint](#sessionssprint)
 - [sessions.subscribe](#sessionssubscribe)
 - [sessions.transcript](#sessionstranscript)
 - [sessions.unpin](#sessionsunpin)
@@ -3443,6 +3445,28 @@ Parameters: [ConversationPinsParams](protocol.md#conversationpinsparams).
 
 Result: [ConversationPinsPage](protocol.md#conversationpinspage).
 
+## sessions.planning
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.SessionsPlanning> = {
+    sessionId: 'YOUR_SESSIONID',
+};
+const result: ResultOf<typeof Method.SessionsPlanning> = await client.call(
+    Method.SessionsPlanning,
+    params,
+);
+```
+
+Parameters: [SessionRef](protocol.md#sessionref).
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `sessionId` | Yes      | `string` |             |
+
+Result: [AgileView](protocol.md#agileview).
+
 ## sessions.rename
 
 ```ts
@@ -3503,6 +3527,34 @@ Parameters: [ConversationRetryParams](protocol.md#conversationretryparams).
 | `text`              | No       | `string`                                                                      |             |
 
 Result: [ConversationRetryResult](protocol.md#conversationretryresult).
+
+## sessions.sprint
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.SessionsSprint> = {
+    command: {
+        action: 'complete',
+        expectedVersion: 1,
+        id: 'YOUR_ID',
+    },
+    sessionId: 'YOUR_SESSIONID',
+};
+const result: ResultOf<typeof Method.SessionsSprint> = await client.call(
+    Method.SessionsSprint,
+    params,
+);
+```
+
+Parameters: [AgileSessionCommand](protocol.md#agilesessioncommand).
+
+| Field       | Required | Type                                                 | Description |
+| ----------- | -------- | ---------------------------------------------------- | ----------- |
+| `command`   | Yes      | [AgileSprintCommand](protocol.md#agilesprintcommand) |             |
+| `sessionId` | Yes      | `string`                                             |             |
+
+Result: [AgileView](protocol.md#agileview).
 
 ## sessions.subscribe
 

@@ -5155,6 +5155,11 @@ export const schema: Schema = {
                                 },
                             ],
                         },
+                        graphic: {
+                            $ref: '#/definitions/Graphic',
+                            description:
+                                'Validated native graphic retained independently of model-visible text.',
+                        },
                         inspectedMediaSha256: {
                             description:
                                 'Host-authored observation evidence; never inferred from result prose.',
@@ -16376,6 +16381,138 @@ export const schema: Schema = {
             ],
             type: 'object',
         },
+        Graphic: {
+            description:
+                'An inert, versioned visual specification. Text never becomes markup or code.',
+            properties: {
+                description: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                kind: {
+                    $ref: '#/definitions/GraphicKind',
+                },
+                series: {
+                    items: {
+                        $ref: '#/definitions/GraphicSeries',
+                    },
+                    type: 'array',
+                },
+                source: {
+                    type: 'string',
+                },
+                style: {
+                    $ref: '#/definitions/GraphicStyle',
+                },
+                title: {
+                    type: 'string',
+                },
+                unit: {
+                    type: 'string',
+                },
+                version: {
+                    const: 1,
+                    type: 'number',
+                },
+                xLabel: {
+                    type: 'string',
+                },
+                yLabel: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'description',
+                'id',
+                'kind',
+                'series',
+                'source',
+                'style',
+                'title',
+                'unit',
+                'version',
+                'xLabel',
+                'yLabel',
+            ],
+            type: 'object',
+        },
+        GraphicEvent: {
+            description:
+                'Correlated native graphic packet, journalled and streamed like other turn events.',
+            properties: {
+                call: {
+                    $ref: '#/definitions/ToolCall',
+                },
+                graphic: {
+                    $ref: '#/definitions/Graphic',
+                },
+                type: {
+                    const: 'graphic',
+                    type: 'string',
+                },
+            },
+            required: ['call', 'graphic', 'type'],
+            type: 'object',
+        },
+        GraphicKind: {
+            description:
+                'Native data visualization families. Relationship diagrams use render_graph.\nSupported visualization family.',
+            enum: [
+                'area',
+                'bar',
+                'donut',
+                'funnel',
+                'heatmap',
+                'line',
+                'metric',
+                'pie',
+                'radar',
+                'scatter',
+                'stacked-bar',
+                'treemap',
+            ],
+            type: 'string',
+        },
+        GraphicMeasurement: {
+            description: 'One bounded measurement. x is required only for a scatter plot.',
+            properties: {
+                label: {
+                    type: 'string',
+                },
+                value: {
+                    type: 'number',
+                },
+                x: {
+                    type: 'number',
+                },
+            },
+            required: ['label', 'value'],
+            type: 'object',
+        },
+        GraphicSeries: {
+            description: 'A named series of measurements.',
+            properties: {
+                name: {
+                    type: 'string',
+                },
+                points: {
+                    items: {
+                        $ref: '#/definitions/GraphicMeasurement',
+                    },
+                    type: 'array',
+                },
+            },
+            required: ['name', 'points'],
+            type: 'object',
+        },
+        GraphicStyle: {
+            description:
+                "Curated palettes and surface treatments, with Nerva's homepage as the default.\nSupported visual treatment.",
+            enum: ['aurora', 'blueprint', 'midnight', 'minimal', 'studio'],
+            type: 'string',
+        },
         HealthResult: {
             description: 'Liveness and identity.',
             properties: {
@@ -22975,6 +23112,11 @@ export const schema: Schema = {
                     description:
                         'Structured data for a UI that renders this tool specially (a diff view, a file tree).\nNever sent to the model — that is what `content` is for.',
                 },
+                graphic: {
+                    $ref: '#/definitions/Graphic',
+                    description:
+                        'Validated native graphic retained independently of model-visible text.',
+                },
                 inspectedMediaSha256: {
                     description: 'Original image digests successfully inspected by a vision route.',
                     items: {
@@ -23545,6 +23687,9 @@ export const schema: Schema = {
             anyOf: [
                 {
                     $ref: '#/definitions/TurnActivityStatusEvent',
+                },
+                {
+                    $ref: '#/definitions/GraphicEvent',
                 },
                 {
                     properties: {

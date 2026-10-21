@@ -38,6 +38,7 @@ Chat, tools, media, artifacts, and voice through the Nexa gateway.
 
 - [Complete usage guide](./docs/guide.md): conversations, running work, tools, skills, audio, images, GIFs, video, generation, documents, artifacts, and ZIP workflows.
 - [Memory testing and ownership](./docs/memory.md): cleanup guarantees, regression tests, and browser stress tests.
+- [Native chat graphics](./docs/graphics.md): chart specifications, styles, delivery packets and retained visual history.
 - [Client API](./docs/client.md): client methods, helpers, options, events, and errors.
 - [Emotional state](./docs/emotions.md): current mood, feelings and private relationships per user, with UI refresh examples.
 - [Package entry points](./docs/exports.md): every public runtime/type import and its contract.

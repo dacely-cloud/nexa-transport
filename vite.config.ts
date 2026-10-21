@@ -4,6 +4,7 @@ const config: UserConfig = {
         target: 'es2023',
         lib: {
             entry: {
+                graphics: 'src/graphics/Graphic.ts',
                 'design-tidy-geometry': 'src/design/DesignTidyGeometry.ts',
                 'design-tidy-edits': 'src/design/DesignTidyEdits.ts',
                 'history-records': 'src/networking/HistoryRecordDecoder.ts',

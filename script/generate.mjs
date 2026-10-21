@@ -21,6 +21,8 @@ writeFileSync(
 
 execFileSync(process.execPath, ['script/workflows.ts'], { stdio: 'inherit' });
 execFileSync(process.execPath, ['script/design.ts'], { stdio: 'inherit' });
+mkdirSync('src/graphics', { recursive: true });
+writeFileSync('src/graphics/Graphic.ts', readFileSync('../nexa/src/graphics/Graphic.ts', 'utf8'));
 mkdirSync('src/graphs', { recursive: true });
 writeFileSync('src/graphs/ChatGraph.ts', readFileSync('../nexa/src/graphs/ChatGraph.ts', 'utf8'));
 // Native capture validation is portable and owned by Nexa.
