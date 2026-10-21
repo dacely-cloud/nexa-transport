@@ -1843,7 +1843,8 @@ export class NexaClient {
             this.#options.reconnect === false ||
             (error instanceof TransportError &&
                 (error.code === TransportErrorCode.Protocol ||
-                    error.code === TransportErrorCode.Remote ||
+                    (error.code === TransportErrorCode.Remote &&
+                        error.remote?.retryable !== true) ||
                     error.code === TransportErrorCode.Aborted ||
                     error.code === TransportErrorCode.Limit ||
                     error.closeDetails?.code === 1008))

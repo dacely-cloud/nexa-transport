@@ -679,6 +679,56 @@ it('reconnects, restores subscriptions and never repeats an interrupted mutation
     expect(await connected.call(Method.AgentAsk, { message: 'New request' })).toEqual(result);
 });
 
+it.each([true, false])(
+    'handles a restored subscription error according to its retryable flag=%s without replaying a mutation',
+    async (retryable: boolean): Promise<void> => {
+        const connected: NexaClient = await connect();
+        if (gateway === undefined) {
+            throw new Error('Missing peer');
+        }
+        let subscriptions: number = 0;
+        let mutations: number = 0;
+        gateway.handler = (socket: WebSocket, request: Request): void => {
+            if (request.method === 'agent.ask') {
+                mutations += 1;
+                socket.close(1001, 'server restarting');
+                return;
+            }
+            if (request.method === 'sessions.subscribe' && ++subscriptions === 2) {
+                socket.send(
+                    JSON.stringify({
+                        id: request.id,
+                        ok: false,
+                        error: {
+                            code: retryable ? 'upstream' : 'forbidden',
+                            message: retryable
+                                ? 'Temporarily unavailable during restart'
+                                : 'Access revoked',
+                            retryable,
+                        },
+                    }),
+                );
+                return;
+            }
+            socket.send(JSON.stringify({ id: request.id, ok: true, result: { ok: true } }));
+        };
+        await connected.call(Method.SessionsSubscribe, { sessionId: 'test::main' });
+        await expect(connected.call(Method.AgentAsk, { message: 'Run once' })).rejects.toThrow(
+            'server restarting',
+        );
+        await expect.poll((): number => subscriptions).toBeGreaterThanOrEqual(2);
+        if (retryable) {
+            await expect.poll((): boolean => connected.connected, { timeout: 3500 }).toBe(true);
+            expect(subscriptions).toBe(3);
+        } else {
+            await expect.poll((): boolean => connected.reconnecting).toBe(false);
+            expect(connected.connected).toBe(false);
+            expect(subscriptions).toBe(2);
+        }
+        expect(mutations).toBe(1);
+    },
+);
+
 it('manual close cancels a scheduled reconnect', async (): Promise<void> => {
     const connected: NexaClient = await connect();
     if (gateway === undefined) {
