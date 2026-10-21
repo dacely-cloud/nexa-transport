@@ -1,3 +1,4 @@
+import { Graphics } from '../graphics/Graphic.js';
 /** JSON Schema subset emitted from Nexa's TypeScript contracts. */
 export interface Schema {
     readonly $ref?: string;
@@ -121,6 +122,9 @@ export class SchemaValidator {
         // stack budget with room for its enclosing method/patch/node schemas.
         if (depth > 256) {
             return false;
+        }
+        if (schema.$ref === '#/definitions/Graphic') {
+            return Graphics.isValid(value);
         }
         if (schema.$ref !== undefined) {
             const resolved: Schema | undefined = this.#resolve(schema.$ref);

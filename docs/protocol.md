@@ -133,6 +133,191 @@ How an agent speaks.
 | `provider`  | Yes      | `string`  | The TTS provider id, e.g. `elevenlabs`. |
 | `voiceId`   | Yes      | `string`  | The provider's voice id.                |
 
+## AgileBoardPlan
+
+Browser-facing plan fields; execution evidence remains in its own authorized APIs.
+
+| Field        | Required | Type                                      | Description                                                                               |
+| ------------ | -------- | ----------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `acceptance` | Yes      | Array of `string`                         |                                                                                           |
+| `agile`      | No       | [AgilePlan](protocol.md#agileplan)        | Agile structure attached atomically to the existing durable plan and its execution steps. |
+| `goal`       | Yes      | `string`                                  |                                                                                           |
+| `status`     | Yes      | [PlanStatus](protocol.md#planstatus)      |                                                                                           |
+| `steps`      | Yes      | Array of [PlanStep](protocol.md#planstep) |                                                                                           |
+
+## AgileChanged
+
+A notification invalidates an older view without replaying the complete backlog on each write.
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `sessionId` | Yes      | `string` |             |
+| `version`   | Yes      | `number` |             |
+
+## AgileDecision
+
+A short planning question and its answer; sources are references, never authorization.
+
+| Field      | Required | Type              | Description |
+| ---------- | -------- | ----------------- | ----------- |
+| `answer`   | Yes      | `string`          |             |
+| `id`       | Yes      | `string`          |             |
+| `question` | Yes      | `string`          |             |
+| `sources`  | Yes      | Array of `string` |             |
+
+## AgileDesign
+
+A single rooted tree describes containment independently of the execution dependency graph.
+
+| Field   | Required | Type                                                    | Description |
+| ------- | -------- | ------------------------------------------------------- | ----------- |
+| `nodes` | Yes      | Array of [AgileDesignNode](protocol.md#agiledesignnode) |             |
+
+## AgileDesignNode
+
+One architectural responsibility; a leaf references the sole authoritative execution step.
+
+| Field            | Required | Type              | Description                                                                                    |
+| ---------------- | -------- | ----------------- | ---------------------------------------------------------------------------------------------- |
+| `id`             | Yes      | `string`          |                                                                                                |
+| `interfaces`     | Yes      | Array of `string` | Concrete inputs, outputs and collaboration contracts, not invented implementation evidence.    |
+| `parentId`       | Yes      | `null,string`     |                                                                                                |
+| `responsibility` | Yes      | `string`          |                                                                                                |
+| `stepId`         | Yes      | `null,string`     | Null for a branch; leaves bind exactly one task whose acceptance and state remain in the plan. |
+| `title`          | Yes      | `string`          |                                                                                                |
+
+## AgileEpic
+
+A product outcome containing stories, with explicit dependencies on other epics.
+
+| Field       | Required | Type              | Description |
+| ----------- | -------- | ----------------- | ----------- |
+| `dependsOn` | Yes      | Array of `string` |             |
+| `id`        | Yes      | `string`          |             |
+| `outcome`   | Yes      | `string`          |             |
+| `title`     | Yes      | `string`          |             |
+
+## AgilePlan
+
+Agile structure attached atomically to the existing durable plan and its execution steps.
+
+| Field            | Required | Type                                                | Description                                                                                |
+| ---------------- | -------- | --------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `assumptions`    | Yes      | Array of `string`                                   |                                                                                            |
+| `decisions`      | Yes      | Array of [AgileDecision](protocol.md#agiledecision) |                                                                                            |
+| `design`         | No       | [AgileDesign](protocol.md#agiledesign)              | Required for new proposals; older saved plans remain readable without fabricated design.   |
+| `epics`          | Yes      | Array of [AgileEpic](protocol.md#agileepic)         |                                                                                            |
+| `intent`         | Yes      | Array of `string`                                   |                                                                                            |
+| `qualitySeconds` | Yes      | `number`                                            | Bounded soft quality target in seconds, not a deadline or permission to omit requirements. |
+| `sprints`        | Yes      | Array of [AgileSprint](protocol.md#agilesprint)     |                                                                                            |
+| `stories`        | Yes      | Array of [AgileStory](protocol.md#agilestory)       |                                                                                            |
+| `tasks`          | Yes      | Array of [AgileTask](protocol.md#agiletask)         |                                                                                            |
+| `version`        | Yes      | `1`                                                 |                                                                                            |
+
+## AgileSessionCommand
+
+Session ownership is resolved before the command reaches the planning store.
+
+| Field       | Required | Type                                                 | Description |
+| ----------- | -------- | ---------------------------------------------------- | ----------- |
+| `command`   | Yes      | [AgileSprintCommand](protocol.md#agilesprintcommand) |             |
+| `sessionId` | Yes      | `string`                                             |             |
+
+## AgileSprint
+
+A bounded increment; completion requires settled tasks and a recorded review.
+
+| Field       | Required | Type                                               | Description |
+| ----------- | -------- | -------------------------------------------------- | ----------- |
+| `dependsOn` | Yes      | Array of `string`                                  |             |
+| `goal`      | Yes      | `string`                                           |             |
+| `id`        | Yes      | `string`                                           |             |
+| `review`    | Yes      | `null,string`                                      |             |
+| `status`    | Yes      | [AgileSprintStatus](protocol.md#agilesprintstatus) |             |
+| `title`     | Yes      | `string`                                           |             |
+
+## AgileSprintAction
+
+Explicit sprint actions preserve a review boundary between completed work and the next increment.
+
+Type: `"complete"` / `"reopen"` / `"review"` / `"start"`.
+
+## AgileSprintCommand
+
+A version-bound edit cannot silently overwrite a newer model or user decision.
+
+| Field             | Required | Type                                               | Description |
+| ----------------- | -------- | -------------------------------------------------- | ----------- |
+| `action`          | Yes      | [AgileSprintAction](protocol.md#agilesprintaction) |             |
+| `expectedVersion` | Yes      | `number`                                           |             |
+| `id`              | Yes      | `string`                                           |             |
+| `review`          | No       | `string`                                           |             |
+
+## AgileSprintStatus
+
+Sprint transitions are checked against the actual task graph before persistence.
+
+Type: `"active"` / `"complete"` / `"planned"` / `"review"`.
+
+## AgileStory
+
+A user-visible behavior delivered in one sprint and linked to the plan's acceptance indices.
+
+| Field        | Required | Type              | Description |
+| ------------ | -------- | ----------------- | ----------- |
+| `acceptance` | Yes      | Array of `string` |             |
+| `criteria`   | Yes      | Array of `number` |             |
+| `dependsOn`  | Yes      | Array of `string` |             |
+| `epicId`     | Yes      | `string`          |             |
+| `id`         | Yes      | `string`          |             |
+| `sprintId`   | Yes      | `string`          |             |
+| `title`      | Yes      | `string`          |             |
+| `userStory`  | Yes      | `string`          |             |
+
+## AgileTask
+
+Binds one durable execution step to a story without duplicating its status or worker owner.
+
+| Field        | Required | Type              | Description |
+| ------------ | -------- | ----------------- | ----------- |
+| `acceptance` | Yes      | Array of `string` |             |
+| `stepId`     | Yes      | `string`          |             |
+| `storyId`    | Yes      | `string`          |             |
+
+## AgileView
+
+One authoritative revision drives both the board and its dependency graph.
+
+| Field     | Required | Type                                                            | Description |
+| --------- | -------- | --------------------------------------------------------------- | ----------- |
+| `epics`   | Yes      | Array of [AgileViewDependency](protocol.md#agileviewdependency) |             |
+| `paused`  | Yes      | `boolean`                                                       |             |
+| `plan`    | Yes      | [AgileBoardPlan](protocol.md#agileboardplan) / `null`           |             |
+| `sprints` | Yes      | Array of [AgileViewDependency](protocol.md#agileviewdependency) |             |
+| `stories` | Yes      | Array of [AgileViewDependency](protocol.md#agileviewdependency) |             |
+| `tasks`   | Yes      | Array of [AgileViewTask](protocol.md#agileviewtask)             |             |
+| `version` | Yes      | `number`                                                        |             |
+
+## AgileViewDependency
+
+Compact effective group edges, including ordering induced by individual tasks.
+
+| Field       | Required | Type              | Description |
+| ----------- | -------- | ----------------- | ----------- |
+| `dependsOn` | Yes      | Array of `string` |             |
+| `id`        | Yes      | `string`          |             |
+
+## AgileViewTask
+
+Bounded blocker details do not send the potentially quadratic expanded graph to every browser.
+
+| Field          | Required | Type              | Description |
+| -------------- | -------- | ----------------- | ----------- |
+| `blockerCount` | Yes      | `number`          |             |
+| `blockers`     | Yes      | Array of `string` |             |
+| `id`           | Yes      | `string`          |             |
+| `ready`        | Yes      | `boolean`         |             |
+
 ## ApplicationBoundary
 
 | Field       | Required | Type                                                           | Description |
@@ -1985,14 +2170,15 @@ Variant 8: Object (fields below)
 
 Variant 9: Object (fields below)
 
-| Field                  | Required | Type                                                         | Description                                                           |
-| ---------------------- | -------- | ------------------------------------------------------------ | --------------------------------------------------------------------- |
-| `chatGraph`            | No       | [ChatGraph](protocol.md#chatgraph)                           | Saved visual delivery; providers only consume the ordinary content.   |
-| `content`              | Yes      | Array of [ContentBlock](protocol.md#contentblock) / `string` |                                                                       |
-| `inspectedMediaSha256` | No       | Array of `string`                                            | Host-authored observation evidence; never inferred from result prose. |
-| `isError`              | No       | `boolean`                                                    |                                                                       |
-| `toolUseId`            | Yes      | `string`                                                     |                                                                       |
-| `type`                 | Yes      | `"tool-result"`                                              | The outcome of a tool call, sent back on the next turn.               |
+| Field                  | Required | Type                                                         | Description                                                            |
+| ---------------------- | -------- | ------------------------------------------------------------ | ---------------------------------------------------------------------- |
+| `chatGraph`            | No       | [ChatGraph](protocol.md#chatgraph)                           | Saved visual delivery; providers only consume the ordinary content.    |
+| `content`              | Yes      | Array of [ContentBlock](protocol.md#contentblock) / `string` |                                                                        |
+| `graphic`              | No       | [Graphic](protocol.md#graphic)                               | Validated native graphic retained independently of model-visible text. |
+| `inspectedMediaSha256` | No       | Array of `string`                                            | Host-authored observation evidence; never inferred from result prose.  |
+| `isError`              | No       | `boolean`                                                    |                                                                        |
+| `toolUseId`            | Yes      | `string`                                                     |                                                                        |
+| `type`                 | Yes      | `"tool-result"`                                              | The outcome of a tool call, sent back on the next turn.                |
 
 ## ConversationInput
 
@@ -2111,6 +2297,7 @@ Spend totals over some slice of the ledger.
 | -------------------- | -------- | ---------------------------------------------------- | --------------------------------------------------------------------------- |
 | `byCategory`         | No       | [Recordstringnumber](protocol.md#recordstringnumber) | Missing on older authorities; other includes historical unclassified usage. |
 | `byKind`             | Yes      | [Recordstringnumber](protocol.md#recordstringnumber) | Totals split by charge kind, so "how much of this was voice" is answerable. |
+| `cacheWriteTokens`   | No       | `number`                                             | Logical tokens newly retained; absent on older reporting authorities.       |
 | `cachedInputTokens`  | Yes      | `number`                                             |                                                                             |
 | `entries`            | Yes      | `number`                                             |                                                                             |
 | `from`               | Yes      | `number`                                             |                                                                             |
@@ -6083,8 +6270,10 @@ Configurable bounds on gateway-owned work and memory.
 | `sessions.messages`                  | Yes      | Object (fields below) |                                                                                                        |
 | `sessions.pin`                       | Yes      | Object (fields below) |                                                                                                        |
 | `sessions.pins`                      | Yes      | Object (fields below) |                                                                                                        |
+| `sessions.planning`                  | Yes      | Object (fields below) |                                                                                                        |
 | `sessions.rename`                    | Yes      | Object (fields below) |                                                                                                        |
 | `sessions.retry`                     | Yes      | Object (fields below) |                                                                                                        |
+| `sessions.sprint`                    | Yes      | Object (fields below) |                                                                                                        |
 | `sessions.subscribe`                 | Yes      | Object (fields below) |                                                                                                        |
 | `sessions.transcript`                | Yes      | Object (fields below) | Compact transcript blocks with original journal byte cursors.                                          |
 | `sessions.unpin`                     | Yes      | Object (fields below) |                                                                                                        |
@@ -7132,6 +7321,13 @@ Configurable bounds on gateway-owned work and memory.
 | `params` | Yes      | [ConversationPinsParams](protocol.md#conversationpinsparams) |             |
 | `result` | Yes      | [ConversationPinsPage](protocol.md#conversationpinspage)     |             |
 
+**sessions.planning**
+
+| Field    | Required | Type                                 | Description |
+| -------- | -------- | ------------------------------------ | ----------- |
+| `params` | Yes      | [SessionRef](protocol.md#sessionref) |             |
+| `result` | Yes      | [AgileView](protocol.md#agileview)   |             |
+
 **sessions.rename**
 
 | Field    | Required | Type                                                             | Description |
@@ -7145,6 +7341,13 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | -------------------------------------------------------------- | ----------- |
 | `params` | Yes      | [ConversationRetryParams](protocol.md#conversationretryparams) |             |
 | `result` | Yes      | [ConversationRetryResult](protocol.md#conversationretryresult) |             |
+
+**sessions.sprint**
+
+| Field    | Required | Type                                                   | Description |
+| -------- | -------- | ------------------------------------------------------ | ----------- |
+| `params` | Yes      | [AgileSessionCommand](protocol.md#agilesessioncommand) |             |
+| `result` | Yes      | [AgileView](protocol.md#agileview)                     |             |
 
 **sessions.subscribe**
 
@@ -7728,6 +7931,65 @@ A structural result is never an execution grant or a connection authorization sn
 | `unavailableHandlers`  | Yes      | Array of `string`                             |             |
 | `valid`                | Yes      | `boolean`                                     |             |
 | `workflowId`           | Yes      | `string`                                      |             |
+
+## Graphic
+
+An inert, versioned visual specification. Text never becomes markup or code.
+
+| Field         | Required | Type                                                | Description |
+| ------------- | -------- | --------------------------------------------------- | ----------- |
+| `description` | Yes      | `string`                                            |             |
+| `id`          | Yes      | `string`                                            |             |
+| `kind`        | Yes      | [GraphicKind](protocol.md#graphickind)              |             |
+| `series`      | Yes      | Array of [GraphicSeries](protocol.md#graphicseries) |             |
+| `source`      | Yes      | `string`                                            |             |
+| `style`       | Yes      | [GraphicStyle](protocol.md#graphicstyle)            |             |
+| `title`       | Yes      | `string`                                            |             |
+| `unit`        | Yes      | `string`                                            |             |
+| `version`     | Yes      | `1`                                                 |             |
+| `xLabel`      | Yes      | `string`                                            |             |
+| `yLabel`      | Yes      | `string`                                            |             |
+
+## GraphicEvent
+
+Correlated native graphic packet, journalled and streamed like other turn events.
+
+| Field     | Required | Type                             | Description |
+| --------- | -------- | -------------------------------- | ----------- |
+| `call`    | Yes      | [ToolCall](protocol.md#toolcall) |             |
+| `graphic` | Yes      | [Graphic](protocol.md#graphic)   |             |
+| `type`    | Yes      | `"graphic"`                      |             |
+
+## GraphicKind
+
+Native data visualization families. Relationship diagrams use render_graph.
+
+Type: `"area"` / `"bar"` / `"donut"` / `"funnel"` / `"heatmap"` / `"line"` / `"metric"` / `"pie"` / `"radar"` / `"scatter"` / `"stacked-bar"` / `"treemap"`.
+
+## GraphicMeasurement
+
+One bounded measurement. x is required only for a scatter plot.
+
+| Field   | Required | Type     | Description |
+| ------- | -------- | -------- | ----------- |
+| `label` | Yes      | `string` |             |
+| `value` | Yes      | `number` |             |
+| `x`     | No       | `number` |             |
+
+## GraphicSeries
+
+A named series of measurements.
+
+| Field    | Required | Type                                                          | Description |
+| -------- | -------- | ------------------------------------------------------------- | ----------- |
+| `name`   | Yes      | `string`                                                      |             |
+| `points` | Yes      | Array of [GraphicMeasurement](protocol.md#graphicmeasurement) |             |
+
+## GraphicStyle
+
+Curated palettes and surface treatments, with Nerva's homepage as the default.
+
+Type: `"aurora"` / `"blueprint"` / `"midnight"` / `"minimal"` / `"studio"`.
 
 ## HealthResult
 
@@ -8381,6 +8643,20 @@ A rich block the server decoded from the model stream, streamed in three phases.
 | `query`     | No       | `string`                        | The query on a `begin` for a `search` block.                                               |
 | `text`      | No       | `string`                        | The appended text on a `delta`.                                                            |
 
+## NcapCacheState
+
+Actual server cache state; a renewal never creates inference or resurrects missing KV.
+
+| Field            | Required | Type     | Description |
+| ---------------- | -------- | -------- | ----------- |
+| `agentId`        | Yes      | `number` |             |
+| `cacheId`        | Yes      | `string` |             |
+| `conversationId` | Yes      | `string` |             |
+| `createdTokens`  | Yes      | `number` |             |
+| `residentTokens` | Yes      | `number` |             |
+| `state`          | Yes      | `number` |             |
+| `ttlMs`          | Yes      | `number` |             |
+
 ## NcapDelta
 
 A single streamed delta from the engine.
@@ -8394,6 +8670,7 @@ A single streamed delta from the engine.
 | `asr`            | No       | [NcapAsrTranscript](protocol.md#ncapasrtranscript)                                            | Native transcription, separate from assistant content.                                      |
 | `backlog`        | No       | Object (fields below) / Object (fields below) / Object (fields below) / Object (fields below) | A live backlog the ENGINE built for this turn: the goal decomposed and fanned out.          |
 | `block`          | No       | [NcapBlockDelta](protocol.md#ncapblockdelta)                                                  | A live rich-block phase (begin/delta/end) decoded server-side.                              |
+| `cache`          | No       | [NcapCacheState](protocol.md#ncapcachestate)                                                  | Actual cache creation/residency, separate from model token accounting.                      |
 | `content`        | Yes      | `string`                                                                                      | Answer content for this chunk (empty on a non-content chunk).                               |
 | `conversationId` | No       | `string`                                                                                      | The server-owned conversation id for this turn, surfaced early (from `AgentBegin`).         |
 | `expert`         | No       | Object (fields below)                                                                         | The EXPERT the server's pre-flight reflection chose to handle this turn.                    |
@@ -8919,6 +9196,31 @@ Complete bounded selection with quality counts and collection diagnostics.
 | `invalidSamples`       | Yes      | `number`                                                  |                                                                                                |
 | `latestSampleMs`       | Yes      | `null,string`                                             |                                                                                                |
 | `query`                | Yes      | [PerformanceQuery](protocol.md#performancequery)          |                                                                                                |
+
+## PlanStatus
+
+Whether a plan is still being worked.
+
+Type: `"abandoned"` / `"active"` / `"complete"`.
+
+## PlanStep
+
+One step of a plan.
+
+| Field           | Required | Type                                         | Description                                                         |
+| --------------- | -------- | -------------------------------------------- | ------------------------------------------------------------------- |
+| `assignedRunId` | No       | `string`                                     | A native delegated run owning this step; absence means parent work. |
+| `blocker`       | No       | `string`                                     |                                                                     |
+| `dependsOn`     | Yes      | Array of `string`                            | Ids of steps that must be settled before this one may start.        |
+| `id`            | Yes      | `string`                                     |                                                                     |
+| `status`        | Yes      | [PlanStepStatus](protocol.md#planstepstatus) |                                                                     |
+| `title`         | Yes      | `string`                                     |                                                                     |
+
+## PlanStepStatus
+
+Where a plan step is.
+
+Type: `"active"` / `"blocked"` / `"done"` / `"pending"` / `"skipped"`.
 
 ## PlanningAlignmentAnchor
 
@@ -10596,6 +10898,7 @@ What a tool returns.
 | `deliveryReceipt`      | No       | [DeliveryReceipt](protocol.md#deliveryreceipt)                                          | Exact submitted artifact and acknowledged destination, produced by the delivery adapter.     |
 | `deliveryReceipts`     | No       | Array of [DeliveryReceipt](protocol.md#deliveryreceipt)                                 | One authoritative receipt per file in a multi-attachment delivery.                           |
 | `display`              | No       | Array of [JsonValue](protocol.md#jsonvalue) / Dictionary / `null,string,number,boolean` | Structured data for a UI that renders this tool specially (a diff view, a file tree).        |
+| `graphic`              | No       | [Graphic](protocol.md#graphic)                                                          | Validated native graphic retained independently of model-visible text.                       |
 | `inspectedMediaSha256` | No       | Array of `string`                                                                       | Original image digests successfully inspected by a vision route.                             |
 | `label`                | No       | `string`                                                                                | A short human label for a UI, e.g. `read 412 lines from src/main.ts`.                        |
 | `processMissing`       | No       | `boolean`                                                                               | The native process table confirmed the requested handle is absent for this session.          |
@@ -10905,56 +11208,64 @@ Variant 1: [TurnActivityStatusEvent](protocol.md#turnactivitystatusevent)
 | `status`   | Yes      | `string`                                           |                                                                                      |
 | `type`     | Yes      | `"status"`                                         |                                                                                      |
 
-Variant 2: Object (fields below)
+Variant 2: [GraphicEvent](protocol.md#graphicevent)
+
+| Field     | Required | Type                             | Description |
+| --------- | -------- | -------------------------------- | ----------- |
+| `call`    | Yes      | [ToolCall](protocol.md#toolcall) |             |
+| `graphic` | Yes      | [Graphic](protocol.md#graphic)   |             |
+| `type`    | Yes      | `"graphic"`                      |             |
+
+Variant 3: Object (fields below)
 
 | Field     | Required | Type                                              | Description |
 | --------- | -------- | ------------------------------------------------- | ----------- |
 | `type`    | Yes      | `"agents-status"`                                 |             |
 | `workers` | Yes      | Array of [WorkerStatus](protocol.md#workerstatus) |             |
 
-Variant 3: Object (fields below)
+Variant 4: Object (fields below)
 
 | Field        | Required | Type                                                   | Description |
 | ------------ | -------- | ------------------------------------------------------ | ----------- |
 | `attachment` | Yes      | [DeliveredAttachment](protocol.md#deliveredattachment) |             |
 | `type`       | Yes      | `"attachment"`                                         |             |
 
-Variant 4: Object (fields below)
+Variant 5: Object (fields below)
 
 | Field    | Required | Type           | Description |
 | -------- | -------- | -------------- | ----------- |
 | `turnId` | Yes      | `string`       |             |
 | `type`   | Yes      | `"turn-start"` |             |
 
-Variant 5: Object (fields below)
+Variant 6: Object (fields below)
 
 | Field       | Required | Type                | Description |
 | ----------- | -------- | ------------------- | ----------- |
 | `iteration` | Yes      | `number`            |             |
 | `type`      | Yes      | `"iteration-start"` |             |
 
-Variant 6: Object (fields below)
+Variant 7: Object (fields below)
 
 | Field  | Required | Type     | Description |
 | ------ | -------- | -------- | ----------- |
 | `text` | Yes      | `string` |             |
 | `type` | Yes      | `"text"` |             |
 
-Variant 7: Object (fields below)
+Variant 8: Object (fields below)
 
 | Field  | Required | Type          | Description |
 | ------ | -------- | ------------- | ----------- |
 | `text` | Yes      | `string`      |             |
 | `type` | Yes      | `"reasoning"` |             |
 
-Variant 8: Object (fields below)
+Variant 9: Object (fields below)
 
 | Field  | Required | Type                             | Description |
 | ------ | -------- | -------------------------------- | ----------- |
 | `call` | Yes      | [ToolCall](protocol.md#toolcall) |             |
 | `type` | Yes      | `"tool-start"`                   |             |
 
-Variant 9: Object (fields below)
+Variant 10: Object (fields below)
 
 | Field    | Required | Type                                     | Description |
 | -------- | -------- | ---------------------------------------- | ----------- |
@@ -10962,14 +11273,14 @@ Variant 9: Object (fields below)
 | `type`   | Yes      | `"tool-progress"`                        |             |
 | `update` | Yes      | [ToolProgress](protocol.md#toolprogress) |             |
 
-Variant 10: Object (fields below)
+Variant 11: Object (fields below)
 
 | Field     | Required | Type                                   | Description |
 | --------- | -------- | -------------------------------------- | ----------- |
 | `outcome` | Yes      | [ToolOutcome](protocol.md#tooloutcome) |             |
 | `type`    | Yes      | `"tool-finish"`                        |             |
 
-Variant 11: Object (fields below)
+Variant 12: Object (fields below)
 
 | Field     | Required | Type                  | Description |
 | --------- | -------- | --------------------- | ----------- |
@@ -10977,7 +11288,7 @@ Variant 11: Object (fields below)
 | `tool`    | Yes      | `string`              |             |
 | `type`    | Yes      | `"approval-required"` |             |
 
-Variant 12: Object (fields below)
+Variant 13: Object (fields below)
 
 | Field             | Required | Type          | Description |
 | ----------------- | -------- | ------------- | ----------- |
@@ -10985,14 +11296,14 @@ Variant 12: Object (fields below)
 | `summary`         | Yes      | `string`      |             |
 | `type`            | Yes      | `"compacted"` |             |
 
-Variant 13: Object (fields below)
+Variant 14: Object (fields below)
 
 | Field   | Required | Type                                 | Description |
 | ------- | -------- | ------------------------------------ | ----------- |
 | `type`  | Yes      | `"usage"`                            |             |
 | `usage` | Yes      | [TokenUsage](protocol.md#tokenusage) |             |
 
-Variant 14: Object (fields below)
+Variant 15: Object (fields below)
 
 | Field    | Required | Type                               | Description |
 | -------- | -------- | ---------------------------------- | ----------- |
@@ -11000,7 +11311,7 @@ Variant 14: Object (fields below)
 | `source` | Yes      | `string`                           |             |
 | `type`   | Yes      | `"native"`                         |             |
 
-Variant 15: Object (fields below)
+Variant 16: Object (fields below)
 
 | Field        | Required | Type                                     | Description |
 | ------------ | -------- | ---------------------------------------- | ----------- |
@@ -11010,7 +11321,7 @@ Variant 15: Object (fields below)
 | `type`       | Yes      | `"turn-finish"`                          |             |
 | `usage`      | Yes      | [TokenUsage](protocol.md#tokenusage)     |             |
 
-Variant 16: Object (fields below)
+Variant 17: Object (fields below)
 
 | Field       | Required | Type                               | Description |
 | ----------- | -------- | ---------------------------------- | ----------- |
@@ -12660,6 +12971,7 @@ Exact counters; missing dimensions were not reported.
 
 | Field               | Required | Type     | Description |
 | ------------------- | -------- | -------- | ----------- |
+| `cacheWriteTokens`  | No       | `string` |             |
 | `cachedInputTokens` | No       | `string` |             |
 | `inputTokens`       | No       | `string` |             |
 | `outputTokens`      | No       | `string` |             |
