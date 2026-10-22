@@ -127,6 +127,18 @@ is acknowledged after handlers finish. Avoid downloading every ZIP/PDF on resume
 Applications may explicitly request visible image/video previews and own their
 Blob URL cleanup.
 
+History lookahead uses at most two concurrent reads per client. The gateway queues
+busy archive reads and reserves separate capacity for file transfers. The SDK
+retries only overload tagged `conversation-lookup-busy`, within the original
+request deadline; authorization, quotas and transfer failures are not replayed.
+Custom transcript consumers can use `SessionArchiveRequests.call` from
+`nexa-transport/archive-requests` for the same behavior.
+
+Downloads allow ten minutes overall, including queueing. Their 60-second idle
+timer starts with the first byte progress event, so waiting for a transfer slot
+does not report a stalled transfer. Cancellation stops waiting, retries and file
+listeners together.
+
 Set `ClientOptions.client.metadataOnlyAttachments: true` to request metadata-only
 live delivery on gateways supporting that handshake field. Saved metadata still
 requires explicit download for bytes. Default live delivery uses `onAttachment`.

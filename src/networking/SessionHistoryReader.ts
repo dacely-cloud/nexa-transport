@@ -13,6 +13,7 @@ import { HistoryRecordDecoder } from './HistoryRecordDecoder.js';
 import type { AttachmentProgress, ReceivedAttachment } from '../media/BinaryMedia.js';
 import type { NexaClient, SavedHistorySnapshot } from './NexaClient.js';
 import type { CallOptions } from '../interface/ClientOptions.js';
+import { SessionArchiveRequests } from './SessionArchiveRequests.js';
 
 /** Restores bounded journal pages and exact binary files through authenticated RPCs. */
 export class SessionHistoryReader {
@@ -22,7 +23,7 @@ export class SessionHistoryReader {
         id: string,
         cursor: string = '0',
         endCursor?: string,
-        concurrency: number = 16,
+        concurrency: number = 2,
         signal?: AbortSignal,
     ): Promise<SavedHistorySnapshot> {
         signal?.throwIfAborted();
@@ -31,7 +32,7 @@ export class SessionHistoryReader {
         const journal: HistoryRecordDecoder = new HistoryRecordDecoder();
         const pages: HistoryPageWindow = new HistoryPageWindow(
             (params: SessionHistoryParams, options: CallOptions): Promise<SessionHistoryPage> =>
-                client.call(Method.SessionsTranscript, params, options),
+                SessionArchiveRequests.call(client, Method.SessionsTranscript, params, options),
             id,
             concurrency,
             signal,
@@ -104,7 +105,7 @@ export class SessionHistoryReader {
         const stalledDelivery: PromiseWithResolvers<never> = Promise.withResolvers<never>();
         const stalled: () => void = (): void =>
             stalledDelivery.reject(new Error('Download stalled. Please try again.'));
-        let idle: ReturnType<typeof setTimeout> = setTimeout(stalled, 60_000);
+        let idle: ReturnType<typeof setTimeout> | undefined;
         const stopProgress: () => void = client.onAttachmentProgress(
             (update: AttachmentProgress): void => {
                 if (
@@ -137,7 +138,8 @@ export class SessionHistoryReader {
             const [, file]: [ResultOf<typeof Method.SessionsDownload>, ReceivedAttachment] =
                 await Promise.race([
                     Promise.all([
-                        client.call(
+                        SessionArchiveRequests.call(
+                            client,
                             Method.SessionsDownload,
                             { id, attachmentId },
                             { timeoutMs: 600_000, signal: requestSignal },

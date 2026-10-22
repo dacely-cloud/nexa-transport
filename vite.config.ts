@@ -9,6 +9,7 @@ const config: UserConfig = {
                 'design-tidy-edits': 'src/design/DesignTidyEdits.ts',
                 'history-records': 'src/networking/HistoryRecordDecoder.ts',
                 'session-files': 'src/networking/SessionFilePager.ts',
+                'archive-requests': 'src/networking/SessionArchiveRequests.ts',
                 'tool-bridge-input': 'src/toolsearch/BridgeInput.ts',
                 'roblox-execution-context': 'src/roblox/RobloxExecutionContext.ts',
                 'roblox-scene-input': 'src/roblox/RobloxSceneInput.ts',

@@ -1,4 +1,5 @@
 import { SessionHistoryReader } from './SessionHistoryReader.js';
+import { SessionArchiveRequests } from './SessionArchiveRequests.js';
 import { EmotionWatches } from './EmotionWatches.js';
 import { resolveBridgeInput } from '../toolsearch/BridgeInput.js';
 import type { EmotionalSnapshot, TurnEventData } from '../protocol/Protocol.js';
@@ -199,7 +200,7 @@ export class NexaClient {
             id,
             cursor,
             endCursor,
-            Math.max(1, Math.min(16, Math.floor(this.#pending.limit / 2))),
+            Math.max(1, Math.min(2, Math.floor(this.#pending.limit / 2))),
             signal,
         );
     }
@@ -1049,7 +1050,7 @@ export class NexaClient {
     ): AsyncGenerator<SessionFilePage['files'], void> {
         return new SessionFilePager(
             (params: SessionFileListParams, callOptions: CallOptions): Promise<SessionFilePage> =>
-                this.call(Method.SessionsFiles, params, callOptions),
+                SessionArchiveRequests.call(this, Method.SessionsFiles, params, callOptions),
         ).pages(id, options);
     }
 
@@ -1060,7 +1061,7 @@ export class NexaClient {
     ): Promise<SessionFilePage['files']> {
         return new SessionFilePager(
             (params: SessionFileListParams, callOptions: CallOptions): Promise<SessionFilePage> =>
-                this.call(Method.SessionsFiles, params, callOptions),
+                SessionArchiveRequests.call(this, Method.SessionsFiles, params, callOptions),
         ).read(id, options);
     }
     /** Subscribes to a catalogued event with a fully validated payload. */
