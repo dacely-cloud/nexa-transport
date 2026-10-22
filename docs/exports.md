@@ -18,6 +18,7 @@ they do not execute server-only handlers or grant access.
 | -------------------------------------- | -------------- | ----------------------------------------------------------------------------------------- |
 | `nexa-transport`                       | ESM + types    | Authenticated client, streams, events, voice, recovery, uploads, and binary channels      |
 | `nexa-transport/session-files`         | ESM + types    | Bounded saved-file metadata pages, source revisions, cancellation and complete recovery   |
+| `nexa-transport/archive-requests`      | ESM + types    | Cancellable archive admission retries within one total request deadline                   |
 | `nexa-transport/history-records`       | ESM + types    | Linear JSONL record framing with full schema validation and duplicate rejection           |
 | `nexa-transport/graphics`              | ESM + types    | Native chart specifications, twelve graphic families, five styles and Graphics validation |
 | `nexa-transport/chat-graph`            | ESM + types    | Colored explanatory relationship graphs and ChatGraphs validation                         |
