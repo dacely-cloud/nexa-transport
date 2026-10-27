@@ -17,6 +17,8 @@ export interface Schema {
     readonly maximum?: number;
     readonly maxLength?: number;
     readonly minLength?: number;
+    /** Trusted generated contracts may constrain opaque identifiers and exact revision encodings. */
+    readonly pattern?: string;
     readonly maxItems?: number;
     readonly $id?: string;
     readonly $schema?: string;
@@ -33,6 +35,7 @@ export class SchemaValidator {
     readonly #root: Schema;
     readonly #resolved: Map<string, Schema | undefined> = new Map();
     readonly #unions: WeakMap<Schema, DiscriminatedSchema | null> = new WeakMap();
+    readonly #patterns: WeakMap<Schema, RegExp | null> = new WeakMap();
     public constructor(root: Schema) {
         this.#root = root;
     }
@@ -67,6 +70,20 @@ export class SchemaValidator {
             this.#resolved.set(path, schema);
         }
         return schema;
+    }
+
+    /** Compile trusted patterns once; malformed schema constraints fail closed without executing generated code. */
+    #pattern(schema: Schema, value: string): boolean {
+        let pattern: RegExp | null | undefined = this.#patterns.get(schema);
+        if (pattern === undefined) {
+            try {
+                pattern = new RegExp(schema.pattern ?? '', 'u');
+            } catch {
+                pattern = null;
+            }
+            this.#patterns.set(schema, pattern);
+        }
+        return pattern !== null && pattern.test(value);
     }
 
     /** Index only branches whose required, distinct constants prove all other branches impossible. */
@@ -178,6 +195,13 @@ export class SchemaValidator {
             typeof value === 'string' &&
             ((schema.maxLength !== undefined && value.length > schema.maxLength) ||
                 (schema.minLength !== undefined && value.length < schema.minLength))
+        ) {
+            return false;
+        }
+        if (
+            typeof value === 'string' &&
+            schema.pattern !== undefined &&
+            !this.#pattern(schema, value)
         ) {
             return false;
         }

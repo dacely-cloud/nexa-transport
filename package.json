@@ -1,6 +1,6 @@
 {
     "name": "nexa-transport",
-    "version": "0.1.0-archive.1",
+    "version": "0.1.0-workspace-files.1",
     "description": "Typed Nexa websocket gateway client for browsers and Node.js",
     "type": "module",
     "license": "Apache-2.0",
@@ -17,6 +17,22 @@
         "licenses"
     ],
     "exports": {
+        "./redteam-types": {
+            "types": "./dist/redteam/RedTeamTypes.d.ts",
+            "import": "./dist/redteam-types.js"
+        },
+        "./redteam-codec": {
+            "types": "./dist/redteam/RedTeamCodec.d.ts",
+            "import": "./dist/redteam-codec.js"
+        },
+        "./redteam-request-codec": {
+            "types": "./dist/redteam/RedTeamRequestCodec.d.ts",
+            "import": "./dist/redteam-request-codec.js"
+        },
+        "./redteam-client": {
+            "types": "./dist/redteam/RedTeamClient.d.ts",
+            "import": "./dist/redteam-client.js"
+        },
         "./archive-requests": {
             "types": "./dist/networking/SessionArchiveRequests.d.ts",
             "import": "./dist/archive-requests.js"

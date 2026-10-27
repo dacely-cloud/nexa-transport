@@ -4,6 +4,10 @@ const config: UserConfig = {
         target: 'es2023',
         lib: {
             entry: {
+                'redteam-types': 'src/redteam/RedTeamTypes.ts',
+                'redteam-codec': 'src/redteam/RedTeamCodec.ts',
+                'redteam-request-codec': 'src/redteam/RedTeamRequestCodec.ts',
+                'redteam-client': 'src/redteam/RedTeamClient.ts',
                 graphics: 'src/graphics/Graphic.ts',
                 'design-tidy-geometry': 'src/design/DesignTidyGeometry.ts',
                 'design-tidy-edits': 'src/design/DesignTidyEdits.ts',

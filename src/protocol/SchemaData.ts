@@ -4993,6 +4993,957 @@ export const schema: Schema = {
             required: ['client', 'maxProtocol', 'minProtocol', 'nonce'],
             type: 'object',
         },
+        ConnectorDirectoryEntry: {
+            description: 'Untrusted names remain display/path data.',
+            properties: {
+                kind: {
+                    $ref: '#/definitions/ConnectorFileKind',
+                },
+                name: {
+                    type: 'string',
+                },
+            },
+            required: ['kind', 'name'],
+            type: 'object',
+        },
+        ConnectorDirectoryResult: {
+            description: 'A directory page has a finite entry count and original request identity.',
+            properties: {
+                action: {
+                    const: 'list',
+                    type: 'string',
+                },
+                entries: {
+                    items: {
+                        $ref: '#/definitions/ConnectorDirectoryEntry',
+                    },
+                    type: 'array',
+                },
+                metadata: {
+                    $ref: '#/definitions/ConnectorMetadata',
+                },
+                nextCursor: {
+                    type: ['null', 'string'],
+                },
+                requestId: {
+                    type: 'string',
+                },
+            },
+            required: ['action', 'entries', 'metadata', 'nextCursor', 'requestId'],
+            type: 'object',
+        },
+        ConnectorEnvironmentParams: {
+            description:
+                'File operations explicitly select an account-owned logical environment, never a network host.',
+            properties: {
+                environmentId: {
+                    type: 'string',
+                },
+            },
+            required: ['environmentId'],
+            type: 'object',
+        },
+        ConnectorFileError: {
+            description: 'Denied file results cannot carry an accidental content payload.',
+            properties: {
+                error: {
+                    $ref: '#/definitions/ConnectorFileFailure',
+                },
+                ok: {
+                    const: false,
+                    type: 'boolean',
+                },
+            },
+            required: ['error', 'ok'],
+            type: 'object',
+        },
+        ConnectorFileFailure: {
+            description: 'No backend or native error text is forwarded as file diagnostics.',
+            enum: ['invalid', 'denied', 'unavailable', 'changed', 'indeterminate'],
+            type: 'string',
+        },
+        ConnectorFileKind: {
+            description:
+                'Listed links and special files carry no authority to follow or execute them.',
+            enum: ['file', 'directory', 'symbolic-link', 'other'],
+            type: 'string',
+        },
+        ConnectorFileMode: {
+            description:
+                'A local read-only grant implies no write, shell or network forwarding authority.',
+            enum: ['read-only', 'read-write'],
+            type: 'string',
+        },
+        ConnectorFileRequest: {
+            anyOf: [
+                {
+                    $ref: '#/definitions/ConnectorRead',
+                },
+                {
+                    $ref: '#/definitions/ConnectorStat',
+                },
+                {
+                    $ref: '#/definitions/ConnectorListDirectory',
+                },
+                {
+                    $ref: '#/definitions/ConnectorWrite',
+                },
+                {
+                    $ref: '#/definitions/ConnectorRemove',
+                },
+                {
+                    $ref: '#/definitions/ConnectorMkdir',
+                },
+                {
+                    $ref: '#/definitions/ConnectorChmod',
+                },
+                {
+                    $ref: '#/definitions/ConnectorRename',
+                },
+            ],
+            description:
+                'Each admitted operation has its original finite action and complete authority fields.',
+        },
+        ConnectorFileSuccess: {
+            description: 'Successful file results cannot contain an error branch.',
+            properties: {
+                ok: {
+                    const: true,
+                    type: 'boolean',
+                },
+                result: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/ConnectorReadResult',
+                        },
+                        {
+                            $ref: '#/definitions/ConnectorStatResult',
+                        },
+                        {
+                            $ref: '#/definitions/ConnectorDirectoryResult',
+                        },
+                        {
+                            $ref: '#/definitions/ConnectorWriteResult',
+                        },
+                        {
+                            $ref: '#/definitions/ConnectorRemoveResult',
+                        },
+                        {
+                            $ref: '#/definitions/ConnectorMkdirResult',
+                        },
+                        {
+                            $ref: '#/definitions/ConnectorChmodResult',
+                        },
+                        {
+                            $ref: '#/definitions/ConnectorRenameResult',
+                        },
+                    ],
+                },
+            },
+            required: ['ok', 'result'],
+            type: 'object',
+        },
+        ConnectorFilesystem: {
+            description:
+                'A recent matching signed profile is separate from installed tooling and execution permission.',
+            properties: {
+                acknowledgedSequence: {
+                    type: 'string',
+                },
+                environmentId: {
+                    type: 'string',
+                },
+                online: {
+                    type: 'boolean',
+                },
+                profile: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/ConnectorProfile',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                sequence: {
+                    type: 'string',
+                },
+            },
+            required: ['acknowledgedSequence', 'environmentId', 'online', 'profile', 'sequence'],
+            type: 'object',
+        },
+        ConnectorFilesystemMethod: {
+            description: 'File grants are read through the authenticated account proxy.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/ConnectorEnvironmentParams',
+                },
+                result: {
+                    $ref: '#/definitions/ConnectorFilesystem',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        ConnectorGetMethod: {
+            description: 'Enrollment metadata remains account-authorized.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/ConnectorGetParams',
+                },
+                result: {
+                    $ref: '#/definitions/ConnectorView',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        ConnectorGetParams: {
+            description: 'IDs cannot override the authenticated account.',
+            properties: {
+                enrollmentId: {
+                    type: 'string',
+                },
+            },
+            required: ['enrollmentId'],
+            type: 'object',
+        },
+        ConnectorGpuInventoryState: {
+            description: 'Missing driver access is different from a successful empty inventory.',
+            enum: ['reported', 'unavailable'],
+            type: 'string',
+        },
+        ConnectorGpuSpecification: {
+            description:
+                'Device identifiers and available VRAM support explicit selection without model-authored shell probing.',
+            properties: {
+                availableVramBytes: {
+                    type: ['null', 'string'],
+                },
+                id: {
+                    type: 'string',
+                },
+                model: {
+                    type: 'string',
+                },
+                totalVramBytes: {
+                    type: ['null', 'string'],
+                },
+                vendor: {
+                    $ref: '#/definitions/ConnectorGpuVendor',
+                },
+            },
+            required: ['availableVramBytes', 'id', 'model', 'totalVramBytes', 'vendor'],
+            type: 'object',
+        },
+        ConnectorInventoryMethod: {
+            description:
+                'Nexa forwards an account-bound metadata page through its protected Compute provider.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/ConnectorInventoryParams',
+                },
+                result: {
+                    $ref: '#/definitions/ConnectorInventoryPage',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        ConnectorInventoryPage: {
+            description: 'At most three connector snapshots are returned by one account RPC.',
+            properties: {
+                items: {
+                    items: {
+                        $ref: '#/definitions/ConnectorInventoryView',
+                    },
+                    type: 'array',
+                },
+                next: {
+                    type: ['null', 'string'],
+                },
+            },
+            required: ['items', 'next'],
+            type: 'object',
+        },
+        ConnectorInventoryParams: {
+            description: 'An account page accepts only an opaque ordered enrollment cursor.',
+            properties: {
+                after: {
+                    type: ['null', 'string'],
+                },
+            },
+            required: ['after'],
+            type: 'object',
+        },
+        ConnectorInventoryView: {
+            description:
+                'Public inventory contains no customer paths, workload credentials or transport authority.',
+            properties: {
+                enrollment: {
+                    $ref: '#/definitions/ConnectorView',
+                },
+                presence: {
+                    $ref: '#/definitions/ConnectorPresence',
+                },
+                receivedAtMs: {
+                    type: ['null', 'string'],
+                },
+                specification: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/ConnectorSystemSpecification',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                trust: {
+                    const: 'customer-reported',
+                    type: 'string',
+                },
+            },
+            required: ['enrollment', 'presence', 'receivedAtMs', 'specification', 'trust'],
+            type: 'object',
+        },
+        ConnectorJob: {
+            description: 'Retained results belong to the original request and exact sequence.',
+            properties: {
+                admissionHash: {
+                    type: 'string',
+                    pattern: '^[a-f0-9]{64}$',
+                    minLength: 64,
+                    maxLength: 64,
+                },
+                authorization: {
+                    $ref: '#/definitions/ConnectorOperationAuthorization',
+                },
+                environmentId: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                phase: {
+                    $ref: '#/definitions/ConnectorJobPhase',
+                },
+                request: {
+                    $ref: '#/definitions/ConnectorFileRequest',
+                },
+                response: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/ConnectorFileSuccess',
+                        },
+                        {
+                            $ref: '#/definitions/ConnectorFileError',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                sequence: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'admissionHash',
+                'authorization',
+                'environmentId',
+                'id',
+                'phase',
+                'request',
+                'response',
+                'sequence',
+            ],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorJobPhase: {
+            description:
+                'Shared dispatch state is independent of the Nexa process handling the request.',
+            enum: ['queued', 'dispatched', 'completed'],
+            type: 'string',
+        },
+        ConnectorLinkApproveMethod: {
+            description:
+                'Explicit approval retains the reviewed key and cannot replace a machine after an uncertain response.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/ConnectorLinkApproveParams',
+                },
+                result: {
+                    $ref: '#/definitions/ConnectorLinkApproved',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        ConnectorLinkApproveParams: {
+            description:
+                'Approval binds the exact identity reviewed by this signed-in user, retaining its original operation ID.',
+            properties: {
+                code: {
+                    type: 'string',
+                },
+                linkId: {
+                    type: 'string',
+                },
+                name: {
+                    type: 'string',
+                },
+                publicKey: {
+                    type: 'string',
+                },
+                requestId: {
+                    type: 'string',
+                },
+            },
+            required: ['code', 'linkId', 'name', 'publicKey', 'requestId'],
+            type: 'object',
+        },
+        ConnectorLinkApproved: {
+            description:
+                'Registered metadata establishes neither an online connection nor file or execution permission.',
+            properties: {
+                enrollment: {
+                    $ref: '#/definitions/ConnectorView',
+                },
+                linkId: {
+                    type: 'string',
+                },
+                publicKey: {
+                    type: 'string',
+                },
+            },
+            required: ['enrollment', 'linkId', 'publicKey'],
+            type: 'object',
+        },
+        ConnectorLinkReview: {
+            description:
+                'Only public machine identity and the original finite approval window are disclosed.',
+            properties: {
+                code: {
+                    type: 'string',
+                },
+                deviceName: {
+                    type: 'string',
+                },
+                expiresAtMs: {
+                    type: 'string',
+                },
+                linkId: {
+                    type: 'string',
+                },
+                publicKey: {
+                    type: 'string',
+                },
+            },
+            required: ['code', 'deviceName', 'expiresAtMs', 'linkId', 'publicKey'],
+            type: 'object',
+        },
+        ConnectorLinkReviewMethod: {
+            description:
+                'Code lookup uses the protected controller and never contacts the customer device directly.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/ConnectorLinkReviewParams',
+                },
+                result: {
+                    $ref: '#/definitions/ConnectorLinkReview',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        ConnectorLinkReviewParams: {
+            description:
+                "Entering a short device code requires the current account's write authority.",
+            properties: {
+                code: {
+                    type: 'string',
+                },
+                requestId: {
+                    type: 'string',
+                },
+            },
+            required: ['code', 'requestId'],
+            type: 'object',
+        },
+        ConnectorList: {
+            description:
+                'The backend independently binds every list element to the current account.',
+            properties: {
+                enrollments: {
+                    items: {
+                        $ref: '#/definitions/ConnectorView',
+                    },
+                    type: 'array',
+                },
+            },
+            required: ['enrollments'],
+            type: 'object',
+        },
+        ConnectorListDirectory: {
+            description:
+                'Directory cursors are opaque exact offsets, not a promise of snapshot consistency.',
+            properties: {
+                action: {
+                    const: 'list',
+                    type: 'string',
+                },
+                cursor: {
+                    type: 'string',
+                },
+                path: {
+                    type: 'string',
+                },
+                policySha256: {
+                    type: 'string',
+                },
+                requestId: {
+                    type: 'string',
+                },
+                rootId: {
+                    type: 'string',
+                },
+            },
+            required: ['action', 'cursor', 'path', 'policySha256', 'requestId', 'rootId'],
+            type: 'object',
+        },
+        ConnectorListMethod: {
+            description: 'Account list accepts no identity override.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/Record%3Cstring%2Cnever%3E',
+                },
+                result: {
+                    $ref: '#/definitions/ConnectorList',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        ConnectorMetadata: {
+            description: 'Exact sizes and nanosecond timestamps remain strings at JSON boundaries.',
+            properties: {
+                kind: {
+                    enum: ['directory', 'file'],
+                    type: 'string',
+                },
+                mode: {
+                    type: 'number',
+                },
+                modifiedAtNs: {
+                    type: 'string',
+                },
+                sizeBytes: {
+                    type: 'string',
+                },
+            },
+            required: ['kind', 'mode', 'modifiedAtNs', 'sizeBytes'],
+            type: 'object',
+        },
+        ConnectorPhase: {
+            description:
+                'Enrollment state is separate from a current authenticated transport or file grant.',
+            enum: ['pending', 'enrolled-offline', 'revoked'],
+            type: 'string',
+        },
+        ConnectorPresence: {
+            description:
+                "Presence is based on the authenticated backend's lease clock and revocation state.",
+            enum: ['pending', 'online', 'offline', 'revoked'],
+            type: 'string',
+        },
+        ConnectorProfile: {
+            description:
+                'Root aliases and commitments keep absolute private paths on the customer machine.',
+            properties: {
+                maximumReadBytes: {
+                    type: 'number',
+                },
+                maximumWriteBytes: {
+                    type: 'number',
+                },
+                mode: {
+                    $ref: '#/definitions/ConnectorFileMode',
+                },
+                policySha256: {
+                    type: 'string',
+                },
+                revision: {
+                    type: 'string',
+                },
+                roots: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+            },
+            required: [
+                'maximumReadBytes',
+                'maximumWriteBytes',
+                'mode',
+                'policySha256',
+                'revision',
+                'roots',
+            ],
+            type: 'object',
+        },
+        ConnectorRead: {
+            description: 'Reads are bounded chunks; offsets remain exact decimal strings.',
+            properties: {
+                action: {
+                    const: 'read',
+                    type: 'string',
+                },
+                limit: {
+                    type: 'number',
+                },
+                offset: {
+                    type: 'string',
+                },
+                path: {
+                    type: 'string',
+                },
+                policySha256: {
+                    type: 'string',
+                },
+                requestId: {
+                    type: 'string',
+                },
+                rootId: {
+                    type: 'string',
+                },
+            },
+            required: ['action', 'limit', 'offset', 'path', 'policySha256', 'requestId', 'rootId'],
+            type: 'object',
+        },
+        ConnectorReadResult: {
+            description:
+                'Successful read data is canonical base64 with its original identity and exact offset.',
+            properties: {
+                action: {
+                    const: 'read',
+                    type: 'string',
+                },
+                dataBase64: {
+                    type: 'string',
+                },
+                metadata: {
+                    $ref: '#/definitions/ConnectorMetadata',
+                },
+                offset: {
+                    type: 'string',
+                },
+                requestId: {
+                    type: 'string',
+                },
+            },
+            required: ['action', 'dataBase64', 'metadata', 'offset', 'requestId'],
+            type: 'object',
+        },
+        ConnectorResultMethod: {
+            description: 'Reading an existing result never redispatches or advances its sequence.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/ConnectorResultParams',
+                },
+                result: {
+                    $ref: '#/definitions/ConnectorJob',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        ConnectorResultParams: {
+            description:
+                'A job-ID lookup remains restricted to the explicitly selected environment.',
+            properties: {
+                environmentId: {
+                    type: 'string',
+                },
+                jobId: {
+                    type: 'string',
+                },
+            },
+            required: ['environmentId', 'jobId'],
+            type: 'object',
+        },
+        ConnectorRevokeMethod: {
+            description: 'Permanent revocation is an explicit write operation.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/ConnectorRevokeParams',
+                },
+                result: {
+                    $ref: '#/definitions/ConnectorView',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        ConnectorRevokeParams: {
+            description:
+                'Exact revision and operation ID must be preserved after an uncertain response.',
+            properties: {
+                enrollmentId: {
+                    type: 'string',
+                },
+                observedRevision: {
+                    type: 'string',
+                },
+                requestId: {
+                    type: 'string',
+                },
+            },
+            required: ['enrollmentId', 'observedRevision', 'requestId'],
+            type: 'object',
+        },
+        ConnectorStat: {
+            description: 'Metadata never follows links or opens devices.',
+            properties: {
+                action: {
+                    const: 'stat',
+                    type: 'string',
+                },
+                path: {
+                    type: 'string',
+                },
+                policySha256: {
+                    type: 'string',
+                },
+                requestId: {
+                    type: 'string',
+                },
+                rootId: {
+                    type: 'string',
+                },
+            },
+            required: ['action', 'path', 'policySha256', 'requestId', 'rootId'],
+            type: 'object',
+        },
+        ConnectorStatResult: {
+            description: 'Only bounded safe metadata is returned to the account.',
+            properties: {
+                action: {
+                    const: 'stat',
+                    type: 'string',
+                },
+                metadata: {
+                    $ref: '#/definitions/ConnectorMetadata',
+                },
+                requestId: {
+                    type: 'string',
+                },
+            },
+            required: ['action', 'metadata', 'requestId'],
+            type: 'object',
+        },
+        ConnectorSubmitMethod: {
+            description:
+                'New local reads require write-level RPC authority as well as the backend read-only file scope.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/ConnectorSubmitParams',
+                },
+                result: {
+                    $ref: '#/definitions/ConnectorJob',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        ConnectorSubmitParams: {
+            description:
+                'Retrying never silently substitutes a newer sequence or policy commitment.',
+            properties: {
+                environmentId: {
+                    type: 'string',
+                },
+                previousSequence: {
+                    type: 'string',
+                },
+                request: {
+                    $ref: '#/definitions/ConnectorFileRequest',
+                },
+            },
+            required: ['environmentId', 'previousSequence', 'request'],
+            type: 'object',
+        },
+        ConnectorSystemPlatform: {
+            description:
+                'Platform labels are finite; unsupported platforms cannot masquerade as qualified Linux installations.',
+            enum: ['linux', 'windows', 'macos', 'other'],
+            type: 'string',
+        },
+        ConnectorSystemSpecification: {
+            description:
+                'Account-visible metadata contains no IP address, username, process list, mount paths or credentials.',
+            properties: {
+                architecture: {
+                    type: 'string',
+                },
+                availableMemoryBytes: {
+                    type: 'string',
+                },
+                cpuModel: {
+                    type: 'string',
+                },
+                gpuState: {
+                    $ref: '#/definitions/ConnectorGpuInventoryState',
+                },
+                gpus: {
+                    items: {
+                        $ref: '#/definitions/ConnectorGpuSpecification',
+                    },
+                    type: 'array',
+                },
+                logicalCpuCount: {
+                    type: 'number',
+                },
+                observedAtMs: {
+                    type: 'string',
+                },
+                osRelease: {
+                    type: 'string',
+                },
+                platform: {
+                    $ref: '#/definitions/ConnectorSystemPlatform',
+                },
+                totalMemoryBytes: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'architecture',
+                'availableMemoryBytes',
+                'cpuModel',
+                'gpuState',
+                'gpus',
+                'logicalCpuCount',
+                'observedAtMs',
+                'osRelease',
+                'platform',
+                'totalMemoryBytes',
+            ],
+            type: 'object',
+        },
+        ConnectorView: {
+            description:
+                'Safe metadata includes no device key, workload proof, controller endpoint or host pathname.',
+            properties: {
+                enrolledAtMs: {
+                    type: ['null', 'string'],
+                },
+                environmentId: {
+                    type: 'string',
+                },
+                expiresAtMs: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                issuedAtMs: {
+                    type: 'string',
+                },
+                name: {
+                    type: 'string',
+                },
+                phase: {
+                    $ref: '#/definitions/ConnectorPhase',
+                },
+                revision: {
+                    type: 'string',
+                },
+                revokedAtMs: {
+                    type: ['null', 'string'],
+                },
+            },
+            required: [
+                'enrolledAtMs',
+                'environmentId',
+                'expiresAtMs',
+                'id',
+                'issuedAtMs',
+                'name',
+                'phase',
+                'revision',
+                'revokedAtMs',
+            ],
+            type: 'object',
+        },
+        ConnectorWrite: {
+            description:
+                'Complete file contents are bounded by the explicit local read-write grant.',
+            properties: {
+                action: {
+                    const: 'write',
+                    type: 'string',
+                },
+                dataBase64: {
+                    type: 'string',
+                },
+                mode: {
+                    $ref: '#/definitions/ConnectorWriteMode',
+                },
+                path: {
+                    type: 'string',
+                },
+                policySha256: {
+                    type: 'string',
+                },
+                requestId: {
+                    type: 'string',
+                },
+                rootId: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'action',
+                'dataBase64',
+                'mode',
+                'path',
+                'policySha256',
+                'requestId',
+                'rootId',
+            ],
+            type: 'object',
+        },
+        ConnectorWriteMode: {
+            description:
+                'Atomic publication choices never grant append, removal or program execution.',
+            enum: ['create', 'replace'],
+            type: 'string',
+        },
+        ConnectorWriteResult: {
+            description:
+                'Successful atomic writes retain exact original byte counts and published metadata.',
+            properties: {
+                action: {
+                    const: 'write',
+                    type: 'string',
+                },
+                bytesWritten: {
+                    type: 'string',
+                },
+                metadata: {
+                    $ref: '#/definitions/ConnectorMetadata',
+                },
+                requestId: {
+                    type: 'string',
+                },
+            },
+            required: ['action', 'bytesWritten', 'metadata', 'requestId'],
+            type: 'object',
+        },
         ContentBlock: {
             anyOf: [
                 {
@@ -12567,6 +13518,7 @@ export const schema: Schema = {
                 'tool-execution',
                 'tool-input',
                 'upstream',
+                'conflict',
             ],
             type: 'string',
         },
@@ -13529,6 +14481,128 @@ export const schema: Schema = {
                         },
                         result: {
                             $ref: '#/definitions/HelloOk',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'connectors.files.get': {
+                    description:
+                        'Reading an existing result never redispatches or advances its sequence.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/ConnectorResultParams',
+                        },
+                        result: {
+                            $ref: '#/definitions/ConnectorJob',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'connectors.files.submit': {
+                    description:
+                        'New local reads require write-level RPC authority as well as the backend read-only file scope.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/ConnectorSubmitParams',
+                        },
+                        result: {
+                            $ref: '#/definitions/ConnectorJob',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'connectors.filesystem': {
+                    description: 'File grants are read through the authenticated account proxy.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/ConnectorEnvironmentParams',
+                        },
+                        result: {
+                            $ref: '#/definitions/ConnectorFilesystem',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'connectors.get': {
+                    description: 'Enrollment metadata remains account-authorized.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/ConnectorGetParams',
+                        },
+                        result: {
+                            $ref: '#/definitions/ConnectorView',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'connectors.inventory': {
+                    description:
+                        'Nexa forwards an account-bound metadata page through its protected Compute provider.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/ConnectorInventoryParams',
+                        },
+                        result: {
+                            $ref: '#/definitions/ConnectorInventoryPage',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'connectors.link.approve': {
+                    description:
+                        'Explicit approval retains the reviewed key and cannot replace a machine after an uncertain response.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/ConnectorLinkApproveParams',
+                        },
+                        result: {
+                            $ref: '#/definitions/ConnectorLinkApproved',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'connectors.link.review': {
+                    description:
+                        'Code lookup uses the protected controller and never contacts the customer device directly.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/ConnectorLinkReviewParams',
+                        },
+                        result: {
+                            $ref: '#/definitions/ConnectorLinkReview',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'connectors.list': {
+                    description: 'Account list accepts no identity override.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/Record%3Cstring%2Cnever%3E',
+                        },
+                        result: {
+                            $ref: '#/definitions/ConnectorList',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'connectors.revoke': {
+                    description: 'Permanent revocation is an explicit write operation.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/ConnectorRevokeParams',
+                        },
+                        result: {
+                            $ref: '#/definitions/ConnectorView',
                         },
                     },
                     required: ['params', 'result'],
@@ -14584,6 +15658,72 @@ export const schema: Schema = {
                         },
                         result: {
                             $ref: '#/definitions/OkResult',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'redteam.get': {
+                    description: 'A revision-pinned view of the effort and its ledger.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/RedTeamGetRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/RedTeamSnapshot',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'redteam.list': {
+                    description: 'Bounded metadata directory without agent transcripts.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/RedTeamListRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/RedTeamListPage',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'redteam.start': {
+                    description: 'Durable effort acceptance under the verified socket owner.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/RedTeamStartRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/RedTeamEffort',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'redteam.stop': {
+                    description:
+                        'An acknowledged cancellation request independent of the viewer connection.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/RedTeamEffortRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/RedTeamEffort',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'redteam.update': {
+                    description: "Compare-and-set changes to the owner's active effort.",
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/RedTeamUpdateRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/RedTeamEffort',
                         },
                     },
                     required: ['params', 'result'],
@@ -16051,6 +17191,276 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'connectors.execution': {
+                    description: 'Public account metadata is proxied only through Nexa.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/ConnectorEnvironmentParams',
+                        },
+                        result: {
+                            $ref: '#/definitions/ConnectorExecutionStatus',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'connectors.execution.submit': {
+                    description:
+                        'Admission requires write-level gateway authority even for a read-only workspace.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/ConnectorExecutionSubmitParams',
+                        },
+                        result: {
+                            $ref: '#/definitions/ConnectorExecutionJob',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'connectors.execution.get': {
+                    description: 'Original command result lookup admits no new effect.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/ConnectorResultParams',
+                        },
+                        result: {
+                            $ref: '#/definitions/ConnectorExecutionJob',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'connectors.execution.cancel': {
+                    description:
+                        'Write-level gateway admission remains independent of reading a retained command result.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/ConnectorExecutionStopParams',
+                        },
+                        result: {
+                            $ref: '#/definitions/ConnectorExecutionStopReceipt',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'connectors.execution.jobs': {
+                    description:
+                        'Read-only original selection supplies exact metadata for a later explicitly authorized stop.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/ConnectorEnvironmentParams',
+                        },
+                        result: {
+                            $ref: '#/definitions/ConnectorExecutionCurrentJobs',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'connectors.link.deny': {
+                    description:
+                        'An uncertain rejection must be checked under the same original request.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/ConnectorLinkDenyParams',
+                        },
+                        result: {
+                            $ref: '#/definitions/ConnectorLinkDenied',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'connectors.execution.output': {
+                    description:
+                        'Reading the captured original grants no command, stop or enrollment mutation.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/ConnectorResultParams',
+                        },
+                        result: {
+                            $ref: '#/definitions/ConnectorExecutionOutputView',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'connectors.workspace.get': {
+                    description:
+                        'Wire contract for reading current owned-conversation file placement.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/ConnectorWorkspaceGetParams',
+                        },
+                        result: {
+                            $ref: '#/definitions/ConnectorWorkspaceSelectionView',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                    additionalProperties: false,
+                },
+                'connectors.workspace.select': {
+                    description:
+                        'Wire contract for explicitly changing file placement for future turns.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/ConnectorWorkspaceSelectParams',
+                        },
+                        result: {
+                            $ref: '#/definitions/ConnectorWorkspaceSelectionView',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                    additionalProperties: false,
+                },
+                'connectors.workspace.clear': {
+                    description:
+                        'Wire contract for explicitly returning future turns to managed placement.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/ConnectorWorkspaceClearParams',
+                        },
+                        result: {
+                            $ref: '#/definitions/ConnectorWorkspaceSelectionView',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                    additionalProperties: false,
+                },
+                'connectors.workspace.create': {
+                    description:
+                        'Wire contract for idempotent, account-owned conversation admission.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/ConnectorWorkspaceCreateParams',
+                        },
+                        result: {
+                            $ref: '#/definitions/ConnectorWorkspaceSelectionView',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                    additionalProperties: false,
+                },
+                'connectors.workspace.catalog': {
+                    description:
+                        'Catalog access is mediated by Nexa and the existing conversation owner.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/ConnectorWorkspaceCatalogParams',
+                        },
+                        result: {
+                            $ref: '#/definitions/ConnectorWorkspaceCatalogView',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                    additionalProperties: false,
+                },
+                'connectors.workspace.select-joint': {
+                    description:
+                        'Joint selection captures a verified mapping; local execution grants remain independent.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/ConnectorWorkspaceSelectJointParams',
+                        },
+                        result: {
+                            $ref: '#/definitions/ConnectorWorkspaceSelectionView',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                    additionalProperties: false,
+                },
+                'workspace.files.list': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/BrowserFilesListParams',
+                        },
+                        result: {
+                            $ref: '#/definitions/BrowserFilesPage',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'workspace.files.read': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/BrowserFilesReadParams',
+                        },
+                        result: {
+                            $ref: '#/definitions/BrowserFilesRead',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'workspace.files.start': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/BrowserFilesStartParams',
+                        },
+                        result: {
+                            $ref: '#/definitions/BrowserFilesUpload',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'workspace.files.chunk': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/BrowserFilesChunkParams',
+                        },
+                        result: {
+                            $ref: '#/definitions/BrowserFilesPosition',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'workspace.files.finish': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/BrowserFilesUploadParams',
+                        },
+                        result: {
+                            $ref: '#/definitions/BrowserFilesDone',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'workspace.files.cancel': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/BrowserFilesUploadParams',
+                        },
+                        result: {
+                            $ref: '#/definitions/BrowserFilesDone',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'workspace.files.mkdir': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/BrowserFilesTarget',
+                        },
+                        result: {
+                            $ref: '#/definitions/BrowserFilesDone',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
             },
             required: [
                 'accounts.create',
@@ -16071,6 +17481,15 @@ export const schema: Schema = {
                 'config.set',
                 'config.unset',
                 'connect',
+                'connectors.files.get',
+                'connectors.files.submit',
+                'connectors.filesystem',
+                'connectors.get',
+                'connectors.inventory',
+                'connectors.link.approve',
+                'connectors.link.review',
+                'connectors.list',
+                'connectors.revoke',
                 'credit.budgets',
                 'credit.removeBudget',
                 'credit.resetAllowance',
@@ -16146,6 +17565,11 @@ export const schema: Schema = {
                 'processes.log',
                 'processes.resize',
                 'processes.stop',
+                'redteam.get',
+                'redteam.list',
+                'redteam.start',
+                'redteam.stop',
+                'redteam.update',
                 'reverse.browser',
                 'reverse.browser.modules',
                 'reverse.browser.screenshot',
@@ -16262,6 +17686,26 @@ export const schema: Schema = {
                 'workspaces.describe',
                 'workspaces.destroy',
                 'workspaces.list',
+                'connectors.execution',
+                'connectors.execution.submit',
+                'connectors.execution.get',
+                'connectors.execution.cancel',
+                'connectors.execution.jobs',
+                'connectors.link.deny',
+                'connectors.execution.output',
+                'connectors.workspace.get',
+                'connectors.workspace.select',
+                'connectors.workspace.clear',
+                'connectors.workspace.create',
+                'connectors.workspace.catalog',
+                'connectors.workspace.select-joint',
+                'workspace.files.list',
+                'workspace.files.read',
+                'workspace.files.start',
+                'workspace.files.chunk',
+                'workspace.files.finish',
+                'workspace.files.cancel',
+                'workspace.files.mkdir',
             ],
             type: 'object',
         },
@@ -19947,6 +21391,816 @@ export const schema: Schema = {
                 $ref: '#/definitions/JsonValue',
             },
         },
+        RedTeamActionKind: {
+            description: 'Observed engine operations, independent of presentation timing.',
+            enum: ['delegate', 'edit', 'error', 'read', 'result', 'tool', 'verify', 'wait'],
+            type: 'string',
+        },
+        RedTeamActionState: {
+            description:
+                'Authoritative action lifecycle, including unsuccessful and cancelled operations.',
+            enum: [
+                'cancelled',
+                'failed',
+                'progress',
+                'started',
+                'succeeded',
+                'unconfirmed',
+                'waiting',
+            ],
+            type: 'string',
+        },
+        RedTeamActionTarget: {
+            description:
+                'A stable owner-scoped reference, never authority to read an arbitrary filesystem path.',
+            properties: {
+                fileId: {
+                    type: ['null', 'string'],
+                },
+                historySelection: {
+                    $ref: '#/definitions/RedTeamHistorySelection',
+                    description:
+                        'Native descendants retain their actual parent archive rather than synthetic child sessions.',
+                },
+                kind: {
+                    $ref: '#/definitions/RedTeamTargetKind',
+                },
+                label: {
+                    type: 'string',
+                },
+                line: {
+                    type: ['null', 'number'],
+                },
+                path: {
+                    type: ['null', 'string'],
+                },
+                sessionKey: {
+                    type: 'string',
+                },
+                targetId: {
+                    type: 'string',
+                },
+                toolCallId: {
+                    type: ['null', 'string'],
+                },
+            },
+            required: [
+                'fileId',
+                'kind',
+                'label',
+                'line',
+                'path',
+                'sessionKey',
+                'targetId',
+                'toolCallId',
+            ],
+            type: 'object',
+        },
+        RedTeamAgent: {
+            description:
+                'Chat events, history, tool output and terminal attachments stay in the existing session APIs.',
+            properties: {
+                activity: {
+                    type: 'string',
+                },
+                agentId: {
+                    type: 'string',
+                },
+                historySelection: {
+                    $ref: '#/definitions/RedTeamHistorySelection',
+                    description:
+                        "Exact saved native frames when this worker shares its parent's archive.",
+                },
+                name: {
+                    description: 'The name this worker uses in the effort and its conversation.',
+                    type: 'string',
+                },
+                sessionKey: {
+                    type: ['null', 'string'],
+                },
+                status: {
+                    $ref: '#/definitions/RedTeamAgentStatus',
+                },
+                taskId: {
+                    type: ['null', 'string'],
+                },
+            },
+            required: ['activity', 'agentId', 'sessionKey', 'status', 'taskId'],
+            type: 'object',
+        },
+        RedTeamAgentStatus: {
+            description:
+                'Worker scheduling and termination states.\nWorker lifecycle discriminator.',
+            enum: ['failed', 'idle', 'pending', 'running', 'stopped', 'verifying'],
+            type: 'string',
+        },
+        RedTeamCoordinationEvent: {
+            description: 'A saved exchange linking an agent to real work or a reported finding.',
+            properties: {
+                action: {
+                    $ref: '#/definitions/RedTeamExecutionAction',
+                    description:
+                        'Present only when the native engine observed this exact action lifecycle.',
+                },
+                agentId: {
+                    description:
+                        "The worker involved; the orchestrator is the effort's main session.",
+                    type: 'string',
+                },
+                atMs: {
+                    description: 'Event time in decimal milliseconds.',
+                    type: 'string',
+                },
+                eventId: {
+                    type: 'string',
+                },
+                findingId: {
+                    type: ['null', 'string'],
+                },
+                kind: {
+                    $ref: '#/definitions/RedTeamCoordinationKind',
+                },
+                sequence: {
+                    description:
+                        'Exact increasing sequence within this effort, encoded without precision loss.',
+                    type: 'string',
+                },
+                summary: {
+                    description: 'A short explanation of the recorded action in plain language.',
+                    type: 'string',
+                },
+                taskId: {
+                    type: ['null', 'string'],
+                },
+            },
+            required: [
+                'agentId',
+                'atMs',
+                'eventId',
+                'findingId',
+                'kind',
+                'sequence',
+                'summary',
+                'taskId',
+            ],
+            type: 'object',
+        },
+        RedTeamCoordinationKind: {
+            description:
+                'Recorded work exchanges, without inferring relationships from model prose.\nThe operation recorded by one coordination event.',
+            enum: ['assign', 'progress', 'result', 'verify'],
+            type: 'string',
+        },
+        RedTeamDelegatedAgent: {
+            description:
+                'An observed native descendant with its real parent, goal and original archive selection.',
+            properties: {
+                activity: {
+                    type: 'string',
+                },
+                agentId: {
+                    type: 'string',
+                },
+                goal: {
+                    type: 'string',
+                },
+                historySelection: {
+                    $ref: '#/definitions/RedTeamHistorySelection',
+                    description:
+                        "Exact saved native frames when this worker shares its parent's archive.",
+                },
+                name: {
+                    description: 'The name this worker uses in the effort and its conversation.',
+                    type: 'string',
+                },
+                parentAgentId: {
+                    type: 'string',
+                },
+                sessionKey: {
+                    type: ['null', 'string'],
+                },
+                status: {
+                    $ref: '#/definitions/RedTeamAgentStatus',
+                },
+                taskId: {
+                    type: ['null', 'string'],
+                },
+            },
+            required: [
+                'activity',
+                'agentId',
+                'goal',
+                'historySelection',
+                'parentAgentId',
+                'sessionKey',
+                'status',
+                'taskId',
+            ],
+            type: 'object',
+        },
+        RedTeamEffort: {
+            description:
+                'Decimal wire counters and timestamps retain integer precision across JSON peers.',
+            properties: {
+                createdAtMs: {
+                    type: 'string',
+                },
+                effortId: {
+                    type: 'string',
+                },
+                error: {
+                    type: ['null', 'string'],
+                },
+                findingCount: {
+                    type: 'string',
+                },
+                parallelism: {
+                    type: 'number',
+                },
+                revision: {
+                    type: 'string',
+                },
+                rules: {
+                    type: 'string',
+                },
+                sessionKey: {
+                    description:
+                        'Ordinary owner-scoped Chat session for the orchestrator and its event journal.',
+                    type: 'string',
+                },
+                source: {
+                    $ref: '#/definitions/RedTeamSource',
+                },
+                status: {
+                    $ref: '#/definitions/RedTeamStatus',
+                },
+                taskCount: {
+                    type: 'string',
+                },
+                title: {
+                    type: 'string',
+                },
+                updatedAtMs: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'createdAtMs',
+                'effortId',
+                'error',
+                'findingCount',
+                'parallelism',
+                'revision',
+                'rules',
+                'sessionKey',
+                'source',
+                'status',
+                'taskCount',
+                'title',
+                'updatedAtMs',
+            ],
+            type: 'object',
+        },
+        RedTeamEffortRequest: {
+            description: 'An effort address resolved under the authenticated principal.',
+            properties: {
+                effortId: {
+                    type: 'string',
+                },
+            },
+            required: ['effortId'],
+            type: 'object',
+        },
+        RedTeamEvidence: {
+            description:
+                'Artifact access remains subject to the existing authenticated file download boundary.',
+            properties: {
+                agentId: {
+                    description:
+                        'Owning researcher archive; omitted selects the finding reporter and null selects the orchestrator.',
+                    type: ['null', 'string'],
+                },
+                description: {
+                    type: 'string',
+                },
+                fileId: {
+                    type: ['null', 'string'],
+                },
+            },
+            required: ['description', 'fileId'],
+            type: 'object',
+        },
+        RedTeamExecutionAction: {
+            description:
+                'One exact engine action, ordered by its containing coordination event sequence.',
+            properties: {
+                actionId: {
+                    type: 'string',
+                },
+                agentId: {
+                    type: 'string',
+                },
+                effortId: {
+                    type: 'string',
+                },
+                kind: {
+                    $ref: '#/definitions/RedTeamActionKind',
+                },
+                parentAgentId: {
+                    type: ['null', 'string'],
+                },
+                relatedTargetId: {
+                    type: ['null', 'string'],
+                },
+                state: {
+                    $ref: '#/definitions/RedTeamActionState',
+                },
+                target: {
+                    $ref: '#/definitions/RedTeamActionTarget',
+                },
+            },
+            required: [
+                'actionId',
+                'agentId',
+                'effortId',
+                'kind',
+                'parentAgentId',
+                'relatedTargetId',
+                'state',
+                'target',
+            ],
+            type: 'object',
+        },
+        RedTeamFilesSource: {
+            description:
+                'The server resolves access to uploaded files under the authenticated principal.',
+            properties: {
+                fileIds: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                kind: {
+                    const: 'files',
+                    type: 'string',
+                },
+            },
+            required: ['fileIds', 'kind'],
+            type: 'object',
+        },
+        RedTeamFinding: {
+            description:
+                'A reported candidate or confirmed finding with retained verification evidence.',
+            properties: {
+                affectedComponent: {
+                    type: 'string',
+                },
+                agentId: {
+                    type: ['null', 'string'],
+                },
+                cvssScore: {
+                    description: 'Decimal score from 0 through 10, with at most one decimal digit.',
+                    type: ['null', 'string'],
+                },
+                description: {
+                    type: 'string',
+                },
+                evidence: {
+                    items: {
+                        $ref: '#/definitions/RedTeamEvidence',
+                    },
+                    type: 'array',
+                },
+                findingId: {
+                    type: 'string',
+                },
+                report: {
+                    $ref: '#/definitions/RedTeamFindingReport',
+                    description:
+                        'Optional details preserve older findings and partially researched reports.',
+                },
+                reproduction: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                severity: {
+                    $ref: '#/definitions/RedTeamSeverity',
+                },
+                status: {
+                    $ref: '#/definitions/RedTeamFindingStatus',
+                },
+                title: {
+                    type: 'string',
+                },
+                updatedAtMs: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'affectedComponent',
+                'agentId',
+                'cvssScore',
+                'description',
+                'evidence',
+                'findingId',
+                'reproduction',
+                'severity',
+                'status',
+                'title',
+                'updatedAtMs',
+            ],
+            type: 'object',
+        },
+        RedTeamFindingReport: {
+            description:
+                'Extra report details in plain language. Missing fields have not been reported yet.',
+            properties: {
+                actualBehavior: {
+                    description: 'What the researcher observed the software doing instead.',
+                    type: 'string',
+                },
+                affectedVersions: {
+                    description: 'Software versions that were checked and found to be affected.',
+                    type: 'string',
+                },
+                cveIds: {
+                    description:
+                        'Published CVE identifiers only; an empty list means none have been assigned.',
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                cweIds: {
+                    description:
+                        'Reported CWE categories; an empty list means none have been identified.',
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                expectedBehavior: {
+                    description: 'What the software should do when it works safely.',
+                    type: 'string',
+                },
+                impact: {
+                    description: 'What could go wrong for people who use the affected software.',
+                    type: 'string',
+                },
+                prerequisites: {
+                    description: 'Conditions needed before the reported problem can happen.',
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                references: {
+                    description: 'Supporting pages the reader can open to check the explanation.',
+                    items: {
+                        $ref: '#/definitions/RedTeamReportReference',
+                    },
+                    type: 'array',
+                },
+                remediation: {
+                    description: 'How the software owner can fix or reduce the problem.',
+                    type: 'string',
+                },
+                technicalDetails: {
+                    description:
+                        'Deeper explanation for the people investigating or fixing the problem.',
+                    type: 'string',
+                },
+            },
+            type: 'object',
+        },
+        RedTeamFindingStatus: {
+            description:
+                'Explicit verification outcome; pending candidates remain distinguishable.\nFinding verification discriminator.',
+            enum: ['confirmed', 'pending', 'rejected'],
+            type: 'string',
+        },
+        RedTeamGetMethod: {
+            description: 'A revision-pinned view of the effort and its ledger.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/RedTeamGetRequest',
+                },
+                result: {
+                    $ref: '#/definitions/RedTeamSnapshot',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        RedTeamGetRequest: {
+            description:
+                'Null revision selects the latest snapshot. Continuations must pin its exact revision.',
+            properties: {
+                effortId: {
+                    type: 'string',
+                },
+                findingCursor: {
+                    type: ['null', 'string'],
+                },
+                revision: {
+                    type: ['null', 'string'],
+                },
+                taskCursor: {
+                    type: ['null', 'string'],
+                },
+            },
+            required: ['effortId', 'findingCursor', 'revision', 'taskCursor'],
+            type: 'object',
+        },
+        RedTeamGitHubSource: {
+            description:
+                'HTTPS GitHub repository location; credentials and arbitrary fetch URLs are prohibited.',
+            properties: {
+                kind: {
+                    const: 'github',
+                    type: 'string',
+                },
+                url: {
+                    type: 'string',
+                },
+            },
+            required: ['kind', 'url'],
+            type: 'object',
+        },
+        RedTeamHistorySelection: {
+            description:
+                'Exact native worker frames selected within their original parent archive and response stream.',
+            properties: {
+                streamId: {
+                    type: 'string',
+                },
+                workerId: {
+                    type: 'string',
+                },
+            },
+            required: ['streamId', 'workerId'],
+            type: 'object',
+        },
+        RedTeamListMethod: {
+            description: 'Bounded metadata directory without agent transcripts.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/RedTeamListRequest',
+                },
+                result: {
+                    $ref: '#/definitions/RedTeamListPage',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        RedTeamListPage: {
+            description: 'One metadata page with an exclusive continuation cursor.',
+            properties: {
+                items: {
+                    items: {
+                        $ref: '#/definitions/RedTeamEffort',
+                    },
+                    type: 'array',
+                },
+                next: {
+                    type: ['null', 'string'],
+                },
+            },
+            required: ['items', 'next'],
+            type: 'object',
+        },
+        RedTeamListRequest: {
+            description: 'Bounded metadata pagination without agent journals or ledger bodies.',
+            properties: {
+                afterEffortId: {
+                    type: ['null', 'string'],
+                },
+                limit: {
+                    type: 'number',
+                },
+            },
+            required: ['afterEffortId', 'limit'],
+            type: 'object',
+        },
+        RedTeamReportReference: {
+            description: "A source readers can open to learn more or check a report's claims.",
+            properties: {
+                title: {
+                    description: 'A short name describing what the linked page explains.',
+                    type: 'string',
+                },
+                url: {
+                    description: 'An HTTP or HTTPS link without embedded account credentials.',
+                    type: 'string',
+                },
+            },
+            required: ['title', 'url'],
+            type: 'object',
+        },
+        RedTeamSeverity: {
+            description:
+                'Severity labels retained independently of the numerical CVSS score.\nFinding severity discriminator.',
+            enum: ['critical', 'high', 'info', 'low', 'medium'],
+            type: 'string',
+        },
+        RedTeamSnapshot: {
+            description: 'Pages are pinned to the effort revision, preventing mixed ledger reads.',
+            properties: {
+                agents: {
+                    items: {
+                        $ref: '#/definitions/RedTeamAgent',
+                    },
+                    type: 'array',
+                },
+                coordination: {
+                    description:
+                        'Recent saved exchanges, ordered by exact sequence rather than browser timing.',
+                    items: {
+                        $ref: '#/definitions/RedTeamCoordinationEvent',
+                    },
+                    type: 'array',
+                },
+                delegatedAgents: {
+                    description:
+                        'Bounded observed native descendants, separate from durable scheduler slots.',
+                    items: {
+                        $ref: '#/definitions/RedTeamDelegatedAgent',
+                    },
+                    type: 'array',
+                },
+                effort: {
+                    $ref: '#/definitions/RedTeamEffort',
+                },
+                findings: {
+                    items: {
+                        $ref: '#/definitions/RedTeamFinding',
+                    },
+                    type: 'array',
+                },
+                nextFindingCursor: {
+                    type: ['null', 'string'],
+                },
+                nextTaskCursor: {
+                    type: ['null', 'string'],
+                },
+                tasks: {
+                    items: {
+                        $ref: '#/definitions/RedTeamTask',
+                    },
+                    type: 'array',
+                },
+            },
+            required: [
+                'agents',
+                'effort',
+                'findings',
+                'nextFindingCursor',
+                'nextTaskCursor',
+                'tasks',
+            ],
+            type: 'object',
+        },
+        RedTeamSource: {
+            anyOf: [
+                {
+                    $ref: '#/definitions/RedTeamFilesSource',
+                },
+                {
+                    $ref: '#/definitions/RedTeamGitHubSource',
+                },
+            ],
+            description: 'Exactly one uploaded selection or GitHub repository.',
+        },
+        RedTeamStartMethod: {
+            description: 'Durable effort acceptance under the verified socket owner.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/RedTeamStartRequest',
+                },
+                result: {
+                    $ref: '#/definitions/RedTeamEffort',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        RedTeamStartRequest: {
+            description:
+                'Caller-selected effort identities make unacknowledged starts safe to retry server-side.',
+            properties: {
+                effortId: {
+                    type: 'string',
+                },
+                parallelism: {
+                    type: 'number',
+                },
+                rules: {
+                    type: 'string',
+                },
+                source: {
+                    $ref: '#/definitions/RedTeamSource',
+                },
+                title: {
+                    type: 'string',
+                },
+            },
+            required: ['effortId', 'rules', 'source', 'title'],
+            type: 'object',
+        },
+        RedTeamStatus: {
+            description:
+                'Effort lifecycle states; completion of individual tasks does not stop an effort.\nEffort lifecycle discriminator.',
+            enum: ['failed', 'running', 'stopped', 'stopping'],
+            type: 'string',
+        },
+        RedTeamStopMethod: {
+            description:
+                'An acknowledged cancellation request independent of the viewer connection.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/RedTeamEffortRequest',
+                },
+                result: {
+                    $ref: '#/definitions/RedTeamEffort',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        RedTeamTargetKind: {
+            description:
+                'Content remains a dot; its original session supplies its inspectable details.',
+            enum: ['file', 'finding', 'plan', 'result', 'task', 'terminal', 'tool'],
+            type: 'string',
+        },
+        RedTeamTask: {
+            description: 'One persisted unit of planned, active or finished work.',
+            properties: {
+                agentId: {
+                    type: ['null', 'string'],
+                },
+                description: {
+                    type: 'string',
+                },
+                status: {
+                    $ref: '#/definitions/RedTeamTaskStatus',
+                },
+                taskId: {
+                    type: 'string',
+                },
+                title: {
+                    type: 'string',
+                },
+                updatedAtMs: {
+                    type: 'string',
+                },
+            },
+            required: ['agentId', 'description', 'status', 'taskId', 'title', 'updatedAtMs'],
+            type: 'object',
+        },
+        RedTeamTaskStatus: {
+            description:
+                'Ledger progress independent of the effort lifecycle.\nTask progress discriminator.',
+            enum: ['blocked', 'cancelled', 'completed', 'planned', 'running'],
+            type: 'string',
+        },
+        RedTeamUpdateMethod: {
+            description: "Compare-and-set changes to the owner's active effort.",
+            properties: {
+                params: {
+                    $ref: '#/definitions/RedTeamUpdateRequest',
+                },
+                result: {
+                    $ref: '#/definitions/RedTeamEffort',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        RedTeamUpdateRequest: {
+            description:
+                'Compare-and-set prevents a delayed update from overwriting a newer owner decision.',
+            properties: {
+                effortId: {
+                    type: 'string',
+                },
+                expectedRevision: {
+                    type: 'string',
+                },
+                parallelism: {
+                    type: 'number',
+                },
+                rules: {
+                    type: 'string',
+                },
+            },
+            required: ['effortId', 'expectedRevision'],
+            type: 'object',
+        },
         ReminderAction: {
             description:
                 'A durable message to the conversation that requested it; no model execution.',
@@ -22965,6 +25219,12 @@ export const schema: Schema = {
                 text: {
                     description: 'Text appended to the live view.',
                     type: 'string',
+                },
+                outputSnapshot: {
+                    description:
+                        'Complete replacement output, including empty output; bounded to 65536 UTF-16 code units and therefore at most 196608 UTF-8 bytes.',
+                    type: 'string',
+                    maxLength: 65536,
                 },
             },
             type: 'object',
@@ -28063,6 +30323,1994 @@ export const schema: Schema = {
             },
             required: ['bytes', 'files', 'reconciledAt'],
             type: 'object',
+        },
+        ConnectorArgumentBound: {
+            description:
+                'UTF-8 bytes and relative-path grammar remain enforced independently on the device.',
+            properties: {
+                kind: {
+                    enum: ['relative-path', 'text'],
+                    type: 'string',
+                },
+                maximumBytes: {
+                    type: 'number',
+                },
+            },
+            required: ['kind', 'maximumBytes'],
+            type: 'object',
+        },
+        ConnectorArgumentChoice: {
+            description: 'Finite exact choices never authorize arbitrary extra arguments.',
+            properties: {
+                kind: {
+                    const: 'choice',
+                    type: 'string',
+                },
+                values: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+            },
+            required: ['kind', 'values'],
+            type: 'object',
+        },
+        ConnectorArgumentRule: {
+            anyOf: [
+                {
+                    $ref: '#/definitions/ConnectorMachineInvocationRule',
+                },
+                {
+                    $ref: '#/definitions/ConnectorInteractiveInvocationRule',
+                },
+                {
+                    $ref: '#/definitions/ConnectorArgumentChoice',
+                },
+                {
+                    $ref: '#/definitions/ConnectorArgumentBound',
+                },
+            ],
+            description: 'A declared variable position has exactly one constraint shape.',
+        },
+        ConnectorExecuteMethod: {
+            description:
+                'Admission requires write-level gateway authority even for a read-only workspace.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/ConnectorExecutionSubmitParams',
+                },
+                result: {
+                    $ref: '#/definitions/ConnectorExecutionJob',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        ConnectorExecutionAccess: {
+            description:
+                'Local workspace mutation and cloud write delegation must both permit an operation.',
+            enum: ['read-only', 'read-write'],
+            type: 'string',
+        },
+        ConnectorExecutionJob: {
+            description:
+                'Reads and retries preserve the same admitted original and selected command lane.',
+            properties: {
+                admissionHash: {
+                    type: 'string',
+                    pattern: '^[a-f0-9]{64}$',
+                    minLength: 64,
+                    maxLength: 64,
+                },
+                authorization: {
+                    $ref: '#/definitions/ConnectorOperationAuthorization',
+                },
+                environmentId: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                lane: {
+                    $ref: '#/definitions/ConnectorExecutionLane',
+                },
+                phase: {
+                    $ref: '#/definitions/ConnectorJobPhase',
+                },
+                request: {
+                    $ref: '#/definitions/ConnectorExecutionRequest',
+                },
+                response: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/ConnectorExecutionResult',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                sequence: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'admissionHash',
+                'authorization',
+                'environmentId',
+                'id',
+                'lane',
+                'phase',
+                'request',
+                'response',
+                'sequence',
+            ],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorExecutionLane: {
+            description:
+                'Fixed command lanes retain separate original dispatch and compaction history.',
+            enum: ['first', 'second'],
+            type: 'string',
+        },
+        ConnectorExecutionLaneStatus: {
+            description:
+                'Current publication and permanent lane counters serve different purposes.',
+            properties: {
+                acknowledgedSequence: {
+                    type: 'string',
+                },
+                lane: {
+                    $ref: '#/definitions/ConnectorExecutionLane',
+                },
+                online: {
+                    type: 'boolean',
+                },
+                profile: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/ConnectorExecutionProfile',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                sequence: {
+                    type: 'string',
+                },
+            },
+            required: ['acknowledgedSequence', 'lane', 'online', 'profile', 'sequence'],
+            type: 'object',
+        },
+        ConnectorExecutionMethod: {
+            description: 'Public account metadata is proxied only through Nexa.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/ConnectorEnvironmentParams',
+                },
+                result: {
+                    $ref: '#/definitions/ConnectorExecutionStatus',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        ConnectorExecutionProfile: {
+            description:
+                'Customer-reported public execution grants are not a network endpoint or authorization to run unlisted code.',
+            properties: {
+                maximumAddressBytes: {
+                    type: 'string',
+                },
+                maximumFileBytes: {
+                    type: 'string',
+                },
+                policySha256: {
+                    type: 'string',
+                },
+                programs: {
+                    items: {
+                        $ref: '#/definitions/ConnectorProgramGrant',
+                    },
+                    type: 'array',
+                },
+                resources: {
+                    $ref: '#/definitions/ConnectorExecutionResources',
+                },
+                revision: {
+                    type: 'string',
+                },
+                roots: {
+                    items: {
+                        $ref: '#/definitions/ConnectorExecutionRoot',
+                    },
+                    type: 'array',
+                },
+                timeoutMs: {
+                    type: 'number',
+                },
+            },
+            required: [
+                'maximumAddressBytes',
+                'maximumFileBytes',
+                'policySha256',
+                'programs',
+                'resources',
+                'revision',
+                'roots',
+                'timeoutMs',
+            ],
+            type: 'object',
+        },
+        ConnectorExecutionRequest: {
+            description:
+                'Original input selects only a reviewed local program, workspace and positional arguments.',
+            properties: {
+                arguments: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                policySha256: {
+                    type: 'string',
+                },
+                programId: {
+                    type: 'string',
+                },
+                requestId: {
+                    type: 'string',
+                },
+                rootId: {
+                    type: 'string',
+                },
+            },
+            required: ['arguments', 'policySha256', 'programId', 'requestId', 'rootId'],
+            type: 'object',
+        },
+        ConnectorExecutionResources: {
+            description: 'Resource quantities stay exact decimal strings at the JSON gateway.',
+            properties: {
+                cpuQuotaMicros: {
+                    type: 'number',
+                },
+                maximumTasks: {
+                    type: 'number',
+                },
+                memoryBytes: {
+                    type: 'string',
+                },
+            },
+            required: ['cpuQuotaMicros', 'maximumTasks', 'memoryBytes'],
+            type: 'object',
+        },
+        ConnectorExecutionResult: {
+            description:
+                'Original terminal output is bounded, canonical and signed; contents remain untrusted data.',
+            properties: {
+                exitCode: {
+                    type: ['null', 'number'],
+                },
+                failure: {
+                    anyOf: [
+                        {
+                            enum: [
+                                'ambiguous-exit',
+                                'cancelled',
+                                'expired',
+                                'interrupted',
+                                'output-limit',
+                                'sandbox',
+                                'signal',
+                                'timeout',
+                            ],
+                            type: 'string',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                setupFailure: {
+                    anyOf: [
+                        {
+                            enum: [
+                                'apparmor',
+                                'bootstrap',
+                                'cgroup',
+                                'configuration',
+                                'confinement',
+                                'execute',
+                                'mounts',
+                                'namespaces',
+                            ],
+                            type: 'string',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                stderrBase64: {
+                    type: 'string',
+                },
+                stdoutBase64: {
+                    type: 'string',
+                },
+                termination: {
+                    $ref: '#/definitions/ConnectorExecutionTermination',
+                },
+            },
+            required: [
+                'exitCode',
+                'failure',
+                'setupFailure',
+                'stderrBase64',
+                'stdoutBase64',
+                'termination',
+            ],
+            type: 'object',
+        },
+        ConnectorExecutionResultMethod: {
+            description: 'Original command result lookup admits no new effect.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/ConnectorResultParams',
+                },
+                result: {
+                    $ref: '#/definitions/ConnectorExecutionJob',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        ConnectorExecutionRoot: {
+            description: 'A root alias has independently enforced read-only or writable access.',
+            properties: {
+                access: {
+                    $ref: '#/definitions/ConnectorExecutionAccess',
+                },
+                id: {
+                    type: 'string',
+                },
+            },
+            required: ['access', 'id'],
+            type: 'object',
+        },
+        ConnectorExecutionStatus: {
+            description:
+                'Status lists exactly first and second, without revealing device credentials or private paths.',
+            properties: {
+                environmentId: {
+                    type: 'string',
+                },
+                lanes: {
+                    items: {
+                        $ref: '#/definitions/ConnectorExecutionLaneStatus',
+                    },
+                    type: 'array',
+                },
+            },
+            required: ['environmentId', 'lanes'],
+            type: 'object',
+        },
+        ConnectorExecutionSubmitParams: {
+            description:
+                'Delegation intent is explicit; the API checks actual retained workspace access independently.',
+            properties: {
+                environmentId: {
+                    type: 'string',
+                },
+                lane: {
+                    $ref: '#/definitions/ConnectorExecutionLane',
+                },
+                previousSequence: {
+                    type: 'string',
+                },
+                request: {
+                    $ref: '#/definitions/ConnectorExecutionRequest',
+                },
+                workspaceAccess: {
+                    $ref: '#/definitions/ConnectorExecutionAccess',
+                },
+            },
+            required: ['environmentId', 'lane', 'previousSequence', 'request', 'workspaceAccess'],
+            type: 'object',
+        },
+        ConnectorExecutionTermination: {
+            description:
+                'Transport loss and uncertain commands must never be presented as successful exits.',
+            enum: ['exited', 'indeterminate'],
+            type: 'string',
+        },
+        ConnectorProgramGrant: {
+            description: 'Public program aliases cannot become host executable paths.',
+            properties: {
+                arguments: {
+                    items: {
+                        $ref: '#/definitions/ConnectorArgumentRule',
+                    },
+                    type: 'array',
+                },
+                id: {
+                    type: 'string',
+                },
+                rootIds: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+            },
+            required: ['arguments', 'id', 'rootIds'],
+            type: 'object',
+        },
+        ConnectorExecutionCurrentJob: {
+            description:
+                "Latest original metadata has the retained workspace grant rather than the device's possibly newer profile.",
+            properties: {
+                admissionHash: {
+                    type: 'string',
+                    pattern: '^[a-f0-9]{64}$',
+                    minLength: 64,
+                    maxLength: 64,
+                },
+                jobId: {
+                    type: 'string',
+                },
+                lane: {
+                    $ref: '#/definitions/ConnectorExecutionLane',
+                },
+                phase: {
+                    $ref: '#/definitions/ConnectorJobPhase',
+                },
+                programId: {
+                    type: 'string',
+                },
+                requestId: {
+                    type: 'string',
+                },
+                rootId: {
+                    type: 'string',
+                },
+                sequence: {
+                    type: 'string',
+                },
+                workspaceAccess: {
+                    $ref: '#/definitions/ConnectorExecutionAccess',
+                },
+            },
+            required: [
+                'admissionHash',
+                'jobId',
+                'lane',
+                'phase',
+                'programId',
+                'requestId',
+                'rootId',
+                'sequence',
+                'workspaceAccess',
+            ],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorExecutionCurrentJobs: {
+            description:
+                'Current jobs contain no program arguments, output, host paths or credentials.',
+            properties: {
+                environmentId: {
+                    type: 'string',
+                },
+                lanes: {
+                    items: {
+                        $ref: '#/definitions/ConnectorExecutionCurrentLane',
+                    },
+                    type: 'array',
+                },
+            },
+            required: ['environmentId', 'lanes'],
+            type: 'object',
+        },
+        ConnectorExecutionCurrentJobsMethod: {
+            description:
+                'Read-only original selection supplies exact metadata for a later explicitly authorized stop.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/ConnectorEnvironmentParams',
+                },
+                result: {
+                    $ref: '#/definitions/ConnectorExecutionCurrentJobs',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        ConnectorExecutionCurrentLane: {
+            description:
+                'One account snapshot correlates its permanent counter with the exact latest original.',
+            properties: {
+                acknowledgedSequence: {
+                    type: 'string',
+                },
+                job: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/ConnectorExecutionCurrentJob',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                lane: {
+                    $ref: '#/definitions/ConnectorExecutionLane',
+                },
+                sequence: {
+                    type: 'string',
+                },
+            },
+            required: ['acknowledgedSequence', 'job', 'lane', 'sequence'],
+            type: 'object',
+        },
+        ConnectorExecutionStopMethod: {
+            description:
+                'Write-level gateway admission remains independent of reading a retained command result.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/ConnectorExecutionStopParams',
+                },
+                result: {
+                    $ref: '#/definitions/ConnectorExecutionStopReceipt',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        ConnectorExecutionStopParams: {
+            description:
+                'An explicit stop captures the original command rather than selecting current lane contents.',
+            properties: {
+                admissionHash: {
+                    type: 'string',
+                    pattern: '^[a-f0-9]{64}$',
+                    minLength: 64,
+                    maxLength: 64,
+                },
+                environmentId: {
+                    type: 'string',
+                },
+                jobId: {
+                    type: 'string',
+                },
+                lane: {
+                    $ref: '#/definitions/ConnectorExecutionLane',
+                },
+                requestId: {
+                    type: 'string',
+                },
+                sequence: {
+                    type: 'string',
+                },
+                workspaceAccess: {
+                    $ref: '#/definitions/ConnectorExecutionAccess',
+                },
+            },
+            required: [
+                'admissionHash',
+                'environmentId',
+                'jobId',
+                'lane',
+                'requestId',
+                'sequence',
+                'workspaceAccess',
+            ],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorExecutionStopReceipt: {
+            description:
+                'Stop admission contains no program arguments or output and does not by itself prove the command ended.',
+            properties: {
+                admissionHash: {
+                    type: 'string',
+                    pattern: '^[a-f0-9]{64}$',
+                    minLength: 64,
+                    maxLength: 64,
+                },
+                environmentId: {
+                    type: 'string',
+                },
+                jobId: {
+                    type: 'string',
+                },
+                lane: {
+                    $ref: '#/definitions/ConnectorExecutionLane',
+                },
+                phase: {
+                    $ref: '#/definitions/ConnectorJobPhase',
+                },
+                requestId: {
+                    type: 'string',
+                },
+                requestedAtMs: {
+                    type: ['null', 'string'],
+                },
+                sequence: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'admissionHash',
+                'environmentId',
+                'jobId',
+                'lane',
+                'phase',
+                'requestId',
+                'requestedAtMs',
+                'sequence',
+            ],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorLinkDenied: {
+            description: 'Retained rejection conveys no enrollment or execution authority.',
+            properties: {
+                deniedAtMs: {
+                    type: 'string',
+                },
+                linkId: {
+                    type: 'string',
+                },
+                publicKey: {
+                    type: 'string',
+                },
+                retainUntilMs: {
+                    type: 'string',
+                },
+            },
+            required: ['deniedAtMs', 'linkId', 'publicKey', 'retainUntilMs'],
+            type: 'object',
+        },
+        ConnectorLinkDenyMethod: {
+            description: 'An uncertain rejection must be checked under the same original request.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/ConnectorLinkDenyParams',
+                },
+                result: {
+                    $ref: '#/definitions/ConnectorLinkDenied',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        ConnectorLinkDenyParams: {
+            description:
+                'Rejection is bound to the exact reviewed identity and original operation, never an account override.',
+            properties: {
+                code: {
+                    type: 'string',
+                },
+                linkId: {
+                    type: 'string',
+                },
+                publicKey: {
+                    type: 'string',
+                },
+                requestId: {
+                    type: 'string',
+                },
+            },
+            required: ['code', 'linkId', 'publicKey', 'requestId'],
+            type: 'object',
+        },
+        ConnectorExecutionOutputData: {
+            description: 'Canonical base64 preserves at most 65536 combined application bytes.',
+            properties: {
+                stderrBase64: {
+                    type: 'string',
+                },
+                stdoutBase64: {
+                    type: 'string',
+                },
+            },
+            required: ['stderrBase64', 'stdoutBase64'],
+            type: 'object',
+        },
+        ConnectorExecutionOutputMethod: {
+            description:
+                'Reading the captured original grants no command, stop or enrollment mutation.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/ConnectorResultParams',
+                },
+                result: {
+                    $ref: '#/definitions/ConnectorExecutionOutputView',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        ConnectorExecutionOutputView: {
+            description:
+                'Provisional output has original identity and phase, never an inferred successful exit.',
+            properties: {
+                admissionHash: {
+                    type: 'string',
+                    pattern: '^[a-f0-9]{64}$',
+                    minLength: 64,
+                    maxLength: 64,
+                },
+                environmentId: {
+                    type: 'string',
+                },
+                id: {
+                    type: 'string',
+                },
+                lane: {
+                    $ref: '#/definitions/ConnectorExecutionLane',
+                },
+                output: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/ConnectorExecutionOutputData',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                phase: {
+                    $ref: '#/definitions/ConnectorJobPhase',
+                },
+                sequence: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'admissionHash',
+                'environmentId',
+                'id',
+                'lane',
+                'output',
+                'phase',
+                'sequence',
+            ],
+            type: 'object',
+        },
+        ConnectorRemove: {
+            description:
+                'Explicit recursive intent cannot select the root itself, follow links or cross mounts.',
+            properties: {
+                action: {
+                    const: 'remove',
+                    type: 'string',
+                },
+                path: {
+                    type: 'string',
+                },
+                policySha256: {
+                    type: 'string',
+                },
+                recursive: {
+                    type: 'boolean',
+                },
+                requestId: {
+                    type: 'string',
+                },
+                rootId: {
+                    type: 'string',
+                },
+            },
+            required: ['action', 'path', 'policySha256', 'recursive', 'requestId', 'rootId'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorRemoveResult: {
+            description:
+                'Complete bounded removal includes the selected target in its exact decimal entry count.',
+            properties: {
+                action: {
+                    const: 'remove',
+                    type: 'string',
+                },
+                entriesRemoved: {
+                    type: 'string',
+                },
+                requestId: {
+                    type: 'string',
+                },
+            },
+            required: ['action', 'entriesRemoved', 'requestId'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorMkdir: {
+            description:
+                'One private directory beneath an existing parent; no implicit recursion or replacement.',
+            properties: {
+                action: {
+                    const: 'mkdir',
+                    type: 'string',
+                },
+                path: {
+                    type: 'string',
+                },
+                policySha256: {
+                    type: 'string',
+                },
+                requestId: {
+                    type: 'string',
+                },
+                rootId: {
+                    type: 'string',
+                },
+            },
+            required: ['action', 'path', 'policySha256', 'requestId', 'rootId'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorMkdirResult: {
+            description:
+                'Confirms one directory creation and parent synchronization under the original request.',
+            properties: {
+                action: {
+                    const: 'mkdir',
+                    type: 'string',
+                },
+                requestId: {
+                    type: 'string',
+                },
+            },
+            required: ['action', 'requestId'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorGpuVendor: {
+            description:
+                'Vendor identities remain separate from compute support and memory availability.',
+            enum: ['nvidia', 'amd', 'intel', 'other'],
+            type: 'string',
+        },
+        ConnectorWorkspaceGetMethod: {
+            description: 'Wire contract for reading current owned-conversation file placement.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/ConnectorWorkspaceGetParams',
+                },
+                result: {
+                    $ref: '#/definitions/ConnectorWorkspaceSelectionView',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorWorkspaceGetParams: {
+            description:
+                'Reads only an existing conversation whose private owner matches the authenticated caller.',
+            properties: {
+                sessionId: {
+                    type: 'string',
+                    minLength: 1,
+                    maxLength: 1024,
+                },
+            },
+            required: ['sessionId'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorWorkspaceSelectionView: {
+            description:
+                'Public current state contains no private owner, provider identity, endpoint or device credentials.',
+            properties: {
+                revision: {
+                    type: 'string',
+                    pattern: '^[a-f0-9]{64}$',
+                },
+                selection: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/ConnectorWorkspaceFileSelection',
+                        },
+                        {
+                            $ref: '#/definitions/ConnectorWorkspaceJointSelection',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                sessionId: {
+                    type: 'string',
+                    minLength: 1,
+                    maxLength: 1024,
+                },
+            },
+            required: ['revision', 'selection', 'sessionId'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorWorkspaceSelectMethod: {
+            description: 'Wire contract for explicitly changing file placement for future turns.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/ConnectorWorkspaceSelectParams',
+                },
+                result: {
+                    $ref: '#/definitions/ConnectorWorkspaceSelectionView',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorWorkspaceSelectParams: {
+            description:
+                'Captures a granted root and exact policy; the current signed profile determines its access mode.',
+            properties: {
+                environmentId: {
+                    type: 'string',
+                    pattern: '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$',
+                },
+                expectedRevision: {
+                    type: 'string',
+                    pattern: '^[a-f0-9]{64}$',
+                },
+                policySha256: {
+                    type: 'string',
+                    pattern: '^[a-f0-9]{64}$',
+                },
+                requestId: {
+                    type: 'string',
+                    pattern: '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$',
+                },
+                rootId: {
+                    type: 'string',
+                    pattern: '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$',
+                },
+                sessionId: {
+                    type: 'string',
+                    minLength: 1,
+                    maxLength: 1024,
+                },
+            },
+            required: [
+                'environmentId',
+                'expectedRevision',
+                'policySha256',
+                'requestId',
+                'rootId',
+                'sessionId',
+            ],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorWorkspaceClearMethod: {
+            description:
+                'Wire contract for explicitly returning future turns to managed placement.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/ConnectorWorkspaceClearParams',
+                },
+                result: {
+                    $ref: '#/definitions/ConnectorWorkspaceSelectionView',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorWorkspaceClearParams: {
+            description:
+                'Removes future file selection using one immutable request and its captured comparison revision.',
+            properties: {
+                expectedRevision: {
+                    type: 'string',
+                    pattern: '^[a-f0-9]{64}$',
+                },
+                requestId: {
+                    type: 'string',
+                    pattern: '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$',
+                },
+                sessionId: {
+                    type: 'string',
+                    minLength: 1,
+                    maxLength: 1024,
+                },
+            },
+            required: ['expectedRevision', 'requestId', 'sessionId'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorWorkspaceCreateMethod: {
+            description: 'Wire contract for idempotent, account-owned conversation admission.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/ConnectorWorkspaceCreateParams',
+                },
+                result: {
+                    $ref: '#/definitions/ConnectorWorkspaceSelectionView',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorWorkspaceCreateParams: {
+            description:
+                'Account-scoped idempotent creation admits an empty owned conversation without starting a turn.',
+            properties: {
+                requestId: {
+                    type: 'string',
+                    pattern: '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$',
+                },
+            },
+            required: ['requestId'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorWorkspaceCatalogMethod: {
+            description: 'Catalog access is mediated by Nexa and the existing conversation owner.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/ConnectorWorkspaceCatalogParams',
+                },
+                result: {
+                    $ref: '#/definitions/ConnectorWorkspaceCatalogView',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorWorkspaceCatalogParams: {
+            description: 'A catalog is read only after verifying ownership of this conversation.',
+            properties: {
+                environmentId: {
+                    type: 'string',
+                    pattern: '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$',
+                },
+                sessionId: {
+                    type: 'string',
+                    minLength: 1,
+                    maxLength: 1024,
+                },
+            },
+            required: ['environmentId', 'sessionId'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorWorkspaceCatalogView: {
+            description:
+                'Only safe summaries leave Nexa; private SDK signatures, keys and routing remain private.',
+            properties: {
+                entries: {
+                    items: {
+                        $ref: '#/definitions/ConnectorWorkspaceCatalogEntry',
+                    },
+                    type: 'array',
+                    maxItems: 128,
+                },
+                environmentId: {
+                    type: 'string',
+                    pattern: '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$',
+                },
+            },
+            required: ['entries', 'environmentId'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorWorkspaceCatalogEntry: {
+            description:
+                'A verified catalog offers exact mapping choices without granting any operation.',
+            properties: {
+                access: {
+                    $ref: '#/definitions/ConnectorFileMode',
+                },
+                bindingRevision: {
+                    type: 'string',
+                    pattern: '^[1-9][0-9]{0,18}$',
+                },
+                bindingSha256: {
+                    type: 'string',
+                    pattern: '^[a-f0-9]{64}$',
+                },
+                descriptorSha256: {
+                    type: 'string',
+                    pattern: '^[a-f0-9]{64}$',
+                },
+                executionPolicySha256: {
+                    type: 'string',
+                    pattern: '^[a-f0-9]{64}$',
+                },
+                executionRootId: {
+                    type: 'string',
+                    pattern: '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$',
+                },
+                filePolicySha256: {
+                    type: 'string',
+                    pattern: '^[a-f0-9]{64}$',
+                },
+                fileRootId: {
+                    type: 'string',
+                    pattern: '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$',
+                },
+            },
+            required: [
+                'access',
+                'bindingRevision',
+                'bindingSha256',
+                'descriptorSha256',
+                'executionPolicySha256',
+                'executionRootId',
+                'filePolicySha256',
+                'fileRootId',
+            ],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorWorkspaceSelectJointMethod: {
+            description:
+                'Joint selection captures a verified mapping; local execution grants remain independent.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/ConnectorWorkspaceSelectJointParams',
+                },
+                result: {
+                    $ref: '#/definitions/ConnectorWorkspaceSelectionView',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorWorkspaceSelectJointParams: {
+            description:
+                'A Joint choice commits every catalog field before fresh device and authority verification.',
+            properties: {
+                expectedRevision: {
+                    type: 'string',
+                    pattern: '^[a-f0-9]{64}$',
+                },
+                requestId: {
+                    type: 'string',
+                    pattern: '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$',
+                },
+                sessionId: {
+                    type: 'string',
+                    minLength: 1,
+                    maxLength: 1024,
+                },
+                target: {
+                    $ref: '#/definitions/ConnectorWorkspaceJointTarget',
+                },
+            },
+            required: ['expectedRevision', 'requestId', 'sessionId', 'target'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorWorkspaceJointTarget: {
+            description:
+                'The environment is part of the immutable selected target, never a transport address.',
+            properties: {
+                access: {
+                    $ref: '#/definitions/ConnectorFileMode',
+                },
+                bindingRevision: {
+                    type: 'string',
+                    pattern: '^[1-9][0-9]{0,18}$',
+                },
+                bindingSha256: {
+                    type: 'string',
+                    pattern: '^[a-f0-9]{64}$',
+                },
+                descriptorSha256: {
+                    type: 'string',
+                    pattern: '^[a-f0-9]{64}$',
+                },
+                environmentId: {
+                    type: 'string',
+                    pattern: '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$',
+                },
+                executionPolicySha256: {
+                    type: 'string',
+                    pattern: '^[a-f0-9]{64}$',
+                },
+                executionRootId: {
+                    type: 'string',
+                    pattern: '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$',
+                },
+                filePolicySha256: {
+                    type: 'string',
+                    pattern: '^[a-f0-9]{64}$',
+                },
+                fileRootId: {
+                    type: 'string',
+                    pattern: '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$',
+                },
+            },
+            required: [
+                'access',
+                'bindingRevision',
+                'bindingSha256',
+                'descriptorSha256',
+                'environmentId',
+                'executionPolicySha256',
+                'executionRootId',
+                'filePolicySha256',
+                'fileRootId',
+            ],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorWorkspaceFileSelection: {
+            description:
+                'Files-only placement derives access from the current signed file profile.',
+            properties: {
+                environmentId: {
+                    type: 'string',
+                    pattern: '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$',
+                },
+                kind: {
+                    const: 'files',
+                    type: 'string',
+                },
+                mode: {
+                    $ref: '#/definitions/ConnectorFileMode',
+                },
+                policySha256: {
+                    type: 'string',
+                    pattern: '^[a-f0-9]{64}$',
+                },
+                rootId: {
+                    type: 'string',
+                    pattern: '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$',
+                },
+            },
+            required: ['environmentId', 'kind', 'mode', 'policySha256', 'rootId'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorWorkspaceJointSelection: {
+            description:
+                'Joint placement pins both policy roots and the complete first archived proof commitment.',
+            properties: {
+                bindingRevision: {
+                    type: 'string',
+                    pattern: '^[1-9][0-9]{0,18}$',
+                },
+                descriptorSha256: {
+                    type: 'string',
+                    pattern: '^[a-f0-9]{64}$',
+                },
+                environmentId: {
+                    type: 'string',
+                    pattern: '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$',
+                },
+                executionPolicySha256: {
+                    type: 'string',
+                    pattern: '^[a-f0-9]{64}$',
+                },
+                executionRootId: {
+                    type: 'string',
+                    pattern: '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$',
+                },
+                jointBindingSha256: {
+                    type: 'string',
+                    pattern: '^[a-f0-9]{64}$',
+                },
+                kind: {
+                    const: 'joint',
+                    type: 'string',
+                },
+                mode: {
+                    $ref: '#/definitions/ConnectorFileMode',
+                },
+                policySha256: {
+                    type: 'string',
+                    pattern: '^[a-f0-9]{64}$',
+                },
+                rootId: {
+                    type: 'string',
+                    pattern: '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$',
+                },
+            },
+            required: [
+                'bindingRevision',
+                'descriptorSha256',
+                'environmentId',
+                'executionPolicySha256',
+                'executionRootId',
+                'jointBindingSha256',
+                'kind',
+                'mode',
+                'policySha256',
+                'rootId',
+            ],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorChmod: {
+            description: 'Changes permissions only on a pinned single-link regular file.',
+            properties: {
+                action: {
+                    const: 'chmod',
+                    type: 'string',
+                },
+                mode: {
+                    $ref: '#/definitions/ConnectorFilePermissionMode',
+                },
+                path: {
+                    type: 'string',
+                },
+                policySha256: {
+                    type: 'string',
+                },
+                requestId: {
+                    type: 'string',
+                },
+                rootId: {
+                    type: 'string',
+                },
+            },
+            required: ['action', 'mode', 'path', 'policySha256', 'requestId', 'rootId'],
+            type: 'object',
+        },
+        ConnectorChmodResult: {
+            description:
+                'Permission success reports the actual requested private mode on the original regular file.',
+            properties: {
+                action: {
+                    const: 'chmod',
+                    type: 'string',
+                },
+                metadata: {
+                    $ref: '#/definitions/ConnectorMetadata',
+                },
+                requestId: {
+                    type: 'string',
+                },
+            },
+            required: ['action', 'metadata', 'requestId'],
+            type: 'object',
+        },
+        ConnectorFilePermissionMode: {
+            description:
+                'Permission changes never add access for another OS user or set special bits.',
+            enum: [384, 448],
+            type: 'number',
+        },
+        ConnectorMachineCommand: {
+            description:
+                "This index refers only to the owning program's pinned [program, ...children] table.",
+            properties: {
+                alias: {
+                    type: 'string',
+                    pattern: '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$',
+                    maxLength: 128,
+                },
+                executableIndex: {
+                    type: 'integer',
+                    minimum: 0,
+                    maximum: 8,
+                },
+            },
+            required: ['alias', 'executableIndex'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorMachineEnvironmentGrant: {
+            description: 'A permitted environment name has its own UTF-8 value ceiling.',
+            properties: {
+                maximumBytes: {
+                    type: 'integer',
+                    minimum: 0,
+                    maximum: 1024,
+                },
+                name: {
+                    type: 'string',
+                    pattern: '^(?!NERVA_)[A-Za-z_][A-Za-z0-9_]{0,63}$',
+                    maxLength: 64,
+                },
+            },
+            required: ['maximumBytes', 'name'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorMachineInvocationRule: {
+            description:
+                "The complete explicit local opt-in is published under the device's existing signed profile.",
+            properties: {
+                commands: {
+                    items: {
+                        $ref: '#/definitions/ConnectorMachineCommand',
+                    },
+                    type: 'array',
+                    maxItems: 9,
+                },
+                environment: {
+                    items: {
+                        $ref: '#/definitions/ConnectorMachineEnvironmentGrant',
+                    },
+                    type: 'array',
+                    maxItems: 16,
+                },
+                kind: {
+                    const: 'machine-invocation',
+                    type: 'string',
+                },
+                maximumArgumentBytes: {
+                    type: 'integer',
+                    minimum: 0,
+                    maximum: 1024,
+                },
+                maximumArguments: {
+                    type: 'integer',
+                    minimum: 0,
+                    maximum: 32,
+                },
+                maximumArgumentsBytes: {
+                    type: 'integer',
+                    minimum: 0,
+                    maximum: 2048,
+                },
+                maximumCwdBytes: {
+                    type: 'integer',
+                    minimum: 1,
+                    maximum: 512,
+                },
+                maximumEnvironmentBytes: {
+                    type: 'integer',
+                    minimum: 0,
+                    maximum: 1024,
+                },
+                maximumScriptBytes: {
+                    type: 'integer',
+                    minimum: 0,
+                    maximum: 2048,
+                },
+                maximumStdinBytes: {
+                    type: 'integer',
+                    minimum: 0,
+                    maximum: 1024,
+                },
+                maximumTimeoutMs: {
+                    type: 'integer',
+                    minimum: 100,
+                    maximum: 30000,
+                },
+                shell: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/ConnectorMachineShell',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+            },
+            required: [
+                'commands',
+                'environment',
+                'kind',
+                'maximumArgumentBytes',
+                'maximumArguments',
+                'maximumArgumentsBytes',
+                'maximumCwdBytes',
+                'maximumEnvironmentBytes',
+                'maximumScriptBytes',
+                'maximumStdinBytes',
+                'maximumTimeoutMs',
+                'shell',
+            ],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorMachineShell: {
+            description:
+                'Fixed local switches precede the signed script, without guessing shell syntax from an executable name.',
+            properties: {
+                executableIndex: {
+                    type: 'integer',
+                    minimum: 0,
+                    maximum: 8,
+                },
+                fixedArguments: {
+                    items: {
+                        type: 'string',
+                        maxLength: 1024,
+                    },
+                    type: 'array',
+                    maxItems: 16,
+                },
+            },
+            required: ['executableIndex', 'fixedArguments'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorRename: {
+            description:
+                'Both paths use one captured root alias and preserve explicit replacement intent.',
+            properties: {
+                action: {
+                    const: 'rename',
+                    type: 'string',
+                },
+                destination: {
+                    type: 'string',
+                },
+                mode: {
+                    $ref: '#/definitions/ConnectorWriteMode',
+                },
+                path: {
+                    type: 'string',
+                },
+                policySha256: {
+                    type: 'string',
+                },
+                requestId: {
+                    type: 'string',
+                },
+                rootId: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'action',
+                'destination',
+                'mode',
+                'path',
+                'policySha256',
+                'requestId',
+                'rootId',
+            ],
+            type: 'object',
+        },
+        ConnectorRenameResult: {
+            description:
+                'Successful movement reports regular-file metadata after source identity verification and parent sync.',
+            properties: {
+                action: {
+                    const: 'rename',
+                    type: 'string',
+                },
+                metadata: {
+                    $ref: '#/definitions/ConnectorMetadata',
+                },
+                requestId: {
+                    type: 'string',
+                },
+            },
+            required: ['action', 'metadata', 'requestId'],
+            type: 'object',
+        },
+        ConnectorIndependentAuthorization: {
+            description:
+                'This envelope is selected by trusted preparation, never by model parameters or a missing historical field.',
+            properties: {
+                kind: {
+                    const: 'independent',
+                    type: 'string',
+                },
+            },
+            required: ['kind'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorJointAuthorization: {
+            description:
+                'Full signed association remains data until the pinned SDK/backend/device separately authorize the operation.',
+            properties: {
+                binding: {
+                    $ref: '#/definitions/ConnectorJointWorkspaceDescriptor',
+                },
+                kind: {
+                    const: 'joint',
+                    type: 'string',
+                },
+            },
+            required: ['binding', 'kind'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorJointExecutionJournals: {
+            description:
+                'Three permanent operation journals remain distinct across reconnects and controller replicas.',
+            properties: {
+                first: {
+                    type: 'string',
+                },
+                second: {
+                    type: 'string',
+                },
+            },
+            required: ['first', 'second'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorJointWorkspaceBinding: {
+            description:
+                'Public wire metadata preserves exact revisions without exposing physical paths or derivation keys.',
+            properties: {
+                access: {
+                    $ref: '#/definitions/ConnectorFileMode',
+                },
+                authorityId: {
+                    type: 'string',
+                },
+                enrollmentId: {
+                    type: 'string',
+                },
+                environmentId: {
+                    type: 'string',
+                },
+                executionJournals: {
+                    $ref: '#/definitions/ConnectorJointExecutionJournals',
+                },
+                executionPolicySha256: {
+                    type: 'string',
+                },
+                executionRootId: {
+                    type: 'string',
+                },
+                fileJournalId: {
+                    type: 'string',
+                },
+                filePolicySha256: {
+                    type: 'string',
+                },
+                fileRootId: {
+                    type: 'string',
+                },
+                physicalRootCommitment: {
+                    type: 'string',
+                },
+                revision: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'access',
+                'authorityId',
+                'enrollmentId',
+                'environmentId',
+                'executionJournals',
+                'executionPolicySha256',
+                'executionRootId',
+                'fileJournalId',
+                'filePolicySha256',
+                'fileRootId',
+                'physicalRootCommitment',
+                'revision',
+            ],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorJointWorkspaceDescriptor: {
+            description:
+                'The complete signature is retained unchanged; structural decoding does not authenticate or activate this descriptor.',
+            properties: {
+                binding: {
+                    $ref: '#/definitions/ConnectorJointWorkspaceBinding',
+                },
+                signature: {
+                    type: 'string',
+                },
+            },
+            required: ['binding', 'signature'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorOperationAuthorization: {
+            anyOf: [
+                {
+                    $ref: '#/definitions/ConnectorIndependentAuthorization',
+                },
+                {
+                    $ref: '#/definitions/ConnectorJointAuthorization',
+                },
+            ],
+            description:
+                'Both current alternatives are explicit; missing or malformed metadata cannot select Independent.',
+        },
+        ConnectorInputKind: {
+            description: 'Data, pipe EOF and terminal resize are distinct immutable operations.',
+            enum: ['data', 'end', 'resize'],
+            type: 'string',
+        },
+        ConnectorInteractiveInvocationRule: {
+            description:
+                'The complete live-input policy supplements one independently bounded Machine invocation.',
+            properties: {
+                controls: {
+                    items: {
+                        $ref: '#/definitions/ConnectorInputKind',
+                    },
+                    type: 'array',
+                    maxItems: 3,
+                },
+                invocation: {
+                    $ref: '#/definitions/ConnectorMachineInvocationRule',
+                },
+                kind: {
+                    const: 'interactive-invocation',
+                    type: 'string',
+                },
+                maximumControls: {
+                    type: 'integer',
+                    minimum: 1,
+                    maximum: 256,
+                },
+                maximumInputBytes: {
+                    description:
+                        'Canonical decimal bytes include the explicitly admitted initial input.',
+                    type: 'string',
+                    pattern: '^(?:0|[1-9][0-9]{0,4})$',
+                    maxLength: 5,
+                },
+                maximumResizes: {
+                    type: 'integer',
+                    minimum: 0,
+                    maximum: 16,
+                },
+                transports: {
+                    items: {
+                        $ref: '#/definitions/ConnectorInteractiveTransport',
+                    },
+                    type: 'array',
+                    maxItems: 2,
+                },
+            },
+            required: [
+                'controls',
+                'invocation',
+                'kind',
+                'maximumControls',
+                'maximumInputBytes',
+                'maximumResizes',
+                'transports',
+            ],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorInteractiveTransport: {
+            description: 'An explicit signed grant selects the native I/O mechanism.',
+            enum: ['pipe', 'pty'],
+            type: 'string',
+        },
+        BrowserFilesChunkParams: {
+            description:
+                'One acknowledged slice; retries must contain the same bytes at the same offset.',
+            properties: {
+                data: {
+                    type: 'string',
+                    maxLength: 1398104,
+                },
+                offset: {
+                    type: 'string',
+                    pattern: '^(0|[1-9][0-9]{0,15})$',
+                    maxLength: 16,
+                },
+                uploadId: {
+                    type: 'string',
+                    pattern: '^[a-f0-9]{64}$',
+                },
+            },
+            required: ['data', 'offset', 'uploadId'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        BrowserFilesDone: {
+            description:
+                'Publication succeeds only after the complete new file or directory is committed.',
+            properties: {
+                ok: {
+                    type: 'boolean',
+                },
+            },
+            required: ['ok'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        BrowserFilesEntry: {
+            description: 'Metadata never follows symlinks, devices or mounts.',
+            properties: {
+                byteLength: {
+                    type: 'string',
+                    pattern: '^(0|[1-9][0-9]{0,15})$',
+                    maxLength: 16,
+                },
+                kind: {
+                    type: 'string',
+                },
+                modifiedAtNs: {
+                    type: 'string',
+                },
+                name: {
+                    type: 'string',
+                },
+            },
+            required: ['byteLength', 'kind', 'modifiedAtNs', 'name'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        BrowserFilesListParams: {
+            description: 'Directory cursors bind both position and directory revision.',
+            properties: {
+                cursor: {
+                    type: 'string',
+                    maxLength: 256,
+                },
+                path: {
+                    type: 'string',
+                    maxLength: 4096,
+                },
+            },
+            required: ['path'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        BrowserFilesPage: {
+            description: 'Only one bounded directory page is materialized.',
+            properties: {
+                assignment: {
+                    type: 'string',
+                    pattern: '^[a-f0-9]{64}$',
+                },
+                entries: {
+                    items: {
+                        $ref: '#/definitions/BrowserFilesEntry',
+                    },
+                    type: 'array',
+                    maxItems: 128,
+                },
+                nextCursor: {
+                    type: ['null', 'string'],
+                },
+            },
+            required: ['assignment', 'entries', 'nextCursor'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        BrowserFilesPosition: {
+            description: 'Exact acknowledged byte position.',
+            properties: {
+                offset: {
+                    type: 'string',
+                    pattern: '^(0|[1-9][0-9]{0,15})$',
+                    maxLength: 16,
+                },
+            },
+            required: ['offset'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        BrowserFilesRead: {
+            description: 'One bounded binary slice encoded for the existing gateway codec.',
+            properties: {
+                assignment: {
+                    type: 'string',
+                    pattern: '^[a-f0-9]{64}$',
+                },
+                byteLength: {
+                    type: 'string',
+                    pattern: '^(0|[1-9][0-9]{0,15})$',
+                    maxLength: 16,
+                },
+                data: {
+                    type: 'string',
+                    maxLength: 1398104,
+                },
+                revision: {
+                    type: 'string',
+                    maxLength: 256,
+                },
+            },
+            required: ['assignment', 'byteLength', 'data', 'revision'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        BrowserFilesReadParams: {
+            description:
+                "Bounded reads retain the opened file's exact revision across download chunks.",
+            properties: {
+                assignment: {
+                    type: 'string',
+                    pattern: '^[a-f0-9]{64}$',
+                },
+                offset: {
+                    type: 'string',
+                    pattern: '^(0|[1-9][0-9]{0,15})$',
+                    maxLength: 16,
+                },
+                path: {
+                    type: 'string',
+                    maxLength: 4096,
+                },
+                revision: {
+                    type: 'string',
+                    maxLength: 256,
+                },
+            },
+            required: ['assignment', 'offset', 'path'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        BrowserFilesStartParams: {
+            description:
+                'Uploads publish a new file or extract a ZIP into a new directory, without replacing existing data.',
+            properties: {
+                assignment: {
+                    type: 'string',
+                    pattern: '^[a-f0-9]{64}$',
+                },
+                byteLength: {
+                    type: 'string',
+                    pattern: '^(0|[1-9][0-9]{0,15})$',
+                    maxLength: 16,
+                },
+                extractZip: {
+                    type: 'boolean',
+                },
+                path: {
+                    type: 'string',
+                    maxLength: 4096,
+                },
+            },
+            required: ['assignment', 'byteLength', 'extractZip', 'path'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        BrowserFilesTarget: {
+            description: 'All operations after discovery retain the original account assignment.',
+            properties: {
+                assignment: {
+                    type: 'string',
+                    pattern: '^[a-f0-9]{64}$',
+                },
+                path: {
+                    type: 'string',
+                    maxLength: 4096,
+                },
+            },
+            required: ['assignment', 'path'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        BrowserFilesUpload: {
+            description: 'Upload acknowledgement advertises its bounded chunk size.',
+            properties: {
+                chunkBytes: {
+                    type: 'number',
+                    minimum: 1,
+                    maximum: 1048576,
+                },
+                uploadId: {
+                    type: 'string',
+                    pattern: '^[a-f0-9]{64}$',
+                },
+            },
+            required: ['chunkBytes', 'uploadId'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        BrowserFilesUploadParams: {
+            description:
+                'Opaque upload handles are scoped to the authenticated account and captured assignment.',
+            properties: {
+                uploadId: {
+                    type: 'string',
+                    pattern: '^[a-f0-9]{64}$',
+                },
+            },
+            required: ['uploadId'],
+            type: 'object',
+            additionalProperties: false,
         },
     },
     description: 'All protocol contracts reachable from the public transport.',

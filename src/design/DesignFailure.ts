@@ -8,6 +8,7 @@ export const DesignFailureReason = {
     Invalid: 'invalid',
     Unchanged: 'unchanged',
     InsertParent: 'insert-parent',
+    InsertIndex: 'insert-index',
     History: 'history',
 } as const;
 /** Public failure category. */

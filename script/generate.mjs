@@ -4,260 +4,287 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { readFileSync, writeFileSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 
-mkdirSync('src/protocol', { recursive: true });
-writeFileSync(
-    'src/protocol/GatewayVersion.ts',
-    readFileSync('../nexa/src/gateway/GatewayVersion.ts', 'utf8'),
-);
+const snapshotOnly = process.argv.slice(2).includes('--snapshot-only');
+if (process.argv.slice(2).some((value) => value !== '--snapshot-only'))
+    throw new Error('Unsupported protocol generation option');
+if (!snapshotOnly) {
+    mkdirSync('src/protocol', { recursive: true });
+    writeFileSync(
+        'src/protocol/GatewayVersion.ts',
+        readFileSync('../nexa/src/gateway/GatewayVersion.ts', 'utf8'),
+    );
 
-mkdirSync('src/toolsearch', { recursive: true });
-writeFileSync(
-    'src/toolsearch/BridgeInput.ts',
-    readFileSync('../nexa/src/toolsearch/BridgeInput.ts', 'utf8').replace(
-        "'../providers/Types'",
-        "'../protocol/Protocol.js'",
-    ),
-);
+    mkdirSync('src/toolsearch', { recursive: true });
+    writeFileSync(
+        'src/toolsearch/BridgeInput.ts',
+        readFileSync('../nexa/src/toolsearch/BridgeInput.ts', 'utf8').replace(
+            "'../providers/Types'",
+            "'../protocol/Protocol.js'",
+        ),
+    );
 
-execFileSync(process.execPath, ['script/workflows.ts'], { stdio: 'inherit' });
-execFileSync(process.execPath, ['script/design.ts'], { stdio: 'inherit' });
-mkdirSync('src/graphics', { recursive: true });
-writeFileSync('src/graphics/Graphic.ts', readFileSync('../nexa/src/graphics/Graphic.ts', 'utf8'));
-mkdirSync('src/graphs', { recursive: true });
-writeFileSync('src/graphs/ChatGraph.ts', readFileSync('../nexa/src/graphs/ChatGraph.ts', 'utf8'));
-// Native capture validation is portable and owned by Nexa.
-writeFileSync(
-    'src/reverse/ControlFlow.ts',
-    readFileSync('../nexa/src/reverse/ControlFlow.ts', 'utf8'),
-);
+    execFileSync(process.execPath, ['script/workflows.ts'], { stdio: 'inherit' });
+    execFileSync(process.execPath, ['script/redteam.ts'], { stdio: 'inherit' });
+    execFileSync(process.execPath, ['script/design.ts'], { stdio: 'inherit' });
+    mkdirSync('src/graphics', { recursive: true });
+    writeFileSync(
+        'src/graphics/Graphic.ts',
+        readFileSync('../nexa/src/graphics/Graphic.ts', 'utf8'),
+    );
+    mkdirSync('src/graphs', { recursive: true });
+    writeFileSync(
+        'src/graphs/ChatGraph.ts',
+        readFileSync('../nexa/src/graphs/ChatGraph.ts', 'utf8'),
+    );
+    // Native capture validation is portable and owned by Nexa.
+    writeFileSync(
+        'src/reverse/ControlFlow.ts',
+        readFileSync('../nexa/src/reverse/ControlFlow.ts', 'utf8'),
+    );
 
-/** Pixel metrics have one portable validator shared with the native workers. */
-const pixelTypes = readFileSync('../nexa/src/reverse/BrowserScreenshotComparisonTypes.ts', 'utf8');
-const pixelStatus = pixelTypes.match(/export const BrowserPixelStatus = [\s\S]*?as const;/u)?.[0];
-if (pixelStatus === undefined) throw new Error('Native pixel status declaration is missing');
-const pixelReceipt = readFileSync('../nexa/src/reverse/BrowserPixelReceipt.ts', 'utf8');
-const pixelImport = /import \{[\s\S]*?\} from '\.\/BrowserScreenshotComparisonTypes';/u;
-if (!pixelImport.test(pixelReceipt)) throw new Error('Native pixel receipt import changed');
-writeFileSync(
-    'src/reverse/BrowserPixelReceipt.ts',
-    pixelReceipt.replace(
-        pixelImport,
-        "import type { BrowserPixelComparison, BrowserPixelBounds } from '../protocol/Protocol.js';\n\n" +
-            pixelStatus,
-    ),
-);
+    /** Pixel metrics have one portable validator shared with the native workers. */
+    const pixelTypes = readFileSync(
+        '../nexa/src/reverse/BrowserScreenshotComparisonTypes.ts',
+        'utf8',
+    );
+    const pixelStatus = pixelTypes.match(
+        /export const BrowserPixelStatus = [\s\S]*?as const;/u,
+    )?.[0];
+    if (pixelStatus === undefined) throw new Error('Native pixel status declaration is missing');
+    const pixelReceipt = readFileSync('../nexa/src/reverse/BrowserPixelReceipt.ts', 'utf8');
+    const pixelImport = /import \{[\s\S]*?\} from '\.\/BrowserScreenshotComparisonTypes';/u;
+    if (!pixelImport.test(pixelReceipt)) throw new Error('Native pixel receipt import changed');
+    writeFileSync(
+        'src/reverse/BrowserPixelReceipt.ts',
+        pixelReceipt.replace(
+            pixelImport,
+            "import type { BrowserPixelComparison, BrowserPixelBounds } from '../protocol/Protocol.js';\n\n" +
+                pixelStatus,
+        ),
+    );
 
-/** Storage validation is portable and shared with native capture/archive publication. */
-const storageTypes = readFileSync('../nexa/src/reverse/BrowserStorageTypes.ts', 'utf8');
-const storageEnums = ['BrowserStorageGroup', 'BrowserStorageKind']
-    .map((name) => {
-        const declaration = storageTypes.match(
-            new RegExp('export const ' + name + ' = [\\s\\S]*?as const;', 'u'),
-        )?.[0];
-        if (declaration === undefined)
-            throw new Error('Native storage declaration is missing: ' + name);
-        return (
-            '/** Native storage enumeration. */\n' +
-            declaration +
-            '\n/** Native storage selection type. */\nexport type ' +
-            name +
-            ' = (typeof ' +
-            name +
-            ')[keyof typeof ' +
-            name +
-            '];'
-        );
-    })
-    .join('\n\n');
-const storageReceipt = readFileSync('../nexa/src/reverse/BrowserStorageReceipt.ts', 'utf8');
-const storageImport = /import \{[\s\S]*?\} from '\.\/BrowserStorageTypes';/u;
-if (!storageImport.test(storageReceipt)) throw new Error('Native storage receipt import changed');
-writeFileSync(
-    'src/reverse/BrowserStorageReceipt.ts',
-    storageReceipt.replace(
-        storageImport,
-        "import type { BrowserStorageMetadata, BrowserStorageCoverage, BrowserStorageQuota, BrowserStorageRow, BrowserStoragePage } from '../protocol/Protocol.js';\n\n" +
-            storageEnums +
-            '\n\n/** Host captures remain separate from paged wire responses. */\nexport interface BrowserStorageCapture { readonly metadata: BrowserStorageMetadata; readonly rows: readonly BrowserStorageRow[]; }',
-    ),
-);
+    /** Storage validation is portable and shared with native capture/archive publication. */
+    const storageTypes = readFileSync('../nexa/src/reverse/BrowserStorageTypes.ts', 'utf8');
+    const storageEnums = ['BrowserStorageGroup', 'BrowserStorageKind']
+        .map((name) => {
+            const declaration = storageTypes.match(
+                new RegExp('export const ' + name + ' = [\\s\\S]*?as const;', 'u'),
+            )?.[0];
+            if (declaration === undefined)
+                throw new Error('Native storage declaration is missing: ' + name);
+            return (
+                '/** Native storage enumeration. */\n' +
+                declaration +
+                '\n/** Native storage selection type. */\nexport type ' +
+                name +
+                ' = (typeof ' +
+                name +
+                ')[keyof typeof ' +
+                name +
+                '];'
+            );
+        })
+        .join('\n\n');
+    const storageReceipt = readFileSync('../nexa/src/reverse/BrowserStorageReceipt.ts', 'utf8');
+    const storageImport = /import \{[\s\S]*?\} from '\.\/BrowserStorageTypes';/u;
+    if (!storageImport.test(storageReceipt))
+        throw new Error('Native storage receipt import changed');
+    writeFileSync(
+        'src/reverse/BrowserStorageReceipt.ts',
+        storageReceipt.replace(
+            storageImport,
+            "import type { BrowserStorageMetadata, BrowserStorageCoverage, BrowserStorageQuota, BrowserStorageRow, BrowserStoragePage } from '../protocol/Protocol.js';\n\n" +
+                storageEnums +
+                '\n\n/** Host captures remain separate from paged wire responses. */\nexport interface BrowserStorageCapture { readonly metadata: BrowserStorageMetadata; readonly rows: readonly BrowserStorageRow[]; }',
+        ),
+    );
 
-/** Comparison validators share native portable source; generated wire types contain no complete capture bodies. */
-const comparisonTypes = readFileSync(
-    '../nexa/src/reverse/BrowserStorageComparisonTypes.ts',
-    'utf8',
-);
-const comparisonEnums = [
-    'BrowserStorageCompareStatus',
-    'BrowserStorageCompareMode',
-    'BrowserStorageChangeKind',
-]
-    .map((name) => {
-        const declaration = comparisonTypes.match(
-            new RegExp('export const ' + name + ' = [\\s\\S]*?as const;', 'u'),
-        )?.[0];
-        if (declaration === undefined)
-            throw new Error('Native comparison enumeration is missing: ' + name);
-        return (
-            '/** Native comparison enumeration. */\n' +
-            declaration +
-            '\n/** Native comparison selection type. */\nexport type ' +
-            name +
-            ' = (typeof ' +
-            name +
-            ')[keyof typeof ' +
-            name +
-            '];'
-        );
-    })
-    .join('\n\n');
-writeFileSync(
-    'src/reverse/BrowserStorageComparisonDefinitions.ts',
-    "// SPDX-FileCopyrightText: 2026 Nexa contributors\n// SPDX-License-Identifier: Apache-2.0\n\nimport type { BrowserStorageComparison, BrowserStorageChange } from '../protocol/Protocol.js';\n\n" +
-        comparisonEnums +
-        '\n\n/** Complete host reports stay separate from paged wire contracts. */\nexport interface BrowserStorageComparisonCapture { readonly comparison: BrowserStorageComparison; readonly changes: readonly BrowserStorageChange[]; }\n',
-);
-/** Native imports are partitioned without adding unused generated bindings. */
-function portableComparisonImport(
-    typeOnly,
-    members,
-    valuesModule,
-    captureModule = './BrowserStorageComparisonDefinitions.js',
-) {
-    const values = [];
-    const types = [];
-    const captures = [];
-    for (const member of members
-        .split(',')
-        .map((item) => item.trim())
-        .filter(Boolean)) {
-        const isType = typeOnly !== undefined || member.startsWith('type ');
-        const binding = member.replace(/^type /u, '');
-        if (
-            binding === 'BrowserStorageComparisonCapture' ||
-            binding === 'BrowserWebMcpCapture' ||
-            binding === 'BrowserWebMcpTool'
-        )
-            captures.push(binding);
-        else if (isType) types.push(binding);
-        else values.push(binding);
-    }
-    return [
-        values.length ? 'import { ' + values.join(', ') + " } from '" + valuesModule + "';" : '',
-        types.length
-            ? 'import type { ' + types.join(', ') + " } from '../protocol/Protocol.js';"
-            : '',
-        captures.length
-            ? 'import type { ' + captures.join(', ') + " } from '" + captureModule + "';"
-            : '',
+    /** Comparison validators share native portable source; generated wire types contain no complete capture bodies. */
+    const comparisonTypes = readFileSync(
+        '../nexa/src/reverse/BrowserStorageComparisonTypes.ts',
+        'utf8',
+    );
+    const comparisonEnums = [
+        'BrowserStorageCompareStatus',
+        'BrowserStorageCompareMode',
+        'BrowserStorageChangeKind',
     ]
-        .filter(Boolean)
-        .join('\n');
-}
-for (const name of [
-    'BrowserStorageComparisonValues',
-    'BrowserStorageComparisonPolicy',
-    'BrowserStorageComparisonReceipt',
-    'BrowserStorageChangeReceipt',
-]) {
-    let source = readFileSync('../nexa/src/reverse/' + name + '.ts', 'utf8');
-    source = source.replace(
-        /import (type )?\{([^}]*)\} from '\.\/BrowserCaptureTypes';/gu,
-        (_match, typeOnly, members) =>
-            portableComparisonImport(typeOnly, members, '../protocol/Protocol.js'),
+        .map((name) => {
+            const declaration = comparisonTypes.match(
+                new RegExp('export const ' + name + ' = [\\s\\S]*?as const;', 'u'),
+            )?.[0];
+            if (declaration === undefined)
+                throw new Error('Native comparison enumeration is missing: ' + name);
+            return (
+                '/** Native comparison enumeration. */\n' +
+                declaration +
+                '\n/** Native comparison selection type. */\nexport type ' +
+                name +
+                ' = (typeof ' +
+                name +
+                ')[keyof typeof ' +
+                name +
+                '];'
+            );
+        })
+        .join('\n\n');
+    writeFileSync(
+        'src/reverse/BrowserStorageComparisonDefinitions.ts',
+        "// SPDX-FileCopyrightText: 2026 Nexa contributors\n// SPDX-License-Identifier: Apache-2.0\n\nimport type { BrowserStorageComparison, BrowserStorageChange } from '../protocol/Protocol.js';\n\n" +
+            comparisonEnums +
+            '\n\n/** Complete host reports stay separate from paged wire contracts. */\nexport interface BrowserStorageComparisonCapture { readonly comparison: BrowserStorageComparison; readonly changes: readonly BrowserStorageChange[]; }\n',
     );
-    source = source.replace(
-        /import (type )?\{([^}]*)\} from '\.\/BrowserStorageTypes';/gu,
-        (_match, typeOnly, members) =>
-            portableComparisonImport(typeOnly, members, './BrowserStorageReceipt.js'),
-    );
-    source = source.replace(
-        /import (type )?\{([^}]*)\} from '\.\/BrowserStorageComparisonTypes';/gu,
-        (_match, typeOnly, members) =>
-            portableComparisonImport(typeOnly, members, './BrowserStorageComparisonDefinitions.js'),
-    );
-    source = source.replace(
-        /from '(\.\/[^']+)'/gu,
-        (_match, path) => "from '" + (path.endsWith('.js') ? path : path + '.js') + "'",
-    );
-    writeFileSync('src/reverse/' + name + '.ts', source);
-}
-
-/** Passive WebMCP validators retain the exact native authority and value-exclusion rules. */
-const webMcpTypes = readFileSync('../nexa/src/reverse/BrowserWebMcpTypes.ts', 'utf8');
-const webMcpDirectoryTypes = readFileSync(
-    '../nexa/src/reverse/BrowserWebMcpDirectoryTypes.ts',
-    'utf8',
-);
-const webMcpEnums = ['BrowserSchemaType', 'BrowserWebMcpDeclaration', 'BrowserWebMcpView']
-    .map((name) => {
-        const source = name === 'BrowserWebMcpView' ? webMcpDirectoryTypes : webMcpTypes;
-        const declaration = source.match(
-            new RegExp('export const ' + name + ' = [\\s\\S]*?as const;', 'u'),
-        )?.[0];
-        if (declaration === undefined)
-            throw new Error('Native WebMCP enumeration is missing: ' + name);
-        return (
-            '/** Native passive WebMCP enumeration. */\n' +
-            declaration +
-            '\n/** Native passive WebMCP selection type. */\nexport type ' +
-            name +
-            ' = (typeof ' +
-            name +
-            ')[keyof typeof ' +
-            name +
-            '];'
+    /** Native imports are partitioned without adding unused generated bindings. */
+    function portableComparisonImport(
+        typeOnly,
+        members,
+        valuesModule,
+        captureModule = './BrowserStorageComparisonDefinitions.js',
+    ) {
+        const values = [];
+        const types = [];
+        const captures = [];
+        for (const member of members
+            .split(',')
+            .map((item) => item.trim())
+            .filter(Boolean)) {
+            const isType = typeOnly !== undefined || member.startsWith('type ');
+            const binding = member.replace(/^type /u, '');
+            if (
+                binding === 'BrowserStorageComparisonCapture' ||
+                binding === 'BrowserWebMcpCapture' ||
+                binding === 'BrowserWebMcpTool'
+            )
+                captures.push(binding);
+            else if (isType) types.push(binding);
+            else values.push(binding);
+        }
+        return [
+            values.length
+                ? 'import { ' + values.join(', ') + " } from '" + valuesModule + "';"
+                : '',
+            types.length
+                ? 'import type { ' + types.join(', ') + " } from '../protocol/Protocol.js';"
+                : '',
+            captures.length
+                ? 'import type { ' + captures.join(', ') + " } from '" + captureModule + "';"
+                : '',
+        ]
+            .filter(Boolean)
+            .join('\n');
+    }
+    for (const name of [
+        'BrowserStorageComparisonValues',
+        'BrowserStorageComparisonPolicy',
+        'BrowserStorageComparisonReceipt',
+        'BrowserStorageChangeReceipt',
+    ]) {
+        let source = readFileSync('../nexa/src/reverse/' + name + '.ts', 'utf8');
+        source = source.replace(
+            /import (type )?\{([^}]*)\} from '\.\/BrowserCaptureTypes';/gu,
+            (_match, typeOnly, members) =>
+                portableComparisonImport(typeOnly, members, '../protocol/Protocol.js'),
         );
-    })
-    .join('\n\n');
-writeFileSync(
-    'src/reverse/BrowserWebMcpDefinitions.ts',
-    '// SPDX-FileCopyrightText: 2026 Nexa contributors\n// SPDX-License-Identifier: Apache-2.0\n\n' +
-        "import type { BrowserWebMcpMetadata, BrowserWebMcpDescriptor, BrowserSchemaProperty } from '../protocol/Protocol.js';\n\n" +
-        webMcpEnums +
-        '\n\n/** Host-only originals are separate from bounded wire pages. */\nexport interface BrowserWebMcpTool extends BrowserWebMcpDescriptor { readonly properties: readonly BrowserSchemaProperty[]; }\n' +
-        '\n/** Complete captures are validated without publishing their arrays in progress. */\nexport interface BrowserWebMcpCapture { readonly metadata: BrowserWebMcpMetadata; readonly tools: readonly BrowserWebMcpTool[]; }\n',
-);
-for (const name of ['BrowserWebMcpReceipt', 'BrowserWebMcpPageReceipt']) {
-    let source = readFileSync('../nexa/src/reverse/' + name + '.ts', 'utf8');
-    source = source.replace(
-        /import (type )?\{([^}]*)\} from '\.\/(?:BrowserWebMcpTypes|BrowserWebMcpDirectoryTypes|BrowserCaptureTypes)';/gu,
-        (_match, typeOnly, members) =>
-            portableComparisonImport(
-                typeOnly,
-                members,
-                './BrowserWebMcpDefinitions.js',
-                './BrowserWebMcpDefinitions.js',
-            ),
-    );
-    source = source.replace(
-        /from '(\.\/[^']+)'/gu,
-        (_match, path) => "from '" + (path.endsWith('.js') ? path : path + '.js') + "'",
-    );
-    writeFileSync('src/reverse/' + name + '.ts', source);
-}
+        source = source.replace(
+            /import (type )?\{([^}]*)\} from '\.\/BrowserStorageTypes';/gu,
+            (_match, typeOnly, members) =>
+                portableComparisonImport(typeOnly, members, './BrowserStorageReceipt.js'),
+        );
+        source = source.replace(
+            /import (type )?\{([^}]*)\} from '\.\/BrowserStorageComparisonTypes';/gu,
+            (_match, typeOnly, members) =>
+                portableComparisonImport(
+                    typeOnly,
+                    members,
+                    './BrowserStorageComparisonDefinitions.js',
+                ),
+        );
+        source = source.replace(
+            /from '(\.\/[^']+)'/gu,
+            (_match, path) => "from '" + (path.endsWith('.js') ? path : path + '.js') + "'",
+        );
+        writeFileSync('src/reverse/' + name + '.ts', source);
+    }
 
-const temporary = mkdtempSync(join(tmpdir(), 'nexa-contract-'));
-let schema;
-try {
-    const output = join(temporary, 'contract.json');
-    execFileSync('./node_modules/.bin/typescript-json-schema', [
-        'script/Contract.ts',
-        'Contract',
-        '--ignoreErrors',
-        '--strictNullChecks',
-        '--required',
-        '--out',
-        output,
-    ]);
-    schema = JSON.parse(readFileSync(output, 'utf8'));
-} finally {
-    rmSync(temporary, { recursive: true, force: true });
+    /** Passive WebMCP validators retain the exact native authority and value-exclusion rules. */
+    const webMcpTypes = readFileSync('../nexa/src/reverse/BrowserWebMcpTypes.ts', 'utf8');
+    const webMcpDirectoryTypes = readFileSync(
+        '../nexa/src/reverse/BrowserWebMcpDirectoryTypes.ts',
+        'utf8',
+    );
+    const webMcpEnums = ['BrowserSchemaType', 'BrowserWebMcpDeclaration', 'BrowserWebMcpView']
+        .map((name) => {
+            const source = name === 'BrowserWebMcpView' ? webMcpDirectoryTypes : webMcpTypes;
+            const declaration = source.match(
+                new RegExp('export const ' + name + ' = [\\s\\S]*?as const;', 'u'),
+            )?.[0];
+            if (declaration === undefined)
+                throw new Error('Native WebMCP enumeration is missing: ' + name);
+            return (
+                '/** Native passive WebMCP enumeration. */\n' +
+                declaration +
+                '\n/** Native passive WebMCP selection type. */\nexport type ' +
+                name +
+                ' = (typeof ' +
+                name +
+                ')[keyof typeof ' +
+                name +
+                '];'
+            );
+        })
+        .join('\n\n');
+    writeFileSync(
+        'src/reverse/BrowserWebMcpDefinitions.ts',
+        '// SPDX-FileCopyrightText: 2026 Nexa contributors\n// SPDX-License-Identifier: Apache-2.0\n\n' +
+            "import type { BrowserWebMcpMetadata, BrowserWebMcpDescriptor, BrowserSchemaProperty } from '../protocol/Protocol.js';\n\n" +
+            webMcpEnums +
+            '\n\n/** Host-only originals are separate from bounded wire pages. */\nexport interface BrowserWebMcpTool extends BrowserWebMcpDescriptor { readonly properties: readonly BrowserSchemaProperty[]; }\n' +
+            '\n/** Complete captures are validated without publishing their arrays in progress. */\nexport interface BrowserWebMcpCapture { readonly metadata: BrowserWebMcpMetadata; readonly tools: readonly BrowserWebMcpTool[]; }\n',
+    );
+    for (const name of ['BrowserWebMcpReceipt', 'BrowserWebMcpPageReceipt']) {
+        let source = readFileSync('../nexa/src/reverse/' + name + '.ts', 'utf8');
+        source = source.replace(
+            /import (type )?\{([^}]*)\} from '\.\/(?:BrowserWebMcpTypes|BrowserWebMcpDirectoryTypes|BrowserCaptureTypes)';/gu,
+            (_match, typeOnly, members) =>
+                portableComparisonImport(
+                    typeOnly,
+                    members,
+                    './BrowserWebMcpDefinitions.js',
+                    './BrowserWebMcpDefinitions.js',
+                ),
+        );
+        source = source.replace(
+            /from '(\.\/[^']+)'/gu,
+            (_match, path) => "from '" + (path.endsWith('.js') ? path : path + '.js') + "'",
+        );
+        writeFileSync('src/reverse/' + name + '.ts', source);
+    }
 }
-/** Older gateways advertise process limits without the newer per-principal byte ceiling. */
-schema.definitions.GatewayLimits.required = schema.definitions.GatewayLimits.required.filter(
-    (field) => field !== 'maxRequestBytesPerPrincipal',
-);
+let schema;
+if (snapshotOnly) {
+    schema = JSON.parse(readFileSync('script/contract.json', 'utf8'));
+} else {
+    const temporary = mkdtempSync(join(tmpdir(), 'nexa-contract-'));
+    try {
+        const output = join(temporary, 'contract.json');
+        execFileSync('./node_modules/.bin/typescript-json-schema', [
+            'script/Contract.ts',
+            'Contract',
+            '--ignoreErrors',
+            '--strictNullChecks',
+            '--required',
+            '--out',
+            output,
+        ]);
+        schema = JSON.parse(readFileSync(output, 'utf8'));
+    } finally {
+        rmSync(temporary, { recursive: true, force: true });
+    }
+    /** Older gateways advertise process limits without the newer per-principal byte ceiling. */
+    schema.definitions.GatewayLimits.required = schema.definitions.GatewayLimits.required.filter(
+        (field) => field !== 'maxRequestBytesPerPrincipal',
+    );
+}
 /** Named method interfaces retain the same validator paths as inline method declarations. */
 for (const [name, method] of Object.entries(schema.definitions.GatewayMethods.properties)) {
     let contract = method;
@@ -278,57 +305,72 @@ for (const [name, method] of Object.entries(schema.definitions.GatewayMethods.pr
     schema.definitions.GatewayMethods.properties[name] = contract;
 }
 
-/** Keep arbitrary JSON fields fully typed and structurally validated. */
-schema.definitions.JsonValue = {
-    anyOf: [
-        { type: 'null' },
-        { type: 'boolean' },
-        { type: 'string' },
-        { type: 'number' },
-        { type: 'array', items: { $ref: '#/definitions/JsonValue' } },
-        { type: 'object', additionalProperties: { $ref: '#/definitions/JsonValue' } },
-    ],
-};
-/** Native history payload is private binary transport state, never a JSON response field. */
-delete schema.definitions.SessionHistoryPage.properties.payload;
-function normalize(node) {
-    if (Array.isArray(node)) {
-        node.forEach(normalize);
-        return;
+if (!snapshotOnly) {
+    /** Keep arbitrary JSON fields fully typed and structurally validated. */
+    schema.definitions.JsonValue = {
+        anyOf: [
+            { type: 'null' },
+            { type: 'boolean' },
+            { type: 'string' },
+            { type: 'number' },
+            { type: 'array', items: { $ref: '#/definitions/JsonValue' } },
+            { type: 'object', additionalProperties: { $ref: '#/definitions/JsonValue' } },
+        ],
+    };
+    /** Native history payload is private binary transport state, never a JSON response field. */
+    delete schema.definitions.SessionHistoryPage.properties.payload;
+    function normalize(node) {
+        if (Array.isArray(node)) {
+            node.forEach(normalize);
+            return;
+        }
+        if (!node || typeof node !== 'object') return;
+        if (Object.keys(node).length === 0) {
+            node.$ref = '#/definitions/JsonValue';
+            return;
+        }
+        for (const value of Object.values(node)) normalize(value);
     }
-    if (!node || typeof node !== 'object') return;
-    if (Object.keys(node).length === 0) {
-        node.$ref = '#/definitions/JsonValue';
-        return;
+    /** Empty schemas represent unknown fields in the server's types. */
+    for (const definition of Object.values(schema.definitions)) normalize(definition);
+    /** Preserve mapped dictionaries the upstream schema generator leaves unexpanded. */
+    for (const [name, definition] of Object.entries(schema.definitions)) {
+        if (name.startsWith('Record<string,')) {
+            const value = name.slice(14, -1);
+            definition.additionalProperties =
+                value === 'never'
+                    ? false
+                    : value === 'Scope'
+                      ? { $ref: '#/definitions/Scope' }
+                      : value === 'unknown'
+                        ? { $ref: '#/definitions/JsonValue' }
+                        : value.includes('|')
+                          ? { anyOf: value.split('|').map((type) => ({ type })) }
+                          : { type: value };
+        }
     }
-    for (const value of Object.values(node)) normalize(value);
+    /** Uint8Array serializes to indexed JSON objects on the current gateway. */
+    const progressBytes = schema.definitions.ToolProgressAttachment.properties.data;
+    schema.definitions.ToolProgressAttachment.properties.data = {
+        anyOf: [progressBytes, { type: 'object', additionalProperties: { type: 'number' } }],
+    };
 }
-/** Empty schemas represent unknown fields in the server's types. */
-for (const definition of Object.values(schema.definitions)) normalize(definition);
-/** Preserve mapped dictionaries the upstream schema generator leaves unexpanded. */
-for (const [name, definition] of Object.entries(schema.definitions)) {
-    if (name.startsWith('Record<string,')) {
-        const value = name.slice(14, -1);
-        definition.additionalProperties =
-            value === 'never'
-                ? false
-                : value === 'Scope'
-                  ? { $ref: '#/definitions/Scope' }
-                  : value === 'unknown'
-                    ? { $ref: '#/definitions/JsonValue' }
-                    : value.includes('|')
-                      ? { anyOf: value.split('|').map((type) => ({ type })) }
-                      : { type: value };
-    }
-}
-/** Uint8Array serializes to indexed JSON objects on the current gateway. */
-const progressBytes = schema.definitions.ToolProgressAttachment.properties.data;
-schema.definitions.ToolProgressAttachment.properties.data = {
-    anyOf: [progressBytes, { type: 'object', additionalProperties: { type: 'number' } }],
-};
+/** Complete output snapshots are bounded UTF-16 display state in both live and history events. */
+const outputSnapshot = schema.definitions.ToolProgress?.properties?.outputSnapshot;
+if (outputSnapshot !== undefined) outputSnapshot.maxLength = 65536;
 const declarations = [];
 const names = new Map();
 const used = new Set();
+if (schema.definitions.ConnectorArgumentKind === undefined) {
+    const source = readFileSync('../nexa/src/dataplane/ConnectorExecutionTypes.ts', 'utf8');
+    const declaration = source.match(/export enum ConnectorArgumentKind \{[^}]+\}/u)?.[0];
+    if (declaration === undefined) throw new Error('Missing named public argument enum');
+    used.add('ConnectorArgumentKind');
+    declarations.push(
+        '/** Published argument kinds distinguish positional, foreground and interactive contracts. */\n' +
+            declaration,
+    );
+}
 function nameFor(name) {
     if (names.has(name)) return names.get(name);
     let clean = name.startsWith('Flatten<')
@@ -387,6 +429,42 @@ function type(node, hint) {
 }
 for (const [name, def] of Object.entries(schema.definitions)) {
     const outputName = nameFor(name);
+    if (
+        def.enum !== undefined &&
+        ['ConnectorInteractiveTransport', 'ConnectorInputKind'].includes(name)
+    ) {
+        const source = readFileSync(
+            '../nexa/src/dataplane/ConnectorInteractiveInvocation.ts',
+            'utf8',
+        );
+        const declaration = source.match(
+            new RegExp('export enum ' + name + ' \\{[^}]+\\}', 'u'),
+        )?.[0];
+        if (declaration === undefined)
+            throw new Error('Missing named public interactive enum: ' + name);
+        declarations.push(
+            '/** Published interactive permission metadata, not native availability. */\n' +
+                declaration,
+        );
+        continue;
+    }
+    if (name === 'ConnectorJobPhase' && def.enum !== undefined) {
+        const source = readFileSync('../nexa/src/dataplane/ConnectorTypes.ts', 'utf8');
+        const declaration = source.match(/export enum ConnectorJobPhase \{[^}]+\}/u)?.[0];
+        if (declaration === undefined) throw new Error('Missing named connector job phase enum');
+        declarations.push('/** Named original command lifecycle. */\n' + declaration);
+        continue;
+    }
+    if (def.enum !== undefined && /^(ConnectorExecution|ConnectorArgument)/u.test(name)) {
+        const source = readFileSync('../nexa/src/dataplane/ConnectorExecutionTypes.ts', 'utf8');
+        const declaration = source.match(
+            new RegExp('export enum ' + name + ' \\{[^}]+\\}', 'u'),
+        )?.[0];
+        if (declaration === undefined)
+            throw new Error('Missing named connector execution enum: ' + name);
+        declarations.push('/** Named connector execution protocol values. */\n' + declaration);
+        continue;
+    }
     if (name === 'EnvironmentPreparationState') {
         const source = readFileSync('../nexa/src/dataplane/EnvironmentPreparationTypes.ts', 'utf8');
         const declaration = source.match(/export enum EnvironmentPreparationState \{[^}]+\}/u)?.[0];
@@ -425,11 +503,16 @@ declarations.push(
     '/** Supported RPC names. */\nexport type MethodName = keyof GatewayMethods;\n/** Parameters for a particular RPC. */\nexport type ParamsOf<M extends MethodName> = GatewayMethods[M]["params"];\n/** Result for a particular RPC. */\nexport type ResultOf<M extends MethodName> = GatewayMethods[M]["result"];',
 );
 /** Runtime enum constants share the server method catalog as their source of truth. */
+const methodKeys = new Set();
 const methodEntries = Object.keys(schema.definitions.GatewayMethods.properties).map((method) => {
     const key = method
-        .split('.')
+        .split(/[.-]/u)
         .map((part) => part[0].toUpperCase() + part.slice(1))
         .join('');
+    if (!/^[A-Za-z][A-Za-z0-9]*$/u.test(key) || methodKeys.has(key)) {
+        throw new Error('Gateway method names require distinct TypeScript identifiers');
+    }
+    methodKeys.add(key);
     return `    /** Calls ${method}. */\n    ${key} = ${JSON.stringify(method)},`;
 });
 declarations.push(
@@ -466,12 +549,14 @@ const validateTypes = Object.fromEntries(
 );
 writeFileSync(
     'src/protocol/Validators.ts',
-    `import { SchemaValidator } from './Schema.js';\nimport { schema } from './SchemaData.js';\nimport type * as protocol from './Protocol.js';\nconst validator: SchemaValidator = new SchemaValidator(schema);\n/** Validates untrusted JSON at a protocol boundary. */\nexport type Validator = (value: unknown) => boolean;\n` +
+    `import { SchemaValidator } from './Schema.js';\nimport { schema } from './SchemaData.js';\nimport { ConnectorExecutionChecks } from './ConnectorExecutionChecks.js';\nimport type * as protocol from './Protocol.js';\nconst validator: SchemaValidator = new SchemaValidator(schema);\n/** Validates untrusted JSON at a protocol boundary. */\nexport type Validator = (value: unknown) => boolean;\n` +
         Object.entries(validators)
-            .map(
-                ([name, path]) =>
-                    `/** Validates ${name}. */\nexport function ${name}(value: unknown): ${validateTypes[name] ? 'value is protocol.' + validateTypes[name] : 'boolean'} { return validator.validate(${JSON.stringify(path)}, value); }`,
-            )
+            .map(([name, path]) => {
+                if (name === 'result' + methodValidators['connectors.execution']) {
+                    return `/** Shape validation precedes dependent public permission checks. */\nfunction connectorExecutionShape(value: unknown): value is protocol.ConnectorExecutionStatus { return validator.validate(${JSON.stringify(path)}, value); }\n/** Validates complete bounded connector permission metadata. */\nexport function ${name}(value: unknown): value is protocol.ConnectorExecutionStatus { return connectorExecutionShape(value) && ConnectorExecutionChecks.status(value); }`;
+                }
+                return `/** Validates ${name}. */\nexport function ${name}(value: unknown): ${validateTypes[name] ? 'value is protocol.' + validateTypes[name] : 'boolean'} { return validator.validate(${JSON.stringify(path)}, value); }`;
+            })
             .join('\n'),
 );
 writeFileSync(
@@ -497,15 +582,18 @@ execFileSync('./node_modules/.bin/prettier', [
     'src/protocol/Validators.ts',
     'src/protocol/MethodValidators.ts',
     'script/contract.json',
+    ...(snapshotOnly ? [] : ['src/reverse']),
 ]);
 
-/** Refresh the complete canonical codec dependency graph, including encoder helpers. */
-execFileSync(process.execPath, ['script/media.ts'], { stdio: 'inherit' });
+if (!snapshotOnly) {
+    /** Refresh the complete canonical codec dependency graph, including encoder helpers. */
+    execFileSync(process.execPath, ['script/media.ts'], { stdio: 'inherit' });
 
-/** NGOP has one canonical codec; copy it without runtime server dependencies. */
-mkdirSync('src/office', { recursive: true });
-execFileSync(process.execPath, ['script/company.ts'], { stdio: 'inherit' });
-writeFileSync(
-    'src/office/OfficeProtocol.ts',
-    readFileSync('../nexa/src/office/OfficeProtocol.ts', 'utf8'),
-);
+    /** NGOP has one canonical codec; copy it without runtime server dependencies. */
+    mkdirSync('src/office', { recursive: true });
+    execFileSync(process.execPath, ['script/company.ts'], { stdio: 'inherit' });
+    writeFileSync(
+        'src/office/OfficeProtocol.ts',
+        readFileSync('../nexa/src/office/OfficeProtocol.ts', 'utf8'),
+    );
+}
