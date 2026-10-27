@@ -28,8 +28,52 @@ they do not execute server-only handlers or grant access.
 | `nexa-transport/options`               | **Types only** | Connection identity, authentication, resource limits, and call options                    |
 | `nexa-transport/protocol`              | ESM + types    | Method enum and complete generated RPC parameters/results                                 |
 | `nexa-transport/reverse-investigation` | ESM + types    | Native investigation receipts, monotonic replay, and saved-page validators                |
+| `nexa-transport/redteam-types`         | ESM + types    | Effort controls, source references, session links, paged ledgers, and worker limits       |
+| `nexa-transport/redteam-codec`         | ESM + types    | Strict bounded effort, agent, task, finding, evidence, and progress decoding              |
+| `nexa-transport/redteam-request-codec` | ESM + types    | Owner-independent request validation, source restrictions, and concurrency defaults       |
+| `nexa-transport/redteam-client`        | ESM + types    | Validated start/list/get/stop/update operations over an authenticated gateway adapter     |
 | `nexa-transport/stream`                | **Types only** | Streaming turn type with acceptance, result, steering, cancel, and detach                 |
 | `nexa-transport/stream-options`        | **Types only** | Turn duration, event/byte buffers, timeout, and cancellation options                      |
+
+## Red team effort contract
+
+Use `client.redTeam` for the five `redteam.*` operations when
+`client.supportsRedTeam` is true. Requests share the authenticated socket's
+timeouts, cancellation and resource limits. `RedTeamClient` also accepts a typed
+`RedTeamGateway` adapter for other authenticated transports. These portable entries
+do not register server handlers or extend the generated `NexaClient.call` method
+map. Server integration must implement the canonical
+gateway declarations, authorization, persistence, ownership checks for uploaded
+file IDs, repository checkout policy, and cancellation of owned agent work.
+
+Start accepts an owner-selected `effortId`, title, GitHub repository URL or uploaded
+file IDs, rules, and optional parallelism. Parallelism defaults to 8 and accepts
+integers from 1 through 50. Updates require an expected decimal revision. Stop
+returns an explicit stopping or stopped acknowledgement; the client never retries
+mutations automatically.
+
+Get returns effort metadata, up to 50 worker session references, and independently
+paged task and finding ledgers. Use null revision and cursors for the initial read,
+then pin that revision when continuing either ledger. Each page holds at most 100
+records; the effort's lifetime and total ledger counts are independent of this
+page bound. Counts, revisions and millisecond timestamps use decimal strings.
+Agent text, tool output and terminal attachments remain in ordinary Chat sessions.
+Findings retain severity, a decimal CVSS score, confirmation state, evidence file
+references and reproduction steps.
+
+Snapshots may include up to 100 saved coordination exchanges. Each exchange names
+an existing worker, records an assignment, result, verification or progress action,
+and keeps an exact increasing sequence. Worker names are optional, and workers may
+be marked as verifying a result. Exchanges may refer to tasks or findings on other
+ledger pages. Older snapshots can omit these optional coordination fields.
+
+Findings may also include `report: RedTeamFindingReport` with impact, affected
+versions, prerequisites, expected and observed behavior, remediation, technical
+details, reported CVE/CWE identifiers, and named HTTP/HTTPS references. Every
+report field is optional: absent details have not been reported yet, while an
+empty identifier list means none have been assigned or identified. The existing
+finding title is the custom report title. Decoding preserves missing information
+and never assigns vulnerability identifiers or fills in report claims.
 
 ## Portable tool input resolution
 
@@ -327,3 +371,12 @@ Metadata-only page ownership, locked ancestry and topmost selection are availabl
 - `nexa-transport/design-svg-selections`: DesignSvgSelections.
 
 - `nexa-transport/design-pattern-references`: linked source dependency traversal and remapping.
+
+The generated protocol includes the managed workspace file browser methods
+`workspace.files.list`, `workspace.files.read`, `workspace.files.start`,
+`workspace.files.chunk`, `workspace.files.finish`, `workspace.files.cancel`, and
+`workspace.files.mkdir`. Use their `Method.WorkspaceFiles*` constants with the
+existing authenticated `NexaClient.call` API. Paths are relative to the account's
+managed workspace; `list` supplies the assignment token required by subsequent
+reads and writes. Reads and upload chunks are bounded at 1 MiB. Preserve file
+revisions across read slices and acknowledged byte positions across upload slices.

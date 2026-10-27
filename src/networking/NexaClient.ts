@@ -76,6 +76,14 @@ import { TransportError, TransportErrorCode } from './TransportError.js';
 import { SessionFilePager } from './SessionFilePager.js';
 import { GatewayVersion } from '../protocol/GatewayVersion.js';
 import type { SessionFilePage, SessionFileListParams } from '../protocol/Protocol.js';
+import { RedTeamClient, type RedTeamRequestMap } from '../redteam/RedTeamClient.js';
+import {
+    RedTeamMethod,
+    type RedTeamEffort,
+    type RedTeamListPage,
+    type RedTeamSnapshot,
+} from '../redteam/RedTeamTypes.js';
+import { RedTeamRequestCodec } from '../redteam/RedTeamRequestCodec.js';
 
 /** A validated envelope retaining the complete JSON payload. */
 export interface GatewayEvent {
@@ -130,6 +138,55 @@ export interface CollaborationOffice {
 }
 /** Authenticated Nexa gateway connection shared by browsers and Node.js. */
 export class NexaClient {
+    readonly #redTeam: RedTeamClient = new RedTeamClient({
+        request: <M extends RedTeamMethod>(
+            method: M,
+            params: RedTeamRequestMap[M],
+            options: CallOptions,
+        ): Promise<unknown> => this.#requestRedTeam(method, params, options),
+    });
+
+    /** Red team controls share this authenticated connection and its request limits. */
+    public get redTeam(): RedTeamClient {
+        return this.#redTeam;
+    }
+    /** Older gateways remain usable while the red team controls stay unavailable. */
+    public get supportsRedTeam(): boolean {
+        return (
+            this.connected &&
+            Object.values(RedTeamMethod).every(
+                (method: RedTeamMethod): boolean =>
+                    this.#hello?.features.methods.includes(method) === true,
+            )
+        );
+    }
+    async #requestRedTeam<M extends RedTeamMethod>(
+        method: M,
+        params: RedTeamRequestMap[M],
+        options: CallOptions,
+    ): Promise<RedTeamEffort | RedTeamListPage | RedTeamSnapshot> {
+        if (!this.connected) {
+            throw new TransportError(TransportErrorCode.Closed, 'Client is not connected');
+        }
+        if (!this.supportsRedTeam) {
+            throw new TransportError(
+                TransportErrorCode.Protocol,
+                'Red team efforts require an updated NEXA gateway',
+            );
+        }
+        switch (method) {
+            case RedTeamMethod.Start:
+                return this.call(Method.RedteamStart, RedTeamRequestCodec.start(params), options);
+            case RedTeamMethod.List:
+                return this.call(Method.RedteamList, RedTeamRequestCodec.list(params), options);
+            case RedTeamMethod.Get:
+                return this.call(Method.RedteamGet, RedTeamRequestCodec.get(params), options);
+            case RedTeamMethod.Stop:
+                return this.call(Method.RedteamStop, RedTeamRequestCodec.effort(params), options);
+            case RedTeamMethod.Update:
+                return this.call(Method.RedteamUpdate, RedTeamRequestCodec.update(params), options);
+        }
+    }
     readonly #emotionalWatches: EmotionWatches = new EmotionWatches({
         read: (agentId: string | undefined, signal: AbortSignal): Promise<EmotionalSnapshot> =>
             this.emotions(agentId, { signal }),
@@ -1298,6 +1355,14 @@ export class NexaClient {
                 'Gateway does not advertise attachment support; upgrade Nexa before sending media',
             );
         }
+        return NexaClient.#result(this.#request(method, params, options, encodeBinary), method);
+    }
+    #request(
+        method: Method,
+        params: ParamsOf<Method>,
+        options: CallOptions,
+        encodeBinary?: (requestId: string) => Uint8Array<ArrayBuffer>,
+    ): Promise<JsonValue> {
         const timeout: number = options.timeoutMs ?? this.#options.requestTimeoutMs ?? 60_000;
         if (!Number.isSafeInteger(timeout) || timeout <= 0 || timeout > 2_147_483_647) {
             throw materializeError(new RangeError('Invalid request timeout'));
@@ -1359,7 +1424,7 @@ export class NexaClient {
                 );
             }
         }
-        return NexaClient.#result(pending, method);
+        return pending;
     }
     static async #result<M extends Method>(
         pending: Promise<JsonValue>,
