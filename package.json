@@ -1016,7 +1016,7 @@
         "prettier": "^3.9.6",
         "typescript": "~7.0.2",
         "typescript-json-schema": "^0.68.0",
-        "vite": "^8.3.0",
+        "vite": "^8.3.4",
         "vitest": "^5.0.0",
         "ws": "^8.21.3",
         "@types/fontkit": "2.0.9"
