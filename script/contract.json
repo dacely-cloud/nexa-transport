@@ -31152,6 +31152,10 @@
                 "uploadId": {
                     "type": "string",
                     "pattern": "^[a-f0-9]{64}$"
+                },
+                "workspaceId": {
+                    "description": "An owned Chat/project workspace ID, never an absolute filesystem path.",
+                    "type": "string"
                 }
             },
             "required": ["data", "offset", "uploadId"],
@@ -31206,6 +31210,10 @@
                 "path": {
                     "type": "string",
                     "maxLength": 4096
+                },
+                "workspaceId": {
+                    "description": "An owned Chat/project workspace ID, never an absolute filesystem path.",
+                    "type": "string"
                 }
             },
             "required": ["path"],
@@ -31296,6 +31304,10 @@
                 "revision": {
                     "type": "string",
                     "maxLength": 256
+                },
+                "workspaceId": {
+                    "description": "An owned Chat/project workspace ID, never an absolute filesystem path.",
+                    "type": "string"
                 }
             },
             "required": ["assignment", "offset", "path"],
@@ -31325,6 +31337,10 @@
                 "path": {
                     "type": "string",
                     "maxLength": 4096
+                },
+                "workspaceId": {
+                    "description": "An owned Chat/project workspace ID, never an absolute filesystem path.",
+                    "type": "string"
                 }
             },
             "required": ["assignment", "byteLength", "extractZip", "path"],
@@ -31346,6 +31362,10 @@
                 "path": {
                     "type": "string",
                     "maxLength": 4096
+                },
+                "workspaceId": {
+                    "description": "An owned Chat/project workspace ID, never an absolute filesystem path.",
+                    "type": "string"
                 }
             },
             "required": ["assignment", "path"],
@@ -31380,6 +31400,10 @@
                 "uploadId": {
                     "type": "string",
                     "pattern": "^[a-f0-9]{64}$"
+                },
+                "workspaceId": {
+                    "description": "An owned Chat/project workspace ID, never an absolute filesystem path.",
+                    "type": "string"
                 }
             },
             "required": ["uploadId"],

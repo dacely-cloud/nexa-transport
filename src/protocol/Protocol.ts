@@ -21145,6 +21145,8 @@ export interface BrowserFilesChunkParamsShape {
     readonly offset: string;
     /** uploadId as defined by the Nexa gateway. */
     readonly uploadId: string;
+    /** workspaceId as defined by the Nexa gateway. */
+    readonly workspaceId?: string;
 }
 
 /** BrowserFilesChunkParams from the Nexa wire protocol. */
@@ -21185,6 +21187,8 @@ export interface BrowserFilesListParamsShape {
     readonly location?: (typeof BrowserFilesListParamslocationValues)[keyof typeof BrowserFilesListParamslocationValues];
     /** path as defined by the Nexa gateway. */
     readonly path: string;
+    /** workspaceId as defined by the Nexa gateway. */
+    readonly workspaceId?: string;
 }
 
 /** BrowserFilesListParams from the Nexa wire protocol. */
@@ -21242,6 +21246,8 @@ export interface BrowserFilesReadParamsShape {
     readonly path: string;
     /** revision as defined by the Nexa gateway. */
     readonly revision?: string;
+    /** workspaceId as defined by the Nexa gateway. */
+    readonly workspaceId?: string;
 }
 
 /** BrowserFilesReadParams from the Nexa wire protocol. */
@@ -21262,6 +21268,8 @@ export interface BrowserFilesStartParamsShape {
     readonly location?: (typeof BrowserFilesStartParamslocationValues)[keyof typeof BrowserFilesStartParamslocationValues];
     /** path as defined by the Nexa gateway. */
     readonly path: string;
+    /** workspaceId as defined by the Nexa gateway. */
+    readonly workspaceId?: string;
 }
 
 /** BrowserFilesStartParams from the Nexa wire protocol. */
@@ -21278,6 +21286,8 @@ export interface BrowserFilesTargetShape {
     readonly location?: (typeof BrowserFilesTargetlocationValues)[keyof typeof BrowserFilesTargetlocationValues];
     /** path as defined by the Nexa gateway. */
     readonly path: string;
+    /** workspaceId as defined by the Nexa gateway. */
+    readonly workspaceId?: string;
 }
 
 /** BrowserFilesTarget from the Nexa wire protocol. */
@@ -21303,6 +21313,8 @@ export interface BrowserFilesUploadParamsShape {
     readonly location?: (typeof BrowserFilesUploadParamslocationValues)[keyof typeof BrowserFilesUploadParamslocationValues];
     /** uploadId as defined by the Nexa gateway. */
     readonly uploadId: string;
+    /** workspaceId as defined by the Nexa gateway. */
+    readonly workspaceId?: string;
 }
 
 /** BrowserFilesUploadParams from the Nexa wire protocol. */

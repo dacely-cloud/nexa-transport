@@ -12,6 +12,12 @@ it('exposes bounded browser RPCs without accepting caller-selected host or accou
     const assignment: string = 'a'.repeat(64);
     expect(methodValidators[Method.WorkspaceFilesList].params({ path: '' })).toBe(true);
     expect(
+        methodValidators[Method.WorkspaceFilesList].params({
+            path: '',
+            workspaceId: 'owned-chat-workspace',
+        }),
+    ).toBe(true);
+    expect(
         methodValidators[Method.WorkspaceFilesList].params({ path: '', location: 'account' }),
     ).toBe(true);
     expect(methodValidators[Method.WorkspaceFilesList].params({ path: '', location: 'vm' })).toBe(

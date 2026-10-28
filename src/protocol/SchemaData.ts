@@ -32106,6 +32106,11 @@ export const schema: Schema = {
                     type: 'string',
                     pattern: '^[a-f0-9]{64}$',
                 },
+                workspaceId: {
+                    description:
+                        'An owned Chat/project workspace ID, never an absolute filesystem path.',
+                    type: 'string',
+                },
             },
             required: ['data', 'offset', 'uploadId'],
             type: 'object',
@@ -32161,6 +32166,11 @@ export const schema: Schema = {
                 path: {
                     type: 'string',
                     maxLength: 4096,
+                },
+                workspaceId: {
+                    description:
+                        'An owned Chat/project workspace ID, never an absolute filesystem path.',
+                    type: 'string',
                 },
             },
             required: ['path'],
@@ -32254,6 +32264,11 @@ export const schema: Schema = {
                     type: 'string',
                     maxLength: 256,
                 },
+                workspaceId: {
+                    description:
+                        'An owned Chat/project workspace ID, never an absolute filesystem path.',
+                    type: 'string',
+                },
             },
             required: ['assignment', 'offset', 'path'],
             type: 'object',
@@ -32285,6 +32300,11 @@ export const schema: Schema = {
                     type: 'string',
                     maxLength: 4096,
                 },
+                workspaceId: {
+                    description:
+                        'An owned Chat/project workspace ID, never an absolute filesystem path.',
+                    type: 'string',
+                },
             },
             required: ['assignment', 'byteLength', 'extractZip', 'path'],
             type: 'object',
@@ -32306,6 +32326,11 @@ export const schema: Schema = {
                 path: {
                     type: 'string',
                     maxLength: 4096,
+                },
+                workspaceId: {
+                    description:
+                        'An owned Chat/project workspace ID, never an absolute filesystem path.',
+                    type: 'string',
                 },
             },
             required: ['assignment', 'path'],
@@ -32342,6 +32367,11 @@ export const schema: Schema = {
                 uploadId: {
                     type: 'string',
                     pattern: '^[a-f0-9]{64}$',
+                },
+                workspaceId: {
+                    description:
+                        'An owned Chat/project workspace ID, never an absolute filesystem path.',
+                    type: 'string',
                 },
             },
             required: ['uploadId'],
