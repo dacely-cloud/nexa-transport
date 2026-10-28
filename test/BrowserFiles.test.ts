@@ -12,6 +12,15 @@ it('exposes bounded browser RPCs without accepting caller-selected host or accou
     const assignment: string = 'a'.repeat(64);
     expect(methodValidators[Method.WorkspaceFilesList].params({ path: '' })).toBe(true);
     expect(
+        methodValidators[Method.WorkspaceFilesList].params({ path: '', location: 'account' }),
+    ).toBe(true);
+    expect(methodValidators[Method.WorkspaceFilesList].params({ path: '', location: 'vm' })).toBe(
+        true,
+    );
+    expect(methodValidators[Method.WorkspaceFilesList].params({ path: '', location: '/etc' })).toBe(
+        false,
+    );
+    expect(
         methodValidators[Method.WorkspaceFilesRead].params({
             path: 'hello.txt',
             assignment,
@@ -56,20 +65,22 @@ it('round-trips bounded binary workspace transfers through the public websocket 
     gateway.handler = (socket: WebSocket, request: Request): void => {
         let result: JsonValue;
         switch (request.method) {
-            case Method.WorkspaceFilesList:
+            case 'workspace.files.list':
                 result = { assignment, entries: [], nextCursor: null };
                 break;
-            case Method.WorkspaceFilesStart:
+            case 'workspace.files.start':
                 result = { uploadId, chunkBytes: 1048576 };
                 break;
-            case Method.WorkspaceFilesChunk:
-                if (typeof request.params['data'] !== 'string') throw new Error('Missing chunk');
+            case 'workspace.files.chunk':
+                if (typeof request.params['data'] !== 'string') {
+                    throw new Error('Missing chunk');
+                }
                 received = createHash('sha256')
                     .update(Buffer.from(request.params['data'], 'base64'))
                     .digest('hex');
                 result = { offset: '1048576' };
                 break;
-            case Method.WorkspaceFilesRead:
+            case 'workspace.files.read':
                 result = {
                     assignment,
                     revision: 'opened-file-revision',

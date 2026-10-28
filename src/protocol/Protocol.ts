@@ -21132,10 +21132,15 @@ export enum ConnectorInteractiveTransport {
     Pty = 'pty',
 }
 
+/** Allowed values for BrowserFilesChunkParamslocation. */
+export const BrowserFilesChunkParamslocationValues = { Value0: 'account', Value1: 'vm' } as const;
+
 /** BrowserFilesChunkParams wire fields. */
 export interface BrowserFilesChunkParamsShape {
     /** data as defined by the Nexa gateway. */
     readonly data: string;
+    /** location as defined by the Nexa gateway. */
+    readonly location?: (typeof BrowserFilesChunkParamslocationValues)[keyof typeof BrowserFilesChunkParamslocationValues];
     /** offset as defined by the Nexa gateway. */
     readonly offset: string;
     /** uploadId as defined by the Nexa gateway. */
@@ -21169,10 +21174,15 @@ export interface BrowserFilesEntryShape {
 /** BrowserFilesEntry from the Nexa wire protocol. */
 export type BrowserFilesEntry = BrowserFilesEntryShape;
 
+/** Allowed values for BrowserFilesListParamslocation. */
+export const BrowserFilesListParamslocationValues = { Value0: 'account', Value1: 'vm' } as const;
+
 /** BrowserFilesListParams wire fields. */
 export interface BrowserFilesListParamsShape {
     /** cursor as defined by the Nexa gateway. */
     readonly cursor?: string;
+    /** location as defined by the Nexa gateway. */
+    readonly location?: (typeof BrowserFilesListParamslocationValues)[keyof typeof BrowserFilesListParamslocationValues];
     /** path as defined by the Nexa gateway. */
     readonly path: string;
 }
@@ -21217,10 +21227,15 @@ export interface BrowserFilesReadShape {
 /** BrowserFilesRead from the Nexa wire protocol. */
 export type BrowserFilesRead = BrowserFilesReadShape;
 
+/** Allowed values for BrowserFilesReadParamslocation. */
+export const BrowserFilesReadParamslocationValues = { Value0: 'account', Value1: 'vm' } as const;
+
 /** BrowserFilesReadParams wire fields. */
 export interface BrowserFilesReadParamsShape {
     /** assignment as defined by the Nexa gateway. */
     readonly assignment: string;
+    /** location as defined by the Nexa gateway. */
+    readonly location?: (typeof BrowserFilesReadParamslocationValues)[keyof typeof BrowserFilesReadParamslocationValues];
     /** offset as defined by the Nexa gateway. */
     readonly offset: string;
     /** path as defined by the Nexa gateway. */
@@ -21232,6 +21247,9 @@ export interface BrowserFilesReadParamsShape {
 /** BrowserFilesReadParams from the Nexa wire protocol. */
 export type BrowserFilesReadParams = BrowserFilesReadParamsShape;
 
+/** Allowed values for BrowserFilesStartParamslocation. */
+export const BrowserFilesStartParamslocationValues = { Value0: 'account', Value1: 'vm' } as const;
+
 /** BrowserFilesStartParams wire fields. */
 export interface BrowserFilesStartParamsShape {
     /** assignment as defined by the Nexa gateway. */
@@ -21240,6 +21258,8 @@ export interface BrowserFilesStartParamsShape {
     readonly byteLength: string;
     /** extractZip as defined by the Nexa gateway. */
     readonly extractZip: boolean;
+    /** location as defined by the Nexa gateway. */
+    readonly location?: (typeof BrowserFilesStartParamslocationValues)[keyof typeof BrowserFilesStartParamslocationValues];
     /** path as defined by the Nexa gateway. */
     readonly path: string;
 }
@@ -21247,10 +21267,15 @@ export interface BrowserFilesStartParamsShape {
 /** BrowserFilesStartParams from the Nexa wire protocol. */
 export type BrowserFilesStartParams = BrowserFilesStartParamsShape;
 
+/** Allowed values for BrowserFilesTargetlocation. */
+export const BrowserFilesTargetlocationValues = { Value0: 'account', Value1: 'vm' } as const;
+
 /** BrowserFilesTarget wire fields. */
 export interface BrowserFilesTargetShape {
     /** assignment as defined by the Nexa gateway. */
     readonly assignment: string;
+    /** location as defined by the Nexa gateway. */
+    readonly location?: (typeof BrowserFilesTargetlocationValues)[keyof typeof BrowserFilesTargetlocationValues];
     /** path as defined by the Nexa gateway. */
     readonly path: string;
 }
@@ -21269,8 +21294,13 @@ export interface BrowserFilesUploadShape {
 /** BrowserFilesUpload from the Nexa wire protocol. */
 export type BrowserFilesUpload = BrowserFilesUploadShape;
 
+/** Allowed values for BrowserFilesUploadParamslocation. */
+export const BrowserFilesUploadParamslocationValues = { Value0: 'account', Value1: 'vm' } as const;
+
 /** BrowserFilesUploadParams wire fields. */
 export interface BrowserFilesUploadParamsShape {
+    /** location as defined by the Nexa gateway. */
+    readonly location?: (typeof BrowserFilesUploadParamslocationValues)[keyof typeof BrowserFilesUploadParamslocationValues];
     /** uploadId as defined by the Nexa gateway. */
     readonly uploadId: string;
 }

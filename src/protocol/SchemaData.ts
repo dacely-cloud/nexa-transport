@@ -32091,6 +32091,12 @@ export const schema: Schema = {
                     type: 'string',
                     maxLength: 1398104,
                 },
+                location: {
+                    description:
+                        'Locations choose a server-resolved account root, never a host path or machine ID.\nPersistent account storage remains available independently of VM execution.',
+                    enum: ['account', 'vm'],
+                    type: 'string',
+                },
                 offset: {
                     type: 'string',
                     pattern: '^(0|[1-9][0-9]{0,15})$',
@@ -32145,6 +32151,12 @@ export const schema: Schema = {
                 cursor: {
                     type: 'string',
                     maxLength: 256,
+                },
+                location: {
+                    description:
+                        'Locations choose a server-resolved account root, never a host path or machine ID.\nPersistent account storage remains available independently of VM execution.',
+                    enum: ['account', 'vm'],
+                    type: 'string',
                 },
                 path: {
                     type: 'string',
@@ -32223,6 +32235,12 @@ export const schema: Schema = {
                     type: 'string',
                     pattern: '^[a-f0-9]{64}$',
                 },
+                location: {
+                    description:
+                        'Locations choose a server-resolved account root, never a host path or machine ID.\nPersistent account storage remains available independently of VM execution.',
+                    enum: ['account', 'vm'],
+                    type: 'string',
+                },
                 offset: {
                     type: 'string',
                     pattern: '^(0|[1-9][0-9]{0,15})$',
@@ -32257,6 +32275,12 @@ export const schema: Schema = {
                 extractZip: {
                     type: 'boolean',
                 },
+                location: {
+                    description:
+                        'Locations choose a server-resolved account root, never a host path or machine ID.\nPersistent account storage remains available independently of VM execution.',
+                    enum: ['account', 'vm'],
+                    type: 'string',
+                },
                 path: {
                     type: 'string',
                     maxLength: 4096,
@@ -32272,6 +32296,12 @@ export const schema: Schema = {
                 assignment: {
                     type: 'string',
                     pattern: '^[a-f0-9]{64}$',
+                },
+                location: {
+                    description:
+                        'Locations choose a server-resolved account root, never a host path or machine ID.\nPersistent account storage remains available independently of VM execution.',
+                    enum: ['account', 'vm'],
+                    type: 'string',
                 },
                 path: {
                     type: 'string',
@@ -32303,6 +32333,12 @@ export const schema: Schema = {
             description:
                 'Opaque upload handles are scoped to the authenticated account and captured assignment.',
             properties: {
+                location: {
+                    description:
+                        'Locations choose a server-resolved account root, never a host path or machine ID.\nPersistent account storage remains available independently of VM execution.',
+                    enum: ['account', 'vm'],
+                    type: 'string',
+                },
                 uploadId: {
                     type: 'string',
                     pattern: '^[a-f0-9]{64}$',
