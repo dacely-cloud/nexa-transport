@@ -17461,6 +17461,18 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'workspaces.page': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/WorkspacePageParams',
+                        },
+                        result: {
+                            $ref: '#/definitions/WorkspacePage',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
             },
             required: [
                 'accounts.create',
@@ -17706,6 +17718,7 @@ export const schema: Schema = {
                 'workspace.files.finish',
                 'workspace.files.cancel',
                 'workspace.files.mkdir',
+                'workspaces.page',
             ],
             type: 'object',
         },
@@ -32377,6 +32390,36 @@ export const schema: Schema = {
             required: ['uploadId'],
             type: 'object',
             additionalProperties: false,
+        },
+        WorkspacePage: {
+            description:
+                'Finite account-owned workspace discovery; omitted rows still advance the cursor.',
+            properties: {
+                entries: {
+                    items: {
+                        $ref: '#/definitions/Workspace',
+                    },
+                    type: 'array',
+                },
+                nextCursor: {
+                    type: ['null', 'string'],
+                },
+            },
+            required: ['entries', 'nextCursor'],
+            type: 'object',
+        },
+        WorkspacePageParams: {
+            description:
+                'Bounded owned-workspace discovery never enumerates the entire registry on the wire.',
+            properties: {
+                cursor: {
+                    type: 'string',
+                },
+                limit: {
+                    type: 'number',
+                },
+            },
+            type: 'object',
         },
     },
     description: 'All protocol contracts reachable from the public transport.',

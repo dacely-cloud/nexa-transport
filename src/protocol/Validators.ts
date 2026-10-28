@@ -3539,3 +3539,17 @@ export function result242(value: unknown): boolean {
         value,
     );
 }
+/** Validates params243. */
+export function params243(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/workspaces.page/properties/params',
+        value,
+    );
+}
+/** Validates result243. */
+export function result243(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/workspaces.page/properties/result',
+        value,
+    );
+}
