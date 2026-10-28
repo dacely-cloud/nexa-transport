@@ -17473,6 +17473,18 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'workspaces.visit': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/IdParams',
+                        },
+                        result: {
+                            $ref: '#/definitions/OkResult',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
             },
             required: [
                 'accounts.create',
@@ -17719,6 +17731,7 @@ export const schema: Schema = {
                 'workspace.files.cancel',
                 'workspace.files.mkdir',
                 'workspaces.page',
+                'workspaces.visit',
             ],
             type: 'object',
         },
@@ -30093,6 +30106,10 @@ export const schema: Schema = {
                     required: ['branch', 'repo'],
                     type: 'object',
                 },
+                lastUsedAtMs: {
+                    description: 'Actual project use, independent of expiry and usage maintenance.',
+                    type: 'string',
+                },
             },
             required: ['createdAt', 'id', 'kind', 'name', 'root', 'updatedAt'],
             type: 'object',
@@ -32404,6 +32421,22 @@ export const schema: Schema = {
                 nextCursor: {
                     type: ['null', 'string'],
                 },
+                titles: {
+                    description:
+                        'Latest owned conversation titles for only this page, never a history snapshot.',
+                    items: {
+                        $ref: '#/definitions/WorkspaceProjectTitle',
+                    },
+                    type: 'array',
+                },
+                presence: {
+                    description:
+                        'Present only when the server verified candidate roots in a confined native batch.',
+                    items: {
+                        $ref: '#/definitions/WorkspaceProjectPresence',
+                    },
+                    type: 'array',
+                },
             },
             required: ['entries', 'nextCursor'],
             type: 'object',
@@ -32418,8 +32451,50 @@ export const schema: Schema = {
                 limit: {
                     type: 'number',
                 },
+                includePresence: {
+                    type: 'boolean',
+                },
             },
             type: 'object',
+        },
+        WorkspaceProjectTitle: {
+            description:
+                'A friendly project label reveals no transcript or unrelated conversation metadata.',
+            properties: {
+                title: {
+                    type: 'string',
+                },
+                workspaceId: {
+                    type: 'string',
+                },
+            },
+            required: ['title', 'workspaceId'],
+            type: 'object',
+        },
+        WorkspaceProjectPresence: {
+            description: 'A result retains the storage assignment that authorized its observation.',
+            properties: {
+                assignment: {
+                    type: 'string',
+                },
+                modifiedAtNs: {
+                    type: 'string',
+                },
+                state: {
+                    $ref: '#/definitions/WorkspacePresenceState',
+                },
+                workspaceId: {
+                    type: 'string',
+                },
+            },
+            required: ['assignment', 'modifiedAtNs', 'state', 'workspaceId'],
+            type: 'object',
+        },
+        WorkspacePresenceState: {
+            description:
+                'Root visibility is metadata only; uncertainty never becomes a negative classification.\nFinite root-presence states shared with the native batch helper.',
+            enum: ['empty', 'nonempty', 'unknown'],
+            type: 'string',
         },
     },
     description: 'All protocol contracts reachable from the public transport.',

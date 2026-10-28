@@ -11262,6 +11262,14 @@ export interface GatewayMethodsworkspaces_pageShape {
     readonly result: WorkspacePage;
 }
 
+/** GatewayMethodsworkspaces_visit wire fields. */
+export interface GatewayMethodsworkspaces_visitShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: IdParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: OkResult;
+}
+
 /** GatewayMethods wire fields. */
 export interface GatewayMethodsShape {
     /** accounts.create as defined by the Nexa gateway. */
@@ -11752,6 +11760,8 @@ export interface GatewayMethodsShape {
     readonly 'workspace.files.mkdir': GatewayMethodsworkspace_files_mkdirShape;
     /** workspaces.page as defined by the Nexa gateway. */
     readonly 'workspaces.page': GatewayMethodsworkspaces_pageShape;
+    /** workspaces.visit as defined by the Nexa gateway. */
+    readonly 'workspaces.visit': GatewayMethodsworkspaces_visitShape;
 }
 
 /** GatewayMethods from the Nexa wire protocol. */
@@ -19919,6 +19929,8 @@ export interface WorkspaceShape {
     readonly usage?: WorkspaceUsage;
     /** worktree as defined by the Nexa gateway. */
     readonly worktree?: WorkspaceworktreeShape;
+    /** lastUsedAtMs as defined by the Nexa gateway. */
+    readonly lastUsedAtMs?: string;
 }
 
 /** Workspace from the Nexa wire protocol. */
@@ -21336,6 +21348,10 @@ export interface WorkspacePageShape {
     readonly entries: ReadonlyArray<Workspace>;
     /** nextCursor as defined by the Nexa gateway. */
     readonly nextCursor: null | string;
+    /** titles as defined by the Nexa gateway. */
+    readonly titles?: ReadonlyArray<WorkspaceProjectTitle>;
+    /** presence as defined by the Nexa gateway. */
+    readonly presence?: ReadonlyArray<WorkspaceProjectPresence>;
 }
 
 /** WorkspacePage from the Nexa wire protocol. */
@@ -21347,10 +21363,49 @@ export interface WorkspacePageParamsShape {
     readonly cursor?: string;
     /** limit as defined by the Nexa gateway. */
     readonly limit?: number;
+    /** includePresence as defined by the Nexa gateway. */
+    readonly includePresence?: boolean;
 }
 
 /** WorkspacePageParams from the Nexa wire protocol. */
 export type WorkspacePageParams = WorkspacePageParamsShape;
+
+/** WorkspaceProjectTitle wire fields. */
+export interface WorkspaceProjectTitleShape {
+    /** title as defined by the Nexa gateway. */
+    readonly title: string;
+    /** workspaceId as defined by the Nexa gateway. */
+    readonly workspaceId: string;
+}
+
+/** WorkspaceProjectTitle from the Nexa wire protocol. */
+export type WorkspaceProjectTitle = WorkspaceProjectTitleShape;
+
+/** WorkspaceProjectPresence wire fields. */
+export interface WorkspaceProjectPresenceShape {
+    /** assignment as defined by the Nexa gateway. */
+    readonly assignment: string;
+    /** modifiedAtNs as defined by the Nexa gateway. */
+    readonly modifiedAtNs: string;
+    /** state as defined by the Nexa gateway. */
+    readonly state: WorkspacePresenceState;
+    /** workspaceId as defined by the Nexa gateway. */
+    readonly workspaceId: string;
+}
+
+/** WorkspaceProjectPresence from the Nexa wire protocol. */
+export type WorkspaceProjectPresence = WorkspaceProjectPresenceShape;
+
+/** Allowed values for WorkspacePresenceState. */
+export const WorkspacePresenceStateValues = {
+    Value0: 'empty',
+    Value1: 'nonempty',
+    Value2: 'unknown',
+} as const;
+
+/** WorkspacePresenceState from the Nexa wire protocol. */
+export type WorkspacePresenceState =
+    (typeof WorkspacePresenceStateValues)[keyof typeof WorkspacePresenceStateValues];
 
 /** Supported RPC names. */
 export type MethodName = keyof GatewayMethods;
@@ -21849,4 +21904,6 @@ export enum Method {
     WorkspaceFilesMkdir = 'workspace.files.mkdir',
     /** Calls workspaces.page. */
     WorkspacesPage = 'workspaces.page',
+    /** Calls workspaces.visit. */
+    WorkspacesVisit = 'workspaces.visit',
 }
