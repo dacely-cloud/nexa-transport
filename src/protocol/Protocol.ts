@@ -11254,6 +11254,14 @@ export interface GatewayMethodsworkspace_files_mkdirShape {
     readonly result: BrowserFilesDone;
 }
 
+/** GatewayMethodsworkspaces_page wire fields. */
+export interface GatewayMethodsworkspaces_pageShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: WorkspacePageParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WorkspacePage;
+}
+
 /** GatewayMethods wire fields. */
 export interface GatewayMethodsShape {
     /** accounts.create as defined by the Nexa gateway. */
@@ -11742,6 +11750,8 @@ export interface GatewayMethodsShape {
     readonly 'workspace.files.cancel': GatewayMethodsworkspace_files_cancelShape;
     /** workspace.files.mkdir as defined by the Nexa gateway. */
     readonly 'workspace.files.mkdir': GatewayMethodsworkspace_files_mkdirShape;
+    /** workspaces.page as defined by the Nexa gateway. */
+    readonly 'workspaces.page': GatewayMethodsworkspaces_pageShape;
 }
 
 /** GatewayMethods from the Nexa wire protocol. */
@@ -21320,6 +21330,28 @@ export interface BrowserFilesUploadParamsShape {
 /** BrowserFilesUploadParams from the Nexa wire protocol. */
 export type BrowserFilesUploadParams = BrowserFilesUploadParamsShape;
 
+/** WorkspacePage wire fields. */
+export interface WorkspacePageShape {
+    /** entries as defined by the Nexa gateway. */
+    readonly entries: ReadonlyArray<Workspace>;
+    /** nextCursor as defined by the Nexa gateway. */
+    readonly nextCursor: null | string;
+}
+
+/** WorkspacePage from the Nexa wire protocol. */
+export type WorkspacePage = WorkspacePageShape;
+
+/** WorkspacePageParams wire fields. */
+export interface WorkspacePageParamsShape {
+    /** cursor as defined by the Nexa gateway. */
+    readonly cursor?: string;
+    /** limit as defined by the Nexa gateway. */
+    readonly limit?: number;
+}
+
+/** WorkspacePageParams from the Nexa wire protocol. */
+export type WorkspacePageParams = WorkspacePageParamsShape;
+
 /** Supported RPC names. */
 export type MethodName = keyof GatewayMethods;
 /** Parameters for a particular RPC. */
@@ -21815,4 +21847,6 @@ export enum Method {
     WorkspaceFilesCancel = 'workspace.files.cancel',
     /** Calls workspace.files.mkdir. */
     WorkspaceFilesMkdir = 'workspace.files.mkdir',
+    /** Calls workspaces.page. */
+    WorkspacesPage = 'workspaces.page',
 }

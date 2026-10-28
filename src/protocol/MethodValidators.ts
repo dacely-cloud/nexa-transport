@@ -278,4 +278,5 @@ export const methodValidators: Readonly<Record<MethodName, MethodValidation>> = 
     'workspace.files.finish': { params: validators.params240, result: validators.result240 },
     'workspace.files.cancel': { params: validators.params241, result: validators.result241 },
     'workspace.files.mkdir': { params: validators.params242, result: validators.result242 },
+    'workspaces.page': { params: validators.params243, result: validators.result243 },
 };
