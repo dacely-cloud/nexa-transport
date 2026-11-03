@@ -17027,6 +17027,32 @@
                     },
                     "required": ["params", "result"],
                     "type": "object"
+                },
+                "environment.admin.inspect": {
+                    "description": "Read one managed environment for an explicitly authorized platform operator.",
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/VmAdministrationInspect"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/VmAdministrationView"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "environment.admin.mutate": {
+                    "description": "Admit one lifecycle operation without waiting for or claiming native completion.",
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/VmAdministrationMutation"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/VmAdministrationView"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
                 }
             },
             "required": [
@@ -17276,7 +17302,9 @@
                 "workspaces.page",
                 "workspaces.visit",
                 "workspace.files.rename",
-                "workspace.files.remove"
+                "workspace.files.remove",
+                "environment.admin.inspect",
+                "environment.admin.mutate"
             ],
             "type": "object"
         },
@@ -31576,6 +31604,278 @@
             "required": ["assignment", "destination", "path"],
             "type": "object",
             "additionalProperties": false
+        },
+        "VmAdministrationInspectMethod": {
+            "description": "Read one managed environment for an explicitly authorized platform operator.",
+            "properties": {
+                "params": {
+                    "$ref": "#/definitions/VmAdministrationInspect"
+                },
+                "result": {
+                    "$ref": "#/definitions/VmAdministrationView"
+                }
+            },
+            "required": ["params", "result"],
+            "type": "object"
+        },
+        "VmAdministrationInspect": {
+            "description": "The operator selects one platform account, never an API, tenant, host or machine credential.",
+            "properties": {
+                "userId": {
+                    "type": "string"
+                }
+            },
+            "required": ["userId"],
+            "type": "object"
+        },
+        "VmAdministrationView": {
+            "description": "A null environment explicitly reports that no managed default has been provisioned.",
+            "properties": {
+                "acceptedOperationId": {
+                    "type": ["null", "string"]
+                },
+                "defaultProfile": {
+                    "$ref": "#/definitions/VmAdministrationProfile"
+                },
+                "environment": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/VmAdministrationEnvironment"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "observedAtMs": {
+                    "type": "string"
+                },
+                "providerId": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "acceptedOperationId",
+                "defaultProfile",
+                "environment",
+                "observedAtMs",
+                "providerId",
+                "userId"
+            ],
+            "type": "object"
+        },
+        "VmAdministrationProfile": {
+            "description": "Resource policy quantities remain exact decimal strings across browser and controller boundaries.",
+            "properties": {
+                "architecture": {
+                    "$ref": "#/definitions/VmAdministrationArchitecture"
+                },
+                "gpuCount": {
+                    "type": "number"
+                },
+                "gpuMinimumMemoryBytes": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "memoryBytes": {
+                    "type": "string"
+                },
+                "revision": {
+                    "type": "string"
+                },
+                "runtime": {
+                    "$ref": "#/definitions/VmAdministrationRuntime"
+                },
+                "vcpus": {
+                    "type": "number"
+                }
+            },
+            "required": [
+                "architecture",
+                "gpuCount",
+                "gpuMinimumMemoryBytes",
+                "id",
+                "memoryBytes",
+                "revision",
+                "runtime",
+                "vcpus"
+            ],
+            "type": "object"
+        },
+        "VmAdministrationArchitecture": {
+            "description": "A persistent guest cannot silently change CPU architecture.",
+            "enum": ["x86_64", "aarch64"],
+            "type": "string"
+        },
+        "VmAdministrationRuntime": {
+            "description": "Runtime policy is reported independently of sampled host hardware.",
+            "enum": ["qemu-cpu", "qemu-gpu"],
+            "type": "string"
+        },
+        "VmAdministrationEnvironment": {
+            "description": "No public administrative record contains SSH material, placement addresses or native capabilities.",
+            "properties": {
+                "generation": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "operation": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/VmAdministrationOperation"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "profile": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/VmAdministrationProfile"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "resourcesReserved": {
+                    "type": "boolean"
+                },
+                "state": {
+                    "$ref": "#/definitions/VmAdministrationState"
+                }
+            },
+            "required": ["generation", "id", "operation", "profile", "resourcesReserved", "state"],
+            "type": "object"
+        },
+        "VmAdministrationOperation": {
+            "description": "Platform-authored lifecycle progress excludes raw guest output and internal worker leases.",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "kind": {
+                    "$ref": "#/definitions/VmAdministrationOperationKind"
+                },
+                "phase": {
+                    "$ref": "#/definitions/VmAdministrationOperationPhase"
+                },
+                "sequence": {
+                    "type": "string"
+                },
+                "stage": {
+                    "anyOf": [
+                        {
+                            "enum": [
+                                "backing-up",
+                                "booting",
+                                "claimed",
+                                "completed",
+                                "configuring-network",
+                                "creating-volumes",
+                                "failed",
+                                "preparing-tools",
+                                "queued",
+                                "reconciling",
+                                "reserving",
+                                "restoring",
+                                "stopping",
+                                "waiting-for-ssh"
+                            ],
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                }
+            },
+            "required": ["id", "kind", "phase", "sequence", "stage"],
+            "type": "object"
+        },
+        "VmAdministrationOperationKind": {
+            "description": "Named lifecycle operations reported by the authoritative Compute queue.",
+            "enum": ["provision", "start", "stop", "resize", "backup", "restore", "delete"],
+            "type": "string"
+        },
+        "VmAdministrationOperationPhase": {
+            "description": "Queue completion does not assert a direct live guest health measurement.",
+            "enum": ["queued", "running", "reconciling", "succeeded", "failed"],
+            "type": "string"
+        },
+        "VmAdministrationState": {
+            "description": "These are shared control-plane observations, not a substitute for direct guest health checks.",
+            "enum": [
+                "unprovisioned",
+                "preparing",
+                "reserved",
+                "active",
+                "stopping",
+                "stopped",
+                "recovery-required"
+            ],
+            "type": "string"
+        },
+        "VmAdministrationMutateMethod": {
+            "description": "Admit one lifecycle operation without waiting for or claiming native completion.",
+            "properties": {
+                "params": {
+                    "$ref": "#/definitions/VmAdministrationMutation"
+                },
+                "result": {
+                    "$ref": "#/definitions/VmAdministrationView"
+                }
+            },
+            "required": ["params", "result"],
+            "type": "object"
+        },
+        "VmAdministrationMutation": {
+            "description": "An observed exact environment/generation and stable original request ID constrain every mutation.",
+            "properties": {
+                "action": {
+                    "enum": ["delete", "start", "stop"],
+                    "type": "string"
+                },
+                "environmentId": {
+                    "type": "string"
+                },
+                "generation": {
+                    "type": "string"
+                },
+                "profile": {
+                    "$ref": "#/definitions/VmAdministrationProfileReference",
+                    "description": "Required only for Start; preserves the observed VM profile across request retries."
+                },
+                "requestId": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "string"
+                }
+            },
+            "required": ["action", "environmentId", "generation", "requestId", "userId"],
+            "type": "object"
+        },
+        "VmAdministrationProfileReference": {
+            "description": "A new deployment default cannot silently replace a persistent VM's retained profile.",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "revision": {
+                    "type": "string"
+                }
+            },
+            "required": ["id", "revision"],
+            "type": "object"
         }
     },
     "description": "All protocol contracts reachable from the public transport.",

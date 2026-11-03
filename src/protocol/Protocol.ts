@@ -11286,6 +11286,22 @@ export interface GatewayMethodsworkspace_files_removeShape {
     readonly result: BrowserFilesDone;
 }
 
+/** GatewayMethodsenvironment_admin_inspect wire fields. */
+export interface GatewayMethodsenvironment_admin_inspectShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: VmAdministrationInspect;
+    /** result as defined by the Nexa gateway. */
+    readonly result: VmAdministrationView;
+}
+
+/** GatewayMethodsenvironment_admin_mutate wire fields. */
+export interface GatewayMethodsenvironment_admin_mutateShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: VmAdministrationMutation;
+    /** result as defined by the Nexa gateway. */
+    readonly result: VmAdministrationView;
+}
+
 /** GatewayMethods wire fields. */
 export interface GatewayMethodsShape {
     /** accounts.create as defined by the Nexa gateway. */
@@ -11782,6 +11798,10 @@ export interface GatewayMethodsShape {
     readonly 'workspace.files.rename': GatewayMethodsworkspace_files_renameShape;
     /** workspace.files.remove as defined by the Nexa gateway. */
     readonly 'workspace.files.remove': GatewayMethodsworkspace_files_removeShape;
+    /** environment.admin.inspect as defined by the Nexa gateway. */
+    readonly 'environment.admin.inspect': GatewayMethodsenvironment_admin_inspectShape;
+    /** environment.admin.mutate as defined by the Nexa gateway. */
+    readonly 'environment.admin.mutate': GatewayMethodsenvironment_admin_mutateShape;
 }
 
 /** GatewayMethods from the Nexa wire protocol. */
@@ -21447,6 +21467,229 @@ export interface BrowserFilesRenameParamsShape {
 /** BrowserFilesRenameParams from the Nexa wire protocol. */
 export type BrowserFilesRenameParams = BrowserFilesRenameParamsShape;
 
+/** VmAdministrationInspectMethod wire fields. */
+export interface VmAdministrationInspectMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: VmAdministrationInspect;
+    /** result as defined by the Nexa gateway. */
+    readonly result: VmAdministrationView;
+}
+
+/** VmAdministrationInspectMethod from the Nexa wire protocol. */
+export type VmAdministrationInspectMethod = VmAdministrationInspectMethodShape;
+
+/** VmAdministrationInspect wire fields. */
+export interface VmAdministrationInspectShape {
+    /** userId as defined by the Nexa gateway. */
+    readonly userId: string;
+}
+
+/** VmAdministrationInspect from the Nexa wire protocol. */
+export type VmAdministrationInspect = VmAdministrationInspectShape;
+
+/** VmAdministrationView wire fields. */
+export interface VmAdministrationViewShape {
+    /** acceptedOperationId as defined by the Nexa gateway. */
+    readonly acceptedOperationId: null | string;
+    /** defaultProfile as defined by the Nexa gateway. */
+    readonly defaultProfile: VmAdministrationProfile;
+    /** environment as defined by the Nexa gateway. */
+    readonly environment: VmAdministrationEnvironment | null;
+    /** observedAtMs as defined by the Nexa gateway. */
+    readonly observedAtMs: string;
+    /** providerId as defined by the Nexa gateway. */
+    readonly providerId: string;
+    /** userId as defined by the Nexa gateway. */
+    readonly userId: string;
+}
+
+/** VmAdministrationView from the Nexa wire protocol. */
+export type VmAdministrationView = VmAdministrationViewShape;
+
+/** VmAdministrationProfile wire fields. */
+export interface VmAdministrationProfileShape {
+    /** architecture as defined by the Nexa gateway. */
+    readonly architecture: VmAdministrationArchitecture;
+    /** gpuCount as defined by the Nexa gateway. */
+    readonly gpuCount: number;
+    /** gpuMinimumMemoryBytes as defined by the Nexa gateway. */
+    readonly gpuMinimumMemoryBytes: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** memoryBytes as defined by the Nexa gateway. */
+    readonly memoryBytes: string;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: string;
+    /** runtime as defined by the Nexa gateway. */
+    readonly runtime: VmAdministrationRuntime;
+    /** vcpus as defined by the Nexa gateway. */
+    readonly vcpus: number;
+}
+
+/** VmAdministrationProfile from the Nexa wire protocol. */
+export type VmAdministrationProfile = VmAdministrationProfileShape;
+
+/** Allowed values for VmAdministrationArchitecture. */
+export const VmAdministrationArchitectureValues = { Value0: 'x86_64', Value1: 'aarch64' } as const;
+
+/** VmAdministrationArchitecture from the Nexa wire protocol. */
+export type VmAdministrationArchitecture =
+    (typeof VmAdministrationArchitectureValues)[keyof typeof VmAdministrationArchitectureValues];
+
+/** Allowed values for VmAdministrationRuntime. */
+export const VmAdministrationRuntimeValues = { Value0: 'qemu-cpu', Value1: 'qemu-gpu' } as const;
+
+/** VmAdministrationRuntime from the Nexa wire protocol. */
+export type VmAdministrationRuntime =
+    (typeof VmAdministrationRuntimeValues)[keyof typeof VmAdministrationRuntimeValues];
+
+/** VmAdministrationEnvironment wire fields. */
+export interface VmAdministrationEnvironmentShape {
+    /** generation as defined by the Nexa gateway. */
+    readonly generation: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** operation as defined by the Nexa gateway. */
+    readonly operation: VmAdministrationOperation | null;
+    /** profile as defined by the Nexa gateway. */
+    readonly profile: VmAdministrationProfile | null;
+    /** resourcesReserved as defined by the Nexa gateway. */
+    readonly resourcesReserved: boolean;
+    /** state as defined by the Nexa gateway. */
+    readonly state: VmAdministrationState;
+}
+
+/** VmAdministrationEnvironment from the Nexa wire protocol. */
+export type VmAdministrationEnvironment = VmAdministrationEnvironmentShape;
+
+/** Allowed values for VmAdministrationOperationstageVariant0. */
+export const VmAdministrationOperationstageVariant0Values = {
+    Value0: 'backing-up',
+    Value1: 'booting',
+    Value2: 'claimed',
+    Value3: 'completed',
+    Value4: 'configuring-network',
+    Value5: 'creating-volumes',
+    Value6: 'failed',
+    Value7: 'preparing-tools',
+    Value8: 'queued',
+    Value9: 'reconciling',
+    Value10: 'reserving',
+    Value11: 'restoring',
+    Value12: 'stopping',
+    Value13: 'waiting-for-ssh',
+} as const;
+
+/** VmAdministrationOperation wire fields. */
+export interface VmAdministrationOperationShape {
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: VmAdministrationOperationKind;
+    /** phase as defined by the Nexa gateway. */
+    readonly phase: VmAdministrationOperationPhase;
+    /** sequence as defined by the Nexa gateway. */
+    readonly sequence: string;
+    /** stage as defined by the Nexa gateway. */
+    readonly stage:
+        | (typeof VmAdministrationOperationstageVariant0Values)[keyof typeof VmAdministrationOperationstageVariant0Values]
+        | null;
+}
+
+/** VmAdministrationOperation from the Nexa wire protocol. */
+export type VmAdministrationOperation = VmAdministrationOperationShape;
+
+/** Allowed values for VmAdministrationOperationKind. */
+export const VmAdministrationOperationKindValues = {
+    Value0: 'provision',
+    Value1: 'start',
+    Value2: 'stop',
+    Value3: 'resize',
+    Value4: 'backup',
+    Value5: 'restore',
+    Value6: 'delete',
+} as const;
+
+/** VmAdministrationOperationKind from the Nexa wire protocol. */
+export type VmAdministrationOperationKind =
+    (typeof VmAdministrationOperationKindValues)[keyof typeof VmAdministrationOperationKindValues];
+
+/** Allowed values for VmAdministrationOperationPhase. */
+export const VmAdministrationOperationPhaseValues = {
+    Value0: 'queued',
+    Value1: 'running',
+    Value2: 'reconciling',
+    Value3: 'succeeded',
+    Value4: 'failed',
+} as const;
+
+/** VmAdministrationOperationPhase from the Nexa wire protocol. */
+export type VmAdministrationOperationPhase =
+    (typeof VmAdministrationOperationPhaseValues)[keyof typeof VmAdministrationOperationPhaseValues];
+
+/** Allowed values for VmAdministrationState. */
+export const VmAdministrationStateValues = {
+    Value0: 'unprovisioned',
+    Value1: 'preparing',
+    Value2: 'reserved',
+    Value3: 'active',
+    Value4: 'stopping',
+    Value5: 'stopped',
+    Value6: 'recovery-required',
+} as const;
+
+/** VmAdministrationState from the Nexa wire protocol. */
+export type VmAdministrationState =
+    (typeof VmAdministrationStateValues)[keyof typeof VmAdministrationStateValues];
+
+/** VmAdministrationMutateMethod wire fields. */
+export interface VmAdministrationMutateMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: VmAdministrationMutation;
+    /** result as defined by the Nexa gateway. */
+    readonly result: VmAdministrationView;
+}
+
+/** VmAdministrationMutateMethod from the Nexa wire protocol. */
+export type VmAdministrationMutateMethod = VmAdministrationMutateMethodShape;
+
+/** Allowed values for VmAdministrationMutationaction. */
+export const VmAdministrationMutationactionValues = {
+    Value0: 'delete',
+    Value1: 'start',
+    Value2: 'stop',
+} as const;
+
+/** VmAdministrationMutation wire fields. */
+export interface VmAdministrationMutationShape {
+    /** action as defined by the Nexa gateway. */
+    readonly action: (typeof VmAdministrationMutationactionValues)[keyof typeof VmAdministrationMutationactionValues];
+    /** environmentId as defined by the Nexa gateway. */
+    readonly environmentId: string;
+    /** generation as defined by the Nexa gateway. */
+    readonly generation: string;
+    /** profile as defined by the Nexa gateway. */
+    readonly profile?: VmAdministrationProfileReference;
+    /** requestId as defined by the Nexa gateway. */
+    readonly requestId: string;
+    /** userId as defined by the Nexa gateway. */
+    readonly userId: string;
+}
+
+/** VmAdministrationMutation from the Nexa wire protocol. */
+export type VmAdministrationMutation = VmAdministrationMutationShape;
+
+/** VmAdministrationProfileReference wire fields. */
+export interface VmAdministrationProfileReferenceShape {
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: string;
+}
+
+/** VmAdministrationProfileReference from the Nexa wire protocol. */
+export type VmAdministrationProfileReference = VmAdministrationProfileReferenceShape;
+
 /** Supported RPC names. */
 export type MethodName = keyof GatewayMethods;
 /** Parameters for a particular RPC. */
@@ -21950,4 +22193,8 @@ export enum Method {
     WorkspaceFilesRename = 'workspace.files.rename',
     /** Calls workspace.files.remove. */
     WorkspaceFilesRemove = 'workspace.files.remove',
+    /** Calls environment.admin.inspect. */
+    EnvironmentAdminInspect = 'environment.admin.inspect',
+    /** Calls environment.admin.mutate. */
+    EnvironmentAdminMutate = 'environment.admin.mutate',
 }

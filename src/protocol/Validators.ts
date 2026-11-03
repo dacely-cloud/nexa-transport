@@ -3595,3 +3595,31 @@ export function result246(value: unknown): boolean {
         value,
     );
 }
+/** Validates params247. */
+export function params247(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/environment.admin.inspect/properties/params',
+        value,
+    );
+}
+/** Validates result247. */
+export function result247(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/environment.admin.inspect/properties/result',
+        value,
+    );
+}
+/** Validates params248. */
+export function params248(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/environment.admin.mutate/properties/params',
+        value,
+    );
+}
+/** Validates result248. */
+export function result248(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/environment.admin.mutate/properties/result',
+        value,
+    );
+}
