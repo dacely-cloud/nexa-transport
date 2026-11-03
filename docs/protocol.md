@@ -13166,3 +13166,142 @@ What a workspace currently holds, and when that was last measured against the di
 | `bytes`        | Yes      | `number` |                                                                                          |
 | `files`        | Yes      | `number` |                                                                                          |
 | `reconciledAt` | Yes      | `number` | When a full walk last corrected these numbers. `0` means never — the counters are then a |
+
+## BrowserFilesChunkParams
+
+One acknowledged slice; retries must contain the same bytes at the same offset.
+
+| Field         | Required | Type                 | Description                                                                       |
+| ------------- | -------- | -------------------- | --------------------------------------------------------------------------------- |
+| `data`        | Yes      | `string`             |                                                                                   |
+| `location`    | No       | `"account"` / `"vm"` | Locations choose a server-resolved account root, never a host path or machine ID. |
+| `offset`      | Yes      | `string`             |                                                                                   |
+| `uploadId`    | Yes      | `string`             |                                                                                   |
+| `workspaceId` | No       | `string`             | An owned Chat/project workspace ID, never an absolute filesystem path.            |
+
+## BrowserFilesDone
+
+Publication succeeds only after the complete new file or directory is committed.
+
+| Field | Required | Type      | Description |
+| ----- | -------- | --------- | ----------- |
+| `ok`  | Yes      | `boolean` |             |
+
+## BrowserFilesEntry
+
+Metadata never follows symlinks, devices or mounts.
+
+| Field          | Required | Type     | Description |
+| -------------- | -------- | -------- | ----------- |
+| `byteLength`   | Yes      | `string` |             |
+| `kind`         | Yes      | `string` |             |
+| `modifiedAtNs` | Yes      | `string` |             |
+| `name`         | Yes      | `string` |             |
+
+## BrowserFilesListParams
+
+Directory cursors bind both position and directory revision.
+
+| Field         | Required | Type                 | Description                                                                       |
+| ------------- | -------- | -------------------- | --------------------------------------------------------------------------------- |
+| `cursor`      | No       | `string`             |                                                                                   |
+| `location`    | No       | `"account"` / `"vm"` | Locations choose a server-resolved account root, never a host path or machine ID. |
+| `path`        | Yes      | `string`             |                                                                                   |
+| `workspaceId` | No       | `string`             | An owned Chat/project workspace ID, never an absolute filesystem path.            |
+
+## BrowserFilesPage
+
+Only one bounded directory page is materialized.
+
+| Field        | Required | Type                                                        | Description |
+| ------------ | -------- | ----------------------------------------------------------- | ----------- |
+| `assignment` | Yes      | `string`                                                    |             |
+| `entries`    | Yes      | Array of [BrowserFilesEntry](protocol.md#browserfilesentry) |             |
+| `nextCursor` | Yes      | `null,string`                                               |             |
+
+## BrowserFilesPosition
+
+Exact acknowledged byte position.
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `offset` | Yes      | `string` |             |
+
+## BrowserFilesRead
+
+One bounded binary slice encoded for the existing gateway codec.
+
+| Field        | Required | Type     | Description |
+| ------------ | -------- | -------- | ----------- |
+| `assignment` | Yes      | `string` |             |
+| `byteLength` | Yes      | `string` |             |
+| `data`       | Yes      | `string` |             |
+| `revision`   | Yes      | `string` |             |
+
+## BrowserFilesReadParams
+
+Bounded reads retain the opened file's exact revision across download chunks.
+
+| Field         | Required | Type                 | Description                                                                       |
+| ------------- | -------- | -------------------- | --------------------------------------------------------------------------------- |
+| `assignment`  | Yes      | `string`             |                                                                                   |
+| `location`    | No       | `"account"` / `"vm"` | Locations choose a server-resolved account root, never a host path or machine ID. |
+| `offset`      | Yes      | `string`             |                                                                                   |
+| `path`        | Yes      | `string`             |                                                                                   |
+| `revision`    | No       | `string`             |                                                                                   |
+| `workspaceId` | No       | `string`             | An owned Chat/project workspace ID, never an absolute filesystem path.            |
+
+## BrowserFilesStartParams
+
+Uploads publish a new file or extract a ZIP into a new directory, without replacing existing data.
+
+| Field         | Required | Type                 | Description                                                                       |
+| ------------- | -------- | -------------------- | --------------------------------------------------------------------------------- |
+| `assignment`  | Yes      | `string`             |                                                                                   |
+| `byteLength`  | Yes      | `string`             |                                                                                   |
+| `extractZip`  | Yes      | `boolean`            |                                                                                   |
+| `location`    | No       | `"account"` / `"vm"` | Locations choose a server-resolved account root, never a host path or machine ID. |
+| `path`        | Yes      | `string`             |                                                                                   |
+| `workspaceId` | No       | `string`             | An owned Chat/project workspace ID, never an absolute filesystem path.            |
+
+## BrowserFilesTarget
+
+All operations after discovery retain the original account assignment.
+
+| Field         | Required | Type                 | Description                                                                       |
+| ------------- | -------- | -------------------- | --------------------------------------------------------------------------------- |
+| `assignment`  | Yes      | `string`             |                                                                                   |
+| `location`    | No       | `"account"` / `"vm"` | Locations choose a server-resolved account root, never a host path or machine ID. |
+| `path`        | Yes      | `string`             |                                                                                   |
+| `workspaceId` | No       | `string`             | An owned Chat/project workspace ID, never an absolute filesystem path.            |
+
+## BrowserFilesUpload
+
+Upload acknowledgement advertises its bounded chunk size.
+
+| Field        | Required | Type     | Description |
+| ------------ | -------- | -------- | ----------- |
+| `chunkBytes` | Yes      | `number` |             |
+| `uploadId`   | Yes      | `string` |             |
+
+## BrowserFilesUploadParams
+
+Opaque upload handles are scoped to the authenticated account and captured assignment.
+
+| Field         | Required | Type                 | Description                                                                       |
+| ------------- | -------- | -------------------- | --------------------------------------------------------------------------------- |
+| `location`    | No       | `"account"` / `"vm"` | Locations choose a server-resolved account root, never a host path or machine ID. |
+| `uploadId`    | Yes      | `string`             |                                                                                   |
+| `workspaceId` | No       | `string`             | An owned Chat/project workspace ID, never an absolute filesystem path.            |
+
+## BrowserFilesRenameParams
+
+Rename targets another sibling name and refuses replacement of existing data.
+
+| Field         | Required | Type                 | Description                                                                       |
+| ------------- | -------- | -------------------- | --------------------------------------------------------------------------------- |
+| `assignment`  | Yes      | `string`             |                                                                                   |
+| `destination` | Yes      | `string`             |                                                                                   |
+| `location`    | No       | `"account"` / `"vm"` | Locations choose a server-resolved account root, never a host path or machine ID. |
+| `path`        | Yes      | `string`             |                                                                                   |
+| `workspaceId` | No       | `string`             | An owned Chat/project workspace ID, never an absolute filesystem path.            |

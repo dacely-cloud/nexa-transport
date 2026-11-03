@@ -3567,3 +3567,31 @@ export function result244(value: unknown): boolean {
         value,
     );
 }
+/** Validates params245. */
+export function params245(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/workspace.files.rename/properties/params',
+        value,
+    );
+}
+/** Validates result245. */
+export function result245(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/workspace.files.rename/properties/result',
+        value,
+    );
+}
+/** Validates params246. */
+export function params246(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/workspace.files.remove/properties/params',
+        value,
+    );
+}
+/** Validates result246. */
+export function result246(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/workspace.files.remove/properties/result',
+        value,
+    );
+}

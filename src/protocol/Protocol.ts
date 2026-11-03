@@ -11270,6 +11270,22 @@ export interface GatewayMethodsworkspaces_visitShape {
     readonly result: OkResult;
 }
 
+/** GatewayMethodsworkspace_files_rename wire fields. */
+export interface GatewayMethodsworkspace_files_renameShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: BrowserFilesRenameParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: BrowserFilesDone;
+}
+
+/** GatewayMethodsworkspace_files_remove wire fields. */
+export interface GatewayMethodsworkspace_files_removeShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: BrowserFilesTarget;
+    /** result as defined by the Nexa gateway. */
+    readonly result: BrowserFilesDone;
+}
+
 /** GatewayMethods wire fields. */
 export interface GatewayMethodsShape {
     /** accounts.create as defined by the Nexa gateway. */
@@ -11762,6 +11778,10 @@ export interface GatewayMethodsShape {
     readonly 'workspaces.page': GatewayMethodsworkspaces_pageShape;
     /** workspaces.visit as defined by the Nexa gateway. */
     readonly 'workspaces.visit': GatewayMethodsworkspaces_visitShape;
+    /** workspace.files.rename as defined by the Nexa gateway. */
+    readonly 'workspace.files.rename': GatewayMethodsworkspace_files_renameShape;
+    /** workspace.files.remove as defined by the Nexa gateway. */
+    readonly 'workspace.files.remove': GatewayMethodsworkspace_files_removeShape;
 }
 
 /** GatewayMethods from the Nexa wire protocol. */
@@ -21407,6 +21427,26 @@ export const WorkspacePresenceStateValues = {
 export type WorkspacePresenceState =
     (typeof WorkspacePresenceStateValues)[keyof typeof WorkspacePresenceStateValues];
 
+/** Allowed values for BrowserFilesRenameParamslocation. */
+export const BrowserFilesRenameParamslocationValues = { Value0: 'account', Value1: 'vm' } as const;
+
+/** BrowserFilesRenameParams wire fields. */
+export interface BrowserFilesRenameParamsShape {
+    /** assignment as defined by the Nexa gateway. */
+    readonly assignment: string;
+    /** destination as defined by the Nexa gateway. */
+    readonly destination: string;
+    /** location as defined by the Nexa gateway. */
+    readonly location?: (typeof BrowserFilesRenameParamslocationValues)[keyof typeof BrowserFilesRenameParamslocationValues];
+    /** path as defined by the Nexa gateway. */
+    readonly path: string;
+    /** workspaceId as defined by the Nexa gateway. */
+    readonly workspaceId?: string;
+}
+
+/** BrowserFilesRenameParams from the Nexa wire protocol. */
+export type BrowserFilesRenameParams = BrowserFilesRenameParamsShape;
+
 /** Supported RPC names. */
 export type MethodName = keyof GatewayMethods;
 /** Parameters for a particular RPC. */
@@ -21906,4 +21946,8 @@ export enum Method {
     WorkspacesPage = 'workspaces.page',
     /** Calls workspaces.visit. */
     WorkspacesVisit = 'workspaces.visit',
+    /** Calls workspace.files.rename. */
+    WorkspaceFilesRename = 'workspace.files.rename',
+    /** Calls workspace.files.remove. */
+    WorkspaceFilesRemove = 'workspace.files.remove',
 }

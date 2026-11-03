@@ -1,6 +1,6 @@
 # RPC reference
 
-All 209 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 208 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
+Selected protocol method examples. `connect` is managed by `NexaClient.connect`; other methods use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
 
 - [accounts.create](#accountscreate)
 - [accounts.list](#accountslist)
@@ -211,6 +211,16 @@ All 209 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [workspaces.describe](#workspacesdescribe)
 - [workspaces.destroy](#workspacesdestroy)
 - [workspaces.list](#workspaceslist)
+
+- [workspace.files.list](#workspacefileslist)
+- [workspace.files.read](#workspacefilesread)
+- [workspace.files.start](#workspacefilesstart)
+- [workspace.files.chunk](#workspacefileschunk)
+- [workspace.files.finish](#workspacefilesfinish)
+- [workspace.files.cancel](#workspacefilescancel)
+- [workspace.files.mkdir](#workspacefilesmkdir)
+- [workspace.files.rename](#workspacefilesrename)
+- [workspace.files.remove](#workspacefilesremove)
 
 ## accounts.create
 
@@ -5578,3 +5588,243 @@ Parameters: [Recordstringnever](protocol.md#recordstringnever).
 Type: Dictionary.
 
 Result: Array of [Workspace](protocol.md#workspace).
+
+## workspace.files.list
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkspaceFilesList> = {
+    path: 'YOUR_PATH',
+};
+const result: ResultOf<typeof Method.WorkspaceFilesList> = await client.call(
+    Method.WorkspaceFilesList,
+    params,
+);
+```
+
+Parameters: [BrowserFilesListParams](protocol.md#browserfileslistparams).
+
+| Field         | Required | Type                 | Description                                                                       |
+| ------------- | -------- | -------------------- | --------------------------------------------------------------------------------- |
+| `cursor`      | No       | `string`             |                                                                                   |
+| `location`    | No       | `"account"` / `"vm"` | Locations choose a server-resolved account root, never a host path or machine ID. |
+| `path`        | Yes      | `string`             |                                                                                   |
+| `workspaceId` | No       | `string`             | An owned Chat/project workspace ID, never an absolute filesystem path.            |
+
+Result: [BrowserFilesPage](protocol.md#browserfilespage).
+
+## workspace.files.read
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkspaceFilesRead> = {
+    assignment: 'YOUR_ASSIGNMENT',
+    offset: 'YOUR_OFFSET',
+    path: 'YOUR_PATH',
+};
+const result: ResultOf<typeof Method.WorkspaceFilesRead> = await client.call(
+    Method.WorkspaceFilesRead,
+    params,
+);
+```
+
+Parameters: [BrowserFilesReadParams](protocol.md#browserfilesreadparams).
+
+| Field         | Required | Type                 | Description                                                                       |
+| ------------- | -------- | -------------------- | --------------------------------------------------------------------------------- |
+| `assignment`  | Yes      | `string`             |                                                                                   |
+| `location`    | No       | `"account"` / `"vm"` | Locations choose a server-resolved account root, never a host path or machine ID. |
+| `offset`      | Yes      | `string`             |                                                                                   |
+| `path`        | Yes      | `string`             |                                                                                   |
+| `revision`    | No       | `string`             |                                                                                   |
+| `workspaceId` | No       | `string`             | An owned Chat/project workspace ID, never an absolute filesystem path.            |
+
+Result: [BrowserFilesRead](protocol.md#browserfilesread).
+
+## workspace.files.start
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkspaceFilesStart> = {
+    assignment: 'YOUR_ASSIGNMENT',
+    byteLength: 'YOUR_BYTELENGTH',
+    extractZip: false,
+    path: 'YOUR_PATH',
+};
+const result: ResultOf<typeof Method.WorkspaceFilesStart> = await client.call(
+    Method.WorkspaceFilesStart,
+    params,
+);
+```
+
+Parameters: [BrowserFilesStartParams](protocol.md#browserfilesstartparams).
+
+| Field         | Required | Type                 | Description                                                                       |
+| ------------- | -------- | -------------------- | --------------------------------------------------------------------------------- |
+| `assignment`  | Yes      | `string`             |                                                                                   |
+| `byteLength`  | Yes      | `string`             |                                                                                   |
+| `extractZip`  | Yes      | `boolean`            |                                                                                   |
+| `location`    | No       | `"account"` / `"vm"` | Locations choose a server-resolved account root, never a host path or machine ID. |
+| `path`        | Yes      | `string`             |                                                                                   |
+| `workspaceId` | No       | `string`             | An owned Chat/project workspace ID, never an absolute filesystem path.            |
+
+Result: [BrowserFilesUpload](protocol.md#browserfilesupload).
+
+## workspace.files.chunk
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkspaceFilesChunk> = {
+    data: 'YOUR_DATA',
+    offset: 'YOUR_OFFSET',
+    uploadId: 'YOUR_UPLOADID',
+};
+const result: ResultOf<typeof Method.WorkspaceFilesChunk> = await client.call(
+    Method.WorkspaceFilesChunk,
+    params,
+);
+```
+
+Parameters: [BrowserFilesChunkParams](protocol.md#browserfileschunkparams).
+
+| Field         | Required | Type                 | Description                                                                       |
+| ------------- | -------- | -------------------- | --------------------------------------------------------------------------------- |
+| `data`        | Yes      | `string`             |                                                                                   |
+| `location`    | No       | `"account"` / `"vm"` | Locations choose a server-resolved account root, never a host path or machine ID. |
+| `offset`      | Yes      | `string`             |                                                                                   |
+| `uploadId`    | Yes      | `string`             |                                                                                   |
+| `workspaceId` | No       | `string`             | An owned Chat/project workspace ID, never an absolute filesystem path.            |
+
+Result: [BrowserFilesPosition](protocol.md#browserfilesposition).
+
+## workspace.files.finish
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkspaceFilesFinish> = {
+    uploadId: 'YOUR_UPLOADID',
+};
+const result: ResultOf<typeof Method.WorkspaceFilesFinish> = await client.call(
+    Method.WorkspaceFilesFinish,
+    params,
+);
+```
+
+Parameters: [BrowserFilesUploadParams](protocol.md#browserfilesuploadparams).
+
+| Field         | Required | Type                 | Description                                                                       |
+| ------------- | -------- | -------------------- | --------------------------------------------------------------------------------- |
+| `location`    | No       | `"account"` / `"vm"` | Locations choose a server-resolved account root, never a host path or machine ID. |
+| `uploadId`    | Yes      | `string`             |                                                                                   |
+| `workspaceId` | No       | `string`             | An owned Chat/project workspace ID, never an absolute filesystem path.            |
+
+Result: [BrowserFilesDone](protocol.md#browserfilesdone).
+
+## workspace.files.cancel
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkspaceFilesCancel> = {
+    uploadId: 'YOUR_UPLOADID',
+};
+const result: ResultOf<typeof Method.WorkspaceFilesCancel> = await client.call(
+    Method.WorkspaceFilesCancel,
+    params,
+);
+```
+
+Parameters: [BrowserFilesUploadParams](protocol.md#browserfilesuploadparams).
+
+| Field         | Required | Type                 | Description                                                                       |
+| ------------- | -------- | -------------------- | --------------------------------------------------------------------------------- |
+| `location`    | No       | `"account"` / `"vm"` | Locations choose a server-resolved account root, never a host path or machine ID. |
+| `uploadId`    | Yes      | `string`             |                                                                                   |
+| `workspaceId` | No       | `string`             | An owned Chat/project workspace ID, never an absolute filesystem path.            |
+
+Result: [BrowserFilesDone](protocol.md#browserfilesdone).
+
+## workspace.files.mkdir
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkspaceFilesMkdir> = {
+    assignment: 'YOUR_ASSIGNMENT',
+    path: 'YOUR_PATH',
+};
+const result: ResultOf<typeof Method.WorkspaceFilesMkdir> = await client.call(
+    Method.WorkspaceFilesMkdir,
+    params,
+);
+```
+
+Parameters: [BrowserFilesTarget](protocol.md#browserfilestarget).
+
+| Field         | Required | Type                 | Description                                                                       |
+| ------------- | -------- | -------------------- | --------------------------------------------------------------------------------- |
+| `assignment`  | Yes      | `string`             |                                                                                   |
+| `location`    | No       | `"account"` / `"vm"` | Locations choose a server-resolved account root, never a host path or machine ID. |
+| `path`        | Yes      | `string`             |                                                                                   |
+| `workspaceId` | No       | `string`             | An owned Chat/project workspace ID, never an absolute filesystem path.            |
+
+Result: [BrowserFilesDone](protocol.md#browserfilesdone).
+
+## workspace.files.rename
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkspaceFilesRename> = {
+    assignment: 'YOUR_ASSIGNMENT',
+    destination: 'YOUR_DESTINATION',
+    path: 'YOUR_PATH',
+};
+const result: ResultOf<typeof Method.WorkspaceFilesRename> = await client.call(
+    Method.WorkspaceFilesRename,
+    params,
+);
+```
+
+Parameters: [BrowserFilesRenameParams](protocol.md#browserfilesrenameparams).
+
+| Field         | Required | Type                 | Description                                                                       |
+| ------------- | -------- | -------------------- | --------------------------------------------------------------------------------- |
+| `assignment`  | Yes      | `string`             |                                                                                   |
+| `destination` | Yes      | `string`             |                                                                                   |
+| `location`    | No       | `"account"` / `"vm"` | Locations choose a server-resolved account root, never a host path or machine ID. |
+| `path`        | Yes      | `string`             |                                                                                   |
+| `workspaceId` | No       | `string`             | An owned Chat/project workspace ID, never an absolute filesystem path.            |
+
+Result: [BrowserFilesDone](protocol.md#browserfilesdone).
+
+## workspace.files.remove
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkspaceFilesRemove> = {
+    assignment: 'YOUR_ASSIGNMENT',
+    path: 'YOUR_PATH',
+};
+const result: ResultOf<typeof Method.WorkspaceFilesRemove> = await client.call(
+    Method.WorkspaceFilesRemove,
+    params,
+);
+```
+
+Parameters: [BrowserFilesTarget](protocol.md#browserfilestarget).
+
+| Field         | Required | Type                 | Description                                                                       |
+| ------------- | -------- | -------------------- | --------------------------------------------------------------------------------- |
+| `assignment`  | Yes      | `string`             |                                                                                   |
+| `location`    | No       | `"account"` / `"vm"` | Locations choose a server-resolved account root, never a host path or machine ID. |
+| `path`        | Yes      | `string`             |                                                                                   |
+| `workspaceId` | No       | `string`             | An owned Chat/project workspace ID, never an absolute filesystem path.            |
+
+Result: [BrowserFilesDone](protocol.md#browserfilesdone).

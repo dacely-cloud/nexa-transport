@@ -33,6 +33,30 @@ it('exposes bounded browser RPCs without accepting caller-selected host or accou
             offset: '0',
         }),
     ).toBe(true);
+    expect(
+        methodValidators[Method.WorkspaceFilesRename].params({
+            path: 'draft.txt',
+            destination: 'final.txt',
+            assignment,
+        }),
+    ).toBe(true);
+    expect(
+        methodValidators[Method.WorkspaceFilesRemove].params({
+            path: 'folder',
+            assignment,
+            location: 'vm',
+        }),
+    ).toBe(true);
+    expect(
+        methodValidators[Method.WorkspaceFilesRename].params({ path: 'draft.txt', assignment }),
+    ).toBe(false);
+    expect(
+        methodValidators[Method.WorkspaceFilesRemove].params({
+            path: 'folder',
+            assignment,
+            root: '/etc',
+        }),
+    ).toBe(false);
     for (const extra of [{ root: '/etc' }, { userId: 'other' }, { machineId: 'other' }]) {
         expect(methodValidators[Method.WorkspaceFilesList].params({ path: '', ...extra })).toBe(
             false,
@@ -132,11 +156,33 @@ it('round-trips bounded binary workspace transfers through the public websocket 
         });
         await client.call(Method.WorkspaceFilesCancel, { uploadId });
         await client.call(Method.WorkspaceFilesMkdir, { assignment, path: 'folder' });
+        await client.call(Method.WorkspaceFilesRename, {
+            assignment,
+            path: 'folder',
+            destination: 'renamed',
+            workspaceId: 'owned-project',
+        });
+        await client.call(Method.WorkspaceFilesRemove, {
+            assignment,
+            path: 'renamed',
+            location: 'vm',
+        });
+        expect(gateway.requests.at(-2)?.params).toEqual({
+            assignment,
+            path: 'folder',
+            destination: 'renamed',
+            workspaceId: 'owned-project',
+        });
+        expect(gateway.requests.at(-1)?.params).toEqual({
+            assignment,
+            path: 'renamed',
+            location: 'vm',
+        });
         expect(
             gateway.requests.filter((request: Request): boolean =>
                 request.method.startsWith('workspace.files.'),
             ),
-        ).toHaveLength(8);
+        ).toHaveLength(10);
     } finally {
         client?.close();
         await gateway.close();
