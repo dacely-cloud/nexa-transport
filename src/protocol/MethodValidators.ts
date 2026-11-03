@@ -282,4 +282,6 @@ export const methodValidators: Readonly<Record<MethodName, MethodValidation>> = 
     'workspaces.visit': { params: validators.params244, result: validators.result244 },
     'workspace.files.rename': { params: validators.params245, result: validators.result245 },
     'workspace.files.remove': { params: validators.params246, result: validators.result246 },
+    'environment.admin.inspect': { params: validators.params247, result: validators.result247 },
+    'environment.admin.mutate': { params: validators.params248, result: validators.result248 },
 };
