@@ -280,4 +280,6 @@ export const methodValidators: Readonly<Record<MethodName, MethodValidation>> = 
     'workspace.files.mkdir': { params: validators.params242, result: validators.result242 },
     'workspaces.page': { params: validators.params243, result: validators.result243 },
     'workspaces.visit': { params: validators.params244, result: validators.result244 },
+    'workspace.files.rename': { params: validators.params245, result: validators.result245 },
+    'workspace.files.remove': { params: validators.params246, result: validators.result246 },
 };

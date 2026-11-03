@@ -17485,6 +17485,30 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'workspace.files.rename': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/BrowserFilesRenameParams',
+                        },
+                        result: {
+                            $ref: '#/definitions/BrowserFilesDone',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'workspace.files.remove': {
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/BrowserFilesTarget',
+                        },
+                        result: {
+                            $ref: '#/definitions/BrowserFilesDone',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
             },
             required: [
                 'accounts.create',
@@ -17732,6 +17756,8 @@ export const schema: Schema = {
                 'workspace.files.mkdir',
                 'workspaces.page',
                 'workspaces.visit',
+                'workspace.files.rename',
+                'workspace.files.remove',
             ],
             type: 'object',
         },
@@ -32495,6 +32521,38 @@ export const schema: Schema = {
                 'Root visibility is metadata only; uncertainty never becomes a negative classification.\nFinite root-presence states shared with the native batch helper.',
             enum: ['empty', 'nonempty', 'unknown'],
             type: 'string',
+        },
+        BrowserFilesRenameParams: {
+            description:
+                'Rename targets another sibling name and refuses replacement of existing data.',
+            properties: {
+                assignment: {
+                    type: 'string',
+                    pattern: '^[a-f0-9]{64}$',
+                },
+                destination: {
+                    type: 'string',
+                    maxLength: 4096,
+                },
+                location: {
+                    description:
+                        'Locations choose a server-resolved account root, never a host path or machine ID.\nPersistent account storage remains available independently of VM execution.',
+                    enum: ['account', 'vm'],
+                    type: 'string',
+                },
+                path: {
+                    type: 'string',
+                    maxLength: 4096,
+                },
+                workspaceId: {
+                    description:
+                        'An owned Chat/project workspace ID, never an absolute filesystem path.',
+                    type: 'string',
+                },
+            },
+            required: ['assignment', 'destination', 'path'],
+            type: 'object',
+            additionalProperties: false,
         },
     },
     description: 'All protocol contracts reachable from the public transport.',

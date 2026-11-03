@@ -16,6 +16,8 @@ try {
         finish: ['BrowserFilesUploadParams', 'BrowserFilesDone'],
         cancel: ['BrowserFilesUploadParams', 'BrowserFilesDone'],
         mkdir: ['BrowserFilesTarget', 'BrowserFilesDone'],
+        rename: ['BrowserFilesRenameParams', 'BrowserFilesDone'],
+        remove: ['BrowserFilesTarget', 'BrowserFilesDone'],
     };
     writeFileSync(
         source,
@@ -57,7 +59,7 @@ try {
             definition.additionalProperties = false;
             for (const [field, property] of Object.entries(definition.properties)) {
                 if (['assignment', 'uploadId'].includes(field)) property.pattern = '^[a-f0-9]{64}$';
-                if (['path'].includes(field)) property.maxLength = 4096;
+                if (['path', 'destination'].includes(field)) property.maxLength = 4096;
                 if (['cursor', 'revision'].includes(field)) property.maxLength = 256;
                 if (['offset', 'byteLength'].includes(field)) {
                     property.pattern = '^(0|[1-9][0-9]{0,15})$';
