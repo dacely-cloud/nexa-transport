@@ -1,6 +1,6 @@
 # RPC reference
 
-Selected protocol method examples. `connect` is managed by `NexaClient.connect`; other methods use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
+All 249 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 248 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
 
 - [accounts.create](#accountscreate)
 - [accounts.list](#accountslist)
@@ -20,6 +20,15 @@ Selected protocol method examples. `connect` is managed by `NexaClient.connect`;
 - [config.set](#configset)
 - [config.unset](#configunset)
 - [connect](#connect)
+- [connectors.files.get](#connectorsfilesget)
+- [connectors.files.submit](#connectorsfilessubmit)
+- [connectors.filesystem](#connectorsfilesystem)
+- [connectors.get](#connectorsget)
+- [connectors.inventory](#connectorsinventory)
+- [connectors.link.approve](#connectorslinkapprove)
+- [connectors.link.review](#connectorslinkreview)
+- [connectors.list](#connectorslist)
+- [connectors.revoke](#connectorsrevoke)
 - [credit.budgets](#creditbudgets)
 - [credit.removeBudget](#creditremovebudget)
 - [credit.resetAllowance](#creditresetallowance)
@@ -95,6 +104,11 @@ Selected protocol method examples. `connect` is managed by `NexaClient.connect`;
 - [processes.log](#processeslog)
 - [processes.resize](#processesresize)
 - [processes.stop](#processesstop)
+- [redteam.get](#redteamget)
+- [redteam.list](#redteamlist)
+- [redteam.start](#redteamstart)
+- [redteam.stop](#redteamstop)
+- [redteam.update](#redteamupdate)
 - [reverse.browser](#reversebrowser)
 - [reverse.browser.modules](#reversebrowsermodules)
 - [reverse.browser.screenshot](#reversebrowserscreenshot)
@@ -211,7 +225,19 @@ Selected protocol method examples. `connect` is managed by `NexaClient.connect`;
 - [workspaces.describe](#workspacesdescribe)
 - [workspaces.destroy](#workspacesdestroy)
 - [workspaces.list](#workspaceslist)
-
+- [connectors.execution](#connectorsexecution)
+- [connectors.execution.submit](#connectorsexecutionsubmit)
+- [connectors.execution.get](#connectorsexecutionget)
+- [connectors.execution.cancel](#connectorsexecutioncancel)
+- [connectors.execution.jobs](#connectorsexecutionjobs)
+- [connectors.link.deny](#connectorslinkdeny)
+- [connectors.execution.output](#connectorsexecutionoutput)
+- [connectors.workspace.get](#connectorsworkspaceget)
+- [connectors.workspace.select](#connectorsworkspaceselect)
+- [connectors.workspace.clear](#connectorsworkspaceclear)
+- [connectors.workspace.create](#connectorsworkspacecreate)
+- [connectors.workspace.catalog](#connectorsworkspacecatalog)
+- [connectors.workspace.select-joint](#connectorsworkspaceselect-joint)
 - [workspace.files.list](#workspacefileslist)
 - [workspace.files.read](#workspacefilesread)
 - [workspace.files.start](#workspacefilesstart)
@@ -219,8 +245,12 @@ Selected protocol method examples. `connect` is managed by `NexaClient.connect`;
 - [workspace.files.finish](#workspacefilesfinish)
 - [workspace.files.cancel](#workspacefilescancel)
 - [workspace.files.mkdir](#workspacefilesmkdir)
+- [workspaces.page](#workspacespage)
+- [workspaces.visit](#workspacesvisit)
 - [workspace.files.rename](#workspacefilesrename)
 - [workspace.files.remove](#workspacefilesremove)
+- [environment.admin.inspect](#environmentadmininspect)
+- [environment.admin.mutate](#environmentadminmutate)
 
 ## accounts.create
 
@@ -597,6 +627,228 @@ Parameters: [ConnectParams](protocol.md#connectparams).
 | `nonce`       | Yes      | `string`                                           | The challenge nonce, proving the client read the server's first frame. |
 
 Result: [HelloOk](protocol.md#hellook).
+
+## connectors.files.get
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ConnectorsFilesGet> = {
+    environmentId: 'YOUR_ENVIRONMENTID',
+    jobId: 'YOUR_JOBID',
+};
+const result: ResultOf<typeof Method.ConnectorsFilesGet> = await client.call(
+    Method.ConnectorsFilesGet,
+    params,
+);
+```
+
+Parameters: [ConnectorResultParams](protocol.md#connectorresultparams).
+
+| Field           | Required | Type     | Description |
+| --------------- | -------- | -------- | ----------- |
+| `environmentId` | Yes      | `string` |             |
+| `jobId`         | Yes      | `string` |             |
+
+Result: [ConnectorJob](protocol.md#connectorjob).
+
+## connectors.files.submit
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ConnectorsFilesSubmit> = {
+    environmentId: 'YOUR_ENVIRONMENTID',
+    previousSequence: 'YOUR_PREVIOUSSEQUENCE',
+    request: {
+        action: 'read',
+        limit: 1,
+        offset: 'YOUR_OFFSET',
+        path: 'YOUR_PATH',
+        policySha256: 'YOUR_POLICYSHA256',
+        requestId: 'YOUR_REQUESTID',
+        rootId: 'YOUR_ROOTID',
+    },
+};
+const result: ResultOf<typeof Method.ConnectorsFilesSubmit> = await client.call(
+    Method.ConnectorsFilesSubmit,
+    params,
+);
+```
+
+Parameters: [ConnectorSubmitParams](protocol.md#connectorsubmitparams).
+
+| Field              | Required | Type                                                     | Description |
+| ------------------ | -------- | -------------------------------------------------------- | ----------- |
+| `environmentId`    | Yes      | `string`                                                 |             |
+| `previousSequence` | Yes      | `string`                                                 |             |
+| `request`          | Yes      | [ConnectorFileRequest](protocol.md#connectorfilerequest) |             |
+
+Result: [ConnectorJob](protocol.md#connectorjob).
+
+## connectors.filesystem
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ConnectorsFilesystem> = {
+    environmentId: 'YOUR_ENVIRONMENTID',
+};
+const result: ResultOf<typeof Method.ConnectorsFilesystem> = await client.call(
+    Method.ConnectorsFilesystem,
+    params,
+);
+```
+
+Parameters: [ConnectorEnvironmentParams](protocol.md#connectorenvironmentparams).
+
+| Field           | Required | Type     | Description |
+| --------------- | -------- | -------- | ----------- |
+| `environmentId` | Yes      | `string` |             |
+
+Result: [ConnectorFilesystem](protocol.md#connectorfilesystem).
+
+## connectors.get
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ConnectorsGet> = {
+    enrollmentId: 'YOUR_ENROLLMENTID',
+};
+const result: ResultOf<typeof Method.ConnectorsGet> = await client.call(
+    Method.ConnectorsGet,
+    params,
+);
+```
+
+Parameters: [ConnectorGetParams](protocol.md#connectorgetparams).
+
+| Field          | Required | Type     | Description |
+| -------------- | -------- | -------- | ----------- |
+| `enrollmentId` | Yes      | `string` |             |
+
+Result: [ConnectorView](protocol.md#connectorview).
+
+## connectors.inventory
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ConnectorsInventory> = {
+    after: null,
+};
+const result: ResultOf<typeof Method.ConnectorsInventory> = await client.call(
+    Method.ConnectorsInventory,
+    params,
+);
+```
+
+Parameters: [ConnectorInventoryParams](protocol.md#connectorinventoryparams).
+
+| Field   | Required | Type          | Description |
+| ------- | -------- | ------------- | ----------- |
+| `after` | Yes      | `null,string` |             |
+
+Result: [ConnectorInventoryPage](protocol.md#connectorinventorypage).
+
+## connectors.link.approve
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ConnectorsLinkApprove> = {
+    code: 'YOUR_CODE',
+    linkId: 'YOUR_LINKID',
+    name: 'YOUR_NAME',
+    publicKey: 'YOUR_PUBLICKEY',
+    requestId: 'YOUR_REQUESTID',
+};
+const result: ResultOf<typeof Method.ConnectorsLinkApprove> = await client.call(
+    Method.ConnectorsLinkApprove,
+    params,
+);
+```
+
+Parameters: [ConnectorLinkApproveParams](protocol.md#connectorlinkapproveparams).
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `code`      | Yes      | `string` |             |
+| `linkId`    | Yes      | `string` |             |
+| `name`      | Yes      | `string` |             |
+| `publicKey` | Yes      | `string` |             |
+| `requestId` | Yes      | `string` |             |
+
+Result: [ConnectorLinkApproved](protocol.md#connectorlinkapproved).
+
+## connectors.link.review
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ConnectorsLinkReview> = {
+    code: 'YOUR_CODE',
+    requestId: 'YOUR_REQUESTID',
+};
+const result: ResultOf<typeof Method.ConnectorsLinkReview> = await client.call(
+    Method.ConnectorsLinkReview,
+    params,
+);
+```
+
+Parameters: [ConnectorLinkReviewParams](protocol.md#connectorlinkreviewparams).
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `code`      | Yes      | `string` |             |
+| `requestId` | Yes      | `string` |             |
+
+Result: [ConnectorLinkReview](protocol.md#connectorlinkreview).
+
+## connectors.list
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ConnectorsList> = {};
+const result: ResultOf<typeof Method.ConnectorsList> = await client.call(
+    Method.ConnectorsList,
+    params,
+);
+```
+
+Parameters: [Recordstringnever](protocol.md#recordstringnever).
+
+Type: Dictionary.
+
+Result: [ConnectorList](protocol.md#connectorlist).
+
+## connectors.revoke
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ConnectorsRevoke> = {
+    enrollmentId: 'YOUR_ENROLLMENTID',
+    observedRevision: 'YOUR_OBSERVEDREVISION',
+    requestId: 'YOUR_REQUESTID',
+};
+const result: ResultOf<typeof Method.ConnectorsRevoke> = await client.call(
+    Method.ConnectorsRevoke,
+    params,
+);
+```
+
+Parameters: [ConnectorRevokeParams](protocol.md#connectorrevokeparams).
+
+| Field              | Required | Type     | Description |
+| ------------------ | -------- | -------- | ----------- |
+| `enrollmentId`     | Yes      | `string` |             |
+| `observedRevision` | Yes      | `string` |             |
+| `requestId`        | Yes      | `string` |             |
+
+Result: [ConnectorView](protocol.md#connectorview).
 
 ## credit.budgets
 
@@ -2568,6 +2820,126 @@ Parameters: [BackgroundProcessRef](protocol.md#backgroundprocessref).
 | `sessionId` | Yes      | `string` |             |
 
 Result: [OkResult](protocol.md#okresult).
+
+## redteam.get
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.RedteamGet> = {
+    effortId: 'YOUR_EFFORTID',
+    findingCursor: null,
+    revision: null,
+    taskCursor: null,
+};
+const result: ResultOf<typeof Method.RedteamGet> = await client.call(Method.RedteamGet, params);
+```
+
+Parameters: [RedTeamGetRequest](protocol.md#redteamgetrequest).
+
+| Field           | Required | Type          | Description |
+| --------------- | -------- | ------------- | ----------- |
+| `effortId`      | Yes      | `string`      |             |
+| `findingCursor` | Yes      | `null,string` |             |
+| `revision`      | Yes      | `null,string` |             |
+| `taskCursor`    | Yes      | `null,string` |             |
+
+Result: [RedTeamSnapshot](protocol.md#redteamsnapshot).
+
+## redteam.list
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.RedteamList> = {
+    afterEffortId: null,
+    limit: 1,
+};
+const result: ResultOf<typeof Method.RedteamList> = await client.call(Method.RedteamList, params);
+```
+
+Parameters: [RedTeamListRequest](protocol.md#redteamlistrequest).
+
+| Field           | Required | Type          | Description |
+| --------------- | -------- | ------------- | ----------- |
+| `afterEffortId` | Yes      | `null,string` |             |
+| `limit`         | Yes      | `number`      |             |
+
+Result: [RedTeamListPage](protocol.md#redteamlistpage).
+
+## redteam.start
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.RedteamStart> = {
+    effortId: 'YOUR_EFFORTID',
+    rules: 'YOUR_RULES',
+    source: {
+        fileIds: [],
+        kind: 'files',
+    },
+    title: 'YOUR_TITLE',
+};
+const result: ResultOf<typeof Method.RedteamStart> = await client.call(Method.RedteamStart, params);
+```
+
+Parameters: [RedTeamStartRequest](protocol.md#redteamstartrequest).
+
+| Field         | Required | Type                                       | Description |
+| ------------- | -------- | ------------------------------------------ | ----------- |
+| `effortId`    | Yes      | `string`                                   |             |
+| `parallelism` | No       | `number`                                   |             |
+| `rules`       | Yes      | `string`                                   |             |
+| `source`      | Yes      | [RedTeamSource](protocol.md#redteamsource) |             |
+| `title`       | Yes      | `string`                                   |             |
+
+Result: [RedTeamEffort](protocol.md#redteameffort).
+
+## redteam.stop
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.RedteamStop> = {
+    effortId: 'YOUR_EFFORTID',
+};
+const result: ResultOf<typeof Method.RedteamStop> = await client.call(Method.RedteamStop, params);
+```
+
+Parameters: [RedTeamEffortRequest](protocol.md#redteameffortrequest).
+
+| Field      | Required | Type     | Description |
+| ---------- | -------- | -------- | ----------- |
+| `effortId` | Yes      | `string` |             |
+
+Result: [RedTeamEffort](protocol.md#redteameffort).
+
+## redteam.update
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.RedteamUpdate> = {
+    effortId: 'YOUR_EFFORTID',
+    expectedRevision: 'YOUR_EXPECTEDREVISION',
+};
+const result: ResultOf<typeof Method.RedteamUpdate> = await client.call(
+    Method.RedteamUpdate,
+    params,
+);
+```
+
+Parameters: [RedTeamUpdateRequest](protocol.md#redteamupdaterequest).
+
+| Field              | Required | Type     | Description |
+| ------------------ | -------- | -------- | ----------- |
+| `effortId`         | Yes      | `string` |             |
+| `expectedRevision` | Yes      | `string` |             |
+| `parallelism`      | No       | `number` |             |
+| `rules`            | No       | `string` |             |
+
+Result: [RedTeamEffort](protocol.md#redteameffort).
 
 ## reverse.browser
 
@@ -5589,6 +5961,372 @@ Type: Dictionary.
 
 Result: Array of [Workspace](protocol.md#workspace).
 
+## connectors.execution
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ConnectorsExecution> = {
+    environmentId: 'YOUR_ENVIRONMENTID',
+};
+const result: ResultOf<typeof Method.ConnectorsExecution> = await client.call(
+    Method.ConnectorsExecution,
+    params,
+);
+```
+
+Parameters: [ConnectorEnvironmentParams](protocol.md#connectorenvironmentparams).
+
+| Field           | Required | Type     | Description |
+| --------------- | -------- | -------- | ----------- |
+| `environmentId` | Yes      | `string` |             |
+
+Result: [ConnectorExecutionStatus](protocol.md#connectorexecutionstatus).
+
+## connectors.execution.submit
+
+```ts
+import {
+    ConnectorExecutionLane,
+    ConnectorExecutionAccess,
+    Method,
+    type ParamsOf,
+    type ResultOf,
+} from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ConnectorsExecutionSubmit> = {
+    environmentId: 'YOUR_ENVIRONMENTID',
+    lane: ConnectorExecutionLane.First,
+    previousSequence: 'YOUR_PREVIOUSSEQUENCE',
+    request: {
+        arguments: [],
+        policySha256: 'YOUR_POLICYSHA256',
+        programId: 'YOUR_PROGRAMID',
+        requestId: 'YOUR_REQUESTID',
+        rootId: 'YOUR_ROOTID',
+    },
+    workspaceAccess: ConnectorExecutionAccess.ReadOnly,
+};
+const result: ResultOf<typeof Method.ConnectorsExecutionSubmit> = await client.call(
+    Method.ConnectorsExecutionSubmit,
+    params,
+);
+```
+
+Parameters: [ConnectorExecutionSubmitParams](protocol.md#connectorexecutionsubmitparams).
+
+| Field              | Required | Type                                                               | Description |
+| ------------------ | -------- | ------------------------------------------------------------------ | ----------- |
+| `environmentId`    | Yes      | `string`                                                           |             |
+| `lane`             | Yes      | [ConnectorExecutionLane](protocol.md#connectorexecutionlane)       |             |
+| `previousSequence` | Yes      | `string`                                                           |             |
+| `request`          | Yes      | [ConnectorExecutionRequest](protocol.md#connectorexecutionrequest) |             |
+| `workspaceAccess`  | Yes      | [ConnectorExecutionAccess](protocol.md#connectorexecutionaccess)   |             |
+
+Result: [ConnectorExecutionJob](protocol.md#connectorexecutionjob).
+
+## connectors.execution.get
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ConnectorsExecutionGet> = {
+    environmentId: 'YOUR_ENVIRONMENTID',
+    jobId: 'YOUR_JOBID',
+};
+const result: ResultOf<typeof Method.ConnectorsExecutionGet> = await client.call(
+    Method.ConnectorsExecutionGet,
+    params,
+);
+```
+
+Parameters: [ConnectorResultParams](protocol.md#connectorresultparams).
+
+| Field           | Required | Type     | Description |
+| --------------- | -------- | -------- | ----------- |
+| `environmentId` | Yes      | `string` |             |
+| `jobId`         | Yes      | `string` |             |
+
+Result: [ConnectorExecutionJob](protocol.md#connectorexecutionjob).
+
+## connectors.execution.cancel
+
+```ts
+import {
+    ConnectorExecutionLane,
+    ConnectorExecutionAccess,
+    Method,
+    type ParamsOf,
+    type ResultOf,
+} from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ConnectorsExecutionCancel> = {
+    admissionHash: 'YOUR_ADMISSIONHASH',
+    environmentId: 'YOUR_ENVIRONMENTID',
+    jobId: 'YOUR_JOBID',
+    lane: ConnectorExecutionLane.First,
+    requestId: 'YOUR_REQUESTID',
+    sequence: 'YOUR_SEQUENCE',
+    workspaceAccess: ConnectorExecutionAccess.ReadOnly,
+};
+const result: ResultOf<typeof Method.ConnectorsExecutionCancel> = await client.call(
+    Method.ConnectorsExecutionCancel,
+    params,
+);
+```
+
+Parameters: [ConnectorExecutionStopParams](protocol.md#connectorexecutionstopparams).
+
+| Field             | Required | Type                                                             | Description |
+| ----------------- | -------- | ---------------------------------------------------------------- | ----------- |
+| `admissionHash`   | Yes      | `string`                                                         |             |
+| `environmentId`   | Yes      | `string`                                                         |             |
+| `jobId`           | Yes      | `string`                                                         |             |
+| `lane`            | Yes      | [ConnectorExecutionLane](protocol.md#connectorexecutionlane)     |             |
+| `requestId`       | Yes      | `string`                                                         |             |
+| `sequence`        | Yes      | `string`                                                         |             |
+| `workspaceAccess` | Yes      | [ConnectorExecutionAccess](protocol.md#connectorexecutionaccess) |             |
+
+Result: [ConnectorExecutionStopReceipt](protocol.md#connectorexecutionstopreceipt).
+
+## connectors.execution.jobs
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ConnectorsExecutionJobs> = {
+    environmentId: 'YOUR_ENVIRONMENTID',
+};
+const result: ResultOf<typeof Method.ConnectorsExecutionJobs> = await client.call(
+    Method.ConnectorsExecutionJobs,
+    params,
+);
+```
+
+Parameters: [ConnectorEnvironmentParams](protocol.md#connectorenvironmentparams).
+
+| Field           | Required | Type     | Description |
+| --------------- | -------- | -------- | ----------- |
+| `environmentId` | Yes      | `string` |             |
+
+Result: [ConnectorExecutionCurrentJobs](protocol.md#connectorexecutioncurrentjobs).
+
+## connectors.link.deny
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ConnectorsLinkDeny> = {
+    code: 'YOUR_CODE',
+    linkId: 'YOUR_LINKID',
+    publicKey: 'YOUR_PUBLICKEY',
+    requestId: 'YOUR_REQUESTID',
+};
+const result: ResultOf<typeof Method.ConnectorsLinkDeny> = await client.call(
+    Method.ConnectorsLinkDeny,
+    params,
+);
+```
+
+Parameters: [ConnectorLinkDenyParams](protocol.md#connectorlinkdenyparams).
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `code`      | Yes      | `string` |             |
+| `linkId`    | Yes      | `string` |             |
+| `publicKey` | Yes      | `string` |             |
+| `requestId` | Yes      | `string` |             |
+
+Result: [ConnectorLinkDenied](protocol.md#connectorlinkdenied).
+
+## connectors.execution.output
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ConnectorsExecutionOutput> = {
+    environmentId: 'YOUR_ENVIRONMENTID',
+    jobId: 'YOUR_JOBID',
+};
+const result: ResultOf<typeof Method.ConnectorsExecutionOutput> = await client.call(
+    Method.ConnectorsExecutionOutput,
+    params,
+);
+```
+
+Parameters: [ConnectorResultParams](protocol.md#connectorresultparams).
+
+| Field           | Required | Type     | Description |
+| --------------- | -------- | -------- | ----------- |
+| `environmentId` | Yes      | `string` |             |
+| `jobId`         | Yes      | `string` |             |
+
+Result: [ConnectorExecutionOutputView](protocol.md#connectorexecutionoutputview).
+
+## connectors.workspace.get
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ConnectorsWorkspaceGet> = {
+    sessionId: 'YOUR_SESSIONID',
+};
+const result: ResultOf<typeof Method.ConnectorsWorkspaceGet> = await client.call(
+    Method.ConnectorsWorkspaceGet,
+    params,
+);
+```
+
+Parameters: [ConnectorWorkspaceGetParams](protocol.md#connectorworkspacegetparams).
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `sessionId` | Yes      | `string` |             |
+
+Result: [ConnectorWorkspaceSelectionView](protocol.md#connectorworkspaceselectionview).
+
+## connectors.workspace.select
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ConnectorsWorkspaceSelect> = {
+    environmentId: 'YOUR_ENVIRONMENTID',
+    expectedRevision: 'YOUR_EXPECTEDREVISION',
+    policySha256: 'YOUR_POLICYSHA256',
+    requestId: 'YOUR_REQUESTID',
+    rootId: 'YOUR_ROOTID',
+    sessionId: 'YOUR_SESSIONID',
+};
+const result: ResultOf<typeof Method.ConnectorsWorkspaceSelect> = await client.call(
+    Method.ConnectorsWorkspaceSelect,
+    params,
+);
+```
+
+Parameters: [ConnectorWorkspaceSelectParams](protocol.md#connectorworkspaceselectparams).
+
+| Field              | Required | Type     | Description |
+| ------------------ | -------- | -------- | ----------- |
+| `environmentId`    | Yes      | `string` |             |
+| `expectedRevision` | Yes      | `string` |             |
+| `policySha256`     | Yes      | `string` |             |
+| `requestId`        | Yes      | `string` |             |
+| `rootId`           | Yes      | `string` |             |
+| `sessionId`        | Yes      | `string` |             |
+
+Result: [ConnectorWorkspaceSelectionView](protocol.md#connectorworkspaceselectionview).
+
+## connectors.workspace.clear
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ConnectorsWorkspaceClear> = {
+    expectedRevision: 'YOUR_EXPECTEDREVISION',
+    requestId: 'YOUR_REQUESTID',
+    sessionId: 'YOUR_SESSIONID',
+};
+const result: ResultOf<typeof Method.ConnectorsWorkspaceClear> = await client.call(
+    Method.ConnectorsWorkspaceClear,
+    params,
+);
+```
+
+Parameters: [ConnectorWorkspaceClearParams](protocol.md#connectorworkspaceclearparams).
+
+| Field              | Required | Type     | Description |
+| ------------------ | -------- | -------- | ----------- |
+| `expectedRevision` | Yes      | `string` |             |
+| `requestId`        | Yes      | `string` |             |
+| `sessionId`        | Yes      | `string` |             |
+
+Result: [ConnectorWorkspaceSelectionView](protocol.md#connectorworkspaceselectionview).
+
+## connectors.workspace.create
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ConnectorsWorkspaceCreate> = {
+    requestId: 'YOUR_REQUESTID',
+};
+const result: ResultOf<typeof Method.ConnectorsWorkspaceCreate> = await client.call(
+    Method.ConnectorsWorkspaceCreate,
+    params,
+);
+```
+
+Parameters: [ConnectorWorkspaceCreateParams](protocol.md#connectorworkspacecreateparams).
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `requestId` | Yes      | `string` |             |
+
+Result: [ConnectorWorkspaceSelectionView](protocol.md#connectorworkspaceselectionview).
+
+## connectors.workspace.catalog
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ConnectorsWorkspaceCatalog> = {
+    environmentId: 'YOUR_ENVIRONMENTID',
+    sessionId: 'YOUR_SESSIONID',
+};
+const result: ResultOf<typeof Method.ConnectorsWorkspaceCatalog> = await client.call(
+    Method.ConnectorsWorkspaceCatalog,
+    params,
+);
+```
+
+Parameters: [ConnectorWorkspaceCatalogParams](protocol.md#connectorworkspacecatalogparams).
+
+| Field           | Required | Type     | Description |
+| --------------- | -------- | -------- | ----------- |
+| `environmentId` | Yes      | `string` |             |
+| `sessionId`     | Yes      | `string` |             |
+
+Result: [ConnectorWorkspaceCatalogView](protocol.md#connectorworkspacecatalogview).
+
+## connectors.workspace.select-joint
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ConnectorsWorkspaceSelectJoint> = {
+    expectedRevision: 'YOUR_EXPECTEDREVISION',
+    requestId: 'YOUR_REQUESTID',
+    sessionId: 'YOUR_SESSIONID',
+    target: {
+        access: 'read-only',
+        bindingRevision: 'YOUR_BINDINGREVISION',
+        bindingSha256: 'YOUR_BINDINGSHA256',
+        descriptorSha256: 'YOUR_DESCRIPTORSHA256',
+        environmentId: 'YOUR_ENVIRONMENTID',
+        executionPolicySha256: 'YOUR_EXECUTIONPOLICYSHA256',
+        executionRootId: 'YOUR_EXECUTIONROOTID',
+        filePolicySha256: 'YOUR_FILEPOLICYSHA256',
+        fileRootId: 'YOUR_FILEROOTID',
+    },
+};
+const result: ResultOf<typeof Method.ConnectorsWorkspaceSelectJoint> = await client.call(
+    Method.ConnectorsWorkspaceSelectJoint,
+    params,
+);
+```
+
+Parameters: [ConnectorWorkspaceSelectJointParams](protocol.md#connectorworkspaceselectjointparams).
+
+| Field              | Required | Type                                                                       | Description |
+| ------------------ | -------- | -------------------------------------------------------------------------- | ----------- |
+| `expectedRevision` | Yes      | `string`                                                                   |             |
+| `requestId`        | Yes      | `string`                                                                   |             |
+| `sessionId`        | Yes      | `string`                                                                   |             |
+| `target`           | Yes      | [ConnectorWorkspaceJointTarget](protocol.md#connectorworkspacejointtarget) |             |
+
+Result: [ConnectorWorkspaceSelectionView](protocol.md#connectorworkspaceselectionview).
+
 ## workspace.files.list
 
 ```ts
@@ -5775,6 +6513,50 @@ Parameters: [BrowserFilesTarget](protocol.md#browserfilestarget).
 
 Result: [BrowserFilesDone](protocol.md#browserfilesdone).
 
+## workspaces.page
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkspacesPage> = {};
+const result: ResultOf<typeof Method.WorkspacesPage> = await client.call(
+    Method.WorkspacesPage,
+    params,
+);
+```
+
+Parameters: [WorkspacePageParams](protocol.md#workspacepageparams).
+
+| Field             | Required | Type      | Description |
+| ----------------- | -------- | --------- | ----------- |
+| `cursor`          | No       | `string`  |             |
+| `limit`           | No       | `number`  |             |
+| `includePresence` | No       | `boolean` |             |
+
+Result: [WorkspacePage](protocol.md#workspacepage).
+
+## workspaces.visit
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.WorkspacesVisit> = {
+    id: 'YOUR_ID',
+};
+const result: ResultOf<typeof Method.WorkspacesVisit> = await client.call(
+    Method.WorkspacesVisit,
+    params,
+);
+```
+
+Parameters: [IdParams](protocol.md#idparams).
+
+| Field | Required | Type     | Description |
+| ----- | -------- | -------- | ----------- |
+| `id`  | Yes      | `string` |             |
+
+Result: [OkResult](protocol.md#okresult).
+
 ## workspace.files.rename
 
 ```ts
@@ -5828,3 +6610,56 @@ Parameters: [BrowserFilesTarget](protocol.md#browserfilestarget).
 | `workspaceId` | No       | `string`             | An owned Chat/project workspace ID, never an absolute filesystem path.            |
 
 Result: [BrowserFilesDone](protocol.md#browserfilesdone).
+
+## environment.admin.inspect
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.EnvironmentAdminInspect> = {
+    userId: 'YOUR_USERID',
+};
+const result: ResultOf<typeof Method.EnvironmentAdminInspect> = await client.call(
+    Method.EnvironmentAdminInspect,
+    params,
+);
+```
+
+Parameters: [VmAdministrationInspect](protocol.md#vmadministrationinspect).
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `userId` | Yes      | `string` |             |
+
+Result: [VmAdministrationView](protocol.md#vmadministrationview).
+
+## environment.admin.mutate
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.EnvironmentAdminMutate> = {
+    action: 'delete',
+    environmentId: 'YOUR_ENVIRONMENTID',
+    generation: 'YOUR_GENERATION',
+    requestId: 'YOUR_REQUESTID',
+    userId: 'YOUR_USERID',
+};
+const result: ResultOf<typeof Method.EnvironmentAdminMutate> = await client.call(
+    Method.EnvironmentAdminMutate,
+    params,
+);
+```
+
+Parameters: [VmAdministrationMutation](protocol.md#vmadministrationmutation).
+
+| Field           | Required | Type                                                                             | Description                                                                        |
+| --------------- | -------- | -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `action`        | Yes      | `"delete"` / `"start"` / `"stop"`                                                |                                                                                    |
+| `environmentId` | Yes      | `string`                                                                         |                                                                                    |
+| `generation`    | Yes      | `string`                                                                         |                                                                                    |
+| `profile`       | No       | [VmAdministrationProfileReference](protocol.md#vmadministrationprofilereference) | Required only for Start; preserves the observed VM profile across request retries. |
+| `requestId`     | Yes      | `string`                                                                         |                                                                                    |
+| `userId`        | Yes      | `string`                                                                         |                                                                                    |
+
+Result: [VmAdministrationView](protocol.md#vmadministrationview).

@@ -370,20 +370,20 @@ There is no `NexaMedia.audio()` attachment helper or generic inbound audio-file 
 
 The transport does not execute tools on the client or send a local tool catalog. Nexa chooses and executes tools under the authenticated user's permissions. Work mode receives the server's tools, skills, and execution context; conversational replies can omit them. `tool-start`, `tool-progress`, and `tool-finish` expose execution to your UI. A server skill is not an SDK plugin; there is no standalone skill-installation RPC in this contract.
 
-### Interactive chat graphs
+### Rich visual responses
 
-Nexa's `render_graph` tool delivers a typed relationship graph in `ToolResult.chatGraph`. It contains a title, description, colored nodes and labelled directed edges. These are visual explanations; they do not execute workflow steps. The agent reads `nexa_capabilities` and relevant integration status before making a capability map.
+Nexa's `render_visual` tool delivers typed UI instructions in `ToolResult.visual`. The scene contains positioned cards, background groups, text, metrics, semantic styles, labelled arrows, and optional flow animation. Nexa plans the components, relationships and reading order after reading the relevant evidence. See [Visual responses](visual-responses.md) for the vocabulary and an example.
 
 ```ts
-import { ChatGraphs, type ChatGraph } from 'nexa-transport/chat-graph';
+import { VisualResponses, type VisualResponse } from 'nexa-transport/visual-responses';
 
-if (event.type === 'tool-finish' && event.outcome.result.chatGraph !== undefined) {
-    const graph: ChatGraph = ChatGraphs.parse(event.outcome.result.chatGraph);
-    console.log(graph.title, graph.nodes, graph.edges);
+if (event.type === 'tool-finish' && event.outcome.result.visual !== undefined) {
+    const visual: VisualResponse = VisualResponses.parse(event.outcome.result.visual);
+    console.log(visual.title, visual.elements, visual.connections, visual.steps);
 }
 ```
 
-`ChatGraphs.parse` rejects missing endpoints, duplicate identities, invalid colors and oversized graphs. Graph deliveries remain in saved `tool-result` content blocks and session event journals, independently of bounded tool-output previews. Render their text as text, and reuse your graph canvas for camera and node layout interaction. Nexa accepts up to 100 nodes and 300 edges per delivery.
+`VisualResponses.parse` rejects missing references, overlapping foreground content, invalid styles, non-finite geometry and oversized scenes. The wire validator requires complete normalized fields. Visual instructions remain in saved `tool-result` blocks and session journals independently of bounded tool-output previews. Render copy as text, use the authored positions and semantic styles, and respect reduced-motion preferences. Keep the diagram free of visible scene titles and editor toolbars; use large text and prominent colored connections. Scenes are limited to 32 elements, 64 connections, eight steps and 64 KiB. The old explanatory graph tool and SDK export have been removed.
 
 Approval events are notifications, not authority to approve:
 

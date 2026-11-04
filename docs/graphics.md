@@ -2,7 +2,7 @@
 
 Nexa can deliver interactive graphics directly in web chat with `render_graphic`.
 No generated website, script, upload or external chart service is required.
-Use `render_graph` for draggable relationship maps and flow diagrams.
+Use `render_visual` for rich visual explanations, architecture diagrams and guided visual interfaces. See [Visual responses](visual-responses.md).
 
 Discover the tool using `tool_search` and inspect its schema with `tool_describe`.
 Read the source data before plotting it. Include units and a plain-text source
