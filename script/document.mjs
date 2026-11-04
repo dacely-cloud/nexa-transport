@@ -119,7 +119,7 @@ function exampleParams(name, params) {
 const methods = definitions.GatewayMethods.properties;
 const enumName = (method) =>
     method
-        .split('.')
+        .split(/[.-]/u)
         .map((part) => part[0].toUpperCase() + part.slice(1))
         .join('');
 let reference = `# RPC reference\n\nAll ${Object.keys(methods).length} protocol methods. \`connect\` is managed by \`NexaClient.connect\`; the remaining ${Object.keys(methods).length - 1} use \`client.call(Method.Name, params)\`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.\n\n`;
@@ -129,6 +129,17 @@ reference +=
         .join('\n') + '\n\n';
 for (const [name, entry] of Object.entries(methods)) {
     const { params, result } = entry.properties;
+    const connectorEnums =
+        name === 'connectors.execution.submit' || name === 'connectors.execution.cancel';
+    const imports = connectorEnums ? 'ConnectorExecutionLane, ConnectorExecutionAccess, ' : '';
+    const paramsSource = connectorEnums
+        ? JSON.stringify(exampleParams(name, params), null, 4)
+              .replace(/"lane": "first"/gu, '"lane": ConnectorExecutionLane.First')
+              .replace(
+                  /"workspaceAccess": "read-only"/gu,
+                  '"workspaceAccess": ConnectorExecutionAccess.ReadOnly',
+              )
+        : JSON.stringify(exampleParams(name, params), null, 4);
     reference += `## ${name}\n\n`;
     if (name === 'connect')
         reference +=
@@ -136,8 +147,8 @@ for (const [name, entry] of Object.entries(methods)) {
     else
         reference +=
             '```ts\n' +
-            "import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';\n\n" +
-            `const params: ParamsOf<typeof Method.${enumName(name)}> = ${JSON.stringify(exampleParams(name, params), null, 4)};\n` +
+            `import { ${imports}Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';\n\n` +
+            `const params: ParamsOf<typeof Method.${enumName(name)}> = ${paramsSource};\n` +
             `const result: ResultOf<typeof Method.${enumName(name)}> = await client.call(Method.${enumName(name)}, params);\n` +
             '```\n\n';
     if (name === 'agent.ask' || name === 'agent.stream')

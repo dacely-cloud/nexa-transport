@@ -1,3 +1,4 @@
+import { VisualResponses } from '../visuals/VisualResponses.js';
 import { Graphics } from '../graphics/Graphic.js';
 /** JSON Schema subset emitted from Nexa's TypeScript contracts. */
 export interface Schema {
@@ -139,6 +140,9 @@ export class SchemaValidator {
         // stack budget with room for its enclosing method/patch/node schemas.
         if (depth > 256) {
             return false;
+        }
+        if (schema.$ref === '#/definitions/VisualResponse') {
+            return VisualResponses.isValid(value);
         }
         if (schema.$ref === '#/definitions/Graphic') {
             return Graphics.isValid(value);

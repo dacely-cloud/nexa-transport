@@ -1883,46 +1883,6 @@ A channel's live health, as its own adapter reports it.
 
 Type: `"adjustment"` / `"completion"` / `"embedding"` / `"media"` / `"speech"` / `"tool"` / `"transcription"`.
 
-## ChatGraph
-
-A non-executable graph delivered directly into a conversation.
-
-| Field         | Required | Type                                                | Description |
-| ------------- | -------- | --------------------------------------------------- | ----------- |
-| `description` | Yes      | `string`                                            |             |
-| `edges`       | Yes      | Array of [ChatGraphEdge](protocol.md#chatgraphedge) |             |
-| `id`          | Yes      | `string`                                            |             |
-| `nodes`       | Yes      | Array of [ChatGraphNode](protocol.md#chatgraphnode) |             |
-| `title`       | Yes      | `string`                                            |             |
-
-## ChatGraphColor
-
-Available semantic colors, shared by the agent and workflow-based chat renderer.
-
-Type: `"blue"` / `"gray"` / `"green"` / `"orange"` / `"purple"` / `"red"`.
-
-## ChatGraphEdge
-
-A directed, labelled relationship between two existing nodes.
-
-| Field   | Required | Type     | Description |
-| ------- | -------- | -------- | ----------- |
-| `from`  | Yes      | `string` |             |
-| `id`    | Yes      | `string` |             |
-| `label` | Yes      | `string` |             |
-| `to`    | Yes      | `string` |             |
-
-## ChatGraphNode
-
-A named idea or capability; descriptions are plain text.
-
-| Field         | Required | Type                                         | Description |
-| ------------- | -------- | -------------------------------------------- | ----------- |
-| `color`       | Yes      | [ChatGraphColor](protocol.md#chatgraphcolor) |             |
-| `description` | Yes      | `string`                                     |             |
-| `id`          | Yes      | `string`                                     |             |
-| `label`       | Yes      | `string`                                     |             |
-
 ## CommandExecutionReceipt
 
 Host-produced command termination evidence, separate from model-visible output.
@@ -2100,6 +2060,580 @@ The `connect` frame's params.
 | `minProtocol` | Yes      | `number`                                           | The oldest protocol the client can speak.                              |
 | `nonce`       | Yes      | `string`                                           | The challenge nonce, proving the client read the server's first frame. |
 
+## ConnectorDirectoryEntry
+
+Untrusted names remain display/path data.
+
+| Field  | Required | Type                                               | Description |
+| ------ | -------- | -------------------------------------------------- | ----------- |
+| `kind` | Yes      | [ConnectorFileKind](protocol.md#connectorfilekind) |             |
+| `name` | Yes      | `string`                                           |             |
+
+## ConnectorDirectoryResult
+
+A directory page has a finite entry count and original request identity.
+
+| Field        | Required | Type                                                                    | Description |
+| ------------ | -------- | ----------------------------------------------------------------------- | ----------- |
+| `action`     | Yes      | `"list"`                                                                |             |
+| `entries`    | Yes      | Array of [ConnectorDirectoryEntry](protocol.md#connectordirectoryentry) |             |
+| `metadata`   | Yes      | [ConnectorMetadata](protocol.md#connectormetadata)                      |             |
+| `nextCursor` | Yes      | `null,string`                                                           |             |
+| `requestId`  | Yes      | `string`                                                                |             |
+
+## ConnectorEnvironmentParams
+
+File operations explicitly select an account-owned logical environment, never a network host.
+
+| Field           | Required | Type     | Description |
+| --------------- | -------- | -------- | ----------- |
+| `environmentId` | Yes      | `string` |             |
+
+## ConnectorFileError
+
+Denied file results cannot carry an accidental content payload.
+
+| Field   | Required | Type                                                     | Description |
+| ------- | -------- | -------------------------------------------------------- | ----------- |
+| `error` | Yes      | [ConnectorFileFailure](protocol.md#connectorfilefailure) |             |
+| `ok`    | Yes      | `false`                                                  |             |
+
+## ConnectorFileFailure
+
+No backend or native error text is forwarded as file diagnostics.
+
+Type: `"invalid"` / `"denied"` / `"unavailable"` / `"changed"` / `"indeterminate"`.
+
+## ConnectorFileKind
+
+Listed links and special files carry no authority to follow or execute them.
+
+Type: `"file"` / `"directory"` / `"symbolic-link"` / `"other"`.
+
+## ConnectorFileMode
+
+A local read-only grant implies no write, shell or network forwarding authority.
+
+Type: `"read-only"` / `"read-write"`.
+
+## ConnectorFileRequest
+
+Each admitted operation has its original finite action and complete authority fields.
+
+Variant 1: [ConnectorRead](protocol.md#connectorread)
+
+| Field          | Required | Type     | Description |
+| -------------- | -------- | -------- | ----------- |
+| `action`       | Yes      | `"read"` |             |
+| `limit`        | Yes      | `number` |             |
+| `offset`       | Yes      | `string` |             |
+| `path`         | Yes      | `string` |             |
+| `policySha256` | Yes      | `string` |             |
+| `requestId`    | Yes      | `string` |             |
+| `rootId`       | Yes      | `string` |             |
+
+Variant 2: [ConnectorStat](protocol.md#connectorstat)
+
+| Field          | Required | Type     | Description |
+| -------------- | -------- | -------- | ----------- |
+| `action`       | Yes      | `"stat"` |             |
+| `path`         | Yes      | `string` |             |
+| `policySha256` | Yes      | `string` |             |
+| `requestId`    | Yes      | `string` |             |
+| `rootId`       | Yes      | `string` |             |
+
+Variant 3: [ConnectorListDirectory](protocol.md#connectorlistdirectory)
+
+| Field          | Required | Type     | Description |
+| -------------- | -------- | -------- | ----------- |
+| `action`       | Yes      | `"list"` |             |
+| `cursor`       | Yes      | `string` |             |
+| `path`         | Yes      | `string` |             |
+| `policySha256` | Yes      | `string` |             |
+| `requestId`    | Yes      | `string` |             |
+| `rootId`       | Yes      | `string` |             |
+
+Variant 4: [ConnectorWrite](protocol.md#connectorwrite)
+
+| Field          | Required | Type                                                 | Description |
+| -------------- | -------- | ---------------------------------------------------- | ----------- |
+| `action`       | Yes      | `"write"`                                            |             |
+| `dataBase64`   | Yes      | `string`                                             |             |
+| `mode`         | Yes      | [ConnectorWriteMode](protocol.md#connectorwritemode) |             |
+| `path`         | Yes      | `string`                                             |             |
+| `policySha256` | Yes      | `string`                                             |             |
+| `requestId`    | Yes      | `string`                                             |             |
+| `rootId`       | Yes      | `string`                                             |             |
+
+Variant 5: [ConnectorRemove](protocol.md#connectorremove)
+
+| Field          | Required | Type       | Description |
+| -------------- | -------- | ---------- | ----------- |
+| `action`       | Yes      | `"remove"` |             |
+| `path`         | Yes      | `string`   |             |
+| `policySha256` | Yes      | `string`   |             |
+| `recursive`    | Yes      | `boolean`  |             |
+| `requestId`    | Yes      | `string`   |             |
+| `rootId`       | Yes      | `string`   |             |
+
+Variant 6: [ConnectorMkdir](protocol.md#connectormkdir)
+
+| Field          | Required | Type      | Description |
+| -------------- | -------- | --------- | ----------- |
+| `action`       | Yes      | `"mkdir"` |             |
+| `path`         | Yes      | `string`  |             |
+| `policySha256` | Yes      | `string`  |             |
+| `requestId`    | Yes      | `string`  |             |
+| `rootId`       | Yes      | `string`  |             |
+
+Variant 7: [ConnectorChmod](protocol.md#connectorchmod)
+
+| Field          | Required | Type                                                                   | Description |
+| -------------- | -------- | ---------------------------------------------------------------------- | ----------- |
+| `action`       | Yes      | `"chmod"`                                                              |             |
+| `mode`         | Yes      | [ConnectorFilePermissionMode](protocol.md#connectorfilepermissionmode) |             |
+| `path`         | Yes      | `string`                                                               |             |
+| `policySha256` | Yes      | `string`                                                               |             |
+| `requestId`    | Yes      | `string`                                                               |             |
+| `rootId`       | Yes      | `string`                                                               |             |
+
+Variant 8: [ConnectorRename](protocol.md#connectorrename)
+
+| Field          | Required | Type                                                 | Description |
+| -------------- | -------- | ---------------------------------------------------- | ----------- |
+| `action`       | Yes      | `"rename"`                                           |             |
+| `destination`  | Yes      | `string`                                             |             |
+| `mode`         | Yes      | [ConnectorWriteMode](protocol.md#connectorwritemode) |             |
+| `path`         | Yes      | `string`                                             |             |
+| `policySha256` | Yes      | `string`                                             |             |
+| `requestId`    | Yes      | `string`                                             |             |
+| `rootId`       | Yes      | `string`                                             |             |
+
+## ConnectorFileSuccess
+
+Successful file results cannot contain an error branch.
+
+| Field    | Required | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | Description |
+| -------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `ok`     | Yes      | `true`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |             |
+| `result` | Yes      | [ConnectorReadResult](protocol.md#connectorreadresult) / [ConnectorStatResult](protocol.md#connectorstatresult) / [ConnectorDirectoryResult](protocol.md#connectordirectoryresult) / [ConnectorWriteResult](protocol.md#connectorwriteresult) / [ConnectorRemoveResult](protocol.md#connectorremoveresult) / [ConnectorMkdirResult](protocol.md#connectormkdirresult) / [ConnectorChmodResult](protocol.md#connectorchmodresult) / [ConnectorRenameResult](protocol.md#connectorrenameresult) |             |
+
+## ConnectorFilesystem
+
+A recent matching signed profile is separate from installed tooling and execution permission.
+
+| Field                  | Required | Type                                                      | Description |
+| ---------------------- | -------- | --------------------------------------------------------- | ----------- |
+| `acknowledgedSequence` | Yes      | `string`                                                  |             |
+| `environmentId`        | Yes      | `string`                                                  |             |
+| `online`               | Yes      | `boolean`                                                 |             |
+| `profile`              | Yes      | [ConnectorProfile](protocol.md#connectorprofile) / `null` |             |
+| `sequence`             | Yes      | `string`                                                  |             |
+
+## ConnectorFilesystemMethod
+
+File grants are read through the authenticated account proxy.
+
+| Field    | Required | Type                                                                 | Description |
+| -------- | -------- | -------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ConnectorEnvironmentParams](protocol.md#connectorenvironmentparams) |             |
+| `result` | Yes      | [ConnectorFilesystem](protocol.md#connectorfilesystem)               |             |
+
+## ConnectorGetMethod
+
+Enrollment metadata remains account-authorized.
+
+| Field    | Required | Type                                                 | Description |
+| -------- | -------- | ---------------------------------------------------- | ----------- |
+| `params` | Yes      | [ConnectorGetParams](protocol.md#connectorgetparams) |             |
+| `result` | Yes      | [ConnectorView](protocol.md#connectorview)           |             |
+
+## ConnectorGetParams
+
+IDs cannot override the authenticated account.
+
+| Field          | Required | Type     | Description |
+| -------------- | -------- | -------- | ----------- |
+| `enrollmentId` | Yes      | `string` |             |
+
+## ConnectorGpuInventoryState
+
+Missing driver access is different from a successful empty inventory.
+
+Type: `"reported"` / `"unavailable"`.
+
+## ConnectorGpuSpecification
+
+Device identifiers and available VRAM support explicit selection without model-authored shell probing.
+
+| Field                | Required | Type                                                 | Description |
+| -------------------- | -------- | ---------------------------------------------------- | ----------- |
+| `availableVramBytes` | Yes      | `null,string`                                        |             |
+| `id`                 | Yes      | `string`                                             |             |
+| `model`              | Yes      | `string`                                             |             |
+| `totalVramBytes`     | Yes      | `null,string`                                        |             |
+| `vendor`             | Yes      | [ConnectorGpuVendor](protocol.md#connectorgpuvendor) |             |
+
+## ConnectorInventoryMethod
+
+Nexa forwards an account-bound metadata page through its protected Compute provider.
+
+| Field    | Required | Type                                                             | Description |
+| -------- | -------- | ---------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ConnectorInventoryParams](protocol.md#connectorinventoryparams) |             |
+| `result` | Yes      | [ConnectorInventoryPage](protocol.md#connectorinventorypage)     |             |
+
+## ConnectorInventoryPage
+
+At most three connector snapshots are returned by one account RPC.
+
+| Field   | Required | Type                                                                  | Description |
+| ------- | -------- | --------------------------------------------------------------------- | ----------- |
+| `items` | Yes      | Array of [ConnectorInventoryView](protocol.md#connectorinventoryview) |             |
+| `next`  | Yes      | `null,string`                                                         |             |
+
+## ConnectorInventoryParams
+
+An account page accepts only an opaque ordered enrollment cursor.
+
+| Field   | Required | Type          | Description |
+| ------- | -------- | ------------- | ----------- |
+| `after` | Yes      | `null,string` |             |
+
+## ConnectorInventoryView
+
+Public inventory contains no customer paths, workload credentials or transport authority.
+
+| Field           | Required | Type                                                                              | Description |
+| --------------- | -------- | --------------------------------------------------------------------------------- | ----------- |
+| `enrollment`    | Yes      | [ConnectorView](protocol.md#connectorview)                                        |             |
+| `presence`      | Yes      | [ConnectorPresence](protocol.md#connectorpresence)                                |             |
+| `receivedAtMs`  | Yes      | `null,string`                                                                     |             |
+| `specification` | Yes      | [ConnectorSystemSpecification](protocol.md#connectorsystemspecification) / `null` |             |
+| `trust`         | Yes      | `"customer-reported"`                                                             |             |
+
+## ConnectorJob
+
+Retained results belong to the original request and exact sequence.
+
+| Field           | Required | Type                                                                                                                     | Description |
+| --------------- | -------- | ------------------------------------------------------------------------------------------------------------------------ | ----------- |
+| `admissionHash` | Yes      | `string`                                                                                                                 |             |
+| `authorization` | Yes      | [ConnectorOperationAuthorization](protocol.md#connectoroperationauthorization)                                           |             |
+| `environmentId` | Yes      | `string`                                                                                                                 |             |
+| `id`            | Yes      | `string`                                                                                                                 |             |
+| `phase`         | Yes      | [ConnectorJobPhase](protocol.md#connectorjobphase)                                                                       |             |
+| `request`       | Yes      | [ConnectorFileRequest](protocol.md#connectorfilerequest)                                                                 |             |
+| `response`      | Yes      | [ConnectorFileSuccess](protocol.md#connectorfilesuccess) / [ConnectorFileError](protocol.md#connectorfileerror) / `null` |             |
+| `sequence`      | Yes      | `string`                                                                                                                 |             |
+
+## ConnectorJobPhase
+
+Shared dispatch state is independent of the Nexa process handling the request.
+
+Type: `"queued"` / `"dispatched"` / `"completed"`.
+
+## ConnectorLinkApproveMethod
+
+Explicit approval retains the reviewed key and cannot replace a machine after an uncertain response.
+
+| Field    | Required | Type                                                                 | Description |
+| -------- | -------- | -------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ConnectorLinkApproveParams](protocol.md#connectorlinkapproveparams) |             |
+| `result` | Yes      | [ConnectorLinkApproved](protocol.md#connectorlinkapproved)           |             |
+
+## ConnectorLinkApproveParams
+
+Approval binds the exact identity reviewed by this signed-in user, retaining its original operation ID.
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `code`      | Yes      | `string` |             |
+| `linkId`    | Yes      | `string` |             |
+| `name`      | Yes      | `string` |             |
+| `publicKey` | Yes      | `string` |             |
+| `requestId` | Yes      | `string` |             |
+
+## ConnectorLinkApproved
+
+Registered metadata establishes neither an online connection nor file or execution permission.
+
+| Field        | Required | Type                                       | Description |
+| ------------ | -------- | ------------------------------------------ | ----------- |
+| `enrollment` | Yes      | [ConnectorView](protocol.md#connectorview) |             |
+| `linkId`     | Yes      | `string`                                   |             |
+| `publicKey`  | Yes      | `string`                                   |             |
+
+## ConnectorLinkReview
+
+Only public machine identity and the original finite approval window are disclosed.
+
+| Field         | Required | Type     | Description |
+| ------------- | -------- | -------- | ----------- |
+| `code`        | Yes      | `string` |             |
+| `deviceName`  | Yes      | `string` |             |
+| `expiresAtMs` | Yes      | `string` |             |
+| `linkId`      | Yes      | `string` |             |
+| `publicKey`   | Yes      | `string` |             |
+
+## ConnectorLinkReviewMethod
+
+Code lookup uses the protected controller and never contacts the customer device directly.
+
+| Field    | Required | Type                                                               | Description |
+| -------- | -------- | ------------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [ConnectorLinkReviewParams](protocol.md#connectorlinkreviewparams) |             |
+| `result` | Yes      | [ConnectorLinkReview](protocol.md#connectorlinkreview)             |             |
+
+## ConnectorLinkReviewParams
+
+Entering a short device code requires the current account's write authority.
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `code`      | Yes      | `string` |             |
+| `requestId` | Yes      | `string` |             |
+
+## ConnectorList
+
+The backend independently binds every list element to the current account.
+
+| Field         | Required | Type                                                | Description |
+| ------------- | -------- | --------------------------------------------------- | ----------- |
+| `enrollments` | Yes      | Array of [ConnectorView](protocol.md#connectorview) |             |
+
+## ConnectorListDirectory
+
+Directory cursors are opaque exact offsets, not a promise of snapshot consistency.
+
+| Field          | Required | Type     | Description |
+| -------------- | -------- | -------- | ----------- |
+| `action`       | Yes      | `"list"` |             |
+| `cursor`       | Yes      | `string` |             |
+| `path`         | Yes      | `string` |             |
+| `policySha256` | Yes      | `string` |             |
+| `requestId`    | Yes      | `string` |             |
+| `rootId`       | Yes      | `string` |             |
+
+## ConnectorListMethod
+
+Account list accepts no identity override.
+
+| Field    | Required | Type                                               | Description |
+| -------- | -------- | -------------------------------------------------- | ----------- |
+| `params` | Yes      | [Recordstringnever](protocol.md#recordstringnever) |             |
+| `result` | Yes      | [ConnectorList](protocol.md#connectorlist)         |             |
+
+## ConnectorMetadata
+
+Exact sizes and nanosecond timestamps remain strings at JSON boundaries.
+
+| Field          | Required | Type                     | Description |
+| -------------- | -------- | ------------------------ | ----------- |
+| `kind`         | Yes      | `"directory"` / `"file"` |             |
+| `mode`         | Yes      | `number`                 |             |
+| `modifiedAtNs` | Yes      | `string`                 |             |
+| `sizeBytes`    | Yes      | `string`                 |             |
+
+## ConnectorPhase
+
+Enrollment state is separate from a current authenticated transport or file grant.
+
+Type: `"pending"` / `"enrolled-offline"` / `"revoked"`.
+
+## ConnectorPresence
+
+Presence is based on the authenticated backend's lease clock and revocation state.
+
+Type: `"pending"` / `"online"` / `"offline"` / `"revoked"`.
+
+## ConnectorProfile
+
+Root aliases and commitments keep absolute private paths on the customer machine.
+
+| Field               | Required | Type                                               | Description |
+| ------------------- | -------- | -------------------------------------------------- | ----------- |
+| `maximumReadBytes`  | Yes      | `number`                                           |             |
+| `maximumWriteBytes` | Yes      | `number`                                           |             |
+| `mode`              | Yes      | [ConnectorFileMode](protocol.md#connectorfilemode) |             |
+| `policySha256`      | Yes      | `string`                                           |             |
+| `revision`          | Yes      | `string`                                           |             |
+| `roots`             | Yes      | Array of `string`                                  |             |
+
+## ConnectorRead
+
+Reads are bounded chunks; offsets remain exact decimal strings.
+
+| Field          | Required | Type     | Description |
+| -------------- | -------- | -------- | ----------- |
+| `action`       | Yes      | `"read"` |             |
+| `limit`        | Yes      | `number` |             |
+| `offset`       | Yes      | `string` |             |
+| `path`         | Yes      | `string` |             |
+| `policySha256` | Yes      | `string` |             |
+| `requestId`    | Yes      | `string` |             |
+| `rootId`       | Yes      | `string` |             |
+
+## ConnectorReadResult
+
+Successful read data is canonical base64 with its original identity and exact offset.
+
+| Field        | Required | Type                                               | Description |
+| ------------ | -------- | -------------------------------------------------- | ----------- |
+| `action`     | Yes      | `"read"`                                           |             |
+| `dataBase64` | Yes      | `string`                                           |             |
+| `metadata`   | Yes      | [ConnectorMetadata](protocol.md#connectormetadata) |             |
+| `offset`     | Yes      | `string`                                           |             |
+| `requestId`  | Yes      | `string`                                           |             |
+
+## ConnectorResultMethod
+
+Reading an existing result never redispatches or advances its sequence.
+
+| Field    | Required | Type                                                       | Description |
+| -------- | -------- | ---------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ConnectorResultParams](protocol.md#connectorresultparams) |             |
+| `result` | Yes      | [ConnectorJob](protocol.md#connectorjob)                   |             |
+
+## ConnectorResultParams
+
+A job-ID lookup remains restricted to the explicitly selected environment.
+
+| Field           | Required | Type     | Description |
+| --------------- | -------- | -------- | ----------- |
+| `environmentId` | Yes      | `string` |             |
+| `jobId`         | Yes      | `string` |             |
+
+## ConnectorRevokeMethod
+
+Permanent revocation is an explicit write operation.
+
+| Field    | Required | Type                                                       | Description |
+| -------- | -------- | ---------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ConnectorRevokeParams](protocol.md#connectorrevokeparams) |             |
+| `result` | Yes      | [ConnectorView](protocol.md#connectorview)                 |             |
+
+## ConnectorRevokeParams
+
+Exact revision and operation ID must be preserved after an uncertain response.
+
+| Field              | Required | Type     | Description |
+| ------------------ | -------- | -------- | ----------- |
+| `enrollmentId`     | Yes      | `string` |             |
+| `observedRevision` | Yes      | `string` |             |
+| `requestId`        | Yes      | `string` |             |
+
+## ConnectorStat
+
+Metadata never follows links or opens devices.
+
+| Field          | Required | Type     | Description |
+| -------------- | -------- | -------- | ----------- |
+| `action`       | Yes      | `"stat"` |             |
+| `path`         | Yes      | `string` |             |
+| `policySha256` | Yes      | `string` |             |
+| `requestId`    | Yes      | `string` |             |
+| `rootId`       | Yes      | `string` |             |
+
+## ConnectorStatResult
+
+Only bounded safe metadata is returned to the account.
+
+| Field       | Required | Type                                               | Description |
+| ----------- | -------- | -------------------------------------------------- | ----------- |
+| `action`    | Yes      | `"stat"`                                           |             |
+| `metadata`  | Yes      | [ConnectorMetadata](protocol.md#connectormetadata) |             |
+| `requestId` | Yes      | `string`                                           |             |
+
+## ConnectorSubmitMethod
+
+New local reads require write-level RPC authority as well as the backend read-only file scope.
+
+| Field    | Required | Type                                                       | Description |
+| -------- | -------- | ---------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ConnectorSubmitParams](protocol.md#connectorsubmitparams) |             |
+| `result` | Yes      | [ConnectorJob](protocol.md#connectorjob)                   |             |
+
+## ConnectorSubmitParams
+
+Retrying never silently substitutes a newer sequence or policy commitment.
+
+| Field              | Required | Type                                                     | Description |
+| ------------------ | -------- | -------------------------------------------------------- | ----------- |
+| `environmentId`    | Yes      | `string`                                                 |             |
+| `previousSequence` | Yes      | `string`                                                 |             |
+| `request`          | Yes      | [ConnectorFileRequest](protocol.md#connectorfilerequest) |             |
+
+## ConnectorSystemPlatform
+
+Platform labels are finite; unsupported platforms cannot masquerade as qualified Linux installations.
+
+Type: `"linux"` / `"windows"` / `"macos"` / `"other"`.
+
+## ConnectorSystemSpecification
+
+Account-visible metadata contains no IP address, username, process list, mount paths or credentials.
+
+| Field                  | Required | Type                                                                        | Description |
+| ---------------------- | -------- | --------------------------------------------------------------------------- | ----------- |
+| `architecture`         | Yes      | `string`                                                                    |             |
+| `availableMemoryBytes` | Yes      | `string`                                                                    |             |
+| `cpuModel`             | Yes      | `string`                                                                    |             |
+| `gpuState`             | Yes      | [ConnectorGpuInventoryState](protocol.md#connectorgpuinventorystate)        |             |
+| `gpus`                 | Yes      | Array of [ConnectorGpuSpecification](protocol.md#connectorgpuspecification) |             |
+| `logicalCpuCount`      | Yes      | `number`                                                                    |             |
+| `observedAtMs`         | Yes      | `string`                                                                    |             |
+| `osRelease`            | Yes      | `string`                                                                    |             |
+| `platform`             | Yes      | [ConnectorSystemPlatform](protocol.md#connectorsystemplatform)              |             |
+| `totalMemoryBytes`     | Yes      | `string`                                                                    |             |
+
+## ConnectorView
+
+Safe metadata includes no device key, workload proof, controller endpoint or host pathname.
+
+| Field           | Required | Type                                         | Description |
+| --------------- | -------- | -------------------------------------------- | ----------- |
+| `enrolledAtMs`  | Yes      | `null,string`                                |             |
+| `environmentId` | Yes      | `string`                                     |             |
+| `expiresAtMs`   | Yes      | `string`                                     |             |
+| `id`            | Yes      | `string`                                     |             |
+| `issuedAtMs`    | Yes      | `string`                                     |             |
+| `name`          | Yes      | `string`                                     |             |
+| `phase`         | Yes      | [ConnectorPhase](protocol.md#connectorphase) |             |
+| `revision`      | Yes      | `string`                                     |             |
+| `revokedAtMs`   | Yes      | `null,string`                                |             |
+
+## ConnectorWrite
+
+Complete file contents are bounded by the explicit local read-write grant.
+
+| Field          | Required | Type                                                 | Description |
+| -------------- | -------- | ---------------------------------------------------- | ----------- |
+| `action`       | Yes      | `"write"`                                            |             |
+| `dataBase64`   | Yes      | `string`                                             |             |
+| `mode`         | Yes      | [ConnectorWriteMode](protocol.md#connectorwritemode) |             |
+| `path`         | Yes      | `string`                                             |             |
+| `policySha256` | Yes      | `string`                                             |             |
+| `requestId`    | Yes      | `string`                                             |             |
+| `rootId`       | Yes      | `string`                                             |             |
+
+## ConnectorWriteMode
+
+Atomic publication choices never grant append, removal or program execution.
+
+Type: `"create"` / `"replace"`.
+
+## ConnectorWriteResult
+
+Successful atomic writes retain exact original byte counts and published metadata.
+
+| Field          | Required | Type                                               | Description |
+| -------------- | -------- | -------------------------------------------------- | ----------- |
+| `action`       | Yes      | `"write"`                                          |             |
+| `bytesWritten` | Yes      | `string`                                           |             |
+| `metadata`     | Yes      | [ConnectorMetadata](protocol.md#connectormetadata) |             |
+| `requestId`    | Yes      | `string`                                           |             |
+
 ## ContentBlock
 
 One block of a message's content.
@@ -2170,15 +2704,15 @@ Variant 8: Object (fields below)
 
 Variant 9: Object (fields below)
 
-| Field                  | Required | Type                                                         | Description                                                            |
-| ---------------------- | -------- | ------------------------------------------------------------ | ---------------------------------------------------------------------- |
-| `chatGraph`            | No       | [ChatGraph](protocol.md#chatgraph)                           | Saved visual delivery; providers only consume the ordinary content.    |
-| `content`              | Yes      | Array of [ContentBlock](protocol.md#contentblock) / `string` |                                                                        |
-| `graphic`              | No       | [Graphic](protocol.md#graphic)                               | Validated native graphic retained independently of model-visible text. |
-| `inspectedMediaSha256` | No       | Array of `string`                                            | Host-authored observation evidence; never inferred from result prose.  |
-| `isError`              | No       | `boolean`                                                    |                                                                        |
-| `toolUseId`            | Yes      | `string`                                                     |                                                                        |
-| `type`                 | Yes      | `"tool-result"`                                              | The outcome of a tool call, sent back on the next turn.                |
+| Field                  | Required | Type                                                         | Description                                                              |
+| ---------------------- | -------- | ------------------------------------------------------------ | ------------------------------------------------------------------------ |
+| `content`              | Yes      | Array of [ContentBlock](protocol.md#contentblock) / `string` |                                                                          |
+| `graphic`              | No       | [Graphic](protocol.md#graphic)                               | Validated native graphic retained independently of model-visible text.   |
+| `inspectedMediaSha256` | No       | Array of `string`                                            | Host-authored observation evidence; never inferred from result prose.    |
+| `isError`              | No       | `boolean`                                                    |                                                                          |
+| `toolUseId`            | Yes      | `string`                                                     |                                                                          |
+| `type`                 | Yes      | `"tool-result"`                                              | The outcome of a tool call, sent back on the next turn.                  |
+| `visual`               | No       | [VisualResponse](protocol.md#visualresponse)                 | Inert rich visual response retained independently of model-visible text. |
 
 ## ConversationInput
 
@@ -5944,7 +6478,7 @@ Reads bounded progress after the last acknowledged cursor.
 
 A stable, machine-readable failure classification.
 
-Type: `"aborted"` / `"auth"` / `"budget-exhausted"` / `"config"` / `"context-overflow"` / `"delivery-unconfirmed"` / `"denied"` / `"forbidden"` / `"internal"` / `"invalid-request"` / `"network"` / `"not-found"` / `"protocol"` / `"rate-limit"` / `"timeout"` / `"tool-execution"` / `"tool-input"` / `"upstream"`.
+Type: `"aborted"` / `"auth"` / `"budget-exhausted"` / `"config"` / `"context-overflow"` / `"delivery-unconfirmed"` / `"denied"` / `"forbidden"` / `"internal"` / `"invalid-request"` / `"network"` / `"not-found"` / `"protocol"` / `"rate-limit"` / `"timeout"` / `"tool-execution"` / `"tool-input"` / `"upstream"` / `"conflict"`.
 
 ## Exclude
 
@@ -6160,6 +6694,15 @@ Configurable bounds on gateway-owned work and memory.
 | `config.set`                         | Yes      | Object (fields below) |                                                                                                        |
 | `config.unset`                       | Yes      | Object (fields below) |                                                                                                        |
 | `connect`                            | Yes      | Object (fields below) |                                                                                                        |
+| `connectors.files.get`               | Yes      | Object (fields below) | Reading an existing result never redispatches or advances its sequence.                                |
+| `connectors.files.submit`            | Yes      | Object (fields below) | New local reads require write-level RPC authority as well as the backend read-only file scope.         |
+| `connectors.filesystem`              | Yes      | Object (fields below) | File grants are read through the authenticated account proxy.                                          |
+| `connectors.get`                     | Yes      | Object (fields below) | Enrollment metadata remains account-authorized.                                                        |
+| `connectors.inventory`               | Yes      | Object (fields below) | Nexa forwards an account-bound metadata page through its protected Compute provider.                   |
+| `connectors.link.approve`            | Yes      | Object (fields below) | Explicit approval retains the reviewed key and cannot replace a machine after an uncertain response.   |
+| `connectors.link.review`             | Yes      | Object (fields below) | Code lookup uses the protected controller and never contacts the customer device directly.             |
+| `connectors.list`                    | Yes      | Object (fields below) | Account list accepts no identity override.                                                             |
+| `connectors.revoke`                  | Yes      | Object (fields below) | Permanent revocation is an explicit write operation.                                                   |
 | `credit.budgets`                     | Yes      | Object (fields below) |                                                                                                        |
 | `credit.removeBudget`                | Yes      | Object (fields below) |                                                                                                        |
 | `credit.resetAllowance`              | Yes      | Object (fields below) |                                                                                                        |
@@ -6235,6 +6778,11 @@ Configurable bounds on gateway-owned work and memory.
 | `processes.log`                      | Yes      | Object (fields below) |                                                                                                        |
 | `processes.resize`                   | Yes      | Object (fields below) |                                                                                                        |
 | `processes.stop`                     | Yes      | Object (fields below) |                                                                                                        |
+| `redteam.get`                        | Yes      | Object (fields below) | A revision-pinned view of the effort and its ledger.                                                   |
+| `redteam.list`                       | Yes      | Object (fields below) | Bounded metadata directory without agent transcripts.                                                  |
+| `redteam.start`                      | Yes      | Object (fields below) | Durable effort acceptance under the verified socket owner.                                             |
+| `redteam.stop`                       | Yes      | Object (fields below) | An acknowledged cancellation request independent of the viewer connection.                             |
+| `redteam.update`                     | Yes      | Object (fields below) | Compare-and-set changes to the owner's active effort.                                                  |
 | `reverse.browser`                    | Yes      | Object (fields below) |                                                                                                        |
 | `reverse.browser.modules`            | Yes      | Object (fields below) |                                                                                                        |
 | `reverse.browser.screenshot`         | Yes      | Object (fields below) |                                                                                                        |
@@ -6351,6 +6899,32 @@ Configurable bounds on gateway-owned work and memory.
 | `workspaces.describe`                | Yes      | Object (fields below) |                                                                                                        |
 | `workspaces.destroy`                 | Yes      | Object (fields below) |                                                                                                        |
 | `workspaces.list`                    | Yes      | Object (fields below) |                                                                                                        |
+| `connectors.execution`               | Yes      | Object (fields below) | Public account metadata is proxied only through Nexa.                                                  |
+| `connectors.execution.submit`        | Yes      | Object (fields below) | Admission requires write-level gateway authority even for a read-only workspace.                       |
+| `connectors.execution.get`           | Yes      | Object (fields below) | Original command result lookup admits no new effect.                                                   |
+| `connectors.execution.cancel`        | Yes      | Object (fields below) | Write-level gateway admission remains independent of reading a retained command result.                |
+| `connectors.execution.jobs`          | Yes      | Object (fields below) | Read-only original selection supplies exact metadata for a later explicitly authorized stop.           |
+| `connectors.link.deny`               | Yes      | Object (fields below) | An uncertain rejection must be checked under the same original request.                                |
+| `connectors.execution.output`        | Yes      | Object (fields below) | Reading the captured original grants no command, stop or enrollment mutation.                          |
+| `connectors.workspace.get`           | Yes      | Object (fields below) | Wire contract for reading current owned-conversation file placement.                                   |
+| `connectors.workspace.select`        | Yes      | Object (fields below) | Wire contract for explicitly changing file placement for future turns.                                 |
+| `connectors.workspace.clear`         | Yes      | Object (fields below) | Wire contract for explicitly returning future turns to managed placement.                              |
+| `connectors.workspace.create`        | Yes      | Object (fields below) | Wire contract for idempotent, account-owned conversation admission.                                    |
+| `connectors.workspace.catalog`       | Yes      | Object (fields below) | Catalog access is mediated by Nexa and the existing conversation owner.                                |
+| `connectors.workspace.select-joint`  | Yes      | Object (fields below) | Joint selection captures a verified mapping; local execution grants remain independent.                |
+| `workspace.files.list`               | Yes      | Object (fields below) |                                                                                                        |
+| `workspace.files.read`               | Yes      | Object (fields below) |                                                                                                        |
+| `workspace.files.start`              | Yes      | Object (fields below) |                                                                                                        |
+| `workspace.files.chunk`              | Yes      | Object (fields below) |                                                                                                        |
+| `workspace.files.finish`             | Yes      | Object (fields below) |                                                                                                        |
+| `workspace.files.cancel`             | Yes      | Object (fields below) |                                                                                                        |
+| `workspace.files.mkdir`              | Yes      | Object (fields below) |                                                                                                        |
+| `workspaces.page`                    | Yes      | Object (fields below) |                                                                                                        |
+| `workspaces.visit`                   | Yes      | Object (fields below) |                                                                                                        |
+| `workspace.files.rename`             | Yes      | Object (fields below) |                                                                                                        |
+| `workspace.files.remove`             | Yes      | Object (fields below) |                                                                                                        |
+| `environment.admin.inspect`          | Yes      | Object (fields below) | Read one managed environment for an explicitly authorized platform operator.                           |
+| `environment.admin.mutate`           | Yes      | Object (fields below) | Admit one lifecycle operation without waiting for or claiming native completion.                       |
 
 **accounts.create**
 
@@ -6489,6 +7063,69 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ------------------------------------------ | ----------- |
 | `params` | Yes      | [ConnectParams](protocol.md#connectparams) |             |
 | `result` | Yes      | [HelloOk](protocol.md#hellook)             |             |
+
+**connectors.files.get**
+
+| Field    | Required | Type                                                       | Description |
+| -------- | -------- | ---------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ConnectorResultParams](protocol.md#connectorresultparams) |             |
+| `result` | Yes      | [ConnectorJob](protocol.md#connectorjob)                   |             |
+
+**connectors.files.submit**
+
+| Field    | Required | Type                                                       | Description |
+| -------- | -------- | ---------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ConnectorSubmitParams](protocol.md#connectorsubmitparams) |             |
+| `result` | Yes      | [ConnectorJob](protocol.md#connectorjob)                   |             |
+
+**connectors.filesystem**
+
+| Field    | Required | Type                                                                 | Description |
+| -------- | -------- | -------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ConnectorEnvironmentParams](protocol.md#connectorenvironmentparams) |             |
+| `result` | Yes      | [ConnectorFilesystem](protocol.md#connectorfilesystem)               |             |
+
+**connectors.get**
+
+| Field    | Required | Type                                                 | Description |
+| -------- | -------- | ---------------------------------------------------- | ----------- |
+| `params` | Yes      | [ConnectorGetParams](protocol.md#connectorgetparams) |             |
+| `result` | Yes      | [ConnectorView](protocol.md#connectorview)           |             |
+
+**connectors.inventory**
+
+| Field    | Required | Type                                                             | Description |
+| -------- | -------- | ---------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ConnectorInventoryParams](protocol.md#connectorinventoryparams) |             |
+| `result` | Yes      | [ConnectorInventoryPage](protocol.md#connectorinventorypage)     |             |
+
+**connectors.link.approve**
+
+| Field    | Required | Type                                                                 | Description |
+| -------- | -------- | -------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ConnectorLinkApproveParams](protocol.md#connectorlinkapproveparams) |             |
+| `result` | Yes      | [ConnectorLinkApproved](protocol.md#connectorlinkapproved)           |             |
+
+**connectors.link.review**
+
+| Field    | Required | Type                                                               | Description |
+| -------- | -------- | ------------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [ConnectorLinkReviewParams](protocol.md#connectorlinkreviewparams) |             |
+| `result` | Yes      | [ConnectorLinkReview](protocol.md#connectorlinkreview)             |             |
+
+**connectors.list**
+
+| Field    | Required | Type                                               | Description |
+| -------- | -------- | -------------------------------------------------- | ----------- |
+| `params` | Yes      | [Recordstringnever](protocol.md#recordstringnever) |             |
+| `result` | Yes      | [ConnectorList](protocol.md#connectorlist)         |             |
+
+**connectors.revoke**
+
+| Field    | Required | Type                                                       | Description |
+| -------- | -------- | ---------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ConnectorRevokeParams](protocol.md#connectorrevokeparams) |             |
+| `result` | Yes      | [ConnectorView](protocol.md#connectorview)                 |             |
 
 **credit.budgets**
 
@@ -7075,6 +7712,41 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | -------------------------------------------------------- | ----------- |
 | `params` | Yes      | [BackgroundProcessRef](protocol.md#backgroundprocessref) |             |
 | `result` | Yes      | [OkResult](protocol.md#okresult)                         |             |
+
+**redteam.get**
+
+| Field    | Required | Type                                               | Description |
+| -------- | -------- | -------------------------------------------------- | ----------- |
+| `params` | Yes      | [RedTeamGetRequest](protocol.md#redteamgetrequest) |             |
+| `result` | Yes      | [RedTeamSnapshot](protocol.md#redteamsnapshot)     |             |
+
+**redteam.list**
+
+| Field    | Required | Type                                                 | Description |
+| -------- | -------- | ---------------------------------------------------- | ----------- |
+| `params` | Yes      | [RedTeamListRequest](protocol.md#redteamlistrequest) |             |
+| `result` | Yes      | [RedTeamListPage](protocol.md#redteamlistpage)       |             |
+
+**redteam.start**
+
+| Field    | Required | Type                                                   | Description |
+| -------- | -------- | ------------------------------------------------------ | ----------- |
+| `params` | Yes      | [RedTeamStartRequest](protocol.md#redteamstartrequest) |             |
+| `result` | Yes      | [RedTeamEffort](protocol.md#redteameffort)             |             |
+
+**redteam.stop**
+
+| Field    | Required | Type                                                     | Description |
+| -------- | -------- | -------------------------------------------------------- | ----------- |
+| `params` | Yes      | [RedTeamEffortRequest](protocol.md#redteameffortrequest) |             |
+| `result` | Yes      | [RedTeamEffort](protocol.md#redteameffort)               |             |
+
+**redteam.update**
+
+| Field    | Required | Type                                                     | Description |
+| -------- | -------- | -------------------------------------------------------- | ----------- |
+| `params` | Yes      | [RedTeamUpdateRequest](protocol.md#redteamupdaterequest) |             |
+| `result` | Yes      | [RedTeamEffort](protocol.md#redteameffort)               |             |
 
 **reverse.browser**
 
@@ -7888,6 +8560,188 @@ Configurable bounds on gateway-owned work and memory.
 | `params` | Yes      | [Recordstringnever](protocol.md#recordstringnever) |             |
 | `result` | Yes      | Array of [Workspace](protocol.md#workspace)        |             |
 
+**connectors.execution**
+
+| Field    | Required | Type                                                                 | Description |
+| -------- | -------- | -------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ConnectorEnvironmentParams](protocol.md#connectorenvironmentparams) |             |
+| `result` | Yes      | [ConnectorExecutionStatus](protocol.md#connectorexecutionstatus)     |             |
+
+**connectors.execution.submit**
+
+| Field    | Required | Type                                                                         | Description |
+| -------- | -------- | ---------------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ConnectorExecutionSubmitParams](protocol.md#connectorexecutionsubmitparams) |             |
+| `result` | Yes      | [ConnectorExecutionJob](protocol.md#connectorexecutionjob)                   |             |
+
+**connectors.execution.get**
+
+| Field    | Required | Type                                                       | Description |
+| -------- | -------- | ---------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ConnectorResultParams](protocol.md#connectorresultparams) |             |
+| `result` | Yes      | [ConnectorExecutionJob](protocol.md#connectorexecutionjob) |             |
+
+**connectors.execution.cancel**
+
+| Field    | Required | Type                                                                       | Description |
+| -------- | -------- | -------------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ConnectorExecutionStopParams](protocol.md#connectorexecutionstopparams)   |             |
+| `result` | Yes      | [ConnectorExecutionStopReceipt](protocol.md#connectorexecutionstopreceipt) |             |
+
+**connectors.execution.jobs**
+
+| Field    | Required | Type                                                                       | Description |
+| -------- | -------- | -------------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ConnectorEnvironmentParams](protocol.md#connectorenvironmentparams)       |             |
+| `result` | Yes      | [ConnectorExecutionCurrentJobs](protocol.md#connectorexecutioncurrentjobs) |             |
+
+**connectors.link.deny**
+
+| Field    | Required | Type                                                           | Description |
+| -------- | -------- | -------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ConnectorLinkDenyParams](protocol.md#connectorlinkdenyparams) |             |
+| `result` | Yes      | [ConnectorLinkDenied](protocol.md#connectorlinkdenied)         |             |
+
+**connectors.execution.output**
+
+| Field    | Required | Type                                                                     | Description |
+| -------- | -------- | ------------------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [ConnectorResultParams](protocol.md#connectorresultparams)               |             |
+| `result` | Yes      | [ConnectorExecutionOutputView](protocol.md#connectorexecutionoutputview) |             |
+
+**connectors.workspace.get**
+
+| Field    | Required | Type                                                                           | Description |
+| -------- | -------- | ------------------------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [ConnectorWorkspaceGetParams](protocol.md#connectorworkspacegetparams)         |             |
+| `result` | Yes      | [ConnectorWorkspaceSelectionView](protocol.md#connectorworkspaceselectionview) |             |
+
+**connectors.workspace.select**
+
+| Field    | Required | Type                                                                           | Description |
+| -------- | -------- | ------------------------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [ConnectorWorkspaceSelectParams](protocol.md#connectorworkspaceselectparams)   |             |
+| `result` | Yes      | [ConnectorWorkspaceSelectionView](protocol.md#connectorworkspaceselectionview) |             |
+
+**connectors.workspace.clear**
+
+| Field    | Required | Type                                                                           | Description |
+| -------- | -------- | ------------------------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [ConnectorWorkspaceClearParams](protocol.md#connectorworkspaceclearparams)     |             |
+| `result` | Yes      | [ConnectorWorkspaceSelectionView](protocol.md#connectorworkspaceselectionview) |             |
+
+**connectors.workspace.create**
+
+| Field    | Required | Type                                                                           | Description |
+| -------- | -------- | ------------------------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [ConnectorWorkspaceCreateParams](protocol.md#connectorworkspacecreateparams)   |             |
+| `result` | Yes      | [ConnectorWorkspaceSelectionView](protocol.md#connectorworkspaceselectionview) |             |
+
+**connectors.workspace.catalog**
+
+| Field    | Required | Type                                                                           | Description |
+| -------- | -------- | ------------------------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [ConnectorWorkspaceCatalogParams](protocol.md#connectorworkspacecatalogparams) |             |
+| `result` | Yes      | [ConnectorWorkspaceCatalogView](protocol.md#connectorworkspacecatalogview)     |             |
+
+**connectors.workspace.select-joint**
+
+| Field    | Required | Type                                                                                   | Description |
+| -------- | -------- | -------------------------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ConnectorWorkspaceSelectJointParams](protocol.md#connectorworkspaceselectjointparams) |             |
+| `result` | Yes      | [ConnectorWorkspaceSelectionView](protocol.md#connectorworkspaceselectionview)         |             |
+
+**workspace.files.list**
+
+| Field    | Required | Type                                                         | Description |
+| -------- | -------- | ------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [BrowserFilesListParams](protocol.md#browserfileslistparams) |             |
+| `result` | Yes      | [BrowserFilesPage](protocol.md#browserfilespage)             |             |
+
+**workspace.files.read**
+
+| Field    | Required | Type                                                         | Description |
+| -------- | -------- | ------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [BrowserFilesReadParams](protocol.md#browserfilesreadparams) |             |
+| `result` | Yes      | [BrowserFilesRead](protocol.md#browserfilesread)             |             |
+
+**workspace.files.start**
+
+| Field    | Required | Type                                                           | Description |
+| -------- | -------- | -------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [BrowserFilesStartParams](protocol.md#browserfilesstartparams) |             |
+| `result` | Yes      | [BrowserFilesUpload](protocol.md#browserfilesupload)           |             |
+
+**workspace.files.chunk**
+
+| Field    | Required | Type                                                           | Description |
+| -------- | -------- | -------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [BrowserFilesChunkParams](protocol.md#browserfileschunkparams) |             |
+| `result` | Yes      | [BrowserFilesPosition](protocol.md#browserfilesposition)       |             |
+
+**workspace.files.finish**
+
+| Field    | Required | Type                                                             | Description |
+| -------- | -------- | ---------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [BrowserFilesUploadParams](protocol.md#browserfilesuploadparams) |             |
+| `result` | Yes      | [BrowserFilesDone](protocol.md#browserfilesdone)                 |             |
+
+**workspace.files.cancel**
+
+| Field    | Required | Type                                                             | Description |
+| -------- | -------- | ---------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [BrowserFilesUploadParams](protocol.md#browserfilesuploadparams) |             |
+| `result` | Yes      | [BrowserFilesDone](protocol.md#browserfilesdone)                 |             |
+
+**workspace.files.mkdir**
+
+| Field    | Required | Type                                                 | Description |
+| -------- | -------- | ---------------------------------------------------- | ----------- |
+| `params` | Yes      | [BrowserFilesTarget](protocol.md#browserfilestarget) |             |
+| `result` | Yes      | [BrowserFilesDone](protocol.md#browserfilesdone)     |             |
+
+**workspaces.page**
+
+| Field    | Required | Type                                                   | Description |
+| -------- | -------- | ------------------------------------------------------ | ----------- |
+| `params` | Yes      | [WorkspacePageParams](protocol.md#workspacepageparams) |             |
+| `result` | Yes      | [WorkspacePage](protocol.md#workspacepage)             |             |
+
+**workspaces.visit**
+
+| Field    | Required | Type                             | Description |
+| -------- | -------- | -------------------------------- | ----------- |
+| `params` | Yes      | [IdParams](protocol.md#idparams) |             |
+| `result` | Yes      | [OkResult](protocol.md#okresult) |             |
+
+**workspace.files.rename**
+
+| Field    | Required | Type                                                             | Description |
+| -------- | -------- | ---------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [BrowserFilesRenameParams](protocol.md#browserfilesrenameparams) |             |
+| `result` | Yes      | [BrowserFilesDone](protocol.md#browserfilesdone)                 |             |
+
+**workspace.files.remove**
+
+| Field    | Required | Type                                                 | Description |
+| -------- | -------- | ---------------------------------------------------- | ----------- |
+| `params` | Yes      | [BrowserFilesTarget](protocol.md#browserfilestarget) |             |
+| `result` | Yes      | [BrowserFilesDone](protocol.md#browserfilesdone)     |             |
+
+**environment.admin.inspect**
+
+| Field    | Required | Type                                                           | Description |
+| -------- | -------- | -------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [VmAdministrationInspect](protocol.md#vmadministrationinspect) |             |
+| `result` | Yes      | [VmAdministrationView](protocol.md#vmadministrationview)       |             |
+
+**environment.admin.mutate**
+
+| Field    | Required | Type                                                             | Description |
+| -------- | -------- | ---------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [VmAdministrationMutation](protocol.md#vmadministrationmutation) |             |
+| `result` | Yes      | [VmAdministrationView](protocol.md#vmadministrationview)         |             |
+
 ## GeometryFormat
 
 Supported serialized 3D asset formats; radiance fields remain unspecified.
@@ -7962,7 +8816,7 @@ Correlated native graphic packet, journalled and streamed like other turn events
 
 ## GraphicKind
 
-Native data visualization families. Relationship diagrams use render_graph.
+Native data visualization families. Rich visual explanations use render_visual.
 
 Type: `"area"` / `"bar"` / `"donut"` / `"funnel"` / `"heatmap"` / `"line"` / `"metric"` / `"pie"` / `"radar"` / `"scatter"` / `"stacked-bar"` / `"treemap"`.
 
@@ -9503,6 +10357,390 @@ Type: Dictionary.
 
 Type: Dictionary.
 
+## RedTeamActionKind
+
+Observed engine operations, independent of presentation timing.
+
+Type: `"delegate"` / `"edit"` / `"error"` / `"read"` / `"result"` / `"tool"` / `"verify"` / `"wait"`.
+
+## RedTeamActionState
+
+Authoritative action lifecycle, including unsuccessful and cancelled operations.
+
+Type: `"cancelled"` / `"failed"` / `"progress"` / `"started"` / `"succeeded"` / `"unconfirmed"` / `"waiting"`.
+
+## RedTeamActionTarget
+
+A stable owner-scoped reference, never authority to read an arbitrary filesystem path.
+
+| Field              | Required | Type                                                           | Description                                                                                 |
+| ------------------ | -------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `fileId`           | Yes      | `null,string`                                                  |                                                                                             |
+| `historySelection` | No       | [RedTeamHistorySelection](protocol.md#redteamhistoryselection) | Native descendants retain their actual parent archive rather than synthetic child sessions. |
+| `kind`             | Yes      | [RedTeamTargetKind](protocol.md#redteamtargetkind)             |                                                                                             |
+| `label`            | Yes      | `string`                                                       |                                                                                             |
+| `line`             | Yes      | `null,number`                                                  |                                                                                             |
+| `path`             | Yes      | `null,string`                                                  |                                                                                             |
+| `sessionKey`       | Yes      | `string`                                                       |                                                                                             |
+| `targetId`         | Yes      | `string`                                                       |                                                                                             |
+| `toolCallId`       | Yes      | `null,string`                                                  |                                                                                             |
+
+## RedTeamAgent
+
+Chat events, history, tool output and terminal attachments stay in the existing session APIs.
+
+| Field              | Required | Type                                                           | Description                                                             |
+| ------------------ | -------- | -------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| `activity`         | Yes      | `string`                                                       |                                                                         |
+| `agentId`          | Yes      | `string`                                                       |                                                                         |
+| `historySelection` | No       | [RedTeamHistorySelection](protocol.md#redteamhistoryselection) | Exact saved native frames when this worker shares its parent's archive. |
+| `name`             | No       | `string`                                                       | The name this worker uses in the effort and its conversation.           |
+| `sessionKey`       | Yes      | `null,string`                                                  |                                                                         |
+| `status`           | Yes      | [RedTeamAgentStatus](protocol.md#redteamagentstatus)           |                                                                         |
+| `taskId`           | Yes      | `null,string`                                                  |                                                                         |
+
+## RedTeamAgentStatus
+
+Worker scheduling and termination states.
+
+Type: `"failed"` / `"idle"` / `"pending"` / `"running"` / `"stopped"` / `"verifying"`.
+
+## RedTeamCoordinationEvent
+
+A saved exchange linking an agent to real work or a reported finding.
+
+| Field       | Required | Type                                                           | Description                                                                   |
+| ----------- | -------- | -------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| `action`    | No       | [RedTeamExecutionAction](protocol.md#redteamexecutionaction)   | Present only when the native engine observed this exact action lifecycle.     |
+| `agentId`   | Yes      | `string`                                                       | The worker involved; the orchestrator is the effort's main session.           |
+| `atMs`      | Yes      | `string`                                                       | Event time in decimal milliseconds.                                           |
+| `eventId`   | Yes      | `string`                                                       |                                                                               |
+| `findingId` | Yes      | `null,string`                                                  |                                                                               |
+| `kind`      | Yes      | [RedTeamCoordinationKind](protocol.md#redteamcoordinationkind) |                                                                               |
+| `sequence`  | Yes      | `string`                                                       | Exact increasing sequence within this effort, encoded without precision loss. |
+| `summary`   | Yes      | `string`                                                       | A short explanation of the recorded action in plain language.                 |
+| `taskId`    | Yes      | `null,string`                                                  |                                                                               |
+
+## RedTeamCoordinationKind
+
+Recorded work exchanges, without inferring relationships from model prose.
+
+Type: `"assign"` / `"progress"` / `"result"` / `"verify"`.
+
+## RedTeamDelegatedAgent
+
+An observed native descendant with its real parent, goal and original archive selection.
+
+| Field              | Required | Type                                                           | Description                                                             |
+| ------------------ | -------- | -------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| `activity`         | Yes      | `string`                                                       |                                                                         |
+| `agentId`          | Yes      | `string`                                                       |                                                                         |
+| `goal`             | Yes      | `string`                                                       |                                                                         |
+| `historySelection` | Yes      | [RedTeamHistorySelection](protocol.md#redteamhistoryselection) | Exact saved native frames when this worker shares its parent's archive. |
+| `name`             | No       | `string`                                                       | The name this worker uses in the effort and its conversation.           |
+| `parentAgentId`    | Yes      | `string`                                                       |                                                                         |
+| `sessionKey`       | Yes      | `null,string`                                                  |                                                                         |
+| `status`           | Yes      | [RedTeamAgentStatus](protocol.md#redteamagentstatus)           |                                                                         |
+| `taskId`           | Yes      | `null,string`                                                  |                                                                         |
+
+## RedTeamEffort
+
+Decimal wire counters and timestamps retain integer precision across JSON peers.
+
+| Field          | Required | Type                                       | Description                                                                    |
+| -------------- | -------- | ------------------------------------------ | ------------------------------------------------------------------------------ |
+| `createdAtMs`  | Yes      | `string`                                   |                                                                                |
+| `effortId`     | Yes      | `string`                                   |                                                                                |
+| `error`        | Yes      | `null,string`                              |                                                                                |
+| `findingCount` | Yes      | `string`                                   |                                                                                |
+| `parallelism`  | Yes      | `number`                                   |                                                                                |
+| `revision`     | Yes      | `string`                                   |                                                                                |
+| `rules`        | Yes      | `string`                                   |                                                                                |
+| `sessionKey`   | Yes      | `string`                                   | Ordinary owner-scoped Chat session for the orchestrator and its event journal. |
+| `source`       | Yes      | [RedTeamSource](protocol.md#redteamsource) |                                                                                |
+| `status`       | Yes      | [RedTeamStatus](protocol.md#redteamstatus) |                                                                                |
+| `taskCount`    | Yes      | `string`                                   |                                                                                |
+| `title`        | Yes      | `string`                                   |                                                                                |
+| `updatedAtMs`  | Yes      | `string`                                   |                                                                                |
+
+## RedTeamEffortRequest
+
+An effort address resolved under the authenticated principal.
+
+| Field      | Required | Type     | Description |
+| ---------- | -------- | -------- | ----------- |
+| `effortId` | Yes      | `string` |             |
+
+## RedTeamEvidence
+
+Artifact access remains subject to the existing authenticated file download boundary.
+
+| Field         | Required | Type          | Description                                                                                        |
+| ------------- | -------- | ------------- | -------------------------------------------------------------------------------------------------- |
+| `agentId`     | No       | `null,string` | Owning researcher archive; omitted selects the finding reporter and null selects the orchestrator. |
+| `description` | Yes      | `string`      |                                                                                                    |
+| `fileId`      | Yes      | `null,string` |                                                                                                    |
+
+## RedTeamExecutionAction
+
+One exact engine action, ordered by its containing coordination event sequence.
+
+| Field             | Required | Type                                                   | Description |
+| ----------------- | -------- | ------------------------------------------------------ | ----------- |
+| `actionId`        | Yes      | `string`                                               |             |
+| `agentId`         | Yes      | `string`                                               |             |
+| `effortId`        | Yes      | `string`                                               |             |
+| `kind`            | Yes      | [RedTeamActionKind](protocol.md#redteamactionkind)     |             |
+| `parentAgentId`   | Yes      | `null,string`                                          |             |
+| `relatedTargetId` | Yes      | `null,string`                                          |             |
+| `state`           | Yes      | [RedTeamActionState](protocol.md#redteamactionstate)   |             |
+| `target`          | Yes      | [RedTeamActionTarget](protocol.md#redteamactiontarget) |             |
+
+## RedTeamFilesSource
+
+The server resolves access to uploaded files under the authenticated principal.
+
+| Field     | Required | Type              | Description |
+| --------- | -------- | ----------------- | ----------- |
+| `fileIds` | Yes      | Array of `string` |             |
+| `kind`    | Yes      | `"files"`         |             |
+
+## RedTeamFinding
+
+A reported candidate or confirmed finding with retained verification evidence.
+
+| Field               | Required | Type                                                     | Description                                                                |
+| ------------------- | -------- | -------------------------------------------------------- | -------------------------------------------------------------------------- |
+| `affectedComponent` | Yes      | `string`                                                 |                                                                            |
+| `agentId`           | Yes      | `null,string`                                            |                                                                            |
+| `cvssScore`         | Yes      | `null,string`                                            | Decimal score from 0 through 10, with at most one decimal digit.           |
+| `description`       | Yes      | `string`                                                 |                                                                            |
+| `evidence`          | Yes      | Array of [RedTeamEvidence](protocol.md#redteamevidence)  |                                                                            |
+| `findingId`         | Yes      | `string`                                                 |                                                                            |
+| `report`            | No       | [RedTeamFindingReport](protocol.md#redteamfindingreport) | Optional details preserve older findings and partially researched reports. |
+| `reproduction`      | Yes      | Array of `string`                                        |                                                                            |
+| `severity`          | Yes      | [RedTeamSeverity](protocol.md#redteamseverity)           |                                                                            |
+| `status`            | Yes      | [RedTeamFindingStatus](protocol.md#redteamfindingstatus) |                                                                            |
+| `title`             | Yes      | `string`                                                 |                                                                            |
+| `updatedAtMs`       | Yes      | `string`                                                 |                                                                            |
+
+## RedTeamFindingReport
+
+Extra report details in plain language. Missing fields have not been reported yet.
+
+| Field              | Required | Type                                                                  | Description                                                                  |
+| ------------------ | -------- | --------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `actualBehavior`   | No       | `string`                                                              | What the researcher observed the software doing instead.                     |
+| `affectedVersions` | No       | `string`                                                              | Software versions that were checked and found to be affected.                |
+| `cveIds`           | No       | Array of `string`                                                     | Published CVE identifiers only; an empty list means none have been assigned. |
+| `cweIds`           | No       | Array of `string`                                                     | Reported CWE categories; an empty list means none have been identified.      |
+| `expectedBehavior` | No       | `string`                                                              | What the software should do when it works safely.                            |
+| `impact`           | No       | `string`                                                              | What could go wrong for people who use the affected software.                |
+| `prerequisites`    | No       | Array of `string`                                                     | Conditions needed before the reported problem can happen.                    |
+| `references`       | No       | Array of [RedTeamReportReference](protocol.md#redteamreportreference) | Supporting pages the reader can open to check the explanation.               |
+| `remediation`      | No       | `string`                                                              | How the software owner can fix or reduce the problem.                        |
+| `technicalDetails` | No       | `string`                                                              | Deeper explanation for the people investigating or fixing the problem.       |
+
+## RedTeamFindingStatus
+
+Explicit verification outcome; pending candidates remain distinguishable.
+
+Type: `"confirmed"` / `"pending"` / `"rejected"`.
+
+## RedTeamGetMethod
+
+A revision-pinned view of the effort and its ledger.
+
+| Field    | Required | Type                                               | Description |
+| -------- | -------- | -------------------------------------------------- | ----------- |
+| `params` | Yes      | [RedTeamGetRequest](protocol.md#redteamgetrequest) |             |
+| `result` | Yes      | [RedTeamSnapshot](protocol.md#redteamsnapshot)     |             |
+
+## RedTeamGetRequest
+
+Null revision selects the latest snapshot. Continuations must pin its exact revision.
+
+| Field           | Required | Type          | Description |
+| --------------- | -------- | ------------- | ----------- |
+| `effortId`      | Yes      | `string`      |             |
+| `findingCursor` | Yes      | `null,string` |             |
+| `revision`      | Yes      | `null,string` |             |
+| `taskCursor`    | Yes      | `null,string` |             |
+
+## RedTeamGitHubSource
+
+HTTPS GitHub repository location; credentials and arbitrary fetch URLs are prohibited.
+
+| Field  | Required | Type       | Description |
+| ------ | -------- | ---------- | ----------- |
+| `kind` | Yes      | `"github"` |             |
+| `url`  | Yes      | `string`   |             |
+
+## RedTeamHistorySelection
+
+Exact native worker frames selected within their original parent archive and response stream.
+
+| Field      | Required | Type     | Description |
+| ---------- | -------- | -------- | ----------- |
+| `streamId` | Yes      | `string` |             |
+| `workerId` | Yes      | `string` |             |
+
+## RedTeamListMethod
+
+Bounded metadata directory without agent transcripts.
+
+| Field    | Required | Type                                                 | Description |
+| -------- | -------- | ---------------------------------------------------- | ----------- |
+| `params` | Yes      | [RedTeamListRequest](protocol.md#redteamlistrequest) |             |
+| `result` | Yes      | [RedTeamListPage](protocol.md#redteamlistpage)       |             |
+
+## RedTeamListPage
+
+One metadata page with an exclusive continuation cursor.
+
+| Field   | Required | Type                                                | Description |
+| ------- | -------- | --------------------------------------------------- | ----------- |
+| `items` | Yes      | Array of [RedTeamEffort](protocol.md#redteameffort) |             |
+| `next`  | Yes      | `null,string`                                       |             |
+
+## RedTeamListRequest
+
+Bounded metadata pagination without agent journals or ledger bodies.
+
+| Field           | Required | Type          | Description |
+| --------------- | -------- | ------------- | ----------- |
+| `afterEffortId` | Yes      | `null,string` |             |
+| `limit`         | Yes      | `number`      |             |
+
+## RedTeamReportReference
+
+A source readers can open to learn more or check a report's claims.
+
+| Field   | Required | Type     | Description                                                 |
+| ------- | -------- | -------- | ----------------------------------------------------------- |
+| `title` | Yes      | `string` | A short name describing what the linked page explains.      |
+| `url`   | Yes      | `string` | An HTTP or HTTPS link without embedded account credentials. |
+
+## RedTeamSeverity
+
+Severity labels retained independently of the numerical CVSS score.
+
+Type: `"critical"` / `"high"` / `"info"` / `"low"` / `"medium"`.
+
+## RedTeamSnapshot
+
+Pages are pinned to the effort revision, preventing mixed ledger reads.
+
+| Field               | Required | Type                                                                      | Description                                                                   |
+| ------------------- | -------- | ------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| `agents`            | Yes      | Array of [RedTeamAgent](protocol.md#redteamagent)                         |                                                                               |
+| `coordination`      | No       | Array of [RedTeamCoordinationEvent](protocol.md#redteamcoordinationevent) | Recent saved exchanges, ordered by exact sequence rather than browser timing. |
+| `delegatedAgents`   | No       | Array of [RedTeamDelegatedAgent](protocol.md#redteamdelegatedagent)       | Bounded observed native descendants, separate from durable scheduler slots.   |
+| `effort`            | Yes      | [RedTeamEffort](protocol.md#redteameffort)                                |                                                                               |
+| `findings`          | Yes      | Array of [RedTeamFinding](protocol.md#redteamfinding)                     |                                                                               |
+| `nextFindingCursor` | Yes      | `null,string`                                                             |                                                                               |
+| `nextTaskCursor`    | Yes      | `null,string`                                                             |                                                                               |
+| `tasks`             | Yes      | Array of [RedTeamTask](protocol.md#redteamtask)                           |                                                                               |
+
+## RedTeamSource
+
+Exactly one uploaded selection or GitHub repository.
+
+Variant 1: [RedTeamFilesSource](protocol.md#redteamfilessource)
+
+| Field     | Required | Type              | Description |
+| --------- | -------- | ----------------- | ----------- |
+| `fileIds` | Yes      | Array of `string` |             |
+| `kind`    | Yes      | `"files"`         |             |
+
+Variant 2: [RedTeamGitHubSource](protocol.md#redteamgithubsource)
+
+| Field  | Required | Type       | Description |
+| ------ | -------- | ---------- | ----------- |
+| `kind` | Yes      | `"github"` |             |
+| `url`  | Yes      | `string`   |             |
+
+## RedTeamStartMethod
+
+Durable effort acceptance under the verified socket owner.
+
+| Field    | Required | Type                                                   | Description |
+| -------- | -------- | ------------------------------------------------------ | ----------- |
+| `params` | Yes      | [RedTeamStartRequest](protocol.md#redteamstartrequest) |             |
+| `result` | Yes      | [RedTeamEffort](protocol.md#redteameffort)             |             |
+
+## RedTeamStartRequest
+
+Caller-selected effort identities make unacknowledged starts safe to retry server-side.
+
+| Field         | Required | Type                                       | Description |
+| ------------- | -------- | ------------------------------------------ | ----------- |
+| `effortId`    | Yes      | `string`                                   |             |
+| `parallelism` | No       | `number`                                   |             |
+| `rules`       | Yes      | `string`                                   |             |
+| `source`      | Yes      | [RedTeamSource](protocol.md#redteamsource) |             |
+| `title`       | Yes      | `string`                                   |             |
+
+## RedTeamStatus
+
+Effort lifecycle states; completion of individual tasks does not stop an effort.
+
+Type: `"failed"` / `"running"` / `"stopped"` / `"stopping"`.
+
+## RedTeamStopMethod
+
+An acknowledged cancellation request independent of the viewer connection.
+
+| Field    | Required | Type                                                     | Description |
+| -------- | -------- | -------------------------------------------------------- | ----------- |
+| `params` | Yes      | [RedTeamEffortRequest](protocol.md#redteameffortrequest) |             |
+| `result` | Yes      | [RedTeamEffort](protocol.md#redteameffort)               |             |
+
+## RedTeamTargetKind
+
+Content remains a dot; its original session supplies its inspectable details.
+
+Type: `"file"` / `"finding"` / `"plan"` / `"result"` / `"task"` / `"terminal"` / `"tool"`.
+
+## RedTeamTask
+
+One persisted unit of planned, active or finished work.
+
+| Field         | Required | Type                                               | Description |
+| ------------- | -------- | -------------------------------------------------- | ----------- |
+| `agentId`     | Yes      | `null,string`                                      |             |
+| `description` | Yes      | `string`                                           |             |
+| `status`      | Yes      | [RedTeamTaskStatus](protocol.md#redteamtaskstatus) |             |
+| `taskId`      | Yes      | `string`                                           |             |
+| `title`       | Yes      | `string`                                           |             |
+| `updatedAtMs` | Yes      | `string`                                           |             |
+
+## RedTeamTaskStatus
+
+Ledger progress independent of the effort lifecycle.
+
+Type: `"blocked"` / `"cancelled"` / `"completed"` / `"planned"` / `"running"`.
+
+## RedTeamUpdateMethod
+
+Compare-and-set changes to the owner's active effort.
+
+| Field    | Required | Type                                                     | Description |
+| -------- | -------- | -------------------------------------------------------- | ----------- |
+| `params` | Yes      | [RedTeamUpdateRequest](protocol.md#redteamupdaterequest) |             |
+| `result` | Yes      | [RedTeamEffort](protocol.md#redteameffort)               |             |
+
+## RedTeamUpdateRequest
+
+Compare-and-set prevents a delayed update from overwriting a newer owner decision.
+
+| Field              | Required | Type     | Description |
+| ------------------ | -------- | -------- | ----------- |
+| `effortId`         | Yes      | `string` |             |
+| `expectedRevision` | Yes      | `string` |             |
+| `parallelism`      | No       | `number` |             |
+| `rules`            | No       | `string` |             |
+
 ## ReminderAction
 
 A durable message to the conversation that requested it; no model execution.
@@ -10844,14 +12082,15 @@ One tool call's outcome, paired back to its call.
 
 ## ToolProgress
 
-| Field        | Required | Type                                                         | Description                                                                         |
-| ------------ | -------- | ------------------------------------------------------------ | ----------------------------------------------------------------------------------- |
-| `attachment` | No       | [ToolProgressAttachment](protocol.md#toolprogressattachment) | Transient visual progress for the active chat; never persisted in the transcript.   |
-| `fraction`   | No       | `number`                                                     | Completed fraction in `[0, 1]`, when the tool can know it.                          |
-| `reverse`    | No       | [ReverseRunSnapshot](protocol.md#reverserunsnapshot)         | Shared investigation plan and evidence provenance, without live query capabilities. |
-| `status`     | No       | `string`                                                     | A one-line status, e.g. `running tests…`.                                           |
-| `terminal`   | No       | [ToolTerminal](protocol.md#toolterminal)                     | Live pseudoterminal identity for authenticated input and resize controls.           |
-| `text`       | No       | `string`                                                     | Text appended to the live view.                                                     |
+| Field            | Required | Type                                                         | Description                                                                                                                       |
+| ---------------- | -------- | ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
+| `attachment`     | No       | [ToolProgressAttachment](protocol.md#toolprogressattachment) | Transient visual progress for the active chat; never persisted in the transcript.                                                 |
+| `fraction`       | No       | `number`                                                     | Completed fraction in `[0, 1]`, when the tool can know it.                                                                        |
+| `reverse`        | No       | [ReverseRunSnapshot](protocol.md#reverserunsnapshot)         | Shared investigation plan and evidence provenance, without live query capabilities.                                               |
+| `status`         | No       | `string`                                                     | A one-line status, e.g. `running tests…`.                                                                                         |
+| `terminal`       | No       | [ToolTerminal](protocol.md#toolterminal)                     | Live pseudoterminal identity for authenticated input and resize controls.                                                         |
+| `text`           | No       | `string`                                                     | Text appended to the live view.                                                                                                   |
+| `outputSnapshot` | No       | `string`                                                     | Complete replacement output, including empty output; bounded to 65536 UTF-16 code units and therefore at most 196608 UTF-8 bytes. |
 
 ## ToolProgressAttachment
 
@@ -10889,7 +12128,6 @@ What a tool returns.
 
 | Field                  | Required | Type                                                                                    | Description                                                                                  |
 | ---------------------- | -------- | --------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| `chatGraph`            | No       | [ChatGraph](protocol.md#chatgraph)                                                      | Validated graph presentation, independent of bounded model-visible result text.              |
 | `commandExecution`     | No       | [CommandExecutionReceipt](protocol.md#commandexecutionreceipt)                          | Only the execution adapter supplies this evidence; stdout cannot forge it.                   |
 | `content`              | Yes      | Array of [ContentBlock](protocol.md#contentblock) / `string`                            | What the model sees. A string for the ordinary case; blocks when the result carries an image |
 | `continuation`         | No       | `string`                                                                                | The exact call that would show the next page of this result, written by the tool.            |
@@ -10910,6 +12148,7 @@ What a tool returns.
 | `terminate`            | No       | `boolean`                                                                               | Whether this result should END the turn rather than feed back into the model.                |
 | `truncation`           | No       | [TruncationRecord](protocol.md#truncationrecord)                                        | What the registry's backstop removed, when it removed anything.                              |
 | `verifiedCodePaths`    | No       | Array of `string`                                                                       | Absolute source paths accepted by a native engineering workflow, never model-supplied.       |
+| `visual`               | No       | [VisualResponse](protocol.md#visualresponse)                                            | Inert rich visual response retained independently of model-visible text.                     |
 
 ## ToolSitesData
 
@@ -13028,25 +14267,26 @@ Type: `null,string,number,boolean`.
 
 An isolated place an agent works.
 
-| Field         | Required | Type                                                                                    | Description                                                                                   |
-| ------------- | -------- | --------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| `createdAt`   | Yes      | `number`                                                                                |                                                                                               |
-| `destroyedAt` | No       | `number`                                                                                | When the tree was removed. Present exactly on a tombstone.                                    |
-| `expiresAt`   | No       | `number`                                                                                | When an ephemeral workspace should be reaped.                                                 |
-| `extraRoots`  | No       | Array of `string`                                                                       | Additional roots tools may also reach (a shared cache, a read-only reference checkout).       |
-| `id`          | Yes      | `string`                                                                                |                                                                                               |
-| `kind`        | Yes      | [WorkspaceKind](protocol.md#workspacekind)                                              |                                                                                               |
-| `leases`      | No       | Array of [WorkspaceLeaseRecord](protocol.md#workspaceleaserecord)                       | Runs currently holding it. Read through {@link activeLeases}, which drops expired ones.       |
-| `name`        | Yes      | `string`                                                                                | A human name, e.g. `acme-migration`.                                                          |
-| `owner`       | No       | [WorkspaceOwner](protocol.md#workspaceowner)                                            | Who may use it. Absent means the deployment's default policy decides.                         |
-| `quota`       | No       | [WorkspaceQuota](protocol.md#workspacequota)                                            | Ceilings for this workspace's contents. Absent means unbounded — see {@link WorkspaceQuota}.  |
-| `root`        | Yes      | `string`                                                                                | The absolute root. Every tool bound to this workspace is confined here.                       |
-| `state`       | No       | `"active"` / `"creating"` / `"destroyed"` / `"destroying"` / `"draining"` / `"expired"` | Where it is in its lifecycle.                                                                 |
-| `storage`     | No       | [WorkspaceStorageIdentity](protocol.md#workspacestorageidentity)                        | Present for assigned-host projects; legacy/native records cannot silently adopt a VM.         |
-| `tags`        | No       | Array of `string`                                                                       | Free-form labels.                                                                             |
-| `updatedAt`   | Yes      | `number`                                                                                |                                                                                               |
-| `usage`       | No       | [WorkspaceUsage](protocol.md#workspaceusage)                                            | Last known contents. Read through {@link usageOf}, which defaults a legacy record to zero.    |
-| `worktree`    | No       | Object (fields below)                                                                   | Set when this workspace IS a git worktree, so destroy unregisters it rather than deleting it. |
+| Field          | Required | Type                                                                                    | Description                                                                                   |
+| -------------- | -------- | --------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `createdAt`    | Yes      | `number`                                                                                |                                                                                               |
+| `destroyedAt`  | No       | `number`                                                                                | When the tree was removed. Present exactly on a tombstone.                                    |
+| `expiresAt`    | No       | `number`                                                                                | When an ephemeral workspace should be reaped.                                                 |
+| `extraRoots`   | No       | Array of `string`                                                                       | Additional roots tools may also reach (a shared cache, a read-only reference checkout).       |
+| `id`           | Yes      | `string`                                                                                |                                                                                               |
+| `kind`         | Yes      | [WorkspaceKind](protocol.md#workspacekind)                                              |                                                                                               |
+| `leases`       | No       | Array of [WorkspaceLeaseRecord](protocol.md#workspaceleaserecord)                       | Runs currently holding it. Read through {@link activeLeases}, which drops expired ones.       |
+| `name`         | Yes      | `string`                                                                                | A human name, e.g. `acme-migration`.                                                          |
+| `owner`        | No       | [WorkspaceOwner](protocol.md#workspaceowner)                                            | Who may use it. Absent means the deployment's default policy decides.                         |
+| `quota`        | No       | [WorkspaceQuota](protocol.md#workspacequota)                                            | Ceilings for this workspace's contents. Absent means unbounded — see {@link WorkspaceQuota}.  |
+| `root`         | Yes      | `string`                                                                                | The absolute root. Every tool bound to this workspace is confined here.                       |
+| `state`        | No       | `"active"` / `"creating"` / `"destroyed"` / `"destroying"` / `"draining"` / `"expired"` | Where it is in its lifecycle.                                                                 |
+| `storage`      | No       | [WorkspaceStorageIdentity](protocol.md#workspacestorageidentity)                        | Present for assigned-host projects; legacy/native records cannot silently adopt a VM.         |
+| `tags`         | No       | Array of `string`                                                                       | Free-form labels.                                                                             |
+| `updatedAt`    | Yes      | `number`                                                                                |                                                                                               |
+| `usage`        | No       | [WorkspaceUsage](protocol.md#workspaceusage)                                            | Last known contents. Read through {@link usageOf}, which defaults a legacy record to zero.    |
+| `worktree`     | No       | Object (fields below)                                                                   | Set when this workspace IS a git worktree, so destroy unregisters it rather than deleting it. |
+| `lastUsedAtMs` | No       | `string`                                                                                | Actual project use, independent of expiry and usage maintenance.                              |
 
 **worktree**
 
@@ -13166,6 +14406,818 @@ What a workspace currently holds, and when that was last measured against the di
 | `bytes`        | Yes      | `number` |                                                                                          |
 | `files`        | Yes      | `number` |                                                                                          |
 | `reconciledAt` | Yes      | `number` | When a full walk last corrected these numbers. `0` means never — the counters are then a |
+
+## ConnectorArgumentBound
+
+UTF-8 bytes and relative-path grammar remain enforced independently on the device.
+
+| Field          | Required | Type                         | Description |
+| -------------- | -------- | ---------------------------- | ----------- |
+| `kind`         | Yes      | `"relative-path"` / `"text"` |             |
+| `maximumBytes` | Yes      | `number`                     |             |
+
+## ConnectorArgumentChoice
+
+Finite exact choices never authorize arbitrary extra arguments.
+
+| Field    | Required | Type              | Description |
+| -------- | -------- | ----------------- | ----------- |
+| `kind`   | Yes      | `"choice"`        |             |
+| `values` | Yes      | Array of `string` |             |
+
+## ConnectorArgumentRule
+
+A declared variable position has exactly one constraint shape.
+
+Variant 1: [ConnectorMachineInvocationRule](protocol.md#connectormachineinvocationrule)
+
+| Field                     | Required | Type                                                                                      | Description |
+| ------------------------- | -------- | ----------------------------------------------------------------------------------------- | ----------- |
+| `commands`                | Yes      | Array of [ConnectorMachineCommand](protocol.md#connectormachinecommand)                   |             |
+| `environment`             | Yes      | Array of [ConnectorMachineEnvironmentGrant](protocol.md#connectormachineenvironmentgrant) |             |
+| `kind`                    | Yes      | `"machine-invocation"`                                                                    |             |
+| `maximumArgumentBytes`    | Yes      | `integer`                                                                                 |             |
+| `maximumArguments`        | Yes      | `integer`                                                                                 |             |
+| `maximumArgumentsBytes`   | Yes      | `integer`                                                                                 |             |
+| `maximumCwdBytes`         | Yes      | `integer`                                                                                 |             |
+| `maximumEnvironmentBytes` | Yes      | `integer`                                                                                 |             |
+| `maximumScriptBytes`      | Yes      | `integer`                                                                                 |             |
+| `maximumStdinBytes`       | Yes      | `integer`                                                                                 |             |
+| `maximumTimeoutMs`        | Yes      | `integer`                                                                                 |             |
+| `shell`                   | Yes      | [ConnectorMachineShell](protocol.md#connectormachineshell) / `null`                       |             |
+
+Variant 2: [ConnectorInteractiveInvocationRule](protocol.md#connectorinteractiveinvocationrule)
+
+| Field               | Required | Type                                                                                | Description                                                            |
+| ------------------- | -------- | ----------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `controls`          | Yes      | Array of [ConnectorInputKind](protocol.md#connectorinputkind)                       |                                                                        |
+| `invocation`        | Yes      | [ConnectorMachineInvocationRule](protocol.md#connectormachineinvocationrule)        |                                                                        |
+| `kind`              | Yes      | `"interactive-invocation"`                                                          |                                                                        |
+| `maximumControls`   | Yes      | `integer`                                                                           |                                                                        |
+| `maximumInputBytes` | Yes      | `string`                                                                            | Canonical decimal bytes include the explicitly admitted initial input. |
+| `maximumResizes`    | Yes      | `integer`                                                                           |                                                                        |
+| `transports`        | Yes      | Array of [ConnectorInteractiveTransport](protocol.md#connectorinteractivetransport) |                                                                        |
+
+Variant 3: [ConnectorArgumentChoice](protocol.md#connectorargumentchoice)
+
+| Field    | Required | Type              | Description |
+| -------- | -------- | ----------------- | ----------- |
+| `kind`   | Yes      | `"choice"`        |             |
+| `values` | Yes      | Array of `string` |             |
+
+Variant 4: [ConnectorArgumentBound](protocol.md#connectorargumentbound)
+
+| Field          | Required | Type                         | Description |
+| -------------- | -------- | ---------------------------- | ----------- |
+| `kind`         | Yes      | `"relative-path"` / `"text"` |             |
+| `maximumBytes` | Yes      | `number`                     |             |
+
+## ConnectorExecuteMethod
+
+Admission requires write-level gateway authority even for a read-only workspace.
+
+| Field    | Required | Type                                                                         | Description |
+| -------- | -------- | ---------------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ConnectorExecutionSubmitParams](protocol.md#connectorexecutionsubmitparams) |             |
+| `result` | Yes      | [ConnectorExecutionJob](protocol.md#connectorexecutionjob)                   |             |
+
+## ConnectorExecutionAccess
+
+Local workspace mutation and cloud write delegation must both permit an operation.
+
+Type: `"read-only"` / `"read-write"`.
+
+## ConnectorExecutionJob
+
+Reads and retries preserve the same admitted original and selected command lane.
+
+| Field           | Required | Type                                                                           | Description |
+| --------------- | -------- | ------------------------------------------------------------------------------ | ----------- |
+| `admissionHash` | Yes      | `string`                                                                       |             |
+| `authorization` | Yes      | [ConnectorOperationAuthorization](protocol.md#connectoroperationauthorization) |             |
+| `environmentId` | Yes      | `string`                                                                       |             |
+| `id`            | Yes      | `string`                                                                       |             |
+| `lane`          | Yes      | [ConnectorExecutionLane](protocol.md#connectorexecutionlane)                   |             |
+| `phase`         | Yes      | [ConnectorJobPhase](protocol.md#connectorjobphase)                             |             |
+| `request`       | Yes      | [ConnectorExecutionRequest](protocol.md#connectorexecutionrequest)             |             |
+| `response`      | Yes      | [ConnectorExecutionResult](protocol.md#connectorexecutionresult) / `null`      |             |
+| `sequence`      | Yes      | `string`                                                                       |             |
+
+## ConnectorExecutionLane
+
+Fixed command lanes retain separate original dispatch and compaction history.
+
+Type: `"first"` / `"second"`.
+
+## ConnectorExecutionLaneStatus
+
+Current publication and permanent lane counters serve different purposes.
+
+| Field                  | Required | Type                                                                        | Description |
+| ---------------------- | -------- | --------------------------------------------------------------------------- | ----------- |
+| `acknowledgedSequence` | Yes      | `string`                                                                    |             |
+| `lane`                 | Yes      | [ConnectorExecutionLane](protocol.md#connectorexecutionlane)                |             |
+| `online`               | Yes      | `boolean`                                                                   |             |
+| `profile`              | Yes      | [ConnectorExecutionProfile](protocol.md#connectorexecutionprofile) / `null` |             |
+| `sequence`             | Yes      | `string`                                                                    |             |
+
+## ConnectorExecutionMethod
+
+Public account metadata is proxied only through Nexa.
+
+| Field    | Required | Type                                                                 | Description |
+| -------- | -------- | -------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ConnectorEnvironmentParams](protocol.md#connectorenvironmentparams) |             |
+| `result` | Yes      | [ConnectorExecutionStatus](protocol.md#connectorexecutionstatus)     |             |
+
+## ConnectorExecutionProfile
+
+Customer-reported public execution grants are not a network endpoint or authorization to run unlisted code.
+
+| Field                 | Required | Type                                                                   | Description |
+| --------------------- | -------- | ---------------------------------------------------------------------- | ----------- |
+| `maximumAddressBytes` | Yes      | `string`                                                               |             |
+| `maximumFileBytes`    | Yes      | `string`                                                               |             |
+| `policySha256`        | Yes      | `string`                                                               |             |
+| `programs`            | Yes      | Array of [ConnectorProgramGrant](protocol.md#connectorprogramgrant)    |             |
+| `resources`           | Yes      | [ConnectorExecutionResources](protocol.md#connectorexecutionresources) |             |
+| `revision`            | Yes      | `string`                                                               |             |
+| `roots`               | Yes      | Array of [ConnectorExecutionRoot](protocol.md#connectorexecutionroot)  |             |
+| `timeoutMs`           | Yes      | `number`                                                               |             |
+
+## ConnectorExecutionRequest
+
+Original input selects only a reviewed local program, workspace and positional arguments.
+
+| Field          | Required | Type              | Description |
+| -------------- | -------- | ----------------- | ----------- |
+| `arguments`    | Yes      | Array of `string` |             |
+| `policySha256` | Yes      | `string`          |             |
+| `programId`    | Yes      | `string`          |             |
+| `requestId`    | Yes      | `string`          |             |
+| `rootId`       | Yes      | `string`          |             |
+
+## ConnectorExecutionResources
+
+Resource quantities stay exact decimal strings at the JSON gateway.
+
+| Field            | Required | Type     | Description |
+| ---------------- | -------- | -------- | ----------- |
+| `cpuQuotaMicros` | Yes      | `number` |             |
+| `maximumTasks`   | Yes      | `number` |             |
+| `memoryBytes`    | Yes      | `string` |             |
+
+## ConnectorExecutionResult
+
+Original terminal output is bounded, canonical and signed; contents remain untrusted data.
+
+| Field          | Required | Type                                                                                                                                    | Description |
+| -------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `exitCode`     | Yes      | `null,number`                                                                                                                           |             |
+| `failure`      | Yes      | `"ambiguous-exit"` / `"cancelled"` / `"expired"` / `"interrupted"` / `"output-limit"` / `"sandbox"` / `"signal"` / `"timeout"` / `null` |             |
+| `setupFailure` | Yes      | `"apparmor"` / `"bootstrap"` / `"cgroup"` / `"configuration"` / `"confinement"` / `"execute"` / `"mounts"` / `"namespaces"` / `null`    |             |
+| `stderrBase64` | Yes      | `string`                                                                                                                                |             |
+| `stdoutBase64` | Yes      | `string`                                                                                                                                |             |
+| `termination`  | Yes      | [ConnectorExecutionTermination](protocol.md#connectorexecutiontermination)                                                              |             |
+
+## ConnectorExecutionResultMethod
+
+Original command result lookup admits no new effect.
+
+| Field    | Required | Type                                                       | Description |
+| -------- | -------- | ---------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ConnectorResultParams](protocol.md#connectorresultparams) |             |
+| `result` | Yes      | [ConnectorExecutionJob](protocol.md#connectorexecutionjob) |             |
+
+## ConnectorExecutionRoot
+
+A root alias has independently enforced read-only or writable access.
+
+| Field    | Required | Type                                                             | Description |
+| -------- | -------- | ---------------------------------------------------------------- | ----------- |
+| `access` | Yes      | [ConnectorExecutionAccess](protocol.md#connectorexecutionaccess) |             |
+| `id`     | Yes      | `string`                                                         |             |
+
+## ConnectorExecutionStatus
+
+Status lists exactly first and second, without revealing device credentials or private paths.
+
+| Field           | Required | Type                                                                              | Description |
+| --------------- | -------- | --------------------------------------------------------------------------------- | ----------- |
+| `environmentId` | Yes      | `string`                                                                          |             |
+| `lanes`         | Yes      | Array of [ConnectorExecutionLaneStatus](protocol.md#connectorexecutionlanestatus) |             |
+
+## ConnectorExecutionSubmitParams
+
+Delegation intent is explicit; the API checks actual retained workspace access independently.
+
+| Field              | Required | Type                                                               | Description |
+| ------------------ | -------- | ------------------------------------------------------------------ | ----------- |
+| `environmentId`    | Yes      | `string`                                                           |             |
+| `lane`             | Yes      | [ConnectorExecutionLane](protocol.md#connectorexecutionlane)       |             |
+| `previousSequence` | Yes      | `string`                                                           |             |
+| `request`          | Yes      | [ConnectorExecutionRequest](protocol.md#connectorexecutionrequest) |             |
+| `workspaceAccess`  | Yes      | [ConnectorExecutionAccess](protocol.md#connectorexecutionaccess)   |             |
+
+## ConnectorExecutionTermination
+
+Transport loss and uncertain commands must never be presented as successful exits.
+
+Type: `"exited"` / `"indeterminate"`.
+
+## ConnectorProgramGrant
+
+Public program aliases cannot become host executable paths.
+
+| Field       | Required | Type                                                                | Description |
+| ----------- | -------- | ------------------------------------------------------------------- | ----------- |
+| `arguments` | Yes      | Array of [ConnectorArgumentRule](protocol.md#connectorargumentrule) |             |
+| `id`        | Yes      | `string`                                                            |             |
+| `rootIds`   | Yes      | Array of `string`                                                   |             |
+
+## ConnectorExecutionCurrentJob
+
+Latest original metadata has the retained workspace grant rather than the device's possibly newer profile.
+
+| Field             | Required | Type                                                             | Description |
+| ----------------- | -------- | ---------------------------------------------------------------- | ----------- |
+| `admissionHash`   | Yes      | `string`                                                         |             |
+| `jobId`           | Yes      | `string`                                                         |             |
+| `lane`            | Yes      | [ConnectorExecutionLane](protocol.md#connectorexecutionlane)     |             |
+| `phase`           | Yes      | [ConnectorJobPhase](protocol.md#connectorjobphase)               |             |
+| `programId`       | Yes      | `string`                                                         |             |
+| `requestId`       | Yes      | `string`                                                         |             |
+| `rootId`          | Yes      | `string`                                                         |             |
+| `sequence`        | Yes      | `string`                                                         |             |
+| `workspaceAccess` | Yes      | [ConnectorExecutionAccess](protocol.md#connectorexecutionaccess) |             |
+
+## ConnectorExecutionCurrentJobs
+
+Current jobs contain no program arguments, output, host paths or credentials.
+
+| Field           | Required | Type                                                                                | Description |
+| --------------- | -------- | ----------------------------------------------------------------------------------- | ----------- |
+| `environmentId` | Yes      | `string`                                                                            |             |
+| `lanes`         | Yes      | Array of [ConnectorExecutionCurrentLane](protocol.md#connectorexecutioncurrentlane) |             |
+
+## ConnectorExecutionCurrentJobsMethod
+
+Read-only original selection supplies exact metadata for a later explicitly authorized stop.
+
+| Field    | Required | Type                                                                       | Description |
+| -------- | -------- | -------------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ConnectorEnvironmentParams](protocol.md#connectorenvironmentparams)       |             |
+| `result` | Yes      | [ConnectorExecutionCurrentJobs](protocol.md#connectorexecutioncurrentjobs) |             |
+
+## ConnectorExecutionCurrentLane
+
+One account snapshot correlates its permanent counter with the exact latest original.
+
+| Field                  | Required | Type                                                                              | Description |
+| ---------------------- | -------- | --------------------------------------------------------------------------------- | ----------- |
+| `acknowledgedSequence` | Yes      | `string`                                                                          |             |
+| `job`                  | Yes      | [ConnectorExecutionCurrentJob](protocol.md#connectorexecutioncurrentjob) / `null` |             |
+| `lane`                 | Yes      | [ConnectorExecutionLane](protocol.md#connectorexecutionlane)                      |             |
+| `sequence`             | Yes      | `string`                                                                          |             |
+
+## ConnectorExecutionStopMethod
+
+Write-level gateway admission remains independent of reading a retained command result.
+
+| Field    | Required | Type                                                                       | Description |
+| -------- | -------- | -------------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ConnectorExecutionStopParams](protocol.md#connectorexecutionstopparams)   |             |
+| `result` | Yes      | [ConnectorExecutionStopReceipt](protocol.md#connectorexecutionstopreceipt) |             |
+
+## ConnectorExecutionStopParams
+
+An explicit stop captures the original command rather than selecting current lane contents.
+
+| Field             | Required | Type                                                             | Description |
+| ----------------- | -------- | ---------------------------------------------------------------- | ----------- |
+| `admissionHash`   | Yes      | `string`                                                         |             |
+| `environmentId`   | Yes      | `string`                                                         |             |
+| `jobId`           | Yes      | `string`                                                         |             |
+| `lane`            | Yes      | [ConnectorExecutionLane](protocol.md#connectorexecutionlane)     |             |
+| `requestId`       | Yes      | `string`                                                         |             |
+| `sequence`        | Yes      | `string`                                                         |             |
+| `workspaceAccess` | Yes      | [ConnectorExecutionAccess](protocol.md#connectorexecutionaccess) |             |
+
+## ConnectorExecutionStopReceipt
+
+Stop admission contains no program arguments or output and does not by itself prove the command ended.
+
+| Field           | Required | Type                                                         | Description |
+| --------------- | -------- | ------------------------------------------------------------ | ----------- |
+| `admissionHash` | Yes      | `string`                                                     |             |
+| `environmentId` | Yes      | `string`                                                     |             |
+| `jobId`         | Yes      | `string`                                                     |             |
+| `lane`          | Yes      | [ConnectorExecutionLane](protocol.md#connectorexecutionlane) |             |
+| `phase`         | Yes      | [ConnectorJobPhase](protocol.md#connectorjobphase)           |             |
+| `requestId`     | Yes      | `string`                                                     |             |
+| `requestedAtMs` | Yes      | `null,string`                                                |             |
+| `sequence`      | Yes      | `string`                                                     |             |
+
+## ConnectorLinkDenied
+
+Retained rejection conveys no enrollment or execution authority.
+
+| Field           | Required | Type     | Description |
+| --------------- | -------- | -------- | ----------- |
+| `deniedAtMs`    | Yes      | `string` |             |
+| `linkId`        | Yes      | `string` |             |
+| `publicKey`     | Yes      | `string` |             |
+| `retainUntilMs` | Yes      | `string` |             |
+
+## ConnectorLinkDenyMethod
+
+An uncertain rejection must be checked under the same original request.
+
+| Field    | Required | Type                                                           | Description |
+| -------- | -------- | -------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ConnectorLinkDenyParams](protocol.md#connectorlinkdenyparams) |             |
+| `result` | Yes      | [ConnectorLinkDenied](protocol.md#connectorlinkdenied)         |             |
+
+## ConnectorLinkDenyParams
+
+Rejection is bound to the exact reviewed identity and original operation, never an account override.
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `code`      | Yes      | `string` |             |
+| `linkId`    | Yes      | `string` |             |
+| `publicKey` | Yes      | `string` |             |
+| `requestId` | Yes      | `string` |             |
+
+## ConnectorExecutionOutputData
+
+Canonical base64 preserves at most 65536 combined application bytes.
+
+| Field          | Required | Type     | Description |
+| -------------- | -------- | -------- | ----------- |
+| `stderrBase64` | Yes      | `string` |             |
+| `stdoutBase64` | Yes      | `string` |             |
+
+## ConnectorExecutionOutputMethod
+
+Reading the captured original grants no command, stop or enrollment mutation.
+
+| Field    | Required | Type                                                                     | Description |
+| -------- | -------- | ------------------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [ConnectorResultParams](protocol.md#connectorresultparams)               |             |
+| `result` | Yes      | [ConnectorExecutionOutputView](protocol.md#connectorexecutionoutputview) |             |
+
+## ConnectorExecutionOutputView
+
+Provisional output has original identity and phase, never an inferred successful exit.
+
+| Field           | Required | Type                                                                              | Description |
+| --------------- | -------- | --------------------------------------------------------------------------------- | ----------- |
+| `admissionHash` | Yes      | `string`                                                                          |             |
+| `environmentId` | Yes      | `string`                                                                          |             |
+| `id`            | Yes      | `string`                                                                          |             |
+| `lane`          | Yes      | [ConnectorExecutionLane](protocol.md#connectorexecutionlane)                      |             |
+| `output`        | Yes      | [ConnectorExecutionOutputData](protocol.md#connectorexecutionoutputdata) / `null` |             |
+| `phase`         | Yes      | [ConnectorJobPhase](protocol.md#connectorjobphase)                                |             |
+| `sequence`      | Yes      | `string`                                                                          |             |
+
+## ConnectorRemove
+
+Explicit recursive intent cannot select the root itself, follow links or cross mounts.
+
+| Field          | Required | Type       | Description |
+| -------------- | -------- | ---------- | ----------- |
+| `action`       | Yes      | `"remove"` |             |
+| `path`         | Yes      | `string`   |             |
+| `policySha256` | Yes      | `string`   |             |
+| `recursive`    | Yes      | `boolean`  |             |
+| `requestId`    | Yes      | `string`   |             |
+| `rootId`       | Yes      | `string`   |             |
+
+## ConnectorRemoveResult
+
+Complete bounded removal includes the selected target in its exact decimal entry count.
+
+| Field            | Required | Type       | Description |
+| ---------------- | -------- | ---------- | ----------- |
+| `action`         | Yes      | `"remove"` |             |
+| `entriesRemoved` | Yes      | `string`   |             |
+| `requestId`      | Yes      | `string`   |             |
+
+## ConnectorMkdir
+
+One private directory beneath an existing parent; no implicit recursion or replacement.
+
+| Field          | Required | Type      | Description |
+| -------------- | -------- | --------- | ----------- |
+| `action`       | Yes      | `"mkdir"` |             |
+| `path`         | Yes      | `string`  |             |
+| `policySha256` | Yes      | `string`  |             |
+| `requestId`    | Yes      | `string`  |             |
+| `rootId`       | Yes      | `string`  |             |
+
+## ConnectorMkdirResult
+
+Confirms one directory creation and parent synchronization under the original request.
+
+| Field       | Required | Type      | Description |
+| ----------- | -------- | --------- | ----------- |
+| `action`    | Yes      | `"mkdir"` |             |
+| `requestId` | Yes      | `string`  |             |
+
+## ConnectorGpuVendor
+
+Vendor identities remain separate from compute support and memory availability.
+
+Type: `"nvidia"` / `"amd"` / `"intel"` / `"other"`.
+
+## ConnectorWorkspaceGetMethod
+
+Wire contract for reading current owned-conversation file placement.
+
+| Field    | Required | Type                                                                           | Description |
+| -------- | -------- | ------------------------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [ConnectorWorkspaceGetParams](protocol.md#connectorworkspacegetparams)         |             |
+| `result` | Yes      | [ConnectorWorkspaceSelectionView](protocol.md#connectorworkspaceselectionview) |             |
+
+## ConnectorWorkspaceGetParams
+
+Reads only an existing conversation whose private owner matches the authenticated caller.
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `sessionId` | Yes      | `string` |             |
+
+## ConnectorWorkspaceSelectionView
+
+Public current state contains no private owner, provider identity, endpoint or device credentials.
+
+| Field       | Required | Type                                                                                                                                                                       | Description |
+| ----------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `revision`  | Yes      | `string`                                                                                                                                                                   |             |
+| `selection` | Yes      | [ConnectorWorkspaceFileSelection](protocol.md#connectorworkspacefileselection) / [ConnectorWorkspaceJointSelection](protocol.md#connectorworkspacejointselection) / `null` |             |
+| `sessionId` | Yes      | `string`                                                                                                                                                                   |             |
+
+## ConnectorWorkspaceSelectMethod
+
+Wire contract for explicitly changing file placement for future turns.
+
+| Field    | Required | Type                                                                           | Description |
+| -------- | -------- | ------------------------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [ConnectorWorkspaceSelectParams](protocol.md#connectorworkspaceselectparams)   |             |
+| `result` | Yes      | [ConnectorWorkspaceSelectionView](protocol.md#connectorworkspaceselectionview) |             |
+
+## ConnectorWorkspaceSelectParams
+
+Captures a granted root and exact policy; the current signed profile determines its access mode.
+
+| Field              | Required | Type     | Description |
+| ------------------ | -------- | -------- | ----------- |
+| `environmentId`    | Yes      | `string` |             |
+| `expectedRevision` | Yes      | `string` |             |
+| `policySha256`     | Yes      | `string` |             |
+| `requestId`        | Yes      | `string` |             |
+| `rootId`           | Yes      | `string` |             |
+| `sessionId`        | Yes      | `string` |             |
+
+## ConnectorWorkspaceClearMethod
+
+Wire contract for explicitly returning future turns to managed placement.
+
+| Field    | Required | Type                                                                           | Description |
+| -------- | -------- | ------------------------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [ConnectorWorkspaceClearParams](protocol.md#connectorworkspaceclearparams)     |             |
+| `result` | Yes      | [ConnectorWorkspaceSelectionView](protocol.md#connectorworkspaceselectionview) |             |
+
+## ConnectorWorkspaceClearParams
+
+Removes future file selection using one immutable request and its captured comparison revision.
+
+| Field              | Required | Type     | Description |
+| ------------------ | -------- | -------- | ----------- |
+| `expectedRevision` | Yes      | `string` |             |
+| `requestId`        | Yes      | `string` |             |
+| `sessionId`        | Yes      | `string` |             |
+
+## ConnectorWorkspaceCreateMethod
+
+Wire contract for idempotent, account-owned conversation admission.
+
+| Field    | Required | Type                                                                           | Description |
+| -------- | -------- | ------------------------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [ConnectorWorkspaceCreateParams](protocol.md#connectorworkspacecreateparams)   |             |
+| `result` | Yes      | [ConnectorWorkspaceSelectionView](protocol.md#connectorworkspaceselectionview) |             |
+
+## ConnectorWorkspaceCreateParams
+
+Account-scoped idempotent creation admits an empty owned conversation without starting a turn.
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `requestId` | Yes      | `string` |             |
+
+## ConnectorWorkspaceCatalogMethod
+
+Catalog access is mediated by Nexa and the existing conversation owner.
+
+| Field    | Required | Type                                                                           | Description |
+| -------- | -------- | ------------------------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [ConnectorWorkspaceCatalogParams](protocol.md#connectorworkspacecatalogparams) |             |
+| `result` | Yes      | [ConnectorWorkspaceCatalogView](protocol.md#connectorworkspacecatalogview)     |             |
+
+## ConnectorWorkspaceCatalogParams
+
+A catalog is read only after verifying ownership of this conversation.
+
+| Field           | Required | Type     | Description |
+| --------------- | -------- | -------- | ----------- |
+| `environmentId` | Yes      | `string` |             |
+| `sessionId`     | Yes      | `string` |             |
+
+## ConnectorWorkspaceCatalogView
+
+Only safe summaries leave Nexa; private SDK signatures, keys and routing remain private.
+
+| Field           | Required | Type                                                                                  | Description |
+| --------------- | -------- | ------------------------------------------------------------------------------------- | ----------- |
+| `entries`       | Yes      | Array of [ConnectorWorkspaceCatalogEntry](protocol.md#connectorworkspacecatalogentry) |             |
+| `environmentId` | Yes      | `string`                                                                              |             |
+
+## ConnectorWorkspaceCatalogEntry
+
+A verified catalog offers exact mapping choices without granting any operation.
+
+| Field                   | Required | Type                                               | Description |
+| ----------------------- | -------- | -------------------------------------------------- | ----------- |
+| `access`                | Yes      | [ConnectorFileMode](protocol.md#connectorfilemode) |             |
+| `bindingRevision`       | Yes      | `string`                                           |             |
+| `bindingSha256`         | Yes      | `string`                                           |             |
+| `descriptorSha256`      | Yes      | `string`                                           |             |
+| `executionPolicySha256` | Yes      | `string`                                           |             |
+| `executionRootId`       | Yes      | `string`                                           |             |
+| `filePolicySha256`      | Yes      | `string`                                           |             |
+| `fileRootId`            | Yes      | `string`                                           |             |
+
+## ConnectorWorkspaceSelectJointMethod
+
+Joint selection captures a verified mapping; local execution grants remain independent.
+
+| Field    | Required | Type                                                                                   | Description |
+| -------- | -------- | -------------------------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ConnectorWorkspaceSelectJointParams](protocol.md#connectorworkspaceselectjointparams) |             |
+| `result` | Yes      | [ConnectorWorkspaceSelectionView](protocol.md#connectorworkspaceselectionview)         |             |
+
+## ConnectorWorkspaceSelectJointParams
+
+A Joint choice commits every catalog field before fresh device and authority verification.
+
+| Field              | Required | Type                                                                       | Description |
+| ------------------ | -------- | -------------------------------------------------------------------------- | ----------- |
+| `expectedRevision` | Yes      | `string`                                                                   |             |
+| `requestId`        | Yes      | `string`                                                                   |             |
+| `sessionId`        | Yes      | `string`                                                                   |             |
+| `target`           | Yes      | [ConnectorWorkspaceJointTarget](protocol.md#connectorworkspacejointtarget) |             |
+
+## ConnectorWorkspaceJointTarget
+
+The environment is part of the immutable selected target, never a transport address.
+
+| Field                   | Required | Type                                               | Description |
+| ----------------------- | -------- | -------------------------------------------------- | ----------- |
+| `access`                | Yes      | [ConnectorFileMode](protocol.md#connectorfilemode) |             |
+| `bindingRevision`       | Yes      | `string`                                           |             |
+| `bindingSha256`         | Yes      | `string`                                           |             |
+| `descriptorSha256`      | Yes      | `string`                                           |             |
+| `environmentId`         | Yes      | `string`                                           |             |
+| `executionPolicySha256` | Yes      | `string`                                           |             |
+| `executionRootId`       | Yes      | `string`                                           |             |
+| `filePolicySha256`      | Yes      | `string`                                           |             |
+| `fileRootId`            | Yes      | `string`                                           |             |
+
+## ConnectorWorkspaceFileSelection
+
+Files-only placement derives access from the current signed file profile.
+
+| Field           | Required | Type                                               | Description |
+| --------------- | -------- | -------------------------------------------------- | ----------- |
+| `environmentId` | Yes      | `string`                                           |             |
+| `kind`          | Yes      | `"files"`                                          |             |
+| `mode`          | Yes      | [ConnectorFileMode](protocol.md#connectorfilemode) |             |
+| `policySha256`  | Yes      | `string`                                           |             |
+| `rootId`        | Yes      | `string`                                           |             |
+
+## ConnectorWorkspaceJointSelection
+
+Joint placement pins both policy roots and the complete first archived proof commitment.
+
+| Field                   | Required | Type                                               | Description |
+| ----------------------- | -------- | -------------------------------------------------- | ----------- |
+| `bindingRevision`       | Yes      | `string`                                           |             |
+| `descriptorSha256`      | Yes      | `string`                                           |             |
+| `environmentId`         | Yes      | `string`                                           |             |
+| `executionPolicySha256` | Yes      | `string`                                           |             |
+| `executionRootId`       | Yes      | `string`                                           |             |
+| `jointBindingSha256`    | Yes      | `string`                                           |             |
+| `kind`                  | Yes      | `"joint"`                                          |             |
+| `mode`                  | Yes      | [ConnectorFileMode](protocol.md#connectorfilemode) |             |
+| `policySha256`          | Yes      | `string`                                           |             |
+| `rootId`                | Yes      | `string`                                           |             |
+
+## ConnectorChmod
+
+Changes permissions only on a pinned single-link regular file.
+
+| Field          | Required | Type                                                                   | Description |
+| -------------- | -------- | ---------------------------------------------------------------------- | ----------- |
+| `action`       | Yes      | `"chmod"`                                                              |             |
+| `mode`         | Yes      | [ConnectorFilePermissionMode](protocol.md#connectorfilepermissionmode) |             |
+| `path`         | Yes      | `string`                                                               |             |
+| `policySha256` | Yes      | `string`                                                               |             |
+| `requestId`    | Yes      | `string`                                                               |             |
+| `rootId`       | Yes      | `string`                                                               |             |
+
+## ConnectorChmodResult
+
+Permission success reports the actual requested private mode on the original regular file.
+
+| Field       | Required | Type                                               | Description |
+| ----------- | -------- | -------------------------------------------------- | ----------- |
+| `action`    | Yes      | `"chmod"`                                          |             |
+| `metadata`  | Yes      | [ConnectorMetadata](protocol.md#connectormetadata) |             |
+| `requestId` | Yes      | `string`                                           |             |
+
+## ConnectorFilePermissionMode
+
+Permission changes never add access for another OS user or set special bits.
+
+Type: `384` / `448`.
+
+## ConnectorMachineCommand
+
+This index refers only to the owning program's pinned [program, ...children] table.
+
+| Field             | Required | Type      | Description |
+| ----------------- | -------- | --------- | ----------- |
+| `alias`           | Yes      | `string`  |             |
+| `executableIndex` | Yes      | `integer` |             |
+
+## ConnectorMachineEnvironmentGrant
+
+A permitted environment name has its own UTF-8 value ceiling.
+
+| Field          | Required | Type      | Description |
+| -------------- | -------- | --------- | ----------- |
+| `maximumBytes` | Yes      | `integer` |             |
+| `name`         | Yes      | `string`  |             |
+
+## ConnectorMachineInvocationRule
+
+The complete explicit local opt-in is published under the device's existing signed profile.
+
+| Field                     | Required | Type                                                                                      | Description |
+| ------------------------- | -------- | ----------------------------------------------------------------------------------------- | ----------- |
+| `commands`                | Yes      | Array of [ConnectorMachineCommand](protocol.md#connectormachinecommand)                   |             |
+| `environment`             | Yes      | Array of [ConnectorMachineEnvironmentGrant](protocol.md#connectormachineenvironmentgrant) |             |
+| `kind`                    | Yes      | `"machine-invocation"`                                                                    |             |
+| `maximumArgumentBytes`    | Yes      | `integer`                                                                                 |             |
+| `maximumArguments`        | Yes      | `integer`                                                                                 |             |
+| `maximumArgumentsBytes`   | Yes      | `integer`                                                                                 |             |
+| `maximumCwdBytes`         | Yes      | `integer`                                                                                 |             |
+| `maximumEnvironmentBytes` | Yes      | `integer`                                                                                 |             |
+| `maximumScriptBytes`      | Yes      | `integer`                                                                                 |             |
+| `maximumStdinBytes`       | Yes      | `integer`                                                                                 |             |
+| `maximumTimeoutMs`        | Yes      | `integer`                                                                                 |             |
+| `shell`                   | Yes      | [ConnectorMachineShell](protocol.md#connectormachineshell) / `null`                       |             |
+
+## ConnectorMachineShell
+
+Fixed local switches precede the signed script, without guessing shell syntax from an executable name.
+
+| Field             | Required | Type              | Description |
+| ----------------- | -------- | ----------------- | ----------- |
+| `executableIndex` | Yes      | `integer`         |             |
+| `fixedArguments`  | Yes      | Array of `string` |             |
+
+## ConnectorRename
+
+Both paths use one captured root alias and preserve explicit replacement intent.
+
+| Field          | Required | Type                                                 | Description |
+| -------------- | -------- | ---------------------------------------------------- | ----------- |
+| `action`       | Yes      | `"rename"`                                           |             |
+| `destination`  | Yes      | `string`                                             |             |
+| `mode`         | Yes      | [ConnectorWriteMode](protocol.md#connectorwritemode) |             |
+| `path`         | Yes      | `string`                                             |             |
+| `policySha256` | Yes      | `string`                                             |             |
+| `requestId`    | Yes      | `string`                                             |             |
+| `rootId`       | Yes      | `string`                                             |             |
+
+## ConnectorRenameResult
+
+Successful movement reports regular-file metadata after source identity verification and parent sync.
+
+| Field       | Required | Type                                               | Description |
+| ----------- | -------- | -------------------------------------------------- | ----------- |
+| `action`    | Yes      | `"rename"`                                         |             |
+| `metadata`  | Yes      | [ConnectorMetadata](protocol.md#connectormetadata) |             |
+| `requestId` | Yes      | `string`                                           |             |
+
+## ConnectorIndependentAuthorization
+
+This envelope is selected by trusted preparation, never by model parameters or a missing historical field.
+
+| Field  | Required | Type            | Description |
+| ------ | -------- | --------------- | ----------- |
+| `kind` | Yes      | `"independent"` |             |
+
+## ConnectorJointAuthorization
+
+Full signed association remains data until the pinned SDK/backend/device separately authorize the operation.
+
+| Field     | Required | Type                                                                               | Description |
+| --------- | -------- | ---------------------------------------------------------------------------------- | ----------- |
+| `binding` | Yes      | [ConnectorJointWorkspaceDescriptor](protocol.md#connectorjointworkspacedescriptor) |             |
+| `kind`    | Yes      | `"joint"`                                                                          |             |
+
+## ConnectorJointExecutionJournals
+
+Three permanent operation journals remain distinct across reconnects and controller replicas.
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `first`  | Yes      | `string` |             |
+| `second` | Yes      | `string` |             |
+
+## ConnectorJointWorkspaceBinding
+
+Public wire metadata preserves exact revisions without exposing physical paths or derivation keys.
+
+| Field                    | Required | Type                                                                           | Description |
+| ------------------------ | -------- | ------------------------------------------------------------------------------ | ----------- |
+| `access`                 | Yes      | [ConnectorFileMode](protocol.md#connectorfilemode)                             |             |
+| `authorityId`            | Yes      | `string`                                                                       |             |
+| `enrollmentId`           | Yes      | `string`                                                                       |             |
+| `environmentId`          | Yes      | `string`                                                                       |             |
+| `executionJournals`      | Yes      | [ConnectorJointExecutionJournals](protocol.md#connectorjointexecutionjournals) |             |
+| `executionPolicySha256`  | Yes      | `string`                                                                       |             |
+| `executionRootId`        | Yes      | `string`                                                                       |             |
+| `fileJournalId`          | Yes      | `string`                                                                       |             |
+| `filePolicySha256`       | Yes      | `string`                                                                       |             |
+| `fileRootId`             | Yes      | `string`                                                                       |             |
+| `physicalRootCommitment` | Yes      | `string`                                                                       |             |
+| `revision`               | Yes      | `string`                                                                       |             |
+
+## ConnectorJointWorkspaceDescriptor
+
+The complete signature is retained unchanged; structural decoding does not authenticate or activate this descriptor.
+
+| Field       | Required | Type                                                                         | Description |
+| ----------- | -------- | ---------------------------------------------------------------------------- | ----------- |
+| `binding`   | Yes      | [ConnectorJointWorkspaceBinding](protocol.md#connectorjointworkspacebinding) |             |
+| `signature` | Yes      | `string`                                                                     |             |
+
+## ConnectorOperationAuthorization
+
+Both current alternatives are explicit; missing or malformed metadata cannot select Independent.
+
+Variant 1: [ConnectorIndependentAuthorization](protocol.md#connectorindependentauthorization)
+
+| Field  | Required | Type            | Description |
+| ------ | -------- | --------------- | ----------- |
+| `kind` | Yes      | `"independent"` |             |
+
+Variant 2: [ConnectorJointAuthorization](protocol.md#connectorjointauthorization)
+
+| Field     | Required | Type                                                                               | Description |
+| --------- | -------- | ---------------------------------------------------------------------------------- | ----------- |
+| `binding` | Yes      | [ConnectorJointWorkspaceDescriptor](protocol.md#connectorjointworkspacedescriptor) |             |
+| `kind`    | Yes      | `"joint"`                                                                          |             |
+
+## ConnectorInputKind
+
+Data, pipe EOF and terminal resize are distinct immutable operations.
+
+Type: `"data"` / `"end"` / `"resize"`.
+
+## ConnectorInteractiveInvocationRule
+
+The complete live-input policy supplements one independently bounded Machine invocation.
+
+| Field               | Required | Type                                                                                | Description                                                            |
+| ------------------- | -------- | ----------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `controls`          | Yes      | Array of [ConnectorInputKind](protocol.md#connectorinputkind)                       |                                                                        |
+| `invocation`        | Yes      | [ConnectorMachineInvocationRule](protocol.md#connectormachineinvocationrule)        |                                                                        |
+| `kind`              | Yes      | `"interactive-invocation"`                                                          |                                                                        |
+| `maximumControls`   | Yes      | `integer`                                                                           |                                                                        |
+| `maximumInputBytes` | Yes      | `string`                                                                            | Canonical decimal bytes include the explicitly admitted initial input. |
+| `maximumResizes`    | Yes      | `integer`                                                                           |                                                                        |
+| `transports`        | Yes      | Array of [ConnectorInteractiveTransport](protocol.md#connectorinteractivetransport) |                                                                        |
+
+## ConnectorInteractiveTransport
+
+An explicit signed grant selects the native I/O mechanism.
+
+Type: `"pipe"` / `"pty"`.
 
 ## BrowserFilesChunkParams
 
@@ -13294,6 +15346,53 @@ Opaque upload handles are scoped to the authenticated account and captured assig
 | `uploadId`    | Yes      | `string`             |                                                                                   |
 | `workspaceId` | No       | `string`             | An owned Chat/project workspace ID, never an absolute filesystem path.            |
 
+## WorkspacePage
+
+Finite account-owned workspace discovery; omitted rows still advance the cursor.
+
+| Field        | Required | Type                                                                      | Description                                                                       |
+| ------------ | -------- | ------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `entries`    | Yes      | Array of [Workspace](protocol.md#workspace)                               |                                                                                   |
+| `nextCursor` | Yes      | `null,string`                                                             |                                                                                   |
+| `titles`     | No       | Array of [WorkspaceProjectTitle](protocol.md#workspaceprojecttitle)       | Latest owned conversation titles for only this page, never a history snapshot.    |
+| `presence`   | No       | Array of [WorkspaceProjectPresence](protocol.md#workspaceprojectpresence) | Present only when the server verified candidate roots in a confined native batch. |
+
+## WorkspacePageParams
+
+Bounded owned-workspace discovery never enumerates the entire registry on the wire.
+
+| Field             | Required | Type      | Description |
+| ----------------- | -------- | --------- | ----------- |
+| `cursor`          | No       | `string`  |             |
+| `limit`           | No       | `number`  |             |
+| `includePresence` | No       | `boolean` |             |
+
+## WorkspaceProjectTitle
+
+A friendly project label reveals no transcript or unrelated conversation metadata.
+
+| Field         | Required | Type     | Description |
+| ------------- | -------- | -------- | ----------- |
+| `title`       | Yes      | `string` |             |
+| `workspaceId` | Yes      | `string` |             |
+
+## WorkspaceProjectPresence
+
+A result retains the storage assignment that authorized its observation.
+
+| Field          | Required | Type                                                         | Description |
+| -------------- | -------- | ------------------------------------------------------------ | ----------- |
+| `assignment`   | Yes      | `string`                                                     |             |
+| `modifiedAtNs` | Yes      | `string`                                                     |             |
+| `state`        | Yes      | [WorkspacePresenceState](protocol.md#workspacepresencestate) |             |
+| `workspaceId`  | Yes      | `string`                                                     |             |
+
+## WorkspacePresenceState
+
+Root visibility is metadata only; uncertainty never becomes a negative classification.
+
+Type: `"empty"` / `"nonempty"` / `"unknown"`.
+
 ## BrowserFilesRenameParams
 
 Rename targets another sibling name and refuses replacement of existing data.
@@ -13305,3 +15404,236 @@ Rename targets another sibling name and refuses replacement of existing data.
 | `location`    | No       | `"account"` / `"vm"` | Locations choose a server-resolved account root, never a host path or machine ID. |
 | `path`        | Yes      | `string`             |                                                                                   |
 | `workspaceId` | No       | `string`             | An owned Chat/project workspace ID, never an absolute filesystem path.            |
+
+## VmAdministrationInspectMethod
+
+Read one managed environment for an explicitly authorized platform operator.
+
+| Field    | Required | Type                                                           | Description |
+| -------- | -------- | -------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [VmAdministrationInspect](protocol.md#vmadministrationinspect) |             |
+| `result` | Yes      | [VmAdministrationView](protocol.md#vmadministrationview)       |             |
+
+## VmAdministrationInspect
+
+The operator selects one platform account, never an API, tenant, host or machine credential.
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `userId` | Yes      | `string` |             |
+
+## VmAdministrationView
+
+A null environment explicitly reports that no managed default has been provisioned.
+
+| Field                 | Required | Type                                                                            | Description |
+| --------------------- | -------- | ------------------------------------------------------------------------------- | ----------- |
+| `acceptedOperationId` | Yes      | `null,string`                                                                   |             |
+| `defaultProfile`      | Yes      | [VmAdministrationProfile](protocol.md#vmadministrationprofile)                  |             |
+| `environment`         | Yes      | [VmAdministrationEnvironment](protocol.md#vmadministrationenvironment) / `null` |             |
+| `observedAtMs`        | Yes      | `string`                                                                        |             |
+| `providerId`          | Yes      | `string`                                                                        |             |
+| `userId`              | Yes      | `string`                                                                        |             |
+
+## VmAdministrationProfile
+
+Resource policy quantities remain exact decimal strings across browser and controller boundaries.
+
+| Field                   | Required | Type                                                                     | Description |
+| ----------------------- | -------- | ------------------------------------------------------------------------ | ----------- |
+| `architecture`          | Yes      | [VmAdministrationArchitecture](protocol.md#vmadministrationarchitecture) |             |
+| `gpuCount`              | Yes      | `number`                                                                 |             |
+| `gpuMinimumMemoryBytes` | Yes      | `string`                                                                 |             |
+| `id`                    | Yes      | `string`                                                                 |             |
+| `memoryBytes`           | Yes      | `string`                                                                 |             |
+| `revision`              | Yes      | `string`                                                                 |             |
+| `runtime`               | Yes      | [VmAdministrationRuntime](protocol.md#vmadministrationruntime)           |             |
+| `vcpus`                 | Yes      | `number`                                                                 |             |
+
+## VmAdministrationArchitecture
+
+A persistent guest cannot silently change CPU architecture.
+
+Type: `"x86_64"` / `"aarch64"`.
+
+## VmAdministrationRuntime
+
+Runtime policy is reported independently of sampled host hardware.
+
+Type: `"qemu-cpu"` / `"qemu-gpu"`.
+
+## VmAdministrationEnvironment
+
+No public administrative record contains SSH material, placement addresses or native capabilities.
+
+| Field               | Required | Type                                                                        | Description |
+| ------------------- | -------- | --------------------------------------------------------------------------- | ----------- |
+| `generation`        | Yes      | `string`                                                                    |             |
+| `id`                | Yes      | `string`                                                                    |             |
+| `operation`         | Yes      | [VmAdministrationOperation](protocol.md#vmadministrationoperation) / `null` |             |
+| `profile`           | Yes      | [VmAdministrationProfile](protocol.md#vmadministrationprofile) / `null`     |             |
+| `resourcesReserved` | Yes      | `boolean`                                                                   |             |
+| `state`             | Yes      | [VmAdministrationState](protocol.md#vmadministrationstate)                  |             |
+
+## VmAdministrationOperation
+
+Platform-authored lifecycle progress excludes raw guest output and internal worker leases.
+
+| Field      | Required | Type                                                                                                                                                                                                                                                        | Description |
+| ---------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `id`       | Yes      | `string`                                                                                                                                                                                                                                                    |             |
+| `kind`     | Yes      | [VmAdministrationOperationKind](protocol.md#vmadministrationoperationkind)                                                                                                                                                                                  |             |
+| `phase`    | Yes      | [VmAdministrationOperationPhase](protocol.md#vmadministrationoperationphase)                                                                                                                                                                                |             |
+| `sequence` | Yes      | `string`                                                                                                                                                                                                                                                    |             |
+| `stage`    | Yes      | `"backing-up"` / `"booting"` / `"claimed"` / `"completed"` / `"configuring-network"` / `"creating-volumes"` / `"failed"` / `"preparing-tools"` / `"queued"` / `"reconciling"` / `"reserving"` / `"restoring"` / `"stopping"` / `"waiting-for-ssh"` / `null` |             |
+
+## VmAdministrationOperationKind
+
+Named lifecycle operations reported by the authoritative Compute queue.
+
+Type: `"provision"` / `"start"` / `"stop"` / `"resize"` / `"backup"` / `"restore"` / `"delete"`.
+
+## VmAdministrationOperationPhase
+
+Queue completion does not assert a direct live guest health measurement.
+
+Type: `"queued"` / `"running"` / `"reconciling"` / `"succeeded"` / `"failed"`.
+
+## VmAdministrationState
+
+These are shared control-plane observations, not a substitute for direct guest health checks.
+
+Type: `"unprovisioned"` / `"preparing"` / `"reserved"` / `"active"` / `"stopping"` / `"stopped"` / `"recovery-required"`.
+
+## VmAdministrationMutateMethod
+
+Admit one lifecycle operation without waiting for or claiming native completion.
+
+| Field    | Required | Type                                                             | Description |
+| -------- | -------- | ---------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [VmAdministrationMutation](protocol.md#vmadministrationmutation) |             |
+| `result` | Yes      | [VmAdministrationView](protocol.md#vmadministrationview)         |             |
+
+## VmAdministrationMutation
+
+An observed exact environment/generation and stable original request ID constrain every mutation.
+
+| Field           | Required | Type                                                                             | Description                                                                        |
+| --------------- | -------- | -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `action`        | Yes      | `"delete"` / `"start"` / `"stop"`                                                |                                                                                    |
+| `environmentId` | Yes      | `string`                                                                         |                                                                                    |
+| `generation`    | Yes      | `string`                                                                         |                                                                                    |
+| `profile`       | No       | [VmAdministrationProfileReference](protocol.md#vmadministrationprofilereference) | Required only for Start; preserves the observed VM profile across request retries. |
+| `requestId`     | Yes      | `string`                                                                         |                                                                                    |
+| `userId`        | Yes      | `string`                                                                         |                                                                                    |
+
+## VmAdministrationProfileReference
+
+A new deployment default cannot silently replace a persistent VM's retained profile.
+
+| Field      | Required | Type     | Description |
+| ---------- | -------- | -------- | ----------- |
+| `id`       | Yes      | `string` |             |
+| `revision` | Yes      | `string` |             |
+
+## VisualResponse
+
+Versioned, inert UI instructions delivered and restored as part of an ordinary conversation.
+
+| Field         | Required | Type                                                      | Description |
+| ------------- | -------- | --------------------------------------------------------- | ----------- |
+| `connections` | Yes      | Array of [VisualConnection](protocol.md#visualconnection) |             |
+| `description` | Yes      | `string`                                                  |             |
+| `elements`    | Yes      | Array of [VisualElement](protocol.md#visualelement)       |             |
+| `height`      | Yes      | `number`                                                  |             |
+| `id`          | Yes      | `string`                                                  |             |
+| `steps`       | Yes      | Array of [VisualStep](protocol.md#visualstep)             |             |
+| `title`       | Yes      | `string`                                                  |             |
+| `version`     | Yes      | `1`                                                       |             |
+| `width`       | Yes      | `number`                                                  |             |
+
+## VisualConnection
+
+Routes attach to card boundaries; optional waypoints describe intentional bends.
+
+| Field      | Required | Type                                            | Description |
+| ---------- | -------- | ----------------------------------------------- | ----------- |
+| `animated` | Yes      | `boolean`                                       |             |
+| `arrow`    | Yes      | [VisualArrow](protocol.md#visualarrow)          |             |
+| `from`     | Yes      | `string`                                        |             |
+| `fromSide` | Yes      | [VisualSide](protocol.md#visualside)            |             |
+| `id`       | Yes      | `string`                                        |             |
+| `label`    | Yes      | `string`                                        |             |
+| `line`     | Yes      | [VisualLine](protocol.md#visualline)            |             |
+| `to`       | Yes      | `string`                                        |             |
+| `toSide`   | Yes      | [VisualSide](protocol.md#visualside)            |             |
+| `via`      | Yes      | Array of [VisualPoint](protocol.md#visualpoint) |             |
+
+## VisualArrow
+
+Type: `"both"` / `"forward"` / `"none"`.
+
+## VisualSide
+
+Type: `"auto"` / `"bottom"` / `"left"` / `"right"` / `"top"`.
+
+## VisualLine
+
+Type: `"dashed"` / `"solid"`.
+
+## VisualPoint
+
+Scene coordinates are bounded display pixels, independent of viewport zoom.
+
+| Field | Required | Type     | Description |
+| ----- | -------- | -------- | ----------- |
+| `x`   | Yes      | `number` |             |
+| `y`   | Yes      | `number` |             |
+
+## VisualElement
+
+All copy is plain text; geometry and semantic style are the complete rendering instructions.
+
+| Field     | Required | Type                                               | Description |
+| --------- | -------- | -------------------------------------------------- | ----------- |
+| `detail`  | Yes      | `string`                                           |             |
+| `eyebrow` | Yes      | `string`                                           |             |
+| `height`  | Yes      | `number`                                           |             |
+| `icon`    | Yes      | [VisualIcon](protocol.md#visualicon)               |             |
+| `id`      | Yes      | `string`                                           |             |
+| `kind`    | Yes      | [VisualElementKind](protocol.md#visualelementkind) |             |
+| `title`   | Yes      | `string`                                           |             |
+| `tone`    | Yes      | [VisualTone](protocol.md#visualtone)               |             |
+| `value`   | Yes      | `string`                                           |             |
+| `width`   | Yes      | `number`                                           |             |
+| `x`       | Yes      | `number`                                           |             |
+| `y`       | Yes      | `number`                                           |             |
+
+## VisualIcon
+
+Icons are native interface symbols, never model-authored markup or remote images.
+
+Type: `"check"` / `"cloud"` / `"code"` / `"cpu"` / `"database"` / `"layers"` / `"none"` / `"server"` / `"shield"` / `"spark"` / `"user"`.
+
+## VisualElementKind
+
+A scene mixes explanatory cards, background groups, typography and key figures.
+
+Type: `"card"` / `"group"` / `"metric"` / `"text"`.
+
+## VisualTone
+
+Semantic surfaces keep generated explanations legible in both application themes.
+
+Type: `"blue"` / `"green"` / `"neutral"` / `"orange"` / `"purple"` / `"red"`.
+
+## VisualStep
+
+Optional guided explanations highlight existing content without changing its meaning or geometry.
+
+| Field         | Required | Type              | Description |
+| ------------- | -------- | ----------------- | ----------- |
+| `connections` | Yes      | Array of `string` |             |
+| `detail`      | Yes      | `string`          |             |
+| `elements`    | Yes      | Array of `string` |             |
+| `title`       | Yes      | `string`          |             |

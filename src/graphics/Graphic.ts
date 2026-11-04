@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
-/** Native data visualization families. Relationship diagrams use render_graph. */
+/** Native data visualization families. Rich visual explanations use render_visual. */
 export const GraphicKind = {
     Line: 'line',
     Area: 'area',

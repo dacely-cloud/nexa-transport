@@ -26,15 +26,20 @@ if (!snapshotOnly) {
     execFileSync(process.execPath, ['script/workflows.ts'], { stdio: 'inherit' });
     execFileSync(process.execPath, ['script/redteam.ts'], { stdio: 'inherit' });
     execFileSync(process.execPath, ['script/design.ts'], { stdio: 'inherit' });
+    mkdirSync('src/visuals', { recursive: true });
+    for (const name of ['VisualResponse', 'VisualValue', 'VisualResponses']) {
+        writeFileSync(
+            'src/visuals/' + name + '.ts',
+            readFileSync('../nexa/src/visuals/' + name + '.ts', 'utf8').replace(
+                /from '(\.\/[^']+)'/gu,
+                "from '$1.js'",
+            ),
+        );
+    }
     mkdirSync('src/graphics', { recursive: true });
     writeFileSync(
         'src/graphics/Graphic.ts',
         readFileSync('../nexa/src/graphics/Graphic.ts', 'utf8'),
-    );
-    mkdirSync('src/graphs', { recursive: true });
-    writeFileSync(
-        'src/graphs/ChatGraph.ts',
-        readFileSync('../nexa/src/graphs/ChatGraph.ts', 'utf8'),
     );
     // Native capture validation is portable and owned by Nexa.
     writeFileSync(

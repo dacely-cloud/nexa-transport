@@ -21,7 +21,7 @@ they do not execute server-only handlers or grant access.
 | `nexa-transport/archive-requests`      | ESM + types    | Cancellable archive admission retries within one total request deadline                   |
 | `nexa-transport/history-records`       | ESM + types    | Linear JSONL record framing with full schema validation and duplicate rejection           |
 | `nexa-transport/graphics`              | ESM + types    | Native chart specifications, twelve graphic families, five styles and Graphics validation |
-| `nexa-transport/chat-graph`            | ESM + types    | Colored explanatory relationship graphs and ChatGraphs validation                         |
+| `nexa-transport/visual-responses`      | ESM + types    | Structured rich visual responses and portable scene validation                            |
 | `nexa-transport/errors`                | ESM + types    | Transport errors, codes, and WebSocket close details                                      |
 | `nexa-transport/events`                | ESM + types    | EventName, typed EventMap, and event validation                                           |
 | `nexa-transport/media`                 | ESM + types    | Media/3D helpers, native event decoding, and MeshoptDecoder                               |

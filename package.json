@@ -1,6 +1,6 @@
 {
     "name": "nexa-transport",
-    "version": "0.1.0-managed-vm-admin.1",
+    "version": "0.1.0-visual-responses.1",
     "description": "Typed Nexa websocket gateway client for browsers and Node.js",
     "type": "module",
     "license": "Apache-2.0",
@@ -200,10 +200,6 @@
         "./workflow-template-inputs": {
             "types": "./dist/workflows/TemplateInputs.d.ts",
             "import": "./dist/workflow-template-inputs.js"
-        },
-        "./chat-graph": {
-            "types": "./dist/graphs/ChatGraph.d.ts",
-            "import": "./dist/chat-graph.js"
         },
         "./reverse-investigation": {
             "types": "./dist/reverse/ReverseInvestigation.d.ts",
@@ -982,6 +978,10 @@
         "./roblox-visual-parts": {
             "types": "./dist/roblox/RobloxVisualParts.d.ts",
             "import": "./dist/roblox-visual-parts.js"
+        },
+        "./visual-responses": {
+            "types": "./dist/visuals/VisualResponses.d.ts",
+            "import": "./dist/visual-responses.js"
         },
         "./graphics": {
             "types": "./dist/graphics/Graphic.d.ts",
