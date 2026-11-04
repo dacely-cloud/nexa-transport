@@ -6925,6 +6925,8 @@ Configurable bounds on gateway-owned work and memory.
 | `workspace.files.remove`             | Yes      | Object (fields below) |                                                                                                        |
 | `environment.admin.inspect`          | Yes      | Object (fields below) | Read one managed environment for an explicitly authorized platform operator.                           |
 | `environment.admin.mutate`           | Yes      | Object (fields below) | Admit one lifecycle operation without waiting for or claiming native completion.                       |
+| `environment.usage`                  | Yes      | Object (fields below) | A visible owner panel requests only its current authenticated account.                                 |
+| `environment.admin.usage`            | Yes      | Object (fields below) | Cross-account monitoring is registered only under the explicit administration gate.                    |
 
 **accounts.create**
 
@@ -8741,6 +8743,20 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ---------------------------------------------------------------- | ----------- |
 | `params` | Yes      | [VmAdministrationMutation](protocol.md#vmadministrationmutation) |             |
 | `result` | Yes      | [VmAdministrationView](protocol.md#vmadministrationview)         |             |
+
+**environment.usage**
+
+| Field    | Required | Type                                               | Description |
+| -------- | -------- | -------------------------------------------------- | ----------- |
+| `params` | Yes      | [Recordstringnever](protocol.md#recordstringnever) |             |
+| `result` | Yes      | [VmUsageSnapshot](protocol.md#vmusagesnapshot)     |             |
+
+**environment.admin.usage**
+
+| Field    | Required | Type                                                                     | Description |
+| -------- | -------- | ------------------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [VmUsageAdministrativeRequest](protocol.md#vmusageadministrativerequest) |             |
+| `result` | Yes      | [VmUsageSnapshot](protocol.md#vmusagesnapshot)                           |             |
 
 ## GeometryFormat
 
@@ -15637,3 +15653,116 @@ Optional guided explanations highlight existing content without changing its mea
 | `detail`      | Yes      | `string`          |             |
 | `elements`    | Yes      | Array of `string` |             |
 | `title`       | Yes      | `string`          |             |
+
+## VmCpuUsage
+
+Exact cumulative nanoseconds survive long-running VMs and JSON serialization.
+
+| Field                   | Required | Type                                             | Description                                                                         |
+| ----------------------- | -------- | ------------------------------------------------ | ----------------------------------------------------------------------------------- |
+| `cumulativeNanoseconds` | Yes      | `string`                                         |                                                                                     |
+| `freshness`             | Yes      | [VmUsageFreshness](protocol.md#vmusagefreshness) |                                                                                     |
+| `observedAtMs`          | Yes      | `string`                                         |                                                                                     |
+| `percentHundredths`     | Yes      | `null,string`                                    | Hundredths of a percent of the VM's provisioned vCPU entitlement; may exceed 10000. |
+| `source`                | Yes      | `"hypervisor"`                                   |                                                                                     |
+
+## VmFilesystemUsage
+
+Filesystem consumption differs from provisioned disk size and host physical allocation.
+
+| Field            | Required | Type                                             | Description |
+| ---------------- | -------- | ------------------------------------------------ | ----------- |
+| `availableBytes` | Yes      | `string`                                         |             |
+| `freshness`      | Yes      | [VmUsageFreshness](protocol.md#vmusagefreshness) |             |
+| `observedAtMs`   | Yes      | `string`                                         |             |
+| `source`         | Yes      | `"guest"`                                        |             |
+| `totalBytes`     | Yes      | `string`                                         |             |
+| `usedBytes`      | Yes      | `string`                                         |             |
+
+## VmGuestMemoryUsage
+
+Linux MemAvailable includes reclaimable cache, unlike MemFree. Guest root can alter these values.
+
+| Field            | Required | Type                                             | Description |
+| ---------------- | -------- | ------------------------------------------------ | ----------- |
+| `availableBytes` | Yes      | `string`                                         |             |
+| `freshness`      | Yes      | [VmUsageFreshness](protocol.md#vmusagefreshness) |             |
+| `observedAtMs`   | Yes      | `string`                                         |             |
+| `source`         | Yes      | `"guest"`                                        |             |
+| `totalBytes`     | Yes      | `string`                                         |             |
+| `usedBytes`      | Yes      | `string`                                         |             |
+
+## VmHostMemoryUsage
+
+Host resident memory includes emulator overhead and is not guest application RAM usage.
+
+| Field           | Required | Type                                             | Description |
+| --------------- | -------- | ------------------------------------------------ | ----------- |
+| `freshness`     | Yes      | [VmUsageFreshness](protocol.md#vmusagefreshness) |             |
+| `observedAtMs`  | Yes      | `string`                                         |             |
+| `residentBytes` | Yes      | `string`                                         |             |
+
+## VmUsageAdministrativeMethod
+
+Cross-account monitoring is registered only under the explicit administration gate.
+
+| Field    | Required | Type                                                                     | Description |
+| -------- | -------- | ------------------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [VmUsageAdministrativeRequest](protocol.md#vmusageadministrativerequest) |             |
+| `result` | Yes      | [VmUsageSnapshot](protocol.md#vmusagesnapshot)                           |             |
+
+## VmUsageAdministrativeRequest
+
+Only a platform account ID is selectable; routing and credentials remain protected.
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `userId` | Yes      | `string` |             |
+
+## VmUsageEnvironment
+
+Public projection contains no compute route, runtime credential, native claim or host identity.
+
+| Field                    | Required | Type                                                          | Description |
+| ------------------------ | -------- | ------------------------------------------------------------- | ----------- |
+| `cpu`                    | Yes      | [VmCpuUsage](protocol.md#vmcpuusage) / `null`                 |             |
+| `generation`             | Yes      | `string`                                                      |             |
+| `guestMemory`            | Yes      | [VmGuestMemoryUsage](protocol.md#vmguestmemoryusage) / `null` |             |
+| `hostMemory`             | Yes      | [VmHostMemoryUsage](protocol.md#vmhostmemoryusage) / `null`   |             |
+| `id`                     | Yes      | `string`                                                      |             |
+| `provisionedMemoryBytes` | Yes      | `null,string`                                                 |             |
+| `root`                   | Yes      | [VmFilesystemUsage](protocol.md#vmfilesystemusage) / `null`   |             |
+| `state`                  | Yes      | [VmUsageState](protocol.md#vmusagestate)                      |             |
+| `vcpus`                  | Yes      | `null,number`                                                 |             |
+| `workspace`              | Yes      | [VmFilesystemUsage](protocol.md#vmfilesystemusage) / `null`   |             |
+
+## VmUsageFreshness
+
+Each independently collected observation retains its own freshness.
+
+Type: `"fresh"` / `"stale"`.
+
+## VmUsageMethod
+
+A visible owner panel requests only its current authenticated account.
+
+| Field    | Required | Type                                               | Description |
+| -------- | -------- | -------------------------------------------------- | ----------- |
+| `params` | Yes      | [Recordstringnever](protocol.md#recordstringnever) |             |
+| `result` | Yes      | [VmUsageSnapshot](protocol.md#vmusagesnapshot)     |             |
+
+## VmUsageSnapshot
+
+A missing environment is a valid read result and must never trigger provisioning.
+
+| Field          | Required | Type                                                          | Description |
+| -------------- | -------- | ------------------------------------------------------------- | ----------- |
+| `environment`  | Yes      | [VmUsageEnvironment](protocol.md#vmusageenvironment) / `null` |             |
+| `observedAtMs` | Yes      | `string`                                                      |             |
+| `userId`       | Yes      | `string`                                                      |             |
+
+## VmUsageState
+
+Monitoring never starts, resumes or creates an environment.
+
+Type: `"preparing"` / `"running"` / `"stopped"` / `"unavailable"`.

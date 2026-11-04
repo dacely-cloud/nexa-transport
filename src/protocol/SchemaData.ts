@@ -17465,6 +17465,34 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'environment.usage': {
+                    description:
+                        'A visible owner panel requests only its current authenticated account.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/Record%3Cstring%2Cnever%3E',
+                        },
+                        result: {
+                            $ref: '#/definitions/VmUsageSnapshot',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
+                'environment.admin.usage': {
+                    description:
+                        'Cross-account monitoring is registered only under the explicit administration gate.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/VmUsageAdministrativeRequest',
+                        },
+                        result: {
+                            $ref: '#/definitions/VmUsageSnapshot',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                },
             },
             required: [
                 'accounts.create',
@@ -17716,6 +17744,8 @@ export const schema: Schema = {
                 'workspace.files.remove',
                 'environment.admin.inspect',
                 'environment.admin.mutate',
+                'environment.usage',
+                'environment.admin.usage',
             ],
             type: 'object',
         },
@@ -33040,6 +33070,279 @@ export const schema: Schema = {
             },
             required: ['connections', 'detail', 'elements', 'title'],
             type: 'object',
+        },
+        VmCpuUsage: {
+            description:
+                'Exact cumulative nanoseconds survive long-running VMs and JSON serialization.',
+            properties: {
+                cumulativeNanoseconds: {
+                    type: 'string',
+                },
+                freshness: {
+                    $ref: '#/definitions/VmUsageFreshness',
+                },
+                observedAtMs: {
+                    type: 'string',
+                },
+                percentHundredths: {
+                    description:
+                        "Hundredths of a percent of the VM's provisioned vCPU entitlement; may exceed 10000.",
+                    type: ['null', 'string'],
+                },
+                source: {
+                    const: 'hypervisor',
+                    type: 'string',
+                },
+            },
+            required: [
+                'cumulativeNanoseconds',
+                'freshness',
+                'observedAtMs',
+                'percentHundredths',
+                'source',
+            ],
+            type: 'object',
+        },
+        VmFilesystemUsage: {
+            description:
+                'Filesystem consumption differs from provisioned disk size and host physical allocation.',
+            properties: {
+                availableBytes: {
+                    type: 'string',
+                },
+                freshness: {
+                    $ref: '#/definitions/VmUsageFreshness',
+                },
+                observedAtMs: {
+                    type: 'string',
+                },
+                source: {
+                    const: 'guest',
+                    type: 'string',
+                },
+                totalBytes: {
+                    type: 'string',
+                },
+                usedBytes: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'availableBytes',
+                'freshness',
+                'observedAtMs',
+                'source',
+                'totalBytes',
+                'usedBytes',
+            ],
+            type: 'object',
+        },
+        VmGuestMemoryUsage: {
+            description:
+                'Linux MemAvailable includes reclaimable cache, unlike MemFree. Guest root can alter these values.',
+            properties: {
+                availableBytes: {
+                    type: 'string',
+                },
+                freshness: {
+                    $ref: '#/definitions/VmUsageFreshness',
+                },
+                observedAtMs: {
+                    type: 'string',
+                },
+                source: {
+                    const: 'guest',
+                    type: 'string',
+                },
+                totalBytes: {
+                    type: 'string',
+                },
+                usedBytes: {
+                    type: 'string',
+                },
+            },
+            required: [
+                'availableBytes',
+                'freshness',
+                'observedAtMs',
+                'source',
+                'totalBytes',
+                'usedBytes',
+            ],
+            type: 'object',
+        },
+        VmHostMemoryUsage: {
+            description:
+                'Host resident memory includes emulator overhead and is not guest application RAM usage.',
+            properties: {
+                freshness: {
+                    $ref: '#/definitions/VmUsageFreshness',
+                },
+                observedAtMs: {
+                    type: 'string',
+                },
+                residentBytes: {
+                    type: 'string',
+                },
+            },
+            required: ['freshness', 'observedAtMs', 'residentBytes'],
+            type: 'object',
+        },
+        VmUsageAdministrativeMethod: {
+            description:
+                'Cross-account monitoring is registered only under the explicit administration gate.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/VmUsageAdministrativeRequest',
+                },
+                result: {
+                    $ref: '#/definitions/VmUsageSnapshot',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        VmUsageAdministrativeRequest: {
+            description:
+                'Only a platform account ID is selectable; routing and credentials remain protected.',
+            properties: {
+                userId: {
+                    type: 'string',
+                },
+            },
+            required: ['userId'],
+            type: 'object',
+        },
+        VmUsageEnvironment: {
+            description:
+                'Public projection contains no compute route, runtime credential, native claim or host identity.',
+            properties: {
+                cpu: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/VmCpuUsage',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                generation: {
+                    type: 'string',
+                },
+                guestMemory: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/VmGuestMemoryUsage',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                hostMemory: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/VmHostMemoryUsage',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                id: {
+                    type: 'string',
+                },
+                provisionedMemoryBytes: {
+                    type: ['null', 'string'],
+                },
+                root: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/VmFilesystemUsage',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                state: {
+                    $ref: '#/definitions/VmUsageState',
+                },
+                vcpus: {
+                    type: ['null', 'number'],
+                },
+                workspace: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/VmFilesystemUsage',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+            },
+            required: [
+                'cpu',
+                'generation',
+                'guestMemory',
+                'hostMemory',
+                'id',
+                'provisionedMemoryBytes',
+                'root',
+                'state',
+                'vcpus',
+                'workspace',
+            ],
+            type: 'object',
+        },
+        VmUsageFreshness: {
+            description: 'Each independently collected observation retains its own freshness.',
+            enum: ['fresh', 'stale'],
+            type: 'string',
+        },
+        VmUsageMethod: {
+            description: 'A visible owner panel requests only its current authenticated account.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/Record%3Cstring%2Cnever%3E',
+                },
+                result: {
+                    $ref: '#/definitions/VmUsageSnapshot',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+        },
+        VmUsageSnapshot: {
+            description:
+                'A missing environment is a valid read result and must never trigger provisioning.',
+            properties: {
+                environment: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/VmUsageEnvironment',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                observedAtMs: {
+                    type: 'string',
+                },
+                userId: {
+                    type: 'string',
+                },
+            },
+            required: ['environment', 'observedAtMs', 'userId'],
+            type: 'object',
+        },
+        VmUsageState: {
+            description: 'Monitoring never starts, resumes or creates an environment.',
+            enum: ['preparing', 'running', 'stopped', 'unavailable'],
+            type: 'string',
         },
     },
     description: 'All protocol contracts reachable from the public transport.',

@@ -1,6 +1,6 @@
 # RPC reference
 
-All 249 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 248 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
+All 251 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 250 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
 
 - [accounts.create](#accountscreate)
 - [accounts.list](#accountslist)
@@ -251,6 +251,8 @@ All 249 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [workspace.files.remove](#workspacefilesremove)
 - [environment.admin.inspect](#environmentadmininspect)
 - [environment.admin.mutate](#environmentadminmutate)
+- [environment.usage](#environmentusage)
+- [environment.admin.usage](#environmentadminusage)
 
 ## accounts.create
 
@@ -6663,3 +6665,43 @@ Parameters: [VmAdministrationMutation](protocol.md#vmadministrationmutation).
 | `userId`        | Yes      | `string`                                                                         |                                                                                    |
 
 Result: [VmAdministrationView](protocol.md#vmadministrationview).
+
+## environment.usage
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.EnvironmentUsage> = {};
+const result: ResultOf<typeof Method.EnvironmentUsage> = await client.call(
+    Method.EnvironmentUsage,
+    params,
+);
+```
+
+Parameters: [Recordstringnever](protocol.md#recordstringnever).
+
+Type: Dictionary.
+
+Result: [VmUsageSnapshot](protocol.md#vmusagesnapshot).
+
+## environment.admin.usage
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.EnvironmentAdminUsage> = {
+    userId: 'YOUR_USERID',
+};
+const result: ResultOf<typeof Method.EnvironmentAdminUsage> = await client.call(
+    Method.EnvironmentAdminUsage,
+    params,
+);
+```
+
+Parameters: [VmUsageAdministrativeRequest](protocol.md#vmusageadministrativerequest).
+
+| Field    | Required | Type     | Description |
+| -------- | -------- | -------- | ----------- |
+| `userId` | Yes      | `string` |             |
+
+Result: [VmUsageSnapshot](protocol.md#vmusagesnapshot).

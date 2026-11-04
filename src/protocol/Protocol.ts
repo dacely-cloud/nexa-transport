@@ -649,10 +649,7 @@ export const AskParamsreasoningEffortValues = {
 } as const;
 
 /** Allowed values for AskParamsresponseFormat. */
-export const AskParamsresponseFormatValues = {
-    Value0: 'json',
-    Value1: 'text',
-} as const;
+export const AskParamsresponseFormatValues = { Value0: 'json', Value1: 'text' } as const;
 
 /** AskParams wire fields. */
 export interface AskParamsShape {
@@ -1609,10 +1606,7 @@ export interface BrowserScreenshotSnapshotShape {
 export type BrowserScreenshotSnapshot = BrowserScreenshotSnapshotShape;
 
 /** Allowed values for BrowserScreenshotView. */
-export const BrowserScreenshotViewValues = {
-    Value0: 'image',
-    Value1: 'metadata',
-} as const;
+export const BrowserScreenshotViewValues = { Value0: 'image', Value1: 'metadata' } as const;
 
 /** BrowserScreenshotView from the Nexa wire protocol. */
 export type BrowserScreenshotView =
@@ -2416,10 +2410,7 @@ export interface BrowserStructureSnapshotShape {
 export type BrowserStructureSnapshot = BrowserStructureSnapshotShape;
 
 /** Allowed values for BrowserStructureView. */
-export const BrowserStructureViewValues = {
-    Value0: 'accessibility',
-    Value1: 'dom',
-} as const;
+export const BrowserStructureViewValues = { Value0: 'accessibility', Value1: 'dom' } as const;
 
 /** BrowserStructureView from the Nexa wire protocol. */
 export type BrowserStructureView =
@@ -2674,10 +2665,7 @@ export interface BudgetShape {
 export type Budget = BudgetShape;
 
 /** Allowed values for BudgetEnforcement. */
-export const BudgetEnforcementValues = {
-    Value0: 'block',
-    Value1: 'warn',
-} as const;
+export const BudgetEnforcementValues = { Value0: 'block', Value1: 'warn' } as const;
 
 /** BudgetEnforcement from the Nexa wire protocol. */
 export type BudgetEnforcement =
@@ -3171,10 +3159,7 @@ export type ConnectorFileKind =
     (typeof ConnectorFileKindValues)[keyof typeof ConnectorFileKindValues];
 
 /** Allowed values for ConnectorFileMode. */
-export const ConnectorFileModeValues = {
-    Value0: 'read-only',
-    Value1: 'read-write',
-} as const;
+export const ConnectorFileModeValues = { Value0: 'read-only', Value1: 'read-write' } as const;
 
 /** ConnectorFileMode from the Nexa wire protocol. */
 export type ConnectorFileMode =
@@ -3483,10 +3468,7 @@ export interface ConnectorListMethodShape {
 export type ConnectorListMethod = ConnectorListMethodShape;
 
 /** Allowed values for ConnectorMetadatakind. */
-export const ConnectorMetadatakindValues = {
-    Value0: 'directory',
-    Value1: 'file',
-} as const;
+export const ConnectorMetadatakindValues = { Value0: 'directory', Value1: 'file' } as const;
 
 /** ConnectorMetadata wire fields. */
 export interface ConnectorMetadataShape {
@@ -3768,10 +3750,7 @@ export interface ConnectorWriteShape {
 export type ConnectorWrite = ConnectorWriteShape;
 
 /** Allowed values for ConnectorWriteMode. */
-export const ConnectorWriteModeValues = {
-    Value0: 'create',
-    Value1: 'replace',
-} as const;
+export const ConnectorWriteModeValues = { Value0: 'create', Value1: 'replace' } as const;
 
 /** ConnectorWriteMode from the Nexa wire protocol. */
 export type ConnectorWriteMode =
@@ -3933,10 +3912,7 @@ export interface ConversationMessageRefShape {
 export type ConversationMessageRef = ConversationMessageRefShape;
 
 /** Allowed values for ConversationPinrole. */
-export const ConversationPinroleValues = {
-    Value0: 'assistant',
-    Value1: 'user',
-} as const;
+export const ConversationPinroleValues = { Value0: 'assistant', Value1: 'user' } as const;
 
 /** ConversationPin wire fields. */
 export interface ConversationPinShape {
@@ -4008,10 +3984,7 @@ export interface ConversationRenameParamsShape {
 export type ConversationRenameParams = ConversationRenameParamsShape;
 
 /** Allowed values for ConversationRetryParamsmode. */
-export const ConversationRetryParamsmodeValues = {
-    Value0: 'edit',
-    Value1: 'regenerate',
-} as const;
+export const ConversationRetryParamsmodeValues = { Value0: 'edit', Value1: 'regenerate' } as const;
 
 /** Allowed values for ConversationRetryParamsreasoningEffort. */
 export const ConversationRetryParamsreasoningEffortValues = {
@@ -6860,10 +6833,7 @@ export interface DesignPaintColorOperationShape {
 export type DesignPaintColorOperation = DesignPaintColorOperationShape;
 
 /** Allowed values for DesignPaintColorTarget. */
-export const DesignPaintColorTargetValues = {
-    Value0: 'fill',
-    Value1: 'stroke',
-} as const;
+export const DesignPaintColorTargetValues = { Value0: 'fill', Value1: 'stroke' } as const;
 
 /** DesignPaintColorTarget from the Nexa wire protocol. */
 export type DesignPaintColorTarget =
@@ -7564,11 +7534,7 @@ export interface DesignShadowShape {
 export type DesignShadow = DesignShadowShape;
 
 /** Allowed values for DesignSizing. */
-export const DesignSizingValues = {
-    Value0: 'fill',
-    Value1: 'fixed',
-    Value2: 'hug',
-} as const;
+export const DesignSizingValues = { Value0: 'fill', Value1: 'fixed', Value2: 'hug' } as const;
 
 /** DesignSizing from the Nexa wire protocol. */
 export type DesignSizing = (typeof DesignSizingValues)[keyof typeof DesignSizingValues];
@@ -7626,11 +7592,7 @@ export interface DesignSizingOperationShape {
 export type DesignSizingOperation = DesignSizingOperationShape;
 
 /** Allowed values for DesignStrokecap. */
-export const DesignStrokecapValues = {
-    Value0: 'butt',
-    Value1: 'round',
-    Value2: 'square',
-} as const;
+export const DesignStrokecapValues = { Value0: 'butt', Value1: 'round', Value2: 'square' } as const;
 
 /** Allowed values for DesignStrokejoin. */
 export const DesignStrokejoinValues = {
@@ -7729,10 +7691,7 @@ export const DesignStyleblendModeValues = {
 } as const;
 
 /** Allowed values for DesignStyleisolation. */
-export const DesignStyleisolationValues = {
-    Value0: 'auto',
-    Value1: 'isolate',
-} as const;
+export const DesignStyleisolationValues = { Value0: 'auto', Value1: 'isolate' } as const;
 
 /** DesignStyle wire fields. */
 export interface DesignStyleShape {
@@ -7875,11 +7834,7 @@ export interface DesignSvgImportRequestShape {
 export type DesignSvgImportRequest = DesignSvgImportRequestShape;
 
 /** Allowed values for DesignTextdirection. */
-export const DesignTextdirectionValues = {
-    Value0: 'auto',
-    Value1: 'ltr',
-    Value2: 'rtl',
-} as const;
+export const DesignTextdirectionValues = { Value0: 'auto', Value1: 'ltr', Value2: 'rtl' } as const;
 
 /** DesignText wire fields. */
 export interface DesignTextShape {
@@ -7953,10 +7908,7 @@ export interface DesignTextRunShape {
 export type DesignTextRun = DesignTextRunShape;
 
 /** Allowed values for DesignTextSpanStyledirection. */
-export const DesignTextSpanStyledirectionValues = {
-    Value0: 'ltr',
-    Value1: 'rtl',
-} as const;
+export const DesignTextSpanStyledirectionValues = { Value0: 'ltr', Value1: 'rtl' } as const;
 
 /** DesignTextSpanStyle wire fields. */
 export interface DesignTextSpanStyleShape {
@@ -8296,11 +8248,7 @@ export interface DesignTranslateOperationShape {
 export type DesignTranslateOperation = DesignTranslateOperationShape;
 
 /** Allowed values for DesignTrigger. */
-export const DesignTriggerValues = {
-    Value0: 'after',
-    Value1: 'click',
-    Value2: 'hover',
-} as const;
+export const DesignTriggerValues = { Value0: 'after', Value1: 'click', Value2: 'hover' } as const;
 
 /** DesignTrigger from the Nexa wire protocol. */
 export type DesignTrigger = (typeof DesignTriggerValues)[keyof typeof DesignTriggerValues];
@@ -11294,6 +11242,22 @@ export interface GatewayMethodsenvironment_admin_mutateShape {
     readonly result: VmAdministrationView;
 }
 
+/** GatewayMethodsenvironment_usage wire fields. */
+export interface GatewayMethodsenvironment_usageShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: Recordstringnever;
+    /** result as defined by the Nexa gateway. */
+    readonly result: VmUsageSnapshot;
+}
+
+/** GatewayMethodsenvironment_admin_usage wire fields. */
+export interface GatewayMethodsenvironment_admin_usageShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: VmUsageAdministrativeRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: VmUsageSnapshot;
+}
+
 /** GatewayMethods wire fields. */
 export interface GatewayMethodsShape {
     /** accounts.create as defined by the Nexa gateway. */
@@ -11794,16 +11758,17 @@ export interface GatewayMethodsShape {
     readonly 'environment.admin.inspect': GatewayMethodsenvironment_admin_inspectShape;
     /** environment.admin.mutate as defined by the Nexa gateway. */
     readonly 'environment.admin.mutate': GatewayMethodsenvironment_admin_mutateShape;
+    /** environment.usage as defined by the Nexa gateway. */
+    readonly 'environment.usage': GatewayMethodsenvironment_usageShape;
+    /** environment.admin.usage as defined by the Nexa gateway. */
+    readonly 'environment.admin.usage': GatewayMethodsenvironment_admin_usageShape;
 }
 
 /** GatewayMethods from the Nexa wire protocol. */
 export type GatewayMethods = GatewayMethodsShape;
 
 /** Allowed values for GeometryFormat. */
-export const GeometryFormatValues = {
-    Value0: 'gaussian_ply',
-    Value1: 'glb',
-} as const;
+export const GeometryFormatValues = { Value0: 'gaussian_ply', Value1: 'glb' } as const;
 
 /** GeometryFormat from the Nexa wire protocol. */
 export type GeometryFormat = (typeof GeometryFormatValues)[keyof typeof GeometryFormatValues];
@@ -11849,10 +11814,7 @@ export const GraphIssueCodeValues = {
 export type GraphIssueCode = (typeof GraphIssueCodeValues)[keyof typeof GraphIssueCodeValues];
 
 /** Allowed values for GraphSeverity. */
-export const GraphSeverityValues = {
-    Value0: 'error',
-    Value1: 'warning',
-} as const;
+export const GraphSeverityValues = { Value0: 'error', Value1: 'warning' } as const;
 
 /** GraphSeverity from the Nexa wire protocol. */
 export type GraphSeverity = (typeof GraphSeverityValues)[keyof typeof GraphSeverityValues];
@@ -12688,10 +12650,7 @@ export interface LuauEditorReportShape {
 export type LuauEditorReport = LuauEditorReportShape;
 
 /** Allowed values for LuauEditorSeverity. */
-export const LuauEditorSeverityValues = {
-    Value0: 'error',
-    Value1: 'warning',
-} as const;
+export const LuauEditorSeverityValues = { Value0: 'error', Value1: 'warning' } as const;
 
 /** LuauEditorSeverity from the Nexa wire protocol. */
 export type LuauEditorSeverity =
@@ -12999,10 +12958,7 @@ export interface NcapDeltageometryVariant1Shape {
 }
 
 /** Allowed values for NcapDeltageometryVariant2phase. */
-export const NcapDeltageometryVariant2phaseValues = {
-    Value0: 'chunk',
-    Value1: 'preview',
-} as const;
+export const NcapDeltageometryVariant2phaseValues = { Value0: 'chunk', Value1: 'preview' } as const;
 
 /** NcapDeltageometryVariant2 wire fields. */
 export interface NcapDeltageometryVariant2Shape {
@@ -13488,10 +13444,7 @@ export type NetworkDetailView =
     (typeof NetworkDetailViewValues)[keyof typeof NetworkDetailViewValues];
 
 /** Allowed values for NetworkFormat. */
-export const NetworkFormatValues = {
-    Value0: 'har',
-    Value1: 'mitmproxy',
-} as const;
+export const NetworkFormatValues = { Value0: 'har', Value1: 'mitmproxy' } as const;
 
 /** NetworkFormat from the Nexa wire protocol. */
 export type NetworkFormat = (typeof NetworkFormatValues)[keyof typeof NetworkFormatValues];
@@ -14020,20 +13973,13 @@ export interface PlanningTurnRefShape {
 export type PlanningTurnRef = PlanningTurnRefShape;
 
 /** Allowed values for PortCardinality. */
-export const PortCardinalityValues = {
-    Value0: 'item',
-    Value1: 'list',
-    Value2: 'stream',
-} as const;
+export const PortCardinalityValues = { Value0: 'item', Value1: 'list', Value2: 'stream' } as const;
 
 /** PortCardinality from the Nexa wire protocol. */
 export type PortCardinality = (typeof PortCardinalityValues)[keyof typeof PortCardinalityValues];
 
 /** Allowed values for PortDirection. */
-export const PortDirectionValues = {
-    Value0: 'input',
-    Value1: 'output',
-} as const;
+export const PortDirectionValues = { Value0: 'input', Value1: 'output' } as const;
 
 /** PortDirection from the Nexa wire protocol. */
 export type PortDirection = (typeof PortDirectionValues)[keyof typeof PortDirectionValues];
@@ -14948,11 +14894,7 @@ export interface ResourceSelectionShape {
 export type ResourceSelection = ResourceSelectionShape;
 
 /** Allowed values for ResourceUse. */
-export const ResourceUseValues = {
-    Value0: 'attach',
-    Value1: 'compute',
-    Value2: 'read',
-} as const;
+export const ResourceUseValues = { Value0: 'attach', Value1: 'compute', Value2: 'read' } as const;
 
 /** ResourceUse from the Nexa wire protocol. */
 export type ResourceUse = (typeof ResourceUseValues)[keyof typeof ResourceUseValues];
@@ -15799,10 +15741,7 @@ export const RiskLevelValues = {
 export type RiskLevel = (typeof RiskLevelValues)[keyof typeof RiskLevelValues];
 
 /** Allowed values for RobloxCoordinateGesturedevice. */
-export const RobloxCoordinateGesturedeviceValues = {
-    Value0: 'Mouse',
-    Value1: 'Touch',
-} as const;
+export const RobloxCoordinateGesturedeviceValues = { Value0: 'Mouse', Value1: 'Touch' } as const;
 
 /** RobloxCoordinateGesture wire fields. */
 export interface RobloxCoordinateGestureShape {
@@ -16141,11 +16080,7 @@ export interface SchemaFieldShape {
 export type SchemaField = SchemaFieldShape;
 
 /** Allowed values for Scope. */
-export const ScopeValues = {
-    Value0: 'admin',
-    Value1: 'read',
-    Value2: 'write',
-} as const;
+export const ScopeValues = { Value0: 'admin', Value1: 'read', Value2: 'write' } as const;
 
 /** Scope from the Nexa wire protocol. */
 export type Scope = (typeof ScopeValues)[keyof typeof ScopeValues];
@@ -16307,10 +16242,7 @@ export interface SessionListParamsShape {
 export type SessionListParams = SessionListParamsShape;
 
 /** Allowed values for SessionMessageDatarole. */
-export const SessionMessageDataroleValues = {
-    Value0: 'assistant',
-    Value1: 'user',
-} as const;
+export const SessionMessageDataroleValues = { Value0: 'assistant', Value1: 'user' } as const;
 
 /** SessionMessageData wire fields. */
 export interface SessionMessageDataShape {
@@ -16462,10 +16394,7 @@ export const StreamParamsreasoningEffortValues = {
 } as const;
 
 /** Allowed values for StreamParamsresponseFormat. */
-export const StreamParamsresponseFormatValues = {
-    Value0: 'json',
-    Value1: 'text',
-} as const;
+export const StreamParamsresponseFormatValues = { Value0: 'json', Value1: 'text' } as const;
 
 /** StreamParams wire fields. */
 export interface StreamParamsShape {
@@ -16710,11 +16639,7 @@ export interface TelemetryProjectShape {
 export type TelemetryProject = TelemetryProjectShape;
 
 /** Allowed values for TerminalAction. */
-export const TerminalActionValues = {
-    Value0: 'input',
-    Value1: 'resize',
-    Value2: 'stop',
-} as const;
+export const TerminalActionValues = { Value0: 'input', Value1: 'resize', Value2: 'stop' } as const;
 
 /** TerminalAction from the Nexa wire protocol. */
 export type TerminalAction = (typeof TerminalActionValues)[keyof typeof TerminalActionValues];
@@ -17177,10 +17102,7 @@ export interface VoiceStopParamsShape {
 export type VoiceStopParams = VoiceStopParamsShape;
 
 /** Allowed values for WalletHistoryEntrykind. */
-export const WalletHistoryEntrykindValues = {
-    Value0: 'purchase',
-    Value1: 'usage',
-} as const;
+export const WalletHistoryEntrykindValues = { Value0: 'purchase', Value1: 'usage' } as const;
 
 /** WalletHistoryEntry wire fields. */
 export interface WalletHistoryEntryShape {
@@ -17762,10 +17684,7 @@ export interface WorkflowArtifactPublicationShape {
 export type WorkflowArtifactPublication = WorkflowArtifactPublicationShape;
 
 /** Allowed values for WorkflowAttentionCategory. */
-export const WorkflowAttentionCategoryValues = {
-    Value0: 'failures',
-    Value1: 'requests',
-} as const;
+export const WorkflowAttentionCategoryValues = { Value0: 'failures', Value1: 'requests' } as const;
 
 /** WorkflowAttentionCategory from the Nexa wire protocol. */
 export type WorkflowAttentionCategory =
@@ -17871,10 +17790,7 @@ export type WorkflowCalendarFold =
     (typeof WorkflowCalendarFoldValues)[keyof typeof WorkflowCalendarFoldValues];
 
 /** Allowed values for WorkflowCalendarGap. */
-export const WorkflowCalendarGapValues = {
-    Value0: 'next-valid',
-    Value1: 'skip',
-} as const;
+export const WorkflowCalendarGapValues = { Value0: 'next-valid', Value1: 'skip' } as const;
 
 /** WorkflowCalendarGap from the Nexa wire protocol. */
 export type WorkflowCalendarGap =
@@ -18393,10 +18309,7 @@ export interface WorkflowImageResolutionRequestShape {
 export type WorkflowImageResolutionRequest = WorkflowImageResolutionRequestShape;
 
 /** Allowed values for WorkflowImageSettingsoperation. */
-export const WorkflowImageSettingsoperationValues = {
-    Value0: 'edit',
-    Value1: 'generate',
-} as const;
+export const WorkflowImageSettingsoperationValues = { Value0: 'edit', Value1: 'generate' } as const;
 
 /** WorkflowImageSettings wire fields. */
 export interface WorkflowImageSettingsShape {
@@ -19888,10 +19801,7 @@ export interface WorkflowTerminalSnapshotShape {
 export type WorkflowTerminalSnapshot = WorkflowTerminalSnapshotShape;
 
 /** Allowed values for WorkflowUsageDimension. */
-export const WorkflowUsageDimensionValues = {
-    Value0: 'agents',
-    Value1: 'steps',
-} as const;
+export const WorkflowUsageDimensionValues = { Value0: 'agents', Value1: 'steps' } as const;
 
 /** WorkflowUsageDimension from the Nexa wire protocol. */
 export type WorkflowUsageDimension =
@@ -21029,10 +20939,7 @@ export interface ConnectorChmodResultShape {
 export type ConnectorChmodResult = ConnectorChmodResultShape;
 
 /** Allowed values for ConnectorFilePermissionMode. */
-export const ConnectorFilePermissionModeValues = {
-    Value0: 384,
-    Value1: 448,
-} as const;
+export const ConnectorFilePermissionModeValues = { Value0: 384, Value1: 448 } as const;
 
 /** ConnectorFilePermissionMode from the Nexa wire protocol. */
 export type ConnectorFilePermissionMode =
@@ -21248,10 +21155,7 @@ export enum ConnectorInteractiveTransport {
 }
 
 /** Allowed values for BrowserFilesChunkParamslocation. */
-export const BrowserFilesChunkParamslocationValues = {
-    Value0: 'account',
-    Value1: 'vm',
-} as const;
+export const BrowserFilesChunkParamslocationValues = { Value0: 'account', Value1: 'vm' } as const;
 
 /** BrowserFilesChunkParams wire fields. */
 export interface BrowserFilesChunkParamsShape {
@@ -21295,10 +21199,7 @@ export interface BrowserFilesEntryShape {
 export type BrowserFilesEntry = BrowserFilesEntryShape;
 
 /** Allowed values for BrowserFilesListParamslocation. */
-export const BrowserFilesListParamslocationValues = {
-    Value0: 'account',
-    Value1: 'vm',
-} as const;
+export const BrowserFilesListParamslocationValues = { Value0: 'account', Value1: 'vm' } as const;
 
 /** BrowserFilesListParams wire fields. */
 export interface BrowserFilesListParamsShape {
@@ -21353,10 +21254,7 @@ export interface BrowserFilesReadShape {
 export type BrowserFilesRead = BrowserFilesReadShape;
 
 /** Allowed values for BrowserFilesReadParamslocation. */
-export const BrowserFilesReadParamslocationValues = {
-    Value0: 'account',
-    Value1: 'vm',
-} as const;
+export const BrowserFilesReadParamslocationValues = { Value0: 'account', Value1: 'vm' } as const;
 
 /** BrowserFilesReadParams wire fields. */
 export interface BrowserFilesReadParamsShape {
@@ -21378,10 +21276,7 @@ export interface BrowserFilesReadParamsShape {
 export type BrowserFilesReadParams = BrowserFilesReadParamsShape;
 
 /** Allowed values for BrowserFilesStartParamslocation. */
-export const BrowserFilesStartParamslocationValues = {
-    Value0: 'account',
-    Value1: 'vm',
-} as const;
+export const BrowserFilesStartParamslocationValues = { Value0: 'account', Value1: 'vm' } as const;
 
 /** BrowserFilesStartParams wire fields. */
 export interface BrowserFilesStartParamsShape {
@@ -21403,10 +21298,7 @@ export interface BrowserFilesStartParamsShape {
 export type BrowserFilesStartParams = BrowserFilesStartParamsShape;
 
 /** Allowed values for BrowserFilesTargetlocation. */
-export const BrowserFilesTargetlocationValues = {
-    Value0: 'account',
-    Value1: 'vm',
-} as const;
+export const BrowserFilesTargetlocationValues = { Value0: 'account', Value1: 'vm' } as const;
 
 /** BrowserFilesTarget wire fields. */
 export interface BrowserFilesTargetShape {
@@ -21435,10 +21327,7 @@ export interface BrowserFilesUploadShape {
 export type BrowserFilesUpload = BrowserFilesUploadShape;
 
 /** Allowed values for BrowserFilesUploadParamslocation. */
-export const BrowserFilesUploadParamslocationValues = {
-    Value0: 'account',
-    Value1: 'vm',
-} as const;
+export const BrowserFilesUploadParamslocationValues = { Value0: 'account', Value1: 'vm' } as const;
 
 /** BrowserFilesUploadParams wire fields. */
 export interface BrowserFilesUploadParamsShape {
@@ -21519,10 +21408,7 @@ export type WorkspacePresenceState =
     (typeof WorkspacePresenceStateValues)[keyof typeof WorkspacePresenceStateValues];
 
 /** Allowed values for BrowserFilesRenameParamslocation. */
-export const BrowserFilesRenameParamslocationValues = {
-    Value0: 'account',
-    Value1: 'vm',
-} as const;
+export const BrowserFilesRenameParamslocationValues = { Value0: 'account', Value1: 'vm' } as const;
 
 /** BrowserFilesRenameParams wire fields. */
 export interface BrowserFilesRenameParamsShape {
@@ -21604,20 +21490,14 @@ export interface VmAdministrationProfileShape {
 export type VmAdministrationProfile = VmAdministrationProfileShape;
 
 /** Allowed values for VmAdministrationArchitecture. */
-export const VmAdministrationArchitectureValues = {
-    Value0: 'x86_64',
-    Value1: 'aarch64',
-} as const;
+export const VmAdministrationArchitectureValues = { Value0: 'x86_64', Value1: 'aarch64' } as const;
 
 /** VmAdministrationArchitecture from the Nexa wire protocol. */
 export type VmAdministrationArchitecture =
     (typeof VmAdministrationArchitectureValues)[keyof typeof VmAdministrationArchitectureValues];
 
 /** Allowed values for VmAdministrationRuntime. */
-export const VmAdministrationRuntimeValues = {
-    Value0: 'qemu-cpu',
-    Value1: 'qemu-gpu',
-} as const;
+export const VmAdministrationRuntimeValues = { Value0: 'qemu-cpu', Value1: 'qemu-gpu' } as const;
 
 /** VmAdministrationRuntime from the Nexa wire protocol. */
 export type VmAdministrationRuntime =
@@ -21823,11 +21703,7 @@ export interface VisualConnectionShape {
 export type VisualConnection = VisualConnectionShape;
 
 /** Allowed values for VisualArrow. */
-export const VisualArrowValues = {
-    Value0: 'both',
-    Value1: 'forward',
-    Value2: 'none',
-} as const;
+export const VisualArrowValues = { Value0: 'both', Value1: 'forward', Value2: 'none' } as const;
 
 /** VisualArrow from the Nexa wire protocol. */
 export type VisualArrow = (typeof VisualArrowValues)[keyof typeof VisualArrowValues];
@@ -21949,6 +21825,162 @@ export interface VisualStepShape {
 
 /** VisualStep from the Nexa wire protocol. */
 export type VisualStep = VisualStepShape;
+
+/** VmCpuUsage wire fields. */
+export interface VmCpuUsageShape {
+    /** cumulativeNanoseconds as defined by the Nexa gateway. */
+    readonly cumulativeNanoseconds: string;
+    /** freshness as defined by the Nexa gateway. */
+    readonly freshness: VmUsageFreshness;
+    /** observedAtMs as defined by the Nexa gateway. */
+    readonly observedAtMs: string;
+    /** percentHundredths as defined by the Nexa gateway. */
+    readonly percentHundredths: null | string;
+    /** source as defined by the Nexa gateway. */
+    readonly source: 'hypervisor';
+}
+
+/** VmCpuUsage from the Nexa wire protocol. */
+export type VmCpuUsage = VmCpuUsageShape;
+
+/** VmFilesystemUsage wire fields. */
+export interface VmFilesystemUsageShape {
+    /** availableBytes as defined by the Nexa gateway. */
+    readonly availableBytes: string;
+    /** freshness as defined by the Nexa gateway. */
+    readonly freshness: VmUsageFreshness;
+    /** observedAtMs as defined by the Nexa gateway. */
+    readonly observedAtMs: string;
+    /** source as defined by the Nexa gateway. */
+    readonly source: 'guest';
+    /** totalBytes as defined by the Nexa gateway. */
+    readonly totalBytes: string;
+    /** usedBytes as defined by the Nexa gateway. */
+    readonly usedBytes: string;
+}
+
+/** VmFilesystemUsage from the Nexa wire protocol. */
+export type VmFilesystemUsage = VmFilesystemUsageShape;
+
+/** VmGuestMemoryUsage wire fields. */
+export interface VmGuestMemoryUsageShape {
+    /** availableBytes as defined by the Nexa gateway. */
+    readonly availableBytes: string;
+    /** freshness as defined by the Nexa gateway. */
+    readonly freshness: VmUsageFreshness;
+    /** observedAtMs as defined by the Nexa gateway. */
+    readonly observedAtMs: string;
+    /** source as defined by the Nexa gateway. */
+    readonly source: 'guest';
+    /** totalBytes as defined by the Nexa gateway. */
+    readonly totalBytes: string;
+    /** usedBytes as defined by the Nexa gateway. */
+    readonly usedBytes: string;
+}
+
+/** VmGuestMemoryUsage from the Nexa wire protocol. */
+export type VmGuestMemoryUsage = VmGuestMemoryUsageShape;
+
+/** VmHostMemoryUsage wire fields. */
+export interface VmHostMemoryUsageShape {
+    /** freshness as defined by the Nexa gateway. */
+    readonly freshness: VmUsageFreshness;
+    /** observedAtMs as defined by the Nexa gateway. */
+    readonly observedAtMs: string;
+    /** residentBytes as defined by the Nexa gateway. */
+    readonly residentBytes: string;
+}
+
+/** VmHostMemoryUsage from the Nexa wire protocol. */
+export type VmHostMemoryUsage = VmHostMemoryUsageShape;
+
+/** VmUsageAdministrativeMethod wire fields. */
+export interface VmUsageAdministrativeMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: VmUsageAdministrativeRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: VmUsageSnapshot;
+}
+
+/** VmUsageAdministrativeMethod from the Nexa wire protocol. */
+export type VmUsageAdministrativeMethod = VmUsageAdministrativeMethodShape;
+
+/** VmUsageAdministrativeRequest wire fields. */
+export interface VmUsageAdministrativeRequestShape {
+    /** userId as defined by the Nexa gateway. */
+    readonly userId: string;
+}
+
+/** VmUsageAdministrativeRequest from the Nexa wire protocol. */
+export type VmUsageAdministrativeRequest = VmUsageAdministrativeRequestShape;
+
+/** VmUsageEnvironment wire fields. */
+export interface VmUsageEnvironmentShape {
+    /** cpu as defined by the Nexa gateway. */
+    readonly cpu: VmCpuUsage | null;
+    /** generation as defined by the Nexa gateway. */
+    readonly generation: string;
+    /** guestMemory as defined by the Nexa gateway. */
+    readonly guestMemory: VmGuestMemoryUsage | null;
+    /** hostMemory as defined by the Nexa gateway. */
+    readonly hostMemory: VmHostMemoryUsage | null;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** provisionedMemoryBytes as defined by the Nexa gateway. */
+    readonly provisionedMemoryBytes: null | string;
+    /** root as defined by the Nexa gateway. */
+    readonly root: VmFilesystemUsage | null;
+    /** state as defined by the Nexa gateway. */
+    readonly state: VmUsageState;
+    /** vcpus as defined by the Nexa gateway. */
+    readonly vcpus: null | number;
+    /** workspace as defined by the Nexa gateway. */
+    readonly workspace: VmFilesystemUsage | null;
+}
+
+/** VmUsageEnvironment from the Nexa wire protocol. */
+export type VmUsageEnvironment = VmUsageEnvironmentShape;
+
+/** Allowed values for VmUsageFreshness. */
+export const VmUsageFreshnessValues = { Value0: 'fresh', Value1: 'stale' } as const;
+
+/** VmUsageFreshness from the Nexa wire protocol. */
+export type VmUsageFreshness = (typeof VmUsageFreshnessValues)[keyof typeof VmUsageFreshnessValues];
+
+/** VmUsageMethod wire fields. */
+export interface VmUsageMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: Recordstringnever;
+    /** result as defined by the Nexa gateway. */
+    readonly result: VmUsageSnapshot;
+}
+
+/** VmUsageMethod from the Nexa wire protocol. */
+export type VmUsageMethod = VmUsageMethodShape;
+
+/** VmUsageSnapshot wire fields. */
+export interface VmUsageSnapshotShape {
+    /** environment as defined by the Nexa gateway. */
+    readonly environment: VmUsageEnvironment | null;
+    /** observedAtMs as defined by the Nexa gateway. */
+    readonly observedAtMs: string;
+    /** userId as defined by the Nexa gateway. */
+    readonly userId: string;
+}
+
+/** VmUsageSnapshot from the Nexa wire protocol. */
+export type VmUsageSnapshot = VmUsageSnapshotShape;
+
+/** Allowed values for VmUsageState. */
+export const VmUsageStateValues = {
+    Value0: 'preparing',
+    Value1: 'running',
+    Value2: 'stopped',
+    Value3: 'unavailable',
+} as const;
+
+/** VmUsageState from the Nexa wire protocol. */
+export type VmUsageState = (typeof VmUsageStateValues)[keyof typeof VmUsageStateValues];
 
 /** Supported RPC names. */
 export type MethodName = keyof GatewayMethods;
@@ -22457,4 +22489,8 @@ export enum Method {
     EnvironmentAdminInspect = 'environment.admin.inspect',
     /** Calls environment.admin.mutate. */
     EnvironmentAdminMutate = 'environment.admin.mutate',
+    /** Calls environment.usage. */
+    EnvironmentUsage = 'environment.usage',
+    /** Calls environment.admin.usage. */
+    EnvironmentAdminUsage = 'environment.admin.usage',
 }

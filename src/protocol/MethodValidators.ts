@@ -8,706 +8,205 @@ export interface MethodValidation {
 }
 /** Exhaustive RPC boundary validators. */
 export const methodValidators: Readonly<Record<MethodName, MethodValidation>> = {
-    'accounts.create': {
-        params: validators.params0,
-        result: validators.result0,
-    },
+    'accounts.create': { params: validators.params0, result: validators.result0 },
     'accounts.list': { params: validators.params1, result: validators.result1 },
-    'accounts.remove': {
-        params: validators.params2,
-        result: validators.result2,
-    },
-    'accounts.usage': {
-        params: validators.params3,
-        result: validators.result3,
-    },
+    'accounts.remove': { params: validators.params2, result: validators.result2 },
+    'accounts.usage': { params: validators.params3, result: validators.result3 },
     'agent.ask': { params: validators.params4, result: validators.result4 },
     'agent.steer': { params: validators.params5, result: validators.result5 },
     'agent.stream': { params: validators.params6, result: validators.result6 },
     'agents.define': { params: validators.params7, result: validators.result7 },
     'agents.list': { params: validators.params8, result: validators.result8 },
-    'approvals.list': {
-        params: validators.params9,
-        result: validators.result9,
-    },
-    'approvals.resolve': {
-        params: validators.params10,
-        result: validators.result10,
-    },
-    'channels.deadLetters.list': {
-        params: validators.params11,
-        result: validators.result11,
-    },
-    'channels.list': {
-        params: validators.params12,
-        result: validators.result12,
-    },
-    'channels.status': {
-        params: validators.params13,
-        result: validators.result13,
-    },
+    'approvals.list': { params: validators.params9, result: validators.result9 },
+    'approvals.resolve': { params: validators.params10, result: validators.result10 },
+    'channels.deadLetters.list': { params: validators.params11, result: validators.result11 },
+    'channels.list': { params: validators.params12, result: validators.result12 },
+    'channels.status': { params: validators.params13, result: validators.result13 },
     'config.get': { params: validators.params14, result: validators.result14 },
     'config.set': { params: validators.params15, result: validators.result15 },
-    'config.unset': {
-        params: validators.params16,
-        result: validators.result16,
-    },
+    'config.unset': { params: validators.params16, result: validators.result16 },
     connect: { params: validators.params17, result: validators.result17 },
-    'connectors.files.get': {
-        params: validators.params18,
-        result: validators.result18,
-    },
-    'connectors.files.submit': {
-        params: validators.params19,
-        result: validators.result19,
-    },
-    'connectors.filesystem': {
-        params: validators.params20,
-        result: validators.result20,
-    },
-    'connectors.get': {
-        params: validators.params21,
-        result: validators.result21,
-    },
-    'connectors.inventory': {
-        params: validators.params22,
-        result: validators.result22,
-    },
-    'connectors.link.approve': {
-        params: validators.params23,
-        result: validators.result23,
-    },
-    'connectors.link.review': {
-        params: validators.params24,
-        result: validators.result24,
-    },
-    'connectors.list': {
-        params: validators.params25,
-        result: validators.result25,
-    },
-    'connectors.revoke': {
-        params: validators.params26,
-        result: validators.result26,
-    },
-    'credit.budgets': {
-        params: validators.params27,
-        result: validators.result27,
-    },
-    'credit.removeBudget': {
-        params: validators.params28,
-        result: validators.result28,
-    },
-    'credit.resetAllowance': {
-        params: validators.params29,
-        result: validators.result29,
-    },
-    'credit.resetHistory': {
-        params: validators.params30,
-        result: validators.result30,
-    },
-    'credit.resets': {
-        params: validators.params31,
-        result: validators.result31,
-    },
-    'credit.setBudget': {
-        params: validators.params32,
-        result: validators.result32,
-    },
-    'credit.summary': {
-        params: validators.params33,
-        result: validators.result33,
-    },
-    'credit.wallet': {
-        params: validators.params34,
-        result: validators.result34,
-    },
-    'credit.walletHistory': {
-        params: validators.params35,
-        result: validators.result35,
-    },
-    'data.upload.cancel': {
-        params: validators.params36,
-        result: validators.result36,
-    },
-    'data.upload.chunk': {
-        params: validators.params37,
-        result: validators.result37,
-    },
-    'data.upload.finish': {
-        params: validators.params38,
-        result: validators.result38,
-    },
-    'data.upload.start': {
-        params: validators.params39,
-        result: validators.result39,
-    },
-    'design.arrange': {
-        params: validators.params40,
-        result: validators.result40,
-    },
-    'design.asset.cancel': {
-        params: validators.params41,
-        result: validators.result41,
-    },
-    'design.asset.chunk': {
-        params: validators.params42,
-        result: validators.result42,
-    },
-    'design.asset.finish': {
-        params: validators.params43,
-        result: validators.result43,
-    },
-    'design.asset.list': {
-        params: validators.params44,
-        result: validators.result44,
-    },
-    'design.asset.read': {
-        params: validators.params45,
-        result: validators.result45,
-    },
-    'design.asset.remove': {
-        params: validators.params46,
-        result: validators.result46,
-    },
-    'design.asset.start': {
-        params: validators.params47,
-        result: validators.result47,
-    },
-    'design.asset.thumbnail': {
-        params: validators.params48,
-        result: validators.result48,
-    },
-    'design.canvas': {
-        params: validators.params49,
-        result: validators.result49,
-    },
-    'design.canvas.metrics': {
-        params: validators.params50,
-        result: validators.result50,
-    },
-    'design.changes': {
-        params: validators.params51,
-        result: validators.result51,
-    },
-    'design.clipboard.copy': {
-        params: validators.params52,
-        result: validators.result52,
-    },
-    'design.clipboard.cut': {
-        params: validators.params53,
-        result: validators.result53,
-    },
-    'design.clipboard.paste': {
-        params: validators.params54,
-        result: validators.result54,
-    },
-    'design.colors': {
-        params: validators.params55,
-        result: validators.result55,
-    },
-    'design.comment.text': {
-        params: validators.params56,
-        result: validators.result56,
-    },
-    'design.comments': {
-        params: validators.params57,
-        result: validators.result57,
-    },
-    'design.component': {
-        params: validators.params58,
-        result: validators.result58,
-    },
-    'design.create': {
-        params: validators.params59,
-        result: validators.result59,
-    },
-    'design.delete': {
-        params: validators.params60,
-        result: validators.result60,
-    },
-    'design.duplicate': {
-        params: validators.params61,
-        result: validators.result61,
-    },
-    'design.events': {
-        params: validators.params62,
-        result: validators.result62,
-    },
-    'design.font.list': {
-        params: validators.params63,
-        result: validators.result63,
-    },
-    'design.font.read': {
-        params: validators.params64,
-        result: validators.result64,
-    },
-    'design.import': {
-        params: validators.params65,
-        result: validators.result65,
-    },
-    'design.layout': {
-        params: validators.params66,
-        result: validators.result66,
-    },
-    'design.layout.preview': {
-        params: validators.params67,
-        result: validators.result67,
-    },
+    'connectors.files.get': { params: validators.params18, result: validators.result18 },
+    'connectors.files.submit': { params: validators.params19, result: validators.result19 },
+    'connectors.filesystem': { params: validators.params20, result: validators.result20 },
+    'connectors.get': { params: validators.params21, result: validators.result21 },
+    'connectors.inventory': { params: validators.params22, result: validators.result22 },
+    'connectors.link.approve': { params: validators.params23, result: validators.result23 },
+    'connectors.link.review': { params: validators.params24, result: validators.result24 },
+    'connectors.list': { params: validators.params25, result: validators.result25 },
+    'connectors.revoke': { params: validators.params26, result: validators.result26 },
+    'credit.budgets': { params: validators.params27, result: validators.result27 },
+    'credit.removeBudget': { params: validators.params28, result: validators.result28 },
+    'credit.resetAllowance': { params: validators.params29, result: validators.result29 },
+    'credit.resetHistory': { params: validators.params30, result: validators.result30 },
+    'credit.resets': { params: validators.params31, result: validators.result31 },
+    'credit.setBudget': { params: validators.params32, result: validators.result32 },
+    'credit.summary': { params: validators.params33, result: validators.result33 },
+    'credit.wallet': { params: validators.params34, result: validators.result34 },
+    'credit.walletHistory': { params: validators.params35, result: validators.result35 },
+    'data.upload.cancel': { params: validators.params36, result: validators.result36 },
+    'data.upload.chunk': { params: validators.params37, result: validators.result37 },
+    'data.upload.finish': { params: validators.params38, result: validators.result38 },
+    'data.upload.start': { params: validators.params39, result: validators.result39 },
+    'design.arrange': { params: validators.params40, result: validators.result40 },
+    'design.asset.cancel': { params: validators.params41, result: validators.result41 },
+    'design.asset.chunk': { params: validators.params42, result: validators.result42 },
+    'design.asset.finish': { params: validators.params43, result: validators.result43 },
+    'design.asset.list': { params: validators.params44, result: validators.result44 },
+    'design.asset.read': { params: validators.params45, result: validators.result45 },
+    'design.asset.remove': { params: validators.params46, result: validators.result46 },
+    'design.asset.start': { params: validators.params47, result: validators.result47 },
+    'design.asset.thumbnail': { params: validators.params48, result: validators.result48 },
+    'design.canvas': { params: validators.params49, result: validators.result49 },
+    'design.canvas.metrics': { params: validators.params50, result: validators.result50 },
+    'design.changes': { params: validators.params51, result: validators.result51 },
+    'design.clipboard.copy': { params: validators.params52, result: validators.result52 },
+    'design.clipboard.cut': { params: validators.params53, result: validators.result53 },
+    'design.clipboard.paste': { params: validators.params54, result: validators.result54 },
+    'design.colors': { params: validators.params55, result: validators.result55 },
+    'design.comment.text': { params: validators.params56, result: validators.result56 },
+    'design.comments': { params: validators.params57, result: validators.result57 },
+    'design.component': { params: validators.params58, result: validators.result58 },
+    'design.create': { params: validators.params59, result: validators.result59 },
+    'design.delete': { params: validators.params60, result: validators.result60 },
+    'design.duplicate': { params: validators.params61, result: validators.result61 },
+    'design.events': { params: validators.params62, result: validators.result62 },
+    'design.font.list': { params: validators.params63, result: validators.result63 },
+    'design.font.read': { params: validators.params64, result: validators.result64 },
+    'design.import': { params: validators.params65, result: validators.result65 },
+    'design.layout': { params: validators.params66, result: validators.result66 },
+    'design.layout.preview': { params: validators.params67, result: validators.result67 },
     'design.list': { params: validators.params68, result: validators.result68 },
-    'design.pattern.tile': {
-        params: validators.params69,
-        result: validators.result69,
-    },
+    'design.pattern.tile': { params: validators.params69, result: validators.result69 },
     'design.read': { params: validators.params70, result: validators.result70 },
     'design.save': { params: validators.params71, result: validators.result71 },
-    'design.svg.import': {
-        params: validators.params72,
-        result: validators.result72,
-    },
-    'design.text.window': {
-        params: validators.params73,
-        result: validators.result73,
-    },
-    'design.transfer': {
-        params: validators.params74,
-        result: validators.result74,
-    },
+    'design.svg.import': { params: validators.params72, result: validators.result72 },
+    'design.text.window': { params: validators.params73, result: validators.result73 },
+    'design.transfer': { params: validators.params74, result: validators.result74 },
     'design.undo': { params: validators.params75, result: validators.result75 },
     'design.view': { params: validators.params76, result: validators.result76 },
-    'devices.approve': {
-        params: validators.params77,
-        result: validators.result77,
-    },
-    'devices.list': {
-        params: validators.params78,
-        result: validators.result78,
-    },
-    'devices.reject': {
-        params: validators.params79,
-        result: validators.result79,
-    },
-    'devices.revoke': {
-        params: validators.params80,
-        result: validators.result80,
-    },
-    'environment.prepare': {
-        params: validators.params81,
-        result: validators.result81,
-    },
-    'environment.status': {
-        params: validators.params82,
-        result: validators.result82,
-    },
+    'devices.approve': { params: validators.params77, result: validators.result77 },
+    'devices.list': { params: validators.params78, result: validators.result78 },
+    'devices.reject': { params: validators.params79, result: validators.result79 },
+    'devices.revoke': { params: validators.params80, result: validators.result80 },
+    'environment.prepare': { params: validators.params81, result: validators.result81 },
+    'environment.status': { params: validators.params82, result: validators.result82 },
     health: { params: validators.params83, result: validators.result83 },
     'jobs.add': { params: validators.params84, result: validators.result84 },
     'jobs.list': { params: validators.params85, result: validators.result85 },
     'jobs.remove': { params: validators.params86, result: validators.result86 },
     'logs.tail': { params: validators.params87, result: validators.result87 },
-    'luau.editor.close': {
-        params: validators.params88,
-        result: validators.result88,
-    },
-    'luau.editor.commit': {
-        params: validators.params89,
-        result: validators.result89,
-    },
-    'luau.editor.completion': {
-        params: validators.params90,
-        result: validators.result90,
-    },
-    'luau.editor.definition': {
-        params: validators.params91,
-        result: validators.result91,
-    },
-    'luau.editor.hover': {
-        params: validators.params92,
-        result: validators.result92,
-    },
-    'luau.editor.stage': {
-        params: validators.params93,
-        result: validators.result93,
-    },
-    'luau.editor.start': {
-        params: validators.params94,
-        result: validators.result94,
-    },
-    'media.acknowledge': {
-        params: validators.params95,
-        result: validators.result95,
-    },
-    'office.ownerProof': {
-        params: validators.params96,
-        result: validators.result96,
-    },
-    'processes.input': {
-        params: validators.params97,
-        result: validators.result97,
-    },
-    'processes.list': {
-        params: validators.params98,
-        result: validators.result98,
-    },
-    'processes.log': {
-        params: validators.params99,
-        result: validators.result99,
-    },
-    'processes.resize': {
-        params: validators.params100,
-        result: validators.result100,
-    },
-    'processes.stop': {
-        params: validators.params101,
-        result: validators.result101,
-    },
-    'redteam.get': {
-        params: validators.params102,
-        result: validators.result102,
-    },
-    'redteam.list': {
-        params: validators.params103,
-        result: validators.result103,
-    },
-    'redteam.start': {
-        params: validators.params104,
-        result: validators.result104,
-    },
-    'redteam.stop': {
-        params: validators.params105,
-        result: validators.result105,
-    },
-    'redteam.update': {
-        params: validators.params106,
-        result: validators.result106,
-    },
-    'reverse.browser': {
-        params: validators.params107,
-        result: validators.result107,
-    },
-    'reverse.browser.modules': {
-        params: validators.params108,
-        result: validators.result108,
-    },
-    'reverse.browser.screenshot': {
-        params: validators.params109,
-        result: validators.result109,
-    },
-    'reverse.browser.sources': {
-        params: validators.params110,
-        result: validators.result110,
-    },
-    'reverse.browser.storage': {
-        params: validators.params111,
-        result: validators.result111,
-    },
+    'luau.editor.close': { params: validators.params88, result: validators.result88 },
+    'luau.editor.commit': { params: validators.params89, result: validators.result89 },
+    'luau.editor.completion': { params: validators.params90, result: validators.result90 },
+    'luau.editor.definition': { params: validators.params91, result: validators.result91 },
+    'luau.editor.hover': { params: validators.params92, result: validators.result92 },
+    'luau.editor.stage': { params: validators.params93, result: validators.result93 },
+    'luau.editor.start': { params: validators.params94, result: validators.result94 },
+    'media.acknowledge': { params: validators.params95, result: validators.result95 },
+    'office.ownerProof': { params: validators.params96, result: validators.result96 },
+    'processes.input': { params: validators.params97, result: validators.result97 },
+    'processes.list': { params: validators.params98, result: validators.result98 },
+    'processes.log': { params: validators.params99, result: validators.result99 },
+    'processes.resize': { params: validators.params100, result: validators.result100 },
+    'processes.stop': { params: validators.params101, result: validators.result101 },
+    'redteam.get': { params: validators.params102, result: validators.result102 },
+    'redteam.list': { params: validators.params103, result: validators.result103 },
+    'redteam.start': { params: validators.params104, result: validators.result104 },
+    'redteam.stop': { params: validators.params105, result: validators.result105 },
+    'redteam.update': { params: validators.params106, result: validators.result106 },
+    'reverse.browser': { params: validators.params107, result: validators.result107 },
+    'reverse.browser.modules': { params: validators.params108, result: validators.result108 },
+    'reverse.browser.screenshot': { params: validators.params109, result: validators.result109 },
+    'reverse.browser.sources': { params: validators.params110, result: validators.result110 },
+    'reverse.browser.storage': { params: validators.params111, result: validators.result111 },
     'reverse.browser.storage.comparison': {
         params: validators.params112,
         result: validators.result112,
     },
-    'reverse.browser.structure': {
-        params: validators.params113,
-        result: validators.result113,
-    },
-    'reverse.browser.webmcp': {
-        params: validators.params114,
-        result: validators.result114,
-    },
-    'reverse.catalog': {
-        params: validators.params115,
-        result: validators.result115,
-    },
-    'reverse.evidence': {
-        params: validators.params116,
-        result: validators.result116,
-    },
-    'reverse.functions': {
-        params: validators.params117,
-        result: validators.result117,
-    },
-    'reverse.graph': {
-        params: validators.params118,
-        result: validators.result118,
-    },
-    'reverse.inspect': {
-        params: validators.params119,
-        result: validators.result119,
-    },
-    'reverse.network': {
-        params: validators.params120,
-        result: validators.result120,
-    },
-    'reverse.network.detail': {
-        params: validators.params121,
-        result: validators.result121,
-    },
-    'roblox.credentials.remove': {
-        params: validators.params122,
-        result: validators.result122,
-    },
-    'roblox.credentials.set': {
-        params: validators.params123,
-        result: validators.result123,
-    },
-    'roblox.credentials.status': {
-        params: validators.params124,
-        result: validators.result124,
-    },
-    'roblox.live.close': {
-        params: validators.params125,
-        result: validators.result125,
-    },
-    'roblox.live.export': {
-        params: validators.params126,
-        result: validators.result126,
-    },
-    'roblox.live.start': {
-        params: validators.params127,
-        result: validators.result127,
-    },
-    'roblox.live.step': {
-        params: validators.params128,
-        result: validators.result128,
-    },
-    'roblox.telemetry.funnel': {
-        params: validators.params129,
-        result: validators.result129,
-    },
-    'roblox.telemetry.performance': {
-        params: validators.params130,
-        result: validators.result130,
-    },
-    'roblox.telemetry.projects': {
-        params: validators.params131,
-        result: validators.result131,
-    },
-    'self.emotions': {
-        params: validators.params132,
-        result: validators.result132,
-    },
-    'sessions.delete': {
-        params: validators.params133,
-        result: validators.result133,
-    },
-    'sessions.download': {
-        params: validators.params134,
-        result: validators.result134,
-    },
-    'sessions.files': {
-        params: validators.params135,
-        result: validators.result135,
-    },
-    'sessions.get': {
-        params: validators.params136,
-        result: validators.result136,
-    },
-    'sessions.input': {
-        params: validators.params137,
-        result: validators.result137,
-    },
-    'sessions.list': {
-        params: validators.params138,
-        result: validators.result138,
-    },
-    'sessions.messages': {
-        params: validators.params139,
-        result: validators.result139,
-    },
-    'sessions.pin': {
-        params: validators.params140,
-        result: validators.result140,
-    },
-    'sessions.pins': {
-        params: validators.params141,
-        result: validators.result141,
-    },
-    'sessions.planning': {
-        params: validators.params142,
-        result: validators.result142,
-    },
-    'sessions.rename': {
-        params: validators.params143,
-        result: validators.result143,
-    },
-    'sessions.retry': {
-        params: validators.params144,
-        result: validators.result144,
-    },
-    'sessions.sprint': {
-        params: validators.params145,
-        result: validators.result145,
-    },
-    'sessions.subscribe': {
-        params: validators.params146,
-        result: validators.result146,
-    },
-    'sessions.transcript': {
-        params: validators.params147,
-        result: validators.result147,
-    },
-    'sessions.unpin': {
-        params: validators.params148,
-        result: validators.result148,
-    },
-    'sessions.unsubscribe': {
-        params: validators.params149,
-        result: validators.result149,
-    },
-    'shares.create': {
-        params: validators.params150,
-        result: validators.result150,
-    },
-    'shares.list': {
-        params: validators.params151,
-        result: validators.result151,
-    },
-    'shares.remove': {
-        params: validators.params152,
-        result: validators.result152,
-    },
-    'shares.setMember': {
-        params: validators.params153,
-        result: validators.result153,
-    },
-    'tasks.cancel': {
-        params: validators.params154,
-        result: validators.result154,
-    },
+    'reverse.browser.structure': { params: validators.params113, result: validators.result113 },
+    'reverse.browser.webmcp': { params: validators.params114, result: validators.result114 },
+    'reverse.catalog': { params: validators.params115, result: validators.result115 },
+    'reverse.evidence': { params: validators.params116, result: validators.result116 },
+    'reverse.functions': { params: validators.params117, result: validators.result117 },
+    'reverse.graph': { params: validators.params118, result: validators.result118 },
+    'reverse.inspect': { params: validators.params119, result: validators.result119 },
+    'reverse.network': { params: validators.params120, result: validators.result120 },
+    'reverse.network.detail': { params: validators.params121, result: validators.result121 },
+    'roblox.credentials.remove': { params: validators.params122, result: validators.result122 },
+    'roblox.credentials.set': { params: validators.params123, result: validators.result123 },
+    'roblox.credentials.status': { params: validators.params124, result: validators.result124 },
+    'roblox.live.close': { params: validators.params125, result: validators.result125 },
+    'roblox.live.export': { params: validators.params126, result: validators.result126 },
+    'roblox.live.start': { params: validators.params127, result: validators.result127 },
+    'roblox.live.step': { params: validators.params128, result: validators.result128 },
+    'roblox.telemetry.funnel': { params: validators.params129, result: validators.result129 },
+    'roblox.telemetry.performance': { params: validators.params130, result: validators.result130 },
+    'roblox.telemetry.projects': { params: validators.params131, result: validators.result131 },
+    'self.emotions': { params: validators.params132, result: validators.result132 },
+    'sessions.delete': { params: validators.params133, result: validators.result133 },
+    'sessions.download': { params: validators.params134, result: validators.result134 },
+    'sessions.files': { params: validators.params135, result: validators.result135 },
+    'sessions.get': { params: validators.params136, result: validators.result136 },
+    'sessions.input': { params: validators.params137, result: validators.result137 },
+    'sessions.list': { params: validators.params138, result: validators.result138 },
+    'sessions.messages': { params: validators.params139, result: validators.result139 },
+    'sessions.pin': { params: validators.params140, result: validators.result140 },
+    'sessions.pins': { params: validators.params141, result: validators.result141 },
+    'sessions.planning': { params: validators.params142, result: validators.result142 },
+    'sessions.rename': { params: validators.params143, result: validators.result143 },
+    'sessions.retry': { params: validators.params144, result: validators.result144 },
+    'sessions.sprint': { params: validators.params145, result: validators.result145 },
+    'sessions.subscribe': { params: validators.params146, result: validators.result146 },
+    'sessions.transcript': { params: validators.params147, result: validators.result147 },
+    'sessions.unpin': { params: validators.params148, result: validators.result148 },
+    'sessions.unsubscribe': { params: validators.params149, result: validators.result149 },
+    'shares.create': { params: validators.params150, result: validators.result150 },
+    'shares.list': { params: validators.params151, result: validators.result151 },
+    'shares.remove': { params: validators.params152, result: validators.result152 },
+    'shares.setMember': { params: validators.params153, result: validators.result153 },
+    'tasks.cancel': { params: validators.params154, result: validators.result154 },
     'tasks.get': { params: validators.params155, result: validators.result155 },
-    'tasks.list': {
-        params: validators.params156,
-        result: validators.result156,
-    },
-    'teams.create': {
-        params: validators.params157,
-        result: validators.result157,
-    },
-    'teams.list': {
-        params: validators.params158,
-        result: validators.result158,
-    },
-    'teams.remove': {
-        params: validators.params159,
-        result: validators.result159,
-    },
-    'teams.setMember': {
-        params: validators.params160,
-        result: validators.result160,
-    },
-    'voice.audio': {
-        params: validators.params161,
-        result: validators.result161,
-    },
-    'voice.start': {
-        params: validators.params162,
-        result: validators.result162,
-    },
-    'voice.stop': {
-        params: validators.params163,
-        result: validators.result163,
-    },
-    'workflows.attention.list': {
-        params: validators.params164,
-        result: validators.result164,
-    },
-    'workflows.catalog': {
-        params: validators.params165,
-        result: validators.result165,
-    },
-    'workflows.create': {
-        params: validators.params166,
-        result: validators.result166,
-    },
-    'workflows.delete': {
-        params: validators.params167,
-        result: validators.result167,
-    },
-    'workflows.list': {
-        params: validators.params168,
-        result: validators.result168,
-    },
-    'workflows.models': {
-        params: validators.params169,
-        result: validators.result169,
-    },
-    'workflows.models.image.quote': {
-        params: validators.params170,
-        result: validators.result170,
-    },
+    'tasks.list': { params: validators.params156, result: validators.result156 },
+    'teams.create': { params: validators.params157, result: validators.result157 },
+    'teams.list': { params: validators.params158, result: validators.result158 },
+    'teams.remove': { params: validators.params159, result: validators.result159 },
+    'teams.setMember': { params: validators.params160, result: validators.result160 },
+    'voice.audio': { params: validators.params161, result: validators.result161 },
+    'voice.start': { params: validators.params162, result: validators.result162 },
+    'voice.stop': { params: validators.params163, result: validators.result163 },
+    'workflows.attention.list': { params: validators.params164, result: validators.result164 },
+    'workflows.catalog': { params: validators.params165, result: validators.result165 },
+    'workflows.create': { params: validators.params166, result: validators.result166 },
+    'workflows.delete': { params: validators.params167, result: validators.result167 },
+    'workflows.list': { params: validators.params168, result: validators.result168 },
+    'workflows.models': { params: validators.params169, result: validators.result169 },
+    'workflows.models.image.quote': { params: validators.params170, result: validators.result170 },
     'workflows.models.image.resolve': {
         params: validators.params171,
         result: validators.result171,
     },
-    'workflows.models.refresh': {
-        params: validators.params172,
-        result: validators.result172,
-    },
-    'workflows.models.resolve': {
-        params: validators.params173,
-        result: validators.result173,
-    },
-    'workflows.planning.cancel': {
-        params: validators.params174,
-        result: validators.result174,
-    },
-    'workflows.planning.history': {
-        params: validators.params175,
-        result: validators.result175,
-    },
-    'workflows.planning.read': {
-        params: validators.params176,
-        result: validators.result176,
-    },
-    'workflows.planning.send': {
-        params: validators.params177,
-        result: validators.result177,
-    },
-    'workflows.planning.sources': {
-        params: validators.params178,
-        result: validators.result178,
-    },
-    'workflows.publications.check': {
-        params: validators.params179,
-        result: validators.result179,
-    },
-    'workflows.publications.list': {
-        params: validators.params180,
-        result: validators.result180,
-    },
+    'workflows.models.refresh': { params: validators.params172, result: validators.result172 },
+    'workflows.models.resolve': { params: validators.params173, result: validators.result173 },
+    'workflows.planning.cancel': { params: validators.params174, result: validators.result174 },
+    'workflows.planning.history': { params: validators.params175, result: validators.result175 },
+    'workflows.planning.read': { params: validators.params176, result: validators.result176 },
+    'workflows.planning.send': { params: validators.params177, result: validators.result177 },
+    'workflows.planning.sources': { params: validators.params178, result: validators.result178 },
+    'workflows.publications.check': { params: validators.params179, result: validators.result179 },
+    'workflows.publications.list': { params: validators.params180, result: validators.result180 },
     'workflows.publications.publish': {
         params: validators.params181,
         result: validators.result181,
     },
-    'workflows.publications.read': {
-        params: validators.params182,
-        result: validators.result182,
-    },
-    'workflows.publications.run': {
-        params: validators.params183,
-        result: validators.result183,
-    },
-    'workflows.read': {
-        params: validators.params184,
-        result: validators.result184,
-    },
-    'workflows.record': {
-        params: validators.params185,
-        result: validators.result185,
-    },
-    'workflows.records': {
-        params: validators.params186,
-        result: validators.result186,
-    },
-    'workflows.runs.agent.control': {
-        params: validators.params187,
-        result: validators.result187,
-    },
-    'workflows.runs.agent.input': {
-        params: validators.params188,
-        result: validators.result188,
-    },
-    'workflows.runs.agent.read': {
-        params: validators.params189,
-        result: validators.result189,
-    },
+    'workflows.publications.read': { params: validators.params182, result: validators.result182 },
+    'workflows.publications.run': { params: validators.params183, result: validators.result183 },
+    'workflows.read': { params: validators.params184, result: validators.result184 },
+    'workflows.record': { params: validators.params185, result: validators.result185 },
+    'workflows.records': { params: validators.params186, result: validators.result186 },
+    'workflows.runs.agent.control': { params: validators.params187, result: validators.result187 },
+    'workflows.runs.agent.input': { params: validators.params188, result: validators.result188 },
+    'workflows.runs.agent.read': { params: validators.params189, result: validators.result189 },
     'workflows.runs.applications.check': {
         params: validators.params190,
         result: validators.result190,
@@ -720,228 +219,71 @@ export const methodValidators: Readonly<Record<MethodName, MethodValidation>> = 
         params: validators.params192,
         result: validators.result192,
     },
-    'workflows.runs.artifact': {
-        params: validators.params193,
-        result: validators.result193,
-    },
-    'workflows.runs.artifacts': {
-        params: validators.params194,
-        result: validators.result194,
-    },
-    'workflows.runs.attempts': {
-        params: validators.params195,
-        result: validators.result195,
-    },
-    'workflows.runs.cancel': {
-        params: validators.params196,
-        result: validators.result196,
-    },
-    'workflows.runs.events': {
-        params: validators.params197,
-        result: validators.result197,
-    },
-    'workflows.runs.inputs': {
-        params: validators.params198,
-        result: validators.result198,
-    },
-    'workflows.runs.list': {
-        params: validators.params199,
-        result: validators.result199,
-    },
-    'workflows.runs.loopPricing': {
-        params: validators.params200,
-        result: validators.result200,
-    },
-    'workflows.runs.loopSpending': {
-        params: validators.params201,
-        result: validators.result201,
-    },
-    'workflows.runs.output': {
-        params: validators.params202,
-        result: validators.result202,
-    },
+    'workflows.runs.artifact': { params: validators.params193, result: validators.result193 },
+    'workflows.runs.artifacts': { params: validators.params194, result: validators.result194 },
+    'workflows.runs.attempts': { params: validators.params195, result: validators.result195 },
+    'workflows.runs.cancel': { params: validators.params196, result: validators.result196 },
+    'workflows.runs.events': { params: validators.params197, result: validators.result197 },
+    'workflows.runs.inputs': { params: validators.params198, result: validators.result198 },
+    'workflows.runs.list': { params: validators.params199, result: validators.result199 },
+    'workflows.runs.loopPricing': { params: validators.params200, result: validators.result200 },
+    'workflows.runs.loopSpending': { params: validators.params201, result: validators.result201 },
+    'workflows.runs.output': { params: validators.params202, result: validators.result202 },
     'workflows.runs.question.answer': {
         params: validators.params203,
         result: validators.result203,
     },
-    'workflows.runs.question.read': {
-        params: validators.params204,
-        result: validators.result204,
-    },
-    'workflows.runs.questions': {
-        params: validators.params205,
-        result: validators.result205,
-    },
-    'workflows.runs.read': {
-        params: validators.params206,
-        result: validators.result206,
-    },
-    'workflows.runs.start': {
-        params: validators.params207,
-        result: validators.result207,
-    },
-    'workflows.runs.steps': {
-        params: validators.params208,
-        result: validators.result208,
-    },
+    'workflows.runs.question.read': { params: validators.params204, result: validators.result204 },
+    'workflows.runs.questions': { params: validators.params205, result: validators.result205 },
+    'workflows.runs.read': { params: validators.params206, result: validators.result206 },
+    'workflows.runs.start': { params: validators.params207, result: validators.result207 },
+    'workflows.runs.steps': { params: validators.params208, result: validators.result208 },
     'workflows.runs.terminal.command': {
         params: validators.params209,
         result: validators.result209,
     },
-    'workflows.runs.terminal.read': {
-        params: validators.params210,
-        result: validators.result210,
-    },
-    'workflows.runs.usage': {
-        params: validators.params211,
-        result: validators.result211,
-    },
-    'workflows.runs.usageBreakdown': {
-        params: validators.params212,
-        result: validators.result212,
-    },
-    'workflows.save': {
-        params: validators.params213,
-        result: validators.result213,
-    },
-    'workflows.schedules.disable': {
-        params: validators.params214,
-        result: validators.result214,
-    },
-    'workflows.schedules.enable': {
-        params: validators.params215,
-        result: validators.result215,
-    },
-    'workflows.schedules.preview': {
-        params: validators.params216,
-        result: validators.result216,
-    },
-    'workflows.schedules.read': {
-        params: validators.params217,
-        result: validators.result217,
-    },
-    'workflows.validate': {
-        params: validators.params218,
-        result: validators.result218,
-    },
-    'workspaces.create': {
-        params: validators.params219,
-        result: validators.result219,
-    },
-    'workspaces.describe': {
-        params: validators.params220,
-        result: validators.result220,
-    },
-    'workspaces.destroy': {
-        params: validators.params221,
-        result: validators.result221,
-    },
-    'workspaces.list': {
-        params: validators.params222,
-        result: validators.result222,
-    },
-    'connectors.execution': {
-        params: validators.params223,
-        result: validators.result223,
-    },
-    'connectors.execution.submit': {
-        params: validators.params224,
-        result: validators.result224,
-    },
-    'connectors.execution.get': {
-        params: validators.params225,
-        result: validators.result225,
-    },
-    'connectors.execution.cancel': {
-        params: validators.params226,
-        result: validators.result226,
-    },
-    'connectors.execution.jobs': {
-        params: validators.params227,
-        result: validators.result227,
-    },
-    'connectors.link.deny': {
-        params: validators.params228,
-        result: validators.result228,
-    },
-    'connectors.execution.output': {
-        params: validators.params229,
-        result: validators.result229,
-    },
-    'connectors.workspace.get': {
-        params: validators.params230,
-        result: validators.result230,
-    },
-    'connectors.workspace.select': {
-        params: validators.params231,
-        result: validators.result231,
-    },
-    'connectors.workspace.clear': {
-        params: validators.params232,
-        result: validators.result232,
-    },
-    'connectors.workspace.create': {
-        params: validators.params233,
-        result: validators.result233,
-    },
-    'connectors.workspace.catalog': {
-        params: validators.params234,
-        result: validators.result234,
-    },
+    'workflows.runs.terminal.read': { params: validators.params210, result: validators.result210 },
+    'workflows.runs.usage': { params: validators.params211, result: validators.result211 },
+    'workflows.runs.usageBreakdown': { params: validators.params212, result: validators.result212 },
+    'workflows.save': { params: validators.params213, result: validators.result213 },
+    'workflows.schedules.disable': { params: validators.params214, result: validators.result214 },
+    'workflows.schedules.enable': { params: validators.params215, result: validators.result215 },
+    'workflows.schedules.preview': { params: validators.params216, result: validators.result216 },
+    'workflows.schedules.read': { params: validators.params217, result: validators.result217 },
+    'workflows.validate': { params: validators.params218, result: validators.result218 },
+    'workspaces.create': { params: validators.params219, result: validators.result219 },
+    'workspaces.describe': { params: validators.params220, result: validators.result220 },
+    'workspaces.destroy': { params: validators.params221, result: validators.result221 },
+    'workspaces.list': { params: validators.params222, result: validators.result222 },
+    'connectors.execution': { params: validators.params223, result: validators.result223 },
+    'connectors.execution.submit': { params: validators.params224, result: validators.result224 },
+    'connectors.execution.get': { params: validators.params225, result: validators.result225 },
+    'connectors.execution.cancel': { params: validators.params226, result: validators.result226 },
+    'connectors.execution.jobs': { params: validators.params227, result: validators.result227 },
+    'connectors.link.deny': { params: validators.params228, result: validators.result228 },
+    'connectors.execution.output': { params: validators.params229, result: validators.result229 },
+    'connectors.workspace.get': { params: validators.params230, result: validators.result230 },
+    'connectors.workspace.select': { params: validators.params231, result: validators.result231 },
+    'connectors.workspace.clear': { params: validators.params232, result: validators.result232 },
+    'connectors.workspace.create': { params: validators.params233, result: validators.result233 },
+    'connectors.workspace.catalog': { params: validators.params234, result: validators.result234 },
     'connectors.workspace.select-joint': {
         params: validators.params235,
         result: validators.result235,
     },
-    'workspace.files.list': {
-        params: validators.params236,
-        result: validators.result236,
-    },
-    'workspace.files.read': {
-        params: validators.params237,
-        result: validators.result237,
-    },
-    'workspace.files.start': {
-        params: validators.params238,
-        result: validators.result238,
-    },
-    'workspace.files.chunk': {
-        params: validators.params239,
-        result: validators.result239,
-    },
-    'workspace.files.finish': {
-        params: validators.params240,
-        result: validators.result240,
-    },
-    'workspace.files.cancel': {
-        params: validators.params241,
-        result: validators.result241,
-    },
-    'workspace.files.mkdir': {
-        params: validators.params242,
-        result: validators.result242,
-    },
-    'workspaces.page': {
-        params: validators.params243,
-        result: validators.result243,
-    },
-    'workspaces.visit': {
-        params: validators.params244,
-        result: validators.result244,
-    },
-    'workspace.files.rename': {
-        params: validators.params245,
-        result: validators.result245,
-    },
-    'workspace.files.remove': {
-        params: validators.params246,
-        result: validators.result246,
-    },
-    'environment.admin.inspect': {
-        params: validators.params247,
-        result: validators.result247,
-    },
-    'environment.admin.mutate': {
-        params: validators.params248,
-        result: validators.result248,
-    },
+    'workspace.files.list': { params: validators.params236, result: validators.result236 },
+    'workspace.files.read': { params: validators.params237, result: validators.result237 },
+    'workspace.files.start': { params: validators.params238, result: validators.result238 },
+    'workspace.files.chunk': { params: validators.params239, result: validators.result239 },
+    'workspace.files.finish': { params: validators.params240, result: validators.result240 },
+    'workspace.files.cancel': { params: validators.params241, result: validators.result241 },
+    'workspace.files.mkdir': { params: validators.params242, result: validators.result242 },
+    'workspaces.page': { params: validators.params243, result: validators.result243 },
+    'workspaces.visit': { params: validators.params244, result: validators.result244 },
+    'workspace.files.rename': { params: validators.params245, result: validators.result245 },
+    'workspace.files.remove': { params: validators.params246, result: validators.result246 },
+    'environment.admin.inspect': { params: validators.params247, result: validators.result247 },
+    'environment.admin.mutate': { params: validators.params248, result: validators.result248 },
+    'environment.usage': { params: validators.params249, result: validators.result249 },
+    'environment.admin.usage': { params: validators.params250, result: validators.result250 },
 };
