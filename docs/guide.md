@@ -627,3 +627,11 @@ Call `turn.detach()` when leaving a local stream view while accepted work should
 
 Native design rotations use a revision-checked `design.save` operation:
 `{op:"rotate",pageId:"page-1",selection:["a","b"],angle:45}`. The angle is a world-space delta between -360 and 360 degrees. Omitting both pivotX and pivotY uses the combined rotated bounds center; specifying both chooses a world pivot. The command rotates selected roots once, preserving child records, visible sizes and constraints through rotated automatic ancestors. A single flowing child may rotate in place; movement about a shared pivot requires absolute placement. `design_guide` with operation `rotate` exposes the exact bounded save schema. The operation is included in portable edits and generated wire validation.
+
+## Cached VM resource monitoring
+
+Read `Method.EnvironmentUsage` with `{}` on the existing authenticated connection. It reports only the current account and never starts, provisions or resumes a VM. Require the current hello to advertise `environment.usage` with method scope `read`, plus authenticated read authority (including the server's write/admin implications), before calling. Recheck discovery after reconnect because another Nexa replica can expose different capabilities.
+
+`Method.EnvironmentAdminUsage` accepts an explicit account `userId`. It requires the separately advertised `admin` method scope and authenticated administrator authority; deployment policy and fresh server-side authorization still apply. Statistics availability does not enable lifecycle controls, and lifecycle controls do not imply statistics availability.
+
+Both calls return `VmUsageSnapshot`. An absent environment or a null metric means there is no measurement to display. Preserve decimal strings for generations, timestamps, bytes and cumulative CPU nanoseconds; convert only after validating the destination range. Each metric retains its own observation time and freshness. Hypervisor CPU/host resident memory and informational guest RAM/filesystem measurements have different sources. Receiving a cached reply does not make an old measurement fresh.

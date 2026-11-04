@@ -3623,3 +3623,31 @@ export function result248(value: unknown): boolean {
         value,
     );
 }
+/** Validates params249. */
+export function params249(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/environment.usage/properties/params',
+        value,
+    );
+}
+/** Validates result249. */
+export function result249(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/environment.usage/properties/result',
+        value,
+    );
+}
+/** Validates params250. */
+export function params250(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/environment.admin.usage/properties/params',
+        value,
+    );
+}
+/** Validates result250. */
+export function result250(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/environment.admin.usage/properties/result',
+        value,
+    );
+}
