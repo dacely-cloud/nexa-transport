@@ -22285,6 +22285,12 @@ export const ConnectorHostToolValues = {
     Value18: 'desktop_pointer',
     Value19: 'desktop_key',
     Value20: 'desktop_text',
+    Value21: 'terminal_read',
+    Value22: 'terminal_release',
+    Value23: 'terminal_resize',
+    Value24: 'terminal_start',
+    Value25: 'terminal_stop',
+    Value26: 'terminal_write',
 } as const;
 
 /** ConnectorHostTool from the Nexa wire protocol. */

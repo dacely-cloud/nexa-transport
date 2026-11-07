@@ -33775,7 +33775,7 @@ export const schema: Schema = {
                         $ref: '#/definitions/ConnectorHostTool',
                     },
                     type: 'array',
-                    maxItems: 21,
+                    maxItems: 27,
                 },
             },
             required: ['directory', 'enabled', 'grantId', 'grantRevision', 'platform', 'tools'],
@@ -33784,13 +33784,13 @@ export const schema: Schema = {
         },
         ConnectorHostPlatform: {
             description:
-                'Native paths and shell syntax belong to the customer computer, not the account API host.',
+                'Native paths and shell syntax belong to the customer computer, not the account API host.\nAllowed values derive from the current runtime mapping.',
             enum: ['linux', 'windows', 'macos'],
             type: 'string',
         },
         ConnectorHostTool: {
             description:
-                'A full-host grant is separate from confined file/program policies and never inferred from pairing.',
+                'A full-host grant is separate from confined file/program policies and never inferred from pairing.\nAllowed values derive from the current runtime mapping.',
             enum: [
                 'computer_info',
                 'file_read',
@@ -33813,6 +33813,12 @@ export const schema: Schema = {
                 'desktop_pointer',
                 'desktop_key',
                 'desktop_text',
+                'terminal_read',
+                'terminal_release',
+                'terminal_resize',
+                'terminal_start',
+                'terminal_stop',
+                'terminal_write',
             ],
             type: 'string',
         },
@@ -33917,7 +33923,7 @@ export const schema: Schema = {
         },
         ConnectorHostJobPhase: {
             description:
-                'A queued original retains its identity across reconnects and account replicas.',
+                'A queued original retains its identity across reconnects and account replicas.\nAllowed values derive from the current runtime mapping.',
             enum: ['queued', 'dispatched', 'completed'],
             type: 'string',
         },
@@ -33965,7 +33971,7 @@ export const schema: Schema = {
         },
         ConnectorHostOutcome: {
             description:
-                'Durable outcomes never treat uncertain effects as permission to execute a fresh original.',
+                'Durable outcomes never treat uncertain effects as permission to execute a fresh original.\nAllowed values derive from the current runtime mapping.',
             enum: ['succeeded', 'failed', 'indeterminate'],
             type: 'string',
         },
@@ -34022,7 +34028,7 @@ export const schema: Schema = {
                         $ref: '#/definitions/ConnectorHostTool',
                     },
                     type: 'array',
-                    maxItems: 21,
+                    maxItems: 27,
                 },
             },
             required: ['enabled', 'grantId', 'grantRevision', 'platform', 'tools'],

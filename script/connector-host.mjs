@@ -113,6 +113,19 @@ export interface ConnectorHostContracts {
     }
     for (const name of reachable) {
         const definition = record(definitions[name]);
+        const prior = retained[name];
+        if (
+            prior !== undefined &&
+            Array.isArray(record(prior).enum) &&
+            Array.isArray(definition.enum)
+        ) {
+            const previousValues = record(prior).enum;
+            const supported = new Set(definition.enum);
+            definition.enum = [
+                ...previousValues.filter((value) => supported.has(value)),
+                ...definition.enum.filter((value) => !previousValues.includes(value)),
+            ];
+        }
         if (
             (name.startsWith('ConnectorHost') || name.startsWith('ConnectorContext')) &&
             definition.type === 'object'

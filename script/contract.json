@@ -32751,7 +32751,7 @@
                         "$ref": "#/definitions/ConnectorHostTool"
                     },
                     "type": "array",
-                    "maxItems": 21
+                    "maxItems": 27
                 }
             },
             "required": ["directory", "enabled", "grantId", "grantRevision", "platform", "tools"],
@@ -32759,12 +32759,12 @@
             "additionalProperties": false
         },
         "ConnectorHostPlatform": {
-            "description": "Native paths and shell syntax belong to the customer computer, not the account API host.",
+            "description": "Native paths and shell syntax belong to the customer computer, not the account API host.\nAllowed values derive from the current runtime mapping.",
             "enum": ["linux", "windows", "macos"],
             "type": "string"
         },
         "ConnectorHostTool": {
-            "description": "A full-host grant is separate from confined file/program policies and never inferred from pairing.",
+            "description": "A full-host grant is separate from confined file/program policies and never inferred from pairing.\nAllowed values derive from the current runtime mapping.",
             "enum": [
                 "computer_info",
                 "file_read",
@@ -32786,7 +32786,13 @@
                 "desktop_screenshot",
                 "desktop_pointer",
                 "desktop_key",
-                "desktop_text"
+                "desktop_text",
+                "terminal_read",
+                "terminal_release",
+                "terminal_resize",
+                "terminal_start",
+                "terminal_stop",
+                "terminal_write"
             ],
             "type": "string"
         },
@@ -32887,7 +32893,7 @@
             "additionalProperties": false
         },
         "ConnectorHostJobPhase": {
-            "description": "A queued original retains its identity across reconnects and account replicas.",
+            "description": "A queued original retains its identity across reconnects and account replicas.\nAllowed values derive from the current runtime mapping.",
             "enum": ["queued", "dispatched", "completed"],
             "type": "string"
         },
@@ -32933,7 +32939,7 @@
             "additionalProperties": false
         },
         "ConnectorHostOutcome": {
-            "description": "Durable outcomes never treat uncertain effects as permission to execute a fresh original.",
+            "description": "Durable outcomes never treat uncertain effects as permission to execute a fresh original.\nAllowed values derive from the current runtime mapping.",
             "enum": ["succeeded", "failed", "indeterminate"],
             "type": "string"
         },
@@ -32989,7 +32995,7 @@
                         "$ref": "#/definitions/ConnectorHostTool"
                     },
                     "type": "array",
-                    "maxItems": 21
+                    "maxItems": 27
                 }
             },
             "required": ["enabled", "grantId", "grantRevision", "platform", "tools"],

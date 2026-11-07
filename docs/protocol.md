@@ -15971,7 +15971,7 @@ Type: `"linux"` / `"windows"` / `"macos"`.
 
 A full-host grant is separate from confined file/program policies and never inferred from pairing.
 
-Type: `"computer_info"` / `"file_read"` / `"file_digest"` / `"file_write"` / `"file_stat"` / `"file_rename"` / `"file_publish"` / `"file_chmod"` / `"directory_list"` / `"directory_create"` / `"file_remove"` / `"process_start"` / `"process_read"` / `"process_write"` / `"process_stop"` / `"process_release"` / `"desktop_info"` / `"desktop_screenshot"` / `"desktop_pointer"` / `"desktop_key"` / `"desktop_text"`.
+Type: `"computer_info"` / `"file_read"` / `"file_digest"` / `"file_write"` / `"file_stat"` / `"file_rename"` / `"file_publish"` / `"file_chmod"` / `"directory_list"` / `"directory_create"` / `"file_remove"` / `"process_start"` / `"process_read"` / `"process_write"` / `"process_stop"` / `"process_release"` / `"desktop_info"` / `"desktop_screenshot"` / `"desktop_pointer"` / `"desktop_key"` / `"desktop_text"` / `"terminal_read"` / `"terminal_release"` / `"terminal_resize"` / `"terminal_start"` / `"terminal_stop"` / `"terminal_write"`.
 
 ## ConnectorHostSubmitMethod
 
