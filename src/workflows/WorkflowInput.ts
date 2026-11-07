@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { WorkflowShapeError } from './WorkflowShapeError.js';
+
 /** Small shared parsers for workflow JSON trust boundaries. */
 export class WorkflowInput {
     /** Full task instructions have their own bound, independent of IDs and attached context. */
@@ -33,11 +35,16 @@ export class WorkflowInput {
     /** Strict shapes prevent newer fields being silently discarded by an older writer. */
     public static record(raw: unknown, keys: readonly string[]): Readonly<Record<string, unknown>> {
         const value: Readonly<Record<string, unknown>> = this.object(raw);
+        const count: number = Reflect.ownKeys(value).length;
         if (
-            Reflect.ownKeys(value).length !== keys.length ||
+            count !== keys.length ||
             keys.some((key: string): boolean => !Object.hasOwn(value, key))
         ) {
-            throw new Error('Unexpected or missing workflow fields');
+            const missing: readonly string[] = keys.filter(
+                (key: string): boolean => !Object.hasOwn(value, key),
+            );
+            const unexpected: number = count - keys.length + missing.length;
+            throw new WorkflowShapeError(keys, missing, unexpected);
         }
         return value;
     }

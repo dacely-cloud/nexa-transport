@@ -76,6 +76,7 @@ const files: readonly string[] = [
     'WorkflowGroupCodec',
     'WorkflowTypes',
     'WorkflowInput',
+    'WorkflowShapeError',
     'WorkflowJson',
     'WorkflowCodec',
     'WorkflowRequests',

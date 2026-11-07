@@ -24,7 +24,7 @@ export class EachComponents {
                 category: ComponentCategory.Flow,
                 display: CoreComponents.display(
                     'For each item',
-                    'Run connected steps for each item in a collection.',
+                    'Run connected steps for each item in a collection. Current item is generic JSON; use Map fields to validate named object values before a Text template.',
                     'Research each site, then collect the reports.',
                     ['loop', 'repeat', 'foreach', 'collection'],
                     'flow',

@@ -51,8 +51,8 @@ export class CoreComponents {
             category: ComponentCategory.Transform,
             display: this.display(
                 'Text template',
-                'Fill a text template from named input values.',
-                'Write a greeting using the submitted name.',
+                'Fill double-brace placeholders such as {{name}} or {{customer.name}} from the values object. Single braces are literal text.',
+                'Use template Hello {{name}} and connect the submitted input object to values, or configure values with name: Ada.',
                 ['text', 'prompt', 'format'],
                 'text',
                 ['template'],

@@ -601,4 +601,13 @@ if (!snapshotOnly) {
         'src/office/OfficeProtocol.ts',
         readFileSync('../nexa/src/office/OfficeProtocol.ts', 'utf8'),
     );
+
+    /** Full regeneration must retain the closed shapes and limits enforced by the scoped generators. */
+    for (const script of [
+        'connector-execution.mjs',
+        'connector-workspace.mjs',
+        'browser-files.mjs',
+    ]) {
+        execFileSync(process.execPath, ['script/' + script], { stdio: 'inherit' });
+    }
 }
