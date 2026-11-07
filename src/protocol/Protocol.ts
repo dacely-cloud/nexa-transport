@@ -649,10 +649,7 @@ export const AskParamsreasoningEffortValues = {
 } as const;
 
 /** Allowed values for AskParamsresponseFormat. */
-export const AskParamsresponseFormatValues = {
-    Value0: 'json',
-    Value1: 'text',
-} as const;
+export const AskParamsresponseFormatValues = { Value0: 'json', Value1: 'text' } as const;
 
 /** AskParams wire fields. */
 export interface AskParamsShape {
@@ -1058,6 +1055,214 @@ export const BrowserDomRelationValues = {
 /** BrowserDomRelation from the Nexa wire protocol. */
 export type BrowserDomRelation =
     (typeof BrowserDomRelationValues)[keyof typeof BrowserDomRelationValues];
+
+/** Allowed values for BrowserFilesChunkParamslocation. */
+export const BrowserFilesChunkParamslocationValues = { Value0: 'account', Value1: 'vm' } as const;
+
+/** BrowserFilesChunkParams wire fields. */
+export interface BrowserFilesChunkParamsShape {
+    /** data as defined by the Nexa gateway. */
+    readonly data: string;
+    /** location as defined by the Nexa gateway. */
+    readonly location?: (typeof BrowserFilesChunkParamslocationValues)[keyof typeof BrowserFilesChunkParamslocationValues];
+    /** offset as defined by the Nexa gateway. */
+    readonly offset: string;
+    /** uploadId as defined by the Nexa gateway. */
+    readonly uploadId: string;
+    /** workspaceId as defined by the Nexa gateway. */
+    readonly workspaceId?: string;
+}
+
+/** BrowserFilesChunkParams from the Nexa wire protocol. */
+export type BrowserFilesChunkParams = BrowserFilesChunkParamsShape;
+
+/** BrowserFilesDone wire fields. */
+export interface BrowserFilesDoneShape {
+    /** ok as defined by the Nexa gateway. */
+    readonly ok: boolean;
+}
+
+/** BrowserFilesDone from the Nexa wire protocol. */
+export type BrowserFilesDone = BrowserFilesDoneShape;
+
+/** BrowserFilesEntry wire fields. */
+export interface BrowserFilesEntryShape {
+    /** byteLength as defined by the Nexa gateway. */
+    readonly byteLength: string;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: string;
+    /** modifiedAtNs as defined by the Nexa gateway. */
+    readonly modifiedAtNs: string;
+    /** name as defined by the Nexa gateway. */
+    readonly name: string;
+}
+
+/** BrowserFilesEntry from the Nexa wire protocol. */
+export type BrowserFilesEntry = BrowserFilesEntryShape;
+
+/** Allowed values for BrowserFilesListParamslocation. */
+export const BrowserFilesListParamslocationValues = { Value0: 'account', Value1: 'vm' } as const;
+
+/** BrowserFilesListParams wire fields. */
+export interface BrowserFilesListParamsShape {
+    /** cursor as defined by the Nexa gateway. */
+    readonly cursor?: string;
+    /** location as defined by the Nexa gateway. */
+    readonly location?: (typeof BrowserFilesListParamslocationValues)[keyof typeof BrowserFilesListParamslocationValues];
+    /** path as defined by the Nexa gateway. */
+    readonly path: string;
+    /** workspaceId as defined by the Nexa gateway. */
+    readonly workspaceId?: string;
+}
+
+/** BrowserFilesListParams from the Nexa wire protocol. */
+export type BrowserFilesListParams = BrowserFilesListParamsShape;
+
+/** BrowserFilesPage wire fields. */
+export interface BrowserFilesPageShape {
+    /** assignment as defined by the Nexa gateway. */
+    readonly assignment: string;
+    /** entries as defined by the Nexa gateway. */
+    readonly entries: ReadonlyArray<BrowserFilesEntry>;
+    /** nextCursor as defined by the Nexa gateway. */
+    readonly nextCursor: null | string;
+}
+
+/** BrowserFilesPage from the Nexa wire protocol. */
+export type BrowserFilesPage = BrowserFilesPageShape;
+
+/** BrowserFilesPosition wire fields. */
+export interface BrowserFilesPositionShape {
+    /** offset as defined by the Nexa gateway. */
+    readonly offset: string;
+}
+
+/** BrowserFilesPosition from the Nexa wire protocol. */
+export type BrowserFilesPosition = BrowserFilesPositionShape;
+
+/** BrowserFilesRead wire fields. */
+export interface BrowserFilesReadShape {
+    /** assignment as defined by the Nexa gateway. */
+    readonly assignment: string;
+    /** byteLength as defined by the Nexa gateway. */
+    readonly byteLength: string;
+    /** data as defined by the Nexa gateway. */
+    readonly data: string;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: string;
+}
+
+/** BrowserFilesRead from the Nexa wire protocol. */
+export type BrowserFilesRead = BrowserFilesReadShape;
+
+/** Allowed values for BrowserFilesReadParamslocation. */
+export const BrowserFilesReadParamslocationValues = { Value0: 'account', Value1: 'vm' } as const;
+
+/** BrowserFilesReadParams wire fields. */
+export interface BrowserFilesReadParamsShape {
+    /** assignment as defined by the Nexa gateway. */
+    readonly assignment: string;
+    /** location as defined by the Nexa gateway. */
+    readonly location?: (typeof BrowserFilesReadParamslocationValues)[keyof typeof BrowserFilesReadParamslocationValues];
+    /** offset as defined by the Nexa gateway. */
+    readonly offset: string;
+    /** path as defined by the Nexa gateway. */
+    readonly path: string;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision?: string;
+    /** workspaceId as defined by the Nexa gateway. */
+    readonly workspaceId?: string;
+}
+
+/** BrowserFilesReadParams from the Nexa wire protocol. */
+export type BrowserFilesReadParams = BrowserFilesReadParamsShape;
+
+/** Allowed values for BrowserFilesRenameParamslocation. */
+export const BrowserFilesRenameParamslocationValues = { Value0: 'account', Value1: 'vm' } as const;
+
+/** BrowserFilesRenameParams wire fields. */
+export interface BrowserFilesRenameParamsShape {
+    /** assignment as defined by the Nexa gateway. */
+    readonly assignment: string;
+    /** destination as defined by the Nexa gateway. */
+    readonly destination: string;
+    /** location as defined by the Nexa gateway. */
+    readonly location?: (typeof BrowserFilesRenameParamslocationValues)[keyof typeof BrowserFilesRenameParamslocationValues];
+    /** path as defined by the Nexa gateway. */
+    readonly path: string;
+    /** workspaceId as defined by the Nexa gateway. */
+    readonly workspaceId?: string;
+}
+
+/** BrowserFilesRenameParams from the Nexa wire protocol. */
+export type BrowserFilesRenameParams = BrowserFilesRenameParamsShape;
+
+/** Allowed values for BrowserFilesStartParamslocation. */
+export const BrowserFilesStartParamslocationValues = { Value0: 'account', Value1: 'vm' } as const;
+
+/** BrowserFilesStartParams wire fields. */
+export interface BrowserFilesStartParamsShape {
+    /** assignment as defined by the Nexa gateway. */
+    readonly assignment: string;
+    /** byteLength as defined by the Nexa gateway. */
+    readonly byteLength: string;
+    /** extractZip as defined by the Nexa gateway. */
+    readonly extractZip: boolean;
+    /** location as defined by the Nexa gateway. */
+    readonly location?: (typeof BrowserFilesStartParamslocationValues)[keyof typeof BrowserFilesStartParamslocationValues];
+    /** path as defined by the Nexa gateway. */
+    readonly path: string;
+    /** workspaceId as defined by the Nexa gateway. */
+    readonly workspaceId?: string;
+}
+
+/** BrowserFilesStartParams from the Nexa wire protocol. */
+export type BrowserFilesStartParams = BrowserFilesStartParamsShape;
+
+/** Allowed values for BrowserFilesTargetlocation. */
+export const BrowserFilesTargetlocationValues = { Value0: 'account', Value1: 'vm' } as const;
+
+/** BrowserFilesTarget wire fields. */
+export interface BrowserFilesTargetShape {
+    /** assignment as defined by the Nexa gateway. */
+    readonly assignment: string;
+    /** location as defined by the Nexa gateway. */
+    readonly location?: (typeof BrowserFilesTargetlocationValues)[keyof typeof BrowserFilesTargetlocationValues];
+    /** path as defined by the Nexa gateway. */
+    readonly path: string;
+    /** workspaceId as defined by the Nexa gateway. */
+    readonly workspaceId?: string;
+}
+
+/** BrowserFilesTarget from the Nexa wire protocol. */
+export type BrowserFilesTarget = BrowserFilesTargetShape;
+
+/** BrowserFilesUpload wire fields. */
+export interface BrowserFilesUploadShape {
+    /** chunkBytes as defined by the Nexa gateway. */
+    readonly chunkBytes: number;
+    /** uploadId as defined by the Nexa gateway. */
+    readonly uploadId: string;
+}
+
+/** BrowserFilesUpload from the Nexa wire protocol. */
+export type BrowserFilesUpload = BrowserFilesUploadShape;
+
+/** Allowed values for BrowserFilesUploadParamslocation. */
+export const BrowserFilesUploadParamslocationValues = { Value0: 'account', Value1: 'vm' } as const;
+
+/** BrowserFilesUploadParams wire fields. */
+export interface BrowserFilesUploadParamsShape {
+    /** location as defined by the Nexa gateway. */
+    readonly location?: (typeof BrowserFilesUploadParamslocationValues)[keyof typeof BrowserFilesUploadParamslocationValues];
+    /** uploadId as defined by the Nexa gateway. */
+    readonly uploadId: string;
+    /** workspaceId as defined by the Nexa gateway. */
+    readonly workspaceId?: string;
+}
+
+/** BrowserFilesUploadParams from the Nexa wire protocol. */
+export type BrowserFilesUploadParams = BrowserFilesUploadParamsShape;
 
 /** BrowserModuleCandidateRow wire fields. */
 export interface BrowserModuleCandidateRowShape {
@@ -1609,10 +1814,7 @@ export interface BrowserScreenshotSnapshotShape {
 export type BrowserScreenshotSnapshot = BrowserScreenshotSnapshotShape;
 
 /** Allowed values for BrowserScreenshotView. */
-export const BrowserScreenshotViewValues = {
-    Value0: 'image',
-    Value1: 'metadata',
-} as const;
+export const BrowserScreenshotViewValues = { Value0: 'image', Value1: 'metadata' } as const;
 
 /** BrowserScreenshotView from the Nexa wire protocol. */
 export type BrowserScreenshotView =
@@ -2416,10 +2618,7 @@ export interface BrowserStructureSnapshotShape {
 export type BrowserStructureSnapshot = BrowserStructureSnapshotShape;
 
 /** Allowed values for BrowserStructureView. */
-export const BrowserStructureViewValues = {
-    Value0: 'accessibility',
-    Value1: 'dom',
-} as const;
+export const BrowserStructureViewValues = { Value0: 'accessibility', Value1: 'dom' } as const;
 
 /** BrowserStructureView from the Nexa wire protocol. */
 export type BrowserStructureView =
@@ -2674,10 +2873,7 @@ export interface BudgetShape {
 export type Budget = BudgetShape;
 
 /** Allowed values for BudgetEnforcement. */
-export const BudgetEnforcementValues = {
-    Value0: 'block',
-    Value1: 'warn',
-} as const;
+export const BudgetEnforcementValues = { Value0: 'block', Value1: 'warn' } as const;
 
 /** BudgetEnforcement from the Nexa wire protocol. */
 export type BudgetEnforcement =
@@ -3097,6 +3293,73 @@ export interface ConnectParamsShape {
 /** ConnectParams from the Nexa wire protocol. */
 export type ConnectParams = ConnectParamsShape;
 
+/** Allowed values for ConnectorArgumentBoundkind. */
+export const ConnectorArgumentBoundkindValues = {
+    Value0: 'relative-path',
+    Value1: 'text',
+} as const;
+
+/** ConnectorArgumentBound wire fields. */
+export interface ConnectorArgumentBoundShape {
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: (typeof ConnectorArgumentBoundkindValues)[keyof typeof ConnectorArgumentBoundkindValues];
+    /** maximumBytes as defined by the Nexa gateway. */
+    readonly maximumBytes: number;
+}
+
+/** ConnectorArgumentBound from the Nexa wire protocol. */
+export type ConnectorArgumentBound = ConnectorArgumentBoundShape;
+
+/** ConnectorArgumentChoice wire fields. */
+export interface ConnectorArgumentChoiceShape {
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: 'choice';
+    /** values as defined by the Nexa gateway. */
+    readonly values: ReadonlyArray<string>;
+}
+
+/** ConnectorArgumentChoice from the Nexa wire protocol. */
+export type ConnectorArgumentChoice = ConnectorArgumentChoiceShape;
+
+/** ConnectorArgumentRule from the Nexa wire protocol. */
+export type ConnectorArgumentRule =
+    | ConnectorMachineInvocationRule
+    | ConnectorInteractiveInvocationRule
+    | ConnectorArgumentChoice
+    | ConnectorArgumentBound;
+
+/** ConnectorChmod wire fields. */
+export interface ConnectorChmodShape {
+    /** action as defined by the Nexa gateway. */
+    readonly action: 'chmod';
+    /** mode as defined by the Nexa gateway. */
+    readonly mode: ConnectorFilePermissionMode;
+    /** path as defined by the Nexa gateway. */
+    readonly path: string;
+    /** policySha256 as defined by the Nexa gateway. */
+    readonly policySha256: string;
+    /** requestId as defined by the Nexa gateway. */
+    readonly requestId: string;
+    /** rootId as defined by the Nexa gateway. */
+    readonly rootId: string;
+}
+
+/** ConnectorChmod from the Nexa wire protocol. */
+export type ConnectorChmod = ConnectorChmodShape;
+
+/** ConnectorChmodResult wire fields. */
+export interface ConnectorChmodResultShape {
+    /** action as defined by the Nexa gateway. */
+    readonly action: 'chmod';
+    /** metadata as defined by the Nexa gateway. */
+    readonly metadata: ConnectorMetadata;
+    /** requestId as defined by the Nexa gateway. */
+    readonly requestId: string;
+}
+
+/** ConnectorChmodResult from the Nexa wire protocol. */
+export type ConnectorChmodResult = ConnectorChmodResultShape;
+
 /** ConnectorDirectoryEntry wire fields. */
 export interface ConnectorDirectoryEntryShape {
     /** kind as defined by the Nexa gateway. */
@@ -3133,6 +3396,398 @@ export interface ConnectorEnvironmentParamsShape {
 
 /** ConnectorEnvironmentParams from the Nexa wire protocol. */
 export type ConnectorEnvironmentParams = ConnectorEnvironmentParamsShape;
+
+/** ConnectorExecuteMethod wire fields. */
+export interface ConnectorExecuteMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConnectorExecutionSubmitParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConnectorExecutionJob;
+}
+
+/** ConnectorExecuteMethod from the Nexa wire protocol. */
+export type ConnectorExecuteMethod = ConnectorExecuteMethodShape;
+
+/** Named connector execution protocol values. */
+export enum ConnectorExecutionAccess {
+    ReadOnly = 'read-only',
+    ReadWrite = 'read-write',
+}
+
+/** ConnectorExecutionCurrentJob wire fields. */
+export interface ConnectorExecutionCurrentJobShape {
+    /** admissionHash as defined by the Nexa gateway. */
+    readonly admissionHash: string;
+    /** jobId as defined by the Nexa gateway. */
+    readonly jobId: string;
+    /** lane as defined by the Nexa gateway. */
+    readonly lane: ConnectorExecutionLane;
+    /** phase as defined by the Nexa gateway. */
+    readonly phase: ConnectorJobPhase;
+    /** programId as defined by the Nexa gateway. */
+    readonly programId: string;
+    /** requestId as defined by the Nexa gateway. */
+    readonly requestId: string;
+    /** rootId as defined by the Nexa gateway. */
+    readonly rootId: string;
+    /** sequence as defined by the Nexa gateway. */
+    readonly sequence: string;
+    /** workspaceAccess as defined by the Nexa gateway. */
+    readonly workspaceAccess: ConnectorExecutionAccess;
+}
+
+/** ConnectorExecutionCurrentJob from the Nexa wire protocol. */
+export type ConnectorExecutionCurrentJob = ConnectorExecutionCurrentJobShape;
+
+/** ConnectorExecutionCurrentJobs wire fields. */
+export interface ConnectorExecutionCurrentJobsShape {
+    /** environmentId as defined by the Nexa gateway. */
+    readonly environmentId: string;
+    /** lanes as defined by the Nexa gateway. */
+    readonly lanes: ReadonlyArray<ConnectorExecutionCurrentLane>;
+}
+
+/** ConnectorExecutionCurrentJobs from the Nexa wire protocol. */
+export type ConnectorExecutionCurrentJobs = ConnectorExecutionCurrentJobsShape;
+
+/** ConnectorExecutionCurrentJobsMethod wire fields. */
+export interface ConnectorExecutionCurrentJobsMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConnectorEnvironmentParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConnectorExecutionCurrentJobs;
+}
+
+/** ConnectorExecutionCurrentJobsMethod from the Nexa wire protocol. */
+export type ConnectorExecutionCurrentJobsMethod = ConnectorExecutionCurrentJobsMethodShape;
+
+/** ConnectorExecutionCurrentLane wire fields. */
+export interface ConnectorExecutionCurrentLaneShape {
+    /** acknowledgedSequence as defined by the Nexa gateway. */
+    readonly acknowledgedSequence: string;
+    /** job as defined by the Nexa gateway. */
+    readonly job: ConnectorExecutionCurrentJob | null;
+    /** lane as defined by the Nexa gateway. */
+    readonly lane: ConnectorExecutionLane;
+    /** sequence as defined by the Nexa gateway. */
+    readonly sequence: string;
+}
+
+/** ConnectorExecutionCurrentLane from the Nexa wire protocol. */
+export type ConnectorExecutionCurrentLane = ConnectorExecutionCurrentLaneShape;
+
+/** ConnectorExecutionJob wire fields. */
+export interface ConnectorExecutionJobShape {
+    /** admissionHash as defined by the Nexa gateway. */
+    readonly admissionHash: string;
+    /** authorization as defined by the Nexa gateway. */
+    readonly authorization: ConnectorOperationAuthorization;
+    /** environmentId as defined by the Nexa gateway. */
+    readonly environmentId: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** lane as defined by the Nexa gateway. */
+    readonly lane: ConnectorExecutionLane;
+    /** phase as defined by the Nexa gateway. */
+    readonly phase: ConnectorJobPhase;
+    /** request as defined by the Nexa gateway. */
+    readonly request: ConnectorExecutionRequest;
+    /** response as defined by the Nexa gateway. */
+    readonly response: ConnectorExecutionResult | null;
+    /** sequence as defined by the Nexa gateway. */
+    readonly sequence: string;
+}
+
+/** ConnectorExecutionJob from the Nexa wire protocol. */
+export type ConnectorExecutionJob = ConnectorExecutionJobShape;
+
+/** Named connector execution protocol values. */
+export enum ConnectorExecutionLane {
+    First = 'first',
+    Second = 'second',
+}
+
+/** ConnectorExecutionLaneStatus wire fields. */
+export interface ConnectorExecutionLaneStatusShape {
+    /** acknowledgedSequence as defined by the Nexa gateway. */
+    readonly acknowledgedSequence: string;
+    /** lane as defined by the Nexa gateway. */
+    readonly lane: ConnectorExecutionLane;
+    /** online as defined by the Nexa gateway. */
+    readonly online: boolean;
+    /** profile as defined by the Nexa gateway. */
+    readonly profile: ConnectorExecutionProfile | null;
+    /** sequence as defined by the Nexa gateway. */
+    readonly sequence: string;
+}
+
+/** ConnectorExecutionLaneStatus from the Nexa wire protocol. */
+export type ConnectorExecutionLaneStatus = ConnectorExecutionLaneStatusShape;
+
+/** ConnectorExecutionMethod wire fields. */
+export interface ConnectorExecutionMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConnectorEnvironmentParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConnectorExecutionStatus;
+}
+
+/** ConnectorExecutionMethod from the Nexa wire protocol. */
+export type ConnectorExecutionMethod = ConnectorExecutionMethodShape;
+
+/** ConnectorExecutionOutputData wire fields. */
+export interface ConnectorExecutionOutputDataShape {
+    /** stderrBase64 as defined by the Nexa gateway. */
+    readonly stderrBase64: string;
+    /** stdoutBase64 as defined by the Nexa gateway. */
+    readonly stdoutBase64: string;
+}
+
+/** ConnectorExecutionOutputData from the Nexa wire protocol. */
+export type ConnectorExecutionOutputData = ConnectorExecutionOutputDataShape;
+
+/** ConnectorExecutionOutputMethod wire fields. */
+export interface ConnectorExecutionOutputMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConnectorResultParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConnectorExecutionOutputView;
+}
+
+/** ConnectorExecutionOutputMethod from the Nexa wire protocol. */
+export type ConnectorExecutionOutputMethod = ConnectorExecutionOutputMethodShape;
+
+/** ConnectorExecutionOutputView wire fields. */
+export interface ConnectorExecutionOutputViewShape {
+    /** admissionHash as defined by the Nexa gateway. */
+    readonly admissionHash: string;
+    /** environmentId as defined by the Nexa gateway. */
+    readonly environmentId: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** lane as defined by the Nexa gateway. */
+    readonly lane: ConnectorExecutionLane;
+    /** output as defined by the Nexa gateway. */
+    readonly output: ConnectorExecutionOutputData | null;
+    /** phase as defined by the Nexa gateway. */
+    readonly phase: ConnectorJobPhase;
+    /** sequence as defined by the Nexa gateway. */
+    readonly sequence: string;
+}
+
+/** ConnectorExecutionOutputView from the Nexa wire protocol. */
+export type ConnectorExecutionOutputView = ConnectorExecutionOutputViewShape;
+
+/** ConnectorExecutionProfile wire fields. */
+export interface ConnectorExecutionProfileShape {
+    /** maximumAddressBytes as defined by the Nexa gateway. */
+    readonly maximumAddressBytes: string;
+    /** maximumFileBytes as defined by the Nexa gateway. */
+    readonly maximumFileBytes: string;
+    /** policySha256 as defined by the Nexa gateway. */
+    readonly policySha256: string;
+    /** programs as defined by the Nexa gateway. */
+    readonly programs: ReadonlyArray<ConnectorProgramGrant>;
+    /** resources as defined by the Nexa gateway. */
+    readonly resources: ConnectorExecutionResources;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: string;
+    /** roots as defined by the Nexa gateway. */
+    readonly roots: ReadonlyArray<ConnectorExecutionRoot>;
+    /** timeoutMs as defined by the Nexa gateway. */
+    readonly timeoutMs: number;
+}
+
+/** ConnectorExecutionProfile from the Nexa wire protocol. */
+export type ConnectorExecutionProfile = ConnectorExecutionProfileShape;
+
+/** ConnectorExecutionRequest wire fields. */
+export interface ConnectorExecutionRequestShape {
+    /** arguments as defined by the Nexa gateway. */
+    readonly arguments: ReadonlyArray<string>;
+    /** policySha256 as defined by the Nexa gateway. */
+    readonly policySha256: string;
+    /** programId as defined by the Nexa gateway. */
+    readonly programId: string;
+    /** requestId as defined by the Nexa gateway. */
+    readonly requestId: string;
+    /** rootId as defined by the Nexa gateway. */
+    readonly rootId: string;
+}
+
+/** ConnectorExecutionRequest from the Nexa wire protocol. */
+export type ConnectorExecutionRequest = ConnectorExecutionRequestShape;
+
+/** ConnectorExecutionResources wire fields. */
+export interface ConnectorExecutionResourcesShape {
+    /** cpuQuotaMicros as defined by the Nexa gateway. */
+    readonly cpuQuotaMicros: number;
+    /** maximumTasks as defined by the Nexa gateway. */
+    readonly maximumTasks: number;
+    /** memoryBytes as defined by the Nexa gateway. */
+    readonly memoryBytes: string;
+}
+
+/** ConnectorExecutionResources from the Nexa wire protocol. */
+export type ConnectorExecutionResources = ConnectorExecutionResourcesShape;
+
+/** Allowed values for ConnectorExecutionResultfailureVariant0. */
+export const ConnectorExecutionResultfailureVariant0Values = {
+    Value0: 'ambiguous-exit',
+    Value1: 'cancelled',
+    Value2: 'expired',
+    Value3: 'interrupted',
+    Value4: 'output-limit',
+    Value5: 'sandbox',
+    Value6: 'signal',
+    Value7: 'timeout',
+} as const;
+
+/** Allowed values for ConnectorExecutionResultsetupFailureVariant0. */
+export const ConnectorExecutionResultsetupFailureVariant0Values = {
+    Value0: 'apparmor',
+    Value1: 'bootstrap',
+    Value2: 'cgroup',
+    Value3: 'configuration',
+    Value4: 'confinement',
+    Value5: 'execute',
+    Value6: 'mounts',
+    Value7: 'namespaces',
+} as const;
+
+/** ConnectorExecutionResult wire fields. */
+export interface ConnectorExecutionResultShape {
+    /** exitCode as defined by the Nexa gateway. */
+    readonly exitCode: null | number;
+    /** failure as defined by the Nexa gateway. */
+    readonly failure:
+        | (typeof ConnectorExecutionResultfailureVariant0Values)[keyof typeof ConnectorExecutionResultfailureVariant0Values]
+        | null;
+    /** setupFailure as defined by the Nexa gateway. */
+    readonly setupFailure:
+        | (typeof ConnectorExecutionResultsetupFailureVariant0Values)[keyof typeof ConnectorExecutionResultsetupFailureVariant0Values]
+        | null;
+    /** stderrBase64 as defined by the Nexa gateway. */
+    readonly stderrBase64: string;
+    /** stdoutBase64 as defined by the Nexa gateway. */
+    readonly stdoutBase64: string;
+    /** termination as defined by the Nexa gateway. */
+    readonly termination: ConnectorExecutionTermination;
+}
+
+/** ConnectorExecutionResult from the Nexa wire protocol. */
+export type ConnectorExecutionResult = ConnectorExecutionResultShape;
+
+/** ConnectorExecutionResultMethod wire fields. */
+export interface ConnectorExecutionResultMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConnectorResultParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConnectorExecutionJob;
+}
+
+/** ConnectorExecutionResultMethod from the Nexa wire protocol. */
+export type ConnectorExecutionResultMethod = ConnectorExecutionResultMethodShape;
+
+/** ConnectorExecutionRoot wire fields. */
+export interface ConnectorExecutionRootShape {
+    /** access as defined by the Nexa gateway. */
+    readonly access: ConnectorExecutionAccess;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+}
+
+/** ConnectorExecutionRoot from the Nexa wire protocol. */
+export type ConnectorExecutionRoot = ConnectorExecutionRootShape;
+
+/** ConnectorExecutionStatus wire fields. */
+export interface ConnectorExecutionStatusShape {
+    /** environmentId as defined by the Nexa gateway. */
+    readonly environmentId: string;
+    /** lanes as defined by the Nexa gateway. */
+    readonly lanes: ReadonlyArray<ConnectorExecutionLaneStatus>;
+}
+
+/** ConnectorExecutionStatus from the Nexa wire protocol. */
+export type ConnectorExecutionStatus = ConnectorExecutionStatusShape;
+
+/** ConnectorExecutionStopMethod wire fields. */
+export interface ConnectorExecutionStopMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConnectorExecutionStopParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConnectorExecutionStopReceipt;
+}
+
+/** ConnectorExecutionStopMethod from the Nexa wire protocol. */
+export type ConnectorExecutionStopMethod = ConnectorExecutionStopMethodShape;
+
+/** ConnectorExecutionStopParams wire fields. */
+export interface ConnectorExecutionStopParamsShape {
+    /** admissionHash as defined by the Nexa gateway. */
+    readonly admissionHash: string;
+    /** environmentId as defined by the Nexa gateway. */
+    readonly environmentId: string;
+    /** jobId as defined by the Nexa gateway. */
+    readonly jobId: string;
+    /** lane as defined by the Nexa gateway. */
+    readonly lane: ConnectorExecutionLane;
+    /** requestId as defined by the Nexa gateway. */
+    readonly requestId: string;
+    /** sequence as defined by the Nexa gateway. */
+    readonly sequence: string;
+    /** workspaceAccess as defined by the Nexa gateway. */
+    readonly workspaceAccess: ConnectorExecutionAccess;
+}
+
+/** ConnectorExecutionStopParams from the Nexa wire protocol. */
+export type ConnectorExecutionStopParams = ConnectorExecutionStopParamsShape;
+
+/** ConnectorExecutionStopReceipt wire fields. */
+export interface ConnectorExecutionStopReceiptShape {
+    /** admissionHash as defined by the Nexa gateway. */
+    readonly admissionHash: string;
+    /** environmentId as defined by the Nexa gateway. */
+    readonly environmentId: string;
+    /** jobId as defined by the Nexa gateway. */
+    readonly jobId: string;
+    /** lane as defined by the Nexa gateway. */
+    readonly lane: ConnectorExecutionLane;
+    /** phase as defined by the Nexa gateway. */
+    readonly phase: ConnectorJobPhase;
+    /** requestId as defined by the Nexa gateway. */
+    readonly requestId: string;
+    /** requestedAtMs as defined by the Nexa gateway. */
+    readonly requestedAtMs: null | string;
+    /** sequence as defined by the Nexa gateway. */
+    readonly sequence: string;
+}
+
+/** ConnectorExecutionStopReceipt from the Nexa wire protocol. */
+export type ConnectorExecutionStopReceipt = ConnectorExecutionStopReceiptShape;
+
+/** ConnectorExecutionSubmitParams wire fields. */
+export interface ConnectorExecutionSubmitParamsShape {
+    /** environmentId as defined by the Nexa gateway. */
+    readonly environmentId: string;
+    /** lane as defined by the Nexa gateway. */
+    readonly lane: ConnectorExecutionLane;
+    /** previousSequence as defined by the Nexa gateway. */
+    readonly previousSequence: string;
+    /** request as defined by the Nexa gateway. */
+    readonly request: ConnectorExecutionRequest;
+    /** workspaceAccess as defined by the Nexa gateway. */
+    readonly workspaceAccess: ConnectorExecutionAccess;
+}
+
+/** ConnectorExecutionSubmitParams from the Nexa wire protocol. */
+export type ConnectorExecutionSubmitParams = ConnectorExecutionSubmitParamsShape;
+
+/** Named connector execution protocol values. */
+export enum ConnectorExecutionTermination {
+    Exited = 'exited',
+    Indeterminate = 'indeterminate',
+}
 
 /** ConnectorFileError wire fields. */
 export interface ConnectorFileErrorShape {
@@ -3171,14 +3826,18 @@ export type ConnectorFileKind =
     (typeof ConnectorFileKindValues)[keyof typeof ConnectorFileKindValues];
 
 /** Allowed values for ConnectorFileMode. */
-export const ConnectorFileModeValues = {
-    Value0: 'read-only',
-    Value1: 'read-write',
-} as const;
+export const ConnectorFileModeValues = { Value0: 'read-only', Value1: 'read-write' } as const;
 
 /** ConnectorFileMode from the Nexa wire protocol. */
 export type ConnectorFileMode =
     (typeof ConnectorFileModeValues)[keyof typeof ConnectorFileModeValues];
+
+/** Allowed values for ConnectorFilePermissionMode. */
+export const ConnectorFilePermissionModeValues = { Value0: 384, Value1: 448 } as const;
+
+/** ConnectorFilePermissionMode from the Nexa wire protocol. */
+export type ConnectorFilePermissionMode =
+    (typeof ConnectorFilePermissionModeValues)[keyof typeof ConnectorFilePermissionModeValues];
 
 /** ConnectorFileRequest from the Nexa wire protocol. */
 export type ConnectorFileRequest =
@@ -3285,6 +3944,61 @@ export interface ConnectorGpuSpecificationShape {
 /** ConnectorGpuSpecification from the Nexa wire protocol. */
 export type ConnectorGpuSpecification = ConnectorGpuSpecificationShape;
 
+/** Allowed values for ConnectorGpuVendor. */
+export const ConnectorGpuVendorValues = {
+    Value0: 'nvidia',
+    Value1: 'amd',
+    Value2: 'intel',
+    Value3: 'other',
+} as const;
+
+/** ConnectorGpuVendor from the Nexa wire protocol. */
+export type ConnectorGpuVendor =
+    (typeof ConnectorGpuVendorValues)[keyof typeof ConnectorGpuVendorValues];
+
+/** ConnectorIndependentAuthorization wire fields. */
+export interface ConnectorIndependentAuthorizationShape {
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: 'independent';
+}
+
+/** ConnectorIndependentAuthorization from the Nexa wire protocol. */
+export type ConnectorIndependentAuthorization = ConnectorIndependentAuthorizationShape;
+
+/** Published interactive permission metadata, not native availability. */
+export enum ConnectorInputKind {
+    Data = 'data',
+    End = 'end',
+    Resize = 'resize',
+}
+
+/** ConnectorInteractiveInvocationRule wire fields. */
+export interface ConnectorInteractiveInvocationRuleShape {
+    /** controls as defined by the Nexa gateway. */
+    readonly controls: ReadonlyArray<ConnectorInputKind>;
+    /** invocation as defined by the Nexa gateway. */
+    readonly invocation: ConnectorMachineInvocationRule;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: 'interactive-invocation';
+    /** maximumControls as defined by the Nexa gateway. */
+    readonly maximumControls: number;
+    /** maximumInputBytes as defined by the Nexa gateway. */
+    readonly maximumInputBytes: string;
+    /** maximumResizes as defined by the Nexa gateway. */
+    readonly maximumResizes: number;
+    /** transports as defined by the Nexa gateway. */
+    readonly transports: ReadonlyArray<ConnectorInteractiveTransport>;
+}
+
+/** ConnectorInteractiveInvocationRule from the Nexa wire protocol. */
+export type ConnectorInteractiveInvocationRule = ConnectorInteractiveInvocationRuleShape;
+
+/** Published interactive permission metadata, not native availability. */
+export enum ConnectorInteractiveTransport {
+    Pipe = 'pipe',
+    Pty = 'pty',
+}
+
 /** ConnectorInventoryMethod wire fields. */
 export interface ConnectorInventoryMethodShape {
     /** params as defined by the Nexa gateway. */
@@ -3363,6 +4077,70 @@ export enum ConnectorJobPhase {
     Completed = 'completed',
 }
 
+/** ConnectorJointAuthorization wire fields. */
+export interface ConnectorJointAuthorizationShape {
+    /** binding as defined by the Nexa gateway. */
+    readonly binding: ConnectorJointWorkspaceDescriptor;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: 'joint';
+}
+
+/** ConnectorJointAuthorization from the Nexa wire protocol. */
+export type ConnectorJointAuthorization = ConnectorJointAuthorizationShape;
+
+/** ConnectorJointExecutionJournals wire fields. */
+export interface ConnectorJointExecutionJournalsShape {
+    /** first as defined by the Nexa gateway. */
+    readonly first: string;
+    /** second as defined by the Nexa gateway. */
+    readonly second: string;
+}
+
+/** ConnectorJointExecutionJournals from the Nexa wire protocol. */
+export type ConnectorJointExecutionJournals = ConnectorJointExecutionJournalsShape;
+
+/** ConnectorJointWorkspaceBinding wire fields. */
+export interface ConnectorJointWorkspaceBindingShape {
+    /** access as defined by the Nexa gateway. */
+    readonly access: ConnectorFileMode;
+    /** authorityId as defined by the Nexa gateway. */
+    readonly authorityId: string;
+    /** enrollmentId as defined by the Nexa gateway. */
+    readonly enrollmentId: string;
+    /** environmentId as defined by the Nexa gateway. */
+    readonly environmentId: string;
+    /** executionJournals as defined by the Nexa gateway. */
+    readonly executionJournals: ConnectorJointExecutionJournals;
+    /** executionPolicySha256 as defined by the Nexa gateway. */
+    readonly executionPolicySha256: string;
+    /** executionRootId as defined by the Nexa gateway. */
+    readonly executionRootId: string;
+    /** fileJournalId as defined by the Nexa gateway. */
+    readonly fileJournalId: string;
+    /** filePolicySha256 as defined by the Nexa gateway. */
+    readonly filePolicySha256: string;
+    /** fileRootId as defined by the Nexa gateway. */
+    readonly fileRootId: string;
+    /** physicalRootCommitment as defined by the Nexa gateway. */
+    readonly physicalRootCommitment: string;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: string;
+}
+
+/** ConnectorJointWorkspaceBinding from the Nexa wire protocol. */
+export type ConnectorJointWorkspaceBinding = ConnectorJointWorkspaceBindingShape;
+
+/** ConnectorJointWorkspaceDescriptor wire fields. */
+export interface ConnectorJointWorkspaceDescriptorShape {
+    /** binding as defined by the Nexa gateway. */
+    readonly binding: ConnectorJointWorkspaceBinding;
+    /** signature as defined by the Nexa gateway. */
+    readonly signature: string;
+}
+
+/** ConnectorJointWorkspaceDescriptor from the Nexa wire protocol. */
+export type ConnectorJointWorkspaceDescriptor = ConnectorJointWorkspaceDescriptorShape;
+
 /** ConnectorLinkApproveMethod wire fields. */
 export interface ConnectorLinkApproveMethodShape {
     /** params as defined by the Nexa gateway. */
@@ -3403,6 +4181,47 @@ export interface ConnectorLinkApprovedShape {
 
 /** ConnectorLinkApproved from the Nexa wire protocol. */
 export type ConnectorLinkApproved = ConnectorLinkApprovedShape;
+
+/** ConnectorLinkDenied wire fields. */
+export interface ConnectorLinkDeniedShape {
+    /** deniedAtMs as defined by the Nexa gateway. */
+    readonly deniedAtMs: string;
+    /** linkId as defined by the Nexa gateway. */
+    readonly linkId: string;
+    /** publicKey as defined by the Nexa gateway. */
+    readonly publicKey: string;
+    /** retainUntilMs as defined by the Nexa gateway. */
+    readonly retainUntilMs: string;
+}
+
+/** ConnectorLinkDenied from the Nexa wire protocol. */
+export type ConnectorLinkDenied = ConnectorLinkDeniedShape;
+
+/** ConnectorLinkDenyMethod wire fields. */
+export interface ConnectorLinkDenyMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConnectorLinkDenyParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConnectorLinkDenied;
+}
+
+/** ConnectorLinkDenyMethod from the Nexa wire protocol. */
+export type ConnectorLinkDenyMethod = ConnectorLinkDenyMethodShape;
+
+/** ConnectorLinkDenyParams wire fields. */
+export interface ConnectorLinkDenyParamsShape {
+    /** code as defined by the Nexa gateway. */
+    readonly code: string;
+    /** linkId as defined by the Nexa gateway. */
+    readonly linkId: string;
+    /** publicKey as defined by the Nexa gateway. */
+    readonly publicKey: string;
+    /** requestId as defined by the Nexa gateway. */
+    readonly requestId: string;
+}
+
+/** ConnectorLinkDenyParams from the Nexa wire protocol. */
+export type ConnectorLinkDenyParams = ConnectorLinkDenyParamsShape;
 
 /** ConnectorLinkReview wire fields. */
 export interface ConnectorLinkReviewShape {
@@ -3482,11 +4301,72 @@ export interface ConnectorListMethodShape {
 /** ConnectorListMethod from the Nexa wire protocol. */
 export type ConnectorListMethod = ConnectorListMethodShape;
 
+/** ConnectorMachineCommand wire fields. */
+export interface ConnectorMachineCommandShape {
+    /** alias as defined by the Nexa gateway. */
+    readonly alias: string;
+    /** executableIndex as defined by the Nexa gateway. */
+    readonly executableIndex: number;
+}
+
+/** ConnectorMachineCommand from the Nexa wire protocol. */
+export type ConnectorMachineCommand = ConnectorMachineCommandShape;
+
+/** ConnectorMachineEnvironmentGrant wire fields. */
+export interface ConnectorMachineEnvironmentGrantShape {
+    /** maximumBytes as defined by the Nexa gateway. */
+    readonly maximumBytes: number;
+    /** name as defined by the Nexa gateway. */
+    readonly name: string;
+}
+
+/** ConnectorMachineEnvironmentGrant from the Nexa wire protocol. */
+export type ConnectorMachineEnvironmentGrant = ConnectorMachineEnvironmentGrantShape;
+
+/** ConnectorMachineInvocationRule wire fields. */
+export interface ConnectorMachineInvocationRuleShape {
+    /** commands as defined by the Nexa gateway. */
+    readonly commands: ReadonlyArray<ConnectorMachineCommand>;
+    /** environment as defined by the Nexa gateway. */
+    readonly environment: ReadonlyArray<ConnectorMachineEnvironmentGrant>;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: 'machine-invocation';
+    /** maximumArgumentBytes as defined by the Nexa gateway. */
+    readonly maximumArgumentBytes: number;
+    /** maximumArguments as defined by the Nexa gateway. */
+    readonly maximumArguments: number;
+    /** maximumArgumentsBytes as defined by the Nexa gateway. */
+    readonly maximumArgumentsBytes: number;
+    /** maximumCwdBytes as defined by the Nexa gateway. */
+    readonly maximumCwdBytes: number;
+    /** maximumEnvironmentBytes as defined by the Nexa gateway. */
+    readonly maximumEnvironmentBytes: number;
+    /** maximumScriptBytes as defined by the Nexa gateway. */
+    readonly maximumScriptBytes: number;
+    /** maximumStdinBytes as defined by the Nexa gateway. */
+    readonly maximumStdinBytes: number;
+    /** maximumTimeoutMs as defined by the Nexa gateway. */
+    readonly maximumTimeoutMs: number;
+    /** shell as defined by the Nexa gateway. */
+    readonly shell: ConnectorMachineShell | null;
+}
+
+/** ConnectorMachineInvocationRule from the Nexa wire protocol. */
+export type ConnectorMachineInvocationRule = ConnectorMachineInvocationRuleShape;
+
+/** ConnectorMachineShell wire fields. */
+export interface ConnectorMachineShellShape {
+    /** executableIndex as defined by the Nexa gateway. */
+    readonly executableIndex: number;
+    /** fixedArguments as defined by the Nexa gateway. */
+    readonly fixedArguments: ReadonlyArray<string>;
+}
+
+/** ConnectorMachineShell from the Nexa wire protocol. */
+export type ConnectorMachineShell = ConnectorMachineShellShape;
+
 /** Allowed values for ConnectorMetadatakind. */
-export const ConnectorMetadatakindValues = {
-    Value0: 'directory',
-    Value1: 'file',
-} as const;
+export const ConnectorMetadatakindValues = { Value0: 'directory', Value1: 'file' } as const;
 
 /** ConnectorMetadata wire fields. */
 export interface ConnectorMetadataShape {
@@ -3502,6 +4382,38 @@ export interface ConnectorMetadataShape {
 
 /** ConnectorMetadata from the Nexa wire protocol. */
 export type ConnectorMetadata = ConnectorMetadataShape;
+
+/** ConnectorMkdir wire fields. */
+export interface ConnectorMkdirShape {
+    /** action as defined by the Nexa gateway. */
+    readonly action: 'mkdir';
+    /** path as defined by the Nexa gateway. */
+    readonly path: string;
+    /** policySha256 as defined by the Nexa gateway. */
+    readonly policySha256: string;
+    /** requestId as defined by the Nexa gateway. */
+    readonly requestId: string;
+    /** rootId as defined by the Nexa gateway. */
+    readonly rootId: string;
+}
+
+/** ConnectorMkdir from the Nexa wire protocol. */
+export type ConnectorMkdir = ConnectorMkdirShape;
+
+/** ConnectorMkdirResult wire fields. */
+export interface ConnectorMkdirResultShape {
+    /** action as defined by the Nexa gateway. */
+    readonly action: 'mkdir';
+    /** requestId as defined by the Nexa gateway. */
+    readonly requestId: string;
+}
+
+/** ConnectorMkdirResult from the Nexa wire protocol. */
+export type ConnectorMkdirResult = ConnectorMkdirResultShape;
+
+/** ConnectorOperationAuthorization from the Nexa wire protocol. */
+export type ConnectorOperationAuthorization =
+    ConnectorIndependentAuthorization | ConnectorJointAuthorization;
 
 /** Allowed values for ConnectorPhase. */
 export const ConnectorPhaseValues = {
@@ -3544,6 +4456,19 @@ export interface ConnectorProfileShape {
 /** ConnectorProfile from the Nexa wire protocol. */
 export type ConnectorProfile = ConnectorProfileShape;
 
+/** ConnectorProgramGrant wire fields. */
+export interface ConnectorProgramGrantShape {
+    /** arguments as defined by the Nexa gateway. */
+    readonly arguments: ReadonlyArray<ConnectorArgumentRule>;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** rootIds as defined by the Nexa gateway. */
+    readonly rootIds: ReadonlyArray<string>;
+}
+
+/** ConnectorProgramGrant from the Nexa wire protocol. */
+export type ConnectorProgramGrant = ConnectorProgramGrantShape;
+
 /** ConnectorRead wire fields. */
 export interface ConnectorReadShape {
     /** action as defined by the Nexa gateway. */
@@ -3581,6 +4506,72 @@ export interface ConnectorReadResultShape {
 
 /** ConnectorReadResult from the Nexa wire protocol. */
 export type ConnectorReadResult = ConnectorReadResultShape;
+
+/** ConnectorRemove wire fields. */
+export interface ConnectorRemoveShape {
+    /** action as defined by the Nexa gateway. */
+    readonly action: 'remove';
+    /** path as defined by the Nexa gateway. */
+    readonly path: string;
+    /** policySha256 as defined by the Nexa gateway. */
+    readonly policySha256: string;
+    /** recursive as defined by the Nexa gateway. */
+    readonly recursive: boolean;
+    /** requestId as defined by the Nexa gateway. */
+    readonly requestId: string;
+    /** rootId as defined by the Nexa gateway. */
+    readonly rootId: string;
+}
+
+/** ConnectorRemove from the Nexa wire protocol. */
+export type ConnectorRemove = ConnectorRemoveShape;
+
+/** ConnectorRemoveResult wire fields. */
+export interface ConnectorRemoveResultShape {
+    /** action as defined by the Nexa gateway. */
+    readonly action: 'remove';
+    /** entriesRemoved as defined by the Nexa gateway. */
+    readonly entriesRemoved: string;
+    /** requestId as defined by the Nexa gateway. */
+    readonly requestId: string;
+}
+
+/** ConnectorRemoveResult from the Nexa wire protocol. */
+export type ConnectorRemoveResult = ConnectorRemoveResultShape;
+
+/** ConnectorRename wire fields. */
+export interface ConnectorRenameShape {
+    /** action as defined by the Nexa gateway. */
+    readonly action: 'rename';
+    /** destination as defined by the Nexa gateway. */
+    readonly destination: string;
+    /** mode as defined by the Nexa gateway. */
+    readonly mode: ConnectorWriteMode;
+    /** path as defined by the Nexa gateway. */
+    readonly path: string;
+    /** policySha256 as defined by the Nexa gateway. */
+    readonly policySha256: string;
+    /** requestId as defined by the Nexa gateway. */
+    readonly requestId: string;
+    /** rootId as defined by the Nexa gateway. */
+    readonly rootId: string;
+}
+
+/** ConnectorRename from the Nexa wire protocol. */
+export type ConnectorRename = ConnectorRenameShape;
+
+/** ConnectorRenameResult wire fields. */
+export interface ConnectorRenameResultShape {
+    /** action as defined by the Nexa gateway. */
+    readonly action: 'rename';
+    /** metadata as defined by the Nexa gateway. */
+    readonly metadata: ConnectorMetadata;
+    /** requestId as defined by the Nexa gateway. */
+    readonly requestId: string;
+}
+
+/** ConnectorRenameResult from the Nexa wire protocol. */
+export type ConnectorRenameResult = ConnectorRenameResultShape;
 
 /** ConnectorResultMethod wire fields. */
 export interface ConnectorResultMethodShape {
@@ -3746,6 +4737,264 @@ export interface ConnectorViewShape {
 /** ConnectorView from the Nexa wire protocol. */
 export type ConnectorView = ConnectorViewShape;
 
+/** ConnectorWorkspaceCatalogEntry wire fields. */
+export interface ConnectorWorkspaceCatalogEntryShape {
+    /** access as defined by the Nexa gateway. */
+    readonly access: ConnectorFileMode;
+    /** bindingRevision as defined by the Nexa gateway. */
+    readonly bindingRevision: string;
+    /** bindingSha256 as defined by the Nexa gateway. */
+    readonly bindingSha256: string;
+    /** descriptorSha256 as defined by the Nexa gateway. */
+    readonly descriptorSha256: string;
+    /** executionPolicySha256 as defined by the Nexa gateway. */
+    readonly executionPolicySha256: string;
+    /** executionRootId as defined by the Nexa gateway. */
+    readonly executionRootId: string;
+    /** filePolicySha256 as defined by the Nexa gateway. */
+    readonly filePolicySha256: string;
+    /** fileRootId as defined by the Nexa gateway. */
+    readonly fileRootId: string;
+}
+
+/** ConnectorWorkspaceCatalogEntry from the Nexa wire protocol. */
+export type ConnectorWorkspaceCatalogEntry = ConnectorWorkspaceCatalogEntryShape;
+
+/** ConnectorWorkspaceCatalogMethod wire fields. */
+export interface ConnectorWorkspaceCatalogMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConnectorWorkspaceCatalogParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConnectorWorkspaceCatalogView;
+}
+
+/** ConnectorWorkspaceCatalogMethod from the Nexa wire protocol. */
+export type ConnectorWorkspaceCatalogMethod = ConnectorWorkspaceCatalogMethodShape;
+
+/** ConnectorWorkspaceCatalogParams wire fields. */
+export interface ConnectorWorkspaceCatalogParamsShape {
+    /** environmentId as defined by the Nexa gateway. */
+    readonly environmentId: string;
+    /** sessionId as defined by the Nexa gateway. */
+    readonly sessionId: string;
+}
+
+/** ConnectorWorkspaceCatalogParams from the Nexa wire protocol. */
+export type ConnectorWorkspaceCatalogParams = ConnectorWorkspaceCatalogParamsShape;
+
+/** ConnectorWorkspaceCatalogView wire fields. */
+export interface ConnectorWorkspaceCatalogViewShape {
+    /** entries as defined by the Nexa gateway. */
+    readonly entries: ReadonlyArray<ConnectorWorkspaceCatalogEntry>;
+    /** environmentId as defined by the Nexa gateway. */
+    readonly environmentId: string;
+}
+
+/** ConnectorWorkspaceCatalogView from the Nexa wire protocol. */
+export type ConnectorWorkspaceCatalogView = ConnectorWorkspaceCatalogViewShape;
+
+/** ConnectorWorkspaceClearMethod wire fields. */
+export interface ConnectorWorkspaceClearMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConnectorWorkspaceClearParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConnectorWorkspaceSelectionView;
+}
+
+/** ConnectorWorkspaceClearMethod from the Nexa wire protocol. */
+export type ConnectorWorkspaceClearMethod = ConnectorWorkspaceClearMethodShape;
+
+/** ConnectorWorkspaceClearParams wire fields. */
+export interface ConnectorWorkspaceClearParamsShape {
+    /** expectedRevision as defined by the Nexa gateway. */
+    readonly expectedRevision: string;
+    /** requestId as defined by the Nexa gateway. */
+    readonly requestId: string;
+    /** sessionId as defined by the Nexa gateway. */
+    readonly sessionId: string;
+}
+
+/** ConnectorWorkspaceClearParams from the Nexa wire protocol. */
+export type ConnectorWorkspaceClearParams = ConnectorWorkspaceClearParamsShape;
+
+/** ConnectorWorkspaceCreateMethod wire fields. */
+export interface ConnectorWorkspaceCreateMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConnectorWorkspaceCreateParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConnectorWorkspaceSelectionView;
+}
+
+/** ConnectorWorkspaceCreateMethod from the Nexa wire protocol. */
+export type ConnectorWorkspaceCreateMethod = ConnectorWorkspaceCreateMethodShape;
+
+/** ConnectorWorkspaceCreateParams wire fields. */
+export interface ConnectorWorkspaceCreateParamsShape {
+    /** requestId as defined by the Nexa gateway. */
+    readonly requestId: string;
+}
+
+/** ConnectorWorkspaceCreateParams from the Nexa wire protocol. */
+export type ConnectorWorkspaceCreateParams = ConnectorWorkspaceCreateParamsShape;
+
+/** ConnectorWorkspaceFileSelection wire fields. */
+export interface ConnectorWorkspaceFileSelectionShape {
+    /** environmentId as defined by the Nexa gateway. */
+    readonly environmentId: string;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: 'files';
+    /** mode as defined by the Nexa gateway. */
+    readonly mode: ConnectorFileMode;
+    /** policySha256 as defined by the Nexa gateway. */
+    readonly policySha256: string;
+    /** rootId as defined by the Nexa gateway. */
+    readonly rootId: string;
+}
+
+/** ConnectorWorkspaceFileSelection from the Nexa wire protocol. */
+export type ConnectorWorkspaceFileSelection = ConnectorWorkspaceFileSelectionShape;
+
+/** ConnectorWorkspaceGetMethod wire fields. */
+export interface ConnectorWorkspaceGetMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConnectorWorkspaceGetParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConnectorWorkspaceSelectionView;
+}
+
+/** ConnectorWorkspaceGetMethod from the Nexa wire protocol. */
+export type ConnectorWorkspaceGetMethod = ConnectorWorkspaceGetMethodShape;
+
+/** ConnectorWorkspaceGetParams wire fields. */
+export interface ConnectorWorkspaceGetParamsShape {
+    /** sessionId as defined by the Nexa gateway. */
+    readonly sessionId: string;
+}
+
+/** ConnectorWorkspaceGetParams from the Nexa wire protocol. */
+export type ConnectorWorkspaceGetParams = ConnectorWorkspaceGetParamsShape;
+
+/** ConnectorWorkspaceJointSelection wire fields. */
+export interface ConnectorWorkspaceJointSelectionShape {
+    /** bindingRevision as defined by the Nexa gateway. */
+    readonly bindingRevision: string;
+    /** descriptorSha256 as defined by the Nexa gateway. */
+    readonly descriptorSha256: string;
+    /** environmentId as defined by the Nexa gateway. */
+    readonly environmentId: string;
+    /** executionPolicySha256 as defined by the Nexa gateway. */
+    readonly executionPolicySha256: string;
+    /** executionRootId as defined by the Nexa gateway. */
+    readonly executionRootId: string;
+    /** jointBindingSha256 as defined by the Nexa gateway. */
+    readonly jointBindingSha256: string;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: 'joint';
+    /** mode as defined by the Nexa gateway. */
+    readonly mode: ConnectorFileMode;
+    /** policySha256 as defined by the Nexa gateway. */
+    readonly policySha256: string;
+    /** rootId as defined by the Nexa gateway. */
+    readonly rootId: string;
+}
+
+/** ConnectorWorkspaceJointSelection from the Nexa wire protocol. */
+export type ConnectorWorkspaceJointSelection = ConnectorWorkspaceJointSelectionShape;
+
+/** ConnectorWorkspaceJointTarget wire fields. */
+export interface ConnectorWorkspaceJointTargetShape {
+    /** access as defined by the Nexa gateway. */
+    readonly access: ConnectorFileMode;
+    /** bindingRevision as defined by the Nexa gateway. */
+    readonly bindingRevision: string;
+    /** bindingSha256 as defined by the Nexa gateway. */
+    readonly bindingSha256: string;
+    /** descriptorSha256 as defined by the Nexa gateway. */
+    readonly descriptorSha256: string;
+    /** environmentId as defined by the Nexa gateway. */
+    readonly environmentId: string;
+    /** executionPolicySha256 as defined by the Nexa gateway. */
+    readonly executionPolicySha256: string;
+    /** executionRootId as defined by the Nexa gateway. */
+    readonly executionRootId: string;
+    /** filePolicySha256 as defined by the Nexa gateway. */
+    readonly filePolicySha256: string;
+    /** fileRootId as defined by the Nexa gateway. */
+    readonly fileRootId: string;
+}
+
+/** ConnectorWorkspaceJointTarget from the Nexa wire protocol. */
+export type ConnectorWorkspaceJointTarget = ConnectorWorkspaceJointTargetShape;
+
+/** ConnectorWorkspaceSelectJointMethod wire fields. */
+export interface ConnectorWorkspaceSelectJointMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConnectorWorkspaceSelectJointParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConnectorWorkspaceSelectionView;
+}
+
+/** ConnectorWorkspaceSelectJointMethod from the Nexa wire protocol. */
+export type ConnectorWorkspaceSelectJointMethod = ConnectorWorkspaceSelectJointMethodShape;
+
+/** ConnectorWorkspaceSelectJointParams wire fields. */
+export interface ConnectorWorkspaceSelectJointParamsShape {
+    /** expectedRevision as defined by the Nexa gateway. */
+    readonly expectedRevision: string;
+    /** requestId as defined by the Nexa gateway. */
+    readonly requestId: string;
+    /** sessionId as defined by the Nexa gateway. */
+    readonly sessionId: string;
+    /** target as defined by the Nexa gateway. */
+    readonly target: ConnectorWorkspaceJointTarget;
+}
+
+/** ConnectorWorkspaceSelectJointParams from the Nexa wire protocol. */
+export type ConnectorWorkspaceSelectJointParams = ConnectorWorkspaceSelectJointParamsShape;
+
+/** ConnectorWorkspaceSelectMethod wire fields. */
+export interface ConnectorWorkspaceSelectMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConnectorWorkspaceSelectParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConnectorWorkspaceSelectionView;
+}
+
+/** ConnectorWorkspaceSelectMethod from the Nexa wire protocol. */
+export type ConnectorWorkspaceSelectMethod = ConnectorWorkspaceSelectMethodShape;
+
+/** ConnectorWorkspaceSelectParams wire fields. */
+export interface ConnectorWorkspaceSelectParamsShape {
+    /** environmentId as defined by the Nexa gateway. */
+    readonly environmentId: string;
+    /** expectedRevision as defined by the Nexa gateway. */
+    readonly expectedRevision: string;
+    /** policySha256 as defined by the Nexa gateway. */
+    readonly policySha256: string;
+    /** requestId as defined by the Nexa gateway. */
+    readonly requestId: string;
+    /** rootId as defined by the Nexa gateway. */
+    readonly rootId: string;
+    /** sessionId as defined by the Nexa gateway. */
+    readonly sessionId: string;
+}
+
+/** ConnectorWorkspaceSelectParams from the Nexa wire protocol. */
+export type ConnectorWorkspaceSelectParams = ConnectorWorkspaceSelectParamsShape;
+
+/** ConnectorWorkspaceSelectionView wire fields. */
+export interface ConnectorWorkspaceSelectionViewShape {
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: string;
+    /** selection as defined by the Nexa gateway. */
+    readonly selection: ConnectorWorkspaceFileSelection | ConnectorWorkspaceJointSelection | null;
+    /** sessionId as defined by the Nexa gateway. */
+    readonly sessionId: string;
+}
+
+/** ConnectorWorkspaceSelectionView from the Nexa wire protocol. */
+export type ConnectorWorkspaceSelectionView = ConnectorWorkspaceSelectionViewShape;
+
 /** ConnectorWrite wire fields. */
 export interface ConnectorWriteShape {
     /** action as defined by the Nexa gateway. */
@@ -3768,10 +5017,7 @@ export interface ConnectorWriteShape {
 export type ConnectorWrite = ConnectorWriteShape;
 
 /** Allowed values for ConnectorWriteMode. */
-export const ConnectorWriteModeValues = {
-    Value0: 'create',
-    Value1: 'replace',
-} as const;
+export const ConnectorWriteModeValues = { Value0: 'create', Value1: 'replace' } as const;
 
 /** ConnectorWriteMode from the Nexa wire protocol. */
 export type ConnectorWriteMode =
@@ -3933,10 +5179,7 @@ export interface ConversationMessageRefShape {
 export type ConversationMessageRef = ConversationMessageRefShape;
 
 /** Allowed values for ConversationPinrole. */
-export const ConversationPinroleValues = {
-    Value0: 'assistant',
-    Value1: 'user',
-} as const;
+export const ConversationPinroleValues = { Value0: 'assistant', Value1: 'user' } as const;
 
 /** ConversationPin wire fields. */
 export interface ConversationPinShape {
@@ -4008,10 +5251,7 @@ export interface ConversationRenameParamsShape {
 export type ConversationRenameParams = ConversationRenameParamsShape;
 
 /** Allowed values for ConversationRetryParamsmode. */
-export const ConversationRetryParamsmodeValues = {
-    Value0: 'edit',
-    Value1: 'regenerate',
-} as const;
+export const ConversationRetryParamsmodeValues = { Value0: 'edit', Value1: 'regenerate' } as const;
 
 /** Allowed values for ConversationRetryParamsreasoningEffort. */
 export const ConversationRetryParamsreasoningEffortValues = {
@@ -4281,6 +5521,19 @@ export interface DeliveredAttachmentShape {
 /** DeliveredAttachment from the Nexa wire protocol. */
 export type DeliveredAttachment = DeliveredAttachmentShape;
 
+/** DeliveryArchiveMember wire fields. */
+export interface DeliveryArchiveMemberShape {
+    /** byteLength as defined by the Nexa gateway. */
+    readonly byteLength: string;
+    /** path as defined by the Nexa gateway. */
+    readonly path: string;
+    /** sha256 as defined by the Nexa gateway. */
+    readonly sha256: string;
+}
+
+/** DeliveryArchiveMember from the Nexa wire protocol. */
+export type DeliveryArchiveMember = DeliveryArchiveMemberShape;
+
 /** DeliveryDestination wire fields. */
 export interface DeliveryDestinationShape {
     /** channel as defined by the Nexa gateway. */
@@ -4298,6 +5551,8 @@ export type DeliveryDestination = DeliveryDestinationShape;
 export interface DeliveryReceiptShape {
     /** acknowledgment as defined by the Nexa gateway. */
     readonly acknowledgment: DeliveryDestination;
+    /** archiveMembers as defined by the Nexa gateway. */
+    readonly archiveMembers?: ReadonlyArray<DeliveryArchiveMember>;
     /** at as defined by the Nexa gateway. */
     readonly at: string;
     /** byteLength as defined by the Nexa gateway. */
@@ -6860,10 +8115,7 @@ export interface DesignPaintColorOperationShape {
 export type DesignPaintColorOperation = DesignPaintColorOperationShape;
 
 /** Allowed values for DesignPaintColorTarget. */
-export const DesignPaintColorTargetValues = {
-    Value0: 'fill',
-    Value1: 'stroke',
-} as const;
+export const DesignPaintColorTargetValues = { Value0: 'fill', Value1: 'stroke' } as const;
 
 /** DesignPaintColorTarget from the Nexa wire protocol. */
 export type DesignPaintColorTarget =
@@ -7564,11 +8816,7 @@ export interface DesignShadowShape {
 export type DesignShadow = DesignShadowShape;
 
 /** Allowed values for DesignSizing. */
-export const DesignSizingValues = {
-    Value0: 'fill',
-    Value1: 'fixed',
-    Value2: 'hug',
-} as const;
+export const DesignSizingValues = { Value0: 'fill', Value1: 'fixed', Value2: 'hug' } as const;
 
 /** DesignSizing from the Nexa wire protocol. */
 export type DesignSizing = (typeof DesignSizingValues)[keyof typeof DesignSizingValues];
@@ -7626,11 +8874,7 @@ export interface DesignSizingOperationShape {
 export type DesignSizingOperation = DesignSizingOperationShape;
 
 /** Allowed values for DesignStrokecap. */
-export const DesignStrokecapValues = {
-    Value0: 'butt',
-    Value1: 'round',
-    Value2: 'square',
-} as const;
+export const DesignStrokecapValues = { Value0: 'butt', Value1: 'round', Value2: 'square' } as const;
 
 /** Allowed values for DesignStrokejoin. */
 export const DesignStrokejoinValues = {
@@ -7729,10 +8973,7 @@ export const DesignStyleblendModeValues = {
 } as const;
 
 /** Allowed values for DesignStyleisolation. */
-export const DesignStyleisolationValues = {
-    Value0: 'auto',
-    Value1: 'isolate',
-} as const;
+export const DesignStyleisolationValues = { Value0: 'auto', Value1: 'isolate' } as const;
 
 /** DesignStyle wire fields. */
 export interface DesignStyleShape {
@@ -7875,11 +9116,7 @@ export interface DesignSvgImportRequestShape {
 export type DesignSvgImportRequest = DesignSvgImportRequestShape;
 
 /** Allowed values for DesignTextdirection. */
-export const DesignTextdirectionValues = {
-    Value0: 'auto',
-    Value1: 'ltr',
-    Value2: 'rtl',
-} as const;
+export const DesignTextdirectionValues = { Value0: 'auto', Value1: 'ltr', Value2: 'rtl' } as const;
 
 /** DesignText wire fields. */
 export interface DesignTextShape {
@@ -7953,10 +9190,7 @@ export interface DesignTextRunShape {
 export type DesignTextRun = DesignTextRunShape;
 
 /** Allowed values for DesignTextSpanStyledirection. */
-export const DesignTextSpanStyledirectionValues = {
-    Value0: 'ltr',
-    Value1: 'rtl',
-} as const;
+export const DesignTextSpanStyledirectionValues = { Value0: 'ltr', Value1: 'rtl' } as const;
 
 /** DesignTextSpanStyle wire fields. */
 export interface DesignTextSpanStyleShape {
@@ -8296,11 +9530,7 @@ export interface DesignTranslateOperationShape {
 export type DesignTranslateOperation = DesignTranslateOperationShape;
 
 /** Allowed values for DesignTrigger. */
-export const DesignTriggerValues = {
-    Value0: 'after',
-    Value1: 'click',
-    Value2: 'hover',
-} as const;
+export const DesignTriggerValues = { Value0: 'after', Value1: 'click', Value2: 'hover' } as const;
 
 /** DesignTrigger from the Nexa wire protocol. */
 export type DesignTrigger = (typeof DesignTriggerValues)[keyof typeof DesignTriggerValues];
@@ -8853,21 +10083,21 @@ export const ErrorCodeValues = {
     Value1: 'auth',
     Value2: 'budget-exhausted',
     Value3: 'config',
-    Value4: 'context-overflow',
-    Value5: 'delivery-unconfirmed',
-    Value6: 'denied',
-    Value7: 'forbidden',
-    Value8: 'internal',
-    Value9: 'invalid-request',
-    Value10: 'network',
-    Value11: 'not-found',
-    Value12: 'protocol',
-    Value13: 'rate-limit',
-    Value14: 'timeout',
-    Value15: 'tool-execution',
-    Value16: 'tool-input',
-    Value17: 'upstream',
-    Value18: 'conflict',
+    Value4: 'conflict',
+    Value5: 'context-overflow',
+    Value6: 'delivery-unconfirmed',
+    Value7: 'denied',
+    Value8: 'forbidden',
+    Value9: 'internal',
+    Value10: 'invalid-request',
+    Value11: 'network',
+    Value12: 'not-found',
+    Value13: 'protocol',
+    Value14: 'rate-limit',
+    Value15: 'timeout',
+    Value16: 'tool-execution',
+    Value17: 'tool-input',
+    Value18: 'upstream',
 } as const;
 
 /** ErrorCode from the Nexa wire protocol. */
@@ -9378,6 +10608,54 @@ export interface GatewayMethodsconnectShape {
     readonly result: HelloOk;
 }
 
+/** GatewayMethodsconnectors_execution wire fields. */
+export interface GatewayMethodsconnectors_executionShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConnectorEnvironmentParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConnectorExecutionStatus;
+}
+
+/** GatewayMethodsconnectors_execution_cancel wire fields. */
+export interface GatewayMethodsconnectors_execution_cancelShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConnectorExecutionStopParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConnectorExecutionStopReceipt;
+}
+
+/** GatewayMethodsconnectors_execution_get wire fields. */
+export interface GatewayMethodsconnectors_execution_getShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConnectorResultParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConnectorExecutionJob;
+}
+
+/** GatewayMethodsconnectors_execution_jobs wire fields. */
+export interface GatewayMethodsconnectors_execution_jobsShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConnectorEnvironmentParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConnectorExecutionCurrentJobs;
+}
+
+/** GatewayMethodsconnectors_execution_output wire fields. */
+export interface GatewayMethodsconnectors_execution_outputShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConnectorResultParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConnectorExecutionOutputView;
+}
+
+/** GatewayMethodsconnectors_execution_submit wire fields. */
+export interface GatewayMethodsconnectors_execution_submitShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConnectorExecutionSubmitParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConnectorExecutionJob;
+}
+
 /** GatewayMethodsconnectors_files_get wire fields. */
 export interface GatewayMethodsconnectors_files_getShape {
     /** params as defined by the Nexa gateway. */
@@ -9426,6 +10704,14 @@ export interface GatewayMethodsconnectors_link_approveShape {
     readonly result: ConnectorLinkApproved;
 }
 
+/** GatewayMethodsconnectors_link_deny wire fields. */
+export interface GatewayMethodsconnectors_link_denyShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConnectorLinkDenyParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConnectorLinkDenied;
+}
+
 /** GatewayMethodsconnectors_link_review wire fields. */
 export interface GatewayMethodsconnectors_link_reviewShape {
     /** params as defined by the Nexa gateway. */
@@ -9448,6 +10734,54 @@ export interface GatewayMethodsconnectors_revokeShape {
     readonly params: ConnectorRevokeParams;
     /** result as defined by the Nexa gateway. */
     readonly result: ConnectorView;
+}
+
+/** GatewayMethodsconnectors_workspace_catalog wire fields. */
+export interface GatewayMethodsconnectors_workspace_catalogShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConnectorWorkspaceCatalogParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConnectorWorkspaceCatalogView;
+}
+
+/** GatewayMethodsconnectors_workspace_clear wire fields. */
+export interface GatewayMethodsconnectors_workspace_clearShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConnectorWorkspaceClearParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConnectorWorkspaceSelectionView;
+}
+
+/** GatewayMethodsconnectors_workspace_create wire fields. */
+export interface GatewayMethodsconnectors_workspace_createShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConnectorWorkspaceCreateParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConnectorWorkspaceSelectionView;
+}
+
+/** GatewayMethodsconnectors_workspace_get wire fields. */
+export interface GatewayMethodsconnectors_workspace_getShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConnectorWorkspaceGetParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConnectorWorkspaceSelectionView;
+}
+
+/** GatewayMethodsconnectors_workspace_select wire fields. */
+export interface GatewayMethodsconnectors_workspace_selectShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConnectorWorkspaceSelectParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConnectorWorkspaceSelectionView;
+}
+
+/** GatewayMethodsconnectors_workspace_select-joint wire fields. */
+export interface GatewayMethodsconnectors_workspace_selectjointShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConnectorWorkspaceSelectJointParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConnectorWorkspaceSelectionView;
 }
 
 /** GatewayMethodscredit_budgets wire fields. */
@@ -9938,6 +11272,38 @@ export interface GatewayMethodsdevices_revokeShape {
     readonly result: OkResult;
 }
 
+/** GatewayMethodsenvironment_admin_inspect wire fields. */
+export interface GatewayMethodsenvironment_admin_inspectShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: VmAdministrationInspect;
+    /** result as defined by the Nexa gateway. */
+    readonly result: VmAdministrationView;
+}
+
+/** GatewayMethodsenvironment_admin_mutate wire fields. */
+export interface GatewayMethodsenvironment_admin_mutateShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: VmAdministrationMutation;
+    /** result as defined by the Nexa gateway. */
+    readonly result: VmAdministrationView;
+}
+
+/** GatewayMethodsenvironment_admin_network wire fields. */
+export interface GatewayMethodsenvironment_admin_networkShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: VmUsageNetworkRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: VmUsageNetworkSnapshot;
+}
+
+/** GatewayMethodsenvironment_admin_usage wire fields. */
+export interface GatewayMethodsenvironment_admin_usageShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: VmUsageAdministrativeRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: VmUsageSnapshot;
+}
+
 /** GatewayMethodsenvironment_prepare wire fields. */
 export interface GatewayMethodsenvironment_prepareShape {
     /** params as defined by the Nexa gateway. */
@@ -9952,6 +11318,14 @@ export interface GatewayMethodsenvironment_statusShape {
     readonly params: EnvironmentPreparationQuery;
     /** result as defined by the Nexa gateway. */
     readonly result: EnvironmentPreparationPage;
+}
+
+/** GatewayMethodsenvironment_usage wire fields. */
+export interface GatewayMethodsenvironment_usageShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: Recordstringnever;
+    /** result as defined by the Nexa gateway. */
+    readonly result: VmUsageSnapshot;
 }
 
 /** GatewayMethodshealth wire fields. */
@@ -11054,6 +12428,78 @@ export interface GatewayMethodsworkflows_validateShape {
     readonly result: GraphValidation;
 }
 
+/** GatewayMethodsworkspace_files_cancel wire fields. */
+export interface GatewayMethodsworkspace_files_cancelShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: BrowserFilesUploadParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: BrowserFilesDone;
+}
+
+/** GatewayMethodsworkspace_files_chunk wire fields. */
+export interface GatewayMethodsworkspace_files_chunkShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: BrowserFilesChunkParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: BrowserFilesPosition;
+}
+
+/** GatewayMethodsworkspace_files_finish wire fields. */
+export interface GatewayMethodsworkspace_files_finishShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: BrowserFilesUploadParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: BrowserFilesDone;
+}
+
+/** GatewayMethodsworkspace_files_list wire fields. */
+export interface GatewayMethodsworkspace_files_listShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: BrowserFilesListParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: BrowserFilesPage;
+}
+
+/** GatewayMethodsworkspace_files_mkdir wire fields. */
+export interface GatewayMethodsworkspace_files_mkdirShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: BrowserFilesTarget;
+    /** result as defined by the Nexa gateway. */
+    readonly result: BrowserFilesDone;
+}
+
+/** GatewayMethodsworkspace_files_read wire fields. */
+export interface GatewayMethodsworkspace_files_readShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: BrowserFilesReadParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: BrowserFilesRead;
+}
+
+/** GatewayMethodsworkspace_files_remove wire fields. */
+export interface GatewayMethodsworkspace_files_removeShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: BrowserFilesTarget;
+    /** result as defined by the Nexa gateway. */
+    readonly result: BrowserFilesDone;
+}
+
+/** GatewayMethodsworkspace_files_rename wire fields. */
+export interface GatewayMethodsworkspace_files_renameShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: BrowserFilesRenameParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: BrowserFilesDone;
+}
+
+/** GatewayMethodsworkspace_files_start wire fields. */
+export interface GatewayMethodsworkspace_files_startShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: BrowserFilesStartParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: BrowserFilesUpload;
+}
+
 /** GatewayMethodsworkspaces_create wire fields. */
 export interface GatewayMethodsworkspaces_createShape {
     /** params as defined by the Nexa gateway. */
@@ -11086,166 +12532,6 @@ export interface GatewayMethodsworkspaces_listShape {
     readonly result: ReadonlyArray<Workspace>;
 }
 
-/** GatewayMethodsconnectors_execution wire fields. */
-export interface GatewayMethodsconnectors_executionShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: ConnectorEnvironmentParams;
-    /** result as defined by the Nexa gateway. */
-    readonly result: ConnectorExecutionStatus;
-}
-
-/** GatewayMethodsconnectors_execution_submit wire fields. */
-export interface GatewayMethodsconnectors_execution_submitShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: ConnectorExecutionSubmitParams;
-    /** result as defined by the Nexa gateway. */
-    readonly result: ConnectorExecutionJob;
-}
-
-/** GatewayMethodsconnectors_execution_get wire fields. */
-export interface GatewayMethodsconnectors_execution_getShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: ConnectorResultParams;
-    /** result as defined by the Nexa gateway. */
-    readonly result: ConnectorExecutionJob;
-}
-
-/** GatewayMethodsconnectors_execution_cancel wire fields. */
-export interface GatewayMethodsconnectors_execution_cancelShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: ConnectorExecutionStopParams;
-    /** result as defined by the Nexa gateway. */
-    readonly result: ConnectorExecutionStopReceipt;
-}
-
-/** GatewayMethodsconnectors_execution_jobs wire fields. */
-export interface GatewayMethodsconnectors_execution_jobsShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: ConnectorEnvironmentParams;
-    /** result as defined by the Nexa gateway. */
-    readonly result: ConnectorExecutionCurrentJobs;
-}
-
-/** GatewayMethodsconnectors_link_deny wire fields. */
-export interface GatewayMethodsconnectors_link_denyShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: ConnectorLinkDenyParams;
-    /** result as defined by the Nexa gateway. */
-    readonly result: ConnectorLinkDenied;
-}
-
-/** GatewayMethodsconnectors_execution_output wire fields. */
-export interface GatewayMethodsconnectors_execution_outputShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: ConnectorResultParams;
-    /** result as defined by the Nexa gateway. */
-    readonly result: ConnectorExecutionOutputView;
-}
-
-/** GatewayMethodsconnectors_workspace_get wire fields. */
-export interface GatewayMethodsconnectors_workspace_getShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: ConnectorWorkspaceGetParams;
-    /** result as defined by the Nexa gateway. */
-    readonly result: ConnectorWorkspaceSelectionView;
-}
-
-/** GatewayMethodsconnectors_workspace_select wire fields. */
-export interface GatewayMethodsconnectors_workspace_selectShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: ConnectorWorkspaceSelectParams;
-    /** result as defined by the Nexa gateway. */
-    readonly result: ConnectorWorkspaceSelectionView;
-}
-
-/** GatewayMethodsconnectors_workspace_clear wire fields. */
-export interface GatewayMethodsconnectors_workspace_clearShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: ConnectorWorkspaceClearParams;
-    /** result as defined by the Nexa gateway. */
-    readonly result: ConnectorWorkspaceSelectionView;
-}
-
-/** GatewayMethodsconnectors_workspace_create wire fields. */
-export interface GatewayMethodsconnectors_workspace_createShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: ConnectorWorkspaceCreateParams;
-    /** result as defined by the Nexa gateway. */
-    readonly result: ConnectorWorkspaceSelectionView;
-}
-
-/** GatewayMethodsconnectors_workspace_catalog wire fields. */
-export interface GatewayMethodsconnectors_workspace_catalogShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: ConnectorWorkspaceCatalogParams;
-    /** result as defined by the Nexa gateway. */
-    readonly result: ConnectorWorkspaceCatalogView;
-}
-
-/** GatewayMethodsconnectors_workspace_select-joint wire fields. */
-export interface GatewayMethodsconnectors_workspace_selectjointShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: ConnectorWorkspaceSelectJointParams;
-    /** result as defined by the Nexa gateway. */
-    readonly result: ConnectorWorkspaceSelectionView;
-}
-
-/** GatewayMethodsworkspace_files_list wire fields. */
-export interface GatewayMethodsworkspace_files_listShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: BrowserFilesListParams;
-    /** result as defined by the Nexa gateway. */
-    readonly result: BrowserFilesPage;
-}
-
-/** GatewayMethodsworkspace_files_read wire fields. */
-export interface GatewayMethodsworkspace_files_readShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: BrowserFilesReadParams;
-    /** result as defined by the Nexa gateway. */
-    readonly result: BrowserFilesRead;
-}
-
-/** GatewayMethodsworkspace_files_start wire fields. */
-export interface GatewayMethodsworkspace_files_startShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: BrowserFilesStartParams;
-    /** result as defined by the Nexa gateway. */
-    readonly result: BrowserFilesUpload;
-}
-
-/** GatewayMethodsworkspace_files_chunk wire fields. */
-export interface GatewayMethodsworkspace_files_chunkShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: BrowserFilesChunkParams;
-    /** result as defined by the Nexa gateway. */
-    readonly result: BrowserFilesPosition;
-}
-
-/** GatewayMethodsworkspace_files_finish wire fields. */
-export interface GatewayMethodsworkspace_files_finishShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: BrowserFilesUploadParams;
-    /** result as defined by the Nexa gateway. */
-    readonly result: BrowserFilesDone;
-}
-
-/** GatewayMethodsworkspace_files_cancel wire fields. */
-export interface GatewayMethodsworkspace_files_cancelShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: BrowserFilesUploadParams;
-    /** result as defined by the Nexa gateway. */
-    readonly result: BrowserFilesDone;
-}
-
-/** GatewayMethodsworkspace_files_mkdir wire fields. */
-export interface GatewayMethodsworkspace_files_mkdirShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: BrowserFilesTarget;
-    /** result as defined by the Nexa gateway. */
-    readonly result: BrowserFilesDone;
-}
-
 /** GatewayMethodsworkspaces_page wire fields. */
 export interface GatewayMethodsworkspaces_pageShape {
     /** params as defined by the Nexa gateway. */
@@ -11260,38 +12546,6 @@ export interface GatewayMethodsworkspaces_visitShape {
     readonly params: IdParams;
     /** result as defined by the Nexa gateway. */
     readonly result: OkResult;
-}
-
-/** GatewayMethodsworkspace_files_rename wire fields. */
-export interface GatewayMethodsworkspace_files_renameShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: BrowserFilesRenameParams;
-    /** result as defined by the Nexa gateway. */
-    readonly result: BrowserFilesDone;
-}
-
-/** GatewayMethodsworkspace_files_remove wire fields. */
-export interface GatewayMethodsworkspace_files_removeShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: BrowserFilesTarget;
-    /** result as defined by the Nexa gateway. */
-    readonly result: BrowserFilesDone;
-}
-
-/** GatewayMethodsenvironment_admin_inspect wire fields. */
-export interface GatewayMethodsenvironment_admin_inspectShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: VmAdministrationInspect;
-    /** result as defined by the Nexa gateway. */
-    readonly result: VmAdministrationView;
-}
-
-/** GatewayMethodsenvironment_admin_mutate wire fields. */
-export interface GatewayMethodsenvironment_admin_mutateShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: VmAdministrationMutation;
-    /** result as defined by the Nexa gateway. */
-    readonly result: VmAdministrationView;
 }
 
 /** GatewayMethods wire fields. */
@@ -11332,6 +12586,18 @@ export interface GatewayMethodsShape {
     readonly 'config.unset': GatewayMethodsconfig_unsetShape;
     /** connect as defined by the Nexa gateway. */
     readonly connect: GatewayMethodsconnectShape;
+    /** connectors.execution as defined by the Nexa gateway. */
+    readonly 'connectors.execution': GatewayMethodsconnectors_executionShape;
+    /** connectors.execution.cancel as defined by the Nexa gateway. */
+    readonly 'connectors.execution.cancel': GatewayMethodsconnectors_execution_cancelShape;
+    /** connectors.execution.get as defined by the Nexa gateway. */
+    readonly 'connectors.execution.get': GatewayMethodsconnectors_execution_getShape;
+    /** connectors.execution.jobs as defined by the Nexa gateway. */
+    readonly 'connectors.execution.jobs': GatewayMethodsconnectors_execution_jobsShape;
+    /** connectors.execution.output as defined by the Nexa gateway. */
+    readonly 'connectors.execution.output': GatewayMethodsconnectors_execution_outputShape;
+    /** connectors.execution.submit as defined by the Nexa gateway. */
+    readonly 'connectors.execution.submit': GatewayMethodsconnectors_execution_submitShape;
     /** connectors.files.get as defined by the Nexa gateway. */
     readonly 'connectors.files.get': GatewayMethodsconnectors_files_getShape;
     /** connectors.files.submit as defined by the Nexa gateway. */
@@ -11344,12 +12610,26 @@ export interface GatewayMethodsShape {
     readonly 'connectors.inventory': GatewayMethodsconnectors_inventoryShape;
     /** connectors.link.approve as defined by the Nexa gateway. */
     readonly 'connectors.link.approve': GatewayMethodsconnectors_link_approveShape;
+    /** connectors.link.deny as defined by the Nexa gateway. */
+    readonly 'connectors.link.deny': GatewayMethodsconnectors_link_denyShape;
     /** connectors.link.review as defined by the Nexa gateway. */
     readonly 'connectors.link.review': GatewayMethodsconnectors_link_reviewShape;
     /** connectors.list as defined by the Nexa gateway. */
     readonly 'connectors.list': GatewayMethodsconnectors_listShape;
     /** connectors.revoke as defined by the Nexa gateway. */
     readonly 'connectors.revoke': GatewayMethodsconnectors_revokeShape;
+    /** connectors.workspace.catalog as defined by the Nexa gateway. */
+    readonly 'connectors.workspace.catalog': GatewayMethodsconnectors_workspace_catalogShape;
+    /** connectors.workspace.clear as defined by the Nexa gateway. */
+    readonly 'connectors.workspace.clear': GatewayMethodsconnectors_workspace_clearShape;
+    /** connectors.workspace.create as defined by the Nexa gateway. */
+    readonly 'connectors.workspace.create': GatewayMethodsconnectors_workspace_createShape;
+    /** connectors.workspace.get as defined by the Nexa gateway. */
+    readonly 'connectors.workspace.get': GatewayMethodsconnectors_workspace_getShape;
+    /** connectors.workspace.select as defined by the Nexa gateway. */
+    readonly 'connectors.workspace.select': GatewayMethodsconnectors_workspace_selectShape;
+    /** connectors.workspace.select-joint as defined by the Nexa gateway. */
+    readonly 'connectors.workspace.select-joint': GatewayMethodsconnectors_workspace_selectjointShape;
     /** credit.budgets as defined by the Nexa gateway. */
     readonly 'credit.budgets': GatewayMethodscredit_budgetsShape;
     /** credit.removeBudget as defined by the Nexa gateway. */
@@ -11458,10 +12738,20 @@ export interface GatewayMethodsShape {
     readonly 'devices.reject': GatewayMethodsdevices_rejectShape;
     /** devices.revoke as defined by the Nexa gateway. */
     readonly 'devices.revoke': GatewayMethodsdevices_revokeShape;
+    /** environment.admin.inspect as defined by the Nexa gateway. */
+    readonly 'environment.admin.inspect': GatewayMethodsenvironment_admin_inspectShape;
+    /** environment.admin.mutate as defined by the Nexa gateway. */
+    readonly 'environment.admin.mutate': GatewayMethodsenvironment_admin_mutateShape;
+    /** environment.admin.network as defined by the Nexa gateway. */
+    readonly 'environment.admin.network': GatewayMethodsenvironment_admin_networkShape;
+    /** environment.admin.usage as defined by the Nexa gateway. */
+    readonly 'environment.admin.usage': GatewayMethodsenvironment_admin_usageShape;
     /** environment.prepare as defined by the Nexa gateway. */
     readonly 'environment.prepare': GatewayMethodsenvironment_prepareShape;
     /** environment.status as defined by the Nexa gateway. */
     readonly 'environment.status': GatewayMethodsenvironment_statusShape;
+    /** environment.usage as defined by the Nexa gateway. */
+    readonly 'environment.usage': GatewayMethodsenvironment_usageShape;
     /** health as defined by the Nexa gateway. */
     readonly health: GatewayMethodshealthShape;
     /** jobs.add as defined by the Nexa gateway. */
@@ -11734,6 +13024,24 @@ export interface GatewayMethodsShape {
     readonly 'workflows.schedules.read': GatewayMethodsworkflows_schedules_readShape;
     /** workflows.validate as defined by the Nexa gateway. */
     readonly 'workflows.validate': GatewayMethodsworkflows_validateShape;
+    /** workspace.files.cancel as defined by the Nexa gateway. */
+    readonly 'workspace.files.cancel': GatewayMethodsworkspace_files_cancelShape;
+    /** workspace.files.chunk as defined by the Nexa gateway. */
+    readonly 'workspace.files.chunk': GatewayMethodsworkspace_files_chunkShape;
+    /** workspace.files.finish as defined by the Nexa gateway. */
+    readonly 'workspace.files.finish': GatewayMethodsworkspace_files_finishShape;
+    /** workspace.files.list as defined by the Nexa gateway. */
+    readonly 'workspace.files.list': GatewayMethodsworkspace_files_listShape;
+    /** workspace.files.mkdir as defined by the Nexa gateway. */
+    readonly 'workspace.files.mkdir': GatewayMethodsworkspace_files_mkdirShape;
+    /** workspace.files.read as defined by the Nexa gateway. */
+    readonly 'workspace.files.read': GatewayMethodsworkspace_files_readShape;
+    /** workspace.files.remove as defined by the Nexa gateway. */
+    readonly 'workspace.files.remove': GatewayMethodsworkspace_files_removeShape;
+    /** workspace.files.rename as defined by the Nexa gateway. */
+    readonly 'workspace.files.rename': GatewayMethodsworkspace_files_renameShape;
+    /** workspace.files.start as defined by the Nexa gateway. */
+    readonly 'workspace.files.start': GatewayMethodsworkspace_files_startShape;
     /** workspaces.create as defined by the Nexa gateway. */
     readonly 'workspaces.create': GatewayMethodsworkspaces_createShape;
     /** workspaces.describe as defined by the Nexa gateway. */
@@ -11742,68 +13050,17 @@ export interface GatewayMethodsShape {
     readonly 'workspaces.destroy': GatewayMethodsworkspaces_destroyShape;
     /** workspaces.list as defined by the Nexa gateway. */
     readonly 'workspaces.list': GatewayMethodsworkspaces_listShape;
-    /** connectors.execution as defined by the Nexa gateway. */
-    readonly 'connectors.execution': GatewayMethodsconnectors_executionShape;
-    /** connectors.execution.submit as defined by the Nexa gateway. */
-    readonly 'connectors.execution.submit': GatewayMethodsconnectors_execution_submitShape;
-    /** connectors.execution.get as defined by the Nexa gateway. */
-    readonly 'connectors.execution.get': GatewayMethodsconnectors_execution_getShape;
-    /** connectors.execution.cancel as defined by the Nexa gateway. */
-    readonly 'connectors.execution.cancel': GatewayMethodsconnectors_execution_cancelShape;
-    /** connectors.execution.jobs as defined by the Nexa gateway. */
-    readonly 'connectors.execution.jobs': GatewayMethodsconnectors_execution_jobsShape;
-    /** connectors.link.deny as defined by the Nexa gateway. */
-    readonly 'connectors.link.deny': GatewayMethodsconnectors_link_denyShape;
-    /** connectors.execution.output as defined by the Nexa gateway. */
-    readonly 'connectors.execution.output': GatewayMethodsconnectors_execution_outputShape;
-    /** connectors.workspace.get as defined by the Nexa gateway. */
-    readonly 'connectors.workspace.get': GatewayMethodsconnectors_workspace_getShape;
-    /** connectors.workspace.select as defined by the Nexa gateway. */
-    readonly 'connectors.workspace.select': GatewayMethodsconnectors_workspace_selectShape;
-    /** connectors.workspace.clear as defined by the Nexa gateway. */
-    readonly 'connectors.workspace.clear': GatewayMethodsconnectors_workspace_clearShape;
-    /** connectors.workspace.create as defined by the Nexa gateway. */
-    readonly 'connectors.workspace.create': GatewayMethodsconnectors_workspace_createShape;
-    /** connectors.workspace.catalog as defined by the Nexa gateway. */
-    readonly 'connectors.workspace.catalog': GatewayMethodsconnectors_workspace_catalogShape;
-    /** connectors.workspace.select-joint as defined by the Nexa gateway. */
-    readonly 'connectors.workspace.select-joint': GatewayMethodsconnectors_workspace_selectjointShape;
-    /** workspace.files.list as defined by the Nexa gateway. */
-    readonly 'workspace.files.list': GatewayMethodsworkspace_files_listShape;
-    /** workspace.files.read as defined by the Nexa gateway. */
-    readonly 'workspace.files.read': GatewayMethodsworkspace_files_readShape;
-    /** workspace.files.start as defined by the Nexa gateway. */
-    readonly 'workspace.files.start': GatewayMethodsworkspace_files_startShape;
-    /** workspace.files.chunk as defined by the Nexa gateway. */
-    readonly 'workspace.files.chunk': GatewayMethodsworkspace_files_chunkShape;
-    /** workspace.files.finish as defined by the Nexa gateway. */
-    readonly 'workspace.files.finish': GatewayMethodsworkspace_files_finishShape;
-    /** workspace.files.cancel as defined by the Nexa gateway. */
-    readonly 'workspace.files.cancel': GatewayMethodsworkspace_files_cancelShape;
-    /** workspace.files.mkdir as defined by the Nexa gateway. */
-    readonly 'workspace.files.mkdir': GatewayMethodsworkspace_files_mkdirShape;
     /** workspaces.page as defined by the Nexa gateway. */
     readonly 'workspaces.page': GatewayMethodsworkspaces_pageShape;
     /** workspaces.visit as defined by the Nexa gateway. */
     readonly 'workspaces.visit': GatewayMethodsworkspaces_visitShape;
-    /** workspace.files.rename as defined by the Nexa gateway. */
-    readonly 'workspace.files.rename': GatewayMethodsworkspace_files_renameShape;
-    /** workspace.files.remove as defined by the Nexa gateway. */
-    readonly 'workspace.files.remove': GatewayMethodsworkspace_files_removeShape;
-    /** environment.admin.inspect as defined by the Nexa gateway. */
-    readonly 'environment.admin.inspect': GatewayMethodsenvironment_admin_inspectShape;
-    /** environment.admin.mutate as defined by the Nexa gateway. */
-    readonly 'environment.admin.mutate': GatewayMethodsenvironment_admin_mutateShape;
 }
 
 /** GatewayMethods from the Nexa wire protocol. */
 export type GatewayMethods = GatewayMethodsShape;
 
 /** Allowed values for GeometryFormat. */
-export const GeometryFormatValues = {
-    Value0: 'gaussian_ply',
-    Value1: 'glb',
-} as const;
+export const GeometryFormatValues = { Value0: 'gaussian_ply', Value1: 'glb' } as const;
 
 /** GeometryFormat from the Nexa wire protocol. */
 export type GeometryFormat = (typeof GeometryFormatValues)[keyof typeof GeometryFormatValues];
@@ -11849,10 +13106,7 @@ export const GraphIssueCodeValues = {
 export type GraphIssueCode = (typeof GraphIssueCodeValues)[keyof typeof GraphIssueCodeValues];
 
 /** Allowed values for GraphSeverity. */
-export const GraphSeverityValues = {
-    Value0: 'error',
-    Value1: 'warning',
-} as const;
+export const GraphSeverityValues = { Value0: 'error', Value1: 'warning' } as const;
 
 /** GraphSeverity from the Nexa wire protocol. */
 export type GraphSeverity = (typeof GraphSeverityValues)[keyof typeof GraphSeverityValues];
@@ -12688,10 +13942,7 @@ export interface LuauEditorReportShape {
 export type LuauEditorReport = LuauEditorReportShape;
 
 /** Allowed values for LuauEditorSeverity. */
-export const LuauEditorSeverityValues = {
-    Value0: 'error',
-    Value1: 'warning',
-} as const;
+export const LuauEditorSeverityValues = { Value0: 'error', Value1: 'warning' } as const;
 
 /** LuauEditorSeverity from the Nexa wire protocol. */
 export type LuauEditorSeverity =
@@ -12999,10 +14250,7 @@ export interface NcapDeltageometryVariant1Shape {
 }
 
 /** Allowed values for NcapDeltageometryVariant2phase. */
-export const NcapDeltageometryVariant2phaseValues = {
-    Value0: 'chunk',
-    Value1: 'preview',
-} as const;
+export const NcapDeltageometryVariant2phaseValues = { Value0: 'chunk', Value1: 'preview' } as const;
 
 /** NcapDeltageometryVariant2 wire fields. */
 export interface NcapDeltageometryVariant2Shape {
@@ -13488,10 +14736,7 @@ export type NetworkDetailView =
     (typeof NetworkDetailViewValues)[keyof typeof NetworkDetailViewValues];
 
 /** Allowed values for NetworkFormat. */
-export const NetworkFormatValues = {
-    Value0: 'har',
-    Value1: 'mitmproxy',
-} as const;
+export const NetworkFormatValues = { Value0: 'har', Value1: 'mitmproxy' } as const;
 
 /** NetworkFormat from the Nexa wire protocol. */
 export type NetworkFormat = (typeof NetworkFormatValues)[keyof typeof NetworkFormatValues];
@@ -14020,20 +15265,13 @@ export interface PlanningTurnRefShape {
 export type PlanningTurnRef = PlanningTurnRefShape;
 
 /** Allowed values for PortCardinality. */
-export const PortCardinalityValues = {
-    Value0: 'item',
-    Value1: 'list',
-    Value2: 'stream',
-} as const;
+export const PortCardinalityValues = { Value0: 'item', Value1: 'list', Value2: 'stream' } as const;
 
 /** PortCardinality from the Nexa wire protocol. */
 export type PortCardinality = (typeof PortCardinalityValues)[keyof typeof PortCardinalityValues];
 
 /** Allowed values for PortDirection. */
-export const PortDirectionValues = {
-    Value0: 'input',
-    Value1: 'output',
-} as const;
+export const PortDirectionValues = { Value0: 'input', Value1: 'output' } as const;
 
 /** PortDirection from the Nexa wire protocol. */
 export type PortDirection = (typeof PortDirectionValues)[keyof typeof PortDirectionValues];
@@ -14948,11 +16186,7 @@ export interface ResourceSelectionShape {
 export type ResourceSelection = ResourceSelectionShape;
 
 /** Allowed values for ResourceUse. */
-export const ResourceUseValues = {
-    Value0: 'attach',
-    Value1: 'compute',
-    Value2: 'read',
-} as const;
+export const ResourceUseValues = { Value0: 'attach', Value1: 'compute', Value2: 'read' } as const;
 
 /** ResourceUse from the Nexa wire protocol. */
 export type ResourceUse = (typeof ResourceUseValues)[keyof typeof ResourceUseValues];
@@ -15799,10 +17033,7 @@ export const RiskLevelValues = {
 export type RiskLevel = (typeof RiskLevelValues)[keyof typeof RiskLevelValues];
 
 /** Allowed values for RobloxCoordinateGesturedevice. */
-export const RobloxCoordinateGesturedeviceValues = {
-    Value0: 'Mouse',
-    Value1: 'Touch',
-} as const;
+export const RobloxCoordinateGesturedeviceValues = { Value0: 'Mouse', Value1: 'Touch' } as const;
 
 /** RobloxCoordinateGesture wire fields. */
 export interface RobloxCoordinateGestureShape {
@@ -16141,11 +17372,7 @@ export interface SchemaFieldShape {
 export type SchemaField = SchemaFieldShape;
 
 /** Allowed values for Scope. */
-export const ScopeValues = {
-    Value0: 'admin',
-    Value1: 'read',
-    Value2: 'write',
-} as const;
+export const ScopeValues = { Value0: 'admin', Value1: 'read', Value2: 'write' } as const;
 
 /** Scope from the Nexa wire protocol. */
 export type Scope = (typeof ScopeValues)[keyof typeof ScopeValues];
@@ -16307,10 +17534,7 @@ export interface SessionListParamsShape {
 export type SessionListParams = SessionListParamsShape;
 
 /** Allowed values for SessionMessageDatarole. */
-export const SessionMessageDataroleValues = {
-    Value0: 'assistant',
-    Value1: 'user',
-} as const;
+export const SessionMessageDataroleValues = { Value0: 'assistant', Value1: 'user' } as const;
 
 /** SessionMessageData wire fields. */
 export interface SessionMessageDataShape {
@@ -16462,10 +17686,7 @@ export const StreamParamsreasoningEffortValues = {
 } as const;
 
 /** Allowed values for StreamParamsresponseFormat. */
-export const StreamParamsresponseFormatValues = {
-    Value0: 'json',
-    Value1: 'text',
-} as const;
+export const StreamParamsresponseFormatValues = { Value0: 'json', Value1: 'text' } as const;
 
 /** StreamParams wire fields. */
 export interface StreamParamsShape {
@@ -16710,11 +17931,7 @@ export interface TelemetryProjectShape {
 export type TelemetryProject = TelemetryProjectShape;
 
 /** Allowed values for TerminalAction. */
-export const TerminalActionValues = {
-    Value0: 'input',
-    Value1: 'resize',
-    Value2: 'stop',
-} as const;
+export const TerminalActionValues = { Value0: 'input', Value1: 'resize', Value2: 'stop' } as const;
 
 /** TerminalAction from the Nexa wire protocol. */
 export type TerminalAction = (typeof TerminalActionValues)[keyof typeof TerminalActionValues];
@@ -16785,6 +18002,8 @@ export interface ToolProgressShape {
     readonly attachment?: ToolProgressAttachment;
     /** fraction as defined by the Nexa gateway. */
     readonly fraction?: number;
+    /** outputSnapshot as defined by the Nexa gateway. */
+    readonly outputSnapshot?: string;
     /** reverse as defined by the Nexa gateway. */
     readonly reverse?: ReverseRunSnapshot;
     /** status as defined by the Nexa gateway. */
@@ -16793,8 +18012,6 @@ export interface ToolProgressShape {
     readonly terminal?: ToolTerminal;
     /** text as defined by the Nexa gateway. */
     readonly text?: string;
-    /** outputSnapshot as defined by the Nexa gateway. */
-    readonly outputSnapshot?: string;
 }
 
 /** ToolProgress from the Nexa wire protocol. */
@@ -17083,6 +18300,630 @@ export type UserRegion = UserRegionShape;
 /** ValueSchema from the Nexa wire protocol. */
 export type ValueSchema = ScalarSchema | ObjectSchema | ListSchema | ResourceSchema;
 
+/** Allowed values for VisualArrow. */
+export const VisualArrowValues = { Value0: 'both', Value1: 'forward', Value2: 'none' } as const;
+
+/** VisualArrow from the Nexa wire protocol. */
+export type VisualArrow = (typeof VisualArrowValues)[keyof typeof VisualArrowValues];
+
+/** VisualConnection wire fields. */
+export interface VisualConnectionShape {
+    /** animated as defined by the Nexa gateway. */
+    readonly animated: boolean;
+    /** arrow as defined by the Nexa gateway. */
+    readonly arrow: VisualArrow;
+    /** from as defined by the Nexa gateway. */
+    readonly from: string;
+    /** fromSide as defined by the Nexa gateway. */
+    readonly fromSide: VisualSide;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** label as defined by the Nexa gateway. */
+    readonly label: string;
+    /** line as defined by the Nexa gateway. */
+    readonly line: VisualLine;
+    /** to as defined by the Nexa gateway. */
+    readonly to: string;
+    /** toSide as defined by the Nexa gateway. */
+    readonly toSide: VisualSide;
+    /** via as defined by the Nexa gateway. */
+    readonly via: ReadonlyArray<VisualPoint>;
+}
+
+/** VisualConnection from the Nexa wire protocol. */
+export type VisualConnection = VisualConnectionShape;
+
+/** VisualElement wire fields. */
+export interface VisualElementShape {
+    /** detail as defined by the Nexa gateway. */
+    readonly detail: string;
+    /** eyebrow as defined by the Nexa gateway. */
+    readonly eyebrow: string;
+    /** height as defined by the Nexa gateway. */
+    readonly height: number;
+    /** icon as defined by the Nexa gateway. */
+    readonly icon: VisualIcon;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: VisualElementKind;
+    /** title as defined by the Nexa gateway. */
+    readonly title: string;
+    /** tone as defined by the Nexa gateway. */
+    readonly tone: VisualTone;
+    /** value as defined by the Nexa gateway. */
+    readonly value: string;
+    /** width as defined by the Nexa gateway. */
+    readonly width: number;
+    /** x as defined by the Nexa gateway. */
+    readonly x: number;
+    /** y as defined by the Nexa gateway. */
+    readonly y: number;
+}
+
+/** VisualElement from the Nexa wire protocol. */
+export type VisualElement = VisualElementShape;
+
+/** Allowed values for VisualElementKind. */
+export const VisualElementKindValues = {
+    Value0: 'card',
+    Value1: 'group',
+    Value2: 'metric',
+    Value3: 'text',
+} as const;
+
+/** VisualElementKind from the Nexa wire protocol. */
+export type VisualElementKind =
+    (typeof VisualElementKindValues)[keyof typeof VisualElementKindValues];
+
+/** Allowed values for VisualIcon. */
+export const VisualIconValues = {
+    Value0: 'check',
+    Value1: 'cloud',
+    Value2: 'code',
+    Value3: 'cpu',
+    Value4: 'database',
+    Value5: 'layers',
+    Value6: 'none',
+    Value7: 'server',
+    Value8: 'shield',
+    Value9: 'spark',
+    Value10: 'user',
+} as const;
+
+/** VisualIcon from the Nexa wire protocol. */
+export type VisualIcon = (typeof VisualIconValues)[keyof typeof VisualIconValues];
+
+/** Allowed values for VisualLine. */
+export const VisualLineValues = { Value0: 'dashed', Value1: 'solid' } as const;
+
+/** VisualLine from the Nexa wire protocol. */
+export type VisualLine = (typeof VisualLineValues)[keyof typeof VisualLineValues];
+
+/** VisualPoint wire fields. */
+export interface VisualPointShape {
+    /** x as defined by the Nexa gateway. */
+    readonly x: number;
+    /** y as defined by the Nexa gateway. */
+    readonly y: number;
+}
+
+/** VisualPoint from the Nexa wire protocol. */
+export type VisualPoint = VisualPointShape;
+
+/** VisualResponse wire fields. */
+export interface VisualResponseShape {
+    /** connections as defined by the Nexa gateway. */
+    readonly connections: ReadonlyArray<VisualConnection>;
+    /** description as defined by the Nexa gateway. */
+    readonly description: string;
+    /** elements as defined by the Nexa gateway. */
+    readonly elements: ReadonlyArray<VisualElement>;
+    /** height as defined by the Nexa gateway. */
+    readonly height: number;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** steps as defined by the Nexa gateway. */
+    readonly steps: ReadonlyArray<VisualStep>;
+    /** title as defined by the Nexa gateway. */
+    readonly title: string;
+    /** version as defined by the Nexa gateway. */
+    readonly version: 1;
+    /** width as defined by the Nexa gateway. */
+    readonly width: number;
+}
+
+/** VisualResponse from the Nexa wire protocol. */
+export type VisualResponse = VisualResponseShape;
+
+/** Allowed values for VisualSide. */
+export const VisualSideValues = {
+    Value0: 'auto',
+    Value1: 'bottom',
+    Value2: 'left',
+    Value3: 'right',
+    Value4: 'top',
+} as const;
+
+/** VisualSide from the Nexa wire protocol. */
+export type VisualSide = (typeof VisualSideValues)[keyof typeof VisualSideValues];
+
+/** VisualStep wire fields. */
+export interface VisualStepShape {
+    /** connections as defined by the Nexa gateway. */
+    readonly connections: ReadonlyArray<string>;
+    /** detail as defined by the Nexa gateway. */
+    readonly detail: string;
+    /** elements as defined by the Nexa gateway. */
+    readonly elements: ReadonlyArray<string>;
+    /** title as defined by the Nexa gateway. */
+    readonly title: string;
+}
+
+/** VisualStep from the Nexa wire protocol. */
+export type VisualStep = VisualStepShape;
+
+/** Allowed values for VisualTone. */
+export const VisualToneValues = {
+    Value0: 'blue',
+    Value1: 'green',
+    Value2: 'neutral',
+    Value3: 'orange',
+    Value4: 'purple',
+    Value5: 'red',
+} as const;
+
+/** VisualTone from the Nexa wire protocol. */
+export type VisualTone = (typeof VisualToneValues)[keyof typeof VisualToneValues];
+
+/** Allowed values for VmAdministrationArchitecture. */
+export const VmAdministrationArchitectureValues = { Value0: 'x86_64', Value1: 'aarch64' } as const;
+
+/** VmAdministrationArchitecture from the Nexa wire protocol. */
+export type VmAdministrationArchitecture =
+    (typeof VmAdministrationArchitectureValues)[keyof typeof VmAdministrationArchitectureValues];
+
+/** VmAdministrationEnvironment wire fields. */
+export interface VmAdministrationEnvironmentShape {
+    /** generation as defined by the Nexa gateway. */
+    readonly generation: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** operation as defined by the Nexa gateway. */
+    readonly operation: VmAdministrationOperation | null;
+    /** profile as defined by the Nexa gateway. */
+    readonly profile: VmAdministrationProfile | null;
+    /** resourcesReserved as defined by the Nexa gateway. */
+    readonly resourcesReserved: boolean;
+    /** state as defined by the Nexa gateway. */
+    readonly state: VmAdministrationState;
+}
+
+/** VmAdministrationEnvironment from the Nexa wire protocol. */
+export type VmAdministrationEnvironment = VmAdministrationEnvironmentShape;
+
+/** VmAdministrationInspect wire fields. */
+export interface VmAdministrationInspectShape {
+    /** userId as defined by the Nexa gateway. */
+    readonly userId: string;
+}
+
+/** VmAdministrationInspect from the Nexa wire protocol. */
+export type VmAdministrationInspect = VmAdministrationInspectShape;
+
+/** VmAdministrationInspectMethod wire fields. */
+export interface VmAdministrationInspectMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: VmAdministrationInspect;
+    /** result as defined by the Nexa gateway. */
+    readonly result: VmAdministrationView;
+}
+
+/** VmAdministrationInspectMethod from the Nexa wire protocol. */
+export type VmAdministrationInspectMethod = VmAdministrationInspectMethodShape;
+
+/** VmAdministrationMutateMethod wire fields. */
+export interface VmAdministrationMutateMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: VmAdministrationMutation;
+    /** result as defined by the Nexa gateway. */
+    readonly result: VmAdministrationView;
+}
+
+/** VmAdministrationMutateMethod from the Nexa wire protocol. */
+export type VmAdministrationMutateMethod = VmAdministrationMutateMethodShape;
+
+/** Allowed values for VmAdministrationMutationaction. */
+export const VmAdministrationMutationactionValues = {
+    Value0: 'delete',
+    Value1: 'start',
+    Value2: 'stop',
+} as const;
+
+/** VmAdministrationMutation wire fields. */
+export interface VmAdministrationMutationShape {
+    /** action as defined by the Nexa gateway. */
+    readonly action: (typeof VmAdministrationMutationactionValues)[keyof typeof VmAdministrationMutationactionValues];
+    /** environmentId as defined by the Nexa gateway. */
+    readonly environmentId: string;
+    /** generation as defined by the Nexa gateway. */
+    readonly generation: string;
+    /** profile as defined by the Nexa gateway. */
+    readonly profile?: VmAdministrationProfileReference;
+    /** requestId as defined by the Nexa gateway. */
+    readonly requestId: string;
+    /** userId as defined by the Nexa gateway. */
+    readonly userId: string;
+}
+
+/** VmAdministrationMutation from the Nexa wire protocol. */
+export type VmAdministrationMutation = VmAdministrationMutationShape;
+
+/** Allowed values for VmAdministrationOperationstageVariant0. */
+export const VmAdministrationOperationstageVariant0Values = {
+    Value0: 'backing-up',
+    Value1: 'booting',
+    Value2: 'claimed',
+    Value3: 'completed',
+    Value4: 'configuring-network',
+    Value5: 'creating-volumes',
+    Value6: 'failed',
+    Value7: 'preparing-tools',
+    Value8: 'queued',
+    Value9: 'reconciling',
+    Value10: 'reserving',
+    Value11: 'restoring',
+    Value12: 'stopping',
+    Value13: 'waiting-for-ssh',
+} as const;
+
+/** VmAdministrationOperation wire fields. */
+export interface VmAdministrationOperationShape {
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: VmAdministrationOperationKind;
+    /** phase as defined by the Nexa gateway. */
+    readonly phase: VmAdministrationOperationPhase;
+    /** sequence as defined by the Nexa gateway. */
+    readonly sequence: string;
+    /** stage as defined by the Nexa gateway. */
+    readonly stage:
+        | (typeof VmAdministrationOperationstageVariant0Values)[keyof typeof VmAdministrationOperationstageVariant0Values]
+        | null;
+}
+
+/** VmAdministrationOperation from the Nexa wire protocol. */
+export type VmAdministrationOperation = VmAdministrationOperationShape;
+
+/** Allowed values for VmAdministrationOperationKind. */
+export const VmAdministrationOperationKindValues = {
+    Value0: 'provision',
+    Value1: 'start',
+    Value2: 'stop',
+    Value3: 'resize',
+    Value4: 'backup',
+    Value5: 'restore',
+    Value6: 'delete',
+} as const;
+
+/** VmAdministrationOperationKind from the Nexa wire protocol. */
+export type VmAdministrationOperationKind =
+    (typeof VmAdministrationOperationKindValues)[keyof typeof VmAdministrationOperationKindValues];
+
+/** Allowed values for VmAdministrationOperationPhase. */
+export const VmAdministrationOperationPhaseValues = {
+    Value0: 'queued',
+    Value1: 'running',
+    Value2: 'reconciling',
+    Value3: 'succeeded',
+    Value4: 'failed',
+} as const;
+
+/** VmAdministrationOperationPhase from the Nexa wire protocol. */
+export type VmAdministrationOperationPhase =
+    (typeof VmAdministrationOperationPhaseValues)[keyof typeof VmAdministrationOperationPhaseValues];
+
+/** VmAdministrationProfile wire fields. */
+export interface VmAdministrationProfileShape {
+    /** architecture as defined by the Nexa gateway. */
+    readonly architecture: VmAdministrationArchitecture;
+    /** gpuCount as defined by the Nexa gateway. */
+    readonly gpuCount: number;
+    /** gpuMinimumMemoryBytes as defined by the Nexa gateway. */
+    readonly gpuMinimumMemoryBytes: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** memoryBytes as defined by the Nexa gateway. */
+    readonly memoryBytes: string;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: string;
+    /** runtime as defined by the Nexa gateway. */
+    readonly runtime: VmAdministrationRuntime;
+    /** vcpus as defined by the Nexa gateway. */
+    readonly vcpus: number;
+}
+
+/** VmAdministrationProfile from the Nexa wire protocol. */
+export type VmAdministrationProfile = VmAdministrationProfileShape;
+
+/** VmAdministrationProfileReference wire fields. */
+export interface VmAdministrationProfileReferenceShape {
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: string;
+}
+
+/** VmAdministrationProfileReference from the Nexa wire protocol. */
+export type VmAdministrationProfileReference = VmAdministrationProfileReferenceShape;
+
+/** Allowed values for VmAdministrationRuntime. */
+export const VmAdministrationRuntimeValues = { Value0: 'qemu-cpu', Value1: 'qemu-gpu' } as const;
+
+/** VmAdministrationRuntime from the Nexa wire protocol. */
+export type VmAdministrationRuntime =
+    (typeof VmAdministrationRuntimeValues)[keyof typeof VmAdministrationRuntimeValues];
+
+/** Allowed values for VmAdministrationState. */
+export const VmAdministrationStateValues = {
+    Value0: 'unprovisioned',
+    Value1: 'preparing',
+    Value2: 'reserved',
+    Value3: 'active',
+    Value4: 'stopping',
+    Value5: 'stopped',
+    Value6: 'recovery-required',
+} as const;
+
+/** VmAdministrationState from the Nexa wire protocol. */
+export type VmAdministrationState =
+    (typeof VmAdministrationStateValues)[keyof typeof VmAdministrationStateValues];
+
+/** VmAdministrationView wire fields. */
+export interface VmAdministrationViewShape {
+    /** acceptedOperationId as defined by the Nexa gateway. */
+    readonly acceptedOperationId: null | string;
+    /** defaultProfile as defined by the Nexa gateway. */
+    readonly defaultProfile: VmAdministrationProfile;
+    /** environment as defined by the Nexa gateway. */
+    readonly environment: VmAdministrationEnvironment | null;
+    /** observedAtMs as defined by the Nexa gateway. */
+    readonly observedAtMs: string;
+    /** providerId as defined by the Nexa gateway. */
+    readonly providerId: string;
+    /** userId as defined by the Nexa gateway. */
+    readonly userId: string;
+}
+
+/** VmAdministrationView from the Nexa wire protocol. */
+export type VmAdministrationView = VmAdministrationViewShape;
+
+/** VmCpuUsage wire fields. */
+export interface VmCpuUsageShape {
+    /** cumulativeNanoseconds as defined by the Nexa gateway. */
+    readonly cumulativeNanoseconds: string;
+    /** freshness as defined by the Nexa gateway. */
+    readonly freshness: VmUsageFreshness;
+    /** observedAtMs as defined by the Nexa gateway. */
+    readonly observedAtMs: string;
+    /** percentHundredths as defined by the Nexa gateway. */
+    readonly percentHundredths: null | string;
+    /** source as defined by the Nexa gateway. */
+    readonly source: 'hypervisor';
+}
+
+/** VmCpuUsage from the Nexa wire protocol. */
+export type VmCpuUsage = VmCpuUsageShape;
+
+/** VmFilesystemUsage wire fields. */
+export interface VmFilesystemUsageShape {
+    /** availableBytes as defined by the Nexa gateway. */
+    readonly availableBytes: string;
+    /** freshness as defined by the Nexa gateway. */
+    readonly freshness: VmUsageFreshness;
+    /** observedAtMs as defined by the Nexa gateway. */
+    readonly observedAtMs: string;
+    /** source as defined by the Nexa gateway. */
+    readonly source: 'guest';
+    /** totalBytes as defined by the Nexa gateway. */
+    readonly totalBytes: string;
+    /** usedBytes as defined by the Nexa gateway. */
+    readonly usedBytes: string;
+}
+
+/** VmFilesystemUsage from the Nexa wire protocol. */
+export type VmFilesystemUsage = VmFilesystemUsageShape;
+
+/** VmGuestMemoryUsage wire fields. */
+export interface VmGuestMemoryUsageShape {
+    /** availableBytes as defined by the Nexa gateway. */
+    readonly availableBytes: string;
+    /** freshness as defined by the Nexa gateway. */
+    readonly freshness: VmUsageFreshness;
+    /** observedAtMs as defined by the Nexa gateway. */
+    readonly observedAtMs: string;
+    /** source as defined by the Nexa gateway. */
+    readonly source: 'guest';
+    /** totalBytes as defined by the Nexa gateway. */
+    readonly totalBytes: string;
+    /** usedBytes as defined by the Nexa gateway. */
+    readonly usedBytes: string;
+}
+
+/** VmGuestMemoryUsage from the Nexa wire protocol. */
+export type VmGuestMemoryUsage = VmGuestMemoryUsageShape;
+
+/** VmHostMemoryUsage wire fields. */
+export interface VmHostMemoryUsageShape {
+    /** freshness as defined by the Nexa gateway. */
+    readonly freshness: VmUsageFreshness;
+    /** observedAtMs as defined by the Nexa gateway. */
+    readonly observedAtMs: string;
+    /** residentBytes as defined by the Nexa gateway. */
+    readonly residentBytes: string;
+}
+
+/** VmHostMemoryUsage from the Nexa wire protocol. */
+export type VmHostMemoryUsage = VmHostMemoryUsageShape;
+
+/** VmUsageAdministrativeMethod wire fields. */
+export interface VmUsageAdministrativeMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: VmUsageAdministrativeRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: VmUsageSnapshot;
+}
+
+/** VmUsageAdministrativeMethod from the Nexa wire protocol. */
+export type VmUsageAdministrativeMethod = VmUsageAdministrativeMethodShape;
+
+/** VmUsageAdministrativeRequest wire fields. */
+export interface VmUsageAdministrativeRequestShape {
+    /** userId as defined by the Nexa gateway. */
+    readonly userId: string;
+}
+
+/** VmUsageAdministrativeRequest from the Nexa wire protocol. */
+export type VmUsageAdministrativeRequest = VmUsageAdministrativeRequestShape;
+
+/** VmUsageEnvironment wire fields. */
+export interface VmUsageEnvironmentShape {
+    /** cpu as defined by the Nexa gateway. */
+    readonly cpu: VmCpuUsage | null;
+    /** generation as defined by the Nexa gateway. */
+    readonly generation: string;
+    /** guestMemory as defined by the Nexa gateway. */
+    readonly guestMemory: VmGuestMemoryUsage | null;
+    /** hostMemory as defined by the Nexa gateway. */
+    readonly hostMemory: VmHostMemoryUsage | null;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** provisionedMemoryBytes as defined by the Nexa gateway. */
+    readonly provisionedMemoryBytes: null | string;
+    /** root as defined by the Nexa gateway. */
+    readonly root: VmFilesystemUsage | null;
+    /** state as defined by the Nexa gateway. */
+    readonly state: VmUsageState;
+    /** vcpus as defined by the Nexa gateway. */
+    readonly vcpus: null | number;
+    /** workspace as defined by the Nexa gateway. */
+    readonly workspace: VmFilesystemUsage | null;
+}
+
+/** VmUsageEnvironment from the Nexa wire protocol. */
+export type VmUsageEnvironment = VmUsageEnvironmentShape;
+
+/** Allowed values for VmUsageFreshness. */
+export const VmUsageFreshnessValues = { Value0: 'fresh', Value1: 'stale' } as const;
+
+/** VmUsageFreshness from the Nexa wire protocol. */
+export type VmUsageFreshness = (typeof VmUsageFreshnessValues)[keyof typeof VmUsageFreshnessValues];
+
+/** VmUsageMethod wire fields. */
+export interface VmUsageMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: Recordstringnever;
+    /** result as defined by the Nexa gateway. */
+    readonly result: VmUsageSnapshot;
+}
+
+/** VmUsageMethod from the Nexa wire protocol. */
+export type VmUsageMethod = VmUsageMethodShape;
+
+/** VmUsageNetworkMethod wire fields. */
+export interface VmUsageNetworkMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: VmUsageNetworkRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: VmUsageNetworkSnapshot;
+}
+
+/** VmUsageNetworkMethod from the Nexa wire protocol. */
+export type VmUsageNetworkMethod = VmUsageNetworkMethodShape;
+
+/** VmUsageNetworkRequest wire fields. */
+export interface VmUsageNetworkRequestShape {
+    /** cursor as defined by the Nexa gateway. */
+    readonly cursor: null | string;
+}
+
+/** VmUsageNetworkRequest from the Nexa wire protocol. */
+export type VmUsageNetworkRequest = VmUsageNetworkRequestShape;
+
+/** VmUsageNetworkRow wire fields. */
+export interface VmUsageNetworkRowShape {
+    /** environment as defined by the Nexa gateway. */
+    readonly environment: VmUsageEnvironment;
+    /** providerId as defined by the Nexa gateway. */
+    readonly providerId: string;
+    /** userId as defined by the Nexa gateway. */
+    readonly userId: string;
+}
+
+/** VmUsageNetworkRow from the Nexa wire protocol. */
+export type VmUsageNetworkRow = VmUsageNetworkRowShape;
+
+/** VmUsageNetworkSnapshot wire fields. */
+export interface VmUsageNetworkSnapshotShape {
+    /** nextCursor as defined by the Nexa gateway. */
+    readonly nextCursor: null | string;
+    /** observedAtMs as defined by the Nexa gateway. */
+    readonly observedAtMs: string;
+    /** rows as defined by the Nexa gateway. */
+    readonly rows: ReadonlyArray<VmUsageNetworkRow>;
+    /** totals as defined by the Nexa gateway. */
+    readonly totals: VmUsageNetworkTotals;
+}
+
+/** VmUsageNetworkSnapshot from the Nexa wire protocol. */
+export type VmUsageNetworkSnapshot = VmUsageNetworkSnapshotShape;
+
+/** VmUsageNetworkTotals wire fields. */
+export interface VmUsageNetworkTotalsShape {
+    /** accountsWithRunningVms as defined by the Nexa gateway. */
+    readonly accountsWithRunningVms: string;
+    /** preparingVms as defined by the Nexa gateway. */
+    readonly preparingVms: string;
+    /** provisionedMemoryBytes as defined by the Nexa gateway. */
+    readonly provisionedMemoryBytes: string;
+    /** provisionedVcpus as defined by the Nexa gateway. */
+    readonly provisionedVcpus: string;
+    /** runningVms as defined by the Nexa gateway. */
+    readonly runningVms: string;
+    /** stoppedVms as defined by the Nexa gateway. */
+    readonly stoppedVms: string;
+    /** unavailableVms as defined by the Nexa gateway. */
+    readonly unavailableVms: string;
+}
+
+/** VmUsageNetworkTotals from the Nexa wire protocol. */
+export type VmUsageNetworkTotals = VmUsageNetworkTotalsShape;
+
+/** VmUsageSnapshot wire fields. */
+export interface VmUsageSnapshotShape {
+    /** environment as defined by the Nexa gateway. */
+    readonly environment: VmUsageEnvironment | null;
+    /** observedAtMs as defined by the Nexa gateway. */
+    readonly observedAtMs: string;
+    /** userId as defined by the Nexa gateway. */
+    readonly userId: string;
+}
+
+/** VmUsageSnapshot from the Nexa wire protocol. */
+export type VmUsageSnapshot = VmUsageSnapshotShape;
+
+/** Allowed values for VmUsageState. */
+export const VmUsageStateValues = {
+    Value0: 'preparing',
+    Value1: 'running',
+    Value2: 'stopped',
+    Value3: 'unavailable',
+} as const;
+
+/** VmUsageState from the Nexa wire protocol. */
+export type VmUsageState = (typeof VmUsageStateValues)[keyof typeof VmUsageStateValues];
+
 /** VoiceAudioParams wire fields. */
 export interface VoiceAudioParamsShape {
     /** callId as defined by the Nexa gateway. */
@@ -17177,10 +19018,7 @@ export interface VoiceStopParamsShape {
 export type VoiceStopParams = VoiceStopParamsShape;
 
 /** Allowed values for WalletHistoryEntrykind. */
-export const WalletHistoryEntrykindValues = {
-    Value0: 'purchase',
-    Value1: 'usage',
-} as const;
+export const WalletHistoryEntrykindValues = { Value0: 'purchase', Value1: 'usage' } as const;
 
 /** WalletHistoryEntry wire fields. */
 export interface WalletHistoryEntryShape {
@@ -17762,10 +19600,7 @@ export interface WorkflowArtifactPublicationShape {
 export type WorkflowArtifactPublication = WorkflowArtifactPublicationShape;
 
 /** Allowed values for WorkflowAttentionCategory. */
-export const WorkflowAttentionCategoryValues = {
-    Value0: 'failures',
-    Value1: 'requests',
-} as const;
+export const WorkflowAttentionCategoryValues = { Value0: 'failures', Value1: 'requests' } as const;
 
 /** WorkflowAttentionCategory from the Nexa wire protocol. */
 export type WorkflowAttentionCategory =
@@ -17871,10 +19706,7 @@ export type WorkflowCalendarFold =
     (typeof WorkflowCalendarFoldValues)[keyof typeof WorkflowCalendarFoldValues];
 
 /** Allowed values for WorkflowCalendarGap. */
-export const WorkflowCalendarGapValues = {
-    Value0: 'next-valid',
-    Value1: 'skip',
-} as const;
+export const WorkflowCalendarGapValues = { Value0: 'next-valid', Value1: 'skip' } as const;
 
 /** WorkflowCalendarGap from the Nexa wire protocol. */
 export type WorkflowCalendarGap =
@@ -18393,10 +20225,7 @@ export interface WorkflowImageResolutionRequestShape {
 export type WorkflowImageResolutionRequest = WorkflowImageResolutionRequestShape;
 
 /** Allowed values for WorkflowImageSettingsoperation. */
-export const WorkflowImageSettingsoperationValues = {
-    Value0: 'edit',
-    Value1: 'generate',
-} as const;
+export const WorkflowImageSettingsoperationValues = { Value0: 'edit', Value1: 'generate' } as const;
 
 /** WorkflowImageSettings wire fields. */
 export interface WorkflowImageSettingsShape {
@@ -19888,10 +21717,7 @@ export interface WorkflowTerminalSnapshotShape {
 export type WorkflowTerminalSnapshot = WorkflowTerminalSnapshotShape;
 
 /** Allowed values for WorkflowUsageDimension. */
-export const WorkflowUsageDimensionValues = {
-    Value0: 'agents',
-    Value1: 'steps',
-} as const;
+export const WorkflowUsageDimensionValues = { Value0: 'agents', Value1: 'steps' } as const;
 
 /** WorkflowUsageDimension from the Nexa wire protocol. */
 export type WorkflowUsageDimension =
@@ -19997,6 +21823,8 @@ export interface WorkspaceShape {
     readonly id: string;
     /** kind as defined by the Nexa gateway. */
     readonly kind: WorkspaceKind;
+    /** lastUsedAtMs as defined by the Nexa gateway. */
+    readonly lastUsedAtMs?: string;
     /** leases as defined by the Nexa gateway. */
     readonly leases?: ReadonlyArray<WorkspaceLeaseRecord>;
     /** name as defined by the Nexa gateway. */
@@ -20019,8 +21847,6 @@ export interface WorkspaceShape {
     readonly usage?: WorkspaceUsage;
     /** worktree as defined by the Nexa gateway. */
     readonly worktree?: WorkspaceworktreeShape;
-    /** lastUsedAtMs as defined by the Nexa gateway. */
-    readonly lastUsedAtMs?: string;
 }
 
 /** Workspace from the Nexa wire protocol. */
@@ -20063,6 +21889,8 @@ export interface WorkspaceDescriptionShape {
     readonly id: string;
     /** kind as defined by the Nexa gateway. */
     readonly kind: WorkspaceKind;
+    /** lastUsedAtMs as defined by the Nexa gateway. */
+    readonly lastUsedAtMs?: string;
     /** leases as defined by the Nexa gateway. */
     readonly leases: ReadonlyArray<WorkspaceLeaseRecord>;
     /** name as defined by the Nexa gateway. */
@@ -20137,6 +21965,71 @@ export interface WorkspaceOwnerShape {
 /** WorkspaceOwner from the Nexa wire protocol. */
 export type WorkspaceOwner = WorkspaceOwnerShape;
 
+/** WorkspacePage wire fields. */
+export interface WorkspacePageShape {
+    /** entries as defined by the Nexa gateway. */
+    readonly entries: ReadonlyArray<Workspace>;
+    /** nextCursor as defined by the Nexa gateway. */
+    readonly nextCursor: null | string;
+    /** presence as defined by the Nexa gateway. */
+    readonly presence?: ReadonlyArray<WorkspaceProjectPresence>;
+    /** titles as defined by the Nexa gateway. */
+    readonly titles?: ReadonlyArray<WorkspaceProjectTitle>;
+}
+
+/** WorkspacePage from the Nexa wire protocol. */
+export type WorkspacePage = WorkspacePageShape;
+
+/** WorkspacePageParams wire fields. */
+export interface WorkspacePageParamsShape {
+    /** cursor as defined by the Nexa gateway. */
+    readonly cursor?: string;
+    /** includePresence as defined by the Nexa gateway. */
+    readonly includePresence?: boolean;
+    /** limit as defined by the Nexa gateway. */
+    readonly limit?: number;
+}
+
+/** WorkspacePageParams from the Nexa wire protocol. */
+export type WorkspacePageParams = WorkspacePageParamsShape;
+
+/** Allowed values for WorkspacePresenceState. */
+export const WorkspacePresenceStateValues = {
+    Value0: 'empty',
+    Value1: 'nonempty',
+    Value2: 'unknown',
+} as const;
+
+/** WorkspacePresenceState from the Nexa wire protocol. */
+export type WorkspacePresenceState =
+    (typeof WorkspacePresenceStateValues)[keyof typeof WorkspacePresenceStateValues];
+
+/** WorkspaceProjectPresence wire fields. */
+export interface WorkspaceProjectPresenceShape {
+    /** assignment as defined by the Nexa gateway. */
+    readonly assignment: string;
+    /** modifiedAtNs as defined by the Nexa gateway. */
+    readonly modifiedAtNs: string;
+    /** state as defined by the Nexa gateway. */
+    readonly state: WorkspacePresenceState;
+    /** workspaceId as defined by the Nexa gateway. */
+    readonly workspaceId: string;
+}
+
+/** WorkspaceProjectPresence from the Nexa wire protocol. */
+export type WorkspaceProjectPresence = WorkspaceProjectPresenceShape;
+
+/** WorkspaceProjectTitle wire fields. */
+export interface WorkspaceProjectTitleShape {
+    /** title as defined by the Nexa gateway. */
+    readonly title: string;
+    /** workspaceId as defined by the Nexa gateway. */
+    readonly workspaceId: string;
+}
+
+/** WorkspaceProjectTitle from the Nexa wire protocol. */
+export type WorkspaceProjectTitle = WorkspaceProjectTitleShape;
+
 /** WorkspaceQuota wire fields. */
 export interface WorkspaceQuotaShape {
     /** maxBytes as defined by the Nexa gateway. */
@@ -20185,1771 +22078,6 @@ export interface WorkspaceUsageShape {
 /** WorkspaceUsage from the Nexa wire protocol. */
 export type WorkspaceUsage = WorkspaceUsageShape;
 
-/** Allowed values for ConnectorArgumentBoundkind. */
-export const ConnectorArgumentBoundkindValues = {
-    Value0: 'relative-path',
-    Value1: 'text',
-} as const;
-
-/** ConnectorArgumentBound wire fields. */
-export interface ConnectorArgumentBoundShape {
-    /** kind as defined by the Nexa gateway. */
-    readonly kind: (typeof ConnectorArgumentBoundkindValues)[keyof typeof ConnectorArgumentBoundkindValues];
-    /** maximumBytes as defined by the Nexa gateway. */
-    readonly maximumBytes: number;
-}
-
-/** ConnectorArgumentBound from the Nexa wire protocol. */
-export type ConnectorArgumentBound = ConnectorArgumentBoundShape;
-
-/** ConnectorArgumentChoice wire fields. */
-export interface ConnectorArgumentChoiceShape {
-    /** kind as defined by the Nexa gateway. */
-    readonly kind: 'choice';
-    /** values as defined by the Nexa gateway. */
-    readonly values: ReadonlyArray<string>;
-}
-
-/** ConnectorArgumentChoice from the Nexa wire protocol. */
-export type ConnectorArgumentChoice = ConnectorArgumentChoiceShape;
-
-/** ConnectorArgumentRule from the Nexa wire protocol. */
-export type ConnectorArgumentRule =
-    | ConnectorMachineInvocationRule
-    | ConnectorInteractiveInvocationRule
-    | ConnectorArgumentChoice
-    | ConnectorArgumentBound;
-
-/** ConnectorExecuteMethod wire fields. */
-export interface ConnectorExecuteMethodShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: ConnectorExecutionSubmitParams;
-    /** result as defined by the Nexa gateway. */
-    readonly result: ConnectorExecutionJob;
-}
-
-/** ConnectorExecuteMethod from the Nexa wire protocol. */
-export type ConnectorExecuteMethod = ConnectorExecuteMethodShape;
-
-/** Named connector execution protocol values. */
-export enum ConnectorExecutionAccess {
-    ReadOnly = 'read-only',
-    ReadWrite = 'read-write',
-}
-
-/** ConnectorExecutionJob wire fields. */
-export interface ConnectorExecutionJobShape {
-    /** admissionHash as defined by the Nexa gateway. */
-    readonly admissionHash: string;
-    /** authorization as defined by the Nexa gateway. */
-    readonly authorization: ConnectorOperationAuthorization;
-    /** environmentId as defined by the Nexa gateway. */
-    readonly environmentId: string;
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** lane as defined by the Nexa gateway. */
-    readonly lane: ConnectorExecutionLane;
-    /** phase as defined by the Nexa gateway. */
-    readonly phase: ConnectorJobPhase;
-    /** request as defined by the Nexa gateway. */
-    readonly request: ConnectorExecutionRequest;
-    /** response as defined by the Nexa gateway. */
-    readonly response: ConnectorExecutionResult | null;
-    /** sequence as defined by the Nexa gateway. */
-    readonly sequence: string;
-}
-
-/** ConnectorExecutionJob from the Nexa wire protocol. */
-export type ConnectorExecutionJob = ConnectorExecutionJobShape;
-
-/** Named connector execution protocol values. */
-export enum ConnectorExecutionLane {
-    First = 'first',
-    Second = 'second',
-}
-
-/** ConnectorExecutionLaneStatus wire fields. */
-export interface ConnectorExecutionLaneStatusShape {
-    /** acknowledgedSequence as defined by the Nexa gateway. */
-    readonly acknowledgedSequence: string;
-    /** lane as defined by the Nexa gateway. */
-    readonly lane: ConnectorExecutionLane;
-    /** online as defined by the Nexa gateway. */
-    readonly online: boolean;
-    /** profile as defined by the Nexa gateway. */
-    readonly profile: ConnectorExecutionProfile | null;
-    /** sequence as defined by the Nexa gateway. */
-    readonly sequence: string;
-}
-
-/** ConnectorExecutionLaneStatus from the Nexa wire protocol. */
-export type ConnectorExecutionLaneStatus = ConnectorExecutionLaneStatusShape;
-
-/** ConnectorExecutionMethod wire fields. */
-export interface ConnectorExecutionMethodShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: ConnectorEnvironmentParams;
-    /** result as defined by the Nexa gateway. */
-    readonly result: ConnectorExecutionStatus;
-}
-
-/** ConnectorExecutionMethod from the Nexa wire protocol. */
-export type ConnectorExecutionMethod = ConnectorExecutionMethodShape;
-
-/** ConnectorExecutionProfile wire fields. */
-export interface ConnectorExecutionProfileShape {
-    /** maximumAddressBytes as defined by the Nexa gateway. */
-    readonly maximumAddressBytes: string;
-    /** maximumFileBytes as defined by the Nexa gateway. */
-    readonly maximumFileBytes: string;
-    /** policySha256 as defined by the Nexa gateway. */
-    readonly policySha256: string;
-    /** programs as defined by the Nexa gateway. */
-    readonly programs: ReadonlyArray<ConnectorProgramGrant>;
-    /** resources as defined by the Nexa gateway. */
-    readonly resources: ConnectorExecutionResources;
-    /** revision as defined by the Nexa gateway. */
-    readonly revision: string;
-    /** roots as defined by the Nexa gateway. */
-    readonly roots: ReadonlyArray<ConnectorExecutionRoot>;
-    /** timeoutMs as defined by the Nexa gateway. */
-    readonly timeoutMs: number;
-}
-
-/** ConnectorExecutionProfile from the Nexa wire protocol. */
-export type ConnectorExecutionProfile = ConnectorExecutionProfileShape;
-
-/** ConnectorExecutionRequest wire fields. */
-export interface ConnectorExecutionRequestShape {
-    /** arguments as defined by the Nexa gateway. */
-    readonly arguments: ReadonlyArray<string>;
-    /** policySha256 as defined by the Nexa gateway. */
-    readonly policySha256: string;
-    /** programId as defined by the Nexa gateway. */
-    readonly programId: string;
-    /** requestId as defined by the Nexa gateway. */
-    readonly requestId: string;
-    /** rootId as defined by the Nexa gateway. */
-    readonly rootId: string;
-}
-
-/** ConnectorExecutionRequest from the Nexa wire protocol. */
-export type ConnectorExecutionRequest = ConnectorExecutionRequestShape;
-
-/** ConnectorExecutionResources wire fields. */
-export interface ConnectorExecutionResourcesShape {
-    /** cpuQuotaMicros as defined by the Nexa gateway. */
-    readonly cpuQuotaMicros: number;
-    /** maximumTasks as defined by the Nexa gateway. */
-    readonly maximumTasks: number;
-    /** memoryBytes as defined by the Nexa gateway. */
-    readonly memoryBytes: string;
-}
-
-/** ConnectorExecutionResources from the Nexa wire protocol. */
-export type ConnectorExecutionResources = ConnectorExecutionResourcesShape;
-
-/** Allowed values for ConnectorExecutionResultfailureVariant0. */
-export const ConnectorExecutionResultfailureVariant0Values = {
-    Value0: 'ambiguous-exit',
-    Value1: 'cancelled',
-    Value2: 'expired',
-    Value3: 'interrupted',
-    Value4: 'output-limit',
-    Value5: 'sandbox',
-    Value6: 'signal',
-    Value7: 'timeout',
-} as const;
-
-/** Allowed values for ConnectorExecutionResultsetupFailureVariant0. */
-export const ConnectorExecutionResultsetupFailureVariant0Values = {
-    Value0: 'apparmor',
-    Value1: 'bootstrap',
-    Value2: 'cgroup',
-    Value3: 'configuration',
-    Value4: 'confinement',
-    Value5: 'execute',
-    Value6: 'mounts',
-    Value7: 'namespaces',
-} as const;
-
-/** ConnectorExecutionResult wire fields. */
-export interface ConnectorExecutionResultShape {
-    /** exitCode as defined by the Nexa gateway. */
-    readonly exitCode: null | number;
-    /** failure as defined by the Nexa gateway. */
-    readonly failure:
-        | (typeof ConnectorExecutionResultfailureVariant0Values)[keyof typeof ConnectorExecutionResultfailureVariant0Values]
-        | null;
-    /** setupFailure as defined by the Nexa gateway. */
-    readonly setupFailure:
-        | (typeof ConnectorExecutionResultsetupFailureVariant0Values)[keyof typeof ConnectorExecutionResultsetupFailureVariant0Values]
-        | null;
-    /** stderrBase64 as defined by the Nexa gateway. */
-    readonly stderrBase64: string;
-    /** stdoutBase64 as defined by the Nexa gateway. */
-    readonly stdoutBase64: string;
-    /** termination as defined by the Nexa gateway. */
-    readonly termination: ConnectorExecutionTermination;
-}
-
-/** ConnectorExecutionResult from the Nexa wire protocol. */
-export type ConnectorExecutionResult = ConnectorExecutionResultShape;
-
-/** ConnectorExecutionResultMethod wire fields. */
-export interface ConnectorExecutionResultMethodShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: ConnectorResultParams;
-    /** result as defined by the Nexa gateway. */
-    readonly result: ConnectorExecutionJob;
-}
-
-/** ConnectorExecutionResultMethod from the Nexa wire protocol. */
-export type ConnectorExecutionResultMethod = ConnectorExecutionResultMethodShape;
-
-/** ConnectorExecutionRoot wire fields. */
-export interface ConnectorExecutionRootShape {
-    /** access as defined by the Nexa gateway. */
-    readonly access: ConnectorExecutionAccess;
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-}
-
-/** ConnectorExecutionRoot from the Nexa wire protocol. */
-export type ConnectorExecutionRoot = ConnectorExecutionRootShape;
-
-/** ConnectorExecutionStatus wire fields. */
-export interface ConnectorExecutionStatusShape {
-    /** environmentId as defined by the Nexa gateway. */
-    readonly environmentId: string;
-    /** lanes as defined by the Nexa gateway. */
-    readonly lanes: ReadonlyArray<ConnectorExecutionLaneStatus>;
-}
-
-/** ConnectorExecutionStatus from the Nexa wire protocol. */
-export type ConnectorExecutionStatus = ConnectorExecutionStatusShape;
-
-/** ConnectorExecutionSubmitParams wire fields. */
-export interface ConnectorExecutionSubmitParamsShape {
-    /** environmentId as defined by the Nexa gateway. */
-    readonly environmentId: string;
-    /** lane as defined by the Nexa gateway. */
-    readonly lane: ConnectorExecutionLane;
-    /** previousSequence as defined by the Nexa gateway. */
-    readonly previousSequence: string;
-    /** request as defined by the Nexa gateway. */
-    readonly request: ConnectorExecutionRequest;
-    /** workspaceAccess as defined by the Nexa gateway. */
-    readonly workspaceAccess: ConnectorExecutionAccess;
-}
-
-/** ConnectorExecutionSubmitParams from the Nexa wire protocol. */
-export type ConnectorExecutionSubmitParams = ConnectorExecutionSubmitParamsShape;
-
-/** Named connector execution protocol values. */
-export enum ConnectorExecutionTermination {
-    Exited = 'exited',
-    Indeterminate = 'indeterminate',
-}
-
-/** ConnectorProgramGrant wire fields. */
-export interface ConnectorProgramGrantShape {
-    /** arguments as defined by the Nexa gateway. */
-    readonly arguments: ReadonlyArray<ConnectorArgumentRule>;
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** rootIds as defined by the Nexa gateway. */
-    readonly rootIds: ReadonlyArray<string>;
-}
-
-/** ConnectorProgramGrant from the Nexa wire protocol. */
-export type ConnectorProgramGrant = ConnectorProgramGrantShape;
-
-/** ConnectorExecutionCurrentJob wire fields. */
-export interface ConnectorExecutionCurrentJobShape {
-    /** admissionHash as defined by the Nexa gateway. */
-    readonly admissionHash: string;
-    /** jobId as defined by the Nexa gateway. */
-    readonly jobId: string;
-    /** lane as defined by the Nexa gateway. */
-    readonly lane: ConnectorExecutionLane;
-    /** phase as defined by the Nexa gateway. */
-    readonly phase: ConnectorJobPhase;
-    /** programId as defined by the Nexa gateway. */
-    readonly programId: string;
-    /** requestId as defined by the Nexa gateway. */
-    readonly requestId: string;
-    /** rootId as defined by the Nexa gateway. */
-    readonly rootId: string;
-    /** sequence as defined by the Nexa gateway. */
-    readonly sequence: string;
-    /** workspaceAccess as defined by the Nexa gateway. */
-    readonly workspaceAccess: ConnectorExecutionAccess;
-}
-
-/** ConnectorExecutionCurrentJob from the Nexa wire protocol. */
-export type ConnectorExecutionCurrentJob = ConnectorExecutionCurrentJobShape;
-
-/** ConnectorExecutionCurrentJobs wire fields. */
-export interface ConnectorExecutionCurrentJobsShape {
-    /** environmentId as defined by the Nexa gateway. */
-    readonly environmentId: string;
-    /** lanes as defined by the Nexa gateway. */
-    readonly lanes: ReadonlyArray<ConnectorExecutionCurrentLane>;
-}
-
-/** ConnectorExecutionCurrentJobs from the Nexa wire protocol. */
-export type ConnectorExecutionCurrentJobs = ConnectorExecutionCurrentJobsShape;
-
-/** ConnectorExecutionCurrentJobsMethod wire fields. */
-export interface ConnectorExecutionCurrentJobsMethodShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: ConnectorEnvironmentParams;
-    /** result as defined by the Nexa gateway. */
-    readonly result: ConnectorExecutionCurrentJobs;
-}
-
-/** ConnectorExecutionCurrentJobsMethod from the Nexa wire protocol. */
-export type ConnectorExecutionCurrentJobsMethod = ConnectorExecutionCurrentJobsMethodShape;
-
-/** ConnectorExecutionCurrentLane wire fields. */
-export interface ConnectorExecutionCurrentLaneShape {
-    /** acknowledgedSequence as defined by the Nexa gateway. */
-    readonly acknowledgedSequence: string;
-    /** job as defined by the Nexa gateway. */
-    readonly job: ConnectorExecutionCurrentJob | null;
-    /** lane as defined by the Nexa gateway. */
-    readonly lane: ConnectorExecutionLane;
-    /** sequence as defined by the Nexa gateway. */
-    readonly sequence: string;
-}
-
-/** ConnectorExecutionCurrentLane from the Nexa wire protocol. */
-export type ConnectorExecutionCurrentLane = ConnectorExecutionCurrentLaneShape;
-
-/** ConnectorExecutionStopMethod wire fields. */
-export interface ConnectorExecutionStopMethodShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: ConnectorExecutionStopParams;
-    /** result as defined by the Nexa gateway. */
-    readonly result: ConnectorExecutionStopReceipt;
-}
-
-/** ConnectorExecutionStopMethod from the Nexa wire protocol. */
-export type ConnectorExecutionStopMethod = ConnectorExecutionStopMethodShape;
-
-/** ConnectorExecutionStopParams wire fields. */
-export interface ConnectorExecutionStopParamsShape {
-    /** admissionHash as defined by the Nexa gateway. */
-    readonly admissionHash: string;
-    /** environmentId as defined by the Nexa gateway. */
-    readonly environmentId: string;
-    /** jobId as defined by the Nexa gateway. */
-    readonly jobId: string;
-    /** lane as defined by the Nexa gateway. */
-    readonly lane: ConnectorExecutionLane;
-    /** requestId as defined by the Nexa gateway. */
-    readonly requestId: string;
-    /** sequence as defined by the Nexa gateway. */
-    readonly sequence: string;
-    /** workspaceAccess as defined by the Nexa gateway. */
-    readonly workspaceAccess: ConnectorExecutionAccess;
-}
-
-/** ConnectorExecutionStopParams from the Nexa wire protocol. */
-export type ConnectorExecutionStopParams = ConnectorExecutionStopParamsShape;
-
-/** ConnectorExecutionStopReceipt wire fields. */
-export interface ConnectorExecutionStopReceiptShape {
-    /** admissionHash as defined by the Nexa gateway. */
-    readonly admissionHash: string;
-    /** environmentId as defined by the Nexa gateway. */
-    readonly environmentId: string;
-    /** jobId as defined by the Nexa gateway. */
-    readonly jobId: string;
-    /** lane as defined by the Nexa gateway. */
-    readonly lane: ConnectorExecutionLane;
-    /** phase as defined by the Nexa gateway. */
-    readonly phase: ConnectorJobPhase;
-    /** requestId as defined by the Nexa gateway. */
-    readonly requestId: string;
-    /** requestedAtMs as defined by the Nexa gateway. */
-    readonly requestedAtMs: null | string;
-    /** sequence as defined by the Nexa gateway. */
-    readonly sequence: string;
-}
-
-/** ConnectorExecutionStopReceipt from the Nexa wire protocol. */
-export type ConnectorExecutionStopReceipt = ConnectorExecutionStopReceiptShape;
-
-/** ConnectorLinkDenied wire fields. */
-export interface ConnectorLinkDeniedShape {
-    /** deniedAtMs as defined by the Nexa gateway. */
-    readonly deniedAtMs: string;
-    /** linkId as defined by the Nexa gateway. */
-    readonly linkId: string;
-    /** publicKey as defined by the Nexa gateway. */
-    readonly publicKey: string;
-    /** retainUntilMs as defined by the Nexa gateway. */
-    readonly retainUntilMs: string;
-}
-
-/** ConnectorLinkDenied from the Nexa wire protocol. */
-export type ConnectorLinkDenied = ConnectorLinkDeniedShape;
-
-/** ConnectorLinkDenyMethod wire fields. */
-export interface ConnectorLinkDenyMethodShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: ConnectorLinkDenyParams;
-    /** result as defined by the Nexa gateway. */
-    readonly result: ConnectorLinkDenied;
-}
-
-/** ConnectorLinkDenyMethod from the Nexa wire protocol. */
-export type ConnectorLinkDenyMethod = ConnectorLinkDenyMethodShape;
-
-/** ConnectorLinkDenyParams wire fields. */
-export interface ConnectorLinkDenyParamsShape {
-    /** code as defined by the Nexa gateway. */
-    readonly code: string;
-    /** linkId as defined by the Nexa gateway. */
-    readonly linkId: string;
-    /** publicKey as defined by the Nexa gateway. */
-    readonly publicKey: string;
-    /** requestId as defined by the Nexa gateway. */
-    readonly requestId: string;
-}
-
-/** ConnectorLinkDenyParams from the Nexa wire protocol. */
-export type ConnectorLinkDenyParams = ConnectorLinkDenyParamsShape;
-
-/** ConnectorExecutionOutputData wire fields. */
-export interface ConnectorExecutionOutputDataShape {
-    /** stderrBase64 as defined by the Nexa gateway. */
-    readonly stderrBase64: string;
-    /** stdoutBase64 as defined by the Nexa gateway. */
-    readonly stdoutBase64: string;
-}
-
-/** ConnectorExecutionOutputData from the Nexa wire protocol. */
-export type ConnectorExecutionOutputData = ConnectorExecutionOutputDataShape;
-
-/** ConnectorExecutionOutputMethod wire fields. */
-export interface ConnectorExecutionOutputMethodShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: ConnectorResultParams;
-    /** result as defined by the Nexa gateway. */
-    readonly result: ConnectorExecutionOutputView;
-}
-
-/** ConnectorExecutionOutputMethod from the Nexa wire protocol. */
-export type ConnectorExecutionOutputMethod = ConnectorExecutionOutputMethodShape;
-
-/** ConnectorExecutionOutputView wire fields. */
-export interface ConnectorExecutionOutputViewShape {
-    /** admissionHash as defined by the Nexa gateway. */
-    readonly admissionHash: string;
-    /** environmentId as defined by the Nexa gateway. */
-    readonly environmentId: string;
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** lane as defined by the Nexa gateway. */
-    readonly lane: ConnectorExecutionLane;
-    /** output as defined by the Nexa gateway. */
-    readonly output: ConnectorExecutionOutputData | null;
-    /** phase as defined by the Nexa gateway. */
-    readonly phase: ConnectorJobPhase;
-    /** sequence as defined by the Nexa gateway. */
-    readonly sequence: string;
-}
-
-/** ConnectorExecutionOutputView from the Nexa wire protocol. */
-export type ConnectorExecutionOutputView = ConnectorExecutionOutputViewShape;
-
-/** ConnectorRemove wire fields. */
-export interface ConnectorRemoveShape {
-    /** action as defined by the Nexa gateway. */
-    readonly action: 'remove';
-    /** path as defined by the Nexa gateway. */
-    readonly path: string;
-    /** policySha256 as defined by the Nexa gateway. */
-    readonly policySha256: string;
-    /** recursive as defined by the Nexa gateway. */
-    readonly recursive: boolean;
-    /** requestId as defined by the Nexa gateway. */
-    readonly requestId: string;
-    /** rootId as defined by the Nexa gateway. */
-    readonly rootId: string;
-}
-
-/** ConnectorRemove from the Nexa wire protocol. */
-export type ConnectorRemove = ConnectorRemoveShape;
-
-/** ConnectorRemoveResult wire fields. */
-export interface ConnectorRemoveResultShape {
-    /** action as defined by the Nexa gateway. */
-    readonly action: 'remove';
-    /** entriesRemoved as defined by the Nexa gateway. */
-    readonly entriesRemoved: string;
-    /** requestId as defined by the Nexa gateway. */
-    readonly requestId: string;
-}
-
-/** ConnectorRemoveResult from the Nexa wire protocol. */
-export type ConnectorRemoveResult = ConnectorRemoveResultShape;
-
-/** ConnectorMkdir wire fields. */
-export interface ConnectorMkdirShape {
-    /** action as defined by the Nexa gateway. */
-    readonly action: 'mkdir';
-    /** path as defined by the Nexa gateway. */
-    readonly path: string;
-    /** policySha256 as defined by the Nexa gateway. */
-    readonly policySha256: string;
-    /** requestId as defined by the Nexa gateway. */
-    readonly requestId: string;
-    /** rootId as defined by the Nexa gateway. */
-    readonly rootId: string;
-}
-
-/** ConnectorMkdir from the Nexa wire protocol. */
-export type ConnectorMkdir = ConnectorMkdirShape;
-
-/** ConnectorMkdirResult wire fields. */
-export interface ConnectorMkdirResultShape {
-    /** action as defined by the Nexa gateway. */
-    readonly action: 'mkdir';
-    /** requestId as defined by the Nexa gateway. */
-    readonly requestId: string;
-}
-
-/** ConnectorMkdirResult from the Nexa wire protocol. */
-export type ConnectorMkdirResult = ConnectorMkdirResultShape;
-
-/** Allowed values for ConnectorGpuVendor. */
-export const ConnectorGpuVendorValues = {
-    Value0: 'nvidia',
-    Value1: 'amd',
-    Value2: 'intel',
-    Value3: 'other',
-} as const;
-
-/** ConnectorGpuVendor from the Nexa wire protocol. */
-export type ConnectorGpuVendor =
-    (typeof ConnectorGpuVendorValues)[keyof typeof ConnectorGpuVendorValues];
-
-/** ConnectorWorkspaceGetMethod wire fields. */
-export interface ConnectorWorkspaceGetMethodShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: ConnectorWorkspaceGetParams;
-    /** result as defined by the Nexa gateway. */
-    readonly result: ConnectorWorkspaceSelectionView;
-}
-
-/** ConnectorWorkspaceGetMethod from the Nexa wire protocol. */
-export type ConnectorWorkspaceGetMethod = ConnectorWorkspaceGetMethodShape;
-
-/** ConnectorWorkspaceGetParams wire fields. */
-export interface ConnectorWorkspaceGetParamsShape {
-    /** sessionId as defined by the Nexa gateway. */
-    readonly sessionId: string;
-}
-
-/** ConnectorWorkspaceGetParams from the Nexa wire protocol. */
-export type ConnectorWorkspaceGetParams = ConnectorWorkspaceGetParamsShape;
-
-/** ConnectorWorkspaceSelectionView wire fields. */
-export interface ConnectorWorkspaceSelectionViewShape {
-    /** revision as defined by the Nexa gateway. */
-    readonly revision: string;
-    /** selection as defined by the Nexa gateway. */
-    readonly selection: ConnectorWorkspaceFileSelection | ConnectorWorkspaceJointSelection | null;
-    /** sessionId as defined by the Nexa gateway. */
-    readonly sessionId: string;
-}
-
-/** ConnectorWorkspaceSelectionView from the Nexa wire protocol. */
-export type ConnectorWorkspaceSelectionView = ConnectorWorkspaceSelectionViewShape;
-
-/** ConnectorWorkspaceSelectMethod wire fields. */
-export interface ConnectorWorkspaceSelectMethodShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: ConnectorWorkspaceSelectParams;
-    /** result as defined by the Nexa gateway. */
-    readonly result: ConnectorWorkspaceSelectionView;
-}
-
-/** ConnectorWorkspaceSelectMethod from the Nexa wire protocol. */
-export type ConnectorWorkspaceSelectMethod = ConnectorWorkspaceSelectMethodShape;
-
-/** ConnectorWorkspaceSelectParams wire fields. */
-export interface ConnectorWorkspaceSelectParamsShape {
-    /** environmentId as defined by the Nexa gateway. */
-    readonly environmentId: string;
-    /** expectedRevision as defined by the Nexa gateway. */
-    readonly expectedRevision: string;
-    /** policySha256 as defined by the Nexa gateway. */
-    readonly policySha256: string;
-    /** requestId as defined by the Nexa gateway. */
-    readonly requestId: string;
-    /** rootId as defined by the Nexa gateway. */
-    readonly rootId: string;
-    /** sessionId as defined by the Nexa gateway. */
-    readonly sessionId: string;
-}
-
-/** ConnectorWorkspaceSelectParams from the Nexa wire protocol. */
-export type ConnectorWorkspaceSelectParams = ConnectorWorkspaceSelectParamsShape;
-
-/** ConnectorWorkspaceClearMethod wire fields. */
-export interface ConnectorWorkspaceClearMethodShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: ConnectorWorkspaceClearParams;
-    /** result as defined by the Nexa gateway. */
-    readonly result: ConnectorWorkspaceSelectionView;
-}
-
-/** ConnectorWorkspaceClearMethod from the Nexa wire protocol. */
-export type ConnectorWorkspaceClearMethod = ConnectorWorkspaceClearMethodShape;
-
-/** ConnectorWorkspaceClearParams wire fields. */
-export interface ConnectorWorkspaceClearParamsShape {
-    /** expectedRevision as defined by the Nexa gateway. */
-    readonly expectedRevision: string;
-    /** requestId as defined by the Nexa gateway. */
-    readonly requestId: string;
-    /** sessionId as defined by the Nexa gateway. */
-    readonly sessionId: string;
-}
-
-/** ConnectorWorkspaceClearParams from the Nexa wire protocol. */
-export type ConnectorWorkspaceClearParams = ConnectorWorkspaceClearParamsShape;
-
-/** ConnectorWorkspaceCreateMethod wire fields. */
-export interface ConnectorWorkspaceCreateMethodShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: ConnectorWorkspaceCreateParams;
-    /** result as defined by the Nexa gateway. */
-    readonly result: ConnectorWorkspaceSelectionView;
-}
-
-/** ConnectorWorkspaceCreateMethod from the Nexa wire protocol. */
-export type ConnectorWorkspaceCreateMethod = ConnectorWorkspaceCreateMethodShape;
-
-/** ConnectorWorkspaceCreateParams wire fields. */
-export interface ConnectorWorkspaceCreateParamsShape {
-    /** requestId as defined by the Nexa gateway. */
-    readonly requestId: string;
-}
-
-/** ConnectorWorkspaceCreateParams from the Nexa wire protocol. */
-export type ConnectorWorkspaceCreateParams = ConnectorWorkspaceCreateParamsShape;
-
-/** ConnectorWorkspaceCatalogMethod wire fields. */
-export interface ConnectorWorkspaceCatalogMethodShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: ConnectorWorkspaceCatalogParams;
-    /** result as defined by the Nexa gateway. */
-    readonly result: ConnectorWorkspaceCatalogView;
-}
-
-/** ConnectorWorkspaceCatalogMethod from the Nexa wire protocol. */
-export type ConnectorWorkspaceCatalogMethod = ConnectorWorkspaceCatalogMethodShape;
-
-/** ConnectorWorkspaceCatalogParams wire fields. */
-export interface ConnectorWorkspaceCatalogParamsShape {
-    /** environmentId as defined by the Nexa gateway. */
-    readonly environmentId: string;
-    /** sessionId as defined by the Nexa gateway. */
-    readonly sessionId: string;
-}
-
-/** ConnectorWorkspaceCatalogParams from the Nexa wire protocol. */
-export type ConnectorWorkspaceCatalogParams = ConnectorWorkspaceCatalogParamsShape;
-
-/** ConnectorWorkspaceCatalogView wire fields. */
-export interface ConnectorWorkspaceCatalogViewShape {
-    /** entries as defined by the Nexa gateway. */
-    readonly entries: ReadonlyArray<ConnectorWorkspaceCatalogEntry>;
-    /** environmentId as defined by the Nexa gateway. */
-    readonly environmentId: string;
-}
-
-/** ConnectorWorkspaceCatalogView from the Nexa wire protocol. */
-export type ConnectorWorkspaceCatalogView = ConnectorWorkspaceCatalogViewShape;
-
-/** ConnectorWorkspaceCatalogEntry wire fields. */
-export interface ConnectorWorkspaceCatalogEntryShape {
-    /** access as defined by the Nexa gateway. */
-    readonly access: ConnectorFileMode;
-    /** bindingRevision as defined by the Nexa gateway. */
-    readonly bindingRevision: string;
-    /** bindingSha256 as defined by the Nexa gateway. */
-    readonly bindingSha256: string;
-    /** descriptorSha256 as defined by the Nexa gateway. */
-    readonly descriptorSha256: string;
-    /** executionPolicySha256 as defined by the Nexa gateway. */
-    readonly executionPolicySha256: string;
-    /** executionRootId as defined by the Nexa gateway. */
-    readonly executionRootId: string;
-    /** filePolicySha256 as defined by the Nexa gateway. */
-    readonly filePolicySha256: string;
-    /** fileRootId as defined by the Nexa gateway. */
-    readonly fileRootId: string;
-}
-
-/** ConnectorWorkspaceCatalogEntry from the Nexa wire protocol. */
-export type ConnectorWorkspaceCatalogEntry = ConnectorWorkspaceCatalogEntryShape;
-
-/** ConnectorWorkspaceSelectJointMethod wire fields. */
-export interface ConnectorWorkspaceSelectJointMethodShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: ConnectorWorkspaceSelectJointParams;
-    /** result as defined by the Nexa gateway. */
-    readonly result: ConnectorWorkspaceSelectionView;
-}
-
-/** ConnectorWorkspaceSelectJointMethod from the Nexa wire protocol. */
-export type ConnectorWorkspaceSelectJointMethod = ConnectorWorkspaceSelectJointMethodShape;
-
-/** ConnectorWorkspaceSelectJointParams wire fields. */
-export interface ConnectorWorkspaceSelectJointParamsShape {
-    /** expectedRevision as defined by the Nexa gateway. */
-    readonly expectedRevision: string;
-    /** requestId as defined by the Nexa gateway. */
-    readonly requestId: string;
-    /** sessionId as defined by the Nexa gateway. */
-    readonly sessionId: string;
-    /** target as defined by the Nexa gateway. */
-    readonly target: ConnectorWorkspaceJointTarget;
-}
-
-/** ConnectorWorkspaceSelectJointParams from the Nexa wire protocol. */
-export type ConnectorWorkspaceSelectJointParams = ConnectorWorkspaceSelectJointParamsShape;
-
-/** ConnectorWorkspaceJointTarget wire fields. */
-export interface ConnectorWorkspaceJointTargetShape {
-    /** access as defined by the Nexa gateway. */
-    readonly access: ConnectorFileMode;
-    /** bindingRevision as defined by the Nexa gateway. */
-    readonly bindingRevision: string;
-    /** bindingSha256 as defined by the Nexa gateway. */
-    readonly bindingSha256: string;
-    /** descriptorSha256 as defined by the Nexa gateway. */
-    readonly descriptorSha256: string;
-    /** environmentId as defined by the Nexa gateway. */
-    readonly environmentId: string;
-    /** executionPolicySha256 as defined by the Nexa gateway. */
-    readonly executionPolicySha256: string;
-    /** executionRootId as defined by the Nexa gateway. */
-    readonly executionRootId: string;
-    /** filePolicySha256 as defined by the Nexa gateway. */
-    readonly filePolicySha256: string;
-    /** fileRootId as defined by the Nexa gateway. */
-    readonly fileRootId: string;
-}
-
-/** ConnectorWorkspaceJointTarget from the Nexa wire protocol. */
-export type ConnectorWorkspaceJointTarget = ConnectorWorkspaceJointTargetShape;
-
-/** ConnectorWorkspaceFileSelection wire fields. */
-export interface ConnectorWorkspaceFileSelectionShape {
-    /** environmentId as defined by the Nexa gateway. */
-    readonly environmentId: string;
-    /** kind as defined by the Nexa gateway. */
-    readonly kind: 'files';
-    /** mode as defined by the Nexa gateway. */
-    readonly mode: ConnectorFileMode;
-    /** policySha256 as defined by the Nexa gateway. */
-    readonly policySha256: string;
-    /** rootId as defined by the Nexa gateway. */
-    readonly rootId: string;
-}
-
-/** ConnectorWorkspaceFileSelection from the Nexa wire protocol. */
-export type ConnectorWorkspaceFileSelection = ConnectorWorkspaceFileSelectionShape;
-
-/** ConnectorWorkspaceJointSelection wire fields. */
-export interface ConnectorWorkspaceJointSelectionShape {
-    /** bindingRevision as defined by the Nexa gateway. */
-    readonly bindingRevision: string;
-    /** descriptorSha256 as defined by the Nexa gateway. */
-    readonly descriptorSha256: string;
-    /** environmentId as defined by the Nexa gateway. */
-    readonly environmentId: string;
-    /** executionPolicySha256 as defined by the Nexa gateway. */
-    readonly executionPolicySha256: string;
-    /** executionRootId as defined by the Nexa gateway. */
-    readonly executionRootId: string;
-    /** jointBindingSha256 as defined by the Nexa gateway. */
-    readonly jointBindingSha256: string;
-    /** kind as defined by the Nexa gateway. */
-    readonly kind: 'joint';
-    /** mode as defined by the Nexa gateway. */
-    readonly mode: ConnectorFileMode;
-    /** policySha256 as defined by the Nexa gateway. */
-    readonly policySha256: string;
-    /** rootId as defined by the Nexa gateway. */
-    readonly rootId: string;
-}
-
-/** ConnectorWorkspaceJointSelection from the Nexa wire protocol. */
-export type ConnectorWorkspaceJointSelection = ConnectorWorkspaceJointSelectionShape;
-
-/** ConnectorChmod wire fields. */
-export interface ConnectorChmodShape {
-    /** action as defined by the Nexa gateway. */
-    readonly action: 'chmod';
-    /** mode as defined by the Nexa gateway. */
-    readonly mode: ConnectorFilePermissionMode;
-    /** path as defined by the Nexa gateway. */
-    readonly path: string;
-    /** policySha256 as defined by the Nexa gateway. */
-    readonly policySha256: string;
-    /** requestId as defined by the Nexa gateway. */
-    readonly requestId: string;
-    /** rootId as defined by the Nexa gateway. */
-    readonly rootId: string;
-}
-
-/** ConnectorChmod from the Nexa wire protocol. */
-export type ConnectorChmod = ConnectorChmodShape;
-
-/** ConnectorChmodResult wire fields. */
-export interface ConnectorChmodResultShape {
-    /** action as defined by the Nexa gateway. */
-    readonly action: 'chmod';
-    /** metadata as defined by the Nexa gateway. */
-    readonly metadata: ConnectorMetadata;
-    /** requestId as defined by the Nexa gateway. */
-    readonly requestId: string;
-}
-
-/** ConnectorChmodResult from the Nexa wire protocol. */
-export type ConnectorChmodResult = ConnectorChmodResultShape;
-
-/** Allowed values for ConnectorFilePermissionMode. */
-export const ConnectorFilePermissionModeValues = {
-    Value0: 384,
-    Value1: 448,
-} as const;
-
-/** ConnectorFilePermissionMode from the Nexa wire protocol. */
-export type ConnectorFilePermissionMode =
-    (typeof ConnectorFilePermissionModeValues)[keyof typeof ConnectorFilePermissionModeValues];
-
-/** ConnectorMachineCommand wire fields. */
-export interface ConnectorMachineCommandShape {
-    /** alias as defined by the Nexa gateway. */
-    readonly alias: string;
-    /** executableIndex as defined by the Nexa gateway. */
-    readonly executableIndex: number;
-}
-
-/** ConnectorMachineCommand from the Nexa wire protocol. */
-export type ConnectorMachineCommand = ConnectorMachineCommandShape;
-
-/** ConnectorMachineEnvironmentGrant wire fields. */
-export interface ConnectorMachineEnvironmentGrantShape {
-    /** maximumBytes as defined by the Nexa gateway. */
-    readonly maximumBytes: number;
-    /** name as defined by the Nexa gateway. */
-    readonly name: string;
-}
-
-/** ConnectorMachineEnvironmentGrant from the Nexa wire protocol. */
-export type ConnectorMachineEnvironmentGrant = ConnectorMachineEnvironmentGrantShape;
-
-/** ConnectorMachineInvocationRule wire fields. */
-export interface ConnectorMachineInvocationRuleShape {
-    /** commands as defined by the Nexa gateway. */
-    readonly commands: ReadonlyArray<ConnectorMachineCommand>;
-    /** environment as defined by the Nexa gateway. */
-    readonly environment: ReadonlyArray<ConnectorMachineEnvironmentGrant>;
-    /** kind as defined by the Nexa gateway. */
-    readonly kind: 'machine-invocation';
-    /** maximumArgumentBytes as defined by the Nexa gateway. */
-    readonly maximumArgumentBytes: number;
-    /** maximumArguments as defined by the Nexa gateway. */
-    readonly maximumArguments: number;
-    /** maximumArgumentsBytes as defined by the Nexa gateway. */
-    readonly maximumArgumentsBytes: number;
-    /** maximumCwdBytes as defined by the Nexa gateway. */
-    readonly maximumCwdBytes: number;
-    /** maximumEnvironmentBytes as defined by the Nexa gateway. */
-    readonly maximumEnvironmentBytes: number;
-    /** maximumScriptBytes as defined by the Nexa gateway. */
-    readonly maximumScriptBytes: number;
-    /** maximumStdinBytes as defined by the Nexa gateway. */
-    readonly maximumStdinBytes: number;
-    /** maximumTimeoutMs as defined by the Nexa gateway. */
-    readonly maximumTimeoutMs: number;
-    /** shell as defined by the Nexa gateway. */
-    readonly shell: ConnectorMachineShell | null;
-}
-
-/** ConnectorMachineInvocationRule from the Nexa wire protocol. */
-export type ConnectorMachineInvocationRule = ConnectorMachineInvocationRuleShape;
-
-/** ConnectorMachineShell wire fields. */
-export interface ConnectorMachineShellShape {
-    /** executableIndex as defined by the Nexa gateway. */
-    readonly executableIndex: number;
-    /** fixedArguments as defined by the Nexa gateway. */
-    readonly fixedArguments: ReadonlyArray<string>;
-}
-
-/** ConnectorMachineShell from the Nexa wire protocol. */
-export type ConnectorMachineShell = ConnectorMachineShellShape;
-
-/** ConnectorRename wire fields. */
-export interface ConnectorRenameShape {
-    /** action as defined by the Nexa gateway. */
-    readonly action: 'rename';
-    /** destination as defined by the Nexa gateway. */
-    readonly destination: string;
-    /** mode as defined by the Nexa gateway. */
-    readonly mode: ConnectorWriteMode;
-    /** path as defined by the Nexa gateway. */
-    readonly path: string;
-    /** policySha256 as defined by the Nexa gateway. */
-    readonly policySha256: string;
-    /** requestId as defined by the Nexa gateway. */
-    readonly requestId: string;
-    /** rootId as defined by the Nexa gateway. */
-    readonly rootId: string;
-}
-
-/** ConnectorRename from the Nexa wire protocol. */
-export type ConnectorRename = ConnectorRenameShape;
-
-/** ConnectorRenameResult wire fields. */
-export interface ConnectorRenameResultShape {
-    /** action as defined by the Nexa gateway. */
-    readonly action: 'rename';
-    /** metadata as defined by the Nexa gateway. */
-    readonly metadata: ConnectorMetadata;
-    /** requestId as defined by the Nexa gateway. */
-    readonly requestId: string;
-}
-
-/** ConnectorRenameResult from the Nexa wire protocol. */
-export type ConnectorRenameResult = ConnectorRenameResultShape;
-
-/** ConnectorIndependentAuthorization wire fields. */
-export interface ConnectorIndependentAuthorizationShape {
-    /** kind as defined by the Nexa gateway. */
-    readonly kind: 'independent';
-}
-
-/** ConnectorIndependentAuthorization from the Nexa wire protocol. */
-export type ConnectorIndependentAuthorization = ConnectorIndependentAuthorizationShape;
-
-/** ConnectorJointAuthorization wire fields. */
-export interface ConnectorJointAuthorizationShape {
-    /** binding as defined by the Nexa gateway. */
-    readonly binding: ConnectorJointWorkspaceDescriptor;
-    /** kind as defined by the Nexa gateway. */
-    readonly kind: 'joint';
-}
-
-/** ConnectorJointAuthorization from the Nexa wire protocol. */
-export type ConnectorJointAuthorization = ConnectorJointAuthorizationShape;
-
-/** ConnectorJointExecutionJournals wire fields. */
-export interface ConnectorJointExecutionJournalsShape {
-    /** first as defined by the Nexa gateway. */
-    readonly first: string;
-    /** second as defined by the Nexa gateway. */
-    readonly second: string;
-}
-
-/** ConnectorJointExecutionJournals from the Nexa wire protocol. */
-export type ConnectorJointExecutionJournals = ConnectorJointExecutionJournalsShape;
-
-/** ConnectorJointWorkspaceBinding wire fields. */
-export interface ConnectorJointWorkspaceBindingShape {
-    /** access as defined by the Nexa gateway. */
-    readonly access: ConnectorFileMode;
-    /** authorityId as defined by the Nexa gateway. */
-    readonly authorityId: string;
-    /** enrollmentId as defined by the Nexa gateway. */
-    readonly enrollmentId: string;
-    /** environmentId as defined by the Nexa gateway. */
-    readonly environmentId: string;
-    /** executionJournals as defined by the Nexa gateway. */
-    readonly executionJournals: ConnectorJointExecutionJournals;
-    /** executionPolicySha256 as defined by the Nexa gateway. */
-    readonly executionPolicySha256: string;
-    /** executionRootId as defined by the Nexa gateway. */
-    readonly executionRootId: string;
-    /** fileJournalId as defined by the Nexa gateway. */
-    readonly fileJournalId: string;
-    /** filePolicySha256 as defined by the Nexa gateway. */
-    readonly filePolicySha256: string;
-    /** fileRootId as defined by the Nexa gateway. */
-    readonly fileRootId: string;
-    /** physicalRootCommitment as defined by the Nexa gateway. */
-    readonly physicalRootCommitment: string;
-    /** revision as defined by the Nexa gateway. */
-    readonly revision: string;
-}
-
-/** ConnectorJointWorkspaceBinding from the Nexa wire protocol. */
-export type ConnectorJointWorkspaceBinding = ConnectorJointWorkspaceBindingShape;
-
-/** ConnectorJointWorkspaceDescriptor wire fields. */
-export interface ConnectorJointWorkspaceDescriptorShape {
-    /** binding as defined by the Nexa gateway. */
-    readonly binding: ConnectorJointWorkspaceBinding;
-    /** signature as defined by the Nexa gateway. */
-    readonly signature: string;
-}
-
-/** ConnectorJointWorkspaceDescriptor from the Nexa wire protocol. */
-export type ConnectorJointWorkspaceDescriptor = ConnectorJointWorkspaceDescriptorShape;
-
-/** ConnectorOperationAuthorization from the Nexa wire protocol. */
-export type ConnectorOperationAuthorization =
-    ConnectorIndependentAuthorization | ConnectorJointAuthorization;
-
-/** Published interactive permission metadata, not native availability. */
-export enum ConnectorInputKind {
-    Data = 'data',
-    End = 'end',
-    Resize = 'resize',
-}
-
-/** ConnectorInteractiveInvocationRule wire fields. */
-export interface ConnectorInteractiveInvocationRuleShape {
-    /** controls as defined by the Nexa gateway. */
-    readonly controls: ReadonlyArray<ConnectorInputKind>;
-    /** invocation as defined by the Nexa gateway. */
-    readonly invocation: ConnectorMachineInvocationRule;
-    /** kind as defined by the Nexa gateway. */
-    readonly kind: 'interactive-invocation';
-    /** maximumControls as defined by the Nexa gateway. */
-    readonly maximumControls: number;
-    /** maximumInputBytes as defined by the Nexa gateway. */
-    readonly maximumInputBytes: string;
-    /** maximumResizes as defined by the Nexa gateway. */
-    readonly maximumResizes: number;
-    /** transports as defined by the Nexa gateway. */
-    readonly transports: ReadonlyArray<ConnectorInteractiveTransport>;
-}
-
-/** ConnectorInteractiveInvocationRule from the Nexa wire protocol. */
-export type ConnectorInteractiveInvocationRule = ConnectorInteractiveInvocationRuleShape;
-
-/** Published interactive permission metadata, not native availability. */
-export enum ConnectorInteractiveTransport {
-    Pipe = 'pipe',
-    Pty = 'pty',
-}
-
-/** Allowed values for BrowserFilesChunkParamslocation. */
-export const BrowserFilesChunkParamslocationValues = {
-    Value0: 'account',
-    Value1: 'vm',
-} as const;
-
-/** BrowserFilesChunkParams wire fields. */
-export interface BrowserFilesChunkParamsShape {
-    /** data as defined by the Nexa gateway. */
-    readonly data: string;
-    /** location as defined by the Nexa gateway. */
-    readonly location?: (typeof BrowserFilesChunkParamslocationValues)[keyof typeof BrowserFilesChunkParamslocationValues];
-    /** offset as defined by the Nexa gateway. */
-    readonly offset: string;
-    /** uploadId as defined by the Nexa gateway. */
-    readonly uploadId: string;
-    /** workspaceId as defined by the Nexa gateway. */
-    readonly workspaceId?: string;
-}
-
-/** BrowserFilesChunkParams from the Nexa wire protocol. */
-export type BrowserFilesChunkParams = BrowserFilesChunkParamsShape;
-
-/** BrowserFilesDone wire fields. */
-export interface BrowserFilesDoneShape {
-    /** ok as defined by the Nexa gateway. */
-    readonly ok: boolean;
-}
-
-/** BrowserFilesDone from the Nexa wire protocol. */
-export type BrowserFilesDone = BrowserFilesDoneShape;
-
-/** BrowserFilesEntry wire fields. */
-export interface BrowserFilesEntryShape {
-    /** byteLength as defined by the Nexa gateway. */
-    readonly byteLength: string;
-    /** kind as defined by the Nexa gateway. */
-    readonly kind: string;
-    /** modifiedAtNs as defined by the Nexa gateway. */
-    readonly modifiedAtNs: string;
-    /** name as defined by the Nexa gateway. */
-    readonly name: string;
-}
-
-/** BrowserFilesEntry from the Nexa wire protocol. */
-export type BrowserFilesEntry = BrowserFilesEntryShape;
-
-/** Allowed values for BrowserFilesListParamslocation. */
-export const BrowserFilesListParamslocationValues = {
-    Value0: 'account',
-    Value1: 'vm',
-} as const;
-
-/** BrowserFilesListParams wire fields. */
-export interface BrowserFilesListParamsShape {
-    /** cursor as defined by the Nexa gateway. */
-    readonly cursor?: string;
-    /** location as defined by the Nexa gateway. */
-    readonly location?: (typeof BrowserFilesListParamslocationValues)[keyof typeof BrowserFilesListParamslocationValues];
-    /** path as defined by the Nexa gateway. */
-    readonly path: string;
-    /** workspaceId as defined by the Nexa gateway. */
-    readonly workspaceId?: string;
-}
-
-/** BrowserFilesListParams from the Nexa wire protocol. */
-export type BrowserFilesListParams = BrowserFilesListParamsShape;
-
-/** BrowserFilesPage wire fields. */
-export interface BrowserFilesPageShape {
-    /** assignment as defined by the Nexa gateway. */
-    readonly assignment: string;
-    /** entries as defined by the Nexa gateway. */
-    readonly entries: ReadonlyArray<BrowserFilesEntry>;
-    /** nextCursor as defined by the Nexa gateway. */
-    readonly nextCursor: null | string;
-}
-
-/** BrowserFilesPage from the Nexa wire protocol. */
-export type BrowserFilesPage = BrowserFilesPageShape;
-
-/** BrowserFilesPosition wire fields. */
-export interface BrowserFilesPositionShape {
-    /** offset as defined by the Nexa gateway. */
-    readonly offset: string;
-}
-
-/** BrowserFilesPosition from the Nexa wire protocol. */
-export type BrowserFilesPosition = BrowserFilesPositionShape;
-
-/** BrowserFilesRead wire fields. */
-export interface BrowserFilesReadShape {
-    /** assignment as defined by the Nexa gateway. */
-    readonly assignment: string;
-    /** byteLength as defined by the Nexa gateway. */
-    readonly byteLength: string;
-    /** data as defined by the Nexa gateway. */
-    readonly data: string;
-    /** revision as defined by the Nexa gateway. */
-    readonly revision: string;
-}
-
-/** BrowserFilesRead from the Nexa wire protocol. */
-export type BrowserFilesRead = BrowserFilesReadShape;
-
-/** Allowed values for BrowserFilesReadParamslocation. */
-export const BrowserFilesReadParamslocationValues = {
-    Value0: 'account',
-    Value1: 'vm',
-} as const;
-
-/** BrowserFilesReadParams wire fields. */
-export interface BrowserFilesReadParamsShape {
-    /** assignment as defined by the Nexa gateway. */
-    readonly assignment: string;
-    /** location as defined by the Nexa gateway. */
-    readonly location?: (typeof BrowserFilesReadParamslocationValues)[keyof typeof BrowserFilesReadParamslocationValues];
-    /** offset as defined by the Nexa gateway. */
-    readonly offset: string;
-    /** path as defined by the Nexa gateway. */
-    readonly path: string;
-    /** revision as defined by the Nexa gateway. */
-    readonly revision?: string;
-    /** workspaceId as defined by the Nexa gateway. */
-    readonly workspaceId?: string;
-}
-
-/** BrowserFilesReadParams from the Nexa wire protocol. */
-export type BrowserFilesReadParams = BrowserFilesReadParamsShape;
-
-/** Allowed values for BrowserFilesStartParamslocation. */
-export const BrowserFilesStartParamslocationValues = {
-    Value0: 'account',
-    Value1: 'vm',
-} as const;
-
-/** BrowserFilesStartParams wire fields. */
-export interface BrowserFilesStartParamsShape {
-    /** assignment as defined by the Nexa gateway. */
-    readonly assignment: string;
-    /** byteLength as defined by the Nexa gateway. */
-    readonly byteLength: string;
-    /** extractZip as defined by the Nexa gateway. */
-    readonly extractZip: boolean;
-    /** location as defined by the Nexa gateway. */
-    readonly location?: (typeof BrowserFilesStartParamslocationValues)[keyof typeof BrowserFilesStartParamslocationValues];
-    /** path as defined by the Nexa gateway. */
-    readonly path: string;
-    /** workspaceId as defined by the Nexa gateway. */
-    readonly workspaceId?: string;
-}
-
-/** BrowserFilesStartParams from the Nexa wire protocol. */
-export type BrowserFilesStartParams = BrowserFilesStartParamsShape;
-
-/** Allowed values for BrowserFilesTargetlocation. */
-export const BrowserFilesTargetlocationValues = {
-    Value0: 'account',
-    Value1: 'vm',
-} as const;
-
-/** BrowserFilesTarget wire fields. */
-export interface BrowserFilesTargetShape {
-    /** assignment as defined by the Nexa gateway. */
-    readonly assignment: string;
-    /** location as defined by the Nexa gateway. */
-    readonly location?: (typeof BrowserFilesTargetlocationValues)[keyof typeof BrowserFilesTargetlocationValues];
-    /** path as defined by the Nexa gateway. */
-    readonly path: string;
-    /** workspaceId as defined by the Nexa gateway. */
-    readonly workspaceId?: string;
-}
-
-/** BrowserFilesTarget from the Nexa wire protocol. */
-export type BrowserFilesTarget = BrowserFilesTargetShape;
-
-/** BrowserFilesUpload wire fields. */
-export interface BrowserFilesUploadShape {
-    /** chunkBytes as defined by the Nexa gateway. */
-    readonly chunkBytes: number;
-    /** uploadId as defined by the Nexa gateway. */
-    readonly uploadId: string;
-}
-
-/** BrowserFilesUpload from the Nexa wire protocol. */
-export type BrowserFilesUpload = BrowserFilesUploadShape;
-
-/** Allowed values for BrowserFilesUploadParamslocation. */
-export const BrowserFilesUploadParamslocationValues = {
-    Value0: 'account',
-    Value1: 'vm',
-} as const;
-
-/** BrowserFilesUploadParams wire fields. */
-export interface BrowserFilesUploadParamsShape {
-    /** location as defined by the Nexa gateway. */
-    readonly location?: (typeof BrowserFilesUploadParamslocationValues)[keyof typeof BrowserFilesUploadParamslocationValues];
-    /** uploadId as defined by the Nexa gateway. */
-    readonly uploadId: string;
-    /** workspaceId as defined by the Nexa gateway. */
-    readonly workspaceId?: string;
-}
-
-/** BrowserFilesUploadParams from the Nexa wire protocol. */
-export type BrowserFilesUploadParams = BrowserFilesUploadParamsShape;
-
-/** WorkspacePage wire fields. */
-export interface WorkspacePageShape {
-    /** entries as defined by the Nexa gateway. */
-    readonly entries: ReadonlyArray<Workspace>;
-    /** nextCursor as defined by the Nexa gateway. */
-    readonly nextCursor: null | string;
-    /** titles as defined by the Nexa gateway. */
-    readonly titles?: ReadonlyArray<WorkspaceProjectTitle>;
-    /** presence as defined by the Nexa gateway. */
-    readonly presence?: ReadonlyArray<WorkspaceProjectPresence>;
-}
-
-/** WorkspacePage from the Nexa wire protocol. */
-export type WorkspacePage = WorkspacePageShape;
-
-/** WorkspacePageParams wire fields. */
-export interface WorkspacePageParamsShape {
-    /** cursor as defined by the Nexa gateway. */
-    readonly cursor?: string;
-    /** limit as defined by the Nexa gateway. */
-    readonly limit?: number;
-    /** includePresence as defined by the Nexa gateway. */
-    readonly includePresence?: boolean;
-}
-
-/** WorkspacePageParams from the Nexa wire protocol. */
-export type WorkspacePageParams = WorkspacePageParamsShape;
-
-/** WorkspaceProjectTitle wire fields. */
-export interface WorkspaceProjectTitleShape {
-    /** title as defined by the Nexa gateway. */
-    readonly title: string;
-    /** workspaceId as defined by the Nexa gateway. */
-    readonly workspaceId: string;
-}
-
-/** WorkspaceProjectTitle from the Nexa wire protocol. */
-export type WorkspaceProjectTitle = WorkspaceProjectTitleShape;
-
-/** WorkspaceProjectPresence wire fields. */
-export interface WorkspaceProjectPresenceShape {
-    /** assignment as defined by the Nexa gateway. */
-    readonly assignment: string;
-    /** modifiedAtNs as defined by the Nexa gateway. */
-    readonly modifiedAtNs: string;
-    /** state as defined by the Nexa gateway. */
-    readonly state: WorkspacePresenceState;
-    /** workspaceId as defined by the Nexa gateway. */
-    readonly workspaceId: string;
-}
-
-/** WorkspaceProjectPresence from the Nexa wire protocol. */
-export type WorkspaceProjectPresence = WorkspaceProjectPresenceShape;
-
-/** Allowed values for WorkspacePresenceState. */
-export const WorkspacePresenceStateValues = {
-    Value0: 'empty',
-    Value1: 'nonempty',
-    Value2: 'unknown',
-} as const;
-
-/** WorkspacePresenceState from the Nexa wire protocol. */
-export type WorkspacePresenceState =
-    (typeof WorkspacePresenceStateValues)[keyof typeof WorkspacePresenceStateValues];
-
-/** Allowed values for BrowserFilesRenameParamslocation. */
-export const BrowserFilesRenameParamslocationValues = {
-    Value0: 'account',
-    Value1: 'vm',
-} as const;
-
-/** BrowserFilesRenameParams wire fields. */
-export interface BrowserFilesRenameParamsShape {
-    /** assignment as defined by the Nexa gateway. */
-    readonly assignment: string;
-    /** destination as defined by the Nexa gateway. */
-    readonly destination: string;
-    /** location as defined by the Nexa gateway. */
-    readonly location?: (typeof BrowserFilesRenameParamslocationValues)[keyof typeof BrowserFilesRenameParamslocationValues];
-    /** path as defined by the Nexa gateway. */
-    readonly path: string;
-    /** workspaceId as defined by the Nexa gateway. */
-    readonly workspaceId?: string;
-}
-
-/** BrowserFilesRenameParams from the Nexa wire protocol. */
-export type BrowserFilesRenameParams = BrowserFilesRenameParamsShape;
-
-/** VmAdministrationInspectMethod wire fields. */
-export interface VmAdministrationInspectMethodShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: VmAdministrationInspect;
-    /** result as defined by the Nexa gateway. */
-    readonly result: VmAdministrationView;
-}
-
-/** VmAdministrationInspectMethod from the Nexa wire protocol. */
-export type VmAdministrationInspectMethod = VmAdministrationInspectMethodShape;
-
-/** VmAdministrationInspect wire fields. */
-export interface VmAdministrationInspectShape {
-    /** userId as defined by the Nexa gateway. */
-    readonly userId: string;
-}
-
-/** VmAdministrationInspect from the Nexa wire protocol. */
-export type VmAdministrationInspect = VmAdministrationInspectShape;
-
-/** VmAdministrationView wire fields. */
-export interface VmAdministrationViewShape {
-    /** acceptedOperationId as defined by the Nexa gateway. */
-    readonly acceptedOperationId: null | string;
-    /** defaultProfile as defined by the Nexa gateway. */
-    readonly defaultProfile: VmAdministrationProfile;
-    /** environment as defined by the Nexa gateway. */
-    readonly environment: VmAdministrationEnvironment | null;
-    /** observedAtMs as defined by the Nexa gateway. */
-    readonly observedAtMs: string;
-    /** providerId as defined by the Nexa gateway. */
-    readonly providerId: string;
-    /** userId as defined by the Nexa gateway. */
-    readonly userId: string;
-}
-
-/** VmAdministrationView from the Nexa wire protocol. */
-export type VmAdministrationView = VmAdministrationViewShape;
-
-/** VmAdministrationProfile wire fields. */
-export interface VmAdministrationProfileShape {
-    /** architecture as defined by the Nexa gateway. */
-    readonly architecture: VmAdministrationArchitecture;
-    /** gpuCount as defined by the Nexa gateway. */
-    readonly gpuCount: number;
-    /** gpuMinimumMemoryBytes as defined by the Nexa gateway. */
-    readonly gpuMinimumMemoryBytes: string;
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** memoryBytes as defined by the Nexa gateway. */
-    readonly memoryBytes: string;
-    /** revision as defined by the Nexa gateway. */
-    readonly revision: string;
-    /** runtime as defined by the Nexa gateway. */
-    readonly runtime: VmAdministrationRuntime;
-    /** vcpus as defined by the Nexa gateway. */
-    readonly vcpus: number;
-}
-
-/** VmAdministrationProfile from the Nexa wire protocol. */
-export type VmAdministrationProfile = VmAdministrationProfileShape;
-
-/** Allowed values for VmAdministrationArchitecture. */
-export const VmAdministrationArchitectureValues = {
-    Value0: 'x86_64',
-    Value1: 'aarch64',
-} as const;
-
-/** VmAdministrationArchitecture from the Nexa wire protocol. */
-export type VmAdministrationArchitecture =
-    (typeof VmAdministrationArchitectureValues)[keyof typeof VmAdministrationArchitectureValues];
-
-/** Allowed values for VmAdministrationRuntime. */
-export const VmAdministrationRuntimeValues = {
-    Value0: 'qemu-cpu',
-    Value1: 'qemu-gpu',
-} as const;
-
-/** VmAdministrationRuntime from the Nexa wire protocol. */
-export type VmAdministrationRuntime =
-    (typeof VmAdministrationRuntimeValues)[keyof typeof VmAdministrationRuntimeValues];
-
-/** VmAdministrationEnvironment wire fields. */
-export interface VmAdministrationEnvironmentShape {
-    /** generation as defined by the Nexa gateway. */
-    readonly generation: string;
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** operation as defined by the Nexa gateway. */
-    readonly operation: VmAdministrationOperation | null;
-    /** profile as defined by the Nexa gateway. */
-    readonly profile: VmAdministrationProfile | null;
-    /** resourcesReserved as defined by the Nexa gateway. */
-    readonly resourcesReserved: boolean;
-    /** state as defined by the Nexa gateway. */
-    readonly state: VmAdministrationState;
-}
-
-/** VmAdministrationEnvironment from the Nexa wire protocol. */
-export type VmAdministrationEnvironment = VmAdministrationEnvironmentShape;
-
-/** Allowed values for VmAdministrationOperationstageVariant0. */
-export const VmAdministrationOperationstageVariant0Values = {
-    Value0: 'backing-up',
-    Value1: 'booting',
-    Value2: 'claimed',
-    Value3: 'completed',
-    Value4: 'configuring-network',
-    Value5: 'creating-volumes',
-    Value6: 'failed',
-    Value7: 'preparing-tools',
-    Value8: 'queued',
-    Value9: 'reconciling',
-    Value10: 'reserving',
-    Value11: 'restoring',
-    Value12: 'stopping',
-    Value13: 'waiting-for-ssh',
-} as const;
-
-/** VmAdministrationOperation wire fields. */
-export interface VmAdministrationOperationShape {
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** kind as defined by the Nexa gateway. */
-    readonly kind: VmAdministrationOperationKind;
-    /** phase as defined by the Nexa gateway. */
-    readonly phase: VmAdministrationOperationPhase;
-    /** sequence as defined by the Nexa gateway. */
-    readonly sequence: string;
-    /** stage as defined by the Nexa gateway. */
-    readonly stage:
-        | (typeof VmAdministrationOperationstageVariant0Values)[keyof typeof VmAdministrationOperationstageVariant0Values]
-        | null;
-}
-
-/** VmAdministrationOperation from the Nexa wire protocol. */
-export type VmAdministrationOperation = VmAdministrationOperationShape;
-
-/** Allowed values for VmAdministrationOperationKind. */
-export const VmAdministrationOperationKindValues = {
-    Value0: 'provision',
-    Value1: 'start',
-    Value2: 'stop',
-    Value3: 'resize',
-    Value4: 'backup',
-    Value5: 'restore',
-    Value6: 'delete',
-} as const;
-
-/** VmAdministrationOperationKind from the Nexa wire protocol. */
-export type VmAdministrationOperationKind =
-    (typeof VmAdministrationOperationKindValues)[keyof typeof VmAdministrationOperationKindValues];
-
-/** Allowed values for VmAdministrationOperationPhase. */
-export const VmAdministrationOperationPhaseValues = {
-    Value0: 'queued',
-    Value1: 'running',
-    Value2: 'reconciling',
-    Value3: 'succeeded',
-    Value4: 'failed',
-} as const;
-
-/** VmAdministrationOperationPhase from the Nexa wire protocol. */
-export type VmAdministrationOperationPhase =
-    (typeof VmAdministrationOperationPhaseValues)[keyof typeof VmAdministrationOperationPhaseValues];
-
-/** Allowed values for VmAdministrationState. */
-export const VmAdministrationStateValues = {
-    Value0: 'unprovisioned',
-    Value1: 'preparing',
-    Value2: 'reserved',
-    Value3: 'active',
-    Value4: 'stopping',
-    Value5: 'stopped',
-    Value6: 'recovery-required',
-} as const;
-
-/** VmAdministrationState from the Nexa wire protocol. */
-export type VmAdministrationState =
-    (typeof VmAdministrationStateValues)[keyof typeof VmAdministrationStateValues];
-
-/** VmAdministrationMutateMethod wire fields. */
-export interface VmAdministrationMutateMethodShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: VmAdministrationMutation;
-    /** result as defined by the Nexa gateway. */
-    readonly result: VmAdministrationView;
-}
-
-/** VmAdministrationMutateMethod from the Nexa wire protocol. */
-export type VmAdministrationMutateMethod = VmAdministrationMutateMethodShape;
-
-/** Allowed values for VmAdministrationMutationaction. */
-export const VmAdministrationMutationactionValues = {
-    Value0: 'delete',
-    Value1: 'start',
-    Value2: 'stop',
-} as const;
-
-/** VmAdministrationMutation wire fields. */
-export interface VmAdministrationMutationShape {
-    /** action as defined by the Nexa gateway. */
-    readonly action: (typeof VmAdministrationMutationactionValues)[keyof typeof VmAdministrationMutationactionValues];
-    /** environmentId as defined by the Nexa gateway. */
-    readonly environmentId: string;
-    /** generation as defined by the Nexa gateway. */
-    readonly generation: string;
-    /** profile as defined by the Nexa gateway. */
-    readonly profile?: VmAdministrationProfileReference;
-    /** requestId as defined by the Nexa gateway. */
-    readonly requestId: string;
-    /** userId as defined by the Nexa gateway. */
-    readonly userId: string;
-}
-
-/** VmAdministrationMutation from the Nexa wire protocol. */
-export type VmAdministrationMutation = VmAdministrationMutationShape;
-
-/** VmAdministrationProfileReference wire fields. */
-export interface VmAdministrationProfileReferenceShape {
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** revision as defined by the Nexa gateway. */
-    readonly revision: string;
-}
-
-/** VmAdministrationProfileReference from the Nexa wire protocol. */
-export type VmAdministrationProfileReference = VmAdministrationProfileReferenceShape;
-
-/** VisualResponse wire fields. */
-export interface VisualResponseShape {
-    /** connections as defined by the Nexa gateway. */
-    readonly connections: ReadonlyArray<VisualConnection>;
-    /** description as defined by the Nexa gateway. */
-    readonly description: string;
-    /** elements as defined by the Nexa gateway. */
-    readonly elements: ReadonlyArray<VisualElement>;
-    /** height as defined by the Nexa gateway. */
-    readonly height: number;
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** steps as defined by the Nexa gateway. */
-    readonly steps: ReadonlyArray<VisualStep>;
-    /** title as defined by the Nexa gateway. */
-    readonly title: string;
-    /** version as defined by the Nexa gateway. */
-    readonly version: 1;
-    /** width as defined by the Nexa gateway. */
-    readonly width: number;
-}
-
-/** VisualResponse from the Nexa wire protocol. */
-export type VisualResponse = VisualResponseShape;
-
-/** VisualConnection wire fields. */
-export interface VisualConnectionShape {
-    /** animated as defined by the Nexa gateway. */
-    readonly animated: boolean;
-    /** arrow as defined by the Nexa gateway. */
-    readonly arrow: VisualArrow;
-    /** from as defined by the Nexa gateway. */
-    readonly from: string;
-    /** fromSide as defined by the Nexa gateway. */
-    readonly fromSide: VisualSide;
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** label as defined by the Nexa gateway. */
-    readonly label: string;
-    /** line as defined by the Nexa gateway. */
-    readonly line: VisualLine;
-    /** to as defined by the Nexa gateway. */
-    readonly to: string;
-    /** toSide as defined by the Nexa gateway. */
-    readonly toSide: VisualSide;
-    /** via as defined by the Nexa gateway. */
-    readonly via: ReadonlyArray<VisualPoint>;
-}
-
-/** VisualConnection from the Nexa wire protocol. */
-export type VisualConnection = VisualConnectionShape;
-
-/** Allowed values for VisualArrow. */
-export const VisualArrowValues = {
-    Value0: 'both',
-    Value1: 'forward',
-    Value2: 'none',
-} as const;
-
-/** VisualArrow from the Nexa wire protocol. */
-export type VisualArrow = (typeof VisualArrowValues)[keyof typeof VisualArrowValues];
-
-/** Allowed values for VisualSide. */
-export const VisualSideValues = {
-    Value0: 'auto',
-    Value1: 'bottom',
-    Value2: 'left',
-    Value3: 'right',
-    Value4: 'top',
-} as const;
-
-/** VisualSide from the Nexa wire protocol. */
-export type VisualSide = (typeof VisualSideValues)[keyof typeof VisualSideValues];
-
-/** Allowed values for VisualLine. */
-export const VisualLineValues = { Value0: 'dashed', Value1: 'solid' } as const;
-
-/** VisualLine from the Nexa wire protocol. */
-export type VisualLine = (typeof VisualLineValues)[keyof typeof VisualLineValues];
-
-/** VisualPoint wire fields. */
-export interface VisualPointShape {
-    /** x as defined by the Nexa gateway. */
-    readonly x: number;
-    /** y as defined by the Nexa gateway. */
-    readonly y: number;
-}
-
-/** VisualPoint from the Nexa wire protocol. */
-export type VisualPoint = VisualPointShape;
-
-/** VisualElement wire fields. */
-export interface VisualElementShape {
-    /** detail as defined by the Nexa gateway. */
-    readonly detail: string;
-    /** eyebrow as defined by the Nexa gateway. */
-    readonly eyebrow: string;
-    /** height as defined by the Nexa gateway. */
-    readonly height: number;
-    /** icon as defined by the Nexa gateway. */
-    readonly icon: VisualIcon;
-    /** id as defined by the Nexa gateway. */
-    readonly id: string;
-    /** kind as defined by the Nexa gateway. */
-    readonly kind: VisualElementKind;
-    /** title as defined by the Nexa gateway. */
-    readonly title: string;
-    /** tone as defined by the Nexa gateway. */
-    readonly tone: VisualTone;
-    /** value as defined by the Nexa gateway. */
-    readonly value: string;
-    /** width as defined by the Nexa gateway. */
-    readonly width: number;
-    /** x as defined by the Nexa gateway. */
-    readonly x: number;
-    /** y as defined by the Nexa gateway. */
-    readonly y: number;
-}
-
-/** VisualElement from the Nexa wire protocol. */
-export type VisualElement = VisualElementShape;
-
-/** Allowed values for VisualIcon. */
-export const VisualIconValues = {
-    Value0: 'check',
-    Value1: 'cloud',
-    Value2: 'code',
-    Value3: 'cpu',
-    Value4: 'database',
-    Value5: 'layers',
-    Value6: 'none',
-    Value7: 'server',
-    Value8: 'shield',
-    Value9: 'spark',
-    Value10: 'user',
-} as const;
-
-/** VisualIcon from the Nexa wire protocol. */
-export type VisualIcon = (typeof VisualIconValues)[keyof typeof VisualIconValues];
-
-/** Allowed values for VisualElementKind. */
-export const VisualElementKindValues = {
-    Value0: 'card',
-    Value1: 'group',
-    Value2: 'metric',
-    Value3: 'text',
-} as const;
-
-/** VisualElementKind from the Nexa wire protocol. */
-export type VisualElementKind =
-    (typeof VisualElementKindValues)[keyof typeof VisualElementKindValues];
-
-/** Allowed values for VisualTone. */
-export const VisualToneValues = {
-    Value0: 'blue',
-    Value1: 'green',
-    Value2: 'neutral',
-    Value3: 'orange',
-    Value4: 'purple',
-    Value5: 'red',
-} as const;
-
-/** VisualTone from the Nexa wire protocol. */
-export type VisualTone = (typeof VisualToneValues)[keyof typeof VisualToneValues];
-
-/** VisualStep wire fields. */
-export interface VisualStepShape {
-    /** connections as defined by the Nexa gateway. */
-    readonly connections: ReadonlyArray<string>;
-    /** detail as defined by the Nexa gateway. */
-    readonly detail: string;
-    /** elements as defined by the Nexa gateway. */
-    readonly elements: ReadonlyArray<string>;
-    /** title as defined by the Nexa gateway. */
-    readonly title: string;
-}
-
-/** VisualStep from the Nexa wire protocol. */
-export type VisualStep = VisualStepShape;
-
 /** Supported RPC names. */
 export type MethodName = keyof GatewayMethods;
 /** Parameters for a particular RPC. */
@@ -21995,6 +22123,18 @@ export enum Method {
     ConfigUnset = 'config.unset',
     /** Calls connect. */
     Connect = 'connect',
+    /** Calls connectors.execution. */
+    ConnectorsExecution = 'connectors.execution',
+    /** Calls connectors.execution.cancel. */
+    ConnectorsExecutionCancel = 'connectors.execution.cancel',
+    /** Calls connectors.execution.get. */
+    ConnectorsExecutionGet = 'connectors.execution.get',
+    /** Calls connectors.execution.jobs. */
+    ConnectorsExecutionJobs = 'connectors.execution.jobs',
+    /** Calls connectors.execution.output. */
+    ConnectorsExecutionOutput = 'connectors.execution.output',
+    /** Calls connectors.execution.submit. */
+    ConnectorsExecutionSubmit = 'connectors.execution.submit',
     /** Calls connectors.files.get. */
     ConnectorsFilesGet = 'connectors.files.get',
     /** Calls connectors.files.submit. */
@@ -22007,12 +22147,26 @@ export enum Method {
     ConnectorsInventory = 'connectors.inventory',
     /** Calls connectors.link.approve. */
     ConnectorsLinkApprove = 'connectors.link.approve',
+    /** Calls connectors.link.deny. */
+    ConnectorsLinkDeny = 'connectors.link.deny',
     /** Calls connectors.link.review. */
     ConnectorsLinkReview = 'connectors.link.review',
     /** Calls connectors.list. */
     ConnectorsList = 'connectors.list',
     /** Calls connectors.revoke. */
     ConnectorsRevoke = 'connectors.revoke',
+    /** Calls connectors.workspace.catalog. */
+    ConnectorsWorkspaceCatalog = 'connectors.workspace.catalog',
+    /** Calls connectors.workspace.clear. */
+    ConnectorsWorkspaceClear = 'connectors.workspace.clear',
+    /** Calls connectors.workspace.create. */
+    ConnectorsWorkspaceCreate = 'connectors.workspace.create',
+    /** Calls connectors.workspace.get. */
+    ConnectorsWorkspaceGet = 'connectors.workspace.get',
+    /** Calls connectors.workspace.select. */
+    ConnectorsWorkspaceSelect = 'connectors.workspace.select',
+    /** Calls connectors.workspace.select-joint. */
+    ConnectorsWorkspaceSelectJoint = 'connectors.workspace.select-joint',
     /** Calls credit.budgets. */
     CreditBudgets = 'credit.budgets',
     /** Calls credit.removeBudget. */
@@ -22121,10 +22275,20 @@ export enum Method {
     DevicesReject = 'devices.reject',
     /** Calls devices.revoke. */
     DevicesRevoke = 'devices.revoke',
+    /** Calls environment.admin.inspect. */
+    EnvironmentAdminInspect = 'environment.admin.inspect',
+    /** Calls environment.admin.mutate. */
+    EnvironmentAdminMutate = 'environment.admin.mutate',
+    /** Calls environment.admin.network. */
+    EnvironmentAdminNetwork = 'environment.admin.network',
+    /** Calls environment.admin.usage. */
+    EnvironmentAdminUsage = 'environment.admin.usage',
     /** Calls environment.prepare. */
     EnvironmentPrepare = 'environment.prepare',
     /** Calls environment.status. */
     EnvironmentStatus = 'environment.status',
+    /** Calls environment.usage. */
+    EnvironmentUsage = 'environment.usage',
     /** Calls health. */
     Health = 'health',
     /** Calls jobs.add. */
@@ -22397,6 +22561,24 @@ export enum Method {
     WorkflowsSchedulesRead = 'workflows.schedules.read',
     /** Calls workflows.validate. */
     WorkflowsValidate = 'workflows.validate',
+    /** Calls workspace.files.cancel. */
+    WorkspaceFilesCancel = 'workspace.files.cancel',
+    /** Calls workspace.files.chunk. */
+    WorkspaceFilesChunk = 'workspace.files.chunk',
+    /** Calls workspace.files.finish. */
+    WorkspaceFilesFinish = 'workspace.files.finish',
+    /** Calls workspace.files.list. */
+    WorkspaceFilesList = 'workspace.files.list',
+    /** Calls workspace.files.mkdir. */
+    WorkspaceFilesMkdir = 'workspace.files.mkdir',
+    /** Calls workspace.files.read. */
+    WorkspaceFilesRead = 'workspace.files.read',
+    /** Calls workspace.files.remove. */
+    WorkspaceFilesRemove = 'workspace.files.remove',
+    /** Calls workspace.files.rename. */
+    WorkspaceFilesRename = 'workspace.files.rename',
+    /** Calls workspace.files.start. */
+    WorkspaceFilesStart = 'workspace.files.start',
     /** Calls workspaces.create. */
     WorkspacesCreate = 'workspaces.create',
     /** Calls workspaces.describe. */
@@ -22405,56 +22587,8 @@ export enum Method {
     WorkspacesDestroy = 'workspaces.destroy',
     /** Calls workspaces.list. */
     WorkspacesList = 'workspaces.list',
-    /** Calls connectors.execution. */
-    ConnectorsExecution = 'connectors.execution',
-    /** Calls connectors.execution.submit. */
-    ConnectorsExecutionSubmit = 'connectors.execution.submit',
-    /** Calls connectors.execution.get. */
-    ConnectorsExecutionGet = 'connectors.execution.get',
-    /** Calls connectors.execution.cancel. */
-    ConnectorsExecutionCancel = 'connectors.execution.cancel',
-    /** Calls connectors.execution.jobs. */
-    ConnectorsExecutionJobs = 'connectors.execution.jobs',
-    /** Calls connectors.link.deny. */
-    ConnectorsLinkDeny = 'connectors.link.deny',
-    /** Calls connectors.execution.output. */
-    ConnectorsExecutionOutput = 'connectors.execution.output',
-    /** Calls connectors.workspace.get. */
-    ConnectorsWorkspaceGet = 'connectors.workspace.get',
-    /** Calls connectors.workspace.select. */
-    ConnectorsWorkspaceSelect = 'connectors.workspace.select',
-    /** Calls connectors.workspace.clear. */
-    ConnectorsWorkspaceClear = 'connectors.workspace.clear',
-    /** Calls connectors.workspace.create. */
-    ConnectorsWorkspaceCreate = 'connectors.workspace.create',
-    /** Calls connectors.workspace.catalog. */
-    ConnectorsWorkspaceCatalog = 'connectors.workspace.catalog',
-    /** Calls connectors.workspace.select-joint. */
-    ConnectorsWorkspaceSelectJoint = 'connectors.workspace.select-joint',
-    /** Calls workspace.files.list. */
-    WorkspaceFilesList = 'workspace.files.list',
-    /** Calls workspace.files.read. */
-    WorkspaceFilesRead = 'workspace.files.read',
-    /** Calls workspace.files.start. */
-    WorkspaceFilesStart = 'workspace.files.start',
-    /** Calls workspace.files.chunk. */
-    WorkspaceFilesChunk = 'workspace.files.chunk',
-    /** Calls workspace.files.finish. */
-    WorkspaceFilesFinish = 'workspace.files.finish',
-    /** Calls workspace.files.cancel. */
-    WorkspaceFilesCancel = 'workspace.files.cancel',
-    /** Calls workspace.files.mkdir. */
-    WorkspaceFilesMkdir = 'workspace.files.mkdir',
     /** Calls workspaces.page. */
     WorkspacesPage = 'workspaces.page',
     /** Calls workspaces.visit. */
     WorkspacesVisit = 'workspaces.visit',
-    /** Calls workspace.files.rename. */
-    WorkspaceFilesRename = 'workspace.files.rename',
-    /** Calls workspace.files.remove. */
-    WorkspaceFilesRemove = 'workspace.files.remove',
-    /** Calls environment.admin.inspect. */
-    EnvironmentAdminInspect = 'environment.admin.inspect',
-    /** Calls environment.admin.mutate. */
-    EnvironmentAdminMutate = 'environment.admin.mutate',
 }
