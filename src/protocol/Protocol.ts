@@ -675,6 +675,8 @@ export interface AskParamsShape {
     readonly userId?: string;
     /** userRegion as defined by the Nexa gateway. */
     readonly userRegion?: UserRegion;
+    /** uploadedSources as defined by the Nexa gateway. */
+    readonly uploadedSources?: ReadonlyArray<string>;
 }
 
 /** AskParams from the Nexa wire protocol. */
@@ -5437,8 +5439,12 @@ export type DataUploadPosition = DataUploadPositionShape;
 export interface DataUploadStartParamsShape {
     /** byteLength as defined by the Nexa gateway. */
     readonly byteLength: string;
+    /** context as defined by the Nexa gateway. */
+    readonly context: DataUploadContext;
     /** filename as defined by the Nexa gateway. */
     readonly filename: string;
+    /** requestId as defined by the Nexa gateway. */
+    readonly requestId: string;
 }
 
 /** DataUploadStartParams from the Nexa wire protocol. */
@@ -10902,12 +10908,18 @@ export interface GatewayMethodscredit_walletHistoryShape {
     readonly result: WalletHistoryPage;
 }
 
+/** GatewayMethodsdata_upload_cancelresult wire fields. */
+export interface GatewayMethodsdata_upload_cancelresultShape {
+    /** ok as defined by the Nexa gateway. */
+    readonly ok: true;
+}
+
 /** GatewayMethodsdata_upload_cancel wire fields. */
 export interface GatewayMethodsdata_upload_cancelShape {
     /** params as defined by the Nexa gateway. */
     readonly params: DataUploadIdParams;
     /** result as defined by the Nexa gateway. */
-    readonly result: OkResult;
+    readonly result: GatewayMethodsdata_upload_cancelresultShape;
 }
 
 /** GatewayMethodsdata_upload_chunk wire fields. */
@@ -10923,7 +10935,7 @@ export interface GatewayMethodsdata_upload_finishShape {
     /** params as defined by the Nexa gateway. */
     readonly params: DataUploadIdParams;
     /** result as defined by the Nexa gateway. */
-    readonly result: DataFile;
+    readonly result: ConversationDataFile;
 }
 
 /** GatewayMethodsdata_upload_start wire fields. */
@@ -10931,7 +10943,7 @@ export interface GatewayMethodsdata_upload_startShape {
     /** params as defined by the Nexa gateway. */
     readonly params: DataUploadStartParams;
     /** result as defined by the Nexa gateway. */
-    readonly result: DataUpload;
+    readonly result: ConversationDataUpload;
 }
 
 /** GatewayMethodsdesign_arrange wire fields. */
@@ -12594,6 +12606,30 @@ export interface GatewayMethodsconnectors_context_checkShape {
     readonly result: ConnectorContextCheckView;
 }
 
+/** GatewayMethodsdata_upload_create wire fields. */
+export interface GatewayMethodsdata_upload_createShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DataUploadCreateParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DataUploadTarget;
+}
+
+/** GatewayMethodsdata_upload_target wire fields. */
+export interface GatewayMethodsdata_upload_targetShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DataUploadTargetParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DataUploadTarget;
+}
+
+/** GatewayMethodsdata_upload_select wire fields. */
+export interface GatewayMethodsdata_upload_selectShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DataUploadSelectParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DataUploadSelectionResult;
+}
+
 /** GatewayMethods wire fields. */
 export interface GatewayMethodsShape {
     /** accounts.create as defined by the Nexa gateway. */
@@ -13114,6 +13150,12 @@ export interface GatewayMethodsShape {
     readonly 'connectors.workspace.select-host': GatewayMethodsconnectors_workspace_selecthostShape;
     /** connectors.context.check as defined by the Nexa gateway. */
     readonly 'connectors.context.check': GatewayMethodsconnectors_context_checkShape;
+    /** data.upload.create as defined by the Nexa gateway. */
+    readonly 'data.upload.create': GatewayMethodsdata_upload_createShape;
+    /** data.upload.target as defined by the Nexa gateway. */
+    readonly 'data.upload.target': GatewayMethodsdata_upload_targetShape;
+    /** data.upload.select as defined by the Nexa gateway. */
+    readonly 'data.upload.select': GatewayMethodsdata_upload_selectShape;
 }
 
 /** GatewayMethods from the Nexa wire protocol. */
@@ -17774,6 +17816,8 @@ export interface StreamParamsShape {
     readonly userId?: string;
     /** userRegion as defined by the Nexa gateway. */
     readonly userRegion?: UserRegion;
+    /** uploadedSources as defined by the Nexa gateway. */
+    readonly uploadedSources?: ReadonlyArray<string>;
 }
 
 /** StreamParams from the Nexa wire protocol. */
@@ -22271,6 +22315,10 @@ export const ConnectorHostToolValues = {
     Value24: 'terminal_start',
     Value25: 'terminal_stop',
     Value26: 'terminal_write',
+    Value27: 'http_close',
+    Value28: 'http_open',
+    Value29: 'http_read',
+    Value30: 'network_resolve',
 } as const;
 
 /** ConnectorHostTool from the Nexa wire protocol. */
@@ -22562,6 +22610,232 @@ export interface CommandExecutionCleanupUnconfirmedShape {
 
 /** CommandExecutionCleanupUnconfirmed from the Nexa wire protocol. */
 export type CommandExecutionCleanupUnconfirmed = CommandExecutionCleanupUnconfirmedShape;
+
+/** ConversationDataFile wire fields. */
+export interface ConversationDataFileShape {
+    /** byteLength as defined by the Nexa gateway. */
+    readonly byteLength: string;
+    /** chunkBytes as defined by the Nexa gateway. */
+    readonly chunkBytes?: string;
+    /** context as defined by the Nexa gateway. */
+    readonly context: DataUploadContext;
+    /** filename as defined by the Nexa gateway. */
+    readonly filename: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** offset as defined by the Nexa gateway. */
+    readonly offset: string;
+    /** path as defined by the Nexa gateway. */
+    readonly path: string;
+    /** sha256 as defined by the Nexa gateway. */
+    readonly sha256: null | string;
+    /** state as defined by the Nexa gateway. */
+    readonly state: 'complete';
+}
+
+/** ConversationDataFile from the Nexa wire protocol. */
+export type ConversationDataFile = ConversationDataFileShape;
+
+/** ConversationDataUpload wire fields. */
+export interface ConversationDataUploadShape {
+    /** byteLength as defined by the Nexa gateway. */
+    readonly byteLength: string;
+    /** chunkBytes as defined by the Nexa gateway. */
+    readonly chunkBytes?: string;
+    /** context as defined by the Nexa gateway. */
+    readonly context: DataUploadContext;
+    /** filename as defined by the Nexa gateway. */
+    readonly filename: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** offset as defined by the Nexa gateway. */
+    readonly offset: string;
+    /** state as defined by the Nexa gateway. */
+    readonly state: ConversationDataUploadState;
+}
+
+/** ConversationDataUpload from the Nexa wire protocol. */
+export type ConversationDataUpload = ConversationDataUploadShape;
+
+/** DataUploadChoice from the Nexa wire protocol. */
+export type DataUploadChoice = DataUploadSelectManaged | DataUploadSelectHost;
+
+/** DataUploadContext wire fields. */
+export interface DataUploadContextShape {
+    /** ownerSha256 as defined by the Nexa gateway. */
+    readonly ownerSha256: string;
+    /** selectionRevision as defined by the Nexa gateway. */
+    readonly selectionRevision: string;
+    /** sessionId as defined by the Nexa gateway. */
+    readonly sessionId: string;
+}
+
+/** DataUploadContext from the Nexa wire protocol. */
+export type DataUploadContext = DataUploadContextShape;
+
+/** DataUploadCreateParams wire fields. */
+export interface DataUploadCreateParamsShape {
+    /** requestId as defined by the Nexa gateway. */
+    readonly requestId: string;
+}
+
+/** DataUploadCreateParams from the Nexa wire protocol. */
+export type DataUploadCreateParams = DataUploadCreateParamsShape;
+
+/** Allowed values for DataUploadHostState. */
+export const DataUploadHostStateValues = {
+    Value0: 'authorized',
+    Value1: 'disabled',
+    Value2: 'missing-tools',
+    Value3: 'offline',
+} as const;
+
+/** DataUploadHostState from the Nexa wire protocol. */
+export type DataUploadHostState =
+    (typeof DataUploadHostStateValues)[keyof typeof DataUploadHostStateValues];
+
+/** DataUploadSelectHost wire fields. */
+export interface DataUploadSelectHostShape {
+    /** environmentId as defined by the Nexa gateway. */
+    readonly environmentId: string;
+    /** grantId as defined by the Nexa gateway. */
+    readonly grantId: string;
+    /** grantRevision as defined by the Nexa gateway. */
+    readonly grantRevision: string;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: 'host';
+}
+
+/** DataUploadSelectHost from the Nexa wire protocol. */
+export type DataUploadSelectHost = DataUploadSelectHostShape;
+
+/** DataUploadSelectManaged wire fields. */
+export interface DataUploadSelectManagedShape {
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: 'managed';
+}
+
+/** DataUploadSelectManaged from the Nexa wire protocol. */
+export type DataUploadSelectManaged = DataUploadSelectManagedShape;
+
+/** DataUploadSelectParams wire fields. */
+export interface DataUploadSelectParamsShape {
+    /** choice as defined by the Nexa gateway. */
+    readonly choice: DataUploadChoice;
+    /** context as defined by the Nexa gateway. */
+    readonly context: DataUploadContext;
+    /** requestId as defined by the Nexa gateway. */
+    readonly requestId: string;
+}
+
+/** DataUploadSelectParams from the Nexa wire protocol. */
+export type DataUploadSelectParams = DataUploadSelectParamsShape;
+
+/** DataUploadSelectionResult wire fields. */
+export interface DataUploadSelectionResultShape {
+    /** receipt as defined by the Nexa gateway. */
+    readonly receipt: ConnectorWorkspaceSelectionView;
+    /** target as defined by the Nexa gateway. */
+    readonly target: DataUploadTarget;
+}
+
+/** DataUploadSelectionResult from the Nexa wire protocol. */
+export type DataUploadSelectionResult = DataUploadSelectionResultShape;
+
+/** DataUploadTarget from the Nexa wire protocol. */
+export type DataUploadTarget =
+    | DataUploadTargetUnselected
+    | DataUploadTargetManaged
+    | DataUploadTargetLocal
+    | DataUploadTargetHost
+    | DataUploadTargetUnsupported;
+
+/** DataUploadTargetHost wire fields. */
+export interface DataUploadTargetHostShape {
+    /** context as defined by the Nexa gateway. */
+    readonly context: DataUploadContext;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: 'host';
+    /** maximumBytes as defined by the Nexa gateway. */
+    readonly maximumBytes: string;
+    /** selection as defined by the Nexa gateway. */
+    readonly selection: ConnectorWorkspaceHostSelection;
+    /** state as defined by the Nexa gateway. */
+    readonly state: DataUploadHostState;
+}
+
+/** DataUploadTargetHost from the Nexa wire protocol. */
+export type DataUploadTargetHost = DataUploadTargetHostShape;
+
+/** DataUploadTargetLocal wire fields. */
+export interface DataUploadTargetLocalShape {
+    /** context as defined by the Nexa gateway. */
+    readonly context: DataUploadContext;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: 'local';
+    /** maximumBytes as defined by the Nexa gateway. */
+    readonly maximumBytes: string;
+}
+
+/** DataUploadTargetLocal from the Nexa wire protocol. */
+export type DataUploadTargetLocal = DataUploadTargetLocalShape;
+
+/** DataUploadTargetManaged wire fields. */
+export interface DataUploadTargetManagedShape {
+    /** context as defined by the Nexa gateway. */
+    readonly context: DataUploadContext;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: 'managed';
+    /** maximumBytes as defined by the Nexa gateway. */
+    readonly maximumBytes: string;
+}
+
+/** DataUploadTargetManaged from the Nexa wire protocol. */
+export type DataUploadTargetManaged = DataUploadTargetManagedShape;
+
+/** DataUploadTargetParams wire fields. */
+export interface DataUploadTargetParamsShape {
+    /** sessionId as defined by the Nexa gateway. */
+    readonly sessionId: string;
+}
+
+/** DataUploadTargetParams from the Nexa wire protocol. */
+export type DataUploadTargetParams = DataUploadTargetParamsShape;
+
+/** DataUploadTargetUnselected wire fields. */
+export interface DataUploadTargetUnselectedShape {
+    /** context as defined by the Nexa gateway. */
+    readonly context: DataUploadContext;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: 'unselected';
+}
+
+/** DataUploadTargetUnselected from the Nexa wire protocol. */
+export type DataUploadTargetUnselected = DataUploadTargetUnselectedShape;
+
+/** DataUploadTargetUnsupported wire fields. */
+export interface DataUploadTargetUnsupportedShape {
+    /** context as defined by the Nexa gateway. */
+    readonly context: DataUploadContext;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: 'unsupported';
+}
+
+/** DataUploadTargetUnsupported from the Nexa wire protocol. */
+export type DataUploadTargetUnsupported = DataUploadTargetUnsupportedShape;
+
+/** Allowed values for ConversationDataUploadState. */
+export const ConversationDataUploadStateValues = {
+    Value0: 'canceled',
+    Value1: 'complete',
+    Value2: 'publishing',
+    Value3: 'receiving',
+    Value4: 'unconfirmed',
+} as const;
+
+/** ConversationDataUploadState from the Nexa wire protocol. */
+export type ConversationDataUploadState =
+    (typeof ConversationDataUploadStateValues)[keyof typeof ConversationDataUploadStateValues];
 
 /** Supported RPC names. */
 export type MethodName = keyof GatewayMethods;
@@ -23090,4 +23364,10 @@ export enum Method {
     ConnectorsWorkspaceSelectHost = 'connectors.workspace.select-host',
     /** Calls connectors.context.check. */
     ConnectorsContextCheck = 'connectors.context.check',
+    /** Calls data.upload.create. */
+    DataUploadCreate = 'data.upload.create',
+    /** Calls data.upload.target. */
+    DataUploadTarget = 'data.upload.target',
+    /** Calls data.upload.select. */
+    DataUploadSelect = 'data.upload.select',
 }

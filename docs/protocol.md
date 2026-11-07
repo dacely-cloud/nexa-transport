@@ -431,6 +431,7 @@ What one turn is asked for.
 | `targetTimeSeconds` | No       | `integer`                                                                     | Soft task time target in seconds; never a cancellation deadline.                          |
 | `userId`            | No       | `string`                                                                      | The principal the turn is billed and authorized as.                                       |
 | `userRegion`        | No       | [UserRegion](protocol.md#userregion)                                          | Coarse regional preferences, never authorization or precise location.                     |
+| `uploadedSources`   | No       | Array of `string`                                                             |                                                                                           |
 
 ## AskResult
 
@@ -455,7 +456,6 @@ Browser-safe background job receipt, without host pids or log paths.
 
 | Field                | Required | Type          | Description                                                            |
 | -------------------- | -------- | ------------- | ---------------------------------------------------------------------- |
-| `cleanupUnconfirmed` | No       | `boolean`     | Stop remains available because native cleanup has not been confirmed.  |
 | `command`            | Yes      | `string`      |                                                                        |
 | `cwd`                | Yes      | `string`      |                                                                        |
 | `endedAt`            | Yes      | `null,string` |                                                                        |
@@ -465,6 +465,7 @@ Browser-safe background job receipt, without host pids or log paths.
 | `running`            | Yes      | `boolean`     |                                                                        |
 | `signal`             | Yes      | `null,string` |                                                                        |
 | `startedAt`          | Yes      | `string`      |                                                                        |
+| `cleanupUnconfirmed` | No       | `boolean`     | Stop remains available because native cleanup has not been confirmed.  |
 
 ## BackgroundProcessLog
 
@@ -2027,15 +2028,10 @@ Type: `"adjustment"` / `"completion"` / `"embedding"` / `"media"` / `"speech"` /
 
 Native cleanup uncertainty remains distinct from a normal command snapshot.
 
-Type: [CommandExecutionSnapshot](protocol.md#commandexecutionsnapshot) / [CommandExecutionCleanupUnconfirmed](protocol.md#commandexecutioncleanupunconfirmed).
-
-## CommandExecutionSnapshot
-
-A normal host-produced command snapshot may describe a running program or observed termination.
+Variant 1: [CommandExecutionSnapshot](protocol.md#commandexecutionsnapshot)
 
 | Field                | Required | Type          | Description                                                                 |
 | -------------------- | -------- | ------------- | --------------------------------------------------------------------------- |
-| `cleanupUnconfirmed` | No       | `false`       | An explicit false value never supplies native cleanup uncertainty metadata. |
 | `command`            | Yes      | `string`      |                                                                             |
 | `cwd`                | Yes      | `string`      |                                                                             |
 | `exitCode`           | Yes      | `null,number` |                                                                             |
@@ -2045,19 +2041,18 @@ A normal host-produced command snapshot may describe a running program or observ
 | `running`            | Yes      | `boolean`     |                                                                             |
 | `signal`             | Yes      | `null,string` |                                                                             |
 | `terminalOutput`     | No       | `string`      | Original terminal stream, including ANSI styles and cursor controls.        |
+| `cleanupUnconfirmed` | No       | `false`       | An explicit false value never supplies native cleanup uncertainty metadata. |
 
-## CommandExecutionCleanupUnconfirmed
+Variant 2: [CommandExecutionCleanupUnconfirmed](protocol.md#commandexecutioncleanupunconfirmed)
 
-Unresolved native ownership preserves only the exact actionable handle, without command arguments or fabricated exit evidence. This is a retained cleanup owner; `running: true` does not establish that its program is still alive. Retry Stop for this same handle.
-
-| Field                | Required | Type     | Description                                                          |
-| -------------------- | -------- | -------- | -------------------------------------------------------------------- |
-| `cleanupUnconfirmed` | Yes      | `true`   | Native cleanup remains unconfirmed.                                  |
-| `processId`          | Yes      | `string` | A bounded opaque identifier of 1 to 128 ASCII identifier characters. |
-| `running`            | Yes      | `true`   | The cleanup owner remains retained.                                  |
-| `remote`             | Yes      | `true`   |                                                                      |
-| `exitCode`           | Yes      | `null`   | No exit code is invented.                                            |
-| `signal`             | Yes      | `null`   | No termination signal is invented.                                   |
+| Field                | Required | Type     | Description |
+| -------------------- | -------- | -------- | ----------- |
+| `cleanupUnconfirmed` | Yes      | `true`   |             |
+| `processId`          | Yes      | `string` |             |
+| `running`            | Yes      | `true`   |             |
+| `remote`             | Yes      | `true`   |             |
+| `exitCode`           | Yes      | `null`   |             |
+| `signal`             | Yes      | `null`   |             |
 
 ## ComponentCategory
 
@@ -3883,10 +3878,12 @@ The durable position acknowledged after one bounded upload chunk.
 
 Starts an upload without embedding source bytes in an agent request.
 
-| Field        | Required | Type     | Description |
-| ------------ | -------- | -------- | ----------- |
-| `byteLength` | Yes      | `string` |             |
-| `filename`   | Yes      | `string` |             |
+| Field        | Required | Type                                               | Description |
+| ------------ | -------- | -------------------------------------------------- | ----------- |
+| `byteLength` | Yes      | `string`                                           |             |
+| `context`    | Yes      | [DataUploadContext](protocol.md#datauploadcontext) |             |
+| `filename`   | Yes      | `string`                                           |             |
+| `requestId`  | Yes      | `string`                                           |             |
 
 ## DeadLetter
 
@@ -7921,6 +7918,9 @@ Configurable bounds on gateway-owned work and memory.
 | `connectors.host.result`             | Yes      | Object (fields below) | Observe one original without submitting another effect.                                                |
 | `connectors.workspace.select-host`   | Yes      | Object (fields below) | Full-host selection retains account ownership and ordinary conversation revision control.              |
 | `connectors.context.check`           | Yes      | Object (fields below) | Authenticated account RPC contract for conditional connector facts.                                    |
+| `data.upload.create`                 | Yes      | Object (fields below) |                                                                                                        |
+| `data.upload.target`                 | Yes      | Object (fields below) |                                                                                                        |
+| `data.upload.select`                 | Yes      | Object (fields below) |                                                                                                        |
 
 **accounts.create**
 
@@ -8331,7 +8331,13 @@ Configurable bounds on gateway-owned work and memory.
 | Field    | Required | Type                                                 | Description |
 | -------- | -------- | ---------------------------------------------------- | ----------- |
 | `params` | Yes      | [DataUploadIdParams](protocol.md#datauploadidparams) |             |
-| `result` | Yes      | [OkResult](protocol.md#okresult)                     |             |
+| `result` | Yes      | Object (fields below)                                |             |
+
+**data.upload.cancel.result**
+
+| Field | Required | Type   | Description |
+| ----- | -------- | ------ | ----------- |
+| `ok`  | Yes      | `true` |             |
 
 **data.upload.chunk**
 
@@ -8342,17 +8348,17 @@ Configurable bounds on gateway-owned work and memory.
 
 **data.upload.finish**
 
-| Field    | Required | Type                                                 | Description |
-| -------- | -------- | ---------------------------------------------------- | ----------- |
-| `params` | Yes      | [DataUploadIdParams](protocol.md#datauploadidparams) |             |
-| `result` | Yes      | [DataFile](protocol.md#datafile)                     |             |
+| Field    | Required | Type                                                     | Description |
+| -------- | -------- | -------------------------------------------------------- | ----------- |
+| `params` | Yes      | [DataUploadIdParams](protocol.md#datauploadidparams)     |             |
+| `result` | Yes      | [ConversationDataFile](protocol.md#conversationdatafile) |             |
 
 **data.upload.start**
 
-| Field    | Required | Type                                                       | Description |
-| -------- | -------- | ---------------------------------------------------------- | ----------- |
-| `params` | Yes      | [DataUploadStartParams](protocol.md#datauploadstartparams) |             |
-| `result` | Yes      | [DataUpload](protocol.md#dataupload)                       |             |
+| Field    | Required | Type                                                         | Description |
+| -------- | -------- | ------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [DataUploadStartParams](protocol.md#datauploadstartparams)   |             |
+| `result` | Yes      | [ConversationDataUpload](protocol.md#conversationdataupload) |             |
 
 **design.arrange**
 
@@ -9807,6 +9813,27 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | -------------------------------------------------------------------- | ----------- |
 | `params` | Yes      | [ConnectorContextCheckQuery](protocol.md#connectorcontextcheckquery) |             |
 | `result` | Yes      | [ConnectorContextCheckView](protocol.md#connectorcontextcheckview)   |             |
+
+**data.upload.create**
+
+| Field    | Required | Type                                                         | Description |
+| -------- | -------- | ------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [DataUploadCreateParams](protocol.md#datauploadcreateparams) |             |
+| `result` | Yes      | [DataUploadTarget](protocol.md#datauploadtarget)             |             |
+
+**data.upload.target**
+
+| Field    | Required | Type                                                         | Description |
+| -------- | -------- | ------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [DataUploadTargetParams](protocol.md#datauploadtargetparams) |             |
+| `result` | Yes      | [DataUploadTarget](protocol.md#datauploadtarget)             |             |
+
+**data.upload.select**
+
+| Field    | Required | Type                                                               | Description |
+| -------- | -------- | ------------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [DataUploadSelectParams](protocol.md#datauploadselectparams)       |             |
+| `result` | Yes      | [DataUploadSelectionResult](protocol.md#datauploadselectionresult) |             |
 
 ## GeometryFormat
 
@@ -12960,6 +12987,7 @@ What one turn is asked for, when the client wants its events streamed.
 | `targetTimeSeconds` | No       | `integer`                                                                     | Soft task time target in seconds; never a cancellation deadline.                          |
 | `userId`            | No       | `string`                                                                      | The principal the turn is billed and authorized as.                                       |
 | `userRegion`        | No       | [UserRegion](protocol.md#userregion)                                          | Coarse regional preferences, never authorization or precise location.                     |
+| `uploadedSources`   | No       | Array of `string`                                                             |                                                                                           |
 
 ## TaskRecord
 
@@ -15992,7 +16020,7 @@ Type: `"linux"` / `"windows"` / `"macos"`.
 
 A full-host grant is separate from confined file/program policies and never inferred from pairing.
 
-Type: `"computer_info"` / `"file_read"` / `"file_digest"` / `"file_write"` / `"file_stat"` / `"file_rename"` / `"file_publish"` / `"file_chmod"` / `"directory_list"` / `"directory_create"` / `"file_remove"` / `"process_start"` / `"process_read"` / `"process_write"` / `"process_stop"` / `"process_release"` / `"desktop_info"` / `"desktop_screenshot"` / `"desktop_pointer"` / `"desktop_key"` / `"desktop_text"` / `"terminal_read"` / `"terminal_release"` / `"terminal_resize"` / `"terminal_start"` / `"terminal_stop"` / `"terminal_write"`.
+Type: `"computer_info"` / `"file_read"` / `"file_digest"` / `"file_write"` / `"file_stat"` / `"file_rename"` / `"file_publish"` / `"file_chmod"` / `"directory_list"` / `"directory_create"` / `"file_remove"` / `"process_start"` / `"process_read"` / `"process_write"` / `"process_stop"` / `"process_release"` / `"desktop_info"` / `"desktop_screenshot"` / `"desktop_pointer"` / `"desktop_key"` / `"desktop_text"` / `"terminal_read"` / `"terminal_release"` / `"terminal_resize"` / `"terminal_start"` / `"terminal_stop"` / `"terminal_write"` / `"http_close"` / `"http_open"` / `"http_read"` / `"network_resolve"`.
 
 ## ConnectorHostSubmitMethod
 
@@ -16153,3 +16181,252 @@ The current metadata version and server clock bound time-derived presence observ
 | `nextTransitionAtMs` | Yes      | `null,string` |             |
 | `serverNowMs`        | Yes      | `string`      |             |
 | `version`            | Yes      | `string`      |             |
+
+## CommandExecutionSnapshot
+
+A normal host-produced command snapshot may describe a running program or observed termination.
+
+| Field                | Required | Type          | Description                                                                 |
+| -------------------- | -------- | ------------- | --------------------------------------------------------------------------- |
+| `command`            | Yes      | `string`      |                                                                             |
+| `cwd`                | Yes      | `string`      |                                                                             |
+| `exitCode`           | Yes      | `null,number` |                                                                             |
+| `processId`          | Yes      | `null,string` |                                                                             |
+| `processToken`       | Yes      | `null,string` |                                                                             |
+| `remote`             | Yes      | `boolean`     |                                                                             |
+| `running`            | Yes      | `boolean`     |                                                                             |
+| `signal`             | Yes      | `null,string` |                                                                             |
+| `terminalOutput`     | No       | `string`      | Original terminal stream, including ANSI styles and cursor controls.        |
+| `cleanupUnconfirmed` | No       | `false`       | An explicit false value never supplies native cleanup uncertainty metadata. |
+
+## CommandExecutionCleanupUnconfirmed
+
+Unresolved native ownership preserves only the exact actionable handle, without command arguments or fabricated exit evidence.
+
+| Field                | Required | Type     | Description |
+| -------------------- | -------- | -------- | ----------- |
+| `cleanupUnconfirmed` | Yes      | `true`   |             |
+| `processId`          | Yes      | `string` |             |
+| `running`            | Yes      | `true`   |             |
+| `remote`             | Yes      | `true`   |             |
+| `exitCode`           | Yes      | `null`   |             |
+| `signal`             | Yes      | `null`   |             |
+
+## ConversationDataFile
+
+Completed files remain opaque source references, with a display path only after verified delivery.
+
+| Field        | Required | Type                                               | Description                                                                        |
+| ------------ | -------- | -------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `byteLength` | Yes      | `string`                                           |                                                                                    |
+| `chunkBytes` | No       | `string`                                           | Maximum binary chunk size supported by this upload host; absent on older gateways. |
+| `context`    | Yes      | [DataUploadContext](protocol.md#datauploadcontext) |                                                                                    |
+| `filename`   | Yes      | `string`                                           |                                                                                    |
+| `id`         | Yes      | `string`                                           |                                                                                    |
+| `offset`     | Yes      | `string`                                           |                                                                                    |
+| `path`       | Yes      | `string`                                           |                                                                                    |
+| `sha256`     | Yes      | `null,string`                                      |                                                                                    |
+| `state`      | Yes      | `"complete"`                                       |                                                                                    |
+
+## ConversationDataUpload
+
+Upload byte admission always returns its exact conversation placement comparison.
+
+| Field        | Required | Type                                                                   | Description                                                                        |
+| ------------ | -------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `byteLength` | Yes      | `string`                                                               |                                                                                    |
+| `chunkBytes` | No       | `string`                                                               | Maximum binary chunk size supported by this upload host; absent on older gateways. |
+| `context`    | Yes      | [DataUploadContext](protocol.md#datauploadcontext)                     |                                                                                    |
+| `filename`   | Yes      | `string`                                                               |                                                                                    |
+| `id`         | Yes      | `string`                                                               |                                                                                    |
+| `offset`     | Yes      | `string`                                                               |                                                                                    |
+| `state`      | Yes      | [ConversationDataUploadState](protocol.md#conversationdatauploadstate) |                                                                                    |
+
+## DataUploadChoice
+
+Both choices require the same original context and immutable CAS request identity.
+
+Variant 1: [DataUploadSelectManaged](protocol.md#datauploadselectmanaged)
+
+| Field  | Required | Type        | Description |
+| ------ | -------- | ----------- | ----------- |
+| `kind` | Yes      | `"managed"` |             |
+
+Variant 2: [DataUploadSelectHost](protocol.md#datauploadselecthost)
+
+| Field           | Required | Type     | Description |
+| --------------- | -------- | -------- | ----------- |
+| `environmentId` | Yes      | `string` |             |
+| `grantId`       | Yes      | `string` |             |
+| `grantRevision` | Yes      | `string` |             |
+| `kind`          | Yes      | `"host"` |             |
+
+## DataUploadContext
+
+A client supplies a comparison context, never a machine address or private owner generation.
+
+| Field               | Required | Type     | Description |
+| ------------------- | -------- | -------- | ----------- |
+| `ownerSha256`       | Yes      | `string` |             |
+| `selectionRevision` | Yes      | `string` |             |
+| `sessionId`         | Yes      | `string` |             |
+
+## DataUploadCreateParams
+
+Reuses the existing idempotent empty-conversation creator; this accepts no user text or file bytes.
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `requestId` | Yes      | `string` |             |
+
+## DataUploadHostState
+
+Published approval is checked before source admission; native operations still verify actual storage.
+
+Type: `"authorized"` / `"disabled"` / `"missing-tools"` / `"offline"`.
+
+## DataUploadSelectHost
+
+Host choice is resolved against the current signed local approval by the existing selection service.
+
+| Field           | Required | Type     | Description |
+| --------------- | -------- | -------- | ----------- |
+| `environmentId` | Yes      | `string` |             |
+| `grantId`       | Yes      | `string` |             |
+| `grantRevision` | Yes      | `string` |             |
+| `kind`          | Yes      | `"host"` |             |
+
+## DataUploadSelectManaged
+
+A placement choice changes only this owned conversation; no endpoint, path or private nonce is accepted.
+
+| Field  | Required | Type        | Description |
+| ------ | -------- | ----------- | ----------- |
+| `kind` | Yes      | `"managed"` |             |
+
+## DataUploadSelectParams
+
+A stale browser dialog cannot select for a recreated private conversation generation.
+
+| Field       | Required | Type                                               | Description |
+| ----------- | -------- | -------------------------------------------------- | ----------- |
+| `choice`    | Yes      | [DataUploadChoice](protocol.md#datauploadchoice)   |             |
+| `context`   | Yes      | [DataUploadContext](protocol.md#datauploadcontext) |             |
+| `requestId` | Yes      | `string`                                           |             |
+
+## DataUploadSelectionResult
+
+Immutable original acceptance is separate from current placement, which may already be newer.
+
+| Field     | Required | Type                                                                           | Description |
+| --------- | -------- | ------------------------------------------------------------------------------ | ----------- |
+| `receipt` | Yes      | [ConnectorWorkspaceSelectionView](protocol.md#connectorworkspaceselectionview) |             |
+| `target`  | Yes      | [DataUploadTarget](protocol.md#datauploadtarget)                               |             |
+
+## DataUploadTarget
+
+Clients cannot infer managed authority from missing host metadata.
+
+Variant 1: [DataUploadTargetUnselected](protocol.md#datauploadtargetunselected)
+
+| Field     | Required | Type                                               | Description |
+| --------- | -------- | -------------------------------------------------- | ----------- |
+| `context` | Yes      | [DataUploadContext](protocol.md#datauploadcontext) |             |
+| `kind`    | Yes      | `"unselected"`                                     |             |
+
+Variant 2: [DataUploadTargetManaged](protocol.md#datauploadtargetmanaged)
+
+| Field          | Required | Type                                               | Description |
+| -------------- | -------- | -------------------------------------------------- | ----------- |
+| `context`      | Yes      | [DataUploadContext](protocol.md#datauploadcontext) |             |
+| `kind`         | Yes      | `"managed"`                                        |             |
+| `maximumBytes` | Yes      | `string`                                           |             |
+
+Variant 3: [DataUploadTargetLocal](protocol.md#datauploadtargetlocal)
+
+| Field          | Required | Type                                               | Description |
+| -------------- | -------- | -------------------------------------------------- | ----------- |
+| `context`      | Yes      | [DataUploadContext](protocol.md#datauploadcontext) |             |
+| `kind`         | Yes      | `"local"`                                          |             |
+| `maximumBytes` | Yes      | `string`                                           |             |
+
+Variant 4: [DataUploadTargetHost](protocol.md#datauploadtargethost)
+
+| Field          | Required | Type                                                                           | Description |
+| -------------- | -------- | ------------------------------------------------------------------------------ | ----------- |
+| `context`      | Yes      | [DataUploadContext](protocol.md#datauploadcontext)                             |             |
+| `kind`         | Yes      | `"host"`                                                                       |             |
+| `maximumBytes` | Yes      | `string`                                                                       |             |
+| `selection`    | Yes      | [ConnectorWorkspaceHostSelection](protocol.md#connectorworkspacehostselection) |             |
+| `state`        | Yes      | [DataUploadHostState](protocol.md#datauploadhoststate)                         |             |
+
+Variant 5: [DataUploadTargetUnsupported](protocol.md#datauploadtargetunsupported)
+
+| Field     | Required | Type                                               | Description |
+| --------- | -------- | -------------------------------------------------- | ----------- |
+| `context` | Yes      | [DataUploadContext](protocol.md#datauploadcontext) |             |
+| `kind`    | Yes      | `"unsupported"`                                    |             |
+
+## DataUploadTargetHost
+
+The exact selected host profile remains the ceiling throughout one upload.
+
+| Field          | Required | Type                                                                           | Description |
+| -------------- | -------- | ------------------------------------------------------------------------------ | ----------- |
+| `context`      | Yes      | [DataUploadContext](protocol.md#datauploadcontext)                             |             |
+| `kind`         | Yes      | `"host"`                                                                       |             |
+| `maximumBytes` | Yes      | `string`                                                                       |             |
+| `selection`    | Yes      | [ConnectorWorkspaceHostSelection](protocol.md#connectorworkspacehostselection) |             |
+| `state`        | Yes      | [DataUploadHostState](protocol.md#datauploadhoststate)                         |             |
+
+## DataUploadTargetLocal
+
+The deployment intentionally exposes its normal local workspace under fresh authenticated account policy.
+
+| Field          | Required | Type                                               | Description |
+| -------------- | -------- | -------------------------------------------------- | ----------- |
+| `context`      | Yes      | [DataUploadContext](protocol.md#datauploadcontext) |             |
+| `kind`         | Yes      | `"local"`                                          |             |
+| `maximumBytes` | Yes      | `string`                                           |             |
+
+## DataUploadTargetManaged
+
+Normal managed storage is activated only from a verified retained Clear receipt.
+
+| Field          | Required | Type                                               | Description |
+| -------------- | -------- | -------------------------------------------------- | ----------- |
+| `context`      | Yes      | [DataUploadContext](protocol.md#datauploadcontext) |             |
+| `kind`         | Yes      | `"managed"`                                        |             |
+| `maximumBytes` | Yes      | `string`                                           |             |
+
+## DataUploadTargetParams
+
+Target discovery requires an already owned conversation, created through the existing account API.
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `sessionId` | Yes      | `string` |             |
+
+## DataUploadTargetUnselected
+
+No storage or default machine is acquired while requesting an explicit choice.
+
+| Field     | Required | Type                                               | Description |
+| --------- | -------- | -------------------------------------------------- | ----------- |
+| `context` | Yes      | [DataUploadContext](protocol.md#datauploadcontext) |             |
+| `kind`    | Yes      | `"unselected"`                                     |             |
+
+## DataUploadTargetUnsupported
+
+A restricted workspace remains selected until the user explicitly chooses a supported upload target.
+
+| Field     | Required | Type                                               | Description |
+| --------- | -------- | -------------------------------------------------- | ----------- |
+| `context` | Yes      | [DataUploadContext](protocol.md#datauploadcontext) |             |
+| `kind`    | Yes      | `"unsupported"`                                    |             |
+
+## ConversationDataUploadState
+
+Observation state controls recovery; a completed or uncertain original never restarts receiving bytes.
+
+Type: `"canceled"` / `"complete"` / `"publishing"` / `"receiving"` / `"unconfirmed"`.

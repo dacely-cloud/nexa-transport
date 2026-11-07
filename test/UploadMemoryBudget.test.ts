@@ -1,10 +1,11 @@
+import { uploadContext, uploadReply } from './support/UploadWireFixture.js';
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import { expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
 import { NexaClient } from '../src/networking/NexaClient.js';
-import type { GatewayLimits, JsonValue } from '../src/protocol/Protocol.js';
+import type { GatewayLimits, DataFile, DataUploadPosition } from '../src/protocol/Protocol.js';
 import { hello, TestGateway, type Request } from './Support.js';
 
 it.each([true, false])(
@@ -35,7 +36,7 @@ it.each([true, false])(
         let offset: number = 0;
         let count: number = 0;
         gateway.handler = (socket: WebSocket, request: Request): void => {
-            let result: JsonValue;
+            let result: DataFile | DataUploadPosition;
             if (request.method === 'data.upload.chunk') {
                 const data: unknown = request.params['data'];
                 if (!(data instanceof Uint8Array)) {
@@ -46,21 +47,26 @@ it.each([true, false])(
                 received.set(data, offset);
                 offset += data.byteLength;
                 count += 1;
-                result = { id: 'upload', offset: String(offset) };
+                result = { id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', offset: String(offset) };
             } else {
                 result = {
-                    id: 'upload',
+                    id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
                     filename: 'source.bin',
                     byteLength: String(source.byteLength),
                     chunkBytes: String(4 * 1024 * 1024),
                     path: '/workspace/source.bin',
                 };
             }
-            socket.send(JSON.stringify({ id: request.id, ok: true, result }));
+            socket.send(
+                JSON.stringify({ id: request.id, ok: true, result: uploadReply(request, result) }),
+            );
         };
         try {
             client = await NexaClient.connect({ url: await gateway.url(), reconnect: false });
-            await client.uploadData(new Blob([source]), 'source.bin');
+            await client.uploadData(new Blob([source]), 'source.bin', {
+                context: uploadContext,
+                requestId: 'original',
+            });
             expect(received).toEqual(source);
             expect(count).toBeGreaterThan(6);
             expect(client.connected).toBe(true);

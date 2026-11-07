@@ -1,3 +1,4 @@
+import { uploadContext, uploadReply, uploadFailureReason } from './support/UploadWireFixture.js';
 import { afterEach, expect, it, vi, type MockInstance } from 'vitest';
 import type { WebSocket } from 'ws';
 import { NexaClient } from '../src/networking/NexaClient.js';
@@ -37,19 +38,23 @@ it('uploads bounded raw slices with exact offsets and acknowledged progress', as
             expect(request.params['offset']).toBe(String(position));
             chunks.push(Uint8Array.from(chunk));
             position += BigInt(chunk.byteLength);
-            result = { id: 'raw-upload', offset: String(position) };
+            result = { id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', offset: String(position) };
         } else {
             result = {
-                id: 'raw-upload',
+                id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
                 filename: 'original.bin',
                 byteLength: String(bytes.length),
                 path: '/workspace/original.bin',
             };
         }
-        socket.send(JSON.stringify({ id: request.id, ok: true, result }));
+        socket.send(
+            JSON.stringify({ id: request.id, ok: true, result: uploadReply(request, result) }),
+        );
     };
     const encode: MockInstance<typeof globalThis.btoa> = vi.spyOn(globalThis, 'btoa');
     const stored: DataFile = await client.uploadData(new Blob([bytes]), 'original.bin', {
+        context: uploadContext,
+        requestId: 'original',
         onProgress: (loaded: bigint): void => {
             progress.push(loaded);
         },
@@ -71,18 +76,25 @@ it('cancels a partial upload after an invalid acknowledgement and leaves the con
     gateway.handler = (socket: WebSocket, request: Request): void => {
         const result: DataFile | DataUploadPosition =
             request.method === 'data.upload.chunk'
-                ? { id: 'upload', offset: '0' }
+                ? { id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', offset: '0' }
                 : {
-                      id: 'upload',
+                      id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
                       filename: 'source.bin',
                       byteLength: '4',
                       path: '/workspace/source.bin',
                   };
-        socket.send(JSON.stringify({ id: request.id, ok: true, result }));
+        socket.send(
+            JSON.stringify({ id: request.id, ok: true, result: uploadReply(request, result) }),
+        );
     };
-    await expect(client.uploadData(new Blob([new Uint8Array(4)]), 'source.bin')).rejects.toThrow(
-        'unexpected upload position',
-    );
+    expect(
+        await uploadFailureReason(
+            client.uploadData(new Blob([new Uint8Array(4)]), 'source.bin', {
+                context: uploadContext,
+                requestId: 'original',
+            }),
+        ),
+    ).toContain('unexpected upload position');
     expect(gateway.requests.at(-1)?.method).toBe(Method.DataUploadCancel);
     expect(
         gateway.requests.some(
@@ -115,19 +127,23 @@ it('negotiates 4 MB slices and transfers 80 MB in twenty acknowledged chunks', a
             expect(chunk.every((value: number): boolean => value === 237)).toBe(true);
             offset += chunk.byteLength;
             count += 1;
-            result = { id: 'large', offset: String(offset) };
+            result = { id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', offset: String(offset) };
         } else {
             result = {
-                id: 'large',
+                id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
                 filename: 'large.bin',
                 byteLength: String(total),
                 path: '/workspace/large.bin',
                 chunkBytes: String(4 * 1024 * 1024),
             };
         }
-        socket.send(JSON.stringify({ id: request.id, ok: true, result }));
+        socket.send(
+            JSON.stringify({ id: request.id, ok: true, result: uploadReply(request, result) }),
+        );
     };
     await client.uploadData(new Blob([bytes]), 'large.bin', {
+        context: uploadContext,
+        requestId: 'original',
         onProgress: (loaded: bigint): void => {
             progress.push(loaded);
         },
@@ -152,13 +168,23 @@ it.each(['0', '-1', '4194305', '4e6', '004194304'])(
                 JSON.stringify({
                     id: request.id,
                     ok: true,
-                    result: { id: 'bad-limit', filename: 'file.bin', byteLength: '1', chunkBytes },
+                    result: uploadReply(request, {
+                        id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+                        filename: 'file.bin',
+                        byteLength: '1',
+                        chunkBytes,
+                    }),
                 }),
             );
         };
-        await expect(client.uploadData(new Blob([new Uint8Array(1)]), 'file.bin')).rejects.toThrow(
-            'invalid upload chunk size',
-        );
+        expect(
+            await uploadFailureReason(
+                client.uploadData(new Blob([new Uint8Array(1)]), 'file.bin', {
+                    context: uploadContext,
+                    requestId: 'original',
+                }),
+            ),
+        ).toContain('invalid upload chunk size');
         expect(gateway.requests.at(-1)?.method).toBe(Method.DataUploadCancel);
         expect(
             gateway.requests.some(
@@ -188,19 +214,24 @@ it('fits negotiated binary slices inside a smaller advertised gateway frame budg
             expect(bytes.length).toBeLessThanOrEqual(budget - 1024);
             offset += bytes.length;
             count += 1;
-            result = { id: 'bounded', offset: String(offset) };
+            result = { id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', offset: String(offset) };
         } else {
             result = {
-                id: 'bounded',
+                id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
                 filename: 'file.bin',
                 byteLength: String(2 * budget),
                 path: '/workspace/file.bin',
                 chunkBytes: String(4 * budget),
             };
         }
-        socket.send(JSON.stringify({ id: request.id, ok: true, result }));
+        socket.send(
+            JSON.stringify({ id: request.id, ok: true, result: uploadReply(request, result) }),
+        );
     };
-    await client.uploadData(new Blob([new Uint8Array(2 * budget)]), 'file.bin');
+    await client.uploadData(new Blob([new Uint8Array(2 * budget)]), 'file.bin', {
+        context: uploadContext,
+        requestId: 'original',
+    });
     expect(count).toBe(3);
     expect(offset).toBe(2 * budget);
 });
@@ -213,13 +244,22 @@ it('refuses raw uploads on an old gateway and cleans up the started upload', asy
             JSON.stringify({
                 id: request.id,
                 ok: true,
-                result: { id: 'old', filename: 'source.bin', byteLength: '1' },
+                result: uploadReply(request, {
+                    id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+                    filename: 'source.bin',
+                    byteLength: '1',
+                }),
             }),
         );
     };
-    await expect(client.uploadData(new Blob([new Uint8Array(1)]), 'source.bin')).rejects.toThrow(
-        'updated NEXA gateway',
-    );
+    expect(
+        await uploadFailureReason(
+            client.uploadData(new Blob([new Uint8Array(1)]), 'source.bin', {
+                context: uploadContext,
+                requestId: 'original',
+            }),
+        ),
+    ).toContain('updated NEXA gateway');
     expect(gateway.requests.map((request: Request): string => request.method)).toEqual([
         'connect',
         Method.DataUploadStart,
