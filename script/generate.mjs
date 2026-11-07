@@ -554,9 +554,40 @@ const validateTypes = Object.fromEntries(
 );
 writeFileSync(
     'src/protocol/Validators.ts',
-    `import { SchemaValidator } from './Schema.js';\nimport { schema } from './SchemaData.js';\nimport { ConnectorExecutionChecks } from './ConnectorExecutionChecks.js';\nimport type * as protocol from './Protocol.js';\nconst validator: SchemaValidator = new SchemaValidator(schema);\n/** Validates untrusted JSON at a protocol boundary. */\nexport type Validator = (value: unknown) => boolean;\n` +
+    `import { SchemaValidator } from './Schema.js';\nimport { schema } from './SchemaData.js';\nimport { ConnectorExecutionChecks } from './ConnectorExecutionChecks.js';\nimport { ConnectorInstructionsChecks } from './ConnectorInstructionsChecks.js';\nimport { ConnectorHostChecks } from './ConnectorHostChecks.js';\nimport type * as protocol from './Protocol.js';\nconst validator: SchemaValidator = new SchemaValidator(schema);\n/** Validates untrusted JSON at a protocol boundary. */\nexport type Validator = (value: unknown) => boolean;\n` +
         Object.entries(validators)
             .map(([name, path]) => {
+                const hostCheck =
+                    name === 'result' + methodValidators['connectors.context.check']
+                        ? 'context'
+                        : name === 'result' + methodValidators['connectors.host.status']
+                          ? 'status'
+                          : name === 'params' + methodValidators['connectors.host.submit']
+                            ? 'submit'
+                            : name === 'result' + methodValidators['connectors.host.submit'] ||
+                                name === 'result' + methodValidators['connectors.host.result']
+                              ? 'job'
+                              : name ===
+                                  'params' + methodValidators['connectors.workspace.select-host']
+                                ? 'select'
+                                : name === 'result' + methodValidators['connectors.workspace.get']
+                                  ? 'workspace'
+                                  : undefined;
+                if (hostCheck !== undefined) {
+                    return `/** Validates dependent full-host counters, grants and bounded native JSON. */\nexport function ${name}(value: unknown): boolean { return validator.validate(${JSON.stringify(path)}, value) && ConnectorHostChecks.${hostCheck}(value); }`;
+                }
+                const instructionCheck =
+                    name === 'params' + methodValidators['connectors.instructions.update']
+                        ? 'update'
+                        : name === 'result' + methodValidators['connectors.instructions.get'] ||
+                            name === 'result' + methodValidators['connectors.instructions.update']
+                          ? 'view'
+                          : name === 'result' + methodValidators['connectors.inventory']
+                            ? 'inventory'
+                            : undefined;
+                if (instructionCheck !== undefined) {
+                    return `/** Validates exact connector instruction text and revision limits. */\nexport function ${name}(value: unknown): boolean { return validator.validate(${JSON.stringify(path)}, value) && ConnectorInstructionsChecks.${instructionCheck}(value)${instructionCheck === 'inventory' ? ' && ConnectorHostChecks.inventory(value)' : ''}; }`;
+                }
                 if (name === 'result' + methodValidators['connectors.execution']) {
                     return `/** Shape validation precedes dependent public permission checks. */\nfunction connectorExecutionShape(value: unknown): value is protocol.ConnectorExecutionStatus { return validator.validate(${JSON.stringify(path)}, value); }\n/** Validates complete bounded connector permission metadata. */\nexport function ${name}(value: unknown): value is protocol.ConnectorExecutionStatus { return connectorExecutionShape(value) && ConnectorExecutionChecks.status(value); }`;
                 }
@@ -606,6 +637,8 @@ if (!snapshotOnly) {
     for (const script of [
         'connector-execution.mjs',
         'connector-workspace.mjs',
+        'connector-instructions.mjs',
+        'connector-host.mjs',
         'browser-files.mjs',
     ]) {
         execFileSync(process.execPath, ['script/' + script], { stdio: 'inherit' });

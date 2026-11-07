@@ -1,6 +1,8 @@
 import { SchemaValidator } from './Schema.js';
 import { schema } from './SchemaData.js';
 import { ConnectorExecutionChecks } from './ConnectorExecutionChecks.js';
+import { ConnectorInstructionsChecks } from './ConnectorInstructionsChecks.js';
+import { ConnectorHostChecks } from './ConnectorHostChecks.js';
 import type * as protocol from './Protocol.js';
 const validator: SchemaValidator = new SchemaValidator(schema);
 /** Validates untrusted JSON at a protocol boundary. */
@@ -536,11 +538,15 @@ export function params28(value: unknown): boolean {
         value,
     );
 }
-/** Validates result28. */
+/** Validates exact connector instruction text and revision limits. */
 export function result28(value: unknown): boolean {
-    return validator.validate(
-        '#/definitions/GatewayMethods/properties/connectors.inventory/properties/result',
-        value,
+    return (
+        validator.validate(
+            '#/definitions/GatewayMethods/properties/connectors.inventory/properties/result',
+            value,
+        ) &&
+        ConnectorInstructionsChecks.inventory(value) &&
+        ConnectorHostChecks.inventory(value)
     );
 }
 /** Validates params29. */
@@ -662,11 +668,13 @@ export function params37(value: unknown): boolean {
         value,
     );
 }
-/** Validates result37. */
+/** Validates dependent full-host counters, grants and bounded native JSON. */
 export function result37(value: unknown): boolean {
-    return validator.validate(
-        '#/definitions/GatewayMethods/properties/connectors.workspace.get/properties/result',
-        value,
+    return (
+        validator.validate(
+            '#/definitions/GatewayMethods/properties/connectors.workspace.get/properties/result',
+            value,
+        ) && ConnectorHostChecks.workspace(value)
     );
 }
 /** Validates params38. */
@@ -3663,5 +3671,121 @@ export function result251(value: unknown): boolean {
     return validator.validate(
         '#/definitions/GatewayMethods/properties/workspaces.visit/properties/result',
         value,
+    );
+}
+/** Validates params252. */
+export function params252(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/connectors.instructions.get/properties/params',
+        value,
+    );
+}
+/** Validates exact connector instruction text and revision limits. */
+export function result252(value: unknown): boolean {
+    return (
+        validator.validate(
+            '#/definitions/GatewayMethods/properties/connectors.instructions.get/properties/result',
+            value,
+        ) && ConnectorInstructionsChecks.view(value)
+    );
+}
+/** Validates exact connector instruction text and revision limits. */
+export function params253(value: unknown): boolean {
+    return (
+        validator.validate(
+            '#/definitions/GatewayMethods/properties/connectors.instructions.update/properties/params',
+            value,
+        ) && ConnectorInstructionsChecks.update(value)
+    );
+}
+/** Validates exact connector instruction text and revision limits. */
+export function result253(value: unknown): boolean {
+    return (
+        validator.validate(
+            '#/definitions/GatewayMethods/properties/connectors.instructions.update/properties/result',
+            value,
+        ) && ConnectorInstructionsChecks.view(value)
+    );
+}
+/** Validates params254. */
+export function params254(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/connectors.host.status/properties/params',
+        value,
+    );
+}
+/** Validates dependent full-host counters, grants and bounded native JSON. */
+export function result254(value: unknown): boolean {
+    return (
+        validator.validate(
+            '#/definitions/GatewayMethods/properties/connectors.host.status/properties/result',
+            value,
+        ) && ConnectorHostChecks.status(value)
+    );
+}
+/** Validates dependent full-host counters, grants and bounded native JSON. */
+export function params255(value: unknown): boolean {
+    return (
+        validator.validate(
+            '#/definitions/GatewayMethods/properties/connectors.host.submit/properties/params',
+            value,
+        ) && ConnectorHostChecks.submit(value)
+    );
+}
+/** Validates dependent full-host counters, grants and bounded native JSON. */
+export function result255(value: unknown): boolean {
+    return (
+        validator.validate(
+            '#/definitions/GatewayMethods/properties/connectors.host.submit/properties/result',
+            value,
+        ) && ConnectorHostChecks.job(value)
+    );
+}
+/** Validates params256. */
+export function params256(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/connectors.host.result/properties/params',
+        value,
+    );
+}
+/** Validates dependent full-host counters, grants and bounded native JSON. */
+export function result256(value: unknown): boolean {
+    return (
+        validator.validate(
+            '#/definitions/GatewayMethods/properties/connectors.host.result/properties/result',
+            value,
+        ) && ConnectorHostChecks.job(value)
+    );
+}
+/** Validates dependent full-host counters, grants and bounded native JSON. */
+export function params257(value: unknown): boolean {
+    return (
+        validator.validate(
+            '#/definitions/GatewayMethods/properties/connectors.workspace.select-host/properties/params',
+            value,
+        ) && ConnectorHostChecks.select(value)
+    );
+}
+/** Validates result257. */
+export function result257(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/connectors.workspace.select-host/properties/result',
+        value,
+    );
+}
+/** Validates params258. */
+export function params258(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/connectors.context.check/properties/params',
+        value,
+    );
+}
+/** Validates dependent full-host counters, grants and bounded native JSON. */
+export function result258(value: unknown): boolean {
+    return (
+        validator.validate(
+            '#/definitions/GatewayMethods/properties/connectors.context.check/properties/result',
+            value,
+        ) && ConnectorHostChecks.context(value)
     );
 }

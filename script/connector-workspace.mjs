@@ -27,11 +27,12 @@ try {
     const output = join(temporary, 'contract.json');
     writeFileSync(
         source,
-        `import type {ConnectorWorkspaceGetMethod,ConnectorWorkspaceSelectMethod,ConnectorWorkspaceClearMethod,ConnectorWorkspaceCreateMethod,ConnectorWorkspaceCatalogMethod,ConnectorWorkspaceSelectJointMethod} from ${JSON.stringify(resolve('../nexa/src/dataplane/ConnectorWorkspaceSelectionTypes.ts'))};
+        `import type {ConnectorWorkspaceGetMethod,ConnectorWorkspaceSelectMethod,ConnectorWorkspaceClearMethod,ConnectorWorkspaceCreateMethod,ConnectorWorkspaceCatalogMethod,ConnectorWorkspaceSelectJointMethod,ConnectorWorkspaceSelectHostMethod} from ${JSON.stringify(resolve('../nexa/src/dataplane/ConnectorWorkspaceSelectionTypes.ts'))};
 import type {ErrorCode} from ${JSON.stringify(resolve('../nexa/src/core/Errors.ts'))};
 export interface ConnectorWorkspaceContracts {
  readonly 'connectors.workspace.catalog': ConnectorWorkspaceCatalogMethod;
  readonly 'connectors.workspace.select-joint': ConnectorWorkspaceSelectJointMethod;
+ readonly 'connectors.workspace.select-host': ConnectorWorkspaceSelectHostMethod;
  readonly 'connectors.workspace.get': ConnectorWorkspaceGetMethod;
  readonly 'connectors.workspace.select': ConnectorWorkspaceSelectMethod;
  readonly 'connectors.workspace.clear': ConnectorWorkspaceClearMethod;
@@ -72,6 +73,7 @@ export interface ConnectorWorkspaceContracts {
     const expected = [
         'connectors.workspace.catalog',
         'connectors.workspace.select-joint',
+        'connectors.workspace.select-host',
         'connectors.workspace.get',
         'connectors.workspace.select',
         'connectors.workspace.clear',
@@ -137,8 +139,13 @@ export interface ConnectorWorkspaceContracts {
                     ].includes(field)
                 ) {
                     value.pattern = '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$';
-                } else if (field === 'bindingRevision') {
+                } else if (['bindingRevision', 'grantRevision'].includes(field)) {
                     value.pattern = '^[1-9][0-9]{0,18}$';
+                } else if (field === 'grantId') {
+                    value.pattern = '^[a-f0-9]{64}$';
+                } else if (field === 'directory') {
+                    value.minLength = 1;
+                    value.maxLength = 4096;
                 } else if (field === 'entries') {
                     value.maxItems = 128;
                 } else if (field === 'sessionId') {
