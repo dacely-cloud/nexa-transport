@@ -563,24 +563,43 @@ are separate operations. See `examples/Geometry.ts` for subscription cleanup.
 
 ### Large data uploads
 
-Use `uploadData` for large documents or datasets. It sends acknowledged 192 KiB slices to the user's workspace instead of creating a whole-file base64 attachment:
+Use `uploadData` for original documents or datasets after resolving an explicit conversation target. Discovery accepts no bytes and acquires no machine. An unselected conversation needs a user-reviewed `data.upload.select` choice; a missing or offline target never falls back to the controller.
 
 ```ts
-import type { DataFile } from 'nexa-transport/protocol';
+import type { ConversationDataFile, DataUploadTarget } from 'nexa-transport/protocol';
 import type { TurnStream } from 'nexa-transport/stream';
 
 declare const file: File;
 const controller: AbortController = new AbortController();
-const uploaded: DataFile = await client.uploadData(file, file.name, {
+const target: DataUploadTarget = await client.call(Method.DataUploadTarget, {
+    sessionId: sessionKey,
+});
+if (
+    target.kind === 'unselected' ||
+    target.kind === 'unsupported' ||
+    (target.kind === 'host' && target.state !== 'authorized')
+) {
+    throw new Error('Choose an available upload destination before reading the file.');
+}
+const requestId: string = crypto.randomUUID();
+const uploaded: ConversationDataFile = await client.uploadData(file, file.name, {
+    context: target.context,
+    requestId,
     signal: controller.signal,
     onProgress: (bytes: bigint, total: bigint): void => console.log(bytes, total),
 });
 const turn: TurnStream = client.stream({
+    conversationId: uploaded.context.sessionId,
+    uploadedSources: [uploaded.id],
     message: `Analyze the entire dataset at ${JSON.stringify(uploaded.path)} using import_dataset and query_dataset.`,
 });
 ```
 
-The server returns a path, filename and decimal-string byte count. Source bytes never enter the agent request. Progress counts acknowledged bytes as `bigint`. Cancellation requests cleanup of unfinished uploads. The server must advertise the `data.upload.*` methods and grant write scope. For Node files, use a file-backed Blob to keep memory bounded. `NexaMedia.document` is still intended for inline attachments; uploading a file does not itself analyze it.
+For a new conversation, call `Method.DataUploadCreate` with a retained request ID. This reuses Nexa's empty-conversation creator without starting a model or managed VM. `DataUploadTarget` distinguishes an untouched selection, a selected full-computer connector, an explicitly configured local/normal workspace, and unsupported restricted selections. `data.upload.select` requires the exact target context, one immutable request ID and an explicit Host or normal-workspace choice. Its original receipt can differ from its latest target after a concurrent change; review that change instead of silently accepting it.
+
+The required `DataUploadOptions.context` pins the conversation, selection revision and opaque owner/provider freshness commitment. The server independently rechecks ownership, provider, permissions and the actual acquired assignment before accepting bytes. Keep `requestId`, context and the file declaration unchanged for explicit recovery. Start reports an exact acknowledged offset and receiving/publishing/complete/canceled/unconfirmed state. Recovery resumes the same receiving source or observes its original publication; it never allocates a replacement for uncertainty. `DataUploadFailure` retains this original metadata and a known upload ID when available. A cancellation request alone does not prove native cleanup.
+
+Slices are negotiated up to 4 MiB and reduced to the gateway's frame and memory budgets; only one source slice is in flight. Progress counts acknowledged bytes as `bigint`. Host uploads currently advertise a 1 GiB file limit and share a 2 GiB durable source budget with other native publications; normal managed uploads preserve their 100 GiB server limit. The browser UI caps individual attachments at 1 GiB. Native publication streams the same durable Mongo source without controller filesystem staging. Its final observation is caller-cancelable and bounded to six hours; each native operation has its own shorter bounds. A returned path is descriptive: send `uploadedSources` with the exact conversation so Nexa verifies the actual prepared target before interpreting it. The server must advertise the current `data.upload.*` contracts and grant write scope. For Node files, use a file-backed Blob to keep memory bounded. Upload alone makes no model call.
 
 For inline CSV, TSV, JSON, JSONL, PDF and Office files, use `NexaMedia.document(file)`. It preserves `File.name` and infers the MIME type from the filename when the browser leaves `File.type` empty. Nexa can import structured attachments directly by their media ID using `import_dataset`, then run full-data SQL with `query_dataset`. Word `.docx` text is available through `extract_document`.
 

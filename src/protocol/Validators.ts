@@ -3789,3 +3789,45 @@ export function result258(value: unknown): boolean {
         ) && ConnectorHostChecks.context(value)
     );
 }
+/** Validates params259. */
+export function params259(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/data.upload.create/properties/params',
+        value,
+    );
+}
+/** Validates result259. */
+export function result259(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/data.upload.create/properties/result',
+        value,
+    );
+}
+/** Validates params260. */
+export function params260(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/data.upload.target/properties/params',
+        value,
+    );
+}
+/** Validates result260. */
+export function result260(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/data.upload.target/properties/result',
+        value,
+    );
+}
+/** Validates params261. */
+export function params261(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/data.upload.select/properties/params',
+        value,
+    );
+}
+/** Validates result261. */
+export function result261(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/data.upload.select/properties/result',
+        value,
+    );
+}

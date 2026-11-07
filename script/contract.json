@@ -984,6 +984,14 @@
                 "userRegion": {
                     "$ref": "#/definitions/UserRegion",
                     "description": "Coarse regional preferences, never authorization or precise location."
+                },
+                "uploadedSources": {
+                    "type": "array",
+                    "maxItems": 32,
+                    "items": {
+                        "type": "string",
+                        "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$"
+                    }
                 }
             },
             "required": ["message"],
@@ -8239,50 +8247,69 @@
                     "type": "string"
                 },
                 "id": {
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$"
                 },
                 "offset": {
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(0|[1-9][0-9]{0,11})$"
                 }
             },
             "required": ["data", "id", "offset"],
-            "type": "object"
+            "type": "object",
+            "additionalProperties": false
         },
         "DataUploadIdParams": {
             "description": "Addresses an upload owned by the authenticated principal.",
             "properties": {
                 "id": {
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$"
                 }
             },
             "required": ["id"],
-            "type": "object"
+            "type": "object",
+            "additionalProperties": false
         },
         "DataUploadPosition": {
             "description": "The durable position acknowledged after one bounded upload chunk.",
             "properties": {
                 "id": {
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$"
                 },
                 "offset": {
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(0|[1-9][0-9]{0,11})$"
                 }
             },
             "required": ["id", "offset"],
-            "type": "object"
+            "type": "object",
+            "additionalProperties": false
         },
         "DataUploadStartParams": {
             "description": "Starts an upload without embedding source bytes in an agent request.",
             "properties": {
                 "byteLength": {
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(0|[1-9][0-9]{0,11})$"
+                },
+                "context": {
+                    "$ref": "#/definitions/DataUploadContext"
                 },
                 "filename": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 120
+                },
+                "requestId": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
                 }
             },
-            "required": ["byteLength", "filename"],
-            "type": "object"
+            "required": ["byteLength", "context", "filename", "requestId"],
+            "type": "object",
+            "additionalProperties": false
         },
         "DeadLetter": {
             "description": "One recorded failure.",
@@ -16497,7 +16524,14 @@
                             "$ref": "#/definitions/DataUploadIdParams"
                         },
                         "result": {
-                            "$ref": "#/definitions/OkResult"
+                            "properties": {
+                                "ok": {
+                                    "const": true,
+                                    "type": "boolean"
+                                }
+                            },
+                            "required": ["ok"],
+                            "type": "object"
                         }
                     },
                     "required": ["params", "result"],
@@ -16521,7 +16555,7 @@
                             "$ref": "#/definitions/DataUploadIdParams"
                         },
                         "result": {
-                            "$ref": "#/definitions/DataFile"
+                            "$ref": "#/definitions/ConversationDataFile"
                         }
                     },
                     "required": ["params", "result"],
@@ -16533,7 +16567,7 @@
                             "$ref": "#/definitions/DataUploadStartParams"
                         },
                         "result": {
-                            "$ref": "#/definitions/DataUpload"
+                            "$ref": "#/definitions/ConversationDataUpload"
                         }
                     },
                     "required": ["params", "result"],
@@ -19154,6 +19188,42 @@
                     "required": ["params", "result"],
                     "type": "object",
                     "additionalProperties": false
+                },
+                "data.upload.create": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/DataUploadCreateParams"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/DataUploadTarget"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "data.upload.target": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/DataUploadTargetParams"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/DataUploadTarget"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "data.upload.select": {
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/DataUploadSelectParams"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/DataUploadSelectionResult"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
                 }
             },
             "required": [
@@ -19415,7 +19485,10 @@
                 "connectors.host.submit",
                 "connectors.host.result",
                 "connectors.workspace.select-host",
-                "connectors.context.check"
+                "connectors.context.check",
+                "data.upload.create",
+                "data.upload.target",
+                "data.upload.select"
             ],
             "type": "object"
         },
@@ -26225,6 +26298,14 @@
                 "userRegion": {
                     "$ref": "#/definitions/UserRegion",
                     "description": "Coarse regional preferences, never authorization or precise location."
+                },
+                "uploadedSources": {
+                    "type": "array",
+                    "maxItems": 32,
+                    "items": {
+                        "type": "string",
+                        "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$"
+                    }
                 }
             },
             "required": ["message"],
@@ -32722,7 +32803,7 @@
                         "$ref": "#/definitions/ConnectorHostTool"
                     },
                     "type": "array",
-                    "maxItems": 27
+                    "maxItems": 31
                 }
             },
             "required": ["directory", "enabled", "grantId", "grantRevision", "platform", "tools"],
@@ -32763,7 +32844,11 @@
                 "terminal_resize",
                 "terminal_start",
                 "terminal_stop",
-                "terminal_write"
+                "terminal_write",
+                "http_close",
+                "http_open",
+                "http_read",
+                "network_resolve"
             ],
             "type": "string"
         },
@@ -32966,7 +33051,7 @@
                         "$ref": "#/definitions/ConnectorHostTool"
                     },
                     "type": "array",
-                    "maxItems": 27
+                    "maxItems": 31
                 }
             },
             "required": ["enabled", "grantId", "grantRevision", "platform", "tools"],
@@ -33207,6 +33292,339 @@
                 "signal"
             ],
             "additionalProperties": false
+        },
+        "ConversationDataFile": {
+            "description": "Completed files remain opaque source references, with a display path only after verified delivery.",
+            "properties": {
+                "byteLength": {
+                    "type": "string",
+                    "pattern": "^(0|[1-9][0-9]{0,11})$"
+                },
+                "chunkBytes": {
+                    "description": "Maximum binary chunk size supported by this upload host; absent on older gateways.",
+                    "type": "string"
+                },
+                "context": {
+                    "$ref": "#/definitions/DataUploadContext"
+                },
+                "filename": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 120
+                },
+                "id": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$"
+                },
+                "offset": {
+                    "type": "string",
+                    "pattern": "^(0|[1-9][0-9]{0,11})$"
+                },
+                "path": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 16384
+                },
+                "sha256": {
+                    "type": ["null", "string"]
+                },
+                "state": {
+                    "const": "complete",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "byteLength",
+                "context",
+                "filename",
+                "id",
+                "offset",
+                "path",
+                "sha256",
+                "state"
+            ],
+            "type": "object",
+            "additionalProperties": false
+        },
+        "ConversationDataUpload": {
+            "description": "Upload byte admission always returns its exact conversation placement comparison.",
+            "properties": {
+                "byteLength": {
+                    "type": "string",
+                    "pattern": "^(0|[1-9][0-9]{0,11})$"
+                },
+                "chunkBytes": {
+                    "description": "Maximum binary chunk size supported by this upload host; absent on older gateways.",
+                    "type": "string"
+                },
+                "context": {
+                    "$ref": "#/definitions/DataUploadContext"
+                },
+                "filename": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 120
+                },
+                "id": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$"
+                },
+                "offset": {
+                    "type": "string",
+                    "pattern": "^(0|[1-9][0-9]{0,11})$"
+                },
+                "state": {
+                    "$ref": "#/definitions/ConversationDataUploadState"
+                }
+            },
+            "required": ["byteLength", "context", "filename", "id", "offset", "state"],
+            "type": "object",
+            "additionalProperties": false
+        },
+        "DataUploadChoice": {
+            "anyOf": [
+                {
+                    "$ref": "#/definitions/DataUploadSelectManaged"
+                },
+                {
+                    "$ref": "#/definitions/DataUploadSelectHost"
+                }
+            ],
+            "description": "Both choices require the same original context and immutable CAS request identity."
+        },
+        "DataUploadContext": {
+            "description": "A client supplies a comparison context, never a machine address or private owner generation.",
+            "properties": {
+                "ownerSha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                },
+                "selectionRevision": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                },
+                "sessionId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                }
+            },
+            "required": ["ownerSha256", "selectionRevision", "sessionId"],
+            "type": "object",
+            "additionalProperties": false
+        },
+        "DataUploadCreateParams": {
+            "description": "Reuses the existing idempotent empty-conversation creator; this accepts no user text or file bytes.",
+            "properties": {
+                "requestId": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+                }
+            },
+            "required": ["requestId"],
+            "type": "object",
+            "additionalProperties": false
+        },
+        "DataUploadHostState": {
+            "description": "Published approval is checked before source admission; native operations still verify actual storage.\nMissing native file authority never becomes a default-machine fallback.",
+            "enum": ["authorized", "disabled", "missing-tools", "offline"],
+            "type": "string"
+        },
+        "DataUploadSelectHost": {
+            "description": "Host choice is resolved against the current signed local approval by the existing selection service.",
+            "properties": {
+                "environmentId": {
+                    "type": "string"
+                },
+                "grantId": {
+                    "type": "string"
+                },
+                "grantRevision": {
+                    "type": "string"
+                },
+                "kind": {
+                    "const": "host",
+                    "type": "string"
+                }
+            },
+            "required": ["environmentId", "grantId", "grantRevision", "kind"],
+            "type": "object",
+            "additionalProperties": false
+        },
+        "DataUploadSelectManaged": {
+            "description": "A placement choice changes only this owned conversation; no endpoint, path or private nonce is accepted.",
+            "properties": {
+                "kind": {
+                    "const": "managed",
+                    "type": "string"
+                }
+            },
+            "required": ["kind"],
+            "type": "object",
+            "additionalProperties": false
+        },
+        "DataUploadSelectParams": {
+            "description": "A stale browser dialog cannot select for a recreated private conversation generation.",
+            "properties": {
+                "choice": {
+                    "$ref": "#/definitions/DataUploadChoice"
+                },
+                "context": {
+                    "$ref": "#/definitions/DataUploadContext"
+                },
+                "requestId": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+                }
+            },
+            "required": ["choice", "context", "requestId"],
+            "type": "object",
+            "additionalProperties": false
+        },
+        "DataUploadSelectionResult": {
+            "description": "Immutable original acceptance is separate from current placement, which may already be newer.",
+            "properties": {
+                "receipt": {
+                    "$ref": "#/definitions/ConnectorWorkspaceSelectionView"
+                },
+                "target": {
+                    "$ref": "#/definitions/DataUploadTarget"
+                }
+            },
+            "required": ["receipt", "target"],
+            "type": "object",
+            "additionalProperties": false
+        },
+        "DataUploadTarget": {
+            "anyOf": [
+                {
+                    "$ref": "#/definitions/DataUploadTargetUnselected"
+                },
+                {
+                    "$ref": "#/definitions/DataUploadTargetManaged"
+                },
+                {
+                    "$ref": "#/definitions/DataUploadTargetLocal"
+                },
+                {
+                    "$ref": "#/definitions/DataUploadTargetHost"
+                },
+                {
+                    "$ref": "#/definitions/DataUploadTargetUnsupported"
+                }
+            ],
+            "description": "Clients cannot infer managed authority from missing host metadata."
+        },
+        "DataUploadTargetHost": {
+            "description": "The exact selected host profile remains the ceiling throughout one upload.",
+            "properties": {
+                "context": {
+                    "$ref": "#/definitions/DataUploadContext"
+                },
+                "kind": {
+                    "const": "host",
+                    "type": "string"
+                },
+                "maximumBytes": {
+                    "type": "string",
+                    "pattern": "^(0|[1-9][0-9]{0,11})$"
+                },
+                "selection": {
+                    "$ref": "#/definitions/ConnectorWorkspaceHostSelection"
+                },
+                "state": {
+                    "$ref": "#/definitions/DataUploadHostState"
+                }
+            },
+            "required": ["context", "kind", "maximumBytes", "selection", "state"],
+            "type": "object",
+            "additionalProperties": false
+        },
+        "DataUploadTargetLocal": {
+            "description": "The deployment intentionally exposes its normal local workspace under fresh authenticated account policy.",
+            "properties": {
+                "context": {
+                    "$ref": "#/definitions/DataUploadContext"
+                },
+                "kind": {
+                    "const": "local",
+                    "type": "string"
+                },
+                "maximumBytes": {
+                    "type": "string",
+                    "pattern": "^(0|[1-9][0-9]{0,11})$"
+                }
+            },
+            "required": ["context", "kind", "maximumBytes"],
+            "type": "object",
+            "additionalProperties": false
+        },
+        "DataUploadTargetManaged": {
+            "description": "Normal managed storage is activated only from a verified retained Clear receipt.",
+            "properties": {
+                "context": {
+                    "$ref": "#/definitions/DataUploadContext"
+                },
+                "kind": {
+                    "const": "managed",
+                    "type": "string"
+                },
+                "maximumBytes": {
+                    "type": "string",
+                    "pattern": "^(0|[1-9][0-9]{0,11})$"
+                }
+            },
+            "required": ["context", "kind", "maximumBytes"],
+            "type": "object",
+            "additionalProperties": false
+        },
+        "DataUploadTargetParams": {
+            "description": "Target discovery requires an already owned conversation, created through the existing account API.",
+            "properties": {
+                "sessionId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                }
+            },
+            "required": ["sessionId"],
+            "type": "object",
+            "additionalProperties": false
+        },
+        "DataUploadTargetUnselected": {
+            "description": "No storage or default machine is acquired while requesting an explicit choice.",
+            "properties": {
+                "context": {
+                    "$ref": "#/definitions/DataUploadContext"
+                },
+                "kind": {
+                    "const": "unselected",
+                    "type": "string"
+                }
+            },
+            "required": ["context", "kind"],
+            "type": "object",
+            "additionalProperties": false
+        },
+        "DataUploadTargetUnsupported": {
+            "description": "A restricted workspace remains selected until the user explicitly chooses a supported upload target.",
+            "properties": {
+                "context": {
+                    "$ref": "#/definitions/DataUploadContext"
+                },
+                "kind": {
+                    "const": "unsupported",
+                    "type": "string"
+                }
+            },
+            "required": ["context", "kind"],
+            "type": "object",
+            "additionalProperties": false
+        },
+        "ConversationDataUploadState": {
+            "description": "Observation state controls recovery; a completed or uncertain original never restarts receiving bytes.\nNo absence/error is interpreted as an empty new upload.",
+            "enum": ["canceled", "complete", "publishing", "receiving", "unconfirmed"],
+            "type": "string"
         }
     },
     "description": "All protocol contracts reachable from the public transport.",

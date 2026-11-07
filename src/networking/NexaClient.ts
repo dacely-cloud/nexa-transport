@@ -1,3 +1,4 @@
+import type { ConversationDataFile } from '../protocol/Protocol.js';
 import { SessionHistoryReader } from './SessionHistoryReader.js';
 import { SessionArchiveRequests } from './SessionArchiveRequests.js';
 import { EmotionWatches } from './EmotionWatches.js';
@@ -28,8 +29,9 @@ import {
 } from '../office/OfficeProtocol.js';
 import { DataUploadClient } from './DataUploadClient.js';
 import type { DataUploadOptions } from '../interface/DataUploadOptions.js';
+export { DataUploadFailure, DataUploadFailureState } from './DataUploadFailure.js';
+export type { DataUploadOriginal } from './DataUploadFailure.js';
 export type { DataUploadOptions } from '../interface/DataUploadOptions.js';
-import type { DataFile } from '../protocol/Protocol.js';
 import { materializeError, rethrow } from './ErrorStack.js';
 import { BinaryChunks } from '../media/BinaryChunks.js';
 import { InboundCapacity } from './InboundCapacity.js';
@@ -1241,8 +1243,8 @@ export class NexaClient {
     public uploadData(
         source: Blob,
         filename: string,
-        options: DataUploadOptions = {},
-    ): Promise<DataFile> {
+        options: DataUploadOptions,
+    ): Promise<ConversationDataFile> {
         return DataUploadClient.upload(this, source, filename, options);
     }
 

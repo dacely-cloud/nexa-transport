@@ -1,6 +1,6 @@
 # RPC reference
 
-All 259 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 258 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
+All 262 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 261 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
 
 - [accounts.create](#accountscreate)
 - [accounts.list](#accountslist)
@@ -261,6 +261,9 @@ All 259 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [connectors.host.result](#connectorshostresult)
 - [connectors.workspace.select-host](#connectorsworkspaceselect-host)
 - [connectors.context.check](#connectorscontextcheck)
+- [data.upload.create](#datauploadcreate)
+- [data.upload.target](#datauploadtarget)
+- [data.upload.select](#datauploadselect)
 
 ## accounts.create
 
@@ -375,6 +378,7 @@ Parameters: [AskParams](protocol.md#askparams).
 | `targetTimeSeconds` | No       | `integer`                                                                     | Soft task time target in seconds; never a cancellation deadline.                          |
 | `userId`            | No       | `string`                                                                      | The principal the turn is billed and authorized as.                                       |
 | `userRegion`        | No       | [UserRegion](protocol.md#userregion)                                          | Coarse regional preferences, never authorization or precise location.                     |
+| `uploadedSources`   | No       | Array of `string`                                                             |                                                                                           |
 
 Result: [AskResult](protocol.md#askresult).
 
@@ -428,6 +432,7 @@ Parameters: [StreamParams](protocol.md#streamparams).
 | `targetTimeSeconds` | No       | `integer`                                                                     | Soft task time target in seconds; never a cancellation deadline.                          |
 | `userId`            | No       | `string`                                                                      | The principal the turn is billed and authorized as.                                       |
 | `userRegion`        | No       | [UserRegion](protocol.md#userregion)                                          | Coarse regional preferences, never authorization or precise location.                     |
+| `uploadedSources`   | No       | Array of `string`                                                             |                                                                                           |
 
 Result: [StreamAccepted](protocol.md#streamaccepted).
 
@@ -1442,7 +1447,7 @@ Parameters: [DataUploadIdParams](protocol.md#datauploadidparams).
 | ----- | -------- | -------- | ----------- |
 | `id`  | Yes      | `string` |             |
 
-Result: [OkResult](protocol.md#okresult).
+Result: Object (fields below).
 
 ## data.upload.chunk
 
@@ -1490,7 +1495,7 @@ Parameters: [DataUploadIdParams](protocol.md#datauploadidparams).
 | ----- | -------- | -------- | ----------- |
 | `id`  | Yes      | `string` |             |
 
-Result: [DataFile](protocol.md#datafile).
+Result: [ConversationDataFile](protocol.md#conversationdatafile).
 
 ## data.upload.start
 
@@ -1499,7 +1504,13 @@ import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
 
 const params: ParamsOf<typeof Method.DataUploadStart> = {
     byteLength: 'YOUR_BYTELENGTH',
+    context: {
+        ownerSha256: 'YOUR_OWNERSHA256',
+        selectionRevision: 'YOUR_SELECTIONREVISION',
+        sessionId: 'YOUR_SESSIONID',
+    },
     filename: 'YOUR_FILENAME',
+    requestId: 'YOUR_REQUESTID',
 };
 const result: ResultOf<typeof Method.DataUploadStart> = await client.call(
     Method.DataUploadStart,
@@ -1509,12 +1520,14 @@ const result: ResultOf<typeof Method.DataUploadStart> = await client.call(
 
 Parameters: [DataUploadStartParams](protocol.md#datauploadstartparams).
 
-| Field        | Required | Type     | Description |
-| ------------ | -------- | -------- | ----------- |
-| `byteLength` | Yes      | `string` |             |
-| `filename`   | Yes      | `string` |             |
+| Field        | Required | Type                                               | Description |
+| ------------ | -------- | -------------------------------------------------- | ----------- |
+| `byteLength` | Yes      | `string`                                           |             |
+| `context`    | Yes      | [DataUploadContext](protocol.md#datauploadcontext) |             |
+| `filename`   | Yes      | `string`                                           |             |
+| `requestId`  | Yes      | `string`                                           |             |
 
-Result: [DataUpload](protocol.md#dataupload).
+Result: [ConversationDataUpload](protocol.md#conversationdataupload).
 
 ## design.arrange
 
@@ -6918,3 +6931,79 @@ Parameters: [ConnectorContextCheckQuery](protocol.md#connectorcontextcheckquery)
 | `knownVersion` | Yes      | `null,string` |             |
 
 Result: [ConnectorContextCheckView](protocol.md#connectorcontextcheckview).
+
+## data.upload.create
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DataUploadCreate> = {
+    requestId: 'YOUR_REQUESTID',
+};
+const result: ResultOf<typeof Method.DataUploadCreate> = await client.call(
+    Method.DataUploadCreate,
+    params,
+);
+```
+
+Parameters: [DataUploadCreateParams](protocol.md#datauploadcreateparams).
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `requestId` | Yes      | `string` |             |
+
+Result: [DataUploadTarget](protocol.md#datauploadtarget).
+
+## data.upload.target
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DataUploadTarget> = {
+    sessionId: 'YOUR_SESSIONID',
+};
+const result: ResultOf<typeof Method.DataUploadTarget> = await client.call(
+    Method.DataUploadTarget,
+    params,
+);
+```
+
+Parameters: [DataUploadTargetParams](protocol.md#datauploadtargetparams).
+
+| Field       | Required | Type     | Description |
+| ----------- | -------- | -------- | ----------- |
+| `sessionId` | Yes      | `string` |             |
+
+Result: [DataUploadTarget](protocol.md#datauploadtarget).
+
+## data.upload.select
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.DataUploadSelect> = {
+    choice: {
+        kind: 'managed',
+    },
+    context: {
+        ownerSha256: 'YOUR_OWNERSHA256',
+        selectionRevision: 'YOUR_SELECTIONREVISION',
+        sessionId: 'YOUR_SESSIONID',
+    },
+    requestId: 'YOUR_REQUESTID',
+};
+const result: ResultOf<typeof Method.DataUploadSelect> = await client.call(
+    Method.DataUploadSelect,
+    params,
+);
+```
+
+Parameters: [DataUploadSelectParams](protocol.md#datauploadselectparams).
+
+| Field       | Required | Type                                               | Description |
+| ----------- | -------- | -------------------------------------------------- | ----------- |
+| `choice`    | Yes      | [DataUploadChoice](protocol.md#datauploadchoice)   |             |
+| `context`   | Yes      | [DataUploadContext](protocol.md#datauploadcontext) |             |
+| `requestId` | Yes      | `string`                                           |             |
+
+Result: [DataUploadSelectionResult](protocol.md#datauploadselectionresult).
