@@ -453,17 +453,18 @@ What a finished turn produced.
 
 Browser-safe background job receipt, without host pids or log paths.
 
-| Field        | Required | Type          | Description                                                            |
-| ------------ | -------- | ------------- | ---------------------------------------------------------------------- |
-| `command`    | Yes      | `string`      |                                                                        |
-| `cwd`        | Yes      | `string`      |                                                                        |
-| `endedAt`    | Yes      | `null,string` |                                                                        |
-| `exitCode`   | Yes      | `null,number` |                                                                        |
-| `foreground` | No       | `boolean`     | A command still attached to its launching tool has an inline terminal. |
-| `processId`  | Yes      | `string`      |                                                                        |
-| `running`    | Yes      | `boolean`     |                                                                        |
-| `signal`     | Yes      | `null,string` |                                                                        |
-| `startedAt`  | Yes      | `string`      |                                                                        |
+| Field                | Required | Type          | Description                                                            |
+| -------------------- | -------- | ------------- | ---------------------------------------------------------------------- |
+| `cleanupUnconfirmed` | No       | `boolean`     | Stop remains available because native cleanup has not been confirmed.  |
+| `command`            | Yes      | `string`      |                                                                        |
+| `cwd`                | Yes      | `string`      |                                                                        |
+| `endedAt`            | Yes      | `null,string` |                                                                        |
+| `exitCode`           | Yes      | `null,number` |                                                                        |
+| `foreground`         | No       | `boolean`     | A command still attached to its launching tool has an inline terminal. |
+| `processId`          | Yes      | `string`      |                                                                        |
+| `running`            | Yes      | `boolean`     |                                                                        |
+| `signal`             | Yes      | `null,string` |                                                                        |
+| `startedAt`          | Yes      | `string`      |                                                                        |
 
 ## BackgroundProcessLog
 
@@ -2024,19 +2025,39 @@ Type: `"adjustment"` / `"completion"` / `"embedding"` / `"media"` / `"speech"` /
 
 ## CommandExecutionReceipt
 
-Host-produced command termination evidence, separate from model-visible output.
+Native cleanup uncertainty remains distinct from a normal command snapshot.
 
-| Field            | Required | Type          | Description                                                          |
-| ---------------- | -------- | ------------- | -------------------------------------------------------------------- |
-| `command`        | Yes      | `string`      |                                                                      |
-| `cwd`            | Yes      | `string`      |                                                                      |
-| `exitCode`       | Yes      | `null,number` |                                                                      |
-| `processId`      | Yes      | `null,string` |                                                                      |
-| `processToken`   | Yes      | `null,string` |                                                                      |
-| `remote`         | Yes      | `boolean`     |                                                                      |
-| `running`        | Yes      | `boolean`     |                                                                      |
-| `signal`         | Yes      | `null,string` |                                                                      |
-| `terminalOutput` | No       | `string`      | Original terminal stream, including ANSI styles and cursor controls. |
+Type: [CommandExecutionSnapshot](protocol.md#commandexecutionsnapshot) / [CommandExecutionCleanupUnconfirmed](protocol.md#commandexecutioncleanupunconfirmed).
+
+## CommandExecutionSnapshot
+
+A normal host-produced command snapshot may describe a running program or observed termination.
+
+| Field                | Required | Type          | Description                                                                 |
+| -------------------- | -------- | ------------- | --------------------------------------------------------------------------- |
+| `cleanupUnconfirmed` | No       | `false`       | An explicit false value never supplies native cleanup uncertainty metadata. |
+| `command`            | Yes      | `string`      |                                                                             |
+| `cwd`                | Yes      | `string`      |                                                                             |
+| `exitCode`           | Yes      | `null,number` |                                                                             |
+| `processId`          | Yes      | `null,string` |                                                                             |
+| `processToken`       | Yes      | `null,string` |                                                                             |
+| `remote`             | Yes      | `boolean`     |                                                                             |
+| `running`            | Yes      | `boolean`     |                                                                             |
+| `signal`             | Yes      | `null,string` |                                                                             |
+| `terminalOutput`     | No       | `string`      | Original terminal stream, including ANSI styles and cursor controls.        |
+
+## CommandExecutionCleanupUnconfirmed
+
+Unresolved native ownership preserves only the exact actionable handle, without command arguments or fabricated exit evidence. This is a retained cleanup owner; `running: true` does not establish that its program is still alive. Retry Stop for this same handle.
+
+| Field                | Required | Type     | Description                                                          |
+| -------------------- | -------- | -------- | -------------------------------------------------------------------- |
+| `cleanupUnconfirmed` | Yes      | `true`   | Native cleanup remains unconfirmed.                                  |
+| `processId`          | Yes      | `string` | A bounded opaque identifier of 1 to 128 ASCII identifier characters. |
+| `running`            | Yes      | `true`   | The cleanup owner remains retained.                                  |
+| `remote`             | Yes      | `true`   |                                                                      |
+| `exitCode`           | Yes      | `null`   | No exit code is invented.                                            |
+| `signal`             | Yes      | `null`   | No termination signal is invented.                                   |
 
 ## ComponentCategory
 

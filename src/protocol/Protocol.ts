@@ -727,6 +727,8 @@ export interface BackgroundProcessShape {
     readonly signal: null | string;
     /** startedAt as defined by the Nexa gateway. */
     readonly startedAt: string;
+    /** cleanupUnconfirmed as defined by the Nexa gateway. */
+    readonly cleanupUnconfirmed?: boolean;
 }
 
 /** BackgroundProcess from the Nexa wire protocol. */
@@ -2973,30 +2975,8 @@ export const ChargeKindValues = {
 /** ChargeKind from the Nexa wire protocol. */
 export type ChargeKind = (typeof ChargeKindValues)[keyof typeof ChargeKindValues];
 
-/** CommandExecutionReceipt wire fields. */
-export interface CommandExecutionReceiptShape {
-    /** command as defined by the Nexa gateway. */
-    readonly command: string;
-    /** cwd as defined by the Nexa gateway. */
-    readonly cwd: string;
-    /** exitCode as defined by the Nexa gateway. */
-    readonly exitCode: null | number;
-    /** processId as defined by the Nexa gateway. */
-    readonly processId: null | string;
-    /** processToken as defined by the Nexa gateway. */
-    readonly processToken: null | string;
-    /** remote as defined by the Nexa gateway. */
-    readonly remote: boolean;
-    /** running as defined by the Nexa gateway. */
-    readonly running: boolean;
-    /** signal as defined by the Nexa gateway. */
-    readonly signal: null | string;
-    /** terminalOutput as defined by the Nexa gateway. */
-    readonly terminalOutput?: string;
-}
-
 /** CommandExecutionReceipt from the Nexa wire protocol. */
-export type CommandExecutionReceipt = CommandExecutionReceiptShape;
+export type CommandExecutionReceipt = CommandExecutionSnapshot | CommandExecutionCleanupUnconfirmed;
 
 /** Allowed values for ComponentCategory. */
 export const ComponentCategoryValues = {
@@ -22536,6 +22516,52 @@ export interface ConnectorContextCheckViewShape {
 
 /** ConnectorContextCheckView from the Nexa wire protocol. */
 export type ConnectorContextCheckView = ConnectorContextCheckViewShape;
+
+/** CommandExecutionSnapshot wire fields. */
+export interface CommandExecutionSnapshotShape {
+    /** command as defined by the Nexa gateway. */
+    readonly command: string;
+    /** cwd as defined by the Nexa gateway. */
+    readonly cwd: string;
+    /** exitCode as defined by the Nexa gateway. */
+    readonly exitCode: null | number;
+    /** processId as defined by the Nexa gateway. */
+    readonly processId: null | string;
+    /** processToken as defined by the Nexa gateway. */
+    readonly processToken: null | string;
+    /** remote as defined by the Nexa gateway. */
+    readonly remote: boolean;
+    /** running as defined by the Nexa gateway. */
+    readonly running: boolean;
+    /** signal as defined by the Nexa gateway. */
+    readonly signal: null | string;
+    /** terminalOutput as defined by the Nexa gateway. */
+    readonly terminalOutput?: string;
+    /** cleanupUnconfirmed as defined by the Nexa gateway. */
+    readonly cleanupUnconfirmed?: false;
+}
+
+/** CommandExecutionSnapshot from the Nexa wire protocol. */
+export type CommandExecutionSnapshot = CommandExecutionSnapshotShape;
+
+/** CommandExecutionCleanupUnconfirmed wire fields. */
+export interface CommandExecutionCleanupUnconfirmedShape {
+    /** cleanupUnconfirmed as defined by the Nexa gateway. */
+    readonly cleanupUnconfirmed: true;
+    /** processId as defined by the Nexa gateway. */
+    readonly processId: string;
+    /** running as defined by the Nexa gateway. */
+    readonly running: true;
+    /** remote as defined by the Nexa gateway. */
+    readonly remote: true;
+    /** exitCode as defined by the Nexa gateway. */
+    readonly exitCode: null;
+    /** signal as defined by the Nexa gateway. */
+    readonly signal: null;
+}
+
+/** CommandExecutionCleanupUnconfirmed from the Nexa wire protocol. */
+export type CommandExecutionCleanupUnconfirmed = CommandExecutionCleanupUnconfirmedShape;
 
 /** Supported RPC names. */
 export type MethodName = keyof GatewayMethods;
