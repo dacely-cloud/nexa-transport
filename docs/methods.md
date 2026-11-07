@@ -1,6 +1,6 @@
 # RPC reference
 
-All 252 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 251 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
+All 259 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 258 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
 
 - [accounts.create](#accountscreate)
 - [accounts.list](#accountslist)
@@ -254,6 +254,13 @@ All 252 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [workspaces.list](#workspaceslist)
 - [workspaces.page](#workspacespage)
 - [workspaces.visit](#workspacesvisit)
+- [connectors.instructions.get](#connectorsinstructionsget)
+- [connectors.instructions.update](#connectorsinstructionsupdate)
+- [connectors.host.status](#connectorshoststatus)
+- [connectors.host.submit](#connectorshostsubmit)
+- [connectors.host.result](#connectorshostresult)
+- [connectors.workspace.select-host](#connectorsworkspaceselect-host)
+- [connectors.context.check](#connectorscontextcheck)
 
 ## accounts.create
 
@@ -6728,3 +6735,186 @@ Parameters: [IdParams](protocol.md#idparams).
 | `id`  | Yes      | `string` |             |
 
 Result: [OkResult](protocol.md#okresult).
+
+## connectors.instructions.get
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ConnectorsInstructionsGet> = {
+    enrollmentId: 'YOUR_ENROLLMENTID',
+};
+const result: ResultOf<typeof Method.ConnectorsInstructionsGet> = await client.call(
+    Method.ConnectorsInstructionsGet,
+    params,
+);
+```
+
+Parameters: [ConnectorInstructionsGetParams](protocol.md#connectorinstructionsgetparams).
+
+| Field          | Required | Type     | Description |
+| -------------- | -------- | -------- | ----------- |
+| `enrollmentId` | Yes      | `string` |             |
+
+Result: [ConnectorInstructionsView](protocol.md#connectorinstructionsview).
+
+## connectors.instructions.update
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ConnectorsInstructionsUpdate> = {
+    enrollmentId: 'YOUR_ENROLLMENTID',
+    instructions: 'YOUR_INSTRUCTIONS',
+    expectedRevision: 'YOUR_EXPECTEDREVISION',
+    requestId: 'YOUR_REQUESTID',
+};
+const result: ResultOf<typeof Method.ConnectorsInstructionsUpdate> = await client.call(
+    Method.ConnectorsInstructionsUpdate,
+    params,
+);
+```
+
+Parameters: [ConnectorInstructionsUpdateParams](protocol.md#connectorinstructionsupdateparams).
+
+| Field              | Required | Type     | Description                                                                                    |
+| ------------------ | -------- | -------- | ---------------------------------------------------------------------------------------------- |
+| `enrollmentId`     | Yes      | `string` |                                                                                                |
+| `instructions`     | Yes      | `string` | Account-owned standing instructions; at most 16384 UTF-8 bytes. Empty text clears preferences. |
+| `expectedRevision` | Yes      | `string` |                                                                                                |
+| `requestId`        | Yes      | `string` |                                                                                                |
+
+Result: [ConnectorInstructionsView](protocol.md#connectorinstructionsview).
+
+## connectors.host.status
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ConnectorsHostStatus> = {
+    environmentId: 'YOUR_ENVIRONMENTID',
+};
+const result: ResultOf<typeof Method.ConnectorsHostStatus> = await client.call(
+    Method.ConnectorsHostStatus,
+    params,
+);
+```
+
+Parameters: [ConnectorHostStatusParams](protocol.md#connectorhoststatusparams).
+
+| Field           | Required | Type     | Description |
+| --------------- | -------- | -------- | ----------- |
+| `environmentId` | Yes      | `string` |             |
+
+Result: [ConnectorHostStatus](protocol.md#connectorhoststatus).
+
+## connectors.host.submit
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ConnectorsHostSubmit> = {
+    environmentId: 'YOUR_ENVIRONMENTID',
+    previousSequence: 'YOUR_PREVIOUSSEQUENCE',
+    request: {
+        argumentsJson: 'YOUR_ARGUMENTSJSON',
+        grantId: 'YOUR_GRANTID',
+        grantRevision: 'YOUR_GRANTREVISION',
+        toolName: 'computer_info',
+    },
+    requestId: 'YOUR_REQUESTID',
+};
+const result: ResultOf<typeof Method.ConnectorsHostSubmit> = await client.call(
+    Method.ConnectorsHostSubmit,
+    params,
+);
+```
+
+Parameters: [ConnectorHostSubmitParams](protocol.md#connectorhostsubmitparams).
+
+| Field              | Required | Type                                                     | Description |
+| ------------------ | -------- | -------------------------------------------------------- | ----------- |
+| `environmentId`    | Yes      | `string`                                                 |             |
+| `previousSequence` | Yes      | `string`                                                 |             |
+| `request`          | Yes      | [ConnectorHostRequest](protocol.md#connectorhostrequest) |             |
+| `requestId`        | Yes      | `string`                                                 |             |
+
+Result: [ConnectorHostJobView](protocol.md#connectorhostjobview).
+
+## connectors.host.result
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ConnectorsHostResult> = {
+    environmentId: 'YOUR_ENVIRONMENTID',
+    jobId: 'YOUR_JOBID',
+};
+const result: ResultOf<typeof Method.ConnectorsHostResult> = await client.call(
+    Method.ConnectorsHostResult,
+    params,
+);
+```
+
+Parameters: [ConnectorHostResultParams](protocol.md#connectorhostresultparams).
+
+| Field           | Required | Type     | Description |
+| --------------- | -------- | -------- | ----------- |
+| `environmentId` | Yes      | `string` |             |
+| `jobId`         | Yes      | `string` |             |
+
+Result: [ConnectorHostJobView](protocol.md#connectorhostjobview).
+
+## connectors.workspace.select-host
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ConnectorsWorkspaceSelectHost> = {
+    environmentId: 'YOUR_ENVIRONMENTID',
+    expectedRevision: 'YOUR_EXPECTEDREVISION',
+    grantId: 'YOUR_GRANTID',
+    grantRevision: 'YOUR_GRANTREVISION',
+    requestId: 'YOUR_REQUESTID',
+    sessionId: 'YOUR_SESSIONID',
+};
+const result: ResultOf<typeof Method.ConnectorsWorkspaceSelectHost> = await client.call(
+    Method.ConnectorsWorkspaceSelectHost,
+    params,
+);
+```
+
+Parameters: [ConnectorWorkspaceSelectHostParams](protocol.md#connectorworkspaceselecthostparams).
+
+| Field              | Required | Type     | Description |
+| ------------------ | -------- | -------- | ----------- |
+| `environmentId`    | Yes      | `string` |             |
+| `expectedRevision` | Yes      | `string` |             |
+| `grantId`          | Yes      | `string` |             |
+| `grantRevision`    | Yes      | `string` |             |
+| `requestId`        | Yes      | `string` |             |
+| `sessionId`        | Yes      | `string` |             |
+
+Result: [ConnectorWorkspaceSelectionView](protocol.md#connectorworkspaceselectionview).
+
+## connectors.context.check
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ConnectorsContextCheck> = {
+    knownVersion: null,
+};
+const result: ResultOf<typeof Method.ConnectorsContextCheck> = await client.call(
+    Method.ConnectorsContextCheck,
+    params,
+);
+```
+
+Parameters: [ConnectorContextCheckQuery](protocol.md#connectorcontextcheckquery).
+
+| Field          | Required | Type          | Description |
+| -------------- | -------- | ------------- | ----------- |
+| `knownVersion` | Yes      | `null,string` |             |
+
+Result: [ConnectorContextCheckView](protocol.md#connectorcontextcheckview).

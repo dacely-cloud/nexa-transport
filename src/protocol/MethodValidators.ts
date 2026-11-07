@@ -287,4 +287,17 @@ export const methodValidators: Readonly<Record<MethodName, MethodValidation>> = 
     'workspaces.list': { params: validators.params249, result: validators.result249 },
     'workspaces.page': { params: validators.params250, result: validators.result250 },
     'workspaces.visit': { params: validators.params251, result: validators.result251 },
+    'connectors.instructions.get': { params: validators.params252, result: validators.result252 },
+    'connectors.instructions.update': {
+        params: validators.params253,
+        result: validators.result253,
+    },
+    'connectors.host.status': { params: validators.params254, result: validators.result254 },
+    'connectors.host.submit': { params: validators.params255, result: validators.result255 },
+    'connectors.host.result': { params: validators.params256, result: validators.result256 },
+    'connectors.workspace.select-host': {
+        params: validators.params257,
+        result: validators.result257,
+    },
+    'connectors.context.check': { params: validators.params258, result: validators.result258 },
 };

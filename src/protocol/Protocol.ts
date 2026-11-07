@@ -4042,6 +4042,12 @@ export interface ConnectorInventoryViewShape {
     readonly specification: ConnectorSystemSpecification | null;
     /** trust as defined by the Nexa gateway. */
     readonly trust: 'customer-reported';
+    /** instructions as defined by the Nexa gateway. */
+    readonly instructions: string;
+    /** instructionsRevision as defined by the Nexa gateway. */
+    readonly instructionsRevision: string;
+    /** host as defined by the Nexa gateway. */
+    readonly host: ConnectorHostSummary | null;
 }
 
 /** ConnectorInventoryView from the Nexa wire protocol. */
@@ -4987,7 +4993,11 @@ export interface ConnectorWorkspaceSelectionViewShape {
     /** revision as defined by the Nexa gateway. */
     readonly revision: string;
     /** selection as defined by the Nexa gateway. */
-    readonly selection: ConnectorWorkspaceFileSelection | ConnectorWorkspaceJointSelection | null;
+    readonly selection:
+        | ConnectorWorkspaceFileSelection
+        | ConnectorWorkspaceJointSelection
+        | ConnectorWorkspaceHostSelection
+        | null;
     /** sessionId as defined by the Nexa gateway. */
     readonly sessionId: string;
 }
@@ -12548,6 +12558,62 @@ export interface GatewayMethodsworkspaces_visitShape {
     readonly result: OkResult;
 }
 
+/** GatewayMethodsconnectors_instructions_get wire fields. */
+export interface GatewayMethodsconnectors_instructions_getShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConnectorInstructionsGetParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConnectorInstructionsView;
+}
+
+/** GatewayMethodsconnectors_instructions_update wire fields. */
+export interface GatewayMethodsconnectors_instructions_updateShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConnectorInstructionsUpdateParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConnectorInstructionsView;
+}
+
+/** GatewayMethodsconnectors_host_status wire fields. */
+export interface GatewayMethodsconnectors_host_statusShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConnectorHostStatusParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConnectorHostStatus;
+}
+
+/** GatewayMethodsconnectors_host_submit wire fields. */
+export interface GatewayMethodsconnectors_host_submitShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConnectorHostSubmitParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConnectorHostJobView;
+}
+
+/** GatewayMethodsconnectors_host_result wire fields. */
+export interface GatewayMethodsconnectors_host_resultShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConnectorHostResultParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConnectorHostJobView;
+}
+
+/** GatewayMethodsconnectors_workspace_select-host wire fields. */
+export interface GatewayMethodsconnectors_workspace_selecthostShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConnectorWorkspaceSelectHostParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConnectorWorkspaceSelectionView;
+}
+
+/** GatewayMethodsconnectors_context_check wire fields. */
+export interface GatewayMethodsconnectors_context_checkShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConnectorContextCheckQuery;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConnectorContextCheckView;
+}
+
 /** GatewayMethods wire fields. */
 export interface GatewayMethodsShape {
     /** accounts.create as defined by the Nexa gateway. */
@@ -13054,6 +13120,20 @@ export interface GatewayMethodsShape {
     readonly 'workspaces.page': GatewayMethodsworkspaces_pageShape;
     /** workspaces.visit as defined by the Nexa gateway. */
     readonly 'workspaces.visit': GatewayMethodsworkspaces_visitShape;
+    /** connectors.instructions.get as defined by the Nexa gateway. */
+    readonly 'connectors.instructions.get': GatewayMethodsconnectors_instructions_getShape;
+    /** connectors.instructions.update as defined by the Nexa gateway. */
+    readonly 'connectors.instructions.update': GatewayMethodsconnectors_instructions_updateShape;
+    /** connectors.host.status as defined by the Nexa gateway. */
+    readonly 'connectors.host.status': GatewayMethodsconnectors_host_statusShape;
+    /** connectors.host.submit as defined by the Nexa gateway. */
+    readonly 'connectors.host.submit': GatewayMethodsconnectors_host_submitShape;
+    /** connectors.host.result as defined by the Nexa gateway. */
+    readonly 'connectors.host.result': GatewayMethodsconnectors_host_resultShape;
+    /** connectors.workspace.select-host as defined by the Nexa gateway. */
+    readonly 'connectors.workspace.select-host': GatewayMethodsconnectors_workspace_selecthostShape;
+    /** connectors.context.check as defined by the Nexa gateway. */
+    readonly 'connectors.context.check': GatewayMethodsconnectors_context_checkShape;
 }
 
 /** GatewayMethods from the Nexa wire protocol. */
@@ -22078,6 +22158,379 @@ export interface WorkspaceUsageShape {
 /** WorkspaceUsage from the Nexa wire protocol. */
 export type WorkspaceUsage = WorkspaceUsageShape;
 
+/** ConnectorInstructionsGetParams wire fields. */
+export interface ConnectorInstructionsGetParamsShape {
+    /** enrollmentId as defined by the Nexa gateway. */
+    readonly enrollmentId: string;
+}
+
+/** ConnectorInstructionsGetParams from the Nexa wire protocol. */
+export type ConnectorInstructionsGetParams = ConnectorInstructionsGetParamsShape;
+
+/** ConnectorInstructionsUpdateParams wire fields. */
+export interface ConnectorInstructionsUpdateParamsShape {
+    /** enrollmentId as defined by the Nexa gateway. */
+    readonly enrollmentId: string;
+    /** instructions as defined by the Nexa gateway. */
+    readonly instructions: string;
+    /** expectedRevision as defined by the Nexa gateway. */
+    readonly expectedRevision: string;
+    /** requestId as defined by the Nexa gateway. */
+    readonly requestId: string;
+}
+
+/** ConnectorInstructionsUpdateParams from the Nexa wire protocol. */
+export type ConnectorInstructionsUpdateParams = ConnectorInstructionsUpdateParamsShape;
+
+/** ConnectorInstructionsView wire fields. */
+export interface ConnectorInstructionsViewShape {
+    /** enrollmentId as defined by the Nexa gateway. */
+    readonly enrollmentId: string;
+    /** instructions as defined by the Nexa gateway. */
+    readonly instructions: string;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: string;
+}
+
+/** ConnectorInstructionsView from the Nexa wire protocol. */
+export type ConnectorInstructionsView = ConnectorInstructionsViewShape;
+
+/** ConnectorHostStatusMethod wire fields. */
+export interface ConnectorHostStatusMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConnectorHostStatusParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConnectorHostStatus;
+}
+
+/** ConnectorHostStatusMethod from the Nexa wire protocol. */
+export type ConnectorHostStatusMethod = ConnectorHostStatusMethodShape;
+
+/** ConnectorHostStatusParams wire fields. */
+export interface ConnectorHostStatusParamsShape {
+    /** environmentId as defined by the Nexa gateway. */
+    readonly environmentId: string;
+}
+
+/** ConnectorHostStatusParams from the Nexa wire protocol. */
+export type ConnectorHostStatusParams = ConnectorHostStatusParamsShape;
+
+/** ConnectorHostStatus wire fields. */
+export interface ConnectorHostStatusShape {
+    /** acknowledgedSequence as defined by the Nexa gateway. */
+    readonly acknowledgedSequence: string;
+    /** environmentId as defined by the Nexa gateway. */
+    readonly environmentId: string;
+    /** online as defined by the Nexa gateway. */
+    readonly online: boolean;
+    /** profile as defined by the Nexa gateway. */
+    readonly profile: ConnectorHostProfile | null;
+    /** sequence as defined by the Nexa gateway. */
+    readonly sequence: string;
+}
+
+/** ConnectorHostStatus from the Nexa wire protocol. */
+export type ConnectorHostStatus = ConnectorHostStatusShape;
+
+/** ConnectorHostProfile wire fields. */
+export interface ConnectorHostProfileShape {
+    /** directory as defined by the Nexa gateway. */
+    readonly directory: string;
+    /** enabled as defined by the Nexa gateway. */
+    readonly enabled: boolean;
+    /** grantId as defined by the Nexa gateway. */
+    readonly grantId: string;
+    /** grantRevision as defined by the Nexa gateway. */
+    readonly grantRevision: string;
+    /** platform as defined by the Nexa gateway. */
+    readonly platform: ConnectorHostPlatform;
+    /** tools as defined by the Nexa gateway. */
+    readonly tools: ReadonlyArray<ConnectorHostTool>;
+}
+
+/** ConnectorHostProfile from the Nexa wire protocol. */
+export type ConnectorHostProfile = ConnectorHostProfileShape;
+
+/** Allowed values for ConnectorHostPlatform. */
+export const ConnectorHostPlatformValues = {
+    Value0: 'linux',
+    Value1: 'windows',
+    Value2: 'macos',
+} as const;
+
+/** ConnectorHostPlatform from the Nexa wire protocol. */
+export type ConnectorHostPlatform =
+    (typeof ConnectorHostPlatformValues)[keyof typeof ConnectorHostPlatformValues];
+
+/** Allowed values for ConnectorHostTool. */
+export const ConnectorHostToolValues = {
+    Value0: 'computer_info',
+    Value1: 'file_read',
+    Value2: 'file_digest',
+    Value3: 'file_write',
+    Value4: 'file_stat',
+    Value5: 'file_rename',
+    Value6: 'file_publish',
+    Value7: 'file_chmod',
+    Value8: 'directory_list',
+    Value9: 'directory_create',
+    Value10: 'file_remove',
+    Value11: 'process_start',
+    Value12: 'process_read',
+    Value13: 'process_write',
+    Value14: 'process_stop',
+    Value15: 'process_release',
+    Value16: 'desktop_info',
+    Value17: 'desktop_screenshot',
+    Value18: 'desktop_pointer',
+    Value19: 'desktop_key',
+    Value20: 'desktop_text',
+} as const;
+
+/** ConnectorHostTool from the Nexa wire protocol. */
+export type ConnectorHostTool =
+    (typeof ConnectorHostToolValues)[keyof typeof ConnectorHostToolValues];
+
+/** ConnectorHostSubmitMethod wire fields. */
+export interface ConnectorHostSubmitMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConnectorHostSubmitParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConnectorHostJobView;
+}
+
+/** ConnectorHostSubmitMethod from the Nexa wire protocol. */
+export type ConnectorHostSubmitMethod = ConnectorHostSubmitMethodShape;
+
+/** ConnectorHostSubmitParams wire fields. */
+export interface ConnectorHostSubmitParamsShape {
+    /** environmentId as defined by the Nexa gateway. */
+    readonly environmentId: string;
+    /** previousSequence as defined by the Nexa gateway. */
+    readonly previousSequence: string;
+    /** request as defined by the Nexa gateway. */
+    readonly request: ConnectorHostRequest;
+    /** requestId as defined by the Nexa gateway. */
+    readonly requestId: string;
+}
+
+/** ConnectorHostSubmitParams from the Nexa wire protocol. */
+export type ConnectorHostSubmitParams = ConnectorHostSubmitParamsShape;
+
+/** ConnectorHostRequest wire fields. */
+export interface ConnectorHostRequestShape {
+    /** argumentsJson as defined by the Nexa gateway. */
+    readonly argumentsJson: string;
+    /** grantId as defined by the Nexa gateway. */
+    readonly grantId: string;
+    /** grantRevision as defined by the Nexa gateway. */
+    readonly grantRevision: string;
+    /** toolName as defined by the Nexa gateway. */
+    readonly toolName: ConnectorHostTool;
+}
+
+/** ConnectorHostRequest from the Nexa wire protocol. */
+export type ConnectorHostRequest = ConnectorHostRequestShape;
+
+/** ConnectorHostJobView wire fields. */
+export interface ConnectorHostJobViewShape {
+    /** environmentId as defined by the Nexa gateway. */
+    readonly environmentId: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** phase as defined by the Nexa gateway. */
+    readonly phase: ConnectorHostJobPhase;
+    /** request as defined by the Nexa gateway. */
+    readonly request: ConnectorHostRequest;
+    /** response as defined by the Nexa gateway. */
+    readonly response: ConnectorHostResponse | null;
+    /** sequence as defined by the Nexa gateway. */
+    readonly sequence: string;
+}
+
+/** ConnectorHostJobView from the Nexa wire protocol. */
+export type ConnectorHostJobView = ConnectorHostJobViewShape;
+
+/** Allowed values for ConnectorHostJobPhase. */
+export const ConnectorHostJobPhaseValues = {
+    Value0: 'queued',
+    Value1: 'dispatched',
+    Value2: 'completed',
+} as const;
+
+/** ConnectorHostJobPhase from the Nexa wire protocol. */
+export type ConnectorHostJobPhase =
+    (typeof ConnectorHostJobPhaseValues)[keyof typeof ConnectorHostJobPhaseValues];
+
+/** Allowed values for ConnectorHostResponseerrorCodeVariant0. */
+export const ConnectorHostResponseerrorCodeVariant0Values = {
+    Value0: 'admission-denied',
+    Value1: 'already-exists',
+    Value2: 'canceled',
+    Value3: 'cross-device',
+    Value4: 'interrupted',
+    Value5: 'invalid-request',
+    Value6: 'is-directory',
+    Value7: 'not-directory',
+    Value8: 'not-found',
+    Value9: 'operation-failed',
+    Value10: 'permission-denied',
+    Value11: 'resource-limit',
+    Value12: 'snapshot-changed',
+    Value13: 'unsupported',
+} as const;
+
+/** ConnectorHostResponse wire fields. */
+export interface ConnectorHostResponseShape {
+    /** errorCode as defined by the Nexa gateway. */
+    readonly errorCode:
+        | (typeof ConnectorHostResponseerrorCodeVariant0Values)[keyof typeof ConnectorHostResponseerrorCodeVariant0Values]
+        | null;
+    /** outcome as defined by the Nexa gateway. */
+    readonly outcome: ConnectorHostOutcome;
+    /** resultJson as defined by the Nexa gateway. */
+    readonly resultJson: null | string;
+}
+
+/** ConnectorHostResponse from the Nexa wire protocol. */
+export type ConnectorHostResponse = ConnectorHostResponseShape;
+
+/** Allowed values for ConnectorHostOutcome. */
+export const ConnectorHostOutcomeValues = {
+    Value0: 'succeeded',
+    Value1: 'failed',
+    Value2: 'indeterminate',
+} as const;
+
+/** ConnectorHostOutcome from the Nexa wire protocol. */
+export type ConnectorHostOutcome =
+    (typeof ConnectorHostOutcomeValues)[keyof typeof ConnectorHostOutcomeValues];
+
+/** ConnectorHostResultMethod wire fields. */
+export interface ConnectorHostResultMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConnectorHostResultParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConnectorHostJobView;
+}
+
+/** ConnectorHostResultMethod from the Nexa wire protocol. */
+export type ConnectorHostResultMethod = ConnectorHostResultMethodShape;
+
+/** ConnectorHostResultParams wire fields. */
+export interface ConnectorHostResultParamsShape {
+    /** environmentId as defined by the Nexa gateway. */
+    readonly environmentId: string;
+    /** jobId as defined by the Nexa gateway. */
+    readonly jobId: string;
+}
+
+/** ConnectorHostResultParams from the Nexa wire protocol. */
+export type ConnectorHostResultParams = ConnectorHostResultParamsShape;
+
+/** ConnectorHostSummary wire fields. */
+export interface ConnectorHostSummaryShape {
+    /** enabled as defined by the Nexa gateway. */
+    readonly enabled: boolean;
+    /** grantId as defined by the Nexa gateway. */
+    readonly grantId: string;
+    /** grantRevision as defined by the Nexa gateway. */
+    readonly grantRevision: string;
+    /** platform as defined by the Nexa gateway. */
+    readonly platform: ConnectorHostPlatform;
+    /** tools as defined by the Nexa gateway. */
+    readonly tools: ReadonlyArray<ConnectorHostTool>;
+}
+
+/** ConnectorHostSummary from the Nexa wire protocol. */
+export type ConnectorHostSummary = ConnectorHostSummaryShape;
+
+/** ConnectorWorkspaceHostSelection wire fields. */
+export interface ConnectorWorkspaceHostSelectionShape {
+    /** directory as defined by the Nexa gateway. */
+    readonly directory: string;
+    /** environmentId as defined by the Nexa gateway. */
+    readonly environmentId: string;
+    /** grantId as defined by the Nexa gateway. */
+    readonly grantId: string;
+    /** grantRevision as defined by the Nexa gateway. */
+    readonly grantRevision: string;
+    /** kind as defined by the Nexa gateway. */
+    readonly kind: 'host';
+    /** mode as defined by the Nexa gateway. */
+    readonly mode: 'read-write';
+    /** platform as defined by the Nexa gateway. */
+    readonly platform: ConnectorHostPlatform;
+}
+
+/** ConnectorWorkspaceHostSelection from the Nexa wire protocol. */
+export type ConnectorWorkspaceHostSelection = ConnectorWorkspaceHostSelectionShape;
+
+/** ConnectorWorkspaceSelectHostMethod wire fields. */
+export interface ConnectorWorkspaceSelectHostMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConnectorWorkspaceSelectHostParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConnectorWorkspaceSelectionView;
+}
+
+/** ConnectorWorkspaceSelectHostMethod from the Nexa wire protocol. */
+export type ConnectorWorkspaceSelectHostMethod = ConnectorWorkspaceSelectHostMethodShape;
+
+/** ConnectorWorkspaceSelectHostParams wire fields. */
+export interface ConnectorWorkspaceSelectHostParamsShape {
+    /** environmentId as defined by the Nexa gateway. */
+    readonly environmentId: string;
+    /** expectedRevision as defined by the Nexa gateway. */
+    readonly expectedRevision: string;
+    /** grantId as defined by the Nexa gateway. */
+    readonly grantId: string;
+    /** grantRevision as defined by the Nexa gateway. */
+    readonly grantRevision: string;
+    /** requestId as defined by the Nexa gateway. */
+    readonly requestId: string;
+    /** sessionId as defined by the Nexa gateway. */
+    readonly sessionId: string;
+}
+
+/** ConnectorWorkspaceSelectHostParams from the Nexa wire protocol. */
+export type ConnectorWorkspaceSelectHostParams = ConnectorWorkspaceSelectHostParamsShape;
+
+/** ConnectorContextCheckMethod wire fields. */
+export interface ConnectorContextCheckMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConnectorContextCheckQuery;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConnectorContextCheckView;
+}
+
+/** ConnectorContextCheckMethod from the Nexa wire protocol. */
+export type ConnectorContextCheckMethod = ConnectorContextCheckMethodShape;
+
+/** ConnectorContextCheckQuery wire fields. */
+export interface ConnectorContextCheckQueryShape {
+    /** knownVersion as defined by the Nexa gateway. */
+    readonly knownVersion: null | string;
+}
+
+/** ConnectorContextCheckQuery from the Nexa wire protocol. */
+export type ConnectorContextCheckQuery = ConnectorContextCheckQueryShape;
+
+/** ConnectorContextCheckView wire fields. */
+export interface ConnectorContextCheckViewShape {
+    /** changed as defined by the Nexa gateway. */
+    readonly changed: boolean;
+    /** nextTransitionAtMs as defined by the Nexa gateway. */
+    readonly nextTransitionAtMs: null | string;
+    /** serverNowMs as defined by the Nexa gateway. */
+    readonly serverNowMs: string;
+    /** version as defined by the Nexa gateway. */
+    readonly version: string;
+}
+
+/** ConnectorContextCheckView from the Nexa wire protocol. */
+export type ConnectorContextCheckView = ConnectorContextCheckViewShape;
+
 /** Supported RPC names. */
 export type MethodName = keyof GatewayMethods;
 /** Parameters for a particular RPC. */
@@ -22591,4 +23044,18 @@ export enum Method {
     WorkspacesPage = 'workspaces.page',
     /** Calls workspaces.visit. */
     WorkspacesVisit = 'workspaces.visit',
+    /** Calls connectors.instructions.get. */
+    ConnectorsInstructionsGet = 'connectors.instructions.get',
+    /** Calls connectors.instructions.update. */
+    ConnectorsInstructionsUpdate = 'connectors.instructions.update',
+    /** Calls connectors.host.status. */
+    ConnectorsHostStatus = 'connectors.host.status',
+    /** Calls connectors.host.submit. */
+    ConnectorsHostSubmit = 'connectors.host.submit',
+    /** Calls connectors.host.result. */
+    ConnectorsHostResult = 'connectors.host.result',
+    /** Calls connectors.workspace.select-host. */
+    ConnectorsWorkspaceSelectHost = 'connectors.workspace.select-host',
+    /** Calls connectors.context.check. */
+    ConnectorsContextCheck = 'connectors.context.check',
 }

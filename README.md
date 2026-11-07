@@ -352,6 +352,42 @@ Use `Method.ApprovalsResolve` with `{ approvalId, approved }` to submit the user
 
 Each subscription returns a function that removes its listener. Use `Method.SessionsSubscribe` and `Method.SessionsUnsubscribe` with `{ sessionId }` to observe a session. Session events also include locally started turns; filter by stream ID when rendering both feeds.
 
+## Connector instructions
+
+`Method.ConnectorsInventory` includes account-owned `instructions` and `instructionsRevision`
+alongside each computer's reported hardware and presence. Read exact preferences with
+`Method.ConnectorsInstructionsGet` and `{ enrollmentId }`. To replace or clear them, call
+`Method.ConnectorsInstructionsUpdate` with `{ enrollmentId, instructions, expectedRevision, requestId }`.
+Both methods return `{ enrollmentId, instructions, revision }`. Revisions are exact decimal
+strings; text is limited to 16384 UTF-8 bytes. Editing requires account write permission and the
+provider's connector enrollment scope. Retain the complete original edit after uncertain delivery.
+
+Nexa injects a cached account connector snapshot into agent context. Before a turn,
+`Method.ConnectorsContextCheck` compares its `knownVersion` with the current server snapshot.
+An unchanged version reuses the prompt text without transferring inventory. Changed versions
+hydrate and verify matching pages before replacing the snapshot. Local edits also invalidate
+the cache. The response includes exact `serverNowMs` and optional `nextTransitionAtMs` decimal
+strings so time-derived presence can be checked at its next deadline. Cached presence and
+custom instructions grant no device access; a failed check cannot establish freshness.
+
+## Connector full-computer workspaces
+
+`Method.ConnectorsHostStatus`, `Method.ConnectorsHostSubmit` and
+`Method.ConnectorsHostResult` use the authenticated connection and require the provider's
+separate full-computer capability plus current local consent. Pairing and confined file or
+program permissions do not activate it. Submissions retain the observed grant, permanent
+sequence, complete arguments and original request ID; poll the same job after uncertain
+delivery. A terminal response includes `errorCode`: successful results require `null`, while
+failed or indeterminate outcomes return a finite code without private OS diagnostics.
+An indeterminate outcome never authorizes automatic replay.
+
+Use `Method.ConnectorsWorkspaceSelectHost` with an owned conversation's `sessionId`,
+`requestId`, `expectedRevision`, and the observed `environmentId`, `grantId`, `grantRevision`
+to select that computer for subsequent turns. The returned `kind: 'host'` selection records
+its native platform and directory. Each operation still checks current account and local
+authority. `file_digest` and snapshot-bound `file_read` support native whole-file validation
+without requiring Python on Windows.
+
 ## Authentication
 
 For a gateway on another domain, have your website issue a short-lived, single-use

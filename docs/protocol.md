@@ -2845,13 +2845,16 @@ An account page accepts only an opaque ordered enrollment cursor.
 
 Public inventory contains no customer paths, workload credentials or transport authority.
 
-| Field           | Required | Type                                                                              | Description |
-| --------------- | -------- | --------------------------------------------------------------------------------- | ----------- |
-| `enrollment`    | Yes      | [ConnectorView](protocol.md#connectorview)                                        |             |
-| `presence`      | Yes      | [ConnectorPresence](protocol.md#connectorpresence)                                |             |
-| `receivedAtMs`  | Yes      | `null,string`                                                                     |             |
-| `specification` | Yes      | [ConnectorSystemSpecification](protocol.md#connectorsystemspecification) / `null` |             |
-| `trust`         | Yes      | `"customer-reported"`                                                             |             |
+| Field                  | Required | Type                                                                              | Description                                                                                    |
+| ---------------------- | -------- | --------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `enrollment`           | Yes      | [ConnectorView](protocol.md#connectorview)                                        |                                                                                                |
+| `presence`             | Yes      | [ConnectorPresence](protocol.md#connectorpresence)                                |                                                                                                |
+| `receivedAtMs`         | Yes      | `null,string`                                                                     |                                                                                                |
+| `specification`        | Yes      | [ConnectorSystemSpecification](protocol.md#connectorsystemspecification) / `null` |                                                                                                |
+| `trust`                | Yes      | `"customer-reported"`                                                             |                                                                                                |
+| `instructions`         | Yes      | `string`                                                                          | Account-owned standing instructions; at most 16384 UTF-8 bytes. Empty text clears preferences. |
+| `instructionsRevision` | Yes      | `string`                                                                          |                                                                                                |
+| `host`                 | Yes      | [ConnectorHostSummary](protocol.md#connectorhostsummary) / `null`                 |                                                                                                |
 
 ## ConnectorJob
 
@@ -3548,11 +3551,11 @@ Captures a granted root and exact policy; the current signed profile determines 
 
 Public current state contains no private owner, provider identity, endpoint or device credentials.
 
-| Field       | Required | Type                                                                                                                                                                       | Description |
-| ----------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| `revision`  | Yes      | `string`                                                                                                                                                                   |             |
-| `selection` | Yes      | [ConnectorWorkspaceFileSelection](protocol.md#connectorworkspacefileselection) / [ConnectorWorkspaceJointSelection](protocol.md#connectorworkspacejointselection) / `null` |             |
-| `sessionId` | Yes      | `string`                                                                                                                                                                   |             |
+| Field       | Required | Type                                                                                                                                                                                                                                                        | Description |
+| ----------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `revision`  | Yes      | `string`                                                                                                                                                                                                                                                    |             |
+| `selection` | Yes      | [ConnectorWorkspaceFileSelection](protocol.md#connectorworkspacefileselection) / [ConnectorWorkspaceJointSelection](protocol.md#connectorworkspacejointselection) / [ConnectorWorkspaceHostSelection](protocol.md#connectorworkspacehostselection) / `null` |             |
+| `sessionId` | Yes      | `string`                                                                                                                                                                                                                                                    |             |
 
 ## ConnectorWrite
 
@@ -7890,6 +7893,13 @@ Configurable bounds on gateway-owned work and memory.
 | `workspaces.list`                    | Yes      | Object (fields below) |                                                                                                        |
 | `workspaces.page`                    | Yes      | Object (fields below) |                                                                                                        |
 | `workspaces.visit`                   | Yes      | Object (fields below) |                                                                                                        |
+| `connectors.instructions.get`        | Yes      | Object (fields below) |                                                                                                        |
+| `connectors.instructions.update`     | Yes      | Object (fields below) |                                                                                                        |
+| `connectors.host.status`             | Yes      | Object (fields below) | Read current full-computer consent, native working directory and permanent counters.                   |
+| `connectors.host.submit`             | Yes      | Object (fields below) | Admit an explicit complete original; pairing and confined roots do not grant host authority.           |
+| `connectors.host.result`             | Yes      | Object (fields below) | Observe one original without submitting another effect.                                                |
+| `connectors.workspace.select-host`   | Yes      | Object (fields below) | Full-host selection retains account ownership and ordinary conversation revision control.              |
+| `connectors.context.check`           | Yes      | Object (fields below) | Authenticated account RPC contract for conditional connector facts.                                    |
 
 **accounts.create**
 
@@ -9727,6 +9737,55 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | -------------------------------- | ----------- |
 | `params` | Yes      | [IdParams](protocol.md#idparams) |             |
 | `result` | Yes      | [OkResult](protocol.md#okresult) |             |
+
+**connectors.instructions.get**
+
+| Field    | Required | Type                                                                         | Description |
+| -------- | -------- | ---------------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ConnectorInstructionsGetParams](protocol.md#connectorinstructionsgetparams) |             |
+| `result` | Yes      | [ConnectorInstructionsView](protocol.md#connectorinstructionsview)           |             |
+
+**connectors.instructions.update**
+
+| Field    | Required | Type                                                                               | Description |
+| -------- | -------- | ---------------------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ConnectorInstructionsUpdateParams](protocol.md#connectorinstructionsupdateparams) |             |
+| `result` | Yes      | [ConnectorInstructionsView](protocol.md#connectorinstructionsview)                 |             |
+
+**connectors.host.status**
+
+| Field    | Required | Type                                                               | Description |
+| -------- | -------- | ------------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [ConnectorHostStatusParams](protocol.md#connectorhoststatusparams) |             |
+| `result` | Yes      | [ConnectorHostStatus](protocol.md#connectorhoststatus)             |             |
+
+**connectors.host.submit**
+
+| Field    | Required | Type                                                               | Description |
+| -------- | -------- | ------------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [ConnectorHostSubmitParams](protocol.md#connectorhostsubmitparams) |             |
+| `result` | Yes      | [ConnectorHostJobView](protocol.md#connectorhostjobview)           |             |
+
+**connectors.host.result**
+
+| Field    | Required | Type                                                               | Description |
+| -------- | -------- | ------------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [ConnectorHostResultParams](protocol.md#connectorhostresultparams) |             |
+| `result` | Yes      | [ConnectorHostJobView](protocol.md#connectorhostjobview)           |             |
+
+**connectors.workspace.select-host**
+
+| Field    | Required | Type                                                                                 | Description |
+| -------- | -------- | ------------------------------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [ConnectorWorkspaceSelectHostParams](protocol.md#connectorworkspaceselecthostparams) |             |
+| `result` | Yes      | [ConnectorWorkspaceSelectionView](protocol.md#connectorworkspaceselectionview)       |             |
+
+**connectors.context.check**
+
+| Field    | Required | Type                                                                 | Description |
+| -------- | -------- | -------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ConnectorContextCheckQuery](protocol.md#connectorcontextcheckquery) |             |
+| `result` | Yes      | [ConnectorContextCheckView](protocol.md#connectorcontextcheckview)   |             |
 
 ## GeometryFormat
 
@@ -15836,3 +15895,240 @@ What a workspace currently holds, and when that was last measured against the di
 | `bytes`        | Yes      | `number` |                                                                                          |
 | `files`        | Yes      | `number` |                                                                                          |
 | `reconciledAt` | Yes      | `number` | When a full walk last corrected these numbers. `0` means never — the counters are then a |
+
+## ConnectorInstructionsGetParams
+
+| Field          | Required | Type     | Description |
+| -------------- | -------- | -------- | ----------- |
+| `enrollmentId` | Yes      | `string` |             |
+
+## ConnectorInstructionsUpdateParams
+
+| Field              | Required | Type     | Description                                                                                    |
+| ------------------ | -------- | -------- | ---------------------------------------------------------------------------------------------- |
+| `enrollmentId`     | Yes      | `string` |                                                                                                |
+| `instructions`     | Yes      | `string` | Account-owned standing instructions; at most 16384 UTF-8 bytes. Empty text clears preferences. |
+| `expectedRevision` | Yes      | `string` |                                                                                                |
+| `requestId`        | Yes      | `string` |                                                                                                |
+
+## ConnectorInstructionsView
+
+| Field          | Required | Type     | Description                                                                                    |
+| -------------- | -------- | -------- | ---------------------------------------------------------------------------------------------- |
+| `enrollmentId` | Yes      | `string` |                                                                                                |
+| `instructions` | Yes      | `string` | Account-owned standing instructions; at most 16384 UTF-8 bytes. Empty text clears preferences. |
+| `revision`     | Yes      | `string` |                                                                                                |
+
+## ConnectorHostStatusMethod
+
+Read current full-computer consent, native working directory and permanent counters.
+
+| Field    | Required | Type                                                               | Description |
+| -------- | -------- | ------------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [ConnectorHostStatusParams](protocol.md#connectorhoststatusparams) |             |
+| `result` | Yes      | [ConnectorHostStatus](protocol.md#connectorhoststatus)             |             |
+
+## ConnectorHostStatusParams
+
+Status only selects an account-owned logical environment.
+
+| Field           | Required | Type     | Description |
+| --------------- | -------- | -------- | ----------- |
+| `environmentId` | Yes      | `string` |             |
+
+## ConnectorHostStatus
+
+Sequence counters remain permanent after bounded result compaction.
+
+| Field                  | Required | Type                                                              | Description |
+| ---------------------- | -------- | ----------------------------------------------------------------- | ----------- |
+| `acknowledgedSequence` | Yes      | `string`                                                          |             |
+| `environmentId`        | Yes      | `string`                                                          |             |
+| `online`               | Yes      | `boolean`                                                         |             |
+| `profile`              | Yes      | [ConnectorHostProfile](protocol.md#connectorhostprofile) / `null` |             |
+| `sequence`             | Yes      | `string`                                                          |             |
+
+## ConnectorHostProfile
+
+Local consent and default task directory are signed under the enrolled device identity.
+
+| Field           | Required | Type                                                        | Description |
+| --------------- | -------- | ----------------------------------------------------------- | ----------- |
+| `directory`     | Yes      | `string`                                                    |             |
+| `enabled`       | Yes      | `boolean`                                                   |             |
+| `grantId`       | Yes      | `string`                                                    |             |
+| `grantRevision` | Yes      | `string`                                                    |             |
+| `platform`      | Yes      | [ConnectorHostPlatform](protocol.md#connectorhostplatform)  |             |
+| `tools`         | Yes      | Array of [ConnectorHostTool](protocol.md#connectorhosttool) |             |
+
+## ConnectorHostPlatform
+
+Native paths and shell syntax belong to the customer computer, not the account API host.
+
+Type: `"linux"` / `"windows"` / `"macos"`.
+
+## ConnectorHostTool
+
+A full-host grant is separate from confined file/program policies and never inferred from pairing.
+
+Type: `"computer_info"` / `"file_read"` / `"file_digest"` / `"file_write"` / `"file_stat"` / `"file_rename"` / `"file_publish"` / `"file_chmod"` / `"directory_list"` / `"directory_create"` / `"file_remove"` / `"process_start"` / `"process_read"` / `"process_write"` / `"process_stop"` / `"process_release"` / `"desktop_info"` / `"desktop_screenshot"` / `"desktop_pointer"` / `"desktop_key"` / `"desktop_text"`.
+
+## ConnectorHostSubmitMethod
+
+Admit an explicit complete original; pairing and confined roots do not grant host authority.
+
+| Field    | Required | Type                                                               | Description |
+| -------- | -------- | ------------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [ConnectorHostSubmitParams](protocol.md#connectorhostsubmitparams) |             |
+| `result` | Yes      | [ConnectorHostJobView](protocol.md#connectorhostjobview)           |             |
+
+## ConnectorHostSubmitParams
+
+Every host operation pins the observed permanent counter and complete locally approved grant.
+
+| Field              | Required | Type                                                     | Description |
+| ------------------ | -------- | -------------------------------------------------------- | ----------- |
+| `environmentId`    | Yes      | `string`                                                 |             |
+| `previousSequence` | Yes      | `string`                                                 |             |
+| `request`          | Yes      | [ConnectorHostRequest](protocol.md#connectorhostrequest) |             |
+| `requestId`        | Yes      | `string`                                                 |             |
+
+## ConnectorHostRequest
+
+Only exact bounded JSON text crosses the transport; the tool runtime validates its operation shape again.
+
+| Field           | Required | Type                                               | Description |
+| --------------- | -------- | -------------------------------------------------- | ----------- |
+| `argumentsJson` | Yes      | `string`                                           |             |
+| `grantId`       | Yes      | `string`                                           |             |
+| `grantRevision` | Yes      | `string`                                           |             |
+| `toolName`      | Yes      | [ConnectorHostTool](protocol.md#connectorhosttool) |             |
+
+## ConnectorHostJobView
+
+An account can poll only its original job in its own environment.
+
+| Field           | Required | Type                                                                | Description |
+| --------------- | -------- | ------------------------------------------------------------------- | ----------- |
+| `environmentId` | Yes      | `string`                                                            |             |
+| `id`            | Yes      | `string`                                                            |             |
+| `phase`         | Yes      | [ConnectorHostJobPhase](protocol.md#connectorhostjobphase)          |             |
+| `request`       | Yes      | [ConnectorHostRequest](protocol.md#connectorhostrequest)            |             |
+| `response`      | Yes      | [ConnectorHostResponse](protocol.md#connectorhostresponse) / `null` |             |
+| `sequence`      | Yes      | `string`                                                            |             |
+
+## ConnectorHostJobPhase
+
+A queued original retains its identity across reconnects and account replicas.
+
+Type: `"queued"` / `"dispatched"` / `"completed"`.
+
+## ConnectorHostResponse
+
+Successful JSON text contains exact decimal file/process quantities; failure text contains no private diagnostics.
+
+| Field        | Required | Type                                                                                                                                                                                                                                                                                             | Description |
+| ------------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------- |
+| `errorCode`  | Yes      | `"admission-denied"` / `"already-exists"` / `"canceled"` / `"cross-device"` / `"interrupted"` / `"invalid-request"` / `"is-directory"` / `"not-directory"` / `"not-found"` / `"operation-failed"` / `"permission-denied"` / `"resource-limit"` / `"snapshot-changed"` / `"unsupported"` / `null` |             |
+| `outcome`    | Yes      | [ConnectorHostOutcome](protocol.md#connectorhostoutcome)                                                                                                                                                                                                                                         |             |
+| `resultJson` | Yes      | `null,string`                                                                                                                                                                                                                                                                                    |             |
+
+## ConnectorHostOutcome
+
+Durable outcomes never treat uncertain effects as permission to execute a fresh original.
+
+Type: `"succeeded"` / `"failed"` / `"indeterminate"`.
+
+## ConnectorHostResultMethod
+
+Observe one original without submitting another effect.
+
+| Field    | Required | Type                                                               | Description |
+| -------- | -------- | ------------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [ConnectorHostResultParams](protocol.md#connectorhostresultparams) |             |
+| `result` | Yes      | [ConnectorHostJobView](protocol.md#connectorhostjobview)           |             |
+
+## ConnectorHostResultParams
+
+A result selects only an existing immutable host job.
+
+| Field           | Required | Type     | Description |
+| --------------- | -------- | -------- | ----------- |
+| `environmentId` | Yes      | `string` |             |
+| `jobId`         | Yes      | `string` |             |
+
+## ConnectorHostSummary
+
+Local consent and default task directory are signed under the enrolled device identity.
+
+| Field           | Required | Type                                                        | Description |
+| --------------- | -------- | ----------------------------------------------------------- | ----------- |
+| `enabled`       | Yes      | `boolean`                                                   |             |
+| `grantId`       | Yes      | `string`                                                    |             |
+| `grantRevision` | Yes      | `string`                                                    |             |
+| `platform`      | Yes      | [ConnectorHostPlatform](protocol.md#connectorhostplatform)  |             |
+| `tools`         | Yes      | Array of [ConnectorHostTool](protocol.md#connectorhosttool) |             |
+
+## ConnectorWorkspaceHostSelection
+
+Full-host placement publishes the native default path without pretending to be a confined file root.
+
+| Field           | Required | Type                                                       | Description |
+| --------------- | -------- | ---------------------------------------------------------- | ----------- |
+| `directory`     | Yes      | `string`                                                   |             |
+| `environmentId` | Yes      | `string`                                                   |             |
+| `grantId`       | Yes      | `string`                                                   |             |
+| `grantRevision` | Yes      | `string`                                                   |             |
+| `kind`          | Yes      | `"host"`                                                   |             |
+| `mode`          | Yes      | `"read-write"`                                             |             |
+| `platform`      | Yes      | [ConnectorHostPlatform](protocol.md#connectorhostplatform) |             |
+
+## ConnectorWorkspaceSelectHostMethod
+
+Full-host selection retains account ownership and ordinary conversation revision control.
+
+| Field    | Required | Type                                                                                 | Description |
+| -------- | -------- | ------------------------------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [ConnectorWorkspaceSelectHostParams](protocol.md#connectorworkspaceselecthostparams) |             |
+| `result` | Yes      | [ConnectorWorkspaceSelectionView](protocol.md#connectorworkspaceselectionview)       |             |
+
+## ConnectorWorkspaceSelectHostParams
+
+Future turns can select one exact separately approved full-computer grant.
+
+| Field              | Required | Type     | Description |
+| ------------------ | -------- | -------- | ----------- |
+| `environmentId`    | Yes      | `string` |             |
+| `expectedRevision` | Yes      | `string` |             |
+| `grantId`          | Yes      | `string` |             |
+| `grantRevision`    | Yes      | `string` |             |
+| `requestId`        | Yes      | `string` |             |
+| `sessionId`        | Yes      | `string` |             |
+
+## ConnectorContextCheckMethod
+
+Authenticated account RPC contract for conditional connector facts.
+
+| Field    | Required | Type                                                                 | Description |
+| -------- | -------- | -------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ConnectorContextCheckQuery](protocol.md#connectorcontextcheckquery) |             |
+| `result` | Yes      | [ConnectorContextCheckView](protocol.md#connectorcontextcheckview)   |             |
+
+## ConnectorContextCheckQuery
+
+An account check compares prompt-visible connector facts without transferring inventory.
+
+| Field          | Required | Type          | Description |
+| -------------- | -------- | ------------- | ----------- |
+| `knownVersion` | Yes      | `null,string` |             |
+
+## ConnectorContextCheckView
+
+The current metadata version and server clock bound time-derived presence observations.
+
+| Field                | Required | Type          | Description |
+| -------------------- | -------- | ------------- | ----------- |
+| `changed`            | Yes      | `boolean`     |             |
+| `nextTransitionAtMs` | Yes      | `null,string` |             |
+| `serverNowMs`        | Yes      | `string`      |             |
+| `version`            | Yes      | `string`      |             |

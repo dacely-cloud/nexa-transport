@@ -6376,8 +6376,38 @@ export const schema: Schema = {
                     const: 'customer-reported',
                     type: 'string',
                 },
+                instructions: {
+                    description:
+                        'Account-owned standing instructions; at most 16384 UTF-8 bytes. Empty text clears preferences.',
+                    type: 'string',
+                    maxLength: 16384,
+                    pattern: '^[^\\u0000-\\u0008\\u000b\\u000c\\u000e-\\u001f\\u007f]*$',
+                },
+                instructionsRevision: {
+                    type: 'string',
+                    pattern: '^(0|[1-9][0-9]{0,18})$',
+                },
+                host: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/ConnectorHostSummary',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
             },
-            required: ['enrollment', 'presence', 'receivedAtMs', 'specification', 'trust'],
+            required: [
+                'enrollment',
+                'presence',
+                'receivedAtMs',
+                'specification',
+                'trust',
+                'instructions',
+                'instructionsRevision',
+                'host',
+            ],
             type: 'object',
         },
         ConnectorJob: {
@@ -7877,6 +7907,9 @@ export const schema: Schema = {
                         },
                         {
                             $ref: '#/definitions/ConnectorWorkspaceJointSelection',
+                        },
+                        {
+                            $ref: '#/definitions/ConnectorWorkspaceHostSelection',
                         },
                         {
                             type: 'null',
@@ -19618,6 +19651,106 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'connectors.instructions.get': {
+                    type: 'object',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/ConnectorInstructionsGetParams',
+                        },
+                        result: {
+                            $ref: '#/definitions/ConnectorInstructionsView',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    additionalProperties: false,
+                },
+                'connectors.instructions.update': {
+                    type: 'object',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/ConnectorInstructionsUpdateParams',
+                        },
+                        result: {
+                            $ref: '#/definitions/ConnectorInstructionsView',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    additionalProperties: false,
+                },
+                'connectors.host.status': {
+                    description:
+                        'Read current full-computer consent, native working directory and permanent counters.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/ConnectorHostStatusParams',
+                        },
+                        result: {
+                            $ref: '#/definitions/ConnectorHostStatus',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                    additionalProperties: false,
+                },
+                'connectors.host.submit': {
+                    description:
+                        'Admit an explicit complete original; pairing and confined roots do not grant host authority.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/ConnectorHostSubmitParams',
+                        },
+                        result: {
+                            $ref: '#/definitions/ConnectorHostJobView',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                    additionalProperties: false,
+                },
+                'connectors.host.result': {
+                    description: 'Observe one original without submitting another effect.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/ConnectorHostResultParams',
+                        },
+                        result: {
+                            $ref: '#/definitions/ConnectorHostJobView',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                    additionalProperties: false,
+                },
+                'connectors.workspace.select-host': {
+                    description:
+                        'Full-host selection retains account ownership and ordinary conversation revision control.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/ConnectorWorkspaceSelectHostParams',
+                        },
+                        result: {
+                            $ref: '#/definitions/ConnectorWorkspaceSelectionView',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                    additionalProperties: false,
+                },
+                'connectors.context.check': {
+                    description:
+                        'Authenticated account RPC contract for conditional connector facts.',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/ConnectorContextCheckQuery',
+                        },
+                        result: {
+                            $ref: '#/definitions/ConnectorContextCheckView',
+                        },
+                    },
+                    required: ['params', 'result'],
+                    type: 'object',
+                    additionalProperties: false,
+                },
             },
             required: [
                 'accounts.create',
@@ -19872,6 +20005,13 @@ export const schema: Schema = {
                 'workspaces.list',
                 'workspaces.page',
                 'workspaces.visit',
+                'connectors.instructions.get',
+                'connectors.instructions.update',
+                'connectors.host.status',
+                'connectors.host.submit',
+                'connectors.host.result',
+                'connectors.workspace.select-host',
+                'connectors.context.check',
             ],
             type: 'object',
         },
@@ -33487,6 +33627,559 @@ export const schema: Schema = {
             },
             required: ['bytes', 'files', 'reconciledAt'],
             type: 'object',
+        },
+        ConnectorInstructionsGetParams: {
+            type: 'object',
+            properties: {
+                enrollmentId: {
+                    type: 'string',
+                    pattern: '^conn_[a-f0-9]{64}$',
+                },
+            },
+            required: ['enrollmentId'],
+            additionalProperties: false,
+        },
+        ConnectorInstructionsUpdateParams: {
+            type: 'object',
+            properties: {
+                enrollmentId: {
+                    type: 'string',
+                    pattern: '^conn_[a-f0-9]{64}$',
+                },
+                instructions: {
+                    description:
+                        'Account-owned standing instructions; at most 16384 UTF-8 bytes. Empty text clears preferences.',
+                    type: 'string',
+                    maxLength: 16384,
+                    pattern: '^[^\\u0000-\\u0008\\u000b\\u000c\\u000e-\\u001f\\u007f]*$',
+                },
+                expectedRevision: {
+                    type: 'string',
+                    pattern: '^(0|[1-9][0-9]{0,18})$',
+                },
+                requestId: {
+                    type: 'string',
+                    pattern: '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$',
+                },
+            },
+            required: ['enrollmentId', 'instructions', 'expectedRevision', 'requestId'],
+            additionalProperties: false,
+        },
+        ConnectorInstructionsView: {
+            type: 'object',
+            properties: {
+                enrollmentId: {
+                    type: 'string',
+                    pattern: '^conn_[a-f0-9]{64}$',
+                },
+                instructions: {
+                    description:
+                        'Account-owned standing instructions; at most 16384 UTF-8 bytes. Empty text clears preferences.',
+                    type: 'string',
+                    maxLength: 16384,
+                    pattern: '^[^\\u0000-\\u0008\\u000b\\u000c\\u000e-\\u001f\\u007f]*$',
+                },
+                revision: {
+                    type: 'string',
+                    pattern: '^(0|[1-9][0-9]{0,18})$',
+                },
+            },
+            required: ['enrollmentId', 'instructions', 'revision'],
+            additionalProperties: false,
+        },
+        ConnectorHostStatusMethod: {
+            description:
+                'Read current full-computer consent, native working directory and permanent counters.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/ConnectorHostStatusParams',
+                },
+                result: {
+                    $ref: '#/definitions/ConnectorHostStatus',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorHostStatusParams: {
+            description: 'Status only selects an account-owned logical environment.',
+            properties: {
+                environmentId: {
+                    type: 'string',
+                    pattern: '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$',
+                },
+            },
+            required: ['environmentId'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorHostStatus: {
+            description: 'Sequence counters remain permanent after bounded result compaction.',
+            properties: {
+                acknowledgedSequence: {
+                    type: 'string',
+                    pattern: '^(0|[1-9][0-9]{0,18})$',
+                },
+                environmentId: {
+                    type: 'string',
+                    pattern: '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$',
+                },
+                online: {
+                    type: 'boolean',
+                },
+                profile: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/ConnectorHostProfile',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                sequence: {
+                    type: 'string',
+                    pattern: '^(0|[1-9][0-9]{0,18})$',
+                },
+            },
+            required: ['acknowledgedSequence', 'environmentId', 'online', 'profile', 'sequence'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorHostProfile: {
+            description:
+                'Local consent and default task directory are signed under the enrolled device identity.',
+            properties: {
+                directory: {
+                    type: 'string',
+                    minLength: 1,
+                    maxLength: 4096,
+                },
+                enabled: {
+                    type: 'boolean',
+                },
+                grantId: {
+                    type: 'string',
+                    pattern: '^[a-f0-9]{64}$',
+                },
+                grantRevision: {
+                    type: 'string',
+                    pattern: '^[1-9][0-9]{0,18}$',
+                },
+                platform: {
+                    $ref: '#/definitions/ConnectorHostPlatform',
+                },
+                tools: {
+                    items: {
+                        $ref: '#/definitions/ConnectorHostTool',
+                    },
+                    type: 'array',
+                    maxItems: 21,
+                },
+            },
+            required: ['directory', 'enabled', 'grantId', 'grantRevision', 'platform', 'tools'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorHostPlatform: {
+            description:
+                'Native paths and shell syntax belong to the customer computer, not the account API host.',
+            enum: ['linux', 'windows', 'macos'],
+            type: 'string',
+        },
+        ConnectorHostTool: {
+            description:
+                'A full-host grant is separate from confined file/program policies and never inferred from pairing.',
+            enum: [
+                'computer_info',
+                'file_read',
+                'file_digest',
+                'file_write',
+                'file_stat',
+                'file_rename',
+                'file_publish',
+                'file_chmod',
+                'directory_list',
+                'directory_create',
+                'file_remove',
+                'process_start',
+                'process_read',
+                'process_write',
+                'process_stop',
+                'process_release',
+                'desktop_info',
+                'desktop_screenshot',
+                'desktop_pointer',
+                'desktop_key',
+                'desktop_text',
+            ],
+            type: 'string',
+        },
+        ConnectorHostSubmitMethod: {
+            description:
+                'Admit an explicit complete original; pairing and confined roots do not grant host authority.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/ConnectorHostSubmitParams',
+                },
+                result: {
+                    $ref: '#/definitions/ConnectorHostJobView',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorHostSubmitParams: {
+            description:
+                'Every host operation pins the observed permanent counter and complete locally approved grant.',
+            properties: {
+                environmentId: {
+                    type: 'string',
+                    pattern: '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$',
+                },
+                previousSequence: {
+                    type: 'string',
+                    pattern: '^(0|[1-9][0-9]{0,18})$',
+                },
+                request: {
+                    $ref: '#/definitions/ConnectorHostRequest',
+                },
+                requestId: {
+                    type: 'string',
+                    pattern: '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$',
+                },
+            },
+            required: ['environmentId', 'previousSequence', 'request', 'requestId'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorHostRequest: {
+            description:
+                'Only exact bounded JSON text crosses the transport; the tool runtime validates its operation shape again.',
+            properties: {
+                argumentsJson: {
+                    type: 'string',
+                    maxLength: 65536,
+                },
+                grantId: {
+                    type: 'string',
+                    pattern: '^[a-f0-9]{64}$',
+                },
+                grantRevision: {
+                    type: 'string',
+                    pattern: '^[1-9][0-9]{0,18}$',
+                },
+                toolName: {
+                    $ref: '#/definitions/ConnectorHostTool',
+                },
+            },
+            required: ['argumentsJson', 'grantId', 'grantRevision', 'toolName'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorHostJobView: {
+            description: 'An account can poll only its original job in its own environment.',
+            properties: {
+                environmentId: {
+                    type: 'string',
+                    pattern: '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$',
+                },
+                id: {
+                    type: 'string',
+                    pattern: '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$',
+                },
+                phase: {
+                    $ref: '#/definitions/ConnectorHostJobPhase',
+                },
+                request: {
+                    $ref: '#/definitions/ConnectorHostRequest',
+                },
+                response: {
+                    anyOf: [
+                        {
+                            $ref: '#/definitions/ConnectorHostResponse',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                sequence: {
+                    type: 'string',
+                    pattern: '^(0|[1-9][0-9]{0,18})$',
+                },
+            },
+            required: ['environmentId', 'id', 'phase', 'request', 'response', 'sequence'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorHostJobPhase: {
+            description:
+                'A queued original retains its identity across reconnects and account replicas.',
+            enum: ['queued', 'dispatched', 'completed'],
+            type: 'string',
+        },
+        ConnectorHostResponse: {
+            description:
+                'Successful JSON text contains exact decimal file/process quantities; failure text contains no private diagnostics.',
+            properties: {
+                errorCode: {
+                    anyOf: [
+                        {
+                            enum: [
+                                'admission-denied',
+                                'already-exists',
+                                'canceled',
+                                'cross-device',
+                                'interrupted',
+                                'invalid-request',
+                                'is-directory',
+                                'not-directory',
+                                'not-found',
+                                'operation-failed',
+                                'permission-denied',
+                                'resource-limit',
+                                'snapshot-changed',
+                                'unsupported',
+                            ],
+                            type: 'string',
+                        },
+                        {
+                            type: 'null',
+                        },
+                    ],
+                },
+                outcome: {
+                    $ref: '#/definitions/ConnectorHostOutcome',
+                },
+                resultJson: {
+                    type: ['null', 'string'],
+                    maxLength: 131072,
+                },
+            },
+            required: ['errorCode', 'outcome', 'resultJson'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorHostOutcome: {
+            description:
+                'Durable outcomes never treat uncertain effects as permission to execute a fresh original.',
+            enum: ['succeeded', 'failed', 'indeterminate'],
+            type: 'string',
+        },
+        ConnectorHostResultMethod: {
+            description: 'Observe one original without submitting another effect.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/ConnectorHostResultParams',
+                },
+                result: {
+                    $ref: '#/definitions/ConnectorHostJobView',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorHostResultParams: {
+            description: 'A result selects only an existing immutable host job.',
+            properties: {
+                environmentId: {
+                    type: 'string',
+                    pattern: '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$',
+                },
+                jobId: {
+                    type: 'string',
+                    pattern: '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$',
+                },
+            },
+            required: ['environmentId', 'jobId'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorHostSummary: {
+            description:
+                'Local consent and default task directory are signed under the enrolled device identity.',
+            properties: {
+                enabled: {
+                    type: 'boolean',
+                },
+                grantId: {
+                    type: 'string',
+                    pattern: '^[a-f0-9]{64}$',
+                },
+                grantRevision: {
+                    type: 'string',
+                    pattern: '^[1-9][0-9]{0,18}$',
+                },
+                platform: {
+                    $ref: '#/definitions/ConnectorHostPlatform',
+                },
+                tools: {
+                    items: {
+                        $ref: '#/definitions/ConnectorHostTool',
+                    },
+                    type: 'array',
+                    maxItems: 21,
+                },
+            },
+            required: ['enabled', 'grantId', 'grantRevision', 'platform', 'tools'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorWorkspaceHostSelection: {
+            description:
+                'Full-host placement publishes the native default path without pretending to be a confined file root.',
+            properties: {
+                directory: {
+                    type: 'string',
+                    minLength: 1,
+                    maxLength: 4096,
+                },
+                environmentId: {
+                    type: 'string',
+                    pattern: '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$',
+                },
+                grantId: {
+                    type: 'string',
+                    pattern: '^[a-f0-9]{64}$',
+                },
+                grantRevision: {
+                    type: 'string',
+                    pattern: '^[1-9][0-9]{0,18}$',
+                },
+                kind: {
+                    const: 'host',
+                    type: 'string',
+                },
+                mode: {
+                    const: 'read-write',
+                    type: 'string',
+                },
+                platform: {
+                    $ref: '#/definitions/ConnectorHostPlatform',
+                },
+            },
+            required: [
+                'directory',
+                'environmentId',
+                'grantId',
+                'grantRevision',
+                'kind',
+                'mode',
+                'platform',
+            ],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorWorkspaceSelectHostMethod: {
+            description:
+                'Full-host selection retains account ownership and ordinary conversation revision control.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/ConnectorWorkspaceSelectHostParams',
+                },
+                result: {
+                    $ref: '#/definitions/ConnectorWorkspaceSelectionView',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorWorkspaceSelectHostParams: {
+            description:
+                'Future turns can select one exact separately approved full-computer grant.',
+            properties: {
+                environmentId: {
+                    type: 'string',
+                    pattern: '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$',
+                },
+                expectedRevision: {
+                    type: 'string',
+                    pattern: '^[a-f0-9]{64}$',
+                },
+                grantId: {
+                    type: 'string',
+                    pattern: '^[a-f0-9]{64}$',
+                },
+                grantRevision: {
+                    type: 'string',
+                    pattern: '^[1-9][0-9]{0,18}$',
+                },
+                requestId: {
+                    type: 'string',
+                    pattern: '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$',
+                },
+                sessionId: {
+                    type: 'string',
+                    minLength: 1,
+                    maxLength: 1024,
+                },
+            },
+            required: [
+                'environmentId',
+                'expectedRevision',
+                'grantId',
+                'grantRevision',
+                'requestId',
+                'sessionId',
+            ],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorContextCheckMethod: {
+            description: 'Authenticated account RPC contract for conditional connector facts.',
+            properties: {
+                params: {
+                    $ref: '#/definitions/ConnectorContextCheckQuery',
+                },
+                result: {
+                    $ref: '#/definitions/ConnectorContextCheckView',
+                },
+            },
+            required: ['params', 'result'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorContextCheckQuery: {
+            description:
+                'An account check compares prompt-visible connector facts without transferring inventory.',
+            properties: {
+                knownVersion: {
+                    type: ['null', 'string'],
+                    pattern: '^[a-f0-9]{64}$',
+                },
+            },
+            required: ['knownVersion'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        ConnectorContextCheckView: {
+            description:
+                'The current metadata version and server clock bound time-derived presence observations.',
+            properties: {
+                changed: {
+                    type: 'boolean',
+                },
+                nextTransitionAtMs: {
+                    type: ['null', 'string'],
+                    pattern: '^(0|[1-9][0-9]{0,18})$',
+                },
+                serverNowMs: {
+                    type: 'string',
+                    pattern: '^(0|[1-9][0-9]{0,18})$',
+                },
+                version: {
+                    type: 'string',
+                    pattern: '^[a-f0-9]{64}$',
+                },
+            },
+            required: ['changed', 'nextTransitionAtMs', 'serverNowMs', 'version'],
+            type: 'object',
+            additionalProperties: false,
         },
     },
     description: 'All protocol contracts reachable from the public transport.',
