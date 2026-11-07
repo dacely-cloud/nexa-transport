@@ -1121,6 +1121,11 @@ export const schema: Schema = {
                 startedAt: {
                     type: 'string',
                 },
+                cleanupUnconfirmed: {
+                    description:
+                        'Stop remains available because native cleanup has not been confirmed.',
+                    type: 'boolean',
+                },
             },
             required: [
                 'command',
@@ -4745,49 +4750,15 @@ export const schema: Schema = {
         },
         CommandExecutionReceipt: {
             description:
-                'Host-produced command termination evidence, separate from model-visible output.',
-            properties: {
-                command: {
-                    type: 'string',
+                'Native cleanup uncertainty remains distinct from a normal command snapshot.',
+            anyOf: [
+                {
+                    $ref: '#/definitions/CommandExecutionSnapshot',
                 },
-                cwd: {
-                    type: 'string',
+                {
+                    $ref: '#/definitions/CommandExecutionCleanupUnconfirmed',
                 },
-                exitCode: {
-                    type: ['null', 'number'],
-                },
-                processId: {
-                    type: ['null', 'string'],
-                },
-                processToken: {
-                    type: ['null', 'string'],
-                },
-                remote: {
-                    type: 'boolean',
-                },
-                running: {
-                    type: 'boolean',
-                },
-                signal: {
-                    type: ['null', 'string'],
-                },
-                terminalOutput: {
-                    description:
-                        'Original terminal stream, including ANSI styles and cursor controls.',
-                    type: 'string',
-                },
-            },
-            required: [
-                'command',
-                'cwd',
-                'exitCode',
-                'processId',
-                'processToken',
-                'remote',
-                'running',
-                'signal',
             ],
-            type: 'object',
         },
         ComponentCategory: {
             description:
@@ -34185,6 +34156,98 @@ export const schema: Schema = {
             },
             required: ['changed', 'nextTransitionAtMs', 'serverNowMs', 'version'],
             type: 'object',
+            additionalProperties: false,
+        },
+        CommandExecutionSnapshot: {
+            description:
+                'A normal host-produced command snapshot may describe a running program or observed termination.',
+            properties: {
+                command: {
+                    type: 'string',
+                },
+                cwd: {
+                    type: 'string',
+                },
+                exitCode: {
+                    type: ['null', 'number'],
+                },
+                processId: {
+                    type: ['null', 'string'],
+                },
+                processToken: {
+                    type: ['null', 'string'],
+                },
+                remote: {
+                    type: 'boolean',
+                },
+                running: {
+                    type: 'boolean',
+                },
+                signal: {
+                    type: ['null', 'string'],
+                },
+                terminalOutput: {
+                    description:
+                        'Original terminal stream, including ANSI styles and cursor controls.',
+                    type: 'string',
+                },
+                cleanupUnconfirmed: {
+                    description:
+                        'An explicit false value never supplies native cleanup uncertainty metadata.',
+                    type: 'boolean',
+                    const: false,
+                },
+            },
+            required: [
+                'command',
+                'cwd',
+                'exitCode',
+                'processId',
+                'processToken',
+                'remote',
+                'running',
+                'signal',
+            ],
+            type: 'object',
+        },
+        CommandExecutionCleanupUnconfirmed: {
+            description:
+                'Unresolved native ownership preserves only the exact actionable handle, without command arguments or fabricated exit evidence.',
+            type: 'object',
+            properties: {
+                cleanupUnconfirmed: {
+                    type: 'boolean',
+                    const: true,
+                },
+                processId: {
+                    type: 'string',
+                    minLength: 1,
+                    maxLength: 128,
+                    pattern: '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$',
+                },
+                running: {
+                    type: 'boolean',
+                    const: true,
+                },
+                remote: {
+                    type: 'boolean',
+                    const: true,
+                },
+                exitCode: {
+                    type: 'null',
+                },
+                signal: {
+                    type: 'null',
+                },
+            },
+            required: [
+                'cleanupUnconfirmed',
+                'processId',
+                'running',
+                'remote',
+                'exitCode',
+                'signal',
+            ],
             additionalProperties: false,
         },
     },
