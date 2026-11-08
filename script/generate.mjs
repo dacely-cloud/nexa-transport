@@ -470,6 +470,15 @@ for (const [name, def] of Object.entries(schema.definitions)) {
         declarations.push('/** Named connector execution protocol values. */\n' + declaration);
         continue;
     }
+    if (name === 'EnvironmentVisitState') {
+        const source = readFileSync('../nexa/src/dataplane/EnvironmentVisitTypes.ts', 'utf8');
+        const declaration = source.match(/export enum EnvironmentVisitState \{[^}]+\}/u)?.[0];
+        if (declaration === undefined) throw new Error('Missing environment visit state enum');
+        declarations.push(
+            '/** Existing-VM visit classification, without a readiness claim. */\n' + declaration,
+        );
+        continue;
+    }
     if (name === 'EnvironmentPreparationState') {
         const source = readFileSync('../nexa/src/dataplane/EnvironmentPreparationTypes.ts', 'utf8');
         const declaration = source.match(/export enum EnvironmentPreparationState \{[^}]+\}/u)?.[0];
@@ -640,6 +649,7 @@ if (!snapshotOnly) {
         'connector-instructions.mjs',
         'connector-host.mjs',
         'browser-files.mjs',
+        'environment-visit.mjs',
     ]) {
         execFileSync(process.execPath, ['script/' + script], { stdio: 'inherit' });
     }

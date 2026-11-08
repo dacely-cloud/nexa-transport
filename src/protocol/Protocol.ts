@@ -12630,6 +12630,14 @@ export interface GatewayMethodsdata_upload_selectShape {
     readonly result: DataUploadSelectionResult;
 }
 
+/** GatewayMethodsenvironment_visit wire fields. */
+export interface GatewayMethodsenvironment_visitShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: Record<string, never>;
+    /** result as defined by the Nexa gateway. */
+    readonly result: EnvironmentVisitResult;
+}
+
 /** GatewayMethods wire fields. */
 export interface GatewayMethodsShape {
     /** accounts.create as defined by the Nexa gateway. */
@@ -13156,6 +13164,8 @@ export interface GatewayMethodsShape {
     readonly 'data.upload.target': GatewayMethodsdata_upload_targetShape;
     /** data.upload.select as defined by the Nexa gateway. */
     readonly 'data.upload.select': GatewayMethodsdata_upload_selectShape;
+    /** environment.visit as defined by the Nexa gateway. */
+    readonly 'environment.visit': GatewayMethodsenvironment_visitShape;
 }
 
 /** GatewayMethods from the Nexa wire protocol. */
@@ -22837,6 +22847,32 @@ export const ConversationDataUploadStateValues = {
 export type ConversationDataUploadState =
     (typeof ConversationDataUploadStateValues)[keyof typeof ConversationDataUploadStateValues];
 
+/** EnvironmentVisitResult wire fields. */
+export interface EnvironmentVisitResultShape {
+    /** state as defined by the Nexa gateway. */
+    readonly state: EnvironmentVisitState;
+}
+
+/** EnvironmentVisitResult from the Nexa wire protocol. */
+export type EnvironmentVisitResult = EnvironmentVisitResultShape;
+
+/** Existing-VM visit classification, without a readiness claim. */
+export enum EnvironmentVisitState {
+    SetupRequired = 'setup-required',
+    Existing = 'existing',
+}
+
+/** EnvironmentVisitMethod wire fields. */
+export interface EnvironmentVisitMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: Record<string, never>;
+    /** result as defined by the Nexa gateway. */
+    readonly result: EnvironmentVisitResult;
+}
+
+/** EnvironmentVisitMethod from the Nexa wire protocol. */
+export type EnvironmentVisitMethod = EnvironmentVisitMethodShape;
+
 /** Supported RPC names. */
 export type MethodName = keyof GatewayMethods;
 /** Parameters for a particular RPC. */
@@ -23370,4 +23406,6 @@ export enum Method {
     DataUploadTarget = 'data.upload.target',
     /** Calls data.upload.select. */
     DataUploadSelect = 'data.upload.select',
+    /** Calls environment.visit. */
+    EnvironmentVisit = 'environment.visit',
 }

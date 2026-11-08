@@ -303,4 +303,5 @@ export const methodValidators: Readonly<Record<MethodName, MethodValidation>> = 
     'data.upload.create': { params: validators.params259, result: validators.result259 },
     'data.upload.target': { params: validators.params260, result: validators.result260 },
     'data.upload.select': { params: validators.params261, result: validators.result261 },
+    'environment.visit': { params: validators.params262, result: validators.result262 },
 };

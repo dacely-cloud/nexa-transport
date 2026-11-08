@@ -19796,6 +19796,19 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'environment.visit': {
+                    type: 'object',
+                    properties: {
+                        params: {
+                            type: 'object',
+                            additionalProperties: false,
+                        },
+                        result: {
+                            $ref: '#/definitions/EnvironmentVisitResult',
+                        },
+                    },
+                    required: ['params', 'result'],
+                },
             },
             required: [
                 'accounts.create',
@@ -20060,6 +20073,7 @@ export const schema: Schema = {
                 'data.upload.create',
                 'data.upload.target',
                 'data.upload.select',
+                'environment.visit',
             ],
             type: 'object',
         },
@@ -34693,6 +34707,36 @@ export const schema: Schema = {
                 'Observation state controls recovery; a completed or uncertain original never restarts receiving bytes.\nNo absence/error is interpreted as an empty new upload.',
             enum: ['canceled', 'complete', 'publishing', 'receiving', 'unconfirmed'],
             type: 'string',
+        },
+        EnvironmentVisitResult: {
+            description:
+                'Existing means an existing VM is running, or its original wake was queued or joined.',
+            properties: {
+                state: {
+                    $ref: '#/definitions/EnvironmentVisitState',
+                },
+            },
+            required: ['state'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        EnvironmentVisitState: {
+            description: 'A passive visit never claims native, SSH, or tooling readiness.',
+            enum: ['setup-required', 'existing'],
+            type: 'string',
+        },
+        EnvironmentVisitMethod: {
+            type: 'object',
+            properties: {
+                params: {
+                    type: 'object',
+                    additionalProperties: false,
+                },
+                result: {
+                    $ref: '#/definitions/EnvironmentVisitResult',
+                },
+            },
+            required: ['params', 'result'],
         },
     },
     description: 'All protocol contracts reachable from the public transport.',

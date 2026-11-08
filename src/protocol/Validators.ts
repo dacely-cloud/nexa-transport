@@ -3831,3 +3831,17 @@ export function result261(value: unknown): boolean {
         value,
     );
 }
+/** Validates params262. */
+export function params262(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/environment.visit/properties/params',
+        value,
+    );
+}
+/** Validates result262. */
+export function result262(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/environment.visit/properties/result',
+        value,
+    );
+}
