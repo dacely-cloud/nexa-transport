@@ -7921,6 +7921,7 @@ Configurable bounds on gateway-owned work and memory.
 | `data.upload.create`                 | Yes      | Object (fields below) |                                                                                                        |
 | `data.upload.target`                 | Yes      | Object (fields below) |                                                                                                        |
 | `data.upload.select`                 | Yes      | Object (fields below) |                                                                                                        |
+| `environment.visit`                  | Yes      | Object (fields below) |                                                                                                        |
 
 **accounts.create**
 
@@ -9834,6 +9835,13 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ------------------------------------------------------------------ | ----------- |
 | `params` | Yes      | [DataUploadSelectParams](protocol.md#datauploadselectparams)       |             |
 | `result` | Yes      | [DataUploadSelectionResult](protocol.md#datauploadselectionresult) |             |
+
+**environment.visit**
+
+| Field    | Required | Type                                                         | Description |
+| -------- | -------- | ------------------------------------------------------------ | ----------- |
+| `params` | Yes      | Dictionary                                                   |             |
+| `result` | Yes      | [EnvironmentVisitResult](protocol.md#environmentvisitresult) |             |
 
 ## GeometryFormat
 
@@ -16430,3 +16438,24 @@ A restricted workspace remains selected until the user explicitly chooses a supp
 Observation state controls recovery; a completed or uncertain original never restarts receiving bytes.
 
 Type: `"canceled"` / `"complete"` / `"publishing"` / `"receiving"` / `"unconfirmed"`.
+
+## EnvironmentVisitResult
+
+Existing means an existing VM is running, or its original wake was queued or joined.
+
+| Field   | Required | Type                                                       | Description |
+| ------- | -------- | ---------------------------------------------------------- | ----------- |
+| `state` | Yes      | [EnvironmentVisitState](protocol.md#environmentvisitstate) |             |
+
+## EnvironmentVisitState
+
+A passive visit never claims native, SSH, or tooling readiness.
+
+Type: `"setup-required"` / `"existing"`.
+
+## EnvironmentVisitMethod
+
+| Field    | Required | Type                                                         | Description |
+| -------- | -------- | ------------------------------------------------------------ | ----------- |
+| `params` | Yes      | Dictionary                                                   |             |
+| `result` | Yes      | [EnvironmentVisitResult](protocol.md#environmentvisitresult) |             |

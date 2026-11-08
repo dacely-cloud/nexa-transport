@@ -1,6 +1,6 @@
 # RPC reference
 
-All 262 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 261 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
+All 263 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 262 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
 
 - [accounts.create](#accountscreate)
 - [accounts.list](#accountslist)
@@ -264,6 +264,7 @@ All 262 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [data.upload.create](#datauploadcreate)
 - [data.upload.target](#datauploadtarget)
 - [data.upload.select](#datauploadselect)
+- [environment.visit](#environmentvisit)
 
 ## accounts.create
 
@@ -7007,3 +7008,21 @@ Parameters: [DataUploadSelectParams](protocol.md#datauploadselectparams).
 | `requestId` | Yes      | `string`                                           |             |
 
 Result: [DataUploadSelectionResult](protocol.md#datauploadselectionresult).
+
+## environment.visit
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.EnvironmentVisit> = {};
+const result: ResultOf<typeof Method.EnvironmentVisit> = await client.call(
+    Method.EnvironmentVisit,
+    params,
+);
+```
+
+Parameters: Dictionary.
+
+Type: Dictionary.
+
+Result: [EnvironmentVisitResult](protocol.md#environmentvisitresult).
