@@ -43,7 +43,6 @@ Chat, tools, media, artifacts, and voice through the Nexa gateway.
 - [Emotional state](./docs/emotions.md): current mood, feelings and private relationships per user, with UI refresh examples.
 - [Package entry points](./docs/exports.md): every public runtime/type import and its contract.
 - [Session recovery](./docs/sessions.md): stream acceptance, cancellation/detachment, durable history, and lazy saved-file downloads.
-- [Office and company APIs](./docs/office-company.md): movement, geometry, private staffing, project decisions/files, budgets, and passive reports.
 - [Reverse-engineering APIs](./docs/reverse-investigation.md): live receipts, replay, and each saved-evidence query family.
 - [Runtime controls and integrations](./docs/operations.md): processes, scheduled jobs, wallets, Roblox, and administration.
 - [RPC reference](./docs/methods.md): every bundled method with call templates, parameters, and results.
@@ -86,7 +85,7 @@ Install the resulting archive in your application:
 npm install /path/to/nexa-transport-0.1.0.tgz
 ```
 
-For a checked-in `file:vendor/…tgz` dependency, retain the archive at that relative path and commit the matching package.json/lockfile integrity. Give rebuilt archives a new filename and reinstall that file; changing bytes under an existing filename can leave stale integrity metadata. The package is ESM: use ES imports and `import type` for [type-only entry points](./docs/exports.md).
+For a checked-in `file:vendor/…tgz` dependency, retain the archive at that relative path and commit the matching package.json/lockfile integrity. Keep only the current archive, update the lockfile integrity and reinstall when replacing its bytes. The package is ESM: use ES imports and `import type` for [type-only entry points](./docs/exports.md).
 
 ## Quick start
 
@@ -602,24 +601,6 @@ The required `DataUploadOptions.context` pins the conversation, selection revisi
 Slices are negotiated up to 4 MiB and reduced to the gateway's frame and memory budgets; only one source slice is in flight. Progress counts acknowledged bytes as `bigint`. Host uploads currently advertise a 1 GiB file limit and share a 2 GiB durable source budget with other native publications; normal managed uploads preserve their 100 GiB server limit. The browser UI caps individual attachments at 1 GiB. Native publication streams the same durable Mongo source without controller filesystem staging. Its final observation is caller-cancelable and bounded to six hours; each native operation has its own shorter bounds. A returned path is descriptive: send `uploadedSources` with the exact conversation so Nexa verifies the actual prepared target before interpreting it. The server must advertise the current `data.upload.*` contracts and grant write scope. For Node files, use a file-backed Blob to keep memory bounded. Upload alone makes no model call.
 
 For inline CSV, TSV, JSON, JSONL, PDF and Office files, use `NexaMedia.document(file)`. It preserves `File.name` and infers the MIME type from the filename when the browser leaves `File.type` empty. Nexa can import structured attachments directly by their media ID using `import_dataset`, then run full-data SQL with `query_dataset`. Word `.docx` text is available through `extract_document`.
-
-### Office building
-
-Read your layout with `client.officeLayout()`, then save `{ revision, pieces }` with the same method. This requires `hello.features.officeLayout`. Layouts use bounded half-metre coordinates and quarter turns. The OLAY binary protocol shares the existing authenticated socket. Only the owner can save; visitors receive public geometry through `subscribeOffice`. Concurrent edits use revision checks and cannot silently overwrite each other.
-
-### Interrupted project work
-
-Check `client.supportsProjectRecovery` before submitting a `review-interruption` decision through `client.project(projectId, { kind: 'review-interruption', id, revision, attemptId, evidence })`. The owner records checked external outcomes; the host independently rejects unresolved provider charges or a live attempt. This never sets prices, token receipts, files or a successful result. Work stays blocked until another explicit approval. The original attempt retains `interruptionReview` with the saved decision ID, timestamp and private note. NCP2 version 5 uses the existing Chat socket. Explicit retries must reuse the same command body and ID; reconnect restores only read subscriptions. Visitors and read-only credentials cannot submit the decision.
-
-### Private employee evidence
-
-Gate employee portfolios on `client.supportsEmployeeResults`. Read saved contributions with `client.employeeResults(employeeId)` or watch them with `client.subscribeEmployeeResults(employeeId, onResults, onError)`. Call the returned unsubscribe function when the view closes. The NCE1 binary channel uses the existing authenticated Chat socket; visitors cannot read these reports. No read starts inference, changes assignments, or approves spending.
-
-Execution workspace reports use the same socket through the private binary NCH1 channel. Check `client.supportsExecutionHosts`, then call `client.executionHost()` or `client.subscribeExecutionHost(onReport, onError)`. Release the returned watch when the view closes. Reports contain status, CPU parallelism, RAM bytes and optional remote command counts; unavailable resources are omitted. A read never provisions or reconnects a machine, executes commands or reveals endpoints, paths or prompts. Approved task concurrency and model-provider hardware are separate. Visit credentials have no access. Reconnect restores read watches only.
-
-Reports retain the employee who executed each saved attempt after reassignment. Accepted implementation credit goes to the final successful worker after owner acceptance. Counts distinguish completed, blocked, interrupted, running, and repeated implementation work. Repeated work is not automatically a defect. `recordedChecks` counts tool evidence receipts on completed attempts, not passed tests. Input/output token totals are exact `bigint` values; project-wide costs are not attributed to one employee. Empty histories do not imply a skill rating or model improvement.
-
-Up to eight reads and watches may be active per client. Snapshots are followed by ordered changes; reconnect restores watches only. Unsupported gateways reject calls locally, and closing the client releases pending reads and listeners. Types are exported from `nexa-transport/employee-results`.
 
 Workflow planning source metadata is available when `client.supportsWorkflowPlanningSources` is true. `Method.WorkflowsPlanningSources` accepts `{workflowId, after}` and returns an owner-scoped metadata page. Planning requests may include up to 16 explicit `sourceIds`; source-free request serialization stays compatible with older gateways. The SDK refuses source discovery and source-bearing requests if the method was not negotiated. Import the shared metadata types and boundary codec from `nexa-transport/workflow-planning-sources`. The current workspace entries require an adapter and confer no file access or workflow execution permission.
 

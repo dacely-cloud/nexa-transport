@@ -634,14 +634,6 @@ if (!snapshotOnly) {
     /** Refresh the complete canonical codec dependency graph, including encoder helpers. */
     execFileSync(process.execPath, ['script/media.ts'], { stdio: 'inherit' });
 
-    /** NGOP has one canonical codec; copy it without runtime server dependencies. */
-    mkdirSync('src/office', { recursive: true });
-    execFileSync(process.execPath, ['script/company.ts'], { stdio: 'inherit' });
-    writeFileSync(
-        'src/office/OfficeProtocol.ts',
-        readFileSync('../nexa/src/office/OfficeProtocol.ts', 'utf8'),
-    );
-
     /** Full regeneration must retain the closed shapes and limits enforced by the scoped generators. */
     for (const script of [
         'connector-execution.mjs',

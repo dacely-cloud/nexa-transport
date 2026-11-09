@@ -7573,68 +7573,44 @@ Evidence returned to the model; raw player/session identifiers are not included.
 
 Methods, events, and additive capabilities supported by this gateway.
 
-| Field                       | Required | Type                                               | Description                                                                                    |
-| --------------------------- | -------- | -------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| `attachments`               | No       | `true`                                             | User media attachments are validated and forwarded to the agent.                               |
-| `binaryDataUploads`         | No       | `true`                                             | Disk upload chunks retain raw bytes from the wire through durable storage.                     |
-| `binaryHistory`             | No       | `true`                                             | History batches use acknowledged raw binary frames.                                            |
-| `binaryMedia`               | No       | `true`                                             | NXMD frames carry outbound file bytes; JSON results contain matching metadata.                 |
-| `designComponentRepeat`     | No       | `true`                                             | Component commands can place editable linked grids without copying source artwork.             |
-| `designExtendedGradients`   | No       | `true`                                             | Angular and diamond gradient paints, geometry and compact edits.                               |
-| `designImageAdjustments`    | No       | `true`                                             | Non-destructive color controls are shared by image layers, fills, strokes and exports.         |
-| `designImageTiles`          | No       | `true`                                             | Repeat cells retain independent image content transforms and original source crops.            |
-| `designImageTransforms`     | No       | `true`                                             | Native image framing supports rotation, reflection, affine placement and repeated image tiles. |
-| `designLayerCompositing`    | No       | `true`                                             | Native layer blending and explicit group isolation preserve editable appearance.               |
-| `designResizeAnchors`       | No       | `true`                                             | Native Resize commands preserve normalized anchors through one-axis sizing and content reflow. |
-| `designSignedGaps`          | No       | `true`                                             | Layout gaps accept signed values and use occupied bounds for overlapping flow and grid tracks. |
-| `designStrokeDashOffset`    | No       | `true`                                             | Stroke phase is editable and preserved by SVG, glyph windows and Boolean silhouettes.          |
-| `designTextDirection`       | No       | `true`                                             | Native typography supports paragraph direction and shared Unicode ordering.                    |
-| `designTextInheritedPaint`  | No       | `true`                                             | Rich typography can inherit the layer's gradient, image or solid fill stack.                   |
-| `designTextPaintClipping`   | No       | `true`                                             | Native glyph windows can preserve shared shaping with bounded paint clips.                     |
-| `designTextRangeFills`      | No       | `true`                                             | UTF-16 rich ranges can replace layer fills with their own editable paint stacks.               |
-| `designTidy`                | No       | `true`                                             | Compact tidy commands arrange free selections without replacing their source bodies.           |
-| `designTidyPreview`         | No       | `true`                                             | Read-only Tidy previews retain deferred text and exact owner-scoped font geometry.             |
-| `designVectorPatterns`      | No       | `true`                                             | Linked component paints support revision-pinned bounded source-cell sampling.                  |
-| `events`                    | Yes      | Array of `string`                                  |                                                                                                |
-| `jsonReplies`               | No       | `true`                                             | Host validation of JSON final answers while native tools remain available.                     |
-| `methodScopes`              | Yes      | [RecordstringScope](protocol.md#recordstringscope) | The scope each method requires.                                                                |
-| `methods`                   | Yes      | Array of `string`                                  |                                                                                                |
-| `modelReview`               | No       | `true`                                             | Per-turn optional AI completion audits retain mandatory local checks.                          |
-| `officeAppearance`          | No       | `true`                                             | Stable employee cosmetics in NGOP v7.                                                          |
-| `officeCompany`             | No       | `true`                                             | NCO2 persistent company staffing and project briefs.                                           |
-| `officeCompanyLimits`       | No       | `true`                                             | Private company-wide funding and capacity over the existing connection.                        |
-| `officeCompanyUpdates`      | No       | `true`                                             | Ordered private company subscriptions over the existing socket.                                |
-| `officeConstruction`        | No       | `true`                                             | NCMP v4 owner construction and NGOP v5 public floor plans.                                     |
-| `officeDepartmentKnowledge` | No       | `true`                                             | Private owner-reviewed department knowledge.                                                   |
-| `officeDepartmentTools`     | No       | `true`                                             | NCO2 version two carries owner-approved department tool ceilings.                              |
-| `officeDeskAssignments`     | No       | `true`                                             | Accepts NGOP v4 with saved visual desk assignments.                                            |
-| `officeDeskPositions`       | No       | `true`                                             | Saved physical workstation positions in NGOP v8 and NCMP v8.                                   |
-| `officeEmployeeCosts`       | No       | `true`                                             | Private employee results include exact original-attempt ledger costs.                          |
-| `officeEmployeeDevelopment` | No       | `true`                                             | NCE1 version 4 supplies evidence-based accepted delivery history on the private owner channel. |
-| `officeEmployeeResults`     | No       | `true`                                             | Read-only employee evidence on the existing private office connection.                         |
-| `officeExecution`           | No       | `true`                                             | Scheduler workload summaries in NGOP v6.                                                       |
-| `officeExecutionHosts`      | No       | `true`                                             | Passive owner-scoped workspace resources in the private NCH1 binary channel.                   |
-| `officeGame`                | No       | `true`                                             | NGOP office state and player input share the authenticated gateway socket.                     |
-| `officeGameVersion`         | No       | `3`                                                | NGOP version supporting server-issued acceptance celebrations.                                 |
-| `officeLayout`              | No       | `true`                                             | Owner-only OLAY geometry commands.                                                             |
-| `officeLayoutDesks`         | No       | `true`                                             | OLAY v2 atomically saves construction and permanent workstation coordinates.                   |
-| `officeProjectBaselines`    | No       | `true`                                             | NCP2 version 2 with accepted-product baselines for new projects.                               |
-| `officeProjectPermissions`  | No       | `true`                                             | Owner-only NCP2 v6 exact-call tool permissions tied to a live execution attempt.               |
-| `officeProjectRecovery`     | No       | `true`                                             | Owner-only NCP2 v5 interruption reviews, with independently enforced financial recovery.       |
-| `officeProjects`            | No       | `true`                                             | NCP2 private project decisions, subscriptions, and delivery chunks.                            |
-| `officeShowroom`            | No       | `true`                                             | Owner-published accepted product labels in NGOP v9 and private NCP2 v4.                        |
-| `officeVerification`        | No       | `true`                                             | Versioned host verification evidence on private project and employee channels.                 |
-| `robloxCoordinateInput`     | No       | `true`                                             | Physical mouse/touch gestures can choose buttons using native GUI coordinates.                 |
-| `robloxTextEditing`         | No       | `true`                                             | Focused TextBoxes accept bounded Unicode edits and logical editing-key gestures.               |
-| `sessionHistory`            | No       | `true`                                             | Durable complete presentation history and binary restoration.                                  |
-| `sessionHistoryUpdates`     | No       | `true`                                             | Session subscriptions notify exact journal ranges for live catch-up.                           |
-| `transcriptBlocks`          | No       | `true`                                             | Compact persisted NDJSON blocks, read in bounded byte pages.                                   |
-| `userRegion`                | No       | `true`                                             | Supports coarse per-turn regional context for news and local information.                      |
-| `workflowDraftsVersion`     | No       | `1`                                                |                                                                                                |
-| `workflowGraphVersion`      | No       | `1`                                                | Exact component catalog and structural validation of pinned drafts.                            |
-| `workflowGroupsVersion`     | No       | `1`                                                | Saved parent-local groups, published aliases and paginated immutable group records.            |
-| `workflowPlanningVersion`   | No       | `1`                                                | Owner-scoped draft storage with bounded reads and revision-safe direct patches.                |
-| `workflowRunsVersion`       | No       | `1`                                                | Durable core workflow test runs and bounded output inspection.                                 |
+| Field                      | Required | Type                                               | Description                                                                                    |
+| -------------------------- | -------- | -------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `attachments`              | No       | `true`                                             | User media attachments are validated and forwarded to the agent.                               |
+| `binaryDataUploads`        | No       | `true`                                             | Disk upload chunks retain raw bytes from the wire through durable storage.                     |
+| `binaryHistory`            | No       | `true`                                             | History batches use acknowledged raw binary frames.                                            |
+| `binaryMedia`              | No       | `true`                                             | NXMD frames carry outbound file bytes; JSON results contain matching metadata.                 |
+| `designComponentRepeat`    | No       | `true`                                             | Component commands can place editable linked grids without copying source artwork.             |
+| `designExtendedGradients`  | No       | `true`                                             | Angular and diamond gradient paints, geometry and compact edits.                               |
+| `designImageAdjustments`   | No       | `true`                                             | Non-destructive color controls are shared by image layers, fills, strokes and exports.         |
+| `designImageTiles`         | No       | `true`                                             | Repeat cells retain independent image content transforms and original source crops.            |
+| `designImageTransforms`    | No       | `true`                                             | Native image framing supports rotation, reflection, affine placement and repeated image tiles. |
+| `designLayerCompositing`   | No       | `true`                                             | Native layer blending and explicit group isolation preserve editable appearance.               |
+| `designResizeAnchors`      | No       | `true`                                             | Native Resize commands preserve normalized anchors through one-axis sizing and content reflow. |
+| `designSignedGaps`         | No       | `true`                                             | Layout gaps accept signed values and use occupied bounds for overlapping flow and grid tracks. |
+| `designStrokeDashOffset`   | No       | `true`                                             | Stroke phase is editable and preserved by SVG, glyph windows and Boolean silhouettes.          |
+| `designTextDirection`      | No       | `true`                                             | Native typography supports paragraph direction and shared Unicode ordering.                    |
+| `designTextInheritedPaint` | No       | `true`                                             | Rich typography can inherit the layer's gradient, image or solid fill stack.                   |
+| `designTextPaintClipping`  | No       | `true`                                             | Native glyph windows can preserve shared shaping with bounded paint clips.                     |
+| `designTextRangeFills`     | No       | `true`                                             | UTF-16 rich ranges can replace layer fills with their own editable paint stacks.               |
+| `designTidy`               | No       | `true`                                             | Compact tidy commands arrange free selections without replacing their source bodies.           |
+| `designTidyPreview`        | No       | `true`                                             | Read-only Tidy previews retain deferred text and exact owner-scoped font geometry.             |
+| `designVectorPatterns`     | No       | `true`                                             | Linked component paints support revision-pinned bounded source-cell sampling.                  |
+| `events`                   | Yes      | Array of `string`                                  |                                                                                                |
+| `jsonReplies`              | No       | `true`                                             | Host validation of JSON final answers while native tools remain available.                     |
+| `methodScopes`             | Yes      | [RecordstringScope](protocol.md#recordstringscope) | The scope each method requires.                                                                |
+| `methods`                  | Yes      | Array of `string`                                  |                                                                                                |
+| `modelReview`              | No       | `true`                                             | Per-turn optional AI completion audits retain mandatory local checks.                          |
+| `robloxCoordinateInput`    | No       | `true`                                             | Physical mouse/touch gestures can choose buttons using native GUI coordinates.                 |
+| `robloxTextEditing`        | No       | `true`                                             | Focused TextBoxes accept bounded Unicode edits and logical editing-key gestures.               |
+| `sessionHistory`           | No       | `true`                                             | Durable complete presentation history and binary restoration.                                  |
+| `sessionHistoryUpdates`    | No       | `true`                                             | Session subscriptions notify exact journal ranges for live catch-up.                           |
+| `transcriptBlocks`         | No       | `true`                                             | Compact persisted NDJSON blocks, read in bounded byte pages.                                   |
+| `userRegion`               | No       | `true`                                             | Supports coarse per-turn regional context for news and local information.                      |
+| `workflowDraftsVersion`    | No       | `1`                                                |                                                                                                |
+| `workflowGraphVersion`     | No       | `1`                                                | Exact component catalog and structural validation of pinned drafts.                            |
+| `workflowGroupsVersion`    | No       | `1`                                                | Saved parent-local groups, published aliases and paginated immutable group records.            |
+| `workflowPlanningVersion`  | No       | `1`                                                | Owner-scoped draft storage with bounded reads and revision-safe direct patches.                |
+| `workflowRunsVersion`      | No       | `1`                                                | Durable core workflow test runs and bounded output inspection.                                 |
 
 ## GatewayLimits
 
@@ -7773,7 +7749,6 @@ Configurable bounds on gateway-owned work and memory.
 | `luau.editor.stage`                  | Yes      | Object (fields below) |                                                                                                        |
 | `luau.editor.start`                  | Yes      | Object (fields below) |                                                                                                        |
 | `media.acknowledge`                  | Yes      | Object (fields below) |                                                                                                        |
-| `office.ownerProof`                  | Yes      | Object (fields below) | Bind an invitation to the authenticated socket's office, using a short-lived signed proof.             |
 | `processes.input`                    | Yes      | Object (fields below) |                                                                                                        |
 | `processes.list`                     | Yes      | Object (fields below) |                                                                                                        |
 | `processes.log`                      | Yes      | Object (fields below) |                                                                                                        |
@@ -7922,6 +7897,11 @@ Configurable bounds on gateway-owned work and memory.
 | `data.upload.target`                 | Yes      | Object (fields below) |                                                                                                        |
 | `data.upload.select`                 | Yes      | Object (fields below) |                                                                                                        |
 | `environment.visit`                  | Yes      | Object (fields below) |                                                                                                        |
+| `agent.profiles.list`                | Yes      | Object (fields below) | Read the authenticated account's standalone profiles.                                                  |
+| `agent.profiles.create`              | Yes      | Object (fields below) | Create a private custom profile.                                                                       |
+| `agent.profiles.update`              | Yes      | Object (fields below) | Replace editable profile settings at an exact revision.                                                |
+| `agent.profiles.delete`              | Yes      | Object (fields below) | Delete one private profile at an exact revision.                                                       |
+| `agent.profiles.upgrade`             | Yes      | Object (fields below) | Explicitly import preserved saved agent profiles under live owner authorization.                       |
 
 **accounts.create**
 
@@ -8787,25 +8767,6 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ------------------------------------------------------------ | ----------- |
 | `params` | Yes      | [MediaAcknowledgeParams](protocol.md#mediaacknowledgeparams) |             |
 | `result` | Yes      | [OkResult](protocol.md#okresult)                             |             |
-
-**office.ownerProof**
-
-| Field    | Required | Type                  | Description |
-| -------- | -------- | --------------------- | ----------- |
-| `params` | Yes      | Object (fields below) |             |
-| `result` | Yes      | Object (fields below) |             |
-
-**office.ownerProof.params**
-
-| Field       | Required | Type     | Description |
-| ----------- | -------- | -------- | ----------- |
-| `accountId` | Yes      | `string` |             |
-
-**office.ownerProof.result**
-
-| Field   | Required | Type     | Description |
-| ------- | -------- | -------- | ----------- |
-| `proof` | Yes      | `string` |             |
 
 **processes.input**
 
@@ -9843,6 +9804,41 @@ Configurable bounds on gateway-owned work and memory.
 | `params` | Yes      | Dictionary                                                   |             |
 | `result` | Yes      | [EnvironmentVisitResult](protocol.md#environmentvisitresult) |             |
 
+**agent.profiles.list**
+
+| Field    | Required | Type                                                   | Description |
+| -------- | -------- | ------------------------------------------------------ | ----------- |
+| `params` | Yes      | [Recordstringnever](protocol.md#recordstringnever)     |             |
+| `result` | Yes      | [AgentProfilesResult](protocol.md#agentprofilesresult) |             |
+
+**agent.profiles.create**
+
+| Field    | Required | Type                                                             | Description |
+| -------- | -------- | ---------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [AgentProfileCreateParams](protocol.md#agentprofilecreateparams) |             |
+| `result` | Yes      | [AgentProfilesResult](protocol.md#agentprofilesresult)           |             |
+
+**agent.profiles.update**
+
+| Field    | Required | Type                                                             | Description |
+| -------- | -------- | ---------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [AgentProfileUpdateParams](protocol.md#agentprofileupdateparams) |             |
+| `result` | Yes      | [AgentProfilesResult](protocol.md#agentprofilesresult)           |             |
+
+**agent.profiles.delete**
+
+| Field    | Required | Type                                                             | Description |
+| -------- | -------- | ---------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [AgentProfileDeleteParams](protocol.md#agentprofiledeleteparams) |             |
+| `result` | Yes      | [AgentProfilesResult](protocol.md#agentprofilesresult)           |             |
+
+**agent.profiles.upgrade**
+
+| Field    | Required | Type                                                               | Description |
+| -------- | -------- | ------------------------------------------------------------------ | ----------- |
+| `params` | Yes      | [AgentProfileUpgradeParams](protocol.md#agentprofileupgradeparams) |             |
+| `result` | Yes      | [AgentProfilesResult](protocol.md#agentprofilesresult)             |             |
+
 ## GeometryFormat
 
 Supported serialized 3D asset formats; radiance fields remain unspecified.
@@ -10163,13 +10159,7 @@ Variant 1: [TelemetryMonitorAction](protocol.md#telemetrymonitoraction)
 | `kind`        | Yes      | `"roblox-monitor"`                                                               |                                                                                 |
 | `rule`        | Yes      | [TelemetryMonitorRule](protocol.md#telemetrymonitorrule)                         |                                                                                 |
 
-Variant 2: Object (fields below)
-
-| Field  | Required | Type                 | Description |
-| ------ | -------- | -------------------- | ----------- |
-| `kind` | Yes      | `"company-dispatch"` |             |
-
-Variant 3: [ReminderAction](protocol.md#reminderaction)
+Variant 2: [ReminderAction](protocol.md#reminderaction)
 
 | Field            | Required | Type         | Description |
 | ---------------- | -------- | ------------ | ----------- |
@@ -10179,7 +10169,7 @@ Variant 3: [ReminderAction](protocol.md#reminderaction)
 | `text`           | Yes      | `string`     |             |
 | `threadId`       | No       | `string`     |             |
 
-Variant 4: Object (fields below)
+Variant 3: Object (fields below)
 
 | Field             | Required | Type           | Description                                                               |
 | ----------------- | -------- | -------------- | ------------------------------------------------------------------------- |
@@ -10189,7 +10179,7 @@ Variant 4: Object (fields below)
 | `prompt`          | Yes      | `string`       |                                                                           |
 | `silentWhenEmpty` | No       | `boolean`      | Suppress delivery when the turn produced nothing worth sending.           |
 
-Variant 5: Object (fields below)
+Variant 4: Object (fields below)
 
 | Field                | Required | Type                                  | Description                                                    |
 | -------------------- | -------- | ------------------------------------- | -------------------------------------------------------------- |
@@ -10200,7 +10190,7 @@ Variant 5: Object (fields below)
 | `kind`               | Yes      | `"shell"`                             | Run a shell command. Its stdout becomes the run's output.      |
 | `timeoutMs`          | No       | `number`                              |                                                                |
 
-Variant 6: Object (fields below)
+Variant 5: Object (fields below)
 
 | Field   | Required | Type                               | Description                                                 |
 | ------- | -------- | ---------------------------------- | ----------------------------------------------------------- |
@@ -10208,7 +10198,7 @@ Variant 6: Object (fields below)
 | `kind`  | Yes      | `"tool"`                           | Call a registered tool directly, with no model in the loop. |
 | `tool`  | Yes      | `string`                           |                                                             |
 
-Variant 7: Object (fields below)
+Variant 6: Object (fields below)
 
 | Field     | Required | Type                               | Description                                  |
 | --------- | -------- | ---------------------------------- | -------------------------------------------- |
@@ -10216,7 +10206,7 @@ Variant 7: Object (fields below)
 | `kind`    | Yes      | `"event"`                          | Emit an event other subsystems subscribe to. |
 | `payload` | No       | [JsonValue](protocol.md#jsonvalue) |                                              |
 
-Variant 8: Object (fields below)
+Variant 7: Object (fields below)
 
 | Field  | Required | Type            | Description                                                               |
 | ------ | -------- | --------------- | ------------------------------------------------------------------------- |
@@ -16459,3 +16449,78 @@ Type: `"setup-required"` / `"existing"`.
 | -------- | -------- | ------------------------------------------------------------ | ----------- |
 | `params` | Yes      | Dictionary                                                   |             |
 | `result` | Yes      | [EnvironmentVisitResult](protocol.md#environmentvisitresult) |             |
+
+## AgentProfile
+
+A private profile with a server-generated identity and exact revision.
+
+| Field          | Required | Type                       | Description                                               |
+| -------------- | -------- | -------------------------- | --------------------------------------------------------- |
+| `description`  | Yes      | `string`                   | Short purpose shown in the profile list.                  |
+| `id`           | Yes      | `string`                   | Server-generated selector.                                |
+| `instructions` | Yes      | `string`                   | Static instructions appended within the inherited policy. |
+| `model`        | Yes      | `string`                   | Configured model identifier; empty inherits Nexa.         |
+| `name`         | Yes      | `string`                   | Display name.                                             |
+| `provider`     | Yes      | `string`                   | Configured provider identifier; empty inherits Nexa.      |
+| `revision`     | Yes      | `string`                   | Exact optimistic revision.                                |
+| `tools`        | Yes      | Array of `string` / `null` | Optional narrowing of the inherited tools.                |
+
+## AgentProfileInput
+
+Editable instructions and tool limits for one account-owned agent.
+
+| Field          | Required | Type                       | Description                                               |
+| -------------- | -------- | -------------------------- | --------------------------------------------------------- |
+| `description`  | Yes      | `string`                   | Short purpose shown in the profile list.                  |
+| `instructions` | Yes      | `string`                   | Static instructions appended within the inherited policy. |
+| `model`        | Yes      | `string`                   | Configured model identifier; empty inherits Nexa.         |
+| `name`         | Yes      | `string`                   | Display name.                                             |
+| `provider`     | Yes      | `string`                   | Configured provider identifier; empty inherits Nexa.      |
+| `tools`        | Yes      | Array of `string` / `null` | Optional narrowing of the inherited tools.                |
+
+## AgentProfileCreateParams
+
+Input for creating a profile under the authenticated account.
+
+| Field                       | Required | Type                                               | Description                                                         |
+| --------------------------- | -------- | -------------------------------------------------- | ------------------------------------------------------------------- |
+| `expectedDirectoryRevision` | Yes      | `string`                                           | Directory revision captured when this creation was prepared.        |
+| `profile`                   | Yes      | [AgentProfileInput](protocol.md#agentprofileinput) |                                                                     |
+| `requestId`                 | Yes      | `string`                                           | Stable creation identity reused after an ambiguous acknowledgement. |
+
+## AgentProfileUpdateParams
+
+A complete optimistic replacement of one account-owned profile.
+
+| Field              | Required | Type                                               | Description |
+| ------------------ | -------- | -------------------------------------------------- | ----------- |
+| `expectedRevision` | Yes      | `string`                                           |             |
+| `id`               | Yes      | `string`                                           |             |
+| `profile`          | Yes      | [AgentProfileInput](protocol.md#agentprofileinput) |             |
+
+## AgentProfileDeleteParams
+
+An optimistic deletion that cannot remove another revision.
+
+| Field              | Required | Type     | Description |
+| ------------------ | -------- | -------- | ----------- |
+| `expectedRevision` | Yes      | `string` |             |
+| `id`               | Yes      | `string` |             |
+
+## AgentProfilesResult
+
+The authenticated account's current profile directory.
+
+| Field               | Required | Type                                              | Description                                                       |
+| ------------------- | -------- | ------------------------------------------------- | ----------------------------------------------------------------- |
+| `directoryRevision` | Yes      | `string`                                          | Exact account configuration revision used for creation admission. |
+| `profiles`          | Yes      | Array of [AgentProfile](protocol.md#agentprofile) | Private directory capped per account.                             |
+| `upgradeAvailable`  | Yes      | `boolean`                                         | The owner can explicitly import an earlier saved profile library. |
+
+## AgentProfileUpgradeParams
+
+Explicitly imports saved profiles at the account's current directory revision.
+
+| Field                       | Required | Type     | Description |
+| --------------------------- | -------- | -------- | ----------- |
+| `expectedDirectoryRevision` | Yes      | `string` |             |

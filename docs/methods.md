@@ -1,6 +1,6 @@
 # RPC reference
 
-All 263 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 262 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
+All 267 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 266 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
 
 - [accounts.create](#accountscreate)
 - [accounts.list](#accountslist)
@@ -116,7 +116,6 @@ All 263 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [luau.editor.stage](#luaueditorstage)
 - [luau.editor.start](#luaueditorstart)
 - [media.acknowledge](#mediaacknowledge)
-- [office.ownerProof](#officeownerproof)
 - [processes.input](#processesinput)
 - [processes.list](#processeslist)
 - [processes.log](#processeslog)
@@ -265,6 +264,11 @@ All 263 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [data.upload.target](#datauploadtarget)
 - [data.upload.select](#datauploadselect)
 - [environment.visit](#environmentvisit)
+- [agent.profiles.list](#agentprofileslist)
+- [agent.profiles.create](#agentprofilescreate)
+- [agent.profiles.update](#agentprofilesupdate)
+- [agent.profiles.delete](#agentprofilesdelete)
+- [agent.profiles.upgrade](#agentprofilesupgrade)
 
 ## accounts.create
 
@@ -3181,28 +3185,6 @@ Parameters: [MediaAcknowledgeParams](protocol.md#mediaacknowledgeparams).
 | `received` | Yes      | `boolean` |             |
 
 Result: [OkResult](protocol.md#okresult).
-
-## office.ownerProof
-
-```ts
-import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
-
-const params: ParamsOf<typeof Method.OfficeOwnerProof> = {
-    accountId: 'YOUR_ACCOUNTID',
-};
-const result: ResultOf<typeof Method.OfficeOwnerProof> = await client.call(
-    Method.OfficeOwnerProof,
-    params,
-);
-```
-
-Parameters: Object (fields below).
-
-| Field       | Required | Type     | Description |
-| ----------- | -------- | -------- | ----------- |
-| `accountId` | Yes      | `string` |             |
-
-Result: Object (fields below).
 
 ## processes.input
 
@@ -7026,3 +7008,133 @@ Parameters: Dictionary.
 Type: Dictionary.
 
 Result: [EnvironmentVisitResult](protocol.md#environmentvisitresult).
+
+## agent.profiles.list
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.AgentProfilesList> = {};
+const result: ResultOf<typeof Method.AgentProfilesList> = await client.call(
+    Method.AgentProfilesList,
+    params,
+);
+```
+
+Parameters: [Recordstringnever](protocol.md#recordstringnever).
+
+Type: Dictionary.
+
+Result: [AgentProfilesResult](protocol.md#agentprofilesresult).
+
+## agent.profiles.create
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.AgentProfilesCreate> = {
+    expectedDirectoryRevision: 'YOUR_EXPECTEDDIRECTORYREVISION',
+    profile: {
+        description: 'YOUR_DESCRIPTION',
+        instructions: 'YOUR_INSTRUCTIONS',
+        model: 'YOUR_MODEL',
+        name: 'YOUR_NAME',
+        provider: 'YOUR_PROVIDER',
+        tools: [],
+    },
+    requestId: 'YOUR_REQUESTID',
+};
+const result: ResultOf<typeof Method.AgentProfilesCreate> = await client.call(
+    Method.AgentProfilesCreate,
+    params,
+);
+```
+
+Parameters: [AgentProfileCreateParams](protocol.md#agentprofilecreateparams).
+
+| Field                       | Required | Type                                               | Description                                                         |
+| --------------------------- | -------- | -------------------------------------------------- | ------------------------------------------------------------------- |
+| `expectedDirectoryRevision` | Yes      | `string`                                           | Directory revision captured when this creation was prepared.        |
+| `profile`                   | Yes      | [AgentProfileInput](protocol.md#agentprofileinput) |                                                                     |
+| `requestId`                 | Yes      | `string`                                           | Stable creation identity reused after an ambiguous acknowledgement. |
+
+Result: [AgentProfilesResult](protocol.md#agentprofilesresult).
+
+## agent.profiles.update
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.AgentProfilesUpdate> = {
+    expectedRevision: 'YOUR_EXPECTEDREVISION',
+    id: 'YOUR_ID',
+    profile: {
+        description: 'YOUR_DESCRIPTION',
+        instructions: 'YOUR_INSTRUCTIONS',
+        model: 'YOUR_MODEL',
+        name: 'YOUR_NAME',
+        provider: 'YOUR_PROVIDER',
+        tools: [],
+    },
+};
+const result: ResultOf<typeof Method.AgentProfilesUpdate> = await client.call(
+    Method.AgentProfilesUpdate,
+    params,
+);
+```
+
+Parameters: [AgentProfileUpdateParams](protocol.md#agentprofileupdateparams).
+
+| Field              | Required | Type                                               | Description |
+| ------------------ | -------- | -------------------------------------------------- | ----------- |
+| `expectedRevision` | Yes      | `string`                                           |             |
+| `id`               | Yes      | `string`                                           |             |
+| `profile`          | Yes      | [AgentProfileInput](protocol.md#agentprofileinput) |             |
+
+Result: [AgentProfilesResult](protocol.md#agentprofilesresult).
+
+## agent.profiles.delete
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.AgentProfilesDelete> = {
+    expectedRevision: 'YOUR_EXPECTEDREVISION',
+    id: 'YOUR_ID',
+};
+const result: ResultOf<typeof Method.AgentProfilesDelete> = await client.call(
+    Method.AgentProfilesDelete,
+    params,
+);
+```
+
+Parameters: [AgentProfileDeleteParams](protocol.md#agentprofiledeleteparams).
+
+| Field              | Required | Type     | Description |
+| ------------------ | -------- | -------- | ----------- |
+| `expectedRevision` | Yes      | `string` |             |
+| `id`               | Yes      | `string` |             |
+
+Result: [AgentProfilesResult](protocol.md#agentprofilesresult).
+
+## agent.profiles.upgrade
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.AgentProfilesUpgrade> = {
+    expectedDirectoryRevision: 'YOUR_EXPECTEDDIRECTORYREVISION',
+};
+const result: ResultOf<typeof Method.AgentProfilesUpgrade> = await client.call(
+    Method.AgentProfilesUpgrade,
+    params,
+);
+```
+
+Parameters: [AgentProfileUpgradeParams](protocol.md#agentprofileupgradeparams).
+
+| Field                       | Required | Type     | Description |
+| --------------------------- | -------- | -------- | ----------- |
+| `expectedDirectoryRevision` | Yes      | `string` |             |
+
+Result: [AgentProfilesResult](protocol.md#agentprofilesresult).

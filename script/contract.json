@@ -15545,126 +15545,6 @@
                     "description": "Per-turn optional AI completion audits retain mandatory local checks.",
                     "type": "boolean"
                 },
-                "officeAppearance": {
-                    "const": true,
-                    "description": "Stable employee cosmetics in NGOP v7.",
-                    "type": "boolean"
-                },
-                "officeCompany": {
-                    "const": true,
-                    "description": "NCO2 persistent company staffing and project briefs.",
-                    "type": "boolean"
-                },
-                "officeCompanyLimits": {
-                    "const": true,
-                    "description": "Private company-wide funding and capacity over the existing connection.",
-                    "type": "boolean"
-                },
-                "officeCompanyUpdates": {
-                    "const": true,
-                    "description": "Ordered private company subscriptions over the existing socket.",
-                    "type": "boolean"
-                },
-                "officeConstruction": {
-                    "const": true,
-                    "description": "NCMP v4 owner construction and NGOP v5 public floor plans.",
-                    "type": "boolean"
-                },
-                "officeDepartmentKnowledge": {
-                    "const": true,
-                    "description": "Private owner-reviewed department knowledge.",
-                    "type": "boolean"
-                },
-                "officeDepartmentTools": {
-                    "const": true,
-                    "description": "NCO2 version two carries owner-approved department tool ceilings.",
-                    "type": "boolean"
-                },
-                "officeDeskAssignments": {
-                    "const": true,
-                    "description": "Accepts NGOP v4 with saved visual desk assignments.",
-                    "type": "boolean"
-                },
-                "officeDeskPositions": {
-                    "const": true,
-                    "description": "Saved physical workstation positions in NGOP v8 and NCMP v8.",
-                    "type": "boolean"
-                },
-                "officeEmployeeCosts": {
-                    "const": true,
-                    "description": "Private employee results include exact original-attempt ledger costs.",
-                    "type": "boolean"
-                },
-                "officeEmployeeDevelopment": {
-                    "const": true,
-                    "description": "NCE1 version 4 supplies evidence-based accepted delivery history on the private owner channel.",
-                    "type": "boolean"
-                },
-                "officeEmployeeResults": {
-                    "const": true,
-                    "description": "Read-only employee evidence on the existing private office connection.",
-                    "type": "boolean"
-                },
-                "officeExecution": {
-                    "const": true,
-                    "description": "Scheduler workload summaries in NGOP v6.",
-                    "type": "boolean"
-                },
-                "officeExecutionHosts": {
-                    "const": true,
-                    "description": "Passive owner-scoped workspace resources in the private NCH1 binary channel.",
-                    "type": "boolean"
-                },
-                "officeGame": {
-                    "const": true,
-                    "description": "NGOP office state and player input share the authenticated gateway socket.",
-                    "type": "boolean"
-                },
-                "officeGameVersion": {
-                    "const": 3,
-                    "description": "NGOP version supporting server-issued acceptance celebrations.",
-                    "type": "number"
-                },
-                "officeLayout": {
-                    "const": true,
-                    "description": "Owner-only OLAY geometry commands.",
-                    "type": "boolean"
-                },
-                "officeLayoutDesks": {
-                    "const": true,
-                    "description": "OLAY v2 atomically saves construction and permanent workstation coordinates.",
-                    "type": "boolean"
-                },
-                "officeProjectBaselines": {
-                    "const": true,
-                    "description": "NCP2 version 2 with accepted-product baselines for new projects.",
-                    "type": "boolean"
-                },
-                "officeProjectPermissions": {
-                    "const": true,
-                    "description": "Owner-only NCP2 v6 exact-call tool permissions tied to a live execution attempt.",
-                    "type": "boolean"
-                },
-                "officeProjectRecovery": {
-                    "const": true,
-                    "description": "Owner-only NCP2 v5 interruption reviews, with independently enforced financial recovery.",
-                    "type": "boolean"
-                },
-                "officeProjects": {
-                    "const": true,
-                    "description": "NCP2 private project decisions, subscriptions, and delivery chunks.",
-                    "type": "boolean"
-                },
-                "officeShowroom": {
-                    "const": true,
-                    "description": "Owner-published accepted product labels in NGOP v9 and private NCP2 v4.",
-                    "type": "boolean"
-                },
-                "officeVerification": {
-                    "const": true,
-                    "description": "Versioned host verification evidence on private project and employee channels.",
-                    "type": "boolean"
-                },
                 "robloxCoordinateInput": {
                     "const": true,
                     "description": "Physical mouse/touch gestures can choose buttons using native GUI coordinates.",
@@ -17343,31 +17223,6 @@
                         },
                         "result": {
                             "$ref": "#/definitions/OkResult"
-                        }
-                    },
-                    "required": ["params", "result"],
-                    "type": "object"
-                },
-                "office.ownerProof": {
-                    "description": "Bind an invitation to the authenticated socket's office, using a short-lived signed proof.",
-                    "properties": {
-                        "params": {
-                            "properties": {
-                                "accountId": {
-                                    "type": "string"
-                                }
-                            },
-                            "required": ["accountId"],
-                            "type": "object"
-                        },
-                        "result": {
-                            "properties": {
-                                "proof": {
-                                    "type": "string"
-                                }
-                            },
-                            "required": ["proof"],
-                            "type": "object"
                         }
                     },
                     "required": ["params", "result"],
@@ -19237,6 +19092,71 @@
                         }
                     },
                     "required": ["params", "result"]
+                },
+                "agent.profiles.list": {
+                    "description": "Read the authenticated account's standalone profiles.",
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/Record%3Cstring%2Cnever%3E"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/AgentProfilesResult"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "agent.profiles.create": {
+                    "description": "Create a private custom profile.",
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/AgentProfileCreateParams"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/AgentProfilesResult"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "agent.profiles.update": {
+                    "description": "Replace editable profile settings at an exact revision.",
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/AgentProfileUpdateParams"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/AgentProfilesResult"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "agent.profiles.delete": {
+                    "description": "Delete one private profile at an exact revision.",
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/AgentProfileDeleteParams"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/AgentProfilesResult"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "agent.profiles.upgrade": {
+                    "description": "Explicitly import preserved saved agent profiles under live owner authorization.",
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/AgentProfileUpgradeParams"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/AgentProfilesResult"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
                 }
             },
             "required": [
@@ -19245,6 +19165,11 @@
                 "accounts.remove",
                 "accounts.usage",
                 "agent.ask",
+                "agent.profiles.create",
+                "agent.profiles.delete",
+                "agent.profiles.list",
+                "agent.profiles.update",
+                "agent.profiles.upgrade",
                 "agent.steer",
                 "agent.stream",
                 "agents.define",
@@ -19258,6 +19183,7 @@
                 "config.set",
                 "config.unset",
                 "connect",
+                "connectors.context.check",
                 "connectors.execution",
                 "connectors.execution.cancel",
                 "connectors.execution.get",
@@ -19268,6 +19194,11 @@
                 "connectors.files.submit",
                 "connectors.filesystem",
                 "connectors.get",
+                "connectors.host.result",
+                "connectors.host.status",
+                "connectors.host.submit",
+                "connectors.instructions.get",
+                "connectors.instructions.update",
                 "connectors.inventory",
                 "connectors.link.approve",
                 "connectors.link.deny",
@@ -19279,6 +19210,7 @@
                 "connectors.workspace.create",
                 "connectors.workspace.get",
                 "connectors.workspace.select",
+                "connectors.workspace.select-host",
                 "connectors.workspace.select-joint",
                 "credit.budgets",
                 "credit.removeBudget",
@@ -19291,8 +19223,11 @@
                 "credit.walletHistory",
                 "data.upload.cancel",
                 "data.upload.chunk",
+                "data.upload.create",
                 "data.upload.finish",
+                "data.upload.select",
                 "data.upload.start",
+                "data.upload.target",
                 "design.arrange",
                 "design.asset.cancel",
                 "design.asset.chunk",
@@ -19341,6 +19276,7 @@
                 "environment.prepare",
                 "environment.status",
                 "environment.usage",
+                "environment.visit",
                 "health",
                 "jobs.add",
                 "jobs.list",
@@ -19354,7 +19290,6 @@
                 "luau.editor.stage",
                 "luau.editor.start",
                 "media.acknowledge",
-                "office.ownerProof",
                 "processes.input",
                 "processes.list",
                 "processes.log",
@@ -19491,18 +19426,7 @@
                 "workspaces.destroy",
                 "workspaces.list",
                 "workspaces.page",
-                "workspaces.visit",
-                "connectors.instructions.get",
-                "connectors.instructions.update",
-                "connectors.host.status",
-                "connectors.host.submit",
-                "connectors.host.result",
-                "connectors.workspace.select-host",
-                "connectors.context.check",
-                "data.upload.create",
-                "data.upload.target",
-                "data.upload.select",
-                "environment.visit"
+                "workspaces.visit"
             ],
             "type": "object"
         },
@@ -20175,16 +20099,6 @@
             "anyOf": [
                 {
                     "$ref": "#/definitions/TelemetryMonitorAction"
-                },
-                {
-                    "properties": {
-                        "kind": {
-                            "const": "company-dispatch",
-                            "type": "string"
-                        }
-                    },
-                    "required": ["kind"],
-                    "type": "object"
                 },
                 {
                     "$ref": "#/definitions/ReminderAction"
@@ -33668,6 +33582,240 @@
                 }
             },
             "required": ["params", "result"]
+        },
+        "AgentProfile": {
+            "description": "A private profile with a server-generated identity and exact revision.",
+            "properties": {
+                "description": {
+                    "description": "Short purpose shown in the profile list.",
+                    "maxLength": 2000,
+                    "type": "string",
+                    "minLength": 0
+                },
+                "id": {
+                    "description": "Server-generated selector.",
+                    "maxLength": 44,
+                    "pattern": "^profile:[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",
+                    "type": "string"
+                },
+                "instructions": {
+                    "description": "Static instructions appended within the inherited policy.",
+                    "maxLength": 16000,
+                    "minLength": 1,
+                    "type": "string"
+                },
+                "model": {
+                    "description": "Configured model identifier; empty inherits Nexa.",
+                    "maxLength": 256,
+                    "type": "string",
+                    "minLength": 0
+                },
+                "name": {
+                    "description": "Display name.",
+                    "maxLength": 80,
+                    "minLength": 1,
+                    "type": "string"
+                },
+                "provider": {
+                    "description": "Configured provider identifier; empty inherits Nexa.",
+                    "maxLength": 128,
+                    "type": "string",
+                    "minLength": 0
+                },
+                "revision": {
+                    "description": "Exact optimistic revision.",
+                    "maxLength": 20,
+                    "pattern": "^(?:0|[1-9][0-9]{0,19})$",
+                    "type": "string"
+                },
+                "tools": {
+                    "anyOf": [
+                        {
+                            "items": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 128
+                            },
+                            "type": "array",
+                            "maxItems": 128
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "Optional narrowing of the inherited tools.",
+                    "maxItems": 128
+                }
+            },
+            "required": [
+                "description",
+                "id",
+                "instructions",
+                "model",
+                "name",
+                "provider",
+                "revision",
+                "tools"
+            ],
+            "type": "object",
+            "additionalProperties": false
+        },
+        "AgentProfileInput": {
+            "description": "Editable instructions and tool limits for one account-owned agent.",
+            "properties": {
+                "description": {
+                    "description": "Short purpose shown in the profile list.",
+                    "maxLength": 2000,
+                    "type": "string",
+                    "minLength": 0
+                },
+                "instructions": {
+                    "description": "Static instructions appended within the inherited policy.",
+                    "maxLength": 16000,
+                    "minLength": 1,
+                    "type": "string"
+                },
+                "model": {
+                    "description": "Configured model identifier; empty inherits Nexa.",
+                    "maxLength": 256,
+                    "type": "string",
+                    "minLength": 0
+                },
+                "name": {
+                    "description": "Display name.",
+                    "maxLength": 80,
+                    "minLength": 1,
+                    "type": "string"
+                },
+                "provider": {
+                    "description": "Configured provider identifier; empty inherits Nexa.",
+                    "maxLength": 128,
+                    "type": "string",
+                    "minLength": 0
+                },
+                "tools": {
+                    "anyOf": [
+                        {
+                            "items": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 128
+                            },
+                            "type": "array",
+                            "maxItems": 128
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "Optional narrowing of the inherited tools.",
+                    "maxItems": 128
+                }
+            },
+            "required": ["description", "instructions", "model", "name", "provider", "tools"],
+            "type": "object",
+            "additionalProperties": false
+        },
+        "AgentProfileCreateParams": {
+            "description": "Input for creating a profile under the authenticated account.",
+            "properties": {
+                "expectedDirectoryRevision": {
+                    "description": "Directory revision captured when this creation was prepared.",
+                    "maxLength": 20,
+                    "pattern": "^(?:0|[1-9][0-9]{0,19})$",
+                    "type": "string"
+                },
+                "profile": {
+                    "$ref": "#/definitions/AgentProfileInput"
+                },
+                "requestId": {
+                    "description": "Stable creation identity reused after an ambiguous acknowledgement.",
+                    "maxLength": 36,
+                    "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",
+                    "type": "string"
+                }
+            },
+            "required": ["expectedDirectoryRevision", "profile", "requestId"],
+            "type": "object",
+            "additionalProperties": false
+        },
+        "AgentProfileUpdateParams": {
+            "description": "A complete optimistic replacement of one account-owned profile.",
+            "properties": {
+                "expectedRevision": {
+                    "type": "string",
+                    "pattern": "^(?:0|[1-9][0-9]{0,19})$",
+                    "maxLength": 20
+                },
+                "id": {
+                    "type": "string",
+                    "pattern": "^profile:[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",
+                    "maxLength": 44
+                },
+                "profile": {
+                    "$ref": "#/definitions/AgentProfileInput"
+                }
+            },
+            "required": ["expectedRevision", "id", "profile"],
+            "type": "object",
+            "additionalProperties": false
+        },
+        "AgentProfileDeleteParams": {
+            "description": "An optimistic deletion that cannot remove another revision.",
+            "properties": {
+                "expectedRevision": {
+                    "type": "string",
+                    "pattern": "^(?:0|[1-9][0-9]{0,19})$",
+                    "maxLength": 20
+                },
+                "id": {
+                    "type": "string",
+                    "pattern": "^profile:[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",
+                    "maxLength": 44
+                }
+            },
+            "required": ["expectedRevision", "id"],
+            "type": "object",
+            "additionalProperties": false
+        },
+        "AgentProfilesResult": {
+            "description": "The authenticated account's current profile directory.",
+            "properties": {
+                "directoryRevision": {
+                    "description": "Exact account configuration revision used for creation admission.",
+                    "maxLength": 20,
+                    "pattern": "^(?:0|[1-9][0-9]{0,19})$",
+                    "type": "string"
+                },
+                "profiles": {
+                    "description": "Private directory capped per account.",
+                    "items": {
+                        "$ref": "#/definitions/AgentProfile"
+                    },
+                    "maxItems": 64,
+                    "type": "array"
+                },
+                "upgradeAvailable": {
+                    "description": "The owner can explicitly import an earlier saved profile library.",
+                    "type": "boolean"
+                }
+            },
+            "required": ["directoryRevision", "profiles", "upgradeAvailable"],
+            "type": "object",
+            "additionalProperties": false
+        },
+        "AgentProfileUpgradeParams": {
+            "description": "Explicitly imports saved profiles at the account's current directory revision.",
+            "properties": {
+                "expectedDirectoryRevision": {
+                    "type": "string",
+                    "pattern": "^(?:0|[1-9][0-9]{0,19})$",
+                    "maxLength": 20
+                }
+            },
+            "required": ["expectedDirectoryRevision"],
+            "type": "object",
+            "additionalProperties": false
         }
     },
     "description": "All protocol contracts reachable from the public transport.",

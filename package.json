@@ -1,6 +1,6 @@
 {
     "name": "nexa-transport",
-    "version": "0.1.0-vm-visit.1",
+    "version": "0.1.0-agent-profiles.2",
     "description": "Typed Nexa websocket gateway client for browsers and Node.js",
     "type": "module",
     "license": "Apache-2.0",
@@ -241,14 +241,6 @@
             "types": "./dist/workflows/ResourceReadiness.d.ts",
             "import": "./dist/workflow-resource-readiness.js"
         },
-        "./company-hosts": {
-            "types": "./dist/company/CompanyHostTypes.d.ts",
-            "import": "./dist/company-hosts.js"
-        },
-        "./employee-results": {
-            "types": "./dist/company/CompanyEmployeeTypes.d.ts",
-            "import": "./dist/employee-results.js"
-        },
         ".": {
             "types": "./dist/networking/NexaClient.d.ts",
             "import": "./dist/nexa-transport.js"
@@ -277,32 +269,6 @@
         },
         "./stream-options": {
             "types": "./dist/interface/StreamOptions.d.ts"
-        },
-        "./office": {
-            "types": "./dist/office/OfficeProtocol.d.ts",
-            "import": "./dist/office.js"
-        },
-        "./company": {
-            "types": "./dist/company/CompanyProtocol.d.ts",
-            "import": "./dist/company.js"
-        },
-        "./company-types": {
-            "types": "./dist/company/CompanyTypes.d.ts",
-            "import": "./dist/company-types.js"
-        },
-        "./projects": {
-            "types": "./dist/company/CompanyProjectProtocol.d.ts",
-            "import": "./dist/projects.js"
-        },
-        "./project-types": {
-            "types": "./dist/company/CompanyProjectTypes.d.ts",
-            "import": "./dist/project-types.js"
-        },
-        "./work-types": {
-            "types": "./dist/company/CompanyWorkTypes.d.ts"
-        },
-        "./company-limits": {
-            "types": "./dist/company/CompanyLimitsTypes.d.ts"
         },
         "./workflow-requests": {
             "types": "./dist/workflows/WorkflowRequests.d.ts",
