@@ -10342,54 +10342,6 @@ export interface GatewayFeaturesShape {
     readonly methods: ReadonlyArray<string>;
     /** modelReview as defined by the Nexa gateway. */
     readonly modelReview?: true;
-    /** officeAppearance as defined by the Nexa gateway. */
-    readonly officeAppearance?: true;
-    /** officeCompany as defined by the Nexa gateway. */
-    readonly officeCompany?: true;
-    /** officeCompanyLimits as defined by the Nexa gateway. */
-    readonly officeCompanyLimits?: true;
-    /** officeCompanyUpdates as defined by the Nexa gateway. */
-    readonly officeCompanyUpdates?: true;
-    /** officeConstruction as defined by the Nexa gateway. */
-    readonly officeConstruction?: true;
-    /** officeDepartmentKnowledge as defined by the Nexa gateway. */
-    readonly officeDepartmentKnowledge?: true;
-    /** officeDepartmentTools as defined by the Nexa gateway. */
-    readonly officeDepartmentTools?: true;
-    /** officeDeskAssignments as defined by the Nexa gateway. */
-    readonly officeDeskAssignments?: true;
-    /** officeDeskPositions as defined by the Nexa gateway. */
-    readonly officeDeskPositions?: true;
-    /** officeEmployeeCosts as defined by the Nexa gateway. */
-    readonly officeEmployeeCosts?: true;
-    /** officeEmployeeDevelopment as defined by the Nexa gateway. */
-    readonly officeEmployeeDevelopment?: true;
-    /** officeEmployeeResults as defined by the Nexa gateway. */
-    readonly officeEmployeeResults?: true;
-    /** officeExecution as defined by the Nexa gateway. */
-    readonly officeExecution?: true;
-    /** officeExecutionHosts as defined by the Nexa gateway. */
-    readonly officeExecutionHosts?: true;
-    /** officeGame as defined by the Nexa gateway. */
-    readonly officeGame?: true;
-    /** officeGameVersion as defined by the Nexa gateway. */
-    readonly officeGameVersion?: 3;
-    /** officeLayout as defined by the Nexa gateway. */
-    readonly officeLayout?: true;
-    /** officeLayoutDesks as defined by the Nexa gateway. */
-    readonly officeLayoutDesks?: true;
-    /** officeProjectBaselines as defined by the Nexa gateway. */
-    readonly officeProjectBaselines?: true;
-    /** officeProjectPermissions as defined by the Nexa gateway. */
-    readonly officeProjectPermissions?: true;
-    /** officeProjectRecovery as defined by the Nexa gateway. */
-    readonly officeProjectRecovery?: true;
-    /** officeProjects as defined by the Nexa gateway. */
-    readonly officeProjects?: true;
-    /** officeShowroom as defined by the Nexa gateway. */
-    readonly officeShowroom?: true;
-    /** officeVerification as defined by the Nexa gateway. */
-    readonly officeVerification?: true;
     /** robloxCoordinateInput as defined by the Nexa gateway. */
     readonly robloxCoordinateInput?: true;
     /** robloxTextEditing as defined by the Nexa gateway. */
@@ -11432,26 +11384,6 @@ export interface GatewayMethodsmedia_acknowledgeShape {
     readonly params: MediaAcknowledgeParams;
     /** result as defined by the Nexa gateway. */
     readonly result: OkResult;
-}
-
-/** GatewayMethodsoffice_ownerProofparams wire fields. */
-export interface GatewayMethodsoffice_ownerProofparamsShape {
-    /** accountId as defined by the Nexa gateway. */
-    readonly accountId: string;
-}
-
-/** GatewayMethodsoffice_ownerProofresult wire fields. */
-export interface GatewayMethodsoffice_ownerProofresultShape {
-    /** proof as defined by the Nexa gateway. */
-    readonly proof: string;
-}
-
-/** GatewayMethodsoffice_ownerProof wire fields. */
-export interface GatewayMethodsoffice_ownerProofShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: GatewayMethodsoffice_ownerProofparamsShape;
-    /** result as defined by the Nexa gateway. */
-    readonly result: GatewayMethodsoffice_ownerProofresultShape;
 }
 
 /** GatewayMethodsprocesses_input wire fields. */
@@ -12638,6 +12570,46 @@ export interface GatewayMethodsenvironment_visitShape {
     readonly result: EnvironmentVisitResult;
 }
 
+/** GatewayMethodsagent_profiles_list wire fields. */
+export interface GatewayMethodsagent_profiles_listShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: Recordstringnever;
+    /** result as defined by the Nexa gateway. */
+    readonly result: AgentProfilesResult;
+}
+
+/** GatewayMethodsagent_profiles_create wire fields. */
+export interface GatewayMethodsagent_profiles_createShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: AgentProfileCreateParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: AgentProfilesResult;
+}
+
+/** GatewayMethodsagent_profiles_update wire fields. */
+export interface GatewayMethodsagent_profiles_updateShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: AgentProfileUpdateParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: AgentProfilesResult;
+}
+
+/** GatewayMethodsagent_profiles_delete wire fields. */
+export interface GatewayMethodsagent_profiles_deleteShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: AgentProfileDeleteParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: AgentProfilesResult;
+}
+
+/** GatewayMethodsagent_profiles_upgrade wire fields. */
+export interface GatewayMethodsagent_profiles_upgradeShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: AgentProfileUpgradeParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: AgentProfilesResult;
+}
+
 /** GatewayMethods wire fields. */
 export interface GatewayMethodsShape {
     /** accounts.create as defined by the Nexa gateway. */
@@ -12868,8 +12840,6 @@ export interface GatewayMethodsShape {
     readonly 'luau.editor.start': GatewayMethodsluau_editor_startShape;
     /** media.acknowledge as defined by the Nexa gateway. */
     readonly 'media.acknowledge': GatewayMethodsmedia_acknowledgeShape;
-    /** office.ownerProof as defined by the Nexa gateway. */
-    readonly 'office.ownerProof': GatewayMethodsoffice_ownerProofShape;
     /** processes.input as defined by the Nexa gateway. */
     readonly 'processes.input': GatewayMethodsprocesses_inputShape;
     /** processes.list as defined by the Nexa gateway. */
@@ -13166,6 +13136,16 @@ export interface GatewayMethodsShape {
     readonly 'data.upload.select': GatewayMethodsdata_upload_selectShape;
     /** environment.visit as defined by the Nexa gateway. */
     readonly 'environment.visit': GatewayMethodsenvironment_visitShape;
+    /** agent.profiles.list as defined by the Nexa gateway. */
+    readonly 'agent.profiles.list': GatewayMethodsagent_profiles_listShape;
+    /** agent.profiles.create as defined by the Nexa gateway. */
+    readonly 'agent.profiles.create': GatewayMethodsagent_profiles_createShape;
+    /** agent.profiles.update as defined by the Nexa gateway. */
+    readonly 'agent.profiles.update': GatewayMethodsagent_profiles_updateShape;
+    /** agent.profiles.delete as defined by the Nexa gateway. */
+    readonly 'agent.profiles.delete': GatewayMethodsagent_profiles_deleteShape;
+    /** agent.profiles.upgrade as defined by the Nexa gateway. */
+    readonly 'agent.profiles.upgrade': GatewayMethodsagent_profiles_upgradeShape;
 }
 
 /** GatewayMethods from the Nexa wire protocol. */
@@ -13640,14 +13620,8 @@ export interface JobShape {
 /** Job from the Nexa wire protocol. */
 export type Job = JobShape;
 
-/** JobActionVariant1 wire fields. */
-export interface JobActionVariant1Shape {
-    /** kind as defined by the Nexa gateway. */
-    readonly kind: 'company-dispatch';
-}
-
-/** JobActionVariant3 wire fields. */
-export interface JobActionVariant3Shape {
+/** JobActionVariant2 wire fields. */
+export interface JobActionVariant2Shape {
     /** agentId as defined by the Nexa gateway. */
     readonly agentId: string;
     /** deliverTo as defined by the Nexa gateway. */
@@ -13660,16 +13634,16 @@ export interface JobActionVariant3Shape {
     readonly silentWhenEmpty?: boolean;
 }
 
-/** Allowed values for JobActionVariant4elevation. */
-export const JobActionVariant4elevationValues = {
+/** Allowed values for JobActionVariant3elevation. */
+export const JobActionVariant3elevationValues = {
     Value0: 'ask',
     Value1: 'full',
     Value2: 'off',
     Value3: 'on',
 } as const;
 
-/** JobActionVariant4 wire fields. */
-export interface JobActionVariant4Shape {
+/** JobActionVariant3 wire fields. */
+export interface JobActionVariant3Shape {
     /** allowSelfLifecycle as defined by the Nexa gateway. */
     readonly allowSelfLifecycle?: boolean;
     /** command as defined by the Nexa gateway. */
@@ -13677,15 +13651,15 @@ export interface JobActionVariant4Shape {
     /** cwd as defined by the Nexa gateway. */
     readonly cwd?: string;
     /** elevation as defined by the Nexa gateway. */
-    readonly elevation?: (typeof JobActionVariant4elevationValues)[keyof typeof JobActionVariant4elevationValues];
+    readonly elevation?: (typeof JobActionVariant3elevationValues)[keyof typeof JobActionVariant3elevationValues];
     /** kind as defined by the Nexa gateway. */
     readonly kind: 'shell';
     /** timeoutMs as defined by the Nexa gateway. */
     readonly timeoutMs?: number;
 }
 
-/** JobActionVariant5 wire fields. */
-export interface JobActionVariant5Shape {
+/** JobActionVariant4 wire fields. */
+export interface JobActionVariant4Shape {
     /** input as defined by the Nexa gateway. */
     readonly input: JsonValue;
     /** kind as defined by the Nexa gateway. */
@@ -13694,8 +13668,8 @@ export interface JobActionVariant5Shape {
     readonly tool: string;
 }
 
-/** JobActionVariant6 wire fields. */
-export interface JobActionVariant6Shape {
+/** JobActionVariant5 wire fields. */
+export interface JobActionVariant5Shape {
     /** event as defined by the Nexa gateway. */
     readonly event: string;
     /** kind as defined by the Nexa gateway. */
@@ -13704,8 +13678,8 @@ export interface JobActionVariant6Shape {
     readonly payload?: JsonValue;
 }
 
-/** JobActionVariant7 wire fields. */
-export interface JobActionVariant7Shape {
+/** JobActionVariant6 wire fields. */
+export interface JobActionVariant6Shape {
     /** kind as defined by the Nexa gateway. */
     readonly kind: 'maintenance';
 }
@@ -13713,13 +13687,12 @@ export interface JobActionVariant7Shape {
 /** JobAction from the Nexa wire protocol. */
 export type JobAction =
     | TelemetryMonitorAction
-    | JobActionVariant1Shape
     | ReminderAction
+    | JobActionVariant2Shape
     | JobActionVariant3Shape
     | JobActionVariant4Shape
     | JobActionVariant5Shape
-    | JobActionVariant6Shape
-    | JobActionVariant7Shape;
+    | JobActionVariant6Shape;
 
 /** JobAddParams wire fields. */
 export interface JobAddParamsShape {
@@ -22873,6 +22846,107 @@ export interface EnvironmentVisitMethodShape {
 /** EnvironmentVisitMethod from the Nexa wire protocol. */
 export type EnvironmentVisitMethod = EnvironmentVisitMethodShape;
 
+/** AgentProfile wire fields. */
+export interface AgentProfileShape {
+    /** description as defined by the Nexa gateway. */
+    readonly description: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** instructions as defined by the Nexa gateway. */
+    readonly instructions: string;
+    /** model as defined by the Nexa gateway. */
+    readonly model: string;
+    /** name as defined by the Nexa gateway. */
+    readonly name: string;
+    /** provider as defined by the Nexa gateway. */
+    readonly provider: string;
+    /** revision as defined by the Nexa gateway. */
+    readonly revision: string;
+    /** tools as defined by the Nexa gateway. */
+    readonly tools: ReadonlyArray<string> | null;
+}
+
+/** AgentProfile from the Nexa wire protocol. */
+export type AgentProfile = AgentProfileShape;
+
+/** AgentProfileInput wire fields. */
+export interface AgentProfileInputShape {
+    /** description as defined by the Nexa gateway. */
+    readonly description: string;
+    /** instructions as defined by the Nexa gateway. */
+    readonly instructions: string;
+    /** model as defined by the Nexa gateway. */
+    readonly model: string;
+    /** name as defined by the Nexa gateway. */
+    readonly name: string;
+    /** provider as defined by the Nexa gateway. */
+    readonly provider: string;
+    /** tools as defined by the Nexa gateway. */
+    readonly tools: ReadonlyArray<string> | null;
+}
+
+/** AgentProfileInput from the Nexa wire protocol. */
+export type AgentProfileInput = AgentProfileInputShape;
+
+/** AgentProfileCreateParams wire fields. */
+export interface AgentProfileCreateParamsShape {
+    /** expectedDirectoryRevision as defined by the Nexa gateway. */
+    readonly expectedDirectoryRevision: string;
+    /** profile as defined by the Nexa gateway. */
+    readonly profile: AgentProfileInput;
+    /** requestId as defined by the Nexa gateway. */
+    readonly requestId: string;
+}
+
+/** AgentProfileCreateParams from the Nexa wire protocol. */
+export type AgentProfileCreateParams = AgentProfileCreateParamsShape;
+
+/** AgentProfileUpdateParams wire fields. */
+export interface AgentProfileUpdateParamsShape {
+    /** expectedRevision as defined by the Nexa gateway. */
+    readonly expectedRevision: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+    /** profile as defined by the Nexa gateway. */
+    readonly profile: AgentProfileInput;
+}
+
+/** AgentProfileUpdateParams from the Nexa wire protocol. */
+export type AgentProfileUpdateParams = AgentProfileUpdateParamsShape;
+
+/** AgentProfileDeleteParams wire fields. */
+export interface AgentProfileDeleteParamsShape {
+    /** expectedRevision as defined by the Nexa gateway. */
+    readonly expectedRevision: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+}
+
+/** AgentProfileDeleteParams from the Nexa wire protocol. */
+export type AgentProfileDeleteParams = AgentProfileDeleteParamsShape;
+
+/** AgentProfilesResult wire fields. */
+export interface AgentProfilesResultShape {
+    /** directoryRevision as defined by the Nexa gateway. */
+    readonly directoryRevision: string;
+    /** profiles as defined by the Nexa gateway. */
+    readonly profiles: ReadonlyArray<AgentProfile>;
+    /** upgradeAvailable as defined by the Nexa gateway. */
+    readonly upgradeAvailable: boolean;
+}
+
+/** AgentProfilesResult from the Nexa wire protocol. */
+export type AgentProfilesResult = AgentProfilesResultShape;
+
+/** AgentProfileUpgradeParams wire fields. */
+export interface AgentProfileUpgradeParamsShape {
+    /** expectedDirectoryRevision as defined by the Nexa gateway. */
+    readonly expectedDirectoryRevision: string;
+}
+
+/** AgentProfileUpgradeParams from the Nexa wire protocol. */
+export type AgentProfileUpgradeParams = AgentProfileUpgradeParamsShape;
+
 /** Supported RPC names. */
 export type MethodName = keyof GatewayMethods;
 /** Parameters for a particular RPC. */
@@ -23110,8 +23184,6 @@ export enum Method {
     LuauEditorStart = 'luau.editor.start',
     /** Calls media.acknowledge. */
     MediaAcknowledge = 'media.acknowledge',
-    /** Calls office.ownerProof. */
-    OfficeOwnerProof = 'office.ownerProof',
     /** Calls processes.input. */
     ProcessesInput = 'processes.input',
     /** Calls processes.list. */
@@ -23408,4 +23480,14 @@ export enum Method {
     DataUploadSelect = 'data.upload.select',
     /** Calls environment.visit. */
     EnvironmentVisit = 'environment.visit',
+    /** Calls agent.profiles.list. */
+    AgentProfilesList = 'agent.profiles.list',
+    /** Calls agent.profiles.create. */
+    AgentProfilesCreate = 'agent.profiles.create',
+    /** Calls agent.profiles.update. */
+    AgentProfilesUpdate = 'agent.profiles.update',
+    /** Calls agent.profiles.delete. */
+    AgentProfilesDelete = 'agent.profiles.delete',
+    /** Calls agent.profiles.upgrade. */
+    AgentProfilesUpgrade = 'agent.profiles.upgrade',
 }

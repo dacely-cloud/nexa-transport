@@ -7,9 +7,6 @@ import { InboundCapacity } from '../src/networking/InboundCapacity.js';
 import { EventStream } from '../src/networking/EventStream.js';
 import { BinaryByteBudget } from '../src/media/BinaryByteBudget.js';
 import type { BinaryInputReservation } from '../src/media/BinaryInputReservation.js';
-import { ProjectChannel } from '../src/networking/ProjectChannel.js';
-import { CompanyProjectProtocol } from '../src/company/CompanyProjectProtocol.js';
-import { ProjectOp, type ProjectPacket } from '../src/company/CompanyProjectTypes.js';
 import { ClientResources } from '../src/networking/ClientResources.js';
 import { NexaClient } from '../src/networking/NexaClient.js';
 import { TurnStream } from '../src/networking/TurnStream.js';
@@ -56,66 +53,6 @@ it.each([Number.NaN, Number.POSITIVE_INFINITY, -1, 0.5])(
         await queue.return();
     },
 );
-
-it('charges only received project capacity and returns it on malformed input, timeout and disposal', async (): Promise<void> => {
-    vi.useFakeTimers();
-    const input: InboundCapacity = new InboundCapacity(16384, new BinaryByteBudget(16384));
-    const channel: ProjectChannel = new ProjectChannel(input);
-    let id: string = '';
-    channel.resume((bytes: Uint8Array<ArrayBuffer>): void => {
-        id = CompanyProjectProtocol.decode(bytes).id;
-    });
-    const prefix: () => ProjectPacket = (): ProjectPacket => ({
-        op: ProjectOp.Chunk,
-        id,
-        project: 'project',
-        offset: 0,
-        total: CompanyProjectProtocol.fileBytes,
-        bytes: new Uint8Array([173]),
-    });
-    try {
-        const pending: Promise<Uint8Array<ArrayBuffer>> = channel.file(
-            'project',
-            'attempt',
-            'file.bin',
-        );
-        channel.receive(prefix());
-        expect(input.used).toBe(4608);
-        channel.receive({
-            op: ProjectOp.Chunk,
-            id,
-            project: 'project',
-            offset: 1,
-            total: CompanyProjectProtocol.fileBytes,
-            bytes: new Uint8Array(0),
-        });
-        await expect(pending).rejects.toThrow('out-of-order');
-        expect(input.used).toBe(0);
-        const timed: Promise<Uint8Array<ArrayBuffer>> = channel.file(
-            'project',
-            'attempt',
-            'file.bin',
-        );
-        const rejected: Promise<void> = expect(timed).rejects.toThrow('timed out');
-        channel.receive(prefix());
-        await vi.advanceTimersByTimeAsync(15001);
-        await rejected;
-        expect(input.used).toBe(0);
-        const disposed: Promise<Uint8Array<ArrayBuffer>> = channel.file(
-            'project',
-            'attempt',
-            'file.bin',
-        );
-        channel.receive(prefix());
-        channel.clear();
-        await expect(disposed).rejects.toThrow('disposed');
-        expect(input.used).toBe(0);
-        expect(vi.getTimerCount()).toBe(0);
-    } finally {
-        channel.clear();
-        vi.useRealTimers();
-    }
-});
 
 const greeting: HelloOk = {
     ...hello,

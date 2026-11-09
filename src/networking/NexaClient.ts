@@ -5,28 +5,6 @@ import { EmotionWatches } from './EmotionWatches.js';
 import { resolveBridgeInput } from '../toolsearch/BridgeInput.js';
 import type { EmotionalSnapshot, TurnEventData } from '../protocol/Protocol.js';
 import type { SessionHistoryRecord } from '../protocol/Protocol.js';
-import { CompanyFormats } from './CompanyFormats.js';
-import { EmployeeChannels } from './EmployeeChannels.js';
-import { CompanyHostFormat } from './CompanyHostFormat.js';
-import { CompanyHostProtocol } from '../company/CompanyHostProtocol.js';
-import { HostOp, type CompanyHostState } from '../company/CompanyHostTypes.js';
-import { CompanyEmployeeProtocol } from '../company/CompanyEmployeeProtocol.js';
-import type { CompanyEmployeeResults } from '../company/CompanyEmployeeTypes.js';
-import type { CompanyLimits, CompanyLimitsCommand } from '../company/CompanyLimitsTypes.js';
-import { ProjectChannel } from './ProjectChannel.js';
-import { CompanyProjectProtocol } from '../company/CompanyProjectProtocol.js';
-import { ProjectOp, type CompanyProjectState } from '../company/CompanyProjectTypes.js';
-import type { CompanyWorkCommand } from '../company/CompanyWorkTypes.js';
-import { OfficeLayoutProtocol, type OfficeLayoutState } from '../office/OfficeProtocol.js';
-import { CompanyProtocol } from '../company/CompanyProtocol.js';
-import { CompanyOp, type CompanyCommand, type CompanyState } from '../company/CompanyTypes.js';
-import { CompanyChannel } from './CompanyChannel.js';
-import {
-    OfficeProtocol,
-    OfficeGameOp,
-    type OfficeGamePacket,
-    type OfficePlayer,
-} from '../office/OfficeProtocol.js';
 import { DataUploadClient } from './DataUploadClient.js';
 import type { DataUploadOptions } from '../interface/DataUploadOptions.js';
 export { DataUploadFailure, DataUploadFailureState } from './DataUploadFailure.js';
@@ -36,7 +14,6 @@ import { materializeError, rethrow } from './ErrorStack.js';
 import { BinaryChunks } from '../media/BinaryChunks.js';
 import { InboundCapacity } from './InboundCapacity.js';
 import { ClientResources } from './ClientResources.js';
-import { InboundPacketMemory } from './InboundPacketMemory.js';
 import { InboundConsumerCredit } from './InboundConsumerCredit.js';
 import { BinaryInputReservation } from '../media/BinaryInputReservation.js';
 import { BinaryAdmissionError } from '../media/BinaryAdmissionError.js';
@@ -62,7 +39,6 @@ import type { StreamParams, UserRegion } from '../protocol/Protocol.js';
 import { BrowserRegion } from './BrowserRegion.js';
 import { TurnStream } from './TurnStream.js';
 import type { CallOptions, ClientOptions } from '../interface/ClientOptions.js';
-import type { PendingLayout } from '../interface/PendingLayout.js';
 import type {
     ConnectChallengeData,
     HelloOk,
@@ -130,13 +106,6 @@ export interface SessionSnapshot {
     readonly files: SessionFilePage['files'];
     /** Full presentation events when supported by the gateway. */
     readonly history?: readonly SessionHistoryRecord[];
-}
-/** One scoped public office stream on your personal connection. */
-export interface CollaborationOffice {
-    /** Release presence and stop receiving this office. Safe to call more than once. */
-    readonly close: () => void;
-    /** Send movement while subscribed; identity and display name remain server-owned. */
-    readonly move: (player: OfficePlayer) => void;
 }
 /** Authenticated Nexa gateway connection shared by browsers and Node.js. */
 export class NexaClient {
@@ -273,249 +242,6 @@ export class NexaClient {
         return SessionHistoryReader.download(this, id, attachmentId, signal, progress);
     }
 
-    readonly #company = new CompanyChannel(CompanyFormats.staffing);
-    readonly #companyLimits = new CompanyChannel(CompanyFormats.limits);
-    readonly #employees = new EmployeeChannels();
-    readonly #hosts = new CompanyChannel(CompanyHostFormat.format);
-    /** Passive execution reports are negotiated only on the private owner's existing socket. */
-    public get supportsExecutionHosts(): boolean {
-        return this.connected && this.#hello?.features.officeExecutionHosts === true;
-    }
-    /** A read cannot configure, provision or reconnect the owner's execution machine. */
-    public executionHost(): Promise<CompanyHostState> {
-        if (!this.supportsExecutionHosts) {
-            return Promise.reject(
-                new Error('Workspace resources require the updated NEXA gateway.'),
-            );
-        }
-        return this.#hosts.request({ op: HostOp.Read, id: crypto.randomUUID() }, (bytes) => {
-            if (!this.connected || this.#socket.bufferedAmount > 256 * 1024) {
-                throw new Error('Workspace resources connection is unavailable or busy.');
-            }
-            this.#socket.send(bytes);
-        });
-    }
-    /** Reconnect restores only the read watch; closing the last view releases it. */
-    public subscribeExecutionHost(
-        listener: (state: CompanyHostState) => void,
-        onError: (error: Error) => void,
-    ): () => void {
-        if (!this.supportsExecutionHosts) {
-            throw new Error('Workspace resources require the updated NEXA gateway.');
-        }
-        return this.#hosts.watch(
-            (state) => this.#notify(() => listener(state)),
-            (error) => this.#notify(() => onError(error)),
-        );
-    }
-    /** Private saved evidence, supported only by gateways advertising this read-only capability. */
-    public get supportsEmployeeResults(): boolean {
-        return this.#hello?.features.officeEmployeeResults === true;
-    }
-    /** Reading results cannot execute work, approve spending or alter an employee. */
-    public employeeResults(employeeId: string): Promise<CompanyEmployeeResults> {
-        if (!this.supportsEmployeeResults) {
-            return Promise.reject(new Error('Employee results require the updated NEXA gateway.'));
-        }
-        return this.#employees.read(employeeId);
-    }
-    /** Release when the employee view closes; reconnect restores only this read subscription. */
-    public subscribeEmployeeResults(
-        employeeId: string,
-        listener: (state: CompanyEmployeeResults) => void,
-        onError: (error: Error) => void,
-    ): () => void {
-        if (!this.supportsEmployeeResults) {
-            throw new Error('Employee results require the updated NEXA gateway.');
-        }
-        return this.#employees.watch(
-            employeeId,
-            (state) => this.#notify(() => listener(state)),
-            (error) => this.#notify(() => onError(error)),
-        );
-    }
-    readonly #projects: ProjectChannel;
-    /** Read a private project or submit one revision-checked decision on the existing socket. */
-    public project(project: string, command?: CompanyWorkCommand): Promise<CompanyProjectState> {
-        return this.#projects.state(
-            command === undefined
-                ? { op: ProjectOp.Read, id: crypto.randomUUID(), project }
-                : { op: ProjectOp.Command, id: command.id, project, command },
-        );
-    }
-    /** Download a captured artifact; workspace paths and another account's deliveries are inaccessible. */
-    public projectFile(
-        project: string,
-        attempt: string,
-        path: string,
-    ): Promise<Uint8Array<ArrayBuffer>> {
-        return this.#projects.file(project, attempt, path);
-    }
-    /** Private ordered state, automatically resubscribed after reconnect without replaying decisions. */
-    public subscribeProject(
-        project: string,
-        listener: (state: CompanyProjectState) => void,
-        onError: (error: Error) => void,
-    ): () => void {
-        return this.#projects.watch(
-            project,
-            (state): void => this.#notify((): void => listener(state)),
-            (error): void => this.#notify((): void => onError(error)),
-        );
-    }
-    /** Whether this connection can attach captured accepted products to new project drafts. */
-    public get supportsProjectBaselines(): boolean {
-        return this.connected && this.#hello?.features.officeProjectBaselines === true;
-    }
-    /** Whether an owner can review an interrupted task after the gateway checks its financial state. */
-    public get supportsProjectRecovery(): boolean {
-        return (
-            this.connected &&
-            this.#hello?.features.officeProjects === true &&
-            this.#hello.features.officeProjectRecovery === true
-        );
-    }
-    /** Whether the owner can decide exact tool invocations on a live company execution. */
-    public get supportsProjectPermissions(): boolean {
-        return (
-            this.connected &&
-            this.#hello?.features.officeProjects === true &&
-            this.#hello.features.officeProjectPermissions === true
-        );
-    }
-    /** Whether private company snapshots include department resource permissions. */
-    public get supportsDepartmentTools(): boolean {
-        return this.#hello?.features.officeDepartmentTools === true;
-    }
-    /** Whether accepted products can publish owner-reviewed showroom labels. */
-    public get supportsProjectShowroom(): boolean {
-        return (
-            this.connected &&
-            this.#hello?.features.officeProjects === true &&
-            this.#hello.features.officeShowroom === true
-        );
-    }
-    /** Whether the connection supports owner-reviewed department guidance. */
-    public get supportsDepartmentKnowledge(): boolean {
-        return this.#hello?.features.officeDepartmentKnowledge === true;
-    }
-    /** Whether the connected owner gateway exposes real company limits. */
-    public get supportsCompanyLimits(): boolean {
-        return this.#hello?.features.officeCompanyLimits === true;
-    }
-    /** Read totals or explicitly approve a revision-checked company-wide policy. */
-    public companyLimits(command?: CompanyLimitsCommand): Promise<CompanyLimits> {
-        if (
-            !this.connected ||
-            !this.supportsCompanyLimits ||
-            this.#socket.bufferedAmount > 256 * 1024
-        ) {
-            return Promise.reject(new Error('Company budget connection is unavailable or busy.'));
-        }
-        return this.#companyLimits.request(
-            command
-                ? { ...command, op: CompanyOp.SetLimits }
-                : { op: CompanyOp.ReadLimits, id: crypto.randomUUID() },
-            (bytes) => this.#socket.send(bytes),
-        );
-    }
-    /** Snapshot followed by ordered usage updates on the existing owner connection. */
-    public subscribeCompanyLimits(
-        listener: (state: CompanyLimits) => void,
-        onError: (error: Error) => void,
-    ): () => void {
-        if (!this.connected || !this.supportsCompanyLimits) {
-            throw new Error('Live budgets require the updated NEXA gateway.');
-        }
-        return this.#companyLimits.watch(
-            (state): void => this.#notify((): void => listener(state)),
-            (error): void => this.#notify((): void => onError(error)),
-        );
-    }
-    /** Live private staffing and project briefs on the same socket, restored after reconnect. */
-    public subscribeCompany(
-        listener: (state: CompanyState) => void,
-        onError: (error: Error) => void,
-    ): () => void {
-        if (!this.connected || this.#hello?.features.officeCompanyUpdates !== true) {
-            throw new Error('Live company updates require the updated NEXA gateway.');
-        }
-        return this.#company.watch(
-            (state): void => this.#notify((): void => listener(state)),
-            (error): void => this.#notify((): void => onError(error)),
-        );
-    }
-    /** Read private staffing and briefs, or submit one revision-checked idempotent company command. */
-    public company(
-        command: CompanyCommand = { op: CompanyOp.Read, id: crypto.randomUUID(), revision: 0n },
-    ): Promise<CompanyState> {
-        if (
-            (command.op === CompanyOp.KnowledgeDraft ||
-                command.op === CompanyOp.KnowledgePublish ||
-                command.op === CompanyOp.KnowledgeArchive) &&
-            !this.supportsDepartmentKnowledge
-        ) {
-            return Promise.reject(
-                new Error('Department knowledge requires the updated NEXA gateway.'),
-            );
-        }
-        if (command.op === CompanyOp.DepartmentPolicy && !this.supportsDepartmentTools) {
-            return Promise.reject(
-                new Error('Department permissions require the updated NEXA gateway.'),
-            );
-        }
-        if (!this.connected || this.#hello?.features.officeCompany !== true) {
-            return Promise.reject(
-                new Error('Company management requires the updated NEXA gateway.'),
-            );
-        }
-        if (this.#socket.bufferedAmount > 256 * 1024) {
-            return Promise.reject(new Error('Office connection is busy.'));
-        }
-        return this.#company.request(command, (bytes) => this.#socket.send(bytes));
-    }
-    readonly #layouts: Map<number, PendingLayout> = new Map();
-    #layoutId: number = 0;
-    /** Read or save owner-only geometry over the existing connection; writes use a revision precondition. */
-    public officeLayout(state?: OfficeLayoutState): Promise<OfficeLayoutState> {
-        if (!this.connected || this.#hello?.features.officeLayout !== true) {
-            return Promise.reject(new Error('Office building requires the updated NEXA gateway.'));
-        }
-        if (this.#layouts.size >= 8 || this.#socket.bufferedAmount > 256 * 1024) {
-            return Promise.reject(new Error('Office connection is busy.'));
-        }
-        if (state?.desks !== undefined && this.#hello.features.officeLayoutDesks !== true) {
-            return Promise.reject(new Error('Moving desks requires the updated NEXA gateway.'));
-        }
-        const id = ++this.#layoutId;
-        const bytes = OfficeLayoutProtocol.encode({
-            op: state ? 2 : 1,
-            id,
-            revision: state?.revision ?? 0n,
-            pieces: state?.pieces ?? [],
-            ...(state?.desks !== undefined
-                ? { desks: state.desks }
-                : !state && this.#hello.features.officeLayoutDesks === true
-                  ? { desks: [] }
-                  : {}),
-        });
-        return new Promise((resolve, reject) => {
-            const timer = setTimeout(() => {
-                this.#layouts.delete(id);
-                reject(new Error('Layout request timed out. Reload the layout before retrying.'));
-            }, 15000);
-            this.#layouts.set(id, { resolve, reject, timer });
-            try {
-                this.#socket.send(bytes);
-            } catch (error) {
-                clearTimeout(timer);
-                this.#layouts.delete(id);
-                reject(error instanceof Error ? error : new Error('Layout send failed'));
-            }
-        });
-    }
-
-    readonly #officeListeners = new Set<(packet: OfficeGamePacket) => void>();
     #socket: WebSocket;
     #detachSocket: (() => void) | undefined;
     readonly #url: URL;
@@ -553,7 +279,6 @@ export class NexaClient {
         this.#options = settings;
         this.#inbound = new InboundCapacity(options.maxInboundBytes);
         ClientResources.register(this, this.#inbound, options.maxActiveStreams ?? 64);
-        this.#projects = new ProjectChannel(this.#inbound);
         this.#pending = new PendingRequests(options.maxPendingRequests ?? 64);
         const url: URL = new URL(options.url);
         if (url.protocol === 'https:') {
@@ -784,78 +509,6 @@ export class NexaClient {
                 );
             }
             this.#ready = true;
-            if (this.supportsExecutionHosts) {
-                this.#hosts.resume((bytes) => {
-                    if (!this.connected || this.#socket.bufferedAmount > 256 * 1024) {
-                        throw new Error('Workspace resources connection is unavailable or busy.');
-                    }
-                    this.#socket.send(bytes);
-                });
-            }
-            if (this.supportsEmployeeResults) {
-                this.#employees.resume(
-                    (bytes): void => {
-                        if (!this.connected || this.#socket.bufferedAmount > 256 * 1024) {
-                            throw new Error('Employee results connection is unavailable or busy.');
-                        }
-                        this.#socket.send(bytes);
-                    },
-                    this.#hello.features.officeEmployeeDevelopment === true
-                        ? 4
-                        : this.#hello.features.officeEmployeeCosts === true
-                          ? 3
-                          : this.#hello.features.officeVerification === true
-                            ? 2
-                            : undefined,
-                );
-            }
-            if (this.#hello.features.officeCompanyUpdates === true) {
-                this.#company.resume(
-                    (bytes): void => {
-                        if (!this.connected || this.#socket.bufferedAmount > 256 * 1024) {
-                            throw new Error('Company connection is unavailable or busy.');
-                        }
-                        this.#socket.send(bytes);
-                    },
-                    this.supportsDepartmentKnowledge
-                        ? CompanyFormats.departmentKnowledge
-                        : this.supportsDepartmentTools
-                          ? CompanyFormats.departmentTools
-                          : CompanyFormats.staffing,
-                );
-            }
-            if (this.#hello.features.officeCompanyLimits === true) {
-                this.#companyLimits.resume((bytes): void => {
-                    if (!this.connected || this.#socket.bufferedAmount > 256 * 1024) {
-                        throw new Error('Company budget connection is unavailable or busy.');
-                    }
-                    this.#socket.send(bytes);
-                });
-            }
-            if (this.#hello.features.officeProjects === true) {
-                this.#projects.resume(
-                    (bytes): void => {
-                        if (!this.connected || this.#socket.bufferedAmount > 256 * 1024) {
-                            throw new Error('Project connection is unavailable or busy.');
-                        }
-                        this.#socket.send(bytes);
-                    },
-                    this.#hello.features.officeProjectPermissions === true
-                        ? 6
-                        : this.#hello.features.officeProjectRecovery === true
-                          ? 5
-                          : this.#hello.features.officeShowroom === true
-                            ? 4
-                            : this.#hello.features.officeVerification === true
-                              ? 3
-                              : this.#hello.features.officeProjectBaselines === true
-                                ? 2
-                                : undefined,
-                );
-            }
-            if (this.#officeListeners.size > 0) {
-                this.#sendOffice(OfficeProtocol.control(OfficeGameOp.Request));
-            }
             this.#attempt = 0;
         } catch (error: unknown) {
             this.#fail(error instanceof Error ? error : new Error(String(error)));
@@ -1259,59 +912,6 @@ export class NexaClient {
             rethrow(error);
         }
     }
-    /** Observe authoritative office state over this existing authenticated connection. */
-    public subscribeOffice(listener: (packet: OfficeGamePacket) => void): () => void {
-        if (this.#hello?.features.officeGame !== true) {
-            throw new Error('This NEXA server does not support live office state');
-        }
-        const release = subscribe(this.#officeListeners, listener);
-        const reference = new WeakRef(this);
-        this.#sendOffice(OfficeProtocol.control(OfficeGameOp.Request));
-        return () => {
-            release();
-            const owner = reference.deref();
-            if (owner !== undefined && owner.#officeListeners.size === 0) {
-                owner.#sendOffice(OfficeProtocol.control(OfficeGameOp.Leave));
-            }
-        };
-    }
-    /** Send bounded player input; agent state can only originate in the runtime. */
-    public moveOffice(player: OfficePlayer): void {
-        if (this.#officeListeners.size > 0) {
-            this.#sendOffice({ ...OfficeProtocol.control(OfficeGameOp.Player), player });
-        }
-    }
-    #sendOffice(packet: OfficeGamePacket): void {
-        if (!this.connected || this.#hello?.features.officeGame !== true) {
-            return;
-        }
-        const bytes = OfficeProtocol.encode(
-            packet,
-            this.#hello.features.officeShowroom === true
-                ? 9
-                : this.#hello.features.officeDeskPositions === true
-                  ? 8
-                  : this.#hello.features.officeAppearance === true
-                    ? 7
-                    : this.#hello.features.officeExecution === true
-                      ? 6
-                      : this.#hello.features.officeConstruction === true
-                        ? 5
-                        : this.#hello.features.officeDeskAssignments === true
-                          ? 4
-                          : this.#hello.features.officeGameVersion === 3
-                            ? 3
-                            : 2,
-        );
-        if (this.#socket.bufferedAmount > 256 * 1024) {
-            if (packet.op === OfficeGameOp.Player) {
-                return;
-            }
-            throw new Error('Office control blocked by socket backpressure');
-        }
-        this.#socket.send(bytes);
-    }
-
     /** Observes connection termination for resource owners and UI state. */
     public onClose(listener: (error: Error) => void): () => void {
         if (this.#failure !== undefined) {
@@ -1588,83 +1188,6 @@ export class NexaClient {
         if (this.#hello === null) {
             throw new Error('Binary media arrived before authentication');
         }
-        InboundPacketMemory.reserve(new Uint8Array(complete), credit);
-        if (CompanyHostProtocol.isFrame(new Uint8Array(complete))) {
-            if (!this.supportsExecutionHosts) {
-                throw new Error('Unnegotiated workspace resource frame');
-            }
-            this.#hosts.receive(CompanyHostProtocol.decode(new Uint8Array(complete)));
-            return false;
-        }
-        if (CompanyEmployeeProtocol.isFrame(new Uint8Array(complete))) {
-            if (!this.supportsEmployeeResults) {
-                throw new Error('Unnegotiated employee results frame');
-            }
-            this.#employees.receive(CompanyEmployeeProtocol.decode(new Uint8Array(complete)));
-            return false;
-        }
-        if (CompanyProjectProtocol.isFrame(new Uint8Array(complete))) {
-            if (this.#hello.features.officeProjects !== true) {
-                throw new Error('Unnegotiated project frame');
-            }
-            this.#projects.receive(CompanyProjectProtocol.decode(new Uint8Array(complete)));
-            return false;
-        }
-        if (CompanyProtocol.isFrame(new Uint8Array(complete))) {
-            if (this.#hello.features.officeCompany !== true) {
-                throw new Error('Unnegotiated company frame');
-            }
-            const packet: ReturnType<typeof CompanyProtocol.decode> = CompanyProtocol.decode(
-                new Uint8Array(complete),
-            );
-            if (
-                packet.op >= CompanyOp.LimitsSnapshot &&
-                this.#hello.features.officeCompanyLimits !== true
-            ) {
-                throw new Error('Unnegotiated budget frame');
-            }
-            if (packet.version === 3 && !this.supportsDepartmentKnowledge) {
-                throw new Error('Unnegotiated department knowledge');
-            }
-            if (packet.version === 2 && !this.supportsDepartmentTools) {
-                throw new Error('Unnegotiated company policy frame');
-            }
-            this.#company.receive(packet);
-            this.#companyLimits.receive(packet);
-            return false;
-        }
-        if (OfficeLayoutProtocol.isFrame(new Uint8Array(complete))) {
-            const packet: ReturnType<typeof OfficeLayoutProtocol.decode> =
-                OfficeLayoutProtocol.decode(new Uint8Array(complete));
-            if (packet.op !== 3 && packet.op !== 4) {
-                throw new Error('Unexpected layout command');
-            }
-            const pending: PendingLayout | undefined = this.#layouts.get(packet.id);
-            if (pending) {
-                this.#layouts.delete(packet.id);
-                clearTimeout(pending.timer);
-                if (packet.op === 4) {
-                    pending.reject(new Error(packet.message));
-                } else {
-                    pending.resolve({
-                        revision: packet.revision,
-                        pieces: packet.pieces,
-                        ...(packet.desks === undefined ? {} : { desks: packet.desks }),
-                    });
-                }
-            }
-            return false;
-        }
-        if (OfficeProtocol.isFrame(new Uint8Array(complete))) {
-            if (this.#hello.features.officeGame !== true) {
-                throw new Error('Unnegotiated office frame');
-            }
-            const packet: OfficeGamePacket = OfficeProtocol.decode(new Uint8Array(complete));
-            for (const listener of this.#officeListeners) {
-                this.#notify((): void => listener(packet));
-            }
-            return false;
-        }
         if (complete.byteLength >= 8 && new DataView(complete).getUint32(0) === 0x4e584246) {
             this.#receiveFrame(
                 BinaryEnvelope.decode(
@@ -1865,16 +1388,6 @@ export class NexaClient {
         this.#failure = materializeError(error);
         this.#pending.close(error);
         this.#emotionalWatches.pause(error);
-        this.#company.close(error);
-        this.#companyLimits.close(error);
-        this.#employees.close(error);
-        this.#hosts.close(error);
-        this.#projects.disconnect(error);
-        for (const pending of this.#layouts.values()) {
-            clearTimeout(pending.timer);
-            pending.reject(error);
-        }
-        this.#layouts.clear();
         this.#wake?.();
         for (const listener of this.#closeListeners) {
             this.#notify((): void => {
@@ -1891,12 +1404,6 @@ export class NexaClient {
     }
     #clearListeners(): void {
         this.#emotionalWatches.clear();
-        this.#projects.clear();
-        this.#company.clear();
-        this.#companyLimits.clear();
-        this.#employees.clear();
-        this.#hosts.clear();
-        this.#officeListeners.clear();
         this.#subscriptions.clear();
         this.#closeListeners.clear();
         this.#events.clear();

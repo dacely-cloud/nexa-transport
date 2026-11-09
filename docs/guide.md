@@ -16,7 +16,6 @@
 - [Errors and limits](#errors-and-limits)
 - [Complete reference](#complete-reference)
 - [Session recovery](sessions.md)
-- [Office and company APIs](office-company.md)
 - [Reverse-engineering APIs](reverse-investigation.md)
 - [Runtime controls and integrations](operations.md)
 - [Package entry points](exports.md)
@@ -514,7 +513,6 @@ RPC mutations are never automatically retried. Connection retries and read-subsc
 
 - [Package entry points](exports.md)
 - [Session recovery and saved attachments](sessions.md)
-- [Office, company, projects, and private reports](office-company.md)
 - [Reverse-engineering APIs](reverse-investigation.md)
 - [Workflows](workflows.md)
 

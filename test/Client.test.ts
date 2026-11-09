@@ -336,26 +336,6 @@ describe('Nexa websocket lifetimes', (): void => {
         ).rejects.toThrow('updated NEXA gateway');
         expect(gateway?.requests.length).toBe(before);
     });
-    it('rejects employee evidence locally when the private capability is absent', async (): Promise<void> => {
-        const connected = await connect();
-        const before = gateway?.requests.length ?? 0;
-        expect(connected.supportsEmployeeResults).toBe(false);
-        await expect(connected.employeeResults('employee')).rejects.toThrow('updated NEXA');
-        expect(() =>
-            connected.subscribeEmployeeResults(
-                'employee',
-                () => {},
-                () => {},
-            ),
-        ).toThrow('updated NEXA');
-        expect(gateway?.requests.length).toBe(before);
-    });
-    it('does not send layout commands to a host without layout support', async (): Promise<void> => {
-        const connected = await connect();
-        const before = gateway?.requests.length ?? 0;
-        await expect(connected.officeLayout()).rejects.toThrow('updated NEXA gateway');
-        expect(gateway?.requests.length).toBe(before);
-    });
     it('calls the enum method with typed conversation and media parameters', async (): Promise<void> => {
         const connected: NexaClient = await connect();
         if (gateway === undefined) {

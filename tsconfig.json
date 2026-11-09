@@ -28,7 +28,6 @@
         "vite.config.ts",
         "examples/**/*.ts",
         "script/workflows.ts",
-        "script/MediaSources.ts",
-        "script/CompanySources.ts"
+        "script/MediaSources.ts"
     ]
 }

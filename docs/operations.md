@@ -78,10 +78,7 @@ derive authority from the authenticated connection even where administrative
 parameters include `userId`.
 
 The SDK does not implement a checkout, invoice renderer, account credential
-vault, or free-credit grant. Those belong to the application/backend. Private
-company/project budgets are separate binary APIs described in
-[Office/company budgets](office-company.md#budgets-and-passive-reports), and
-workflow usage retains its own reported billing evidence.
+vault, or free-credit grant. Those belong to the application/backend. Workflow usage retains its own reported billing evidence.
 
 ## Roblox live previews, connections and telemetry
 
@@ -150,7 +147,7 @@ the specific contract supports them, and reconcile uncertain outcomes.
 
 `OfficeOwnerProof` returns a host-generated proof for a requested account under
 the authenticated gateway's authorization. It is a backend integration credential,
-not a display identity or an office/game packet. Keep it opaque and private; use
+not a display identity. Keep it opaque and private; use
 the deployment's verified backend flow rather than treating a browser-supplied
 account ID as proof of ownership. Native media receipt acknowledgements are sent
 automatically by the SDK after attachment handlers complete; callers need not

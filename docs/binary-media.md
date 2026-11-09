@@ -61,7 +61,4 @@ or use `Method.SessionsDownload` with the ordinary attachment listener. The SDK
 matches the session and attachment identity before returning the original bytes.
 See [session recovery](sessions.md) for reconciliation and callback ownership.
 
-These binary media frames use big-endian integers. Office/company channels on the
-same socket have their own magic/version/endianness and dedicated codecs; they
-are not NXMD/NXBF payloads. Use [Office/company helpers](office-company.md) rather
-than applying this frame layout to every binary WebSocket message.
+These binary media frames use big-endian integers.

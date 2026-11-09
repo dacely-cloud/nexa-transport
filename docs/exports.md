@@ -6,7 +6,7 @@ contract. Runtime entries include TypeScript declarations. Entries marked
 **Types only** require `import type` and provide no JavaScript module.
 
 The [client reference](client.md), [usage guide](guide.md),
-[Office/company guide](office-company.md), [reverse guide](reverse-investigation.md),
+[reverse guide](reverse-investigation.md),
 and [workflow guide](workflows.md) explain how to use these families. Exact RPC
 payload fields are generated in [protocol types](protocol.md). Portable workflow
 interfaces/codecs remain available through their entry points and declarations;
@@ -111,20 +111,6 @@ pixel parity and replay of paths present before capture remain unverified.
 | `nexa-transport/roblox-surface-material`     | ESM + types  | Bounded preview surface material response.                       |
 | `nexa-transport/roblox-visual-parts`         | ESM + types  | Renderable part geometry and visual mesh transforms.             |
 
-## Office and private company channels
-
-| Import                            | Availability   | Contract                                                                                        |
-| --------------------------------- | -------------- | ----------------------------------------------------------------------------------------------- |
-| `nexa-transport/company`          | ESM + types    | Private staffing NCO2 binary codec                                                              |
-| `nexa-transport/company-hosts`    | ESM + types    | Passive execution-host report types and packet operations                                       |
-| `nexa-transport/company-limits`   | **Types only** | Company budgets, concurrency, commands, and live limit packets                                  |
-| `nexa-transport/company-types`    | ESM + types    | CompanyState, employees, departments, project briefs, CompanyOp, and commands                   |
-| `nexa-transport/employee-results` | ESM + types    | Saved employee contributions, verification, costs, and report packets                           |
-| `nexa-transport/office`           | ESM + types    | Public office and private layout framing, work projections, placement, and appearance utilities |
-| `nexa-transport/project-types`    | ESM + types    | Project state, requests, packet operations, and chunks                                          |
-| `nexa-transport/projects`         | ESM + types    | NCP2 project decision/state/file binary codec                                                   |
-| `nexa-transport/work-types`       | **Types only** | Private project tasks, attempts, artifacts, proposals, and owner decisions                      |
-
 ## Portable workflow contracts
 
 | Import                                        | Availability | Contract                                                                       |
@@ -199,8 +185,7 @@ pixel parity and replay of paths present before capture remain unverified.
 
 `NexaClient` is the root runtime export. Connection options, stream types, and
 most domain contracts have their own imports; they are not all re-exported at
-the root. Project work/decision contracts use
-`nexa-transport/work-types`. Use the current [client API](client.md) rather than
+the root. Use the current [client API](client.md) rather than
 inventing convenience methods from an entry point name.
 
 Browser applications use the same portable SDK as Node.js 22+ ESM consumers.
