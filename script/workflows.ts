@@ -137,6 +137,17 @@ for (const file of files) {
     await writeFile(new URL(`${file}.ts`, destination), content);
 }
 
+/** Account connection contracts are shared by the gateway and the website. */
+const connectionsDestination: URL = new URL('../src/connections/', import.meta.url);
+await mkdir(connectionsDestination, { recursive: true });
+await writeFile(
+    new URL('ConnectionTypes.ts', connectionsDestination),
+    await readFile(
+        new URL('../../nexa/src/connections/ConnectionTypes.ts', import.meta.url),
+        'utf8',
+    ),
+);
+
 /** Pricing classification is shared by metering and the portable spending reader. */
 const creditDestination: URL = new URL('../src/credit/', import.meta.url);
 await mkdir(creditDestination, { recursive: true });

@@ -12,14 +12,6 @@ export interface WorkflowApplicationStatus {
     readonly title: string;
     readonly status: ApplicationConnection;
 }
-export interface WorkflowApplicationRequest {
-    readonly workflowId: string;
-    readonly revision: string;
-}
-export interface WorkflowApplicationSetupRequest extends WorkflowApplicationRequest {
-    readonly application: WorkflowApplication;
-    readonly sessionId: string;
-}
 export interface WorkflowTerminalRequest {
     readonly sessionId: string;
 }

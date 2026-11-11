@@ -1,38 +1,11 @@
 // SPDX-License-Identifier: Apache-2.0
 import { WorkflowInput } from '../WorkflowInput.js';
-import { WorkflowApplications } from './Applications.js';
 import {
     TerminalAction,
     type WorkflowTerminalCommand,
     type WorkflowTerminalRequest,
-    type WorkflowApplicationRequest,
-    type WorkflowApplicationSetupRequest,
 } from './TerminalTypes.js';
 export class WorkflowTerminalCodec {
-    public static applications(raw: unknown): WorkflowApplicationRequest {
-        const value: Readonly<Record<string, unknown>> = WorkflowInput.record(raw, [
-            'workflowId',
-            'revision',
-        ]);
-        return {
-            workflowId: WorkflowInput.id(value['workflowId']),
-            revision: WorkflowInput.id(value['revision']),
-        };
-    }
-    public static setup(raw: unknown): WorkflowApplicationSetupRequest {
-        const value: Readonly<Record<string, unknown>> = WorkflowInput.record(raw, [
-            'workflowId',
-            'revision',
-            'application',
-            'sessionId',
-        ]);
-        return {
-            workflowId: WorkflowInput.id(value['workflowId']),
-            revision: WorkflowInput.id(value['revision']),
-            application: WorkflowApplications.get(WorkflowInput.id(value['application'])).id,
-            sessionId: WorkflowInput.id(value['sessionId']),
-        };
-    }
     public static read(raw: unknown): WorkflowTerminalRequest {
         const value: Readonly<Record<string, unknown>> = WorkflowInput.record(raw, ['sessionId']);
         return { sessionId: WorkflowInput.id(value['sessionId']) };

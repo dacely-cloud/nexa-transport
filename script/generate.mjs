@@ -642,6 +642,7 @@ if (!snapshotOnly) {
         'connector-host.mjs',
         'browser-files.mjs',
         'environment-visit.mjs',
+        'vm-connections.mjs',
     ]) {
         execFileSync(process.execPath, ['script/' + script], { stdio: 'inherit' });
     }

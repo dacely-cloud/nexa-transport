@@ -992,6 +992,10 @@
                         "type": "string",
                         "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$"
                     }
+                },
+                "model": {
+                    "$ref": "#/definitions/ChatModelSelection",
+                    "description": "A model the user connected with their own key or subscription; absent selects the Nexa model."
                 }
             },
             "required": ["message"],
@@ -18394,33 +18398,6 @@
                     "required": ["params", "result"],
                     "type": "object"
                 },
-                "workflows.runs.applications.check": {
-                    "properties": {
-                        "params": {
-                            "$ref": "#/definitions/WorkflowApplicationRequest"
-                        },
-                        "result": {
-                            "items": {
-                                "$ref": "#/definitions/WorkflowApplicationStatus"
-                            },
-                            "type": "array"
-                        }
-                    },
-                    "required": ["params", "result"],
-                    "type": "object"
-                },
-                "workflows.runs.applications.setup": {
-                    "properties": {
-                        "params": {
-                            "$ref": "#/definitions/WorkflowApplicationSetupRequest"
-                        },
-                        "result": {
-                            "$ref": "#/definitions/WorkflowTerminalSnapshot"
-                        }
-                    },
-                    "required": ["params", "result"],
-                    "type": "object"
-                },
                 "workflows.runs.approval.decide": {
                     "properties": {
                         "params": {
@@ -19157,6 +19134,84 @@
                     },
                     "required": ["params", "result"],
                     "type": "object"
+                },
+                "connections.applications.check": {
+                    "description": "`connections.applications.check` contract.",
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/Record%3Cstring%2Cnever%3E"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/ConnectionApplicationsPage"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "connections.applications.setup": {
+                    "description": "`connections.applications.setup` contract.",
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/ConnectionApplicationSetupRequest"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/WorkflowTerminalSnapshot"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "connections.tools.status": {
+                    "description": "`connections.tools.status` contract.",
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/Record%3Cstring%2Cnever%3E"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/LicensedToolsPage"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "connections.tools.install": {
+                    "description": "`connections.tools.install` contract.",
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/LicensedToolRequest"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/LicensedToolStatus"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "connections.tools.remove": {
+                    "description": "`connections.tools.remove` contract.",
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/LicensedToolRequest"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/LicensedToolStatus"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
+                },
+                "connections.models.list": {
+                    "description": "`connections.models.list` contract.",
+                    "properties": {
+                        "params": {
+                            "$ref": "#/definitions/Record%3Cstring%2Cnever%3E"
+                        },
+                        "result": {
+                            "$ref": "#/definitions/ChatModelsPage"
+                        }
+                    },
+                    "required": ["params", "result"],
+                    "type": "object"
                 }
             },
             "required": [
@@ -19383,8 +19438,6 @@
                 "workflows.runs.agent.control",
                 "workflows.runs.agent.input",
                 "workflows.runs.agent.read",
-                "workflows.runs.applications.check",
-                "workflows.runs.applications.setup",
                 "workflows.runs.approval.decide",
                 "workflows.runs.artifact",
                 "workflows.runs.artifacts",
@@ -19426,7 +19479,13 @@
                 "workspaces.destroy",
                 "workspaces.list",
                 "workspaces.page",
-                "workspaces.visit"
+                "workspaces.visit",
+                "connections.applications.check",
+                "connections.applications.setup",
+                "connections.tools.status",
+                "connections.tools.install",
+                "connections.tools.remove",
+                "connections.models.list"
             ],
             "type": "object"
         },
@@ -26234,6 +26293,10 @@
                         "type": "string",
                         "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$"
                     }
+                },
+                "model": {
+                    "$ref": "#/definitions/ChatModelSelection",
+                    "description": "A model the user connected with their own key or subscription; absent selects the Nexa model."
                 }
             },
             "required": ["message"],
@@ -28686,36 +28749,6 @@
         "WorkflowApplication": {
             "enum": ["claude-code", "codex", "grok-build", "mistral-vibe", "nerva-code"],
             "type": "string"
-        },
-        "WorkflowApplicationRequest": {
-            "properties": {
-                "revision": {
-                    "type": "string"
-                },
-                "workflowId": {
-                    "type": "string"
-                }
-            },
-            "required": ["revision", "workflowId"],
-            "type": "object"
-        },
-        "WorkflowApplicationSetupRequest": {
-            "properties": {
-                "application": {
-                    "$ref": "#/definitions/WorkflowApplication"
-                },
-                "revision": {
-                    "type": "string"
-                },
-                "sessionId": {
-                    "type": "string"
-                },
-                "workflowId": {
-                    "type": "string"
-                }
-            },
-            "required": ["application", "revision", "sessionId", "workflowId"],
-            "type": "object"
         },
         "WorkflowApplicationStatus": {
             "properties": {
@@ -33816,6 +33849,240 @@
             "required": ["expectedDirectoryRevision"],
             "type": "object",
             "additionalProperties": false
+        },
+        "ChatModelChoice": {
+            "description": "One selectable chat model backed by the user's own key or subscription.",
+            "properties": {
+                "model": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "provider": {
+                    "description": "Provider id for API keys, or the application id for subscriptions.",
+                    "type": "string"
+                },
+                "providerName": {
+                    "type": "string"
+                },
+                "source": {
+                    "$ref": "#/definitions/ChatModelSource"
+                }
+            },
+            "required": ["model", "name", "provider", "providerName", "source"],
+            "type": "object",
+            "additionalProperties": false
+        },
+        "ChatModelSelection": {
+            "description": "A user-connected chat model. Absent means the deployment's own Nexa model.",
+            "properties": {
+                "model": {
+                    "type": "string"
+                },
+                "provider": {
+                    "description": "Provider id for API keys, or the application id for subscriptions.",
+                    "type": "string"
+                },
+                "source": {
+                    "$ref": "#/definitions/ChatModelSource"
+                }
+            },
+            "required": ["model", "provider", "source"],
+            "type": "object",
+            "additionalProperties": false
+        },
+        "ChatModelSource": {
+            "description": "Who runs a chat model the user selected.\nUnion of {@link ChatModelSource} values.",
+            "enum": ["api-key", "subscription"],
+            "type": "string"
+        },
+        "ChatModelsPage": {
+            "description": "Chat models the authenticated account has connected.",
+            "properties": {
+                "items": {
+                    "items": {
+                        "$ref": "#/definitions/ChatModelChoice"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": ["items"],
+            "type": "object",
+            "additionalProperties": false
+        },
+        "ConnectionApplicationSetupRequest": {
+            "description": "Opens the application's own login flow in a terminal on the user's VM.",
+            "properties": {
+                "application": {
+                    "$ref": "#/definitions/WorkflowApplication"
+                },
+                "sessionId": {
+                    "type": "string"
+                }
+            },
+            "required": ["application", "sessionId"],
+            "type": "object",
+            "additionalProperties": false
+        },
+        "ConnectionApplicationsPage": {
+            "description": "Account-level sign-in state of every subscription application on the user's VM.",
+            "properties": {
+                "applications": {
+                    "items": {
+                        "$ref": "#/definitions/WorkflowApplicationStatus"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": ["applications"],
+            "type": "object",
+            "additionalProperties": false
+        },
+        "LicensedToolRequest": {
+            "description": "Names one licensed tool on the authenticated account's VM.",
+            "properties": {
+                "tool": {
+                    "const": "ida-pro",
+                    "description": "Licensed desktop software a user links once and Nexa installs on that user's own VM.\nUnion of {@link LicensedTool} values.",
+                    "type": "string"
+                }
+            },
+            "required": ["tool"],
+            "type": "object",
+            "additionalProperties": false
+        },
+        "LicensedToolState": {
+            "description": "Where a licensed tool stands on the authenticated account's VM.\nUnion of {@link LicensedToolState} values.",
+            "enum": [
+                "failed",
+                "installed",
+                "installing",
+                "not-connected",
+                "not-installed",
+                "outdated",
+                "unavailable"
+            ],
+            "type": "string"
+        },
+        "LicensedToolStatus": {
+            "description": "Install state of one licensed tool. It never carries a license, key or vendor output.",
+            "properties": {
+                "detail": {
+                    "description": "Bounded user-facing explanation of the current state.",
+                    "type": "string"
+                },
+                "edition": {
+                    "description": "Installed product family, or null before installation.",
+                    "type": ["null", "string"]
+                },
+                "state": {
+                    "$ref": "#/definitions/LicensedToolState"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "tool": {
+                    "const": "ida-pro",
+                    "description": "Licensed desktop software a user links once and Nexa installs on that user's own VM.\nUnion of {@link LicensedTool} values.",
+                    "type": "string"
+                }
+            },
+            "required": ["detail", "edition", "state", "title", "tool"],
+            "type": "object",
+            "additionalProperties": false
+        },
+        "LicensedToolsPage": {
+            "description": "Every licensed tool the deployment can install.",
+            "properties": {
+                "tools": {
+                    "items": {
+                        "$ref": "#/definitions/LicensedToolStatus"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": ["tools"],
+            "type": "object",
+            "additionalProperties": false
+        },
+        "ConnectionApplicationsCheckMethod": {
+            "description": "`connections.applications.check` contract.",
+            "properties": {
+                "params": {
+                    "$ref": "#/definitions/Record%3Cstring%2Cnever%3E"
+                },
+                "result": {
+                    "$ref": "#/definitions/ConnectionApplicationsPage"
+                }
+            },
+            "required": ["params", "result"],
+            "type": "object"
+        },
+        "ConnectionApplicationsSetupMethod": {
+            "description": "`connections.applications.setup` contract.",
+            "properties": {
+                "params": {
+                    "$ref": "#/definitions/ConnectionApplicationSetupRequest"
+                },
+                "result": {
+                    "$ref": "#/definitions/WorkflowTerminalSnapshot"
+                }
+            },
+            "required": ["params", "result"],
+            "type": "object"
+        },
+        "ConnectionToolsStatusMethod": {
+            "description": "`connections.tools.status` contract.",
+            "properties": {
+                "params": {
+                    "$ref": "#/definitions/Record%3Cstring%2Cnever%3E"
+                },
+                "result": {
+                    "$ref": "#/definitions/LicensedToolsPage"
+                }
+            },
+            "required": ["params", "result"],
+            "type": "object"
+        },
+        "ConnectionToolsInstallMethod": {
+            "description": "`connections.tools.install` contract.",
+            "properties": {
+                "params": {
+                    "$ref": "#/definitions/LicensedToolRequest"
+                },
+                "result": {
+                    "$ref": "#/definitions/LicensedToolStatus"
+                }
+            },
+            "required": ["params", "result"],
+            "type": "object"
+        },
+        "ConnectionToolsRemoveMethod": {
+            "description": "`connections.tools.remove` contract.",
+            "properties": {
+                "params": {
+                    "$ref": "#/definitions/LicensedToolRequest"
+                },
+                "result": {
+                    "$ref": "#/definitions/LicensedToolStatus"
+                }
+            },
+            "required": ["params", "result"],
+            "type": "object"
+        },
+        "ConnectionModelsListMethod": {
+            "description": "`connections.models.list` contract.",
+            "properties": {
+                "params": {
+                    "$ref": "#/definitions/Record%3Cstring%2Cnever%3E"
+                },
+                "result": {
+                    "$ref": "#/definitions/ChatModelsPage"
+                }
+            },
+            "required": ["params", "result"],
+            "type": "object"
         }
     },
     "description": "All protocol contracts reachable from the public transport.",
