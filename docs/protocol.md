@@ -418,20 +418,21 @@ The payload of a {@link GATEWAY_EVENTS.ApprovalResolved} event.
 
 What one turn is asked for.
 
-| Field               | Required | Type                                                                          | Description                                                                               |
-| ------------------- | -------- | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| `agentId`           | No       | `string`                                                                      |                                                                                           |
-| `attachments`       | No       | Array of [InboundAttachment](protocol.md#inboundattachment)                   | User-authored image, video, document, and text blocks, in display order.                  |
-| `conversationId`    | No       | `string`                                                                      | Continues an existing conversation.                                                       |
-| `cwd`               | No       | `string`                                                                      | Where tools operate.                                                                      |
-| `message`           | Yes      | `string`                                                                      | User text; may be blank when at least one attachment contains content.                    |
-| `modelReview`       | No       | `boolean`                                                                     | Optional AI completion audit for this turn; local execution checks always remain enabled. |
-| `reasoningEffort`   | No       | `"high"` / `"low"` / `"max"` / `"medium"` / `"minimal"` / `"off"` / `"xhigh"` | Per-turn reasoning preference; never changes the saved agent configuration.               |
-| `responseFormat`    | No       | `"json"` / `"text"`                                                           | Final answer format; JSON mode does not disable tools or verification.                    |
-| `targetTimeSeconds` | No       | `integer`                                                                     | Soft task time target in seconds; never a cancellation deadline.                          |
-| `userId`            | No       | `string`                                                                      | The principal the turn is billed and authorized as.                                       |
-| `userRegion`        | No       | [UserRegion](protocol.md#userregion)                                          | Coarse regional preferences, never authorization or precise location.                     |
-| `uploadedSources`   | No       | Array of `string`                                                             |                                                                                           |
+| Field               | Required | Type                                                                          | Description                                                                                   |
+| ------------------- | -------- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `agentId`           | No       | `string`                                                                      |                                                                                               |
+| `attachments`       | No       | Array of [InboundAttachment](protocol.md#inboundattachment)                   | User-authored image, video, document, and text blocks, in display order.                      |
+| `conversationId`    | No       | `string`                                                                      | Continues an existing conversation.                                                           |
+| `cwd`               | No       | `string`                                                                      | Where tools operate.                                                                          |
+| `message`           | Yes      | `string`                                                                      | User text; may be blank when at least one attachment contains content.                        |
+| `modelReview`       | No       | `boolean`                                                                     | Optional AI completion audit for this turn; local execution checks always remain enabled.     |
+| `reasoningEffort`   | No       | `"high"` / `"low"` / `"max"` / `"medium"` / `"minimal"` / `"off"` / `"xhigh"` | Per-turn reasoning preference; never changes the saved agent configuration.                   |
+| `responseFormat`    | No       | `"json"` / `"text"`                                                           | Final answer format; JSON mode does not disable tools or verification.                        |
+| `targetTimeSeconds` | No       | `integer`                                                                     | Soft task time target in seconds; never a cancellation deadline.                              |
+| `userId`            | No       | `string`                                                                      | The principal the turn is billed and authorized as.                                           |
+| `userRegion`        | No       | [UserRegion](protocol.md#userregion)                                          | Coarse regional preferences, never authorization or precise location.                         |
+| `uploadedSources`   | No       | Array of `string`                                                             |                                                                                               |
+| `model`             | No       | [ChatModelSelection](protocol.md#chatmodelselection)                          | A model the user connected with their own key or subscription; absent selects the Nexa model. |
 
 ## AskResult
 
@@ -7842,8 +7843,6 @@ Configurable bounds on gateway-owned work and memory.
 | `workflows.runs.agent.control`       | Yes      | Object (fields below) |                                                                                                        |
 | `workflows.runs.agent.input`         | Yes      | Object (fields below) |                                                                                                        |
 | `workflows.runs.agent.read`          | Yes      | Object (fields below) |                                                                                                        |
-| `workflows.runs.applications.check`  | Yes      | Object (fields below) |                                                                                                        |
-| `workflows.runs.applications.setup`  | Yes      | Object (fields below) |                                                                                                        |
 | `workflows.runs.approval.decide`     | Yes      | Object (fields below) |                                                                                                        |
 | `workflows.runs.artifact`            | Yes      | Object (fields below) |                                                                                                        |
 | `workflows.runs.artifacts`           | Yes      | Object (fields below) |                                                                                                        |
@@ -7902,6 +7901,12 @@ Configurable bounds on gateway-owned work and memory.
 | `agent.profiles.update`              | Yes      | Object (fields below) | Replace editable profile settings at an exact revision.                                                |
 | `agent.profiles.delete`              | Yes      | Object (fields below) | Delete one private profile at an exact revision.                                                       |
 | `agent.profiles.upgrade`             | Yes      | Object (fields below) | Explicitly import preserved saved agent profiles under live owner authorization.                       |
+| `connections.applications.check`     | Yes      | Object (fields below) | `connections.applications.check` contract.                                                             |
+| `connections.applications.setup`     | Yes      | Object (fields below) | `connections.applications.setup` contract.                                                             |
+| `connections.tools.status`           | Yes      | Object (fields below) | `connections.tools.status` contract.                                                                   |
+| `connections.tools.install`          | Yes      | Object (fields below) | `connections.tools.install` contract.                                                                  |
+| `connections.tools.remove`           | Yes      | Object (fields below) | `connections.tools.remove` contract.                                                                   |
+| `connections.models.list`            | Yes      | Object (fields below) | `connections.models.list` contract.                                                                    |
 
 **accounts.create**
 
@@ -9419,20 +9424,6 @@ Configurable bounds on gateway-owned work and memory.
 | `params` | Yes      | [WorkflowAgentSessionRequest](protocol.md#workflowagentsessionrequest) |             |
 | `result` | Yes      | [WorkflowAgentSession](protocol.md#workflowagentsession)               |             |
 
-**workflows.runs.applications.check**
-
-| Field    | Required | Type                                                                        | Description |
-| -------- | -------- | --------------------------------------------------------------------------- | ----------- |
-| `params` | Yes      | [WorkflowApplicationRequest](protocol.md#workflowapplicationrequest)        |             |
-| `result` | Yes      | Array of [WorkflowApplicationStatus](protocol.md#workflowapplicationstatus) |             |
-
-**workflows.runs.applications.setup**
-
-| Field    | Required | Type                                                                           | Description |
-| -------- | -------- | ------------------------------------------------------------------------------ | ----------- |
-| `params` | Yes      | [WorkflowApplicationSetupRequest](protocol.md#workflowapplicationsetuprequest) |             |
-| `result` | Yes      | [WorkflowTerminalSnapshot](protocol.md#workflowterminalsnapshot)               |             |
-
 **workflows.runs.approval.decide**
 
 | Field    | Required | Type                                                             | Description |
@@ -9838,6 +9829,48 @@ Configurable bounds on gateway-owned work and memory.
 | -------- | -------- | ------------------------------------------------------------------ | ----------- |
 | `params` | Yes      | [AgentProfileUpgradeParams](protocol.md#agentprofileupgradeparams) |             |
 | `result` | Yes      | [AgentProfilesResult](protocol.md#agentprofilesresult)             |             |
+
+**connections.applications.check**
+
+| Field    | Required | Type                                                                 | Description |
+| -------- | -------- | -------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [Recordstringnever](protocol.md#recordstringnever)                   |             |
+| `result` | Yes      | [ConnectionApplicationsPage](protocol.md#connectionapplicationspage) |             |
+
+**connections.applications.setup**
+
+| Field    | Required | Type                                                                               | Description |
+| -------- | -------- | ---------------------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ConnectionApplicationSetupRequest](protocol.md#connectionapplicationsetuprequest) |             |
+| `result` | Yes      | [WorkflowTerminalSnapshot](protocol.md#workflowterminalsnapshot)                   |             |
+
+**connections.tools.status**
+
+| Field    | Required | Type                                               | Description |
+| -------- | -------- | -------------------------------------------------- | ----------- |
+| `params` | Yes      | [Recordstringnever](protocol.md#recordstringnever) |             |
+| `result` | Yes      | [LicensedToolsPage](protocol.md#licensedtoolspage) |             |
+
+**connections.tools.install**
+
+| Field    | Required | Type                                                   | Description |
+| -------- | -------- | ------------------------------------------------------ | ----------- |
+| `params` | Yes      | [LicensedToolRequest](protocol.md#licensedtoolrequest) |             |
+| `result` | Yes      | [LicensedToolStatus](protocol.md#licensedtoolstatus)   |             |
+
+**connections.tools.remove**
+
+| Field    | Required | Type                                                   | Description |
+| -------- | -------- | ------------------------------------------------------ | ----------- |
+| `params` | Yes      | [LicensedToolRequest](protocol.md#licensedtoolrequest) |             |
+| `result` | Yes      | [LicensedToolStatus](protocol.md#licensedtoolstatus)   |             |
+
+**connections.models.list**
+
+| Field    | Required | Type                                               | Description |
+| -------- | -------- | -------------------------------------------------- | ----------- |
+| `params` | Yes      | [Recordstringnever](protocol.md#recordstringnever) |             |
+| `result` | Yes      | [ChatModelsPage](protocol.md#chatmodelspage)       |             |
 
 ## GeometryFormat
 
@@ -12971,21 +13004,22 @@ The acknowledgement of a streaming run.
 
 What one turn is asked for, when the client wants its events streamed.
 
-| Field               | Required | Type                                                                          | Description                                                                               |
-| ------------------- | -------- | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| `agentId`           | No       | `string`                                                                      |                                                                                           |
-| `attachments`       | No       | Array of [InboundAttachment](protocol.md#inboundattachment)                   | User-authored image, video, document, and text blocks, in display order.                  |
-| `conversationId`    | No       | `string`                                                                      | Continues an existing conversation.                                                       |
-| `cwd`               | No       | `string`                                                                      | Where tools operate.                                                                      |
-| `message`           | Yes      | `string`                                                                      | User text; may be blank when at least one attachment contains content.                    |
-| `modelReview`       | No       | `boolean`                                                                     | Optional AI completion audit for this turn; local execution checks always remain enabled. |
-| `reasoningEffort`   | No       | `"high"` / `"low"` / `"max"` / `"medium"` / `"minimal"` / `"off"` / `"xhigh"` | Per-turn reasoning preference; never changes the saved agent configuration.               |
-| `responseFormat`    | No       | `"json"` / `"text"`                                                           | Final answer format; JSON mode does not disable tools or verification.                    |
-| `streamId`          | No       | `string`                                                                      | The stream's id, chosen by the CLIENT.                                                    |
-| `targetTimeSeconds` | No       | `integer`                                                                     | Soft task time target in seconds; never a cancellation deadline.                          |
-| `userId`            | No       | `string`                                                                      | The principal the turn is billed and authorized as.                                       |
-| `userRegion`        | No       | [UserRegion](protocol.md#userregion)                                          | Coarse regional preferences, never authorization or precise location.                     |
-| `uploadedSources`   | No       | Array of `string`                                                             |                                                                                           |
+| Field               | Required | Type                                                                          | Description                                                                                   |
+| ------------------- | -------- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `agentId`           | No       | `string`                                                                      |                                                                                               |
+| `attachments`       | No       | Array of [InboundAttachment](protocol.md#inboundattachment)                   | User-authored image, video, document, and text blocks, in display order.                      |
+| `conversationId`    | No       | `string`                                                                      | Continues an existing conversation.                                                           |
+| `cwd`               | No       | `string`                                                                      | Where tools operate.                                                                          |
+| `message`           | Yes      | `string`                                                                      | User text; may be blank when at least one attachment contains content.                        |
+| `modelReview`       | No       | `boolean`                                                                     | Optional AI completion audit for this turn; local execution checks always remain enabled.     |
+| `reasoningEffort`   | No       | `"high"` / `"low"` / `"max"` / `"medium"` / `"minimal"` / `"off"` / `"xhigh"` | Per-turn reasoning preference; never changes the saved agent configuration.                   |
+| `responseFormat`    | No       | `"json"` / `"text"`                                                           | Final answer format; JSON mode does not disable tools or verification.                        |
+| `streamId`          | No       | `string`                                                                      | The stream's id, chosen by the CLIENT.                                                        |
+| `targetTimeSeconds` | No       | `integer`                                                                     | Soft task time target in seconds; never a cancellation deadline.                              |
+| `userId`            | No       | `string`                                                                      | The principal the turn is billed and authorized as.                                           |
+| `userRegion`        | No       | [UserRegion](protocol.md#userregion)                                          | Coarse regional preferences, never authorization or precise location.                         |
+| `uploadedSources`   | No       | Array of `string`                                                             |                                                                                               |
+| `model`             | No       | [ChatModelSelection](protocol.md#chatmodelselection)                          | A model the user connected with their own key or subscription; absent selects the Nexa model. |
 
 ## TaskRecord
 
@@ -14164,22 +14198,6 @@ Type: `"boolean"` / `"choice"` / `"text"`.
 ## WorkflowApplication
 
 Type: `"claude-code"` / `"codex"` / `"grok-build"` / `"mistral-vibe"` / `"nerva-code"`.
-
-## WorkflowApplicationRequest
-
-| Field        | Required | Type     | Description |
-| ------------ | -------- | -------- | ----------- |
-| `revision`   | Yes      | `string` |             |
-| `workflowId` | Yes      | `string` |             |
-
-## WorkflowApplicationSetupRequest
-
-| Field         | Required | Type                                                   | Description |
-| ------------- | -------- | ------------------------------------------------------ | ----------- |
-| `application` | Yes      | [WorkflowApplication](protocol.md#workflowapplication) |             |
-| `revision`    | Yes      | `string`                                               |             |
-| `sessionId`   | Yes      | `string`                                               |             |
-| `workflowId`  | Yes      | `string`                                               |             |
 
 ## WorkflowApplicationStatus
 
@@ -16524,3 +16542,144 @@ Explicitly imports saved profiles at the account's current directory revision.
 | Field                       | Required | Type     | Description |
 | --------------------------- | -------- | -------- | ----------- |
 | `expectedDirectoryRevision` | Yes      | `string` |             |
+
+## ChatModelChoice
+
+One selectable chat model backed by the user's own key or subscription.
+
+| Field          | Required | Type                                           | Description                                                        |
+| -------------- | -------- | ---------------------------------------------- | ------------------------------------------------------------------ |
+| `model`        | Yes      | `string`                                       |                                                                    |
+| `name`         | Yes      | `string`                                       |                                                                    |
+| `provider`     | Yes      | `string`                                       | Provider id for API keys, or the application id for subscriptions. |
+| `providerName` | Yes      | `string`                                       |                                                                    |
+| `source`       | Yes      | [ChatModelSource](protocol.md#chatmodelsource) |                                                                    |
+
+## ChatModelSelection
+
+A user-connected chat model. Absent means the deployment's own Nexa model.
+
+| Field      | Required | Type                                           | Description                                                        |
+| ---------- | -------- | ---------------------------------------------- | ------------------------------------------------------------------ |
+| `model`    | Yes      | `string`                                       |                                                                    |
+| `provider` | Yes      | `string`                                       | Provider id for API keys, or the application id for subscriptions. |
+| `source`   | Yes      | [ChatModelSource](protocol.md#chatmodelsource) |                                                                    |
+
+## ChatModelSource
+
+Who runs a chat model the user selected.
+
+Type: `"api-key"` / `"subscription"`.
+
+## ChatModelsPage
+
+Chat models the authenticated account has connected.
+
+| Field   | Required | Type                                                    | Description |
+| ------- | -------- | ------------------------------------------------------- | ----------- |
+| `items` | Yes      | Array of [ChatModelChoice](protocol.md#chatmodelchoice) |             |
+
+## ConnectionApplicationSetupRequest
+
+Opens the application's own login flow in a terminal on the user's VM.
+
+| Field         | Required | Type                                                   | Description |
+| ------------- | -------- | ------------------------------------------------------ | ----------- |
+| `application` | Yes      | [WorkflowApplication](protocol.md#workflowapplication) |             |
+| `sessionId`   | Yes      | `string`                                               |             |
+
+## ConnectionApplicationsPage
+
+Account-level sign-in state of every subscription application on the user's VM.
+
+| Field          | Required | Type                                                                        | Description |
+| -------------- | -------- | --------------------------------------------------------------------------- | ----------- |
+| `applications` | Yes      | Array of [WorkflowApplicationStatus](protocol.md#workflowapplicationstatus) |             |
+
+## LicensedToolRequest
+
+Names one licensed tool on the authenticated account's VM.
+
+| Field  | Required | Type        | Description                                                                          |
+| ------ | -------- | ----------- | ------------------------------------------------------------------------------------ |
+| `tool` | Yes      | `"ida-pro"` | Licensed desktop software a user links once and Nexa installs on that user's own VM. |
+
+## LicensedToolState
+
+Where a licensed tool stands on the authenticated account's VM.
+
+Type: `"failed"` / `"installed"` / `"installing"` / `"not-connected"` / `"not-installed"` / `"outdated"` / `"unavailable"`.
+
+## LicensedToolStatus
+
+Install state of one licensed tool. It never carries a license, key or vendor output.
+
+| Field     | Required | Type                                               | Description                                                                          |
+| --------- | -------- | -------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `detail`  | Yes      | `string`                                           | Bounded user-facing explanation of the current state.                                |
+| `edition` | Yes      | `null,string`                                      | Installed product family, or null before installation.                               |
+| `state`   | Yes      | [LicensedToolState](protocol.md#licensedtoolstate) |                                                                                      |
+| `title`   | Yes      | `string`                                           |                                                                                      |
+| `tool`    | Yes      | `"ida-pro"`                                        | Licensed desktop software a user links once and Nexa installs on that user's own VM. |
+
+## LicensedToolsPage
+
+Every licensed tool the deployment can install.
+
+| Field   | Required | Type                                                          | Description |
+| ------- | -------- | ------------------------------------------------------------- | ----------- |
+| `tools` | Yes      | Array of [LicensedToolStatus](protocol.md#licensedtoolstatus) |             |
+
+## ConnectionApplicationsCheckMethod
+
+`connections.applications.check` contract.
+
+| Field    | Required | Type                                                                 | Description |
+| -------- | -------- | -------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [Recordstringnever](protocol.md#recordstringnever)                   |             |
+| `result` | Yes      | [ConnectionApplicationsPage](protocol.md#connectionapplicationspage) |             |
+
+## ConnectionApplicationsSetupMethod
+
+`connections.applications.setup` contract.
+
+| Field    | Required | Type                                                                               | Description |
+| -------- | -------- | ---------------------------------------------------------------------------------- | ----------- |
+| `params` | Yes      | [ConnectionApplicationSetupRequest](protocol.md#connectionapplicationsetuprequest) |             |
+| `result` | Yes      | [WorkflowTerminalSnapshot](protocol.md#workflowterminalsnapshot)                   |             |
+
+## ConnectionToolsStatusMethod
+
+`connections.tools.status` contract.
+
+| Field    | Required | Type                                               | Description |
+| -------- | -------- | -------------------------------------------------- | ----------- |
+| `params` | Yes      | [Recordstringnever](protocol.md#recordstringnever) |             |
+| `result` | Yes      | [LicensedToolsPage](protocol.md#licensedtoolspage) |             |
+
+## ConnectionToolsInstallMethod
+
+`connections.tools.install` contract.
+
+| Field    | Required | Type                                                   | Description |
+| -------- | -------- | ------------------------------------------------------ | ----------- |
+| `params` | Yes      | [LicensedToolRequest](protocol.md#licensedtoolrequest) |             |
+| `result` | Yes      | [LicensedToolStatus](protocol.md#licensedtoolstatus)   |             |
+
+## ConnectionToolsRemoveMethod
+
+`connections.tools.remove` contract.
+
+| Field    | Required | Type                                                   | Description |
+| -------- | -------- | ------------------------------------------------------ | ----------- |
+| `params` | Yes      | [LicensedToolRequest](protocol.md#licensedtoolrequest) |             |
+| `result` | Yes      | [LicensedToolStatus](protocol.md#licensedtoolstatus)   |             |
+
+## ConnectionModelsListMethod
+
+`connections.models.list` contract.
+
+| Field    | Required | Type                                               | Description |
+| -------- | -------- | -------------------------------------------------- | ----------- |
+| `params` | Yes      | [Recordstringnever](protocol.md#recordstringnever) |             |
+| `result` | Yes      | [ChatModelsPage](protocol.md#chatmodelspage)       |             |

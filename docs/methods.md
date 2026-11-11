@@ -1,6 +1,6 @@
 # RPC reference
 
-All 267 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 266 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
+All 271 protocol methods. `connect` is managed by `NexaClient.connect`; the remaining 270 use `client.call(Method.Name, params)`. Examples are independent templates; replace identifiers and values before calling. Administrative and destructive methods change server state. Availability depends on the authenticated identity, scopes, and server policy.
 
 - [accounts.create](#accountscreate)
 - [accounts.list](#accountslist)
@@ -209,8 +209,6 @@ All 267 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [workflows.runs.agent.control](#workflowsrunsagentcontrol)
 - [workflows.runs.agent.input](#workflowsrunsagentinput)
 - [workflows.runs.agent.read](#workflowsrunsagentread)
-- [workflows.runs.applications.check](#workflowsrunsapplicationscheck)
-- [workflows.runs.applications.setup](#workflowsrunsapplicationssetup)
 - [workflows.runs.approval.decide](#workflowsrunsapprovaldecide)
 - [workflows.runs.artifact](#workflowsrunsartifact)
 - [workflows.runs.artifacts](#workflowsrunsartifacts)
@@ -269,6 +267,12 @@ All 267 protocol methods. `connect` is managed by `NexaClient.connect`; the rema
 - [agent.profiles.update](#agentprofilesupdate)
 - [agent.profiles.delete](#agentprofilesdelete)
 - [agent.profiles.upgrade](#agentprofilesupgrade)
+- [connections.applications.check](#connectionsapplicationscheck)
+- [connections.applications.setup](#connectionsapplicationssetup)
+- [connections.tools.status](#connectionstoolsstatus)
+- [connections.tools.install](#connectionstoolsinstall)
+- [connections.tools.remove](#connectionstoolsremove)
+- [connections.models.list](#connectionsmodelslist)
 
 ## accounts.create
 
@@ -370,20 +374,21 @@ With a personal API key, omit `userId`; the gateway uses the authenticated ident
 
 Parameters: [AskParams](protocol.md#askparams).
 
-| Field               | Required | Type                                                                          | Description                                                                               |
-| ------------------- | -------- | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| `agentId`           | No       | `string`                                                                      |                                                                                           |
-| `attachments`       | No       | Array of [InboundAttachment](protocol.md#inboundattachment)                   | User-authored image, video, document, and text blocks, in display order.                  |
-| `conversationId`    | No       | `string`                                                                      | Continues an existing conversation.                                                       |
-| `cwd`               | No       | `string`                                                                      | Where tools operate.                                                                      |
-| `message`           | Yes      | `string`                                                                      | User text; may be blank when at least one attachment contains content.                    |
-| `modelReview`       | No       | `boolean`                                                                     | Optional AI completion audit for this turn; local execution checks always remain enabled. |
-| `reasoningEffort`   | No       | `"high"` / `"low"` / `"max"` / `"medium"` / `"minimal"` / `"off"` / `"xhigh"` | Per-turn reasoning preference; never changes the saved agent configuration.               |
-| `responseFormat`    | No       | `"json"` / `"text"`                                                           | Final answer format; JSON mode does not disable tools or verification.                    |
-| `targetTimeSeconds` | No       | `integer`                                                                     | Soft task time target in seconds; never a cancellation deadline.                          |
-| `userId`            | No       | `string`                                                                      | The principal the turn is billed and authorized as.                                       |
-| `userRegion`        | No       | [UserRegion](protocol.md#userregion)                                          | Coarse regional preferences, never authorization or precise location.                     |
-| `uploadedSources`   | No       | Array of `string`                                                             |                                                                                           |
+| Field               | Required | Type                                                                          | Description                                                                                   |
+| ------------------- | -------- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `agentId`           | No       | `string`                                                                      |                                                                                               |
+| `attachments`       | No       | Array of [InboundAttachment](protocol.md#inboundattachment)                   | User-authored image, video, document, and text blocks, in display order.                      |
+| `conversationId`    | No       | `string`                                                                      | Continues an existing conversation.                                                           |
+| `cwd`               | No       | `string`                                                                      | Where tools operate.                                                                          |
+| `message`           | Yes      | `string`                                                                      | User text; may be blank when at least one attachment contains content.                        |
+| `modelReview`       | No       | `boolean`                                                                     | Optional AI completion audit for this turn; local execution checks always remain enabled.     |
+| `reasoningEffort`   | No       | `"high"` / `"low"` / `"max"` / `"medium"` / `"minimal"` / `"off"` / `"xhigh"` | Per-turn reasoning preference; never changes the saved agent configuration.                   |
+| `responseFormat`    | No       | `"json"` / `"text"`                                                           | Final answer format; JSON mode does not disable tools or verification.                        |
+| `targetTimeSeconds` | No       | `integer`                                                                     | Soft task time target in seconds; never a cancellation deadline.                              |
+| `userId`            | No       | `string`                                                                      | The principal the turn is billed and authorized as.                                           |
+| `userRegion`        | No       | [UserRegion](protocol.md#userregion)                                          | Coarse regional preferences, never authorization or precise location.                         |
+| `uploadedSources`   | No       | Array of `string`                                                             |                                                                                               |
+| `model`             | No       | [ChatModelSelection](protocol.md#chatmodelselection)                          | A model the user connected with their own key or subscription; absent selects the Nexa model. |
 
 Result: [AskResult](protocol.md#askresult).
 
@@ -423,21 +428,22 @@ With a personal API key, omit `userId`; the gateway uses the authenticated ident
 
 Parameters: [StreamParams](protocol.md#streamparams).
 
-| Field               | Required | Type                                                                          | Description                                                                               |
-| ------------------- | -------- | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| `agentId`           | No       | `string`                                                                      |                                                                                           |
-| `attachments`       | No       | Array of [InboundAttachment](protocol.md#inboundattachment)                   | User-authored image, video, document, and text blocks, in display order.                  |
-| `conversationId`    | No       | `string`                                                                      | Continues an existing conversation.                                                       |
-| `cwd`               | No       | `string`                                                                      | Where tools operate.                                                                      |
-| `message`           | Yes      | `string`                                                                      | User text; may be blank when at least one attachment contains content.                    |
-| `modelReview`       | No       | `boolean`                                                                     | Optional AI completion audit for this turn; local execution checks always remain enabled. |
-| `reasoningEffort`   | No       | `"high"` / `"low"` / `"max"` / `"medium"` / `"minimal"` / `"off"` / `"xhigh"` | Per-turn reasoning preference; never changes the saved agent configuration.               |
-| `responseFormat`    | No       | `"json"` / `"text"`                                                           | Final answer format; JSON mode does not disable tools or verification.                    |
-| `streamId`          | No       | `string`                                                                      | The stream's id, chosen by the CLIENT.                                                    |
-| `targetTimeSeconds` | No       | `integer`                                                                     | Soft task time target in seconds; never a cancellation deadline.                          |
-| `userId`            | No       | `string`                                                                      | The principal the turn is billed and authorized as.                                       |
-| `userRegion`        | No       | [UserRegion](protocol.md#userregion)                                          | Coarse regional preferences, never authorization or precise location.                     |
-| `uploadedSources`   | No       | Array of `string`                                                             |                                                                                           |
+| Field               | Required | Type                                                                          | Description                                                                                   |
+| ------------------- | -------- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `agentId`           | No       | `string`                                                                      |                                                                                               |
+| `attachments`       | No       | Array of [InboundAttachment](protocol.md#inboundattachment)                   | User-authored image, video, document, and text blocks, in display order.                      |
+| `conversationId`    | No       | `string`                                                                      | Continues an existing conversation.                                                           |
+| `cwd`               | No       | `string`                                                                      | Where tools operate.                                                                          |
+| `message`           | Yes      | `string`                                                                      | User text; may be blank when at least one attachment contains content.                        |
+| `modelReview`       | No       | `boolean`                                                                     | Optional AI completion audit for this turn; local execution checks always remain enabled.     |
+| `reasoningEffort`   | No       | `"high"` / `"low"` / `"max"` / `"medium"` / `"minimal"` / `"off"` / `"xhigh"` | Per-turn reasoning preference; never changes the saved agent configuration.                   |
+| `responseFormat`    | No       | `"json"` / `"text"`                                                           | Final answer format; JSON mode does not disable tools or verification.                        |
+| `streamId`          | No       | `string`                                                                      | The stream's id, chosen by the CLIENT.                                                        |
+| `targetTimeSeconds` | No       | `integer`                                                                     | Soft task time target in seconds; never a cancellation deadline.                              |
+| `userId`            | No       | `string`                                                                      | The principal the turn is billed and authorized as.                                           |
+| `userRegion`        | No       | [UserRegion](protocol.md#userregion)                                          | Coarse regional preferences, never authorization or precise location.                         |
+| `uploadedSources`   | No       | Array of `string`                                                             |                                                                                               |
+| `model`             | No       | [ChatModelSelection](protocol.md#chatmodelselection)                          | A model the user connected with their own key or subscription; absent selects the Nexa model. |
 
 Result: [StreamAccepted](protocol.md#streamaccepted).
 
@@ -5554,58 +5560,6 @@ Parameters: [WorkflowAgentSessionRequest](protocol.md#workflowagentsessionreques
 
 Result: [WorkflowAgentSession](protocol.md#workflowagentsession).
 
-## workflows.runs.applications.check
-
-```ts
-import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
-
-const params: ParamsOf<typeof Method.WorkflowsRunsApplicationsCheck> = {
-    revision: 'YOUR_REVISION',
-    workflowId: 'YOUR_WORKFLOWID',
-};
-const result: ResultOf<typeof Method.WorkflowsRunsApplicationsCheck> = await client.call(
-    Method.WorkflowsRunsApplicationsCheck,
-    params,
-);
-```
-
-Parameters: [WorkflowApplicationRequest](protocol.md#workflowapplicationrequest).
-
-| Field        | Required | Type     | Description |
-| ------------ | -------- | -------- | ----------- |
-| `revision`   | Yes      | `string` |             |
-| `workflowId` | Yes      | `string` |             |
-
-Result: Array of [WorkflowApplicationStatus](protocol.md#workflowapplicationstatus).
-
-## workflows.runs.applications.setup
-
-```ts
-import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
-
-const params: ParamsOf<typeof Method.WorkflowsRunsApplicationsSetup> = {
-    application: 'claude-code',
-    revision: 'YOUR_REVISION',
-    sessionId: 'YOUR_SESSIONID',
-    workflowId: 'YOUR_WORKFLOWID',
-};
-const result: ResultOf<typeof Method.WorkflowsRunsApplicationsSetup> = await client.call(
-    Method.WorkflowsRunsApplicationsSetup,
-    params,
-);
-```
-
-Parameters: [WorkflowApplicationSetupRequest](protocol.md#workflowapplicationsetuprequest).
-
-| Field         | Required | Type                                                   | Description |
-| ------------- | -------- | ------------------------------------------------------ | ----------- |
-| `application` | Yes      | [WorkflowApplication](protocol.md#workflowapplication) |             |
-| `revision`    | Yes      | `string`                                               |             |
-| `sessionId`   | Yes      | `string`                                               |             |
-| `workflowId`  | Yes      | `string`                                               |             |
-
-Result: [WorkflowTerminalSnapshot](protocol.md#workflowterminalsnapshot).
-
 ## workflows.runs.approval.decide
 
 ```ts
@@ -7138,3 +7092,125 @@ Parameters: [AgentProfileUpgradeParams](protocol.md#agentprofileupgradeparams).
 | `expectedDirectoryRevision` | Yes      | `string` |             |
 
 Result: [AgentProfilesResult](protocol.md#agentprofilesresult).
+
+## connections.applications.check
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ConnectionsApplicationsCheck> = {};
+const result: ResultOf<typeof Method.ConnectionsApplicationsCheck> = await client.call(
+    Method.ConnectionsApplicationsCheck,
+    params,
+);
+```
+
+Parameters: [Recordstringnever](protocol.md#recordstringnever).
+
+Type: Dictionary.
+
+Result: [ConnectionApplicationsPage](protocol.md#connectionapplicationspage).
+
+## connections.applications.setup
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ConnectionsApplicationsSetup> = {
+    application: 'claude-code',
+    sessionId: 'YOUR_SESSIONID',
+};
+const result: ResultOf<typeof Method.ConnectionsApplicationsSetup> = await client.call(
+    Method.ConnectionsApplicationsSetup,
+    params,
+);
+```
+
+Parameters: [ConnectionApplicationSetupRequest](protocol.md#connectionapplicationsetuprequest).
+
+| Field         | Required | Type                                                   | Description |
+| ------------- | -------- | ------------------------------------------------------ | ----------- |
+| `application` | Yes      | [WorkflowApplication](protocol.md#workflowapplication) |             |
+| `sessionId`   | Yes      | `string`                                               |             |
+
+Result: [WorkflowTerminalSnapshot](protocol.md#workflowterminalsnapshot).
+
+## connections.tools.status
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ConnectionsToolsStatus> = {};
+const result: ResultOf<typeof Method.ConnectionsToolsStatus> = await client.call(
+    Method.ConnectionsToolsStatus,
+    params,
+);
+```
+
+Parameters: [Recordstringnever](protocol.md#recordstringnever).
+
+Type: Dictionary.
+
+Result: [LicensedToolsPage](protocol.md#licensedtoolspage).
+
+## connections.tools.install
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ConnectionsToolsInstall> = {
+    tool: 'ida-pro',
+};
+const result: ResultOf<typeof Method.ConnectionsToolsInstall> = await client.call(
+    Method.ConnectionsToolsInstall,
+    params,
+);
+```
+
+Parameters: [LicensedToolRequest](protocol.md#licensedtoolrequest).
+
+| Field  | Required | Type        | Description                                                                          |
+| ------ | -------- | ----------- | ------------------------------------------------------------------------------------ |
+| `tool` | Yes      | `"ida-pro"` | Licensed desktop software a user links once and Nexa installs on that user's own VM. |
+
+Result: [LicensedToolStatus](protocol.md#licensedtoolstatus).
+
+## connections.tools.remove
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ConnectionsToolsRemove> = {
+    tool: 'ida-pro',
+};
+const result: ResultOf<typeof Method.ConnectionsToolsRemove> = await client.call(
+    Method.ConnectionsToolsRemove,
+    params,
+);
+```
+
+Parameters: [LicensedToolRequest](protocol.md#licensedtoolrequest).
+
+| Field  | Required | Type        | Description                                                                          |
+| ------ | -------- | ----------- | ------------------------------------------------------------------------------------ |
+| `tool` | Yes      | `"ida-pro"` | Licensed desktop software a user links once and Nexa installs on that user's own VM. |
+
+Result: [LicensedToolStatus](protocol.md#licensedtoolstatus).
+
+## connections.models.list
+
+```ts
+import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+
+const params: ParamsOf<typeof Method.ConnectionsModelsList> = {};
+const result: ResultOf<typeof Method.ConnectionsModelsList> = await client.call(
+    Method.ConnectionsModelsList,
+    params,
+);
+```
+
+Parameters: [Recordstringnever](protocol.md#recordstringnever).
+
+Type: Dictionary.
+
+Result: [ChatModelsPage](protocol.md#chatmodelspage).

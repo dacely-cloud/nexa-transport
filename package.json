@@ -1,6 +1,6 @@
 {
     "name": "nexa-transport",
-    "version": "0.1.0-agent-profiles.2",
+    "version": "0.1.0-vm-connections.1",
     "description": "Typed Nexa websocket gateway client for browsers and Node.js",
     "type": "module",
     "license": "Apache-2.0",
@@ -373,6 +373,10 @@
         "./workflow-terminal-types": {
             "types": "./dist/workflows/terminal/TerminalTypes.d.ts",
             "import": "./dist/workflow-terminal-types.js"
+        },
+        "./vm-connections": {
+            "types": "./dist/connections/ConnectionTypes.d.ts",
+            "import": "./dist/vm-connections.js"
         },
         "./workflow-model-effort": {
             "types": "./dist/workflows/ModelEffort.d.ts",

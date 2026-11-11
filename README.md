@@ -50,6 +50,7 @@ Chat, tools, media, artifacts, and voice through the Nexa gateway.
 - [Protocol types](./docs/protocol.md): every payload field and union variant.
 - [Workflows](./docs/workflows.md): capability checks, drafts, deletion, runs, models, templates, HTTP requests, terminal agents, and usage.
 - [Workflow resources](./docs/workflow-resources.md) and [schedules](./docs/workflow-schedules.md): bindings, groups, immutable publications, and timed execution.
+- [VM connections](./docs/vm-connections.md): licensed tools installed on the user's VM, subscription sign-in, and connected chat models.
 - [Saved browser evidence](./docs/reverse-browser-webmcp.md): passive WebMCP declarations and links to source, module, storage, structure, and screenshot reads.
 - [Steering](./docs/steering.md) and [streaming voice](./docs/streaming-voice.md): active-turn corrections and microphone transcripts.
 

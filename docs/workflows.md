@@ -239,8 +239,9 @@ commands for the terminal components in the Agents category:
 
 These operate the real application in the owner's workspace. Mistral Vibe uses
 `vibe --setup` for setup and is separate from the Mistral model/API-key component.
-Check/install/login through negotiated `WorkflowsRunsApplicationsCheck` and
-`WorkflowsRunsApplicationsSetup`; inspect/control a specific invocation through
+Sign-in is account-wide rather than per workflow: check and log in through
+`ConnectionsApplicationsCheck` and `ConnectionsApplicationsSetup` (see
+[VM connections](vm-connections.md)); inspect/control a specific invocation through
 `WorkflowsRunsTerminalRead` and `WorkflowsRunsTerminalCommand`. Local registry
 presence does not prove the executable or execution handler is installed on the
 connected host. Workflow JSON cannot choose arbitrary host executables or login

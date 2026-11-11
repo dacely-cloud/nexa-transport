@@ -183,6 +183,7 @@ const config: UserConfig = {
                 'workflow-application-models': 'src/workflows/terminal/ApplicationModels.ts',
                 'workflow-applications': 'src/workflows/terminal/Applications.ts',
                 'workflow-terminal-types': 'src/workflows/terminal/TerminalTypes.ts',
+                'vm-connections': 'src/connections/ConnectionTypes.ts',
                 'reverse-investigation': 'src/reverse/ReverseInvestigation.ts',
                 'workflow-planning-alignment': 'src/workflows/planning/PlanningAlignment.ts',
                 'workflow-planning-sources': 'src/workflows/planning/PlanningSources.ts',

@@ -677,6 +677,8 @@ export interface AskParamsShape {
     readonly userRegion?: UserRegion;
     /** uploadedSources as defined by the Nexa gateway. */
     readonly uploadedSources?: ReadonlyArray<string>;
+    /** model as defined by the Nexa gateway. */
+    readonly model?: ChatModelSelection;
 }
 
 /** AskParams from the Nexa wire protocol. */
@@ -12130,22 +12132,6 @@ export interface GatewayMethodsworkflows_runs_agent_readShape {
     readonly result: WorkflowAgentSession;
 }
 
-/** GatewayMethodsworkflows_runs_applications_check wire fields. */
-export interface GatewayMethodsworkflows_runs_applications_checkShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: WorkflowApplicationRequest;
-    /** result as defined by the Nexa gateway. */
-    readonly result: ReadonlyArray<WorkflowApplicationStatus>;
-}
-
-/** GatewayMethodsworkflows_runs_applications_setup wire fields. */
-export interface GatewayMethodsworkflows_runs_applications_setupShape {
-    /** params as defined by the Nexa gateway. */
-    readonly params: WorkflowApplicationSetupRequest;
-    /** result as defined by the Nexa gateway. */
-    readonly result: WorkflowTerminalSnapshot;
-}
-
 /** GatewayMethodsworkflows_runs_approval_decide wire fields. */
 export interface GatewayMethodsworkflows_runs_approval_decideShape {
     /** params as defined by the Nexa gateway. */
@@ -12610,6 +12596,54 @@ export interface GatewayMethodsagent_profiles_upgradeShape {
     readonly result: AgentProfilesResult;
 }
 
+/** GatewayMethodsconnections_applications_check wire fields. */
+export interface GatewayMethodsconnections_applications_checkShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: Recordstringnever;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConnectionApplicationsPage;
+}
+
+/** GatewayMethodsconnections_applications_setup wire fields. */
+export interface GatewayMethodsconnections_applications_setupShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConnectionApplicationSetupRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WorkflowTerminalSnapshot;
+}
+
+/** GatewayMethodsconnections_tools_status wire fields. */
+export interface GatewayMethodsconnections_tools_statusShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: Recordstringnever;
+    /** result as defined by the Nexa gateway. */
+    readonly result: LicensedToolsPage;
+}
+
+/** GatewayMethodsconnections_tools_install wire fields. */
+export interface GatewayMethodsconnections_tools_installShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: LicensedToolRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: LicensedToolStatus;
+}
+
+/** GatewayMethodsconnections_tools_remove wire fields. */
+export interface GatewayMethodsconnections_tools_removeShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: LicensedToolRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: LicensedToolStatus;
+}
+
+/** GatewayMethodsconnections_models_list wire fields. */
+export interface GatewayMethodsconnections_models_listShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: Recordstringnever;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ChatModelsPage;
+}
+
 /** GatewayMethods wire fields. */
 export interface GatewayMethodsShape {
     /** accounts.create as defined by the Nexa gateway. */
@@ -13026,10 +13060,6 @@ export interface GatewayMethodsShape {
     readonly 'workflows.runs.agent.input': GatewayMethodsworkflows_runs_agent_inputShape;
     /** workflows.runs.agent.read as defined by the Nexa gateway. */
     readonly 'workflows.runs.agent.read': GatewayMethodsworkflows_runs_agent_readShape;
-    /** workflows.runs.applications.check as defined by the Nexa gateway. */
-    readonly 'workflows.runs.applications.check': GatewayMethodsworkflows_runs_applications_checkShape;
-    /** workflows.runs.applications.setup as defined by the Nexa gateway. */
-    readonly 'workflows.runs.applications.setup': GatewayMethodsworkflows_runs_applications_setupShape;
     /** workflows.runs.approval.decide as defined by the Nexa gateway. */
     readonly 'workflows.runs.approval.decide': GatewayMethodsworkflows_runs_approval_decideShape;
     /** workflows.runs.artifact as defined by the Nexa gateway. */
@@ -13146,6 +13176,18 @@ export interface GatewayMethodsShape {
     readonly 'agent.profiles.delete': GatewayMethodsagent_profiles_deleteShape;
     /** agent.profiles.upgrade as defined by the Nexa gateway. */
     readonly 'agent.profiles.upgrade': GatewayMethodsagent_profiles_upgradeShape;
+    /** connections.applications.check as defined by the Nexa gateway. */
+    readonly 'connections.applications.check': GatewayMethodsconnections_applications_checkShape;
+    /** connections.applications.setup as defined by the Nexa gateway. */
+    readonly 'connections.applications.setup': GatewayMethodsconnections_applications_setupShape;
+    /** connections.tools.status as defined by the Nexa gateway. */
+    readonly 'connections.tools.status': GatewayMethodsconnections_tools_statusShape;
+    /** connections.tools.install as defined by the Nexa gateway. */
+    readonly 'connections.tools.install': GatewayMethodsconnections_tools_installShape;
+    /** connections.tools.remove as defined by the Nexa gateway. */
+    readonly 'connections.tools.remove': GatewayMethodsconnections_tools_removeShape;
+    /** connections.models.list as defined by the Nexa gateway. */
+    readonly 'connections.models.list': GatewayMethodsconnections_models_listShape;
 }
 
 /** GatewayMethods from the Nexa wire protocol. */
@@ -17801,6 +17843,8 @@ export interface StreamParamsShape {
     readonly userRegion?: UserRegion;
     /** uploadedSources as defined by the Nexa gateway. */
     readonly uploadedSources?: ReadonlyArray<string>;
+    /** model as defined by the Nexa gateway. */
+    readonly model?: ChatModelSelection;
 }
 
 /** StreamParams from the Nexa wire protocol. */
@@ -19524,32 +19568,6 @@ export const WorkflowApplicationValues = {
 /** WorkflowApplication from the Nexa wire protocol. */
 export type WorkflowApplication =
     (typeof WorkflowApplicationValues)[keyof typeof WorkflowApplicationValues];
-
-/** WorkflowApplicationRequest wire fields. */
-export interface WorkflowApplicationRequestShape {
-    /** revision as defined by the Nexa gateway. */
-    readonly revision: string;
-    /** workflowId as defined by the Nexa gateway. */
-    readonly workflowId: string;
-}
-
-/** WorkflowApplicationRequest from the Nexa wire protocol. */
-export type WorkflowApplicationRequest = WorkflowApplicationRequestShape;
-
-/** WorkflowApplicationSetupRequest wire fields. */
-export interface WorkflowApplicationSetupRequestShape {
-    /** application as defined by the Nexa gateway. */
-    readonly application: WorkflowApplication;
-    /** revision as defined by the Nexa gateway. */
-    readonly revision: string;
-    /** sessionId as defined by the Nexa gateway. */
-    readonly sessionId: string;
-    /** workflowId as defined by the Nexa gateway. */
-    readonly workflowId: string;
-}
-
-/** WorkflowApplicationSetupRequest from the Nexa wire protocol. */
-export type WorkflowApplicationSetupRequest = WorkflowApplicationSetupRequestShape;
 
 /** WorkflowApplicationStatus wire fields. */
 export interface WorkflowApplicationStatusShape {
@@ -22947,6 +22965,187 @@ export interface AgentProfileUpgradeParamsShape {
 /** AgentProfileUpgradeParams from the Nexa wire protocol. */
 export type AgentProfileUpgradeParams = AgentProfileUpgradeParamsShape;
 
+/** ChatModelChoice wire fields. */
+export interface ChatModelChoiceShape {
+    /** model as defined by the Nexa gateway. */
+    readonly model: string;
+    /** name as defined by the Nexa gateway. */
+    readonly name: string;
+    /** provider as defined by the Nexa gateway. */
+    readonly provider: string;
+    /** providerName as defined by the Nexa gateway. */
+    readonly providerName: string;
+    /** source as defined by the Nexa gateway. */
+    readonly source: ChatModelSource;
+}
+
+/** ChatModelChoice from the Nexa wire protocol. */
+export type ChatModelChoice = ChatModelChoiceShape;
+
+/** ChatModelSelection wire fields. */
+export interface ChatModelSelectionShape {
+    /** model as defined by the Nexa gateway. */
+    readonly model: string;
+    /** provider as defined by the Nexa gateway. */
+    readonly provider: string;
+    /** source as defined by the Nexa gateway. */
+    readonly source: ChatModelSource;
+}
+
+/** ChatModelSelection from the Nexa wire protocol. */
+export type ChatModelSelection = ChatModelSelectionShape;
+
+/** Allowed values for ChatModelSource. */
+export const ChatModelSourceValues = { Value0: 'api-key', Value1: 'subscription' } as const;
+
+/** ChatModelSource from the Nexa wire protocol. */
+export type ChatModelSource = (typeof ChatModelSourceValues)[keyof typeof ChatModelSourceValues];
+
+/** ChatModelsPage wire fields. */
+export interface ChatModelsPageShape {
+    /** items as defined by the Nexa gateway. */
+    readonly items: ReadonlyArray<ChatModelChoice>;
+}
+
+/** ChatModelsPage from the Nexa wire protocol. */
+export type ChatModelsPage = ChatModelsPageShape;
+
+/** ConnectionApplicationSetupRequest wire fields. */
+export interface ConnectionApplicationSetupRequestShape {
+    /** application as defined by the Nexa gateway. */
+    readonly application: WorkflowApplication;
+    /** sessionId as defined by the Nexa gateway. */
+    readonly sessionId: string;
+}
+
+/** ConnectionApplicationSetupRequest from the Nexa wire protocol. */
+export type ConnectionApplicationSetupRequest = ConnectionApplicationSetupRequestShape;
+
+/** ConnectionApplicationsPage wire fields. */
+export interface ConnectionApplicationsPageShape {
+    /** applications as defined by the Nexa gateway. */
+    readonly applications: ReadonlyArray<WorkflowApplicationStatus>;
+}
+
+/** ConnectionApplicationsPage from the Nexa wire protocol. */
+export type ConnectionApplicationsPage = ConnectionApplicationsPageShape;
+
+/** LicensedToolRequest wire fields. */
+export interface LicensedToolRequestShape {
+    /** tool as defined by the Nexa gateway. */
+    readonly tool: 'ida-pro';
+}
+
+/** LicensedToolRequest from the Nexa wire protocol. */
+export type LicensedToolRequest = LicensedToolRequestShape;
+
+/** Allowed values for LicensedToolState. */
+export const LicensedToolStateValues = {
+    Value0: 'failed',
+    Value1: 'installed',
+    Value2: 'installing',
+    Value3: 'not-connected',
+    Value4: 'not-installed',
+    Value5: 'outdated',
+    Value6: 'unavailable',
+} as const;
+
+/** LicensedToolState from the Nexa wire protocol. */
+export type LicensedToolState =
+    (typeof LicensedToolStateValues)[keyof typeof LicensedToolStateValues];
+
+/** LicensedToolStatus wire fields. */
+export interface LicensedToolStatusShape {
+    /** detail as defined by the Nexa gateway. */
+    readonly detail: string;
+    /** edition as defined by the Nexa gateway. */
+    readonly edition: null | string;
+    /** state as defined by the Nexa gateway. */
+    readonly state: LicensedToolState;
+    /** title as defined by the Nexa gateway. */
+    readonly title: string;
+    /** tool as defined by the Nexa gateway. */
+    readonly tool: 'ida-pro';
+}
+
+/** LicensedToolStatus from the Nexa wire protocol. */
+export type LicensedToolStatus = LicensedToolStatusShape;
+
+/** LicensedToolsPage wire fields. */
+export interface LicensedToolsPageShape {
+    /** tools as defined by the Nexa gateway. */
+    readonly tools: ReadonlyArray<LicensedToolStatus>;
+}
+
+/** LicensedToolsPage from the Nexa wire protocol. */
+export type LicensedToolsPage = LicensedToolsPageShape;
+
+/** ConnectionApplicationsCheckMethod wire fields. */
+export interface ConnectionApplicationsCheckMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: Recordstringnever;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ConnectionApplicationsPage;
+}
+
+/** ConnectionApplicationsCheckMethod from the Nexa wire protocol. */
+export type ConnectionApplicationsCheckMethod = ConnectionApplicationsCheckMethodShape;
+
+/** ConnectionApplicationsSetupMethod wire fields. */
+export interface ConnectionApplicationsSetupMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: ConnectionApplicationSetupRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: WorkflowTerminalSnapshot;
+}
+
+/** ConnectionApplicationsSetupMethod from the Nexa wire protocol. */
+export type ConnectionApplicationsSetupMethod = ConnectionApplicationsSetupMethodShape;
+
+/** ConnectionToolsStatusMethod wire fields. */
+export interface ConnectionToolsStatusMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: Recordstringnever;
+    /** result as defined by the Nexa gateway. */
+    readonly result: LicensedToolsPage;
+}
+
+/** ConnectionToolsStatusMethod from the Nexa wire protocol. */
+export type ConnectionToolsStatusMethod = ConnectionToolsStatusMethodShape;
+
+/** ConnectionToolsInstallMethod wire fields. */
+export interface ConnectionToolsInstallMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: LicensedToolRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: LicensedToolStatus;
+}
+
+/** ConnectionToolsInstallMethod from the Nexa wire protocol. */
+export type ConnectionToolsInstallMethod = ConnectionToolsInstallMethodShape;
+
+/** ConnectionToolsRemoveMethod wire fields. */
+export interface ConnectionToolsRemoveMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: LicensedToolRequest;
+    /** result as defined by the Nexa gateway. */
+    readonly result: LicensedToolStatus;
+}
+
+/** ConnectionToolsRemoveMethod from the Nexa wire protocol. */
+export type ConnectionToolsRemoveMethod = ConnectionToolsRemoveMethodShape;
+
+/** ConnectionModelsListMethod wire fields. */
+export interface ConnectionModelsListMethodShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: Recordstringnever;
+    /** result as defined by the Nexa gateway. */
+    readonly result: ChatModelsPage;
+}
+
+/** ConnectionModelsListMethod from the Nexa wire protocol. */
+export type ConnectionModelsListMethod = ConnectionModelsListMethodShape;
+
 /** Supported RPC names. */
 export type MethodName = keyof GatewayMethods;
 /** Parameters for a particular RPC. */
@@ -23370,10 +23569,6 @@ export enum Method {
     WorkflowsRunsAgentInput = 'workflows.runs.agent.input',
     /** Calls workflows.runs.agent.read. */
     WorkflowsRunsAgentRead = 'workflows.runs.agent.read',
-    /** Calls workflows.runs.applications.check. */
-    WorkflowsRunsApplicationsCheck = 'workflows.runs.applications.check',
-    /** Calls workflows.runs.applications.setup. */
-    WorkflowsRunsApplicationsSetup = 'workflows.runs.applications.setup',
     /** Calls workflows.runs.approval.decide. */
     WorkflowsRunsApprovalDecide = 'workflows.runs.approval.decide',
     /** Calls workflows.runs.artifact. */
@@ -23490,4 +23685,16 @@ export enum Method {
     AgentProfilesDelete = 'agent.profiles.delete',
     /** Calls agent.profiles.upgrade. */
     AgentProfilesUpgrade = 'agent.profiles.upgrade',
+    /** Calls connections.applications.check. */
+    ConnectionsApplicationsCheck = 'connections.applications.check',
+    /** Calls connections.applications.setup. */
+    ConnectionsApplicationsSetup = 'connections.applications.setup',
+    /** Calls connections.tools.status. */
+    ConnectionsToolsStatus = 'connections.tools.status',
+    /** Calls connections.tools.install. */
+    ConnectionsToolsInstall = 'connections.tools.install',
+    /** Calls connections.tools.remove. */
+    ConnectionsToolsRemove = 'connections.tools.remove',
+    /** Calls connections.models.list. */
+    ConnectionsModelsList = 'connections.models.list',
 }
