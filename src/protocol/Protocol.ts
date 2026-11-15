@@ -22882,6 +22882,8 @@ export interface AgentProfileShape {
     readonly revision: string;
     /** tools as defined by the Nexa gateway. */
     readonly tools: ReadonlyArray<string> | null;
+    /** modelConnection as defined by the Nexa gateway. */
+    readonly modelConnection?: ChatModelSelection;
 }
 
 /** AgentProfile from the Nexa wire protocol. */
@@ -22901,6 +22903,8 @@ export interface AgentProfileInputShape {
     readonly provider: string;
     /** tools as defined by the Nexa gateway. */
     readonly tools: ReadonlyArray<string> | null;
+    /** modelConnection as defined by the Nexa gateway. */
+    readonly modelConnection?: ChatModelSelection;
 }
 
 /** AgentProfileInput from the Nexa wire protocol. */

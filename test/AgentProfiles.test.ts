@@ -4,7 +4,13 @@
 import { expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
 import { NexaClient } from '../src/networking/NexaClient.js';
-import { Method, type AgentProfile, type AgentProfileInput } from '../src/protocol/Protocol.js';
+import {
+    Method,
+    type AgentProfile,
+    type AgentProfileInput,
+    type AgentProfilesResult,
+    type ChatModelSelection,
+} from '../src/protocol/Protocol.js';
 import { TestGateway, type Request } from './Support.js';
 
 const input: AgentProfileInput = {
@@ -117,3 +123,42 @@ it('rejects malformed profile results before returning them to an application', 
         await gateway.close();
     }
 });
+
+it.each(['api-key', 'subscription'] as const)(
+    'round-trips saved %s agent connections without exposing credentials',
+    async (source: ChatModelSelection['source']): Promise<void> => {
+        const gateway: TestGateway = new TestGateway();
+        let client: NexaClient | null = null;
+        const connected: AgentProfileInput = {
+            ...input,
+            modelConnection: {
+                source,
+                provider: source === 'api-key' ? 'openai' : 'codex',
+                model: 'connected-model',
+            },
+        };
+        const saved: AgentProfile = { ...profile, ...connected };
+        gateway.handler = (socket: WebSocket, request: Request): void => {
+            expect(request.params).toMatchObject({ profile: connected });
+            socket.send(
+                JSON.stringify({
+                    id: request.id,
+                    ok: true,
+                    result: { directoryRevision, upgradeAvailable, profiles: [saved] },
+                }),
+            );
+        };
+        try {
+            client = await NexaClient.connect({ url: await gateway.url(), reconnect: false });
+            const result: AgentProfilesResult = await client.call(Method.AgentProfilesCreate, {
+                requestId,
+                expectedDirectoryRevision: directoryRevision,
+                profile: connected,
+            });
+            expect(result.profiles[0]?.modelConnection).toEqual(connected.modelConnection);
+        } finally {
+            client?.close();
+            await gateway.close();
+        }
+    },
+);

@@ -34738,6 +34738,11 @@ export const schema: Schema = {
                     description: 'Optional narrowing of the inherited tools.',
                     maxItems: 128,
                 },
+                modelConnection: {
+                    $ref: '#/definitions/ChatModelSelection',
+                    description:
+                        'An account-owned API key or subscription; absent inherits the current Chat model.',
+                },
             },
             required: [
                 'description',
@@ -34802,6 +34807,11 @@ export const schema: Schema = {
                     ],
                     description: 'Optional narrowing of the inherited tools.',
                     maxItems: 128,
+                },
+                modelConnection: {
+                    $ref: '#/definitions/ChatModelSelection',
+                    description:
+                        'An account-owned API key or subscription; absent inherits the current Chat model.',
                 },
             },
             required: ['description', 'instructions', 'model', 'name', 'provider', 'tools'],
