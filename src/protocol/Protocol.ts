@@ -22320,6 +22320,7 @@ export const ConnectorHostToolValues = {
     Value28: 'http_open',
     Value29: 'http_read',
     Value30: 'network_resolve',
+    Value31: 'environment_inspect',
 } as const;
 
 /** ConnectorHostTool from the Nexa wire protocol. */
