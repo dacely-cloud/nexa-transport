@@ -757,7 +757,7 @@
         "docs": "node script/document.mjs && prettier --write \"docs/**/*.md\"",
         "docs:check": "node script/check-docs.mjs",
         "generate:roblox": "node script/roblox.ts",
-        "check:circular": "madge --circular --strict ."
+        "check:circular": "madge --circular --strict src test examples"
     },
     "devDependencies": {
         "@types/fontkit": "2.0.9",
