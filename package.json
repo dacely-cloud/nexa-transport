@@ -794,7 +794,7 @@
         "meshoptimizer": "^1.2.0",
         "pathkit-wasm": "1.0.0",
         "woff2-encoder": "2.0.0",
-        "nexa-protocol": "https://codeload.github.com/dacely-cloud/nexa-protocol/tar.gz/93c4d38485b6ab9e7d509caea3a5147ddebf1477"
+        "nexa-protocol": "git+https://github.com/dacely-cloud/nexa-protocol.git#93c4d38485b6ab9e7d509caea3a5147ddebf1477"
     },
     "madge": {
         "baseDir": ".",

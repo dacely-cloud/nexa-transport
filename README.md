@@ -78,12 +78,11 @@ application declares both:
 
 ```json
 "nexa-transport": "git+https://github.com/dacely-cloud/nexa-transport.git#<commit>",
-"nexa-protocol": "https://codeload.github.com/dacely-cloud/nexa-protocol/tar.gz/<commit>"
+"nexa-protocol": "git+https://github.com/dacely-cloud/nexa-protocol.git#<commit>"
 ```
 
-npm builds the package on install (`prepare`). Projects that restrict remote
-dependencies with `allow-remote=root` must declare `nexa-protocol` themselves, because
-npm refuses a URL dependency reached only through another package. The package is
+npm builds the package on install (`prepare`). Git must be authenticated with
+read access to the private `dacely-cloud/nexa-protocol` repository. The package is
 ESM: use ES imports and `import type` for [type-only entry points](./docs/exports.md).
 
 ## Quick start
