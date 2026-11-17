@@ -497,13 +497,15 @@ npm run check
 | `npm test`                    | Run library tests                                               |
 | `npm run test:memory`         | Build and run forced-GC retention and memory stress tests       |
 | `npm run test:memory:browser` | Run the two-tab Chrome memory stress test                       |
-| `npm run test:gateway`        | Run Nexa gateway and Chrome integration tests                   |
 | `npm run generate`            | Regenerate protocol types, schemas, and workflow contracts      |
 | `npm run generate:workflows`  | Copy portable workflow contracts from the sibling Nexa checkout |
 | `npm run docs`                | Regenerate RPC/type references and format documentation         |
 | `npm run docs:check`          | Compile TypeScript examples across README and documentation     |
 | `npm pack`                    | Build and package a release                                     |
-| `npm run test:package`        | Verify the packed package in an isolated consumer               |
+
+Nexa's gateway suites that drive this client run in `dacely-cloud/nerva-integration` with
+`npx vitest run --project nexa`.
+| `npm run test:package` | Verify the packed package in an isolated consumer |
 
 `npm run docs:check` also checks package import names against the export map and requires every public entry point in the index. Protocol generation requires a sibling `nexa` checkout. Gateway tests additionally require the transport integration fixtures in that checkout and Google Chrome. Package verification requires a generated tarball.
 
