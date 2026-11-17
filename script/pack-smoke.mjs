@@ -15,10 +15,22 @@ try {
         join(directory, 'package.json'),
         JSON.stringify({ private: true, type: 'module' }),
     );
-    execFileSync('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', archive], {
-        cwd: directory,
-        stdio: 'pipe',
-    });
+    /** Consumers declare the pinned nexa-protocol themselves; npm refuses URL dependencies reached transitively. */
+    const protocol = manifest.dependencies?.['nexa-protocol'];
+    if (typeof protocol !== 'string') throw new Error('Missing pinned nexa-protocol dependency');
+    execFileSync(
+        'npm',
+        [
+            'install',
+            '--ignore-scripts',
+            '--no-audit',
+            '--no-fund',
+            '--allow-remote=root',
+            archive,
+            `nexa-protocol@${protocol}`,
+        ],
+        { cwd: directory, stdio: 'pipe' },
+    );
     await writeFile(
         join(directory, 'consumer.ts'),
         `import { NexaClient } from 'nexa-transport';
@@ -44,7 +56,7 @@ import { WorkflowGroupCodec } from 'nexa-transport/workflow-group-codec';
 import type { WorkflowGroup } from 'nexa-transport/workflow-group-types';
 const savedGroup: WorkflowGroup = WorkflowGroupCodec.parse({id: 'group', title: 'Research', objective: '', parent: null, x: 0, y: 0, nodes: [], ports: []});
 void savedGroup;
-import { WorkflowImagePolicies } from 'nexa-transport/workflow-image-policy';
+import { WorkflowImagePolicies } from 'nexa-protocol/workflows/ImageModelPolicy.js';
 import { WorkflowImageResolutionCodec } from 'nexa-transport/workflow-image-resolution';
 void WorkflowImagePolicies.defaults;
 void WorkflowImageResolutionCodec.result;

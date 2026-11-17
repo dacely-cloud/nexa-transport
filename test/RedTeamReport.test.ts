@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { RedTeamReportCodec } from '../src/redteam/RedTeamReportCodec.js';
-import { RedTeamCodec } from '../src/redteam/RedTeamCodec.js';
+import { RedTeamReportCodec } from 'nexa-protocol/redteam/RedTeamReportCodec.js';
+import { RedTeamCodec } from 'nexa-protocol/redteam/RedTeamCodec.js';
 import type {
     RedTeamFinding,
     RedTeamFindingReport,
     RedTeamReportReference,
-} from '../src/redteam/RedTeamTypes.js';
+} from 'nexa-protocol/redteam/RedTeamTypes.js';
 
 const finding: RedTeamFinding = {
     findingId: 'finding-1',

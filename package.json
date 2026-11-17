@@ -17,18 +17,6 @@
         "licenses"
     ],
     "exports": {
-        "./redteam-types": {
-            "types": "./dist/redteam/RedTeamTypes.d.ts",
-            "import": "./dist/redteam-types.js"
-        },
-        "./redteam-codec": {
-            "types": "./dist/redteam/RedTeamCodec.d.ts",
-            "import": "./dist/redteam-codec.js"
-        },
-        "./redteam-request-codec": {
-            "types": "./dist/redteam/RedTeamRequestCodec.d.ts",
-            "import": "./dist/redteam-request-codec.js"
-        },
         "./redteam-client": {
             "types": "./dist/redteam/RedTeamClient.d.ts",
             "import": "./dist/redteam-client.js"
@@ -229,18 +217,6 @@
             "types": "./dist/workflows/WorkflowCodec.d.ts",
             "import": "./dist/workflow-codec.js"
         },
-        "./workflow-resources": {
-            "types": "./dist/workflows/ResourceTypes.d.ts",
-            "import": "./dist/workflow-resources.js"
-        },
-        "./workflow-resource-codec": {
-            "types": "./dist/workflows/ResourceBindingCodec.d.ts",
-            "import": "./dist/workflow-resource-codec.js"
-        },
-        "./workflow-resource-readiness": {
-            "types": "./dist/workflows/ResourceReadiness.d.ts",
-            "import": "./dist/workflow-resource-readiness.js"
-        },
         ".": {
             "types": "./dist/networking/NexaClient.d.ts",
             "import": "./dist/nexa-transport.js"
@@ -298,14 +274,6 @@
             "types": "./dist/workflows/PortCompatibility.d.ts",
             "import": "./dist/workflow-ports.js"
         },
-        "./workflow-schemas": {
-            "types": "./dist/workflows/Schemas.d.ts",
-            "import": "./dist/workflow-schemas.js"
-        },
-        "./workflow-schema-types": {
-            "types": "./dist/workflows/SchemaTypes.d.ts",
-            "import": "./dist/workflow-schema-types.js"
-        },
         "./workflow-values": {
             "types": "./dist/workflows/SchemaValues.d.ts",
             "import": "./dist/workflow-values.js"
@@ -326,25 +294,9 @@
             "types": "./dist/workflows/runtime/RunRequestCodec.d.ts",
             "import": "./dist/workflow-run-request-codec.js"
         },
-        "./workflow-planning-sources": {
-            "types": "./dist/workflows/planning/PlanningSources.d.ts",
-            "import": "./dist/workflow-planning-sources.js"
-        },
         "./workflow-planning-alignment": {
             "types": "./dist/workflows/planning/PlanningAlignment.d.ts",
             "import": "./dist/workflow-planning-alignment.js"
-        },
-        "./workflow-model-policy": {
-            "types": "./dist/workflows/ModelResolution.d.ts",
-            "import": "./dist/workflow-model-policy.js"
-        },
-        "./workflow-public-models": {
-            "types": "./dist/workflows/PublicModels.d.ts",
-            "import": "./dist/workflow-public-models.js"
-        },
-        "./workflow-models": {
-            "types": "./dist/workflows/WorkflowModels.d.ts",
-            "import": "./dist/workflow-models.js"
         },
         "./workflow-artifacts": {
             "types": "./dist/workflows/runtime/ArtifactDownload.d.ts",
@@ -354,10 +306,6 @@
             "types": "./dist/workflows/ImageResolution.d.ts",
             "import": "./dist/workflow-image-resolution.js"
         },
-        "./workflow-image-policy": {
-            "types": "./dist/workflows/ImageModelPolicy.d.ts",
-            "import": "./dist/workflow-image-policy.js"
-        },
         "./workflow-group-types": {
             "types": "./dist/workflows/WorkflowGroupTypes.d.ts",
             "import": "./dist/workflow-group-types.js"
@@ -365,14 +313,6 @@
         "./workflow-group-codec": {
             "types": "./dist/workflows/WorkflowGroupCodec.d.ts",
             "import": "./dist/workflow-group-codec.js"
-        },
-        "./workflow-model-effort": {
-            "types": "./dist/workflows/ModelEffort.d.ts",
-            "import": "./dist/workflow-model-effort.js"
-        },
-        "./workflow-application-models": {
-            "types": "./dist/workflows/terminal/ApplicationModels.d.ts",
-            "import": "./dist/workflow-application-models.js"
         },
         "./workflow-publication-codec": {
             "types": "./dist/workflows/PublicationCodec.d.ts",
@@ -390,10 +330,6 @@
             "types": "./dist/workflows/schedule/ScheduleTiming.d.ts",
             "import": "./dist/workflow-schedule-times.js"
         },
-        "./workflow-calendar-types": {
-            "types": "./dist/workflows/schedule/CalendarTypes.d.ts",
-            "import": "./dist/workflow-calendar-types.js"
-        },
         "./workflow-calendar-codec": {
             "types": "./dist/workflows/schedule/CalendarCodec.d.ts",
             "import": "./dist/workflow-calendar-codec.js"
@@ -409,10 +345,6 @@
         "./workflow-wait-codec": {
             "types": "./dist/workflows/WaitCodec.d.ts",
             "import": "./dist/workflow-wait-codec.js"
-        },
-        "./workflow-time-limits": {
-            "types": "./dist/workflows/TimeLimits.d.ts",
-            "import": "./dist/workflow-time-limits.js"
         },
         "./workflow-mapping-types": {
             "types": "./dist/workflows/mapping/MappingTypes.d.ts",
@@ -469,18 +401,6 @@
         "./workflow-loops": {
             "types": "./dist/workflows/LoopComponents.d.ts",
             "import": "./dist/workflow-loops.js"
-        },
-        "./workflow-breakdown-codec": {
-            "types": "./dist/workflows/runtime/RunBreakdownCodec.d.ts",
-            "import": "./dist/workflow-breakdown-codec.js"
-        },
-        "./workflow-usage-codec": {
-            "types": "./dist/workflows/runtime/RunUsageCodec.d.ts",
-            "import": "./dist/workflow-usage-codec.js"
-        },
-        "./workflow-spending-codec": {
-            "types": "./dist/workflows/runtime/RunSpendingCodec.d.ts",
-            "import": "./dist/workflow-spending-codec.js"
         },
         "./workflow-http": {
             "types": "./dist/workflows/HttpInputs.d.ts",
@@ -997,7 +917,7 @@
         "meshoptimizer": "^1.2.0",
         "pathkit-wasm": "1.0.0",
         "woff2-encoder": "2.0.0",
-        "nexa-protocol": "https://codeload.github.com/dacely-cloud/nexa-protocol/tar.gz/4094e21f7f6b3eea71fa0e45d1d6036cab007a87"
+        "nexa-protocol": "https://codeload.github.com/dacely-cloud/nexa-protocol/tar.gz/54f18175b10fa59ffefbcfd3df928c56f536e856"
     },
     "madge": {
         "baseDir": ".",

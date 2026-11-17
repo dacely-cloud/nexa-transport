@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: LicenseRef-Proprietary
 
 import { expect, it } from 'vitest';
-import { RedTeamCodec } from '../src/redteam/RedTeamCodec.js';
+import { RedTeamCodec } from 'nexa-protocol/redteam/RedTeamCodec.js';
 import type {
     RedTeamAgent,
     RedTeamCoordinationEvent,
@@ -10,7 +10,7 @@ import type {
     RedTeamExecutionAction,
     RedTeamDelegatedAgent,
     RedTeamEvidence,
-} from '../src/redteam/RedTeamTypes.js';
+} from 'nexa-protocol/redteam/RedTeamTypes.js';
 
 const event: RedTeamCoordinationEvent = {
     eventId: 'event-1',

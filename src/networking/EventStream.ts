@@ -2,7 +2,7 @@ import { TransportError, TransportErrorCode } from './TransportError.js';
 import type { BinaryInputReservation } from '../media/BinaryInputReservation.js';
 import { EventCredits } from './EventCredits.js';
 import { InboundCapacity } from './InboundCapacity.js';
-import { BinaryAdmissionError } from '../media/BinaryAdmissionError.js';
+import { BinaryAdmissionError } from 'nexa-protocol/media/BinaryAdmissionError.js';
 /** One waiting iterator consumer. */
 interface Waiter<T> {
     readonly resolve: (value: IteratorResult<T, undefined>) => void;

@@ -102,18 +102,18 @@ readiness before automatic admission.
 
 ## Public models and provider keys
 
-`nexa-transport/workflow-public-models` exports `WorkflowPublicModels` with a
+`nexa-protocol/workflows/PublicModels.js` exports `WorkflowPublicModels` with a
 bundled, local text/reasoning catalog for Anthropic, OpenAI, xAI, and Mistral.
 Listing and searching it require no connection, linked key, deployment secret,
 or NCAP model-discovery request:
 
 ```ts
-import { WorkflowPublicModels } from 'nexa-transport/workflow-public-models';
+import { WorkflowPublicModels } from 'nexa-protocol/workflows/PublicModels.js';
 import {
     WorkflowModelCapability,
     type WorkflowModelsPage,
     type WorkflowModelsRequest,
-} from 'nexa-transport/workflow-models';
+} from 'nexa-protocol/workflows/WorkflowModels.js';
 
 const request: WorkflowModelsRequest = {
     workflowId: 'owned-workflow',

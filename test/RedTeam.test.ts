@@ -4,14 +4,14 @@ import {
     type RedTeamGateway,
     type RedTeamRequestMap,
 } from '../src/redteam/RedTeamClient.js';
-import { RedTeamCodec } from '../src/redteam/RedTeamCodec.js';
-import { RedTeamRequestCodec } from '../src/redteam/RedTeamRequestCodec.js';
+import { RedTeamCodec } from 'nexa-protocol/redteam/RedTeamCodec.js';
+import { RedTeamRequestCodec } from 'nexa-protocol/redteam/RedTeamRequestCodec.js';
 import {
     RedTeamMethod,
     type RedTeamEffort,
     type RedTeamStartRequest,
     type RedTeamSnapshot,
-} from '../src/redteam/RedTeamTypes.js';
+} from 'nexa-protocol/redteam/RedTeamTypes.js';
 import type { CallOptions } from '../src/interface/ClientOptions.js';
 import { NexaClient } from '../src/networking/NexaClient.js';
 import { hello, TestGateway, type Request } from './Support.js';

@@ -28,7 +28,7 @@ import { InboundCapacity } from './InboundCapacity.js';
 import { ClientResources } from './ClientResources.js';
 import { InboundConsumerCredit } from './InboundConsumerCredit.js';
 import { BinaryInputReservation } from '../media/BinaryInputReservation.js';
-import { BinaryAdmissionError } from '../media/BinaryAdmissionError.js';
+import { BinaryAdmissionError } from 'nexa-protocol/media/BinaryAdmissionError.js';
 import type { BinaryChunkReceipt } from '../media/interface/BinaryChunkReceipt.js';
 import { NexaMedia } from '../media/NexaMedia.js';
 import { BinaryEnvelope } from '../media/BinaryEnvelope.js';
@@ -72,8 +72,8 @@ import {
     type RedTeamEffort,
     type RedTeamListPage,
     type RedTeamSnapshot,
-} from '../redteam/RedTeamTypes.js';
-import { RedTeamRequestCodec } from '../redteam/RedTeamRequestCodec.js';
+} from 'nexa-protocol/redteam/RedTeamTypes.js';
+import { RedTeamRequestCodec } from 'nexa-protocol/redteam/RedTeamRequestCodec.js';
 
 /** Authenticated Nexa gateway connection shared by browsers and Node.js. */
 export class NexaClient implements ClientConnection {

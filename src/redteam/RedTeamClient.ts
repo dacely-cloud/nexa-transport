@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: LicenseRef-Proprietary
 
 import type { CallOptions } from '../interface/ClientOptions.js';
-import { RedTeamCodec } from './RedTeamCodec.js';
-import { RedTeamRequestCodec } from './RedTeamRequestCodec.js';
-import { RedTeamMethod, RedTeamStatus } from './RedTeamTypes.js';
+import { RedTeamCodec } from 'nexa-protocol/redteam/RedTeamCodec.js';
+import { RedTeamRequestCodec } from 'nexa-protocol/redteam/RedTeamRequestCodec.js';
+import { RedTeamMethod, RedTeamStatus } from 'nexa-protocol/redteam/RedTeamTypes.js';
 import type {
     RedTeamEffort,
     RedTeamSnapshot,
@@ -14,7 +14,7 @@ import type {
     RedTeamGetRequest,
     RedTeamListRequest,
     RedTeamUpdateRequest,
-} from './RedTeamTypes.js';
+} from 'nexa-protocol/redteam/RedTeamTypes.js';
 
 /** Exact operation parameters for an authenticated gateway adapter. */
 export interface RedTeamRequestMap {
