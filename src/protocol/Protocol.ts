@@ -22333,6 +22333,8 @@ export const ConnectorHostToolValues = {
     Value29: 'http_read',
     Value30: 'network_resolve',
     Value31: 'environment_inspect',
+    Value32: 'application_open',
+    Value33: 'desktop_snapshot',
 } as const;
 
 /** ConnectorHostTool from the Nexa wire protocol. */
@@ -22426,6 +22428,7 @@ export const ConnectorHostResponseerrorCodeVariant0Values = {
     Value11: 'resource-limit',
     Value12: 'snapshot-changed',
     Value13: 'unsupported',
+    Value14: 'expired',
 } as const;
 
 /** ConnectorHostResponse wire fields. */

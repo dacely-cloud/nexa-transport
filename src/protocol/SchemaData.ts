@@ -33799,7 +33799,8 @@ export const schema: Schema = {
                         $ref: '#/definitions/ConnectorHostTool',
                     },
                     type: 'array',
-                    maxItems: 32,
+                    minItems: 1,
+                    maxItems: 34,
                 },
             },
             required: ['directory', 'enabled', 'grantId', 'grantRevision', 'platform', 'tools'],
@@ -33848,6 +33849,8 @@ export const schema: Schema = {
                 'http_read',
                 'network_resolve',
                 'environment_inspect',
+                'application_open',
+                'desktop_snapshot',
             ],
             type: 'string',
         },
@@ -33868,7 +33871,7 @@ export const schema: Schema = {
         },
         ConnectorHostSubmitParams: {
             description:
-                'Every host operation pins the observed permanent counter and complete locally approved grant.',
+                'Every submitted host operation pins the current permanent counter and complete locally approved grant.',
             properties: {
                 environmentId: {
                     type: 'string',
@@ -33978,6 +33981,7 @@ export const schema: Schema = {
                                 'resource-limit',
                                 'snapshot-changed',
                                 'unsupported',
+                                'expired',
                             ],
                             type: 'string',
                         },
@@ -34057,7 +34061,8 @@ export const schema: Schema = {
                         $ref: '#/definitions/ConnectorHostTool',
                     },
                     type: 'array',
-                    maxItems: 32,
+                    minItems: 1,
+                    maxItems: 34,
                 },
             },
             required: ['enabled', 'grantId', 'grantRevision', 'platform', 'tools'],
