@@ -23184,6 +23184,8 @@ export interface DecisionRunParamsShape {
     readonly brief?: boolean;
     /** explanation as defined by the Nexa gateway. */
     readonly explanation?: boolean;
+    /** images as defined by the Nexa gateway. */
+    readonly images?: ReadonlyArray<DecisionImage>;
     /** input as defined by the Nexa gateway. */
     readonly input: string;
     /** probabilities as defined by the Nexa gateway. */
@@ -23216,6 +23218,28 @@ export interface DecisionUsageShape {
 
 /** DecisionUsage from the Nexa wire protocol. */
 export type DecisionUsage = DecisionUsageShape;
+
+/** DecisionImage wire fields. */
+export interface DecisionImageShape {
+    /** data as defined by the Nexa gateway. */
+    readonly data: string;
+    /** mimeType as defined by the Nexa gateway. */
+    readonly mimeType: DecisionImageMime;
+}
+
+/** DecisionImage from the Nexa wire protocol. */
+export type DecisionImage = DecisionImageShape;
+
+/** Allowed values for DecisionImageMime. */
+export const DecisionImageMimeValues = {
+    Value0: 'image/jpeg',
+    Value1: 'image/png',
+    Value2: 'image/webp',
+} as const;
+
+/** DecisionImageMime from the Nexa wire protocol. */
+export type DecisionImageMime =
+    (typeof DecisionImageMimeValues)[keyof typeof DecisionImageMimeValues];
 
 /** Supported RPC names. */
 export type MethodName = keyof GatewayMethods;

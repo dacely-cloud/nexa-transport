@@ -3,7 +3,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
 import { NexaClient } from '../src/networking/NexaClient.js';
-import { Method, type DecisionRunResult } from '../src/protocol/Protocol.js';
+import { Method, type DecisionImage, type DecisionRunResult } from '../src/protocol/Protocol.js';
 import { methodValidators } from '../src/protocol/MethodValidators.js';
 import { hello, TestGateway, type Request } from './Support.js';
 
@@ -57,7 +57,7 @@ describe('stateless decision SDK', (): void => {
             features: {
                 ...hello.features,
                 methods: hello.features.methods.filter(
-                    (method: string): boolean => method !== Method.DecisionRun,
+                    (method: string): boolean => method !== 'decision.run',
                 ),
             },
         });
@@ -69,11 +69,22 @@ describe('stateless decision SDK', (): void => {
         const validate = methodValidators[Method.DecisionRun].params;
         expect(validate({ input: 'x', actions: [{ id: 'A' }] })).toBe(true);
         expect(validate({ input: 'x', explanation: true, brief: true })).toBe(true);
+        const image: DecisionImage = {
+            mimeType: 'image/png',
+            data: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Wl6eQAAAABJRU5ErkJggg==',
+        };
+        expect(validate({ input: 'Compare these images', images: [image, image, image] })).toBe(
+            true,
+        );
         for (const value of [
             { input: 'x', system: 'override' },
             { input: 'x', history: [] },
             { input: 'x', explanation: 'yes' },
             { input: 'x', brief: null },
+            { input: 'x', images: [image, image, image, image] },
+            { input: 'x', images: [{ mimeType: 'video/mp4', data: 'AAAA' }] },
+            { input: 'x', images: [{ ...image, url: 'https://example.com/image.png' }] },
+            { input: 'x', images: [{ ...image, data: 'a'.repeat(9786716) }] },
             { input: 'x', actions: [] },
             { input: 'x', actions: [{ id: '../tool' }] },
             { input: 'x', actions: new Array(33).fill({ id: 'A' }) },

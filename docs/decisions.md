@@ -39,6 +39,25 @@ or invalid JSON. The gateway ends requests after five minutes, including admissi
 Other Chat and routing limits are unchanged. The engine must have the matching 10,000-token
 quick-decision guard deployed.
 
+`images` optionally carries up to three still PNG, JPEG or WebP images. Each image is
+`{ mimeType, data }`, where `data` is the original file's base64 content. Dimensions may
+be up to 4096 pixels on either side, with a combined 7 MiB of file bytes per request.
+Videos, animated images, remote URLs and disguised file formats are rejected. Encoded
+images remain at their original resolution; model preprocessing uses its normal vision path.
+The engine must negotiate `quick-decision-images-1`; older engines fail before generation.
+
+```typescript
+import { readFile } from 'node:fs/promises';
+import type { DecisionRunResult } from 'nexa-transport/protocol';
+
+const data: string = (await readFile('screenshot.png')).toString('base64');
+const decision: DecisionRunResult = await client.decide({
+    input: 'Identify the next button to press. Return JSON.',
+    images: [{ mimeType: 'image/png', data }],
+});
+console.log(decision.json);
+```
+
 With actions supplied, output contains the selected `action` and optional JSON-object
 `arguments`. Set `explanation: true` to request a short reason for the choice and
 `brief: true` for one concise sentence describing the intended next step. Both are optional

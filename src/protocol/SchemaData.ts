@@ -35232,6 +35232,15 @@ export const schema: Schema = {
                         'Request a short explanation of the choice, without internal reasoning.',
                     type: 'boolean',
                 },
+                images: {
+                    description:
+                        'At most three PNG, JPEG or still WebP images, each up to 4096 pixels per side.',
+                    items: {
+                        $ref: '#/definitions/DecisionImage',
+                    },
+                    type: 'array',
+                    maxItems: 3,
+                },
                 input: {
                     description:
                         'UTF-8 text, at most 32768 bytes. No separate system prompt or history fields are accepted.',
@@ -35281,6 +35290,31 @@ export const schema: Schema = {
             },
             required: ['inputTokens', 'outputTokens'],
             type: 'object',
+            additionalProperties: false,
+        },
+        DecisionImage: {
+            description:
+                'One original encoded still image. URLs and temporal media are not accepted.',
+            properties: {
+                data: {
+                    type: 'string',
+                    minLength: 4,
+                    maxLength: 9786712,
+                },
+                mimeType: {
+                    $ref: '#/definitions/DecisionImageMime',
+                    enum: ['image/png', 'image/jpeg', 'image/webp'],
+                },
+            },
+            required: ['data', 'mimeType'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        DecisionImageMime: {
+            description:
+                'Accepted still-image file formats; temporal and active-content formats are excluded.\nOne supported encoded-image MIME type.',
+            enum: ['image/jpeg', 'image/png', 'image/webp'],
+            type: 'string',
             additionalProperties: false,
         },
     },
