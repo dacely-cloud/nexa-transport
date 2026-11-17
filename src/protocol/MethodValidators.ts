@@ -312,4 +312,5 @@ export const methodValidators: Readonly<Record<MethodName, MethodValidation>> = 
     'connections.tools.install': { params: validators.params268, result: validators.result268 },
     'connections.tools.remove': { params: validators.params269, result: validators.result269 },
     'connections.models.list': { params: validators.params270, result: validators.result270 },
+    'decision.run': { params: validators.params271, result: validators.result271 },
 };

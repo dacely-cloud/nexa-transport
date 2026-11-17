@@ -474,6 +474,9 @@ export class NexaClient {
                         version: this.#options.client?.version ?? '0.1.0',
                         platform: this.#options.client?.platform ?? 'javascript',
                         mode: 'ui',
+                        ...(this.#options.client?.workspace === undefined
+                            ? {}
+                            : { workspace: this.#options.client.workspace }),
                         ...(this.#options.client?.metadataOnlyAttachments === undefined
                             ? {}
                             : {
@@ -603,6 +606,20 @@ export class NexaClient {
             this.#hello?.features.methods.includes(Method.WorkflowsPlanningSources) === true
         );
     }
+    /** Makes one independent JSON decision without tools, history or automatic replay. */
+    public async decide(
+        params: ParamsOf<typeof Method.DecisionRun>,
+        options: CallOptions = {},
+    ): Promise<ResultOf<typeof Method.DecisionRun>> {
+        if (this.#hello?.features.methods.includes(Method.DecisionRun) !== true) {
+            throw new TransportError(
+                TransportErrorCode.Protocol,
+                'Decision requests require an updated Nexa gateway',
+            );
+        }
+        return this.call(Method.DecisionRun, params, options);
+    }
+
     /** Calls any Nexa RPC with validated parameters and result. Mutations are never replayed. */
     public async call<M extends Exclude<Method, Method.Connect>>(
         method: M,

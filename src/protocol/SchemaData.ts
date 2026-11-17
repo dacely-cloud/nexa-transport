@@ -5206,6 +5206,10 @@ export const schema: Schema = {
                 version: {
                     type: 'string',
                 },
+                workspace: {
+                    type: 'boolean',
+                    description: 'False skips background VM wake for stateless decision clients.',
+                },
             },
             required: ['id', 'mode', 'platform', 'version'],
             type: 'object',
@@ -19772,6 +19776,18 @@ export const schema: Schema = {
                     required: ['params', 'result'],
                     type: 'object',
                 },
+                'decision.run': {
+                    type: 'object',
+                    properties: {
+                        params: {
+                            $ref: '#/definitions/DecisionRunParams',
+                        },
+                        result: {
+                            $ref: '#/definitions/DecisionRunResult',
+                        },
+                    },
+                    required: ['params', 'result'],
+                },
             },
             required: [
                 'accounts.create',
@@ -20045,6 +20061,7 @@ export const schema: Schema = {
                 'connections.tools.install',
                 'connections.tools.remove',
                 'connections.models.list',
+                'decision.run',
             ],
             type: 'object',
         },
@@ -35157,6 +35174,94 @@ export const schema: Schema = {
             },
             required: ['params', 'result'],
             type: 'object',
+        },
+        DecisionAction: {
+            description:
+                'A choice the caller may execute; the decision endpoint never executes it.',
+            properties: {
+                description: {
+                    type: 'string',
+                    maxLength: 2048,
+                },
+                id: {
+                    description: 'Stable caller-owned identifier, such as jump or open_calculator.',
+                    type: 'string',
+                    pattern: '^[A-Za-z][A-Za-z0-9_.:-]{0,63}$',
+                },
+            },
+            required: ['id'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        DecisionRunParams: {
+            description:
+                'One independent decision. Input may be plain text or an intact JSON document.',
+            properties: {
+                actions: {
+                    description:
+                        'Optional bounded choices. The model must select one of these IDs or abstain.',
+                    items: {
+                        $ref: '#/definitions/DecisionAction',
+                    },
+                    type: 'array',
+                    minItems: 1,
+                    maxItems: 32,
+                },
+                allowCustomActions: {
+                    description:
+                        'Allow proposed actions named requested::name in addition to the supplied choices.',
+                    type: 'boolean',
+                },
+                input: {
+                    description:
+                        'UTF-8 text, at most 32768 bytes. No model instructions or history are accepted.',
+                    type: 'string',
+                    minLength: 1,
+                    maxLength: 32768,
+                },
+                probabilities: {
+                    description:
+                        'Request an estimated probability distribution over the supplied actions.',
+                    type: 'boolean',
+                },
+            },
+            required: ['input'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        DecisionRunResult: {
+            description:
+                'JSON is retained as text so large numeric identifiers cannot be rounded by transport.',
+            properties: {
+                durationMs: {
+                    type: 'number',
+                },
+                json: {
+                    description:
+                        'A validated JSON object, without Markdown or internal model diagnostics.',
+                    type: 'string',
+                },
+                usage: {
+                    $ref: '#/definitions/DecisionUsage',
+                },
+            },
+            required: ['durationMs', 'json', 'usage'],
+            type: 'object',
+            additionalProperties: false,
+        },
+        DecisionUsage: {
+            description: 'Bounded token counts for the single model call.',
+            properties: {
+                inputTokens: {
+                    type: 'number',
+                },
+                outputTokens: {
+                    type: 'number',
+                },
+            },
+            required: ['inputTokens', 'outputTokens'],
+            type: 'object',
+            additionalProperties: false,
         },
     },
     description: 'All protocol contracts reachable from the public transport.',

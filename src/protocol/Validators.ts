@@ -3957,3 +3957,17 @@ export function result270(value: unknown): boolean {
         value,
     );
 }
+/** Validates params271. */
+export function params271(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/decision.run/properties/params',
+        value,
+    );
+}
+/** Validates result271. */
+export function result271(value: unknown): boolean {
+    return validator.validate(
+        '#/definitions/GatewayMethods/properties/decision.run/properties/result',
+        value,
+    );
+}

@@ -8,6 +8,8 @@ export interface ClientIdentity {
     readonly platform: string;
     /** Opt into metadata-only live attachments; request originals with downloadSessionFile. */
     readonly metadataOnlyAttachments?: boolean;
+    /** False skips background VM wake for stateless clients. It grants no execution authority. */
+    readonly workspace?: boolean;
 }
 
 /** Browser and Node.js connection configuration. Credentials stay in memory. */

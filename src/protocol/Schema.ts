@@ -21,6 +21,7 @@ export interface Schema {
     /** Trusted generated contracts may constrain opaque identifiers and exact revision encodings. */
     readonly pattern?: string;
     readonly maxItems?: number;
+    readonly minItems?: number;
     readonly $id?: string;
     readonly $schema?: string;
 }
@@ -211,8 +212,8 @@ export class SchemaValidator {
         }
         if (
             Array.isArray(value) &&
-            schema.maxItems !== undefined &&
-            value.length > schema.maxItems
+            ((schema.maxItems !== undefined && value.length > schema.maxItems) ||
+                (schema.minItems !== undefined && value.length < schema.minItems))
         ) {
             return false;
         }

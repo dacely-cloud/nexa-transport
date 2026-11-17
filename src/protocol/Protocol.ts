@@ -3257,6 +3257,8 @@ export interface ConnectClientInfoShape {
     readonly platform: string;
     /** version as defined by the Nexa gateway. */
     readonly version: string;
+    /** workspace as defined by the Nexa gateway. */
+    readonly workspace?: boolean;
 }
 
 /** ConnectClientInfo from the Nexa wire protocol. */
@@ -12644,6 +12646,14 @@ export interface GatewayMethodsconnections_models_listShape {
     readonly result: ChatModelsPage;
 }
 
+/** GatewayMethodsdecision_run wire fields. */
+export interface GatewayMethodsdecision_runShape {
+    /** params as defined by the Nexa gateway. */
+    readonly params: DecisionRunParams;
+    /** result as defined by the Nexa gateway. */
+    readonly result: DecisionRunResult;
+}
+
 /** GatewayMethods wire fields. */
 export interface GatewayMethodsShape {
     /** accounts.create as defined by the Nexa gateway. */
@@ -13188,6 +13198,8 @@ export interface GatewayMethodsShape {
     readonly 'connections.tools.remove': GatewayMethodsconnections_tools_removeShape;
     /** connections.models.list as defined by the Nexa gateway. */
     readonly 'connections.models.list': GatewayMethodsconnections_models_listShape;
+    /** decision.run as defined by the Nexa gateway. */
+    readonly 'decision.run': GatewayMethodsdecision_runShape;
 }
 
 /** GatewayMethods from the Nexa wire protocol. */
@@ -23146,6 +23158,56 @@ export interface ConnectionModelsListMethodShape {
 /** ConnectionModelsListMethod from the Nexa wire protocol. */
 export type ConnectionModelsListMethod = ConnectionModelsListMethodShape;
 
+/** DecisionAction wire fields. */
+export interface DecisionActionShape {
+    /** description as defined by the Nexa gateway. */
+    readonly description?: string;
+    /** id as defined by the Nexa gateway. */
+    readonly id: string;
+}
+
+/** DecisionAction from the Nexa wire protocol. */
+export type DecisionAction = DecisionActionShape;
+
+/** DecisionRunParams wire fields. */
+export interface DecisionRunParamsShape {
+    /** actions as defined by the Nexa gateway. */
+    readonly actions?: ReadonlyArray<DecisionAction>;
+    /** allowCustomActions as defined by the Nexa gateway. */
+    readonly allowCustomActions?: boolean;
+    /** input as defined by the Nexa gateway. */
+    readonly input: string;
+    /** probabilities as defined by the Nexa gateway. */
+    readonly probabilities?: boolean;
+}
+
+/** DecisionRunParams from the Nexa wire protocol. */
+export type DecisionRunParams = DecisionRunParamsShape;
+
+/** DecisionRunResult wire fields. */
+export interface DecisionRunResultShape {
+    /** durationMs as defined by the Nexa gateway. */
+    readonly durationMs: number;
+    /** json as defined by the Nexa gateway. */
+    readonly json: string;
+    /** usage as defined by the Nexa gateway. */
+    readonly usage: DecisionUsage;
+}
+
+/** DecisionRunResult from the Nexa wire protocol. */
+export type DecisionRunResult = DecisionRunResultShape;
+
+/** DecisionUsage wire fields. */
+export interface DecisionUsageShape {
+    /** inputTokens as defined by the Nexa gateway. */
+    readonly inputTokens: number;
+    /** outputTokens as defined by the Nexa gateway. */
+    readonly outputTokens: number;
+}
+
+/** DecisionUsage from the Nexa wire protocol. */
+export type DecisionUsage = DecisionUsageShape;
+
 /** Supported RPC names. */
 export type MethodName = keyof GatewayMethods;
 /** Parameters for a particular RPC. */
@@ -23697,4 +23759,6 @@ export enum Method {
     ConnectionsToolsRemove = 'connections.tools.remove',
     /** Calls connections.models.list. */
     ConnectionsModelsList = 'connections.models.list',
+    /** Calls decision.run. */
+    DecisionRun = 'decision.run',
 }
