@@ -35223,6 +35223,15 @@ export const schema: Schema = {
                         'Allow proposed actions with ordinary names in addition to the supplied choices.',
                     type: 'boolean',
                 },
+                brief: {
+                    description: 'Request one concise sentence describing the intended next step.',
+                    type: 'boolean',
+                },
+                explanation: {
+                    description:
+                        'Request a short explanation of the choice, without internal reasoning.',
+                    type: 'boolean',
+                },
                 input: {
                     description:
                         'UTF-8 text, at most 32768 bytes. No separate system prompt or history fields are accepted.',

@@ -23180,6 +23180,10 @@ export interface DecisionRunParamsShape {
     readonly actions?: ReadonlyArray<DecisionAction>;
     /** allowCustomActions as defined by the Nexa gateway. */
     readonly allowCustomActions?: boolean;
+    /** brief as defined by the Nexa gateway. */
+    readonly brief?: boolean;
+    /** explanation as defined by the Nexa gateway. */
+    readonly explanation?: boolean;
     /** input as defined by the Nexa gateway. */
     readonly input: string;
     /** probabilities as defined by the Nexa gateway. */

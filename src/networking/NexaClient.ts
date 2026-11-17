@@ -585,7 +585,10 @@ export class NexaClient implements ClientConnection {
                 'Decision requests require an updated Nexa gateway',
             );
         }
-        return this.call(Method.DecisionRun, params, options);
+        return this.call(Method.DecisionRun, params, {
+            ...options,
+            timeoutMs: options.timeoutMs ?? 305_000,
+        });
     }
 
     /** Calls any Nexa RPC with validated parameters and result. Mutations are never replayed. */

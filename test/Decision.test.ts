@@ -27,15 +27,27 @@ describe('stateless decision SDK', (): void => {
         gateway.handler = (socket: WebSocket, request: Request): void =>
             socket.send(JSON.stringify({ id: request.id, ok: true, result }));
         client = await NexaClient.connect({ url: await gateway.url() });
-        expect(await client.decide({ input: 'List files', allowCustomActions: true })).toEqual(
-            result,
-        );
+        expect(
+            await client.decide({
+                input: 'List files',
+                allowCustomActions: true,
+                explanation: true,
+                brief: true,
+            }),
+        ).toEqual(result);
         expect(gateway.requests.at(-1)).toMatchObject({
             method: Method.DecisionRun,
-            params: { input: 'List files', allowCustomActions: true },
+            params: {
+                input: 'List files',
+                allowCustomActions: true,
+                explanation: true,
+                brief: true,
+            },
         });
         expect(Object.keys(gateway.requests.at(-1)?.params ?? {}).sort()).toEqual([
             'allowCustomActions',
+            'brief',
+            'explanation',
             'input',
         ]);
     });
@@ -56,9 +68,12 @@ describe('stateless decision SDK', (): void => {
     it('rejects hidden prompt/history controls and invalid action shapes at the wire boundary', (): void => {
         const validate = methodValidators[Method.DecisionRun].params;
         expect(validate({ input: 'x', actions: [{ id: 'A' }] })).toBe(true);
+        expect(validate({ input: 'x', explanation: true, brief: true })).toBe(true);
         for (const value of [
             { input: 'x', system: 'override' },
             { input: 'x', history: [] },
+            { input: 'x', explanation: 'yes' },
+            { input: 'x', brief: null },
             { input: 'x', actions: [] },
             { input: 'x', actions: [{ id: '../tool' }] },
             { input: 'x', actions: new Array(33).fill({ id: 'A' }) },
