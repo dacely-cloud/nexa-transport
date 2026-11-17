@@ -33799,7 +33799,7 @@ export const schema: Schema = {
                         $ref: '#/definitions/ConnectorHostTool',
                     },
                     type: 'array',
-                    maxItems: 31,
+                    maxItems: 32,
                 },
             },
             required: ['directory', 'enabled', 'grantId', 'grantRevision', 'platform', 'tools'],
@@ -33847,6 +33847,7 @@ export const schema: Schema = {
                 'http_open',
                 'http_read',
                 'network_resolve',
+                'environment_inspect',
             ],
             type: 'string',
         },
@@ -34056,7 +34057,7 @@ export const schema: Schema = {
                         $ref: '#/definitions/ConnectorHostTool',
                     },
                     type: 'array',
-                    maxItems: 31,
+                    maxItems: 32,
                 },
             },
             required: ['enabled', 'grantId', 'grantRevision', 'platform', 'tools'],
@@ -34755,6 +34756,11 @@ export const schema: Schema = {
                     description: 'Optional narrowing of the inherited tools.',
                     maxItems: 128,
                 },
+                modelConnection: {
+                    $ref: '#/definitions/ChatModelSelection',
+                    description:
+                        'An account-owned API key or subscription; absent inherits the current Chat model.',
+                },
             },
             required: [
                 'description',
@@ -34819,6 +34825,11 @@ export const schema: Schema = {
                     ],
                     description: 'Optional narrowing of the inherited tools.',
                     maxItems: 128,
+                },
+                modelConnection: {
+                    $ref: '#/definitions/ChatModelSelection',
+                    description:
+                        'An account-owned API key or subscription; absent inherits the current Chat model.',
                 },
             },
             required: ['description', 'instructions', 'model', 'name', 'provider', 'tools'],

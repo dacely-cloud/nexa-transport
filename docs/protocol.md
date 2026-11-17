@@ -16036,7 +16036,7 @@ Type: `"linux"` / `"windows"` / `"macos"`.
 
 A full-host grant is separate from confined file/program policies and never inferred from pairing.
 
-Type: `"computer_info"` / `"file_read"` / `"file_digest"` / `"file_write"` / `"file_stat"` / `"file_rename"` / `"file_publish"` / `"file_chmod"` / `"directory_list"` / `"directory_create"` / `"file_remove"` / `"process_start"` / `"process_read"` / `"process_write"` / `"process_stop"` / `"process_release"` / `"desktop_info"` / `"desktop_screenshot"` / `"desktop_pointer"` / `"desktop_key"` / `"desktop_text"` / `"terminal_read"` / `"terminal_release"` / `"terminal_resize"` / `"terminal_start"` / `"terminal_stop"` / `"terminal_write"` / `"http_close"` / `"http_open"` / `"http_read"` / `"network_resolve"`.
+Type: `"computer_info"` / `"file_read"` / `"file_digest"` / `"file_write"` / `"file_stat"` / `"file_rename"` / `"file_publish"` / `"file_chmod"` / `"directory_list"` / `"directory_create"` / `"file_remove"` / `"process_start"` / `"process_read"` / `"process_write"` / `"process_stop"` / `"process_release"` / `"desktop_info"` / `"desktop_screenshot"` / `"desktop_pointer"` / `"desktop_key"` / `"desktop_text"` / `"terminal_read"` / `"terminal_release"` / `"terminal_resize"` / `"terminal_start"` / `"terminal_stop"` / `"terminal_write"` / `"http_close"` / `"http_open"` / `"http_read"` / `"network_resolve"` / `"environment_inspect"`.
 
 ## ConnectorHostSubmitMethod
 
@@ -16472,29 +16472,31 @@ Type: `"setup-required"` / `"existing"`.
 
 A private profile with a server-generated identity and exact revision.
 
-| Field          | Required | Type                       | Description                                               |
-| -------------- | -------- | -------------------------- | --------------------------------------------------------- |
-| `description`  | Yes      | `string`                   | Short purpose shown in the profile list.                  |
-| `id`           | Yes      | `string`                   | Server-generated selector.                                |
-| `instructions` | Yes      | `string`                   | Static instructions appended within the inherited policy. |
-| `model`        | Yes      | `string`                   | Configured model identifier; empty inherits Nexa.         |
-| `name`         | Yes      | `string`                   | Display name.                                             |
-| `provider`     | Yes      | `string`                   | Configured provider identifier; empty inherits Nexa.      |
-| `revision`     | Yes      | `string`                   | Exact optimistic revision.                                |
-| `tools`        | Yes      | Array of `string` / `null` | Optional narrowing of the inherited tools.                |
+| Field             | Required | Type                                                 | Description                                                                       |
+| ----------------- | -------- | ---------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `description`     | Yes      | `string`                                             | Short purpose shown in the profile list.                                          |
+| `id`              | Yes      | `string`                                             | Server-generated selector.                                                        |
+| `instructions`    | Yes      | `string`                                             | Static instructions appended within the inherited policy.                         |
+| `model`           | Yes      | `string`                                             | Configured model identifier; empty inherits Nexa.                                 |
+| `name`            | Yes      | `string`                                             | Display name.                                                                     |
+| `provider`        | Yes      | `string`                                             | Configured provider identifier; empty inherits Nexa.                              |
+| `revision`        | Yes      | `string`                                             | Exact optimistic revision.                                                        |
+| `tools`           | Yes      | Array of `string` / `null`                           | Optional narrowing of the inherited tools.                                        |
+| `modelConnection` | No       | [ChatModelSelection](protocol.md#chatmodelselection) | An account-owned API key or subscription; absent inherits the current Chat model. |
 
 ## AgentProfileInput
 
 Editable instructions and tool limits for one account-owned agent.
 
-| Field          | Required | Type                       | Description                                               |
-| -------------- | -------- | -------------------------- | --------------------------------------------------------- |
-| `description`  | Yes      | `string`                   | Short purpose shown in the profile list.                  |
-| `instructions` | Yes      | `string`                   | Static instructions appended within the inherited policy. |
-| `model`        | Yes      | `string`                   | Configured model identifier; empty inherits Nexa.         |
-| `name`         | Yes      | `string`                   | Display name.                                             |
-| `provider`     | Yes      | `string`                   | Configured provider identifier; empty inherits Nexa.      |
-| `tools`        | Yes      | Array of `string` / `null` | Optional narrowing of the inherited tools.                |
+| Field             | Required | Type                                                 | Description                                                                       |
+| ----------------- | -------- | ---------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `description`     | Yes      | `string`                                             | Short purpose shown in the profile list.                                          |
+| `instructions`    | Yes      | `string`                                             | Static instructions appended within the inherited policy.                         |
+| `model`           | Yes      | `string`                                             | Configured model identifier; empty inherits Nexa.                                 |
+| `name`            | Yes      | `string`                                             | Display name.                                                                     |
+| `provider`        | Yes      | `string`                                             | Configured provider identifier; empty inherits Nexa.                              |
+| `tools`           | Yes      | Array of `string` / `null`                           | Optional narrowing of the inherited tools.                                        |
+| `modelConnection` | No       | [ChatModelSelection](protocol.md#chatmodelselection) | An account-owned API key or subscription; absent inherits the current Chat model. |
 
 ## AgentProfileCreateParams
 

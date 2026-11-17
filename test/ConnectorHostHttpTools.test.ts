@@ -29,8 +29,9 @@ const status: ConnectorHostStatus = {
     },
 };
 
-it('decodes all31 current approved tools in inventory/status and accepts only the four exact HTTP tool names in admission', (): void => {
-    expect(tools).toHaveLength(31);
+it('decodes all 32 current approved tools in inventory/status and accepts only the four exact HTTP tool names in admission', (): void => {
+    expect(tools).toHaveLength(32);
+    expect(tools).toContain('environment_inspect');
     expect(methodValidators[Method.ConnectorsHostStatus].result(status)).toBe(true);
     const inventory: ConnectorInventoryPage = {
         items: [
