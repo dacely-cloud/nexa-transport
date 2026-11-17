@@ -25,14 +25,6 @@
             "types": "./dist/networking/SessionArchiveRequests.d.ts",
             "import": "./dist/archive-requests.js"
         },
-        "./design-builtin-font-catalog": {
-            "types": "./dist/design/DesignBuiltinFontCatalog.d.ts",
-            "import": "./dist/design-builtin-font-catalog.js"
-        },
-        "./design-source-serif-bytes": {
-            "types": "./dist/design/DesignSourceSerifBytes.d.ts",
-            "import": "./dist/design-source-serif-bytes.js"
-        },
         "./design-flex": {
             "types": "./dist/design/DesignFlex.d.ts",
             "import": "./dist/design-flex.js"
@@ -69,33 +61,9 @@
             "types": "./dist/design/DesignSvgPaints.d.ts",
             "import": "./dist/design-svg-paints.js"
         },
-        "./design-image-sampling-types": {
-            "types": "./dist/design/DesignImageSamplingTypes.d.ts",
-            "import": "./dist/design-image-sampling-types.js"
-        },
-        "./design-image-sampling-geometry": {
-            "types": "./dist/design/DesignImageSamplingGeometry.d.ts",
-            "import": "./dist/design-image-sampling-geometry.js"
-        },
-        "./design-image-tile-types": {
-            "types": "./dist/design/DesignImageTileTypes.d.ts",
-            "import": "./dist/design-image-tile-types.js"
-        },
-        "./design-image-tile-codec": {
-            "types": "./dist/design/DesignImageTileCodec.d.ts",
-            "import": "./dist/design-image-tile-codec.js"
-        },
         "./design-image-tile-geometry": {
             "types": "./dist/design/DesignImageTileGeometry.d.ts",
             "import": "./dist/design-image-tile-geometry.js"
-        },
-        "./design-image-transform-types": {
-            "types": "./dist/design/DesignImageTransformTypes.d.ts",
-            "import": "./dist/design-image-transform-types.js"
-        },
-        "./design-image-transform-codec": {
-            "types": "./dist/design/DesignImageTransformCodec.d.ts",
-            "import": "./dist/design-image-transform-codec.js"
         },
         "./roblox-keyboard-input": {
             "types": "./dist/roblox/RobloxKeyboardInput.d.ts",
@@ -108,14 +76,6 @@
         "./design-image-geometry": {
             "types": "./dist/design/DesignImageGeometry.d.ts",
             "import": "./dist/design-image-geometry.js"
-        },
-        "./design-asset-types": {
-            "types": "./dist/design/DesignAssetTypes.d.ts",
-            "import": "./dist/design-asset-types.js"
-        },
-        "./design-asset-codec": {
-            "types": "./dist/design/DesignAssetCodec.d.ts",
-            "import": "./dist/design-asset-codec.js"
         },
         "./design-asset-references": {
             "types": "./dist/design/DesignAssetReferences.d.ts",
@@ -176,10 +136,6 @@
         "./design-change-codec": {
             "types": "./dist/design/DesignChangeCodec.d.ts",
             "import": "./dist/design-change-codec.js"
-        },
-        "./design-paging": {
-            "types": "./dist/design/DesignPaging.d.ts",
-            "import": "./dist/design-paging.js"
         },
         "./workflow-template-fields": {
             "types": "./dist/workflows/TemplateFields.d.ts",
@@ -458,14 +414,6 @@
             "types": "./dist/design/DesignPatternSources.d.ts",
             "import": "./dist/design-pattern-sources.js"
         },
-        "./design-pattern-tile-types": {
-            "types": "./dist/design/DesignPatternTileTypes.d.ts",
-            "import": "./dist/design-pattern-tile-types.js"
-        },
-        "./design-pattern-tile-codec": {
-            "types": "./dist/design/DesignPatternTileCodec.d.ts",
-            "import": "./dist/design-pattern-tile-codec.js"
-        },
         "./design-paint-pattern-edits": {
             "types": "./dist/design/DesignPaintPatternEdits.d.ts",
             "import": "./dist/design-paint-pattern-edits.js"
@@ -494,10 +442,6 @@
             "types": "./dist/design/DesignBooleanKernel.d.ts",
             "import": "./dist/design-boolean-kernel.js"
         },
-        "./design-mask-types": {
-            "types": "./dist/design/DesignMaskTypes.d.ts",
-            "import": "./dist/design-mask-types.js"
-        },
         "./design-mask-geometry": {
             "types": "./dist/design/DesignMaskGeometry.d.ts",
             "import": "./dist/design-mask-geometry.js"
@@ -506,10 +450,6 @@
             "types": "./dist/design/DesignVariants.d.ts",
             "import": "./dist/design-variants.js"
         },
-        "./design-variant-types": {
-            "types": "./dist/design/DesignVariantTypes.d.ts",
-            "import": "./dist/design-variant-types.js"
-        },
         "./design-font-engine": {
             "types": "./dist/design/DesignFontEngine.d.ts",
             "import": "./dist/design-font-engine.js"
@@ -517,14 +457,6 @@
         "./design-builtin-fonts": {
             "types": "./dist/design/DesignBuiltinFonts.d.ts",
             "import": "./dist/design-builtin-fonts.js"
-        },
-        "./design-inter-bytes": {
-            "types": "./dist/design/DesignInterBytes.d.ts",
-            "import": "./dist/design-inter-bytes.js"
-        },
-        "./design-inter-outline-bytes": {
-            "types": "./dist/design/DesignInterOutlineBytes.d.ts",
-            "import": "./dist/design-inter-outline-bytes.js"
         },
         "./design-text-outline": {
             "types": "./dist/design/DesignTextOutline.d.ts",
@@ -686,14 +618,6 @@
             "types": "./dist/design/DesignTextStyles.d.ts",
             "import": "./dist/design-text-styles.js"
         },
-        "./design-transfer-types": {
-            "types": "./dist/design/DesignTransferTypes.d.ts",
-            "import": "./dist/design-transfer-types.js"
-        },
-        "./design-transfer-codec": {
-            "types": "./dist/design/DesignTransferCodec.d.ts",
-            "import": "./dist/design-transfer-codec.js"
-        },
         "./design-token-edits": {
             "types": "./dist/design/DesignTokenEdits.d.ts",
             "import": "./dist/design-token-edits.js"
@@ -701,9 +625,6 @@
         "./design-typography-styles": {
             "types": "./dist/design/DesignTypographyStyleCodec.d.ts",
             "import": "./dist/design-typography-styles.js"
-        },
-        "./design-gradient-types": {
-            "types": "./dist/design/DesignGradientTypes.d.ts"
         },
         "./design-gradient-geometry": {
             "types": "./dist/design/DesignGradientGeometry.d.ts",
@@ -713,10 +634,6 @@
             "types": "./dist/design/DesignPaintGradientEdits.d.ts",
             "import": "./dist/design-paint-gradient.js"
         },
-        "./design-stroke-types": {
-            "types": "./dist/design/DesignStrokeTypes.d.ts",
-            "import": "./dist/design-stroke-types.js"
-        },
         "./design-stroke-geometry": {
             "types": "./dist/design/DesignStrokeGeometry.d.ts",
             "import": "./dist/design-stroke-geometry.js"
@@ -724,18 +641,6 @@
         "./design-svg-import": {
             "types": "./dist/design/DesignSvgImport.d.ts",
             "import": "./dist/design-svg-import.js"
-        },
-        "./design-svg-import-types": {
-            "types": "./dist/design/DesignSvgImportTypes.d.ts",
-            "import": "./dist/design-svg-import-types.js"
-        },
-        "./design-svg-image-types": {
-            "types": "./dist/design/DesignSvgImageTypes.d.ts",
-            "import": "./dist/design-svg-image-types.js"
-        },
-        "./design-svg-import-codec": {
-            "types": "./dist/design/DesignSvgImportCodec.d.ts",
-            "import": "./dist/design-svg-import-codec.js"
         },
         "./design-selection-index": {
             "types": "./dist/design/DesignSelectionIndex.d.ts",
@@ -757,25 +662,9 @@
             "types": "./dist/roblox/RobloxSceneMeshes.d.ts",
             "import": "./dist/roblox-scene-meshes.js"
         },
-        "./design-image-adjustment-types": {
-            "types": "./dist/design/DesignImageAdjustmentTypes.d.ts",
-            "import": "./dist/design-image-adjustment-types.js"
-        },
-        "./design-image-adjustment-codec": {
-            "types": "./dist/design/DesignImageAdjustmentCodec.d.ts",
-            "import": "./dist/design-image-adjustment-codec.js"
-        },
-        "./design-image-color": {
-            "types": "./dist/design/DesignImageColor.d.ts",
-            "import": "./dist/design-image-color.js"
-        },
         "./session-files": {
             "types": "./dist/networking/SessionFilePager.d.ts",
             "import": "./dist/session-files.js"
-        },
-        "./design-blend-types": {
-            "types": "./dist/design/DesignBlendTypes.d.ts",
-            "import": "./dist/design-blend-types.js"
         },
         "./history-records": {
             "types": "./dist/networking/HistoryRecordDecoder.d.ts",
@@ -813,17 +702,9 @@
             "types": "./dist/design/DesignCommentReadTypes.d.ts",
             "import": "./dist/design-comment-read-types.js"
         },
-        "./design-text-direction": {
-            "types": "./dist/design/DesignTextDirection.d.ts",
-            "import": "./dist/design-text-direction.js"
-        },
         "./design-text-bidi": {
             "types": "./dist/design/DesignTextBidi.d.ts",
             "import": "./dist/design-text-bidi.js"
-        },
-        "./design-script-font-bytes": {
-            "types": "./dist/design/DesignScriptFontBytes.d.ts",
-            "import": "./dist/design-script-font-bytes.js"
         },
         "./design-font-run": {
             "types": "./dist/design/DesignFontRun.d.ts",
@@ -836,10 +717,6 @@
         "./design-text-glyphs": {
             "types": "./dist/design/DesignTextGlyphs.d.ts",
             "import": "./dist/design-text-glyphs.js"
-        },
-        "./design-tidy-geometry": {
-            "types": "./dist/design/DesignTidyGeometry.d.ts",
-            "import": "./dist/design-tidy-geometry.js"
         },
         "./design-tidy-edits": {
             "types": "./dist/design/DesignTidyEdits.d.ts",
@@ -917,7 +794,7 @@
         "meshoptimizer": "^1.2.0",
         "pathkit-wasm": "1.0.0",
         "woff2-encoder": "2.0.0",
-        "nexa-protocol": "https://codeload.github.com/dacely-cloud/nexa-protocol/tar.gz/54f18175b10fa59ffefbcfd3df928c56f536e856"
+        "nexa-protocol": "https://codeload.github.com/dacely-cloud/nexa-protocol/tar.gz/93c4d38485b6ab9e7d509caea3a5147ddebf1477"
     },
     "madge": {
         "baseDir": ".",

@@ -2,7 +2,7 @@
 
 The canonical Design model supports `DesignKind.Mask` with an optional `mask` record required on mask groups: `{mode: 'alpha' | 'vector' | 'luminance', sourceId: string | null}`. Ordinary nodes omit this field.
 
-Import `DesignMaskMode` from `nexa-transport/design-mask-types`. The existing Design save/arrange RPCs carry masking edits over the authenticated WebSocket. `DesignSelectionAction.Mask` groups selected siblings using the bottom selected layer as source. `ReleaseMask` preserves the complete forest in an ordinary group. Native tooling exposes these as `design_arrange` actions `mask` and `release-mask`; `design_guide` explains exact calls.
+Import `DesignMaskMode` from `nexa-protocol/design/DesignMaskTypes.js`. The existing Design save/arrange RPCs carry masking edits over the authenticated WebSocket. `DesignSelectionAction.Mask` groups selected siblings using the bottom selected layer as source. `ReleaseMask` preserves the complete forest in an ordinary group. Native tooling exposes these as `design_arrange` actions `mask` and `release-mask`; `design_guide` explains exact calls.
 
 Source IDs reference immediate children and are remapped on duplication and component detachment. Assign another child or release masking before removing an active source. An empty source hides the content. The existing transaction revision guard, command identities, paging and undo journal apply unchanged.
 
