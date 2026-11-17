@@ -250,7 +250,7 @@
             "import": "./dist/protocol.js"
         },
         "./media": {
-            "types": "./dist/media/NexaMedia.d.ts",
+            "types": "./dist/media/Media.d.ts",
             "import": "./dist/media.js"
         },
         "./events": {
@@ -959,7 +959,7 @@
         }
     },
     "scripts": {
-        "build": "vite build && tsc -p tsconfig.build.json",
+        "build": "npm run check:circular && vite build && tsc -p tsconfig.build.json",
         "prepare": "npm run build",
         "typecheck": "tsc --noEmit",
         "lint": "oxlint --type-aware --type-check --deny-warnings src test examples",
@@ -976,11 +976,14 @@
         "test:package": "node script/pack-smoke.mjs",
         "docs": "node script/document.mjs && prettier --write \"docs/**/*.md\"",
         "docs:check": "node script/check-docs.mjs",
-        "generate:roblox": "node script/roblox.ts"
+        "generate:roblox": "node script/roblox.ts",
+        "check:circular": "madge --circular --strict ."
     },
     "devDependencies": {
+        "@types/fontkit": "2.0.9",
         "@types/node": "^26.5.1",
         "@types/ws": "^8.18.1",
+        "madge": "https://codeload.github.com/dacely-cloud/madge/tar.gz/065cb322d7fae520c5343d492f277c9f89f60938",
         "oxlint": "^1.83.0",
         "oxlint-tsgolint": "^7.0.2002",
         "prettier": "^3.9.6",
@@ -988,8 +991,7 @@
         "typescript-json-schema": "^0.68.0",
         "vite": "^8.3.0",
         "vitest": "^5.0.0",
-        "ws": "^8.21.3",
-        "@types/fontkit": "2.0.9"
+        "ws": "^8.21.3"
     },
     "publishConfig": {
         "access": "public"
@@ -1005,12 +1007,27 @@
         "transport"
     ],
     "dependencies": {
-        "fflate": "0.8.3",
         "@js-temporal/polyfill": "0.5.1",
+        "bidi-shaper": "0.1.2",
+        "fflate": "0.8.3",
+        "fontkit": "2.0.4",
         "meshoptimizer": "^1.2.0",
         "pathkit-wasm": "1.0.0",
-        "fontkit": "2.0.4",
-        "bidi-shaper": "0.1.2",
         "woff2-encoder": "2.0.0"
+    },
+    "madge": {
+        "baseDir": ".",
+        "fileExtensions": [
+            "ts",
+            "tsx",
+            "mts",
+            "cts",
+            "js",
+            "jsx",
+            "mjs",
+            "cjs"
+        ],
+        "respectGitIgnore": true,
+        "tsConfig": "./tsconfig.json"
     }
 }

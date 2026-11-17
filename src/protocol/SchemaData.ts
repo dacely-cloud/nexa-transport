@@ -35220,12 +35220,12 @@ export const schema: Schema = {
                 },
                 allowCustomActions: {
                     description:
-                        'Allow proposed actions named requested::name in addition to the supplied choices.',
+                        'Allow proposed actions with ordinary names in addition to the supplied choices.',
                     type: 'boolean',
                 },
                 input: {
                     description:
-                        'UTF-8 text, at most 32768 bytes. No model instructions or history are accepted.',
+                        'UTF-8 text, at most 32768 bytes. No separate system prompt or history fields are accepted.',
                     type: 'string',
                     minLength: 1,
                     maxLength: 32768,

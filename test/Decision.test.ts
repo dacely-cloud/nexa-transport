@@ -20,7 +20,7 @@ describe('stateless decision SDK', (): void => {
     it('sends caller input and options only and preserves JSON numeric text', async (): Promise<void> => {
         gateway = new TestGateway();
         const result: DecisionRunResult = {
-            json: '{"id":9007199254740993123,"action":"requested::bash","arguments":{"command":"ls -la"}}',
+            json: '{"id":9007199254740993123,"action":"bash","arguments":{"command":"ls -la"}}',
             durationMs: 140,
             usage: { inputTokens: 80, outputTokens: 20 },
         };

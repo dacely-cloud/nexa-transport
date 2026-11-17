@@ -251,7 +251,7 @@ it('cancels queued history pages and can reopen the same conversation on the sam
         }
     };
     const controller: AbortController = new AbortController();
-    const read: Promise<import('../src/networking/NexaClient.js').SavedHistorySnapshot> =
+    const read: Promise<import('../src/networking/ClientEvents.js').SavedHistorySnapshot> =
         connected.readHistorySnapshot('saved', undefined, undefined, controller.signal);
     const rejected: Promise<void> = expect(read).rejects.toThrow('Request aborted');
     await prefetched.promise;

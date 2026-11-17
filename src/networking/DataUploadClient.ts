@@ -1,4 +1,4 @@
-import type { NexaClient } from './NexaClient.js';
+import type { ClientConnection } from './ClientConnection.js';
 import {
     Method,
     type ConversationDataUpload,
@@ -19,7 +19,7 @@ import {
 export class DataUploadClient {
     /** New byte admission never infers a target or uses a replacement identity after an uncertain response. */
     public static async upload(
-        client: NexaClient,
+        client: ClientConnection,
         source: Blob,
         filename: string,
         options: DataUploadOptions,

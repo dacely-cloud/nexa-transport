@@ -235,7 +235,7 @@ const config: UserConfig = {
                 'workflow-resource-readiness': 'src/workflows/ResourceReadiness.ts',
                 'nexa-transport': 'src/networking/NexaClient.ts',
                 protocol: 'src/protocol/Protocol.ts',
-                media: 'src/media/NexaMedia.ts',
+                media: 'src/media/Media.ts',
                 events: 'src/protocol/Events.ts',
                 errors: 'src/networking/TransportError.ts',
             },

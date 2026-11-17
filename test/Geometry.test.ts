@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { NexaGeometry, NexaMedia } from '../src/media/NexaMedia.js';
+import { NexaGeometry, NexaMedia } from '../src/media/Media.js';
 import { methodValidators } from '../src/protocol/MethodValidators.js';
 
 it('creates schema-valid text generation turns with explicit sampling controls', (): void => {

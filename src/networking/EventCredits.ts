@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: LicenseRef-Proprietary
 
-import type { EventStream } from './EventStream.js';
 import type { BinaryInputReservation } from '../media/BinaryInputReservation.js';
 
 /** Owns queued credit without retaining queued values or their iterator. */
@@ -12,7 +11,7 @@ export class EventCredits {
     readonly #credits: Set<BinaryInputReservation> = new Set();
 
     /** Unreachable completed queues release their counters without a client or payload retention cycle. */
-    public track<T>(queue: EventStream<T>): void {
+    public track<T>(queue: AsyncIterable<T>): void {
         EventCredits.#collected.register(queue, this, this);
     }
 

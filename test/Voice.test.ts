@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
-import { NexaClient, type ReceivedTranscript } from '../src/networking/NexaClient.js';
+import { NexaClient } from '../src/networking/NexaClient.js';
+import { type ReceivedTranscript } from '../src/networking/ClientEvents.js';
 import { Method } from '../src/protocol/Protocol.js';
 import { TestGateway, type Request } from './Support.js';
 

@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: LicenseRef-Proprietary
 
-import type { NexaClient } from './NexaClient.js';
+import type { ClientConnection } from './ClientConnection.js';
 import { InboundCapacity } from './InboundCapacity.js';
 import type { BinaryInputReservation } from '../media/BinaryInputReservation.js';
 import { TransportError, TransportErrorCode } from './TransportError.js';
@@ -59,10 +59,14 @@ class ClientResourceState {
 
 /** Private association lets stream constructors use client resources without expanding the public API. */
 export class ClientResources {
-    static readonly #clients: WeakMap<NexaClient, ClientResourceState> = new WeakMap();
+    static readonly #clients: WeakMap<ClientConnection, ClientResourceState> = new WeakMap();
 
     /** Registers once; network messages cannot select or replace this authority. */
-    public static register(client: NexaClient, input: InboundCapacity, streamLimit: number): void {
+    public static register(
+        client: ClientConnection,
+        input: InboundCapacity,
+        streamLimit: number,
+    ): void {
         if (ClientResources.#clients.has(client)) {
             throw new Error('Client resources are already registered');
         }
@@ -70,23 +74,23 @@ export class ClientResources {
     }
 
     /** Returns immutable accounting authority without keeping a strong client reference. */
-    public static input(client: NexaClient): InboundCapacity {
+    public static input(client: ClientConnection): InboundCapacity {
         return ClientResources.#state(client).input;
     }
 
     /** Acquires one slot across both the convenience API and direct stream constructors. */
-    public static stream(client: NexaClient, id: string): () => void {
+    public static stream(client: ClientConnection, id: string): () => void {
         return ClientResources.#state(client).acquire(id);
     }
 
     /** Captures resource state only, so completed queues do not retain disposed clients. */
-    public static retainer(client: NexaClient): (bytes: number) => BinaryInputReservation {
+    public static retainer(client: ClientConnection): (bytes: number) => BinaryInputReservation {
         return ClientResources.#state(client).retain;
     }
 
     /** Limits a decoded frame's borrowing scope to synchronous callback dispatch. */
     public static route<T>(
-        client: NexaClient,
+        client: ClientConnection,
         credit: BinaryInputReservation,
         operation: () => T,
     ): T {
@@ -94,7 +98,7 @@ export class ClientResources {
     }
 
     /** An unregistered object cannot bypass host-established resource accounting. */
-    static #state(client: NexaClient): ClientResourceState {
+    static #state(client: ClientConnection): ClientResourceState {
         const state: ClientResourceState | undefined = ClientResources.#clients.get(client);
         if (state === undefined) {
             throw new Error('Client resource authority is unavailable');

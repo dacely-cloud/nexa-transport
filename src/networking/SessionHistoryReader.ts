@@ -11,7 +11,8 @@ import {
 import { HistoryPageWindow } from './HistoryPageWindow.js';
 import { HistoryRecordDecoder } from './HistoryRecordDecoder.js';
 import type { AttachmentProgress, ReceivedAttachment } from '../media/BinaryMedia.js';
-import type { NexaClient, SavedHistorySnapshot } from './NexaClient.js';
+import type { ClientConnection } from './ClientConnection.js';
+import type { SavedHistorySnapshot } from './ClientEvents.js';
 import type { CallOptions } from '../interface/ClientOptions.js';
 import { SessionArchiveRequests } from './SessionArchiveRequests.js';
 
@@ -19,7 +20,7 @@ import { SessionArchiveRequests } from './SessionArchiveRequests.js';
 export class SessionHistoryReader {
     /** Reads complete records after a prior boundary, without downloading their prefix again. */
     public static async snapshot(
-        client: NexaClient,
+        client: ClientConnection,
         id: string,
         cursor: string = '0',
         endCursor?: string,
@@ -90,7 +91,7 @@ export class SessionHistoryReader {
 
     /** Subscribes before requesting bytes, matching both session and attachment identity. */
     public static async download(
-        client: NexaClient,
+        client: ClientConnection,
         id: string,
         attachmentId: string,
         signal?: AbortSignal,

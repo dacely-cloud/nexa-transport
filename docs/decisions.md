@@ -40,8 +40,7 @@ the model may return `{"action":null,"reason":"..."}`. Requested `probabilities`
 estimates over all supplied actions, with values between zero and one summing to one.
 
 Set `allowCustomActions: true` to permit a proposal such as
-`{"action":"requested::bash","arguments":{"command":"ls -la"}}`. A custom action must
-use the `requested::name` namespace. When probabilities are requested, the selected custom
+`{"action":"bash","arguments":{"command":"ls -la"}}`. Custom actions use ordinary short names such as `bash` or `open_calculator`. When probabilities are requested, the selected custom
 action is included alongside the supplied choices. Nexa returns the proposal; your application
 decides whether and how to execute it. Without the option, the model cannot select an action
 outside your list.

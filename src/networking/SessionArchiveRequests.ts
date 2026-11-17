@@ -3,7 +3,7 @@
 
 import { Method, type ParamsOf, type ResultOf } from '../protocol/Protocol.js';
 import type { CallOptions } from '../interface/ClientOptions.js';
-import type { NexaClient } from './NexaClient.js';
+import type { ClientConnection } from './ClientConnection.js';
 import { TransportError, TransportErrorCode } from './TransportError.js';
 
 /** Only read operations whose admission refusal guarantees that no file bytes were sent. */
@@ -14,7 +14,7 @@ export type SessionArchiveMethod =
 export class SessionArchiveRequests {
     /** Ownership, quota, connection and transfer failures remain immediate failures. */
     public static async call<M extends SessionArchiveMethod>(
-        client: Pick<NexaClient, 'call'>,
+        client: Pick<ClientConnection, 'call'>,
         method: M,
         params: ParamsOf<M>,
         options: CallOptions = {},

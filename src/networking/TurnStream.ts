@@ -11,14 +11,15 @@ import { EventStream } from './EventStream.js';
 import { ClientResources } from './ClientResources.js';
 import { JsonSerializedBytes } from '../media/JsonSerializedBytes.js';
 import type { JsonValue, JsonObject, ResultOf } from '../protocol/Protocol.js';
-import type { GatewayEvent, NexaClient } from './NexaClient.js';
+import type { ClientConnection } from './ClientConnection.js';
+import type { GatewayEvent } from './ClientEvents.js';
 import { TransportError, TransportErrorCode } from './TransportError.js';
 import { materializeError } from './ErrorStack.js';
 
 /** A turn's events, terminal result, and server-side cancellation handle. */
 export class TurnStream implements AsyncIterable<WireTurnEvent> {
     readonly #events: EventStream<WireTurnEvent>;
-    #client: NexaClient | undefined;
+    #client: ClientConnection | undefined;
     readonly #accepted: Promise<StreamAccepted>;
     readonly #completion: PromiseWithResolvers<AskResult> = Promise.withResolvers<AskResult>();
     #unlisten: (() => void) | undefined;
@@ -34,7 +35,11 @@ export class TurnStream implements AsyncIterable<WireTurnEvent> {
     /** Settles when turn.end arrives, even if events have not yet been consumed. */
     public readonly result: Promise<AskResult>;
     /** Starts a turn; use NexaClient.stream. */
-    public constructor(client: NexaClient, params: StreamParams, options: StreamOptions = {}) {
+    public constructor(
+        client: ClientConnection,
+        params: StreamParams,
+        options: StreamOptions = {},
+    ) {
         const limit: number = options.maxBufferedEvents ?? 256;
         const bytes: number = options.maxBufferedBytes ?? 8 * 1024 * 1024;
         if (!Number.isSafeInteger(bytes) || bytes < 1 || bytes > 64 * 1024 * 1024) {
@@ -143,7 +148,7 @@ export class TurnStream implements AsyncIterable<WireTurnEvent> {
         }
     }
     async #observeStart(): Promise<void> {
-        const client: NexaClient | undefined = this.#client;
+        const client: ClientConnection | undefined = this.#client;
         try {
             const accepted: StreamAccepted = await this.#accepted;
             if (accepted.streamId !== this.streamId) {
@@ -172,7 +177,7 @@ export class TurnStream implements AsyncIterable<WireTurnEvent> {
         if (this.#ended) {
             return;
         }
-        const client: NexaClient | undefined = this.#client;
+        const client: ClientConnection | undefined = this.#client;
         this.#end(error);
         try {
             const accepted: StreamAccepted = await this.#accepted;
