@@ -226,7 +226,7 @@ template components can turn the response into model input.
 
 ## Terminal coding agents
 
-`WorkflowApplications` from `nexa-transport/workflow-applications` defines fixed
+`WorkflowApplications` from `nexa-protocol/workflows/terminal/Applications.js` defines fixed
 commands for the terminal components in the Agents category:
 
 | Component                 | Application  | Executable   |

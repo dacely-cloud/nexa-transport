@@ -35,7 +35,7 @@ deletes the tool and its license file from the VM.
 
 ```ts
 import { Method } from 'nexa-transport/protocol';
-import { LicensedTool, LicensedToolState } from 'nexa-transport/vm-connections';
+import { LicensedTool, LicensedToolState } from 'nexa-protocol/connections/ConnectionTypes.js';
 
 declare const client: import('nexa-transport').NexaClient;
 await client.call(Method.ConnectionsToolsInstall, { tool: LicensedTool.IdaPro });

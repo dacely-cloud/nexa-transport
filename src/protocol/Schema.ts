@@ -1,5 +1,5 @@
 import { VisualResponses } from '../visuals/VisualResponses.js';
-import { Graphics } from '../graphics/Graphic.js';
+import { Graphics } from 'nexa-protocol/graphics/Graphic.js';
 /** JSON Schema subset emitted from Nexa's TypeScript contracts. */
 export interface Schema {
     readonly $ref?: string;

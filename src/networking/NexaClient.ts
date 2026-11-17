@@ -64,7 +64,7 @@ import * as validators from '../protocol/Validators.js';
 import { PendingRequests } from './PendingRequests.js';
 import { TransportError, TransportErrorCode } from './TransportError.js';
 import { SessionFilePager } from './SessionFilePager.js';
-import { GatewayVersion } from '../protocol/GatewayVersion.js';
+import { GatewayVersion } from 'nexa-protocol/gateway/GatewayVersion.js';
 import type { SessionFilePage, SessionFileListParams } from '../protocol/Protocol.js';
 import { RedTeamClient, type RedTeamRequestMap } from '../redteam/RedTeamClient.js';
 import {

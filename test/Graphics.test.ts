@@ -1,5 +1,10 @@
 import { expect, it } from 'vitest';
-import { Graphics, GraphicKind, GraphicStyle, type Graphic } from '../src/graphics/Graphic.js';
+import {
+    Graphics,
+    GraphicKind,
+    GraphicStyle,
+    type Graphic,
+} from 'nexa-protocol/graphics/Graphic.js';
 import { isEventData } from '../src/protocol/Events.js';
 import * as validators from '../src/protocol/Validators.js';
 

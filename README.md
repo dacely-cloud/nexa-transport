@@ -56,37 +56,35 @@ Chat, tools, media, artifacts, and voice through the Nexa gateway.
 
 ## Features
 
-|                    |                                                            |
-| ------------------ | ---------------------------------------------------------- |
-| **Typed RPC**      | Method enums with method-specific parameters and results.  |
-| **Conversations**  | Create, resume, list, and retrieve chat history.           |
-| **Streaming**      | Text, reasoning, tool progress, and terminal results.      |
-| **Media**          | Images, videos, ordered frames, and documents.             |
-| **Rich output**    | Tool results, artifacts, NCAP events, and binary payloads. |
-| **Voice**          | PCM audio transport, transcripts, and call lifecycle.      |
-| **Access control** | API keys, device pairing, scopes, and tool approvals.      |
-| **Portable**       | Browser and Node.js support with no runtime dependencies.  |
+|                    |                                                                     |
+| ------------------ | ------------------------------------------------------------------- |
+| **Typed RPC**      | Method enums with method-specific parameters and results.           |
+| **Conversations**  | Create, resume, list, and retrieve chat history.                    |
+| **Streaming**      | Text, reasoning, tool progress, and terminal results.               |
+| **Media**          | Images, videos, ordered frames, and documents.                      |
+| **Rich output**    | Tool results, artifacts, NCAP events, and binary payloads.          |
+| **Voice**          | PCM audio transport, transcripts, and call lifecycle.               |
+| **Access control** | API keys, device pairing, scopes, and tool approvals.               |
+| **Portable**       | Browser and Node.js support; one runtime dependency, nexa-protocol. |
 
 ## Installation
 
 Requires Node.js 22+ or a modern browser. Distributed as ESM with TypeScript declarations.
 
-Build a package from source (`npm pack` runs the full check/build hooks):
+Install it from GitHub at a commit, together with the `nexa-protocol` commit that
+`package.json` here pins. Shared definitions such as graphics, account connections
+and terminal applications are imported from `nexa-protocol` directly, so your
+application declares both:
 
-```bash
-git clone git@github.com:dacely-cloud/nexa-transport.git
-cd nexa-transport
-npm ci
-npm pack
+```json
+"nexa-transport": "git+https://github.com/dacely-cloud/nexa-transport.git#<commit>",
+"nexa-protocol": "https://codeload.github.com/dacely-cloud/nexa-protocol/tar.gz/<commit>"
 ```
 
-Install the resulting archive in your application:
-
-```bash
-npm install /path/to/nexa-transport-0.1.0.tgz
-```
-
-For a checked-in `file:vendor/…tgz` dependency, retain the archive at that relative path and commit the matching package.json/lockfile integrity. Keep only the current archive, update the lockfile integrity and reinstall when replacing its bytes. The package is ESM: use ES imports and `import type` for [type-only entry points](./docs/exports.md).
+npm builds the package on install (`prepare`). Projects that restrict remote
+dependencies with `allow-remote=root` must declare `nexa-protocol` themselves, because
+npm refuses a URL dependency reached only through another package. The package is
+ESM: use ES imports and `import type` for [type-only entry points](./docs/exports.md).
 
 ## Quick start
 

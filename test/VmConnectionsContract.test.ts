@@ -12,7 +12,7 @@ import {
     ChatModelSource,
     LicensedTool,
     LicensedToolState,
-} from '../src/connections/ConnectionTypes.js';
+} from 'nexa-protocol/connections/ConnectionTypes.js';
 
 const status: LicensedToolStatus = {
     tool: LicensedTool.IdaPro,

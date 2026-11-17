@@ -366,18 +366,6 @@
             "types": "./dist/workflows/WorkflowGroupCodec.d.ts",
             "import": "./dist/workflow-group-codec.js"
         },
-        "./workflow-applications": {
-            "types": "./dist/workflows/terminal/Applications.d.ts",
-            "import": "./dist/workflow-applications.js"
-        },
-        "./workflow-terminal-types": {
-            "types": "./dist/workflows/terminal/TerminalTypes.d.ts",
-            "import": "./dist/workflow-terminal-types.js"
-        },
-        "./vm-connections": {
-            "types": "./dist/connections/ConnectionTypes.d.ts",
-            "import": "./dist/vm-connections.js"
-        },
         "./workflow-model-effort": {
             "types": "./dist/workflows/ModelEffort.d.ts",
             "import": "./dist/workflow-model-effort.js"
@@ -952,10 +940,6 @@
         "./visual-responses": {
             "types": "./dist/visuals/VisualResponses.d.ts",
             "import": "./dist/visual-responses.js"
-        },
-        "./graphics": {
-            "types": "./dist/graphics/Graphic.d.ts",
-            "import": "./dist/graphics.js"
         }
     },
     "scripts": {
@@ -1012,7 +996,8 @@
         "fontkit": "2.0.4",
         "meshoptimizer": "^1.2.0",
         "pathkit-wasm": "1.0.0",
-        "woff2-encoder": "2.0.0"
+        "woff2-encoder": "2.0.0",
+        "nexa-protocol": "https://codeload.github.com/dacely-cloud/nexa-protocol/tar.gz/4094e21f7f6b3eea71fa0e45d1d6036cab007a87"
     },
     "madge": {
         "baseDir": ".",
