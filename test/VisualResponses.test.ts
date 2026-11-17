@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: LicenseRef-Proprietary
 import { expect, it } from 'vitest';
 import { VisualResponses, type VisualResponse } from '../src/visuals/VisualResponses.js';
 import { isEventData } from '../src/protocol/Events.js';

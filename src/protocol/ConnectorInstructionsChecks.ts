@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: LicenseRef-Proprietary
 
 /** Dependent UTF-8 and int64 limits complement the public JSON schema at the client boundary. */
 export class ConnectorInstructionsChecks {

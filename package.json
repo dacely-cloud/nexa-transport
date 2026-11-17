@@ -3,7 +3,7 @@
     "version": "0.1.0-vm-connections.1",
     "description": "Typed Nexa websocket gateway client for browsers and Node.js",
     "type": "module",
-    "license": "Apache-2.0",
+    "license": "UNLICENSED",
     "sideEffects": false,
     "engines": {
         "node": ">=22"

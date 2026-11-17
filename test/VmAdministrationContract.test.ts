@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: LicenseRef-Proprietary
 
 import { expect, expectTypeOf, it } from 'vitest';
 import { NexaClient } from '../src/networking/NexaClient.js';

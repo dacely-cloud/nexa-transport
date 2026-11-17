@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: LicenseRef-Proprietary
 
 import type { SessionFileListParams, SessionFilePage } from '../protocol/Protocol.js';
 import type { CallOptions } from '../interface/ClientOptions.js';

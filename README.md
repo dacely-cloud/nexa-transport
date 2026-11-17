@@ -511,7 +511,7 @@ See [Chat.ts](./examples/Chat.ts) and [Node.ts](./examples/Node.ts) for applicat
 
 ---
 
-<div align="center"><sub><a href="./LICENSE">Apache-2.0</a> · <a href="https://github.com/dacely-cloud">Dacely Cloud</a></sub></div>
+<div align="center"><sub><a href="./LICENSE">Proprietary</a> · <a href="https://github.com/dacely-cloud">Dacely Cloud</a></sub></div>
 
 ### Text and image to 3D
 

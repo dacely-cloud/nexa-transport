@@ -1,6 +1,6 @@
 import { uploadContext, uploadReply } from './support/UploadWireFixture.js';
 // SPDX-FileCopyrightText: 2026 Nexa contributors
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: LicenseRef-Proprietary
 
 import { expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
