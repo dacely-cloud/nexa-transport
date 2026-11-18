@@ -109,7 +109,7 @@
     ],
     "dependencies": {
         "meshoptimizer": "^1.2.0",
-        "nexa-protocol": "https://codeload.github.com/dacely-cloud/nexa-protocol/tar.gz/__NEXA_PROTOCOL_SHA__"
+        "nexa-protocol": "https://codeload.github.com/dacely-cloud/nexa-protocol/tar.gz/d1cd9559fefbdd34015ffb3df1901c45570d59ab"
     },
     "madge": {
         "baseDir": ".",
