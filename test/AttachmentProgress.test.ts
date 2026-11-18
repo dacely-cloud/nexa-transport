@@ -1,12 +1,12 @@
 import { afterEach, expect, it, vi } from 'vitest';
 import type { WebSocket } from 'ws';
 import { NexaClient } from '../src/networking/NexaClient.js';
-import { BinaryChunks } from '../src/media/BinaryChunks.js';
+import { BinaryChunks } from 'nexa-protocol/media/BinaryChunks.js';
 import {
     BinaryMedia,
     type AttachmentProgress,
     type ReceivedAttachment,
-} from '../src/media/BinaryMedia.js';
+} from 'nexa-protocol/media/BinaryMedia.js';
 import { Method } from '../src/protocol/Protocol.js';
 import { hello, TestGateway, type Request } from './Support.js';
 

@@ -1,27 +1,15 @@
 # Workflow resource contracts
 
-See the [workflow guide](workflows.md) for current execution, model, template, HTTP, terminal and usage APIs. The resource and draft foundation has these portable package entry points:
+See the [workflow guide](workflows.md) for current execution, model, template, HTTP, terminal and usage APIs. The resource and draft wire types are in these `nexa-protocol` modules:
 
-| Import                                            | Purpose                                                                             |
-| ------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| `nexa-protocol/workflows/ResourceTypes.js`        | Binding, descriptor, family, use, mode and readiness types/constants                |
-| `nexa-protocol/workflows/ResourceBindingCodec.js` | Validate and detach version 1 binding data                                          |
-| `nexa-protocol/workflows/ResourceReadiness.js`    | Compute advisory readiness without I/O                                              |
-| `nexa-transport/workflow-types`                   | Versioned draft nodes, edges, patches, manifests and compact management projections |
-| `nexa-transport/workflow-codec`                   | Validate draft syntax while preserving incomplete configuration                     |
-| `nexa-transport/workflow-requests`                | Draft RPC types and bounded transport limits                                        |
-| `nexa-transport/workflow-request-codec`           | Strict create/save/list/read/record request parsing                                 |
-| `nexa-transport/workflow-catalog`                 | Exact-version component registry and default node creation                          |
-| `nexa-transport/workflow-component-types`         | Roles, categories, ports and execution declarations                                 |
-| `nexa-transport/workflow-validation`              | Pure graph validation without external I/O                                          |
-| `nexa-transport/workflow-graph-types`             | Graph snapshots and bounded validation results                                      |
-| `nexa-transport/workflow-ports`                   | Port compatibility for connection pickers                                           |
-| `nexa-protocol/workflows/Schemas.js`              | Shared schema constructors and managed envelopes                                    |
-| `nexa-protocol/workflows/SchemaTypes.js`          | Value, envelope and schema contracts                                                |
-| `nexa-transport/workflow-values`                  | Bounded runtime value validation                                                    |
-
-Nexa owns the canonical files in `src/workflows/`. Run `npm run generate:workflows`
-to copy them, or run the full protocol generator. Parity tests reject drift.
+| Import                                        | Purpose                                                                             |
+| --------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `nexa-protocol/workflows/ResourceTypes.js`    | Binding, descriptor, family, use, mode and readiness types/constants                |
+| `nexa-protocol/workflows/WorkflowTypes.js`    | Versioned draft nodes, edges, patches, manifests and compact management projections |
+| `nexa-protocol/workflows/WorkflowRequests.js` | Draft RPC types and bounded transport limits                                        |
+| `nexa-protocol/workflows/ComponentTypes.js`   | Roles, categories, ports and execution declarations                                 |
+| `nexa-protocol/workflows/GraphTypes.js`       | Graph snapshots and bounded validation results                                      |
+| `nexa-protocol/workflows/SchemaTypes.js`      | Value, envelope and schema contracts                                                |
 
 Bindings identify one consumer, external resource, connection, connector version,
 exact dataset/endpoint, permitted operation requirements and output limits.
@@ -55,7 +43,7 @@ operational adapters. Syntax validation is not graph validation or permission to
 
 ## Nested workflow groups
 
-`supportsWorkflowGroups` requires the advertised `workflowGroupsVersion: 1` plus complete graph/draft support. Use `nexa-transport/workflow-group-types` and `nexa-transport/workflow-group-codec` for the canonical group, published-port and immutable-reference shapes. Group records store a parent-local origin and directly owned node identities; they do not store collapse, viewport, execution state or resource credentials. Published ports alias exact original node/port endpoints without rewriting executable edges.
+`supportsWorkflowGroups` requires the advertised `workflowGroupsVersion: 1` plus complete graph/draft support. The canonical group, published-port and immutable-reference shapes are in `nexa-protocol/workflows/WorkflowGroupTypes.js`. Group records store a parent-local origin and directly owned node identities; they do not store collapse, viewport, execution state or resource credentials. Published ports alias exact original node/port endpoints without rewriting executable edges.
 
 Hierarchy-aware patches include both `groups` upserts and `removeGroups` identities, even when one or both arrays are empty. The writer validates the complete resulting hierarchy atomically against the post-edit node set. Orphan parents, cycles, duplicate ownership, publications outside their subtree, more than 1000 groups or more than 16 nesting levels are rejected. Parent movement writes a new group record and retains unchanged child node, position and group references. Node removal must also repair membership/publications in the same patch.
 

@@ -3,7 +3,7 @@
 
 import type { ClientConnection } from './ClientConnection.js';
 import { InboundCapacity } from './InboundCapacity.js';
-import type { BinaryInputReservation } from '../media/BinaryInputReservation.js';
+import type { BinaryInputReservation } from 'nexa-protocol/media/BinaryInputReservation.js';
 import { TransportError, TransportErrorCode } from './TransportError.js';
 import { materializeError } from './ErrorStack.js';
 

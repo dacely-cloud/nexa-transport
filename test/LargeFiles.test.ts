@@ -1,7 +1,7 @@
 import { afterEach, expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
-import { BinaryChunks } from '../src/media/BinaryChunks.js';
-import { BinaryMedia, type ReceivedAttachment } from '../src/media/BinaryMedia.js';
+import { BinaryChunks } from 'nexa-protocol/media/BinaryChunks.js';
+import { BinaryMedia, type ReceivedAttachment } from 'nexa-protocol/media/BinaryMedia.js';
 import { NexaMedia } from '../src/media/NexaMedia.js';
 import { NexaClient } from '../src/networking/NexaClient.js';
 import { Method, type InboundAttachment, type HelloOk } from '../src/protocol/Protocol.js';

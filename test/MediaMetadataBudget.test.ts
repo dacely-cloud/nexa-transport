@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: LicenseRef-Proprietary
 
 import { expect, it, vi, type MockInstance } from 'vitest';
-import { BinaryMedia, type ReceivedAttachment } from '../src/media/BinaryMedia.js';
-import { BinaryByteBudget } from '../src/media/BinaryByteBudget.js';
-import { BinaryInputReservation } from '../src/media/BinaryInputReservation.js';
+import { BinaryMedia, type ReceivedAttachment } from 'nexa-protocol/media/BinaryMedia.js';
+import { BinaryByteBudget } from 'nexa-protocol/media/BinaryByteBudget.js';
+import { BinaryInputReservation } from 'nexa-protocol/media/BinaryInputReservation.js';
 
 /** Frames external metadata independently of the codec's trusted encoder. */
 function frame(text: string): ArrayBuffer {

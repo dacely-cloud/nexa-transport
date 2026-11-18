@@ -1,21 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: LicenseRef-Proprietary
 
-import { readFile } from 'node:fs/promises';
 import { expect, it } from 'vitest';
-import { resolveBridgeInput, type ToolCallInput } from '../src/toolsearch/BridgeInput.js';
-
-it('shares the executed native bridge resolver without server runtime imports', async (): Promise<void> => {
-    const native: string = await readFile(
-        new URL('../../nexa/src/toolsearch/BridgeInput.ts', import.meta.url),
-        'utf8',
-    );
-    const sdk: string = await readFile(
-        new URL('../src/toolsearch/BridgeInput.ts', import.meta.url),
-        'utf8',
-    );
-    expect(sdk).toBe(native.replace("'../providers/Types'", "'../protocol/Protocol.js'"));
-});
+import { resolveBridgeInput, type ToolCallInput } from 'nexa-protocol/toolsearch/BridgeInput.js';
 
 it('retains target names and arguments through supported redundant envelopes', (): void => {
     const leaf: ToolCallInput = {

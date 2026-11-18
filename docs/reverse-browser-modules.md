@@ -3,8 +3,7 @@
 Read immutable `application:browser-import-report` evidence using
 `Method.ReverseBrowserModules` over Nexa's authenticated WebSocket. Parameters are
 the original parent conversation `id`, child analysis `runId`, report `evidenceId`,
-`view`, and an optional decimal `cursor`. `ReverseInvestigation.modules` validates
-reply identities, exact fields, native/computed states, Unicode and pagination.
+`view`, and an optional decimal `cursor`.
 
 `view: "imports"` returns body-free relationship previews. `view: "candidates"`
 requires an exact relationship ID as `selector` and returns original captured

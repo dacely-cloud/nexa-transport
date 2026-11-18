@@ -1,6 +1,6 @@
 import type { InboundAttachment } from '../src/protocol/Protocol.js';
-import { BinaryMedia } from '../src/media/BinaryMedia.js';
-import { BinaryEnvelope } from '../src/media/BinaryEnvelope.js';
+import { BinaryMedia } from 'nexa-protocol/media/BinaryMedia.js';
+import { BinaryEnvelope } from 'nexa-protocol/media/BinaryEnvelope.js';
 import { describe, expect, it } from 'vitest';
 import { NexaMedia } from '../src/media/NexaMedia.js';
 import { SchemaValidator } from '../src/protocol/Schema.js';

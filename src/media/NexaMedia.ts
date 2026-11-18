@@ -1,5 +1,5 @@
-import { BinaryChunks } from './BinaryChunks.js';
-import type { ReceivedAttachment } from './BinaryMedia.js';
+import { BinaryChunks } from 'nexa-protocol/media/BinaryChunks.js';
+import type { ReceivedAttachment } from 'nexa-protocol/media/BinaryMedia.js';
 export { MeshoptDecoder } from 'meshoptimizer/decoder';
 import type {
     BinarySource,

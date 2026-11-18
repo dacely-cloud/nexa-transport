@@ -6,6 +6,4 @@ Import `DesignMaskMode` from `nexa-protocol/design/DesignMaskTypes.js`. The exis
 
 Source IDs reference immediate children and are remapped on duplication and component detachment. Assign another child or release masking before removing an active source. An empty source hides the content. The existing transaction revision guard, command identities, paging and undo journal apply unchanged.
 
-`DesignScene.paints(node)` excludes source artwork from ordinary painter passes. A mask-source render pass supplies its owning group ID as the optional second argument. Vector coverage can use the portable `DesignMaskGeometry.vector(node)` adapter from `nexa-transport/design-mask-geometry`; it retains geometry and glyph records without changing stored paints.
-
 SVG export retains source definitions and masks rather than flattening editable artwork. Alpha and vector use alpha mask coverage; luminance explicitly uses sRGB luminance. Browser masking uses the existing editor renderer and a bounded render-target pool.

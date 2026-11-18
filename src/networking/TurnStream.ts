@@ -9,7 +9,7 @@ import type {
 import * as validators from '../protocol/Validators.js';
 import { EventStream } from './EventStream.js';
 import { ClientResources } from './ClientResources.js';
-import { JsonSerializedBytes } from '../media/JsonSerializedBytes.js';
+import { JsonSerializedBytes } from 'nexa-protocol/media/JsonSerializedBytes.js';
 import type { JsonValue, JsonObject, ResultOf } from '../protocol/Protocol.js';
 import type { ClientConnection } from './ClientConnection.js';
 import type { GatewayEvent } from './ClientEvents.js';

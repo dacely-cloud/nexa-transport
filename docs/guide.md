@@ -16,7 +16,6 @@
 - [Errors and limits](#errors-and-limits)
 - [Complete reference](#complete-reference)
 - [Session recovery](sessions.md)
-- [Reverse-engineering APIs](reverse-investigation.md)
 - [Runtime controls and integrations](operations.md)
 - [Package entry points](exports.md)
 
@@ -374,7 +373,7 @@ The transport does not execute tools on the client or send a local tool catalog.
 Nexa's `render_visual` tool delivers typed UI instructions in `ToolResult.visual`. The scene contains positioned cards, background groups, text, metrics, semantic styles, labelled arrows, and optional flow animation. Nexa plans the components, relationships and reading order after reading the relevant evidence. See [Visual responses](visual-responses.md) for the vocabulary and an example.
 
 ```ts
-import { VisualResponses, type VisualResponse } from 'nexa-transport/visual-responses';
+import { VisualResponses, type VisualResponse } from 'nexa-protocol/visuals/VisualResponses.js';
 
 if (event.type === 'tool-finish' && event.outcome.result.visual !== undefined) {
     const visual: VisualResponse = VisualResponses.parse(event.outcome.result.visual);
@@ -513,7 +512,6 @@ RPC mutations are never automatically retried. Connection retries and read-subsc
 
 - [Package entry points](exports.md)
 - [Session recovery and saved attachments](sessions.md)
-- [Reverse-engineering APIs](reverse-investigation.md)
 - [Workflows](workflows.md)
 
 - [Client, stream, media helpers, and options](client.md)
@@ -521,7 +519,7 @@ RPC mutations are never automatically retried. Connection retries and read-subsc
 - [All protocol type fields and variants](protocol.md)
 - [Typed source examples](../examples)
 
-The method/type pages are generated from the package's bundled contract with `npm run docs`. After updating the server protocol, run `npm run generate` before regenerating documentation, and run the normal package checks. `npm run docs:check` compiles `ts` and `typescript` code blocks across README and every documentation page against the SDK and checks variable annotations. Snippets share the connection setup above; file and microphone inputs are supplied by the application. Stream loop bindings are inferred from the explicitly typed `TurnStream` because TypeScript forbids type annotations on `for...of` bindings.
+The method/type pages are generated from the gateway contract together with the protocol types. `npm run docs:check` compiles `ts` and `typescript` code blocks across README and every documentation page against the SDK and checks variable annotations. Snippets share the connection setup above; file and microphone inputs are supplied by the application. Stream loop bindings are inferred from the explicitly typed `TurnStream` because TypeScript forbids type annotations on `for...of` bindings.
 
 ## Recover after a reload or disconnect
 

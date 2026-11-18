@@ -4,37 +4,6 @@
 
 A supplied stack replaces the layer paints for that range. `[]` leaves the selected characters unfilled; `null` restores layer paints. Omitted fields preserve existing formatting. A non-null stack requires a null range `color`; a compact patch can omit `color`. Setting `color` replaces any existing range stack. Gradient coordinates and image framing use the entire text box, including wrapped lines and viewport windows.
 
-```ts
-import { DesignDefaults } from 'nexa-transport/design-defaults';
-import { DesignTextStyles } from 'nexa-transport/design-text-styles';
-import {
-    DesignPaintKind,
-    type DesignNode,
-    type DesignPaint,
-    type DesignText,
-} from 'nexa-transport/design-types';
-
-const template: DesignNode = DesignDefaults.node('caption', 'text');
-if (template.text === null) {
-    throw new Error('Missing text defaults');
-}
-const gradient: DesignPaint = {
-    ...DesignDefaults.paint(),
-    kind: DesignPaintKind.Linear,
-    stops: [
-        { offset: 0, color: '#CC3366' },
-        { offset: 1, color: '#97D9B7' },
-    ],
-};
-const text: DesignText = { ...template.text, content: 'Find your next idea' };
-const styled: DesignText = DesignTextStyles.apply(text, 0, 4, {
-    fills: [gradient],
-    weight: 700,
-    underline: true,
-});
-console.log(styled.content === text.content);
-```
-
 For saved documents, send a compact `text-style` operation through the authenticated client and pin `expectedRevision`. Verify with `design.text-style`: it returns original intersecting ranges and full-source fingerprints, without paragraph text. Pages normally stay within 12,000 bytes. A single first range with a stack can use up to 65,536 bytes, retaining every legal stop; continue with the exact `nextOffset` at the same revision and source range.
 
 Connected editors expose the stack controls only when `hello.features.designTextRangeFills === true`. A glyph window carries `rangeFills: true` when the complete layer uses range stacks, even if its visible glyphs inherit layer paint. It includes only visible range styles and glyph positions. Image references from other ranges are not sent. Shared image caches retain each renderer's active window demand independently.

@@ -8,7 +8,7 @@ import {
     type DataUploadContext,
 } from '../protocol/Protocol.js';
 import type { DataUploadOptions } from '../interface/DataUploadOptions.js';
-import { BinaryUploadSizing } from '../media/BinaryUploadSizing.js';
+import { BinaryUploadSizing } from 'nexa-protocol/media/BinaryUploadSizing.js';
 import {
     DataUploadFailure,
     DataUploadFailureState,

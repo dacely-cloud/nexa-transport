@@ -93,9 +93,8 @@ activates its own authored behavior.
 `RobloxLiveStart` opens an authorized delivered `preview.roblox.live.json` attachment
 using its conversation and attachment IDs. The server reads the archived source and
 execution context; callers cannot override either with browser input.
-`RobloxLiveDescriptorCodec` from `nexa-transport/roblox-live-descriptor` validates the
-descriptor and returns an explicit `executionContext`. It accepts server/client from
-`nexa-transport/roblox-execution-context`; older artifacts without that field use server.
+The server validates the descriptor and its explicit `executionContext`, server or
+client; older artifacts without that field use server.
 Malformed selectors are rejected. The selected side remains fixed for the session.
 Client execution supports eligible native LocalScripts and their original callbacks;
 it does not create players, replication or a connected client/server pair.

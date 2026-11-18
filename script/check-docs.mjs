@@ -109,6 +109,7 @@ try {
                 noUnusedLocals: false,
                 noUnusedParameters: false,
                 noEmit: true,
+                types: ['node'],
                 paths: Object.fromEntries(
                     Object.entries(packageExports).map(([key, entry]) => [
                         key === '.' ? 'nexa-transport' : `nexa-transport${key.slice(1)}`,

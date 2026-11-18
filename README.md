@@ -43,7 +43,6 @@ Chat, tools, media, artifacts, and voice through the Nexa gateway.
 - [Emotional state](./docs/emotions.md): current mood, feelings and private relationships per user, with UI refresh examples.
 - [Package entry points](./docs/exports.md): every public runtime/type import and its contract.
 - [Session recovery](./docs/sessions.md): stream acceptance, cancellation/detachment, durable history, and lazy saved-file downloads.
-- [Reverse-engineering APIs](./docs/reverse-investigation.md): live receipts, replay, and each saved-evidence query family.
 - [Runtime controls and integrations](./docs/operations.md): processes, scheduled jobs, wallets, Roblox, and administration.
 - [RPC reference](./docs/methods.md): every bundled method with call templates, parameters, and results.
 - [Binary media protocol](./docs/binary-media.md): raw bytes, chunking, limits, and file delivery.
@@ -72,18 +71,19 @@ Chat, tools, media, artifacts, and voice through the Nexa gateway.
 Requires Node.js 22+ or a modern browser. Distributed as ESM with TypeScript declarations.
 
 Install it from GitHub at a commit, together with the `nexa-protocol` commit that
-`package.json` here pins. Shared definitions such as graphics, account connections
-and terminal applications are imported from `nexa-protocol` directly, so your
+`package.json` here pins. Wire definitions such as graphics, account connections
+and terminal application names are imported from `nexa-protocol` directly, so your
 application declares both:
 
 ```json
 "nexa-transport": "git+https://github.com/dacely-cloud/nexa-transport.git#<commit>",
-"nexa-protocol": "git+https://github.com/dacely-cloud/nexa-protocol.git#<commit>"
+"nexa-protocol": "https://codeload.github.com/dacely-cloud/nexa-protocol/tar.gz/<commit>"
 ```
 
-npm builds the package on install (`prepare`). Git must be authenticated with
-read access to the private `dacely-cloud/nexa-protocol` repository. The package is
-ESM: use ES imports and `import type` for [type-only entry points](./docs/exports.md).
+npm builds the package on install (`prepare`). `nexa-protocol` is public and installs
+from its commit tarball. Projects that restrict remote dependencies with
+`allow-remote=root` must declare `nexa-protocol` themselves, because npm refuses a URL
+dependency reached only through another package. The package is ESM: use ES imports and `import type` for [type-only entry points](./docs/exports.md).
 
 ## Quick start
 
@@ -220,29 +220,12 @@ controller.abort();
 Native `reverse_engineer` calls carry structured investigation receipts in tool
 progress and final outcomes. They describe the shared task plan, dependency
 edges, specialist states, retries and evidence provenance. They contain no query
-capability fields. Use the same receipts when replaying presentation history.
-
-```ts
-import { ReverseInvestigation } from 'nexa-transport/reverse-investigation';
-import type { ReverseRunSnapshot } from 'nexa-transport/protocol';
-
-let investigation: ReverseRunSnapshot | undefined;
-for await (const update of client.stream({ message: 'Reverse engineer sample.bin' })) {
-    const receipt: ReverseRunSnapshot | undefined = ReverseInvestigation.event(update);
-    if (receipt !== undefined) {
-        investigation = ReverseInvestigation.advance(investigation, receipt);
-        console.log(investigation.state, investigation.tasks, investigation.evidence);
-    }
-}
-```
-
-`parse` validates untrusted receipts and their presentation limits. `advance`
-rejects identity changes and ignores stale revisions or attempts to revive a
-terminal run. Revisions and timestamps remain decimal strings. Live projections
-include at most 16 recent evidence records; specialists use `reverse_evidence`
-to page through their entire shared index and read saved observations. A `done`
-specialist has submitted a report; its claims still need verification. A tool's
-`ok` result can contain a run with `partial` coverage, which should remain visible.
+capability fields. Revisions and timestamps remain decimal strings. Live
+projections include at most 16 recent evidence records; specialists use
+`reverse_evidence` to page through their entire shared index and read saved
+observations. A `done` specialist has submitted a report; its claims still need
+verification. A tool's `ok` result can contain a run with `partial` coverage,
+which should remain visible.
 
 ## Media and artifacts
 
@@ -485,26 +468,23 @@ npm ci
 npm run check
 ```
 
-| Command                       | Purpose                                                         |
-| ----------------------------- | --------------------------------------------------------------- |
-| `npm run build`               | Build ESM bundles and declarations                              |
-| `npm run typecheck`           | Check TypeScript contracts                                      |
-| `npm run lint`                | Run type-aware Oxc checks                                       |
-| `npm run format`              | Format source and documentation                                 |
-| `npm test`                    | Run library tests                                               |
-| `npm run test:memory`         | Build and run forced-GC retention and memory stress tests       |
-| `npm run test:memory:browser` | Run the two-tab Chrome memory stress test                       |
-| `npm run generate`            | Regenerate protocol types, schemas, and workflow contracts      |
-| `npm run generate:workflows`  | Copy portable workflow contracts from the sibling Nexa checkout |
-| `npm run docs`                | Regenerate RPC/type references and format documentation         |
-| `npm run docs:check`          | Compile TypeScript examples across README and documentation     |
-| `npm pack`                    | Build and package a release                                     |
+| Command                       | Purpose                                                     |
+| ----------------------------- | ----------------------------------------------------------- |
+| `npm run build`               | Build ESM bundles and declarations                          |
+| `npm run typecheck`           | Check TypeScript contracts                                  |
+| `npm run lint`                | Run type-aware Oxc checks                                   |
+| `npm run format`              | Format source and documentation                             |
+| `npm test`                    | Run library tests                                           |
+| `npm run test:memory`         | Build and run forced-GC retention and memory stress tests   |
+| `npm run test:memory:browser` | Run the two-tab Chrome memory stress test                   |
+| `npm run docs:check`          | Compile TypeScript examples across README and documentation |
+| `npm pack`                    | Build and package a release                                 |
 
 Nexa's gateway suites that drive this client run in `dacely-cloud/nerva-integration` with
 `npx vitest run --project nexa`.
 | `npm run test:package` | Verify the packed package in an isolated consumer |
 
-`npm run docs:check` also checks package import names against the export map and requires every public entry point in the index. Protocol generation requires a sibling `nexa` checkout. Gateway tests additionally require the transport integration fixtures in that checkout and Google Chrome. Package verification requires a generated tarball.
+`npm run docs:check` also checks package import names against the export map and requires every public entry point in the index. Gateway tests additionally require the transport integration fixtures in that checkout and Google Chrome. Package verification requires a generated tarball.
 
 See [Chat.ts](./examples/Chat.ts) and [Node.ts](./examples/Node.ts) for application examples.
 
@@ -602,47 +582,27 @@ Slices are negotiated up to 4 MiB and reduced to the gateway's frame and memory 
 
 For inline CSV, TSV, JSON, JSONL, PDF and Office files, use `NexaMedia.document(file)`. It preserves `File.name` and infers the MIME type from the filename when the browser leaves `File.type` empty. Nexa can import structured attachments directly by their media ID using `import_dataset`, then run full-data SQL with `query_dataset`. Word `.docx` text is available through `extract_document`.
 
-Workflow planning source metadata is available when `client.supportsWorkflowPlanningSources` is true. `Method.WorkflowsPlanningSources` accepts `{workflowId, after}` and returns an owner-scoped metadata page. Planning requests may include up to 16 explicit `sourceIds`; source-free request serialization stays compatible with older gateways. The SDK refuses source discovery and source-bearing requests if the method was not negotiated. Import the shared metadata types and boundary codec from `nexa-protocol/workflows/planning/PlanningSources.js`. The current workspace entries require an adapter and confer no file access or workflow execution permission.
+Workflow planning source metadata is available when `client.supportsWorkflowPlanningSources` is true. `Method.WorkflowsPlanningSources` accepts `{workflowId, after}` and returns an owner-scoped metadata page. Planning requests may include up to 16 explicit `sourceIds`; source-free request serialization stays compatible with older gateways. The SDK refuses source discovery and source-bearing requests if the method was not negotiated. The metadata types are in `nexa-protocol/workflows/planning/PlanningSourceTypes.js`. The current workspace entries require an adapter and confer no file access or workflow execution permission.
 
-New planning replies may also include versioned `alignment` fingerprints generated by Nexa. Import portable graph canonicalization and anchor types from `nexa-transport/workflow-planning-alignment` when comparing a current draft with proposed steps. Fingerprints exclude card labels/layout and detect configuration or connection drift; they are not authorization or proof of execution readiness. Older stored replies may omit them.
-
-### Workflow artifact downloads
-
-Use an artifact ID returned by an owned workflow run. Downloads use the same authenticated connection and validate every fragment plus the complete SHA-256 before returning bytes:
-
-```ts
-import {
-    WorkflowArtifactDownloads,
-    type WorkflowArtifactDownload,
-} from 'nexa-transport/workflow-artifacts';
-
-const controller: AbortController = new AbortController();
-const download: WorkflowArtifactDownload = await WorkflowArtifactDownloads.forClient(
-    client,
-).download({ runId: 'owned-run-id', artifactId: 'returned-artifact-id' }, controller.signal);
-const file: Blob = new Blob([download.bytes], { type: download.artifact.contentType });
-```
-
-The helper bounds total content to 32 MiB, checks contiguous 256 KiB fragments, and supports cancellation. Missing or expired artifacts reject rather than returning partial bytes. Applications own any Blob URLs they create and must revoke them. This API does not publish files or grant another account access.
+New planning replies may also include versioned `alignment` fingerprints generated by Nexa. The alignment types are in `nexa-protocol/workflows/planning/PlanningAlignmentTypes.js`. Fingerprints exclude card labels/layout and detect configuration or connection drift; they are not authorization or proof of execution readiness. Older stored replies may omit them.
 
 ### Workflow image price estimates
 
-`Method.WorkflowsModelsImageQuote` accepts a workflow ID, node ID, exact provider/model, and bounded image settings. Import `WorkflowImageQuoteCodec` and the request/result types from `nexa-transport/workflow-image-quote`. Check that the method was negotiated before calling it. The gateway authorizes the workflow owner before consulting the same account tariff used by run preparation.
+`Method.WorkflowsModelsImageQuote` accepts a workflow ID, node ID, exact provider/model, and bounded image settings. The request and result types are in `nexa-protocol/workflows/WorkflowImageQuoteTypes.js`. Check that the method was negotiated before calling it. The gateway authorizes the workflow owner before consulting the same account tariff used by run preparation.
 
 Results retain exact microcent strings, request settings, pricing/capability references and a quote timestamp. A quote does not save the graph, create a run, reserve funds, generate an image, or establish provider account access. Invalidate an estimate when settings or the selected model change; run acceptance rechecks the price.
 
 ### Image model policies
 
-`workflows.models.image.resolve` is an authenticated read-only preview for a configured image provider, an image policy and the settings of every connected render. The `workflow-image-policy` entry point exposes strict policy/evidence validation; `workflow-image-resolution` exposes request/result codecs. Image limits use a decimal-integer microcent ceiling per complete render, independently of text-token rates. Negotiate the method through the server hello before calling it. Previewing does not save a graph, generate an image or reserve credits.
+`workflows.models.image.resolve` is an authenticated read-only preview for a configured image provider, an image policy and the settings of every connected render. The policy and evidence types are in `nexa-protocol/workflows/ImageModelPolicyTypes.js`, and the request and result types in `nexa-protocol/workflows/ImageResolutionTypes.js`. Image limits use a decimal-integer microcent ceiling per complete render, independently of text-token rates. Negotiate the method through the server hello before calling it. Previewing does not save a graph, generate an image or reserve credits.
 
-Latest image run snapshots retain their exact provider/model, original policy evidence, supported settings and pricing reference. The portable run codec accepts these records while preserving existing exact image snapshots. Failed or ambiguous resolution returns an explicit reason. A model listing is not a successful generation or billing check.
+Latest image run snapshots retain their exact provider/model, original policy evidence, supported settings and pricing reference. Failed or ambiguous resolution returns an explicit reason. A model listing is not a successful generation or billing check.
 
 Investigation receipts may include an adaptive `plan` with evidence-linked
 follow-ups, scope owners, dependency step ids and runtime states. Missing `plan`
-means the receipt predates adaptive planning. `ReverseInvestigation.parse` bounds
-these steps, checks owner/provenance references and rejects dependency cycles.
-Plan evidence ids can refer to earlier records outside the latest evidence preview.
-Use the native shared evidence index to page through those records.
+means the receipt predates adaptive planning. Plan evidence ids can refer to
+earlier records outside the latest evidence preview. Use the native shared evidence
+index to page through those records.
 
 ### Regional context for Chat
 

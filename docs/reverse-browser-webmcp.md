@@ -7,17 +7,14 @@ IDs does not grant another account access.
 
 ```ts
 import { Method, type BrowserWebMcpPage } from 'nexa-transport/protocol';
-import { ReverseInvestigation } from 'nexa-transport/reverse-investigation';
 
 if (client.hello.features.methods.includes(Method.ReverseBrowserWebmcp)) {
-    const page: BrowserWebMcpPage = ReverseInvestigation.webMcp(
-        await client.call(Method.ReverseBrowserWebmcp, {
-            id: sessionKey,
-            runId: 'saved-analysis-run-id',
-            evidenceId: 'saved-evidence-id',
-            view: 'metadata',
-        }),
-    );
+    const page: BrowserWebMcpPage = await client.call(Method.ReverseBrowserWebmcp, {
+        id: sessionKey,
+        runId: 'saved-analysis-run-id',
+        evidenceId: 'saved-evidence-id',
+        view: 'metadata',
+    });
     console.log(page.metadata.available, page.metadata.limitations);
 }
 ```
@@ -33,9 +30,7 @@ investigation. The three views have independent selections:
 
 Follow decimal `nextCursor` within the same view/selection until null. Pin pages
 to the same run, evidence, report hash, capture hash, and metadata identity.
-`ReverseInvestigation.webMcpIdentity(metadata)` provides the portable metadata
-identity; `webMcp(page)` validates exact fields, bounded consecutive ordinals,
-selection, schema structure and page advancement. A page contains at most 96,000
+A page contains at most 96,000
 serialized characters. Loading a tool directory does not prefetch its schema.
 
 The captured provider is `cdp-passive`. Metadata retains target/frame/origin scope,

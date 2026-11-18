@@ -2,8 +2,8 @@ import { WebSocketServer, WebSocket } from 'ws';
 import type { AddressInfo } from 'node:net';
 import type { IncomingMessage } from 'node:http';
 import type { AskResult, HelloOk, JsonValue } from '../src/protocol/Protocol.js';
-import { BinaryChunks } from '../src/media/BinaryChunks.js';
-import { BinaryEnvelope } from '../src/media/BinaryEnvelope.js';
+import { BinaryChunks } from 'nexa-protocol/media/BinaryChunks.js';
+import { BinaryEnvelope } from 'nexa-protocol/media/BinaryEnvelope.js';
 import { methodValidators } from '../src/protocol/MethodValidators.js';
 /** Minimal protocol-v2 hello fixture independent of the client implementation. */
 export const hello: HelloOk = {

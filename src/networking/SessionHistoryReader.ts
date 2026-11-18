@@ -10,7 +10,7 @@ import {
 } from '../protocol/Protocol.js';
 import { HistoryPageWindow } from './HistoryPageWindow.js';
 import { HistoryRecordDecoder } from './HistoryRecordDecoder.js';
-import type { AttachmentProgress, ReceivedAttachment } from '../media/BinaryMedia.js';
+import type { AttachmentProgress, ReceivedAttachment } from 'nexa-protocol/media/BinaryMedia.js';
 import type { ClientConnection } from './ClientConnection.js';
 import type { SavedHistorySnapshot } from './ClientEvents.js';
 import type { CallOptions } from '../interface/ClientOptions.js';

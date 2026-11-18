@@ -6,13 +6,11 @@ contains coverage, counts and an immutable reference to the original conversatio
 run, evidence ID and capture SHA-256. It never embeds code or full inventories.
 
 Use `Method.ReverseBrowserSources` through the authenticated Nexa WebSocket with
-`id: reference.sessionId`, `runId: reference.runId`, and
-`evidenceId: reference.evidenceId`. Select `view: "scripts"` or
-`"resources"` for metadata only. Select `view: "source"` with the exact captured
-script's `id` as `selector` to retrieve code. Follow `nextCursor` for that view;
-directory and source cursors are independent. `ReverseInvestigation.sources`
-validates the page before rendering, including exact allowed fields, identities,
-coverage, URLs, cursor progress, source states and Unicode boundaries.
+`id: reference.sessionId`, `runId: reference.runId`, and `evidenceId:
+reference.evidenceId`. Select `view: "scripts"` or `"resources"` for metadata
+only. Select `view: "source"` with the exact captured script's `id` as
+`selector` to retrieve code. Follow `nextCursor` for that view; directory and
+source cursors are independent.
 
 Each directory returns at most twenty rows. Every serialized reply is at most
 12,000 characters. Source cursors count UTF-16 code units; source pages retain the
@@ -38,8 +36,6 @@ one saved source reference and question. Three specialists share one parse/index
 request evidence-linked follow-ups and finish with independent review. The child
 receipt's `browserInput` retains the original capture reference and source-run
 hash separately from its own identity, plus verified export-manifest metadata.
-`ReverseInvestigation.parse` rejects cross-conversation references, unexpected
-source bodies and inconsistent export counts before presentation.
 
 Read original Scripts/Resources/source pages using `browserInput.reference.runId`
 and `evidenceId` with the same parent conversation. Validate the returned run hash

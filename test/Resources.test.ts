@@ -2,9 +2,9 @@ import { getEventListeners } from 'node:events';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { PendingRequests } from '../src/networking/PendingRequests.js';
 import { EventStream } from '../src/networking/EventStream.js';
-import { BinaryChunks } from '../src/media/BinaryChunks.js';
+import { BinaryChunks } from 'nexa-protocol/media/BinaryChunks.js';
 import type { BinaryChunkBudget } from 'nexa-protocol/media/interface/BinaryChunkBudget.js';
-import { BinaryEnvelope } from '../src/media/BinaryEnvelope.js';
+import { BinaryEnvelope } from 'nexa-protocol/media/BinaryEnvelope.js';
 import { NexaMedia } from '../src/media/NexaMedia.js';
 import type { AskParams, BinarySource } from '../src/protocol/Protocol.js';
 

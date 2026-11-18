@@ -34,51 +34,37 @@ try {
     await writeFile(
         join(directory, 'consumer.ts'),
         `import { NexaClient } from 'nexa-transport';
-import { DesignFlex } from 'nexa-transport/design-flex';
-import { DesignTidyGeometry } from 'nexa-protocol/design/DesignTidyGeometry.js';
-import { DesignTidyEdits } from 'nexa-transport/design-tidy-edits';
-void DesignTidyGeometry.inspect;
-void DesignTidyEdits;
-import { DesignGridPacking } from 'nexa-transport/design-grid-packing';
-import * as DesignTextDirection from 'nexa-protocol/design/DesignTextDirection.js';
-import { DesignCommentReadCodec } from 'nexa-transport/design-comment-read-codec';
-import type { DesignCommentTextPage } from 'nexa-transport/design-comment-read-types';
 import { Method } from 'nexa-transport/protocol';
-DesignCommentReadCodec.commentsRequest({ id: 'layout', revision: '9007199254740993', pageId: null });
+import type { AskResult } from 'nexa-transport/protocol';
+import type { ClientOptions } from 'nexa-transport/options';
+import type { TurnStream } from 'nexa-transport/stream';
+import { NexaMedia } from 'nexa-transport/media';
+import { EventName } from 'nexa-transport/events';
+import { TransportError } from 'nexa-transport/errors';
+import { RedTeamClient } from 'nexa-transport/redteam-client';
+import { Graphics, type Graphic } from 'nexa-protocol/graphics/Graphic.js';
+import { GatewayVersion } from 'nexa-protocol/gateway/GatewayVersion.js';
+import { BinaryChunks } from 'nexa-protocol/media/BinaryChunks.js';
+import { RedTeamRequestCodec } from 'nexa-protocol/redteam/RedTeamRequestCodec.js';
+import type { DesignCommentTextPage } from 'nexa-protocol/design/DesignCommentReadTypes.js';
+import type { WorkflowGroup } from 'nexa-protocol/workflows/WorkflowGroupTypes.js';
+import type { WorkflowRunSnapshot } from 'nexa-protocol/workflows/runtime/RunSnapshotTypes.js';
 function readFeedback(client: NexaClient): Promise<DesignCommentTextPage> {
     return client.call(Method.DesignCommentText, { id: 'layout', revision: '9007199254740993', pageId: null, commentId: 'note', offset: 0, limit: 2000 });
 }
 void readFeedback;
-void DesignFlex.lines;
-void DesignGridPacking.arrange;
-void DesignTextDirection;
-import { WorkflowGroupCodec } from 'nexa-transport/workflow-group-codec';
-import type { WorkflowGroup } from 'nexa-transport/workflow-group-types';
-const savedGroup: WorkflowGroup = WorkflowGroupCodec.parse({id: 'group', title: 'Research', objective: '', parent: null, x: 0, y: 0, nodes: [], ports: []});
-void savedGroup;
-import { WorkflowImagePolicies } from 'nexa-protocol/workflows/ImageModelPolicy.js';
-import { WorkflowImageResolutionCodec } from 'nexa-transport/workflow-image-resolution';
-void WorkflowImagePolicies.defaults;
-void WorkflowImageResolutionCodec.result;
-import { NexaMedia } from 'nexa-transport/media';
-import { WorkflowArtifactDownloads, type WorkflowArtifactDownload } from 'nexa-transport/workflow-artifacts';
-import { EventName } from 'nexa-transport/events';
-import { TransportError } from 'nexa-transport/errors';
-import type { AskResult } from 'nexa-transport/protocol';
-import type { ClientOptions } from 'nexa-transport/options';
-import type { TurnStream } from 'nexa-transport/stream';
-import { ComponentRegistry } from 'nexa-transport/workflow-catalog';
-import { WorkflowRunCodec } from 'nexa-transport/workflow-run-codec';
-import type { WorkflowRunSnapshot } from 'nexa-transport/workflow-run-types';
-import { WorkflowImageQuoteCodec, type WorkflowImageQuoteRequest } from 'nexa-transport/workflow-image-quote';
-const quoteRequest: WorkflowImageQuoteRequest = WorkflowImageQuoteCodec.request({ workflowId: 'draft', nodeId: 'image', provider: 'images', model: 'model', settings: { size: '1024x1024', quality: 'high', count: 1, outputFormat: 'png', options: {} } });
-void quoteRequest;
-function imageSnapshot(snapshot: WorkflowRunSnapshot): string | undefined {
-    const parsed: WorkflowRunSnapshot = WorkflowRunCodec.snapshot(snapshot);
-    return parsed.imageModels?.[0]?.model;
+const group: WorkflowGroup | undefined = undefined;
+void group;
+function imageModel(snapshot: WorkflowRunSnapshot): string | undefined {
+    return snapshot.imageModels?.[0]?.model;
 }
-void imageSnapshot;
-if (ComponentRegistry.builtin().get('inference.image', '1') === null) throw new Error('Missing image component');
+void imageModel;
+const graphic: Graphic | null = Graphics.isValid(null) ? null : null;
+void graphic;
+void GatewayVersion.Current;
+void BinaryChunks;
+void RedTeamRequestCodec.start;
+void RedTeamClient;
 const options: ClientOptions = { url: 'ws://localhost:18830' };
 async function consume(): Promise<AskResult> {
     const client: NexaClient = await NexaClient.connect(options);
@@ -90,10 +76,6 @@ async function consume(): Promise<AskResult> {
 }
 void consume;
 void TransportError;
-async function downloadArtifact(client: NexaClient): Promise<WorkflowArtifactDownload> {
-    return WorkflowArtifactDownloads.forClient(client).download({ runId: 'run', artifactId: 'artifact' }, new AbortController().signal);
-}
-void downloadArtifact;
 `,
     );
     await writeFile(
@@ -121,7 +103,7 @@ void downloadArtifact;
         [
             '--input-type=module',
             '-e',
-            `import { NexaClient } from 'nexa-transport'; import { NexaMedia } from 'nexa-transport/media'; import { EventName } from 'nexa-transport/events'; import { WorkflowArtifactDownloads } from 'nexa-transport/workflow-artifacts'; import { DesignFlex } from 'nexa-transport/design-flex'; import { DesignGridPacking } from 'nexa-transport/design-grid-packing'; import * as DesignTextDirection from 'nexa-protocol/design/DesignTextDirection.js'; import { DesignCommentReadCodec } from 'nexa-transport/design-comment-read-codec'; if (typeof DesignCommentReadCodec.textRequest !== 'function' || typeof NexaClient.connect !== 'function' || typeof WorkflowArtifactDownloads.forClient !== 'function' || typeof DesignFlex.lines !== 'function' || typeof DesignGridPacking.arrange !== 'function' || Object.keys(DesignTextDirection).length === 0 || NexaMedia.base64(new Uint8Array([1,2,3])) !== 'AQID' || EventName.TurnEvent !== 'turn.event') throw new Error('Package exports failed');`,
+            `import { NexaClient } from 'nexa-transport'; import { NexaMedia } from 'nexa-transport/media'; import { EventName } from 'nexa-transport/events'; import { RedTeamClient } from 'nexa-transport/redteam-client'; import { Graphics } from 'nexa-protocol/graphics/Graphic.js'; import { GatewayVersion } from 'nexa-protocol/gateway/GatewayVersion.js'; if (typeof NexaClient.connect !== 'function' || typeof RedTeamClient !== 'function' || typeof Graphics.isValid !== 'function' || GatewayVersion.Current < GatewayVersion.Minimum || NexaMedia.base64(new Uint8Array([1,2,3])) !== 'AQID' || EventName.TurnEvent !== 'turn.event') throw new Error('Package exports failed');`,
         ],
         { cwd: directory, stdio: 'pipe' },
     );

@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: LicenseRef-Proprietary
 
-import type { BinaryInputReservation } from '../media/BinaryInputReservation.js';
+import type { BinaryInputReservation } from 'nexa-protocol/media/BinaryInputReservation.js';
 
 /** Explicit consumer completion releases credit; collection is a fallback for abandoned file promises. */
 export class InboundConsumerCredit {

@@ -1,9 +1,9 @@
 # Saved native viewport images
 
 Use generated `Method.ReverseBrowserScreenshot` with the authenticated original
-conversation `id`, `runId`, `evidenceId`, `view` and raw-byte `cursor`. Decode the
-result with `ReverseInvestigation.screenshot`. The native run's `browserScreenshot`
-receipt contains image-free metadata and its original archive reference.
+conversation `id`, `runId`, `evidenceId`, `view` and raw-byte `cursor`. The native
+run's `browserScreenshot` receipt contains image-free metadata and its original
+archive reference.
 
 View `metadata` requires cursor `0` and returns no PNG data. View `image` returns
 at most 49,152 decoded PNG bytes / 65,536 base64 characters with an independent
@@ -27,10 +27,9 @@ the original multimodal provider result.
 
 `ReverseRunSnapshot.browserComparison` is an image-free native report. It includes
 `before` and `after` source receipts, deterministic `rgba-channel-v1` metrics and
-the independently archived comparison reference. `ReverseInvestigation.parse`
-validates exact field declarations, source provenance, bounded metadata and metric
-arithmetic. The generated portable metric validator comes from Nexa's worker
-validator, so both sides enforce the same status and counter rules.
+the independently archived comparison reference. The generated portable metric
+validator comes from Nexa's worker validator, so both sides enforce the same
+status and counter rules.
 
 Each source retains its original `reference`, source-run `sha256` and PNG `metadata`.
 Use the original source reference's run/evidence IDs and the original parent

@@ -14,7 +14,7 @@ import type { ConversationDataFile } from '../protocol/Protocol.js';
 import { SessionHistoryReader } from './SessionHistoryReader.js';
 import { SessionArchiveRequests } from './SessionArchiveRequests.js';
 import { EmotionWatches } from './EmotionWatches.js';
-import { resolveBridgeInput } from '../toolsearch/BridgeInput.js';
+import { resolveBridgeInput } from 'nexa-protocol/toolsearch/BridgeInput.js';
 import type { EmotionalSnapshot, TurnEventData } from '../protocol/Protocol.js';
 import type { SessionHistoryRecord } from '../protocol/Protocol.js';
 import { DataUploadClient } from './DataUploadClient.js';
@@ -23,21 +23,21 @@ export { DataUploadFailure, DataUploadFailureState } from './DataUploadFailure.j
 export type { DataUploadOriginal } from './DataUploadFailure.js';
 export type { DataUploadOptions } from '../interface/DataUploadOptions.js';
 import { materializeError, rethrow } from './ErrorStack.js';
-import { BinaryChunks } from '../media/BinaryChunks.js';
+import { BinaryChunks } from 'nexa-protocol/media/BinaryChunks.js';
 import { InboundCapacity } from './InboundCapacity.js';
 import { ClientResources } from './ClientResources.js';
 import { InboundConsumerCredit } from './InboundConsumerCredit.js';
-import { BinaryInputReservation } from '../media/BinaryInputReservation.js';
+import { BinaryInputReservation } from 'nexa-protocol/media/BinaryInputReservation.js';
 import { BinaryAdmissionError } from 'nexa-protocol/media/BinaryAdmissionError.js';
-import type { BinaryChunkReceipt } from '../media/interface/BinaryChunkReceipt.js';
+import type { BinaryChunkReceipt } from 'nexa-protocol/media/interface/BinaryChunkReceipt.js';
 import { NexaMedia } from '../media/NexaMedia.js';
-import { BinaryEnvelope } from '../media/BinaryEnvelope.js';
+import { BinaryEnvelope } from 'nexa-protocol/media/BinaryEnvelope.js';
 import {
     BinaryMedia,
     type ReceivedAttachment,
     type AttachmentProgress,
-} from '../media/BinaryMedia.js';
-export type { ReceivedAttachment } from '../media/BinaryMedia.js';
+} from 'nexa-protocol/media/BinaryMedia.js';
+export type { ReceivedAttachment } from 'nexa-protocol/media/BinaryMedia.js';
 import {
     EventName,
     isEventData,

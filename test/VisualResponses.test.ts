@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: LicenseRef-Proprietary
 import { expect, it } from 'vitest';
-import { VisualResponses, type VisualResponse } from '../src/visuals/VisualResponses.js';
+import { VisualResponses, type VisualResponse } from 'nexa-protocol/visuals/VisualResponses.js';
 import { isEventData } from '../src/protocol/Events.js';
 import type { ToolResult } from '../src/protocol/Protocol.js';
 import { methodValidators } from '../src/protocol/MethodValidators.js';

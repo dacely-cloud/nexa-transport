@@ -3,7 +3,7 @@
 
 import type { Method, ParamsOf, ResultOf, HelloOk } from '../protocol/Protocol.js';
 import type { CallOptions } from '../interface/ClientOptions.js';
-import type { ReceivedAttachment, AttachmentProgress } from '../media/BinaryMedia.js';
+import type { ReceivedAttachment, AttachmentProgress } from 'nexa-protocol/media/BinaryMedia.js';
 import type { GatewayEvent } from './ClientEvents.js';
 
 /** Resource, streaming and archive owners borrow this connection contract; NexaClient retains validation and socket authority. */

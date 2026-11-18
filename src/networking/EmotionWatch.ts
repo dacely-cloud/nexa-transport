@@ -133,9 +133,7 @@ export class EmotionWatch {
                     this.#listeners.size > 0
                 ) {
                     this.#timer = setTimeout((): void => this.refresh(), 30_000);
-                    if (typeof this.#timer === 'object') {
-                        this.#timer.unref();
-                    }
+                    EmotionWatch.#detach(this.#timer);
                 }
             }
         }
@@ -156,6 +154,17 @@ export class EmotionWatch {
         this.#controller?.abort();
         this.#controller = undefined;
         this.#dirty = false;
+    }
+
+    /** Node timer handles can stop holding the process open; browser timers are plain numbers. */
+    static #detach(handle: unknown): void {
+        if (typeof handle !== 'object' || handle === null || !('unref' in handle)) {
+            return;
+        }
+        const unref: unknown = handle.unref;
+        if (typeof unref === 'function') {
+            Reflect.apply(unref, handle, []);
+        }
     }
 
     static #freeze(snapshot: EmotionalSnapshot): EmotionalSnapshot {

@@ -5,12 +5,10 @@ relationships as one immutable native investigation. The progress receipt includ
 `browserStructure`, containing a bounded summary and reference with the original
 conversation, run/evidence IDs and capture SHA-256. It carries no complete trees.
 
-Use `Method.ReverseBrowserStructure` through the authenticated Nexa WebSocket.
-Select view `dom` or `accessibility` and selector `all`, `roots`, `node:ID`,
-`children:ID`, or DOM-only `attributes:ID`. Follow `nextCursor`; each reply contains
-at most twenty rows and 12,000 serialized characters. `ReverseInvestigation.structure`
-validates representation, exact provenance, safe node identities, selected
-relationships, cursor progress and coverage before display.
+Use `Method.ReverseBrowserStructure` through the authenticated Nexa WebSocket. Select
+view `dom` or `accessibility` and selector `all`, `roots`, `node:ID`, `children:ID`,
+or DOM-only `attributes:ID`. Follow `nextCursor`; each reply contains at most twenty
+rows and 12,000 serialized characters.
 
 DOM IDs and opaque AX IDs have separate capture-local namespaces. Backend IDs link
 native DOM and accessibility nodes when available. DOM rows retain containment,

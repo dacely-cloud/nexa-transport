@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: LicenseRef-Proprietary
 
-import type { BinaryInputReservation } from '../media/BinaryInputReservation.js';
+import type { BinaryInputReservation } from 'nexa-protocol/media/BinaryInputReservation.js';
 
 /** Owns queued credit without retaining queued values or their iterator. */
 export class EventCredits {

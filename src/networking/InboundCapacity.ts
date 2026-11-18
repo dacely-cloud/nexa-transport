@@ -1,17 +1,17 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: LicenseRef-Proprietary
 
-import { BinaryByteBudget } from '../media/BinaryByteBudget.js';
-import { BinaryChunks } from '../media/BinaryChunks.js';
-import { BinaryInputReservation } from '../media/BinaryInputReservation.js';
-import { BinaryRequestMemory } from '../media/BinaryRequestMemory.js';
+import { BinaryByteBudget } from 'nexa-protocol/media/BinaryByteBudget.js';
+import { BinaryChunks } from 'nexa-protocol/media/BinaryChunks.js';
+import { BinaryInputReservation } from 'nexa-protocol/media/BinaryInputReservation.js';
+import { BinaryRequestMemory } from 'nexa-protocol/media/BinaryRequestMemory.js';
 import { BinaryAdmissionError } from 'nexa-protocol/media/BinaryAdmissionError.js';
-import { BinaryMedia, type AttachmentProgress } from '../media/BinaryMedia.js';
+import { BinaryMedia, type AttachmentProgress } from 'nexa-protocol/media/BinaryMedia.js';
 import { JsonFrameMemory } from 'nexa-protocol/media/JsonFrameMemory.js';
 import { Utf8Bytes } from 'nexa-protocol/media/Utf8Bytes.js';
-import type { BinaryChunkReceipt } from '../media/interface/BinaryChunkReceipt.js';
+import type { BinaryChunkReceipt } from 'nexa-protocol/media/interface/BinaryChunkReceipt.js';
 import { TransportError, TransportErrorCode } from './TransportError.js';
-import { BinaryChunkTransfer } from '../media/BinaryChunkTransfer.js';
+import { BinaryChunkTransfer } from 'nexa-protocol/media/BinaryChunkTransfer.js';
 
 /** Shares inbound working storage across partial transfers, decoding and unfinished consumers. */
 export class InboundCapacity {

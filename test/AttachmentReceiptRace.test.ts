@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
-import { BinaryChunks } from '../src/media/BinaryChunks.js';
-import { BinaryMedia, type ReceivedAttachment } from '../src/media/BinaryMedia.js';
+import { BinaryChunks } from 'nexa-protocol/media/BinaryChunks.js';
+import { BinaryMedia, type ReceivedAttachment } from 'nexa-protocol/media/BinaryMedia.js';
 import { NexaClient } from '../src/networking/NexaClient.js';
 import { Method } from '../src/protocol/Protocol.js';
 import { hello, TestGateway, type Request } from './Support.js';

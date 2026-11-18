@@ -50,8 +50,7 @@ admission. Accepted runs have their own cancellation API. The SDK never retries 
 mutation automatically; reconcile uncertain results before explicitly retrying.
 
 Planning replies propose edits without saving the draft or activating work.
-Applications decide when to apply a proposal using
-`nexa-transport/workflow-planning-edits`. Optional alignment fingerprints detect
+Applications decide when to apply a proposal. Optional alignment fingerprints detect
 configuration/connection drift independently of card labels and layout. Source
 selections require `supportsWorkflowPlanningSources`; source metadata grants no
 file access or execution permission.
@@ -62,7 +61,7 @@ Start a mock or live test from one owned saved revision:
 
 ```ts
 import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
-import { WorkflowRunMode } from 'nexa-transport/workflow-run-types';
+import { WorkflowRunMode } from 'nexa-protocol/workflows/runtime/RunTypes.js';
 
 if (client.supportsWorkflowRuns) {
     const request: ParamsOf<typeof Method.WorkflowsRunsStart> = {
@@ -102,39 +101,11 @@ readiness before automatic admission.
 
 ## Public models and provider keys
 
-`nexa-protocol/workflows/PublicModels.js` exports `WorkflowPublicModels` with a
-bundled, local text/reasoning catalog for Anthropic, OpenAI, xAI, and Mistral.
-Listing and searching it require no connection, linked key, deployment secret,
-or NCAP model-discovery request:
-
-```ts
-import { WorkflowPublicModels } from 'nexa-protocol/workflows/PublicModels.js';
-import {
-    WorkflowModelCapability,
-    type WorkflowModelsPage,
-    type WorkflowModelsRequest,
-} from 'nexa-protocol/workflows/WorkflowModels.js';
-
-const request: WorkflowModelsRequest = {
-    workflowId: 'owned-workflow',
-    provider: 'mistral',
-    query: '',
-    capability: WorkflowModelCapability.Text,
-    compatibleOnly: true,
-    favorites: null,
-    after: null,
-};
-const page: WorkflowModelsPage = WorkflowPublicModels.list(request);
-console.log(page.items);
-```
-
-`list` filters by provider, search, favorites, and an optional `provider:model`
-cursor; the current small catalog returns `next: null`. Use it for text/reasoning,
-not image-generation discovery. `find(provider, id)` returns exact public metadata
-or null. `providers` names the four native providers; the returned page also
-includes `nerva` as a provider choice for the application's separate discovery
-path. Catalog `status: "available"` describes a selectable entry, not verified
-account access. Unknown prices, bounds, and endpoint availability remain null.
+Text and reasoning model choices come from the negotiated `WorkflowsModels`
+discovery API; its request and page types are in
+`nexa-protocol/workflows/WorkflowModelTypes.js`. Catalog `status: "available"`
+describes a selectable entry, not verified account access. Unknown prices, bounds,
+and endpoint availability remain null.
 
 The SDK contains no provider-key vault or key-linking RPC. The application backend
 owns encrypted account credentials and must integrate Nexa's account credential
@@ -147,34 +118,10 @@ fail execution rather than falling back to a deployment credential.
 Configured internal/custom providers and image generation continue to use the
 negotiated `WorkflowsModels`/`WorkflowsModelsRefresh` discovery APIs. A
 latest-compatible text policy requires verified release and eligibility evidence;
-the local public catalog does not supply it. Use an exact public ID. A provider's
+Use an exact public ID. A provider's
 literal ID ending in `-latest` is still an exact selected ID, not that policy.
 Image resolution and image quotes have separate contracts and do not reserve
 funds or generate output.
-
-## Templates and submitted input
-
-Use `WorkflowTemplateFields` for named substitutions such as
-`{{ customer.name }}`. It accepts own JSON fields, preserves null/false/zero/empty
-text, and rejects executable expressions and prototype paths:
-
-```ts
-import { WorkflowTemplateFields } from 'nexa-transport/workflow-template-fields';
-import type { WorkflowObject } from 'nexa-transport/workflow-types';
-
-const values: WorkflowObject = { customer: { name: 'Alex' }, count: 0 };
-const template: string = 'Hello {{customer.name}}: {{count}}';
-WorkflowTemplateFields.validate(template, values);
-const fields: readonly string[] = WorkflowTemplateFields.paths(template);
-console.log(fields);
-```
-
-`WorkflowTemplateInputs.validate(graph, triggerNodeId, input)` provides the same
-preflight used for templates directly started by a trigger and connected from
-its `input` output to the template's `values` input. It reports the component
-label/ID when a submitted field is unavailable. Conditional branches and computed
-values still require validation at their actual invocation. These helpers check
-inputs without executing or saving a workflow.
 
 ## HTTP Request components
 
@@ -184,38 +131,15 @@ and body can also be authored as configuration fallbacks. Response outputs are
 `response`, `status`, and `responseHeaders`; HTTP 2xx takes `success` and other
 statuses take `error`.
 
-`nexa-transport/workflow-http` exports `WorkflowHttpInputs`,
-`WorkflowHttpMethod`, `WorkflowHttpFormat`, and `WorkflowHttpRequest`. Validate
-resolved data and settings locally:
+Nexa validates resolved data and settings before a request.
 
-```ts
-import {
-    WorkflowHttpInputs,
-    WorkflowHttpMethod,
-    WorkflowHttpFormat,
-    type WorkflowHttpRequest,
-} from 'nexa-transport/workflow-http';
-import type { WorkflowObject } from 'nexa-transport/workflow-types';
-
-const configuration: WorkflowObject = {
-    method: WorkflowHttpMethod.Get,
-    responseFormat: WorkflowHttpFormat.Json,
-    timeoutMs: '30000',
-    maxResponseBytes: '262144',
-    followRedirects: true,
-};
-const inputs: WorkflowObject = { url: 'https://example.com/data.json' };
-const request: WorkflowHttpRequest = WorkflowHttpInputs.parse(configuration, inputs);
-console.log(request.url.href, request.method);
-```
-
-Parsing performs no request or DNS lookup. The URL must be absolute HTTP(S),
+Validation performs no request or DNS lookup. The URL must be absolute HTTP(S),
 without embedded credentials or fragments. GET/HEAD cannot have a body. Other
 methods serialize non-string JSON values and supply JSON Content-Type when
 absent. Bodies are bounded to 256 KiB, headers to 64 entries/16 KiB, timeouts to
 1–60 seconds, and response limits to 1 KiB–1 MiB. Transport and proxy-control
 headers are reserved. Timeout and byte limits are decimal strings in authored
-configuration and bounded numbers in the parsed request.
+configuration.
 
 Live execution requires Nexa's configured workspace proxy and `http.proxy`
 capability. The host checks public destination addresses and redirects; proxy
@@ -226,8 +150,9 @@ template components can turn the response into model input.
 
 ## Terminal coding agents
 
-`WorkflowApplications` from `nexa-protocol/workflows/terminal/Applications.js` defines fixed
-commands for the terminal components in the Agents category:
+Nexa defines fixed commands for the terminal components in the Agents category. The
+application names are typed by `WorkflowApplication` in
+`nexa-protocol/workflows/terminal/ApplicationTypes.js`:
 
 | Component                 | Application  | Executable   |
 | ------------------------- | ------------ | ------------ |
@@ -249,18 +174,15 @@ commands.
 
 ## Artifacts and retained usage
 
-List run artifacts with `WorkflowsRunsArtifacts`, then download the selected
-owned artifact using `WorkflowArtifactDownloads` from
-`nexa-transport/workflow-artifacts`. It checks bounded fragments and the complete
-SHA-256 before returning bytes. The [README example](../README.md#workflow-artifact-downloads)
-shows cancellation and Blob construction; applications own Blob URL cleanup.
+List run artifacts with `WorkflowsRunsArtifacts`, then read the selected owned
+artifact's bounded fragments with `WorkflowsRunsArtifact`. Verify the complete
+SHA-256 before using the bytes; applications own any Blob URLs they create.
 
 `WorkflowsRunsUsage` returns retained model usage in pages of at most ten groups.
 `WorkflowsRunsUsageBreakdown` partitions the same evidence by `steps` or `agents`;
 `WorkflowsRunsLoopSpending`/`WorkflowsRunsLoopPricing` expose loop spending and its
 classified pricing evidence. Check each method before calling it and follow its
-cursor. Portable validators live in `workflow-usage-codec`,
-`workflow-breakdown-codec`, and `workflow-spending-codec`.
+cursor.
 
 Amounts in microcents, cumulative counters, revisions, and timestamps use decimal
 strings. Compare exact amounts with bigint, and distinguish null/unreported cost
@@ -270,10 +192,6 @@ reports; adding them to the whole-run total would double-count spending. Old
 writers may have only partial attribution, and expired evidence cannot be
 reconstructed. Mock runs explicitly mark simulation and cannot supply live usage.
 
-## Contract generation
+## Documentation checks
 
-Nexa owns the portable workflow source. `npm run generate:workflows` copies the
-shared files from the sibling checkout, while `npm run generate` also refreshes
-the gateway contract. Do not change a copied contract independently of Nexa.
-`npm run docs` regenerates RPC/type references from the bundled contract;
 `npm run docs:check` compiles TypeScript examples across the documentation.

@@ -22,12 +22,5 @@
             "nexa-transport/events": ["./src/protocol/Events.ts"]
         }
     },
-    "include": [
-        "src/**/*.ts",
-        "test/**/*.ts",
-        "vite.config.ts",
-        "examples/**/*.ts",
-        "script/workflows.ts",
-        "script/MediaSources.ts"
-    ]
+    "include": ["src/**/*.ts", "test/**/*.ts", "vite.config.ts", "examples/**/*.ts"]
 }
