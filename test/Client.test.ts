@@ -2,7 +2,7 @@ import { WorkerState, type WorkerStatus } from 'nexa-protocol/agent/WorkerStatus
 import { Method } from 'nexa-protocol/gateway/Method.js';
 import type { AskResult } from 'nexa-protocol/gateway/ProtocolEventTypes.js';
 import type { TokenUsage } from 'nexa-protocol/providers/Types.js';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { WebSocket } from 'ws';
 import { NexaClient } from '../src/networking/NexaClient.js';
 import { TransportErrorCode } from '../src/networking/TransportError.js';
@@ -503,6 +503,48 @@ describe('Nexa websocket lifetimes', (): void => {
             gateway?.requests.filter((request: Request): boolean => request.method === 'health'),
         ).toHaveLength(1);
     });
+    it('lets the server finish a turn after one hour when the client deadline is disabled', async (): Promise<void> => {
+        const connected: NexaClient = await connect();
+        if (gateway === undefined) throw new Error('Missing gateway');
+        const finish: PromiseWithResolvers<() => void> = Promise.withResolvers();
+        gateway.handler = (socket: WebSocket, request: Request): void => {
+            const streamId: unknown = request.params['streamId'];
+            socket.send(
+                JSON.stringify({
+                    id: request.id,
+                    ok: true,
+                    result: { streamId, runId: 'long-run' },
+                }),
+            );
+            finish.resolve((): void => {
+                socket.send(
+                    JSON.stringify({
+                        event: 'turn.end',
+                        seq: 2,
+                        data: { streamId, ok: true, result },
+                    }),
+                );
+            });
+        };
+        vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+        try {
+            const turn: TurnStream = connected.stream(
+                { message: 'Long request' },
+                { turnTimeoutMs: null },
+            );
+            await turn.accepted;
+            await vi.advanceTimersByTimeAsync(3_600_001);
+            (await finish.promise)();
+            await expect(turn.result).resolves.toEqual(result);
+            expect(
+                gateway.requests.some(
+                    (request: Request): boolean => request.method === Method.TasksCancel,
+                ),
+            ).toBe(false);
+        } finally {
+            vi.useRealTimers();
+        }
+    });
     it('cancels using the server run id after a consumer breaks', async (): Promise<void> => {
         const connected: NexaClient = await connect();
         if (gateway === undefined) {
@@ -531,7 +573,7 @@ describe('Nexa websocket lifetimes', (): void => {
                 }),
             );
         };
-        const turn: TurnStream = connected.stream({ message: 'hello' });
+        const turn: TurnStream = connected.stream({ message: 'hello' }, { turnTimeoutMs: null });
         for await (const event of turn) {
             expect(event.type).toBe('text');
             break;

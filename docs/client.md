@@ -79,13 +79,13 @@ Breaking out of the iterator cancels unfinished work. Consume the iterator and a
 
 `StreamOptions` extends `CallOptions`:
 
-| Option              | Default                                               |
-| ------------------- | ----------------------------------------------------- |
-| `timeoutMs`         | Client RPC deadline, for stream-start acknowledgement |
-| `signal`            | None                                                  |
-| `turnTimeoutMs`     | 3,600,000 ms for the entire turn                      |
-| `maxBufferedEvents` | 256 unread events                                     |
-| `maxBufferedBytes`  | 8 MiB of unread JSON event data                       |
+| Option              | Default                                                             |
+| ------------------- | ------------------------------------------------------------------- |
+| `timeoutMs`         | Client RPC deadline, for stream-start acknowledgement               |
+| `signal`            | None                                                                |
+| `turnTimeoutMs`     | 3,600,000 ms for the entire turn. `null` disables the client timer. |
+| `maxBufferedEvents` | 256 unread events                                                   |
+| `maxBufferedBytes`  | 8 MiB of unread JSON event data                                     |
 
 ## NexaMedia
 

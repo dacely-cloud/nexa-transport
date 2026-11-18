@@ -42,14 +42,14 @@ export class TurnStream implements AsyncIterable<WireTurnEvent> {
         if (!Number.isSafeInteger(bytes) || bytes < 1 || bytes > 64 * 1024 * 1024) {
             throw new RangeError('Invalid stream byte limit');
         }
-        const duration: number = options.turnTimeoutMs ?? 3_600_000;
+        const duration: number | null =
+            options.turnTimeoutMs === undefined ? 3_600_000 : options.turnTimeoutMs;
         if (
             !Number.isSafeInteger(limit) ||
             limit < 1 ||
             limit > 65_536 ||
-            !Number.isSafeInteger(duration) ||
-            duration < 1 ||
-            duration > 2_147_483_647
+            (duration !== null &&
+                (!Number.isSafeInteger(duration) || duration < 1 || duration > 2_147_483_647))
         ) {
             throw new RangeError('Invalid stream limits');
         }
@@ -77,9 +77,13 @@ export class TurnStream implements AsyncIterable<WireTurnEvent> {
             this.#unclose = client.onClose((error: Error): void => {
                 this.#end(error);
             });
-            this.#timer = setTimeout((): void => {
-                void this.#cancel(new TransportError(TransportErrorCode.Timeout, 'Turn timed out'));
-            }, duration);
+            if (duration !== null) {
+                this.#timer = setTimeout((): void => {
+                    void this.#cancel(
+                        new TransportError(TransportErrorCode.Timeout, 'Turn timed out'),
+                    );
+                }, duration);
+            }
             this.#accepted = client.call(
                 Method.AgentStream,
                 { ...params, streamId: this.streamId },

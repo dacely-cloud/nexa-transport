@@ -5,6 +5,6 @@ export interface StreamOptions extends CallOptions {
     readonly maxBufferedEvents?: number;
     /** Maximum unread JSON event bytes; default 8 MiB. */
     readonly maxBufferedBytes?: number;
-    /** Maximum overall turn duration; default one hour. */
-    readonly turnTimeoutMs?: number;
+    /** Maximum overall turn duration; default one hour. Pass null to leave completion to the server. */
+    readonly turnTimeoutMs?: number | null;
 }
