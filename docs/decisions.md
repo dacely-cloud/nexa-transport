@@ -7,7 +7,7 @@ Model instructions stay on the server. The request accepts only caller input and
 
 ```typescript
 import { NexaClient } from 'nexa-transport';
-import type { DecisionRunResult } from 'nexa-transport/protocol';
+import type { DecisionRunResult } from 'nexa-protocol/decision/DecisionTypes.js';
 
 const client: NexaClient = await NexaClient.connect({
     url: 'wss://ai.dacely.com',
@@ -48,7 +48,7 @@ The engine must negotiate `quick-decision-images-1`; older engines fail before g
 
 ```typescript
 import { readFile } from 'node:fs/promises';
-import type { DecisionRunResult } from 'nexa-transport/protocol';
+import type { DecisionRunResult } from 'nexa-protocol/decision/DecisionTypes.js';
 
 const data: string = (await readFile('screenshot.png')).toString('base64');
 const decision: DecisionRunResult = await client.decide({

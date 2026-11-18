@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: LicenseRef-Proprietary
 
 import { expect, it } from 'vitest';
-import {
-    Method,
-    type ConnectorInstructionsUpdateParams,
-    type ConnectorInstructionsView,
-} from '../src/protocol/Protocol.js';
-import { methodValidators } from '../src/protocol/MethodValidators.js';
+import type {
+    ConnectorInstructionsUpdateParams,
+    ConnectorInstructionsView,
+} from 'nexa-protocol/dataplane/ConnectorInstructionsTypes.js';
+import { Method } from 'nexa-protocol/gateway/Method.js';
+import { methodValidators } from 'nexa-protocol/schema/MethodValidators.js';
 import { NexaClient } from '../src/networking/NexaClient.js';
 import type { WebSocket } from 'ws';
 import { TestGateway, type Request } from './Support.js';

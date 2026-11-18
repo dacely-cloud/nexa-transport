@@ -1,7 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: LicenseRef-Proprietary
 
-import { Method, type ParamsOf, type ResultOf } from '../protocol/Protocol.js';
+import { Method } from 'nexa-protocol/gateway/Method.js';
+import type { ParamsOf, ResultOf } from 'nexa-protocol/gateway/ProtocolTypes.js';
 import type { CallOptions } from '../interface/ClientOptions.js';
 import type { ClientConnection } from './ClientConnection.js';
 import { TransportError, TransportErrorCode } from './TransportError.js';

@@ -4,24 +4,23 @@
 import { expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
 import { NexaClient } from '../src/networking/NexaClient.js';
-import { methodValidators } from '../src/protocol/MethodValidators.js';
-import { schema } from '../src/protocol/SchemaData.js';
-import type { Schema } from '../src/protocol/Schema.js';
+import { methodValidators } from 'nexa-protocol/schema/MethodValidators.js';
+import { schema } from 'nexa-protocol/schema/SchemaData.js';
+import type { Schema } from 'nexa-protocol/schema/Schema.js';
 import {
-    ConnectorHostToolValues,
-    ConnectorHostResponseerrorCodeVariant0Values,
-    Method,
-    type ConnectorHostTool,
-    type ConnectorInventoryPage,
+    ConnectorHostErrorCode,
+    ConnectorHostTool,
     type ConnectorHostStatus,
     type ConnectorHostSummary,
-} from '../src/protocol/Protocol.js';
+} from 'nexa-protocol/dataplane/ConnectorHostTypes.js';
+import type { ConnectorInventoryPage } from 'nexa-protocol/dataplane/ConnectorInventoryTypes.js';
+import { Method } from 'nexa-protocol/gateway/Method.js';
 import { TestGateway, type Request } from './Support.js';
 
 /** Native desktop capabilities must be part of the exact published catalog, not admitted as arbitrary strings. */
 const desktopTools: readonly ConnectorHostTool[] = ['application_open', 'desktop_snapshot'];
 const tools: readonly ConnectorHostTool[] = [
-    ...new Set([...Object.values(ConnectorHostToolValues), ...desktopTools]),
+    ...new Set([...Object.values(ConnectorHostTool), ...desktopTools]),
 ];
 const summary: ConnectorHostSummary = {
     grantId: 'a'.repeat(64),
@@ -65,7 +64,7 @@ const inventory: ConnectorInventoryPage = {
 };
 
 it('accepts the authoritative complete host tool catalog in inventory summaries and status profiles', (): void => {
-    expect(Object.values(ConnectorHostToolValues)).toEqual(tools);
+    expect(Object.values(ConnectorHostTool)).toEqual(tools);
     expect(methodValidators[Method.ConnectorsInventory].result(inventory)).toBe(true);
     expect(methodValidators[Method.ConnectorsHostStatus].result(status)).toBe(true);
     for (const name of ['ConnectorHostProfile', 'ConnectorHostSummary']) {
@@ -77,9 +76,9 @@ it('accepts the authoritative complete host tool catalog in inventory summaries 
 });
 
 it('keeps previously published error keys stable when an additive native expiry result is refreshed', (): void => {
-    expect(ConnectorHostResponseerrorCodeVariant0Values.Value4).toBe('interrupted');
-    expect(ConnectorHostResponseerrorCodeVariant0Values.Value13).toBe('unsupported');
-    expect(Object.values(ConnectorHostResponseerrorCodeVariant0Values)).toContain('expired');
+    expect(ConnectorHostErrorCode.Interrupted).toBe('interrupted');
+    expect(ConnectorHostErrorCode.Unsupported).toBe('unsupported');
+    expect(Object.values(ConnectorHostErrorCode)).toContain('expired');
 });
 
 it('keeps both desktop names exact in original host submissions while rejecting unregistered capabilities', (): void => {

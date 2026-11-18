@@ -4,13 +4,13 @@
 import { expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
 import { NexaClient } from '../src/networking/NexaClient.js';
-import {
-    Method,
-    type AgentProfile,
-    type AgentProfileInput,
-    type AgentProfilesResult,
-    type ChatModelSelection,
-} from '../src/protocol/Protocol.js';
+import type {
+    AgentProfile,
+    AgentProfileInput,
+    AgentProfilesResult,
+} from 'nexa-protocol/agent/ProfileTypes.js';
+import type { ChatModelSelection } from 'nexa-protocol/connections/ConnectionTypes.js';
+import { Method } from 'nexa-protocol/gateway/Method.js';
 import { TestGateway, type Request } from './Support.js';
 
 const input: AgentProfileInput = {

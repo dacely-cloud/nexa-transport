@@ -1,11 +1,11 @@
-import type { InboundAttachment } from '../src/protocol/Protocol.js';
+import type { InboundAttachment } from 'nexa-protocol/gateway/AttachmentTypes.js';
 import { BinaryMedia } from 'nexa-protocol/media/BinaryMedia.js';
 import { BinaryEnvelope } from 'nexa-protocol/media/BinaryEnvelope.js';
 import { describe, expect, it } from 'vitest';
 import { NexaMedia } from '../src/media/NexaMedia.js';
-import { SchemaValidator } from '../src/protocol/Schema.js';
-import { schema } from '../src/protocol/SchemaData.js';
-import { methodValidators } from '../src/protocol/MethodValidators.js';
+import { SchemaValidator } from 'nexa-protocol/schema/Schema.js';
+import { schema } from 'nexa-protocol/schema/SchemaData.js';
+import { methodValidators } from 'nexa-protocol/schema/MethodValidators.js';
 
 describe('media and public contracts', (): void => {
     it('round-trips arbitrary binary bytes through browser-compatible base64', async (): Promise<void> => {

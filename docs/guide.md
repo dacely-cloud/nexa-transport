@@ -25,7 +25,7 @@ Requires an ESM application, Node.js 22+ or a modern browser with `WebSocket`, `
 
 ```ts
 import { NexaClient } from 'nexa-transport';
-import { Method } from 'nexa-transport/protocol';
+import { Method } from 'nexa-protocol/gateway/Method.js';
 import { EventName } from 'nexa-transport/events';
 import { NexaMedia } from 'nexa-transport/media';
 
@@ -76,7 +76,7 @@ Connection options also include `scopes`, `client: { id, version, platform }`, `
 Omit `conversationId` to start a new conversation:
 
 ```ts
-import type { ResultOf } from 'nexa-transport/protocol';
+import type { ResultOf } from 'nexa-protocol/gateway/ProtocolTypes.js';
 
 const first: ResultOf<typeof Method.AgentAsk> = await client.call(Method.AgentAsk, {
     message: 'Explain how this library works.',
@@ -93,7 +93,8 @@ console.log(second.text);
 Save `sessionKey` in your application. Nexa's provider-level `conversationId` is a different identifier; gateway conversation requests use the session key. A result also contains `turnId`, `finishReason`, `reasoning`, `iterations`, and token `usage`.
 
 ```ts
-import type { ResultOf, Session } from 'nexa-transport/protocol';
+import type { ResultOf } from 'nexa-protocol/gateway/ProtocolTypes.js';
+import type { Session } from 'nexa-protocol/session/SessionTypes.js';
 
 const sessions: ResultOf<typeof Method.SessionsList> = await client.call(Method.SessionsList, {
     limit: 50,
@@ -130,7 +131,8 @@ The preference belongs to that invocation, including saved retries, and does not
 other users or the saved agent configuration.
 
 ```ts
-import type { NcapDelta, AskResult } from 'nexa-transport/protocol';
+import type { NcapDelta } from 'nexa-protocol/ncap/DeltaTypes.js';
+import type { AskResult } from 'nexa-protocol/gateway/ProtocolEventTypes.js';
 import type { TurnStream } from 'nexa-transport/stream';
 
 const turn: TurnStream = client.stream({
@@ -162,14 +164,14 @@ for await (const event of turn) {
 const result: AskResult = await turn.result;
 ```
 
-The iterator includes turn/iteration lifecycle, status, reasoning, usage, tools, native events, and finish events. Use the discriminator and [WireTurnEvent variants](protocol.md#wireturnevent) to render all supported cases. `turn.streamId` identifies the local stream; `turn.result` resolves only with its terminal answer. Starting a stream returns immediately; a pending model turn is not itself a connection failure.
+The iterator includes turn/iteration lifecycle, status, reasoning, usage, tools, native events, and finish events. Use the discriminator and [WireTurnEvent variants](https://github.com/dacely-cloud/nexa-protocol/blob/main/docs/protocol.md#wireturnevent) to render all supported cases. `turn.streamId` identifies the local stream; `turn.result` resolves only with its terminal answer. Starting a stream returns immediately; a pending model turn is not itself a connection failure.
 
 For a JSON final answer, pass `responseFormat: 'json'` in the turn parameters. Native tools remain available; intermediate reasoning and tool events still stream. Final text is withheld until the entire response parses as JSON and required completion checks pass. Invalid formatting receives bounded correction attempts. This requires `client.hello.features.jsonReplies === true`; older gateways are rejected before the turn starts. Check `incompleteReason` and validate your application schema separately.
 
 For a work UI, show the last status/tool progress while waiting for text, keep the cancellation control available, and distinguish terminal completion, failure, and interruption. Native agent/backlog/graph events can describe delegated work independently of the visible answer.
 
 ```ts
-import type { ResultOf, TaskRecord } from 'nexa-transport/protocol';
+import type { ResultOf, TaskRecord } from 'nexa-protocol/gateway/ProtocolTypes.js';
 
 const tasks: ResultOf<typeof Method.TasksList> = await client.call(Method.TasksList, {});
 const task: TaskRecord | undefined = tasks[0];
@@ -192,7 +194,8 @@ Check `client.hello.features.attachments` before relying on attachments. Support
 Browser `File` objects are `Blob` objects and work directly:
 
 ```ts
-import type { ResultOf, InboundAttachment } from 'nexa-transport/protocol';
+import type { ResultOf } from 'nexa-protocol/gateway/ProtocolTypes.js';
+import type { InboundAttachment } from 'nexa-protocol/gateway/AttachmentTypes.js';
 
 const image: InboundAttachment = await NexaMedia.image(
     new Blob([imageBytes], { type: 'image/png' }),
@@ -237,7 +240,7 @@ The URL must be accessible to the server. Browser cookies and application author
 | PDF/document         | `NexaMedia.document(blob)`                              | Transports a document source; extraction and supported formats depend on Nexa/provider        |
 
 ```ts
-import type { InboundAttachment } from 'nexa-transport/protocol';
+import type { InboundAttachment } from 'nexa-protocol/gateway/AttachmentTypes.js';
 
 const clip: InboundAttachment = await NexaMedia.video(videoFile, 'Clip');
 const frames: InboundAttachment[] = await Promise.all(
@@ -258,7 +261,8 @@ The SDK does not expose frame timestamps or an FPS option in `videoFrame`. Suppl
 Generation is an agent task. There is no `generateImage()` or `generateVideo()` SDK endpoint. Ask Nexa through `AgentAsk` or `stream`; the configured server tools/providers perform generation and delivery. For multiple distinct images, request separate files with one scene per image. Nexa provides `generate_images`, a batch tool with 1–8 independently prompted entries, one generated file per entry, progress updates, and per-item outcomes. Entries are submitted concurrently so Nerva can combine compatible requests into native GPU batches; the engine may split them according to dimensions, sampling settings, and available memory. Successful files survive a partial batch failure. Only the first output may have an inline model preview; all successful files remain available for delivery through `onAttachment` and later session downloads.
 
 ```ts
-import type { NcapDelta, AskResult } from 'nexa-transport/protocol';
+import type { NcapDelta } from 'nexa-protocol/ncap/DeltaTypes.js';
+import type { AskResult } from 'nexa-protocol/gateway/ProtocolEventTypes.js';
 import type { TurnStream } from 'nexa-transport/stream';
 
 const generation: TurnStream = client.stream({
@@ -275,7 +279,7 @@ const generated: AskResult = await generation.result;
 
 For video, request the duration, format, and visual content in the message. For image editing or image-to-video, include an image attachment. For GIF output, request a GIF and use the returned artifact/file if the server can produce it. Prompting does not guarantee an installed generator, a particular model, a codec, or a downloadable URL. Report tool errors and the terminal response in your application.
 
-Native video events have a `phase` discriminator. Inspect the [NcapDelta video field](protocol.md#ncapdelta) for begin/chunk/end payloads and format metadata. `NexaMedia.nativeEvent()` restores chunk byte arrays. Assemble chunks according to the announced format; the SDK does not mux containers or provide a video player.
+Native video events have a `phase` discriminator. Inspect the [NcapDelta video field](https://github.com/dacely-cloud/nexa-protocol/blob/main/docs/protocol.md#ncapdelta) for begin/chunk/end payloads and format metadata. `NexaMedia.nativeEvent()` restores chunk byte arrays. Assemble chunks according to the announced format; the SDK does not mux containers or provide a video player.
 
 ## Artifacts, files, and ZIP archives
 
@@ -283,7 +287,7 @@ The gateway registers the same `send_media` tool used by chat channels. Subscrib
 
 ```ts
 import type { ReceivedAttachment } from 'nexa-transport';
-import type { ResultOf } from 'nexa-transport/protocol';
+import type { ResultOf } from 'nexa-protocol/gateway/ProtocolTypes.js';
 
 const stopFiles: () => void = client.onAttachment((file: ReceivedAttachment): void => {
     const blob: Blob = new Blob([file.data], { type: file.mimeType });
@@ -308,7 +312,7 @@ limits are separate from the 300 MiB file limit, including for unchunked binary 
 Other deliverables may appear as native artifact events, tool-result content, document/media blocks, or links in the final answer. Preserve all of these channels when building an artifact viewer. `NcapArtifactDelta` contains `item`, `title`, and an `artifact` string; that string is not guaranteed to be a URL or file bytes.
 
 ```ts
-import type { NcapDelta, NcapArtifactDelta } from 'nexa-transport/protocol';
+import type { NcapDelta, NcapArtifactDelta } from 'nexa-protocol/ncap/DeltaTypes.js';
 
 const native: NcapDelta | null = NexaMedia.nativeEvent(event);
 if (native?.artifact !== undefined) {
@@ -332,7 +336,7 @@ The voice RPCs transport raw **mono PCM16** in binary WebSocket frames when bina
 Register listeners before opening a call:
 
 ```ts
-import type { ResultOf } from 'nexa-transport/protocol';
+import type { ResultOf } from 'nexa-protocol/gateway/ProtocolTypes.js';
 import type { VoiceEvent } from 'nexa-transport/events';
 import type { ReceivedAudio } from 'nexa-transport';
 
@@ -358,7 +362,7 @@ try {
 }
 ```
 
-Here `microphonePcm` is a `Uint8Array<ArrayBuffer>` produced by your audio capture code. Use the returned `sampleRate` and `frameBytes`; do not hardcode either. Keep capture backpressure bounded and release microphone tracks/audio resources on stop or disconnect. Voice-event variants include transcripts and call state; their exact fields are in [VoiceCallEvent](protocol.md#voicecallevent).
+Here `microphonePcm` is a `Uint8Array<ArrayBuffer>` produced by your audio capture code. Use the returned `sampleRate` and `frameBytes`; do not hardcode either. Keep capture backpressure bounded and release microphone tracks/audio resources on stop or disconnect. Voice-event variants include transcripts and call state; their exact fields are in [VoiceCallEvent](https://github.com/dacely-cloud/nexa-protocol/blob/main/docs/protocol.md#voicecallevent).
 
 Native NCAP `voice` output is a separate binary event field, decoded by `nativeEvent()`. Do not assume those bytes have the same framing as `voice.audio`; use the producing provider's format contract.
 
@@ -386,7 +390,8 @@ if (event.type === 'tool-finish' && event.outcome.result.visual !== undefined) {
 Approval events are notifications, not authority to approve:
 
 ```ts
-import type { ResultOf, ApprovalRequestedData } from 'nexa-transport/protocol';
+import type { ResultOf } from 'nexa-protocol/gateway/ProtocolTypes.js';
+import type { ApprovalRequestedData } from 'nexa-protocol/gateway/ProtocolEventTypes.js';
 
 const unsubscribe: () => void = client.on(
     EventName.ApprovalRequested,
@@ -422,7 +427,7 @@ Approval listing/resolution requires operator-level access in the current gatewa
 | `Shutdown`                              | Server shutdown notification                      |
 
 ```ts
-import type { SessionMessageData } from 'nexa-transport/protocol';
+import type { SessionMessageData } from 'nexa-protocol/gateway/ProtocolEventTypes.js';
 
 const stopMessages: () => void = client.on(
     EventName.SessionMessage,
@@ -440,11 +445,11 @@ Subscriptions require gateway authorization and session ownership. Personal acco
 
 Use `client.onSequenceGap(({ expected, received }) => ...)` to detect missing events and refresh affected state. The library does not replay gaps. Use `onClose()` to report interruptions and release live audio resources, and `onReconnect()` to refresh session state. Event and attachment listeners remain registered across automatic reconnects. Use `onListenerError` in connection options to report exceptions thrown by application listeners.
 
-Native events preserve the NCAP fields for content, reasoning, status, usage, tools, block phases, artifacts, video, voice, agents, agent-tool requests, backlog, graph, expert, findings, research, preflight, reflections, skills, and steering. Some describe server internals or progress; not every provider emits them. See [NcapDelta](protocol.md#ncapdelta) for each field and union variant.
+Native events preserve the NCAP fields for content, reasoning, status, usage, tools, block phases, artifacts, video, voice, agents, agent-tool requests, backlog, graph, expert, findings, research, preflight, reflections, skills, and steering. Some describe server internals or progress; not every provider emits them. See [NcapDelta](https://github.com/dacely-cloud/nexa-protocol/blob/main/docs/protocol.md#ncapdelta) for each field and union variant.
 
 ## Administration
 
-All method families are documented individually in the [RPC reference](methods.md):
+All method families are documented individually in the [RPC reference](https://github.com/dacely-cloud/nexa-protocol/blob/main/docs/methods.md):
 
 | Family           | Operations                                                            |
 | ---------------- | --------------------------------------------------------------------- |
@@ -515,8 +520,8 @@ RPC mutations are never automatically retried. Connection retries and read-subsc
 - [Workflows](workflows.md)
 
 - [Client, stream, media helpers, and options](client.md)
-- [Every RPC method with parameters, results, and a call template](methods.md)
-- [All protocol type fields and variants](protocol.md)
+- [Every RPC method with parameters, results, and a call template](https://github.com/dacely-cloud/nexa-protocol/blob/main/docs/methods.md)
+- [All protocol type fields and variants](https://github.com/dacely-cloud/nexa-protocol/blob/main/docs/protocol.md)
 - [Typed source examples](../examples)
 
 The method/type pages are generated from the gateway contract together with the protocol types. `npm run docs:check` compiles `ts` and `typescript` code blocks across README and every documentation page against the SDK and checks variable annotations. Snippets share the connection setup above; file and microphone inputs are supplied by the application. Stream loop bindings are inferred from the explicitly typed `TurnStream` because TypeScript forbids type annotations on `for...of` bindings.
@@ -527,7 +532,7 @@ Keep the session key in your application's storage, scoped to the authenticated 
 
 ```typescript
 import { NexaClient, type SessionSnapshot } from 'nexa-transport';
-import { Method } from 'nexa-transport/protocol';
+import { Method } from 'nexa-protocol/gateway/Method.js';
 
 const client: NexaClient = await NexaClient.connect({
     url: 'wss://nexa.example.com',
@@ -567,7 +572,7 @@ Downloads use the same raw, chunked binary transport and `onAttachment` callback
 Gateways advertising `hello.features.sessionHistory` preserve the complete presentation transcript independently of model-context compaction. `resumeSession()` includes `history` on these gateways. `client.readHistory(sessionKey)` reads a fixed snapshot through bounded pages, validates each record, and preserves native worker events, reasoning, tools, approvals, site cards, inputs, attachment identities, terminal outcomes, and their original times. Replace the restored conversation by its session identity; do not append another copy on each read. Records have stable IDs for reconciliation.
 
 ```ts
-import type { SessionHistoryRecord } from 'nexa-transport/protocol';
+import type { SessionHistoryRecord } from 'nexa-protocol/gateway/HistoryTypes.js';
 
 if (client.supportsSessionHistory) {
     const records: readonly SessionHistoryRecord[] = await client.readHistory(sessionKey);
@@ -582,7 +587,8 @@ if (client.supportsSessionHistory) {
 Nexa streams `agents-status` updates for its delegated workers, independently of parent text and tool completion. Use each worker's `id` as the UI key; multiple workers can share an `agentId` (persona). `parentId` and `rootId` describe the delegation tree. Updates include `goal`, `depth`, `state`, `activity`, `startedAt`, and `lastActivityAt`. Times are decimal epoch-millisecond strings.
 
 ```ts
-import { WorkerState, type WorkerStatus, type AskResult } from 'nexa-transport/protocol';
+import { WorkerState, type WorkerStatus } from 'nexa-protocol/agent/WorkerStatusTypes.js';
+import type { AskResult } from 'nexa-protocol/gateway/ProtocolEventTypes.js';
 import type { TurnStream } from 'nexa-transport/stream';
 
 const workers: Map<string, WorkerStatus> = new Map<string, WorkerStatus>();

@@ -5,8 +5,9 @@ import { afterEach, expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
 import { NexaClient } from '../src/networking/NexaClient.js';
 import type { TurnStream } from '../src/networking/TurnStream.js';
-import type { TurnActivityEvent, TurnEventData, WireTurnEvent } from '../src/protocol/Protocol.js';
-import { turnEvent } from '../src/protocol/Validators.js';
+import type { TurnActivityEvent } from 'nexa-protocol/agent/TurnActivityTypes.js';
+import type { TurnEventData, WireTurnEvent } from 'nexa-protocol/gateway/ProtocolEventTypes.js';
+import { turnEvent } from 'nexa-protocol/schema/Validators.js';
 import { result, TestGateway, type Request } from './Support.js';
 
 let client: NexaClient | undefined;

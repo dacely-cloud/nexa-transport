@@ -1,4 +1,4 @@
-import type { StreamParams } from '../protocol/Protocol.js';
+import type { StreamParams } from 'nexa-protocol/gateway/ProtocolTypes.js';
 import { NexaMedia } from './NexaMedia.js';
 
 /** Sampling controls shared by text and image generation. */

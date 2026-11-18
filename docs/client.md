@@ -1,6 +1,6 @@
 # Client API
 
-Import `NexaClient` from `nexa-transport`, `Method` and protocol types from `nexa-transport/protocol`, `EventName` from `nexa-transport/events`, and `NexaMedia` from `nexa-transport/media`.
+Import `NexaClient` from `nexa-transport`, `EventName` from `nexa-transport/events` and `NexaMedia` from `nexa-transport/media`. The method catalog `Method` and every request, response and event type come from the `nexa-protocol` package, at the module that declares them: `nexa-protocol/gateway/Method.js`, `nexa-protocol/gateway/ProtocolTypes.js` and so on.
 
 ## NexaClient
 
@@ -117,7 +117,7 @@ Image, video, and frame encoders require a non-empty MIME type. `document` uses 
 
 `GatewayEvent` and `SequenceGap` are exported types from `nexa-transport`. Raw event sequence numbers are bigint; convert explicitly when storing them as JSON.
 
-For exact payload fields see [protocol types](protocol.md), especially `TurnEventData`, `TurnEndData`, `SessionMessageData`, `ApprovalRequestedData`, `ApprovalResolvedData`, `ChangedData`, and `VoiceCallEvent`. The event-only helper types are:
+For exact payload fields see [protocol types](https://github.com/dacely-cloud/nexa-protocol/blob/main/docs/protocol.md), especially `TurnEventData`, `TurnEndData`, `SessionMessageData`, `ApprovalRequestedData`, `ApprovalResolvedData`, `ChangedData`, and `VoiceCallEvent`. The event-only helper types are:
 
 | Type            | Fields                                                               |
 | --------------- | -------------------------------------------------------------------- |
@@ -144,9 +144,7 @@ Local validation and media helpers can also throw native errors such as `TypeErr
 
 ## Protocol exports
 
-`nexa-transport/protocol` exports `Method`, `GatewayMethods`, `MethodName`, `ParamsOf<M>`, `ResultOf<M>`, and the generated protocol interfaces, aliases, and value objects. `Method` is the runtime enum used for RPC dispatch. Other generated value objects describe wire-level unions and are not additional RPCs.
-
-The SDK validates the bundled protocol version, retains extensible JSON payloads, and exposes the server's negotiated capabilities in `hello`. Updating these generated types requires regenerating the contract against a compatible Nexa checkout and testing both endpoints.
+The gateway contract is the `nexa-protocol` package's, not this SDK's. `nexa-protocol/gateway/Method.js` exports `Method`, the runtime enum used for RPC dispatch, and `nexa-protocol/gateway/ProtocolTypes.js` exports `GatewayMethods`, `MethodName`, `ParamsOf<M>` and `ResultOf<M>`. Every other request, response and event type is exported by the module that declares it, and wire enums are const objects with a same-named type. The SDK validates every method boundary and event with the schema validators in `nexa-protocol/schema/`, retains extensible JSON payloads, and exposes the server's negotiated capabilities in `hello`. The [RPC reference](https://github.com/dacely-cloud/nexa-protocol/blob/main/docs/methods.md) and [protocol types](https://github.com/dacely-cloud/nexa-protocol/blob/main/docs/protocol.md) list every method and field.
 
 ## Reconnection and session recovery
 

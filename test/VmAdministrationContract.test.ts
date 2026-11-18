@@ -3,13 +3,13 @@
 
 import { expect, expectTypeOf, it } from 'vitest';
 import { NexaClient } from '../src/networking/NexaClient.js';
-import {
-    Method,
-    type ParamsOf,
-    type VmAdministrationMutation,
-    type VmAdministrationView,
-} from '../src/protocol/Protocol.js';
-import { methodValidators } from '../src/protocol/MethodValidators.js';
+import type {
+    VmAdministrationMutation,
+    VmAdministrationView,
+} from 'nexa-protocol/dataplane/VmAdministrationTypes.js';
+import { Method } from 'nexa-protocol/gateway/Method.js';
+import type { ParamsOf } from 'nexa-protocol/gateway/ProtocolTypes.js';
+import { methodValidators } from 'nexa-protocol/schema/MethodValidators.js';
 
 /** Type-checking a call never opens a socket or performs a VM mutation. */
 function verifyCalls(client: NexaClient, mutation: VmAdministrationMutation): void {

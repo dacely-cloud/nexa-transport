@@ -6,7 +6,8 @@ analysis `runId`, and `evidenceId`. Negotiate the method before use. Knowing cap
 IDs does not grant another account access.
 
 ```ts
-import { Method, type BrowserWebMcpPage } from 'nexa-transport/protocol';
+import { Method } from 'nexa-protocol/gateway/Method.js';
+import type { BrowserWebMcpPage } from 'nexa-protocol/reverse/BrowserWebMcpDirectoryTypes.js';
 
 if (client.hello.features.methods.includes(Method.ReverseBrowserWebmcp)) {
     const page: BrowserWebMcpPage = await client.call(Method.ReverseBrowserWebmcp, {

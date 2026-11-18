@@ -2,7 +2,8 @@ import { uploadContext, uploadReply, uploadFailureReason } from './support/Uploa
 import { afterEach, expect, it, vi, type MockInstance } from 'vitest';
 import type { WebSocket } from 'ws';
 import { NexaClient } from '../src/networking/NexaClient.js';
-import { Method, type DataFile, type DataUploadPosition } from '../src/protocol/Protocol.js';
+import type { DataFile, DataUploadPosition } from 'nexa-protocol/analytics/DataUploadTypes.js';
+import { Method } from 'nexa-protocol/gateway/Method.js';
 import { TestGateway, hello, type Request } from './Support.js';
 
 let gateway: TestGateway | undefined;

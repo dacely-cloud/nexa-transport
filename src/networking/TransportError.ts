@@ -1,5 +1,5 @@
 import { materializeError } from './ErrorStack.js';
-import type { WireError } from '../protocol/Protocol.js';
+import type { WireError } from 'nexa-protocol/gateway/ProtocolEventTypes.js';
 /** Machine-readable transport failures. */
 export const TransportErrorCode = {
     Closed: 'closed',

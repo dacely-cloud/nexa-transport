@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: LicenseRef-Proprietary
 
-import type { SessionHistoryRecord } from '../protocol/Protocol.js';
-import { historyRecord } from '../protocol/Validators.js';
+import type { SessionHistoryRecord } from 'nexa-protocol/gateway/HistoryTypes.js';
+import { historyRecord } from 'nexa-protocol/schema/Validators.js';
 
 /** Frames journal lines by scanning new input only, with coalesced retained text segments. */
 export class HistoryRecordDecoder {

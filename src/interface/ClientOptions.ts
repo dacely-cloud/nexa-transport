@@ -1,3 +1,6 @@
+import type { UserRegion } from 'nexa-protocol/agent/RegionalContextTypes.js';
+import type { Scope } from 'nexa-protocol/gateway/GatewayScopeTypes.js';
+
 /** Metadata sent in the Nexa connect handshake. */
 export interface ClientIdentity {
     /** Stable application or installation identifier. */
@@ -15,7 +18,7 @@ export interface ClientIdentity {
 /** Browser and Node.js connection configuration. Credentials stay in memory. */
 export interface ClientOptions {
     /** Override coarse browser regional hints, or null to disable automatic hints. */
-    readonly userRegion?: import('../protocol/Protocol.js').UserRegion | null;
+    readonly userRegion?: UserRegion | null;
     /** ws(s) endpoint, or an http(s) URL converted to ws(s). */
     readonly url: string;
     /** Nexa token, or a previously provisioned device token. */
@@ -29,7 +32,7 @@ export interface ClientOptions {
     /** Single-use pairing code issued by the operator. */
     readonly pairingCode?: string;
     /** Requested subset of scopes; the server remains authoritative. */
-    readonly scopes?: readonly import('../protocol/Protocol.js').Scope[];
+    readonly scopes?: readonly Scope[];
     /** Receives exceptions raised by application event listeners. */
     readonly onListenerError?: (error: Error) => void;
     /** Client identity for gateway diagnostics. */

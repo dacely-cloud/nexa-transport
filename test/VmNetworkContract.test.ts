@@ -3,9 +3,11 @@
 
 import { expect, expectTypeOf, it } from 'vitest';
 import type { NexaClient } from '../src/networking/NexaClient.js';
-import { Method, type ParamsOf, type VmUsageNetworkSnapshot } from '../src/protocol/Protocol.js';
-import { methodValidators } from '../src/protocol/MethodValidators.js';
-import { schema } from '../src/protocol/SchemaData.js';
+import type { VmUsageNetworkSnapshot } from 'nexa-protocol/dataplane/VmUsageNetworkTypes.js';
+import { Method } from 'nexa-protocol/gateway/Method.js';
+import type { ParamsOf } from 'nexa-protocol/gateway/ProtocolTypes.js';
+import { methodValidators } from 'nexa-protocol/schema/MethodValidators.js';
+import { schema } from 'nexa-protocol/schema/SchemaData.js';
 
 /** Compile-time coverage never opens a socket or grants administrator authority. */
 function verifyCalls(client: NexaClient): void {

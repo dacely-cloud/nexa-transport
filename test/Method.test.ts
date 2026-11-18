@@ -1,7 +1,9 @@
 import { describe, expect, expectTypeOf, it } from 'vitest';
 import { NexaClient } from '../src/networking/NexaClient.js';
-import { Method, type AskResult, type GatewayMethods } from '../src/protocol/Protocol.js';
-import { methodValidators } from '../src/protocol/MethodValidators.js';
+import { Method } from 'nexa-protocol/gateway/Method.js';
+import type { AskResult } from 'nexa-protocol/gateway/ProtocolEventTypes.js';
+import type { GatewayMethods } from 'nexa-protocol/gateway/ProtocolTypes.js';
+import { methodValidators } from 'nexa-protocol/schema/MethodValidators.js';
 import { result } from './Support.js';
 
 /** Compile-time contracts; never invokes a live client. */

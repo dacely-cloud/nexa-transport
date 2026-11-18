@@ -4,7 +4,9 @@
 import { expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
 import { NexaClient } from '../src/networking/NexaClient.js';
-import { Method, type EmotionalSnapshot, type JsonValue } from '../src/protocol/Protocol.js';
+import { Method } from 'nexa-protocol/gateway/Method.js';
+import type { JsonValue } from 'nexa-protocol/json/JsonValue.js';
+import type { EmotionalSnapshot } from 'nexa-protocol/self/EmotionTypes.js';
 import { TestGateway, type Request } from './Support.js';
 import { EventName } from '../src/protocol/Events.js';
 

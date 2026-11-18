@@ -5,8 +5,10 @@ import { createHash } from 'node:crypto';
 import type { WebSocket } from 'ws';
 import { NexaClient } from '../src/networking/NexaClient.js';
 import { TestGateway, type Request } from './Support.js';
-import { Method, type JsonValue, type BrowserFilesRead } from '../src/protocol/Protocol.js';
-import { methodValidators } from '../src/protocol/MethodValidators.js';
+import { Method } from 'nexa-protocol/gateway/Method.js';
+import type { JsonValue } from 'nexa-protocol/json/JsonValue.js';
+import type { BrowserFilesRead } from 'nexa-protocol/workspace/BrowserFilesTypes.js';
+import { methodValidators } from 'nexa-protocol/schema/MethodValidators.js';
 
 it('exposes bounded browser RPCs without accepting caller-selected host or account authority', (): void => {
     const assignment: string = 'a'.repeat(64);

@@ -4,19 +4,19 @@
 import { expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
 import { NexaClient } from '../src/networking/NexaClient.js';
-import {
-    Method,
-    type BackgroundProcess,
-    type CommandExecutionCleanupUnconfirmed,
-    type CommandExecutionReceipt,
-    type CommandExecutionSnapshot,
-    type ToolResult,
-    type WireTurnEvent,
-} from '../src/protocol/Protocol.js';
-import { methodValidators } from '../src/protocol/MethodValidators.js';
-import { SchemaValidator } from '../src/protocol/Schema.js';
-import { schema } from '../src/protocol/SchemaData.js';
-import { historyRecord, turnEvent } from '../src/protocol/Validators.js';
+import type { BackgroundProcess } from 'nexa-protocol/gateway/BackgroundProcessTypes.js';
+import { Method } from 'nexa-protocol/gateway/Method.js';
+import type { WireTurnEvent } from 'nexa-protocol/gateway/ProtocolEventTypes.js';
+import type {
+    CommandExecutionCleanupUnconfirmed,
+    CommandExecutionReceipt,
+    CommandExecutionSnapshot,
+    ToolResult,
+} from 'nexa-protocol/tools/Types.js';
+import { methodValidators } from 'nexa-protocol/schema/MethodValidators.js';
+import { SchemaValidator } from 'nexa-protocol/schema/Schema.js';
+import { schema } from 'nexa-protocol/schema/SchemaData.js';
+import { historyRecord, turnEvent } from 'nexa-protocol/schema/Validators.js';
 import { TestGateway, type Request } from './Support.js';
 
 /** The retained cell represents uncertain cleanup, without fabricating an OS exit or a replacement process. */

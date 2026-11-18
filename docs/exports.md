@@ -7,11 +7,12 @@ contract. Runtime entries include TypeScript declarations. Entries marked
 
 The [client reference](client.md), [usage guide](guide.md),
 and [workflow guide](workflows.md) explain how to use these families. Exact RPC
-payload fields are generated in [protocol types](protocol.md).
+payload fields are generated in [protocol types](https://github.com/dacely-cloud/nexa-protocol/blob/main/docs/protocol.md).
 
 The wire definitions this package shares with the Nexa server have one source in
-the `nexa-protocol` package, which this package depends on: request, response and
-event types, wire enums and limits, binary media framing, and the response codecs
+the `nexa-protocol` package, which this package depends on: the `Method` catalog,
+request, response and event types, wire enums and limits, the generated schema and
+its method, event and page validators, binary media framing, and the response codecs
 the clients below run. Import them from `nexa-protocol` at the module's path, for
 example `nexa-protocol/graphics/Graphic.js`, `nexa-protocol/redteam/RedTeamTypes.js`
 or `nexa-protocol/design/DesignRequests.js`. Feature logic such as design editing,
@@ -29,11 +30,9 @@ Roblox preview rendering and workflow graph tooling is not part of this SDK.
 | `nexa-transport/events`           | ESM + types    | EventName, typed EventMap, and event validation                                         |
 | `nexa-transport/media`            | ESM + types    | Media/3D helpers, native event decoding, and MeshoptDecoder                             |
 | `nexa-transport/options`          | **Types only** | Connection identity, authentication, resource limits, and call options                  |
-| `nexa-transport/protocol`         | ESM + types    | Method enum and complete generated RPC parameters/results                               |
 | `nexa-transport/redteam-client`   | ESM + types    | Validated start/list/get/stop/update operations over an authenticated gateway adapter   |
 | `nexa-transport/stream`           | **Types only** | Streaming turn type with acceptance, result, steering, cancel, and detach               |
 | `nexa-transport/stream-options`   | **Types only** | Turn duration, event/byte buffers, timeout, and cancellation options                    |
-| `nexa-transport/validators`       | ESM + types    | Generated schema validators for paged reverse-engineering responses                     |
 
 ## Red team effort contract
 

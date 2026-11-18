@@ -6,7 +6,8 @@ import { BinaryChunks } from 'nexa-protocol/media/BinaryChunks.js';
 import type { BinaryChunkBudget } from 'nexa-protocol/media/interface/BinaryChunkBudget.js';
 import { BinaryEnvelope } from 'nexa-protocol/media/BinaryEnvelope.js';
 import { NexaMedia } from '../src/media/NexaMedia.js';
-import type { AskParams, BinarySource } from '../src/protocol/Protocol.js';
+import type { AskParams } from 'nexa-protocol/gateway/ProtocolEventTypes.js';
+import type { BinarySource } from 'nexa-protocol/providers/Types.js';
 
 afterEach((): void => {
     vi.useRealTimers();

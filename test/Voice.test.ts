@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
 import { NexaClient } from '../src/networking/NexaClient.js';
 import { type ReceivedTranscript } from '../src/networking/ClientEvents.js';
-import { Method } from '../src/protocol/Protocol.js';
+import { Method } from 'nexa-protocol/gateway/Method.js';
 import { TestGateway, type Request } from './Support.js';
 
 describe('streaming voice transcription', (): void => {

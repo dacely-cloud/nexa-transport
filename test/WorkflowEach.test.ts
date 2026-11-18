@@ -2,8 +2,10 @@
 // SPDX-License-Identifier: LicenseRef-Proprietary
 
 import { expect, it } from 'vitest';
-import { Method, type WorkflowStepView, type WorkflowRunEvent } from '../src/protocol/Protocol.js';
-import { methodValidators } from '../src/protocol/MethodValidators.js';
+import { Method } from 'nexa-protocol/gateway/Method.js';
+import type { WorkflowStepView } from 'nexa-protocol/workflows/runtime/RunRequests.js';
+import type { WorkflowRunEvent } from 'nexa-protocol/workflows/runtime/RunTypes.js';
+import { methodValidators } from 'nexa-protocol/schema/MethodValidators.js';
 
 it('validates iteration provenance while retaining ordinary run history compatibility', (): void => {
     const step: WorkflowStepView = {

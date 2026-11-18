@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: LicenseRef-Proprietary
 
 import { expect, it } from 'vitest';
-import {
-    Method,
-    type ChatModelSelection,
-    type LicensedToolStatus,
-} from '../src/protocol/Protocol.js';
-import { methodValidators } from '../src/protocol/MethodValidators.js';
+import type {
+    ChatModelSelection,
+    LicensedToolStatus,
+} from 'nexa-protocol/connections/ConnectionTypes.js';
+import { Method } from 'nexa-protocol/gateway/Method.js';
+import { methodValidators } from 'nexa-protocol/schema/MethodValidators.js';
 import {
     ChatModelSource,
     LicensedTool,

@@ -1,7 +1,7 @@
 import { afterEach, expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
 import { NexaClient } from '../src/networking/NexaClient.js';
-import { Method } from '../src/protocol/Protocol.js';
+import { Method } from 'nexa-protocol/gateway/Method.js';
 import { hello, TestGateway, type Request } from './Support.js';
 
 let gateway: TestGateway | undefined;

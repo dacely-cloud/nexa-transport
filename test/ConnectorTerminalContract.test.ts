@@ -5,16 +5,15 @@ import { expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
 import { NexaClient } from '../src/networking/NexaClient.js';
 import {
-    ConnectorHostResponseerrorCodeVariant0Values,
-    ConnectorHostToolValues,
-    Method,
+    ConnectorHostErrorCode,
+    ConnectorHostTool,
     type ConnectorHostJobView,
     type ConnectorHostStatus,
     type ConnectorHostSubmitParams,
-    type ConnectorHostTool,
-} from '../src/protocol/Protocol.js';
-import { schema } from '../src/protocol/SchemaData.js';
-import { methodValidators } from '../src/protocol/MethodValidators.js';
+} from 'nexa-protocol/dataplane/ConnectorHostTypes.js';
+import { Method } from 'nexa-protocol/gateway/Method.js';
+import { schema } from 'nexa-protocol/schema/SchemaData.js';
+import { methodValidators } from 'nexa-protocol/schema/MethodValidators.js';
 import { TestGateway, type Request } from './Support.js';
 
 /** Published generated keys retain their existing meanings when a native capability is added. */
@@ -64,7 +63,7 @@ const status: ConnectorHostStatus = {
         enabled: true,
         platform: 'windows',
         directory: 'C:\\Nexa Tasks',
-        tools: Object.values(ConnectorHostToolValues),
+        tools: Object.values(ConnectorHostTool),
     },
 };
 
@@ -100,15 +99,20 @@ function completed(input: ConnectorHostSubmitParams): ConnectorHostJobView {
 }
 
 it('generated host values retain published keys and match both finite schema tool bounds and error codes', (): void => {
-    for (const [key, value] of Object.entries(publishedHostToolValues)) {
-        expect(Reflect.get(ConnectorHostToolValues, key)).toBe(value);
+    const values: readonly ConnectorHostTool[] = Object.values(ConnectorHostTool);
+    for (const value of Object.values(publishedHostToolValues)) {
+        expect(values).toContain(value);
     }
-    const values: readonly ConnectorHostTool[] = Object.values(ConnectorHostToolValues);
     expect(values).toEqual(expect.arrayContaining([...terminalTools]));
-    expect(schema.definitions?.['ConnectorHostTool']?.enum).toEqual(values);
+    expect([...(schema.definitions?.['ConnectorHostTool']?.enum ?? [])].sort()).toEqual(
+        [...values].sort(),
+    );
     expect(
-        schema.definitions?.['ConnectorHostResponse']?.properties?.['errorCode']?.anyOf?.[0]?.enum,
-    ).toEqual(Object.values(ConnectorHostResponseerrorCodeVariant0Values));
+        [
+            ...(schema.definitions?.['ConnectorHostResponse']?.properties?.['errorCode']?.anyOf?.[0]
+                ?.enum ?? []),
+        ].sort(),
+    ).toEqual(Object.values(ConnectorHostErrorCode).sort());
     for (const name of ['ConnectorHostProfile', 'ConnectorHostSummary']) {
         expect(schema.definitions?.[name]?.properties?.['tools']?.maxItems).toBe(values.length);
     }

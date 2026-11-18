@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: LicenseRef-Proprietary
 
-import type { UserRegion } from '../protocol/Protocol.js';
+import type { UserRegion } from 'nexa-protocol/agent/RegionalContextTypes.js';
 
 /** Coarse browser preferences only; never requests GPS, IP lookup, or browser permission. */
 export class BrowserRegion {

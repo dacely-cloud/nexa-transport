@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest';
 import { NexaGeometry, NexaMedia } from '../src/media/Media.js';
-import { methodValidators } from '../src/protocol/MethodValidators.js';
+import { methodValidators } from 'nexa-protocol/schema/MethodValidators.js';
 
 it('creates schema-valid text generation turns with explicit sampling controls', (): void => {
     const turn = NexaGeometry.text('A wooden chair', { seed: 7, steps: 25 });

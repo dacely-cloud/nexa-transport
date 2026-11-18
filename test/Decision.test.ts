@@ -3,8 +3,9 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
 import { NexaClient } from '../src/networking/NexaClient.js';
-import { Method, type DecisionImage, type DecisionRunResult } from '../src/protocol/Protocol.js';
-import { methodValidators } from '../src/protocol/MethodValidators.js';
+import type { DecisionImage, DecisionRunResult } from 'nexa-protocol/decision/DecisionTypes.js';
+import { Method } from 'nexa-protocol/gateway/Method.js';
+import { methodValidators } from 'nexa-protocol/schema/MethodValidators.js';
 import { hello, TestGateway, type Request } from './Support.js';
 
 let gateway: TestGateway | undefined;

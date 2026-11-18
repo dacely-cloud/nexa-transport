@@ -14,7 +14,9 @@ tools. They do not launch a new command. Address every operation with both
 server task/run IDs, and scheduled job IDs are separate identities.
 
 ```ts
-import { Method, type ResultOf, type BackgroundProcess } from 'nexa-transport/protocol';
+import { Method } from 'nexa-protocol/gateway/Method.js';
+import type { ResultOf } from 'nexa-protocol/gateway/ProtocolTypes.js';
+import type { BackgroundProcess } from 'nexa-protocol/gateway/BackgroundProcessTypes.js';
 
 if (client.hello.features.methods.includes(Method.ProcessesList)) {
     const processes: ResultOf<typeof Method.ProcessesList> = await client.call(
@@ -133,13 +135,13 @@ documents. Gateway identity and a Roblox Open Cloud key have different roles.
 `completionWindowMs`, with optional configuration/performance correlation filters.
 These wire queries carry no owner selector. They report retained observations;
 listing or reading does not deploy a game or invent missing events. Exact report
-fields and query bounds appear in [protocol types](protocol.md).
+fields and query bounds appear in [protocol types](https://github.com/dacely-cloud/nexa-protocol/blob/main/docs/protocol.md).
 
 ## Administration and backend bridges
 
 Agent configuration, account/team/share management, workspaces, device pairing,
 channels/dead letters, config, logs, and health use their corresponding method
-families in the [RPC reference](methods.md). Some are destructive or operator-only.
+families in the [RPC reference](https://github.com/dacely-cloud/nexa-protocol/blob/main/docs/methods.md). Some are destructive or operator-only.
 Local cancellation of `client.call` only ends waiting; a server mutation may have
 already committed. Keep application-owned decisions and their durable IDs where
 the specific contract supports them, and reconcile uncertain outcomes.

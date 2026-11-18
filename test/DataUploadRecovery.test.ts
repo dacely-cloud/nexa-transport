@@ -8,8 +8,8 @@ import { DataUploadFailure } from '../src/networking/DataUploadFailure.js';
 import type {
     ConversationDataUpload,
     ConversationDataFile,
-    JsonValue,
-} from '../src/protocol/Protocol.js';
+} from 'nexa-protocol/analytics/ConversationUploadTypes.js';
+import type { JsonValue } from 'nexa-protocol/json/JsonValue.js';
 import { TestGateway, hello, type Request } from './Support.js';
 import { uploadContext, failedUpload } from './support/UploadWireFixture.js';
 

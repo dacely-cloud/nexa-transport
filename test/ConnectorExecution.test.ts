@@ -5,13 +5,13 @@ import { afterEach, expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
 import { NexaClient } from '../src/networking/NexaClient.js';
 import {
-    Method,
     ConnectorExecutionLane,
     ConnectorExecutionAccess,
     type ConnectorExecutionStatus,
     type ConnectorExecutionSubmitParams,
-} from '../src/protocol/Protocol.js';
-import { methodValidators } from '../src/protocol/MethodValidators.js';
+} from 'nexa-protocol/dataplane/ConnectorExecutionTypes.js';
+import { Method } from 'nexa-protocol/gateway/Method.js';
+import { methodValidators } from 'nexa-protocol/schema/MethodValidators.js';
 import { TestGateway, type Request } from './Support.js';
 
 let gateway: TestGateway | undefined;

@@ -6,7 +6,7 @@ import {
     type Graphic,
 } from 'nexa-protocol/graphics/Graphic.js';
 import { isEventData } from '../src/protocol/Events.js';
-import * as validators from '../src/protocol/Validators.js';
+import * as validators from 'nexa-protocol/schema/Validators.js';
 
 const graphic: Graphic = {
     version: 1,

@@ -1,6 +1,6 @@
 import { materializeError } from './ErrorStack.js';
 import type { CallOptions } from '../interface/ClientOptions.js';
-import type { JsonValue } from '../protocol/Protocol.js';
+import type { JsonValue } from 'nexa-protocol/json/JsonValue.js';
 import { TransportError, TransportErrorCode } from './TransportError.js';
 /** One request's response and cleanup hooks. */
 interface PendingRequest {

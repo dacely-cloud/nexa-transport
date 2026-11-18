@@ -1,7 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: LicenseRef-Proprietary
 
-import type { Method, ParamsOf, ResultOf, HelloOk } from '../protocol/Protocol.js';
+import type { Method } from 'nexa-protocol/gateway/Method.js';
+import type { ParamsOf, ResultOf, HelloOk } from 'nexa-protocol/gateway/ProtocolTypes.js';
 import type { CallOptions } from '../interface/ClientOptions.js';
 import type { ReceivedAttachment, AttachmentProgress } from 'nexa-protocol/media/BinaryMedia.js';
 import type { GatewayEvent } from './ClientEvents.js';

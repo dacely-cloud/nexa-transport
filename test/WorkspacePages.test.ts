@@ -2,10 +2,11 @@
 // SPDX-License-Identifier: LicenseRef-Proprietary
 
 import { expect, it } from 'vitest';
-import { Method, type WorkspacePage, type Workspace } from '../src/protocol/Protocol.js';
-import { SchemaValidator } from '../src/protocol/Schema.js';
-import { schema } from '../src/protocol/SchemaData.js';
-import { methodValidators } from '../src/protocol/MethodValidators.js';
+import { Method } from 'nexa-protocol/gateway/Method.js';
+import type { WorkspacePage, Workspace } from 'nexa-protocol/workspace/Types.js';
+import { SchemaValidator } from 'nexa-protocol/schema/Schema.js';
+import { schema } from 'nexa-protocol/schema/SchemaData.js';
+import { methodValidators } from 'nexa-protocol/schema/MethodValidators.js';
 
 const workspace: Workspace = {
     id: 'saved-project',

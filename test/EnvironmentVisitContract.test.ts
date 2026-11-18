@@ -4,12 +4,11 @@
 import { expect, expectTypeOf, it } from 'vitest';
 import {
     EnvironmentVisitState,
-    Method,
     type EnvironmentVisitResult,
-    type ParamsOf,
-    type ResultOf,
-} from '../src/protocol/Protocol.js';
-import { methodValidators } from '../src/protocol/MethodValidators.js';
+} from 'nexa-protocol/dataplane/EnvironmentVisitTypes.js';
+import { Method } from 'nexa-protocol/gateway/Method.js';
+import type { ParamsOf, ResultOf } from 'nexa-protocol/gateway/ProtocolTypes.js';
+import { methodValidators } from 'nexa-protocol/schema/MethodValidators.js';
 
 it('permits an authenticated visit without accepting account or VM selectors', (): void => {
     expect(methodValidators[Method.EnvironmentVisit].params({})).toBe(true);

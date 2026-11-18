@@ -1,10 +1,7 @@
-import {
-    Method,
-    WorkerState,
-    type TokenUsage,
-    type WorkerStatus,
-    type AskResult,
-} from '../src/protocol/Protocol.js';
+import { WorkerState, type WorkerStatus } from 'nexa-protocol/agent/WorkerStatusTypes.js';
+import { Method } from 'nexa-protocol/gateway/Method.js';
+import type { AskResult } from 'nexa-protocol/gateway/ProtocolEventTypes.js';
+import type { TokenUsage } from 'nexa-protocol/providers/Types.js';
 import { afterEach, describe, expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
 import { NexaClient } from '../src/networking/NexaClient.js';

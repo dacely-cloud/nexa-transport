@@ -4,7 +4,7 @@ Nexa Transport carries microphone PCM and ASR transcripts through the authentica
 
 ```ts
 import type { ReceivedTranscript } from 'nexa-transport';
-import type { ResultOf } from 'nexa-transport/protocol';
+import type { ResultOf } from 'nexa-protocol/gateway/ProtocolTypes.js';
 
 declare function renderTranscript(callId: string, text: string, final: boolean): void;
 declare const frame: Uint8Array<ArrayBuffer>;

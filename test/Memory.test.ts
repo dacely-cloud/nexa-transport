@@ -5,7 +5,8 @@ import { EventStream } from '../src/networking/EventStream.js';
 import { BinaryEnvelope } from 'nexa-protocol/media/BinaryEnvelope.js';
 import { BinaryMedia } from 'nexa-protocol/media/BinaryMedia.js';
 import { BinaryChunks } from 'nexa-protocol/media/BinaryChunks.js';
-import { Method, type AskParams } from '../src/protocol/Protocol.js';
+import { Method } from 'nexa-protocol/gateway/Method.js';
+import type { AskParams } from 'nexa-protocol/gateway/ProtocolEventTypes.js';
 import { TransportErrorCode } from '../src/networking/TransportError.js';
 import { hello, result, TestGateway, type Request } from './Support.js';
 

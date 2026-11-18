@@ -1,12 +1,12 @@
 import type { ClientConnection } from './ClientConnection.js';
-import {
-    Method,
-    type ConversationDataUpload,
-    type DataUploadPosition,
-    type ConversationDataFile,
-    type GatewayLimits,
-    type DataUploadContext,
-} from '../protocol/Protocol.js';
+import type {
+    ConversationDataUpload,
+    ConversationDataFile,
+} from 'nexa-protocol/analytics/ConversationUploadTypes.js';
+import type { DataUploadContext } from 'nexa-protocol/analytics/DataUploadTargetTypes.js';
+import type { DataUploadPosition } from 'nexa-protocol/analytics/DataUploadTypes.js';
+import type { GatewayLimits } from 'nexa-protocol/gateway/GatewayLimits.js';
+import { Method } from 'nexa-protocol/gateway/Method.js';
 import type { DataUploadOptions } from '../interface/DataUploadOptions.js';
 import { BinaryUploadSizing } from 'nexa-protocol/media/BinaryUploadSizing.js';
 import {

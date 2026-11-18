@@ -2,8 +2,8 @@
 import { expect, it } from 'vitest';
 import { VisualResponses, type VisualResponse } from 'nexa-protocol/visuals/VisualResponses.js';
 import { isEventData } from '../src/protocol/Events.js';
-import type { ToolResult } from '../src/protocol/Protocol.js';
-import { methodValidators } from '../src/protocol/MethodValidators.js';
+import type { ToolResult } from 'nexa-protocol/tools/Types.js';
+import { methodValidators } from 'nexa-protocol/schema/MethodValidators.js';
 
 const visual: VisualResponse = VisualResponses.parse({
     version: 1,

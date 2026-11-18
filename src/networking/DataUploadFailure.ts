@@ -1,4 +1,4 @@
-import type { DataUploadContext } from '../protocol/Protocol.js';
+import type { DataUploadContext } from 'nexa-protocol/analytics/DataUploadTargetTypes.js';
 
 /** A proved cancellation differs from an unconfirmed transfer or publication. */
 export const DataUploadFailureState = { Canceled: 'canceled', Unconfirmed: 'unconfirmed' } as const;

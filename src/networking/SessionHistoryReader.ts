@@ -1,13 +1,13 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: LicenseRef-Proprietary
 
-import {
-    Method,
-    type ResultOf,
-    type SessionHistoryPage,
-    type SessionHistoryParams,
-    type SessionHistoryRecord,
-} from '../protocol/Protocol.js';
+import type {
+    SessionHistoryPage,
+    SessionHistoryParams,
+    SessionHistoryRecord,
+} from 'nexa-protocol/gateway/HistoryTypes.js';
+import { Method } from 'nexa-protocol/gateway/Method.js';
+import type { ResultOf } from 'nexa-protocol/gateway/ProtocolTypes.js';
 import { HistoryPageWindow } from './HistoryPageWindow.js';
 import { HistoryRecordDecoder } from './HistoryRecordDecoder.js';
 import type { AttachmentProgress, ReceivedAttachment } from 'nexa-protocol/media/BinaryMedia.js';

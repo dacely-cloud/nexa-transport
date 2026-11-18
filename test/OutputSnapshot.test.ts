@@ -1,8 +1,9 @@
 import { expect, it } from 'vitest';
-import { SchemaValidator } from '../src/protocol/Schema.js';
-import { schema } from '../src/protocol/SchemaData.js';
-import { turnEvent, historyRecord } from '../src/protocol/Validators.js';
-import type { ToolProgress, WireTurnEvent } from '../src/protocol/Protocol.js';
+import { SchemaValidator } from 'nexa-protocol/schema/Schema.js';
+import { schema } from 'nexa-protocol/schema/SchemaData.js';
+import { turnEvent, historyRecord } from 'nexa-protocol/schema/Validators.js';
+import type { WireTurnEvent } from 'nexa-protocol/gateway/ProtocolEventTypes.js';
+import type { ToolProgress } from 'nexa-protocol/tools/Types.js';
 
 const validator: SchemaValidator = new SchemaValidator(schema);
 

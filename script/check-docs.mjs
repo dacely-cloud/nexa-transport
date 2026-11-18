@@ -5,12 +5,15 @@ import { dirname, resolve } from 'node:path';
 // Shared setup and application-owned inputs described by the usage guide.
 const setup = new Map([
     ['NexaClient', "import { NexaClient } from 'nexa-transport';"],
-    ['Method', "import { Method } from 'nexa-transport/protocol';"],
+    ['Method', "import { Method } from 'nexa-protocol/gateway/Method.js';"],
     ['EventName', "import { EventName } from 'nexa-transport/events';"],
     ['NexaMedia', "import { NexaMedia } from 'nexa-transport/media';"],
     ['client', "declare const client: import('nexa-transport').NexaClient;"],
     ['sessionKey', 'declare const sessionKey: string;'],
-    ['event', "declare const event: import('nexa-transport/protocol').WireTurnEvent;"],
+    [
+        'event',
+        "declare const event: import('nexa-protocol/gateway/ProtocolEventTypes.js').WireTurnEvent;",
+    ],
     ['imageBytes', 'declare const imageBytes: Uint8Array<ArrayBuffer>;'],
     ['pdfBytes', 'declare const pdfBytes: Uint8Array<ArrayBuffer>;'],
     ['microphonePcm', 'declare const microphonePcm: Uint8Array<ArrayBuffer>;'],

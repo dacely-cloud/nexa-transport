@@ -4,7 +4,9 @@ import { BinaryChunks } from 'nexa-protocol/media/BinaryChunks.js';
 import { BinaryMedia, type ReceivedAttachment } from 'nexa-protocol/media/BinaryMedia.js';
 import { NexaMedia } from '../src/media/NexaMedia.js';
 import { NexaClient } from '../src/networking/NexaClient.js';
-import { Method, type InboundAttachment, type HelloOk } from '../src/protocol/Protocol.js';
+import type { InboundAttachment } from 'nexa-protocol/gateway/AttachmentTypes.js';
+import { Method } from 'nexa-protocol/gateway/Method.js';
+import type { HelloOk } from 'nexa-protocol/gateway/ProtocolTypes.js';
 import { hello, result, TestGateway, type Request } from './Support.js';
 
 let gateway: TestGateway | undefined;

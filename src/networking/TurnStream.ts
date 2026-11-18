@@ -1,16 +1,13 @@
-import { Method } from '../protocol/Protocol.js';
+import { Method } from 'nexa-protocol/gateway/Method.js';
 import type { StreamOptions } from '../interface/StreamOptions.js';
-import type {
-    AskResult,
-    StreamAccepted,
-    StreamParams,
-    WireTurnEvent,
-} from '../protocol/Protocol.js';
-import * as validators from '../protocol/Validators.js';
+import type { AskResult, WireTurnEvent } from 'nexa-protocol/gateway/ProtocolEventTypes.js';
+import type { StreamAccepted, StreamParams } from 'nexa-protocol/gateway/ProtocolTypes.js';
+import * as validators from 'nexa-protocol/schema/Validators.js';
 import { EventStream } from './EventStream.js';
 import { ClientResources } from './ClientResources.js';
 import { JsonSerializedBytes } from 'nexa-protocol/media/JsonSerializedBytes.js';
-import type { JsonValue, JsonObject, ResultOf } from '../protocol/Protocol.js';
+import type { ResultOf } from 'nexa-protocol/gateway/ProtocolTypes.js';
+import type { JsonObject, JsonValue } from 'nexa-protocol/json/JsonValue.js';
 import type { ClientConnection } from './ClientConnection.js';
 import type { GatewayEvent } from './ClientEvents.js';
 import { TransportError, TransportErrorCode } from './TransportError.js';

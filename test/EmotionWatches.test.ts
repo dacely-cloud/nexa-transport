@@ -4,7 +4,7 @@
 import { afterEach, expect, it, vi } from 'vitest';
 import { EmotionWatches } from '../src/networking/EmotionWatches.js';
 import type { EmotionWatchSource } from '../src/networking/EmotionWatch.js';
-import type { EmotionalSnapshot } from '../src/protocol/Protocol.js';
+import type { EmotionalSnapshot } from 'nexa-protocol/self/EmotionTypes.js';
 
 /** One pending RPC exposes cancellation and controlled reply ordering. */
 interface EmotionRead {

@@ -1,7 +1,10 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: LicenseRef-Proprietary
 
-import type { SessionHistoryPage, SessionHistoryParams } from '../protocol/Protocol.js';
+import type {
+    SessionHistoryPage,
+    SessionHistoryParams,
+} from 'nexa-protocol/gateway/HistoryTypes.js';
 import type { CallOptions } from '../interface/ClientOptions.js';
 
 /** Typed authenticated RPC boundary supplied by the owning client. */

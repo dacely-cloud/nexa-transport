@@ -28,10 +28,6 @@
             "types": "./dist/networking/NexaClient.d.ts",
             "import": "./dist/nexa-transport.js"
         },
-        "./protocol": {
-            "types": "./dist/protocol/Protocol.d.ts",
-            "import": "./dist/protocol.js"
-        },
         "./media": {
             "types": "./dist/media/Media.d.ts",
             "import": "./dist/media.js"
@@ -39,10 +35,6 @@
         "./events": {
             "types": "./dist/protocol/Events.d.ts",
             "import": "./dist/events.js"
-        },
-        "./validators": {
-            "types": "./dist/protocol/PageValidators.d.ts",
-            "import": "./dist/validators.js"
         },
         "./errors": {
             "types": "./dist/networking/TransportError.d.ts",
@@ -109,7 +101,7 @@
     ],
     "dependencies": {
         "meshoptimizer": "^1.2.0",
-        "nexa-protocol": "https://codeload.github.com/dacely-cloud/nexa-protocol/tar.gz/d1cd9559fefbdd34015ffb3df1901c45570d59ab"
+        "nexa-protocol": "https://codeload.github.com/dacely-cloud/nexa-protocol/tar.gz/__NEXA_PROTOCOL_SHA__"
     },
     "madge": {
         "baseDir": ".",

@@ -4,11 +4,9 @@
 import { expect, it } from 'vitest';
 import { SessionFilePager } from '../src/networking/SessionFilePager.js';
 import { TransportError, TransportErrorCode } from '../src/networking/TransportError.js';
-import type {
-    SessionFileListParams,
-    SessionFilePage,
-    DeliveredAttachment,
-} from '../src/protocol/Protocol.js';
+import type { SessionFileListParams } from 'nexa-protocol/gateway/interface/SessionFileListParams.js';
+import type { SessionFilePage } from 'nexa-protocol/gateway/interface/SessionFilePage.js';
+import type { DeliveredAttachment } from 'nexa-protocol/media/DeliveredAttachment.js';
 import type { CallOptions } from '../src/interface/ClientOptions.js';
 
 const revision: string = '00000000-0000-0000-0000-000000000001';

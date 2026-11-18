@@ -3,7 +3,7 @@
 
 import { expect, it } from 'vitest';
 import { HistoryPageWindow } from '../src/networking/HistoryPageWindow.js';
-import type { SessionHistoryPage } from '../src/protocol/Protocol.js';
+import type { SessionHistoryPage } from 'nexa-protocol/gateway/HistoryTypes.js';
 
 it('preserves an actual RPC error and normalizes arbitrary thrown boundary values', async (): Promise<void> => {
     const error: Error = new Error('RPC unavailable');

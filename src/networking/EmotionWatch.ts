@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: LicenseRef-Proprietary
 
-import type { EmotionalSnapshot } from '../protocol/Protocol.js';
+import type { EmotionalSnapshot } from 'nexa-protocol/self/EmotionTypes.js';
 
 /** Application callbacks belong to one view of the authenticated user's feelings. */
 export interface EmotionListener {

@@ -1,7 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: LicenseRef-Proprietary
 
-import type { SessionFileListParams, SessionFilePage } from '../protocol/Protocol.js';
+import type { SessionFileListParams } from 'nexa-protocol/gateway/interface/SessionFileListParams.js';
+import type { SessionFilePage } from 'nexa-protocol/gateway/interface/SessionFilePage.js';
 import type { CallOptions } from '../interface/ClientOptions.js';
 import { TransportError, TransportErrorCode } from './TransportError.js';
 

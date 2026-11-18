@@ -44,9 +44,9 @@ Chat, tools, media, artifacts, and voice through the Nexa gateway.
 - [Package entry points](./docs/exports.md): every public runtime/type import and its contract.
 - [Session recovery](./docs/sessions.md): stream acceptance, cancellation/detachment, durable history, and lazy saved-file downloads.
 - [Runtime controls and integrations](./docs/operations.md): processes, scheduled jobs, wallets, Roblox, and administration.
-- [RPC reference](./docs/methods.md): every bundled method with call templates, parameters, and results.
+- [RPC reference](https://github.com/dacely-cloud/nexa-protocol/blob/main/docs/methods.md): every bundled method with call templates, parameters, and results.
 - [Binary media protocol](./docs/binary-media.md): raw bytes, chunking, limits, and file delivery.
-- [Protocol types](./docs/protocol.md): every payload field and union variant.
+- [Protocol types](https://github.com/dacely-cloud/nexa-protocol/blob/main/docs/protocol.md): every payload field and union variant.
 - [Workflows](./docs/workflows.md): capability checks, drafts, deletion, runs, models, templates, HTTP requests, terminal agents, and usage.
 - [Workflow resources](./docs/workflow-resources.md) and [schedules](./docs/workflow-schedules.md): bindings, groups, immutable publications, and timed execution.
 - [VM connections](./docs/vm-connections.md): licensed tools installed on the user's VM, subscription sign-in, and connected chat models.
@@ -88,10 +88,10 @@ dependency reached only through another package. The package is ESM: use ES impo
 ## Quick start
 
 ```ts
-import type { ResultOf } from 'nexa-transport/protocol';
+import type { ResultOf } from 'nexa-protocol/gateway/ProtocolTypes.js';
 
 import { NexaClient } from 'nexa-transport';
-import { Method } from 'nexa-transport/protocol';
+import { Method } from 'nexa-protocol/gateway/Method.js';
 
 const client: NexaClient = await NexaClient.connect({
     url: 'wss://nexa.example.com',
@@ -118,7 +118,7 @@ The examples below use an authenticated `client`. `client.call()` accepts `Metho
 Send a message without `conversationId` to create a conversation. Use the returned `sessionKey` for subsequent turns.
 
 ```ts
-import type { ResultOf } from 'nexa-transport/protocol';
+import type { ResultOf } from 'nexa-protocol/gateway/ProtocolTypes.js';
 
 const first: ResultOf<typeof Method.AgentAsk> = await client.call(Method.AgentAsk, {
     message: 'Help me build a website',
@@ -133,7 +133,8 @@ const next: ResultOf<typeof Method.AgentAsk> = await client.call(Method.AgentAsk
 List saved conversations, retrieve their messages, and resume using the selected session's `id`:
 
 ```ts
-import type { ResultOf, Session } from 'nexa-transport/protocol';
+import type { ResultOf } from 'nexa-protocol/gateway/ProtocolTypes.js';
+import type { Session } from 'nexa-protocol/session/SessionTypes.js';
 
 const sessions: ResultOf<typeof Method.SessionsList> = await client.call(Method.SessionsList, {
     limit: 50,
@@ -167,7 +168,7 @@ preserved in full.
 ## Streaming
 
 ```ts
-import type { AskResult } from 'nexa-transport/protocol';
+import type { AskResult } from 'nexa-protocol/gateway/ProtocolEventTypes.js';
 import type { TurnStream } from 'nexa-transport/stream';
 
 const turn: TurnStream = client.stream({
@@ -276,7 +277,7 @@ With `hello.features.binaryMedia`, files up to 300 MiB use 256 KiB binary chunks
 Read native artifacts and video output from the event stream:
 
 ```ts
-import type { NcapDelta } from 'nexa-transport/protocol';
+import type { NcapDelta } from 'nexa-protocol/ncap/DeltaTypes.js';
 import type { TurnStream } from 'nexa-transport/stream';
 
 import { NexaMedia } from 'nexa-transport/media';
@@ -304,7 +305,8 @@ Tool results preserve content blocks, display metadata, and delivery receipts. N
 ## Events and approvals
 
 ```ts
-import type { ResultOf, ApprovalRequestedData } from 'nexa-transport/protocol';
+import type { ResultOf } from 'nexa-protocol/gateway/ProtocolTypes.js';
+import type { ApprovalRequestedData } from 'nexa-protocol/gateway/ProtocolEventTypes.js';
 
 import { EventName } from 'nexa-transport/events';
 
@@ -425,7 +427,6 @@ For voice, `client.startVoice()` returns the call ID, sample rate, and frame siz
 | Import                          | Exports                                |
 | ------------------------------- | -------------------------------------- |
 | `nexa-transport`                | `NexaClient`                           |
-| `nexa-transport/protocol`       | `Method`, request and response types   |
 | `nexa-transport/events`         | `EventName`, event types               |
 | `nexa-transport/media`          | `NexaMedia`                            |
 | `nexa-transport/errors`         | `TransportError`, `TransportErrorCode` |
@@ -545,7 +546,8 @@ are separate operations. See `examples/Geometry.ts` for subscription cleanup.
 Use `uploadData` for original documents or datasets after resolving an explicit conversation target. Discovery accepts no bytes and acquires no machine. An unselected conversation needs a user-reviewed `data.upload.select` choice; a missing or offline target never falls back to the controller.
 
 ```ts
-import type { ConversationDataFile, DataUploadTarget } from 'nexa-transport/protocol';
+import type { ConversationDataFile } from 'nexa-protocol/analytics/ConversationUploadTypes.js';
+import type { DataUploadTarget } from 'nexa-protocol/analytics/DataUploadTargetTypes.js';
 import type { TurnStream } from 'nexa-transport/stream';
 
 declare const file: File;

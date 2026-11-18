@@ -2,16 +2,16 @@
 // SPDX-License-Identifier: LicenseRef-Proprietary
 
 import { expect, it } from 'vitest';
+import type { ConnectorExecutionOutputView } from 'nexa-protocol/dataplane/ConnectorExecutionOutput.js';
 import {
-    Method,
     ConnectorExecutionAccess,
     ConnectorExecutionLane,
-    ConnectorJobPhase,
-    type ConnectorMachineInvocationRule,
     type ConnectorExecutionStatus,
-    type ConnectorExecutionOutputView,
-} from '../src/protocol/Protocol.js';
-import { methodValidators } from '../src/protocol/MethodValidators.js';
+} from 'nexa-protocol/dataplane/ConnectorExecutionTypes.js';
+import type { ConnectorMachineInvocationRule } from 'nexa-protocol/dataplane/ConnectorMachineInvocationTypes.js';
+import { ConnectorJobPhase } from 'nexa-protocol/dataplane/ConnectorTypes.js';
+import { Method } from 'nexa-protocol/gateway/Method.js';
+import { methodValidators } from 'nexa-protocol/schema/MethodValidators.js';
 
 const rule: ConnectorMachineInvocationRule = {
     kind: 'machine-invocation',

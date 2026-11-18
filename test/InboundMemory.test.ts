@@ -11,7 +11,8 @@ import { BinaryEnvelope } from 'nexa-protocol/media/BinaryEnvelope.js';
 import { BinaryMedia } from 'nexa-protocol/media/BinaryMedia.js';
 import type { BinaryInputReservation } from 'nexa-protocol/media/BinaryInputReservation.js';
 import type { BinaryChunkReceipt } from 'nexa-protocol/media/interface/BinaryChunkReceipt.js';
-import { Method, type HelloOk } from '../src/protocol/Protocol.js';
+import { Method } from 'nexa-protocol/gateway/Method.js';
+import type { HelloOk } from 'nexa-protocol/gateway/ProtocolTypes.js';
 import { TransportErrorCode } from '../src/networking/TransportError.js';
 import { hello, TestGateway, type Request } from './Support.js';
 

@@ -34,15 +34,15 @@ try {
     await writeFile(
         join(directory, 'consumer.ts'),
         `import { NexaClient } from 'nexa-transport';
-import { Method } from 'nexa-transport/protocol';
-import type { AskResult } from 'nexa-transport/protocol';
+import { Method } from 'nexa-protocol/gateway/Method.js';
+import type { AskResult } from 'nexa-protocol/gateway/ProtocolEventTypes.js';
 import type { ClientOptions } from 'nexa-transport/options';
 import type { TurnStream } from 'nexa-transport/stream';
 import { NexaMedia } from 'nexa-transport/media';
 import { EventName } from 'nexa-transport/events';
 import { TransportError } from 'nexa-transport/errors';
 import { RedTeamClient } from 'nexa-transport/redteam-client';
-import { reverseSnapshot } from 'nexa-transport/validators';
+import { reverseSnapshot } from 'nexa-protocol/schema/Validators.js';
 import { Graphics, type Graphic } from 'nexa-protocol/graphics/Graphic.js';
 import { GatewayVersion } from 'nexa-protocol/gateway/GatewayVersion.js';
 import { BinaryChunks } from 'nexa-protocol/media/BinaryChunks.js';
@@ -106,7 +106,7 @@ void TransportError;
         [
             '--input-type=module',
             '-e',
-            `import { NexaClient } from 'nexa-transport'; import { NexaMedia } from 'nexa-transport/media'; import { EventName } from 'nexa-transport/events'; import { RedTeamClient } from 'nexa-transport/redteam-client'; import { reverseSnapshot, reverseGraph } from 'nexa-transport/validators'; import { Graphics } from 'nexa-protocol/graphics/Graphic.js'; import { GatewayVersion } from 'nexa-protocol/gateway/GatewayVersion.js'; if (typeof NexaClient.connect !== 'function' || typeof RedTeamClient !== 'function' || reverseSnapshot(null) !== false || typeof reverseGraph !== 'function' || typeof Graphics.isValid !== 'function' || GatewayVersion.Current < GatewayVersion.Minimum || NexaMedia.base64(new Uint8Array([1,2,3])) !== 'AQID' || EventName.TurnEvent !== 'turn.event') throw new Error('Package exports failed');`,
+            `import { NexaClient } from 'nexa-transport'; import { NexaMedia } from 'nexa-transport/media'; import { EventName } from 'nexa-transport/events'; import { RedTeamClient } from 'nexa-transport/redteam-client'; import { reverseSnapshot, reverseGraph } from 'nexa-protocol/schema/Validators.js'; import { Graphics } from 'nexa-protocol/graphics/Graphic.js'; import { GatewayVersion } from 'nexa-protocol/gateway/GatewayVersion.js'; if (typeof NexaClient.connect !== 'function' || typeof RedTeamClient !== 'function' || reverseSnapshot(null) !== false || typeof reverseGraph !== 'function' || typeof Graphics.isValid !== 'function' || GatewayVersion.Current < GatewayVersion.Minimum || NexaMedia.base64(new Uint8Array([1,2,3])) !== 'AQID' || EventName.TurnEvent !== 'turn.event') throw new Error('Package exports failed');`,
         ],
         { cwd: directory, stdio: 'pipe' },
     );

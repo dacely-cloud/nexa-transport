@@ -1,12 +1,9 @@
 // SPDX-FileCopyrightText: 2026 Nexa contributors
 // SPDX-License-Identifier: LicenseRef-Proprietary
 
-import type {
-    DataUpload,
-    DataUploadPosition,
-    DataUploadContext,
-    JsonValue,
-} from '../../src/protocol/Protocol.js';
+import type { DataUploadContext } from 'nexa-protocol/analytics/DataUploadTargetTypes.js';
+import type { DataUpload, DataUploadPosition } from 'nexa-protocol/analytics/DataUploadTypes.js';
+import type { JsonValue } from 'nexa-protocol/json/JsonValue.js';
 import type { Request } from '../Support.js';
 
 /** Fixed explicit placement is test-only metadata; no real account, host or workspace is contacted. */
@@ -40,7 +37,9 @@ export function uploadReply(request: Request, value: DataUpload | DataUploadPosi
 
 /** Tests inspect the typed cause without unsafe framework matchers or discarding retained original metadata. */
 export async function failedUpload(
-    request: Promise<import('../../src/protocol/Protocol.js').ConversationDataFile>,
+    request: Promise<
+        import('nexa-protocol/analytics/ConversationUploadTypes.js').ConversationDataFile
+    >,
 ): Promise<import('../../src/networking/DataUploadFailure.js').DataUploadFailure> {
     try {
         await request;
@@ -55,7 +54,9 @@ export async function failedUpload(
 }
 /** Native observations are surfaced without guessing an error class or encoding. */
 export async function uploadFailureReason(
-    request: Promise<import('../../src/protocol/Protocol.js').ConversationDataFile>,
+    request: Promise<
+        import('nexa-protocol/analytics/ConversationUploadTypes.js').ConversationDataFile
+    >,
 ): Promise<string> {
     const failure: import('../../src/networking/DataUploadFailure.js').DataUploadFailure =
         await failedUpload(request);

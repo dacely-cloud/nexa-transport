@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { SchemaValidator, type Schema } from '../src/protocol/Schema.js';
+import { SchemaValidator, type Schema } from 'nexa-protocol/schema/Schema.js';
 
 it('refuses excess array items before reading their values', (): void => {
     const validator: SchemaValidator = new SchemaValidator({

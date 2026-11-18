@@ -21,7 +21,7 @@ Check capabilities on the authenticated, connected client:
 Additive methods are negotiated individually through
 `client.hello.features.methods`. For example, draft support alone does not promise
 deletion, schedules, publications, usage reports, or application setup. Use the
-[RPC reference](methods.md) for exact parameters and results; calls require the
+[RPC reference](https://github.com/dacely-cloud/nexa-protocol/blob/main/docs/methods.md) for exact parameters and results; calls require the
 `Method` enum and server authorization.
 
 ## Drafts and deletion
@@ -34,7 +34,8 @@ The [resource guide](workflow-resources.md) describes patch limits and group pag
 Delete the revision the owner reviewed:
 
 ```ts
-import { Method, type ResultOf } from 'nexa-transport/protocol';
+import { Method } from 'nexa-protocol/gateway/Method.js';
+import type { ResultOf } from 'nexa-protocol/gateway/ProtocolTypes.js';
 
 if (client.hello.features.methods.includes(Method.WorkflowsDelete)) {
     const deleted: ResultOf<typeof Method.WorkflowsDelete> = await client.call(
@@ -60,7 +61,8 @@ file access or execution permission.
 Start a mock or live test from one owned saved revision:
 
 ```ts
-import { Method, type ParamsOf, type ResultOf } from 'nexa-transport/protocol';
+import { Method } from 'nexa-protocol/gateway/Method.js';
+import type { ParamsOf, ResultOf } from 'nexa-protocol/gateway/ProtocolTypes.js';
 import { WorkflowRunMode } from 'nexa-protocol/workflows/runtime/RunTypes.js';
 
 if (client.supportsWorkflowRuns) {

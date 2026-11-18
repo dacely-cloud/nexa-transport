@@ -4,12 +4,12 @@
 import { expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
 import { NexaClient } from '../src/networking/NexaClient.js';
-import {
-    Method,
-    type ConnectorWorkspaceSelectHostParams,
-    type ConnectorWorkspaceSelectionView,
-} from '../src/protocol/Protocol.js';
-import { methodValidators } from '../src/protocol/MethodValidators.js';
+import type {
+    ConnectorWorkspaceSelectHostParams,
+    ConnectorWorkspaceSelectionView,
+} from 'nexa-protocol/dataplane/ConnectorWorkspaceSelectionTypes.js';
+import { Method } from 'nexa-protocol/gateway/Method.js';
+import { methodValidators } from 'nexa-protocol/schema/MethodValidators.js';
 import { TestGateway, type Request } from './Support.js';
 
 const original: ConnectorWorkspaceSelectHostParams = {

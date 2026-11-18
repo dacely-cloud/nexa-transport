@@ -11,7 +11,8 @@ steering use the server run ID. Display names are not authenticated identities.
 to learn the server run ID and optional session key before the final answer:
 
 ```ts
-import type { AskResult, StreamAccepted } from 'nexa-transport/protocol';
+import type { AskResult } from 'nexa-protocol/gateway/ProtocolEventTypes.js';
+import type { StreamAccepted } from 'nexa-protocol/gateway/ProtocolTypes.js';
 import type { TurnStream } from 'nexa-transport/stream';
 
 const turn: TurnStream = client.stream({

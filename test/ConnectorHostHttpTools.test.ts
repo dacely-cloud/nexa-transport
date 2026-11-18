@@ -3,16 +3,15 @@
 
 import { expect, it } from 'vitest';
 import {
-    ConnectorHostToolValues,
-    Method,
-    type ConnectorHostTool,
+    ConnectorHostTool,
     type ConnectorHostStatus,
-    type ConnectorInventoryPage,
-} from '../src/protocol/Protocol.js';
-import { methodValidators } from '../src/protocol/MethodValidators.js';
+} from 'nexa-protocol/dataplane/ConnectorHostTypes.js';
+import type { ConnectorInventoryPage } from 'nexa-protocol/dataplane/ConnectorInventoryTypes.js';
+import { Method } from 'nexa-protocol/gateway/Method.js';
+import { methodValidators } from 'nexa-protocol/schema/MethodValidators.js';
 
 /** All current tools remain an approval ceiling; no call or actual host is made by schema qualification. */
-const tools: readonly ConnectorHostTool[] = Object.values(ConnectorHostToolValues);
+const tools: readonly ConnectorHostTool[] = Object.values(ConnectorHostTool);
 /** Public profile fields never contain a provider credential or controller endpoint. */
 const status: ConnectorHostStatus = {
     environmentId: 'test-environment',

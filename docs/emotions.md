@@ -3,7 +3,7 @@
 Read the mood, emotion intensities and private relationship toward the authenticated user:
 
 ```ts
-import type { EmotionalSnapshot } from 'nexa-transport/protocol';
+import type { EmotionalSnapshot } from 'nexa-protocol/self/EmotionTypes.js';
 
 const feelings: EmotionalSnapshot = await client.emotions();
 console.log(feelings.mood, feelings.emotions, feelings.towardUser);
@@ -32,7 +32,7 @@ Call the returned function when the view unmounts. Removing the last view cancel
 Reactions completed through `tool_call` refresh the same subscription as direct `self_emotion` calls, including during an ongoing turn. A failed read invalidates the cached snapshot: a newly mounted view requests fresh state instead of replaying the last successful expression. If the application replaces the SDK client entirely, mounted views must release the old subscription and subscribe on the replacement client.
 
 ```ts
-import type { EmotionalSnapshot } from 'nexa-transport/protocol';
+import type { EmotionalSnapshot } from 'nexa-protocol/self/EmotionTypes.js';
 
 function displayNexaMood(element: HTMLElement): () => void {
     if (!client.supportsEmotions) {

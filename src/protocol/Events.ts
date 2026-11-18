@@ -1,18 +1,17 @@
+import type { AgileChanged } from 'nexa-protocol/agile/interface/AgileView.js';
+import type { SessionHistoryData } from 'nexa-protocol/gateway/HistoryTypes.js';
 import type {
     ApprovalRequestedData,
-    AgileChanged,
     ApprovalResolvedData,
-    ChangedData,
-    ConnectChallengeData,
     SessionMessageData,
-    SessionHistoryData,
     TurnEndData,
     TurnEventData,
     ToolSitesData,
-    VoiceCallEvent,
-} from './Protocol.js';
-import * as validators from './Validators.js';
-import type { Validator } from './Validators.js';
+} from 'nexa-protocol/gateway/ProtocolEventTypes.js';
+import type { ChangedData, ConnectChallengeData } from 'nexa-protocol/gateway/ProtocolTypes.js';
+import type { VoiceCallEvent } from 'nexa-protocol/voice/VoiceCallTypes.js';
+import * as validators from 'nexa-protocol/schema/Validators.js';
+import type { Validator } from 'nexa-protocol/schema/Validators.js';
 /** The gateway's catalogued event names. */
 export const EventName = {
     Challenge: 'connect.challenge',

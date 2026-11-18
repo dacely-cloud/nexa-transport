@@ -11,11 +11,9 @@ terminal on that VM; drive it with `WorkflowsRunsTerminalRead` and `WorkflowsRun
 Credentials stay inside the application on the VM and are never returned.
 
 ```ts
-import {
-    Method,
-    type ConnectionApplicationsPage,
-    type WorkflowTerminalSnapshot,
-} from 'nexa-transport/protocol';
+import { Method } from 'nexa-protocol/gateway/Method.js';
+import type { ConnectionApplicationsPage } from 'nexa-protocol/connections/ConnectionTypes.js';
+import type { WorkflowTerminalSnapshot } from 'nexa-protocol/workflows/terminal/TerminalTypes.js';
 
 declare const client: import('nexa-transport').NexaClient;
 const page: ConnectionApplicationsPage = await client.call(Method.ConnectionsApplicationsCheck, {});
@@ -34,7 +32,7 @@ immediately; poll `ConnectionsToolsStatus` until the state settles. `Connections
 deletes the tool and its license file from the VM.
 
 ```ts
-import { Method } from 'nexa-transport/protocol';
+import { Method } from 'nexa-protocol/gateway/Method.js';
 import { LicensedTool, LicensedToolState } from 'nexa-protocol/connections/ConnectionTypes.js';
 
 declare const client: import('nexa-transport').NexaClient;
@@ -54,7 +52,8 @@ use the Nexa model. The gateway re-checks the selection against the account on e
 subscription turn runs the official CLI in the conversation's workspace on the user's VM.
 
 ```ts
-import { Method, type ChatModelChoice } from 'nexa-transport/protocol';
+import { Method } from 'nexa-protocol/gateway/Method.js';
+import type { ChatModelChoice } from 'nexa-protocol/connections/ConnectionTypes.js';
 
 declare const client: import('nexa-transport').NexaClient;
 const { items } = await client.call(Method.ConnectionsModelsList, {});

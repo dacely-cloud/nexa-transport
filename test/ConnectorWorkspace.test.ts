@@ -4,14 +4,14 @@
 import { afterEach, expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
 import { NexaClient } from '../src/networking/NexaClient.js';
-import {
-    Method,
-    type ConnectorWorkspaceSelectParams,
-    type ConnectorWorkspaceSelectionView,
-    type WireError,
-} from '../src/protocol/Protocol.js';
-import { SchemaValidator, type Schema } from '../src/protocol/Schema.js';
-import { methodValidators } from '../src/protocol/MethodValidators.js';
+import type {
+    ConnectorWorkspaceSelectParams,
+    ConnectorWorkspaceSelectionView,
+} from 'nexa-protocol/dataplane/ConnectorWorkspaceSelectionTypes.js';
+import { Method } from 'nexa-protocol/gateway/Method.js';
+import type { WireError } from 'nexa-protocol/gateway/ProtocolEventTypes.js';
+import { SchemaValidator, type Schema } from 'nexa-protocol/schema/Schema.js';
+import { methodValidators } from 'nexa-protocol/schema/MethodValidators.js';
 import { TestGateway, type Request } from './Support.js';
 
 let gateway: TestGateway | undefined;

@@ -1,4 +1,5 @@
-import type { DataUploadContext, ConversationDataUpload } from '../protocol/Protocol.js';
+import type { ConversationDataUpload } from 'nexa-protocol/analytics/ConversationUploadTypes.js';
+import type { DataUploadContext } from 'nexa-protocol/analytics/DataUploadTargetTypes.js';
 
 /** Controls one immutable, explicitly placed upload without adding source bytes to an agent request. */
 export interface DataUploadOptions {

@@ -5,7 +5,8 @@ import { expect, it, type Mock, vi } from 'vitest';
 import type { NexaClient } from '../src/networking/NexaClient.js';
 import { SessionArchiveRequests } from '../src/networking/SessionArchiveRequests.js';
 import { TransportError, TransportErrorCode } from '../src/networking/TransportError.js';
-import { Method, type SessionHistoryPage } from '../src/protocol/Protocol.js';
+import type { SessionHistoryPage } from 'nexa-protocol/gateway/HistoryTypes.js';
+import { Method } from 'nexa-protocol/gateway/Method.js';
 
 /** A gateway refusal issued before protected work or binary delivery starts. */
 function busy(): TransportError {

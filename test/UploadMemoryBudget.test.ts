@@ -5,7 +5,8 @@ import { uploadContext, uploadReply } from './support/UploadWireFixture.js';
 import { expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
 import { NexaClient } from '../src/networking/NexaClient.js';
-import type { GatewayLimits, DataFile, DataUploadPosition } from '../src/protocol/Protocol.js';
+import type { DataFile, DataUploadPosition } from 'nexa-protocol/analytics/DataUploadTypes.js';
+import type { GatewayLimits } from 'nexa-protocol/gateway/GatewayLimits.js';
 import { hello, TestGateway, type Request } from './Support.js';
 
 it.each([true, false])(

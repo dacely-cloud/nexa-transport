@@ -4,13 +4,13 @@
 import { afterEach, expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
 import { NexaClient } from '../src/networking/NexaClient.js';
-import {
-    Method,
-    ConnectorFileModeValues,
-    type ConnectorWorkspaceSelectJointParams,
-    type ConnectorWorkspaceSelectionView,
-} from '../src/protocol/Protocol.js';
-import { methodValidators } from '../src/protocol/MethodValidators.js';
+import type {
+    ConnectorWorkspaceSelectJointParams,
+    ConnectorWorkspaceSelectionView,
+} from 'nexa-protocol/dataplane/ConnectorWorkspaceSelectionTypes.js';
+import { ConnectorFileMode } from 'nexa-protocol/dataplane/ConnectorFileMode.js';
+import { Method } from 'nexa-protocol/gateway/Method.js';
+import { methodValidators } from 'nexa-protocol/schema/MethodValidators.js';
 import { TestGateway, type Request } from './Support.js';
 
 let gateway: TestGateway | undefined;
@@ -32,7 +32,7 @@ const original: ConnectorWorkspaceSelectJointParams = {
         executionRootId: 'programs',
         filePolicySha256: 'b'.repeat(64),
         executionPolicySha256: 'c'.repeat(64),
-        access: ConnectorFileModeValues.Value1,
+        access: ConnectorFileMode.ReadWrite,
         bindingRevision: '9007199254740993',
         bindingSha256: 'd'.repeat(64),
         descriptorSha256: 'e'.repeat(64),

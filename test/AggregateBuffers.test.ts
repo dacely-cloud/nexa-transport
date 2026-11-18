@@ -10,10 +10,12 @@ import type { BinaryInputReservation } from 'nexa-protocol/media/BinaryInputRese
 import { ClientResources } from '../src/networking/ClientResources.js';
 import { NexaClient } from '../src/networking/NexaClient.js';
 import { TurnStream } from '../src/networking/TurnStream.js';
-import { Method, type HelloOk, type JsonValue } from '../src/protocol/Protocol.js';
+import { Method } from 'nexa-protocol/gateway/Method.js';
+import type { HelloOk } from 'nexa-protocol/gateway/ProtocolTypes.js';
+import type { JsonValue } from 'nexa-protocol/json/JsonValue.js';
 import { hello, result, TestGateway, type Request } from './Support.js';
 import { TransportErrorCode } from '../src/networking/TransportError.js';
-import * as validators from '../src/protocol/Validators.js';
+import * as validators from 'nexa-protocol/schema/Validators.js';
 
 const cancelMethod: string = Method.TasksCancel;
 

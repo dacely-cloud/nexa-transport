@@ -3,7 +3,7 @@ import type { WebSocket } from 'ws';
 import { BinaryChunks } from 'nexa-protocol/media/BinaryChunks.js';
 import { BinaryMedia, type ReceivedAttachment } from 'nexa-protocol/media/BinaryMedia.js';
 import { NexaClient } from '../src/networking/NexaClient.js';
-import { Method } from '../src/protocol/Protocol.js';
+import { Method } from 'nexa-protocol/gateway/Method.js';
 import { hello, TestGateway, type Request } from './Support.js';
 
 it('accepts the next large file before the previous receipt RPC replies', async (): Promise<void> => {

@@ -4,7 +4,7 @@
 import { expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
 import { NexaClient } from '../src/networking/NexaClient.js';
-import { Method } from '../src/protocol/Protocol.js';
+import { Method } from 'nexa-protocol/gateway/Method.js';
 import { TestGateway, hello, result, type Request } from './Support.js';
 
 it.each([true, false])(

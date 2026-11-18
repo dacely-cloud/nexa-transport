@@ -1,13 +1,11 @@
 // SPDX-FileCopyrightText: 2026 Nerva contributors
 // SPDX-License-Identifier: LicenseRef-Proprietary
 
-import type {
-    JsonValue,
-    SessionHistoryRecord,
-    ResultOf,
-    Method,
-    SessionFilePage,
-} from '../protocol/Protocol.js';
+import type { SessionHistoryRecord } from 'nexa-protocol/gateway/HistoryTypes.js';
+import type { SessionFilePage } from 'nexa-protocol/gateway/interface/SessionFilePage.js';
+import type { Method } from 'nexa-protocol/gateway/Method.js';
+import type { ResultOf } from 'nexa-protocol/gateway/ProtocolTypes.js';
+import type { JsonValue } from 'nexa-protocol/json/JsonValue.js';
 
 /** A validated envelope retaining the complete JSON payload. */
 export interface GatewayEvent {

@@ -1,14 +1,12 @@
 import { BinaryChunks } from 'nexa-protocol/media/BinaryChunks.js';
 import type { ReceivedAttachment } from 'nexa-protocol/media/BinaryMedia.js';
 export { MeshoptDecoder } from 'meshoptimizer/decoder';
-import type {
-    BinarySource,
-    InboundAttachment,
-    JsonValue,
-    NcapDelta,
-    WireTurnEvent,
-} from '../protocol/Protocol.js';
-import { native } from '../protocol/Validators.js';
+import type { InboundAttachment } from 'nexa-protocol/gateway/AttachmentTypes.js';
+import type { WireTurnEvent } from 'nexa-protocol/gateway/ProtocolEventTypes.js';
+import type { JsonValue } from 'nexa-protocol/json/JsonValue.js';
+import type { NcapDelta } from 'nexa-protocol/ncap/DeltaTypes.js';
+import type { BinarySource } from 'nexa-protocol/providers/Types.js';
+import { native } from 'nexa-protocol/schema/Validators.js';
 /** Creates protocol media blocks and decodes rich native payloads without platform imports. */
 export class NexaMedia {
     /** Creates a 3D upload using the gateway's file carrier; bytes determine the stored asset kind. */
@@ -140,8 +138,8 @@ export class NexaMedia {
         }
         return data;
     }
-    /** Reconstructs bytes from JSON-serialized Uint8Array records or array payloads. */
-    public static bytes(value: JsonValue | undefined): Uint8Array<ArrayBuffer> {
+    /** Reconstructs bytes from JSON-serialized Uint8Array records or array payloads, or copies a binary view. */
+    public static bytes(value: JsonValue | Uint8Array | undefined): Uint8Array<ArrayBuffer> {
         if (!Array.isArray(value) && !isJsonRecord(value)) {
             throw new TypeError('Expected binary JSON');
         }
@@ -219,6 +217,6 @@ export class NexaMedia {
     }
 }
 /** Narrows an extensible protocol field without discarding its contents. */
-function isJsonRecord(value: JsonValue | undefined): value is Readonly<Record<string, JsonValue>> {
+function isJsonRecord(value: unknown): value is Readonly<Record<string, JsonValue>> {
     return typeof value === 'object' && value !== null && !Array.isArray(value);
 }

@@ -7,7 +7,7 @@ import {
     type AttachmentProgress,
     type ReceivedAttachment,
 } from 'nexa-protocol/media/BinaryMedia.js';
-import { Method } from '../src/protocol/Protocol.js';
+import { Method } from 'nexa-protocol/gateway/Method.js';
 import { hello, TestGateway, type Request } from './Support.js';
 
 let gateway: TestGateway | undefined;

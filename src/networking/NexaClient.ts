@@ -10,13 +10,14 @@ import type {
     SavedHistorySnapshot,
     SessionSnapshot,
 } from './ClientEvents.js';
-import type { ConversationDataFile } from '../protocol/Protocol.js';
+import type { ConversationDataFile } from 'nexa-protocol/analytics/ConversationUploadTypes.js';
 import { SessionHistoryReader } from './SessionHistoryReader.js';
 import { SessionArchiveRequests } from './SessionArchiveRequests.js';
 import { EmotionWatches } from './EmotionWatches.js';
 import { resolveBridgeInput } from 'nexa-protocol/toolsearch/BridgeInput.js';
-import type { EmotionalSnapshot, TurnEventData } from '../protocol/Protocol.js';
-import type { SessionHistoryRecord } from '../protocol/Protocol.js';
+import type { TurnEventData } from 'nexa-protocol/gateway/ProtocolEventTypes.js';
+import type { EmotionalSnapshot } from 'nexa-protocol/self/EmotionTypes.js';
+import type { SessionHistoryRecord } from 'nexa-protocol/gateway/HistoryTypes.js';
 import { DataUploadClient } from './DataUploadClient.js';
 import type { DataUploadOptions } from '../interface/DataUploadOptions.js';
 export { DataUploadFailure, DataUploadFailureState } from './DataUploadFailure.js';
@@ -46,26 +47,28 @@ import {
     type EventMap,
 } from '../protocol/Events.js';
 import type { StreamOptions } from '../interface/StreamOptions.js';
-import { Method } from '../protocol/Protocol.js';
-import type { StreamParams, UserRegion } from '../protocol/Protocol.js';
+import { Method } from 'nexa-protocol/gateway/Method.js';
+import type { UserRegion } from 'nexa-protocol/agent/RegionalContextTypes.js';
+import type { StreamParams } from 'nexa-protocol/gateway/ProtocolTypes.js';
 import { BrowserRegion } from './BrowserRegion.js';
 import { TurnStream } from './TurnStream.js';
 import type { CallOptions, ClientOptions } from '../interface/ClientOptions.js';
+import type { WireError } from 'nexa-protocol/gateway/ProtocolEventTypes.js';
 import type {
     ConnectChallengeData,
     HelloOk,
-    JsonValue,
     ParamsOf,
     ResultOf,
-    WireError,
-} from '../protocol/Protocol.js';
-import { methodValidators } from '../protocol/MethodValidators.js';
-import * as validators from '../protocol/Validators.js';
+} from 'nexa-protocol/gateway/ProtocolTypes.js';
+import type { JsonValue } from 'nexa-protocol/json/JsonValue.js';
+import { methodValidators } from 'nexa-protocol/schema/MethodValidators.js';
+import * as validators from 'nexa-protocol/schema/Validators.js';
 import { PendingRequests } from './PendingRequests.js';
 import { TransportError, TransportErrorCode } from './TransportError.js';
 import { SessionFilePager } from './SessionFilePager.js';
 import { GatewayVersion } from 'nexa-protocol/gateway/GatewayVersion.js';
-import type { SessionFilePage, SessionFileListParams } from '../protocol/Protocol.js';
+import type { SessionFileListParams } from 'nexa-protocol/gateway/interface/SessionFileListParams.js';
+import type { SessionFilePage } from 'nexa-protocol/gateway/interface/SessionFilePage.js';
 import { RedTeamClient, type RedTeamRequestMap } from '../redteam/RedTeamClient.js';
 import {
     RedTeamMethod,

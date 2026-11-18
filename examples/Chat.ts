@@ -1,6 +1,7 @@
 import { NexaClient } from 'nexa-transport';
 import { NexaMedia } from 'nexa-transport/media';
-import type { AskResult, InboundAttachment, WireTurnEvent } from 'nexa-transport/protocol';
+import type { InboundAttachment } from 'nexa-protocol/gateway/AttachmentTypes.js';
+import type { AskResult, WireTurnEvent } from 'nexa-protocol/gateway/ProtocolEventTypes.js';
 /** UI callbacks for a Nervalab Nexa-mode conversation. */
 export interface ChatView {
     /** Renders text, reasoning, tools, approvals, or native rich output. */
