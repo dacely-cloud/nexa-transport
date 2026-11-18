@@ -16,6 +16,17 @@ import type { JsonValue } from 'nexa-protocol/json/JsonValue.js';
 import { hello, result, TestGateway, type Request } from './Support.js';
 import { TransportErrorCode } from '../src/networking/TransportError.js';
 import * as validators from 'nexa-protocol/schema/Validators.js';
+import type * as ValidatorsModule from 'nexa-protocol/schema/Validators.js';
+
+vi.mock(
+    'nexa-protocol/schema/Validators.js',
+    async (
+        importOriginal: () => Promise<typeof ValidatorsModule>,
+    ): Promise<Readonly<Record<string, unknown>>> => {
+        const actual: typeof ValidatorsModule = await importOriginal();
+        return { ...actual, turnEvent: vi.fn(actual.turnEvent) };
+    },
+);
 
 const cancelMethod: string = Method.TasksCancel;
 
@@ -99,7 +110,8 @@ it('validates a matching event once rather than once per active turn', async ():
     const turns: TurnStream[] = [];
     let client: NexaClient | null = null;
     let count: number = 0;
-    const checked = vi.spyOn(validators, 'turnEvent');
+    const checked = vi.mocked(validators.turnEvent);
+    checked.mockClear();
     gateway.handler = (socket: WebSocket, request: Request): void => {
         if (request.method === cancelMethod) {
             socket.send(JSON.stringify({ id: request.id, ok: true, result: { ok: true } }));
@@ -140,7 +152,7 @@ it('validates a matching event once rather than once per active turn', async ():
         for (const turn of turns) {
             await turn.cancel();
         }
-        checked.mockRestore();
+        checked.mockClear();
         client?.close();
         await gateway.close();
     }

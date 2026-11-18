@@ -1,7 +1,7 @@
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { WebSocketServer } from 'ws';
-import { Method } from '../dist/protocol.js';
+import { Method } from 'nexa-protocol/gateway/Method.js';
 
 export const answer = {
     turnId: 'turn',

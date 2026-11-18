@@ -1,5 +1,5 @@
 import { NexaClient } from '../dist/nexa-transport.js';
-import { Method } from '../dist/protocol.js';
+import { Method } from 'nexa-protocol/gateway/Method.js';
 
 export async function createScenario(url) {
     const client = await NexaClient.connect({ url, reconnect: true });

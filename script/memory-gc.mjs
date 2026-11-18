@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { after, test } from 'node:test';
 import { setTimeout as delay } from 'node:timers/promises';
 import { createScenario } from './memory-scenario.mjs';
-import { Method } from '../dist/protocol.js';
+import { Method } from 'nexa-protocol/gateway/Method.js';
 import { NexaClient } from '../dist/nexa-transport.js';
 import { createPeer } from './memory-peer.mjs';
 
