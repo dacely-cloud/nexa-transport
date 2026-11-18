@@ -33,6 +33,7 @@ Roblox preview rendering and workflow graph tooling is not part of this SDK.
 | `nexa-transport/redteam-client`   | ESM + types    | Validated start/list/get/stop/update operations over an authenticated gateway adapter   |
 | `nexa-transport/stream`           | **Types only** | Streaming turn type with acceptance, result, steering, cancel, and detach               |
 | `nexa-transport/stream-options`   | **Types only** | Turn duration, event/byte buffers, timeout, and cancellation options                    |
+| `nexa-transport/validators`       | ESM + types    | Generated schema validators for paged reverse-engineering responses                     |
 
 ## Red team effort contract
 

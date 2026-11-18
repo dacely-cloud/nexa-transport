@@ -12,6 +12,7 @@ const config: UserConfig = {
                 protocol: 'src/protocol/Protocol.ts',
                 media: 'src/media/Media.ts',
                 events: 'src/protocol/Events.ts',
+                validators: 'src/protocol/PageValidators.ts',
                 errors: 'src/networking/TransportError.ts',
             },
             formats: ['es'],

@@ -40,6 +40,10 @@
             "types": "./dist/protocol/Events.d.ts",
             "import": "./dist/events.js"
         },
+        "./validators": {
+            "types": "./dist/protocol/PageValidators.d.ts",
+            "import": "./dist/validators.js"
+        },
         "./errors": {
             "types": "./dist/networking/TransportError.d.ts",
             "import": "./dist/errors.js"

@@ -42,6 +42,7 @@ import { NexaMedia } from 'nexa-transport/media';
 import { EventName } from 'nexa-transport/events';
 import { TransportError } from 'nexa-transport/errors';
 import { RedTeamClient } from 'nexa-transport/redteam-client';
+import { reverseSnapshot } from 'nexa-transport/validators';
 import { Graphics, type Graphic } from 'nexa-protocol/graphics/Graphic.js';
 import { GatewayVersion } from 'nexa-protocol/gateway/GatewayVersion.js';
 import { BinaryChunks } from 'nexa-protocol/media/BinaryChunks.js';
@@ -65,6 +66,8 @@ void GatewayVersion.Current;
 void BinaryChunks;
 void RedTeamRequestCodec.start;
 void RedTeamClient;
+const snapshotValid: boolean = reverseSnapshot(null);
+void snapshotValid;
 const options: ClientOptions = { url: 'ws://localhost:18830' };
 async function consume(): Promise<AskResult> {
     const client: NexaClient = await NexaClient.connect(options);
@@ -103,7 +106,7 @@ void TransportError;
         [
             '--input-type=module',
             '-e',
-            `import { NexaClient } from 'nexa-transport'; import { NexaMedia } from 'nexa-transport/media'; import { EventName } from 'nexa-transport/events'; import { RedTeamClient } from 'nexa-transport/redteam-client'; import { Graphics } from 'nexa-protocol/graphics/Graphic.js'; import { GatewayVersion } from 'nexa-protocol/gateway/GatewayVersion.js'; if (typeof NexaClient.connect !== 'function' || typeof RedTeamClient !== 'function' || typeof Graphics.isValid !== 'function' || GatewayVersion.Current < GatewayVersion.Minimum || NexaMedia.base64(new Uint8Array([1,2,3])) !== 'AQID' || EventName.TurnEvent !== 'turn.event') throw new Error('Package exports failed');`,
+            `import { NexaClient } from 'nexa-transport'; import { NexaMedia } from 'nexa-transport/media'; import { EventName } from 'nexa-transport/events'; import { RedTeamClient } from 'nexa-transport/redteam-client'; import { reverseSnapshot, reverseGraph } from 'nexa-transport/validators'; import { Graphics } from 'nexa-protocol/graphics/Graphic.js'; import { GatewayVersion } from 'nexa-protocol/gateway/GatewayVersion.js'; if (typeof NexaClient.connect !== 'function' || typeof RedTeamClient !== 'function' || reverseSnapshot(null) !== false || typeof reverseGraph !== 'function' || typeof Graphics.isValid !== 'function' || GatewayVersion.Current < GatewayVersion.Minimum || NexaMedia.base64(new Uint8Array([1,2,3])) !== 'AQID' || EventName.TurnEvent !== 'turn.event') throw new Error('Package exports failed');`,
         ],
         { cwd: directory, stdio: 'pipe' },
     );
