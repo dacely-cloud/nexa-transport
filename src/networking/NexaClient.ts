@@ -919,10 +919,20 @@ export class NexaClient implements ClientConnection {
     public get reconnecting(): boolean {
         return !this.#disposed && this.#attempt > 0;
     }
+    /** Starts a queued retry immediately when the host resumes. An active handshake keeps ownership. */
+    public resumeReconnect(): void {
+        if (this.#disposed || this.#retryTimer === undefined) {
+            return;
+        }
+        clearTimeout(this.#retryTimer);
+        this.#retryTimer = undefined;
+        void this.#reconnect();
+    }
     /** Closes permanently, cancelling reconnect and rejecting pending requests. Idempotent. */
     public close(): void {
         this.#disposed = true;
         clearTimeout(this.#retryTimer);
+        this.#retryTimer = undefined;
         this.#fail(new TransportError(TransportErrorCode.Closed, 'Client closed'));
         this.#clearListeners();
     }
@@ -1423,7 +1433,7 @@ export class NexaClient implements ClientConnection {
         const delay: number = Math.min(30_000, 500 * 2 ** Math.min(this.#attempt - 1, 6));
         this.#retryTimer = setTimeout(
             (): void => {
-                void this.#reconnect();
+                this.resumeReconnect();
             },
             delay * (0.5 + Math.random() * 0.5),
         );

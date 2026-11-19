@@ -69,6 +69,35 @@ it('refuses mixed credentials and aborts while obtaining a ticket without openin
     expect(gateway.upgradeUrls).toHaveLength(0);
 });
 
+it('resuming after an abnormal close starts one fresh handshake without waiting for retry timers', async (): Promise<void> => {
+    gateway = new TestGateway();
+    let issued: number = 0;
+    const renewal: PromiseWithResolvers<string> = Promise.withResolvers<string>();
+    client = await NexaClient.connect({
+        url: await gateway.url(),
+        tokenProvider: (): Promise<string> =>
+            ++issued === 1 ? Promise.resolve('first') : renewal.promise,
+    });
+    const connected: NexaClient = client;
+    const restored: Promise<void> = new Promise<void>((resolve): void => {
+        connected.onReconnect(resolve);
+    });
+    gateway.handler = (socket: WebSocket): void => {
+        socket.terminate();
+    };
+    await expect(connected.call(Method.Health, {})).rejects.toThrow('1006');
+    expect(issued).toBe(1);
+    expect(connected.reconnecting).toBe(true);
+    connected.resumeReconnect();
+    expect(issued).toBe(2);
+    connected.resumeReconnect();
+    renewal.resolve('second');
+    await restored;
+    connected.resumeReconnect();
+    expect(issued).toBe(2);
+    expect(gateway.upgradeUrls).toEqual(['/?token=first', '/?token=second']);
+});
+
 it('manual close while renewal is pending prevents the replacement socket', async (): Promise<void> => {
     gateway = new TestGateway();
     let issued: number = 0;
