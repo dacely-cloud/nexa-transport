@@ -4,14 +4,14 @@
 import { expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
 import { NexaClient } from '../src/networking/NexaClient.js';
-import type {
-    ConnectorHostStatus,
-    ConnectorHostSubmitParams,
-    ConnectorHostJobView,
-} from 'nexa-protocol/dataplane/ConnectorHostTypes.js';
+import type { ConnectorHostSubmitParams } from 'nexa-protocol/dataplane/ConnectorHostTypes.js';
 import { Method } from 'nexa-protocol/gateway/Method.js';
 import { methodValidators } from 'nexa-protocol/schema/MethodValidators.js';
 import { TestGateway, type Request } from './Support.js';
+import type {
+    ConnectorHostJobView,
+    ConnectorHostStatus,
+} from 'nerva-connector-protocol/protocol/ConnectorHost.js';
 
 const original: ConnectorHostSubmitParams = {
     environmentId: 'env-one',
@@ -24,7 +24,7 @@ const original: ConnectorHostSubmitParams = {
         argumentsJson: '{"shell":"powershell","command":"Get-Location","timeoutMs":30000}',
     },
 };
-const status: ConnectorHostStatus = {
+const status: ConnectorHostStatus<string> = {
     environmentId: original.environmentId,
     sequence: original.previousSequence,
     acknowledgedSequence: original.previousSequence,
@@ -38,7 +38,7 @@ const status: ConnectorHostStatus = {
         tools: ['process_start', 'desktop_screenshot'],
     },
 };
-const completed: ConnectorHostJobView = {
+const completed: ConnectorHostJobView<string> = {
     id: 'host-job',
     environmentId: original.environmentId,
     sequence: '9007199254740994',

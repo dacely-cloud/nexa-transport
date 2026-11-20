@@ -3,18 +3,17 @@
 
 import { expect, it } from 'vitest';
 import type { ConnectorExecutionOutputView } from 'nexa-protocol/dataplane/ConnectorExecutionOutput.js';
-import {
-    ConnectorExecutionAccess,
-    ConnectorExecutionLane,
-    type ConnectorExecutionStatus,
-} from 'nexa-protocol/dataplane/ConnectorExecutionTypes.js';
-import type { ConnectorMachineInvocationRule } from 'nexa-protocol/dataplane/ConnectorMachineInvocationTypes.js';
-import { ConnectorJobPhase } from 'nexa-protocol/dataplane/ConnectorTypes.js';
+import { type ConnectorExecutionStatus } from 'nexa-protocol/dataplane/ConnectorExecutionTypes.js';
 import { Method } from 'nexa-protocol/gateway/Method.js';
 import { methodValidators } from 'nexa-protocol/schema/MethodValidators.js';
+import { ExecutionLane } from 'nerva-connector-protocol/execution/ExecutionLane.js';
+import type { ExecutionMachineInvocationRule } from 'nerva-connector-protocol/execution/ExecutionMachineInvocation.js';
+import { ExecutionWorkspaceAccess } from 'nerva-connector-protocol/execution/ExecutionTypes.js';
+import { ConnectorFileJobPhase } from 'nerva-connector-protocol/protocol/ConnectorFileJobs.js';
+import { ExecutionArgumentKind } from 'nerva-connector-protocol/execution/ExecutionArgumentKind.js';
 
-const rule: ConnectorMachineInvocationRule = {
-    kind: 'machine-invocation',
+const rule: ExecutionMachineInvocationRule = {
+    kind: ExecutionArgumentKind.MachineInvocation,
     shell: { executableIndex: 0, fixedArguments: ['-c'] },
     commands: [{ alias: 'node', executableIndex: 1 }],
     environment: [{ name: 'APP_MODE', maximumBytes: 128 }],
@@ -29,10 +28,10 @@ const rule: ConnectorMachineInvocationRule = {
 };
 
 /** Public metadata only: no private SDK, native path, program digest or signing code enters the package. */
-function status(argument: ConnectorMachineInvocationRule): ConnectorExecutionStatus {
+function status(argument: ExecutionMachineInvocationRule): ConnectorExecutionStatus {
     return {
         environmentId: 'environment',
-        lanes: Object.values(ConnectorExecutionLane).map((lane) => ({
+        lanes: Object.values(ExecutionLane).map((lane) => ({
             lane,
             sequence: '9007199254740993',
             acknowledgedSequence: '9007199254740993',
@@ -40,7 +39,7 @@ function status(argument: ConnectorMachineInvocationRule): ConnectorExecutionSta
             profile: {
                 revision: '9007199254740993',
                 policySha256: 'a'.repeat(64),
-                roots: [{ id: 'project', access: ConnectorExecutionAccess.ReadWrite }],
+                roots: [{ id: 'project', access: ExecutionWorkspaceAccess.ReadWrite }],
                 programs: [{ id: 'machine', rootIds: ['project'], arguments: [argument] }],
                 resources: { memoryBytes: '67108864', maximumTasks: 8, cpuQuotaMicros: 50000 },
                 timeoutMs: 5000,
@@ -75,10 +74,10 @@ it('partial output requires the exact bounded admission commitment field', (): v
     const output: ConnectorExecutionOutputView = {
         environmentId: 'environment',
         id: 'job',
-        lane: ConnectorExecutionLane.First,
+        lane: ExecutionLane.First,
         sequence: '9007199254740994',
         admissionHash: 'b'.repeat(64),
-        phase: ConnectorJobPhase.Queued,
+        phase: ConnectorFileJobPhase.Queued,
         output: null,
     };
     const validate: (value: unknown) => boolean =

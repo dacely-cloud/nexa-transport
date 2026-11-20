@@ -5,14 +5,14 @@ import { afterEach, expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
 import { NexaClient } from '../src/networking/NexaClient.js';
 import {
-    ConnectorExecutionLane,
-    ConnectorExecutionAccess,
     type ConnectorExecutionStatus,
     type ConnectorExecutionSubmitParams,
 } from 'nexa-protocol/dataplane/ConnectorExecutionTypes.js';
 import { Method } from 'nexa-protocol/gateway/Method.js';
 import { methodValidators } from 'nexa-protocol/schema/MethodValidators.js';
 import { TestGateway, type Request } from './Support.js';
+import { ExecutionLane } from 'nerva-connector-protocol/execution/ExecutionLane.js';
+import { ExecutionWorkspaceAccess } from 'nerva-connector-protocol/execution/ExecutionTypes.js';
 
 let gateway: TestGateway | undefined;
 let client: NexaClient | undefined;
@@ -25,8 +25,8 @@ afterEach(async (): Promise<void> => {
 
 const original: ConnectorExecutionSubmitParams = {
     environmentId: 'environment',
-    workspaceAccess: ConnectorExecutionAccess.ReadWrite,
-    lane: ConnectorExecutionLane.First,
+    workspaceAccess: ExecutionWorkspaceAccess.ReadWrite,
+    lane: ExecutionLane.First,
     previousSequence: '9007199254740993',
     request: {
         requestId: 'original',
@@ -41,8 +41,8 @@ it('the native client reads both named lanes with exact counters through the cur
     gateway = new TestGateway();
     const expected: ConnectorExecutionStatus = {
         environmentId: original.environmentId,
-        lanes: Object.values(ConnectorExecutionLane).map(
-            (lane: ConnectorExecutionLane): ConnectorExecutionStatus['lanes'][number] => ({
+        lanes: Object.values(ExecutionLane).map(
+            (lane: ExecutionLane): ConnectorExecutionStatus['lanes'][number] => ({
                 lane,
                 sequence: original.previousSequence,
                 acknowledgedSequence: original.previousSequence,

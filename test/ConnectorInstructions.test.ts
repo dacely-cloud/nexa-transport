@@ -2,15 +2,13 @@
 // SPDX-License-Identifier: LicenseRef-Proprietary
 
 import { expect, it } from 'vitest';
-import type {
-    ConnectorInstructionsUpdateParams,
-    ConnectorInstructionsView,
-} from 'nexa-protocol/dataplane/ConnectorInstructionsTypes.js';
+import type { ConnectorInstructionsUpdateParams } from 'nexa-protocol/dataplane/ConnectorInstructionsTypes.js';
 import { Method } from 'nexa-protocol/gateway/Method.js';
 import { methodValidators } from 'nexa-protocol/schema/MethodValidators.js';
 import { NexaClient } from '../src/networking/NexaClient.js';
 import type { WebSocket } from 'ws';
 import { TestGateway, type Request } from './Support.js';
+import type { ConnectorInstructionsView } from 'nerva-connector-protocol/protocol/ConnectorInstructions.js';
 
 /** One exact retained edit crosses browser and Node clients without floating-point revision conversion. */
 const original: ConnectorInstructionsUpdateParams = {
@@ -48,7 +46,7 @@ it('exposes get/update contracts with closed account-owned identities and exact 
     ]) {
         expect(validate({ ...original, ...fields })).toBe(false);
     }
-    const view: ConnectorInstructionsView = {
+    const view: ConnectorInstructionsView<string> = {
         enrollmentId: original.enrollmentId,
         instructions: original.instructions,
         revision: '9007199254740994',

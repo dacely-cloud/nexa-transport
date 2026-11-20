@@ -5,13 +5,15 @@ import { afterEach, expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
 import { NexaClient } from '../src/networking/NexaClient.js';
 import {
-    ConnectorJobPhase,
     type ConnectorSubmitParams,
     type ConnectorJob,
 } from 'nexa-protocol/dataplane/ConnectorTypes.js';
 import { Method } from 'nexa-protocol/gateway/Method.js';
 import { methodValidators } from 'nexa-protocol/schema/MethodValidators.js';
 import { TestGateway, type Request } from './Support.js';
+import { ConnectorFileJobPhase } from 'nerva-connector-protocol/protocol/ConnectorFileJobs.js';
+import { ConnectorFileAction } from 'nerva-connector-protocol/protocol/ConnectorFileTypes.js';
+import { ConnectorAuthorizationKind } from 'nerva-connector-protocol/protocol/ConnectorAuthorization.js';
 
 let gateway: TestGateway | undefined;
 let client: NexaClient | undefined;
@@ -26,7 +28,7 @@ const original: ConnectorSubmitParams = {
     environmentId: 'environment',
     previousSequence: '9007199254740993',
     request: {
-        action: 'remove',
+        action: ConnectorFileAction.Remove,
         requestId: 'original-remove',
         policySha256: 'a'.repeat(64),
         rootId: 'project',
@@ -52,16 +54,20 @@ it('current file contracts require explicit recursive intent and refuse addition
 it('the native SDK carries original removal and typed retained results through the existing account RPC', async (): Promise<void> => {
     gateway = new TestGateway();
     const expected: ConnectorJob = {
-        authorization: { kind: 'independent' },
+        authorization: { kind: ConnectorAuthorizationKind.Independent },
         admissionHash: 'b'.repeat(64),
         id: 'original-job',
         environmentId: original.environmentId,
         sequence: '9007199254740994',
-        phase: ConnectorJobPhase.Completed,
+        phase: ConnectorFileJobPhase.Completed,
         request: original.request,
         response: {
             ok: true,
-            result: { action: 'remove', requestId: 'original-remove', entriesRemoved: '4' },
+            result: {
+                action: ConnectorFileAction.Remove,
+                requestId: 'original-remove',
+                entriesRemoved: '4',
+            },
         },
     };
     gateway.handler = (socket: WebSocket, request: Request): void => {
@@ -98,7 +104,7 @@ it('directory creation and completion have one strict contract without recursive
         environmentId: original.environmentId,
         previousSequence: original.previousSequence,
         request: {
-            action: 'mkdir',
+            action: ConnectorFileAction.Mkdir,
             requestId: 'directory',
             policySha256: 'a'.repeat(64),
             rootId: 'project',
@@ -110,14 +116,17 @@ it('directory creation and completion have one strict contract without recursive
         expect(validate({ ...input, request: { ...input.request, ...addition } })).toBe(false);
     }
     const completed: ConnectorJob = {
-        authorization: { kind: 'independent' },
+        authorization: { kind: ConnectorAuthorizationKind.Independent },
         admissionHash: 'b'.repeat(64),
         id: 'directory-job',
         environmentId: input.environmentId,
         sequence: '1',
-        phase: ConnectorJobPhase.Completed,
+        phase: ConnectorFileJobPhase.Completed,
         request: input.request,
-        response: { ok: true, result: { action: 'mkdir', requestId: 'directory' } },
+        response: {
+            ok: true,
+            result: { action: ConnectorFileAction.Mkdir, requestId: 'directory' },
+        },
     };
     const result: (value: unknown) => boolean = methodValidators[Method.ConnectorsFilesGet].result;
     expect(result(completed)).toBe(true);

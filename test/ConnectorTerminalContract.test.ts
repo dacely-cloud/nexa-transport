@@ -4,17 +4,17 @@
 import { expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
 import { NexaClient } from '../src/networking/NexaClient.js';
-import {
-    ConnectorHostErrorCode,
-    ConnectorHostTool,
-    type ConnectorHostJobView,
-    type ConnectorHostStatus,
-    type ConnectorHostSubmitParams,
-} from 'nexa-protocol/dataplane/ConnectorHostTypes.js';
+import { type ConnectorHostSubmitParams } from 'nexa-protocol/dataplane/ConnectorHostTypes.js';
 import { Method } from 'nexa-protocol/gateway/Method.js';
 import { schema } from 'nexa-protocol/schema/SchemaData.js';
 import { methodValidators } from 'nexa-protocol/schema/MethodValidators.js';
 import { TestGateway, type Request } from './Support.js';
+import {
+    ConnectorHostErrorCode,
+    type ConnectorHostJobView,
+    type ConnectorHostStatus,
+    ConnectorHostTool,
+} from 'nerva-connector-protocol/protocol/ConnectorHost.js';
 
 /** Published generated keys retain their existing meanings when a native capability is added. */
 const publishedHostToolValues: Readonly<Record<string, ConnectorHostTool>> = {
@@ -52,7 +52,7 @@ const terminalTools: readonly ConnectorHostTool[] = [
 ];
 
 /** A complete profile exercises the finite bound as well as the newly admitted tool names. */
-const status: ConnectorHostStatus = {
+const status: ConnectorHostStatus<string> = {
     environmentId: 'terminal-environment',
     sequence: '9007199254740993',
     acknowledgedSequence: '9007199254740993',
@@ -83,7 +83,7 @@ function original(toolName: ConnectorHostTool): ConnectorHostSubmitParams {
 }
 
 /** Immutable terminal receipts preserve exact byte counters inside the bounded native JSON body. */
-function completed(input: ConnectorHostSubmitParams): ConnectorHostJobView {
+function completed(input: ConnectorHostSubmitParams): ConnectorHostJobView<string> {
     return {
         id: input.requestId + '-job',
         environmentId: input.environmentId,
@@ -113,7 +113,7 @@ it('generated host values retain published keys and match both finite schema too
                 ?.enum ?? []),
         ].sort(),
     ).toEqual(Object.values(ConnectorHostErrorCode).sort());
-    for (const name of ['ConnectorHostProfile', 'ConnectorHostSummary']) {
+    for (const name of ['ConnectorHostProfile<string>', 'ConnectorHostInventoryView']) {
         expect(schema.definitions?.[name]?.properties?.['tools']?.maxItems).toBe(values.length);
     }
     expect(methodValidators[Method.ConnectorsHostStatus].result(status)).toBe(true);

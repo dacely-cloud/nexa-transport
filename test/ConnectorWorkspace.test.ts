@@ -13,6 +13,7 @@ import type { WireError } from 'nexa-protocol/gateway/ProtocolEventTypes.js';
 import { SchemaValidator, type Schema } from 'nexa-protocol/schema/Schema.js';
 import { methodValidators } from 'nexa-protocol/schema/MethodValidators.js';
 import { TestGateway, type Request } from './Support.js';
+import { ConnectorFileMode } from 'nerva-connector-protocol/protocol/ConnectorFiles.js';
 
 let gateway: TestGateway | undefined;
 let client: NexaClient | undefined;
@@ -39,7 +40,7 @@ const view: ConnectorWorkspaceSelectionView = {
         environmentId: original.environmentId,
         rootId: original.rootId,
         policySha256: original.policySha256,
-        mode: 'read-write',
+        mode: ConnectorFileMode.ReadWrite,
     },
 };
 

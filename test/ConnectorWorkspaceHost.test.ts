@@ -11,6 +11,7 @@ import type {
 import { Method } from 'nexa-protocol/gateway/Method.js';
 import { methodValidators } from 'nexa-protocol/schema/MethodValidators.js';
 import { TestGateway, type Request } from './Support.js';
+import { ConnectorFileMode } from 'nerva-connector-protocol/protocol/ConnectorFiles.js';
 
 const original: ConnectorWorkspaceSelectHostParams = {
     sessionId: 'owned-session',
@@ -30,7 +31,7 @@ const view: ConnectorWorkspaceSelectionView = {
         grantRevision: original.grantRevision,
         platform: 'windows',
         directory: 'C:\\Users\\Owner\\Nexa Tasks',
-        mode: 'read-write',
+        mode: ConnectorFileMode.ReadWrite,
     },
 };
 

@@ -2,31 +2,27 @@
 // SPDX-License-Identifier: LicenseRef-Proprietary
 
 import { expect, it } from 'vitest';
-import { ConnectorArgumentKind } from 'nexa-protocol/dataplane/ConnectorArgumentKind.js';
-import {
-    ConnectorExecutionAccess,
-    ConnectorExecutionLane,
-    type ConnectorArgumentRule,
-    type ConnectorExecutionStatus,
-} from 'nexa-protocol/dataplane/ConnectorExecutionTypes.js';
-import {
-    ConnectorInputKind,
-    ConnectorInteractiveTransport,
-    type ConnectorInteractiveInvocationRule,
-} from 'nexa-protocol/dataplane/ConnectorInteractiveInvocationTypes.js';
+import { type ConnectorExecutionStatus } from 'nexa-protocol/dataplane/ConnectorExecutionTypes.js';
 import { Method } from 'nexa-protocol/gateway/Method.js';
 import { methodValidators } from 'nexa-protocol/schema/MethodValidators.js';
 import { NexaClient } from '../src/networking/NexaClient.js';
 import { TestGateway, type Request } from './Support.js';
 import type { WebSocket } from 'ws';
+import { ExecutionArgumentKind } from 'nerva-connector-protocol/execution/ExecutionArgumentKind.js';
+import { ExecutionInputKind } from 'nerva-connector-protocol/execution/ExecutionInput.js';
+import { ExecutionInteractiveTransport } from 'nerva-connector-protocol/execution/ExecutionInteractive.js';
+import type { ExecutionInteractiveInvocationRule } from 'nerva-connector-protocol/execution/ExecutionInteractiveInvocation.js';
+import type { ExecutionInputRule } from 'nerva-connector-protocol/execution/ExecutionJobs.js';
+import { ExecutionLane } from 'nerva-connector-protocol/execution/ExecutionLane.js';
+import { ExecutionWorkspaceAccess } from 'nerva-connector-protocol/execution/ExecutionTypes.js';
 
 /** Public metadata only; neither declared transport nor a successful decode asserts native capability. */
 class InteractiveFixture {
-    public static rule(): ConnectorInteractiveInvocationRule {
+    public static rule(): ExecutionInteractiveInvocationRule<string> {
         return {
-            kind: ConnectorArgumentKind.InteractiveInvocation,
+            kind: ExecutionArgumentKind.InteractiveInvocation,
             invocation: {
-                kind: ConnectorArgumentKind.MachineInvocation,
+                kind: ExecutionArgumentKind.MachineInvocation,
                 shell: { executableIndex: 0, fixedArguments: ['-c'] },
                 commands: [{ alias: 'node', executableIndex: 1 }],
                 environment: [{ name: 'LANG', maximumBytes: 128 }],
@@ -39,18 +35,18 @@ class InteractiveFixture {
                 maximumArgumentsBytes: 2048,
                 maximumScriptBytes: 2048,
             },
-            transports: [ConnectorInteractiveTransport.Pipe],
-            controls: [ConnectorInputKind.Data, ConnectorInputKind.End],
+            transports: [ExecutionInteractiveTransport.Pipe],
+            controls: [ExecutionInputKind.Data, ExecutionInputKind.End],
             maximumInputBytes: '65536',
             maximumControls: 256,
             maximumResizes: 0,
         };
     }
-    public static status(rule: ConnectorArgumentRule = this.rule()): ConnectorExecutionStatus {
+    public static status(rule: ExecutionInputRule<string> = this.rule()): ConnectorExecutionStatus {
         return {
             environmentId: 'environment',
-            lanes: Object.values(ConnectorExecutionLane).map(
-                (lane: ConnectorExecutionLane): ConnectorExecutionStatus['lanes'][number] => ({
+            lanes: Object.values(ExecutionLane).map(
+                (lane: ExecutionLane): ConnectorExecutionStatus['lanes'][number] => ({
                     lane,
                     online: true,
                     sequence: '9223372036854775807',
@@ -58,7 +54,7 @@ class InteractiveFixture {
                     profile: {
                         revision: '9223372036854775807',
                         policySha256: 'a'.repeat(64),
-                        roots: [{ id: 'project', access: ConnectorExecutionAccess.ReadWrite }],
+                        roots: [{ id: 'project', access: ExecutionWorkspaceAccess.ReadWrite }],
                         programs: [{ id: 'process', rootIds: ['project'], arguments: [rule] }],
                         resources: {
                             memoryBytes: '67108864',
@@ -78,7 +74,7 @@ class InteractiveFixture {
 it('complete named interactive metadata and unchanged foreground profiles decode through the actual RPC result validator', (): void => {
     const validate: (value: unknown) => boolean =
         methodValidators[Method.ConnectorsExecution].result;
-    const rule: ConnectorInteractiveInvocationRule = InteractiveFixture.rule();
+    const rule: ExecutionInteractiveInvocationRule<string> = InteractiveFixture.rule();
     expect(validate(InteractiveFixture.status(rule))).toBe(true);
     expect(validate(InteractiveFixture.status(rule.invocation))).toBe(true);
     expect(
@@ -87,7 +83,7 @@ it('complete named interactive metadata and unchanged foreground profiles decode
                 ...rule,
                 maximumInputBytes: '0',
                 maximumControls: 1,
-                controls: [ConnectorInputKind.Data],
+                controls: [ExecutionInputKind.Data],
             }),
         ),
     ).toBe(true);
@@ -95,8 +91,8 @@ it('complete named interactive metadata and unchanged foreground profiles decode
         validate(
             InteractiveFixture.status({
                 ...rule,
-                transports: [ConnectorInteractiveTransport.Pty],
-                controls: [ConnectorInputKind.Data, ConnectorInputKind.Resize],
+                transports: [ExecutionInteractiveTransport.Pty],
+                controls: [ExecutionInputKind.Data, ExecutionInputKind.Resize],
                 maximumResizes: 16,
             }),
         ),
@@ -104,7 +100,7 @@ it('complete named interactive metadata and unchanged foreground profiles decode
 });
 
 it('closed shapes and real dependent checks reject impossible, excessive, duplicated or private grants', (): void => {
-    const rule: ConnectorInteractiveInvocationRule = InteractiveFixture.rule();
+    const rule: ExecutionInteractiveInvocationRule<string> = InteractiveFixture.rule();
     const status: ConnectorExecutionStatus = InteractiveFixture.status(rule);
     const candidates: readonly unknown[] = [
         { ...rule, maximumInputBytes: '65537' },

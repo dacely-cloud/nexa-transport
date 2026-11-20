@@ -2,18 +2,21 @@
 // SPDX-License-Identifier: LicenseRef-Proprietary
 
 import { expect, it } from 'vitest';
-import {
-    ConnectorHostTool,
-    type ConnectorHostStatus,
-} from 'nexa-protocol/dataplane/ConnectorHostTypes.js';
-import type { ConnectorInventoryPage } from 'nexa-protocol/dataplane/ConnectorInventoryTypes.js';
 import { Method } from 'nexa-protocol/gateway/Method.js';
 import { methodValidators } from 'nexa-protocol/schema/MethodValidators.js';
+import {
+    type ConnectorHostStatus,
+    ConnectorHostTool,
+} from 'nerva-connector-protocol/protocol/ConnectorHost.js';
+import type { ConnectorInventoryPage } from 'nerva-connector-protocol/protocol/ConnectorInventory.js';
+import { ConnectorEnrollmentPhase } from 'nerva-connector-protocol/protocol/ConnectorEnrollment.js';
+import { ConnectorPresence } from 'nerva-connector-protocol/protocol/ConnectorInventory.js';
+import { ConnectorInventoryTrust } from 'nerva-connector-protocol/protocol/ConnectorInventory.js';
 
 /** All current tools remain an approval ceiling; no call or actual host is made by schema qualification. */
 const tools: readonly ConnectorHostTool[] = Object.values(ConnectorHostTool);
 /** Public profile fields never contain a provider credential or controller endpoint. */
-const status: ConnectorHostStatus = {
+const status: ConnectorHostStatus<string> = {
     environmentId: 'test-environment',
     sequence: '0',
     acknowledgedSequence: '0',
@@ -31,22 +34,22 @@ const status: ConnectorHostStatus = {
 it('decodes the complete current tool catalog in inventory/status and accepts only the four exact HTTP tool names in admission', (): void => {
     expect(tools).toContain('environment_inspect');
     expect(methodValidators[Method.ConnectorsHostStatus].result(status)).toBe(true);
-    const inventory: ConnectorInventoryPage = {
+    const inventory: ConnectorInventoryPage<string> = {
         items: [
             {
                 enrollment: {
                     id: 'conn_' + 'b'.repeat(64),
                     environmentId: 'test-environment',
                     name: 'Uploaded-source PC',
-                    phase: 'enrolled-offline',
+                    phase: ConnectorEnrollmentPhase.EnrolledOffline,
                     revision: '1',
                     issuedAtMs: '1',
                     expiresAtMs: '1000',
                     enrolledAtMs: '2',
                     revokedAtMs: null,
                 },
-                presence: 'online',
-                trust: 'customer-reported',
+                presence: ConnectorPresence.Online,
+                trust: ConnectorInventoryTrust.CustomerReported,
                 receivedAtMs: null,
                 specification: null,
                 instructions: '',

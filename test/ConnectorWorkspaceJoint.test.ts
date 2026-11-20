@@ -8,10 +8,10 @@ import type {
     ConnectorWorkspaceSelectJointParams,
     ConnectorWorkspaceSelectionView,
 } from 'nexa-protocol/dataplane/ConnectorWorkspaceSelectionTypes.js';
-import { ConnectorFileMode } from 'nexa-protocol/dataplane/ConnectorFileMode.js';
 import { Method } from 'nexa-protocol/gateway/Method.js';
 import { methodValidators } from 'nexa-protocol/schema/MethodValidators.js';
 import { TestGateway, type Request } from './Support.js';
+import { ConnectorFileMode } from 'nerva-connector-protocol/protocol/ConnectorFiles.js';
 
 let gateway: TestGateway | undefined;
 let client: NexaClient | undefined;
