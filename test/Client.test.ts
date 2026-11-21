@@ -5,7 +5,7 @@ import type { TokenUsage } from 'nexa-protocol/providers/Types.js';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { WebSocket } from 'ws';
 import { NexaClient } from '../src/networking/NexaClient.js';
-import { TransportErrorCode } from '../src/networking/TransportError.js';
+import { TransportError, TransportErrorCode } from '../src/networking/TransportError.js';
 import type { TurnStream } from '../src/networking/TurnStream.js';
 import { hello, result, TestGateway, type Request } from './Support.js';
 
@@ -505,7 +505,9 @@ describe('Nexa websocket lifetimes', (): void => {
     });
     it('lets the server finish a turn after one hour when the client deadline is disabled', async (): Promise<void> => {
         const connected: NexaClient = await connect();
-        if (gateway === undefined) throw new Error('Missing gateway');
+        if (gateway === undefined) {
+            throw new Error('Missing gateway');
+        }
         const finish: PromiseWithResolvers<() => void> = Promise.withResolvers();
         gateway.handler = (socket: WebSocket, request: Request): void => {
             const streamId: unknown = request.params['streamId'];
@@ -538,7 +540,7 @@ describe('Nexa websocket lifetimes', (): void => {
             await expect(turn.result).resolves.toEqual(result);
             expect(
                 gateway.requests.some(
-                    (request: Request): boolean => request.method === Method.TasksCancel,
+                    (request: Request): boolean => request.method === 'tasks.cancel',
                 ),
             ).toBe(false);
         } finally {
@@ -735,6 +737,15 @@ it.each([true, false])(
         await expect(connected.call(Method.AgentAsk, { message: 'Run once' })).rejects.toThrow(
             'server restarting',
         );
+        const observed: PromiseWithResolvers<boolean> = Promise.withResolvers<boolean>();
+        const release: () => void = connected.onClose((cause: Error): void => {
+            if (cause instanceof TransportError && cause.code === TransportErrorCode.Remote) {
+                observed.resolve(connected.reconnecting);
+            }
+        });
+        connected.resumeReconnect();
+        expect(await observed.promise).toBe(retryable);
+        release();
         await expect.poll((): number => subscriptions).toBeGreaterThanOrEqual(2);
         if (retryable) {
             await expect.poll((): boolean => connected.connected, { timeout: 3500 }).toBe(true);
@@ -748,6 +759,97 @@ it.each([true, false])(
     },
 );
 
+it.each([1, 4])(
+    'restores remaining subscriptions with bounded concurrency %i after one disappears',
+    async (width: number): Promise<void> => {
+        gateway = new TestGateway();
+        client = await NexaClient.connect({
+            url: await gateway.url(),
+            maxPendingRequests: width,
+            requestTimeoutMs: 1000,
+        });
+        const connected: NexaClient = client;
+        let interrupted: number = 0;
+        let inFlight: number = 0;
+        let peak: number = 0;
+        let restoreRequests: number = 0;
+        let missingChecks: number = 0;
+        gateway.handler = (socket: WebSocket, request: Request): void => {
+            if (request.method === 'agent.ask') {
+                interrupted++;
+                socket.close(1001, 'test interruption');
+                return;
+            }
+            if (interrupted === 0) {
+                socket.send(JSON.stringify({ id: request.id, ok: true, result: { ok: true } }));
+                return;
+            }
+            const missing: boolean = request.params['sessionId'] === 'test::removed';
+            restoreRequests++;
+            if (missing) {
+                missingChecks++;
+            }
+            peak = Math.max(peak, ++inFlight);
+            setTimeout((): void => {
+                inFlight--;
+                socket.send(
+                    JSON.stringify(
+                        missing
+                            ? {
+                                  id: request.id,
+                                  ok: false,
+                                  error: {
+                                      code: 'not-found',
+                                      message: 'Session unavailable',
+                                      retryable: false,
+                                  },
+                              }
+                            : { id: request.id, ok: true, result: { ok: true } },
+                    ),
+                );
+            }, 20);
+        };
+        for (const id of [
+            'removed',
+            'first',
+            'second',
+            'third',
+            'fourth',
+            'fifth',
+            'sixth',
+            'seventh',
+        ]) {
+            await connected.call(Method.SessionsSubscribe, { sessionId: 'test::' + id });
+        }
+        for (let attempt: number = 0; attempt < 2; attempt++) {
+            const restored: PromiseWithResolvers<undefined> = Promise.withResolvers();
+            const release: () => void = connected.onReconnect((): void =>
+                restored.resolve(undefined),
+            );
+            await expect(connected.call(Method.AgentAsk, { message: 'Run once' })).rejects.toThrow(
+                'test interruption',
+            );
+            const started: number = performance.now();
+            connected.resumeReconnect();
+            await restored.promise;
+            release();
+            expect(connected.connected).toBe(true);
+            expect(connected.reconnecting).toBe(false);
+            if (attempt === 0) {
+                console.info(
+                    'Restored eight subscriptions, width=%i, elapsed=%i ms',
+                    width,
+                    Math.round(performance.now() - started),
+                );
+            }
+        }
+        expect(interrupted).toBe(2);
+        expect(restoreRequests).toBe(15);
+        expect(missingChecks).toBe(1);
+        expect(peak).toBe(width);
+    },
+);
+
 it('manual close cancels a scheduled reconnect', async (): Promise<void> => {
     const connected: NexaClient = await connect();
     if (gateway === undefined) {
@@ -757,7 +859,12 @@ it('manual close cancels a scheduled reconnect', async (): Promise<void> => {
         socket.close(1001, 'temporary disconnect');
     };
     await expect(connected.call(Method.AgentAsk, { message: 'Run once' })).rejects.toThrow();
+    const transitions: boolean[] = [];
+    connected.onClose((): void => {
+        transitions.push(connected.reconnecting);
+    });
     connected.close();
+    expect(transitions).toEqual([true, false]);
     await new Promise<void>((resolve): void => {
         setTimeout(resolve, 600);
     });

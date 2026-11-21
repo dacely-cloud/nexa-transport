@@ -1,4 +1,5 @@
 import type { ClientConnection } from './ClientConnection.js';
+import { ErrorCode } from 'nexa-protocol/core/ErrorTypes.js';
 // SPDX-FileCopyrightText: 2026 Nerva contributors
 // SPDX-License-Identifier: LicenseRef-Proprietary
 
@@ -80,6 +81,7 @@ import { RedTeamRequestCodec } from 'nexa-protocol/redteam/RedTeamRequestCodec.j
 
 /** Authenticated Nexa gateway connection shared by browsers and Node.js. */
 export class NexaClient implements ClientConnection {
+    static readonly #restoreWidth: number = 4;
     readonly #redTeam: RedTeamClient = new RedTeamClient({
         request: <M extends RedTeamMethod>(
             method: M,
@@ -219,6 +221,7 @@ export class NexaClient implements ClientConnection {
     #disposed: boolean = false;
     #ready: boolean = false;
     #retryTimer: ReturnType<typeof setTimeout> | undefined;
+    #restore: Promise<void> | undefined;
     #attempt: number = 0;
     readonly #subscriptions: Set<string> = new Set();
     readonly #reconnectListeners: Set<() => void> = new Set();
@@ -474,9 +477,7 @@ export class NexaClient implements ClientConnection {
                 this.#url.searchParams.set('token', this.#hello.auth.token);
                 this.#url.searchParams.delete('pair');
             }
-            for (const sessionId of this.#subscriptions) {
-                await this.#call(Method.SessionsSubscribe, { sessionId }, {});
-            }
+            await this.#restoreSubscriptions();
             if (this.#closed || this.#disposed) {
                 throw (
                     this.#failure ?? new TransportError(TransportErrorCode.Closed, 'Client closed')
@@ -492,6 +493,56 @@ export class NexaClient implements ClientConnection {
             signal?.removeEventListener('abort', abort);
             this.#wake = undefined;
         }
+    }
+
+    /** Rechecks subscriptions under the newly negotiated authorization before reporting readiness. */
+    async #restoreSubscriptions(): Promise<void> {
+        if (this.#subscriptions.size === 0) {
+            return;
+        }
+        if (this.#hello?.features.methods.includes(Method.SessionsSubscribe) !== true) {
+            this.#subscriptions.clear();
+            return;
+        }
+        const sessions: readonly string[] = [...this.#subscriptions];
+        // A retry falls back to one outstanding request for peers with stricter admission limits.
+        const width: number =
+            this.#attempt > 1
+                ? 1
+                : Math.min(NexaClient.#restoreWidth, this.#options.maxPendingRequests ?? 64);
+        for (let cursor: number = 0; cursor < sessions.length; cursor += width) {
+            await Promise.all(
+                sessions
+                    .slice(cursor, cursor + width)
+                    .map((sessionId: string): Promise<void> =>
+                        this.#restoreSubscription(sessionId),
+                    ),
+            );
+        }
+    }
+
+    /** A deleted or no longer visible session must not prevent recovery of the connection. */
+    async #restoreSubscription(sessionId: string): Promise<void> {
+        try {
+            const result: ResultOf<Method.SessionsSubscribe> = await this.#call(
+                Method.SessionsSubscribe,
+                { sessionId },
+                {},
+            );
+            if (result.ok) {
+                return;
+            }
+        } catch (error: unknown) {
+            if (
+                !(error instanceof TransportError) ||
+                error.code !== TransportErrorCode.Remote ||
+                error.remote?.code !== ErrorCode.NotFound ||
+                error.remote.retryable
+            ) {
+                throw error;
+            }
+        }
+        this.#subscriptions.delete(sessionId);
     }
 
     /** Negotiated identity, scopes, capabilities, limits, and initial agent snapshot. */
@@ -903,11 +954,13 @@ export class NexaClient implements ClientConnection {
             rethrow(error);
         }
     }
-    /** Observes connection termination for resource owners and UI state. */
+    /** Observes lost connections and any later failure while restoring them. */
     public onClose(listener: (error: Error) => void): () => void {
         if (this.#failure !== undefined) {
             listener(this.#failure);
-            return (): void => {};
+            if (!this.reconnecting) {
+                return (): void => {};
+            }
         }
         return subscribe(this.#closeListeners, listener);
     }
@@ -926,15 +979,30 @@ export class NexaClient implements ClientConnection {
         }
         clearTimeout(this.#retryTimer);
         this.#retryTimer = undefined;
-        void this.#reconnect();
+        this.#restore =
+            this.#restore === undefined
+                ? this.#reconnect()
+                : this.#restore.then((): Promise<void> => this.#reconnect());
     }
     /** Closes permanently, cancelling reconnect and rejecting pending requests. Idempotent. */
     public close(): void {
+        if (this.#disposed) {
+            return;
+        }
         this.#disposed = true;
         clearTimeout(this.#retryTimer);
         this.#retryTimer = undefined;
-        this.#fail(new TransportError(TransportErrorCode.Closed, 'Client closed'));
-        this.#clearListeners();
+        const error: TransportError = new TransportError(
+            TransportErrorCode.Closed,
+            'Client closed',
+        );
+        if (this.#closed) {
+            this.#failure = error;
+            this.#notifyClose(error);
+            this.#clearListeners();
+        } else {
+            this.#fail(error);
+        }
     }
 
     async #call<M extends Method>(
@@ -1388,19 +1456,28 @@ export class NexaClient implements ClientConnection {
         this.#closed = true;
         this.#failure = materializeError(error);
         this.#pending.close(error);
-        this.#emotionalWatches.pause(error);
         this.#wake?.();
-        for (const listener of this.#closeListeners) {
-            this.#notify((): void => {
-                listener(error);
-            });
-        }
         this.#inbound.clear();
         this.#detachSocket?.();
         this.#detachSocket = undefined;
         this.#socket.close();
-        if (wasReady) {
+        if (wasReady || this.#attempt > 0) {
             this.#scheduleReconnect(error);
+        }
+        this.#emotionalWatches.pause(error);
+        this.#notifyClose(error);
+        if (this.#disposed) {
+            this.#clearListeners();
+        }
+    }
+    #notifyClose(error: Error): void {
+        for (const listener of [...this.#closeListeners]) {
+            if (!this.#closeListeners.has(listener)) {
+                continue;
+            }
+            this.#notify((): void => {
+                listener(error);
+            });
         }
     }
     #clearListeners(): void {
@@ -1426,7 +1503,6 @@ export class NexaClient implements ClientConnection {
                     error.closeDetails?.code === 1008))
         ) {
             this.#disposed = true;
-            this.#clearListeners();
             return;
         }
         this.#attempt += 1;
@@ -1465,7 +1541,7 @@ export class NexaClient implements ClientConnection {
                 this.#notify(listener);
             }
         } catch (error: unknown) {
-            this.#scheduleReconnect(error instanceof Error ? error : new Error(String(error)));
+            this.#fail(error instanceof Error ? error : new Error(String(error)));
         }
     }
 }
