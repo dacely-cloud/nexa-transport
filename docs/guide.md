@@ -372,6 +372,8 @@ There is no `NexaMedia.audio()` attachment helper or generic inbound audio-file 
 
 The transport does not execute tools on the client or send a local tool catalog. Nexa chooses and executes tools under the authenticated user's permissions. Work mode receives the server's tools, skills, and execution context; conversational replies can omit them. `tool-start`, `tool-progress`, and `tool-finish` expose execution to your UI. A server skill is not an SDK plugin; there is no standalone skill-installation RPC in this contract.
 
+The gateway publishes presentation data for tool events. Use the call ID to associate progress with its start and outcome, and render the public result label and bounded output. Tool discovery, skill instructions, and private execution receipts stay on the server. Shell output is available in `commandExecution.terminalOutput` when present. Attachments use the authenticated binary media channel.
+
 ### Rich visual responses
 
 Nexa's `render_visual` tool delivers typed UI instructions in `ToolResult.visual`. The scene contains positioned cards, background groups, text, metrics, semantic styles, labelled arrows, and optional flow animation. Nexa plans the components, relationships and reading order after reading the relevant evidence. See [Visual responses](visual-responses.md) for the vocabulary and an example.
@@ -445,7 +447,7 @@ Subscriptions require gateway authorization and session ownership. Personal acco
 
 Use `client.onSequenceGap(({ expected, received }) => ...)` to detect missing events and refresh affected state. The library does not replay gaps. Use `onClose()` to report interruptions and release live audio resources, and `onReconnect()` to refresh session state. Event and attachment listeners remain registered across automatic reconnects. Use `onListenerError` in connection options to report exceptions thrown by application listeners.
 
-Native events preserve the NCAP fields for content, reasoning, status, usage, tools, block phases, artifacts, video, voice, agents, agent-tool requests, backlog, graph, expert, findings, research, preflight, reflections, skills, and steering. Some describe server internals or progress; not every provider emits them. See [NcapDelta](https://github.com/dacely-cloud/nexa-protocol/blob/main/docs/protocol.md#ncapdelta) for each field and union variant.
+Native events preserve NCAP presentation fields for content, reasoning, status, usage, block phases, artifacts, video, voice, agents, backlog, graph, expert, findings, research, preflight, reflections, skills, and steering. Native agent tool notices carry attribution and a bounded argument preview. Use the tool events for tool lifecycle updates. See [NcapDelta](https://github.com/dacely-cloud/nexa-protocol/blob/main/docs/protocol.md#ncapdelta) for the field types.
 
 ## Administration
 
