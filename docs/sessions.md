@@ -43,6 +43,10 @@ from `tool-start` and merge subsequent updates by call ID. If progress arrives
 first, create the activity at that point and fill in details from the start or
 finish event when available.
 
+File-change cards retain the bounded edit text from `tool-start`. A matching
+`tool-finish` can omit that text and carry only the file identity and result.
+Keep the start record when applying the completion, including after reconnect.
+
 `cancel()` requests cancellation for this run. Abort signals and breaking an
 unfinished iterator also cancel. `steer(message)` submits a text correction to
 this exact active run; see [steering](steering.md). `detach()` releases this local
