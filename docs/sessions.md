@@ -37,6 +37,12 @@ A `tool-forming` status reports that the model is preparing a tool call. Nexa
 can coalesce successive previews into one status. Use the tool start and finish
 events for call identity and public results.
 
+`tool-progress` reports a status, fraction, or terminal update for its `call.id`.
+It can carry the resolved tool name for a deferred call. Keep display arguments
+from `tool-start` and merge subsequent updates by call ID. If progress arrives
+first, create the activity at that point and fill in details from the start or
+finish event when available.
+
 `cancel()` requests cancellation for this run. Abort signals and breaking an
 unfinished iterator also cancel. `steer(message)` submits a text correction to
 this exact active run; see [steering](steering.md). `detach()` releases this local
