@@ -374,6 +374,8 @@ The transport does not execute tools on the client or send a local tool catalog.
 
 The gateway publishes presentation data for tool events. Use the call ID to associate progress with its start and outcome, and render the public result label and bounded output. Search results with a query-matched `browser-search-results` display carry ranked links in `result.display` and a short result count in `result.content`. Older search results may carry bounded text. Tool discovery, skill instructions, and private execution receipts stay on the server. Shell output is available in `commandExecution.terminalOutput` when present. Attachments use the authenticated binary media channel.
 
+Apply shell progress in stream order. Replace the output with `update.outputSnapshot` whenever present, including an empty string. Otherwise, append `update.text` when present. A live stream can send only the newly appended text. The saved conversation can consolidate consecutive replacement snapshots to the latest complete output for that tool.
+
 ### Rich visual responses
 
 Nexa's `render_visual` tool delivers typed UI instructions in `ToolResult.visual`. The scene contains positioned cards, background groups, text, metrics, semantic styles, labelled arrows, and optional flow animation. Nexa plans the components, relationships and reading order after reading the relevant evidence. See [Visual responses](visual-responses.md) for the vocabulary and an example.
