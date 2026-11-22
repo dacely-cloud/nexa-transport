@@ -50,6 +50,9 @@ Keep the start record when applying the completion, including after reconnect.
 Design write completions can carry a `summary` with the saved document `id` and
 `name` in their result content. The design editor loads the document separately.
 Starting a design creation can report `id` and `commandId` for matching its commit.
+Bound design inspections can carry `{ kind: "design-inspection", id }` with an
+optional `name` in their result `display`. Legacy replay can place the same
+receipt as JSON text in `content`. Use it with the matching call's document ID.
 
 `cancel()` requests cancellation for this run. Abort signals and breaking an
 unfinished iterator also cancel. `steer(message)` submits a text correction to
