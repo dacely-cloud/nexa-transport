@@ -43,6 +43,13 @@ from `tool-start` and merge subsequent updates by call ID. If progress arrives
 first, create the activity at that point and fill in details from the start or
 finish event when available.
 
+When a live viewer has received the exact display arguments in a tool start, a
+matching `tool-finish` can carry just the call ID and tool identity. Apply its
+result, status, and duration to the existing card while keeping the start's
+display arguments. A deferred call can identify its tool as
+`{ name: "tool_call", input: { name: "browser_search" } }`. A viewer that
+joins after the start can receive the complete public call with its finish.
+
 File-change cards retain the bounded edit text from `tool-start`. A matching
 `tool-finish` can omit that text and carry only the file identity and result.
 Keep the start record when applying the completion, including after reconnect.
