@@ -58,5 +58,6 @@ and inert SVG, never model-authored HTML or executable chart expressions.
 Successful native calls emit a correlated `graphic` packet on `turn.event`
 before `tool-finish`. The packet carries `call` and the versioned `graphic`.
 The structured graphic also lives on the tool outcome and saved `tool-result`
-block, separately from bounded model-visible text. Live session subscribers,
-the presentation journal, and transcript restoration retain the same visual.
+block, separately from bounded model-visible text. A live completion can reuse
+the earlier graphic for a recipient that received it. Late viewers and saved
+history can recover the full graphic from the completion.
