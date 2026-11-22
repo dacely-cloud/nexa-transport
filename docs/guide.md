@@ -372,7 +372,7 @@ There is no `NexaMedia.audio()` attachment helper or generic inbound audio-file 
 
 The transport does not execute tools on the client or send a local tool catalog. Nexa chooses and executes tools under the authenticated user's permissions. Work mode receives the server's tools, skills, and execution context; conversational replies can omit them. `tool-start`, `tool-progress`, and `tool-finish` expose execution to your UI. A server skill is not an SDK plugin; there is no standalone skill-installation RPC in this contract.
 
-The gateway publishes presentation data for tool events. Use the call ID to associate progress with its start and outcome, and render the public result label and bounded output. Tool discovery, skill instructions, and private execution receipts stay on the server. Shell output is available in `commandExecution.terminalOutput` when present. Attachments use the authenticated binary media channel.
+The gateway publishes presentation data for tool events. Use the call ID to associate progress with its start and outcome, and render the public result label and bounded output. Search results with a query-matched `browser-search-results` display carry ranked links in `result.display` and a short result count in `result.content`. Older search results may carry bounded text. Tool discovery, skill instructions, and private execution receipts stay on the server. Shell output is available in `commandExecution.terminalOutput` when present. Attachments use the authenticated binary media channel.
 
 ### Rich visual responses
 
