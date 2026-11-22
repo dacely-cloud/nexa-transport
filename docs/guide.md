@@ -378,6 +378,8 @@ Apply shell progress in stream order and track output by stream and call ID. Upd
 
 A `graphic` event can deliver a chart before its tool completes. Keep it under the event's call ID and apply the status, label, and duration from `tool-finish`. The originating stream can omit `result.graphic` when it already sent the same chart for that call. Session mirrors and saved history retain the chart in the completion when one is available.
 
+Failed shell calls carry a public error message and can retain terminal output that already arrived in progress events. A failed completion can carry a minimal `cleanupUnconfirmed` receipt with the existing process ID for retrying Stop. This applies to live events, compact history, and binary reconnects.
+
 ### Rich visual responses
 
 Nexa's `render_visual` tool delivers typed UI instructions in `ToolResult.visual`. The scene contains positioned cards, background groups, text, metrics, semantic styles, labelled arrows, and optional flow animation. Nexa plans the components, relationships and reading order after reading the relevant evidence. See [Visual responses](visual-responses.md) for the vocabulary and an example.
