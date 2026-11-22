@@ -47,6 +47,10 @@ File-change cards retain the bounded edit text from `tool-start`. A matching
 `tool-finish` can omit that text and carry only the file identity and result.
 Keep the start record when applying the completion, including after reconnect.
 
+Design write completions can carry a `summary` with the saved document `id` and
+`name` in their result content. The design editor loads the document separately.
+Starting a design creation can report `id` and `commandId` for matching its commit.
+
 `cancel()` requests cancellation for this run. Abort signals and breaking an
 unfinished iterator also cancel. `steer(message)` submits a text correction to
 this exact active run; see [steering](steering.md). `detach()` releases this local
