@@ -5,6 +5,32 @@ import { turnEvent, historyRecord } from 'nexa-protocol/schema/Validators.js';
 import type { WireTurnEvent } from 'nexa-protocol/gateway/ProtocolEventTypes.js';
 import type { ToolProgress } from 'nexa-protocol/tools/Types.js';
 
+it('accepts a live completion receipt with an exit code and output already sent as progress', (): void => {
+    const event: WireTurnEvent = {
+        type: 'tool-finish',
+        outcome: {
+            call: { id: 'call', name: 'run_bash', input: {} },
+            durationMs: 234,
+            result: {
+                status: 'ok',
+                content: '',
+                label: 'Exit 2',
+                commandExecution: {
+                    command: '',
+                    cwd: '',
+                    processToken: null,
+                    processId: null,
+                    running: false,
+                    remote: true,
+                    exitCode: 2,
+                    signal: null,
+                },
+            },
+        },
+    };
+    expect(turnEvent({ streamId: 'stream', event })).toBe(true);
+});
+
 const validator: SchemaValidator = new SchemaValidator(schema);
 
 it.each(['', 'repeat\nrepeat\n', '漢'.repeat(65536), '😀'.repeat(32768)])(
