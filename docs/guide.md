@@ -376,6 +376,8 @@ The gateway publishes presentation data for tool events. Use the call ID to asso
 
 Apply shell progress in stream order. Replace the output with `update.outputSnapshot` whenever present, including an empty string. Otherwise, append `update.text` when present. A live stream can send only the newly appended text. A completion on the originating stream can omit `commandExecution.terminalOutput` when it matches the output already sent. Keep the displayed output when that field is absent and still apply the completion status and exit code. Saved history and session mirrors retain a bounded final snapshot when the command provides one. The saved conversation can consolidate consecutive replacement snapshots to the latest complete output for that tool.
 
+A `graphic` event can deliver a chart before its tool completes. Keep it under the event's call ID and apply the status, label, and duration from `tool-finish`. The originating stream can omit `result.graphic` when it already sent the same chart for that call. Session mirrors and saved history retain the chart in the completion when one is available.
+
 ### Rich visual responses
 
 Nexa's `render_visual` tool delivers typed UI instructions in `ToolResult.visual`. The scene contains positioned cards, background groups, text, metrics, semantic styles, labelled arrows, and optional flow animation. Nexa plans the components, relationships and reading order after reading the relevant evidence. See [Visual responses](visual-responses.md) for the vocabulary and an example.

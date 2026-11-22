@@ -31,6 +31,26 @@ const graphic: Graphic = {
     ],
 };
 const call = { id: 'call', name: 'render_graphic', input: {} };
+it('accepts a graphic followed by a completion that carries its status and label', (): void => {
+    const streamId: string = 'stream';
+    expect(isEventData('turn.event', { streamId, event: { type: 'graphic', call, graphic } })).toBe(
+        true,
+    );
+    expect(
+        isEventData('turn.event', {
+            streamId,
+            event: {
+                type: 'tool-finish',
+                outcome: {
+                    call,
+                    durationMs: 24,
+                    result: { status: 'ok', label: 'Chart rendered', content: '' },
+                },
+            },
+        }),
+    ).toBe(true);
+});
+
 it('accepts all native graphic packets and retains graphics through results and history validation', (): void => {
     for (const kind of Object.values(GraphicKind)) {
         for (const style of Object.values(GraphicStyle)) {
