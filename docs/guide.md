@@ -395,7 +395,7 @@ if (event.type === 'tool-finish' && event.outcome.result.visual !== undefined) {
 
 `VisualResponses.parse` rejects missing references, overlapping foreground content, invalid styles, non-finite geometry and oversized scenes. The wire validator requires complete normalized fields. Visual instructions remain in saved `tool-result` blocks and session journals independently of bounded tool-output previews. Render copy as text, use the authored positions and semantic styles, and respect reduced-motion preferences. Keep the diagram free of visible scene titles and editor toolbars; use large text and prominent colored connections. Scenes are limited to 32 elements, 64 connections, eight steps and 64 KiB. The old explanatory graph tool and SDK export have been removed.
 
-Approval events are notifications, not authority to approve:
+Approval notifications and saved history carry the request ID, tool, summary, risk, and timing. The operator reads pending operation details with `ApprovalsList` before making a decision. Older gateways may include `detail` in notifications.
 
 ```ts
 import type { ResultOf } from 'nexa-protocol/gateway/ProtocolTypes.js';
@@ -404,11 +404,11 @@ import type { ApprovalRequestedData } from 'nexa-protocol/gateway/ProtocolEventT
 const unsubscribe: () => void = client.on(
     EventName.ApprovalRequested,
     (request: ApprovalRequestedData): void => {
-        console.log(request);
+        console.log(request.approvalId, request.summary);
     },
 );
 const pending: ResultOf<typeof Method.ApprovalsList> = await client.call(Method.ApprovalsList, {});
-// After an authorized operator explicitly decides:
+// Present the matching pending operation before an authorized operator decides.
 await client.call(Method.ApprovalsResolve, {
     approvalId: 'SELECTED_APPROVAL_ID',
     approved: true,

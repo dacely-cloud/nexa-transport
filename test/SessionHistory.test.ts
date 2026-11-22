@@ -1,6 +1,7 @@
 import { afterEach, expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
 import { NexaClient } from '../src/networking/NexaClient.js';
+import { EventName, isEventData } from '../src/protocol/Events.js';
 import type { SessionHistoryRecord } from 'nexa-protocol/gateway/HistoryTypes.js';
 import { hello, TestGateway, type Request } from './Support.js';
 
@@ -68,6 +69,41 @@ it('decodes split UTF-8 characters and split records without losing rich native 
             .slice(2)
             .every((request: Request): boolean => typeof request.params['endCursor'] === 'string'),
     ).toBe(true);
+});
+
+it('accepts summary-only approval notices and keeps their resolutions in paged history', async (): Promise<void> => {
+    const notice = {
+        approvalId: 'approval',
+        sessionId: 'saved',
+        principalId: 'owner',
+        tool: 'edit_file',
+        summary: 'Review the project edits',
+        risk: 'write',
+        requestedAt: 1000,
+        expiresAt: 2000,
+    } as const;
+    expect(isEventData(EventName.ApprovalRequested, notice)).toBe(true);
+    const records: readonly SessionHistoryRecord[] = [
+        { id: 'request', at: 1000, kind: 'approval-requested', runId: 'run', data: notice },
+        {
+            id: 'resolution',
+            at: 1100,
+            kind: 'approval-resolved',
+            data: {
+                approvalId: notice.approvalId,
+                approved: false,
+                outcome: 'answered',
+                by: 'operator',
+            },
+        },
+    ];
+    const connected: NexaClient = await connect(
+        records
+            .map((record: SessionHistoryRecord): string => JSON.stringify(record) + '\n')
+            .join(''),
+        51,
+    );
+    expect(await connected.readHistory('saved')).toEqual(records);
 });
 
 it.each([1, 4, 64])(
