@@ -14,6 +14,8 @@ The client must display supplied bytes rather than fetch the origin itself.
 Icon requests are deduplicated and run with bounded concurrency outside agent
 execution. Nexa caches successes for seven days and failures for one hour, with
 bounded memory and disk storage. A restarted gateway reuses the disk cache.
+Each update is the full set of available icons for that call. Nexa groups
+ready icons into one update and sends another when slower lookups finish.
 
 ```ts
 import { EventName, type EventMap } from 'nexa-transport/events';
