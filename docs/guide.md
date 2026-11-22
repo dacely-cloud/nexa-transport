@@ -449,7 +449,7 @@ Subscriptions require gateway authorization and session ownership. Personal acco
 
 Use `client.onSequenceGap(({ expected, received }) => ...)` to detect missing events and refresh affected state. The library does not replay gaps. Use `onClose()` to report interruptions and release live audio resources, and `onReconnect()` to refresh session state. Event and attachment listeners remain registered across automatic reconnects. Use `onListenerError` in connection options to report exceptions thrown by application listeners.
 
-Native events preserve NCAP presentation fields for content, reasoning, status, usage, block phases, artifacts, video, voice, agents, backlog, graph, expert, findings, research, preflight, reflections, skills, and steering. Native agent tool notices carry attribution and a bounded argument preview. Use the tool events for tool lifecycle updates. See [NcapDelta](https://github.com/dacely-cloud/nexa-protocol/blob/main/docs/protocol.md#ncapdelta) for the field types.
+Native events preserve NCAP presentation fields for content, reasoning, status, usage, block phases, artifacts, video, voice, agents, backlog, graph, expert, findings, research, preflight, reflections, skills, and steering. Native agent tool notices carry the tool name and attribution. Use the tool lifecycle events for public inputs, status, errors, and supported output such as terminal logs, source links, and matching filenames. Most successful tool calls have an empty `result.content`. Model-facing tool responses remain on the gateway. See [NcapDelta](https://github.com/dacely-cloud/nexa-protocol/blob/main/docs/protocol.md#ncapdelta) for the field types.
 
 ## Administration
 
