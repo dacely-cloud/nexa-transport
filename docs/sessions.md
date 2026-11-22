@@ -33,6 +33,10 @@ events promptly and handle errors from both iteration and `result`. A normal
 generation stop is separate from verified task completion: inspect
 `incompleteReason`, and validate any requested application data separately.
 
+A `tool-forming` status reports that the model is preparing a tool call. Nexa
+can coalesce successive previews into one status. Use the tool start and finish
+events for call identity and public results.
+
 `cancel()` requests cancellation for this run. Abort signals and breaking an
 unfinished iterator also cancel. `steer(message)` submits a text correction to
 this exact active run; see [steering](steering.md). `detach()` releases this local
@@ -70,7 +74,8 @@ worker transcripts. The response confirms this with `excludesWorkers: true`.
 When the user opens a worker panel, request the same parent `id` with
 `compact: true`, `streamId`, and `workerId` instead. Preserve these selectors and
 `sourceEndCursor` across subsequent pages. The parent ownership check applies
-to every page. Raw journal reads remain complete for recovery and other clients.
+to every page. The history returned to clients retains public tool activity and
+errors while keeping unfinished arguments in the execution pipeline.
 
 `readHistory` returns journal records only. `readHistorySnapshot` also returns
 the complete decimal-string byte boundary for incremental catch-up:
