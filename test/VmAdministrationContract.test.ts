@@ -101,6 +101,16 @@ it('sends a regional provision request without accepting a host or an existing V
     const validate: (value: unknown) => boolean =
         methodValidators[Method.EnvironmentAdminMutate].params;
     expect(validate(input)).toBe(true);
+    expect(
+        validate({
+            ...input,
+            disks: { rootBytes: '8589934592', workspaceBytes: '34359738368' },
+            includeStorage: true,
+        }),
+    ).toBe(true);
+    expect(
+        validate({ ...input, disks: { rootBytes: 8589934592, workspaceBytes: '34359738368' } }),
+    ).toBe(false);
     expect(validate({ ...input, siteId: undefined })).toBe(false);
     expect(validate({ ...input, environmentId: 'existing-environment' })).toBe(false);
     expect(validate({ ...input, host: 'never-client-selected' })).toBe(false);
