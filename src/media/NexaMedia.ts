@@ -106,15 +106,24 @@ export class NexaMedia {
             ...(title === undefined ? {} : { title }),
         };
     }
-    /** Decodes an NCAP event, preserving artifacts, documents, graph, video, and voice fields. */
+    /** Decodes public NCAP media, artifacts and indexing status. */
     public static nativeEvent(event: WireTurnEvent): NcapDelta | null {
-        if (event.type !== 'native' || event.source !== 'ncap') {
+        if (event.type !== 'native' || event.source !== 'ncap' || event.data === 0) {
             return null;
         }
         if (!isJsonRecord(event.data)) {
             throw new TypeError('Expected an NCAP data object');
         }
         const data: Record<string, JsonValue> = { ...event.data };
+        if (data['graph'] !== undefined) {
+            const graph: JsonValue = data['graph'];
+            const phase: JsonValue | undefined = isJsonRecord(graph) ? graph['phase'] : undefined;
+            if (phase === 'begin' || phase === 'end') {
+                data['graph'] = { phase };
+            } else {
+                delete data['graph'];
+            }
+        }
         if (data['voice'] !== undefined) {
             data['voice'] = Array.from(NexaMedia.bytes(data['voice']));
         }

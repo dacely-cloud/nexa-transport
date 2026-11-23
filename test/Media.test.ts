@@ -43,6 +43,24 @@ describe('media and public contracts', (): void => {
         expect(native?.artifact?.title).toBe('Report');
         expect(native?.video).toMatchObject({ data: [0, 255] });
     });
+    it('normalizes legacy graph data to the workspace indexing lifecycle', (): void => {
+        for (const phase of ['begin', 'end', 'node', 'edge', 'grounding'] as const) {
+            const graph = { phase, unprojected: { path: '/private/engine/policy.ts' } };
+            const event = NexaMedia.nativeEvent({
+                type: 'native',
+                source: 'ncap',
+                data: { content: '', reasoning: '', graph, status: 'Preparing workspace' },
+            });
+            expect(event?.graph).toEqual(
+                phase === 'begin' || phase === 'end' ? { phase } : undefined,
+            );
+            expect(event?.status).toBe('Preparing workspace');
+        }
+    });
+    it('skips the hidden history marker and rejects other invalid native payloads', (): void => {
+        expect(NexaMedia.nativeEvent({ type: 'native', source: 'ncap', data: 0 })).toBeNull();
+        expect(() => NexaMedia.nativeEvent({ type: 'native', source: 'ncap', data: 1 })).toThrow();
+    });
     it('validates dictionaries instead of treating mapped types as empty objects', (): void => {
         const validator: SchemaValidator = new SchemaValidator(schema);
         expect(validator.validate('#/definitions/Record<string,Scope>', { health: 'read' })).toBe(
