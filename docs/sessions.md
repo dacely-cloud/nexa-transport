@@ -47,6 +47,12 @@ from `tool-start` and merge subsequent updates by call ID. If progress arrives
 first, create the activity at that point and fill in details from the start or
 finish event when available.
 
+Tool arguments in Chat events are presentation data. Search and page cards get
+their query or destination, file cards get their paths and bounded change
+inputs, and terminals get their command. Tools without an argument display can
+carry an empty input object. Use the call ID and name for attribution and the
+result status, label or public error for the outcome.
+
 When a live viewer has received the exact display arguments in a tool start, a
 matching `tool-finish` can carry just the call ID and tool identity. Apply its
 result, status, and duration to the existing card while keeping the start's
