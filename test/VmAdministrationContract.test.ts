@@ -89,3 +89,19 @@ it('retains exact profile quantities and refuses unknown lifecycle states in rep
         }),
     ).toBe(false);
 });
+
+it('sends a regional provision request without accepting a host or an existing VM selector', (): void => {
+    const input: ParamsOf<Method.EnvironmentAdminMutate> = {
+        action: 'provision',
+        userId: 'a'.repeat(64),
+        requestId: '12345678-1111-4111-8111-111111111111',
+        siteId: 'eu-west',
+        profile: { id: 'performance', revision: '2' },
+    };
+    const validate: (value: unknown) => boolean =
+        methodValidators[Method.EnvironmentAdminMutate].params;
+    expect(validate(input)).toBe(true);
+    expect(validate({ ...input, siteId: undefined })).toBe(false);
+    expect(validate({ ...input, environmentId: 'existing-environment' })).toBe(false);
+    expect(validate({ ...input, host: 'never-client-selected' })).toBe(false);
+});
