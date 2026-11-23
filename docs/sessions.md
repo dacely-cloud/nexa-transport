@@ -58,6 +58,13 @@ File-change cards retain the bounded edit text from `tool-start`. A matching
 `tool-finish` can omit that text and carry only the file identity and result.
 Keep the start record when applying the completion, including after reconnect.
 
+Delegated worker activity uses a native event with `source: "worker"` and
+`data: { workerId, event }`. The child `event` uses the ordinary public turn
+event shape, including tool status and error summaries. Current gateways remove
+internal fields from the worker envelope on live delivery and history replay.
+For compatibility with older history, ignore incomplete worker notices and
+continue consuming the parent stream.
+
 Design write completions can carry a `summary` with the saved document `id` and
 `name` in their result content. The design editor loads the document separately.
 Starting a design creation can report `id` and `commandId` for matching its commit.
