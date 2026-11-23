@@ -37,6 +37,10 @@ A `tool-forming` status reports that the model is preparing a tool call. Nexa
 can coalesce successive previews into one status. Use the tool start and finish
 events for call identity and public results.
 
+A `compacted` event reports `droppedMessages`. Its `summary` field is empty on
+current gateways. Older gateways can send internal context there. Use the
+message count for any conversation maintenance indicator.
+
 `tool-progress` reports a status, fraction, or terminal update for its `call.id`.
 It can carry the resolved tool name for a deferred call. Keep display arguments
 from `tool-start` and merge subsequent updates by call ID. If progress arrives
@@ -86,6 +90,8 @@ Keep the session key in application storage scoped to the signed-in account.
 file metadata. With `supportsSessionHistory`, its optional `history` contains the
 complete presentation journal, including reasoning, tools, worker events,
 attachments, and terminal outcomes. Reading a session does not repeat user input.
+Current gateways return the retained chat messages and any verbatim recovered
+user messages from `sessions.messages`. Internal context summaries are omitted.
 
 `sessions.list` returns parent conversations. Delegated model transcripts remain
 stored for recovery and carry `parentSessionId`; older reserved `sub-agent-…`
