@@ -105,3 +105,16 @@ it('sends a regional provision request without accepting a host or an existing V
     expect(validate({ ...input, environmentId: 'existing-environment' })).toBe(false);
     expect(validate({ ...input, host: 'never-client-selected' })).toBe(false);
 });
+
+it('accepts a fleet page filter without any account, URL, or machine access selectors', (): void => {
+    const request: ParamsOf<Method.EnvironmentAdminFleet> = {
+        providerId: 'cloud',
+        siteId: 'eu-west',
+        after: null,
+    };
+    const validate: (value: unknown) => boolean =
+        methodValidators[Method.EnvironmentAdminFleet].params;
+    expect(validate(request)).toBe(true);
+    expect(validate({ ...request, siteId: 'https://invalid.example' })).toBe(false);
+    expect(validate({ ...request, userId: 'a'.repeat(64) })).toBe(false);
+});
