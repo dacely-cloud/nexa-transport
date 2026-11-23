@@ -116,6 +116,23 @@ it('sends a regional provision request without accepting a host or an existing V
     expect(validate({ ...input, host: 'never-client-selected' })).toBe(false);
 });
 
+it('keeps resize requests bound to an exact environment generation and declared tier', (): void => {
+    const input: ParamsOf<Method.EnvironmentAdminMutate> = {
+        action: 'resize',
+        userId: 'a'.repeat(64),
+        requestId: '12345678-1111-4111-8111-111111111111',
+        environmentId: 'owned-environment',
+        generation: '9007199254740993',
+        profile: { id: 'performance', revision: '2' },
+        includeResize: true,
+    };
+    const validate: (value: unknown) => boolean =
+        methodValidators[Method.EnvironmentAdminMutate].params;
+    expect(validate(input)).toBe(true);
+    expect(validate({ ...input, generation: undefined })).toBe(false);
+    expect(validate({ ...input, nodeId: 'another-host' })).toBe(false);
+});
+
 it('accepts a fleet page filter without any account, URL, or machine access selectors', (): void => {
     const request: ParamsOf<Method.EnvironmentAdminFleet> = {
         providerId: 'cloud',
