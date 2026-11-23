@@ -102,7 +102,7 @@
     "dependencies": {
         "meshoptimizer": "^1.2.0",
         "nerva-connector-protocol": "https://codeload.github.com/dacely-cloud/nerva-connector-protocol/tar.gz/c4a7fa7a47f0800975195cbdfa38f014c524f5c5",
-        "nexa-protocol": "https://codeload.github.com/dacely-cloud/nexa-protocol/tar.gz/6deb70fa7495f1112c425fd6f17d4a30fbaa88aa"
+        "nexa-protocol": "https://codeload.github.com/dacely-cloud/nexa-protocol/tar.gz/816521ae018fd5b690d730967fc8f08f46266637"
     },
     "madge": {
         "baseDir": ".",

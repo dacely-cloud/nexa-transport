@@ -29,6 +29,18 @@ it('registers both administrative methods as required, typed public contracts', 
         methodValidators[Method.EnvironmentAdminInspect].params({ userId: 'a'.repeat(64) }),
     ).toBe(true);
     expect(methodValidators[Method.EnvironmentAdminInspect].params({})).toBe(false);
+    expect(
+        methodValidators[Method.EnvironmentAdminInspect].params({
+            userId: 'a'.repeat(64),
+            includeAvailability: true,
+        }),
+    ).toBe(true);
+    expect(
+        methodValidators[Method.EnvironmentAdminInspect].params({
+            userId: 'a'.repeat(64),
+            includeAvailability: 'true',
+        }),
+    ).toBe(false);
 });
 
 it('requires captured mutation metadata and preserves exact generation strings', (): void => {
@@ -75,6 +87,28 @@ it('retains exact profile quantities and refuses unknown lifecycle states in rep
     const validate: (value: unknown) => boolean =
         methodValidators[Method.EnvironmentAdminInspect].result;
     expect(validate(snapshot)).toBe(true);
+    const provisionable: VmAdministrationView = {
+        ...snapshot,
+        environment: null,
+        provisioning: {
+            sites: ['eu-west'],
+            profiles: [snapshot.defaultProfile],
+            diskOffers: [],
+            automaticStorageOffers: [{ siteId: 'eu-west', profileId: 'cpu', profileRevision: '2' }],
+        },
+    };
+    expect(validate(provisionable)).toBe(true);
+    expect(
+        validate({
+            ...provisionable,
+            provisioning: {
+                ...provisionable.provisioning,
+                automaticStorageOffers: [
+                    { siteId: 'eu-west', profileId: 'cpu', profileRevision: '2', host: 'private' },
+                ],
+            },
+        }),
+    ).toBe(false);
     expect(validate({ ...snapshot, observedAtMs: 1793750000000 })).toBe(false);
     expect(
         validate({
