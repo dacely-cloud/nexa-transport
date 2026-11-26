@@ -1,6 +1,6 @@
 import type { ClientConnection } from './ClientConnection.js';
 import { ErrorCode } from 'nexa-protocol/core/ErrorTypes.js';
-// SPDX-FileCopyrightText: 2026 Nerva contributors
+// SPDX-FileCopyrightText: 2026 Dacely <business@dacely.com>
 // SPDX-License-Identifier: LicenseRef-Proprietary
 
 import type {
