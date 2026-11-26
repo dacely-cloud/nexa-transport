@@ -77,7 +77,7 @@
     "devDependencies": {
         "@types/node": "^26.6.11",
         "@types/ws": "^8.18.2",
-        "madge": "https://codeload.github.com/dacely-cloud/madge/tar.gz/065cb322d7fae520c5343d492f277c9f89f60938",
+        "madge": "https://codeload.github.com/dacely-cloud/madge/tar.gz/24ba175408a8d3a92b517f2b8fb9b9a1bad94687",
         "oxlint": "^1.95.0",
         "oxlint-tsgolint": "^7.0.2008",
         "prettier": "^3.10.1",
