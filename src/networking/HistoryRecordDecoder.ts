@@ -10,38 +10,55 @@ export class HistoryRecordDecoder {
     readonly #segments: string[] = [];
     readonly #seen: Set<string> = new Set();
     #tail: string = '';
+    /** Input after the last yielded record when a consumer stopped iterating early. */
+    #unread: string = '';
 
-    /** Yields complete validated records without rescanning the unfinished record prefix. */
+    /**
+     * Yields complete validated records without rescanning the unfinished record prefix.
+     *
+     * @remarks
+     * A consumer that stops iterating early keeps the rest of its input for the next `write`, so
+     * no record is skipped.
+     */
     public *write(text: string): Generator<SessionHistoryRecord, void> {
+        const input: string = this.#unread + text;
+        this.#unread = '';
         let offset: number = 0;
-        for (;;) {
-            const newline: number = text.indexOf('\n', offset);
-            if (newline === -1) {
-                this.#append(text.slice(offset));
-                return;
+        try {
+            for (;;) {
+                const newline: number = input.indexOf('\n', offset);
+                if (newline === -1) {
+                    this.#append(input.slice(offset));
+                    offset = input.length;
+                    return;
+                }
+                this.#append(input.slice(offset, newline));
+                this.#segments.push(this.#tail);
+                const line: string = this.#segments.join('');
+                this.#segments.length = 0;
+                this.#tail = '';
+                offset = newline + 1;
+                const record: unknown = JSON.parse(line);
+                if (
+                    !historyRecord(record) ||
+                    this.#seen.has(record.id) ||
+                    !Number.isSafeInteger(record.at)
+                ) {
+                    throw new Error('Invalid or duplicate history record');
+                }
+                this.#seen.add(record.id);
+                yield record;
             }
-            this.#append(text.slice(offset, newline));
-            this.#segments.push(this.#tail);
-            const line: string = this.#segments.join('');
-            this.#segments.length = 0;
-            this.#tail = '';
-            const record: unknown = JSON.parse(line);
-            if (
-                !historyRecord(record) ||
-                this.#seen.has(record.id) ||
-                !Number.isSafeInteger(record.at)
-            ) {
-                throw new Error('Invalid or duplicate history record');
+        } finally {
+            if (offset < input.length) {
+                this.#unread = input.slice(offset);
             }
-            this.#seen.add(record.id);
-            yield record;
-            offset = newline + 1;
         }
     }
 
-    /** A snapshot boundary must terminate a complete journal line. */
+    /** A snapshot boundary must terminate a complete journal line that was fully read. */
     public finish(): void {
-        if (this.#tail.length !== 0 || this.#segments.length !== 0) {
+        if (this.#tail.length !== 0 || this.#segments.length !== 0 || this.#unread.length !== 0) {
             throw new Error('Incomplete saved history record');
         }
     }

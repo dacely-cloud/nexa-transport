@@ -208,7 +208,10 @@ export class NexaMedia {
             xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
         };
-        return formats[extension] ?? 'application/octet-stream';
+        return (
+            (Object.hasOwn(formats, extension) ? formats[extension] : undefined) ??
+            'application/octet-stream'
+        );
     }
 
     static async #source(blob: Blob, mediaType: string = blob.type): Promise<BinarySource> {

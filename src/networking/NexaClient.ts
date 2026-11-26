@@ -150,6 +150,9 @@ export class NexaClient implements ClientConnection {
         onError: (error: Error) => void,
         agentId?: string,
     ): () => void {
+        if (!this.connected) {
+            throw new TransportError(TransportErrorCode.Closed, 'Client is not connected');
+        }
         if (!this.supportsEmotions) {
             throw new TransportError(
                 TransportErrorCode.Protocol,
@@ -633,6 +636,9 @@ export class NexaClient implements ClientConnection {
         params: ParamsOf<typeof Method.DecisionRun>,
         options: CallOptions = {},
     ): Promise<ResultOf<typeof Method.DecisionRun>> {
+        if (!this.connected) {
+            throw new TransportError(TransportErrorCode.Closed, 'Client is not connected');
+        }
         if (this.#hello?.features.methods.includes(Method.DecisionRun) !== true) {
             throw new TransportError(
                 TransportErrorCode.Protocol,
@@ -1053,12 +1059,7 @@ export class NexaClient implements ClientConnection {
                     encodeBinary !== undefined
                         ? encodeBinary(id)
                         : this.#hello?.features.binaryMedia === true
-                          ? BinaryEnvelope.encodeValue({
-                                v: GatewayVersion.Current,
-                                id,
-                                method,
-                                params,
-                            })
+                          ? this.#binaryEnvelope(id, method, params)
                           : null;
                 const payload: string | Uint8Array<ArrayBuffer> =
                     binary ?? JSON.stringify({ v: GatewayVersion.Current, id, method, params });
@@ -1150,7 +1151,7 @@ export class NexaClient implements ClientConnection {
     }
     async #sendBinary(payload: Uint8Array<ArrayBuffer>, id: string): Promise<void> {
         const socket: WebSocket = this.#socket;
-        let started: boolean = false;
+        let sent: Uint8Array | undefined;
         try {
             const chunkBytes: number = Math.min(
                 BinaryChunks.CHUNK_BYTES,
@@ -1185,19 +1186,63 @@ export class NexaClient implements ClientConnection {
                     throw materializeError(new Error('Binary upload was interrupted'));
                 }
                 socket.send(chunk);
-                started = true;
+                sent = chunk;
             }
         } catch (error: unknown) {
             this.#pending.reject(
                 id,
                 error instanceof Error ? error : new Error('Could not send request'),
             );
-            if (started && socket === this.#socket) {
-                this.#fail(
-                    new TransportError(TransportErrorCode.Connection, 'Binary upload interrupted'),
-                );
+            if (sent === undefined || socket !== this.#socket) {
+                return;
             }
+            if (socket.readyState === WebSocket.OPEN && !this.#closed) {
+                socket.send(BinaryChunks.cancel(sent));
+                return;
+            }
+            this.#fail(
+                new TransportError(TransportErrorCode.Connection, 'Binary upload interrupted'),
+            );
         }
+    }
+
+    /**
+     * Encodes a request's byte carriers, or returns null so plain JSON is sent as text.
+     *
+     * @remarks
+     * The binary planner refuses paths deeper than 24 levels even when nothing in them is binary,
+     * while the gateway accepts JSON nested far deeper, so a deep workflow configuration would
+     * otherwise fail locally on a binary-media gateway. Raw bytes cannot be sent as JSON, so a
+     * deep request that holds them still fails.
+     */
+    #binaryEnvelope(
+        id: string,
+        method: Method,
+        params: ParamsOf<Method>,
+    ): Uint8Array<ArrayBuffer> | null {
+        const message: RequestFrame = { v: GatewayVersion.Current, id, method, params };
+        try {
+            return BinaryEnvelope.encodeValue(message);
+        } catch (error: unknown) {
+            if (
+                error instanceof RangeError &&
+                error.message === 'Binary JSON nesting limit exceeded' &&
+                !NexaClient.#holdsBytes(message)
+            ) {
+                return null;
+            }
+            throw error;
+        }
+    }
+
+    /** Whether any value in a request is a byte view that JSON cannot carry. */
+    static #holdsBytes(message: RequestFrame): boolean {
+        let found: boolean = false;
+        JSON.stringify(message, (_key: string, value: unknown): unknown => {
+            found ||= ArrayBuffer.isView(value);
+            return value;
+        });
+        return found;
     }
 
     #receive(raw: unknown): void {
@@ -1514,15 +1559,19 @@ export class NexaClient implements ClientConnection {
             delay * (0.5 + Math.random() * 0.5),
         );
     }
+    /**
+     * Opens and authenticates a replacement socket.
+     *
+     * @remarks
+     * The client stays closed until the token provider has answered and the new socket exists.
+     * Reopening first left the dead socket current for that wait, so a late failure from it could
+     * mark the client closed again just before the new handshake, which then never completed.
+     */
     async #reconnect(): Promise<void> {
         if (this.#disposed) {
             return;
         }
-        this.#closed = false;
-        this.#failure = undefined;
-        this.#hello = null;
-        this.#challenge = null;
-        this.#sequence = 0n;
+        let opened: boolean = false;
         try {
             if (this.#options.tokenProvider !== undefined) {
                 const token: string = await this.#options.tokenProvider();
@@ -1534,14 +1583,27 @@ export class NexaClient implements ClientConnection {
                 }
                 this.#url.searchParams.set('token', token);
             }
+            this.#closed = false;
+            this.#failure = undefined;
+            this.#hello = null;
+            this.#challenge = null;
+            this.#sequence = 0n;
             this.#socket = this.#openSocket();
+            opened = true;
             await this.#handshake();
             this.#emotionalWatches.resume();
             for (const listener of this.#reconnectListeners) {
                 this.#notify(listener);
             }
         } catch (error: unknown) {
-            this.#fail(error instanceof Error ? error : new Error(String(error)));
+            const failure: Error = error instanceof Error ? error : new Error(String(error));
+            if (opened) {
+                this.#fail(failure);
+                return;
+            }
+            this.#failure = materializeError(failure);
+            this.#scheduleReconnect(failure);
+            this.#notifyClose(failure);
         }
     }
 }
@@ -1585,3 +1647,11 @@ export type {
     SavedHistorySnapshot,
     SessionSnapshot,
 } from './ClientEvents.js';
+
+/** One outbound RPC request as framed on the wire. */
+interface RequestFrame {
+    readonly v: typeof GatewayVersion.Current;
+    readonly id: string;
+    readonly method: Method;
+    readonly params: ParamsOf<Method>;
+}
