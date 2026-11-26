@@ -1,63 +1,42 @@
-# Rich visual responses
+# Inline SVG diagrams
 
-`render_visual` delivers a structured visual explanation directly in the conversation. It replaces the old explanatory graph tool and workflow-canvas viewer. Numerical plots continue to use `render_graphic`; executable workflows retain their own tools.
+Nexa draws diagrams directly in its web chat reply. It writes the drawing as a fenced code block whose language is `svg`, and web chat renders that block as a native figure in the site theme. There is no tool call, discovery step or extra model round trip, so a diagram streams in with the rest of the answer. Numeric charts still use `render_graphic`, and executable workflows keep their own tools.
 
-When asked to explain an architecture, Nexa reads the relevant evidence, identifies components and relationships, plans the reading order and layout, then calls `render_visual`. The result carries the complete versioned scene through authenticated live chat and saved conversation history. The interface renders it inline, with large labels, colored arrows and optional flow motion.
+Nexa reaches for a diagram when a picture explains better than prose: an architecture, a request or data flow, a branching process, a state machine, a hierarchy, a timeline, a cycle, a comparison, some geometry or an annotated concept. Definitions and short linear steps stay as text. When the diagram describes the user's own system, Nexa reads the relevant evidence first and labels generic examples as illustrative.
 
-The scene contains `version: 1`, `id`, `title`, `description`, `width`, `height`, `elements`, `connections`, and `steps`. Discover the complete tool schema with `tool_describe`. Optional presentation fields receive safe defaults.
+The authoring rules live in `src/visuals/InlineSvgGuidance.ts` and are included in the system prompt only on surfaces that render inline visuals (web chat and the gateway). Channels such as Telegram and Discord never receive them.
 
-- Elements have stable IDs, a `kind` (`card`, `group`, `text`, `metric`), plain-text `title`, optional `detail`, `eyebrow`, `value`, `icon`, `tone`, and explicit `x`, `y`, `width`, `height` in display pixels.
-- Connections reference element IDs with `from` and `to`. They accept a `label`, attachment sides, `solid` or `dashed` lines, `forward`, `both`, or `none` arrows, optional `animated` flow, and optional `via` waypoints. Automatic routes avoid cards.
-- Steps have a title, explanation, and arrays of element and connection IDs. These are optional metadata for consumers that support walkthroughs; omit them for the minimal Chat renderer.
+## Format
 
-Prefer 4–12 components on a 720–1080px canvas. Use short component names, one concise sentence of detail, compact 100–120px elements, sufficient space for large connection labels and a clear direction. Avoid numbered eyebrows, unrelated metrics and repeated summaries. Group related components with a background region. Reserve room for arrow labels. Use motion sparingly to explain flow. Read the actual system before describing a user’s architecture; label generic examples as illustrative.
+A figure is a single `<svg viewBox="0 0 680 H">` element, with the height fitted to the content and coordinates in pixels at the 680 width. A `<title>` names it for screen readers and for the downloaded file. Chat supplies the frame, background, font and the light or dark theme, so the drawing leaves those out.
 
-The format accepts semantic colors and curated icons. Text stays text. HTML, SVG source, CSS, JavaScript, external images, actions and URLs are outside the scene vocabulary. Native execution and network validation reject invalid references, non-finite geometry, unsupported styles and oversized payloads. Scenes are limited to 32 elements, 64 connections, eight steps and 64 KiB.
+Theme classes carry the styling, on an element or on a `<g>` that wraps one component:
 
-The renderer displays the diagram without a visible scene title, toolbar, step navigation or decorative panels. Component names use 20px text, descriptions 16px and connection labels 17px. A single icon expands the visual. Connection colors follow their source components. Native scrolling keeps text readable on narrow screens, and reduced-motion preferences disable flow animation.
+- Text: `heading` (15px semibold), `label` (14px), `caption` (12px muted) and `mono` for code.
+- Shapes: `box` for a card with fill and border, and `zone` for a dashed region that groups boxes.
+- Connectors: `line` and `arrow`, which adds an arrowhead at the end of the path (`both` adds two). Add `dashed`, or `flow` for animated movement that respects reduced motion.
+- Colors: `gray`, `blue`, `teal`, `green`, `amber`, `orange`, `red`, `pink` and `purple`. On a group or a box they tint the box, its border, its heading and the arrows inside it. On text they color the text, and on a bare shape they fill it.
 
-```json
-{
-    "version": 1,
-    "id": "inference",
-    "title": "An illustrative inference path",
-    "width": 760,
-    "height": 280,
-    "elements": [
-        {
-            "id": "router",
-            "kind": "card",
-            "title": "Request router",
-            "detail": "Selects a ready worker.",
-            "icon": "server",
-            "tone": "blue",
-            "x": 32,
-            "y": 60,
-            "width": 240,
-            "height": 160
-        },
-        {
-            "id": "worker",
-            "kind": "card",
-            "title": "GPU worker",
-            "detail": "Generates and streams tokens.",
-            "icon": "cpu",
-            "tone": "orange",
-            "x": 488,
-            "y": 60,
-            "width": 240,
-            "height": 160
-        }
-    ],
-    "connections": [
-        {
-            "id": "dispatch",
-            "from": "router",
-            "to": "worker",
-            "label": "Batch / tokens",
-            "arrow": "both",
-            "animated": true
-        }
-    ]
-}
+Any other color is remapped onto this palette, so a drawing made for a white page still reads well in dark mode. When exact colors are the point, such as flags, swatches or brand marks, `data-colors="exact"` on the `<svg>` keeps them.
+
+```svg
+<svg viewBox="0 0 680 124" xmlns="http://www.w3.org/2000/svg">
+<title>Request path</title>
+<g class="blue"><rect class="box" x="40" y="30" width="200" height="64" rx="10"/>
+<text class="heading" x="140" y="58" text-anchor="middle">Browser</text>
+<text class="caption" x="140" y="78" text-anchor="middle">Sends the request</text></g>
+<path class="arrow" d="M242 62 H438"/>
+<text class="caption" x="340" y="52" text-anchor="middle">HTTPS</text>
+<g class="green"><rect class="box" x="440" y="30" width="200" height="64" rx="10"/>
+<text class="heading" x="540" y="58" text-anchor="middle">API server</text>
+<text class="caption" x="540" y="78" text-anchor="middle">Returns JSON</text></g>
+</svg>
 ```
+
+## Rendering and safety
+
+Web chat never hands the source to an HTML or XML parser. A small strict reader builds the figure element by element and keeps only drawing elements (shapes, text, groups, markers, gradients and clip paths) with a fixed attribute vocabulary. Scripts, styles, event handlers, `foreignObject`, images, links, `use`, patterns, filters and animation elements are dropped. Ids move into a private per-figure namespace, references must point inside the same figure, and document type declarations are rejected. Source size, element count and nesting depth are bounded.
+
+While the reply streams, the figure draws as each tag completes. Once it is complete, labels that overflow their box shrink to fit and the view box grows to include anything drawn outside it. Each figure offers its code, a copy of the original source and a standalone download.
+
+Clients other than web chat see an ordinary fenced code block and can show it as code.

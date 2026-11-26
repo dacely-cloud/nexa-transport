@@ -380,20 +380,9 @@ A `graphic` event can deliver a chart before its tool completes. Keep it under t
 
 Failed shell calls carry a public error message and can retain terminal output that already arrived in progress events. A failed completion can carry a minimal `cleanupUnconfirmed` receipt with the existing process ID for retrying Stop. This applies to live events, compact history, and binary reconnects.
 
-### Rich visual responses
+### Inline SVG diagrams
 
-Nexa's `render_visual` tool delivers typed UI instructions in `ToolResult.visual`. The scene contains positioned cards, background groups, text, metrics, semantic styles, labelled arrows, and optional flow animation. Nexa plans the components, relationships and reading order after reading the relevant evidence. See [Visual responses](visual-responses.md) for the vocabulary and an example.
-
-```ts
-import { VisualResponses, type VisualResponse } from 'nexa-protocol/visuals/VisualResponses.js';
-
-if (event.type === 'tool-finish' && event.outcome.result.visual !== undefined) {
-    const visual: VisualResponse = VisualResponses.parse(event.outcome.result.visual);
-    console.log(visual.title, visual.elements, visual.connections, visual.steps);
-}
-```
-
-`VisualResponses.parse` rejects missing references, overlapping foreground content, invalid styles, non-finite geometry and oversized scenes. The wire validator requires complete normalized fields. Visual instructions remain in saved `tool-result` blocks and session journals independently of bounded tool-output previews. Render copy as text, use the authored positions and semantic styles, and respect reduced-motion preferences. Keep the diagram free of visible scene titles and editor toolbars; use large text and prominent colored connections. Scenes are limited to 32 elements, 64 connections, eight steps and 64 KiB. The old explanatory graph tool and SDK export have been removed.
+Nexa draws diagrams as a fenced `svg` code block inside the reply text, so they arrive through ordinary `text` events and saved assistant messages rather than a tool result. Web chat renders the block as a sanitized native figure in its theme; other clients can show it as code. Gateways no longer emit `ToolResult.visual`, and saved `visual` blocks from older sessions are not forwarded. See [Inline SVG diagrams](visual-responses.md) for the theme vocabulary, the safety rules and an example.
 
 Approval notifications and saved history carry the request ID, tool, summary, risk, and timing. The operator reads pending operation details with `ApprovalsList` before making a decision. Older gateways may include `detail` in notifications.
 
