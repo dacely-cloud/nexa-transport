@@ -1,5 +1,5 @@
 import { uploadContext, uploadReply } from './support/UploadWireFixture.js';
-// SPDX-FileCopyrightText: 2026 Nexa contributors
+// SPDX-FileCopyrightText: 2026 Dacely <business@dacely.com>
 // SPDX-License-Identifier: LicenseRef-Proprietary
 
 import { expect, it } from 'vitest';
