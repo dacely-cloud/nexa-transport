@@ -75,16 +75,16 @@
         "check:circular": "madge --circular --strict src test examples"
     },
     "devDependencies": {
-        "@types/node": "^26.5.1",
-        "@types/ws": "^8.18.1",
+        "@types/node": "^26.6.11",
+        "@types/ws": "^8.18.2",
         "madge": "https://codeload.github.com/dacely-cloud/madge/tar.gz/065cb322d7fae520c5343d492f277c9f89f60938",
-        "oxlint": "^1.83.0",
-        "oxlint-tsgolint": "^7.0.2002",
-        "prettier": "^3.9.6",
+        "oxlint": "^1.95.0",
+        "oxlint-tsgolint": "^7.0.2008",
+        "prettier": "^3.10.1",
         "typescript": "~7.0.2",
-        "vite": "^8.3.0",
-        "vitest": "^5.0.0",
-        "ws": "^8.21.3"
+        "vite": "^8.3.8",
+        "vitest": "^5.1.2",
+        "ws": "^8.23.0"
     },
     "publishConfig": {
         "access": "public"
@@ -100,9 +100,9 @@
         "transport"
     ],
     "dependencies": {
-        "meshoptimizer": "^1.2.0",
-        "nerva-connector-protocol": "https://codeload.github.com/dacely-cloud/nerva-connector-protocol/tar.gz/c4a7fa7a47f0800975195cbdfa38f014c524f5c5",
-        "nexa-protocol": "https://codeload.github.com/dacely-cloud/nexa-protocol/tar.gz/1302e51aa1b8bf5f772a19e1db3893a2b0111d25"
+        "meshoptimizer": "^1.3.0",
+        "nerva-connector-protocol": "https://codeload.github.com/dacely-cloud/nerva-connector-protocol/tar.gz/7d092724f1a7a46e1fe8438c9070b81ff61b39ba",
+        "nexa-protocol": "https://codeload.github.com/dacely-cloud/nexa-protocol/tar.gz/374146f72cd1eeda3f5d285f9d4151c72f7418ae"
     },
     "madge": {
         "baseDir": ".",
