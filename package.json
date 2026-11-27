@@ -44,7 +44,8 @@
             "types": "./dist/interface/ClientOptions.d.ts"
         },
         "./stream": {
-            "types": "./dist/networking/TurnStream.d.ts"
+            "types": "./dist/networking/TurnStream.d.ts",
+            "import": "./dist/stream.js"
         },
         "./stream-options": {
             "types": "./dist/interface/StreamOptions.d.ts"

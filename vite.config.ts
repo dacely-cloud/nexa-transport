@@ -12,6 +12,7 @@ const config: UserConfig = {
                 media: 'src/media/Media.ts',
                 events: 'src/protocol/Events.ts',
                 errors: 'src/networking/TransportError.ts',
+                stream: 'src/networking/TurnStream.ts',
             },
             formats: ['es'],
         },
