@@ -24,20 +24,20 @@ Q4,171,110
 
 The first column labels each row: a category, a date or an x value. Every other column is a series, up to eight. Cells hold plain numbers; the unit goes in `unit:` and an empty cell is a gap. Dates are written as `YYYY`, `YYYY-Q1`, `YYYY-MM`, `YYYY-MM-DD` or ISO timestamps and keep their real spacing on a time axis. Rows can also be separated by tabs, semicolons or Markdown table pipes, and a chart can hold up to 20,000 rows.
 
-| Type                                | Columns                                                                          |
-| ----------------------------------- | -------------------------------------------------------------------------------- |
-| `line`, `area`                      | label or date, then one column per series                                        |
-| `bar`, `hbar`                       | category, then series; `hbar` draws horizontal bars for long labels and rankings |
-| `scatter`                           | x, y (more y columns are more series), optional `label` and `group` columns      |
-| `bubble`                            | label, x, y, size                                                                |
-| `pie`, `donut`, `treemap`, `funnel` | label, value                                                                     |
-| `radar`                             | axis, then series                                                                |
-| `heatmap`                           | row label, then one column per matrix column                                     |
-| `waterfall`                         | step, change; `total` in a change cell draws the running total                   |
-| `histogram`                         | one column of raw values                                                         |
-| `candlestick`                       | date, open, high, low, close                                                     |
-| `boxplot`                           | group, min, q1, median, q3, max, or one column of raw values per group           |
-| `metric`                            | label, value, change, note: up to four headline figures written as displayed     |
+| Type                                | Columns                                                                                                      |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `line`, `area`                      | label or date, then one column per series                                                                    |
+| `bar`, `hbar`                       | category, then series; `hbar` draws horizontal bars for long labels and rankings                             |
+| `scatter`                           | x, y (more y columns are more series), optional `label` and `group` columns; `trend` and `connect` add lines |
+| `bubble`                            | label, x, y, size                                                                                            |
+| `pie`, `donut`, `treemap`, `funnel` | label, value                                                                                                 |
+| `radar`                             | axis, then series                                                                                            |
+| `heatmap`                           | row label, then one column per matrix column                                                                 |
+| `waterfall`                         | step, change; `total` in a change cell draws the running total                                               |
+| `histogram`                         | one column of raw values                                                                                     |
+| `candlestick`                       | date, open, high, low, close                                                                                 |
+| `boxplot`                           | group, min, q1, median, q3, max, or one column of raw values per group                                       |
+| `metric`                            | label, value, change, note: up to four headline figures written as displayed                                 |
 
 Settings:
 
@@ -51,6 +51,7 @@ Settings:
 - `highlight` keeps one series or category in colour and greys the rest.
 - `colors` assigns hues in series order from blue, orange, teal, amber, pink, green, purple, red and gray.
 - `min`, `max`, `log: true` and `bins` control the value axis and histogram bins.
+- `trend: true` draws a dashed least-squares line through each scatter group, and `connect: true` joins a group's points in row order (`type: connected-scatter` does the same).
 
 Unknown settings are ignored and listed under the chart.
 
@@ -58,7 +59,7 @@ Unknown settings are ignored and listed under the chart.
 
 Web chat reads the block line by line. The frame, title and legend appear as soon as the settings and header arrive, at the height the chart will have. Each completed row joins the plot: bars grow from the baseline, lines extend from their last point, slices make room for new ones and the axes rescale smoothly. A half-written row is never drawn.
 
-Charts share the diagram frame, caption footer and hue names. Data marks use the figure hues stepped for data and validated for colour-blind separation on the light and dark surfaces. Ticks fall on round numbers and calendar boundaries. Two to eight series get a legend that toggles each one, and two to four lines whose ends do not collide are labelled where they end. A pie with more than eight slices folds the smallest into Other.
+Charts share the diagram frame, caption footer and hue names. The frame is a flat 12px panel like Chat's other cards and the site's panels, and the title uses the site's panel title type. Data marks use the figure hues stepped for data and validated for colour-blind separation on the light and dark surfaces. Ticks fall on round numbers and calendar boundaries. Two to eight series get a legend that toggles each one, and two to four lines whose ends do not collide are labelled where they end. A pie with more than eight slices folds the smallest into Other.
 
 Readers can point at, tap or arrow through the data for a tooltip, switch to a data table, view and copy the source, download the chart as SVG or its data as CSV, and expand it. Long lines are reduced to a few points per pixel with a shape-preserving method, and dense scatter plots draw as one path, so large tables stay fast while the tooltip and table read every row.
 
