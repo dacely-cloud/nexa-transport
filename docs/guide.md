@@ -376,13 +376,15 @@ The gateway publishes presentation data for tool events. Use the call ID to asso
 
 Apply shell progress in stream order and track output by stream and call ID. Updates from parallel calls can alternate. Replace the output with `update.outputSnapshot` whenever present, including an empty string. Otherwise, append `update.text` when present. Both the originating stream and a session subscription can send only the newly appended text after delivering its preceding snapshot. A late subscriber or a subscriber that missed the preceding update receives a complete replacement snapshot. A completion can omit `commandExecution.terminalOutput` when that recipient already received the matching output. When that field is absent, keep the displayed output and still apply the completion status and exit code. Saved history retains a bounded final snapshot when the command provides one and can consolidate consecutive replacement snapshots to the latest complete output for that tool.
 
-A `graphic` event can deliver a chart before its tool completes. Keep it under the event's call ID and apply the status, label, and duration from `tool-finish`. The originating stream can omit `result.graphic` when it already sent the same chart for that call. Session mirrors and saved history retain the chart in the completion when one is available.
-
 Failed shell calls carry a public error message and can retain terminal output that already arrived in progress events. A failed completion can carry a minimal `cleanupUnconfirmed` receipt with the existing process ID for retrying Stop. This applies to live events, compact history, and binary reconnects.
 
 ### Inline SVG diagrams
 
 Nexa draws diagrams as a fenced `svg` code block inside the reply text, so they arrive through ordinary `text` events and saved assistant messages rather than a tool result. Web chat renders the block as a sanitized native figure in its theme; other clients can show it as code. Gateways no longer emit `ToolResult.visual`, and saved `visual` blocks from older sessions are not forwarded. See [Inline SVG diagrams](visual-responses.md) for the theme vocabulary, the safety rules and an example.
+
+### Inline charts
+
+Nexa writes charts the same way, as a fenced `chart` code block in the reply text: `key: value` settings, a `---` line and CSV rows. They arrive through `text` events, so a client that renders them can draw each row as it streams in. Gateways no longer emit `graphic` events or `ToolResult.graphic` for new replies; older saved history can still contain `graphic` events, which a client may ignore. See [Inline charts](graphics.md) for the format, every chart type and its settings.
 
 Approval notifications and saved history carry the request ID, tool, summary, risk, and timing. The operator reads pending operation details with `ApprovalsList` before making a decision. Older gateways may include `detail` in notifications.
 

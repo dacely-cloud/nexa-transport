@@ -1,6 +1,6 @@
 # Inline SVG diagrams
 
-Nexa draws diagrams directly in its web chat reply. It writes the drawing as a fenced code block whose language is `svg`, and web chat renders that block as a native figure in the site theme. There is no tool call, discovery step or extra model round trip, so a diagram streams in with the rest of the answer. Numeric charts still use `render_graphic`, and executable workflows keep their own tools.
+Nexa draws diagrams directly in its web chat reply. It writes the drawing as a fenced code block whose language is `svg`, and web chat renders that block as a native figure in the site theme. There is no tool call, discovery step or extra model round trip, so a diagram streams in with the rest of the answer. Numeric charts are written the same way, as a fenced `chart` block (see [Inline charts](graphics.md)), and executable workflows keep their own tools.
 
 Nexa reaches for a diagram when a picture explains better than prose: an architecture, a request or data flow, a branching process, a state machine, a hierarchy, a timeline, a cycle, a comparison, some geometry or an annotated concept. Definitions and short linear steps stay as text. When the diagram describes the user's own system, Nexa reads the relevant evidence first and labels generic examples as illustrative.
 
