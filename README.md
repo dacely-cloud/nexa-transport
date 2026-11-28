@@ -273,6 +273,8 @@ const stopFiles: () => void = client.onAttachment((file: ReceivedAttachment): vo
 });
 ```
 
+Each hello tells Nexa whether this client receives the files the agent sends, from whether an attachment handler is registered at that moment. Pass `onAttachment` to `NexaClient.connect` so the first connection declares it; a handler added after connecting counts from the next reconnect. A client that declares none gets each file's workspace path instead of the file. `client.acceptsAttachments` overrides the declaration.
+
 With `hello.features.binaryMedia`, files up to 300 MiB use 256 KiB binary chunks. Inline uploads and live PCM audio also use binary WebSocket frames. Use `sendAudio(callId, bytes)` and `onAudio(listener)` for live audio. Register listeners before starting work; result attachment IDs match the received files.
 
 Read native artifacts and video output from the event stream:

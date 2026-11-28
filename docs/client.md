@@ -21,7 +21,7 @@ Import `NexaClient` from `nexa-transport`, `EventName` from `nexa-transport/even
 | `client.onReconnect(listener)`               | Reports restored authentication/subscriptions; returns unsubscribe. Refresh saved state here.                                                                |
 | `client.close()`                             | Idempotent close; rejects pending requests and terminates active stream consumers.                                                                           |
 
-`client.onAttachment(listener)` delivers `ReceivedAttachment` records with `Uint8Array<ArrayBuffer>` data, filename, MIME type, delivery ID, and optional stream/session IDs. Subscribe before starting a request; the returned function unsubscribes. Binary files are separate from JSON events and are not retained by the client. A handler may return `Promise<void>`; the SDK acknowledges receipt only after handlers complete. Throw or reject on handling failure. Missing handlers send a failure acknowledgment. Receipt does not confirm that a human viewed the file.
+`client.onAttachment(listener)` delivers `ReceivedAttachment` records with `Uint8Array<ArrayBuffer>` data, filename, MIME type, delivery ID, and optional stream/session IDs. Subscribe before starting a request; the returned function unsubscribes. Each hello declares `acceptsAttachments` from whether an attachment handler is registered at that moment, so pass `ClientOptions.onAttachment` to declare it from the first connection; a handler added after connecting counts from the next reconnect. A client that declares false gets each file's workspace path instead of the file. Binary files are separate from JSON events and are not retained by the client. A handler may return `Promise<void>`; the SDK acknowledges receipt only after handlers complete. Throw or reject on handling failure. Missing handlers send a failure acknowledgment. Receipt does not confirm that a human viewed the file.
 
 `client.onAudio(listener)` delivers `ReceivedAudio` records with `callId`, `sampleRate`, and raw PCM16 `data`. `client.sendAudio(callId, data, options?)` sends a PCM16 byte array and returns the typed `VoiceAudio` RPC result. Both received types are exported from `nexa-transport`.
 
@@ -38,26 +38,27 @@ including reconnects. Tickets remain in memory; established sockets do not need
 periodic renewal. The backend continues enforcing session expiry and revocation.
 The provider cannot be combined with API keys, pairing or device credentials.
 
-| Option               | Type                     | Behavior/default                                                                                             |
-| -------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------ |
-| `url`                | `string`                 | Required WebSocket URL. `http:`/`https:` are converted to `ws:`/`wss:`. Userinfo and fragments are rejected. |
-| `apiKey`             | `string`                 | Personal key, operator token, or paired-device credential. Cannot be empty when provided.                    |
-| `tokenProvider`      | `() => Promise<string>`  | Fresh single-use ticket per connection attempt, including reconnects.                                        |
-| `reconnect`          | `boolean`                | Retry established connections with bounded backoff; true by default.                                         |
-| `deviceId`           | `string`                 | Stable installation identifier for device authentication.                                                    |
-| `deviceName`         | `string`                 | Display name during pairing.                                                                                 |
-| `pairingCode`        | `string`                 | Operator-issued one-time pairing code.                                                                       |
-| `scopes`             | `readonly Scope[]`       | Requested subset of server-granted scopes.                                                                   |
-| `client`             | `ClientIdentity`         | `{ id, version, platform }` sent in the handshake.                                                           |
-| `onListenerError`    | `(error: Error) => void` | Receives exceptions thrown by application event callbacks.                                                   |
-| `connectTimeoutMs`   | `number`                 | Connection and handshake deadline; 15,000 ms.                                                                |
-| `requestTimeoutMs`   | `number`                 | Default RPC deadline; 60,000 ms.                                                                             |
-| `maxMessageBytes`    | `number`                 | JSON frame limit; 16 MiB.                                                                                    |
-| `maxPendingRequests` | `number`                 | In-flight RPC ceiling; 64.                                                                                   |
-| `maxActiveStreams`   | `number`                 | Active streaming-turn ceiling, including acknowledged turns; 64.                                             |
-| `signal`             | `AbortSignal`            | Cancels connection establishment. Use call/stream signals for subsequent operations.                         |
+| Option               | Type                                                  | Behavior/default                                                                                             |
+| -------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `url`                | `string`                                              | Required WebSocket URL. `http:`/`https:` are converted to `ws:`/`wss:`. Userinfo and fragments are rejected. |
+| `apiKey`             | `string`                                              | Personal key, operator token, or paired-device credential. Cannot be empty when provided.                    |
+| `tokenProvider`      | `() => Promise<string>`                               | Fresh single-use ticket per connection attempt, including reconnects.                                        |
+| `reconnect`          | `boolean`                                             | Retry established connections with bounded backoff; true by default.                                         |
+| `deviceId`           | `string`                                              | Stable installation identifier for device authentication.                                                    |
+| `deviceName`         | `string`                                              | Display name during pairing.                                                                                 |
+| `pairingCode`        | `string`                                              | Operator-issued one-time pairing code.                                                                       |
+| `scopes`             | `readonly Scope[]`                                    | Requested subset of server-granted scopes.                                                                   |
+| `client`             | `ClientIdentity`                                      | `{ id, version, platform }` sent in the handshake.                                                           |
+| `onListenerError`    | `(error: Error) => void`                              | Receives exceptions thrown by application event callbacks.                                                   |
+| `onAttachment`       | `(file: ReceivedAttachment) => void \| Promise<void>` | Attachment handler registered before the first hello, so it declares `acceptsAttachments`.                   |
+| `connectTimeoutMs`   | `number`                                              | Connection and handshake deadline; 15,000 ms.                                                                |
+| `requestTimeoutMs`   | `number`                                              | Default RPC deadline; 60,000 ms.                                                                             |
+| `maxMessageBytes`    | `number`                                              | JSON frame limit; 16 MiB.                                                                                    |
+| `maxPendingRequests` | `number`                                              | In-flight RPC ceiling; 64.                                                                                   |
+| `maxActiveStreams`   | `number`                                              | Active streaming-turn ceiling, including acknowledged turns; 64.                                             |
+| `signal`             | `AbortSignal`                                         | Cancels connection establishment. Use call/stream signals for subsequent operations.                         |
 
-`ClientIdentity` also accepts `metadataOnlyAttachments?: boolean`. Setting it to true requests metadata-only live file delivery on supporting gateways; use `downloadSessionFile` for the original bytes. It does not enable automatic previews or downloads.
+`ClientIdentity` also accepts `acceptsAttachments?: boolean`, which overrides the hello's handler-based declaration for an application that always handles files the agent sends, or never does. It also accepts `metadataOnlyAttachments?: boolean`. Setting it to true requests metadata-only live file delivery on supporting gateways; use `downloadSessionFile` for the original bytes. It does not enable automatic previews or downloads.
 
 `CallOptions` has `timeoutMs` and `signal`. Pass it as the third argument of `call`. It controls local waiting, not transactional rollback on the server.
 

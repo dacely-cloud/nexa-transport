@@ -254,6 +254,9 @@ export class NexaClient implements ClientConnection {
     private constructor(options: ClientOptions) {
         const { signal: _signal, ...settings } = options;
         this.#options = settings;
+        if (options.onAttachment !== undefined) {
+            this.#attachments.add(options.onAttachment);
+        }
         this.#inbound = new InboundCapacity(options.maxInboundBytes);
         ClientResources.register(this, this.#inbound, options.maxActiveStreams ?? 64);
         this.#pending = new PendingRequests(options.maxPendingRequests ?? 64);
@@ -369,6 +372,9 @@ export class NexaClient implements ClientConnection {
                 new TypeError('A token provider cannot include other credentials'),
             );
         }
+        if (options.onAttachment !== undefined && typeof options.onAttachment !== 'function') {
+            throw materializeError(new TypeError('onAttachment must be a function'));
+        }
         for (const value of [
             options.connectTimeoutMs,
             options.requestTimeoutMs,
@@ -460,6 +466,8 @@ export class NexaClient implements ClientConnection {
                                   metadataOnlyAttachments:
                                       this.#options.client.metadataOnlyAttachments,
                               }),
+                        acceptsAttachments:
+                            this.#options.client?.acceptsAttachments ?? this.#attachments.size > 0,
                     },
                 },
                 {},
@@ -890,7 +898,15 @@ export class NexaClient implements ClientConnection {
         return this.call(Method.VoiceAudio, { callId, pcm: NexaMedia.base64(data) }, options);
     }
 
-    /** Receives raw file bytes for ask and stream calls; subscribe before starting a turn. */
+    /**
+     * Receives raw file bytes for ask and stream calls and requested downloads.
+     *
+     * @remarks
+     * Each hello declares whether this client accepts the files the agent sends, from whether an
+     * attachment handler is registered at that moment. A handler added here after connecting
+     * counts from the next reconnect; pass {@link ClientOptions.onAttachment} to count from the
+     * first connection.
+     */
     public onAttachment(
         listener: (attachment: ReceivedAttachment) => void | Promise<void>,
     ): () => void {

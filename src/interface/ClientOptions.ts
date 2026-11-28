@@ -1,5 +1,6 @@
 import type { UserRegion } from 'nexa-protocol/agent/RegionalContextTypes.js';
 import type { Scope } from 'nexa-protocol/gateway/GatewayScopeTypes.js';
+import type { ReceivedAttachment } from 'nexa-protocol/media/BinaryMedia.js';
 
 /** Metadata sent in the Nexa connect handshake. */
 export interface ClientIdentity {
@@ -13,6 +14,8 @@ export interface ClientIdentity {
     readonly metadataOnlyAttachments?: boolean;
     /** False skips background VM wake for stateless clients. It grants no execution authority. */
     readonly workspace?: boolean;
+    /** Overrides the hello's declaration that this client receives files the agent sends; see {@link ClientOptions.onAttachment}. */
+    readonly acceptsAttachments?: boolean;
 }
 
 /** Browser and Node.js connection configuration. Credentials stay in memory. */
@@ -37,6 +40,8 @@ export interface ClientOptions {
     readonly onListenerError?: (error: Error) => void;
     /** Client identity for gateway diagnostics. */
     readonly client?: ClientIdentity;
+    /** Receives files from the first connection on; the hello declares that this client accepts the files the agent sends while any attachment handler is registered. */
+    readonly onAttachment?: (attachment: ReceivedAttachment) => void | Promise<void>;
     /** Deadline for opening and authenticating the connection; default 15000. */
     readonly connectTimeoutMs?: number;
     /** Per-RPC response deadline; default 60000. */

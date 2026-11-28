@@ -22,7 +22,7 @@ All integers are unsigned, big-endian. WebSocket messages use the binary opcode.
 
 ## Library API
 
-Register `client.onAttachment()` before asking for media. It receives `ReceivedAttachment` with raw `Uint8Array<ArrayBuffer>` data after assembly. The SDK does not retain these files after notifying listeners; store the bytes or create a browser `Blob` in your callback. Delivery metadata is also present in the final result for correlation.
+Pass `onAttachment` to `NexaClient.connect`, or register `client.onAttachment()` before asking for media on a client whose hello declared `acceptsAttachments`; a client that declares none gets each file's workspace path instead of the file. It receives `ReceivedAttachment` with raw `Uint8Array<ArrayBuffer>` data after assembly. The SDK does not retain these files after notifying listeners; store the bytes or create a browser `Blob` in your callback. Delivery metadata is also present in the final result for correlation.
 
 Use `client.sendAudio(callId, pcm)` and `client.onAudio()` for raw PCM16 byte arrays. The existing enum-based `Method.VoiceAudio` call remains supported and is packed into binary frames automatically.
 

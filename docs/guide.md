@@ -283,7 +283,7 @@ Native video events have a `phase` discriminator. Inspect the [NcapDelta video f
 
 ## Artifacts, files, and ZIP archives
 
-The gateway registers the same `send_media` tool used by chat channels. Subscribe to `client.onAttachment()` before asking for a file. The callback supplies raw `Uint8Array` bytes for images, audio, video, documents, and archives:
+The gateway registers the same `send_media` tool used by chat channels. Pass an `onAttachment` handler to `NexaClient.connect`: each hello declares whether this client receives the files the agent sends, from whether a handler is registered at that moment, and a client that declares none gets each file's workspace path instead of the file. A handler added with `client.onAttachment()` after connecting counts from the next reconnect, and `client.acceptsAttachments` overrides the declaration. Requested downloads reach every registered handler. The callback supplies raw `Uint8Array` bytes for images, audio, video, documents, and archives:
 
 ```ts
 import type { ReceivedAttachment } from 'nexa-transport';
