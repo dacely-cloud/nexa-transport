@@ -28,6 +28,8 @@ Roblox preview rendering and workflow graph tooling is not part of this SDK.
 | `nexa-transport/history-records`  | ESM + types    | Linear JSONL record framing with full schema validation and duplicate rejection         |
 | `nexa-transport/errors`           | ESM + types    | Transport errors, codes, and WebSocket close details                                    |
 | `nexa-transport/events`           | ESM + types    | EventName, typed EventMap, and event validation                                         |
+| `nexa-transport/environments`     | ESM + types    | Attach an environment to a connection and answer its requests with your own handlers    |
+| `nexa-transport/node-environment` | ESM + types    | Node.js only: serve a local directory as an attached environment with child processes   |
 | `nexa-transport/media`            | ESM + types    | Media/3D helpers, native event decoding, and MeshoptDecoder                             |
 | `nexa-transport/options`          | **Types only** | Connection identity, authentication, resource limits, and call options                  |
 | `nexa-transport/redteam-client`   | ESM + types    | Validated start/list/get/stop/update operations over an authenticated gateway adapter   |

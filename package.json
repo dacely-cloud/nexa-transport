@@ -36,6 +36,14 @@
             "types": "./dist/protocol/Events.d.ts",
             "import": "./dist/events.js"
         },
+        "./environments": {
+            "types": "./dist/environments/AttachedEnvironmentHost.d.ts",
+            "import": "./dist/environments.js"
+        },
+        "./node-environment": {
+            "types": "./dist/environments/NodeDirectoryEnvironment.d.ts",
+            "import": "./dist/node-environment.js"
+        },
         "./errors": {
             "types": "./dist/networking/TransportError.d.ts",
             "import": "./dist/errors.js"

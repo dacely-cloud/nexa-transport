@@ -10,6 +10,7 @@ import type {
 } from 'nexa-protocol/gateway/ProtocolEventTypes.js';
 import type { ChangedData, ConnectChallengeData } from 'nexa-protocol/gateway/ProtocolTypes.js';
 import type { VoiceCallEvent } from 'nexa-protocol/voice/VoiceCallTypes.js';
+import type { AttachedEnvironmentRequestData } from 'nexa-protocol/environments/AttachedEnvironmentTypes.js';
 import * as validators from 'nexa-protocol/schema/Validators.js';
 import type { Validator } from 'nexa-protocol/schema/Validators.js';
 /** The gateway's catalogued event names. */
@@ -28,6 +29,8 @@ export const EventName = {
     VoiceAudio: 'voice.audio',
     VoiceEvent: 'voice.event',
     Shutdown: 'gateway.shutdown',
+    /** One operation for an environment this connection attached; answer with `environments.respond`. */
+    EnvironmentRequest: 'environment.request',
 } as const;
 /** PCM16 voice frame delivered by Nexa. */
 export interface VoiceAudio {
@@ -64,6 +67,7 @@ export interface EventMap {
     readonly 'voice.audio': VoiceAudio;
     readonly 'voice.event': VoiceEvent;
     readonly 'gateway.shutdown': Shutdown;
+    readonly 'environment.request': AttachedEnvironmentRequestData;
 }
 const eventValidators: Readonly<Record<keyof EventMap, Validator>> = {
     'connect.challenge': validators.challenge,
@@ -88,6 +92,7 @@ const eventValidators: Readonly<Record<keyof EventMap, Validator>> = {
         isRecord(value) && typeof value['callId'] === 'string' && validators.voice(value),
     'gateway.shutdown': (value: unknown): boolean =>
         isRecord(value) && typeof value['reason'] === 'string',
+    'environment.request': validators.environmentRequest,
 };
 /** Narrows an external payload using the validator for its catalogued event. */
 export function isEventData<E extends keyof EventMap>(name: E, data: unknown): data is EventMap[E] {

@@ -18,7 +18,9 @@
         "paths": {
             "nexa-transport": ["./src/networking/NexaClient.ts"],
             "nexa-transport/media": ["./src/media/Media.ts"],
-            "nexa-transport/events": ["./src/protocol/Events.ts"]
+            "nexa-transport/events": ["./src/protocol/Events.ts"],
+            "nexa-transport/environments": ["./src/environments/AttachedEnvironmentHost.ts"],
+            "nexa-transport/node-environment": ["./src/environments/NodeDirectoryEnvironment.ts"]
         }
     },
     "include": ["src/**/*.ts", "test/**/*.ts", "vite.config.ts", "examples/**/*.ts"]
